@@ -3,7 +3,8 @@ import {
   safeInput,
   processDate,
   chain,
-  undefinedOrDefault
+  undefinedOrDefault,
+  processDecimal
 } from "../common/converter";
 
 import {
@@ -38,7 +39,8 @@ import {
   BsdaRevisionRequestReception,
   BsdaWorkerCertification,
   CompanyInput,
-  Bsda
+  Bsda,
+  BsdaTransporterInput
 } from "../generated/graphql/types";
 import {
   Prisma,
@@ -46,7 +48,7 @@ import {
   BsdaRevisionRequest
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 import { BsdaForElastic } from "./elastic";
 import { BsdaWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";
@@ -103,8 +105,8 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
     weight: nullIfNoValues<BsdaWeight>({
       isEstimate: bsda.weightIsEstimate,
       value: bsda.weightValue
-        ? new Decimal(bsda.weightValue).dividedBy(1000).toNumber()
-        : bsda.weightValue
+        ? processDecimal(bsda.weightValue)!.dividedBy(1000).toNumber()
+        : null
     }),
     destination: nullIfNoValues<BsdaDestination>({
       company: nullIfNoValues<FormCompany>({
@@ -123,10 +125,10 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
         refusalReason: bsda.destinationReceptionRefusalReason,
         date: processDate(bsda.destinationReceptionDate),
         weight: bsda.destinationReceptionWeight
-          ? new Decimal(bsda.destinationReceptionWeight)
+          ? processDecimal(bsda.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
-          : bsda.destinationReceptionWeight
+          : null
       }),
       operation: nullIfNoValues<BsdaOperation>({
         code: bsda.destinationOperationCode,
@@ -193,6 +195,9 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
       })
     }),
     transporter: transporter ? expandTransporterFromDb(transporter) : null,
+    transporters: (bsda.transporters ?? [])
+      .map(t => expandTransporterFromDb(t))
+      .filter(Boolean),
     grouping: [],
     metadata: undefined as any
   };
@@ -202,6 +207,7 @@ export function expandTransporterFromDb(
   transporter: PrismaBsdaTransporter
 ): BsdaTransporter | null {
   return nullIfNoValues<BsdaTransporter>({
+    id: transporter.id,
     company: nullIfNoValues<FormCompany>({
       name: transporter.transporterCompanyName,
       orgId: getTransporterCompanyOrgId(transporter),
@@ -441,52 +447,42 @@ function flattenBsdaDestinationInput({
   };
 }
 
-export function flattenBsdaTransporterInput({
-  transporter
-}: Pick<BsdaInput, "transporter">) {
+export function flattenBsdaTransporterInput(input: BsdaTransporterInput) {
   return safeInput({
-    transporterCompanyName: chain(transporter, t =>
-      chain(t.company, c => c.name)
-    ),
-    transporterCompanySiret: chain(transporter, t =>
-      chain(t.company, c => c.siret)
-    ),
-    transporterCompanyAddress: chain(transporter, t =>
+    transporterCompanyName: chain(input, t => chain(t.company, c => c.name)),
+    transporterCompanySiret: chain(input, t => chain(t.company, c => c.siret)),
+    transporterCompanyAddress: chain(input, t =>
       chain(t.company, c => c.address)
     ),
-    transporterCompanyContact: chain(transporter, t =>
+    transporterCompanyContact: chain(input, t =>
       chain(t.company, c => c.contact)
     ),
-    transporterCompanyPhone: chain(transporter, t =>
-      chain(t.company, c => c.phone)
-    ),
-    transporterCompanyMail: chain(transporter, t =>
-      chain(t.company, c => c.mail)
-    ),
-    transporterCompanyVatNumber: chain(transporter, t =>
+    transporterCompanyPhone: chain(input, t => chain(t.company, c => c.phone)),
+    transporterCompanyMail: chain(input, t => chain(t.company, c => c.mail)),
+    transporterCompanyVatNumber: chain(input, t =>
       chain(t.company, c => c.vatNumber)
     ),
-    transporterCustomInfo: chain(transporter, t => t.customInfo),
-    transporterRecepisseIsExempted: chain(transporter, t =>
+    transporterCustomInfo: chain(input, t => t.customInfo),
+    transporterRecepisseIsExempted: chain(input, t =>
       chain(t.recepisse, r => r.isExempted)
     ),
-    transporterRecepisseNumber: chain(transporter, t =>
+    transporterRecepisseNumber: chain(input, t =>
       chain(t.recepisse, r => r.number)
     ),
-    transporterRecepisseDepartment: chain(transporter, t =>
+    transporterRecepisseDepartment: chain(input, t =>
       chain(t.recepisse, r => r.department)
     ),
-    transporterRecepisseValidityLimit: chain(transporter, t =>
+    transporterRecepisseValidityLimit: chain(input, t =>
       chain(t.recepisse, r => r.validityLimit)
     ),
-    transporterTransportMode: chain(transporter, t =>
+    transporterTransportMode: chain(input, t =>
       chain(t.transport, tr => tr.mode)
     ),
     transporterTransportPlates: undefinedOrDefault(
-      chain(transporter, t => chain(t.transport, tr => tr.plates)),
+      chain(input, t => chain(t.transport, tr => tr.plates)),
       []
     ),
-    transporterTransportTakenOverAt: chain(transporter, t =>
+    transporterTransportTakenOverAt: chain(input, t =>
       chain(t.transport, tr => tr.takenOverAt)
     )
   });

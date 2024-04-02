@@ -108,6 +108,12 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       brokerRecepisseDepartment: brokerReceipt.department,
       brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
       transportersOrgIds: [transporter.company.siret!],
+      emitterEmissionSignatureDate: new Date(),
+      emitterEmissionSignatureAuthor: "John",
+      workerWorkSignatureDate: new Date(),
+      workerWorkSignatureAuthor: "John",
+      destinationOperationSignatureDate: new Date(),
+      destinationOperationSignatureAuthor: "John",
       ...opt
     },
     transporterOpt: {
@@ -119,7 +125,9 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       transporterCompanyMail: transporter.company.contactEmail,
       transporterRecepisseNumber: transporterReceipt.receiptNumber,
       transporterRecepisseDepartment: transporterReceipt.department,
-      transporterRecepisseValidityLimit: transporterReceipt.validityLimit
+      transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+      transporterTransportSignatureDate: new Date(),
+      transporterTransportSignatureAuthor: "John"
     }
   });
 
@@ -150,7 +158,7 @@ describe("Mutation.Bsda.duplicate", () => {
       include: { transporters: true }
     });
 
-    const duplicatedTransporter = getFirstTransporterSync(duplicatedBsda);
+    const duplicatedTransporter = getFirstTransporterSync(duplicatedBsda)!;
 
     const {
       type,
@@ -379,12 +387,40 @@ describe("Mutation.Bsda.duplicate", () => {
     expect(Object.keys(restTransporter).sort(sortFn)).toEqual(
       expectedSkippedTransporter.sort(sortFn)
     );
+
+    // Vérifie que les champs signatures ne sont pas dupliqués
+    expect(duplicatedBsda.emitterEmissionSignatureDate).toBeNull();
+    expect(duplicatedBsda.emitterEmissionSignatureAuthor).toBeNull();
+    expect(duplicatedBsda.workerWorkSignatureDate).toBeNull();
+    expect(duplicatedBsda.workerWorkSignatureAuthor).toBeNull();
+    expect(duplicatedBsda.destinationOperationSignatureDate).toBeNull();
+    expect(duplicatedBsda.destinationOperationSignatureAuthor).toBeNull();
+    expect(duplicatedTransporter.transporterTransportSignatureDate).toBeNull();
+    expect(
+      duplicatedTransporter.transporterTransportSignatureAuthor
+    ).toBeNull();
   });
 
   test("duplicated BSDA should have the updated data when company info changes", async () => {
     // Given
-
     const { bsda, transporter, emitter, worker, broker } = await createBsda();
+
+    // On s'assure que toutes les signatures sont nulles pour ne pas que l'auto-complétion
+    // soit sautée pour cause de champ vérouillé
+    await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        emitterEmissionSignatureDate: null,
+        workerWorkSignatureDate: null,
+        destinationOperationSignatureDate: null,
+        transporters: {
+          updateMany: {
+            data: { transporterTransportSignatureDate: null },
+            where: {}
+          }
+        }
+      }
+    });
 
     await prisma.company.update({
       where: {
@@ -636,6 +672,23 @@ describe("Mutation.Bsda.duplicate", () => {
           }
         }
       });
+
+    // On s'assure que toutes les signatures sont nulles pour ne pas que l'auto-complétion
+    // soit sautée pour cause de champ vérouillé
+    await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        emitterEmissionSignatureDate: null,
+        workerWorkSignatureDate: null,
+        destinationOperationSignatureDate: null,
+        transporters: {
+          updateMany: {
+            data: { transporterTransportSignatureDate: null },
+            where: {}
+          }
+        }
+      }
+    });
 
     function searchResult(companyName: string) {
       return {

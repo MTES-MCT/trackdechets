@@ -471,6 +471,9 @@ export const sendPendingRevisionRequestToAdminDetailsEmail = async (
             bsdReadableId:
               (request as BsddRevisionRequestWithReadableId).bsdd?.readableId ??
               (request as BsdaRevisionRequest).bsdaId,
+            bsdId:
+              (request as BsddRevisionRequestWithReadableId).bsddId ??
+              (request as BsdaRevisionRequest).bsdaId,
             companyName: approval.company.name,
             companyOrgId: approval.company.orgId
           };

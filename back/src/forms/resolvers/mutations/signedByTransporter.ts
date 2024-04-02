@@ -21,6 +21,7 @@ import { Prisma } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { getFormReceiptField } from "./signTransportForm";
 import { UserInputError } from "../../../common/errors";
+import Decimal from "decimal.js";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
   async (parent, args, context) => {
@@ -74,7 +75,9 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     const wasteDetails = {
       wasteDetailsPackagingInfos:
         infos.packagingInfos ?? form.wasteDetailsPackagingInfos,
-      wasteDetailsQuantity: infos.quantity ?? form.wasteDetailsQuantity,
+      wasteDetailsQuantity: infos.quantity
+        ? new Decimal(infos.quantity)
+        : form.wasteDetailsQuantity,
       wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
     };
 

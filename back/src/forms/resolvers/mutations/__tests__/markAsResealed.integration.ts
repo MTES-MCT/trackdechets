@@ -401,7 +401,9 @@ describe("Mutation markAsResealed", () => {
       repackaging.packagingInfos
     );
     expect(tempStorage?.wasteDetailsOnuCode).toEqual(repackaging.onuCode);
-    expect(tempStorage?.wasteDetailsQuantity).toEqual(repackaging.quantity);
+    expect(tempStorage?.wasteDetailsQuantity?.toNumber()).toEqual(
+      repackaging.quantity
+    );
     expect(tempStorage?.wasteDetailsQuantityType).toEqual(
       repackaging.quantityType
     );

@@ -60,4 +60,4 @@ if [ "$BASEDIR"  == "$PWD" ]; then
 fi
 
 echo -e "\e[1m→ Running SQL migrations"
-npx nx run @td/prisma:migrate
+npx prisma migrate dev

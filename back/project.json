@@ -7,6 +7,15 @@
     "types": {
       "command": "tsc -p back/tsconfig.lib.json --noEmit"
     },
+    "reindex-all-bsds-bulk": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/reindexAllInBulk.ts"
+      },
+      "configurations": {
+        "integration": {}
+      }
+    },
     "codegen": {
       "inputs": ["{projectRoot}/**/*.graphql"],
       "cache": true,

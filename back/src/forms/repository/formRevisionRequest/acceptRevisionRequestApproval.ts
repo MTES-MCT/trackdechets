@@ -246,7 +246,25 @@ async function getUpdateFromFormRevisionRequest(
     }
   }
 
-  return [removeEmpty(bsddUpdate), removeEmpty(forwardedInUpdate)];
+  // Remove empty keys
+  const emptyBsddUpdate = removeEmpty(bsddUpdate);
+  const emptyForwardedInUpdate = removeEmpty(forwardedInUpdate);
+
+  // Careful. Some operation codes explicitely need a null operation mode (ex: D15)
+  if (
+    bsddUpdate.processingOperationDone &&
+    !bsddUpdate.destinationOperationMode
+  ) {
+    return [
+      {
+        ...emptyBsddUpdate,
+        destinationOperationMode: null
+      },
+      emptyForwardedInUpdate
+    ];
+  }
+
+  return [emptyBsddUpdate, emptyForwardedInUpdate];
 }
 
 function getNewStatus(

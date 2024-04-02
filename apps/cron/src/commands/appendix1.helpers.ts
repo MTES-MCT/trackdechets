@@ -72,7 +72,8 @@ async function cleanOrphanAppendix1() {
   const where: Prisma.FormWhereInput = {
     emitterType: EmitterType.APPENDIX1_PRODUCER,
     createdAt: { lte: limitDate },
-    grouping: { none: { initialForm: {} } }
+    isDeleted: false,
+    groupedIn: { none: {} }
   };
 
   const orphansCount = await prisma.form.count({ where });

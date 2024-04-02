@@ -1,16 +1,22 @@
-import { ParsedZodBsda } from "./schema";
-import { BsdaSignatureType } from "../../generated/graphql/types";
+import { ParsedZodBsda, ParsedZodBsdaTransporter } from "./schema";
 import { Prisma, User } from "@prisma/client";
+import { BsdaUserFunctions } from "./helpers";
+import { AllBsdaSignatureType } from "../types";
 
 export type ZodBsdaTransformer = (
   bsda: ParsedZodBsda
 ) => ParsedZodBsda | Promise<ParsedZodBsda>;
 
+export type ZodBsdaTransporterTransformer = (
+  bsdaTransporter: ParsedZodBsdaTransporter
+) => ParsedZodBsdaTransporter | Promise<ParsedZodBsdaTransporter>;
+
 export type BsdaValidationContext = {
   user?: User;
-  currentSignatureType?: BsdaSignatureType;
+  currentSignatureType?: AllBsdaSignatureType;
   enableCompletionTransformers?: boolean;
   enablePreviousBsdasChecks?: boolean;
+  userFunctions?: BsdaUserFunctions;
 };
 
 export const BsdaForParsingInclude = Prisma.validator<Prisma.BsdaInclude>()({

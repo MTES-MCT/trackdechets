@@ -621,13 +621,15 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     expect(updatedBsdd.recipientCap).toEqual("TTR CAP");
     expect(updatedBsdd.forwardedIn!.recipientCap).toEqual("EXUTOIRE CAP");
-    expect(updatedBsdd.quantityReceived).toEqual(40);
+    expect(updatedBsdd.quantityReceived?.toNumber()).toEqual(40);
     expect(updatedBsdd.forwardedIn!.processingOperationDone).toBe("R 3");
     expect(updatedBsdd.forwardedIn!.processingOperationDescription).toBe(
       "Recyclage"
     );
-    expect(updatedBsdd.forwardedIn!.wasteDetailsQuantity).toEqual(40);
-    expect(updatedBsdd.forwardedIn!.quantityReceived).toBe(50);
+    expect(updatedBsdd.forwardedIn!.wasteDetailsQuantity?.toNumber()).toEqual(
+      40
+    );
+    expect(updatedBsdd.forwardedIn!.quantityReceived?.toNumber()).toBe(50);
   });
 
   it("should not edit bsdd when refused", async () => {
@@ -773,7 +775,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived!
+            quantity: appendix2.quantityReceived!.toNumber()
           }
         }
       }
@@ -994,6 +996,56 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd.processingOperationDone).toBe("R 4");
     expect(updatedBsdd.destinationOperationMode).toBe("RECYCLAGE");
   });
+
+  it.each([null, undefined])(
+    "should nullify the operation mode",
+    async mode => {
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          processingOperationDone: "R 1",
+          destinationOperationMode: "VALORISATION_ENERGETIQUE"
+        }
+      });
+
+      const revisionRequest = await prisma.bsddRevisionRequest.create({
+        data: {
+          bsddId: bsdd.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret! } },
+          processingOperationDone: "D 15",
+          destinationOperationMode: mode,
+          comment: "test"
+        }
+      });
+
+      const { data } = await mutate<
+        Pick<Mutation, "submitFormRevisionRequestApproval">,
+        MutationSubmitFormRevisionRequestApprovalArgs
+      >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+      const updatedBsdd = await prisma.form.findUniqueOrThrow({
+        where: { id: bsdd.id }
+      });
+
+      expect(updatedBsdd.processingOperationDone).toBe("D 15");
+      expect(updatedBsdd.destinationOperationMode).toBeNull();
+    }
+  );
 
   it("should delete the finalOperations rows when changing operation code from a final to a non-final code", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(

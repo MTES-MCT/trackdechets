@@ -11,8 +11,12 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { bsdaFactory } from "../../../__tests__/factories";
+import {
+  bsdaFactory,
+  bsdaTransporterFactory
+} from "../../../__tests__/factories";
 import { buildPdfAsBase64 } from "../../../pdf/generator";
+import { getTransportersSync } from "../../../database";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
@@ -368,7 +372,12 @@ describe("Mutation.Bsda.sign", () => {
           status: "SIGNED_BY_PRODUCER",
           emitterEmissionSignatureAuthor: "Emétteur",
           emitterEmissionSignatureDate: new Date(),
-          workerCompanySiret: worker.company.siret
+          workerCompanySiret: worker.company.siret,
+          // vérifie que les numéros de scellés ne sont pas obligatoires
+          // > selon l'exutoire, le numéro est obligatoire ou pas (ISDD oui, ISDND non)
+          // > et comme on ne sait pas si il va dans l'un ou l'autre, du moins auj.
+          // > on ne peut pas le rendre obligatoire"
+          wasteSealNumbers: []
         }
       });
 
@@ -573,7 +582,8 @@ describe("Mutation.Bsda.sign", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message: expect.stringContaining(
-            "Le numéro de récépissé du transporteur est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+            "Le numéro de récépissé du transporteur n° 1 est obligatoire. " +
+              "L'établissement doit renseigner son récépissé dans Trackdéchets"
           )
         })
       ]);
@@ -660,8 +670,7 @@ describe("Mutation.Bsda.sign", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message:
-            "Vous ne pouvez pas apposer cette signature sur le bordereau."
+          message: "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
         })
       ]);
     });
@@ -746,6 +755,124 @@ describe("Mutation.Bsda.sign", () => {
       });
 
       expect(data.signBsda.id).toBeTruthy();
+    });
+
+    it("should sign transport for transporter N", async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const transporter1 = await userWithCompanyFactory("ADMIN");
+      const transporter2 = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({ company: transporter1.company });
+      await transporterReceiptFactory({ company: transporter2.company });
+
+      // Crée un BSDA avec la signature du premier transporteur
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitter.company.siret,
+          emitterCompanyName: emitter.company.name,
+          emitterEmissionSignatureDate: new Date("2018-12-11T00:00:00.000Z")
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter1.company.siret,
+          transporterTransportSignatureDate: new Date(
+            "2018-12-12T00:00:00.000Z"
+          )
+        }
+      });
+
+      // Ajoute un second transporteur qui n'a pas encore signé
+      const bsdaTransporter2 = await bsdaTransporterFactory({
+        bsdaId: bsda.id,
+        opts: {
+          transporterCompanySiret: transporter2.company.siret,
+          transporterTransportSignatureDate: null
+        }
+      });
+
+      const transporterTransportSignatureDate2 = new Date(
+        "2018-12-13T00:00:00.000Z"
+      );
+      const { mutate } = makeClient(transporter2.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            date: transporterTransportSignatureDate2.toISOString() as any,
+            author: "Transporteur n°2"
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      const updatedBsda = await prisma.bsda.findFirstOrThrow({
+        where: { id: bsda.id },
+        include: { transporters: true }
+      });
+
+      // Le statut ne doit pas être modifié
+      expect(updatedBsda.status).toEqual("SENT");
+
+      const transporters = getTransportersSync(updatedBsda);
+
+      expect(transporters[1].id).toEqual(bsdaTransporter2.id);
+      expect(transporters[1].transporterTransportSignatureDate).toEqual(
+        transporterTransportSignatureDate2
+      );
+    });
+
+    it("should not be possible for transporter N+1 to sign if transporter N has not signed", async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const transporter1 = await userWithCompanyFactory("ADMIN");
+      const transporter2 = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({ company: transporter1.company });
+      await transporterReceiptFactory({ company: transporter2.company });
+
+      // Crée un BSDA avec un transporteur qui n'a pas encore signé
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitter.company.siret,
+          emitterCompanyName: emitter.company.name,
+          emitterEmissionSignatureDate: new Date("2018-12-11T00:00:00.000Z")
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter1.company.siret,
+          transporterTransportSignatureDate: null
+        }
+      });
+
+      // Ajoute un second transporteur qui n'a pas encore signé
+      await bsdaTransporterFactory({
+        bsdaId: bsda.id,
+        opts: {
+          transporterCompanySiret: transporter2.company.siret,
+          transporterTransportSignatureDate: null
+        }
+      });
+
+      const { mutate } = makeClient(transporter2.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            author: "Transporteur n°2"
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: "Vous ne pouvez pas signer ce bordereau"
+        })
+      ]);
     });
   });
 
@@ -855,6 +982,13 @@ describe("Mutation.Bsda.sign", () => {
           transporterCompanyName: null,
           transporterCompanySiret: null
         }
+      });
+
+      // il n'y a pas de transporteur sur les bordereaux de collecte
+      // en déchetterie
+      await prisma.bsda.update({
+        where: { id: bsda.id },
+        data: { transporters: { deleteMany: {} } }
       });
 
       const { mutate } = makeClient(user);
@@ -1240,6 +1374,72 @@ describe("Mutation.Bsda.sign", () => {
       });
       expect(newForwarding.status).toEqual(BsdaStatus.REFUSED);
       expect(newForwarding.forwardingId).toBe(null);
+    });
+
+    it("should be possible to sign operation even if the last transporter multi-modal has not signed", async () => {
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.company.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
+        }
+      });
+
+      // Crée un second transporteur qui n'a pas encore signé
+      await bsdaTransporterFactory({
+        bsdaId: bsda.id,
+        opts: { transporterTransportSignatureDate: null }
+      });
+
+      const { mutate } = makeClient(user);
+
+      // Finalement le déchet va directement au centre de traitement
+      const { data } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      expect(data.signBsda.id).toBeTruthy();
+
+      const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id },
+        include: { transporters: true }
+      });
+
+      expect(updatedBsda.status).toEqual("PROCESSED");
+
+      // le second transporteur qui n'a pas signé ne doit plus apparaitre sur le bordereau
+      expect(updatedBsda.transporters).toHaveLength(1);
+      expect(updatedBsda.transporters[0].transporterCompanySiret).toEqual(
+        transporter.company.siret
+      );
+      expect(
+        updatedBsda.transporters[0].transporterTransportSignatureDate
+      ).toBeDefined();
     });
   });
 });

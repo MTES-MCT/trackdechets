@@ -6,6 +6,7 @@ import {
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
 import { BsdaWithTransporters } from "../../types";
+import { getTransportersSync } from "../../database";
 
 export type UpdateBsdaFn = (
   where: Prisma.BsdaWhereUniqueInput,
@@ -28,16 +29,60 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       forwarding: { select: { id: true } }
     };
 
-    const { grouping, forwarding } = await prisma.bsda.findUniqueOrThrow({
-      where,
-      include: previousBsdaInclude
-    });
+    const { grouping, forwarding, ...bsda } =
+      await prisma.bsda.findUniqueOrThrow({
+        where,
+        include: { ...previousBsdaInclude, transporters: true }
+      });
 
     const updatedBsda = await prisma.bsda.update({
       where,
       data,
       include: { ...previousBsdaInclude, transporters: true }
     });
+
+    // update transporters ordering when connecting transporters records
+    if (
+      data.transporters?.connect &&
+      Array.isArray(data.transporters.connect)
+    ) {
+      await Promise.all(
+        data.transporters?.connect.map(({ id: transporterId }, idx) =>
+          prisma.bsdaTransporter.update({
+            where: { id: transporterId },
+            data: {
+              number: idx + 1
+            }
+          })
+        )
+      );
+    }
+
+    // If a transporter is deleted, make sure to decrement the number of transporters after him.
+    // This code should normally only be called from the `updateForm` mutation when { transporter: null }
+    // is passed in the UpdateBsda input or from the deleteBsdaTransporter mutation.
+    if (data.transporters?.delete && updatedBsda.transporters?.length) {
+      if (Array.isArray(data.transporters.delete)) {
+        // this case should never happen, throw a custom error to debug in Sentry if it ever does
+        throw new Error(
+          "Impossible de supprimer plusieurs transporteurs à la fois sur un bordereau"
+        );
+      } else {
+        const deletedTransporterId = data.transporters.delete.id;
+        if (deletedTransporterId) {
+          const deletedTransporter = bsda.transporters.find(
+            t => t.id === deletedTransporterId
+          )!;
+          const transporterIdsToDecrement = updatedBsda.transporters
+            .filter(t => t.number > deletedTransporter.number)
+            .map(t => t.id);
+          await prisma.bsdaTransporter.updateMany({
+            where: { id: { in: transporterIdsToDecrement } },
+            data: { number: { decrement: 1 } }
+          });
+        }
+      }
+    }
 
     await prisma.event.create({
       data: {
@@ -58,6 +103,21 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
           type: bsdaEventTypes.signed,
           data: { status: data.status },
           metadata: { ...logMetadata, authType: user.auth }
+        }
+      });
+    }
+
+    if (data.transporters) {
+      // recompute transporterOrgIds
+      await prisma.bsda.update({
+        where,
+        data: {
+          transportersOrgIds: getTransportersSync(updatedBsda)
+            .flatMap(t => [
+              t.transporterCompanySiret,
+              t.transporterCompanyVatNumber
+            ])
+            .filter(Boolean)
         }
       });
     }

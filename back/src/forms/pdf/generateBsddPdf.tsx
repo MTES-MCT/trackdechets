@@ -30,9 +30,11 @@ import {
 import { expandFormFromDb, expandableFormIncludes } from "../converter";
 import { prisma } from "@td/prisma";
 import { buildAddress } from "../../companies/sirene/utils";
-import { packagingsEqual } from "@td/constants";
+import { isDangerous, packagingsEqual } from "@td/constants";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../common/operationModes";
+import { FormCompanyDetails } from "../../common/pdf/components/FormCompanyDetails";
+import { isFrenchCompany } from "../../companies/validation";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -310,6 +312,12 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
       form.wasteDetails?.packagingInfos
     );
   const qrCode = await QRCode.toString(form.readableId, { type: "svg" });
+
+  const wasteIsDangerous =
+    Boolean(form.wasteDetails?.isDangerous) ||
+    isDangerous(form.wasteDetails?.code) ||
+    Boolean(form.wasteDetails?.pop);
+
   const html = ReactDOMServer.renderToStaticMarkup(
     <Document title={form.readableId}>
       <div className="Page">
@@ -320,7 +328,13 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
           </div>
           <div className="BoxCol TextAlignCenter">
             <p>Ministère de la Transition Ecologique</p>
-            <h1>Bordereau de suivi de déchets dangereux</h1>
+            <h1>Bordereau de suivi de déchets</h1>
+            <p>
+              <input type="checkbox" checked={wasteIsDangerous} readOnly />{" "}
+              dangereux{" "}
+              <input type="checkbox" checked={!wasteIsDangerous} readOnly /> non
+              dangereux{" "}
+            </p>
             <p>Récépissé Trackdéchets</p>
           </div>
           <div className="BoxCol TextAlignCenter">
@@ -400,6 +414,20 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
             <p>
               <input
                 type="checkbox"
+                checked={isFrenchCompany({
+                  company: form.emitter?.company,
+                  isForeignShip: Boolean(form.emitter?.isForeignShip),
+                  isPrivateIndividual: Boolean(
+                    form.emitter?.isPrivateIndividual
+                  )
+                })}
+                readOnly
+              />{" "}
+              L'émetteur est un établissement français
+            </p>
+            <p>
+              <input
+                type="checkbox"
                 checked={Boolean(form.emitter?.isPrivateIndividual)}
                 readOnly
               />{" "}
@@ -413,7 +441,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
               />{" "}
               L'émetteur est un navire étranger
             </p>
-            <FormCompanyFields
+            <FormCompanyDetails
               company={form.emitter?.company}
               isPrivateIndividual={Boolean(form.emitter?.isPrivateIndividual)}
               isForeignShip={Boolean(form.emitter?.isForeignShip)}

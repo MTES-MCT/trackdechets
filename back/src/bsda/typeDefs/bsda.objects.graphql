@@ -48,8 +48,14 @@ type Bsda {
   "Entreprise de travaux"
   worker: BsdaWorker
 
-  "Entreprise de transport"
+  "Entreprise de transport - 1er transporteur en cas de transport multi-modal"
   transporter: BsdaTransporter
+
+  """
+  Liste des transporteurs du déchet. Contient 1 seul transporteur en cas d'achemniment direct.
+  Peut contenir un maximum de 5 transporteurs différents en cas de transport multi-modal
+  """
+  transporters: [BsdaTransporter!]!
 
   "Bordereau que celui-ci réexpédie"
   forwarding: InitialBsda
@@ -280,6 +286,8 @@ type BsdaWork {
 }
 
 type BsdaTransporter {
+  "Identifiant du transporteur"
+  id: ID!
   "Coordonnées de l'entreprise de transport"
   company: FormCompany
   "Champ libre"

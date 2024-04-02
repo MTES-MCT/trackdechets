@@ -3,8 +3,7 @@ import {
   TransportMode,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { BsdaSignatureType } from "../../generated/graphql/types";
-import { ParsedZodBsda, ZodBsda } from "./schema";
+import { ParsedZodBsda, ZodBsda, ZodBsdaTransporter } from "./schema";
 import { isForeignVat } from "@td/constants";
 import {
   getCurrentSignatureType,
@@ -17,8 +16,10 @@ import { getOperationModesFromOperationCode } from "../../common/operationModes"
 import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { BsdaValidationContext } from "./types";
+import { AllBsdaSignatureType } from "../types";
 
-export type EditableBsdaFields = Required<
+// Liste des champs éditables sur l'objet Bsda
+export type BsdaEditableFields = Required<
   Omit<
     ZodBsda,
     | "id"
@@ -34,48 +35,246 @@ export type EditableBsdaFields = Required<
     | "workerWorkSignatureDate"
     | "intermediariesOrgIds"
     | "transportersOrgIds"
-    | "transporterId"
   >
 >;
 
-export type RequiredCheckFn = (
-  // BSDA sur lequel s'applique le parsing Zod
-  bsda: ZodBsda
-) => boolean;
+// Liste des champs éditables sur l'objet BsdaTransporter
+export type BsdaTransporterEditableFields = Required<
+  Omit<
+    ZodBsdaTransporter,
+    | "number"
+    | "transporterTransportSignatureAuthor"
+    | "transporterTransportSignatureDate"
+  >
+>;
 
-export type SealedCheckFn = (
-  // BSDA modifié, résultant de la fusion entre les données en base et les données de l'input
-  bsda: ZodBsda,
+type RuleContext<T extends ZodBsda | ZodBsdaTransporter> = {
   // BSDA persisté en base - avant modification
-  persisted: ZodBsda,
+  persisted: T;
   // Liste des "rôles" que l'utilisateur a sur le BSDA (ex: émetteur, transporteur, etc).
   // Permet de conditionner un check a un rôle. Ex: "Ce champ est modifiable mais uniquement par l'émetteur"
-  userFunctions: BsdaUserFunctions
-) => boolean;
-
-// Permet de définir d'une même façon deux types de règles d'édition :
-// - Vérification sur le vérrouillage des champs.
-// - Vérification sur la présence requise des champs.
-export type EditionRule<CheckFn> = {
-  // Signature à partir de laquelle le champ est verrouillé / requis.
-  from: BsdaSignatureType;
-  // Condition supplémentaire à vérifier pour que le champ soit verrouillé / requis.
-  when?: CheckFn;
-  // A custom message at the end of the error
-  suffix?: string;
+  userFunctions: BsdaUserFunctions;
 };
 
-export type EditionRules = {
-  [Key in keyof EditableBsdaFields]: {
+// Fonction permettant de définir une signature de champ requis ou
+// verrouilage de champ à partir des données du BSDA et du contexte
+type GetBsdaSignatureTypeFn<T extends ZodBsda | ZodBsdaTransporter> = (
+  bsda: T,
+  ruleContext?: RuleContext<T>
+) => AllBsdaSignatureType | undefined;
+
+// Règle d'édition qui permet de définir à partir de quelle signature
+// un champ est verrouillé / requis avec une config contenant un paramètre
+// optionnel `when`
+type EditionRule<T extends ZodBsda | ZodBsdaTransporter> = {
+  // Signature à partir de laquelle le champ est requis ou fonction
+  // permettant de calculer cette signature
+  from: AllBsdaSignatureType | GetBsdaSignatureTypeFn<T>;
+  // Condition supplémentaire à vérifier pour que le champ soit requis.
+  when?: (bsda: T) => boolean;
+  customErrorMessage?: string;
+};
+
+export type EditionRules<
+  T extends ZodBsda | ZodBsdaTransporter,
+  E extends BsdaEditableFields | BsdaTransporterEditableFields
+> = {
+  [Key in keyof E]: {
     // At what signature the field is sealed, and under which circumstances
-    sealed: EditionRule<SealedCheckFn>;
+    sealed: EditionRule<T>;
     // At what signature the field is required, and under which circumstances. If absent, field is never required
-    required?: EditionRule<RequiredCheckFn>;
+    required?: EditionRule<T>;
     readableFieldName?: string; // A custom field name for errors
   };
 };
 
-export const editionRules: EditionRules = {
+type BsdaEditionRules = EditionRules<ZodBsda, BsdaEditableFields>;
+
+type BsdaTransporterEditionRules = EditionRules<
+  ZodBsdaTransporter,
+  BsdaTransporterEditableFields
+>;
+
+/**
+ * Régle de verrouillage des champs définie à partir d'une fonction.
+ * Un champ appliquant cette règle est verrouillé à partir de la
+ * signature émetteur sauf si l'utilisateur est l'émetteur, auquel cas
+ * il peut encore modifier le champ jusqu'à la signature suivante.
+ */
+const sealedFromEissionExceptForEmitter: GetBsdaSignatureTypeFn<ZodBsda> = (
+  _,
+  context
+) => {
+  const { isEmitter } = context!.userFunctions;
+  return isEmitter ? "WORK" : "EMISSION";
+};
+
+/**
+ * Règle de verrouillage des champs définie à partir d'une fonction.
+ * Un champ appliquant cette règle est vérouillée à partir de la
+ * signature émetteur sauf si l'utilisateur est en train d'ajouter ou supprimer
+ * un entreposage provisoire, auquel cas le champ est encore modifiable
+ * jusqu'à la signature du transporteur.
+ */
+const sealedFromEmissionExceptAddOrRemoveNextDestination: GetBsdaSignatureTypeFn<
+  ZodBsda
+> = (bsda, context) => {
+  const { isEmitter, isWorker, isTransporter, isDestination } =
+    context!.userFunctions;
+  const persisted = context!.persisted;
+
+  const isAddingNextDestination =
+    !persisted?.destinationOperationNextDestinationCompanySiret &&
+    bsda.destinationOperationNextDestinationCompanySiret;
+  const isRemovingNextDestination =
+    persisted?.destinationOperationNextDestinationCompanySiret &&
+    !bsda.destinationOperationNextDestinationCompanySiret;
+
+  // If I am a worker, a transporter or destination and the transporter hasn't signed,
+  // then I can either add or remove a nextDestination. To do so I need to edit the destination.
+  if (
+    (isEmitter || isWorker || isTransporter || isDestination) &&
+    (isAddingNextDestination || isRemovingNextDestination)
+  ) {
+    return "TRANSPORT";
+  }
+
+  return isEmitter ? "WORK" : "EMISSION";
+};
+
+function transporterSignature(
+  transporter: ZodBsdaTransporter
+): AllBsdaSignatureType {
+  if (transporter.number && transporter.number > 1) {
+    return `TRANSPORT_${transporter.number}` as AllBsdaSignatureType;
+  }
+  return "TRANSPORT";
+}
+
+export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
+  id: {
+    readableFieldName: "le transporteur",
+    sealed: { from: transporterSignature }
+  },
+  bsdaId: {
+    readableFieldName: "le BSDA associé au transporteur",
+    sealed: { from: transporterSignature }
+  },
+  transporterCompanyName: {
+    readableFieldName: "le nom du transporteur",
+    sealed: {
+      from: transporterSignature
+    },
+    required: { from: transporterSignature }
+  },
+  transporterCompanySiret: {
+    readableFieldName: "le SIRET du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: transporter => !transporter.transporterCompanyVatNumber
+    }
+  },
+  transporterCompanyAddress: {
+    readableFieldName: "l'adresse du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    }
+  },
+  transporterCompanyContact: {
+    readableFieldName: "le nom de contact du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    }
+  },
+  transporterCompanyPhone: {
+    readableFieldName: "le téléphone du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    }
+  },
+  transporterCompanyMail: {
+    readableFieldName: "l'email du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    }
+  },
+  transporterCompanyVatNumber: {
+    readableFieldName: "le numéro de TVA du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: transporter => !transporter.transporterCompanySiret
+    }
+  },
+  transporterCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires du transporteur",
+    sealed: { from: transporterSignature }
+  },
+  transporterRecepisseIsExempted: {
+    readableFieldName: "l'exemption de récépissé du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    }
+  },
+  transporterRecepisseNumber: {
+    readableFieldName: "le numéro de récépissé du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: requireTransporterRecepisse,
+      customErrorMessage:
+        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+    }
+  },
+  transporterRecepisseDepartment: {
+    readableFieldName: "le département de récépissé du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: requireTransporterRecepisse,
+      customErrorMessage:
+        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+    }
+  },
+  transporterRecepisseValidityLimit: {
+    readableFieldName: "la date de validité du récépissé du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: requireTransporterRecepisse,
+      customErrorMessage:
+        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+    }
+  },
+  transporterTransportMode: {
+    readableFieldName: "le mode de transport",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    }
+  },
+  transporterTransportPlates: {
+    readableFieldName: "l'immatriculation du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: bsda => bsda.transporterTransportMode === "ROAD"
+    }
+  },
+  transporterTransportTakenOverAt: {
+    readableFieldName: "la date d'enlèvement du transporteur",
+    sealed: { from: transporterSignature }
+  }
+};
+
+export const bsdaEditionRules: BsdaEditionRules = {
   type: {
     sealed: { from: "EMISSION" },
     required: { from: "EMISSION" }
@@ -105,8 +304,7 @@ export const editionRules: EditionRules = {
   emitterCompanyContact: {
     readableFieldName: "le nom de contact de l'entreprise émettrice",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -116,8 +314,7 @@ export const editionRules: EditionRules = {
   emitterCompanyPhone: {
     readableFieldName: "le téléphone de l'entreprise émettrice",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -127,8 +324,7 @@ export const editionRules: EditionRules = {
   emitterCompanyMail: {
     readableFieldName: "l'email de l'entreprise émettrice",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -139,43 +335,37 @@ export const editionRules: EditionRules = {
     readableFieldName:
       "les champs d'informations complémentaires de l'entreprise émettrice",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     }
   },
   emitterPickupSiteName: {
     readableFieldName: "le nom de l'adresse de chantier ou de collecte",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     }
   },
   emitterPickupSiteAddress: {
     readableFieldName: "l'adresse de collecte ou de chantier",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     }
   },
   emitterPickupSiteCity: {
     readableFieldName: "la ville de l'adresse de collecte ou de chantier",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     }
   },
   emitterPickupSitePostalCode: {
     readableFieldName: "le code postal de l'adresse de collecte ou de chantier",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     }
   },
   emitterPickupSiteInfos: {
     readableFieldName: "les informations de l'adresse de collecte",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     }
   },
   ecoOrganismeName: {
@@ -193,24 +383,21 @@ export const editionRules: EditionRules = {
   destinationCompanyName: {
     readableFieldName: "le nom de l'entreprise de destination",
     sealed: {
-      from: "EMISSION",
-      when: isDestinationSealed
+      from: sealedFromEmissionExceptAddOrRemoveNextDestination
     },
     required: { from: "EMISSION" }
   },
   destinationCompanySiret: {
     readableFieldName: "le SIRET de l'entreprise de destination",
     sealed: {
-      from: "EMISSION",
-      when: isDestinationSealed
+      from: sealedFromEmissionExceptAddOrRemoveNextDestination
     },
     required: { from: "EMISSION" }
   },
   destinationCompanyAddress: {
     readableFieldName: "l'adresse de l'entreprise de destination",
     sealed: {
-      from: "EMISSION",
-      when: isDestinationSealed
+      from: sealedFromEmissionExceptAddOrRemoveNextDestination
     },
     required: { from: "EMISSION" }
   },
@@ -236,7 +423,7 @@ export const editionRules: EditionRules = {
   },
   destinationCap: {
     readableFieldName: "le CAP du destinataire",
-    sealed: { from: "TRANSPORT" },
+    sealed: { from: sealedFromEmissionExceptAddOrRemoveNextDestination },
     required: {
       from: "EMISSION",
       when: bsda =>
@@ -246,7 +433,7 @@ export const editionRules: EditionRules = {
   },
   destinationPlannedOperationCode: {
     readableFieldName: "le code d'opération prévu",
-    sealed: { from: "TRANSPORT" },
+    sealed: { from: sealedFromEmissionExceptAddOrRemoveNextDestination },
     required: { from: "EMISSION" }
   },
   destinationReceptionDate: {
@@ -367,149 +554,34 @@ export const editionRules: EditionRules = {
         Boolean(bsda.destinationOperationNextDestinationCompanySiret)
     }
   },
-  transporterCompanyName: {
-    readableFieldName: "le nom du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT", when: hasTransporter }
-  },
-  transporterCompanySiret: {
-    readableFieldName: "le SIRET du transporteur",
-    sealed: { from: "TRANSPORT" },
+  transporters: {
+    readableFieldName: "la liste des transporteurs",
+    sealed: {
+      // Le verrouillage des champs en fonction des signatures est géré plus finement
+      // dans bsdaTransporterEditionRules
+      from: "TRANSPORT_5"
+    },
     required: {
-      from: "EMISSION",
-      when: bsda => {
+      from: bsda => {
+        if (bsda.type === BsdaType.COLLECTION_2710) {
+          // Bordereau de collecte en déchetterie sans transporteur
+          return undefined;
+        }
         // Transporter is required if there is no worker and the emitter is a private individual.
         // This is to avoid usage of an OTHER_COLLECTIONS BSDA instead of a COLLECTION_2710
         if (
           bsda.emitterIsPrivateIndividual &&
           bsda.type === BsdaType.OTHER_COLLECTIONS &&
-          bsda.workerIsDisabled &&
-          !bsda.transporterCompanyVatNumber
+          bsda.workerIsDisabled
         ) {
-          return true;
+          return "EMISSION";
         }
-
-        // Otherwise, the transporter is only required for the transporter signature.
-        // No specific check needed as anyway he cannot sign without being part of the bsda
-        return false;
+        return "TRANSPORT";
       },
-      suffix:
+      customErrorMessage:
+        // FIXME ce message ne s'applique que pour un des cas
         "Si l'émetteur est un particulier et qu'aucune entreprise de travaux n'a été visée, l'ajout d'un transporteur est obligatoire."
     }
-  },
-  transporterCompanyAddress: {
-    readableFieldName: "l'adresse du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: hasTransporter
-    }
-  },
-  transporterCompanyContact: {
-    readableFieldName: "le nom de contact du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: hasTransporter
-    }
-  },
-  transporterCompanyPhone: {
-    readableFieldName: "le téléphone du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: hasTransporter
-    }
-  },
-  transporterCompanyMail: {
-    readableFieldName: "l'email du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: hasTransporter
-    }
-  },
-  transporterCompanyVatNumber: {
-    readableFieldName: "le numéro de TVA du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "EMISSION",
-      when: bsda => {
-        // Transporter is required if there is no worker and the emitter is a private individual.
-        // This is to avoid usage of an OTHER_COLLECTIONS BSDA instead of a COLLECTION_2710
-        if (
-          bsda.emitterIsPrivateIndividual &&
-          bsda.type === BsdaType.OTHER_COLLECTIONS &&
-          bsda.workerIsDisabled &&
-          !bsda.transporterCompanySiret
-        ) {
-          return true;
-        }
-
-        return false;
-      }
-    }
-  },
-  transporterCustomInfo: {
-    readableFieldName:
-      "les champs d'informations complémentaires du transporteur",
-    sealed: { from: "TRANSPORT" }
-  },
-  transporterRecepisseIsExempted: {
-    readableFieldName: "l'exemption de récépissé du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: hasTransporter
-    }
-  },
-  transporterRecepisseNumber: {
-    readableFieldName: "le numéro de récépissé du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: requireTransporterRecepisse,
-      suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
-  },
-  transporterRecepisseDepartment: {
-    readableFieldName: "le département de récépissé du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: requireTransporterRecepisse,
-      suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
-  },
-  transporterRecepisseValidityLimit: {
-    readableFieldName: "la date de validaté du récépissé du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: requireTransporterRecepisse,
-      suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
-  },
-  transporterTransportMode: {
-    readableFieldName: "le mode de transport",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: hasTransporter
-    }
-  },
-  transporterTransportPlates: {
-    readableFieldName: "l'immatriculation du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: bsda =>
-        hasTransporter(bsda) && bsda.transporterTransportMode === "ROAD"
-    }
-  },
-  transporterTransportTakenOverAt: {
-    readableFieldName: "la date d'enlèvement du transporteur",
-    sealed: { from: "TRANSPORT" }
   },
   workerIsDisabled: {
     sealed: { from: "EMISSION" },
@@ -521,8 +593,7 @@ export const editionRules: EditionRules = {
   workerCompanyName: {
     readableFieldName: "le nom de l'entreprise de travaux",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -532,8 +603,7 @@ export const editionRules: EditionRules = {
   workerCompanySiret: {
     readableFieldName: "le SIRET de l'entreprise de travaux",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -543,8 +613,7 @@ export const editionRules: EditionRules = {
   workerCompanyAddress: {
     readableFieldName: "l'adresse de l'entreprise de travaux",
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -651,8 +720,7 @@ export const editionRules: EditionRules = {
   },
   wasteCode: {
     sealed: {
-      from: "EMISSION",
-      when: (bsda, _, userFunctions) => isSealedForEmitter(bsda, userFunctions)
+      from: sealedFromEissionExceptForEmitter
     },
     required: { from: "EMISSION" },
     readableFieldName: "le code déchet"
@@ -675,11 +743,7 @@ export const editionRules: EditionRules = {
   },
   wasteSealNumbers: {
     readableFieldName: "le(s) numéro(s) de scellés",
-    sealed: { from: "WORK" },
-    required: {
-      from: "WORK",
-      when: bsda => bsda.type !== BsdaType.COLLECTION_2710
-    }
+    sealed: { from: "WORK" }
   },
   wastePop: {
     readableFieldName: "le champ sur les polluants organiques persistants",
@@ -715,16 +779,11 @@ function hasWorker(bsda: ZodBsda) {
   return bsda.type === BsdaType.OTHER_COLLECTIONS && !bsda.workerIsDisabled;
 }
 
-function hasTransporter(bsda: ZodBsda) {
-  return bsda.type !== BsdaType.COLLECTION_2710;
-}
-
-function requireTransporterRecepisse(bsda: ZodBsda) {
+function requireTransporterRecepisse(transporter: ZodBsdaTransporter) {
   return (
-    hasTransporter(bsda) &&
-    !bsda.transporterRecepisseIsExempted &&
-    bsda.transporterTransportMode === TransportMode.ROAD &&
-    !isForeignVat(bsda.transporterCompanyVatNumber)
+    !transporter.transporterRecepisseIsExempted &&
+    transporter.transporterTransportMode === TransportMode.ROAD &&
+    !isForeignVat(transporter.transporterCompanyVatNumber)
   );
 }
 
@@ -746,106 +805,126 @@ function isNotRefused(bsda: ZodBsda) {
 }
 
 /**
- * The emitter has special rights to edit several fields after he signed,
- * and until other signatures are applied.
- */
-function isSealedForEmitter(bsda: ZodBsda, { isEmitter }: BsdaUserFunctions) {
-  const isSealedForEmitter = hasWorker(bsda)
-    ? bsda.workerWorkSignatureDate != null
-    : bsda.transporterTransportSignatureDate != null;
-
-  if (isEmitter && !isSealedForEmitter) {
-    return false;
-  }
-
-  return true;
-}
-
-function isDestinationSealed(
-  bsda: ZodBsda,
-  persisted: ZodBsda,
-  userFunctions: BsdaUserFunctions
-) {
-  if (!isSealedForEmitter(bsda, userFunctions)) {
-    return false;
-  }
-
-  // If I am worker, transporter or destination and the transporter hasn't signed,
-  // then I can either add or remove a nextDestination. To do so I need to edit the destination.
-  const isAddingNextDestination =
-    !persisted?.destinationOperationNextDestinationCompanySiret &&
-    bsda.destinationOperationNextDestinationCompanySiret;
-  const isRemovingNextDestination =
-    persisted?.destinationOperationNextDestinationCompanySiret &&
-    !bsda.destinationOperationNextDestinationCompanySiret;
-  if (
-    (userFunctions.isEmitter ||
-      userFunctions.isWorker ||
-      userFunctions.isTransporter ||
-      userFunctions.isDestination) &&
-    bsda.transporterTransportSignatureDate == null &&
-    (isAddingNextDestination || isRemovingNextDestination)
-  ) {
-    return false;
-  }
-
-  return true;
-}
-
-export type RulesEntries = {
-  [K in keyof EditionRules]: [K, EditionRules[K]];
-}[keyof EditionRules][];
-
-/**
  * Cette fonction permet de vérifier qu'un utilisateur n'est pas
  * en train d'essayer de modifier des données qui ont été verrouillée
  * par une signature
- * @param bsda BSDA persisté en base
- * @param update Modifications qui sont apportées par l'input
+ * @param persisted BSDA persisté en base
+ * @param bsda BSDA avec les modifications apportées par l'input
  * @param user Utilisateur qui effectue la modification
  */
-export async function checkSealedFields(
+export async function checkBsdaSealedFields(
+  persisted: ZodBsda,
   bsda: ZodBsda,
-  update: ZodBsda,
   context: BsdaValidationContext
 ) {
   const sealedFieldErrors: string[] = [];
 
-  const updatedFields = getUpdatedFields(bsda, update);
+  const updatedFields = getUpdatedFields(persisted, bsda);
 
   const currentSignatureType =
-    context.currentSignatureType ?? getCurrentSignatureType(bsda);
+    context.currentSignatureType ?? getCurrentSignatureType(persisted);
 
   // Some signatures may be skipped, so always check all the hierarchy
   const signaturesToCheck = getSignatureAncestors(currentSignatureType);
 
-  const userFunctions = await getBsdaUserFunctions(context.user, bsda);
+  const userFunctions = await getBsdaUserFunctions(context.user, persisted);
 
   for (const field of updatedFields) {
-    const rule = editionRules[field as keyof EditableBsdaFields];
-    const sealedRule = {
-      from: rule.sealed.from,
-      when: rule.sealed.when ?? (() => true), // Default to true
-      suffix: rule.sealed.suffix
-    };
+    const { readableFieldName, sealed: sealedRule } =
+      bsdaEditionRules[field as keyof BsdaEditableFields];
 
-    const fieldDescription = rule.readableFieldName
-      ? capitalize(rule.readableFieldName)
+    const fieldDescription = readableFieldName
+      ? capitalize(readableFieldName)
       : `Le champ ${field}`;
 
-    const isSealed =
-      signaturesToCheck.includes(sealedRule.from) &&
-      sealedRule.when({ ...bsda, ...update }, bsda, userFunctions);
+    const isSealed = isBsdaFieldSealed(sealedRule, bsda, signaturesToCheck, {
+      persisted,
+      userFunctions
+    });
 
     if (isSealed) {
       sealedFieldErrors.push(
         [
           `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
-          sealedRule.suffix
+          sealedRule.customErrorMessage
         ]
           .filter(Boolean)
           .join(" ")
       );
+    }
+  }
+
+  if (updatedFields.includes("transporters")) {
+    // Une modification a eu lieu dans le tableau des transporteurs. Il peut s'agir :
+    // Cas 1 : d'une modification des identifiants des transporteurs visés via le champ BsdaInput.transporters
+    // Cas 2 : d'une modification du premier transporteur via le champ BsdaInput.transporter
+
+    const persistedTransporters = persisted.transporters ?? [];
+    const updatedTransporters = bsda.transporters ?? [];
+
+    // Vérification du cas 1
+    persistedTransporters.forEach((persistedTransporter, idx) => {
+      const updatedTransporter = updatedTransporters[idx];
+      if (persistedTransporter.id !== updatedTransporter?.id) {
+        const rule = bsdaTransporterEditionRules.id;
+        const isSealed = isBsdaTransporterFieldSealed(
+          rule.sealed,
+          { ...updatedTransporter, number: idx + 1 },
+          signaturesToCheck
+        );
+
+        if (isSealed) {
+          sealedFieldErrors.push(
+            `Le transporteur n°${
+              idx + 1
+            } a déjà signé le BSDA, il ne peut pas être supprimé ou modifié`
+          );
+        }
+      }
+    });
+
+    // Vérification du cas n°2
+    const firstPersistedTransporter = persistedTransporters[0];
+    const firstUpdatedTransporter = updatedTransporters[0];
+
+    if (
+      firstPersistedTransporter &&
+      firstUpdatedTransporter &&
+      firstPersistedTransporter.id === firstUpdatedTransporter.id
+    ) {
+      const transporterUpdatedFields = getUpdatedFields(
+        persistedTransporters[0],
+        updatedTransporters[0]
+      );
+
+      for (const transporterUpdatedField of transporterUpdatedFields) {
+        const rule =
+          bsdaTransporterEditionRules[
+            transporterUpdatedField as keyof BsdaTransporterEditableFields
+          ];
+
+        if (rule) {
+          const isSealed = isBsdaTransporterFieldSealed(
+            rule.sealed,
+            { ...updatedTransporters[0], number: 1 },
+            signaturesToCheck,
+            {
+              persisted: { ...persistedTransporters[0], number: 1 },
+              userFunctions
+            }
+          );
+
+          const fieldDescription = rule.readableFieldName
+            ? capitalize(rule.readableFieldName)
+            : `Le champ ${transporterUpdatedField}`;
+
+          if (isSealed) {
+            sealedFieldErrors.push(
+              `${fieldDescription} n°1 a été vérouillé via signature et ne peut pas être modifié.`
+            );
+          }
+        }
+      }
     }
   }
 
@@ -867,13 +946,70 @@ export async function getSealedFields(
 
   const userFunctions = await getBsdaUserFunctions(context.user, bsda);
 
-  const sealedFields = Object.entries(editionRules)
-    .filter(
-      ([_, rule]) =>
-        signaturesToCheck.includes(rule.sealed.from) &&
-        (!rule.sealed.when || rule.sealed.when(bsda, bsda, userFunctions))
-    )
-    .map(([field]) => field as keyof EditionRules);
+  const sealedFields = Object.entries(bsdaEditionRules)
+    .filter(([_, { sealed: sealedRule }]) => {
+      const isSealed = isBsdaFieldSealed(sealedRule, bsda, signaturesToCheck, {
+        persisted: bsda,
+        userFunctions
+      });
+
+      return isSealed;
+    })
+    .map(([field]) => field as keyof BsdaEditionRules);
 
   return sealedFields;
+}
+
+// Fonction utilitaire générique permettant d'appliquer une règle
+// de verrouillage de champ ou de champ requis
+// définie soit à partir d'une fonction soit à partir d'une config
+function isRuleApplied<T extends ZodBsda | ZodBsdaTransporter>(
+  rule: EditionRule<T>,
+  resource: T,
+  signatures: AllBsdaSignatureType[],
+  context?: RuleContext<T>
+) {
+  const from =
+    typeof rule.from === "function" ? rule.from(resource, context) : rule.from;
+
+  const isApplied =
+    from &&
+    signatures.includes(from) &&
+    (rule.when === undefined || rule.when(resource));
+
+  return isApplied;
+}
+
+function isBsdaFieldSealed(
+  rule: EditionRule<ZodBsda>,
+  bsda: ZodBsda,
+  signatures: AllBsdaSignatureType[],
+  context?: RuleContext<ZodBsda>
+) {
+  return isRuleApplied(rule, bsda, signatures, context);
+}
+
+function isBsdaTransporterFieldSealed(
+  rule: EditionRule<ZodBsdaTransporter>,
+  bsdaTransporter: ZodBsdaTransporter,
+  signatures: AllBsdaSignatureType[],
+  context?: RuleContext<ZodBsdaTransporter>
+) {
+  return isRuleApplied(rule, bsdaTransporter, signatures, context);
+}
+
+export function isBsdaFieldRequired(
+  rule: EditionRule<ZodBsda>,
+  bsda: ZodBsda,
+  signatures: AllBsdaSignatureType[]
+) {
+  return isRuleApplied(rule, bsda, signatures);
+}
+
+export function isBsdaTransporterFieldRequired(
+  rule: EditionRule<ZodBsdaTransporter>,
+  bsdaTransporter: ZodBsdaTransporter,
+  signatures: AllBsdaSignatureType[]
+) {
+  return isRuleApplied(rule, bsdaTransporter, signatures);
 }

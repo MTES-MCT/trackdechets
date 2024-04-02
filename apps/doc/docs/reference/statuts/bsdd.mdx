@@ -65,7 +65,7 @@ ACCEPTED -->|markAsProcessed - avec opération de regroupement | AWAITING_GROUP(
 ACCEPTED -->|markAsProcessed - avec une destination ultérieure à l'étranger | FOLLOWED_WITH_PNTTD(FOLLOWED_WITH_PNTTD)
 SENT -->|markAsReceived - avec refus| REFUSED(REFUSED)
 SENT -->|markAsTempStored - avec refus| REFUSED
-AWAITING_GROUP.->|createForm - appendix2Forms |DRAFT
+AWAITING_GROUP-.->|createForm - appendix2Forms |DRAFT
 AWAITING_GROUP-->|Lorsque markAsSealed est appelé sur le BSD de regroupement avec annexe 2|GROUPED[GROUPED]
 GROUPED-->|Lorsque markAsProcessed est appelé sur le BSD  de regroupement avec annexe 2|PROCESSED
 SENT -->|markAsTempStored - |TEMP_STORED(TEMP_STORED)

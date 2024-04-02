@@ -12,7 +12,8 @@ import {
   QueryBsdaArgs,
   Query,
   Bsda,
-  BsdaInput
+  BsdaInput,
+  BsdaType
 } from "@td/codegen-ui";
 import initialState from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
@@ -101,11 +102,19 @@ export default function BsdaStepsList(props: Props) {
   };
 
   function saveForm(input: BsdaInput): Promise<any> {
+    const cleanInput =
+      input.type === BsdaType.Collection_2710
+        ? // s'assure qu'on ne crée pas un transporteur "vide"
+          // dans le cadre d'un BSDA de collecte en déchetterie
+          // qui n'autorise pas l'ajout de transporteur
+          { ...input, transporter: null }
+        : input;
+
     return formState.id
       ? updateBsda({
-          variables: { id: formState.id, input: cleanupFields(input) }
+          variables: { id: formState.id, input: cleanupFields(cleanInput) }
         })
-      : createBsda({ variables: { input } });
+      : createBsda({ variables: { input: cleanInput } });
   }
 
   function onSubmit(values) {

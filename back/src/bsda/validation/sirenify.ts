@@ -1,15 +1,19 @@
-import { ParsedZodBsda } from "./schema";
+import { ParsedZodBsda, ParsedZodBsdaTransporter } from "./schema";
 import { CompanyInput } from "../../generated/graphql/types";
 import { nextBuildSirenify } from "../../companies/sirenify";
 import { getSealedFields } from "./rules";
-import { BsdaValidationContext, ZodBsdaTransformer } from "./types";
+import {
+  BsdaValidationContext,
+  ZodBsdaTransformer,
+  ZodBsdaTransporterTransformer
+} from "./types";
 
 type SiretInfos = {
   name: string | null | undefined;
   address: string | null | undefined;
 };
 
-const sirenifyAccessors = (
+const sirenifyBsdaAccessors = (
   bsda: ParsedZodBsda,
   sealedFields: string[] // Tranformations should not be run on sealed fields
 ) => [
@@ -19,14 +23,6 @@ const sirenifyAccessors = (
     setter: (input, companyInput: SiretInfos) => {
       input.emitterCompanyName = companyInput.name;
       input.emitterCompanyAddress = companyInput.address;
-    }
-  },
-  {
-    siret: bsda?.transporterCompanySiret,
-    skip: sealedFields.includes("transporterCompanySiret"),
-    setter: (input, companyInput: CompanyInput) => {
-      input.transporterCompanyName = companyInput.name;
-      input.transporterCompanyAddress = companyInput.address;
     }
   },
   {
@@ -61,17 +57,46 @@ const sirenifyAccessors = (
       intermediary.name = companyInput.name;
       intermediary.address = companyInput.address;
     }
+  })),
+  ...(bsda.transporters ?? []).map((_, idx) => ({
+    siret: bsda.transporters![idx].transporterCompanySiret,
+    // FIXME skip conditionnaly based on transporter signatures
+    skip: false,
+    setter: (input, companyInput: CompanyInput) => {
+      const transporter = input.transporters[idx];
+      transporter.transporterCompanyName = companyInput.name;
+      transporter.transporterCompanyAddress = companyInput.address;
+    }
   }))
 ];
 
-export const sirenify: (
+export const sirenifyBsda: (
   context: BsdaValidationContext
 ) => ZodBsdaTransformer = context => {
   return async bsda => {
     const sealedFields = await getSealedFields(bsda, context);
-    return nextBuildSirenify<ParsedZodBsda>(sirenifyAccessors)(
+    return nextBuildSirenify<ParsedZodBsda>(sirenifyBsdaAccessors)(
       bsda,
       sealedFields
     );
   };
 };
+
+const sirenifyBsdaTransporterAccessors = (
+  bsdaTransporter: ParsedZodBsdaTransporter
+) => [
+  {
+    siret: bsdaTransporter.transporterCompanySiret,
+    setter: (input: ParsedZodBsdaTransporter, companyInput: CompanyInput) => {
+      input.transporterCompanyName = companyInput.name;
+      input.transporterCompanyAddress = companyInput.address;
+    },
+    skip: false
+  }
+];
+
+export const sirenifyBsdaTransporter: ZodBsdaTransporterTransformer =
+  bsdaTransporter =>
+    nextBuildSirenify<ParsedZodBsdaTransporter>(
+      sirenifyBsdaTransporterAccessors
+    )(bsdaTransporter, []);

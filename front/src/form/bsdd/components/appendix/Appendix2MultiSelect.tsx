@@ -10,7 +10,7 @@ import {
   Packagings
 } from "@td/codegen-ui";
 import React, { useEffect, useMemo, useState } from "react";
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 
 const APPENDIX2_FORMS = gql`
   query AppendixForms($siret: String!, $wasteCode: String) {

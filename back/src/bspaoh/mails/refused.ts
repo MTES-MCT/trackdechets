@@ -6,7 +6,7 @@ import {
   formNotAccepted,
   formPartiallyRefused
 } from "@td/mail";
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 import { getFirstTransporterSync } from "../converter";
 import { PrismaBspaohWithTransporters } from "../types";
 import { buildPdfAsBase64 } from "../pdf/generator";

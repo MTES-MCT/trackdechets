@@ -19,11 +19,11 @@ import {
   Transporter,
   draftFormSchema,
   hasPipeline,
-  validateGroupement
+  validateGroupement,
+  validateIntermediaries
 } from "../../validation";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
-import { validateIntermediariesInput } from "../../../common/validation";
 import { sirenifyFormInput } from "../../sirenify";
 import { recipifyFormInput } from "../../recipify";
 import { checkCanCreate } from "../../permissions";
@@ -191,7 +191,7 @@ const createFormResolver = async (
   }
 
   if (intermediaries) {
-    await validateIntermediariesInput(intermediaries);
+    await validateIntermediaries(intermediaries, form);
     formCreateInput.intermediaries = {
       createMany: {
         data: intermediaries.map(i => ({

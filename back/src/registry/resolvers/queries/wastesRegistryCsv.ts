@@ -3,17 +3,14 @@ import {
   QueryResolvers,
   QueryWastesRegistryCsvArgs
 } from "../../../generated/graphql/types";
-import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFileDownload } from "../../../common/fileDownload";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getRegistryFileName } from "../../filename";
 import { format } from "@fast-csv/format";
 import { wasteFormatter, wastesReader } from "../../streams";
-import { searchBsds } from "../../elastic";
+
 import { GraphQLContext } from "../../../types";
-import { Permission, syncCheckUserPermissions } from "../../../permissions";
-import { UserInputError } from "../../../common/errors";
-import { TotalHits } from "@elastic/elasticsearch/api/types";
+import { checkWastesRegistryDownloadPermissions } from "./wasteRegistryBase";
 
 export const wastesRegistryCsvDownloadHandler: DownloadHandler<QueryWastesRegistryCsvArgs> =
   {
@@ -39,25 +36,8 @@ export async function wastesRegistryCsvResolverFn(
   args: QueryWastesRegistryCsvArgs,
   context: GraphQLContext
 ): Promise<FileDownload> {
-  const user = checkIsAuthenticated(context);
-  const userRoles = await context.dataloaders.userRoles.load(user.id);
-  for (const siret of args.sirets) {
-    syncCheckUserPermissions(
-      userRoles,
-      [siret].filter(Boolean),
-      Permission.RegistryCanRead,
-      `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${siret}`
-    );
-  }
-  const hits = await searchBsds(args.registryType, args.sirets, args.where, {
-    size: 1,
-    sort: [{ id: "ASC" }]
-  });
-  if ((hits.total as TotalHits).value === 0) {
-    throw new UserInputError(
-      "Aucune donnée à exporter sur la période sélectionnée"
-    );
-  }
+  await checkWastesRegistryDownloadPermissions(args, context);
+
   return getFileDownload({
     handler: wastesRegistryCsvDownloadHandler.name,
     params: args

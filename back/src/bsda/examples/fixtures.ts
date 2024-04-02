@@ -141,6 +141,16 @@ function transporterSignatureUpdateInput() {
   };
 }
 
+function transporterNSignatureUpdateInput() {
+  return {
+    transport: {
+      mode: "ROAD",
+      plates: ["abc21cde"],
+      takenOverAt: new Date().toISOString() as any
+    }
+  };
+}
+
 function destinationSignatureUpdateInput() {
   return {
     destination: {
@@ -204,5 +214,6 @@ export default {
   emitterSignatureUpdateInput,
   workerSignatureUpdateInput,
   transporterSignatureUpdateInput,
+  transporterNSignatureUpdateInput,
   destinationSignatureUpdateInput
 };

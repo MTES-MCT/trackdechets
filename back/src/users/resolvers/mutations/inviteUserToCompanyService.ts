@@ -36,7 +36,7 @@ export async function inviteUserToCompanyFn(
 
     const mail = renderMail(notifyUserOfInvite, {
       to: [{ email, name: existingUser.name }],
-      variables: { companyName: company.name }
+      variables: { companyName: company.name, companyOrgId: siret }
     });
     await sendMail(mail);
   } else {
@@ -45,11 +45,15 @@ export async function inviteUserToCompanyFn(
     // as the account is created, the association will be persisted
 
     const userAccountHash = await createUserAccountHash(email, role, siret);
-
     const mail = renderMail(inviteUserToJoin, {
       to: [{ email, name: email }],
-      variables: { hash: userAccountHash.hash, companyName: company.name }
+      variables: {
+        hash: userAccountHash.hash,
+        companyName: company.name,
+        companyOrgId: siret
+      }
     });
+
     await sendMail(mail);
   }
 

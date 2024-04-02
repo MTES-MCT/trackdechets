@@ -86,3 +86,25 @@ export function create2710Bsda(
     setContext: (ctx, data) => ({ ...ctx, bsda: data })
   };
 }
+
+export function createBsdaWithTransporters(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
+  return {
+    ...createBsda(company),
+    description:
+      "Crée un BSDA en associant une liste de transporteurs dans un ordre donné",
+    variables: ({ producteur, worker, traiteur, bsdaTransporters }) => ({
+      input: {
+        emitter: fixtures.emitterInput(producteur.siret),
+        destination: fixtures.destinationInput(traiteur.siret),
+        waste: fixtures.wasteInput(),
+        worker: fixtures.workerInput(worker.siret),
+        packagings: fixtures.packagingsInput(),
+        weight: fixtures.weightInput(),
+        transporters: bsdaTransporters
+      }
+    })
+  };
+}

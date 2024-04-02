@@ -5,6 +5,24 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.4.1] 09/04/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- ETQ utilisateur je peux faire du multi-modal sur le BSDA par API [PR 3108](https://github.com/MTES-MCT/trackdechets/pull/3108)
+
+#### :nail_care: Améliorations
+
+- Le siret de l'établissement est précisé dans les emails d'invitation [PR 3151](https://github.com/MTES-MCT/trackdechets/pull/3151)
+
+#### :bug: Corrections de bugs
+
+- Correction des registres éco-organisme et intermédiaires [PR 3196](https://github.com/MTES-MCT/trackdechets/pull/3196/)
+
+#### :house: Interne
+
+- Permettre au comptes de service de télécharger les registres csv and xls de tous les sirets P[R 3207](https://github.com/MTES-MCT/trackdechets/pull/3207)
+
 # [2024.3.1] 12/03/2024
 
 #### :rocket: Nouvelles fonctionnalités

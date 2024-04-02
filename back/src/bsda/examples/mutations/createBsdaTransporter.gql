@@ -1,0 +1,5 @@
+mutation CreateBsdaTransporter($input: BsdaTransporterInput!) {
+  createBsdaTransporter(input: $input) {
+    id
+  }
+}

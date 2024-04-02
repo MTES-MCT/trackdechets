@@ -63,6 +63,10 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           ? "UNIDENTIFIED_EXTRA_EUROPEAN_COMPANY"
           : extraEuropeanCompany
       );
+    } else {
+      setIsExtraEuropeanCompany(false);
+      setFieldValue("nextDestination.company.extraEuropeanId", "");
+      setExtraEuropeanCompany("");
     }
   }, [
     isExtraEuropeanCompany,

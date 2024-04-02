@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["tracing", "metrics"]
+  previewFeatures = ["metrics", "tracing"]
 }
 
 datasource db {
@@ -16,8 +16,8 @@ enum CompanyType {
   WASTE_VEHICLES
   WASTE_CENTER
   TRADER
-  BROKER
   ECO_ORGANISME
+  BROKER
   WORKER
   CREMATORIUM
   INTERMEDIARY
@@ -71,9 +71,9 @@ enum WasteProcessorType {
 }
 
 enum CompanyVerificationMode {
-  AUTO
   MANUAL
   LETTER
+  AUTO
 }
 
 enum CompanyVerificationStatus {
@@ -110,8 +110,8 @@ enum EmitterType {
   PRODUCER
   OTHER
   APPENDIX1
-  APPENDIX1_PRODUCER
   APPENDIX2
+  APPENDIX1_PRODUCER
 }
 
 enum QuantityType {
@@ -129,7 +129,6 @@ enum Consistence {
 enum Status {
   DRAFT
   SEALED
-  SIGNED_BY_PRODUCER
   SENT
   RECEIVED
   ACCEPTED
@@ -138,13 +137,13 @@ enum Status {
   GROUPED
   NO_TRACEABILITY
   REFUSED
-  FOLLOWED_WITH_PNTTD
-  // Temporary storage status
   TEMP_STORED
   TEMP_STORER_ACCEPTED
   RESEALED
-  SIGNED_BY_TEMP_STORER
   RESENT
+  SIGNED_BY_PRODUCER
+  SIGNED_BY_TEMP_STORER
+  FOLLOWED_WITH_PNTTD
   CANCELED
 }
 
@@ -158,10 +157,10 @@ enum TransportMode {
 }
 
 enum UserRole {
-  READER
-  DRIVER
   MEMBER
   ADMIN
+  DRIVER
+  READER
 }
 
 enum MembershipRequestStatus {
@@ -217,17 +216,17 @@ enum OperationMode {
 }
 
 model AccessToken {
-  id            String       @id @default(cuid())
+  id            String       @id @default(cuid()) @db.VarChar(30)
   createdAt     DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt     DateTime     @updatedAt @db.Timestamptz(6)
-  token         String       @unique
-  description   String?
+  token         String       @unique(map: "AccessToken.token._UNIQUE")
   isRevoked     Boolean      @default(false)
   lastUsed      DateTime?    @db.Timestamptz(6)
-  applicationId String?
-  application   Application? @relation(fields: [applicationId], references: [id])
-  userId        String
-  user          User         @relation(fields: [userId], references: [id])
+  applicationId String?      @db.VarChar(30)
+  description   String?
+  application   Application? @relation(fields: [applicationId], references: [id], onUpdate: NoAction, map: "AccessToken_application_fkey")
+  userId        String       @db.VarChar(30)
+  user          User         @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "AccessToken_user_fkey")
 }
 
 model Application {
@@ -236,38 +235,28 @@ model Application {
   updatedAt     DateTime         @updatedAt @db.Timestamptz(6)
   clientSecret  String
   name          String
-  goal          ApplicationGoal?
   logoUrl       String?
   redirectUris  String[]
-  admin         User?            @relation(fields: [adminId], references: [id])
   adminId       String?
+  admin         User?            @relation(fields: [adminId], references: [id], onDelete: Restrict)
+  goal          ApplicationGoal?
   openIdEnabled Boolean          @default(false)
   AccessToken   AccessToken[]
   Grant         Grant[]
 }
 
 model Company {
-  id                                   String                    @id @default(cuid())
+  id                                   String                    @id @default(cuid()) @db.VarChar(30)
   orgId                                String                    @unique
-  siret                                String?                   @unique
-  vatNumber                            String?                   @unique
+  siret                                String?                   @unique(map: "_Company_siret_unique")
+  vatNumber                            String?                   @unique(map: "_Company_vatNumber_unique")
   updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
   createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
-  securityCode                         Int
-  verificationCode                     String
-  verificationStatus                   CompanyVerificationStatus @default(TO_BE_VERIFIED)
-  verificationMode                     CompanyVerificationMode?
-  verificationComment                  String?
-  verifiedAt                           DateTime?                 @db.Timestamptz(6)
   name                                 String
-  address                              String?
-  codeDepartement                      String?
-  longitude                            Float?
-  latitude                             Float?
   gerepId                              String?
   codeNaf                              String?
+  securityCode                         Int
   givenName                            String?
-  contact                              String?
   contactEmail                         String?
   contactPhone                         String?
   website                              String?
@@ -275,32 +264,42 @@ model Company {
   companyTypes                         CompanyType[]
   collectorTypes                       CollectorType[]
   wasteProcessorTypes                  WasteProcessorType[]
-  traderReceiptId                      String?
-  traderReceipt                        TraderReceipt?            @relation(fields: [traderReceiptId], references: [id])
-  brokerReceiptId                      String?
-  brokerReceipt                        BrokerReceipt?            @relation(fields: [brokerReceiptId], references: [id])
-  transporterReceiptId                 String?
-  transporterReceipt                   TransporterReceipt?       @relation(fields: [transporterReceiptId], references: [id])
-  vhuAgrementDemolisseurId             String?
-  vhuAgrementDemolisseur               VhuAgrement?              @relation(name: "VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
-  vhuAgrementBroyeurId                 String?
-  vhuAgrementBroyeur                   VhuAgrement?              @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
-  workerCertificationId                String?
+  address                              String?
+  latitude                             Float?
+  longitude                            Float?
+  verificationCode                     String
+  verificationStatus                   CompanyVerificationStatus @default(TO_BE_VERIFIED)
+  verificationMode                     CompanyVerificationMode?
+  verificationComment                  String?
+  verifiedAt                           DateTime?                 @db.Timestamptz(6)
+  contact                              String?
+  codeDepartement                      String?
+  workerCertificationId                String?                   @db.VarChar(40)
+  traderReceiptId                      String?                   @db.VarChar(30)
+  traderReceipt                        TraderReceipt?            @relation(fields: [traderReceiptId], references: [id], onUpdate: NoAction, map: "Company_traderReceipt_fkey")
+  brokerReceiptId                      String?                   @db.VarChar(30)
+  brokerReceipt                        BrokerReceipt?            @relation(fields: [brokerReceiptId], references: [id], onUpdate: NoAction, map: "company_brokerreceipt_fkey")
+  transporterReceiptId                 String?                   @db.VarChar(30)
+  transporterReceipt                   TransporterReceipt?       @relation(fields: [transporterReceiptId], references: [id], onUpdate: NoAction, map: "Company_transporterReceipt_fkey")
+  vhuAgrementDemolisseurId             String?                   @db.VarChar(40)
+  vhuAgrementDemolisseur               VhuAgrement?              @relation("VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
+  vhuAgrementBroyeurId                 String?                   @db.VarChar(40)
+  vhuAgrementBroyeur                   VhuAgrement?              @relation("VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
   workerCertification                  WorkerCertification?      @relation(fields: [workerCertificationId], references: [id])
   companyAssociations                  CompanyAssociation[]
-  MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
-  bsddRevisionRequests                 BsddRevisionRequest[]
+  MembershipRequest                    MembershipRequest[]
   bsdaRevisionRequests                 BsdaRevisionRequest[]
+  bsddRevisionRequests                 BsddRevisionRequest[]
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
   receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
-
-  // gin indices _CompanyTypesIdx => 149_create_company_indices.sql
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
   @@index([createdAt], map: "_CompanyCreatedAtIdx")
   @@index([verificationStatus], map: "_CompanyVerificationStatusIdx")
+  @@index([companyTypes], map: "_CompanyTypesIdx", type: Gin)
+  @@index([vatNumber], map: "_CompanyVatNumberIdx")
 }
 
 // Companies with restricted diffusion of SIRENE or VAT information (police, army, etc)
@@ -315,24 +314,26 @@ model Company {
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
   id          String  @id @default(cuid())
-  orgId       String  @unique
-  siret       String? @unique
-  vatNumber   String? @unique
+  orgId       String  @unique(map: "AnonymousCompany.orgId_unique")
+  siret       String? @unique(map: "AnonymousCompany.siret_unique")
+  vatNumber   String? @unique(map: "AnonymousCompany.vatnumber_unique")
   name        String
   address     String
   codeNaf     String
   libelleNaf  String
   codeCommune String
+
+  @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
 
 // Un utilisateur peut demander la création de son entreprise non-diffusible,
 // à condition de fournir un avis de situation SIRENE de moins de 3 mois.
 // Un admin vérifiera manuellement la demande.
 model AnonymousCompanyRequest {
-  id          String  @id @default(cuid())
-  siret       String  @unique
+  id          String   @id @default(cuid())
+  siret       String   @unique(map: "AnonymousCompanyRequest.siret_unique")
   pdf         String
-  createdAt   DateTime   @default(now()) @db.Timestamptz(6)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   name        String
@@ -342,13 +343,13 @@ model AnonymousCompanyRequest {
 }
 
 model CompanyAssociation {
-  id                    String    @id @default(cuid())
+  id                    String    @id @default(cuid()) @db.VarChar(30)
   role                  UserRole
-  companyId             String
-  company               Company   @relation(fields: [companyId], references: [id])
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id])
-  createdAt             DateTime? @default(now()) @db.Timestamptz(6)
+  companyId             String    @db.VarChar(30)
+  company               Company   @relation(fields: [companyId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "CompanyAssociation_company_fkey")
+  userId                String    @db.VarChar(30)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "CompanyAssociation_user_fkey")
+  createdAt             DateTime? @default(now())
   // Tell apart automatically accepted invitations from others
   automaticallyAccepted Boolean   @default(false)
 
@@ -359,18 +360,18 @@ model CompanyAssociation {
 
 model SignatureAutomation {
   id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  createdAt DateTime @default(now())
   fromId    String
   from      Company  @relation("SignatureAutomationFrom", fields: [fromId], references: [id])
   toId      String
   to        Company  @relation("SignatureAutomationTo", fields: [toId], references: [id])
 
-  @@unique([fromId, toId])
+  @@unique([fromId, toId], map: "SignatureAutomation_fkey_unique_together")
   @@index([fromId], map: "_SignatureAutomationFromIdIdx")
 }
 
 model Declaration {
-  id         String     @id @default(cuid())
+  id         String     @id @default(cuid()) @db.VarChar(30)
   codeS3ic   String?
   nomEts     String?
   annee      String?
@@ -378,12 +379,12 @@ model Declaration {
   libDechet  String?
   gerepType  GerepType?
 
-  @@index([codeS3ic], name: "declaration_codes3ic")
+  @@index([codeS3ic], map: "declaration_codes3ic")
 }
 
 model EcoOrganisme {
-  id            String  @id @default(cuid())
-  siret         String  @unique
+  id            String  @id @default(cuid()) @db.VarChar(30)
+  siret         String  @unique(map: "EcoOrganisme.siret._UNIQUE")
   name          String
   address       String
   handleBsdasri Boolean @default(false)
@@ -393,7 +394,7 @@ model EcoOrganisme {
 // Modèle qui peut être partagé entre tous les
 // bordereaux pour calculcer la traçabilité finale
 model FinalOperation {
-  id                      String   @id @default(cuid())
+  id                      String   @id @unique(map: "_FinalOperation_pkey") @default(cuid())
   createdAt               DateTime @default(now()) @db.Timestamptz(6)
   updatedAt               DateTime @updatedAt @db.Timestamptz(6)
   finalBsdReadableId      String
@@ -401,28 +402,39 @@ model FinalOperation {
   quantity                Float
   destinationCompanySiret String
   destinationCompanyName  String
-  // Champs spécifiques pour Form
-  Form                    Form?    @relation(fields: [formId], references: [id])
   formId                  String?
+  Form                    Form?    @relation(fields: [formId], references: [id], onDelete: Cascade)
 
-  @@unique([formId, finalBsdReadableId])
+  @@unique([formId, finalBsdReadableId], map: "FinalOperation_pkey_unique_together")
+  @@unique([finalBsdReadableId, formId], map: "_FinalOperation_finalBsdReadableId")
+  @@index([formId], map: "_FinalOperationFormIdIdx")
+  @@index([destinationCompanySiret], map: "_FinalOperationdestinationCompanySiretIdx")
 }
 
 model Form {
-  id                                    String                  @id @default(cuid())
-  rowNumber                             Int                     @unique @default(autoincrement())
+  id                                    String                  @id @default(cuid()) @db.VarChar(30)
+  rowNumber                             Int                     @unique(map: "Form_rowNumber_ukey") @default(autoincrement())
   createdAt                             DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt                             DateTime                @updatedAt @db.Timestamptz(6)
+  readableId                            String                  @unique(map: "Form.readableId._UNIQUE")
+  customId                              String?
+  isDeleted                             Boolean?                @default(false)
+  status                                Status                  @default(DRAFT)
   emitterType                           EmitterType?
   emitterPickupSite                     String?
-  emitterIsPrivateIndividual            Boolean?                @default(false)
-  emitterIsForeignShip                  Boolean?                @default(false)
   emitterCompanyName                    String?
   emitterCompanySiret                   String?
   emitterCompanyAddress                 String?
   emitterCompanyContact                 String?
   emitterCompanyPhone                   String?
   emitterCompanyMail                    String?
+  emitterWorkSiteName                   String?
+  emitterWorkSiteAddress                String?
+  emitterWorkSiteCity                   String?
+  emitterWorkSitePostalCode             String?
+  emitterWorkSiteInfos                  String?
+  emitterIsPrivateIndividual            Boolean?                @default(false)
+  emitterIsForeignShip                  Boolean?                @default(false)
   emitterCompanyOmiNumber               String?
   recipientCap                          String?
   recipientProcessingOperation          String?
@@ -432,39 +444,20 @@ model Form {
   recipientCompanyContact               String?
   recipientCompanyPhone                 String?
   recipientCompanyMail                  String?
+  recipientIsTempStorage                Boolean?                @default(false)
   wasteDetailsCode                      String?
+  wasteDetailsName                      String?
   wasteDetailsOnuCode                   String?
-  wasteDetailsPackagingInfos            Json                    @default("[]")
-  wasteDetailsQuantity                  Float?
+  wasteDetailsQuantity                  Decimal?                @db.Decimal(65, 30)
   wasteDetailsQuantityType              QuantityType?
+  wasteDetailsConsistence               Consistence?
+  wasteDetailsPackagingInfos            Json                    @default("[]")
   wasteDetailsPop                       Boolean                 @default(false)
+  wasteDetailsSampleNumber              String?
   wasteDetailsIsDangerous               Boolean                 @default(false)
-  wasteDetailsParcelNumbers             Json                    @default("[]")
+  wasteDetailsParcelNumbers             Json?                   @default("[]")
   wasteDetailsAnalysisReferences        String[]
   wasteDetailsLandIdentifiers           String[]
-  wasteDetailsSampleNumber              String?
-  readableId                            String                  @unique
-  status                                Status                  @default(DRAFT)
-  emittedBy                             String?
-  emittedAt                             DateTime?               @db.Timestamptz(6)
-  emittedByEcoOrganisme                 Boolean?
-  takenOverBy                           String?
-  takenOverAt                           DateTime?               @db.Timestamptz(6)
-  sentAt                                DateTime?               @db.Timestamptz(6)
-  sentBy                                String?
-  isAccepted                            Boolean?                @default(false)
-  receivedAt                            DateTime?               @db.Timestamptz(6)
-  quantityReceived                      Float?
-  quantityReceivedType                  QuantityType?
-  processingOperationDone               String?
-  destinationOperationMode              OperationMode?
-  wasteDetailsName                      String?
-  isDeleted                             Boolean?                @default(false)
-  receivedBy                            String?
-  wasteDetailsConsistence               Consistence?
-  processedBy                           String?
-  processedAt                           DateTime?               @db.Timestamptz(6)
-  nextDestinationProcessingOperation    String?
   traderCompanyName                     String?
   traderCompanySiret                    String?
   traderCompanyAddress                  String?
@@ -474,6 +467,8 @@ model Form {
   traderReceipt                         String?
   traderDepartment                      String?
   traderValidityLimit                   DateTime?               @db.Timestamptz(6)
+  ecoOrganismeName                      String?
+  ecoOrganismeSiret                     String?
   brokerCompanyName                     String?
   brokerCompanySiret                    String?
   brokerCompanyAddress                  String?
@@ -483,12 +478,7 @@ model Form {
   brokerReceipt                         String?
   brokerDepartment                      String?
   brokerValidityLimit                   DateTime?               @db.Timestamptz(6)
-  processingOperationDescription        String?
-  noTraceability                        Boolean?
-  signedByTransporter                   Boolean?
-  customId                              String?
-  wasteAcceptationStatus                WasteAcceptationStatus?
-  wasteRefusalReason                    String?
+  nextDestinationProcessingOperation    String?
   nextDestinationCompanyName            String?
   nextDestinationCompanySiret           String?
   nextDestinationCompanyAddress         String?
@@ -496,28 +486,41 @@ model Form {
   nextDestinationCompanyPhone           String?
   nextDestinationCompanyMail            String?
   nextDestinationCompanyCountry         String?
-  nextDestinationCompanyVatNumber       String?
-  nextDestinationCompanyExtraEuropeanId String?
+  nextDestinationCompanyVatNumber       String?                 @db.VarChar(30)
   nextDestinationNotificationNumber     String?
-  emitterWorkSiteName                   String?
-  emitterWorkSiteAddress                String?
-  emitterWorkSiteCity                   String?
-  emitterWorkSitePostalCode             String?
-  emitterWorkSiteInfos                  String?
-  recipientIsTempStorage                Boolean?                @default(false)
+  nextDestinationCompanyExtraEuropeanId String?
+  nextTransporterOrgId                  String?                 @db.VarChar(30)
+  emittedAt                             DateTime?               @db.Timestamptz(6)
+  emittedBy                             String?
+  emittedByEcoOrganisme                 Boolean?
+  takenOverAt                           DateTime?               @db.Timestamptz(6)
+  takenOverBy                           String?
   signedAt                              DateTime?               @db.Timestamptz(6)
-  currentTransporterOrgId               String?
-  nextTransporterOrgId                  String?
-  isImportedFromPaper                   Boolean                 @default(false)
-  ecoOrganismeName                      String?
-  ecoOrganismeSiret                     String?
   signedBy                              String?
+  isImportedFromPaper                   Boolean                 @default(false)
+  quantityReceivedType                  QuantityType?
+  signedByTransporter                   Boolean?
+  sentAt                                DateTime?               @db.Timestamptz(6)
+  sentBy                                String?
+  isAccepted                            Boolean?                @default(false)
+  wasteAcceptationStatus                WasteAcceptationStatus?
+  wasteRefusalReason                    String?
+  receivedBy                            String?
+  receivedAt                            DateTime?               @db.Timestamptz(6)
+  quantityReceived                      Decimal?                @db.Decimal(65, 30)
+  processedBy                           String?
+  processedAt                           DateTime?               @db.Timestamptz(6)
+  processingOperationDone               String?
+  processingOperationDescription        String?
+  noTraceability                        Boolean?
+  destinationOperationMode              OperationMode?
+  currentTransporterOrgId               String?                 @db.VarChar(30)
 
   transporters BsddTransporter[]
   groupedIn    FormGroupement[]  @relation("GroupedIn")
   grouping     FormGroupement[]  @relation("Grouping")
 
-  ownerId              String
+  ownerId              String                        @db.VarChar(30)
   owner                User                          @relation(fields: [ownerId], references: [id])
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
@@ -544,7 +547,6 @@ model Form {
 
   // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
   // partial index _FormRecipientIsTempStorageIdx see 99_add_form_indices.sql
-  // gin indices see 104_denormalize_indexes.sql & 149_add_draft_access_form.sql
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -559,17 +561,23 @@ model Form {
   @@index([currentTransporterOrgId], map: "_FormCurrentTransporterOrgIdIdx")
   @@index([nextTransporterOrgId], map: "_FormNextTransporterOrgIdIdx")
   @@index([nextDestinationCompanySiret], map: "_FormNextDestinationCompanySiretIdx")
+  @@index([canAccessDraftSirets], map: "_FormCanAccessDraftSiretsIdx", type: Gin)
+  @@index([emitterCompanyMail], map: "_FormEmitterCompanyMailIdx")
+  @@index([intermediariesSirets], map: "_FormIntermediariesSiretsIdx", type: Gin)
+  @@index([recipientsSirets], map: "_FormRecipientsSiretsIdx", type: Gin)
+  @@index([transportersSirets], map: "_FormTransportersSiretsIdx", type: Gin)
+  @@index([updatedAt], map: "_FormUpdatedAtIdx")
 }
 
 model FormGroupement {
   id            String @id @default(cuid())
   nextFormId    String
-  nextForm      Form   @relation(fields: [nextFormId], references: [id], name: "Grouping")
+  nextForm      Form   @relation("Grouping", fields: [nextFormId], references: [id])
   initialFormId String
-  initialForm   Form   @relation(fields: [initialFormId], references: [id], name: "GroupedIn")
+  initialForm   Form   @relation("GroupedIn", fields: [initialFormId], references: [id])
   quantity      Float
 
-  @@unique([nextFormId, initialFormId])
+  @@unique([nextFormId, initialFormId], map: "FormGroupement_pkey_unique_together")
   @@index([nextFormId], map: "_FormGroupementNextFormId")
   @@index([initialFormId], map: "_FormGroupementInitialFormId")
 }
@@ -577,7 +585,6 @@ model FormGroupement {
 // Entreprise jouant le rôle d'intermédiaire sur un bordereau
 model IntermediaryFormAssociation {
   id        String   @id @default(cuid())
-  formId    String
   name      String
   siret     String
   contact   String
@@ -585,31 +592,28 @@ model IntermediaryFormAssociation {
   address   String?
   phone     String?
   mail      String?
+  formId    String
   form      Form     @relation(fields: [formId], references: [id])
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  createdAt DateTime @default(now())
 
   @@index([formId], map: "_IntermediaryFormAssociationFormIdIdx")
   @@index([siret], map: "IntermediaryFormAssociationSiretIdx")
   @@index([vatNumber], map: "IntermediaryFormAssociationVatNumberIdx")
 }
 
-enum RevisionRequestStatus {
-  PENDING
-  ACCEPTED
-  REFUSED
-}
-
 model BsddRevisionRequest {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+  isCanceled Boolean  @default(false)
+  comment    String
 
   bsddId             String
-  bsdd               Form    @relation(fields: [bsddId], references: [id])
+  bsdd               Form                          @relation(fields: [bsddId], references: [id], onDelete: Cascade)
   authoringCompanyId String
-  authoringCompany   Company @relation(fields: [authoringCompanyId], references: [id])
-
-  approvals BsddRevisionRequestApproval[]
+  authoringCompany   Company                       @relation(fields: [authoringCompanyId], references: [id], onDelete: Cascade)
+  approvals          BsddRevisionRequestApproval[]
+  status             RevisionRequestStatus         @default(PENDING)
 
   recipientCap                                    String?
   wasteDetailsCode                                String?
@@ -641,58 +645,44 @@ model BsddRevisionRequest {
   temporaryStorageDestinationCap                  String?
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
-  isCanceled                                      Boolean        @default(false)
-
-  comment String
-
-  status RevisionRequestStatus @default(PENDING)
 
   @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")
   @@index([status], map: "_BsddRevisionRequestStatusIdx")
 }
 
-enum RevisionRequestApprovalStatus {
-  PENDING
-  ACCEPTED
-  REFUSED
-  CANCELED
-}
-
 model BsddRevisionRequestApproval {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
+  id                String                        @id @default(cuid())
+  createdAt         DateTime                      @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime                      @updatedAt @db.Timestamptz(6)
   revisionRequestId String
-  revisionRequest   BsddRevisionRequest @relation(fields: [revisionRequestId], references: [id])
+  revisionRequest   BsddRevisionRequest           @relation(fields: [revisionRequestId], references: [id], onDelete: Cascade)
   approverSiret     String
-
-  status  RevisionRequestApprovalStatus @default(PENDING)
-  comment String?
+  status            RevisionRequestApprovalStatus @default(PENDING)
+  comment           String?
 
   @@index([revisionRequestId], map: "_BsddRevisionRequestApprovalRevisionRequestIdIdx")
   @@index([approverSiret], map: "_BsddRevisionRequestApprovalApproverSiretIdx")
 }
 
 model Grant {
-  id            String      @id @default(cuid())
+  id            String      @id @default(cuid()) @db.VarChar(30)
   createdAt     DateTime    @default(now()) @db.Timestamptz(6)
   updatedAt     DateTime    @updatedAt @db.Timestamptz(6)
-  code          String      @unique
+  code          String      @unique(map: "Grant.code._UNIQUE")
   expires       Int
   redirectUri   String
-  applicationId String
   openIdEnabled Boolean     @default(false)
   scope         String[]    @default([])
   nonce         String?
-  application   Application @relation(fields: [applicationId], references: [id])
-  userId        String
-  user          User        @relation(fields: [userId], references: [id])
+  applicationId String      @db.VarChar(30)
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "Grant_application_fkey")
+  userId        String      @db.VarChar(30)
+  user          User        @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "Grant_user_fkey")
 }
 
 model Installation {
-  id                String  @id @default(cuid())
+  id                String  @id @default(cuid()) @db.VarChar(30)
   codeS3ic          String?
   nomEts            String?
   regime            String?
@@ -713,23 +703,23 @@ model Installation {
 }
 
 model MembershipRequest {
-  id              String                  @id @default(cuid())
+  id              String                  @id @default(cuid()) @db.VarChar(30)
   createdAt       DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt       DateTime                @updatedAt @db.Timestamptz(6)
   status          MembershipRequestStatus @default(PENDING)
   statusUpdatedBy String?
   sentTo          String[]
-  companyId       String
-  company         Company                 @relation(fields: [companyId], references: [id])
-  userId          String
-  user            User                    @relation(fields: [userId], references: [id])
+  companyId       String                  @db.VarChar(30)
+  company         Company                 @relation(fields: [companyId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "MembershipRequest_company_fkey")
+  userId          String                  @db.VarChar(30)
+  user            User                    @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "MembershipRequest_user_fkey")
 
   @@index([userId], map: "_MembershipRequestUserIdIdx")
   @@index([companyId], map: "_MembershipRequestCompanyIdIdx")
 }
 
 model Rubrique {
-  id               String     @id @default(cuid())
+  id               String     @id @default(cuid()) @db.VarChar(30)
   codeS3ic         String?
   rubrique         String?
   alinea           String?
@@ -746,15 +736,15 @@ model Rubrique {
 }
 
 model StatusLog {
-  id            String    @id @default(cuid())
+  id            String    @id @default(cuid()) @db.VarChar(30)
   status        Status
   loggedAt      DateTime? @db.Timestamptz(6)
   updatedFields Json
-  formId        String
-  form          Form      @relation(fields: [formId], references: [id])
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
   authType      AuthType
+  formId        String    @db.VarChar(30)
+  form          Form      @relation(fields: [formId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "StatusLog_form_fkey")
+  userId        String    @db.VarChar(30)
+  user          User      @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "StatusLog_user_fkey")
 
   @@index([userId], map: "_StatusLogUserIdIdx")
   @@index([formId], map: "_StatusLogFormIdIdx")
@@ -770,7 +760,7 @@ model TraderReceipt {
 }
 
 model BrokerReceipt {
-  id            String    @id @default(cuid())
+  id            String    @id @default(cuid()) @db.VarChar(30)
   receiptNumber String
   validityLimit DateTime  @db.Timestamptz(6)
   department    String
@@ -786,28 +776,28 @@ model TransporterReceipt {
 }
 
 model VhuAgrement {
-  id                   String    @id @default(cuid())
-  agrementNumber       String
-  department           String
-  demolisseurCompanies Company[] @relation("VhuAgrementDemolisseur_Company")
+  id                   String    @id @default(cuid()) @db.VarChar(40)
+  agrementNumber       String    @db.VarChar(50)
+  department           String    @db.VarChar(50)
   broyeurCompanies     Company[] @relation("VhuAgrementBroyeur_Company")
+  demolisseurCompanies Company[] @relation("VhuAgrementDemolisseur_Company")
 }
 
 model WorkerCertification {
-  id                  String    @id @default(cuid())
-  hasSubSectionFour   Boolean
-  hasSubSectionThree  Boolean
-  certificationNumber String?
+  id                  String    @id @default(cuid()) @db.VarChar(30)
+  hasSubSectionFour   Boolean   @default(false)
+  hasSubSectionThree  Boolean   @default(false)
+  certificationNumber String?   @db.VarChar(50)
   validityLimit       DateTime? @db.Timestamptz(6)
-  organisation        String?
+  organisation        String?   @db.VarChar(30)
   Company             Company[]
 }
 
 model BsddTransporter {
-  id                              String         @id @default(cuid())
+  id                              String         @id @default(cuid()) @db.VarChar(30)
   number                          Int
   transporterCompanySiret         String?
-  transporterCompanyVatNumber     String?
+  transporterCompanyVatNumber     String?        @db.VarChar(30)
   transporterCompanyName          String?
   transporterCompanyAddress       String?
   transporterCompanyContact       String?
@@ -821,54 +811,52 @@ model BsddTransporter {
   transporterTransportMode        TransportMode?
   transporterCustomInfo           String?
   readyToTakeOver                 Boolean?       @default(false)
-  previousTransporterCompanyOrgId String?
+  previousTransporterCompanyOrgId String?        @db.VarChar(30)
   takenOverAt                     DateTime?      @db.Timestamptz(6)
   takenOverBy                     String?
   createdAt                       DateTime       @default(now()) @db.Timestamptz(6)
   updatedAt                       DateTime       @updatedAt @db.Timestamptz(6)
-  formId                          String?
-  form                            Form?          @relation(fields: [formId], references: [id], onDelete: Cascade)
+  formId                          String?        @db.VarChar(30)
+  form                            Form?          @relation(fields: [formId], references: [id], onDelete: Cascade, map: "BsddTransporter_formId_fkey")
 
   @@index([formId], map: "_BsddTransporterFormIdIdx")
   @@index([transporterCompanySiret], map: "_BsddTransporterCompanySiretIdx")
-  @@index([transporterCompanyVatNumber], map: "_BsddTransporterCompanyVatNumberIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsddTransporterTransporterCompanyVatNumberIdx")
 }
 
 model User {
-  id                    String                  @id @default(cuid())
-  email                 String                  @unique
-  password              String
-  passwordVersion       Int
-  name                  String
-  phone                 String?
-  createdAt             DateTime                @default(now()) @db.Timestamptz(6)
-  updatedAt             DateTime                @updatedAt @db.Timestamptz(6)
-  activatedAt           DateTime?               @db.Timestamptz(6) // when was this user activated ? - emailing purpose @db.Timestamptz(6)
-  firstAssociationDate  DateTime?               @db.Timestamptz(6) // when was this user first associated to any company ? - emailing purpose @db.Timestamptz(6)
-  isActive              Boolean?                @default(false)
-  isAdmin               Boolean?                @default(false)
+  id                      String                    @id @default(cuid())
+  email                   String                    @unique(map: "User.email_unique")
+  password                String
+  passwordVersion         Int?
+  name                    String
+  phone                   String?
+  createdAt               DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt               DateTime                  @updatedAt @db.Timestamptz(6)
+  activatedAt             DateTime?                 @db.Timestamptz(6)
+  firstAssociationDate    DateTime?                 @db.Timestamptz(6)
+  isActive                Boolean?                  @default(false)
+  isAdmin                 Boolean?                  @default(false)
   // TODO champ à supprimer suite à la création des comptes gouvernementaux
-  isRegistreNational    Boolean?                @default(false)
-  // compte gouvernemental avec des droits étendus
-  governmentAccount     GovernmentAccount?      @relation(fields: [governmentAccountId], references: [id], onDelete: SetNull)
-  applications          Application[]
-  companyAssociations   CompanyAssociation[]
-  AccessToken           AccessToken[]
-  Form                  Form[]
-  Grant                 Grant[]
-  MembershipRequest     MembershipRequest[]
-  StatusLog             StatusLog[]
-  UserActivationHash    UserActivationHash[]
-  UserResetPasswordHash UserResetPasswordHash[]
-  PdfAccessToken        PdfAccessToken[]
-  featureFlags          FeatureFlag[]
+  isRegistreNational      Boolean                   @default(false)
+  governmentAccountId     String?                   @unique
+  governmentAccount       GovernmentAccount?        @relation(fields: [governmentAccountId], references: [id])
+  AccessToken             AccessToken[]
   AnonymousCompanyRequest AnonymousCompanyRequest[]
+  applications            Application[]
+  companyAssociations     CompanyAssociation[]
+  featureFlags            FeatureFlag[]
+  Grant                   Grant[]
+  MembershipRequest       MembershipRequest[]
+  StatusLog               StatusLog[]
+  UserResetPasswordHash   UserResetPasswordHash[]
 
-  bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
-  bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
-  bsdasriReceptionSignatures Bsdasri[] @relation("BsdasriReceptionSignature")
-  bsdasriOperationignatures  Bsdasri[] @relation("BsdasriOperationSignature")
-  governmentAccountId        String?   @unique
+  bsdasriEmissionSignatures  Bsdasri[]            @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[]            @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[]            @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures  Bsdasri[]            @relation("BsdasriOperationSignature")
+  Form                       Form[]
+  UserActivationHash         UserActivationHash[]
 }
 
 enum GovernmentPermission {
@@ -891,17 +879,17 @@ model GovernmentAccount {
   // Pour que les permissions étendues s'appliquent à tous les établissements,
   // passer la valeur 'ALL'
   authorizedOrgIds String[]
-  User             User[]
+  User             User?
 }
 
 model UserAccountHash {
-  id           String    @id @default(cuid())
+  id           String    @id @default(cuid()) @db.VarChar(30)
   email        String
-  companySiret String
-  hash         String    @unique
-  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
-  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  companySiret String    @db.VarChar(25)
   role         UserRole
+  hash         String    @unique(map: "UserAccountHash.hash._UNIQUE")
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
   acceptedAt   DateTime? @db.Timestamptz(6)
 
   @@index([email], map: "_UserAccountHashEmailIdx")
@@ -909,11 +897,11 @@ model UserAccountHash {
 }
 
 model UserActivationHash {
-  id        String   @id @default(cuid())
-  hash      String   @unique
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  id        String   @id @default(cuid()) @db.VarChar(30)
+  hash      String   @unique(map: "UserActivationHash.hash._UNIQUE")
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-  userId    String
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  userId    String   @db.VarChar(30)
   user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "_UserActivationHashUserIdIdx")
@@ -931,44 +919,18 @@ model UserResetPasswordHash {
 }
 
 model FeatureFlag {
-  id      String  @id @default(cuid())
-  name    String
+  id      String  @id @default(cuid()) @db.VarChar(30)
+  name    String  @db.VarChar(255)
   enabled Boolean @default(false)
-  userId  String
-  user    User    @relation(fields: [userId], references: [id])
+  userId  String  @db.VarChar(30)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([name, userId])
-}
-
-// ----------------
-// BSVHU FORM
-// ----------------
-enum BsvhuStatus {
-  INITIAL
-  SIGNED_BY_PRODUCER
-  SENT
-  PROCESSED
-  REFUSED
-}
-
-enum BsvhuPackaging {
-  UNITE
-  LOT
-}
-
-enum BsvhuIdentificationType {
-  NUMERO_ORDRE_REGISTRE_POLICE
-  NUMERO_ORDRE_LOTS_SORTANTS
-}
-
-enum BsvhuDestinationType {
-  BROYEUR
-  DEMOLISSEUR
+  @@unique([name, userId], map: "FeatureFlag_name_userId_unique_together")
 }
 
 model Bsvhu {
-  id        String   @id
-  rowNumber Int      @unique @default(autoincrement())
+  id        String   @id(map: "VhuForm_pkey") @db.VarChar(40)
+  rowNumber Int      @unique(map: "Bsvhu_rowNumber_ukey") @default(autoincrement())
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
   isDraft   Boolean  @default(false)
@@ -976,74 +938,68 @@ model Bsvhu {
 
   status BsvhuStatus @default(INITIAL)
 
-  emitterAgrementNumber String?
-  emitterCompanyName    String?
-  emitterCompanySiret   String?
-  emitterCompanyAddress String?
-  emitterCompanyContact String?
-  emitterCompanyPhone   String?
-  emitterCompanyMail    String?
-  emitterCustomInfo     String?
-
-  destinationType                 BsvhuDestinationType?
-  destinationPlannedOperationCode String?               @default("R 4")
-  destinationAgrementNumber       String?
-  destinationCompanyName          String?
-  destinationCompanySiret         String?
-  destinationCompanyAddress       String?
-  destinationCompanyContact       String?
-  destinationCompanyPhone         String?
-  destinationCompanyMail          String?
-  destinationCustomInfo           String?
-
-  wasteCode             String?                  @default("16 01 06")
-  packaging             BsvhuPackaging?
-  identificationNumbers String[]
-  identificationType    BsvhuIdentificationType?
-  quantity              Int?
-  weightValue           Float?
-  weightIsEstimate      Boolean?
-
-  emitterEmissionSignatureAuthor String?
-  emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
-
-  transporterCompanyName              String?
-  transporterCompanySiret             String?
-  transporterCompanyAddress           String?
-  transporterCompanyContact           String?
-  transporterCompanyPhone             String?
-  transporterCompanyMail              String?
-  transporterCompanyVatNumber         String?
-  transporterCustomInfo               String?
-  transporterRecepisseNumber          String?
-  transporterRecepisseDepartment      String?
-  transporterRecepisseValidityLimit   DateTime? @db.Timestamptz(6)
-  transporterRecepisseIsExempted      Boolean?
-  transporterTransportTakenOverAt     DateTime? @db.Timestamptz(6)
-  transporterTransportPlates          String[]
-  transporterTransportSignatureAuthor String?
-  transporterTransportSignatureDate   DateTime? @db.Timestamptz(6)
-
-  destinationReceptionQuantity              Int?
-  destinationReceptionWeight                Float?
-  destinationReceptionAcceptationStatus     WasteAcceptationStatus?
-  destinationReceptionRefusalReason         String?
-  destinationReceptionIdentificationNumbers String[]
-  destinationReceptionIdentificationType    BsvhuIdentificationType?
-  destinationReceptionDate                  DateTime?                @db.Timestamptz(6)
-
-  destinationOperationDate                            DateTime?      @db.Timestamptz(6)
-  destinationOperationCode                            String?
-  destinationOperationMode                            OperationMode?
+  emitterAgrementNumber                               String?                  @db.VarChar(100)
+  emitterCompanyName                                  String?
+  emitterCompanySiret                                 String?                  @db.VarChar(17)
+  emitterCompanyAddress                               String?
+  emitterCompanyContact                               String?
+  emitterCompanyPhone                                 String?
+  emitterCompanyMail                                  String?
+  emitterCustomInfo                                   String?
+  emitterEmissionSignatureAuthor                      String?
+  emitterEmissionSignatureDate                        DateTime?                @db.Timestamptz(6)
+  destinationType                                     BsvhuDestinationType?
+  destinationPlannedOperationCode                     String?                  @default("R 4") @db.VarChar(50)
+  destinationAgrementNumber                           String?                  @db.VarChar(100)
+  destinationCompanyName                              String?
+  destinationCompanySiret                             String?                  @db.VarChar(17)
+  destinationCompanyAddress                           String?
+  destinationCompanyContact                           String?
+  destinationCompanyPhone                             String?
+  destinationCompanyMail                              String?
+  destinationReceptionAcceptationStatus               WasteAcceptationStatus?
+  destinationReceptionRefusalReason                   String?
+  destinationReceptionIdentificationNumbers           String[]
+  destinationReceptionIdentificationType              BsvhuIdentificationType?
+  destinationOperationCode                            String?                  @db.VarChar(50)
   destinationOperationNextDestinationCompanyName      String?
-  destinationOperationNextDestinationCompanySiret     String?
+  destinationOperationNextDestinationCompanySiret     String?                  @db.VarChar(17)
   destinationOperationNextDestinationCompanyAddress   String?
   destinationOperationNextDestinationCompanyContact   String?
   destinationOperationNextDestinationCompanyPhone     String?
   destinationOperationNextDestinationCompanyMail      String?
-  destinationOperationNextDestinationCompanyVatNumber String?
   destinationOperationSignatureAuthor                 String?
-  destinationOperationSignatureDate                   DateTime?      @db.Timestamptz(6)
+  destinationOperationSignatureDate                   DateTime?                @db.Timestamptz(6)
+  destinationOperationDate                            DateTime?                @db.Timestamptz(6)
+  destinationReceptionQuantity                        Int?
+  destinationReceptionWeight                          Float?
+  destinationReceptionDate                            DateTime?                @db.Timestamptz(6)
+  destinationOperationNextDestinationCompanyVatNumber String?
+  destinationCustomInfo                               String?
+  destinationOperationMode                            OperationMode?
+  wasteCode                                           String?                  @default("16 01 06") @db.VarChar(10)
+  packaging                                           BsvhuPackaging?
+  identificationNumbers                               String[]
+  identificationType                                  BsvhuIdentificationType?
+  quantity                                            Int?
+  weightValue                                         Float?
+  weightIsEstimate                                    Boolean?
+  transporterCompanyName                              String?
+  transporterCompanySiret                             String?                  @db.VarChar(17)
+  transporterCompanyAddress                           String?
+  transporterCompanyContact                           String?
+  transporterCompanyPhone                             String?
+  transporterCompanyMail                              String?
+  transporterRecepisseNumber                          String?
+  transporterRecepisseDepartment                      String?
+  transporterRecepisseValidityLimit                   DateTime?                @db.Timestamptz(6)
+  transporterCompanyVatNumber                         String?                  @db.VarChar(50)
+  transporterTransportSignatureAuthor                 String?
+  transporterTransportSignatureDate                   DateTime?                @db.Timestamptz(6)
+  transporterTransportTakenOverAt                     DateTime?                @db.Timestamptz(6)
+  transporterCustomInfo                               String?
+  transporterTransportPlates                          String[]
+  transporterRecepisseIsExempted                      Boolean?
 
   // partial indices _BsvhuIsDeletedIdx,_BsvhuIsDraftIdx  see migration82_missing_indices.sql
 
@@ -1054,147 +1010,113 @@ model Bsvhu {
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
 }
 
-// ----------------
-// BSDASRI FORM
-// ----------------
-
-enum BsdasriStatus {
-  INITIAL
-  SIGNED_BY_PRODUCER
-  SENT
-  RECEIVED
-  PROCESSED
-  REFUSED
-  AWAITING_GROUP
-}
-
-enum BsdasriEmitterType {
-  PRODUCER
-  COLLECTOR
-}
-
-enum BsdasriType {
-  SIMPLE
-  GROUPING
-  SYNTHESIS
-}
-
 model Bsdasri {
-  id                                  String                  @unique
-  type                                BsdasriType             @default(SIMPLE)
-  status                              BsdasriStatus           @default(INITIAL)
-  rowNumber                           Int                     @unique @default(autoincrement())
-  createdAt                           DateTime                @default(now()) @db.Timestamptz(6)
-  updatedAt                           DateTime                @updatedAt @db.Timestamptz(6)
-  isDeleted                           Boolean?                @default(false)
-  isDraft                             Boolean?                @default(false)
-  identificationNumbers               String[]
-  // waste
-  wasteCode                           String?
-  wasteAdr                            String?
-  // emitter
-  emitterCompanyName                  String?
-  emitterCompanySiret                 String?
-  emitterCompanyAddress               String?
-  emitterCompanyContact               String?
-  emitterCompanyPhone                 String?
-  emitterCompanyMail                  String?
-  emitterPickupSiteName               String?
-  emitterPickupSiteAddress            String?
-  emitterPickupSiteCity               String?
-  emitterPickupSitePostalCode         String?
-  emitterPickupSiteInfos              String?
-  emitterCustomInfo                   String? // free field
-  // emission
-  emitterWasteWeightValue             Float? // kg
-  emitterWasteWeightIsEstimate        Boolean?
-  emitterWasteVolume                  Float? // liters
-  emitterWastePackagings              Json                    @default("[]")
-  emissionSignatory                   User?                   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id])
-  emissionSignatoryId                 String?
-  emitterEmissionSignatureDate        DateTime?               @db.Timestamptz(6)
-  emitterEmissionSignatureAuthor      String?
-  isEmissionDirectTakenOver           Boolean                 @default(false)
-  isEmissionTakenOverWithSecretCode   Boolean                 @default(false)
-  // Ecoorganisme
-  ecoOrganismeName                    String?
-  ecoOrganismeSiret                   String?
-  emittedByEcoOrganisme               Boolean                 @default(false)
-  // transporter
-  transporterCompanyName              String?
-  transporterCompanySiret             String?
-  transporterCompanyVatNumber         String?
-  transporterCompanyAddress           String?
-  transporterCompanyPhone             String?
-  transporterCompanyContact           String?
-  transporterCompanyMail              String?
-  transporterRecepisseNumber          String?
-  transporterRecepisseDepartment      String?
-  transporterRecepisseValidityLimit   DateTime?               @db.Timestamptz(6)
-  transporterRecepisseIsExempted      Boolean?
-  transporterCustomInfo               String? // free field
-  // transport
-  transporterTransportMode            TransportMode?          @default(ROAD)
-  transporterAcceptationStatus        WasteAcceptationStatus?
-  transporterWasteRefusalReason       String?
-  transporterWasteRefusedWeightValue  Float? // kg
-  transporterTakenOverAt              DateTime?               @db.Timestamptz(6)
-  transporterWastePackagings          Json                    @default("[]")
-  transporterWasteWeightValue         Float? // kg
-  transporterWasteWeightIsEstimate    Boolean?
-  transporterWasteVolume              Float? // liters
-  handedOverToRecipientAt             DateTime?               @db.Timestamptz(6)
-  transportSignatory                  User?                   @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id])
-  transportSignatoryId                String?
-  transporterTransportSignatureDate   DateTime?               @db.Timestamptz(6)
-  transporterTransportSignatureAuthor String?
-  transporterTransportPlates          String[]
+  id        String        @id
+  type      BsdasriType   @default(SIMPLE)
+  status    BsdasriStatus @default(INITIAL)
+  rowNumber Int           @unique(map: "Bsdasri_rowNumber_ukey") @default(autoincrement())
+  createdAt DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime      @updatedAt @db.Timestamptz(6)
+  isDeleted Boolean?      @default(false)
+  isDraft   Boolean?      @default(false)
 
-  // destination
+  emitterCompanyName                          String?
+  emitterCompanySiret                         String?
+  emitterCompanyAddress                       String?
+  emitterCompanyContact                       String?
+  emitterCompanyPhone                         String?
+  emitterCompanyMail                          String?
+  emitterPickupSiteName                       String?
+  emitterPickupSiteAddress                    String?
+  emitterPickupSiteCity                       String?
+  emitterPickupSitePostalCode                 String?
+  emitterPickupSiteInfos                      String?
+  emitterWasteVolume                          Float?
+  emitterWastePackagings                      Json                    @default("[]")
+  emitterCustomInfo                           String?
+  emitterEmissionSignatureAuthor              String?
+  emitterWasteWeightValue                     Decimal?                @db.Decimal(65, 30)
+  emitterEmissionSignatureDate                DateTime?               @db.Timestamptz(6)
+  isEmissionDirectTakenOver                   Boolean?                @default(false)
+  isEmissionTakenOverWithSecretCode           Boolean?                @default(false)
+  wasteCode                                   String?
+  wasteAdr                                    String?
+  transporterCompanyName                      String?
+  transporterCompanySiret                     String?
+  transporterCompanyAddress                   String?
+  transporterCompanyPhone                     String?
+  transporterCompanyContact                   String?
+  transporterCompanyMail                      String?
+  transporterRecepisseNumber                  String?
+  transporterRecepisseDepartment              String?
+  transporterRecepisseValidityLimit           DateTime?               @db.Timestamptz(6)
+  transporterRecepisseIsExempted              Boolean?
+  transporterAcceptationStatus                WasteAcceptationStatus?
+  transporterWasteRefusalReason               String?
+  transporterWasteRefusedWeightValue          Decimal?                @db.Decimal(65, 30)
+  transporterTakenOverAt                      DateTime?               @db.Timestamptz(6)
+  transporterWastePackagings                  Json                    @default("[]")
+  transporterWasteWeightValue                 Decimal?                @db.Decimal(65, 30)
+  transporterWasteVolume                      Float?
+  transporterCustomInfo                       String?
+  transporterTransportSignatureAuthor         String?
+  transporterTransportSignatureDate           DateTime?               @db.Timestamptz(6)
+  handedOverToRecipientAt                     DateTime?               @db.Timestamptz(6)
   destinationCompanyName                      String?
   destinationCompanySiret                     String?
   destinationCompanyAddress                   String?
   destinationCompanyContact                   String?
   destinationCompanyPhone                     String?
   destinationCompanyMail                      String?
-  destinationCustomInfo                       String? // free field
-  // reception
+  destinationCustomInfo                       String?
   destinationWastePackagings                  Json                    @default("[]")
   destinationReceptionAcceptationStatus       WasteAcceptationStatus?
   destinationReceptionWasteRefusalReason      String?
-  destinationReceptionWasteRefusedWeightValue Float? // kg
-  destinationReceptionWasteWeightValue        Float? // kg
-  destinationReceptionWasteVolume             Float? // liters
-  destinationReceptionDate                    DateTime? // accepted or refused date @db.Timestamptz(6)
-  // processing
+  destinationReceptionWasteRefusedWeightValue Decimal?                @db.Decimal(65, 30)
+  destinationReceptionWasteWeightValue        Decimal?                @db.Decimal(65, 30)
+  destinationReceptionWasteVolume             Float?
+  destinationReceptionDate                    DateTime?               @db.Timestamptz(6)
   destinationOperationCode                    String?
-  destinationOperationMode                    OperationMode?
   destinationOperationDate                    DateTime?               @db.Timestamptz(6)
-  receptionSignatory                          User?                   @relation("BsdasriReceptionSignature", fields: [receptionSignatoryId], references: [id])
-  receptionSignatoryId                        String?
-  destinationReceptionSignatureDate           DateTime?               @db.Timestamptz(6)
   destinationReceptionSignatureAuthor         String?
-  operationSignatory                          User?                   @relation("BsdasriOperationSignature", fields: [operationSignatoryId], references: [id])
-  operationSignatoryId                        String?
+  destinationReceptionSignatureDate           DateTime?               @db.Timestamptz(6)
   destinationOperationSignatureDate           DateTime?               @db.Timestamptz(6)
   destinationOperationSignatureAuthor         String?
-  // grouping
-  grouping                                    Bsdasri[]               @relation("BsdasriGrouping")
-  groupedIn                                   Bsdasri?                @relation("BsdasriGrouping", fields: [groupedInId], references: [id])
-  groupedInId                                 String?
-  //synthesis
-  synthesizing                                Bsdasri[]               @relation("BsdasriSynthesizing")
-  synthesizedIn                               Bsdasri?                @relation("BsdasriSynthesizing", fields: [synthesizedInId], references: [id])
-  synthesizedInId                             String?
+  transporterTransportMode                    TransportMode?          @default(ROAD)
+  emitterWasteWeightIsEstimate                Boolean?
+  transporterWasteWeightIsEstimate            Boolean?
+  ecoOrganismeName                            String?
+  ecoOrganismeSiret                           String?
+  transporterTransportPlates                  String[]
+  identificationNumbers                       String[]
+  transporterCompanyVatNumber                 String?
+  emittedByEcoOrganisme                       Boolean                 @default(false)
+  destinationOperationMode                    OperationMode?
+
+  emissionSignatoryId  String?
+  emissionSignatory    User?   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id], onDelete: Cascade)
+  transportSignatoryId String?
+  transportSignatory   User?   @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id], onDelete: Cascade)
+  receptionSignatoryId String?
+  receptionSignatory   User?   @relation("BsdasriReceptionSignature", fields: [receptionSignatoryId], references: [id], onDelete: Cascade)
+  operationSignatoryId String?
+  operationSignatory   User?   @relation("BsdasriOperationSignature", fields: [operationSignatoryId], references: [id], onDelete: Cascade)
+
+  groupedIn   Bsdasri?  @relation("BsdasriGrouping", fields: [groupedInId], references: [id], map: "Bsdasri_regroupedOnBsdasriId_fkey")
+  grouping    Bsdasri[] @relation("BsdasriGrouping")
+  groupedInId String?
+
+  synthesizing    Bsdasri[] @relation("BsdasriSynthesizing")
+  synthesizedIn   Bsdasri?  @relation("BsdasriSynthesizing", fields: [synthesizedInId], references: [id])
+  synthesizedInId String?
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
   // Emitter sirets list in case of synthesis bsd
-  synthesisEmitterSirets String[] @default([])
-  // Emitter sirets list in case of grouping bsd
   groupingEmitterSirets  String[] @default([])
+  // Emitter sirets list in case of grouping bsd
+  synthesisEmitterSirets String[] @default([])
 
-  // partial indices _BsdasriTypeIdx, _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
-  // gin index see 119_dasri_denormalized_sirets.sql
+  // partial indices _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
 
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
@@ -1205,84 +1127,68 @@ model Bsdasri {
   @@index([status], map: "_BsdasriStatusIdx")
   @@index([type], map: "_BsdasriTypeIdx")
   @@index([updatedAt], map: "_BsdasriUpdatedAtIdx")
+  @@index([groupingEmitterSirets], map: "_BsdasriGroupingEmitterSiretIdx", type: Gin)
+  @@index([synthesisEmitterSirets], map: "_BsdasriSynthesisEmitterSiretsIdx", type: Gin)
 }
-
-// ----------------
-// BSFF FORM
-// ----------------
 
 model Bsff {
   id        String     @id
-  rowNumber Int        @unique @default(autoincrement())
+  rowNumber Int        @unique(map: "Bsff_rowNumber_ukey") @default(autoincrement())
   createdAt DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt DateTime   @updatedAt @db.Timestamptz(6)
-  isDeleted Boolean    @default(false)
+  status    BsffStatus @default(INITIAL)
   isDraft   Boolean    @default(false)
   type      BsffType   @default(TRACER_FLUIDE)
-  status    BsffStatus @default(INITIAL)
+  isDeleted Boolean    @default(false)
 
-  emitterCompanyName    String?
-  emitterCompanySiret   String?
-  emitterCompanyAddress String?
-  emitterCompanyContact String?
-  emitterCompanyPhone   String?
-  emitterCompanyMail    String?
-  emitterCustomInfo     String?
-
-  // Denormalized detenteur sirets to speed up query `bsffs`
-  detenteurCompanySirets String[] @default([])
-
-  emitterEmissionSignatureAuthor String?
-  emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
-
-  wasteCode        String?
-  wasteDescription String?
-  wasteAdr         String?
-
-  weightValue      Float?
-  weightIsEstimate Boolean?
-
-  transporterCompanyName      String?
-  transporterCompanySiret     String?
-  transporterCompanyVatNumber String?
-  transporterCompanyAddress   String?
-  transporterCompanyContact   String?
-  transporterCompanyPhone     String?
-  transporterCompanyMail      String?
-
-  transporterCustomInfo String?
-
-  transporterRecepisseNumber        String?
-  transporterRecepisseDepartment    String?
-  transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
-  transporterRecepisseIsExempted    Boolean?
-
-  transporterTransportMode            TransportMode? @default(ROAD)
-  transporterTransportPlates          String[]
+  emitterCompanyName                  String?
+  emitterCompanySiret                 String?
+  emitterCompanyAddress               String?
+  emitterCompanyContact               String?
+  emitterCompanyPhone                 String?
+  emitterCompanyMail                  String?
+  emitterCustomInfo                   String?
+  emitterEmissionSignatureAuthor      String?
+  emitterEmissionSignatureDate        DateTime?      @db.Timestamptz(6)
+  wasteCode                           String?
+  wasteAdr                            String?
+  weightValue                         Decimal?       @db.Decimal(65, 30)
+  weightIsEstimate                    Boolean?
+  wasteDescription                    String?
+  transporterCompanyName              String?
+  transporterCompanySiret             String?
+  transporterCompanyAddress           String?
+  transporterCompanyContact           String?
+  transporterCompanyPhone             String?
+  transporterCompanyMail              String?
+  transporterCompanyVatNumber         String?
+  transporterCustomInfo               String?
   transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
+  transporterTransportPlates          String[]
+  transporterRecepisseIsExempted      Boolean?
+  transporterRecepisseNumber          String?
+  transporterRecepisseDepartment      String?
+  transporterRecepisseValidityLimit   DateTime?      @db.Timestamptz(6)
+  transporterTransportMode            TransportMode? @default(ROAD)
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
-
-  destinationCompanyName    String?
-  destinationCompanySiret   String?
-  destinationCompanyAddress String?
-  destinationCompanyContact String?
-  destinationCompanyPhone   String?
-  destinationCompanyMail    String?
-  destinationCap            String?
-
-  destinationCustomInfo String?
-
-  destinationReceptionDate DateTime? @db.Timestamptz(6)
-
+  destinationCompanyName              String?
+  destinationCompanySiret             String?
+  destinationCompanyAddress           String?
+  destinationCompanyContact           String?
+  destinationCompanyPhone             String?
+  destinationCompanyMail              String?
+  destinationCustomInfo               String?
+  destinationCap                      String?
+  destinationReceptionDate            DateTime?      @db.Timestamptz(6)
   destinationReceptionSignatureAuthor String?
-  destinationReceptionSignatureDate   DateTime? @db.Timestamptz(6)
+  destinationReceptionSignatureDate   DateTime?      @db.Timestamptz(6)
+  destinationPlannedOperationCode     String?
 
-  destinationPlannedOperationCode String?
-
-  ficheInterventions BsffFicheIntervention[]
-
-  packagings BsffPackaging[]
+  // Denormalized detenteur sirets to speed up query `bsffs`
+  detenteurCompanySirets String[]                @default([])
+  ficheInterventions     BsffFicheIntervention[] @relation("BsffToBsffFicheIntervention")
+  packagings             BsffPackaging[]
 
   // partial _BsffIsDeletedIdx, _BsffIsDraftIdx index see migration82_missing_indices.sql
 
@@ -1294,26 +1200,7 @@ model Bsff {
   @@index([createdAt], map: "_BsffCreatedAtIdx")
   @@index([emitterEmissionSignatureDate], map: "_BsffEmitterEmissionSignatureDateIdx")
   @@index([transporterTransportSignatureDate], map: "_BsffTransporterTransportSignatureDateIdx")
-}
-
-enum BsffType {
-  TRACER_FLUIDE
-  COLLECTE_PETITES_QUANTITES
-  GROUPEMENT
-  RECONDITIONNEMENT
-  REEXPEDITION
-}
-
-enum BsffStatus {
-  INITIAL
-  SIGNED_BY_EMITTER
-  SENT
-  RECEIVED
-  ACCEPTED
-  PARTIALLY_REFUSED
-  REFUSED
-  PROCESSED
-  INTERMEDIATELY_PROCESSED
+  @@index([detenteurCompanySirets], map: "_BsffDetenteurSiretsIdx", type: Gin)
 }
 
 model BsffFicheIntervention {
@@ -1321,7 +1208,7 @@ model BsffFicheIntervention {
   createdAt  DateTime @default(now()) @db.Timestamptz(6)
   updatedAt  DateTime @updatedAt @db.Timestamptz(6)
   numero     String
-  weight     Float
+  weight     Decimal  @db.Decimal(65, 30)
   postalCode String
 
   detenteurCompanyName         String
@@ -1339,7 +1226,7 @@ model BsffFicheIntervention {
   operateurCompanyPhone   String
   operateurCompanyMail    String
 
-  bsffs Bsff[]
+  bsffs Bsff[] @relation("BsffToBsffFicheIntervention")
 
   @@index([detenteurCompanySiret], map: "_BsffFicheInterventionDetenteurCompanySiretIdx")
   @@index([operateurCompanySiret], map: "_BsffFicheInterventionOperateurCompanySiretIdx")
@@ -1351,13 +1238,13 @@ model BsffPackaging {
   other          String?
   volume         Float?
   weight         Float
-  emissionNumero String
-  numero         String
+  emissionNumero String            @db.VarChar(100)
+  numero         String            @db.VarChar(100)
 
   acceptationDate             DateTime?               @db.Timestamptz(6)
-  acceptationWeight           Float?
-  acceptationStatus           WasteAcceptationStatus?
   acceptationRefusalReason    String?
+  acceptationStatus           WasteAcceptationStatus?
+  acceptationWeight           Float?
   acceptationWasteCode        String?
   acceptationWasteDescription String?
 
@@ -1382,11 +1269,11 @@ model BsffPackaging {
   operationNextDestinationCompanyPhone         String?
   operationNextDestinationCompanyMail          String?
 
-  bsff   Bsff   @relation(fields: [bsffId], references: [id], onDelete: Cascade)
   bsffId String
+  bsff   Bsff   @relation(fields: [bsffId], references: [id], onDelete: Cascade)
 
-  nextPackaging      BsffPackaging?  @relation("NextPackaging", fields: [nextPackagingId], references: [id])
   nextPackagingId    String?
+  nextPackaging      BsffPackaging?  @relation("NextPackaging", fields: [nextPackagingId], references: [id])
   previousPackagings BsffPackaging[] @relation("NextPackaging")
 
   //  partial indices _BsffPackagingOperationNoTraceabilityIdx
@@ -1400,50 +1287,15 @@ model BsffPackaging {
   @@index([operationSignatureDate], map: "_BsffPackagingOperationSignatureDateIdx")
 }
 
-enum BsffPackagingType {
-  BOUTEILLE
-  CONTENEUR
-  CITERNE
-  AUTRE
-}
-
-// ----------------
-// BSDA FORM
-// ----------------
-enum BsdaStatus {
-  INITIAL
-  SIGNED_BY_PRODUCER
-  SIGNED_BY_WORKER
-  SENT
-  PROCESSED
-  REFUSED
-  AWAITING_CHILD
-  CANCELED
-}
-
-enum BsdaType {
-  COLLECTION_2710
-  OTHER_COLLECTIONS
-  GATHERING
-  RESHIPMENT
-}
-
-enum BsdaConsistence {
-  SOLIDE
-  PULVERULENT
-  OTHER
-}
-
 model Bsda {
-  id        String   @id
-  rowNumber Int      @unique @default(autoincrement())
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-  isDraft   Boolean  @default(false)
-  isDeleted Boolean  @default(false)
-
-  status BsdaStatus @default(INITIAL)
-  type   BsdaType   @default(OTHER_COLLECTIONS)
+  id        String     @id
+  rowNumber Int        @unique(map: "Bsda_rowNumber_ukey") @default(autoincrement())
+  createdAt DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime   @updatedAt @db.Timestamptz(6)
+  isDraft   Boolean    @default(false)
+  isDeleted Boolean    @default(false)
+  status    BsdaStatus @default(INITIAL)
+  type      BsdaType   @default(OTHER_COLLECTIONS)
 
   emitterIsPrivateIndividual     Boolean?
   emitterCompanyName             String?
@@ -1470,11 +1322,61 @@ model Bsda {
   wasteConsistence  BsdaConsistence?
   wasteSealNumbers  String[]
   wasteAdr          String?
-  wastePop          Boolean          @default(value: false)
+  wastePop          Boolean?         @default(false)
+  packagings        Json             @default("[]")
+  weightValue       Decimal?         @db.Decimal(65, 30)
+  weightIsEstimate  Boolean?
 
-  packagings       Json     @default("[]")
-  weightIsEstimate Boolean?
-  weightValue      Float?
+  destinationCompanyName                                  String?
+  destinationCompanySiret                                 String?
+  destinationCompanyAddress                               String?
+  destinationCompanyContact                               String?
+  destinationCompanyPhone                                 String?
+  destinationCompanyMail                                  String?
+  destinationCustomInfo                                   String?
+  destinationCap                                          String?
+  destinationPlannedOperationCode                         String?
+  destinationReceptionDate                                DateTime?               @db.Timestamptz(6)
+  destinationReceptionWeight                              Decimal?                @db.Decimal(65, 30)
+  destinationReceptionAcceptationStatus                   WasteAcceptationStatus?
+  destinationReceptionRefusalReason                       String?
+  destinationOperationCode                                String?
+  destinationOperationDate                                DateTime?               @db.Timestamptz(6)
+  destinationOperationSignatureAuthor                     String?
+  destinationOperationSignatureDate                       DateTime?               @db.Timestamptz(6)
+  destinationOperationMode                                OperationMode?
+  destinationOperationDescription                         String?
+  destinationOperationNextDestinationCompanyName          String?
+  destinationOperationNextDestinationCompanySiret         String?
+  destinationOperationNextDestinationCompanyVatNumber     String?
+  destinationOperationNextDestinationCompanyAddress       String?
+  destinationOperationNextDestinationCompanyContact       String?
+  destinationOperationNextDestinationCompanyPhone         String?
+  destinationOperationNextDestinationCompanyMail          String?
+  destinationOperationNextDestinationCap                  String?
+  destinationOperationNextDestinationPlannedOperationCode String?
+
+  // Date de signature du premier transporteur
+  // Cette valeur est dupliquée entre le modèle Bsda et BsdaTransporter[0]
+  // pour optimiser certains calculs
+  transporterTransportSignatureDate DateTime?         @db.Timestamptz(6)
+  transporters                      BsdaTransporter[]
+
+  workerCompanyName                      String?
+  workerCompanySiret                     String?
+  workerCompanyAddress                   String?
+  workerCompanyContact                   String?
+  workerCompanyPhone                     String?
+  workerCompanyMail                      String?
+  workerIsDisabled                       Boolean?
+  workerWorkHasEmitterPaperSignature     Boolean?
+  workerWorkSignatureAuthor              String?
+  workerWorkSignatureDate                DateTime? @db.Timestamptz(6)
+  workerCertificationHasSubSectionFour   Boolean?
+  workerCertificationHasSubSectionThree  Boolean?
+  workerCertificationCertificationNumber String?   @db.VarChar(50)
+  workerCertificationValidityLimit       DateTime? @db.Timestamptz(6)
+  workerCertificationOrganisation        String?   @db.VarChar(30)
 
   brokerCompanyName            String?
   brokerCompanySiret           String?
@@ -1486,71 +1388,12 @@ model Bsda {
   brokerRecepisseDepartment    String?
   brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
-  // Date de signature du premier transporteur
-  // Cette valeur est dupliquée entre le modèle Bsda et BsdaTransporter[0]
-  // pour optimiser certains calculs
-  transporterTransportSignatureDate DateTime? @db.Timestamptz(6)
-
-  destinationCompanyName          String?
-  destinationCompanySiret         String?
-  destinationCompanyAddress       String?
-  destinationCompanyContact       String?
-  destinationCompanyPhone         String?
-  destinationCompanyMail          String?
-  destinationCap                  String?
-  destinationPlannedOperationCode String?
-  destinationCustomInfo           String?
-
-  destinationReceptionDate              DateTime?               @db.Timestamptz(6)
-  destinationReceptionWeight            Float?
-  destinationReceptionAcceptationStatus WasteAcceptationStatus?
-  destinationReceptionRefusalReason     String?
-
-  destinationOperationCode            String?
-  destinationOperationMode            OperationMode?
-  destinationOperationDescription     String?
-  destinationOperationDate            DateTime?      @db.Timestamptz(6)
-  destinationOperationSignatureAuthor String?
-  destinationOperationSignatureDate   DateTime?      @db.Timestamptz(6)
-
-  destinationOperationNextDestinationCompanySiret         String?
-  destinationOperationNextDestinationCompanyVatNumber     String?
-  destinationOperationNextDestinationCompanyName          String?
-  destinationOperationNextDestinationCompanyAddress       String?
-  destinationOperationNextDestinationCompanyContact       String?
-  destinationOperationNextDestinationCompanyPhone         String?
-  destinationOperationNextDestinationCompanyMail          String?
-  destinationOperationNextDestinationCap                  String?
-  destinationOperationNextDestinationPlannedOperationCode String?
-
-  transporters BsdaTransporter[]
-
-  workerIsDisabled Boolean?
-
-  workerCompanyName                      String?
-  workerCompanySiret                     String?
-  workerCompanyAddress                   String?
-  workerCompanyContact                   String?
-  workerCompanyPhone                     String?
-  workerCompanyMail                      String?
-  workerCertificationHasSubSectionFour   Boolean?
-  workerCertificationHasSubSectionThree  Boolean?
-  workerCertificationCertificationNumber String?
-  workerCertificationValidityLimit       DateTime? @db.Timestamptz(6)
-  workerCertificationOrganisation        String?
-
-  workerWorkHasEmitterPaperSignature Boolean?
-  workerWorkSignatureAuthor          String?
-  workerWorkSignatureDate            DateTime? @db.Timestamptz(6)
-
-  groupedIn   Bsda?   @relation("BsdaGrouping", fields: [groupedInId], references: [id])
-  groupedInId String?
-  grouping    Bsda[]  @relation("BsdaGrouping")
-
-  forwarding   Bsda?   @relation("BsdaForwarding", fields: [forwardingId], references: [id])
-  forwardingId String? @unique
-  forwardedIn  Bsda?   @relation("BsdaForwarding")
-
+  forwarding           Bsda?                         @relation("BsdaForwarding", fields: [forwardingId], references: [id])
+  forwardingId         String?                       @unique(map: "Bsda_forwardingId_unique")
+  forwardedIn          Bsda?                         @relation("BsdaForwarding")
+  groupedIn            Bsda?                         @relation("BsdaGrouping", fields: [groupedInId], references: [id])
+  groupedInId          String?
+  grouping             Bsda[]                        @relation("BsdaGrouping")
   bsdaRevisionRequests BsdaRevisionRequest[]
   intermediaries       IntermediaryBsdaAssociation[]
 
@@ -1559,7 +1402,6 @@ model Bsda {
   transportersOrgIds   String[] @default([])
 
   // partial indices _BsdaIsDeletedIdx, _BsdaIsDraftIdx see migration82_missing_indices.sql
-  // array index _BsdaIntermediariesOrgIdsIdx: see 119_denormalize_bsdas_sirets.sql
 
   @@index([emitterCompanySiret], map: "_BsdaEmitterCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
@@ -1569,6 +1411,8 @@ model Bsda {
   @@index([status], map: "_BsdaStatusIdx")
   @@index([groupedInId], map: "_BsdaGroupedInIdIdx")
   @@index([updatedAt], map: "_BsdaUpdatedAtIdx")
+  @@index([intermediariesOrgIds], map: "_BsdaIntermediariesOrgIdsIdx", type: Gin)
+  @@index([transportersOrgIds], map: "_BsdaTransportersOrgIdsIdx", type: Gin)
 }
 
 model BsdaTransporter {
@@ -1576,8 +1420,8 @@ model BsdaTransporter {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
   number    Int
-  bsdaId    String?
   bsda      Bsda?    @relation(fields: [bsdaId], references: [id], onDelete: Cascade)
+  bsdaId    String?
 
   transporterCompanySiret             String?
   transporterCompanyName              String?
@@ -1603,50 +1447,43 @@ model BsdaTransporter {
 }
 
 model BsdaRevisionRequest {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
+  id                 String                @id @default(cuid())
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  status             RevisionRequestStatus @default(PENDING)
+  comment            String
+  isCanceled         Boolean               @default(false)
   bsdaId             String
-  bsda               Bsda    @relation(fields: [bsdaId], references: [id])
+  bsda               Bsda                  @relation(fields: [bsdaId], references: [id], onDelete: Cascade)
   authoringCompanyId String
-  authoringCompany   Company @relation(fields: [authoringCompanyId], references: [id])
+  authoringCompany   Company               @relation(fields: [authoringCompanyId], references: [id], onDelete: Cascade)
 
   approvals BsdaRevisionRequestApproval[]
 
-  wasteCode         String?
-  wastePop          Boolean?
-  packagings        Json?
-  wasteSealNumbers  String[]
-  wasteMaterialName String?
-
+  wasteCode                       String?
+  wastePop                        Boolean?
+  packagings                      Json?
+  wasteSealNumbers                String[]
+  wasteMaterialName               String?
   destinationCap                  String?
   destinationReceptionWeight      Float?
   destinationOperationCode        String?
-  destinationOperationMode        OperationMode?
   destinationOperationDescription String?
-
-  brokerCompanyName            String?
-  brokerCompanySiret           String?
-  brokerCompanyAddress         String?
-  brokerCompanyContact         String?
-  brokerCompanyPhone           String?
-  brokerCompanyMail            String?
-  brokerRecepisseNumber        String?
-  brokerRecepisseDepartment    String?
-  brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
-
-  emitterPickupSiteName       String?
-  emitterPickupSiteAddress    String?
-  emitterPickupSiteCity       String?
-  emitterPickupSitePostalCode String?
-  emitterPickupSiteInfos      String?
-
-  comment String
-
-  status RevisionRequestStatus @default(PENDING)
-
-  isCanceled Boolean @default(false)
+  destinationOperationMode        OperationMode?
+  brokerCompanyName               String?
+  brokerCompanySiret              String?
+  brokerCompanyAddress            String?
+  brokerCompanyContact            String?
+  brokerCompanyPhone              String?
+  brokerCompanyMail               String?
+  brokerRecepisseNumber           String?
+  brokerRecepisseDepartment       String?
+  brokerRecepisseValidityLimit    DateTime?      @db.Timestamptz(6)
+  emitterPickupSiteName           String?
+  emitterPickupSiteAddress        String?
+  emitterPickupSiteCity           String?
+  emitterPickupSitePostalCode     String?
+  emitterPickupSiteInfos          String?
 
   @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
   @@index([status], map: "_BsdaRevisionRequestStatusIdx")
@@ -1654,16 +1491,14 @@ model BsdaRevisionRequest {
 }
 
 model BsdaRevisionRequestApproval {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
+  id                String                        @id @default(cuid())
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
   revisionRequestId String
-  revisionRequest   BsdaRevisionRequest @relation(fields: [revisionRequestId], references: [id])
+  revisionRequest   BsdaRevisionRequest           @relation(fields: [revisionRequestId], references: [id], onDelete: Cascade)
   approverSiret     String
-
-  status  RevisionRequestApprovalStatus @default(PENDING)
-  comment String?
+  status            RevisionRequestApprovalStatus @default(PENDING)
+  comment           String?
 
   @@index([revisionRequestId], map: "_BsdaRevisionRequestApprovalRevisionRequestIdIdx")
   @@index([approverSiret], map: "_BsdaRevisionRequestApprovalApproverSiretIdx")
@@ -1671,16 +1506,16 @@ model BsdaRevisionRequestApproval {
 
 model IntermediaryBsdaAssociation {
   id        String   @id @default(cuid())
-  bsdaId    String
   name      String
+  createdAt DateTime @default(now())
   siret     String
   contact   String
   vatNumber String?
   address   String?
   phone     String?
   mail      String?
+  bsdaId    String
   bsda      Bsda     @relation(fields: [bsdaId], references: [id])
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([bsdaId], map: "_IntermediaryBsdaAssociationBsdaIdIdx")
   @@index([siret], map: "IntermediaryBsdaAssociationSiretIdx")
@@ -1690,111 +1525,75 @@ model IntermediaryBsdaAssociation {
 model Event {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
+  streamId  String   @db.VarChar(50)
+  type      String   @db.VarChar(50)
+  data      Json?
+  metadata  Json?
+  actor     String   @db.VarChar(50)
 
-  streamId String
-  type     String
-  data     Json
-  metadata Json?
-
-  actor String
-}
-
-// ----------------
-// BSPAOH FORM
-// ----------------
-enum BspaohStatus {
-  DRAFT
-  INITIAL
-  SIGNED_BY_PRODUCER
-  SENT
-  RECEIVED
-  PROCESSED
-  REFUSED
-  PARTIALLY_REFUSED
-  CANCELED
-}
-
-enum BspaohType {
-  PAOH
-  FOETUS
+  @@index([actor], map: "_EventActorIdx")
+  @@index([streamId], map: "_EventStreamIdIdx")
 }
 
 model Bspaoh {
-  id String @id
-
-  rowNumber Int          @unique @default(autoincrement())
+  id        String       @id
+  rowNumber Int          @unique(map: "Bspaoh_rowNumber_ukey") @default(autoincrement())
   createdAt DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt DateTime     @updatedAt @db.Timestamptz(6)
   isDeleted Boolean      @default(false)
   status    BspaohStatus @default(INITIAL)
 
-  // Waste
   wasteCode       String?
   wasteAdr        String?
-  wastePackagings Json       @default("[]")
   wasteType       BspaohType @default(PAOH)
+  wastePackagings Json?      @default("[]")
 
-  //emitter
-  emitterCompanyName    String?
-  emitterCompanySiret   String?
-  emitterCompanyAddress String?
-  emitterCompanyContact String?
-  emitterCompanyPhone   String?
-  emitterCompanyMail    String?
-  emitterCustomInfo     String?
+  emitterCompanyName             String?
+  emitterCompanySiret            String?
+  emitterCompanyAddress          String?
+  emitterCompanyContact          String?
+  emitterCompanyPhone            String?
+  emitterCompanyMail             String?
+  emitterCustomInfo              String?
+  emitterPickupSiteName          String?
+  emitterPickupSiteAddress       String?
+  emitterPickupSiteCity          String?
+  emitterPickupSitePostalCode    String?
+  emitterPickupSiteInfos         String?
+  emitterWasteQuantityValue      Int?
+  emitterWasteWeightValue        Float?
+  emitterWasteWeightIsEstimate   Boolean?
+  emitterEmissionSignatureAuthor String?
+  emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
-  // adresse de collecte
-  emitterPickupSiteName           String?
-  emitterPickupSiteAddress        String?
-  emitterPickupSiteCity           String?
-  emitterPickupSitePostalCode     String?
-  emitterPickupSiteInfos          String?
-  // emitter waste details
-  emitterWasteQuantityValue       Int?
-  emitterWasteWeightValue         Float? // kg
-  emitterWasteWeightIsEstimate    Boolean?
-  // date filled by emitter for take over, denormalized from BspaohTransporter.takenOverAt
   transporterTransportTakenOverAt DateTime? @db.Timestamptz(6)
-  emitterEmissionSignatureAuthor  String?
-  emitterEmissionSignatureDate    DateTime? @db.Timestamptz(6)
 
-  // destination
-  destinationCompanyName    String?
-  destinationCompanySiret   String?
-  destinationCompanyAddress String?
-  destinationCompanyContact String?
-  destinationCompanyPhone   String?
-  destinationCompanyMail    String?
-  destinationCustomInfo     String?
-
-  destinationCap String?
-
-  // transporter handover fields
-  handedOverToDestinationDate            DateTime? @db.Timestamptz(6)
-  handedOverToDestinationSignatureDate   DateTime? @db.Timestamptz(6) // accepted or refused date
-  handedOverToDestinationSignatureAuthor String?
-
-  // reception
-  // reception waste details
-  destinationReceptionWasteWeightValue           Float? // kg
-  destinationReceptionWasteWeightIsEstimate      Boolean?
+  destinationCompanyName                         String?
+  destinationCompanySiret                        String?
+  destinationCompanyAddress                      String?
+  destinationCompanyContact                      String?
+  destinationCompanyPhone                        String?
+  destinationCompanyMail                         String?
+  destinationCustomInfo                          String?
+  destinationCap                                 String?
+  handedOverToDestinationDate                    DateTime?               @db.Timestamptz(6)
+  handedOverToDestinationSignatureDate           DateTime?               @db.Timestamptz(6)
+  handedOverToDestinationSignatureAuthor         String?
+  destinationReceptionWasteWeightValue           Float?
   destinationReceptionWasteQuantityValue         Int?
+  destinationReceptionWasteWeightIsEstimate      Boolean?
   destinationReceptionAcceptationStatus          WasteAcceptationStatus?
-  destinationReceptionWasteRefusalReason         String? //todo reame
-  destinationReceptionWastePackagingsAcceptation Json                    @default("[]")
-
-  destinationReceptionDate            DateTime? @db.Timestamptz(6)
-  destinationReceptionSignatureDate   DateTime? @db.Timestamptz(6) // accepted or refused date @db.Timestamptz(6)
-  destinationReceptionSignatureAuthor String?
-
-  // processing
-  destinationOperationCode            String?
-  destinationOperationDate            DateTime? @db.Timestamptz(6)
-  destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)
-  destinationOperationSignatureAuthor String?
-
-  currentTransporterOrgId String?
-  nextTransporterOrgId    String?
+  destinationReceptionWasteRefusalReason         String?
+  destinationReceptionWastePackagingsAcceptation Json?                   @default("[]")
+  destinationReceptionDate                       DateTime?               @db.Timestamptz(6)
+  destinationReceptionSignatureDate              DateTime?               @db.Timestamptz(6)
+  destinationReceptionSignatureAuthor            String?
+  destinationOperationCode                       String?
+  destinationOperationDate                       DateTime?               @db.Timestamptz(6)
+  destinationOperationSignatureDate              DateTime?               @db.Timestamptz(6)
+  destinationOperationSignatureAuthor            String?
+  currentTransporterOrgId                        String?
+  nextTransporterOrgId                           String?
 
   transporters BspaohTransporter[]
 
@@ -1811,37 +1610,28 @@ model Bspaoh {
 }
 
 model BspaohTransporter {
-  id     String @id @default(cuid())
-  // transporter
-  number Int
-
-  transporterCompanyName      String?
-  transporterCompanySiret     String?
-  transporterCompanyVatNumber String?
-  transporterCompanyAddress   String?
-  transporterCompanyContact   String?
-  transporterCompanyPhone     String?
-  transporterCompanyMail      String?
-
-  // recepisse
-  transporterRecepisseNumber        String?
-  transporterRecepisseDepartment    String?
-  transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
-  transporterRecepisseIsExempted    Boolean?
-
-  // custom
-  transporterCustomInfo String?
-
-  // Transport
-  // Immatriculations
-  transporterTransportPlates          String[]
-  transporterTransportMode            TransportMode?
-  transporterTakenOverAt              DateTime?      @db.Timestamptz(6)
-  transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
-  transporterTransportSignatureAuthor String?
-
+  id        String   @id @default(cuid())
+  number    Int
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  transporterCompanyName              String?
+  transporterCompanySiret             String?
+  transporterCompanyVatNumber         String?
+  transporterCompanyAddress           String?
+  transporterCompanyContact           String?
+  transporterCompanyPhone             String?
+  transporterCompanyMail              String?
+  transporterTransportMode            TransportMode?
+  transporterCustomInfo               String?
+  transporterRecepisseDepartment      String?
+  transporterRecepisseIsExempted      Boolean?
+  transporterRecepisseNumber          String?
+  transporterRecepisseValidityLimit   DateTime?      @db.Timestamptz(6)
+  transporterTakenOverAt              DateTime?      @db.Timestamptz(6)
+  transporterTransportPlates          String[]
+  transporterTransportSignatureAuthor String?
+  transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
 
   bspaohId String?
   bspaoh   Bspaoh? @relation(fields: [bspaohId], references: [id], onDelete: Cascade)
@@ -1856,15 +1646,12 @@ model PdfAccessToken {
   id        String    @id @default(cuid())
   createdAt DateTime  @default(now()) @db.Timestamptz(6)
   expiresAt DateTime  @db.Timestamptz(6)
-  token     String    @unique
+  token     String    @unique(map: "_PdfAccessTokenTokenIdx")
   bsdType   BsdType
   bsdId     String
   lastUsed  DateTime? @db.Timestamptz(6)
   userId    String
-  user      User      @relation(fields: [userId], references: [id])
   visitedAt DateTime? @db.Timestamptz(6)
-
-  @@index([token], map: "_PdfAccessTokenTokenIdx")
 }
 
 model WebhookSetting {
@@ -1873,7 +1660,138 @@ model WebhookSetting {
   endpointUri String
   token       String
   orgId       String   @unique
-  activated   Boolean  @default(value: false)
+  activated   Boolean  @default(false)
 
   @@index([orgId], map: "_WebhookSettingOrgIdIdx")
+}
+
+enum RevisionRequestStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}
+
+enum RevisionRequestApprovalStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+  CANCELED
+}
+
+enum BsvhuStatus {
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SENT
+  PROCESSED
+  REFUSED
+}
+
+enum BsvhuPackaging {
+  UNITE
+  LOT
+}
+
+enum BsvhuIdentificationType {
+  NUMERO_ORDRE_REGISTRE_POLICE
+  NUMERO_ORDRE_LOTS_SORTANTS
+}
+
+enum BsvhuDestinationType {
+  BROYEUR
+  DEMOLISSEUR
+}
+
+enum BsdasriStatus {
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SENT
+  RECEIVED
+  REFUSED_BY_RECIPIENT
+  PROCESSED
+  REFUSED
+  AWAITING_GROUP
+}
+
+enum BsdasriEmitterType {
+  PRODUCER
+  COLLECTOR
+}
+
+enum BsdasriType {
+  SIMPLE
+  GROUPING
+  SYNTHESIS
+}
+
+enum BsffType {
+  TRACER_FLUIDE
+  COLLECTE_PETITES_QUANTITES
+  GROUPEMENT
+  RECONDITIONNEMENT
+  REEXPEDITION
+}
+
+enum BsffStatus {
+  INITIAL
+  SIGNED_BY_EMITTER
+  SENT
+  RECEIVED
+  INTERMEDIATELY_PROCESSED
+  PROCESSED
+  REFUSED
+  ACCEPTED
+  PARTIALLY_REFUSED
+}
+
+enum BsffPackagingType {
+  BOUTEILLE
+  CONTENEUR
+  CITERNE
+  AUTRE
+}
+
+enum BsdaStatus {
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SIGNED_BY_WORKER
+  SENT
+  PROCESSED
+  REFUSED
+  AWAITING_CHILD
+  CANCELED
+}
+
+enum BsdaType {
+  COLLECTION_2710
+  OTHER_COLLECTIONS
+  GATHERING
+  RESHIPMENT
+}
+
+enum BsdaConsistence {
+  SOLIDE
+  PULVERULENT
+  OTHER
+}
+
+enum BspaohStatus {
+  DRAFT
+  INITIAL
+  SIGNED_BY_PRODUCER
+  SENT
+  RECEIVED
+  PROCESSED
+  REFUSED
+  CANCELED
+  PARTIALLY_REFUSED
+}
+
+enum BspaohType {
+  PAOH
+  FOETUS
+}
+
+enum BsvhuRecipientType {
+  BROYEUR
+  DEMOLISSEUR
 }

@@ -11,6 +11,7 @@ import {
 } from "./generated/graphql/types";
 import { checkSecurityCode } from "./common/permissions";
 import { ForbiddenError } from "./common/errors";
+import { MultiModalSignatureType } from "./common/types";
 
 // List of all the permissions
 export enum Permission {
@@ -215,13 +216,18 @@ type AllSignatureType =
   | BsdasriSignatureType
   | SignatureTypeInput // BSVHU
   | BsffSignatureType
-  | BspaohSignatureType;
+  | BspaohSignatureType
+  | MultiModalSignatureType;
 
 export const signatureTypeToPermission: {
   [Key in AllSignatureType]: Permission;
 } = {
   EMISSION: Permission.BsdCanSignEmission,
   TRANSPORT: Permission.BsdCanSignTransport,
+  TRANSPORT_2: Permission.BsdCanSignTransport,
+  TRANSPORT_3: Permission.BsdCanSignTransport,
+  TRANSPORT_4: Permission.BsdCanSignTransport,
+  TRANSPORT_5: Permission.BsdCanSignTransport,
   DELIVERY: Permission.BsdCanSignTransport,
   WORK: Permission.BsdCanSignWork,
   RECEPTION: Permission.BsdCanSignAcceptation,

@@ -27,7 +27,11 @@ describe("getBsdaHistory", () => {
       }
     });
     const history = await getBsdaHistory(bsda5);
-    expect(history.map(bsda => bsda.id)).toEqual([
+    const sortedHistory = history.sort(
+      // évite un "flaky test" où l'ordre est différent d'un test run à l'autre
+      (bsda1, bsda2) => bsda1.rowNumber - bsda2.rowNumber
+    );
+    expect(sortedHistory.map(bsda => bsda.id)).toEqual([
       bsda1.id,
       bsda2.id,
       bsda3.id,
