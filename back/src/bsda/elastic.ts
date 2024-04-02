@@ -264,7 +264,9 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
       transporter?.transporterTransportSignatureDate?.getTime(),
     destinationReceptionDate: bsda.destinationReceptionDate?.getTime(),
     destinationAcceptationDate: bsda.destinationReceptionDate?.getTime(),
-    destinationAcceptationWeight: bsda.destinationReceptionWeight,
+    destinationAcceptationWeight: bsda.destinationReceptionWeight
+      ? bsda.destinationReceptionWeight.toNumber()
+      : null,
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     ...where,
     ...getBsdaRevisionOrgIds(bsda),

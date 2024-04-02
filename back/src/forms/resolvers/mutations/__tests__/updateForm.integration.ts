@@ -1489,7 +1489,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -1519,7 +1519,7 @@ describe("Mutation.updateForm", () => {
     });
     expect(newAppendix2Form.status).toBe("GROUPED");
     expect(newAppendix2Form.quantityGrouped).toEqual(
-      newAppendix2Form.quantityReceived
+      newAppendix2Form.quantityReceived?.toNumber()
     );
   });
 
@@ -1544,7 +1544,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -1589,7 +1589,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         },
         transporters: {
@@ -1645,7 +1645,7 @@ describe("Mutation.updateForm", () => {
           grouping: {
             create: {
               initialFormId: initialAppendix2.id,
-              quantity: initialAppendix2.quantityReceived!
+              quantity: initialAppendix2.quantityReceived!.toNumber()
             }
           }
         }
@@ -1698,7 +1698,7 @@ describe("Mutation.updateForm", () => {
           grouping: {
             create: {
               initialFormId: initialAppendix2.id,
-              quantity: initialAppendix2.quantityReceived!
+              quantity: initialAppendix2.quantityReceived!.toNumber()
             }
           }
         }
@@ -1714,7 +1714,7 @@ describe("Mutation.updateForm", () => {
         grouping: [
           {
             form: { id: wannaBeAppendix2.id },
-            quantity: wannaBeAppendix2.quantityReceived
+            quantity: wannaBeAppendix2.quantityReceived?.toNumber()
           }
         ]
       };
@@ -1754,7 +1754,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -1863,7 +1863,7 @@ describe("Mutation.updateForm", () => {
             grouping: [
               {
                 form: { id: appendixForm.id },
-                quantity: appendixForm.quantityReceived
+                quantity: appendixForm.quantityReceived?.toNumber()
               }
             ]
           }
@@ -1899,7 +1899,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -1943,7 +1943,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -2385,7 +2385,7 @@ describe("Mutation.updateForm", () => {
       where: { id: data.updateForm.id },
       include: { transporters: true }
     });
-    expect(updatedForm.wasteDetailsQuantity).toEqual(50);
+    expect(updatedForm.wasteDetailsQuantity?.toNumber()).toEqual(50);
 
     expect(updatedForm.transporters).toHaveLength(1);
     expect(updatedForm.transporters[0]?.transporterTransportMode).toEqual(
@@ -2432,7 +2432,7 @@ describe("Mutation.updateForm", () => {
       where: { id: data.updateForm.id },
       include: { transporters: true }
     });
-    expect(updatedForm.wasteDetailsQuantity).toEqual(50);
+    expect(updatedForm.wasteDetailsQuantity?.toNumber()).toEqual(50);
 
     expect(updatedForm.transporters).toHaveLength(1);
     expect(updatedForm.transporters[0]?.transporterTransportMode).toEqual(

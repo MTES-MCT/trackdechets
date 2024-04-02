@@ -248,7 +248,9 @@ export function toOutgoingWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toNumber()
+      : null,
     emitterCustomInfo: bsff.emitterCustomInfo,
     destinationCompanyMail: bsff.destinationCompanyMail,
     ...getOperationData(bsff)
@@ -297,7 +299,9 @@ export function toTransportedWaste(
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsff.destinationReceptionDate,
-    weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toNumber()
+      : null,
     ...initialEmitter,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
@@ -439,7 +443,9 @@ export function toAllWaste(
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    weight: bsff.weightValue ? bsff.weightValue / 1000 : bsff.weightValue,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toNumber()
+      : null,
     managedEndDate: null,
     managedStartDate: null,
     traderCompanyName: null,

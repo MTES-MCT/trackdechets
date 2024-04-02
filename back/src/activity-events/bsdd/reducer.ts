@@ -1,5 +1,6 @@
 import { Form, Prisma } from "@prisma/client";
 import { BsddEvent } from "./types";
+import { Decimal } from "decimal.js";
 
 export function bsddReducer(
   currentState: Partial<Form>,
@@ -51,7 +52,8 @@ export function bsddReducer(
                 wasteDetailsLandIdentifiers as string[]
             }
           : {}),
-        ...dateConverter({}, bsdd)
+        ...dateConverter({}, bsdd),
+        ...decimalConverter({}, bsdd)
       };
     }
 
@@ -100,7 +102,8 @@ export function bsddReducer(
                 wasteDetailsLandIdentifiers as string[]
             }
           : {}),
-        ...dateConverter(currentState, event.data.content as any)
+        ...dateConverter(currentState, event.data.content as any),
+        ...decimalConverter(currentState, event.data.content as any)
       };
     }
 
@@ -128,6 +131,10 @@ export function bsddReducer(
           : {}),
         ...(wasteDetailsPop ? { wasteDetailsPop: wasteDetailsPop } : {}),
         ...dateConverter(
+          currentState,
+          event.data.content as Partial<Prisma.FormCreateInput>
+        ),
+        ...decimalConverter(
           currentState,
           event.data.content as Partial<Prisma.FormCreateInput>
         )
@@ -170,6 +177,36 @@ function getDateField(
 ) {
   if (update[fieldName]) {
     return new Date(update[fieldName]);
+  }
+  if (currentState[fieldName]) {
+    return currentState[fieldName];
+  }
+  return null;
+}
+
+function decimalConverter(
+  currentState: Partial<Form>,
+  update: Partial<Prisma.FormCreateInput>
+) {
+  return {
+    wasteDetailsQuantity: getDecimalField(
+      currentState,
+      update,
+      "wasteDetailsQuantity"
+    ),
+    quantityReceived: getDecimalField(currentState, update, "quantityReceived")
+  };
+}
+
+function getDecimalField(
+  currentState: Partial<Form>,
+  update: Partial<Prisma.FormCreateInput>,
+  fieldName: string
+) {
+  if (update[fieldName]) {
+    return !Decimal.isDecimal(update[fieldName])
+      ? new Decimal(update[fieldName])
+      : update[fieldName];
   }
   if (currentState[fieldName]) {
     return currentState[fieldName];

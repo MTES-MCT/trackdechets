@@ -98,7 +98,7 @@ describe("Test Form OperationHook job", () => {
     expect(updatedForm?.finalOperations[0]).toMatchObject({
       formId: updatedForm.id,
       finalBsdReadableId: updatedForm.forwardedIn!.readableId,
-      quantity: updatedForm.forwardedIn!.quantityReceived!,
+      quantity: updatedForm.forwardedIn!.quantityReceived!.toNumber(),
       operationCode: updatedForm.forwardedIn!.processingOperationDone!,
       destinationCompanySiret: updatedForm.forwardedIn!.recipientCompanySiret!,
       destinationCompanyName: updatedForm.forwardedIn!.recipientCompanyName!
@@ -172,7 +172,7 @@ describe("Test Form OperationHook job", () => {
     expect(level2Form?.finalOperations[0]).toMatchObject({
       formId: level2Form.id,
       finalBsdReadableId: level2Form.forwardedIn!.readableId,
-      quantity: level2Form.forwardedIn!.quantityReceived!,
+      quantity: level2Form.forwardedIn!.quantityReceived!.toNumber(),
       operationCode: level2Form.forwardedIn!.processingOperationDone!,
       destinationCompanySiret: level2Form.forwardedIn!.recipientCompanySiret!,
       destinationCompanyName: level2Form.forwardedIn!.recipientCompanyName!

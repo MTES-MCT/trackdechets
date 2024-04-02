@@ -75,7 +75,7 @@ describe("appendix2Forms resolver", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived!
+            quantity: appendix2.quantityReceived!.toNumber()
           }
         }
       }
@@ -98,7 +98,7 @@ describe("appendix2Forms resolver", () => {
           }
         },
         signedAt: appendix2.signedAt,
-        quantityReceived: appendix2.quantityReceived,
+        quantityReceived: appendix2.quantityReceived?.toNumber(),
         processingOperationDone: appendix2.processingOperationDone,
         emitterPostalCode: "13001"
       }
@@ -133,7 +133,7 @@ describe("appendix2Forms resolver", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived!
+            quantity: appendix2.quantityReceived!.toNumber()
           }
         }
       }
