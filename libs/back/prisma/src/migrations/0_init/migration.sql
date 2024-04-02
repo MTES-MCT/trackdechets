@@ -106,9 +106,6 @@ CREATE TYPE "BspaohStatus" AS ENUM ('DRAFT', 'INITIAL', 'SIGNED_BY_PRODUCER', 'S
 -- CreateEnum
 CREATE TYPE "BspaohType" AS ENUM ('PAOH', 'FOETUS');
 
--- CreateEnum
-CREATE TYPE "BsvhuRecipientType" AS ENUM ('BROYEUR', 'DEMOLISSEUR');
-
 -- CreateTable
 CREATE TABLE "AccessToken" (
     "id" VARCHAR(30) NOT NULL,
