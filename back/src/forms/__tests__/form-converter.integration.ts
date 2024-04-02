@@ -150,7 +150,7 @@ describe("expandFormFromDb", () => {
       receivedBy: null,
       receivedAt: null,
       signedAt: null,
-      quantityReceived: null,
+      quantityReceived: undefined,
       processingOperationDone: null,
       quantityGrouped: 0,
       processingOperationDescription: null,

@@ -67,7 +67,9 @@ export function simpleFormToBsdd(
     emitterEmissionSignatureAuthor: form.sentBy,
     emitterEmissionSignatureDate: form.sentAt,
     packagings: form.wasteDetailsPackagingInfos,
-    weightValue: form.wasteDetailsQuantity,
+    weightValue: form.wasteDetailsQuantity
+      ? form.wasteDetailsQuantity.toNumber()
+      : null,
     wasteAdr: form.wasteDetailsOnuCode,
     weightIsEstimate: form.wasteDetailsQuantityType == QuantityType.ESTIMATED,
     transporterCompanyName: transporter?.transporterCompanyName,
@@ -137,7 +139,9 @@ export function simpleFormToBsdd(
     destinationCompanyMail: form.recipientCompanyMail,
     destinationCustomInfo: null,
     destinationReceptionDate: form.receivedAt,
-    destinationReceptionWeight: form.quantityReceived,
+    destinationReceptionWeight: form.quantityReceived
+      ? form.quantityReceived.toNumber()
+      : null,
     destinationReceptionAcceptationStatus: form.wasteAcceptationStatus,
     destinationReceptionRefusalReason: form.wasteRefusalReason,
     destinationReceptionSignatureAuthor: form.receivedBy,

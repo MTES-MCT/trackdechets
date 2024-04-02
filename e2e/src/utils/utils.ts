@@ -12,3 +12,12 @@ export const expectInputValue = async (
 
   expect(value).toEqual(expectedValue);
 };
+
+export const navigateInDashboard = async (
+  page: Page,
+  tabName: string,
+  url: string
+) => {
+  await page.getByRole("link", { name: tabName }).click();
+  await page.waitForURL(url);
+};

@@ -1,4 +1,4 @@
-import { Bsda, BsdaTransporter } from "@prisma/client";
+import { Bsda } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -18,7 +18,7 @@ import {
   emptyTransportedWaste
 } from "../registry/types";
 import { extractPostalCode } from "../utils";
-import { getFirstTransporterSync } from "./database";
+import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { RegistryBsda } from "../registry/elastic";
 import { BsdaForElastic } from "./elastic";
 
@@ -28,17 +28,34 @@ const getOperationData = (bsda: Bsda) => ({
   destinationOperationMode: bsda.destinationOperationMode
 });
 
-const getTransporterData = (transporter: BsdaTransporter) => ({
-  transporterTakenOverAt: transporter.transporterTransportTakenOverAt,
-  transporterRecepisseIsExempted: transporter.transporterRecepisseIsExempted,
-  transporterNumberPlates: transporter.transporterTransportPlates,
-  transporterCompanyAddress: transporter.transporterCompanyAddress,
-  transporterCompanyName: transporter.transporterCompanyName,
-  transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-  transporterRecepisseNumber: transporter.transporterRecepisseNumber,
-  transporterCompanyMail: transporter.transporterCompanyMail,
-  transporterCustomInfo: transporter.transporterCustomInfo
-});
+const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
+  const transporters = getTransportersSync(bsda);
+
+  const [transporter, transporter2, transporter3] = transporters;
+
+  return {
+    transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
+    transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
+    transporterCompanyAddress: transporter?.transporterCompanyAddress,
+    transporterCompanyName: transporter?.transporterCompanyName,
+    transporterCompanySiret: transporter?.transporterCompanySiret,
+    transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporterNumberPlates: transporter?.transporterTransportPlates,
+    transporterCompanyMail: transporter?.transporterCompanyMail,
+    transporter2CompanyAddress: transporter2?.transporterCompanyAddress,
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanySiret: transporter2?.transporterCompanySiret,
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2NumberPlates: transporter2?.transporterTransportPlates,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter3CompanyAddress: transporter3?.transporterCompanyAddress,
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanySiret: transporter3?.transporterCompanySiret,
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3NumberPlates: transporter3?.transporterTransportPlates,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail
+  };
+};
 
 type RegistryFields =
   | "isIncomingWasteFor"
@@ -79,11 +96,14 @@ export function getRegistryFields(
         }
       }
     }
+  }
 
-    const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
-
-    if (transporterCompanyOrgId) {
-      registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+  for (const transporter of bsda.transporters ?? []) {
+    if (transporter.transporterTransportSignatureDate) {
+      const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+      if (transporterCompanyOrgId) {
+        registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+      }
     }
   }
 
@@ -96,8 +116,6 @@ export function getRegistryFields(
 }
 
 function toGenericWaste(bsda: RegistryBsda): GenericWaste {
-  const transporter = getFirstTransporterSync(bsda);
-
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
@@ -117,14 +135,14 @@ function toGenericWaste(bsda: RegistryBsda): GenericWaste {
       bsda.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsda.destinationOperationDate,
     destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight / 1000
-      : bsda.destinationReceptionWeight,
+      ? bsda.destinationReceptionWeight.dividedBy(1000).toNumber()
+      : null,
 
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress: bsda.workerCompanyAddress,
-    ...(transporter ? getTransporterData(transporter) : {})
+    ...getTransportersData(bsda)
   };
 }
 
@@ -248,7 +266,9 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
+    weight: bsda.weightValue
+      ? bsda.weightValue.dividedBy(1000).toNumber()
+      : null,
     emitterCustomInfo: bsda.emitterCustomInfo,
     destinationCompanyMail: bsda.destinationCompanyMail,
     ...getOperationData(bsda)
@@ -293,7 +313,9 @@ export function toTransportedWaste(
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsda.destinationReceptionDate,
-    weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
+    weight: bsda.weightValue
+      ? bsda.weightValue.dividedBy(1000).toNumber()
+      : null,
     ...initialEmitter,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
@@ -438,7 +460,9 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
       ].filter(Boolean)
     ),
     ...initialEmitter,
-    weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
+    weight: bsda.weightValue
+      ? bsda.weightValue.dividedBy(1000).toNumber()
+      : null,
     managedEndDate: null,
     managedStartDate: null,
     traderCompanyName: null,

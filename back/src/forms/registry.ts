@@ -94,13 +94,13 @@ export function getRegistryFields(
         }
       }
     }
+  }
 
-    if (form.transporters?.length) {
-      for (const transporter of form.transporters) {
-        const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
-        if (transporterCompanyOrgId) {
-          registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
-        }
+  for (const transporter of form.transporters ?? []) {
+    if (transporter.takenOverAt) {
+      const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+      if (transporterCompanyOrgId) {
+        registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
       }
     }
   }

@@ -1,3 +1,4 @@
+import { Decimal } from "decimal.js";
 import {
   BsdaInput,
   BsdaRevisionRequestContentInput
@@ -26,8 +27,8 @@ describe("flattenBsdaInput", () => {
 describe("expandBsdaFromDb", () => {
   it("should convert kg to tonnes", () => {
     const dbInput = {
-      weightValue: 4060,
-      destinationReceptionWeight: 4060
+      weightValue: new Decimal(4060),
+      destinationReceptionWeight: new Decimal(4060)
     };
     const expanded = expandBsdaFromDb(dbInput as any);
     expect(expanded).toMatchObject({
@@ -50,7 +51,7 @@ describe("flattenBsdaRevisionRequestInput", () => {
 describe("expandBsdaRevisionRequestContent", () => {
   it("should convert kg to tonnes", () => {
     const dbInput = {
-      destinationReceptionWeight: 4060
+      destinationReceptionWeight: new Decimal(4060)
     };
     const expanded = expandBsdaRevisionRequestContent(dbInput as any);
     expect(expanded).toMatchObject({

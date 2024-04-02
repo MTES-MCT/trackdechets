@@ -1,4 +1,4 @@
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 import { prisma } from "@td/prisma";
 import { processDbIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";
 

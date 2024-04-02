@@ -130,7 +130,7 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
         if (transporter.takenOverAt) {
           // `handedOver` permet de savoir si le transporteur
           // N+1 a également pris en charge le déchet, si c'est le
-          // cas le bordereau ne doit pas apparaitre dans l'onglet "À collecter"
+          // cas le bordereau ne doit pas apparaitre dans l'onglet "Collecté"
           // du transporteur N
           const handedOver = transporters.find(
             t => t.number > transporter.number && t.takenOverAt
@@ -198,7 +198,6 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
 
       break;
     }
-    case Status.GROUPED:
     case Status.REFUSED:
     case Status.PROCESSED:
     case Status.FOLLOWED_WITH_PNTTD:
@@ -209,6 +208,7 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
       }
       break;
     }
+    case Status.GROUPED:
     case Status.AWAITING_GROUP:
     default:
       break;
@@ -226,10 +226,11 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
 function getFormSirets(form: FullForm) {
   const transporter = getFirstTransporterSync(form);
 
-  // Appendix 1 only appears in the dashboard for emitters & transporters
+  // Appendix 1 only appears in the dashboard for emitters & transporters & EO
   if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
     return {
       emitterCompanySiret: form.emitterCompanySiret,
+      ecoOrganismeSiret: form.ecoOrganismeSiret,
       ...(transporter
         ? {
             [transporterCompanyOrgIdKey(transporter)]:
