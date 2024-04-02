@@ -21,6 +21,10 @@ type Mutation {
     website: String
     "Profil de l'établissement"
     companyTypes: [CompanyType!]
+    "Sous-types pour les Installation de Tri, Transit Regroupement de déchets"
+    collectorTypes: [CollectorType!]
+    "Sous-types d'entreprises pour les installation de traitement de déchets"
+    wasteProcessorTypes: [WasteProcessorType!]
     "Nom d'usage de l'établissement"
     givenName: String
     "Identifiant d'un récépissé transporteur"
