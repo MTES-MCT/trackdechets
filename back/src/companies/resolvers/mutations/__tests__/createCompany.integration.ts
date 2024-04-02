@@ -11,9 +11,11 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { geocode } from "../../../geo/geocode";
 import {
+  CollectorType,
   CompanyType,
   CompanyVerificationMode,
-  CompanyVerificationStatus
+  CompanyVerificationStatus,
+  WasteProcessorType
 } from "@prisma/client";
 import {
   onboardingFirstStep,
@@ -53,6 +55,8 @@ const CREATE_COMPANY = `
       name
       address
       companyTypes
+      collectorTypes
+      wasteProcessorTypes
       ecoOrganismeAgreements
       transporterReceipt {
         id
@@ -964,5 +968,465 @@ describe("Mutation.createCompany", () => {
 
     // Verification letter
     expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(0);
+  });
+
+  it("company types should not be duplicated", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Collector",
+      address: "une adresse",
+      companyTypes: [CompanyType.COLLECTOR, CompanyType.COLLECTOR]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      companyTypes: [CompanyType.COLLECTOR]
+    });
+  });
+
+  it("collector should be able to chose collector types", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Collector",
+      address: "une adresse",
+      companyTypes: [CompanyType.PRODUCER, CompanyType.COLLECTOR],
+      collectorTypes: [
+        CollectorType.DANGEROUS_WASTES,
+        CollectorType.DEEE_WASTES
+      ]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      companyTypes: [CompanyType.PRODUCER, CompanyType.COLLECTOR],
+      collectorTypes: [
+        CollectorType.DANGEROUS_WASTES,
+        CollectorType.DEEE_WASTES
+      ]
+    });
+  });
+
+  it("collector types must be valid CollectorTypes", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Collector",
+      address: "une adresse",
+      companyTypes: [CompanyType.COLLECTOR],
+      collectorTypes: [WasteProcessorType.CREMATION]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      `Variable "$companyInput" got invalid value "CREMATION" at "companyInput.collectorTypes[0]"; Value "CREMATION" does not exist in "CollectorType" enum.`
+    );
+  });
+
+  it("collector types should not be duplicated", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Collector",
+      address: "une adresse",
+      companyTypes: [CompanyType.PRODUCER, CompanyType.COLLECTOR],
+      collectorTypes: [
+        CollectorType.DANGEROUS_WASTES,
+        CollectorType.DANGEROUS_WASTES
+      ]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      companyTypes: [CompanyType.PRODUCER, CompanyType.COLLECTOR],
+      collectorTypes: [CollectorType.DANGEROUS_WASTES]
+    });
+  });
+
+  it("non-collector should NOT be able to chose collector types", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Producer",
+      address: "une adresse",
+      companyTypes: [CompanyType.PRODUCER],
+      collectorTypes: [CollectorType.DANGEROUS_WASTES]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Your company needs to be a Collector to have collectorTypes"
+    );
+  });
+
+  it.each([null, undefined, []])(
+    "collector types are optional > empty value '%p'",
+    async collectorTypes => {
+      // Given
+      const user = await userFactory();
+      const siret = siretify(8);
+      const orgId = siret;
+      (searchCompany as jest.Mock).mockResolvedValueOnce({
+        orgId,
+        siret: orgId,
+        etatAdministratif: "A"
+      });
+
+      const companyInput = {
+        siret,
+        companyName: "Collector",
+        address: "une adresse",
+        companyTypes: [CompanyType.PRODUCER, CompanyType.COLLECTOR],
+        collectorTypes
+      };
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { data, errors } = await mutate(CREATE_COMPANY, {
+        variables: {
+          companyInput
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createCompany).toMatchObject({
+        companyTypes: [CompanyType.PRODUCER, CompanyType.COLLECTOR],
+        collectorTypes: []
+      });
+    }
+  );
+
+  it("waste processor should be able to chose waste processor types", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Waste processor",
+      address: "une adresse",
+      companyTypes: [CompanyType.WASTEPROCESSOR, CompanyType.COLLECTOR],
+      wasteProcessorTypes: [
+        WasteProcessorType.CREMATION,
+        WasteProcessorType.INERT_WASTES_STORAGE
+      ]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      companyTypes: [CompanyType.WASTEPROCESSOR, CompanyType.COLLECTOR],
+      wasteProcessorTypes: [
+        WasteProcessorType.CREMATION,
+        WasteProcessorType.INERT_WASTES_STORAGE
+      ]
+    });
+  });
+
+  it("waste processor types must be valid WasteProcessorTypes", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Waste processor",
+      address: "une adresse",
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [CollectorType.DEEE_WASTES]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      `Variable "$companyInput" got invalid value "DEEE_WASTES" at "companyInput.wasteProcessorTypes[0]"; Value "DEEE_WASTES" does not exist in "WasteProcessorType" enum.`
+    );
+  });
+
+  it("waste processor types should not be duplicated", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Waste processor",
+      address: "une adresse",
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [
+        WasteProcessorType.CREMATION,
+        WasteProcessorType.CREMATION
+      ]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.CREMATION]
+    });
+  });
+
+  it("non-waste-processor should NOT be able to chose waste processor types", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Waste processor",
+      address: "une adresse",
+      companyTypes: [CompanyType.PRODUCER],
+      wasteProcessorTypes: [WasteProcessorType.CREMATION]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Your company needs to be a WasteProcessor to have wasteProcessorTypes"
+    );
+  });
+
+  it.each([null, undefined, []])(
+    "waste processor types are optional > empty value '%p'",
+    async wasteProcessorTypes => {
+      // Given
+      const user = await userFactory();
+      const siret = siretify(8);
+      const orgId = siret;
+      (searchCompany as jest.Mock).mockResolvedValueOnce({
+        orgId,
+        siret: orgId,
+        etatAdministratif: "A"
+      });
+
+      const companyInput = {
+        siret,
+        companyName: "Waste processor",
+        address: "une adresse",
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes
+      };
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { data, errors } = await mutate(CREATE_COMPANY, {
+        variables: {
+          companyInput
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createCompany).toMatchObject({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: []
+      });
+    }
+  );
+
+  it("company can have a combination of waste processor types & collector types", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Waste processor & Collector",
+      address: "une adresse",
+      companyTypes: [
+        CompanyType.PRODUCER,
+        CompanyType.COLLECTOR,
+        CompanyType.WASTEPROCESSOR
+      ],
+      collectorTypes: [
+        CollectorType.DANGEROUS_WASTES,
+        CollectorType.DEEE_WASTES
+      ],
+      wasteProcessorTypes: [
+        WasteProcessorType.OTHER_DANGEROUS_WASTES,
+        WasteProcessorType.DANGEROUS_WASTES_STORAGE
+      ]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      companyTypes: [
+        CompanyType.PRODUCER,
+        CompanyType.COLLECTOR,
+        CompanyType.WASTEPROCESSOR
+      ],
+      collectorTypes: [
+        CollectorType.DANGEROUS_WASTES,
+        CollectorType.DEEE_WASTES
+      ],
+      wasteProcessorTypes: [
+        WasteProcessorType.OTHER_DANGEROUS_WASTES,
+        WasteProcessorType.DANGEROUS_WASTES_STORAGE
+      ]
+    });
   });
 });
