@@ -182,7 +182,7 @@ model AccessToken {
 }
 
 model Application {
-  id            String           @id @default(cuid())
+  id            String           @id @default(cuid()) @db.VarChar(30)
   createdAt     DateTime         @default(now()) @db.Timestamptz(6)
   updatedAt     DateTime         @updatedAt @db.Timestamptz(6)
   clientSecret  String
@@ -702,7 +702,7 @@ model StatusLog {
 }
 
 model TraderReceipt {
-  id            String    @id @default(cuid())
+  id            String    @id @default(cuid()) @db.VarChar(30)
   receiptNumber String
   validityLimit DateTime  @db.Timestamptz(6)
   department    String
@@ -718,7 +718,7 @@ model BrokerReceipt {
 }
 
 model TransporterReceipt {
-  id            String    @id @default(cuid())
+  id            String    @id @default(cuid()) @db.VarChar(30)
   receiptNumber String
   validityLimit DateTime  @db.Timestamptz(6)
   department    String
@@ -775,7 +775,7 @@ model BsddTransporter {
 }
 
 model User {
-  id                      String                    @id @default(cuid())
+  id                      String                    @id @default(cuid()) @db.VarChar(30)
   email                   String                    @unique(map: "User.email_unique")
   password                String
   passwordVersion         Int?
