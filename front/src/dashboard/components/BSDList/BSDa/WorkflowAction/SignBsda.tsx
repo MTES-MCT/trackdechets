@@ -3,6 +3,7 @@ import { ActionButton } from "../../../../../common/components";
 import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
 import React, { useState } from "react";
 import { SignBsdaModal } from "./SignBsdaModal";
+import { Bsda } from "@td/codegen-ui";
 
 export const SIGN_BSDA = gql`
   mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
@@ -16,7 +17,7 @@ export const SIGN_BSDA = gql`
 type Props = {
   title: string;
   bsdaId: string;
-  children: (props: { bsda; onClose }) => React.ReactNode;
+  children: (props: { bsda: Bsda; onClose }) => React.ReactNode;
   isModalOpenFromParent?: boolean;
   onModalCloseFromParent?: () => void;
   displayActionButton?: boolean;

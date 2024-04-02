@@ -56,6 +56,15 @@ export const UPDATE_BSDA = gql`
   ${FullBsdaFragment}
 `;
 
+export const UPDATE_BSDA_TRANSPORTER = gql`
+  mutation UpdateBsdaTransporter($id: ID!, $input: BsdaTransporterInput!) {
+    updateBsdaTransporter(id: $id, input: $input) {
+      ...FullBsda
+    }
+  }
+  ${FullBsdaFragment}
+`;
+
 export const SIGN_BSDA = gql`
   mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
     signBsda(id: $id, input: $input) {

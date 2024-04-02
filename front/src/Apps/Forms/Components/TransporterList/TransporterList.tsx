@@ -1,22 +1,22 @@
 import * as React from "react";
-import { FieldArray, useField } from "formik";
+import { FieldArray } from "formik";
 import { TransporterForm } from "../TransporterForm/TransporterForm";
 import { TransporterAccordion } from "../TransporterAccordion/TransporterAccordion";
-import { Mutation, MutationDeleteFormTransporterArgs } from "@td/codegen-ui";
-import { useMutation } from "@apollo/client";
-import { DELETE_FORM_TRANSPORTER } from "../query";
+import { BsdType } from "@td/codegen-ui";
 import { Loader } from "../../../common/Components";
-import {
-  CreateOrUpdateTransporterInput,
-  initialFormTransporter
-} from "../../../../form/bsdd/utils/initial-state";
+import { initialFormTransporter } from "../../../../form/bsdd/utils/initial-state";
 import TransporterDisplay from "../TransporterDisplay/TransporterDisplay";
+import { AnyTransporterInput } from "../../types";
+import { useTransporters } from "../../hooks/useTransporters";
+import { useDeleteTransporter } from "../../hooks/useDeleteTransporter";
+import { initialBsdaTransporter } from "../../../../form/bsda/stepper/initial-state";
 
 type TransporterListProps = {
   // SIRET ou VAT de l'établissement courant
   orgId?: string;
-  // Nom du champ Formik stockant la liste des transporteurs
   fieldName: string;
+  // Type de bordereau
+  bsdType: BsdType;
 };
 
 /**
@@ -24,18 +24,15 @@ type TransporterListProps = {
  * - l'ajout et la suppression de transporteurs à la liste.
  * - la permutation de deux transporteurs dans la liste.
  */
-export function TransporterList({ orgId, fieldName }: TransporterListProps) {
-  const [field] = useField<CreateOrUpdateTransporterInput[]>({
-    name: fieldName
-  });
-
-  const transporters = field.value;
+export function TransporterList<TransporterInput extends AnyTransporterInput>({
+  orgId,
+  fieldName,
+  bsdType
+}: TransporterListProps) {
+  const transporters = useTransporters<TransporterInput>(fieldName, bsdType);
 
   const [deleteFormTransporter, { loading: deleteFormTransporterLoading }] =
-    useMutation<
-      Pick<Mutation, "deleteFormTransporter">,
-      MutationDeleteFormTransporterArgs
-    >(DELETE_FORM_TRANSPORTER);
+    useDeleteTransporter(bsdType)!;
 
   // Le fonctionnement du groupe d'accordéons fait qu'un seul à la fois
   // peut être déplié. Cette variable permet d'enregistrer l'index du transporteur
@@ -43,6 +40,14 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
   const [expandedIdx, setExpandedIdx] = React.useState<number | null>(
     // Tous les accordéons sont repliés par défaut s'il y a plusieurs transporteurs
     transporters.length === 1 ? 0 : null
+  );
+
+  const initialTransporterData = React.useMemo(
+    () =>
+      bsdType === BsdType.Bsdd
+        ? initialFormTransporter
+        : initialBsdaTransporter,
+    [bsdType]
   );
 
   return (
@@ -53,7 +58,7 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
           <>
             {transporters.map((t, idx) => {
               const onTransporterAdd = () => {
-                arrayHelpers.insert(idx + 1, initialFormTransporter);
+                arrayHelpers.insert(idx + 1, initialTransporterData);
                 // replie tous les formulaire sauf celui du nouveau
                 // transporteur qui vient d'être crée
                 setExpandedIdx(idx + 1);
@@ -155,6 +160,7 @@ export function TransporterList({ orgId, fieldName }: TransporterListProps) {
                     <TransporterForm
                       orgId={orgId}
                       fieldName={`${fieldName}[${idx}]`}
+                      bsdType={bsdType}
                     />
                   )}
                 </TransporterAccordion>

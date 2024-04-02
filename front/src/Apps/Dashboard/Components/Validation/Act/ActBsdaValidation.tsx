@@ -108,6 +108,20 @@ const ActBsdaValidation = ({
     );
   };
   const renderSentModal = () => {
+    const nextTransporter = (bsd.transporters ?? []).find(
+      t => !t.transport?.signature?.date
+    );
+
+    if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
+      return (
+        <SignTransport
+          siret={currentSiret}
+          bsdaId={bsd.id}
+          {...actionButtonAdapterProps}
+        />
+      );
+    }
+
     return (
       <SignOperation
         siret={currentSiret}

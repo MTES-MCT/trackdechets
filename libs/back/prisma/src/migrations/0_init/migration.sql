@@ -106,9 +106,6 @@ CREATE TYPE "BspaohStatus" AS ENUM ('DRAFT', 'INITIAL', 'SIGNED_BY_PRODUCER', 'S
 -- CreateEnum
 CREATE TYPE "BspaohType" AS ENUM ('PAOH', 'FOETUS');
 
--- CreateEnum
-CREATE TYPE "BsvhuRecipientType" AS ENUM ('BROYEUR', 'DEMOLISSEUR');
-
 -- CreateTable
 CREATE TABLE "AccessToken" (
     "id" VARCHAR(30) NOT NULL,
@@ -126,7 +123,7 @@ CREATE TABLE "AccessToken" (
 
 -- CreateTable
 CREATE TABLE "Application" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(30) NOT NULL,
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(6) NOT NULL,
     "clientSecret" TEXT NOT NULL,
@@ -554,7 +551,7 @@ CREATE TABLE "StatusLog" (
 
 -- CreateTable
 CREATE TABLE "TraderReceipt" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(30) NOT NULL,
     "receiptNumber" TEXT NOT NULL,
     "validityLimit" TIMESTAMPTZ(6) NOT NULL,
     "department" TEXT NOT NULL,
@@ -574,7 +571,7 @@ CREATE TABLE "BrokerReceipt" (
 
 -- CreateTable
 CREATE TABLE "TransporterReceipt" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(30) NOT NULL,
     "receiptNumber" TEXT NOT NULL,
     "validityLimit" TIMESTAMPTZ(6) NOT NULL,
     "department" TEXT NOT NULL,
@@ -634,7 +631,7 @@ CREATE TABLE "BsddTransporter" (
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(30) NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "passwordVersion" INTEGER,
@@ -645,7 +642,7 @@ CREATE TABLE "User" (
     "activatedAt" TIMESTAMPTZ(6),
     "firstAssociationDate" TIMESTAMPTZ(6),
     "isActive" BOOLEAN DEFAULT false,
-    "isAdmin" BOOLEAN DEFAULT false,
+    "isAdmin" BOOLEAN NOT NULL DEFAULT false,
     "isRegistreNational" BOOLEAN NOT NULL DEFAULT false,
     "governmentAccountId" TEXT,
 
@@ -1586,6 +1583,9 @@ CREATE INDEX "_BsvhuDestinationCompanySiretIdx" ON "Bsvhu"("destinationCompanySi
 CREATE INDEX "_BsvhuTransporterCompanySiretIdx" ON "Bsvhu"("transporterCompanySiret");
 
 -- CreateIndex
+CREATE INDEX "_BsvhuTransporterCompanyVatNumberIdx" ON "Bsvhu"("transporterCompanyVatNumber");
+
+-- CreateIndex
 CREATE INDEX "_BsvhuStatusIdx" ON "Bsvhu"("status");
 
 -- CreateIndex
@@ -1599,6 +1599,9 @@ CREATE INDEX "_BsdasriEmitterCompanySiretIdx" ON "Bsdasri"("emitterCompanySiret"
 
 -- CreateIndex
 CREATE INDEX "_BsdasriTransporterCompanySiretIdx" ON "Bsdasri"("transporterCompanySiret");
+
+-- CreateIndex
+CREATE INDEX "_BsdasriTransporterCompanyVatNumberIdx" ON "Bsdasri"("transporterCompanyVatNumber");
 
 -- CreateIndex
 CREATE INDEX "_BsdasriDestinationCompanySiretIdx" ON "Bsdasri"("destinationCompanySiret");
@@ -1635,6 +1638,9 @@ CREATE INDEX "_BsffEmitterCompanySiretIdx" ON "Bsff"("emitterCompanySiret");
 
 -- CreateIndex
 CREATE INDEX "_BsffTransporterCompanySiretIdx" ON "Bsff"("transporterCompanySiret");
+
+-- CreateIndex
+CREATE INDEX "_BsffTransporterCompanyVatNumberIdx" ON "Bsff"("transporterCompanyVatNumber");
 
 -- CreateIndex
 CREATE INDEX "_BsffDestinationCompanySiretIdx" ON "Bsff"("destinationCompanySiret");

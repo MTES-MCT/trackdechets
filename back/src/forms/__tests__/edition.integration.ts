@@ -161,7 +161,6 @@ describe("checkEditionRules", () => {
         "wasteDetailsParcelNumbers, " +
         "wasteDetailsAnalysisReferences, " +
         "wasteDetailsLandIdentifiers, " +
-        "wasteDetailsSampleNumber, " +
         "traderCompanyName, " +
         "traderCompanySiret, " +
         "traderCompanyAddress, " +
