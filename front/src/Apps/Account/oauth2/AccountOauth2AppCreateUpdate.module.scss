@@ -1,0 +1,41 @@
+@import "../../../scss/Constants.scss";
+
+.oauth2AppAddForm {
+  max-width: initial;
+
+  .field {
+    width: 100%;
+    display: flex;
+    margin: 1.5em auto;
+    justify-content: flex-start;
+  }
+
+  .field > label {
+    flex-shrink: 0;
+    width: 180px;
+  }
+
+  .bold {
+    font-weight: bold;
+  }
+
+  .field__value {
+    width: 100%;
+    display: block;
+    margin-left: 1em;
+    margin-right: 3em;
+  }
+
+  .textField {
+    width: 300px;
+  }
+}
+
+.InputGroup {
+  display: flex;
+  margin-bottom: 0.5rem;
+
+  & > *:not(:last-child) {
+    margin-right: 0.5rem;
+  }
+}
