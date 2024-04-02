@@ -5,8 +5,7 @@ import { Field, Form, Formik } from "formik";
 import {
   BsdaSignatureType,
   Mutation,
-  MutationSignBsdaArgs,
-  SignatureTypeInput
+  MutationSignBsdaArgs
 } from "@td/codegen-ui";
 import React from "react";
 import { generatePath, Link } from "react-router-dom";
@@ -54,7 +53,7 @@ export function SignEmission({
     >
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
-          error => error.requiredFor === SignatureTypeInput.Emission
+          error => error?.requiredFor === BsdaSignatureType.Emission
         ) ? (
           <>
             <p className="tw-m-2 tw-text-red-700">
@@ -64,7 +63,7 @@ export function SignEmission({
 
             <ul className="tw-mb-2 tw-text-red-700 tw-list-disc">
               {bsda.metadata?.errors.map((error, idx) => (
-                <li key={idx}>{error.message}</li>
+                <li key={idx}>{error?.message}</li>
               ))}
             </ul>
             <Link

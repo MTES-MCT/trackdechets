@@ -4,9 +4,10 @@ import { formTransportIsPipeline } from "./utils/packagings";
 import { TransporterList } from "../../Apps/Forms/Components/TransporterList/TransporterList";
 import { useParams } from "react-router-dom";
 import { FormFormikValues } from "./utils/initial-state";
-import { EmitterType } from "@td/codegen-ui";
+import { BsdType, EmitterType } from "@td/codegen-ui";
 import { TransporterForm } from "../../Apps/Forms/Components/TransporterForm/TransporterForm";
 import TransporterDisplay from "../../Apps/Forms/Components/TransporterDisplay/TransporterDisplay";
+import { mapBsddTransporter } from "../../Apps/Forms/bsdTransporterMapper";
 
 export default function Transporter() {
   const { values } = useFormikContext<FormFormikValues>();
@@ -23,10 +24,24 @@ export default function Transporter() {
     const transporter = values.transporters?.[0];
     // TRA-13753 - Un seul transporteur est autorisé en cas de bordereau de tournée dédiée
     if (transporter && transporter?.takenOverAt) {
-      return <TransporterDisplay transporter={transporter} />;
+      return (
+        <TransporterDisplay transporter={mapBsddTransporter(transporter)} />
+      );
     }
-    return <TransporterForm orgId={siret} fieldName="transporters[0]" />;
+    return (
+      <TransporterForm
+        orgId={siret}
+        fieldName="transporters[0]"
+        bsdType={BsdType.Bsdd}
+      />
+    );
   }
 
-  return <TransporterList fieldName="transporters" orgId={siret} />;
+  return (
+    <TransporterList
+      fieldName="transporters"
+      orgId={siret}
+      bsdType={BsdType.Bsdd}
+    />
+  );
 }
