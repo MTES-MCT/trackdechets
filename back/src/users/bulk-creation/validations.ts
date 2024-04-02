@@ -1,4 +1,4 @@
-import { CollectorType, CompanyType, UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import * as yup from "yup";
 import { prisma } from "@td/prisma";
 import { CompanyRow } from "./types";

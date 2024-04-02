@@ -26,10 +26,13 @@ const validateCompanyTypes = (
   company: Company,
   args: RequireFields<MutationUpdateCompanyArgs, "id">
 ) => {
-  let { companyTypes, collectorTypes, wasteProcessorTypes } = {
+  const mergedCompanyData = {
     ...company,
     ...args
   };
+
+  const { companyTypes } = mergedCompanyData;
+  let { collectorTypes, wasteProcessorTypes } = mergedCompanyData;
 
   // Nullify sub-types automatically
   if (args?.companyTypes?.length) {
