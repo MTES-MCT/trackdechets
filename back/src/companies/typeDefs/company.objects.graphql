@@ -7,10 +7,10 @@ type CompanyPrivate {
   companyTypes: [CompanyType!]!
 
   "Sous-types pour les Installation de Tri, Transit Regroupement de déchets"
-  collectorTypes: [CollectorType!]
+  collectorTypes: [CollectorType!]!
 
   "Sous-types d'entreprises pour les installation de traitement de déchets"
-  wasteProcessorTypes: [WasteProcessorType!]
+  wasteProcessorTypes: [WasteProcessorType!]!
 
   "Identifiant GEREP"
   gerepId: String
