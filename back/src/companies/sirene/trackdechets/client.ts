@@ -50,7 +50,9 @@ const searchResponseToCompany = (
 
   const company: SireneSearchResult = {
     siret: etablissement.siret,
-    etatAdministratif: etablissement.etatAdministratifEtablissement,
+    etatAdministratif:
+      etablissement.etatAdministratifEtablissement ||
+      (etablissement.etatAdministratifUniteLegale === "C" ? "F" : "A"),
     address: fullAddress,
     addressVoie,
     addressPostalCode: etablissement.codePostalEtablissement,
