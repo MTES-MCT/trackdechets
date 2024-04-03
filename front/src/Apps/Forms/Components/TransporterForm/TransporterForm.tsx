@@ -1,6 +1,5 @@
 import * as React from "react";
 import CompanySelectorWrapper from "../../../../form/common/components/CompanySelectorWrapper/CompanySelectorWrapper";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Field } from "formik";
@@ -16,6 +15,7 @@ import TransporterRecepisse from "../TransporterRecepisse/TransporterRecepisse";
 import { isForeignVat } from "@td/constants";
 import { useTransporter } from "../../hooks/useTransporter";
 import { AnyTransporterInput } from "../../types";
+import TransportPlates from "../TransportPlates/TransportPlates";
 
 type TransporterFormProps = {
   // SIRET ou VAT de l'établissement courant
@@ -39,9 +39,9 @@ export function TransporterForm<T extends AnyTransporterInput>({
     transporterOrgId,
     transporter,
     setTransporter,
-    transportPlatesField,
-    transportModeField,
-    transporterRecepisseIsExemptedField
+    transportPlatesFieldName,
+    transportModeFieldName,
+    transporterRecepisseIsExemptedFieldName
   } = useTransporter<T>(fieldName, bsdType);
 
   const isForeign = React.useMemo(
@@ -90,7 +90,7 @@ export function TransporterForm<T extends AnyTransporterInput>({
 
       <CompanyContactInfo fieldName={`${fieldName}.company`} />
 
-      <Field name={transporterRecepisseIsExemptedField}>
+      <Field name={transporterRecepisseIsExemptedFieldName}>
         {({ field, form }) => (
           <ToggleSwitch
             label={
@@ -111,7 +111,10 @@ export function TransporterForm<T extends AnyTransporterInput>({
             checked={field.value}
             disabled={isForeign}
             onChange={checked =>
-              form.setFieldValue(transporterRecepisseIsExemptedField, checked)
+              form.setFieldValue(
+                transporterRecepisseIsExemptedFieldName,
+                checked
+              )
             }
             defaultChecked={false}
           />
@@ -129,9 +132,9 @@ export function TransporterForm<T extends AnyTransporterInput>({
           />
         )}
 
-      <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+      <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
         <div className="fr-col-12 fr-col-md-3">
-          <Field name={transportModeField}>
+          <Field name={transportModeFieldName}>
             {({ field }) => (
               <Select label="Mode de transport" nativeSelectProps={field}>
                 <option value="ROAD">Route</option>
@@ -144,11 +147,10 @@ export function TransporterForm<T extends AnyTransporterInput>({
           </Field>
         </div>
         <div className="fr-col-12 fr-col-md-3">
-          <Field name={transportPlatesField}>
-            {({ field }) => (
-              <Input label="Immatriculation" nativeInputProps={field} />
-            )}
-          </Field>
+          <TransportPlates
+            bsdType={bsdType}
+            fieldName={transportPlatesFieldName}
+          />
         </div>
       </div>
     </div>
