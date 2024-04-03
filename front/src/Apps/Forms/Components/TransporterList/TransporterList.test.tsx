@@ -67,6 +67,12 @@ function getBsdaTransporter(
   };
 }
 
+function getInitialTransporter(bsdType: BsdType) {
+  return bsdType === BsdType.Bsdd
+    ? initialFormTransporter
+    : initialBsdaTransporter;
+}
+
 describe("<TransporterList />", () => {
   const mocks = [];
 
@@ -85,7 +91,7 @@ describe("<TransporterList />", () => {
     "component renders without errors when bsdType is %p",
     bsdType => {
       const { container } = render(
-        component([initialFormTransporter], bsdType)
+        component([getInitialTransporter(bsdType)], bsdType)
       );
       expect(container).toBeTruthy();
     }
@@ -94,7 +100,7 @@ describe("<TransporterList />", () => {
   test.each([BsdType.Bsdd, BsdType.Bsda])(
     "delete button is disabled when there is only one transporter and bsdType is %p",
     bsdType => {
-      render(component([initialFormTransporter], bsdType));
+      render(component([getInitialTransporter(bsdType)], bsdType));
       const addButton = screen.getByTitle("Supprimer");
       expect(addButton).toBeDisabled();
     }
@@ -103,7 +109,7 @@ describe("<TransporterList />", () => {
   test.each([BsdType.Bsdd, BsdType.Bsda])(
     "up button is disabled when there is only one transporter and bsdType is %p",
     bsdType => {
-      render(component([initialFormTransporter], bsdType));
+      render(component([getInitialTransporter(bsdType)], bsdType));
       const upButton = screen.getByTitle("Remonter");
       expect(upButton).toBeDisabled();
     }
@@ -112,7 +118,7 @@ describe("<TransporterList />", () => {
   test.each([BsdType.Bsdd, BsdType.Bsda])(
     "down button is disabled when there is only one transporter and bsdType is %p",
     bsdType => {
-      render(component([initialFormTransporter], bsdType));
+      render(component([getInitialTransporter(bsdType)], bsdType));
       const downButton = screen.getByTitle("Descendre");
       expect(downButton).toBeDisabled();
     }
@@ -121,7 +127,7 @@ describe("<TransporterList />", () => {
   test.each([BsdType.Bsdd, BsdType.Bsda])(
     "new transporters can be added until 5 when bsdType is %p",
     async bsdType => {
-      render(component([initialFormTransporter], bsdType));
+      render(component([getInitialTransporter(bsdType)], bsdType));
       const addButton = screen.getByTitle("Ajouter");
       fireEvent.click(addButton);
       fireEvent.click(addButton);
@@ -150,7 +156,10 @@ describe("<TransporterList />", () => {
     "transporters can be deleted with the delete button when bsdType is %p",
     async bsdType => {
       render(
-        component([initialFormTransporter, initialFormTransporter], bsdType)
+        component(
+          [getInitialTransporter(bsdType), getInitialTransporter(bsdType)],
+          bsdType
+        )
       );
       expect(await screen.findByText("1 - Transporteur")).toBeInTheDocument();
       expect(await screen.findByText("2 - Transporteur")).toBeInTheDocument();
@@ -167,7 +176,10 @@ describe("<TransporterList />", () => {
     "up button is disabled for the first transporter when bsdType is %p",
     async bsdType => {
       render(
-        component([initialFormTransporter, initialFormTransporter], bsdType)
+        component(
+          [getInitialTransporter(bsdType), getInitialTransporter(bsdType)],
+          bsdType
+        )
       );
       const upButtons = screen.getAllByTitle("Remonter");
       expect(upButtons[0]).toBeDisabled();
@@ -179,7 +191,10 @@ describe("<TransporterList />", () => {
     "down button is disabled for the last transporter when bsdType is %p",
     async bsdType => {
       render(
-        component([initialFormTransporter, initialFormTransporter], bsdType)
+        component(
+          [getInitialTransporter(bsdType), getInitialTransporter(bsdType)],
+          bsdType
+        )
       );
       const upButtons = screen.getAllByTitle("Descendre");
       expect(upButtons[0]).not.toBeDisabled();
@@ -191,7 +206,10 @@ describe("<TransporterList />", () => {
     "accordions are folded by default when there is several transporters and bsdType is %p",
     bsdType => {
       render(
-        component([initialFormTransporter, initialFormTransporter], bsdType)
+        component(
+          [getInitialTransporter(bsdType), getInitialTransporter(bsdType)],
+          bsdType
+        )
       );
       const unfoldButtons = screen.getAllByTitle("Déplier");
       expect(unfoldButtons).toHaveLength(2);
@@ -201,7 +219,7 @@ describe("<TransporterList />", () => {
   test.each([BsdType.Bsdd, BsdType.Bsda])(
     "accordion is expanded by default when there is only one transporter and bsdType is %p",
     bsdType => {
-      render(component([initialFormTransporter], bsdType));
+      render(component([getInitialTransporter(bsdType)], bsdType));
       const foldButton = screen.getByTitle("Replier");
       expect(foldButton).toBeInTheDocument();
     }
@@ -211,7 +229,10 @@ describe("<TransporterList />", () => {
     "only one accordion can be expanded at once when bsdType is %p",
     async bsdType => {
       render(
-        component([initialFormTransporter, initialFormTransporter], bsdType)
+        component(
+          [getInitialTransporter(bsdType), getInitialTransporter(bsdType)],
+          bsdType
+        )
       );
       const expandButtons = screen.getAllByTitle("Déplier");
       expect(expandButtons).toHaveLength(2);
@@ -230,14 +251,13 @@ describe("<TransporterList />", () => {
           ? getBsddTransporter({ takenOverAt: new Date().toISOString() })
           : getBsdaTransporter({ takenOverAt: new Date().toISOString() });
 
-      const initialTransporter =
-        bsdType === BsdType.Bsdd
-          ? initialFormTransporter
-          : initialBsdaTransporter;
-
       render(
         component(
-          [transporter1, { ...initialTransporter }, { ...initialTransporter }],
+          [
+            transporter1,
+            getInitialTransporter(bsdType),
+            getInitialTransporter(bsdType)
+          ],
           bsdType
         )
       );
@@ -288,7 +308,9 @@ describe("<TransporterList />", () => {
 
       expect(screen.getByText("Récépissé valide jusqu'au")).toBeInTheDocument();
       expect(screen.getAllByText("Mode de transport")).toHaveLength(3);
-      expect(screen.getAllByText("Immatriculation")).toHaveLength(3);
+      expect(
+        screen.getAllByText("Immatriculation", { exact: false })
+      ).toHaveLength(3);
       expect(
         screen.getByText(
           bsdType === BsdType.Bsdd
