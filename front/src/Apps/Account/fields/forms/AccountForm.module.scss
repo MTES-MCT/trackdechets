@@ -1,0 +1,49 @@
+@import "../../../../scss/Constants.scss";
+
+.input__group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.input__group > * {
+  margin-left: 10px;
+}
+
+.icon {
+  width: 1.3em;
+  height: auto;
+  color: $blue;
+}
+
+.icon:hover {
+  cursor: pointer;
+}
+
+.input {
+  min-width: 400px;
+}
+.checkbox__row {
+  display: flex;
+  padding-right: 1rem;
+
+  label {
+    flex: 1;
+  }
+}
+
+.workerCertif {
+  display: flex;
+  flex-direction: column;
+  margin-left: 35px;
+}
+
+.workerCertifItem {
+  width: 350px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.workCertifSubSectionThree {
+  width: 350px;
+}

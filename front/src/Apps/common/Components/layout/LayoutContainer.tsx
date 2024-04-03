@@ -19,11 +19,11 @@ const DashboardRoutes = lazy(
   () => import("../../../Dashboard/DashboardRoutes")
 );
 const CompaniesRoutes = lazy(
-  () => import("../../../../account/CompaniesRoutes")
+  () => import("../../../Companies/CompaniesRoutes")
 );
-const Account = lazy(() => import("../../../../account/Account"));
+const Account = lazy(() => import("../../../Account/Account"));
 const AccountMembershipRequest = lazy(
-  () => import("../../../../account/AccountMembershipRequest")
+  () => import("../../../Account/AccountMembershipRequest")
 );
 const FormContainer = lazy(() => import("../../../../form/bsdd/FormContainer"));
 const BsvhuFormContainer = lazy(
