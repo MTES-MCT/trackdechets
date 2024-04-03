@@ -85,7 +85,6 @@ export const searchCompany = async (
         }
       }
     });
-    console.log("td response", response);
     if (!response.body.hits.hits || !response.body.hits.hits[0]?._source) {
       throw new SiretNotFoundError();
     }
@@ -98,7 +97,6 @@ export const searchCompany = async (
     }
     return company;
   } catch (error) {
-    console.log("td error", error);
     if (error instanceof ResponseError && error.meta.statusCode === 404) {
       throw new SiretNotFoundError();
     }
