@@ -690,20 +690,22 @@ export const deleteCompany = async (page, { siret }) => {
 
   // Click once
   const deletionDiv = companyDiv
-    .getByText("Supprimer l'établissement")
+    .getByText("Suppression de l'établissement")
     .locator("..");
   await expect(deletionDiv).toBeVisible();
   await deletionDiv.getByText("Supprimer", { exact: true }).click();
 
   // Warning message should be visible
-  await expect(
-    page.getByText(
-      "En supprimant cet établissement, vous supprimez les accès de tous les administrateurs"
-    )
-  ).toBeVisible();
+  const confirmationDiv = page.getByText(
+    "Êtes vous sur de vouloir supprimer l'établissement"
+  );
+  await expect(confirmationDiv).toBeVisible();
 
   // Delete
-  await deletionDiv.getByRole("button", { name: "Supprimer" }).click();
+  await confirmationDiv
+    .locator("..")
+    .getByRole("button", { name: "Supprimer", exact: true })
+    .click();
 
   // Verify that deletion succeeded
   await expect(page.getByTestId("loader")).not.toBeVisible(); // Wait for loading to end
