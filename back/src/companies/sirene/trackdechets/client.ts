@@ -45,7 +45,7 @@ const searchResponseToCompany = (
     siret: etablissement.siret,
     etatAdministratif:
       etablissement.etatAdministratifEtablissement ||
-      (etablissement.etatAdministratifUniteLegale === "A" ? "A" : "F"),
+      (etablissement.etatAdministratifUniteLegale === "C" ? "F" : "A"),
     address: fullAddress,
     addressVoie,
     addressPostalCode: etablissement.codePostalEtablissement,
