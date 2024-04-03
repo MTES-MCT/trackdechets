@@ -60,10 +60,10 @@ type Mutation {
   ): TransporterReceipt!
 
   """
-  Permet de créer une requête de création d'entreprise anonyme (qui devra être validée par un admin)
+  Permet de créer une entreprise anonyme
   Prend un PDF d'avis de répertoire SIRENE de moins de 3 mois en entrée, en base64.
   """
-  createAnonymousCompanyRequest(
-    input: CreateAnonymousCompanyRequestInput!
-  ): Boolean
+  createAnonymousCompanyFromPDF(
+    input: CreateAnonymousCompanyFromPDFInput!
+  ): AnonymousCompany
 }

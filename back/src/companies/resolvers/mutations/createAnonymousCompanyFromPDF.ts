@@ -1,25 +1,24 @@
 import * as yup from "yup";
-import { renderMail, createAnonymousCompanyRequestEmail } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
-  CreateAnonymousCompanyRequestInput,
+  CreateAnonymousCompanyFromPdfInput,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { sendMail } from "../../../mailer/mailing";
 import { getCodeCommune } from "../../geo/getCodeCommune";
-import { validateAndExtractSireneDataFromPDFInBase64 } from "./createAnonymousCompanyRequest.helpers";
+import { validateAndExtractSireneDataFromPDFInBase64 } from "./createAnonymousCompanyFromPDF.helpers";
 import { base64, siret } from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
+import { libelleFromCodeNaf } from "../../sirene/utils";
 
-const anonymousCompanyRequestInputSchema: yup.SchemaOf<CreateAnonymousCompanyRequestInput> =
+const anonymousCompanyRequestInputSchema: yup.SchemaOf<CreateAnonymousCompanyFromPdfInput> =
   yup.object({
     siret: siret.required(),
     pdf: base64.required()
   });
 
-const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousCompanyRequest"] =
+const createAnonymousCompanyFromPDFResolver: MutationResolvers["createAnonymousCompanyFromPDF"] =
   async (_, { input }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
@@ -51,44 +50,30 @@ const createAnonymousCompanyRequestResolver: MutationResolvers["createAnonymousC
     });
     if (anonymousCompany || company) {
       throw new UserInputError(
-        `L'entreprise avec le SIRET ${data.siret} existe déjà`
+        `L'entreprise avec le SIRET "${data.siret}" existe déjà`
       );
     }
 
-    // Verify creation request does not already exist
-    const request = await prisma.anonymousCompanyRequest.findFirst({
-      where: {
-        siret: data.siret
-      }
-    });
-    if (request) {
-      throw new UserInputError(
-        `Une demande pour l'entreprise ${data.siret} est déjà en cours`
-      );
-    }
-
-    // Retrieve the codeCommune (can be null, admins will complete)
+    // Retrieve the codeCommune (can be null)
     const codeCommune = await getCodeCommune(data.address);
 
+    if (!codeCommune) {
+      throw new UserInputError(
+        `Le code commune associé au SIRET "${data.siret}" n'a pas pu être trouvé`
+      );
+    }
+
     // Create the request
-    await prisma.anonymousCompanyRequest.create({
+    const createdCompany = await prisma.anonymousCompany.create({
       data: {
         ...data,
-        codeCommune: codeCommune,
-        userId: user.id,
-        pdf
+        orgId: input.siret,
+        codeCommune,
+        libelleNaf: libelleFromCodeNaf(data.codeNaf)
       }
     });
 
-    // Send an email
-    await sendMail(
-      renderMail(createAnonymousCompanyRequestEmail, {
-        to: [{ name: user.name ?? "", email: user.email }],
-        variables: { siret: data.siret }
-      })
-    );
-
-    return true;
+    return createdCompany;
   };
 
-export default createAnonymousCompanyRequestResolver;
+export default createAnonymousCompanyFromPDFResolver;

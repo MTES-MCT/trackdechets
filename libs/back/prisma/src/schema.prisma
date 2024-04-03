@@ -326,22 +326,6 @@ model AnonymousCompany {
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
 
-// Un utilisateur peut demander la création de son entreprise non-diffusible,
-// à condition de fournir un avis de situation SIRENE de moins de 3 mois.
-// Un admin vérifiera manuellement la demande.
-model AnonymousCompanyRequest {
-  id          String   @id @default(cuid())
-  siret       String   @unique(map: "AnonymousCompanyRequest.siret_unique")
-  pdf         String
-  createdAt   DateTime @default(now()) @db.Timestamptz(6)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  name        String
-  codeNaf     String
-  address     String
-  codeCommune String?
-}
-
 model CompanyAssociation {
   id                    String    @id @default(cuid()) @db.VarChar(30)
   role                  UserRole
@@ -842,7 +826,6 @@ model User {
   governmentAccountId     String?                   @unique
   governmentAccount       GovernmentAccount?        @relation(fields: [governmentAccountId], references: [id])
   AccessToken             AccessToken[]
-  AnonymousCompanyRequest AnonymousCompanyRequest[]
   applications            Application[]
   companyAssociations     CompanyAssociation[]
   featureFlags            FeatureFlag[]
