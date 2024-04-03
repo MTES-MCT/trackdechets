@@ -76,7 +76,7 @@
 4. Démarrer les containers de bases de données
 
    ```bash
-   docker-compose docker-compose.yml up -d
+   docker compose docker-compose.yml up -d
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
@@ -307,14 +307,14 @@ npx nx run front:storybook
 La commande pour faire tourner tous les tests unitaires est la suivante :
 
 ```bash
-docker-compose -f docker-compose.test.yml up
+docker compose -f docker-compose.test.yml up
 ```
 
 Il est également possible de faire tourner les tests unitaires sur l'environnement de `dev` en se connectant à chacun des containers. Par exemple :
 
 1. Démarrer les différents services
    ```
-   docker-compose up -d
+   docker compose up -d
    ```
 2. Faire tourner les tests back
    ```bash
@@ -571,7 +571,7 @@ $ ./restore-db.sh
 1. Télécharger un backup de la base de donnée nommée `prisma` que vous souhaitez restaurer
 2. Démarrer le conteneur postgres
    ```
-   docker-compose -f docker-compose.dev.yml up --build postgres
+   docker compose -f docker-compose.dev.yml up --build postgres
    ```
 3. Copier le fichier de backup à l'intérieur du conteneur
    ```
