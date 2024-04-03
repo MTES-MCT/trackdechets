@@ -14,7 +14,10 @@ const ContactFormCtaFragment = ({ handleReset, handleSubmit, disabled }) => (
     <Button
       priority="primary"
       size="small"
-      nativeButtonProps={{ type: "button" }}
+      nativeButtonProps={{
+        type: "button",
+        "data-testid": "company-contact-submit"
+      }}
       onClick={handleSubmit}
       disabled={disabled}
     >

@@ -3,10 +3,13 @@ import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { UPDATE_CONTACT_INFOS } from "../common/queries";
+import { object, string } from "yup";
 import { useMutation } from "@apollo/client";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { UPDATE_CONTACT_INFOS } from "../common/queries";
 import { NotificationError } from "../../common/Components/Error/Error";
 import ContactFormCtaFragment from "./ContactFormCtaFragment";
+import { validatePhoneNumber } from "../../../common/helper";
 import "./contactForm.scss";
 
 interface ContactFormProps {
@@ -18,6 +21,17 @@ interface ContactFormFields {
   contactPhone: string;
   website: string;
 }
+const yupSchema = object().shape({
+  contactEmail: string().email(),
+  contactPhone: string()
+    .trim()
+    .test(
+      "is-valid-phone",
+      "Merci de renseigner un numéro de téléphone valide",
+      value => !value || validatePhoneNumber(value)
+    ),
+  website: string().url()
+});
 
 const CompanyContactForm = ({ company }: ContactFormProps) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -40,7 +54,8 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
         contactEmail: company?.contactEmail || "",
         contactPhone: company?.contactPhone || "",
         website: company?.website || ""
-      }
+      },
+      resolver: yupResolver<ContactFormFields>(yupSchema)
     });
 
   const onSubmit: SubmitHandler<ContactFormFields> = async data => {
@@ -71,7 +86,11 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
       <div className="contactForm__topActions">
         <h4>Coordonnées</h4>
         {showEditCta && (
-          <Button size="small" onClick={onEditionClick}>
+          <Button
+            data-testid="company-contact-edit"
+            size="small"
+            onClick={onEditionClick}
+          >
             Modifier
           </Button>
         )}
@@ -90,28 +109,39 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
           <Input
             label="Prénom et nom"
             state={formState.errors.contact ? "error" : "default"}
-            nativeInputProps={{ ...register("contact", { required: true }) }}
+            nativeInputProps={{
+              ...register("contact", { required: true }),
+              placeholder: "Prénom et nom"
+            }}
             stateRelatedMessage="Ce champ est obligatoire"
           />
           <Input
             label="Email"
             nativeInputProps={{
-              ...register("contactEmail", { required: true })
+              type: "email",
+              ...register("contactEmail", { required: true }),
+              "data-testid": "company-contact-email"
             }}
             state={formState.errors.contactEmail ? "error" : "default"}
-            stateRelatedMessage="Ce champ est obligatoire"
+            stateRelatedMessage="Email invalide"
           />
           <Input
             label="Téléphone"
             nativeInputProps={{
-              ...register("contactPhone", { required: true })
+              ...register("contactPhone", { required: true }),
+              placeholder: "Téléphone"
             }}
             state={formState.errors.contactPhone ? "error" : "default"}
-            stateRelatedMessage="Ce champ est obligatoire"
+            stateRelatedMessage="Merci de renseigner un numéro de téléphone valide"
           />
           <Input
             label="Site web (optionnel)"
-            nativeInputProps={{ ...register("website") }}
+            nativeInputProps={{
+              ...register("website"),
+              placeholder: "Site web"
+            }}
+            state={formState.errors.website ? "error" : "default"}
+            stateRelatedMessage="URL invalide"
           />
 
           {error && <NotificationError apolloError={error} />}
