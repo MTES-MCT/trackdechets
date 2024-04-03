@@ -3,7 +3,7 @@ import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import routes, { getRelativeRoute } from "../Apps/routes";
 import React from "react";
 import { NavLink, Routes, Route, Navigate } from "react-router-dom";
-import { AnonymousCompaniesDashboard } from "./anonymousCompany";
+import { AnonymousCompanyDashboard } from "./anonymousCompany";
 import Reindex from "./reindex/Reindex";
 import AnonymizeUser from "./user/anonymizeUser";
 import CompaniesVerification from "./verification/CompaniesVerification";
@@ -95,8 +95,8 @@ export default function Admin() {
           />
 
           <Route
-            path={toRelative(routes.admin.anonymousCompanies)}
-            element={<AnonymousCompaniesDashboard />}
+            path={toRelative(routes.admin.anonymousCompany)}
+            element={<AnonymousCompanyDashboard />}
           />
 
           <Route

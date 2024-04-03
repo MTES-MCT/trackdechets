@@ -12,7 +12,7 @@ import { base64, siret } from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
 
-const anonymousCompanyRequestInputSchema: yup.SchemaOf<CreateAnonymousCompanyFromPdfInput> =
+const anonymousCompanyInputSchema: yup.SchemaOf<CreateAnonymousCompanyFromPdfInput> =
   yup.object({
     siret: siret.required(),
     pdf: base64.required()
@@ -24,7 +24,7 @@ const createAnonymousCompanyFromPDFResolver: MutationResolvers["createAnonymousC
     const user = checkIsAuthenticated(context);
 
     // Yup validation
-    await anonymousCompanyRequestInputSchema.validate(input);
+    await anonymousCompanyInputSchema.validate(input);
 
     const { siret, pdf } = input;
 

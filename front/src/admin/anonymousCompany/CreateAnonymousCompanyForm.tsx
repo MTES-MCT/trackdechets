@@ -67,10 +67,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
   });
 
-export function CreateAnonymousCompanyForm({
-  anonymousCompanyRequest,
-  onCompanyCreated
-}) {
+export function CreateAnonymousCompanyForm() {
   const [createAnonymousCompany, { loading, error }] = useMutation<
     Pick<Mutation, "createAnonymousCompany">,
     MutationCreateAnonymousCompanyArgs
@@ -78,17 +75,15 @@ export function CreateAnonymousCompanyForm({
 
   return (
     <>
-      <h3 className="fr-h3 fr-mt-2w">
-        {anonymousCompanyRequest ? "Vérifier" : "Créer"} une entreprise
-      </h3>
+      <h3 className="fr-h3 fr-mt-2w">Créer une entreprise</h3>
 
       <Formik
         initialValues={{
-          address: anonymousCompanyRequest?.address ?? "",
-          codeCommune: anonymousCompanyRequest?.codeCommune ?? "",
-          codeNaf: anonymousCompanyRequest?.codeNaf ?? "",
-          name: anonymousCompanyRequest?.name ?? "",
-          siret: anonymousCompanyRequest?.siret ?? "",
+          address: "",
+          codeCommune: "",
+          codeNaf: "",
+          name: "",
+          siret: "",
           vatNumber: ""
         }}
         validationSchema={AnonymousCompanyInputSchema}
@@ -96,14 +91,14 @@ export function CreateAnonymousCompanyForm({
           const { data } = await createAnonymousCompany({
             variables: { input: values }
           });
+
           resetForm();
+
           if (data) {
             toast.success(
               `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
               { duration: TOAST_DURATION }
             );
-
-            onCompanyCreated();
           }
         }}
       >
@@ -184,13 +179,7 @@ export function CreateAnonymousCompanyForm({
                 return (
                   <Input
                     label="Code commune"
-                    hintText={
-                      <CodeCommuneLinks
-                        address={
-                          anonymousCompanyRequest?.address || values.address
-                        }
-                      />
-                    }
+                    hintText={<CodeCommuneLinks address={values.address} />}
                     state={errors.codeCommune ? "error" : "default"}
                     stateRelatedMessage={errors.codeCommune as string}
                     disabled={loading}

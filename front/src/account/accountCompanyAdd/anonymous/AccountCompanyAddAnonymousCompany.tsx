@@ -1,35 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "../../AccountCompanyAdd.module.scss";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { Upload } from "@codegouvfr/react-dsfr/Upload";
-import {
-  Mutation,
-  Query,
-  QueryAnonymousCompanyRequestArgs
-} from "@td/codegen-ui";
+import { Mutation } from "@td/codegen-ui";
 import { InvalidSirenePDFError } from "./InvalidSirenePDFError";
 import { UploadYourSirenePDFInfo } from "./UploadYourSirenePDFInfo";
 import { SirenePDFUploadDisabledFallbackError } from "./SirenePDFUploadDisabledFallbackError";
 import { convertFileToBase64 } from "../../../Apps/utils/fileUtils";
-import { Loader } from "../../../Apps/common/Components";
-import { AlreadyPendingAnonymousCompanyRequestInfo } from "./AlreadyPendingAnonymousCompanyRequestInfo";
 import { InvalidSirenePDFFormatError } from "./InvalidSirenePDFFormatError";
 import { InvalidSirenePDFSizeError } from "./InvalidSirenePDFSizeError";
-import { AnonymousCompanyRequestCreationSuccess } from "./AnonymousCompanyRequestCreationSuccess";
+import { AnonymousCompanyCreationSuccess } from "./AnonymousCompanyCreationSuccess";
 
-const ANONYMOUS_COMPANY_REQUEST = gql`
-  query AnonymousCompanyRequest($siret: String!) {
-    anonymousCompanyRequest(siret: $siret) {
-      id
-    }
-  }
-`;
-
-const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
-  mutation CreateAnonymousCompanyRequest(
-    $input: CreateAnonymousCompanyRequestInput!
+const CREATE_ANONYMOUS_COMPANY_FROM_PDF = gql`
+  mutation CreateAnonymousCompanyFromPDF(
+    $input: CreateAnonymousCompanyFromPDFInput!
   ) {
-    createAnonymousCompanyRequest(input: $input)
+    createAnonymousCompanyFromPDF(input: $input) {
+      orgId
+    }
   }
 `;
 
@@ -43,44 +31,20 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
   const [fileHasInvalidFormat, setFileHasInvalidFormat] =
     useState<boolean>(false);
   const [fileHasInvalidSize, setFileHasInvalidSize] = useState<boolean>(false);
-  const {
-    data,
-    loading: getLoading,
-    refetch
-  } = useQuery<
-    Pick<Query, "anonymousCompanyRequest">,
-    QueryAnonymousCompanyRequestArgs
-  >(ANONYMOUS_COMPANY_REQUEST, {
-    variables: {
-      siret
-    },
-    skip: DISABLE_FILE_UPLOAD
-  });
-  const [
-    createAnonymousCompanyRequest,
-    { data: createData, error: createError, loading: createLoading }
-  ] = useMutation<Pick<Mutation, "createAnonymousCompanyRequest">, any>(
-    CREATE_ANONYMOUS_COMPANY_REQUEST
-  );
 
-  useEffect(() => {
-    refetch({ siret });
-  }, [siret, refetch]);
+  const [
+    createAnonymousCompanyFromPDF,
+    { data: createData, error: createError, loading: createLoading }
+  ] = useMutation<Pick<Mutation, "createAnonymousCompanyFromPDF">, any>(
+    CREATE_ANONYMOUS_COMPANY_FROM_PDF
+  );
 
   if (DISABLE_FILE_UPLOAD) {
     return <SirenePDFUploadDisabledFallbackError />;
   }
 
-  if (getLoading) {
-    return <Loader />;
-  }
-
-  if (createData?.createAnonymousCompanyRequest) {
-    return <AnonymousCompanyRequestCreationSuccess />;
-  }
-
-  if (data?.anonymousCompanyRequest) {
-    return <AlreadyPendingAnonymousCompanyRequestInfo />;
+  if (createData?.createAnonymousCompanyFromPDF) {
+    return <AnonymousCompanyCreationSuccess />;
   }
 
   return (
@@ -119,7 +83,7 @@ const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
               const base64 = await convertFileToBase64(file);
 
               // Send to backend for data extraction
-              await createAnonymousCompanyRequest({
+              await createAnonymousCompanyFromPDF({
                 variables: { input: { siret, pdf: base64 } }
               });
             }

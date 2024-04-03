@@ -2,7 +2,7 @@ const routes = {
   admin: {
     index: "/admin",
     verification: "/admin/verification",
-    anonymousCompanies: "/admin/anonymous-companies",
+    anonymousCompany: "/admin/anonymous-company",
     reindex: "/admin/reindex",
     user: "/admin/user",
     impersonate: "/admin/impersonate"
