@@ -39,7 +39,7 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
   const isAdmin = company.userRole === UserRole.Admin;
   const formRef = useRef<HTMLFormElement>(null);
 
-  const [updateContact, { error }] = useMutation(UPDATE_CONTACT_INFOS);
+  const [updateContact, { data, error }] = useMutation(UPDATE_CONTACT_INFOS);
 
   useEffect(() => {
     if (isAdmin && !isEditing) {
@@ -55,6 +55,7 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
         contactPhone: company?.contactPhone || "",
         website: company?.website || ""
       },
+      values: { ...data?.updateCompany }, // will get updated once values returns
       resolver: yupResolver<ContactFormFields>(yupSchema)
     });
 
