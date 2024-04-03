@@ -1,15 +1,17 @@
 import React from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import { CompanyPrivate, UserRole } from "@td/codegen-ui";
-import ContactForm from "./ContactForm";
+import CompanyContactForm from "./CompanyContactForm";
 
 export default {
   title: "COMPONENTS/COMPANIES/CONTACT",
-  component: ContactForm,
+  component: CompanyContactForm,
   parameters: { actions: { argTypesRegex: "^on.*" } }
-} as Meta<typeof ContactForm>;
+} as Meta<typeof CompanyContactForm>;
 
-const Template: StoryFn<typeof ContactForm> = args => <ContactForm {...args} />;
+const Template: StoryFn<typeof CompanyContactForm> = args => (
+  <CompanyContactForm {...args} />
+);
 
 export const ContactNotEditable = Template.bind({});
 export const ContactEditable = Template.bind({});

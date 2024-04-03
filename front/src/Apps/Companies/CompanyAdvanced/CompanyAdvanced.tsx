@@ -8,7 +8,7 @@ import {
 import { DELETE_COMPANY, MY_COMPANIES } from "../common/queries";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import { GET_ME } from "../../../account/Account";
+import { GET_ME } from "../common/queries";
 import routes from "../../routes";
 import { Modal } from "../../../common/components";
 import "./advanced.scss";
@@ -17,7 +17,7 @@ import { NotificationError } from "../../common/Components/Error/Error";
 interface AdvancedProps {
   company: CompanyPrivate;
 }
-const Advanced = ({ company }: AdvancedProps) => {
+const CompanyAdvanced = ({ company }: AdvancedProps) => {
   const navigate = useNavigate();
   const [isModalOpened, setIsModalOpened] = useState<boolean>(false);
 
@@ -98,4 +98,4 @@ const Advanced = ({ company }: AdvancedProps) => {
   );
 };
 
-export default Advanced;
+export default CompanyAdvanced;

@@ -19,7 +19,7 @@ interface ContactFormFields {
   website: string;
 }
 
-const ContactForm = ({ company }: ContactFormProps) => {
+const CompanyContactForm = ({ company }: ContactFormProps) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [showEditCta, setShowEditCta] = useState<boolean>(false);
   const isAdmin = company.userRole === UserRole.Admin;
@@ -147,4 +147,4 @@ const ContactForm = ({ company }: ContactFormProps) => {
   );
 };
 
-export default ContactForm;
+export default CompanyContactForm;

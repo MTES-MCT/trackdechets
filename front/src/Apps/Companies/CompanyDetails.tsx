@@ -3,8 +3,8 @@ import { useQuery } from "@apollo/client";
 import AccountCompanyInfo from "./AccountCompanyInfo";
 import AccountCompanySecurity from "./AccountCompanySecurity";
 import AccountCompanyMemberList from "./AccountCompanyMemberList";
-import AccountCompanyContact from "./AccountCompanyContact";
-import AccountCompanyAdvanced from "./AccountCompanyAdvanced";
+import CompanyContactForm from "./CompanyContact/CompanyContactForm";
+import CompanyAdvanced from "./CompanyAdvanced/CompanyAdvanced";
 import { Query, QueryMyCompaniesArgs, UserRole } from "@td/codegen-ui";
 import { Navigate, useParams } from "react-router-dom";
 import { userRole } from "./CompaniesList/CompaniesList";
@@ -153,7 +153,7 @@ export default function CompanyDetails() {
           aria-labelledby="tabpanel-407"
           tabIndex={0}
         >
-          <AccountCompanyContact company={company} />
+          <CompanyContactForm company={company} />
         </div>
         {isAdmin && (
           <div
@@ -163,7 +163,7 @@ export default function CompanyDetails() {
             aria-labelledby="tabpanel-408"
             tabIndex={0}
           >
-            <AccountCompanyAdvanced company={company} />
+            <CompanyAdvanced company={company} />
           </div>
         )}
       </div>

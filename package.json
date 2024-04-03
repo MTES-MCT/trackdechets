@@ -285,7 +285,6 @@
     "ws": "^8.2.3"
   },
   "optionalDependencies": {
-    "@nx/nx-darwin-arm64": "^18.0.7",
     "@rollup/rollup-darwin-arm64": "^4.12.0",
     "@swc/core-darwin-arm64": "^1.4.6",
     "@swc/core-darwin-x64": "^1.4.6",
