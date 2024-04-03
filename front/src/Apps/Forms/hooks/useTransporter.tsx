@@ -68,17 +68,17 @@ export function useTransporter<T extends AnyTransporterInput>(
     setValue(updatedTransporter);
   };
 
-  const transportPlatesField =
+  const transportPlatesFieldName =
     bsdType === BsdType.Bsdd
       ? `${fieldName}.numberPlate`
       : `${fieldName}.transport.plates`;
 
-  const transportModeField =
+  const transportModeFieldName =
     bsdType === BsdType.Bsdd
       ? `${fieldName}.mode`
       : `${fieldName}.transport.mode`;
 
-  const transporterRecepisseIsExemptedField =
+  const transporterRecepisseIsExemptedFieldName =
     bsdType === BsdType.Bsdd
       ? `${fieldName}.isExemptedOfReceipt`
       : `${fieldName}.recepisse.isExempted`;
@@ -87,8 +87,8 @@ export function useTransporter<T extends AnyTransporterInput>(
     transporterOrgId,
     transporter: mapBsdTransporter(transporter, bsdType),
     setTransporter,
-    transportPlatesField,
-    transportModeField,
-    transporterRecepisseIsExemptedField
+    transportPlatesFieldName,
+    transportModeFieldName,
+    transporterRecepisseIsExemptedFieldName
   };
 }

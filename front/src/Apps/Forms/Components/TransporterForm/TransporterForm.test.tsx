@@ -57,7 +57,8 @@ const defaultBsdaTransporter: BsdaTransporter = {
     validityLimit: "2023-12-31T23:00:00.000Z"
   },
   transport: {
-    mode: TransportMode.Road
+    mode: TransportMode.Road,
+    plates: []
   }
 };
 
@@ -162,7 +163,9 @@ describe("TransporterForm", () => {
       expect(isExemptedOfReceiptInput).toBeInTheDocument();
       const transportModeInput = screen.getByLabelText("Mode de transport");
       expect(transportModeInput).toBeInTheDocument();
-      const plateInput = screen.getByLabelText("Immatriculation");
+      const plateInput = screen.getByLabelText("Immatriculation", {
+        exact: false
+      });
       expect(plateInput).toBeInTheDocument();
     }
   );
@@ -291,15 +294,22 @@ describe("TransporterForm", () => {
   test.each([BsdType.Bsdd, BsdType.Bsda])(
     "transporter recepisse error is not displayed if transport mode is not road and bsdType is %p",
     bsdType => {
+      const defaultTransporter = getDefaultTransporter(bsdType);
+
       const data =
         bsdType === BsdType.Bsdd
           ? { mode: TransportMode.Rail }
-          : { transport: { mode: TransportMode.Rail } };
+          : {
+              transport: {
+                ...(defaultTransporter as BsdaTransporter).transport,
+                mode: TransportMode.Rail
+              }
+            };
 
       render(
         Component({
           data: {
-            ...getDefaultTransporter(bsdType),
+            ...defaultTransporter,
             ...data
           },
           bsdType
