@@ -15,7 +15,9 @@
     &__formCTA {
       display: flex;
       justify-content: end;
-      gap: 3px;
+      button {
+        margin: 0 3px;
+      }
     }
   }
   &__title-field {

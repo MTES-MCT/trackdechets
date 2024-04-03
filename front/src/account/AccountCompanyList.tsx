@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import AccountCompany from "./AccountCompany";
 import { useNavigate } from "react-router-dom";
 import { Query } from "@td/codegen-ui";
@@ -13,7 +13,25 @@ import {
 } from "@td/constants";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { MY_COMPANIES } from "../Apps/Companies/common/queries";
+
+export const MY_COMPANIES = gql`
+  query MyCompanies($first: Int, $after: ID, $search: String) {
+    myCompanies(first: $first, after: $after, search: $search) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          ...AccountCompanyFragment
+        }
+      }
+    }
+  }
+  ${AccountCompany.fragments.company}
+`;
 
 // Prevent to short and long clues
 const isSearchClueValid = clue =>

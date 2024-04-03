@@ -6,7 +6,7 @@ import AccountCompanyInfo from "./AccountCompanyInfo";
 import AccountCompanySecurity from "./AccountCompanySecurity";
 import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import AccountCompanyContact from "./AccountCompanyContact";
-import Advanced from "../Apps/Companies/Advanced/Advanced";
+import AccountCompanyAdvanced from "./AccountCompanyAdvanced";
 import styles from "./AccountCompany.module.scss";
 import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 
@@ -56,7 +56,7 @@ export default function AccountCompany({ company }: Props) {
 
   const contact = <AccountCompanyContact company={company} />;
 
-  const advanced = <Advanced company={company} />;
+  const advanced = <AccountCompanyAdvanced company={company} />;
 
   let activeContent: ReactNode = null;
 
