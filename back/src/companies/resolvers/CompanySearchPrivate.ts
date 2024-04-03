@@ -41,14 +41,15 @@ const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
       })
       .vhuAgrementDemolisseur();
   },
-  receivedSignatureAutomations: parent => {
-    return prisma.company
+  receivedSignatureAutomations: async parent => {
+    const automations = await prisma.company
       .findUnique({
         where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
       })
       .receivedSignatureAutomations({
         include: { from: true, to: true }
-      }) as any;
+      });
+    return (automations as any) ?? [];
   },
   workerCertification: parent =>
     prisma.company
