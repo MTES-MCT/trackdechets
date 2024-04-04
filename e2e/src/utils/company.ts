@@ -335,13 +335,11 @@ export const submitAndVerifyGenericInfo = async (
   if (contact) {
     await companyDiv.getByRole("tab", { name: "Contact" }).click();
     await expect(
-      companyDiv.getByText(`Prénom et nom du contact${contact.name}`)
+      companyDiv.getByText(`Prénom et nom${contact.name}`)
     ).toBeVisible();
+    await expect(companyDiv.getByText(`Email${contact.email}`)).toBeVisible();
     await expect(
-      companyDiv.getByText(`Email de contact${contact.email}`)
-    ).toBeVisible();
-    await expect(
-      companyDiv.getByText(`Téléphone de contact${contact.phone}`)
+      companyDiv.getByText(`Téléphone${contact.phone}`)
     ).toBeVisible();
   }
 
@@ -561,95 +559,45 @@ export const updateCompanyContactInfo = async (
   // Click on company's contact tab
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Contact" });
 
-  // Update the name
-  await companyDiv
-    .locator("div")
-    .filter({ hasText: /^Prénom et nom du contactAjouter$/ })
-    .locator("div")
-    .nth(1)
-    .click();
-  await companyDiv
-    .getByPlaceholder("Prénom et nom du contact")
-    .fill(contact.name);
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
-  await expect(
-    companyDiv.getByText(`Prénom et nom du contact${contact.name}`)
-  ).toBeVisible();
+  // Update contact info
+  await companyDiv.getByTestId("company-contact-edit").click();
 
-  // Update the email
-  await companyDiv
-    .locator("div")
-    .filter({ hasText: /^Email de contactAjouter$/ })
-    .locator("div")
-    .nth(1)
-    .click();
+  await companyDiv.getByPlaceholder("Prénom et nom").fill(contact.name);
+
   // Test with invalid email. Should fail
-  await companyDiv.getByPlaceholder("Email de contact").fill("user@mail");
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await companyDiv.getByTestId("company-contact-email").fill("user@mail");
+  await companyDiv.getByTestId("company-contact-submit").nth(1).click();
   await expect(companyDiv.getByText("Email invalide")).toBeVisible();
   // Fill in correct email
-  await companyDiv.getByPlaceholder("Email de contact").fill(contact.email);
-  // TODO: bug: have to submit twice
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
-  await expect(
-    companyDiv.getByText(`Email de contact${contact.email}`)
-  ).toBeVisible();
+  await companyDiv.getByTestId("company-contact-email").fill(contact.email);
 
-  // Update the phone number
-  await companyDiv
-    .locator("div")
-    .filter({ hasText: /^Téléphone de contactAjouter$/ })
-    .locator("div")
-    .nth(1)
-    .click();
   // Test with invalid phone number. Should fail
-  await companyDiv.getByPlaceholder("Téléphone de contact").fill("1245");
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await companyDiv.getByPlaceholder("Téléphone").fill("1245");
+  await companyDiv.getByTestId("company-contact-submit").nth(1).click();
   await expect(
     companyDiv.getByText("Merci de renseigner un numéro de téléphone valide")
   ).toBeVisible();
   // Fill in correct phone number
-  await companyDiv.getByPlaceholder("Téléphone de contact").fill(contact.phone);
-  // TODO: bug: have to submit twice
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
-  await expect(
-    companyDiv.getByText(`Téléphone de contact${contact.phone}`)
-  ).toBeVisible();
+  await companyDiv.getByPlaceholder("Téléphone").fill(contact.phone);
 
-  // Update the website URL
-  await companyDiv
-    .locator("div")
-    .filter({ hasText: /^Site webAjouter$/ })
-    .locator("div")
-    .nth(1)
-    .click();
   // Test with invalid URL. Should fail
   await companyDiv.getByPlaceholder("Site web").fill("www.invalid.com");
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
+  await companyDiv.getByTestId("company-contact-submit").nth(1).click();
   await expect(companyDiv.getByText("URL invalide")).toBeVisible();
   // Fill in correct URL
   await companyDiv.getByPlaceholder("Site web").fill(contact.website);
-  // TODO: bug: have to submit twice
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
-  await companyDiv.getByRole("button", { name: "Valider" }).click();
+
+  // submit
+  await companyDiv.getByTestId("company-contact-submit").nth(1).click();
+
+  await expect(
+    companyDiv.getByText(`Prénom et nom${contact.name}`)
+  ).toBeVisible();
+  await expect(companyDiv.getByText(`Email${contact.email}`)).toBeVisible();
+  await expect(companyDiv.getByText(`Téléphone${contact.phone}`)).toBeVisible();
   await expect(
     companyDiv.getByText(`Site web${contact.website}`)
   ).toBeVisible();
-
-  // Info message with company link should be visible
-  const infoDiv = page.getByText("Ces informations de contact");
-  await expect(
-    infoDiv.getByRole("link", { name: "fiche entreprise" })
-  ).toBeVisible();
-  await expect(
-    await infoDiv
-      .getByRole("link", { name: "fiche entreprise" })
-      .getAttribute("href")
-  ).toEqual(
-    `${process.env.VITE_URL_SCHEME}://${process.env.VITE_HOSTNAME}/company/${siret}`
-  );
 };
 
 /**
@@ -696,20 +644,22 @@ export const deleteCompany = async (page, { siret }) => {
 
   // Click once
   const deletionDiv = companyDiv
-    .getByText("Supprimer l'établissement")
+    .getByText("Suppression de l'établissement")
     .locator("..");
   await expect(deletionDiv).toBeVisible();
   await deletionDiv.getByText("Supprimer", { exact: true }).click();
 
   // Warning message should be visible
-  await expect(
-    page.getByText(
-      "En supprimant cet établissement, vous supprimez les accès de tous les administrateurs"
-    )
-  ).toBeVisible();
+  const confirmationDiv = page.getByText(
+    "Êtes vous sur de vouloir supprimer l'établissement"
+  );
+  await expect(confirmationDiv).toBeVisible();
 
   // Delete
-  await deletionDiv.getByRole("button", { name: "Supprimer" }).click();
+  await confirmationDiv
+    .locator("..")
+    .getByRole("button", { name: "Supprimer", exact: true })
+    .click();
 
   // Verify that deletion succeeded
   await expect(page.getByTestId("loader")).not.toBeVisible(); // Wait for loading to end
