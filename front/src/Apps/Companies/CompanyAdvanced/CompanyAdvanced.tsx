@@ -12,6 +12,7 @@ import routes from "../../routes";
 import { Modal } from "../../../common/components";
 import "./advanced.scss";
 import { NotificationError } from "../../common/Components/Error/Error";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 interface AdvancedProps {
   company: CompanyPrivate;
@@ -19,6 +20,8 @@ interface AdvancedProps {
 const CompanyAdvanced = ({ company }: AdvancedProps) => {
   const navigate = useNavigate();
   const [isModalOpened, setIsModalOpened] = useState<boolean>(false);
+  const [siretOrOrgId, setSiretOrOrgId] = useState<string>("");
+  const [hasSiretError, setHasSiretError] = useState<boolean>(false);
 
   const [deleteCompany, { loading, error }] = useMutation<
     Pick<Mutation, "deleteCompany">,
@@ -37,9 +40,21 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
     setIsModalOpened(true);
   };
   const onCloseModal = () => {
+    setSiretOrOrgId("");
     setIsModalOpened(false);
+    setHasSiretError(false);
   };
-  const onRemoveCompany = () => deleteCompany();
+  const onRemoveCompany = () => {
+    if (siretOrOrgId === company.siret || siretOrOrgId === company.orgId) {
+      deleteCompany();
+    } else {
+      setHasSiretError(true);
+    }
+  };
+  const onChangeSiret = e => {
+    setHasSiretError(false); //reset
+    setSiretOrOrgId(e.currentTarget.value);
+  };
 
   return (
     <div className="company-advanced">
@@ -77,13 +92,30 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
           au suivi des bordereaux, ni au registre.
         </p>
 
+        <b>
+          Pour supprimer l'établissement, saisissez son numéro de SIRET ou N° de
+          TVA intracommunautaire
+        </b>
+        <br />
+        <br />
+        <Input
+          label="SIRET ou N° de TVA intracommunautaire "
+          nativeInputProps={{
+            value: siretOrOrgId,
+            onChange: onChangeSiret,
+            ...{ "data-testid": "siretOrOrgId" }
+          }}
+          state={hasSiretError ? "error" : "default"}
+          stateRelatedMessage="Le SIRET renseigné ne correspond pas à l'établissement"
+        />
+
         {error && <NotificationError apolloError={error} />}
 
         <div className="company-advanced__modal-cta">
           <Button
             size="small"
             onClick={onRemoveCompany}
-            disabled={loading}
+            disabled={loading || hasSiretError}
             nativeButtonProps={{ className: "btn-red" }}
           >
             {loading ? "Suppression..." : "Supprimer"}

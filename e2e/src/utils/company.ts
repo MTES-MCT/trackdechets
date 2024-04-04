@@ -655,6 +655,20 @@ export const deleteCompany = async (page, { siret }) => {
   );
   await expect(confirmationDiv).toBeVisible();
 
+  // wrong siret
+  await page.getByTestId("siretOrOrgId").fill("");
+  // Delete
+  await confirmationDiv
+    .locator("..")
+    .getByRole("button", { name: "Supprimer", exact: true })
+    .click();
+  //fails
+  await expect(
+    page.getByText("Le SIRET renseigné ne correspond pas à l'établissement")
+  ).toBeVisible();
+
+  // maching siret
+  await page.getByTestId("siretOrOrgId").fill(siret);
   // Delete
   await confirmationDiv
     .locator("..")
