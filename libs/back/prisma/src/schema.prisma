@@ -1668,6 +1668,14 @@ model WebhookSetting {
   @@index([orgId], map: "_WebhookSettingOrgIdIdx")
 }
 
+model MigrationScript {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  startedAt  DateTime  @default(now()) @db.Timestamptz(6)
+  finishedAt DateTime? @db.Timestamptz(6)
+  error      String?
+}
+
 enum RevisionRequestStatus {
   PENDING
   ACCEPTED
