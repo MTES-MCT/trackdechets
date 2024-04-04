@@ -469,15 +469,25 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 
 ## Migrations
 
-Les migrations de base peuvent se faire soit en SQL, soit via des script TypeScript.
-Pour le SQL elles sont situées dans `libs/back/prisma/migrate/migrations`. Les fichiers sont numérotés dans l'ordre croissant. Ils doivent être nommé `XX_any-namme.sql`.
-A noter que une fois que ces migrations ont été jouées, le contenu des fichiers est hashé dans la table migration et il ne faut donc surtout pas les modifier.
+### Modèle de données
 
-Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations doivent prendre la forme d'une classe, implémentant `Updater` et décorée par `registerUpdater`.
-Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
+Les migrations de modèle sont gérées avec [Prisma migrate](https://www.prisma.io/docs/orm/prisma-migrate).
 
-Les scripts sont joués avec la commande `npx nx run back:update`.
-Les migrations SQL sont joués avec Prisma migrate `npx prisma migrate dev`.
+Le workflow est le suivant:
+
+- modification du schéma de la base de donnée, dans le fichier `libs/back/prisma/src/schema.prisma`
+- génération de la migration correspondante en jouant `npx prisma migrate dev`. Le CLI demandera de nommer sa migration. Les migrations peuvent être retrouvées dans `libs/back/prisma/src/migrations`
+- si on souhaite modifier le SQL généré par Prisma avant qu'il soit appliqué, il est possible de jouer `npx prisma migrate dev --create-only`. C'est notamment utile lorsque l'on souhaite utiliser des fonctionnalitées non supportées par Prisma (ex: index partiel)
+
+Pour plus d'informations sur l'utilisation de Prisma migrate, allez [consulter leur documentation](https://www.prisma.io/docs/orm/prisma-migrate).
+
+### Scripts de migration
+
+Les scripts sont gérés par le projet `libs/back/scripts`.
+
+Pour générer un script, on utilise `npx nx run @td/scripts:generate`. Le CLI demandera alors à nomemr le script, et un boilerplate d'écriture de script sera généré. Les fichiers sont générés dans le dossier `libs/back/scripts/src/scripts`.
+
+Pour jouer les scripts, on utilise `npx nx run @td/scripts:migrate`. Les scripts exécutés avec succès sont sauvegardés en base de données pour s'assurer qu'ils ne sont joués qu'une seule fois.
 
 ## Réindexation Elasticsearch des BSDs
 
