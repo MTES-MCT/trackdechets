@@ -5,10 +5,9 @@ import {
   Mutation,
   MutationDeleteCompanyArgs
 } from "@td/codegen-ui";
-import { DELETE_COMPANY, MY_COMPANIES } from "../common/queries";
+import { DELETE_COMPANY, MY_COMPANIES, GET_ME } from "../common/queries";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import { GET_ME } from "../common/queries";
 import routes from "../../routes";
 import { Modal } from "../../../common/components";
 import "./advanced.scss";
