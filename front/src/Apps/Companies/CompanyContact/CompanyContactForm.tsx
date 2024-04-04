@@ -3,7 +3,7 @@ import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { object, string } from "yup";
+import { object, string, ObjectSchema } from "yup";
 import { useMutation } from "@apollo/client";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { UPDATE_CONTACT_INFOS } from "../common/queries";
@@ -21,17 +21,22 @@ interface ContactFormFields {
   contactPhone: string;
   website: string;
 }
-const yupSchema = object().shape({
-  contactEmail: string().email(),
-  contactPhone: string()
-    .trim()
-    .test(
-      "is-valid-phone",
-      "Merci de renseigner un numéro de téléphone valide",
-      value => !value || validatePhoneNumber(value)
-    ),
-  website: string().url()
-});
+// replace with zod schema
+const yupSchema = object()
+  .shape({
+    contact: string().required(),
+    contactEmail: string().email().required(),
+    contactPhone: string()
+      .trim()
+      .test(
+        "is-valid-phone",
+        "Merci de renseigner un numéro de téléphone valide",
+        value => !value || validatePhoneNumber(value)
+      )
+      .required(),
+    website: string().url()
+  })
+  .required();
 
 const CompanyContactForm = ({ company }: ContactFormProps) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -47,17 +52,18 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
     }
   }, [isAdmin, isEditing]);
 
-  const { handleSubmit, reset, formState, register } =
-    useForm<ContactFormFields>({
-      defaultValues: {
-        contact: company?.contact || "",
-        contactEmail: company?.contactEmail || "",
-        contactPhone: company?.contactPhone || "",
-        website: company?.website || ""
-      },
-      values: { ...data?.updateCompany }, // will get updated once values returns
-      resolver: yupResolver<ContactFormFields>(yupSchema)
-    });
+  const defaultValues = {
+    contact: company?.contact || "",
+    contactEmail: company?.contactEmail || "",
+    contactPhone: company?.contactPhone || "",
+    website: company?.website || ""
+  };
+
+  const { handleSubmit, reset, formState, register } = useForm({
+    defaultValues,
+    values: { ...data?.updateCompany }, // will get updated once values returns
+    resolver: yupResolver<ObjectSchema<any>>(yupSchema)
+  });
 
   const onSubmit: SubmitHandler<ContactFormFields> = async data => {
     await updateContact({ variables: { id: company.id, ...data } });
@@ -72,7 +78,7 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
   };
 
   const handleReset = reset => {
-    reset();
+    reset({ ...defaultValues });
     setIsEditing(false);
     setShowEditCta(isAdmin);
   };
@@ -121,7 +127,7 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
             nativeInputProps={{
               type: "email",
               ...register("contactEmail", { required: true }),
-              "data-testid": "company-contact-email"
+              ...{ "data-testid": "company-contact-email" }
             }}
             state={formState.errors.contactEmail ? "error" : "default"}
             stateRelatedMessage="Email invalide"
