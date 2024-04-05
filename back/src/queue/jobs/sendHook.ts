@@ -69,6 +69,7 @@ const apiCallProcessor = async ({
   // throw to trigger bull retry mechanism
   throw new WebhookRequestError(`Webhook requets fail for orgId ${orgId}`);
 };
+
 export async function sendHookJob(job: Job<WebhookQueueItem>) {
   const { id, sirets, action } = job.data;
 

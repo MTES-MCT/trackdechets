@@ -90,7 +90,12 @@ export async function handleWebhookFail(
 
     if (wehbookSetting) {
       await prisma.webhookSetting.update({
-        where: { endpointUri, orgId },
+        where: {
+          WebhookSetting_orgId_endpointUri_unique_together: {
+            orgId,
+            endpointUri
+          }
+        },
         data: { activated: false }
       });
       await delWebhookSetting(wehbookSetting);
