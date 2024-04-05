@@ -38,7 +38,7 @@ const keypress = async () => {
   // Checks for --since and if it has a value
   const sinceIndex = process.argv.indexOf("--since");
 
-  if (!sinceIndex) {
+  if (sinceIndex === -1) {
     console.log(
       [
         `Ce script permet d'ajouter les informations de la base SIRENE sur des bordereaux`,
@@ -58,7 +58,7 @@ const keypress = async () => {
   // Checks for --before and if it has a value
   const beforeIndex = process.argv.indexOf("--before");
 
-  if (beforeIndex) {
+  if (beforeIndex > -1) {
     beforeValue = process.argv[beforeIndex + 1];
   }
 

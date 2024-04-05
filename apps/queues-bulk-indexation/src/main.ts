@@ -2,7 +2,8 @@ import {
   SIRENIFY_JOB_NAME,
   bulkIndexQueue,
   indexChunkBsdJob,
-  sirenifyBsdJob
+  sirenifyBsdJob,
+  sirenifyQueue
 } from "back";
 
 // Ne pas dépasser 1 en prod avec plusieurs workers
@@ -20,7 +21,7 @@ function startConsumers() {
   // Plutôt que de créer un worker à part, on se sert du
   // worker d'indexation en masse lorsque l'on souhaite
   // faire un rattrapage des données SIRENE
-  bulkIndexQueue.process(SIRENIFY_JOB_NAME, 5, sirenifyBsdJob);
+  sirenifyQueue.process(SIRENIFY_JOB_NAME, 5, sirenifyBsdJob);
 }
 
 startConsumers();

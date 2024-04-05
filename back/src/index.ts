@@ -27,6 +27,7 @@ export {
   bulkIndexQueue,
   bulkIndexMasterQueue
 } from "./queue/producers/elastic";
+export { sirenifyQueue } from "./queue/producers/sirenify";
 export { mailQueue } from "./queue/producers/mail";
 export { syncEventsQueue } from "./queue/producers/events";
 export {

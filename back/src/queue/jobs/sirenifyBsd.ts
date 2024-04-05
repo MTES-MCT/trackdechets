@@ -409,6 +409,7 @@ export async function sirenifyBsdJob(job: Job<string>): Promise<string> {
 
   if (bsdId.startsWith("BSDA-")) {
     await sirenifyBsda(bsdId);
+    return bsdId;
   }
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
     await sirenifyBsdd(bsdId);

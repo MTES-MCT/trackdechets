@@ -3,7 +3,7 @@ import Queue, { JobOptions } from "bull";
 import { SIRENIFY_JOB_NAME } from "./jobNames";
 const { REDIS_URL, NODE_ENV } = process.env;
 
-export const SIRENIFY_QUEUE_NAME = `sirenify_${NODE_ENV}`;
+export const SIRENIFY_QUEUE_NAME = `queue_bulk_sirenify_${NODE_ENV}`;
 
 export const sirenifyQueue = new Queue<string>(
   SIRENIFY_QUEUE_NAME,
