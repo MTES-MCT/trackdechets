@@ -293,6 +293,7 @@ model Company {
   bsddRevisionRequests                 BsddRevisionRequest[]
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
   receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
+  webhookSettingsLimit                 Int @default(1)
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -1662,10 +1663,11 @@ model WebhookSetting {
   createdAt   DateTime @default(now()) @db.Timestamptz(6)
   endpointUri String
   token       String
-  orgId       String   @unique
+  orgId       String
   activated   Boolean  @default(false)
 
   @@index([orgId], map: "_WebhookSettingOrgIdIdx")
+  @@unique([orgId, endpointUri], name: "WebhookSetting_orgId_endpointUri_unique_together")
 }
 
 enum RevisionRequestStatus {

@@ -26,42 +26,46 @@ export const axiosPost = async (url, action, id, clearToken) => {
 };
 
 const apiCallProcessor = async ({
-  url,
+  endpointUri,
   orgId,
   payload
 }: {
-  url: string;
+  endpointUri: string;
   orgId: string;
   payload: { action: string; id: string; token: string };
 }) => {
   const { action, id, token } = payload;
-  logger.info(`Sending webhook request to ${url}`);
+  logger.info(`Sending webhook request to ${endpointUri}`);
 
   try {
     const clearToken = aesDecrypt(token);
     // we send the payload as an array, maybe we'll group webhooks by recipients in the future
-    const res = await axiosPost(url, action, id, clearToken);
+    const res = await axiosPost(endpointUri, action, id, clearToken);
     // Customer server endpoint are supposed to return HTTP 200 each time a request si amde
     if (res.status !== 200) {
       // valid enpoint response, exit
-      logger.error(`Webhook invalid return status (${res.status}) (${url})`);
+      logger.error(
+        `Webhook invalid return status (${res.status}) (${endpointUri})`
+      );
     } else {
       return;
     }
   } catch (err) {
-    logger.error(`Webhook error : ${err.message} - ${err.code} (${url})`);
+    logger.error(
+      `Webhook error : ${err.message} - ${err.code} (${endpointUri})`
+    );
     if (err.response) {
       logger.error(
-        `Webhook error - Status :${err.response.status} - Data: ${err.response.data} (${url})`
+        `Webhook error - Status :${err.response.status} - Data: ${err.response.data} (${endpointUri})`
       );
     } else if (err.request) {
-      logger.error(`Webhook error : ${err.request} (${url})`);
+      logger.error(`Webhook error : ${err.request} (${endpointUri})`);
     } else {
-      logger.error(`Webhook error : ${err.message} (${url})`);
+      logger.error(`Webhook error : ${err.message} (${endpointUri})`);
     }
   }
 
-  await handleWebhookFail(orgId);
+  await handleWebhookFail(orgId, endpointUri);
   // throw to trigger bull retry mechanism
   throw new WebhookRequestError(`Webhook requets fail for orgId ${orgId}`);
 };
@@ -78,7 +82,7 @@ export async function sendHookJob(job: Job<WebhookQueueItem>) {
     }
     for (const setting of settings) {
       await apiCallProcessor({
-        url: setting.endpointUri,
+        endpointUri: setting.endpointUri,
         orgId,
         payload: {
           token: setting.token,

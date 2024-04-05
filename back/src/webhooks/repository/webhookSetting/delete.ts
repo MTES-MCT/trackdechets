@@ -30,7 +30,7 @@ export function buildDeleteWebhookSetting(
       }
     });
 
-    await delWebhookSetting(deletedWebhookSetting.orgId);
+    await delWebhookSetting(deletedWebhookSetting);
 
     return deletedWebhookSetting;
   };
