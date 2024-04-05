@@ -541,6 +541,14 @@ Depuis un one-off container de taille XL
 - Si ES est surchargé, il peut être opportun de diminuer le nombre de workers.
 - À la fin de la réindexation, set le nombre de workers `bulkindexqueuemaster` et `bulkindexqueue` à 0.
 
+## Rattrapage SIRENE
+
+Si les données de raison sociale et d'adresses enregistrés sur les bordereaux sont erronnées suite à un dysfonctionnement de l'index SIRENE, un rattrapage peut être effectué à postériori grâce au script :
+
+`npx nx run back:bulk-sirenify --since 2024-04-01 --before 2024-04-03`
+
+Les jobs de "sirenification" sont dépilés par le worker `bulkindexqueue` qui doit donc être démarré sur Scalingo avant de lancer le script.
+
 ## Guides
 
 ### Mettre à jour le changelog
