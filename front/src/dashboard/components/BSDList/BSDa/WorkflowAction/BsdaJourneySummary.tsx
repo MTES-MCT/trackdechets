@@ -12,6 +12,10 @@ interface Props {
 }
 
 export function BsdaJourneySummary({ bsda }: Props) {
+  const signedByEmitter = Boolean(bsda.emitter?.emission?.signature?.date);
+  const workerIsDisabled = bsda.worker?.isDisabled;
+  const signedByWorker = Boolean(bsda.worker?.work?.signature?.date);
+
   return (
     <Journey>
       <JourneyStop
@@ -24,12 +28,12 @@ export function BsdaJourneySummary({ bsda }: Props) {
           {bsda.emitter?.company?.address}
         </JourneyStopDescription>
       </JourneyStop>
-      {bsda.worker?.company?.name && (
+      {!workerIsDisabled && bsda.worker?.company?.siret && (
         <JourneyStop
           variant={
-            bsda.worker?.work?.signature
+            signedByWorker
               ? "complete"
-              : bsda.emitter?.emission?.signature
+              : signedByEmitter
               ? "active"
               : "incomplete"
           }
@@ -54,7 +58,9 @@ export function BsdaJourneySummary({ bsda }: Props) {
                 // en charge le déchet après la signature émetteur
                 (idx > 0 &&
                     bsda.transporters[idx - 1].transport?.signature?.date) ||
-                  (bsda.emitter?.emission?.signature?.date && idx === 0)
+                  (idx === 0 &&
+                    signedByEmitter &&
+                    (workerIsDisabled || signedByWorker))
                 ? "active"
                 : "incomplete"
             }

@@ -590,9 +590,23 @@ describe("TransporterForm", () => {
     "no error message should be displayed if company has not the TRANSPORTER profile but exemption is active and bsdType is %p",
     async bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
+
+      const data = {
+        ...defaultTransporter,
+        ...(bsdType === BsdType.Bsdd ? { isExemptedOfReceipt: true } : {}),
+        ...(bsdType === BsdType.Bsda
+          ? {
+              recepisse: {
+                ...(defaultTransporter as BsdaTransporter).recepisse,
+                isExempted: true
+              }
+            }
+          : {})
+      };
+
       render(
         Component({
-          data: { ...defaultTransporter, isExemptedOfReceipt: true },
+          data,
           mocks: [
             searchCompaniesMock(defaultTransporter, bsdType, {
               companyTypes: [CompanyType.Producer]

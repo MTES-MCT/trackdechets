@@ -126,16 +126,20 @@ export default function BsdaStepsList(props: Props) {
         mode: transport?.mode,
         plates: transport?.plates
       },
-      ...(input.recepisse?.isExempted ||
-      isForeignVat(input?.company?.vatNumber) ||
-      transport?.mode !== TransportMode.Road
-        ? {
-            receipt: null,
-            validityLimit: null,
-            department: null
-          }
-        : {})
+      recepisse: {
+        ...input.recepisse,
+        ...(input.recepisse?.isExempted ||
+        isForeignVat(input?.company?.vatNumber) ||
+        transport?.mode !== TransportMode.Road
+          ? {
+              number: null,
+              validityLimit: null,
+              department: null
+            }
+          : {})
+      }
     };
+
     if (id) {
       // Le transporteur existe déjà en base de données, on met
       // à jour les infos (uniquement si le transporteur n'a pas encore
