@@ -12,7 +12,8 @@ import {
   getWebhookSettings,
   clearWebhookSetting
 } from "../../../../common/redis/webhooksettings";
-import { prisma } from "../../../../../../libs/back/prisma/src";
+import { prisma } from "@td/prisma";
+
 const UPDATE_WEBHOOK_SETTING = gql`
   mutation UpdateWebhookSetting($id: ID!, $input: WebhookSettingUpdateInput!) {
     updateWebhookSetting(id: $id, input: $input) {
@@ -152,7 +153,7 @@ describe("Mutation.updateWebhookSetting", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN", {
       webhookSettingsLimit: 2
     });
-    const whs1 = await webhookSettingFactory({
+    await webhookSettingFactory({
       company,
       endpointUri: "https://url1.fr"
     });
@@ -196,7 +197,7 @@ describe("Mutation.updateWebhookSetting", () => {
       company: company1,
       endpointUri: "https://url1.fr"
     });
-    const whs2 = await webhookSettingFactory({
+    await webhookSettingFactory({
       company: company2,
       endpointUri: "https://url1.fr"
     });
