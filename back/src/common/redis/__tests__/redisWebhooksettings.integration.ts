@@ -10,10 +10,12 @@ import { prisma } from "@td/prisma";
 
 const sort = array => array.sort((a, b) => a.localeCompare(b));
 
-const expectWebhookSettingsEndpointUrisToBe = (
-  webhookSettings,
+const expectCompanyWebhookSettingsEndpointUrisToBe = async (
+  companyOrgId,
   expectedUris
 ) => {
+  const webhookSettings = await getWebhookSettings(companyOrgId);
+
   expect(webhookSettings.length).toBe(expectedUris.length);
 
   const uris = webhookSettings.map(w => w.endpointUri);
@@ -37,8 +39,10 @@ describe("webhooksettings redis", () => {
       endpointUri: "https://lorem.ipsum"
     });
     expect(whs.activated).toBe(true);
-    let redisWhs = await getWebhookSettings(company.orgId);
-    expectWebhookSettingsEndpointUrisToBe(redisWhs, ["https://lorem.ipsum"]);
+
+    await expectCompanyWebhookSettingsEndpointUrisToBe(company.orgId, [
+      "https://lorem.ipsum"
+    ]);
 
     // When
     await handleWebhookFail(company.orgId, "https://lorem.ipsum");
@@ -48,17 +52,19 @@ describe("webhooksettings redis", () => {
     await handleWebhookFail(company.orgId, "https://lorem.ipsum");
 
     // Then
-    redisWhs = await getWebhookSettings(company.orgId);
-    expectWebhookSettingsEndpointUrisToBe(redisWhs, ["https://lorem.ipsum"]);
+    await expectCompanyWebhookSettingsEndpointUrisToBe(company.orgId, [
+      "https://lorem.ipsum"
+    ]);
 
     // Go over limit
     await handleWebhookFail(company.orgId, "https://lorem.ipsum");
 
+    // Webhook should be removed
     const updatedWhs = await prisma.webhookSetting.findUniqueOrThrow({
       where: { id: whs.id }
     });
     expect(updatedWhs.activated).toBe(false);
-    redisWhs = await getWebhookSettings(company.orgId);
+    const redisWhs = await getWebhookSettings(company.orgId);
     expect(redisWhs.length).toBe(0);
   });
 
@@ -83,14 +89,12 @@ describe("webhooksettings redis", () => {
       endpointUri: "https://url3.fr"
     });
 
-    let redisWhsCompany1 = await getWebhookSettings(company1.orgId);
-    expectWebhookSettingsEndpointUrisToBe(redisWhsCompany1, [
+    await expectCompanyWebhookSettingsEndpointUrisToBe(company1.orgId, [
       "https://url1.fr",
       "https://url2.fr"
     ]);
 
-    let redisWhsCompany2 = await getWebhookSettings(company2.orgId);
-    expectWebhookSettingsEndpointUrisToBe(redisWhsCompany2, [
+    await expectCompanyWebhookSettingsEndpointUrisToBe(company2.orgId, [
       "https://url3.fr"
     ]);
 
@@ -102,14 +106,12 @@ describe("webhooksettings redis", () => {
     await handleWebhookFail(company1.orgId, "https://url2.fr");
 
     // Then
-    redisWhsCompany1 = await getWebhookSettings(company1.orgId);
-    expectWebhookSettingsEndpointUrisToBe(redisWhsCompany1, [
+    await expectCompanyWebhookSettingsEndpointUrisToBe(company1.orgId, [
       "https://url1.fr",
       "https://url2.fr"
     ]);
 
-    redisWhsCompany2 = await getWebhookSettings(company2.orgId);
-    expectWebhookSettingsEndpointUrisToBe(redisWhsCompany2, [
+    await expectCompanyWebhookSettingsEndpointUrisToBe(company2.orgId, [
       "https://url3.fr"
     ]);
 
@@ -122,13 +124,11 @@ describe("webhooksettings redis", () => {
     });
     expect(updatedWhs.activated).toBe(false);
 
-    redisWhsCompany1 = await getWebhookSettings(company1.orgId);
-    expectWebhookSettingsEndpointUrisToBe(redisWhsCompany1, [
+    await expectCompanyWebhookSettingsEndpointUrisToBe(company1.orgId, [
       "https://url1.fr"
     ]);
 
-    redisWhsCompany2 = await getWebhookSettings(company2.orgId);
-    expectWebhookSettingsEndpointUrisToBe(redisWhsCompany2, [
+    await expectCompanyWebhookSettingsEndpointUrisToBe(company2.orgId, [
       "https://url3.fr"
     ]);
   });
