@@ -3,6 +3,7 @@ import {
   PrismaFormWithForwardedInAndTransporters,
   expandFormFromDb
 } from "../converter";
+import Decimal from "decimal.js";
 
 export function isArray(obj) {
   return {}.toString.apply(obj) === "[object Array]";
@@ -14,6 +15,11 @@ export function isObject(obj) {
 
 export function isString(obj) {
   return {}.toString.call(obj) === "[object String]";
+}
+
+export function isNumber(obj) {
+  const objectType = {}.toString.apply(obj);
+  return objectType === "[object Decimal]" || objectType === "[object Number]";
 }
 
 export function isEmpty(obj) {
@@ -46,6 +52,16 @@ export function stringEqual(
   s2: string | null | undefined
 ) {
   return (s1 ?? "") === (s2 ?? "");
+}
+
+export function numberEqual(
+  n1: number | Decimal | null | undefined,
+  n2: number | Decimal | null | undefined
+) {
+  if (n1 && n2) {
+    return new Decimal(n1).equals(new Decimal(n2));
+  }
+  return n1 === n2;
 }
 
 export function objectDiff(o1, o2) {
@@ -84,6 +100,14 @@ export function objectDiff(o1, o2) {
         [key]: o2[key]
       };
     }
+
+    if (isNumber(o2[key])) {
+      if (numberEqual(o1[key], o2[key])) {
+        return diff;
+      }
+      return { ...diff, [key]: o2[key] };
+    }
+
     if (o1[key] === o2[key] || !(key in o1)) return diff;
     return {
       ...diff,

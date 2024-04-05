@@ -365,6 +365,37 @@ describe("Mutation.updateForm", () => {
     expect(errors).toBeUndefined();
   });
 
+  it("should be possible to resend same Decimal value when emitter has signed", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const intermediary1 = await companyFactory();
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date(),
+        intermediaries: { create: toIntermediaryCompany(intermediary1) }
+      }
+    });
+    const { mutate } = makeClient(destination.user);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: { quantity: form.wasteDetailsQuantity?.toNumber() }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
   it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
     "should allow %p to update a draft form",
     async role => {
