@@ -95,7 +95,8 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
         CompanyType.WasteVehicles,
         CompanyType.WasteCenter,
         CompanyType.Collector,
-        CompanyType.Worker
+        CompanyType.Worker,
+        CompanyType.EcoOrganisme
       ].includes(t)
     ).length > 0
   ) {
@@ -120,7 +121,8 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
 
   if (
     companyTypes.includes(CompanyType.Trader) ||
-    companyTypes.includes(CompanyType.Broker)
+    companyTypes.includes(CompanyType.Broker) ||
+    companyTypes.includes(CompanyType.Intermediary)
   ) {
     exportTypes.push(WasteRegistryType.Managed);
   }
