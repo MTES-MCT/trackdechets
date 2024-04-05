@@ -10,7 +10,7 @@ import { prisma } from "@td/prisma";
 
 const sort = array => array.sort((a, b) => a.localeCompare(b));
 
-const expectCompanyWebhookSettingsEndpointUrisToBe = async (
+export const expectCompanyWebhookSettingsEndpointUrisToBe = async (
   companyOrgId,
   expectedUris
 ) => {
