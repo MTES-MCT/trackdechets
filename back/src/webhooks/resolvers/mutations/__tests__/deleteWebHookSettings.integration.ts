@@ -31,6 +31,7 @@ describe("Mutation.deleteWebhookSetting", () => {
     await resetDatabase();
     await clearWebhookSetting();
   });
+
   it("should disallow unauthenticated user", async () => {
     const company = await companyFactory();
 
@@ -112,5 +113,95 @@ describe("Mutation.deleteWebhookSetting", () => {
         })
       })
     ]);
+  });
+
+  it("should delete targeted webhook setting and no other", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      webhookSettingsLimit: 2
+    });
+    const whs1 = await webhookSettingFactory({
+      company,
+      token: "secret",
+      endpointUri: "https://url1.fr"
+    });
+    const whs2 = await webhookSettingFactory({
+      company,
+      token: "secret",
+      endpointUri: "https://url2.fr"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+
+    await mutate<Pick<Mutation, "createWebhookSetting">>(
+      DELETE_WEBHOOK_SETTING,
+      {
+        variables: {
+          id: whs1.id
+        }
+      }
+    );
+
+    // Then
+    const found = await prisma.webhookSetting.findUnique({
+      where: { id: whs1.id }
+    });
+    expect(found).toEqual(null);
+
+    const redisWebhookSettings = await getWebhookSettings(company.orgId);
+    expect(redisWebhookSettings.length).toEqual(1);
+    const endpointUris = redisWebhookSettings.map(
+      settings => settings.endpointUri
+    );
+    expect(endpointUris).toEqual([whs2.endpointUri]);
+  });
+
+  it("should delete targeted webhook setting belonging to targeted company and no other", async () => {
+    // Given
+    const { user, company: company1 } = await userWithCompanyFactory("ADMIN");
+    const { company: company2 } = await userWithCompanyFactory("ADMIN");
+    const whs1 = await webhookSettingFactory({
+      company: company1,
+      token: "secret",
+      endpointUri: "https://url1.fr"
+    });
+    const whs2 = await webhookSettingFactory({
+      company: company2,
+      token: "secret",
+      endpointUri: "https://url1.fr"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+
+    await mutate<Pick<Mutation, "createWebhookSetting">>(
+      DELETE_WEBHOOK_SETTING,
+      {
+        variables: {
+          id: whs1.id
+        }
+      }
+    );
+
+    // Then
+
+    // Company 1
+    const found1 = await prisma.webhookSetting.findUnique({
+      where: { id: whs1.id }
+    });
+    expect(found1).toEqual(null);
+
+    const redisWebhookSettings1 = await getWebhookSettings(company1.orgId);
+    expect(redisWebhookSettings1.length).toEqual(0);
+
+    // Company 2
+    const found2 = await prisma.webhookSetting.findUnique({
+      where: { id: whs2.id }
+    });
+    expect(found2).not.toEqual(null);
+
+    const redisWebhookSettings2 = await getWebhookSettings(company2.orgId);
+    expect(redisWebhookSettings2.length).toEqual(1);
   });
 });

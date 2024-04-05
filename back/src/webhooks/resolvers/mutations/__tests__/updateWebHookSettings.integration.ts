@@ -12,6 +12,7 @@ import {
   getWebhookSettings,
   clearWebhookSetting
 } from "../../../../common/redis/webhooksettings";
+import { prisma } from "../../../../../../libs/back/prisma/src";
 const UPDATE_WEBHOOK_SETTING = gql`
   mutation UpdateWebhookSetting($id: ID!, $input: WebhookSettingUpdateInput!) {
     updateWebhookSetting(id: $id, input: $input) {
@@ -60,36 +61,258 @@ describe("Mutation.updateWebhookSetting", () => {
   });
 
   it("should update a webhook setting", async () => {
+    // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
-
-    const { mutate } = makeClient(user);
     const whs = await webhookSettingFactory({
       company,
-
       endpointUri: "https://lorem.ipsum"
     });
-    const { data } = await mutate<Pick<Mutation, "updateWebhookSetting">>(
-      UPDATE_WEBHOOK_SETTING,
-      {
-        variables: {
-          id: whs.id,
-          input: { endpointUri: "https://lorem.ipsum/plop" }
-        }
-      }
-    );
 
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateWebhookSetting">
+    >(UPDATE_WEBHOOK_SETTING, {
+      variables: {
+        id: whs.id,
+        input: { endpointUri: "https://lorem.ipsum/plop" }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
     expect(data.updateWebhookSetting.endpointUri).toEqual(
       "https://lorem.ipsum/plop"
     );
 
-    // check webhook is cached in redis
+    // Check webhook is cached in redis
     const redisWebhookSettings = await getWebhookSettings(company.orgId);
-
     expect(redisWebhookSettings.length).toEqual(1);
     expect(redisWebhookSettings[0].endpointUri).toEqual(
       "https://lorem.ipsum/plop"
     );
+
+    // DB
+    const dbWebhookSetting = await prisma.webhookSetting.findFirstOrThrow({
+      where: {
+        id: whs.id
+      }
+    });
+    expect(dbWebhookSetting.endpointUri).toEqual("https://lorem.ipsum/plop");
   });
+
+  it("if company has several webhookSettings, should update the correct one", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      webhookSettingsLimit: 2
+    });
+    await webhookSettingFactory({
+      company,
+      endpointUri: "https://url1.fr"
+    });
+    const whs2 = await webhookSettingFactory({
+      company,
+      endpointUri: "https://url2.fr"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "updateWebhookSetting">>(
+      UPDATE_WEBHOOK_SETTING,
+      {
+        variables: {
+          id: whs2.id,
+          input: { endpointUri: "https://url3.fr" }
+        }
+      }
+    );
+
+    // Then
+    expect(data.updateWebhookSetting.endpointUri).toEqual("https://url3.fr");
+
+    // Check webhook is cached in redis
+    const redisWebhookSettings = await getWebhookSettings(company.orgId);
+    expect(redisWebhookSettings.length).toEqual(2);
+    const endpointUris = redisWebhookSettings.map(
+      settings => settings.endpointUri
+    );
+    expect(endpointUris.sort()).toEqual(["https://url1.fr", "https://url3.fr"]);
+
+    // DB
+    const dbWebhookSetting = await prisma.webhookSetting.findFirstOrThrow({
+      where: {
+        id: whs2.id
+      }
+    });
+    expect(dbWebhookSetting.endpointUri).toEqual("https://url3.fr");
+  });
+
+  it("should not allow updating endpointUri to another webhookSetting's endpointUri", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      webhookSettingsLimit: 2
+    });
+    const whs1 = await webhookSettingFactory({
+      company,
+      endpointUri: "https://url1.fr"
+    });
+    const whs2 = await webhookSettingFactory({
+      company,
+      endpointUri: "https://url2.fr"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateWebhookSetting">>(
+      UPDATE_WEBHOOK_SETTING,
+      {
+        variables: {
+          id: whs2.id,
+          input: { endpointUri: "https://url1.fr" }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      `Cet établissement a déjà un webhook avec l'endpoint "https://url1.fr"`
+    );
+
+    // Nothing should have changed
+    const redisWebhookSettings = await getWebhookSettings(company.orgId);
+    expect(redisWebhookSettings.length).toEqual(2);
+    const endpointUris = redisWebhookSettings.map(
+      settings => settings.endpointUri
+    );
+    expect(endpointUris.sort()).toEqual(["https://url1.fr", "https://url2.fr"]);
+  });
+
+  it("should update targeted company's enpoint and no other", async () => {
+    // Given
+    const { user, company: company1 } = await userWithCompanyFactory("ADMIN");
+    const { company: company2 } = await userWithCompanyFactory("ADMIN");
+    const whs1 = await webhookSettingFactory({
+      company: company1,
+      endpointUri: "https://url1.fr"
+    });
+    const whs2 = await webhookSettingFactory({
+      company: company2,
+      endpointUri: "https://url1.fr"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateWebhookSetting">>(
+      UPDATE_WEBHOOK_SETTING,
+      {
+        variables: {
+          id: whs1.id,
+          input: { endpointUri: "https://url2.fr" }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    // Company 1
+    const redisWebhookSettings1 = await getWebhookSettings(company1.orgId);
+    expect(redisWebhookSettings1.length).toEqual(1);
+    const endpointUris1 = redisWebhookSettings1.map(
+      settings => settings.endpointUri
+    );
+    expect(endpointUris1.sort()).toEqual(["https://url2.fr"]);
+
+    // Company 2
+    const redisWebhookSettings2 = await getWebhookSettings(company2.orgId);
+    expect(redisWebhookSettings2.length).toEqual(1);
+    const endpointUris2 = redisWebhookSettings2.map(
+      settings => settings.endpointUri
+    );
+    expect(endpointUris2.sort()).toEqual(["https://url1.fr"]);
+  });
+
+  it("if deactivating a webhook, should not deactivate the others", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      webhookSettingsLimit: 2
+    });
+    await webhookSettingFactory({
+      company,
+      endpointUri: "https://url1.fr"
+    });
+    const whs2 = await webhookSettingFactory({
+      company,
+      endpointUri: "https://url2.fr"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateWebhookSetting">>(
+      UPDATE_WEBHOOK_SETTING,
+      {
+        variables: {
+          id: whs2.id,
+          input: { activated: false }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    const redisWebhookSettings = await getWebhookSettings(company.orgId);
+    expect(redisWebhookSettings.length).toEqual(1);
+    const endpointUris = redisWebhookSettings.map(
+      settings => settings.endpointUri
+    );
+    expect(endpointUris).toEqual(["https://url1.fr"]);
+  });
+
+  it("if activating a webhook, should be back into redis", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      webhookSettingsLimit: 2
+    });
+    await webhookSettingFactory({
+      company,
+      endpointUri: "https://url1.fr",
+      activated: true
+    });
+    const whs2 = await webhookSettingFactory({
+      company,
+      endpointUri: "https://url2.fr",
+      activated: false
+    });
+
+    // Expect 1
+    let redisWebhookSettings = await getWebhookSettings(company.orgId);
+    expect(redisWebhookSettings.length).toEqual(1);
+    let endpointUris = redisWebhookSettings.map(
+      settings => settings.endpointUri
+    );
+    expect(endpointUris).toEqual(["https://url1.fr"]);
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateWebhookSetting">>(
+      UPDATE_WEBHOOK_SETTING,
+      {
+        variables: {
+          id: whs2.id,
+          input: { activated: true }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    redisWebhookSettings = await getWebhookSettings(company.orgId);
+    expect(redisWebhookSettings.length).toEqual(2);
+    endpointUris = redisWebhookSettings.map(settings => settings.endpointUri);
+    expect(endpointUris.sort()).toEqual(["https://url1.fr", "https://url2.fr"]);
+  });
+
   it("should forbid short tokens", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 

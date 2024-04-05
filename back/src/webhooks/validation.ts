@@ -31,12 +31,12 @@ const webhookSettingCreateSchema: yup.SchemaOf<WebhookSettingCreateInput> =
     companyId: yup.string().required("L'id de l'établissement est requis'"),
     endpointUri: yup
       .string()
-      // .url()
+      .url()
       .max(300)
-      .required("L'url de notification du webhook est requise"),
-    // .test("webhook-url-https", "L'url doit être en https", (value: string) =>
-    //   value.startsWith("https://")
-    // ),
+      .required("L'url de notification du webhook est requise")
+      .test("webhook-url-https", "L'url doit être en https", (value: string) =>
+        value.startsWith("https://")
+      ),
     token: yup.string().notRequired().min(20).max(100) as any,
     activated: yup.boolean()
   });
