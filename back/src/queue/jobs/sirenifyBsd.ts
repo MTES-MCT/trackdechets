@@ -45,10 +45,10 @@ async function sirenify<Bsd, BsdInput>(
   return sirenified;
 }
 
-async function sirenifyBsdd(readableId: string) {
+export async function sirenifyBsdd(readableId: string) {
   const form = await prisma.form.findUniqueOrThrow({
     where: { readableId },
-    include: { transporters: true, intermediaries: true, forwardedIn: true }
+    include: { transporters: true, intermediaries: true }
   });
 
   const sirenifyOpts: SirenifyOpts<Form, Prisma.FormUpdateInput>[] = [
@@ -141,7 +141,7 @@ async function sirenifyBsdd(readableId: string) {
   }
 }
 
-async function sirenifyBsda(id: string) {
+export async function sirenifyBsda(id: string) {
   const bsda = await prisma.bsda.findUniqueOrThrow({
     where: { id },
     include: { transporters: true }
@@ -204,7 +204,7 @@ async function sirenifyBsda(id: string) {
   }
 }
 
-async function sirenifyBsdasri(id: string) {
+export async function sirenifyBsdasri(id: string) {
   const bsdasri = await prisma.bsdasri.findUniqueOrThrow({
     where: { id }
   });
@@ -241,7 +241,7 @@ async function sirenifyBsdasri(id: string) {
   await prisma.bsdasri.update({ data, where: { id } });
 }
 
-async function sirenifyBsff(id: string) {
+export async function sirenifyBsff(id: string) {
   const bsff = await prisma.bsff.findUniqueOrThrow({
     where: { id },
     include: { ficheInterventions: true }
@@ -349,7 +349,7 @@ async function sirenifyBsvhu(id: string) {
   await prisma.bsvhu.update({ data, where: { id } });
 }
 
-async function sirenifyBspaoh(id: string) {
+export async function sirenifyBspaoh(id: string) {
   const bspaoh = await prisma.bspaoh.findUniqueOrThrow({
     where: { id },
     include: { transporters: true }
