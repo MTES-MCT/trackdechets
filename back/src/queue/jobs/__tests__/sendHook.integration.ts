@@ -199,57 +199,130 @@ describe("sendHook", () => {
       );
     });
 
-    // TODO: what's the expected behaviour???
-    // it("if the call to one webhook fails, should still call the others", async () => {
-    //     // Given
-    //     const company1 = await companyFactory({ webhookSettingsLimit: 2 });
-    //     const company2 = await companyFactory();
+    it("if the call to one webhook fails, should still call the others", async () => {
+      // Given
+      const company1 = await companyFactory({ webhookSettingsLimit: 2 });
+      const company2 = await companyFactory();
 
-    //     await webhookSettingFactory({
-    //         company: company1,
-    //         token: "secret-wh1",
-    //         endpointUri: "https://company1.fr/endpoint1"
-    //     });
-    //     await webhookSettingFactory({
-    //         company: company1,
-    //         token: "secret-wh2",
-    //         endpointUri: "https://company1.fr/endpoint2"
-    //     });
-    //     await webhookSettingFactory({
-    //         company: company2,
-    //         token: "secret-wh3",
-    //         endpointUri: "https://company2.fr/endpoint1"
-    //     });
+      await webhookSettingFactory({
+        company: company1,
+        token: "secret-wh1",
+        endpointUri: "https://company1.fr/endpoint1"
+      });
+      await webhookSettingFactory({
+        company: company1,
+        token: "secret-wh2",
+        endpointUri: "https://company1.fr/endpoint2"
+      });
+      await webhookSettingFactory({
+        company: company2,
+        token: "secret-wh3",
+        endpointUri: "https://company2.fr/endpoint1"
+      });
 
-    //     (axios.post as jest.Mock<any>).mockImplementation((url) => {
-    //         if(url === "https://company1.fr/endpoint1") return Promise.resolve({ status: 404 });
-    //         return Promise.resolve({ status: 200 });
-    //     });
+      (axios.post as jest.Mock<any>).mockImplementation(url => {
+        if (url === "https://company1.fr/endpoint1")
+          return Promise.resolve({ status: 404 });
+        return Promise.resolve({ status: 200 });
+      });
 
-    //     // When
-    //     await sendHookJob({data: {
-    //         id: "bsd-id",
-    //         sirets: [company1.siret!, company2.siret!],
-    //         action: "CREATE",
-    //     }} as Job<WebhookQueueItem>);
+      // When
+      expect.assertions(6);
+      try {
+        await sendHookJob({
+          data: {
+            id: "bsd-id",
+            sirets: [company1.siret!, company2.siret!],
+            action: "CREATE"
+          }
+        } as Job<WebhookQueueItem>);
+      } catch (e) {
+        expect(e).not.toBeUndefined();
+        expect(e.message).toBe(
+          `Webhook requets fail for orgId ${company1.orgId} and endpoint https://company1.fr/endpoint1`
+        );
+      }
 
-    //     // Then
-    //     expect(axios.post as jest.Mock<any>).toHaveBeenCalledTimes(3);
-    //     expect(axios.post as jest.Mock).toHaveBeenCalledWith(
-    //         "https://company1.fr/endpoint1",
-    //         [ { action: 'CREATE', id: 'bsd-id' } ],
-    //         { timeout: 5000, headers: { Authorization: 'Bearer: secret-wh1' } }
-    //     );
-    //     expect(axios.post as jest.Mock).toHaveBeenCalledWith(
-    //         "https://company1.fr/endpoint2",
-    //         [ { action: 'CREATE', id: 'bsd-id' } ],
-    //         { timeout: 5000, headers: { Authorization: 'Bearer: secret-wh2' } }
-    //     );
-    //     expect(axios.post as jest.Mock).toHaveBeenCalledWith(
-    //         "https://company2.fr/endpoint1",
-    //         [ { action: 'CREATE', id: 'bsd-id' } ],
-    //         { timeout: 5000, headers: { Authorization: 'Bearer: secret-wh3' } }
-    //     );
-    // });
+      // Then
+      expect(axios.post as jest.Mock<any>).toHaveBeenCalledTimes(3);
+      expect(axios.post as jest.Mock).toHaveBeenCalledWith(
+        "https://company1.fr/endpoint1",
+        [{ action: "CREATE", id: "bsd-id" }],
+        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh1" } }
+      );
+      expect(axios.post as jest.Mock).toHaveBeenCalledWith(
+        "https://company1.fr/endpoint2",
+        [{ action: "CREATE", id: "bsd-id" }],
+        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh2" } }
+      );
+      expect(axios.post as jest.Mock).toHaveBeenCalledWith(
+        "https://company2.fr/endpoint1",
+        [{ action: "CREATE", id: "bsd-id" }],
+        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh3" } }
+      );
+    });
+
+    it("if the calls to one company's webhooks fail, should still call the others", async () => {
+      // Given
+      const company1 = await companyFactory({ webhookSettingsLimit: 2 });
+      const company2 = await companyFactory();
+
+      await webhookSettingFactory({
+        company: company1,
+        token: "secret-wh1",
+        endpointUri: "https://company1.fr/endpoint1"
+      });
+      await webhookSettingFactory({
+        company: company1,
+        token: "secret-wh2",
+        endpointUri: "https://company1.fr/endpoint2"
+      });
+      await webhookSettingFactory({
+        company: company2,
+        token: "secret-wh3",
+        endpointUri: "https://company2.fr/endpoint1"
+      });
+
+      (axios.post as jest.Mock<any>).mockImplementation(url => {
+        if (url.startsWith("https://company1.fr"))
+          return Promise.resolve({ status: 404 });
+        return Promise.resolve({ status: 200 });
+      });
+
+      // When
+      expect.assertions(6);
+      try {
+        await sendHookJob({
+          data: {
+            id: "bsd-id",
+            sirets: [company1.siret!, company2.siret!],
+            action: "CREATE"
+          }
+        } as Job<WebhookQueueItem>);
+      } catch (e) {
+        expect(e).not.toBeUndefined();
+        expect(e.message).toBe(
+          `Webhook requets fail for orgId ${company1.orgId} and endpoint https://company1.fr/endpoint1`
+        );
+      }
+
+      // Then
+      expect(axios.post as jest.Mock<any>).toHaveBeenCalledTimes(3);
+      expect(axios.post as jest.Mock).toHaveBeenCalledWith(
+        "https://company1.fr/endpoint1",
+        [{ action: "CREATE", id: "bsd-id" }],
+        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh1" } }
+      );
+      expect(axios.post as jest.Mock).toHaveBeenCalledWith(
+        "https://company1.fr/endpoint2",
+        [{ action: "CREATE", id: "bsd-id" }],
+        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh2" } }
+      );
+      expect(axios.post as jest.Mock).toHaveBeenCalledWith(
+        "https://company2.fr/endpoint1",
+        [{ action: "CREATE", id: "bsd-id" }],
+        { timeout: 5000, headers: { Authorization: "Bearer: secret-wh3" } }
+      );
+    });
   });
 });

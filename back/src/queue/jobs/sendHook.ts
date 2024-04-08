@@ -67,7 +67,9 @@ const apiCallProcessor = async ({
 
   await handleWebhookFail(orgId, endpointUri);
   // throw to trigger bull retry mechanism
-  throw new WebhookRequestError(`Webhook requets fail for orgId ${orgId}`);
+  throw new WebhookRequestError(
+    `Webhook requets fail for orgId ${orgId} and endpoint ${endpointUri}`
+  );
 };
 
 export async function sendHookJob(job: Job<WebhookQueueItem>) {
@@ -75,22 +77,31 @@ export async function sendHookJob(job: Job<WebhookQueueItem>) {
 
   const uniqueOrgIds = new Set(sirets);
 
+  let error;
   for (const orgId of uniqueOrgIds) {
     const settings = await getWebhookSettings(orgId);
 
     if (!settings.length) {
       continue;
     }
+
     for (const setting of settings) {
-      await apiCallProcessor({
-        endpointUri: setting.endpointUri,
-        orgId,
-        payload: {
-          token: setting.token,
-          id,
-          action
-        }
-      });
+      try {
+        await apiCallProcessor({
+          endpointUri: setting.endpointUri,
+          orgId,
+          payload: {
+            token: setting.token,
+            id,
+            action
+          }
+        });
+      } catch (e) {
+        error = e;
+      }
     }
   }
+
+  // At least one webhook failed for this BSD. Try again
+  if (error) throw error;
 }
