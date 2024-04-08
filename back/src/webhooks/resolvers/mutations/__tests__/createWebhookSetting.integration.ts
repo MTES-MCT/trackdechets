@@ -213,7 +213,7 @@ describe("Mutation.createWebhookSetting", () => {
     ]);
   });
 
-  it("should forbid to create several webhook settings for the same company", async () => {
+  it("should forbid to create several webhook settings for the same company (if not allowed)", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     await webhookSettingFactory({
@@ -334,5 +334,38 @@ describe("Mutation.createWebhookSetting", () => {
     expect(errors[0].message).toBe(
       `Cet établissement a déjà un webhook avec l'endpoint "https://url1.com"`
     );
+  });
+
+  it("two companies can create webhooks with the same endpointUri (weird but ok)", async () => {
+    // Given
+    const { company: company1 } = await userWithCompanyFactory("ADMIN");
+    const { user: user2, company: company2 } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    await webhookSettingFactory({
+      company: company1,
+      token: "secret",
+      endpointUri: "https://url1.com"
+    });
+
+    // When
+    const { mutate } = makeClient(user2);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createWebhookSetting">
+    >(CREATE_WEBHOOK_SETTING, {
+      variables: {
+        input: {
+          companyId: company2.id,
+          endpointUri: "https://url1.com",
+          token: "secret_secret_secret",
+          activated: true
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createWebhookSetting.endpointUri).toBe("https://url1.com");
+    expect(data.createWebhookSetting.orgId).toBe(company2.orgId);
   });
 });

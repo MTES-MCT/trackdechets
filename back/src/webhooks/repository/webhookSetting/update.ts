@@ -30,6 +30,7 @@ export function buildUpdatWebhookSettings(
     if (data.endpointUri) {
       const existingWebhookSettingCount = await prisma.webhookSetting.count({
         where: {
+          orgId: where.orgId,
           id: { not: where.id },
           endpointUri: data.endpointUri.toString()
         }

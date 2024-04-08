@@ -142,6 +142,80 @@ describe("Mutation.updateWebhookSetting", () => {
     expect(dbWebhookSetting.endpointUri).toEqual("https://url3.fr");
   });
 
+  it.only("two companies can have the same endpointUri (weird but ok)", async () => {
+    // Given
+    const { user, company: company1 } = await userWithCompanyFactory("ADMIN");
+    const { company: company2 } = await userWithCompanyFactory("ADMIN");
+    const whs1 = await webhookSettingFactory({
+      company: company1,
+      endpointUri: "https://url1.fr"
+    });
+    const whs2 = await webhookSettingFactory({
+      company: company2,
+      endpointUri: "https://url2.fr"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "updateWebhookSetting">
+    >(UPDATE_WEBHOOK_SETTING, {
+      variables: {
+        id: whs1.id,
+        input: { endpointUri: "https://url2.fr" }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.updateWebhookSetting.endpointUri).toEqual("https://url2.fr");
+
+    // Check webhook is cached in redis
+    await expectCompanyWebhookSettingsEndpointUrisToBe(company1.orgId, [
+      "https://url2.fr"
+    ]);
+
+    // DB
+    const dbWebhookSetting = await prisma.webhookSetting.findFirstOrThrow({
+      where: {
+        id: whs2.id
+      }
+    });
+    expect(dbWebhookSetting.endpointUri).toEqual("https://url2.fr");
+  });
+
+  it.only("cannot update another company's webhookSetting", async () => {
+    // Given
+    const { user, company: company1 } = await userWithCompanyFactory("ADMIN");
+    const { company: company2 } = await userWithCompanyFactory("ADMIN");
+    await webhookSettingFactory({
+      company: company1,
+      endpointUri: "https://url1.fr"
+    });
+    const whs2 = await webhookSettingFactory({
+      company: company2,
+      endpointUri: "https://url2.fr"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateWebhookSetting">>(
+      UPDATE_WEBHOOK_SETTING,
+      {
+        variables: {
+          id: whs2.id,
+          input: { endpointUri: "https://url3.fr" }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      `Le webhook avec l'identifiant "${whs2.id}" n'existe pas ou vous n'avez pas les permissions pour y accéder.`
+    );
+  });
+
   it("should not allow updating endpointUri to another webhookSetting's endpointUri", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN", {

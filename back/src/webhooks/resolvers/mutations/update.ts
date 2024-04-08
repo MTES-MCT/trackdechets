@@ -36,7 +36,7 @@ const updateWebhookSettingResolver = async (
   const webhookSettingRepository = getWebhookSettingRepository(user);
 
   const updatedWebhookSetting = await webhookSettingRepository.update(
-    { id: id },
+    { id: id, orgId: webhookSetting.orgId },
     {
       ...(endpointUri ? { endpointUri } : {}),
       ...(token ? { token: aesEncrypt(token) } : {}),
