@@ -115,12 +115,12 @@ export default function LayoutContainer() {
               isAdmin={isAdmin}
               v2banner={
                 <SurveyBanner
-                  message="Pour en savoir plus sur les dernières évolutions de Trackdéchets, consultez notre FAQ."
+                  message="Pour en savoir plus sur les nouveautés du mois d'avril, consultez notre FAQ."
                   button={{
                     title: "Voir la FAQ",
                     href: "https://faq.trackdechets.fr/pour-aller-plus-loin/les-dernieres-evolutions-de-trackdechets"
                   }}
-                  persistedSurveyName="td-20240312"
+                  persistedSurveyName="td-20240409"
                 />
               }
               defaultOrgId={defaultOrgId}
