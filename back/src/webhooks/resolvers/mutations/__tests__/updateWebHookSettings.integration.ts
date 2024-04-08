@@ -8,10 +8,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { gql } from "graphql-tag";
 import { webhookSettingFactory } from "../../../__tests__/factories";
-import {
-  getWebhookSettings,
-  clearWebhookSetting
-} from "../../../../common/redis/webhooksettings";
+import { clearWebhookSetting } from "../../../../common/redis/webhooksettings";
 import { prisma } from "@td/prisma";
 import { expectCompanyWebhookSettingsEndpointUrisToBe } from "../../../../common/redis/__tests__/redisWebhooksettings.integration";
 
@@ -250,6 +247,7 @@ describe("Mutation.updateWebhookSetting", () => {
     );
 
     // Then
+    expect(errors).toBeUndefined();
     await expectCompanyWebhookSettingsEndpointUrisToBe(company.orgId, [
       "https://url1.fr"
     ]);
