@@ -68,7 +68,7 @@ export const CREATE_COMPANY_HOOK_OPTIONS = navigate => ({
   onCompleted: data => {
     navigate(
       generatePath(routes.companies.details, {
-        siret: data.createCompany.siret
+        siret: data.createCompany.siret || data.createCompany.vatNumber
       })
     );
   }
