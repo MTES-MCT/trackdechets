@@ -11,7 +11,7 @@ if echo "$APP" | grep -o 'api'; then
     npx nx run-many -t build --projects=api,cron,tag:backend:queues
 
     echo "Running migrate for $APP"
-    npx prisma migrate dev
+    npx prisma migrate deploy
 
     cp "$ROOT_DIR/.slugignore.back" "$ROOT_DIR/.slugignore"
 
