@@ -71,7 +71,7 @@ describe("webhooksettings redis", () => {
   it("should deactivate targeted webhook and no other", async () => {
     // Given
     const company1 = await companyFactory({ webhookSettingsLimit: 2 });
-    await webhookSettingFactory({
+    const whs1 = await webhookSettingFactory({
       company: company1,
       token: "secret",
       endpointUri: "https://url1.fr"
@@ -83,7 +83,7 @@ describe("webhooksettings redis", () => {
     });
 
     const company2 = await companyFactory({ webhookSettingsLimit: 2 });
-    await webhookSettingFactory({
+    const whs3 = await webhookSettingFactory({
       company: company2,
       token: "secret",
       endpointUri: "https://url3.fr"
@@ -119,10 +119,20 @@ describe("webhooksettings redis", () => {
     await handleWebhookFail(company1.orgId, "https://url2.fr");
 
     // Then
+    const updatedWhs1 = await prisma.webhookSetting.findUniqueOrThrow({
+      where: { id: whs1.id, endpointUri: whs1.endpointUri }
+    });
+    expect(updatedWhs1.activated).toBe(true);
+
     const updatedWhs = await prisma.webhookSetting.findUniqueOrThrow({
       where: { id: whs2.id, endpointUri: whs2.endpointUri }
     });
     expect(updatedWhs.activated).toBe(false);
+
+    const updatedWhs3 = await prisma.webhookSetting.findUniqueOrThrow({
+      where: { id: whs3.id, endpointUri: whs3.endpointUri }
+    });
+    expect(updatedWhs3.activated).toBe(true);
 
     await expectCompanyWebhookSettingsEndpointUrisToBe(company1.orgId, [
       "https://url1.fr"

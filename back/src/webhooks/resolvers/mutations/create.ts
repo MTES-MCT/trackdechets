@@ -48,7 +48,7 @@ const createWebhookSettingResolver = async (
   }
 
   if (
-    companyWebhookSettings.find(
+    companyWebhookSettings.some(
       settings => settings.endpointUri === endpointUri
     )
   ) {
