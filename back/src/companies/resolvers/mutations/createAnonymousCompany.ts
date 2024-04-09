@@ -65,6 +65,7 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
       data: {
         orgId,
         ...input,
+        vatNumber: input.vatNumber || null, // Get rid of empty string
         libelleNaf: libelleFromCodeNaf(input.codeNaf)
       }
     });
