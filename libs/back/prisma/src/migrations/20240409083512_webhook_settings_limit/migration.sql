@@ -5,7 +5,8 @@
 
 */
 -- DropIndex
-DROP INDEX "WebhookSetting_orgId_key";
+alter table "WebhookSetting" drop constraint if exists "WebhookSetting_orgId_key";
+DROP INDEX if exists "WebhookSetting_orgId_key";
 
 -- AlterTable
 ALTER TABLE "Company" ADD COLUMN     "webhookSettingsLimit" INTEGER NOT NULL DEFAULT 1;
