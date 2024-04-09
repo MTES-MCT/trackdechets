@@ -69,22 +69,29 @@ const keypress = async () => {
     `Mise à jour des bordereaux entre ${since.toISOString()} et ${before.toISOString()}`
   );
 
+  const where = {
+    OR: [
+      { updatedAt: { gte: since, lte: before } },
+      { createdAt: { gte: since, lte: before } }
+    ]
+  };
+
   const bsdds = await prisma.form.findMany({
-    where: { updatedAt: { gte: since, lte: before } },
+    where,
     select: { readableId: true }
   });
 
   console.log(`Il y a ${bsdds.length} BSDDs à mettre à jour`);
 
   const bsdas = await prisma.bsda.findMany({
-    where: { updatedAt: { gte: since, lte: before } },
+    where,
     select: { id: true }
   });
 
   console.log(`Il y a ${bsdas.length} BSDAs à mettre à jour`);
 
   const bsdasris = await prisma.bsdasri.findMany({
-    where: { updatedAt: { gte: since, lte: before } },
+    where,
     select: { id: true }
   });
 
@@ -98,14 +105,14 @@ const keypress = async () => {
   console.log(`Il y a ${bsffs.length} BSFFSs à mettre à jour`);
 
   const bsvhus = await prisma.bsvhu.findMany({
-    where: { updatedAt: { gte: since, lte: before } },
+    where,
     select: { id: true }
   });
 
   console.log(`Il y a ${bsvhus.length} BSVHUs à mettre à jour`);
 
   const bspaohs = await prisma.bspaoh.findMany({
-    where: { updatedAt: { gte: since, lte: before } },
+    where,
     select: { id: true }
   });
 
