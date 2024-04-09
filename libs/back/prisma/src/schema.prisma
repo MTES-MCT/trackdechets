@@ -489,7 +489,7 @@ model Form {
   nextDestinationCompanyVatNumber       String?                 @db.VarChar(30)
   nextDestinationNotificationNumber     String?
   nextDestinationCompanyExtraEuropeanId String?
-  nextTransporterOrgId                  String?                 @db.VarChar(30)
+  nextTransporterOrgId                  String?
   emittedAt                             DateTime?               @db.Timestamptz(6)
   emittedBy                             String?
   emittedByEcoOrganisme                 Boolean?
@@ -514,7 +514,7 @@ model Form {
   processingOperationDescription        String?
   noTraceability                        Boolean?
   destinationOperationMode              OperationMode?
-  currentTransporterOrgId               String?                 @db.VarChar(30)
+  currentTransporterOrgId               String?
 
   transporters BsddTransporter[]
   groupedIn    FormGroupement[]  @relation("GroupedIn")
