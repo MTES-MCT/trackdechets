@@ -4,7 +4,8 @@ const routes = {
     verification: "/admin/verification",
     anonymousCompanies: "/admin/anonymous-companies",
     reindex: "/admin/reindex",
-    user: "/admin/user"
+    user: "/admin/user",
+    impersonate: "/admin/impersonate"
   },
   login: "/login",
   invite: "/invite",
@@ -29,7 +30,7 @@ const routes = {
       act: "/dashboard/:siret/bsds/act",
       follow: "/dashboard/:siret/bsds/follow",
       history: "/dashboard/:siret/bsds/history",
-      toReview: "/dashboard/:siret/bsds/to-review",
+      toReview: "/dashboard/:siret/bsds/to-review/:bsdId?",
       reviewed: "/dashboard/:siret/bsds/reviewed"
     },
     bsdds: {
@@ -102,6 +103,7 @@ const routes = {
   },
   companies: {
     index: "/companies",
+    details: "/companies/:siret",
     create: {
       simple: "/companies/new",
       pro: "/companies/professional",

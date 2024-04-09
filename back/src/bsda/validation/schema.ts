@@ -28,18 +28,19 @@ import {
   checkOperationIsAfterReception,
   checkOperationMode,
   checkRequiredFields,
+  checkTransporters,
   checkWorkerSubSectionThree,
   validateDestination,
   validatePreviousBsdas
 } from "./refinements";
 import {
   fillIntermediariesOrgIds,
-  updateTransporterRecepisee,
+  updateTransportersRecepisee,
   fillWasteConsistenceWhenForwarding,
   emptyWorkerCertificationWhenWorkerIsDisabled,
-  fillTransportersOrgIds
+  updateTransporterRecepisse
 } from "./transformers";
-import { sirenify } from "./sirenify";
+import { sirenifyBsda, sirenifyBsdaTransporter } from "./sirenify";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -78,6 +79,35 @@ export const bsdaPackagingSchema = z
     message:
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
   });
+
+const rawBsdaTransporterSchema = z.object({
+  id: z.string().nullish(),
+  number: z.number().nullish(),
+  bsdaId: z.string().nullish(),
+  transporterCompanyName: z.string().nullish(),
+  transporterCompanySiret: siretSchema.nullish(),
+  transporterCompanyAddress: z.string().nullish(),
+  transporterCompanyContact: z.string().nullish(),
+  transporterCompanyPhone: z.string().nullish(),
+  transporterCompanyMail: z.string().nullish(),
+  transporterCompanyVatNumber: foreignVatNumberSchema.nullish(),
+  transporterCustomInfo: z.string().nullish(),
+  transporterRecepisseIsExempted: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
+  transporterRecepisseNumber: z.string().nullish(),
+  transporterRecepisseDepartment: z.string().nullish(),
+  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
+  transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
+  transporterTransportPlates: z
+    .array(z.string())
+    .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+    .default([]),
+  transporterTransportTakenOverAt: z.coerce.date().nullish(),
+  transporterTransportSignatureAuthor: z.string().nullish(),
+  transporterTransportSignatureDate: z.coerce.date().nullish()
+});
 
 /**
  * Schéma de validation Zod de base permettant pour chaque champ de :
@@ -177,30 +207,6 @@ export const rawBsdaSchema = z.object({
   destinationOperationNextDestinationCompanyMail: z.string().nullish(),
   destinationOperationNextDestinationCap: z.string().nullish(),
   destinationOperationNextDestinationPlannedOperationCode: z.string().nullish(),
-  transporterId: z.string().nullish(),
-  transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema.nullish(),
-  transporterCompanyAddress: z.string().nullish(),
-  transporterCompanyContact: z.string().nullish(),
-  transporterCompanyPhone: z.string().nullish(),
-  transporterCompanyMail: z.string().nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema.nullish(),
-  transporterCustomInfo: z.string().nullish(),
-  transporterRecepisseIsExempted: z.coerce
-    .boolean()
-    .nullish()
-    .transform(v => Boolean(v)),
-  transporterRecepisseNumber: z.string().nullish(),
-  transporterRecepisseDepartment: z.string().nullish(),
-  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
-  transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
-  transporterTransportPlates: z
-    .array(z.string())
-    .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
-    .default([]),
-  transporterTransportTakenOverAt: z.coerce.date().nullish(),
-  transporterTransportSignatureAuthor: z.string().nullish(),
-  transporterTransportSignatureDate: z.coerce.date().nullish(),
   workerIsDisabled: z.coerce
     .boolean()
     .default(false)
@@ -229,6 +235,10 @@ export const rawBsdaSchema = z.object({
     .transform(v => Boolean(v)),
   workerWorkSignatureAuthor: z.string().nullish(),
   workerWorkSignatureDate: z.coerce.date().nullish(),
+  transporters: z
+    .array(rawBsdaTransporterSchema)
+    .max(5, "Vous ne pouvez pas ajouter plus de 5 transporteurs")
+    .optional(),
   grouping: z.array(z.string()).optional().nullish(),
   forwarding: z.string().nullish(),
   intermediaries: z
@@ -265,15 +275,15 @@ export const refinedSchema = rawBsdaSchema
   .superRefine(checkWorkerSubSectionThree)
   .superRefine(checkNoTransporterWhenCollection2710)
   .superRefine(checkNoWorkerWhenCollection2710)
-  .superRefine(checkNoBothGroupingAndForwarding);
+  .superRefine(checkNoBothGroupingAndForwarding)
+  .superRefine(checkTransporters);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
 const transformedSyncSchema = refinedSchema
-  // FIXME le calcul des champs dénormalisés `intermediariesOrgIds` et `transporterOrgIds`
+  // FIXME le calcul du champ dénormalisé `intermediariesOrgIds`
   // devrait se faire dans le repository pour s'assurer que les données restent synchro
   .transform(fillIntermediariesOrgIds)
-  .transform(fillTransportersOrgIds)
   .transform(emptyWorkerCertificationWhenWorkerIsDisabled);
 
 /**
@@ -300,8 +310,8 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
     ? // Transformations asynchrones qui ne sont pas
       // `enableCompletionTransformers=false`;
       transformedSyncSchema
-        .transform(sirenify(context))
-        .transform(updateTransporterRecepisee)
+        .transform(sirenifyBsda(context))
+        .transform(updateTransportersRecepisee)
         .transform(fillWasteConsistenceWhenForwarding)
     : transformedSyncSchema;
 
@@ -319,3 +329,20 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
     ? refinedAsyncSchema.superRefine(validatePreviousBsdas)
     : refinedAsyncSchema;
 };
+
+// Type inféré par Zod - avant parsing
+// Voir https://zod.dev/?id=type-inference
+export type ZodBsdaTransporter = z.input<typeof rawBsdaTransporterSchema>;
+
+// Type inféré par Zod - après parsing par le schéma "brut".
+// On pourra utiliser ce type en entrée et en sortie dans les refinements et
+// les transformers qui arrivent après le parsing initial (on fait pour cela
+// la supposition que les transformers n'apportent pas de modification au typage)
+// Voir https://zod.dev/?id=type-inference
+export type ParsedZodBsdaTransporter = z.output<
+  typeof rawBsdaTransporterSchema
+>;
+
+export const transformedBsdaTransporterSchema = rawBsdaTransporterSchema
+  .transform(updateTransporterRecepisse)
+  .transform(sirenifyBsdaTransporter);

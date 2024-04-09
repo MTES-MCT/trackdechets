@@ -12,6 +12,7 @@ import { RadioButton } from "../../../../../form/common/components/custom-inputs
 import { Field, Form, Formik } from "formik";
 import { packagingsEqual } from "@td/constants";
 import {
+  BsdType,
   FormStatus,
   Mutation,
   QuantityType,
@@ -234,7 +235,11 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
             </h5>
 
             <RedErrorMessage name="transporter.company.name" />
-            <TransporterForm fieldName="transporter" orgId={orgId!} />
+            <TransporterForm
+              fieldName="transporter"
+              orgId={orgId!}
+              bsdType={BsdType.Bsdd}
+            />
 
             <div className="form__actions">
               <button

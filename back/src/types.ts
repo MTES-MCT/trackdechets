@@ -28,6 +28,8 @@ export type Nullable<T> = {
 declare module "express-session" {
   interface SessionData {
     warningMessage?: string;
+    impersonatedUserId?: string;
+    impersonationStartsAt?: number;
   }
 }
 

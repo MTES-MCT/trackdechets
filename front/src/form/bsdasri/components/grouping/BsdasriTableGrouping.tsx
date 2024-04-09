@@ -101,6 +101,11 @@ export default function BsdasriTableGrouping({
         0
       ) ?? 0
     );
+    // Manually set isEstimate which is usually handled by the weight widget main switch
+    setFieldValue(
+      "emitter.emission.weight.isEstimate",
+      values?.emitter?.emission?.weight?.isEstimate ?? false
+    );
 
     const packagings: BsdasriPackaging[][] = selectedDasris.map(
       item => item?.destination?.reception?.packagings ?? []

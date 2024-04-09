@@ -1,8 +1,7 @@
 import * as React from "react";
-import { CreateOrUpdateTransporterInput } from "../../../../form/bsdd/utils/initial-state";
 import { formatDate } from "../../../../common/datetime";
-
 import "./TransporterDisplay.scss";
+import { BsdTransporterInput } from "../../types";
 
 type TransporterFieldProps = {
   label: string;
@@ -10,7 +9,7 @@ type TransporterFieldProps = {
 };
 
 type TransporterProps = {
-  transporter: CreateOrUpdateTransporterInput;
+  transporter: BsdTransporterInput;
 };
 
 function TransporterField({ label, value }: TransporterFieldProps) {
@@ -76,20 +75,23 @@ export default function TransporterDisplay({ transporter }: TransporterProps) {
       </div>
       <div className="fr-grid-row fr-grid-row--gutters ">
         <div className="fr-col-12 fr-col-md-4">
-          <TransporterField label="Récépissé n°" value={transporter.receipt} />
+          <TransporterField
+            label="Récépissé n°"
+            value={transporter.recepisse?.number}
+          />
         </div>
         <div className="fr-col-12 fr-col-md-4">
           <TransporterField
             label="Récépissé département"
-            value={transporter.department}
+            value={transporter.recepisse?.department}
           />
         </div>
         <div className="fr-col-12 fr-col-md-4">
           <TransporterField
             label="Récépissé valide jusqu'au"
             value={
-              transporter.validityLimit
-                ? formatDate(transporter.validityLimit)
+              transporter.recepisse?.validityLimit
+                ? formatDate(transporter.recepisse?.validityLimit)
                 : ""
             }
           />
@@ -99,13 +101,13 @@ export default function TransporterDisplay({ transporter }: TransporterProps) {
         <div className="fr-col-12 fr-col-md-4">
           <TransporterField
             label="Mode de transport"
-            value={transporter.mode}
+            value={transporter?.transport?.mode}
           />
         </div>
         <div className="fr-col-12 fr-col-md-4">
           <TransporterField
             label="Immatriculation"
-            value={transporter.numberPlate}
+            value={transporter.transport?.plates?.[0]}
           />
         </div>
         <div className="fr-col-12 fr-col-md-4">

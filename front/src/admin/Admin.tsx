@@ -8,6 +8,7 @@ import Reindex from "./reindex/Reindex";
 import AnonymizeUser from "./user/anonymizeUser";
 import CompaniesVerification from "./verification/CompaniesVerification";
 import "../Apps/Dashboard/dashboard.scss";
+import { Impersonate } from "./user/impersonate";
 
 const toRelative = route => {
   return getRelativeRoute(routes.admin.index, route);
@@ -70,6 +71,18 @@ export default function Admin() {
                 Comptes utilisateurs
               </NavLink>
             </li>
+            <li className="tw-mb-1">
+              <NavLink
+                to={routes.admin.impersonate}
+                className={({ isActive }) =>
+                  isActive
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
+                }
+              >
+                Impersonation
+              </NavLink>
+            </li>
           </ul>
         </Accordion>
       </SideBar>
@@ -94,6 +107,11 @@ export default function Admin() {
           <Route
             path={toRelative(routes.admin.user)}
             element={<AnonymizeUser />}
+          />
+
+          <Route
+            path={toRelative(routes.admin.impersonate)}
+            element={<Impersonate />}
           />
 
           <Route

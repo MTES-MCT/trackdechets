@@ -22,7 +22,7 @@ export function Transport({ disabled, required = false }: Props) {
           Mode de transport:
           <Field
             id="id_mode"
-            name="transporter.transport.mode"
+            name="transport.mode"
             component={FieldTransportModeSelect}
             disabled={disabled}
           ></Field>
@@ -30,15 +30,11 @@ export function Transport({ disabled, required = false }: Props) {
       </div>
 
       <div className="form__row">
-        <label htmlFor="transporter.transport.plates">
+        <label htmlFor="transport.plates">
           Immatriculations
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
         </label>
-        <TagsInput
-          name="transporter.transport.plates"
-          disabled={disabled}
-          limit={2}
-        />
+        <TagsInput name="transport.plates" disabled={disabled} limit={2} />
       </div>
 
       <div className="form__row">
@@ -46,7 +42,7 @@ export function Transport({ disabled, required = false }: Props) {
           Date de prise en charge
           <Field
             component={DateInput}
-            name="transporter.transport.takenOverAt"
+            name="transport.takenOverAt"
             className={`td-input td-input--small`}
             disabled={disabled}
             minDate={subMonths(TODAY, 2)}

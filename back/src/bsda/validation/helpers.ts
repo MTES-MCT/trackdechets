@@ -3,19 +3,75 @@ import { objectDiff } from "../../forms/workflow/diff";
 import {
   BsdaInput,
   BsdaPackaging,
-  BsdaSignatureType
+  BsdaTransporterInput
 } from "../../generated/graphql/types";
 import { flattenBsdaInput, flattenBsdaTransporterInput } from "../converter";
 import { SIGNATURES_HIERARCHY } from "./constants";
+import { AllBsdaSignatureType } from "../types";
 import { getUserCompanies } from "../../users/database";
 import {
   ZodBsda,
+  ZodBsdaTransporter,
   ZodOperationEnum,
   ZodWasteCodeEnum,
   ZodWorkerCertificationOrganismEnum
 } from "./schema";
 import { PrismaBsdaForParsing } from "./types";
 import { safeInput } from "../../common/converter";
+import { prisma } from "@td/prisma";
+import { UserInputError } from "../../common/errors";
+import { getTransportersSync } from "../database";
+
+export function graphqlInputToZodBsdaTransporter(
+  input: BsdaTransporterInput
+): ZodBsdaTransporter {
+  return flattenBsdaTransporterInput(input);
+}
+
+export async function getZodTransporters(
+  input: BsdaInput
+): Promise<ZodBsdaTransporter[] | undefined> {
+  if (input.transporter !== undefined && input.transporters) {
+    throw new UserInputError(
+      "Vous ne pouvez pas utiliser les champs `transporter` et `transporters` en même temps"
+    );
+  }
+  if (input.transporter) {
+    // Couche de compatibilité avec l'API BSDA "pré multi-modal"
+    // Les données de `input.transporter` correspondent au premier
+    // transporteur.
+    return [graphqlInputToZodBsdaTransporter(input.transporter)];
+  } else if (
+    input.transporter === null ||
+    (input.transporters && input.transporters.length === 0)
+  ) {
+    return [];
+  } else if (input.transporters && input.transporters.length) {
+    const dbTransporters = await prisma.bsdaTransporter.findMany({
+      where: { id: { in: input.transporters } }
+    });
+    // Vérifie que tous les identifiants correspondent bien à un transporteur BSDA en base
+    const unknownTransporters = input.transporters.filter(
+      id => !dbTransporters.map(t => t.id).includes(id)
+    );
+    if (unknownTransporters.length > 0) {
+      throw new UserInputError(
+        `Aucun transporteur ne possède le ou les identifiants suivants : ${unknownTransporters.join(
+          ", "
+        )}`
+      );
+    }
+
+    // garde le même ordre
+    return input.transporters.map(transporterId => {
+      const { createdAt, updatedAt, number, ...transporterData } =
+        dbTransporters.find(t => t.id === transporterId)!;
+      return transporterData;
+    });
+  }
+
+  return undefined;
+}
 
 /**
  * Cette fonction permet de convertir les données d'input GraphQL
@@ -23,7 +79,9 @@ import { safeInput } from "../../common/converter";
  * typés en string côté GraphQL mais en enum côté Zod ce qui nous oblige
  * à faire un casting de type.
  */
-export function graphQlInputToZodBsda(input: BsdaInput): ZodBsda {
+export async function graphQlInputToZodBsda(
+  input: BsdaInput
+): Promise<ZodBsda> {
   const {
     wasteCode,
     destinationPlannedOperationCode,
@@ -32,17 +90,18 @@ export function graphQlInputToZodBsda(input: BsdaInput): ZodBsda {
     intermediaries,
     ...flattenedBsdaInput
   } = flattenBsdaInput(input);
-  const flattenedBsdaTransporter = flattenBsdaTransporterInput(input);
+
+  const transporters = await getZodTransporters(input);
 
   return safeInput({
     ...flattenedBsdaInput,
-    ...flattenedBsdaTransporter,
     wasteCode: wasteCode as ZodWasteCodeEnum,
     destinationPlannedOperationCode:
       destinationPlannedOperationCode as ZodOperationEnum,
     destinationOperationCode: destinationOperationCode as ZodOperationEnum,
     workerCertificationOrganisation:
       workerCertificationOrganisation as ZodWorkerCertificationOrganismEnum,
+    transporters,
     intermediaries: intermediaries?.map(i =>
       safeInput({
         // FIXME : Les règles d'édition (fichier rules.ts) ne permettent
@@ -85,12 +144,11 @@ export function prismaToZodBsda(bsda: PrismaBsdaForParsing): ZodBsda {
     intermediaries,
     ...data
   } = bsda;
-  const { id, ...transporter } = transporters[0];
 
   return {
     ...data,
-    ...transporter,
-    transporterId: id,
+    weightValue: data.weightValue?.toNumber(),
+    destinationReceptionWeight: data.weightValue?.toNumber(),
     wasteCode: wasteCode as ZodWasteCodeEnum,
     destinationPlannedOperationCode:
       destinationPlannedOperationCode as ZodOperationEnum,
@@ -103,16 +161,23 @@ export function prismaToZodBsda(bsda: PrismaBsdaForParsing): ZodBsda {
     intermediaries: intermediaries.map(i => {
       const { bsdaId, id, createdAt, ...intermediaryData } = i;
       return { ...intermediaryData, address: intermediaryData.address! };
+    }),
+    transporters: getTransportersSync({ transporters }).map(t => {
+      const { createdAt, updatedAt, number, ...transporterData } = t;
+      return transporterData;
     })
   };
 }
 
-export function getUpdatedFields(bsda: ZodBsda, update: ZodBsda) {
+export function getUpdatedFields(
+  val: ZodBsda | ZodBsdaTransporter,
+  update: ZodBsda | ZodBsdaTransporter
+): string[] {
   // only pick keys present in the input to compute the diff between
   // the input and the data in DB
   const compareTo = {
     ...Object.keys(update).reduce((acc, field) => {
-      return { ...acc, [field]: bsda[field] };
+      return { ...acc, [field]: val[field] };
     }, {})
   };
 
@@ -125,8 +190,8 @@ export function getUpdatedFields(bsda: ZodBsda, update: ZodBsda) {
  * Gets all the signatures prior to the target signature in the signature hierarchy.
  */
 export function getSignatureAncestors(
-  targetSignature: BsdaSignatureType | undefined | null
-): BsdaSignatureType[] {
+  targetSignature: AllBsdaSignatureType | undefined | null
+): AllBsdaSignatureType[] {
   if (!targetSignature) return [];
 
   const parent = Object.entries(SIGNATURES_HIERARCHY).find(
@@ -135,7 +200,7 @@ export function getSignatureAncestors(
 
   return [
     targetSignature,
-    ...getSignatureAncestors(parent as BsdaSignatureType)
+    ...getSignatureAncestors(parent as AllBsdaSignatureType)
   ];
 }
 
@@ -155,6 +220,8 @@ export async function getBsdaUserFunctions(
   const companies = user ? await getUserCompanies(user.id) : [];
   const orgIds = companies.map(c => c.orgId);
 
+  const transporters = bsda.transporters ?? [];
+
   return {
     isEcoOrganisme:
       bsda.ecoOrganismeSiret != null && orgIds.includes(bsda.ecoOrganismeSiret),
@@ -170,11 +237,13 @@ export async function getBsdaUserFunctions(
     isDestination:
       bsda.destinationCompanySiret != null &&
       orgIds.includes(bsda.destinationCompanySiret),
-    isTransporter:
-      (bsda.transporterCompanySiret != null &&
-        orgIds.includes(bsda.transporterCompanySiret)) ||
-      (bsda.transporterCompanyVatNumber != null &&
-        orgIds.includes(bsda.transporterCompanyVatNumber))
+    isTransporter: transporters.some(
+      transporter =>
+        (transporter.transporterCompanySiret != null &&
+          orgIds.includes(transporter.transporterCompanySiret)) ||
+        (transporter.transporterCompanyVatNumber != null &&
+          orgIds.includes(transporter.transporterCompanyVatNumber))
+    )
   };
 }
 
@@ -183,14 +252,18 @@ export async function getBsdaUserFunctions(
  */
 export function getCurrentSignatureType(
   bsda: ZodBsda
-): BsdaSignatureType | undefined {
+): AllBsdaSignatureType | undefined {
   /**
    * Fonction interne récursive qui parcourt la hiérarchie des signatures et
    * renvoie les signatures présentes sur le bordereau
    */
-  function getSignatures(current: BsdaSignatureType, acc: BsdaSignatureType[]) {
+  function getSignatures(
+    current: AllBsdaSignatureType,
+    acc: AllBsdaSignatureType[]
+  ) {
     const signature = SIGNATURES_HIERARCHY[current];
-    const hasCurrentSignature = Boolean(bsda[signature.field]);
+    const signatureDate = signature.signatureDate(bsda);
+    const hasCurrentSignature = Boolean(signatureDate);
     const signatures = [...(hasCurrentSignature ? [current] : []), ...acc];
     if (signature.next) {
       return getSignatures(signature.next, signatures);

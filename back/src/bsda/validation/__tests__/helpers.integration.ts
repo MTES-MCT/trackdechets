@@ -1,5 +1,35 @@
+import { prisma } from "@td/prisma";
 import { bsdaFactory } from "../../__tests__/factories";
-import { getCurrentSignatureType, prismaToZodBsda } from "../helpers";
+import {
+  getCurrentSignatureType,
+  getZodTransporters,
+  prismaToZodBsda
+} from "../helpers";
+
+describe("graphqlInputToZodTransporters", () => {
+  it("should return transporters from DB in the same order", async () => {
+    const bsdaTransporter1 = await prisma.bsdaTransporter.create({
+      data: { number: 0, transporterCompanySiret: "1" }
+    });
+    const bsdaTransporter2 = await prisma.bsdaTransporter.create({
+      data: { number: 0, transporterCompanySiret: "2" }
+    });
+
+    const zodTransporters = await getZodTransporters({
+      transporters: [bsdaTransporter2.id, bsdaTransporter1.id]
+    });
+    expect(zodTransporters).toEqual([
+      expect.objectContaining({
+        id: bsdaTransporter2.id,
+        transporterCompanySiret: "2"
+      }),
+      expect.objectContaining({
+        id: bsdaTransporter1.id,
+        transporterCompanySiret: "1"
+      })
+    ]);
+  });
+});
 
 describe("getCurrentSignatureType", () => {
   test("before EMISSION", async () => {

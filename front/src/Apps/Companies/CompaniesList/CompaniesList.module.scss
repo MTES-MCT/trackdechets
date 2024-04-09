@@ -1,0 +1,46 @@
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #e3e3fd;
+  padding: 10px 20px;
+  margin-bottom: 8px;
+
+  &:hover {
+    background-color: #f5f5fe !important;
+  }
+}
+
+.name {
+  color: #000091;
+  font-weight: bold;
+}
+
+.icon {
+  display: flex;
+  color: #000091;
+  margin-right: 4px;
+
+  &:before {
+    height: 16px;
+  }
+}
+
+.role {
+  display: flex;
+  align-items: center;
+}
+
+.arrow {
+  display: flex;
+  color: #000091;
+  align-items: center;
+  rotate: -90deg;
+  transition: rotate 0.2s cubic-bezier(0.39, 0.575, 0.565, 1);
+}
+
+.cancel {
+  &:before {
+    mask-image: url("icons/system/close-circle-line.svg") !important;
+  }
+}

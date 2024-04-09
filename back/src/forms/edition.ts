@@ -11,7 +11,7 @@ import { SealedFieldError } from "../common/errors";
 import { getFirstTransporterSync } from "./database";
 import { FullForm } from "./types";
 import { prisma } from "@td/prisma";
-import { Decimal } from "decimal.js-light";
+import { Decimal } from "decimal.js";
 
 type EditableBsddFields = Required<
   Omit<

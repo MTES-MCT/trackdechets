@@ -1,6 +1,7 @@
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { prisma } from "@td/prisma";
-import { ZodBsdaTransformer } from "./types";
+import { ZodBsdaTransformer, ZodBsdaTransporterTransformer } from "./types";
+import { ParsedZodBsdaTransporter } from "./schema";
 
 export const fillIntermediariesOrgIds: ZodBsdaTransformer = bsda => {
   bsda.intermediariesOrgIds = bsda.intermediaries
@@ -8,17 +9,6 @@ export const fillIntermediariesOrgIds: ZodBsdaTransformer = bsda => {
         .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
         .filter(Boolean)
     : undefined;
-
-  return bsda;
-};
-
-export const fillTransportersOrgIds: ZodBsdaTransformer = bsda => {
-  bsda.transportersOrgIds = [
-    bsda.transporterCompanySiret,
-    bsda.transporterCompanyVatNumber
-  ]
-    .filter(Boolean)
-    .filter(orgId => orgId.length > 0);
 
   return bsda;
 };
@@ -40,19 +30,17 @@ export const fillWasteConsistenceWhenForwarding: ZodBsdaTransformer =
     return bsda;
   };
 
-export const updateTransporterRecepisee: ZodBsdaTransformer = async bsda => {
+async function recipifyTransporter(transporter: ParsedZodBsdaTransporter) {
   // Évite de modifier les données transporteur après
   // la signature de celui-ci
-  if (bsda.transporterTransportSignatureDate) {
-    return bsda;
+  if (transporter.transporterTransportSignatureDate) {
+    return transporter;
   }
-
   const orgId = getTransporterCompanyOrgId({
-    transporterCompanySiret: bsda.transporterCompanySiret ?? null,
-    transporterCompanyVatNumber: bsda.transporterCompanyVatNumber ?? null
+    transporterCompanySiret: transporter.transporterCompanySiret ?? null,
+    transporterCompanyVatNumber: transporter.transporterCompanyVatNumber ?? null
   });
-
-  if (!bsda.transporterRecepisseIsExempted && orgId) {
+  if (orgId && !transporter.transporterRecepisseIsExempted) {
     const transporterReceipt = await prisma.company
       .findUnique({
         where: {
@@ -61,15 +49,30 @@ export const updateTransporterRecepisee: ZodBsdaTransformer = async bsda => {
       })
       .transporterReceipt();
 
-    bsda.transporterRecepisseNumber = transporterReceipt?.receiptNumber ?? null;
-    bsda.transporterRecepisseValidityLimit =
-      transporterReceipt?.validityLimit ?? null;
-    bsda.transporterRecepisseDepartment =
-      transporterReceipt?.department ?? null;
+    return {
+      ...transporter,
+      transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
+      transporterRecepisseValidityLimit:
+        transporterReceipt?.validityLimit ?? null,
+      transporterRecepisseDepartment: transporterReceipt?.department ?? null
+    };
   }
+  return transporter;
+}
 
+export const updateTransportersRecepisee: ZodBsdaTransformer = async bsda => {
+  const transporters = bsda.transporters;
+  if (transporters && transporters.length > 0) {
+    const recipifedTransporters = await Promise.all(
+      transporters.map(t => recipifyTransporter(t))
+    );
+    return { ...bsda, transporters: recipifedTransporters };
+  }
   return bsda;
 };
+
+export const updateTransporterRecepisse: ZodBsdaTransporterTransformer =
+  async bsdaTransporter => recipifyTransporter(bsdaTransporter);
 
 export const emptyWorkerCertificationWhenWorkerIsDisabled: ZodBsdaTransformer =
   bsda => {

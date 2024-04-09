@@ -154,4 +154,19 @@ type Mutation {
     "Commentaire facultatif"
     comment: String
   ): BsdaRevisionRequest!
+
+  """
+  Crée un transporteur BSDA
+  """
+  createBsdaTransporter(input: BsdaTransporterInput!): BsdaTransporter
+
+  """
+  Modifie un transporteur BSDA
+  """
+  updateBsdaTransporter(id: ID!, input: BsdaTransporterInput!): BsdaTransporter
+
+  """
+  Supprime un transporteur BSDA
+  """
+  deleteBsdaTransporter("Identifiant du transporteur" id: ID!): ID!
 }

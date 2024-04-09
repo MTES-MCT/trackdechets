@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Start DB with docker
-        run: docker-compose up -d
+        run: docker compose up -d
       - name: Init DB & ES index
         run: |
           npx nx run back:codegen

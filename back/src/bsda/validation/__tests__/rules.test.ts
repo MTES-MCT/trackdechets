@@ -20,7 +20,7 @@ import {
   BsdaInput
 } from "../../../generated/graphql/types";
 import { flattenBsdaInput } from "../../converter";
-import { editionRules } from "../rules";
+import { bsdaEditionRules } from "../rules";
 
 describe("rules", () => {
   test("an edition rule should be defined for every key in BsdaInput", () => {
@@ -163,11 +163,12 @@ describe("rules", () => {
       ecoOrganisme,
       forwarding: "",
       grouping: [],
-      intermediaries: []
+      intermediaries: [],
+      transporters: []
     };
     const flatInput = flattenBsdaInput(input);
     for (const key of Object.keys(flatInput)) {
-      expect(Object.keys(editionRules)).toContain(key);
+      expect(Object.keys(bsdaEditionRules)).toContain(key);
     }
   });
 });

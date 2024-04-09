@@ -7,3 +7,13 @@
     }
   }
 }
+
+.revision-modal-loader {
+  min-height: 30vh;
+  display: flex;
+  justify-content: center;
+
+  :first-child {
+    display: flex;
+  }
+}

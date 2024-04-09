@@ -25,14 +25,14 @@ import {
   draftFormSchema,
   hasPipeline,
   sealedFormSchema,
-  validateGroupement
+  validateGroupement,
+  validateIntermediaries
 } from "../../validation";
 import { prisma } from "@td/prisma";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sirenifyFormInput } from "../../sirenify";
 import { recipifyFormInput } from "../../recipify";
-import { validateIntermediariesInput } from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
 import { checkEditionRules } from "../../edition";
 
@@ -267,7 +267,7 @@ const updateFormResolver = async (
       deleteMany: {}
     };
   } else if (intermediaries?.length) {
-    await validateIntermediariesInput(intermediaries);
+    await validateIntermediaries(intermediaries, form);
     // Update the intermediaties
     const existingIntermediaries =
       await prisma.intermediaryFormAssociation.findMany({

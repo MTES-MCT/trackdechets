@@ -17,7 +17,8 @@ import {
   RevisionRequestApprovalStatus,
   RevisionRequestStatus,
   UserPermission,
-  Transporter
+  Transporter,
+  BsdaTransporter
 } from "@td/codegen-ui";
 import {
   ACCEPTE,
@@ -74,7 +75,7 @@ export const getBsdStatusLabel = (
   bsdType?: BsdType,
   operationCode?: string,
   bsdaAnnexed?: boolean,
-  transporters?: Transporter[]
+  transporters?: Transporter[] | BsdaTransporter[]
 ) => {
   switch (status) {
     case BsdStatusCode.Draft:
@@ -82,11 +83,21 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Sealed:
       return INITIAL;
     case BsdStatusCode.Sent:
-      if (transporters && transporters.length > 1) {
-        const lastTransporterNumero = transporters.filter(t =>
-          Boolean(t.takenOverAt)
-        ).length;
-        return SIGNE_PAR_TRANSPORTEUR_N(lastTransporterNumero);
+      if (bsdType && transporters && transporters.length > 1) {
+        // Le code qui suit permet d'afficher "Signé par le transporteur N"
+        // en cas de transport multi-modal
+        let lastTransporterNumero: Maybe<number> = null;
+        if (isBsdd(bsdType)) {
+          lastTransporterNumero = (transporters as Transporter[]).filter(t =>
+            Boolean(t.takenOverAt)
+          ).length;
+        } else if (isBsda(bsdType)) {
+          lastTransporterNumero = (transporters as BsdaTransporter[]).filter(
+            t => Boolean(t.transport?.signature?.date)
+          ).length;
+        }
+        if (lastTransporterNumero)
+          return SIGNE_PAR_TRANSPORTEUR_N(lastTransporterNumero);
       }
       return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.Received:
@@ -180,6 +191,12 @@ export const getRevisionStatusLabel = (status: string) => {
   }
 };
 
+export const isBsvhu = (type: BsdType): boolean => type === BsdType.Bsvhu;
+const isBsda = (type: BsdType): boolean => type === BsdType.Bsda;
+export const isBsff = (type: BsdType): boolean => type === BsdType.Bsff;
+const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
+export const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
+
 const hasEmitterTransporterAndEcoOrgSiret = (
   bsd: BsdDisplay,
   siret: string
@@ -210,6 +227,18 @@ export const isSameSiretTransporter = (
   currentSiret === bsd.transporter?.company?.siret ||
   currentSiret === bsd.transporter?.company?.orgId;
 
+// Renvoie le premier transporteur de la liste qui n'a pas encore
+// pris en charge le déchet.
+export const getNextTransporter = (bsd: BsdDisplay) => {
+  const nextTransporter = (bsd.transporters ?? []).find(t => {
+    const signatureDate = isBsdd(bsd.type)
+      ? (t as Transporter).takenOverAt
+      : (t as BsdaTransporter).transport?.signature?.date;
+    return !signatureDate;
+  });
+  return nextTransporter ?? null;
+};
+
 // Cas du transport multi-modal BSDD, vérifie si l'établissement
 // courant est le prochain transporteur dans la liste des transporteurs
 // multi-modaux à devoir prendre en charge le déchet.
@@ -218,7 +247,7 @@ export const isSameSiretNextTransporter = (
   bsd: BsdDisplay
 ): boolean => {
   // Premier transporteur de la liste qui n'a pas encore pris en charge le déchet.
-  const nextTransporter = (bsd.transporters ?? []).find(t => !t.takenOverAt);
+  const nextTransporter = getNextTransporter(bsd);
   if (nextTransporter) {
     return currentSiret === nextTransporter.company?.orgId;
   }
@@ -267,12 +296,6 @@ const isSameSiretTemporaryStorageDestination = (
   currentSiret: string,
   bsd: BsdDisplay
 ) => currentSiret === bsd.temporaryStorageDetail?.destination?.company?.siret;
-
-export const isBsvhu = (type: BsdType): boolean => type === BsdType.Bsvhu;
-const isBsda = (type: BsdType): boolean => type === BsdType.Bsda;
-export const isBsff = (type: BsdType): boolean => type === BsdType.Bsff;
-const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
-export const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
 
 export const isBsdaSign = (bsd: BsdDisplay, currentSiret: string) => {
   if (isBsda(bsd.type)) {
@@ -607,12 +630,22 @@ export const getSentBtnLabel = (
   }
 
   if (
+    isToCollectTab &&
+    isBsda(bsd.type) &&
+    isSameSiretNextTransporter(currentSiret, bsd) &&
+    permissions.includes(UserPermission.BsdCanSignTransport)
+  ) {
+    return SIGNER;
+  }
+
+  if (
     isSameSiretDestination(currentSiret, bsd) &&
     (isBsvhu(bsd.type) || isBsda(bsd.type)) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     return VALIDER_TRAITEMENT;
   }
+
   return "";
 };
 
@@ -1102,14 +1135,12 @@ const canUpdateBsdd = bsd =>
     BsdStatusCode.Sent
   ].includes(bsd.status);
 
-const canDeleteBsdd = bsd =>
+const canDeleteBsdd = (bsd, siret) =>
   bsd.type === BsdType.Bsdd &&
   bsd.emitterType !== EmitterType.Appendix1Producer &&
-  [
-    BsdStatusCode.Draft,
-    BsdStatusCode.Sealed,
-    BsdStatusCode.SignedByProducer
-  ].includes(bsd.status);
+  ([BsdStatusCode.Draft, BsdStatusCode.Sealed].includes(bsd.status) ||
+    (bsd.status === BsdStatusCode.SignedByProducer &&
+      isSameSiretEmmiter(siret, bsd)));
 
 const canDeleteBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda &&
@@ -1162,7 +1193,7 @@ const canDeleteBsff = (bsd, siret) =>
   canDuplicateBsff(bsd, siret);
 
 export const canDeleteBsd = (bsd, siret) =>
-  canDeleteBsdd(bsd) ||
+  canDeleteBsdd(bsd, siret) ||
   canDeleteBsda(bsd, siret) ||
   canDeleteBsdasri(bsd, siret) ||
   canDeleteBsff(bsd, siret) ||

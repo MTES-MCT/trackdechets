@@ -13,18 +13,23 @@ export const onSignup: MailTemplate<{ activationHash: string }> = {
 export const inviteUserToJoin: MailTemplate<{
   hash: string;
   companyName: string;
+  companyOrgId: string;
 }> = {
   subject: "Vous avez été invité à rejoindre Trackdéchets",
   body: mustacheRenderer("invitation-par-administrateur.html"),
   templateId: templateIds.LAYOUT,
-  prepareVariables: ({ hash, companyName }) => ({
-    companyName,
-    hash: encodeURIComponent(hash)
-  })
+  prepareVariables: ({ hash, companyName, companyOrgId }) => {
+    return {
+      companyName,
+      companyOrgId,
+      hash: encodeURIComponent(hash)
+    };
+  }
 };
 
 export const notifyUserOfInvite: MailTemplate<{
   companyName: string;
+  companyOrgId: string;
 }> = {
   subject: "Vous avez été invité sur Trackdéchets",
   body: mustacheRenderer("notification-invitation.html"),
@@ -89,8 +94,9 @@ export const formPartiallyRefused: MailTemplate<{
         transporterCompanyName: cleanupSpecialChars(
           form.transporterCompanyName
         ),
-        quantityPartiallyRefused:
-          form.wasteDetailsQuantity! - form.quantityReceived!,
+        quantityPartiallyRefused: form.wasteDetailsQuantity
+          ?.minus(form.quantityReceived!)
+          .toNumber(),
         signedAt: form.signedAt
           ? toFrFormat(new Date(form.signedAt))
           : form.signedAt,
@@ -232,6 +238,7 @@ export const producersSecondOnboardingEmail: MailTemplate = {
 export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
   requestCreatedAt: string;
   bsdReadableId: string;
+  bsdId: string;
   companyName: string;
   companyOrgId: string;
 }> = {

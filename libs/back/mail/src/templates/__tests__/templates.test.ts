@@ -1,4 +1,4 @@
-import { BsddTransporter, Form } from "@prisma/client";
+import { BsddTransporter, Form, Prisma } from "@prisma/client";
 import {
   onSignup,
   inviteUserToJoin,
@@ -43,21 +43,25 @@ describe("templates", () => {
   test("inviteUserToJoin", () => {
     const hash = "abcd";
     const companyName = "ACME";
+    const companyOrgId = "12345";
     const rendered = renderMail(inviteUserToJoin, {
-      variables: { hash, companyName },
+      variables: { hash, companyName, companyOrgId },
       to
     });
     expect(rendered.body).toContain(hash);
     expect(rendered.body).toContain(companyName);
+    expect(rendered.body).toContain(companyOrgId);
   });
 
   test("notifyUserOfInvite", () => {
     const companyName = "ACME";
+    const companyOrgId = "12345";
     const rendered = renderMail(notifyUserOfInvite, {
-      variables: { companyName },
+      variables: { companyName, companyOrgId },
       to
     });
     expect(rendered.body).toContain(companyName);
+    expect(rendered.body).toContain(companyOrgId);
   });
 
   test("createPasswordResetRequest", () => {
@@ -78,7 +82,7 @@ describe("templates", () => {
       readableId: "BSDD-XXX",
       wasteDetailsName: "waste",
       wasteDetailsCode: "01 01 01*",
-      wasteDetailsQuantity: 1,
+      wasteDetailsQuantity: new Prisma.Decimal(1),
       wasteRefusalReason: "parce que",
       transporterIsExemptedOfReceipt: false,
       transporterCompanyName: "Transporteur",
@@ -111,7 +115,7 @@ describe("templates", () => {
       readableId: "BSDD-XXX",
       wasteDetailsName: "waste",
       wasteDetailsCode: "01 01 01*",
-      wasteDetailsQuantity: 1,
+      wasteDetailsQuantity: new Prisma.Decimal(1),
       wasteRefusalReason: "parce que",
       transporterIsExemptedOfReceipt: true,
       transporterCompanyName: "Transporteur",
@@ -136,7 +140,7 @@ describe("templates", () => {
       readableId: "BSDD-XXX",
       wasteDetailsName: "waste",
       wasteDetailsCode: "01 01 01*",
-      wasteDetailsQuantity: 1,
+      wasteDetailsQuantity: new Prisma.Decimal(1),
       wasteRefusalReason: undefined,
       transporterIsExemptedOfReceipt: false,
       transporterCompanyName: "Transporteur",
@@ -159,8 +163,8 @@ describe("templates", () => {
       readableId: "BSDD-XXX",
       wasteDetailsName: "waste",
       wasteDetailsCode: "01 01 01*",
-      wasteDetailsQuantity: 1,
-      quantityReceived: 0.5,
+      wasteDetailsQuantity: new Prisma.Decimal(1),
+      quantityReceived: new Prisma.Decimal(0.5),
       wasteRefusalReason: "parce que",
       transporterIsExemptedOfReceipt: false,
       transporterCompanyName: "Transporteur",
@@ -193,8 +197,8 @@ describe("templates", () => {
       readableId: "BSDD-XXX",
       wasteDetailsName: "waste",
       wasteDetailsCode: "01 01 01*",
-      wasteDetailsQuantity: 1,
-      quantityReceived: 0.5,
+      wasteDetailsQuantity: new Prisma.Decimal(1),
+      quantityReceived: new Prisma.Decimal(0.5),
       wasteRefusalReason: "parce que",
       transporterIsExemptedOfReceipt: true,
       transporterCompanyName: "Transporteur",
@@ -219,8 +223,8 @@ describe("templates", () => {
       readableId: "BSDD-XXX",
       wasteDetailsName: "waste",
       wasteDetailsCode: "01 01 01*",
-      wasteDetailsQuantity: 1,
-      quantityReceived: 0.5,
+      wasteDetailsQuantity: new Prisma.Decimal(1),
+      quantityReceived: new Prisma.Decimal(0.5),
       wasteRefusalReason: undefined,
       transporterIsExemptedOfReceipt: false,
       transporterCompanyName: "Transporteur",

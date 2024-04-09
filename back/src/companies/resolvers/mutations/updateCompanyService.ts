@@ -16,6 +16,8 @@ export async function updateCompanyFn(
   const {
     id,
     companyTypes,
+    collectorTypes,
+    wasteProcessorTypes,
     gerepId,
     contact,
     contactEmail,
@@ -33,6 +35,12 @@ export async function updateCompanyFn(
   } = args;
   const data: Prisma.CompanyUpdateInput = {
     ...(companyTypes != null ? { companyTypes: { set: companyTypes } } : {}),
+    ...(collectorTypes != null
+      ? { collectorTypes: { set: collectorTypes } }
+      : {}),
+    ...(wasteProcessorTypes != null
+      ? { wasteProcessorTypes: { set: wasteProcessorTypes } }
+      : {}),
     ...(gerepId != null ? { gerepId } : {}),
     ...(contact != null ? { contact } : {}),
     ...(contactEmail != null ? { contactEmail } : {}),

@@ -29,17 +29,19 @@ import {
   BsdasriEcoOrganisme,
   BsdasriEcoOrganismeInput,
   BsdasriIdentification,
-  BsdasriIdentificationInput
+  BsdasriIdentificationInput,
+  BsdasriStatus
 } from "../generated/graphql/types";
 import {
   nullIfNoValues,
   safeInput,
   processDate,
   chain,
-  undefinedOrDefault
+  undefinedOrDefault,
+  processDecimal
 } from "../common/converter";
-import { Bsdasri, BsdasriStatus } from "@prisma/client";
-import { Decimal } from "decimal.js-light";
+import { Bsdasri } from "@prisma/client";
+import { Decimal } from "decimal.js";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdasriForElastic } from "./elastic";
 
@@ -83,7 +85,9 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
         }),
 
         weight: nullIfNoValues<BsdasriWeight>({
-          value: bsdasri.emitterWasteWeightValue,
+          value: bsdasri.emitterWasteWeightValue
+            ? processDecimal(bsdasri.emitterWasteWeightValue).toNumber()
+            : null,
           // due to a previous validation bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
 
           isEstimate: !!bsdasri.emitterWasteWeightValue
@@ -122,7 +126,9 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
         plates: bsdasri.transporterTransportPlates,
 
         weight: nullIfNoValues<BsdasriWeight>({
-          value: bsdasri.transporterWasteWeightValue,
+          value: bsdasri.transporterWasteWeightValue
+            ? processDecimal(bsdasri.transporterWasteWeightValue).toNumber()
+            : null,
           // due to a previous validation bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
           isEstimate: !!bsdasri.transporterWasteWeightValue
             ? bsdasri.transporterWasteWeightIsEstimate
@@ -136,6 +142,10 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
           status: bsdasri.transporterAcceptationStatus,
           refusalReason: bsdasri.transporterWasteRefusalReason,
           refusedWeight: bsdasri.transporterWasteRefusedWeightValue
+            ? processDecimal(
+                bsdasri.transporterWasteRefusedWeightValue
+              ).toNumber()
+            : null
         }),
         takenOverAt: processDate(bsdasri.transporterTakenOverAt),
         handedOverAt: bsdasri.handedOverToRecipientAt,
@@ -164,6 +174,10 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
           status: bsdasri.destinationReceptionAcceptationStatus,
           refusalReason: bsdasri.destinationReceptionWasteRefusalReason,
           refusedWeight: bsdasri.destinationReceptionWasteRefusedWeightValue
+            ? processDecimal(
+                bsdasri.destinationReceptionWasteRefusedWeightValue
+              ).toNumber()
+            : null
         }),
         date: processDate(bsdasri.destinationReceptionDate),
         signature: nullIfNoValues<BsdasriSignature>({
@@ -174,6 +188,10 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
       operation: nullIfNoValues<BsdasriOperation>({
         weight: nullIfNoValues<BsdasriOperationWeight>({
           value: bsdasri.destinationReceptionWasteWeightValue
+            ? processDecimal(
+                bsdasri.destinationReceptionWasteWeightValue
+              ).toNumber()
+            : null
         }),
         code: bsdasri.destinationOperationCode,
         mode: bsdasri.destinationOperationMode,
@@ -234,7 +252,9 @@ export const expandGroupingDasri = (dasri: Bsdasri): InitialBsdasri => ({
 
   volume: dasri.destinationReceptionWasteVolume,
 
-  weight: dasri.destinationReceptionWasteWeightValue,
+  weight: dasri.destinationReceptionWasteWeightValue
+    ? processDecimal(dasri.destinationReceptionWasteWeightValue).toNumber()
+    : null,
 
   takenOverAt: processDate(dasri.transporterTakenOverAt),
 
@@ -250,7 +270,7 @@ export const expandSynthesizingDasri = (dasri: Bsdasri): InitialBsdasri => ({
 
   volume: dasri.emitterWasteVolume ?? 0,
 
-  weight: dasri?.emitterWasteWeightValue ?? 0,
+  weight: processDecimal(dasri?.emitterWasteWeightValue)?.toNumber() ?? 0,
 
   takenOverAt: dasri.transporterTakenOverAt,
 

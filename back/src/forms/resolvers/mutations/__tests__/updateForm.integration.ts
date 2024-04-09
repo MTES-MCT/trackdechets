@@ -365,6 +365,37 @@ describe("Mutation.updateForm", () => {
     expect(errors).toBeUndefined();
   });
 
+  it("should be possible to resend same Decimal value when emitter has signed", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const intermediary1 = await companyFactory();
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date(),
+        intermediaries: { create: toIntermediaryCompany(intermediary1) }
+      }
+    });
+    const { mutate } = makeClient(destination.user);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: { quantity: form.wasteDetailsQuantity?.toNumber() }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
   it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
     "should allow %p to update a draft form",
     async role => {
@@ -1489,7 +1520,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -1519,7 +1550,7 @@ describe("Mutation.updateForm", () => {
     });
     expect(newAppendix2Form.status).toBe("GROUPED");
     expect(newAppendix2Form.quantityGrouped).toEqual(
-      newAppendix2Form.quantityReceived
+      newAppendix2Form.quantityReceived?.toNumber()
     );
   });
 
@@ -1544,7 +1575,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -1589,7 +1620,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         },
         transporters: {
@@ -1645,7 +1676,7 @@ describe("Mutation.updateForm", () => {
           grouping: {
             create: {
               initialFormId: initialAppendix2.id,
-              quantity: initialAppendix2.quantityReceived!
+              quantity: initialAppendix2.quantityReceived!.toNumber()
             }
           }
         }
@@ -1698,7 +1729,7 @@ describe("Mutation.updateForm", () => {
           grouping: {
             create: {
               initialFormId: initialAppendix2.id,
-              quantity: initialAppendix2.quantityReceived!
+              quantity: initialAppendix2.quantityReceived!.toNumber()
             }
           }
         }
@@ -1714,7 +1745,7 @@ describe("Mutation.updateForm", () => {
         grouping: [
           {
             form: { id: wannaBeAppendix2.id },
-            quantity: wannaBeAppendix2.quantityReceived
+            quantity: wannaBeAppendix2.quantityReceived?.toNumber()
           }
         ]
       };
@@ -1754,7 +1785,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -1863,7 +1894,7 @@ describe("Mutation.updateForm", () => {
             grouping: [
               {
                 form: { id: appendixForm.id },
-                quantity: appendixForm.quantityReceived
+                quantity: appendixForm.quantityReceived?.toNumber()
               }
             ]
           }
@@ -1899,7 +1930,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -1943,7 +1974,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived!
+            quantity: appendixForm.quantityReceived!.toNumber()
           }
         }
       }
@@ -2385,7 +2416,7 @@ describe("Mutation.updateForm", () => {
       where: { id: data.updateForm.id },
       include: { transporters: true }
     });
-    expect(updatedForm.wasteDetailsQuantity).toEqual(50);
+    expect(updatedForm.wasteDetailsQuantity?.toNumber()).toEqual(50);
 
     expect(updatedForm.transporters).toHaveLength(1);
     expect(updatedForm.transporters[0]?.transporterTransportMode).toEqual(
@@ -2432,7 +2463,7 @@ describe("Mutation.updateForm", () => {
       where: { id: data.updateForm.id },
       include: { transporters: true }
     });
-    expect(updatedForm.wasteDetailsQuantity).toEqual(50);
+    expect(updatedForm.wasteDetailsQuantity?.toNumber()).toEqual(50);
 
     expect(updatedForm.transporters).toHaveLength(1);
     expect(updatedForm.transporters[0]?.transporterTransportMode).toEqual(
@@ -3080,7 +3111,6 @@ describe("Mutation.updateForm", () => {
 
     const { mutate } = makeClient(emitter.user);
 
-    // update first transporter with deprecated field `transporter`
     const updateFormInput: UpdateFormInput = {
       id: form.id,
       transporters: []
@@ -3111,7 +3141,6 @@ describe("Mutation.updateForm", () => {
     });
     const { mutate } = makeClient(emitter.user);
 
-    // update first transporter with deprecated field `transporter`
     const updateFormInput: UpdateFormInput = {
       id: form.id,
       transporters: ["ID1", "ID2"]

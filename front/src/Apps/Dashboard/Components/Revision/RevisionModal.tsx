@@ -4,7 +4,8 @@ import {
   BsdType,
   Query,
   QueryBsdaRevisionRequestsArgs,
-  QueryFormRevisionRequestsArgs
+  QueryFormRevisionRequestsArgs,
+  RevisionRequestStatus
 } from "@td/codegen-ui";
 import { useLazyQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
@@ -13,7 +14,6 @@ import { ReviewInterface, mapRevision } from "./revisionMapper";
 import RevisionList from "./RevisionList/RevisionList";
 import { Modal } from "../../../../common/components";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { Loader } from "../../../common/Components";
 import RevisionApproveFragment from "./RevisionApproveFragment";
 import "./revisionModal.scss";
 import RevisionCancelFragment from "./RevisionCancelFragment";
@@ -24,6 +24,21 @@ import {
   MODAL_TITLE_DELETE,
   MODAL_TITLE_UPDATE
 } from "./wordingsRevision";
+import { InlineLoader } from "../../../common/Components/Loader/Loaders";
+
+const hasBeenUpdated = revision => {
+  return (
+    revision.status === RevisionRequestStatus.Accepted ||
+    revision.status === RevisionRequestStatus.Refused
+  );
+};
+
+const noRevisionRequestsIn = (bsdRevisions, bsdaRevisions) => {
+  return (
+    !bsdRevisions?.formRevisionRequests?.edges?.length &&
+    !bsdaRevisions?.bsdaRevisionRequests?.edges?.length
+  );
+};
 
 export enum ActionType {
   CONSUlT = "CONSUlT",
@@ -90,44 +105,75 @@ const RevisionModal = ({
     });
   };
 
+  const latestRevision = reviewList?.[0] as ReviewInterface;
+
+  let actualActionType = actionType;
+  // User had a direct link to the revision, but it has been updated since.
+  // Show consultation modal instead
+  if (
+    latestRevision &&
+    actionType === ActionType.UPDATE &&
+    hasBeenUpdated(latestRevision)
+  ) {
+    actualActionType = ActionType.CONSUlT;
+  }
+
+  const reviews = (
+    actualActionType === ActionType.CONSUlT ? reviewList : [latestRevision]
+  )?.filter(Boolean);
+
+  // If the data sent by the API is void of revisions, the bsdId is probably wrong.
+  // Don't crash & close the modal
+  useEffect(() => {
+    if (
+      (dataForm || dataBsda) && // We've got the data back
+      noRevisionRequestsIn(dataForm, dataBsda) // But it's empty
+    ) {
+      if (onModalCloseFromParent) onModalCloseFromParent();
+    }
+  }, [reviews, dataForm, dataBsda, onModalCloseFromParent]);
+
   const ariaLabel =
-    actionType === ActionType.CONSUlT
+    actualActionType === ActionType.CONSUlT
       ? MODAL_ARIA_LABEL_CONSULT
       : MODAL_ARIA_LABEL_UPDATE;
 
   const getModalTitlePrefix = () => {
-    if (actionType === ActionType.UPDATE) {
+    if (actualActionType === ActionType.UPDATE) {
       return MODAL_TITLE_UPDATE;
     }
-    if (actionType === ActionType.CONSUlT) {
+    if (actualActionType === ActionType.CONSUlT) {
       return MODAL_TITLE_CONSULT;
     }
-    if (actionType === ActionType.DELETE) {
+    if (actualActionType === ActionType.DELETE) {
       return MODAL_TITLE_DELETE;
     }
     return "";
   };
 
-  const latestRevision = reviewList?.[0] as ReviewInterface;
-  const reviews =
-    actionType === ActionType.CONSUlT ? reviewList : [latestRevision];
   return (
     <Modal onClose={onModalCloseFromParent!} ariaLabel={ariaLabel} isOpen>
       <div className="revision-modal">
-        {(loadingFormRevision || loadingBsdaRevision) && <Loader />}
+        {(loadingFormRevision || loadingBsdaRevision) && (
+          <div className="revision-modal-loader">
+            <div>
+              <InlineLoader />
+            </div>
+          </div>
+        )}
 
         {reviewList && (
           <RevisionList reviews={reviews} title={getModalTitlePrefix()} />
         )}
         <div className="revision-modal__btn">
-          {actionType === ActionType.CONSUlT && (
+          {actualActionType === ActionType.CONSUlT && (
             <Button priority="primary" onClick={onModalCloseFromParent}>
               Fermer
             </Button>
           )}
 
           {(!loadingFormRevision || !loadingBsdaRevision) &&
-            actionType === ActionType.UPDATE && (
+            actualActionType === ActionType.UPDATE && (
               <RevisionApproveFragment
                 reviewId={latestRevision?.id}
                 bsdType={bsdType}
@@ -136,7 +182,7 @@ const RevisionModal = ({
               />
             )}
           {(!loadingFormRevision || !loadingBsdaRevision) &&
-            actionType === ActionType.DELETE && (
+            actualActionType === ActionType.DELETE && (
               <RevisionCancelFragment
                 reviewId={latestRevision?.id}
                 bsdType={bsdType}

@@ -12,6 +12,10 @@ interface Props {
 }
 
 export function BsdaJourneySummary({ bsda }: Props) {
+  const signedByEmitter = Boolean(bsda.emitter?.emission?.signature?.date);
+  const workerIsDisabled = bsda.worker?.isDisabled;
+  const signedByWorker = Boolean(bsda.worker?.work?.signature?.date);
+
   return (
     <Journey>
       <JourneyStop
@@ -24,12 +28,12 @@ export function BsdaJourneySummary({ bsda }: Props) {
           {bsda.emitter?.company?.address}
         </JourneyStopDescription>
       </JourneyStop>
-      {bsda.worker?.company?.name && (
+      {!workerIsDisabled && bsda.worker?.company?.siret && (
         <JourneyStop
           variant={
-            bsda.worker?.work?.signature
+            signedByWorker
               ? "complete"
-              : bsda.emitter?.emission?.signature
+              : signedByEmitter
               ? "active"
               : "incomplete"
           }
@@ -42,30 +46,44 @@ export function BsdaJourneySummary({ bsda }: Props) {
           </JourneyStopDescription>
         </JourneyStop>
       )}
-      {bsda.transporter?.company?.name && (
-        <JourneyStop
-          variant={
-            bsda.transporter?.transport?.signature
-              ? "complete"
-              : bsda.worker?.work?.signature
-              ? "active"
-              : "incomplete"
-          }
-        >
-          <JourneyStopName>Transporteur</JourneyStopName>
-          <JourneyStopDescription>
-            {bsda.transporter?.company?.name} (
-            {bsda.transporter?.company?.orgId})
-            <br />
-            {bsda.transporter?.company?.address}
-          </JourneyStopDescription>
-        </JourneyStop>
-      )}
+      {bsda.transporters.map((transporter, idx) => {
+        return (
+          <JourneyStop
+            key={idx}
+            variant={
+              transporter?.transport?.signature?.date
+                ? "complete"
+                : // Le transporteur est considéré actif s'il est le premier
+                // dans la liste des transporteurs à ne pas encore avoir pris
+                // en charge le déchet après la signature émetteur
+                (idx > 0 &&
+                    bsda.transporters[idx - 1].transport?.signature?.date) ||
+                  (idx === 0 &&
+                    signedByEmitter &&
+                    (workerIsDisabled || signedByWorker))
+                ? "active"
+                : "incomplete"
+            }
+          >
+            <JourneyStopName>
+              Transporteur{bsda.transporters.length > 1 ? ` n° ${idx + 1}` : ""}
+            </JourneyStopName>
+
+            <JourneyStopDescription>
+              {transporter?.company?.name} ({transporter?.company?.orgId})
+              <br />
+              {transporter?.company?.address}
+            </JourneyStopDescription>
+          </JourneyStop>
+        );
+      })}
       <JourneyStop
         variant={
           bsda.destination?.operation?.signature
             ? "complete"
-            : bsda.transporter?.transport?.signature
+            : (bsda.transporters ?? []).every(t =>
+                Boolean(t?.transport?.signature?.date)
+              )
             ? "active"
             : "incomplete"
         }

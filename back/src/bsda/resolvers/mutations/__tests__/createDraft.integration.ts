@@ -1,30 +1,38 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { BsdaInput, Mutation } from "../../../../generated/graphql/types";
 import {
+  BsdaInput,
+  Mutation,
+  MutationCreateDraftBsdaArgs
+} from "../../../../generated/graphql/types";
+import {
+  companyFactory,
   siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
+import { gql } from "graphql-tag";
+import { bsdaFactory } from "../../../__tests__/factories";
+import { getFirstTransporterSync } from "../../../database";
 
-const CREATE_BSDA = `
-mutation CreateDraftBsda($input: BsdaInput!) {
-  createDraftBsda(input: $input) {
-    id
-    destination {
-      company {
+const CREATE_BSDA = gql`
+  mutation CreateDraftBsda($input: BsdaInput!) {
+    createDraftBsda(input: $input) {
+      id
+      destination {
+        company {
           siret
+        }
       }
-    }
-    emitter {
-      company {
+      emitter {
+        company {
           siret
+        }
       }
     }
   }
-}
 `;
 describe("Mutation.Bsda.createDraft", () => {
   afterEach(resetDatabase);
@@ -221,5 +229,163 @@ describe("Mutation.Bsda.createDraft", () => {
       }
     );
     expect(errors).toBeUndefined();
+  });
+
+  it("should be possible to create a bsda and connect existing bsdaTransporters", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter1 = await prisma.bsdaTransporter.create({
+      data: { number: 0 }
+    });
+    const transporter2 = await prisma.bsdaTransporter.create({
+      data: { number: 0 }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createDraftBsda">,
+      MutationCreateDraftBsdaArgs
+    >(CREATE_BSDA, {
+      variables: {
+        input: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporters: [transporter1.id, transporter2.id]
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    const bsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data.createDraftBsda.id },
+      include: { transporters: true }
+    });
+    expect(bsda.transporters.length).toEqual(2);
+    expect(bsda.transporters.map(t => t.id)).toContain(transporter1.id);
+    expect(bsda.transporters.map(t => t.id)).toContain(transporter2.id);
+    const updatedTransporter1 = bsda.transporters.find(
+      t => t.id === transporter1.id
+    )!;
+    expect(updatedTransporter1.number).toEqual(1);
+    const updatedTransporter2 = bsda.transporters.find(
+      t => t.id === transporter2.id
+    )!;
+    expect(updatedTransporter2.number).toEqual(2);
+  });
+
+  it("should throw an error when trying to connect a non existant bsdaTransporter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createDraftBsda">,
+      MutationCreateDraftBsdaArgs
+    >(CREATE_BSDA, {
+      variables: {
+        input: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporters: ["ID1", "ID2"]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Aucun transporteur ne possède le ou les identifiants suivants : ID1, ID2"
+      })
+    ]);
+  });
+
+  it("should throw an error when trying to connect a transporter already associated to a BSDA", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const anotherBsda = await bsdaFactory({});
+
+    const transporter1 = getFirstTransporterSync(anotherBsda)!;
+    const transporter2 = await prisma.bsdaTransporter.create({
+      data: { number: 0 }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createDraftBsda">,
+      MutationCreateDraftBsdaArgs
+    >(CREATE_BSDA, {
+      variables: {
+        input: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporters: [transporter1.id, transporter2.id]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le transporteur BSDA ${transporter1.id} est déjà associé à un autre BSDA`
+      })
+    ]);
+  });
+
+  it("should not be possible to add more than 5 transporters", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const transporters = await Promise.all(
+      [...Array(6).keys()].map(() =>
+        prisma.bsdaTransporter.create({
+          data: { number: 0 }
+        })
+      )
+    );
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateDraftBsdaArgs
+    >(CREATE_BSDA, {
+      variables: {
+        input: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporters: transporters.map(t => t.id)
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas ajouter plus de 5 transporteurs"
+      })
+    ]);
+  });
+
+  it("should not be possible to use `transporter` and `transporters` in the same input", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+    const bsdaTransporter = await prisma.bsdaTransporter.create({
+      data: { number: 0 }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createDraftBsda">,
+      MutationCreateDraftBsdaArgs
+    >(CREATE_BSDA, {
+      variables: {
+        input: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporter: { company: { siret: transporter.siret } },
+          transporters: [bsdaTransporter.id]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas utiliser les champs `transporter` et `transporters` en même temps"
+      })
+    ]);
   });
 });

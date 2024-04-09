@@ -1,17 +1,16 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
 import routes from "../../../../../Apps/routes";
-import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
 import { Transport } from "../../../../../form/bsda/stepper/steps/Transport";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
-import { getComputedState } from "../../../../../form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   BsdaSignatureType,
+  BsdaTransportInput,
   Mutation,
   MutationSignBsdaArgs,
-  MutationUpdateBsdaArgs,
-  SignatureTypeInput,
+  MutationUpdateBsdaTransporterArgs,
+  SignatureInput,
   TransportMode
 } from "@td/codegen-ui";
 import React from "react";
@@ -20,13 +19,16 @@ import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
+import { UPDATE_BSDA_TRANSPORTER } from "../../../../../Apps/Forms/Components/query";
 
 const validationSchema = yup.object({
-  date: yup.date().required("La date est requise"),
-  author: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
+  signature: yup.object({
+    date: yup.date().required("La date est requise"),
+    author: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis")
+  })
 });
 
 type Props = {
@@ -36,6 +38,12 @@ type Props = {
   onModalCloseFromParent?: () => void;
   displayActionButton?: boolean;
 };
+
+type FormikValues = {
+  transport: BsdaTransportInput;
+  signature: SignatureInput;
+};
+
 export function SignTransport({
   siret,
   bsdaId,
@@ -43,10 +51,11 @@ export function SignTransport({
   onModalCloseFromParent,
   displayActionButton
 }: Props) {
-  const [updateBsda, { error: updateError }] = useMutation<
-    Pick<Mutation, "updateBsda">,
-    MutationUpdateBsdaArgs
-  >(UPDATE_BSDA);
+  const [updateBsdaTransporter, { error: updateError }] = useMutation<
+    Pick<Mutation, "updateBsdaTransporter">,
+    MutationUpdateBsdaTransporterArgs
+  >(UPDATE_BSDA_TRANSPORTER);
+
   const [signBsda, { loading, error: signatureError }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
@@ -62,71 +71,78 @@ export function SignTransport({
       onModalCloseFromParent={onModalCloseFromParent}
       displayActionButton={displayActionButton}
     >
-      {({ bsda, onClose }) =>
-        bsda.metadata?.errors?.some(
-          error =>
-            error.requiredFor === SignatureTypeInput.Transport &&
-            // Transporter Receipt will be auto-completed by the transporter
-            !error.path.startsWith("transporterRecepisse") &&
-            error.path !== "transporterTransportPlates"
-        ) ? (
-          <>
-            <p className="tw-m-2 tw-text-red-700">
-              Vous devez mettre à jour le bordereau et renseigner les champs
-              obligatoires avant de le signer.
-            </p>
+      {({ bsda, onClose }) => {
+        if (
+          (bsda.metadata?.errors ?? []).some(
+            error =>
+              error &&
+              error.requiredFor === BsdaSignatureType.Transport &&
+              // Transporter Receipt will be auto-completed by the transporter
+              !error.path.startsWith("transporterRecepisse") &&
+              error.path !== "transporterTransportPlates"
+          )
+        ) {
+          return (
+            <>
+              <p className="tw-m-2 tw-text-red-700">
+                Vous devez mettre à jour le bordereau et renseigner les champs
+                obligatoires avant de le signer.
+              </p>
 
-            <ul className="tw-mb-2 tw-text-red-700 tw-list-disc">
-              {bsda.metadata?.errors.map((error, idx) => (
-                <li key={idx}>{error.message}</li>
-              ))}
-            </ul>
-            <Link
-              to={generatePath(routes.dashboard.bsdas.edit, {
-                siret,
-                id: bsda.id
-              })}
-              className="btn btn--primary"
-            >
-              Mettre le bordereau à jour pour le signer
-            </Link>
-          </>
-        ) : (
-          <Formik
+              <ul className="tw-mb-2 tw-text-red-700 tw-list-disc">
+                {bsda.metadata?.errors?.map((error, idx) => (
+                  <li key={idx}>{error?.message}</li>
+                ))}
+              </ul>
+              <Link
+                to={generatePath(routes.dashboard.bsdas.edit, {
+                  siret,
+                  id: bsda.id
+                })}
+                className="btn btn--primary"
+              >
+                Mettre le bordereau à jour pour le signer
+              </Link>
+            </>
+          );
+        }
+
+        const signingTransporter = bsda.transporters?.find(
+          t => !t.transport?.signature?.date
+        )!;
+
+        console.log(signingTransporter);
+
+        return (
+          <Formik<FormikValues>
             initialValues={{
-              author: "",
-              date: TODAY.toISOString(),
-              ...getComputedState(
-                {
-                  transporter: {
-                    recepisse: {
-                      isExempted: false
-                    },
-                    transport: {
-                      mode: TransportMode.Road,
-                      plates: [],
-                      takenOverAt: new Date().toISOString()
-                    }
-                  }
-                },
-                bsda
-              )
+              transport: {
+                mode: signingTransporter.transport?.mode ?? TransportMode.Road,
+                plates: signingTransporter.transport?.plates ?? [],
+                takenOverAt:
+                  signingTransporter.transport?.takenOverAt ??
+                  new Date().toISOString()
+              },
+              signature: {
+                author: "",
+                date: TODAY.toISOString()
+              }
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
-              const { id, author, date, ...update } = values;
-              await updateBsda({
+              const { transport, signature } = values;
+              await updateBsdaTransporter({
                 variables: {
-                  id: bsda.id,
-                  input: update
+                  id: signingTransporter.id,
+                  input: { transport: transport }
                 }
               });
               await signBsda({
                 variables: {
                   id: bsda.id,
                   input: {
-                    date,
-                    author,
+                    date: signature.date,
+                    author: signature.author,
                     type: BsdaSignatureType.Transport
                   }
                 }
@@ -146,7 +162,7 @@ export function SignTransport({
                       type="text"
                       className="td-input"
                       disabled
-                      value={bsda.waste?.adr}
+                      value={bsda.waste?.adr ?? ""}
                     />
                   </label>
                 </div>
@@ -155,14 +171,14 @@ export function SignTransport({
                   j'atteste que les informations ci-dessus sont correctes. En
                   signant ce document, je déclare prendre en charge le déchet.
                 </p>
-                <TransporterRecepisseWrapper transporter={bsda.transporter!} />
+                <TransporterRecepisseWrapper transporter={signingTransporter} />
 
                 <div className="form__row">
                   <label>
                     Date de signature
                     <div className="td-date-wrapper">
                       <Field
-                        name="date"
+                        name="signature.date"
                         component={DateInput}
                         minDate={subMonths(TODAY, 2)}
                         maxDate={TODAY}
@@ -179,7 +195,7 @@ export function SignTransport({
                     Nom du signataire
                     <Field
                       type="text"
-                      name="author"
+                      name="signature.author"
                       placeholder="NOM Prénom"
                       className="td-input"
                     />
@@ -225,8 +241,8 @@ export function SignTransport({
               </Form>
             )}
           </Formik>
-        )
-      }
+        );
+      }}
     </SignBsda>
   );
 }

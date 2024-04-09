@@ -4,9 +4,9 @@ import {
   graphQlInputToZodBsda,
   prismaToZodBsda
 } from "./helpers";
-import { checkSealedFields } from "./rules";
+import { checkBsdaSealedFields } from "./rules";
 import { contextualSchema } from "./schema";
-import { ParsedZodBsda } from "./schema";
+import { ZodBsdaTransporter, transformedBsdaTransporterSchema } from "./schema";
 import { ZodBsda, contextualSchemaAsync } from "./schema";
 import { BsdaValidationContext, PrismaBsdaForParsing } from "./types";
 
@@ -19,25 +19,43 @@ import { BsdaValidationContext, PrismaBsdaForParsing } from "./types";
  */
 export async function mergeInputAndParseBsdaAsync(
   // BSDA déjà stockée en base de données.
-  // Sera undefined dans le cas d'une création.
   persisted: PrismaBsdaForParsing,
   // Données entrantes provenant de la couche GraphQL.
-  // Sera undefined dans le cas d'une signature, duplication, publication.
   input: BsdaInput,
   context: BsdaValidationContext
 ) {
   const zodPersisted = prismaToZodBsda(persisted);
-  const zodInput = graphQlInputToZodBsda(input);
+  const zodInput = await graphQlInputToZodBsda(input);
 
   const bsda: ZodBsda = {
     ...zodPersisted,
     ...zodInput
   };
 
+  // La fusion des transporteurs est un peu plus compliquée à cause de l'utilisation
+  // possible du du champ `BsdaInput.transporter (rétro-comptabilité avec l'API
+  // BSDA pré multi-modal)
+  if (input.transporter === null) {
+    // On supprime le premier transporteur en gardant les suivants (s'ils existent)
+    bsda.transporters = (zodPersisted.transporters ?? []).slice(1);
+  } else if (
+    input.transporter &&
+    zodPersisted.transporters &&
+    zodPersisted.transporters.length > 0
+  ) {
+    // On modifie les données du 1er transporteur
+    bsda.transporters = zodPersisted.transporters.map((t, idx) => {
+      if (idx === 0) {
+        return { ...t, ...bsda.transporters![0] };
+      }
+      return t;
+    });
+  }
+
   // Calcule la signature courante à partir des données si elle n'est
   // pas fourni via le contexte
   const currentSignatureType =
-    context.currentSignatureType ?? getCurrentSignatureType(bsda);
+    context.currentSignatureType ?? getCurrentSignatureType(zodPersisted);
 
   const contextWithSignature = {
     ...context,
@@ -46,9 +64,9 @@ export async function mergeInputAndParseBsdaAsync(
 
   // Vérifie que l'on n'est pas en train de modifier des données
   // vérrouillées par signature.
-  const updatedFields = await checkSealedFields(
+  const updatedFields = await checkBsdaSealedFields(
     zodPersisted,
-    zodInput,
+    bsda,
     contextWithSignature
   );
 
@@ -63,14 +81,12 @@ export async function mergeInputAndParseBsdaAsync(
  * doivent être converties au préalable au format attendu par zod (`ZodBsda`).
  * La fonction `parseBsdaInContext` permet de gérer cette conversion.
  */
-
 export async function parseBsdaAsync(
   bsda: ZodBsda,
   context: BsdaValidationContext
 ) {
   const schema = contextualSchemaAsync(context);
-  const parsedBsda = await schema.parseAsync(bsda);
-  return toMultiModalBsda(parsedBsda);
+  return schema.parseAsync(bsda);
 }
 /**
  * Version synchrone de `parseBsdaAsync` qui ne prend pas en compte les
@@ -79,64 +95,13 @@ export async function parseBsdaAsync(
 
 export function parseBsda(bsda: ZodBsda, context: BsdaValidationContext) {
   const schema = contextualSchema(context);
-  const parsedBsda = schema.parse(bsda);
-  return toMultiModalBsda(parsedBsda);
+  return schema.parse(bsda);
 }
+
 /**
- * Couche de compatibilité temporaire entre les données transporteurs
- * Zod ("à plat") et les données transporteurs en base de données (table séparée).
- * Va disparaitre avec l'implémentation du multi-modal
+ * Fonction permettant de valider et parser un BsdaTransporter dans les
+ * mutations `createBsdaTransporter` et `updateBsdaTransporter`
  */
-
-export function toMultiModalBsda(parsedBsda: ParsedZodBsda) {
-  const {
-    transporterCompanySiret,
-    transporterCompanyName,
-    transporterCompanyVatNumber,
-    transporterCompanyAddress,
-    transporterCompanyContact,
-    transporterCompanyPhone,
-    transporterCompanyMail,
-    transporterCustomInfo,
-    transporterRecepisseIsExempted,
-    transporterRecepisseNumber,
-    transporterRecepisseDepartment,
-    transporterRecepisseValidityLimit,
-    transporterTransportMode,
-    transporterTransportPlates,
-    transporterTransportTakenOverAt,
-    transporterTransportSignatureAuthor,
-    transporterTransportSignatureDate,
-    transporterId,
-    ...rest
-  } = parsedBsda;
-
-  // Au niveau du schéma Zod, tout se passe comme si les données de transport
-  // était encore "à plat" avec un seul transporteur (en attendant l'implémentation du multi-modal)
-  // On renvoie séparement les données du bsda et les données du transporteur
-  // car elles font ensuite l'objet de traitement séparé pour construire les payloads de création / update
-  // en base de données
-  return {
-    bsda: { ...rest, transporterTransportSignatureDate },
-    transporter: {
-      id: transporterId,
-      transporterCompanySiret,
-      transporterCompanyName,
-      transporterCompanyVatNumber,
-      transporterCompanyAddress,
-      transporterCompanyContact,
-      transporterCompanyPhone,
-      transporterCompanyMail,
-      transporterCustomInfo,
-      transporterRecepisseIsExempted,
-      transporterRecepisseNumber,
-      transporterRecepisseDepartment,
-      transporterRecepisseValidityLimit,
-      transporterTransportMode,
-      transporterTransportPlates,
-      transporterTransportTakenOverAt,
-      transporterTransportSignatureAuthor,
-      transporterTransportSignatureDate
-    }
-  };
+export function parseBsdaTransporterAsync(transporter: ZodBsdaTransporter) {
+  return transformedBsdaTransporterSchema.parseAsync(transporter);
 }

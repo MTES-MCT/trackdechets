@@ -41,21 +41,38 @@ const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
       })
       .vhuAgrementDemolisseur();
   },
-  receivedSignatureAutomations: parent => {
-    return prisma.company
+  receivedSignatureAutomations: async parent => {
+    const automations = await prisma.company
       .findUnique({
         where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
       })
       .receivedSignatureAutomations({
         include: { from: true, to: true }
-      }) as any;
+      });
+    return (automations as any) ?? [];
   },
   workerCertification: parent =>
     prisma.company
       .findUnique({
         where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
       })
-      .workerCertification()
+      .workerCertification(),
+  users: async (parent, _, ctx) => {
+    // Only admins can retrieve users through this API. This is used for impersonation
+    if (!ctx.user?.isAdmin || !parent.trackdechetsId) {
+      return [];
+    }
+
+    const associations = await prisma.companyAssociation.findMany({
+      where: { companyId: parent.trackdechetsId },
+      include: { user: true }
+    });
+
+    return associations.map(association => ({
+      ...association.user,
+      role: association.role
+    }));
+  }
 };
 
 export default companySearchPrivateResolvers;

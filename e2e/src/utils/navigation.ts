@@ -42,6 +42,7 @@ export const goTo = async (page, path) => {
  * Enables to test current URL
  */
 export const checkCurrentURL = async (page, path) => {
+  await page.waitForURL(`**${path}`);
   await expect(new URL(page.url()).pathname).toEqual(path);
 };
 
@@ -57,13 +58,20 @@ export const selectCompany = async (page, siret) => {
   );
 
   const currentCompanySiret = await currentCompany.textContent();
+
+  // Current company is not the one we expect. Change it
   if (!currentCompanySiret.includes(siret)) {
     await companySwitcher.click();
-    const newCompany = companySwitcher
-      .locator(".company-switcher-item")
-      .filter({ hasText: siret });
 
-    await newCompany.click();
+    // Because there can be 10+ companies, use the search input
+    await companySwitcher
+      .getByRole("searchbox", { name: "Rechercher" })
+      .fill(siret);
+    await companySwitcher
+      .locator("div")
+      .filter({ hasText: siret })
+      .nth(2)
+      .click();
   }
 };
 

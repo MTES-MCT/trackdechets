@@ -6,6 +6,7 @@ module.exports = {
   tagline: "Connectez vos systèmes d'information à l'API Trackdéchets",
   url: "https://developers.trackdechets.beta.gouv.fr",
   baseUrl: "/",
+  trailingSlash: false,
   onBrokenLinks: "ignore",
   onBrokenMarkdownLinks: "throw",
   favicon: "img/trackdechets.png",

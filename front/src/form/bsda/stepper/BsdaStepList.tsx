@@ -2,8 +2,6 @@ import { useMutation, useQuery } from "@apollo/client";
 import React, { lazy, ReactElement, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "../../../Apps/common/Components";
-import { getComputedState } from "../../common/getComputedState";
-
 import { IStepContainerProps } from "../../common/stepper/Step";
 import {
   Mutation,
@@ -12,13 +10,27 @@ import {
   QueryBsdaArgs,
   Query,
   Bsda,
-  BsdaInput
+  BsdaInput,
+  BsdaType,
+  TransportMode,
+  MutationCreateBsdaTransporterArgs,
+  MutationUpdateBsdaTransporterArgs,
+  BsdaTransporterInput
 } from "@td/codegen-ui";
-import initialState from "./initial-state";
+import {
+  BsdaFormikValues,
+  CreateOrUpdateBsdaTransporterInput,
+  getInitialState
+} from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
 import omitDeep from "omit-deep-lodash";
 import { toastApolloError } from "../../common/stepper/toaster";
 import { bsdaValidationSchema } from "./schema";
+import {
+  CREATE_BSDA_TRANSPORTER,
+  UPDATE_BSDA_TRANSPORTER
+} from "../../../Apps/Forms/Components/query";
+import { isForeignVat } from "@td/constants";
 
 const GenericStepList = lazy(
   () => import("../../common/stepper/GenericStepList")
@@ -29,18 +41,11 @@ interface Props {
   formId?: string;
   initialStep: number;
 }
-const prefillTransportMode = state => {
-  if (!state?.transporter?.transport?.mode) {
-    state.transporter.transport.mode = "ROAD";
-  }
-
-  return state;
-};
 
 export default function BsdaStepsList(props: Props) {
   const navigate = useNavigate();
 
-  const formQuery = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
+  const bsdaQuery = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
       id: props.formId!
     },
@@ -48,36 +53,10 @@ export default function BsdaStepsList(props: Props) {
     fetchPolicy: "network-only"
   });
 
-  const formState = useMemo(() => {
-    const existingBsda = formQuery.data?.bsda;
-
-    const computedState = prefillTransportMode(
-      getComputedState(initialState, existingBsda)
-    );
-
-    if (existingBsda?.grouping) {
-      computedState.grouping = existingBsda.grouping.map(bsda => bsda.id);
-    }
-    if (existingBsda?.forwarding) {
-      computedState.forwarding = existingBsda.forwarding.id;
-    }
-
-    if (
-      computedState.emitter?.pickupSite &&
-      existingBsda?.emitter?.pickupSite === null
-    ) {
-      computedState.emitter.pickupSite = null;
-    }
-
-    if (
-      computedState.worker?.certification &&
-      existingBsda?.worker?.certification === null
-    ) {
-      computedState.worker.certification = null;
-    }
-
-    return computedState;
-  }, [formQuery.data]);
+  const bsdaState = useMemo(() => {
+    const existingBsda = bsdaQuery.data?.bsda;
+    return getInitialState(existingBsda);
+  }, [bsdaQuery.data]);
 
   const [createBsda, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsda">,
@@ -88,6 +67,21 @@ export default function BsdaStepsList(props: Props) {
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
   >(UPDATE_BSDA);
+
+  const [createBsdaTransporter, { loading: creatingBsdaTransporter }] =
+    useMutation<
+      Pick<Mutation, "createBsdaTransporter">,
+      MutationCreateBsdaTransporterArgs
+    >(CREATE_BSDA_TRANSPORTER);
+
+  const [updateBsdaTransporter, { loading: updatingBsdaTransporter }] =
+    useMutation<
+      Pick<Mutation, "updateBsdaTransporter">,
+      MutationUpdateBsdaTransporterArgs
+    >(UPDATE_BSDA_TRANSPORTER);
+
+  const loading =
+    creating || updating || creatingBsdaTransporter || updatingBsdaTransporter;
 
   const cleanupFields = (input: BsdaInput): BsdaInput => {
     // When created through api, this field might be null in db
@@ -100,17 +94,108 @@ export default function BsdaStepsList(props: Props) {
     return omitDeep(input, "worker.work");
   };
 
-  function saveForm(input: BsdaInput): Promise<any> {
-    return formState.id
+  function saveBsda(input: BsdaInput): Promise<any> {
+    const cleanInput =
+      input.type === BsdaType.Collection_2710
+        ? // s'assure qu'on ne crée pas un transporteur "vide"
+          // dans le cadre d'un BSDA de collecte en déchetterie
+          // qui n'autorise pas l'ajout de transporteur
+          { ...input, transporter: null }
+        : input;
+
+    return bsdaState.id
       ? updateBsda({
-          variables: { id: formState.id, input: cleanupFields(input) }
+          variables: { id: bsdaState.id, input: cleanupFields(cleanInput) }
         })
-      : createBsda({ variables: { input } });
+      : createBsda({ variables: { input: cleanInput } });
   }
 
-  function onSubmit(values) {
-    const { id, ...input } = values;
-    saveForm(input)
+  async function saveBsdaTransporter(
+    transporterInput: CreateOrUpdateBsdaTransporterInput
+  ): Promise<string> {
+    const { id, takenOverAt, transport, ...input } = transporterInput;
+
+    // S'assure que les données de récépissé transport sont nulles dans les
+    // cas suivants :
+    // - l'exemption est cochée
+    // - le transporteur est étranger
+    // - le transport ne se fait pas par la route
+    const cleanInput: BsdaTransporterInput = {
+      ...input,
+      transport: {
+        mode: transport?.mode,
+        plates: transport?.plates
+      },
+      recepisse: {
+        ...input.recepisse,
+        ...(input.recepisse?.isExempted ||
+        isForeignVat(input?.company?.vatNumber) ||
+        transport?.mode !== TransportMode.Road
+          ? {
+              number: null,
+              validityLimit: null,
+              department: null
+            }
+          : {})
+      }
+    };
+
+    if (id) {
+      // Le transporteur existe déjà en base de données, on met
+      // à jour les infos (uniquement si le transporteur n'a pas encore
+      // pris en charge le déchet) et on renvoie l'identifiant
+      if (!takenOverAt) {
+        const { errors } = await updateBsdaTransporter({
+          variables: { id, input: cleanInput },
+          onError: err => {
+            toastApolloError(err);
+          }
+        });
+        if (errors) {
+          throw new Error(errors.map(e => e.message).join("\n"));
+        }
+      }
+      return id;
+    } else {
+      // Le transporteur n'existe pas encore en base, on le crée
+      // et on renvoie l'identifiant retourné
+      const { data, errors } = await createBsdaTransporter({
+        variables: { input: cleanInput },
+        onError: err => {
+          toastApolloError(err);
+        }
+      });
+      if (errors) {
+        throw new Error(errors.map(e => e.message).join("\n"));
+      }
+      // if `errors` is not defined then data?.createFormTransporter?.id
+      // should be defined. For type safety we return "" if it is not, but
+      // it should not hapen
+      return data?.createBsdaTransporter?.id ?? "";
+    }
+  }
+
+  async function onSubmit(values: BsdaFormikValues) {
+    const { id, transporters, ...input } = values;
+
+    let transporterIds: string[] = [];
+
+    try {
+      transporterIds = await Promise.all(
+        transporters.map(t => saveBsdaTransporter(t))
+      );
+    } catch (_) {
+      // Si une erreur survient pendant la sauvegarde des données
+      // transporteur, on n'essaye même pas de sauvgarder le bordereau
+      return;
+    }
+
+    const bsdaInput: BsdaInput = {
+      ...input,
+      transporters: transporterIds
+    };
+
+    saveBsda(bsdaInput)
       .then(_ => {
         navigate(-1);
       })
@@ -119,7 +204,7 @@ export default function BsdaStepsList(props: Props) {
 
   // As it's a render function, the steps are nested into a `<></>` block
   // So we render then unwrap to get the steps
-  const parentOfSteps = props.children(formQuery.data?.bsda);
+  const parentOfSteps = props.children(bsdaQuery.data?.bsda);
   const steps = parentOfSteps.props
     .children as ReactElement<IStepContainerProps>[];
 
@@ -128,13 +213,13 @@ export default function BsdaStepsList(props: Props) {
       <GenericStepList
         children={steps}
         formId={props.formId}
-        formQuery={formQuery}
+        formQuery={bsdaQuery}
         onSubmit={onSubmit}
-        initialValues={formState}
+        initialValues={bsdaState}
         validationSchema={bsdaValidationSchema}
         initialStep={props.initialStep}
       />
-      {(creating || updating) && <Loader />}
+      {loading && <Loader />}
     </>
   );
 }

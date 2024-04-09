@@ -1,25 +1,27 @@
 import * as React from "react";
 import CompanySelectorWrapper from "../../../../form/common/components/CompanySelectorWrapper/CompanySelectorWrapper";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
-import { Field, useField } from "formik";
+import { Field } from "formik";
 import {
+  BsdType,
   CompanySearchResult,
   CompanyType,
   FavoriteType,
-  Transporter as FormTransporter,
-  TransportMode,
-  Transporter
+  TransportMode
 } from "@td/codegen-ui";
 import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 import TransporterRecepisse from "../TransporterRecepisse/TransporterRecepisse";
 import { isForeignVat } from "@td/constants";
+import { useTransporter } from "../../hooks/useTransporter";
+import { AnyTransporterInput } from "../../types";
+import TransportPlates from "../TransportPlates/TransportPlates";
 
 type TransporterFormProps = {
   // SIRET ou VAT de l'établissement courant
   orgId?: string;
   fieldName: string;
+  bsdType: BsdType;
 };
 
 /**
@@ -28,25 +30,19 @@ type TransporterFormProps = {
  * state Formik dès qu'un établissement est sélectionné dans le
  * CompanySelector.
  */
-export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
-  const [field, _, { setValue }] = useField<FormTransporter>(fieldName);
-
-  const transporter = field.value;
-
-  // transporter.company.orgId should always be defined
-  // but let's not take the risk
-  const transporterOrgId = React.useMemo(
-    () =>
-      transporter?.company?.orgId ??
-      transporter?.company?.siret ??
-      transporter?.company?.vatNumber ??
-      null,
-    [
-      transporter?.company?.orgId,
-      transporter?.company?.siret,
-      transporter?.company?.vatNumber
-    ]
-  );
+export function TransporterForm<T extends AnyTransporterInput>({
+  orgId,
+  fieldName,
+  bsdType
+}: TransporterFormProps) {
+  const {
+    transporterOrgId,
+    transporter,
+    setTransporter,
+    transportPlatesFieldName,
+    transportModeFieldName,
+    transporterRecepisseIsExemptedFieldName
+  } = useTransporter<T>(fieldName, bsdType);
 
   const isForeign = React.useMemo(
     () => isForeignVat(transporterOrgId),
@@ -57,40 +53,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
   // modifier le state Formik
   const onCompanySelected = (company?: CompanySearchResult) => {
     if (company) {
-      const updatedTransporter: Transporter = {
-        ...transporter,
-        company: {
-          ...transporter.company,
-          orgId: company.orgId,
-          siret: company.siret,
-          vatNumber: company.vatNumber,
-          country: company.codePaysEtrangerEtablissement,
-          // auto-completion de la raison sociale et de l'adresse
-          name: company.name ?? "",
-          address: company.address ?? "",
-          ...(transporterOrgId !== company.orgId
-            ? {
-                // auto-completion des infos de contact uniquement
-                // s'il y a un changement d'établissement pour
-                // éviter d'écraser les infos de contact spécifiées par l'utilisateur
-                // lors d'une modification de bordereau
-                contact: company.contact ?? "",
-                phone: company.contactPhone ?? "",
-                mail: company.contactEmail ?? ""
-              }
-            : {})
-        },
-        // auto-complétion du récépissé de transport
-        receipt: company.transporterReceipt?.receiptNumber,
-        validityLimit: company.transporterReceipt?.validityLimit,
-        department: company.transporterReceipt?.department,
-        isExemptedOfReceipt: isForeignVat(company.vatNumber)
-          ? // l'obligation de récépissé ne concerne pas les transporteurs étrangers
-            // on force la valeur à `false` et on désactive le champ
-            false
-          : transporter.isExemptedOfReceipt
-      };
-      setValue(updatedTransporter);
+      setTransporter(company);
     }
   };
 
@@ -99,7 +62,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
       if (!company.isRegistered) {
         return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
       } else if (
-        !transporter.isExemptedOfReceipt &&
+        !transporter?.recepisse?.isExempted &&
         !company.companyTypes?.includes(CompanyType.Transporter)
       ) {
         return (
@@ -127,7 +90,7 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
 
       <CompanyContactInfo fieldName={`${fieldName}.company`} />
 
-      <Field name={`${fieldName}.isExemptedOfReceipt`}>
+      <Field name={transporterRecepisseIsExemptedFieldName}>
         {({ field, form }) => (
           <ToggleSwitch
             label={
@@ -148,7 +111,10 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
             checked={field.value}
             disabled={isForeign}
             onChange={checked =>
-              form.setFieldValue(`${fieldName}.isExemptedOfReceipt`, checked)
+              form.setFieldValue(
+                transporterRecepisseIsExemptedFieldName,
+                checked
+              )
             }
             defaultChecked={false}
           />
@@ -157,18 +123,18 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
 
       {!!transporterOrgId &&
         !isForeign &&
-        !transporter.isExemptedOfReceipt &&
-        transporter.mode === TransportMode.Road && (
+        !transporter?.recepisse?.isExempted &&
+        transporter?.transport?.mode === TransportMode.Road && (
           <TransporterRecepisse
-            number={transporter.receipt}
-            department={transporter.department}
-            validityLimit={transporter.validityLimit}
+            number={transporter?.recepisse?.number}
+            department={transporter?.recepisse?.department}
+            validityLimit={transporter?.recepisse?.validityLimit}
           />
         )}
 
-      <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+      <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
         <div className="fr-col-12 fr-col-md-3">
-          <Field name={`${fieldName}.mode`}>
+          <Field name={transportModeFieldName}>
             {({ field }) => (
               <Select label="Mode de transport" nativeSelectProps={field}>
                 <option value="ROAD">Route</option>
@@ -181,11 +147,10 @@ export function TransporterForm({ orgId, fieldName }: TransporterFormProps) {
           </Field>
         </div>
         <div className="fr-col-12 fr-col-md-3">
-          <Field name={`${fieldName}.numberPlate`}>
-            {({ field }) => (
-              <Input label="Immatriculation" nativeInputProps={field} />
-            )}
-          </Field>
+          <TransportPlates
+            bsdType={bsdType}
+            fieldName={transportPlatesFieldName}
+          />
         </div>
       </div>
     </div>

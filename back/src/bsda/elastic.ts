@@ -1,4 +1,4 @@
-import { Bsda, BsdaStatus, BsdType } from "@prisma/client";
+import { Bsda, BsdaStatus, BsdaTransporter, BsdType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -18,7 +18,11 @@ import {
 } from "./types";
 import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
-import { getFirstTransporterSync } from "./database";
+import {
+  getFirstTransporterSync,
+  getNextTransporterSync,
+  getTransportersSync
+} from "./database";
 
 export type BsdaForElastic = Bsda &
   BsdaWithTransporters &
@@ -42,6 +46,12 @@ export async function getBsdaForElastic(
     where: { id: bsda.id },
     include: BsdaForElasticInclude
   });
+}
+
+// génère une clé permettant d'identifier les transporteurs de façon
+// unique dans un mapping
+function transporterCompanyOrgIdKey(transporter: BsdaTransporter) {
+  return `transporter${transporter.number}CompanyOrgId`;
 }
 
 type WhereKeys =
@@ -85,7 +95,23 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     {}
   );
 
-  const transporter = getFirstTransporterSync(bsda);
+  const firstTransporter = getFirstTransporterSync(bsda);
+
+  // build a mapping that looks like
+  // { transporter1CompanyOrgId: "SIRET1", transporter2CompanyOrgId: "SIRET2"}
+  const transporterOrgIds = (bsda.transporters ?? []).reduce(
+    (acc, transporter) => {
+      const orgId = getTransporterCompanyOrgId(transporter);
+      if (orgId) {
+        return {
+          ...acc,
+          [transporterCompanyOrgIdKey(transporter)]: orgId
+        };
+      }
+      return acc;
+    },
+    {}
+  );
 
   const bsdaSirets: Partial<
     Record<keyof Bsda | "transporterCompanySiret", string | null | undefined>
@@ -94,11 +120,11 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     ecoOrganismeSiret: bsda.ecoOrganismeSiret,
     workerCompanySiret: bsda.workerCompanySiret,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     brokerCompanySiret: bsda.brokerCompanySiret,
     destinationOperationNextDestinationCompanySiret:
       bsda.destinationOperationNextDestinationCompanySiret,
-    ...intermediarySirets
+    ...intermediarySirets,
+    ...transporterOrgIds
   };
 
   const siretsFilters = new Map<string, keyof typeof where>(
@@ -127,8 +153,16 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
         setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
         break;
       }
-      if (bsda.emitterIsPrivateIndividual && bsda.workerIsDisabled) {
-        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+      if (
+        bsda.emitterIsPrivateIndividual &&
+        bsda.workerIsDisabled &&
+        firstTransporter
+      ) {
+        setTab(
+          siretsFilters,
+          transporterCompanyOrgIdKey(firstTransporter),
+          "isToCollectFor"
+        );
         break;
       }
       if (
@@ -144,23 +178,80 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     case BsdaStatus.SIGNED_BY_PRODUCER:
       if (bsda.type === "OTHER_COLLECTIONS" && !bsda.workerIsDisabled) {
         setTab(siretsFilters, "workerCompanySiret", "isForActionFor");
-      } else {
+      } else if (firstTransporter) {
         // Bsda types GATHERING and RESHIPMENT do not expect worker signature,
         // so they're ready to take over an must appear on transporter dashboard
         // (COLLECTION_2710 is directly PROCESSED and never SIGNED_BY_PRODUCER)
-        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+        setTab(
+          siretsFilters,
+          transporterCompanyOrgIdKey(firstTransporter),
+          "isToCollectFor"
+        );
       }
 
       break;
 
     case BsdaStatus.SIGNED_BY_WORKER:
-      setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+      if (firstTransporter) {
+        setTab(
+          siretsFilters,
+          transporterCompanyOrgIdKey(firstTransporter),
+          "isToCollectFor"
+        );
+      }
       break;
 
-    case BsdaStatus.SENT:
-      setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
-      setTab(siretsFilters, "transporterCompanySiret", "isCollectedFor");
+    case BsdaStatus.SENT: {
+      // tra-1294 ETQ destination, je souhaite avoir la possibilité de signer la réception
+      // même si l'ensemble des transporteurs visés dans le bordereau n'ont pas pris en charge le déchet,
+      // pouvoir gérer au mieux la réception, et éviter le cas où le bordereau serait bloqué en absence
+      // d'un des transporteurs. On fait une exception à la règle dans le cas où l'installation de destination
+      // est également le transporteur N+1.
+      const nextTransporter = getNextTransporterSync(bsda);
+      if (
+        !nextTransporter ||
+        nextTransporter.transporterCompanySiret !== bsda.destinationCompanySiret
+      ) {
+        setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
+      }
+
+      const transporters = getTransportersSync(bsda);
+
+      transporters.forEach((transporter, idx) => {
+        if (transporter.transporterTransportSignatureDate) {
+          // `handedOver` permet de savoir si le transporteur
+          // N+1 a également pris en charge le déchet, si c'est le
+          // cas le bordereau ne doit pas apparaitre dans l'onglet "Collecté"
+          // du transporteur N
+          const handedOver = transporters.find(
+            t =>
+              t.number > transporter.number &&
+              t.transporterTransportSignatureDate
+          );
+
+          if (!handedOver) {
+            setTab(
+              siretsFilters,
+              transporterCompanyOrgIdKey(transporter),
+              "isCollectedFor"
+            );
+          }
+        } else if (
+          // le bordereau est "à collecter" soit par le premier transporteur
+          // (géré dans case SIGNED_BY_PRODUCER) soit par le transporteur N+1 dès lors que
+          // le transporteur N a signé.
+          idx > 0 &&
+          bsda.transporters[idx - 1].transporterTransportSignatureDate
+        ) {
+          setTab(
+            siretsFilters,
+            transporterCompanyOrgIdKey(transporter),
+            "isToCollectFor"
+          );
+        }
+      });
       break;
+    }
 
     case BsdaStatus.REFUSED:
     case BsdaStatus.PROCESSED:
@@ -264,7 +355,9 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
       transporter?.transporterTransportSignatureDate?.getTime(),
     destinationReceptionDate: bsda.destinationReceptionDate?.getTime(),
     destinationAcceptationDate: bsda.destinationReceptionDate?.getTime(),
-    destinationAcceptationWeight: bsda.destinationReceptionWeight,
+    destinationAcceptationWeight: bsda.destinationReceptionWeight
+      ? bsda.destinationReceptionWeight.toNumber()
+      : null,
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     ...where,
     ...getBsdaRevisionOrgIds(bsda),
