@@ -77,7 +77,7 @@ export async function sendHookJob(job: Job<WebhookQueueItem>) {
 
   const uniqueOrgIds = new Set(sirets);
 
-  let error;
+  const errors: string[] = [];
   for (const orgId of uniqueOrgIds) {
     const settings = await getWebhookSettings(orgId);
 
@@ -97,11 +97,18 @@ export async function sendHookJob(job: Job<WebhookQueueItem>) {
           }
         });
       } catch (e) {
-        error = e;
+        // Let the loop continue. We'll throw later on
+        errors.push(e.message);
       }
     }
   }
 
   // At least one webhook failed for this BSD. Try again
-  if (error) throw error;
+  if (errors.length) {
+    throw new WebhookRequestError(
+      `Webhook job threw errors (id=${id}, sirets=[${sirets}], action=${action}): ${errors.join(
+        ", "
+      )}`
+    );
+  }
 }

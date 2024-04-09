@@ -204,17 +204,17 @@ describe("sendHook", () => {
       const company1 = await companyFactory({ webhookSettingsLimit: 2 });
       const company2 = await companyFactory();
 
-      await webhookSettingFactory({
+      const whs1 = await webhookSettingFactory({
         company: company1,
         token: "secret-wh1",
         endpointUri: "https://company1.fr/endpoint1"
       });
-      await webhookSettingFactory({
+      const whs2 = await webhookSettingFactory({
         company: company1,
         token: "secret-wh2",
         endpointUri: "https://company1.fr/endpoint2"
       });
-      await webhookSettingFactory({
+      const whs3 = await webhookSettingFactory({
         company: company2,
         token: "secret-wh3",
         endpointUri: "https://company2.fr/endpoint1"
@@ -227,7 +227,7 @@ describe("sendHook", () => {
       });
 
       // When
-      expect.assertions(6);
+      expect.assertions(9);
       try {
         await sendHookJob({
           data: {
@@ -238,9 +238,16 @@ describe("sendHook", () => {
         } as Job<WebhookQueueItem>);
       } catch (e) {
         expect(e).not.toBeUndefined();
-        expect(e.message).toBe(
-          `Webhook requets fail for orgId ${company1.orgId} and endpoint https://company1.fr/endpoint1`
+        expect(e.message.startsWith(`Webhook job threw errors`)).toBeTruthy();
+
+        // Company1 endpoint1 should have failed
+        expect(e.message).toContain(
+          `Webhook requets fail for orgId ${company1.orgId} and endpoint ${whs1.endpointUri}`
         );
+
+        // Other endpoints should be ok
+        expect(e.message).not.toContain(whs2.endpointUri);
+        expect(e.message).not.toContain(whs3.endpointUri);
       }
 
       // Then
@@ -267,17 +274,17 @@ describe("sendHook", () => {
       const company1 = await companyFactory({ webhookSettingsLimit: 2 });
       const company2 = await companyFactory();
 
-      await webhookSettingFactory({
+      const whs1 = await webhookSettingFactory({
         company: company1,
         token: "secret-wh1",
         endpointUri: "https://company1.fr/endpoint1"
       });
-      await webhookSettingFactory({
+      const whs2 = await webhookSettingFactory({
         company: company1,
         token: "secret-wh2",
         endpointUri: "https://company1.fr/endpoint2"
       });
-      await webhookSettingFactory({
+      const whs3 = await webhookSettingFactory({
         company: company2,
         token: "secret-wh3",
         endpointUri: "https://company2.fr/endpoint1"
@@ -290,7 +297,7 @@ describe("sendHook", () => {
       });
 
       // When
-      expect.assertions(6);
+      expect.assertions(9);
       try {
         await sendHookJob({
           data: {
@@ -301,9 +308,18 @@ describe("sendHook", () => {
         } as Job<WebhookQueueItem>);
       } catch (e) {
         expect(e).not.toBeUndefined();
-        expect(e.message).toBe(
-          `Webhook requets fail for orgId ${company1.orgId} and endpoint https://company1.fr/endpoint1`
+        expect(e.message.startsWith(`Webhook job threw errors`)).toBeTruthy();
+
+        // Company1 endpoints should have failed
+        expect(e.message).toContain(
+          `Webhook requets fail for orgId ${company1.orgId} and endpoint ${whs1.endpointUri}`
         );
+        expect(e.message).toContain(
+          `Webhook requets fail for orgId ${company1.orgId} and endpoint ${whs2.endpointUri}`
+        );
+
+        // Company2 endpoint should be ok
+        expect(e.message).not.toContain(whs3.endpointUri);
       }
 
       // Then
