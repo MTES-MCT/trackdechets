@@ -27,6 +27,7 @@ export {
   bulkIndexQueue,
   bulkIndexMasterQueue
 } from "./queue/producers/elastic";
+export { sirenifyQueue } from "./queue/producers/sirenify";
 export { mailQueue } from "./queue/producers/mail";
 export { syncEventsQueue } from "./queue/producers/events";
 export {
@@ -42,7 +43,8 @@ export {
   DELETE_JOB_NAME,
   INDEX_JOB_NAME,
   INDEX_CREATED_JOB_NAME,
-  INDEX_UPDATED_JOB_NAME
+  INDEX_UPDATED_JOB_NAME,
+  SIRENIFY_JOB_NAME
 } from "./queue/producers/jobNames";
 export { deleteBsdJob } from "./queue/jobs/deleteBsd";
 export { indexFavoritesJob } from "./queue/jobs/indexFavorites";
@@ -52,6 +54,7 @@ export {
   webhooksQueue,
   SEND_WEBHOOK_JOB_NAME
 } from "./queue/producers/webhooks";
+export { sirenifyBsdJob } from "./queue/jobs/sirenifyBsd";
 export { associateUserToCompany } from "./users/database";
 export { Mutation, MutationDeleteCompanyArgs } from "./generated/graphql/types";
 export { redisClient } from "./common/redis";
