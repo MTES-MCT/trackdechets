@@ -534,18 +534,18 @@ export const getSealedBtnLabel = (
       return SIGNER;
     }
     if (isAppendix1Producer(bsd)) {
+      if (bsd.ecoOrganisme?.siret === currentSiret) {
+        return "";
+      }
+
       if (isSignEmission(currentSiret, bsd, hasAutomaticSignature)) {
         const currentUserIsEmitter =
-          bsd.emitter?.company?.siret?.includes(currentSiret);
+          bsd.emitter?.company?.siret === currentSiret;
         if (currentUserIsEmitter) {
-          console.log(currentUserIsEmitter);
           return SIGNER;
         }
-        if (isSameSiretTransporter(currentSiret, bsd)) {
-          return FAIRE_SIGNER;
-        }
+        return FAIRE_SIGNER;
       }
-      return "";
     }
     if (isSameSiretEmmiter(currentSiret, bsd)) {
       return SIGNER;
