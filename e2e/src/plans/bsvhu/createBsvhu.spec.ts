@@ -15,12 +15,13 @@ import {
   verifyOverviewData,
   deleteBsvhu
 } from "../../utils/bsvhu";
+import crypto from "crypto";
 
 test.describe.serial("Cahier de recette de création des BSVHU", async () => {
   // User credentials
   const USER_NAME = "User e2e Create BSVHU";
   const USER_EMAIL = "user.e2e.create.bsvhu@mail.com";
-  const USER_PASSWORD = "Us3r_E2E_Cre4te_BSVHU$$";
+  const USER_PASSWORD = crypto.randomBytes(20).toString("hex");
 
   // User
   let user;
