@@ -543,9 +543,9 @@ Depuis un one-off container de taille XL
 
 ## Rattrapage SIRENE
 
-Si les données de raison sociale et d'adresses enregistrés sur les bordereaux sont erronnées suite à un dysfonctionnement de l'index SIRENE, un rattrapage peut être effectué à postériori grâce au script :
+Si les données de raison sociale et d'adresses enregistrés sur les bordereaux sont erronnées suite à un dysfonctionnement de l'index SIRENE, un rattrapage peut être effectué à postériori grâce au script suivante. Tous les bordereaux qui ont été crées ou modifiés entre ces deux dates seront mis à jour.
 
-`npx nx run back:bulk-sirenify --since 2024-04-01 --before 2024-04-03`
+`npx nx run back:sirenify-bulk --since 2024-04-01 --before 2024-04-03`
 
 Les jobs de "sirenification" sont dépilés par le worker `bulkindexqueue` qui doit donc être démarré sur Scalingo avant de lancer le script.
 
