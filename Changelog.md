@@ -25,6 +25,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correction des registres éco-organisme et intermédiaires [PR 3196](https://github.com/MTES-MCT/trackdechets/pull/3196/)
 - Correction des révisions avec un mode de traitement null [PR 3193](https://github.com/MTES-MCT/trackdechets/pull/3193)
+- Correction de la gestion du poids lors de la création d'un Bsdasri de groupement [PR 3236](https://github.com/MTES-MCT/trackdechets/pull/3236)
 
 #### :house: Interne
 
