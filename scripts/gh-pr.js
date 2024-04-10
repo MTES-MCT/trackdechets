@@ -21,7 +21,9 @@ async function getBody(github, context) {
     lines.push(
       `|${pr.title}|[#${pr.number}](${pr.html_url})|@${
         pr.user.login
-      }|${nbApprovals}| ${nbApprovals >= 2 ? "🐥" : nbApprovals === 1 ? "🐣" : "🥚"}|`
+      }|${nbApprovals}| ${
+        nbApprovals >= 2 ? "🐥" : nbApprovals === 1 ? "🐣" : "🥚"
+      }|`
     );
   }
 
