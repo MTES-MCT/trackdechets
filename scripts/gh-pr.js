@@ -47,5 +47,5 @@ async function getNbPrApprovals(github, context, pr) {
     pull_number: pr.number
   });
 
-  return reviews.filter(review => review.state === "APPROVED").length;
+  return reviews.data.filter(review => review.state === "APPROVED").length;
 }
