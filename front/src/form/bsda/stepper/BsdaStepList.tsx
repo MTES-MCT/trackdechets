@@ -100,7 +100,7 @@ export default function BsdaStepsList(props: Props) {
         ? // s'assure qu'on ne crée pas un transporteur "vide"
           // dans le cadre d'un BSDA de collecte en déchetterie
           // qui n'autorise pas l'ajout de transporteur
-          { ...input, transporter: null }
+          { ...input, transporters: [] }
         : input;
 
     return bsdaState.id
