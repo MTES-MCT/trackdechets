@@ -63,6 +63,13 @@ export const bulkIndexMasterQueue = new Queue<string>(
       // 24h pour prendre de la marge, les jobs de cette queue attendent que toutes les chunks
       // soit process lors d'un reindex global
       timeout: 24 * 3600 * 1000
+    },
+    settings: {
+      // https://github.com/OptimalBits/bull?tab=readme-ov-file#important-notes
+      // https://github.com/OptimalBits/bull/issues/1591
+      lockDuration: 2 * 60 * 1000, // 2 minutes - default 3000 (30s)
+      // prevent the job from being run twice if it is stalled
+      maxStalledCount: 0 // default is 1
     }
   }
 );
