@@ -533,16 +533,19 @@ export const getSealedBtnLabel = (
     ) {
       return SIGNER;
     }
-    if (isSignEmission(currentSiret, bsd, hasAutomaticSignature)) {
-      const emitterSirets = [
-        bsd.emitter?.company?.siret,
-        bsd.ecoOrganisme?.siret
-      ];
-      const currentUserIsEmitter = emitterSirets.includes(currentSiret);
-      if (currentUserIsEmitter) {
-        return SIGNER;
+    if (isAppendix1Producer(bsd)) {
+      if (bsd.ecoOrganisme?.siret === currentSiret) {
+        return "";
       }
-      return FAIRE_SIGNER;
+
+      if (isSignEmission(currentSiret, bsd, hasAutomaticSignature)) {
+        const currentUserIsEmitter =
+          bsd.emitter?.company?.siret === currentSiret;
+        if (currentUserIsEmitter) {
+          return SIGNER;
+        }
+        return FAIRE_SIGNER;
+      }
     }
     if (isSameSiretEmmiter(currentSiret, bsd)) {
       return SIGNER;

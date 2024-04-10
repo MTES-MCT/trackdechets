@@ -13,6 +13,7 @@ import {
 } from "@td/codegen-ui";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { initialBsdaTransporter } from "../initial-state";
 
 type Props = { disabled: boolean };
 
@@ -78,7 +79,11 @@ export function Type({ disabled }: Props) {
       setFieldValue("destination.company.address", data?.companyInfos.address);
       setFieldValue("destination.company.name", data?.companyInfos.name);
       setFieldValue("worker.company", getInitialCompany());
-      setFieldValue("transporter.company", getInitialCompany());
+      // Nettoie les données transporteurs en gardant quand même un
+      // transporteur vide par défaut au cas où on repasse sur un autre type
+      // de BSDA. Un clean sera fait au moment de la soumission du formulaire
+      // pour s'assurer que `transporters: []` en cas de collecte en déchetterie.
+      setFieldValue("transporters", [initialBsdaTransporter]);
     }
   }, [type, setFieldValue, data]);
 
