@@ -74,6 +74,12 @@ export const bulkIndexMasterQueue = new Queue<string>(
   }
 );
 
+bulkIndexMasterQueue.on("stalled", opt => {
+  logger.warn(
+    `The job ${opt.id} in queue bulkIndexMasterQueue has been stalled`
+  );
+});
+
 indexQueue.on("completed", async job => {
   const id = job.data;
 
