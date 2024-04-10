@@ -19,7 +19,7 @@ async function getBody(github, context) {
     const nbApprovals = await getNbPrApprovals(github, context, pr);
 
     lines.push(
-      `|${pr.title}|[#${pr.number}](${pr.html_url})}|@${
+      `|${pr.title}|[#${pr.number}](${pr.html_url})|@${
         pr.user.login
       }|${nbApprovals}| ${nbApprovals >= 2 ? "🐥" : nbApprovals === 1 ? "🐣" : "🥚"}|`
     );
