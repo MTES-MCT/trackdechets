@@ -11,7 +11,7 @@ async function getBody(github, context) {
     return "Rien dans le poulailler ce matin 🐔 On retourne pondre du code ! 🧑‍💻";
   }
 
-  const header = `|Titre|N°|Auteur|Approvals||
+  const header = `|Titre|N°|Auteur|Approvals|🐔|
 |---|---|---|---|---|`;
 
   const lines = [];
