@@ -265,24 +265,63 @@ export async function isIndexMappingsVersionChanged(
   }
 }
 
+type GetBsdIdentifiersOpt = {
+  since?: Date;
+  paginateBy?: number;
+};
+
 /**
  * Retrieves all BSD identifiers for a given BSD type
  */
 export async function getBsdIdentifiers(
   bsdName: string,
-  since?: Date
+  { since, paginateBy }: GetBsdIdentifiersOpt = {}
 ): Promise<string[]> {
   const prismaModelDelegate = prismaModels[bsdName];
 
-  const bsds = await prismaModelDelegate.findMany({
-    where: {
-      isDeleted: false,
-      ...(since ? { updatedAt: { gte: since } } : {})
-    },
-    select: { id: true }
-  });
+  const defaultPaginateBy = 500000;
+  const take = paginateBy ?? defaultPaginateBy;
 
-  return bsds.map(bsd => bsd.id);
+  // Renvoie <take> bordereaux après le bordereau
+  // identifié par son curseur
+  async function nextPage(after: string | null) {
+    const bsds = await prismaModelDelegate.findMany({
+      take,
+      ...(after
+        ? {
+            // Cf https://www.prisma.io/docs/orm/prisma-client/queries/pagination#cursor-based-pagination
+            skip: 1,
+            cursor: {
+              rowNumber: after
+            }
+          }
+        : {}),
+      where: {
+        isDeleted: false,
+        ...(since ? { updatedAt: { gte: since } } : {})
+      },
+      select: { id: true, rowNumber: true },
+      orderBy: { rowNumber: "asc" }
+    });
+
+    return bsds;
+  }
+
+  // Récupère tous les identifiants en paginant la liste des bordereaux
+  // de manière récursive grâce à une pagination par curseur qui utilise `rowNumber`
+  async function paginate(after: string | null = null, ids: string[] = []) {
+    const bsds = await nextPage(after);
+    const length = bsds.length;
+    if (length === 0) {
+      return ids;
+    } else {
+      const bsdIds = bsds.map(bsd => bsd.id) as string[];
+      const nextCursor = bsds[length - 1].rowNumber;
+      return paginate(nextCursor, [...ids, ...bsdIds]);
+    }
+  }
+
+  return paginate();
 }
 
 export async function processDbIdentifiersByChunk(
@@ -305,7 +344,7 @@ export async function indexAllBsdTypeSync({
   since,
   indexConfig
 }: IndexAllFnSignature): Promise<void> {
-  const ids = await getBsdIdentifiers(bsdName, since);
+  const ids = await getBsdIdentifiers(bsdName, { since });
 
   logger.info(`Starting synchronous indexation of ${ids.length} ${bsdName}`);
 
@@ -331,7 +370,7 @@ export async function indexAllBsdTypeConcurrentJobs({
 }: IndexAllFnSignature) {
   const jobs: Job<string>[] = [];
   const data: { name: string; data: string; opts?: JobOptions }[] = [];
-  const ids = await getBsdIdentifiers(bsdName, since);
+  const ids = await getBsdIdentifiers(bsdName, { since });
   logger.info(`Starting indexation of ${ids.length} ${bsdName}`);
 
   // Prepare Job data payload to call indexQueue.addBulk
