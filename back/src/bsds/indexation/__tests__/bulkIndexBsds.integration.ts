@@ -34,13 +34,89 @@ describe("processDbIdentifiersByChunk", () => {
 describe("getBsdIdentifiers", () => {
   afterEach(resetDatabase);
 
-  it("should return all identifiers of a bsd type", async () => {
-    const user = await userFactory();
+  it.each([1, 2, 3, 4, 5, 100])(
+    "should return all BSDD's identifiers when paginating by %p",
+    async paginateBy => {
+      const user = await userFactory();
 
-    const form = await formFactory({ ownerId: user.id });
-    const ids = await getBsdIdentifiers("bsdd");
-    expect(ids).toEqual([form.id]);
-  });
+      const form1 = await formFactory({ ownerId: user.id });
+      const form2 = await formFactory({ ownerId: user.id });
+      const form3 = await formFactory({ ownerId: user.id });
+      const form4 = await formFactory({ ownerId: user.id });
+      const form5 = await formFactory({ ownerId: user.id });
+
+      const ids = await getBsdIdentifiers("bsdd", { paginateBy });
+      expect(ids).toEqual([form1.id, form2.id, form3.id, form4.id, form5.id]);
+    }
+  );
+
+  it.each([1, 2, 3, 4, 5, 100])(
+    "should return all BSDA's identifiers when paginating by %p",
+    async paginateBy => {
+      const bsda1 = await bsdaFactory({});
+      const bsda2 = await bsdaFactory({});
+      const bsda3 = await bsdaFactory({});
+      const bsda4 = await bsdaFactory({});
+      const bsda5 = await bsdaFactory({});
+
+      const ids = await getBsdIdentifiers("bsda", { paginateBy });
+      expect(ids).toEqual([bsda1.id, bsda2.id, bsda3.id, bsda4.id, bsda5.id]);
+    }
+  );
+
+  it.each([1, 2, 3, 4, 5, 100])(
+    "should return all BSDASRI's identifiers when paginating by %p",
+    async paginateBy => {
+      const bsdasri1 = await bsdasriFactory({});
+      const bsdasri2 = await bsdasriFactory({});
+      const bsdasri3 = await bsdasriFactory({});
+      const bsdasri4 = await bsdasriFactory({});
+      const bsdasri5 = await bsdasriFactory({});
+
+      const ids = await getBsdIdentifiers("bsdasri", { paginateBy });
+      expect(ids).toEqual([
+        bsdasri1.id,
+        bsdasri2.id,
+        bsdasri3.id,
+        bsdasri4.id,
+        bsdasri5.id
+      ]);
+    }
+  );
+
+  it.each([1, 2, 3, 4, 5, 100])(
+    "should return all BSFF's identifiers when paginating by %p",
+    async paginateBy => {
+      const bsff1 = await createBsff();
+      const bsff2 = await createBsff({});
+      const bsff3 = await createBsff({});
+      const bsff4 = await createBsff({});
+      const bsff5 = await createBsff({});
+
+      const ids = await getBsdIdentifiers("bsff", { paginateBy });
+      expect(ids).toEqual([bsff1.id, bsff2.id, bsff3.id, bsff4.id, bsff5.id]);
+    }
+  );
+
+  it.each([1, 2, 3, 4, 5, 100])(
+    "should return all BSVHU's identifiers when paginating by %p",
+    async paginateBy => {
+      const bsvhu1 = await bsvhuFactory({});
+      const bsvhu2 = await bsvhuFactory({});
+      const bsvhu3 = await bsvhuFactory({});
+      const bsvhu4 = await bsvhuFactory({});
+      const bsvhu5 = await bsvhuFactory({});
+
+      const ids = await getBsdIdentifiers("bsvhu", { paginateBy });
+      expect(ids).toEqual([
+        bsvhu1.id,
+        bsvhu2.id,
+        bsvhu3.id,
+        bsvhu4.id,
+        bsvhu5.id
+      ]);
+    }
+  );
 
   it("should not return identifiers updated before since paramater", async () => {
     const user = await userFactory();
@@ -54,7 +130,9 @@ describe("getBsdIdentifiers", () => {
       ownerId: user.id,
       opt: { updatedAt: new Date("2023-02-01") }
     });
-    const ids = await getBsdIdentifiers("bsdd", new Date("2023-02-01"));
+    const ids = await getBsdIdentifiers("bsdd", {
+      since: new Date("2023-02-01")
+    });
     expect(ids).toEqual([form2.id]);
   });
 });
