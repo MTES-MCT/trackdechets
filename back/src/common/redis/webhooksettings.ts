@@ -1,8 +1,8 @@
 import { redisClient } from "./redis";
 import { WebhookSetting } from "@prisma/client";
-
 import { prisma } from "@td/prisma";
-type WebhookInfo = { endpointUri: string; token: string };
+
+export type WebhookInfo = { endpointUri: string; token: string };
 
 export const WEBHOOK_SETTING_CACHE_KEY = "webhooks_setting";
 const WEBHOOK_FAIL_CACHE_KEY = "webhook_fail";
@@ -18,13 +18,15 @@ export async function getWebhookSettings(
   orgId: string
 ): Promise<WebhookInfo[]> {
   const key = genWebhookKey(orgId);
-
   const storedWebhooks = await redisClient.smembers(key);
 
   return storedWebhooks
     .map(el => el.split(separator))
     .map(el => ({ endpointUri: el[0], token: el[1] }));
 }
+
+const smember = (webhookSetting: WebhookSetting) =>
+  `${webhookSetting.endpointUri}${separator}${webhookSetting.token}`;
 
 /**
  * Store a redis webhook setting - key : uri|token
@@ -33,11 +35,7 @@ export async function setWebhookSetting(
   webhookSetting: WebhookSetting
 ): Promise<void> {
   const key = genWebhookKey(webhookSetting.orgId);
-
-  await redisClient.sadd(
-    key,
-    `${webhookSetting.endpointUri}${separator}${webhookSetting.token}`
-  );
+  await redisClient.sadd(key, smember(webhookSetting));
 }
 
 /**Delete all redis webhooks settings */
@@ -59,31 +57,50 @@ export async function clearWebhookSetting(cursor = 0): Promise<void> {
   }
 }
 
-export async function delWebhookSetting(orgId: string): Promise<void> {
-  const key = genWebhookKey(orgId);
-  await redisClient.del(key);
+export async function delWebhookSetting(
+  webhookSetting: WebhookSetting
+): Promise<void> {
+  const key = genWebhookKey(webhookSetting.orgId);
+  await redisClient.srem(key, smember(webhookSetting));
 }
+// How many failed webhook for a given orgId before deactivation
 const WEBHOOK_FAIL_ACCEPTED = parseInt(
   process.env.WEBHOOK_FAIL_ACCEPTED || "5",
   10
-); // how many failed webhook ofor a given orgId before deactivation
+);
+// How long after the last fail the counter is reset
 const WEBHOOK_FAIL_RESET_DELAY = parseInt(
   process.env.WEBHOOK_FAIL_RESET_DELAY || "600",
   10
-); // how long after the last fail the counter is reset
+);
 
-const genWebhookFailKey = (orgId: string): string =>
-  `${WEBHOOK_FAIL_CACHE_KEY}:${orgId}`;
+const genWebhookFailKey = (orgId: string, endpointUri: string): string =>
+  `${WEBHOOK_FAIL_CACHE_KEY}:${orgId}:${endpointUri}`;
 
-export async function handleWebhookFail(orgId: string): Promise<void> {
-  const key = genWebhookFailKey(orgId);
+export async function handleWebhookFail(
+  orgId: string,
+  endpointUri: string
+): Promise<void> {
+  const key = genWebhookFailKey(orgId, endpointUri);
   const failCount = await redisClient.get(key);
   if (failCount && parseInt(failCount, 10) >= WEBHOOK_FAIL_ACCEPTED) {
-    await prisma.webhookSetting.update({
-      where: { orgId },
-      data: { activated: false }
+    const wehbookSetting = await prisma.webhookSetting.findFirst({
+      where: { endpointUri, orgId }
     });
-    await delWebhookSetting(orgId);
+
+    if (wehbookSetting) {
+      await prisma.webhookSetting.update({
+        where: {
+          WebhookSetting_orgId_endpointUri_unique_together: {
+            orgId,
+            endpointUri
+          }
+        },
+        data: { activated: false }
+      });
+      await delWebhookSetting(wehbookSetting);
+    }
+
     await redisClient.del(key);
     return;
   }

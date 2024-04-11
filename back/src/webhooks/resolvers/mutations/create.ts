@@ -30,25 +30,30 @@ const createWebhookSettingResolver = async (
 
   const company = await getCompanyOrCompanyNotFound({ id: companyId });
 
-  if (!allowedCompaniesOrgIds.includes(company.orgId)) {
+  if (!allowedCompaniesOrgIds.includes(company.orgId) || !company) {
     throw new UserInputError(
       "Vous n'avez pas la permission de gérer les webhooks de cet établissement."
     );
   }
 
-  if (!company) {
+  const webhookSettingRepository = getWebhookSettingRepository(user);
+  const companyWebhookSettings = await webhookSettingRepository.findMany(
+    { orgId: company.orgId },
+    { select: { endpointUri: true } }
+  );
+  if (companyWebhookSettings.length >= company.webhookSettingsLimit) {
     throw new UserInputError(
-      "Vous n'avez pas la permission de gérer les webhooks de cet établissement"
+      "Cet établissement ne peut pas créer davantage de webhooks."
     );
   }
-  const webhookSettingRepository = getWebhookSettingRepository(user);
-  const hasWebhookSettings = await webhookSettingRepository.count({
-    orgId: company.orgId
-  });
 
-  if (hasWebhookSettings) {
+  if (
+    companyWebhookSettings.some(
+      settings => settings.endpointUri === endpointUri
+    )
+  ) {
     throw new UserInputError(
-      "Un webhook est déjà programmé pour cet établissement."
+      `Cet établissement a déjà un webhook avec l'endpoint "${endpointUri}"`
     );
   }
 

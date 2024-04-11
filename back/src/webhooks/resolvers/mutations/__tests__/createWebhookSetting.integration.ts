@@ -125,7 +125,7 @@ describe("Mutation.createWebhookSetting", () => {
       })
     ]);
   });
-  it("should forbid non htpps uri", async () => {
+  it("should forbid non https uri", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const { mutate } = makeClient(user);
@@ -213,7 +213,7 @@ describe("Mutation.createWebhookSetting", () => {
     ]);
   });
 
-  it("should forbid to create several webhook settings for the same company", async () => {
+  it("should forbid to create several webhook settings for the same company (if not allowed)", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     await webhookSettingFactory({
@@ -240,11 +240,132 @@ describe("Mutation.createWebhookSetting", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Un webhook est déjà programmé pour cet établissement.",
+        message: "Cet établissement ne peut pas créer davantage de webhooks.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
       })
     ]);
+  });
+
+  it("if company webhook limit has been increased, should allow to create several webhook settings for the same company", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      webhookSettingsLimit: 2
+    });
+    await webhookSettingFactory({
+      company,
+      token: "secret",
+      endpointUri: "https://url1.com"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createWebhookSetting">
+    >(CREATE_WEBHOOK_SETTING, {
+      variables: {
+        input: {
+          companyId: company.id,
+          endpointUri: "https://url2.com",
+          token: "secret_secret_secret",
+          activated: true
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createWebhookSetting.orgId).toEqual(company.orgId);
+
+    // 2nd time should fail
+    const { errors: secondTryErrors } = await mutate<
+      Pick<Mutation, "createWebhookSetting">
+    >(CREATE_WEBHOOK_SETTING, {
+      variables: {
+        input: {
+          companyId: company.id,
+          endpointUri: "https://url3.com",
+          token: "secret_secret_secret",
+          activated: true
+        }
+      }
+    });
+
+    expect(secondTryErrors).toEqual([
+      expect.objectContaining({
+        message: "Cet établissement ne peut pas créer davantage de webhooks.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("a company should not be able to create several webhookSettings with the same endpointUri", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      webhookSettingsLimit: 2
+    });
+    await webhookSettingFactory({
+      company,
+      token: "secret",
+      endpointUri: "https://url1.com"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createWebhookSetting">>(
+      CREATE_WEBHOOK_SETTING,
+      {
+        variables: {
+          input: {
+            companyId: company.id,
+            endpointUri: "https://url1.com",
+            token: "secret_secret_secret",
+            activated: true
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      `Cet établissement a déjà un webhook avec l'endpoint "https://url1.com"`
+    );
+  });
+
+  it("two companies can create webhooks with the same endpointUri (weird but ok)", async () => {
+    // Given
+    const { company: company1 } = await userWithCompanyFactory("ADMIN");
+    const { user: user2, company: company2 } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    await webhookSettingFactory({
+      company: company1,
+      token: "secret",
+      endpointUri: "https://url1.com"
+    });
+
+    // When
+    const { mutate } = makeClient(user2);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createWebhookSetting">
+    >(CREATE_WEBHOOK_SETTING, {
+      variables: {
+        input: {
+          companyId: company2.id,
+          endpointUri: "https://url1.com",
+          token: "secret_secret_secret",
+          activated: true
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createWebhookSetting.endpointUri).toBe("https://url1.com");
+    expect(data.createWebhookSetting.orgId).toBe(company2.orgId);
   });
 });
