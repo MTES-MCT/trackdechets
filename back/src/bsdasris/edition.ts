@@ -37,6 +37,8 @@ type EditableBsdasriFields = Required<
     | "isEmissionDirectTakenOver"
     | "isEmissionTakenOverWithSecretCode"
     | "emittedByEcoOrganisme"
+    | "finalOperations"
+    | "FinalOperationToFinalBsdasri"
   >
 >;
 // Defines until which signature BSDASRI fields can be modified

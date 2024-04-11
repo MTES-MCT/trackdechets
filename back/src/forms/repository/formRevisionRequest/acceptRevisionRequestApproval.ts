@@ -25,7 +25,7 @@ import buildRemoveAppendix2 from "../form/removeAppendix2";
 import { distinct } from "../../../common/arrays";
 import { ForbiddenError } from "../../../common/errors";
 import { isFinalOperationCode } from "../../../common/operationCodes";
-import { operationHooksQueue } from "../../../queue/producers/operationHook";
+import { operationHook } from "../../operationHook";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -323,6 +323,10 @@ export async function approveAndApplyRevisionRequest(
   const [bsddUpdate, forwardedInUpdate] =
     await getUpdateFromFormRevisionRequest(revisionRequest, prisma);
 
+  const bsddBeforeRevision = await prisma.form.findUniqueOrThrow({
+    where: { id: revisionRequest.bsddId }
+  });
+
   const updatedBsdd = await prisma.form.update({
     where: { id: revisionRequest.bsddId },
     data: {
@@ -331,20 +335,31 @@ export async function approveAndApplyRevisionRequest(
         forwardedIn: { update: { ...forwardedInUpdate } }
       })
     },
-    select: {
-      id: true,
-      readableId: true,
-      emitterType: true,
+    include: {
       grouping: {
         select: { initialForm: { select: { readableId: true } } }
       }
     }
   });
-  // this update or delete  FinalOperations eventually  attached
-  await operationHooksQueue.add({
-    finalFormId: updatedBsdd.id,
-    initialFormId: updatedBsdd.id
-  });
+
+  if (bsddUpdate && bsddUpdate.processingOperationDone) {
+    const beforeRevisionOperationIsFinal = isFinalOperationCode(
+      bsddBeforeRevision.processingOperationDone
+    );
+    const updatedOperationIsFinal = isFinalOperationCode(
+      updatedBsdd.processingOperationDone
+    );
+    if (updatedOperationIsFinal && !beforeRevisionOperationIsFinal) {
+      prisma.addAfterCommitCallback?.(async () => {
+        await operationHook(updatedBsdd, { runSync: false });
+      });
+    } else if (!updatedOperationIsFinal && beforeRevisionOperationIsFinal) {
+      await prisma.bsddFinalOperation.deleteMany({
+        where: { finalFormId: updatedBsdd.id }
+      });
+    }
+  }
+
   if (updatedBsdd.emitterType === EmitterType.APPENDIX1) {
     const { wasteDetailsCode, wasteDetailsName, wasteDetailsPop } =
       revisionRequest;

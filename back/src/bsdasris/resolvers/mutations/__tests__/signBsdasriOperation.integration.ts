@@ -15,6 +15,7 @@ import { prisma } from "@td/prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 
 import { SIGN_DASRI } from "./signUtils";
+import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 
 describe("Mutation.signBsdasri operation", () => {
   afterEach(resetDatabase);
@@ -94,8 +95,12 @@ describe("Mutation.signBsdasri operation", () => {
       }
     });
 
+    await new Promise(resolve => {
+      operationHooksQueue.once("global:drained", () => resolve(true));
+    });
     const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
-      where: { id: dasri.id }
+      where: { id: dasri.id },
+      include: { finalOperations: true }
     });
     expect(receivedDasri.status).toEqual("PROCESSED");
     expect(receivedDasri.destinationOperationSignatureAuthor).toEqual(
@@ -103,6 +108,7 @@ describe("Mutation.signBsdasri operation", () => {
     );
     expect(receivedDasri.operationSignatoryId).toEqual(recipient.id);
     expect(receivedDasri.destinationOperationSignatureDate).toBeTruthy();
+    expect(receivedDasri.finalOperations).toHaveLength(1);
   });
 
   it("should put operation signature on a dasri and set status to AWAITING_GROUP", async () => {

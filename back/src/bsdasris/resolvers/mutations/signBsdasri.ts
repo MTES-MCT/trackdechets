@@ -32,6 +32,7 @@ import { runInTransaction } from "../../../common/repository/helper";
 import { BsdasriRepository, getBsdasriRepository } from "../../repository";
 import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
+import { operationHook } from "../../operationHook";
 
 const signBsdasri: MutationResolvers["signBsdasri"] = async (
   _,
@@ -301,7 +302,14 @@ async function signOperation(
     dasriUpdateInput: updateInput as any
   });
 
-  return updateBsdasri(user, bsdasri, { ...updateInput, status });
+  const updatedBsdasri = await updateBsdasri(user, bsdasri, {
+    ...updateInput,
+    status
+  });
+
+  await operationHook(updatedBsdasri, { runSync: false });
+
+  return updatedBsdasri;
 }
 
 /**

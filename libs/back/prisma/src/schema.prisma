@@ -293,7 +293,7 @@ model Company {
   bsddRevisionRequests                 BsddRevisionRequest[]
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
   receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
-  webhookSettingsLimit                 Int @default(1)
+  webhookSettingsLimit                 Int                       @default(1)
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -376,24 +376,31 @@ model EcoOrganisme {
   handleBsda    Boolean @default(false)
 }
 
-// Modèle qui peut être partagé entre tous les
-// bordereaux pour calculcer la traçabilité finale
-model FinalOperation {
-  id                      String   @id @unique(map: "_FinalOperation_pkey") @default(cuid())
-  createdAt               DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt               DateTime @updatedAt @db.Timestamptz(6)
-  finalBsdReadableId      String
-  operationCode           String
-  quantity                Float
-  destinationCompanySiret String
-  destinationCompanyName  String
-  formId                  String?
-  Form                    Form?    @relation(fields: [formId], references: [id], onDelete: Cascade)
+// Permet de faire le lien entre un bordereau "initial" et le ou 
+// les bordereaux plus loin dans la chaine de traçabilité qui 
+// ont reçu un traitement final ou un regroupement avec perte
+// de traçabilité.
+model BsddFinalOperation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@unique([formId, finalBsdReadableId], map: "FinalOperation_pkey_unique_together")
-  @@unique([finalBsdReadableId, formId], map: "_FinalOperation_finalBsdReadableId")
-  @@index([formId], map: "_FinalOperationFormIdIdx")
-  @@index([destinationCompanySiret], map: "_FinalOperationdestinationCompanySiretIdx")
+  operationCode  String
+  noTraceability Boolean
+  // quantité qui doit être affectée à ce traitement final (en cas de regroupement avec ventilation
+  // des quantités quelque part dans la chaîne de traçabilité. La somme des quantités de toutes les 
+  // opération finales doit être égale à la quantité acceptée du bordereau 
+  quantity       Decimal @db.Decimal(65, 30)
+
+  finalFormId String
+  finalForm   Form   @relation("FinalOperationToFinalForm", fields: [finalFormId], references: [id], onDelete: Cascade)
+
+  initialFormId String
+  initialForm   Form   @relation("FinalOperationToInitialForm", fields: [initialFormId], references: [id], onDelete: Cascade)
+
+  @@unique([initialFormId, finalFormId], map: "_FinalOperationFormsUniqueTogether")
+  @@index([initialFormId], map: "_FinalOperationInitialFormIdIdx")
+  @@index([finalFormId], map: "_FinalOperationFinalFormIdIdx")
 }
 
 model Form {
@@ -528,10 +535,8 @@ model Form {
   // Relation vers les infos de traçabilité finales
   // Cas particulier sur le BSDD avec la ventilation des quantités en plusieurs groupement
   // il peut y avoir plusieurs traitements en bout de chaîne
-  finalOperations FinalOperation[]
-
-  // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
-  // partial index _FormRecipientIsTempStorageIdx see 99_add_form_indices.sql
+  finalOperations           BsddFinalOperation[] @relation("FinalOperationToInitialForm")
+  FinalOperationToFinalForm BsddFinalOperation[] @relation("FinalOperationToFinalForm")
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -1101,6 +1106,12 @@ model Bsdasri {
   // Emitter sirets list in case of grouping bsd
   synthesisEmitterSirets String[] @default([])
 
+  // Relation vers les infos de traçabilité finales
+  // Cas particulier sur le BSDD avec la ventilation des quantités en plusieurs groupement
+  // il peut y avoir plusieurs traitements en bout de chaîne
+  finalOperations              BsdasriFinalOperation[] @relation("FinalOperationToInitialBsdasri")
+  FinalOperationToFinalBsdasri BsdasriFinalOperation[] @relation("FinalOperationToFinalBsdasri")
+
   // partial indices _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
 
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
@@ -1115,6 +1126,26 @@ model Bsdasri {
   @@index([updatedAt], map: "_BsdasriUpdatedAtIdx")
   @@index([groupingEmitterSirets], map: "_BsdasriGroupingEmitterSiretIdx", type: Gin)
   @@index([synthesisEmitterSirets], map: "_BsdasriSynthesisEmitterSiretsIdx", type: Gin)
+}
+
+model BsdasriFinalOperation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  operationCode String
+  // quantité qui doit être affectée à ce traitement final
+  quantity      Decimal @db.Decimal(65, 30)
+
+  finalBsdasriId String
+  finalBsdasri   Bsdasri @relation("FinalOperationToFinalBsdasri", fields: [finalBsdasriId], references: [id], onDelete: Cascade)
+
+  initialBsdasriId String
+  initialBsdasri   Bsdasri @relation("FinalOperationToInitialBsdasri", fields: [initialBsdasriId], references: [id], onDelete: Cascade)
+
+  @@unique([initialBsdasriId, finalBsdasriId], map: "_FinalOperationBsdasrisUniqueTogether")
+  @@index([initialBsdasriId], map: "_FinalOperationInitialBsdasriIdIdx")
+  @@index([finalBsdasriId], map: "_FinalOperationFinalBsdasriIdIdx")
 }
 
 model Bsff {
@@ -1177,7 +1208,6 @@ model Bsff {
   packagings             BsffPackaging[]
 
   // partial _BsffIsDeletedIdx, _BsffIsDraftIdx index see migration82_missing_indices.sql
-
   @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsffTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsffTransporterCompanyVatNumberIdx")
@@ -1188,6 +1218,27 @@ model Bsff {
   @@index([emitterEmissionSignatureDate], map: "_BsffEmitterEmissionSignatureDateIdx")
   @@index([transporterTransportSignatureDate], map: "_BsffTransporterTransportSignatureDateIdx")
   @@index([detenteurCompanySirets], map: "_BsffDetenteurSiretsIdx", type: Gin)
+}
+
+model BsffPackagingFinalOperation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  operationCode  String
+  noTraceability Boolean
+  // quantité qui doit être affectée à ce traitement final
+  quantity       Decimal @db.Decimal(65, 30)
+
+  finalBsffPackagingId String
+  finalBsffPackaging   BsffPackaging @relation("FinalOperationToFinalBsffPackaging", fields: [finalBsffPackagingId], references: [id], onDelete: Cascade)
+
+  initialBsffPackagingId String
+  initialBsffPackaging   BsffPackaging @relation("FinalOperationToInitialBsffPackaging", fields: [initialBsffPackagingId], references: [id], onDelete: Cascade)
+
+  @@unique([initialBsffPackagingId, finalBsffPackagingId], map: "_FinalOperationBsffPackagingsUniqueTogether")
+  @@index([initialBsffPackagingId], map: "_FinalOperationInitialBsffPackagingIdIdx")
+  @@index([finalBsffPackagingId], map: "_FinalOperationFinalBsffPackagingIdIdx")
 }
 
 model BsffFicheIntervention {
@@ -1264,6 +1315,10 @@ model BsffPackaging {
   previousPackagings BsffPackaging[] @relation("NextPackaging")
 
   //  partial indices _BsffPackagingOperationNoTraceabilityIdx
+
+  // Relation vers les infos de traçabilité finales
+  finalOperations                    BsffPackagingFinalOperation[] @relation("FinalOperationToInitialBsffPackaging")
+  FinalOperationToFinalBsffPackaging BsffPackagingFinalOperation[] @relation("FinalOperationToFinalBsffPackaging")
 
   @@index([bsffId], map: "_BsffPackagingBsffId")
   @@index([nextPackagingId], map: "_BsffPackagingNextPackagingIdx")
@@ -1388,8 +1443,13 @@ model Bsda {
   intermediariesOrgIds String[] @default([])
   transportersOrgIds   String[] @default([])
 
-  // partial indices _BsdaIsDeletedIdx, _BsdaIsDraftIdx see migration82_missing_indices.sql
+  // Relation vers les infos de traçabilité finales
+  // Même si aujourd'hui il ne peut y avoir qu'une opération finale, on anticipe le fait 
+  // qu'on puisse à terme faire des regroupements avec ventilation des quantités
+  finalOperations           BsdaFinalOperation[] @relation("FinalOperationToInitialBsda")
+  FinalOperationToFinalForm BsdaFinalOperation[] @relation("FinalOperationToFinalBsda")
 
+  // partial indices _BsdaIsDeletedIdx, _BsdaIsDraftIdx see migration82_missing_indices.sql
   @@index([emitterCompanySiret], map: "_BsdaEmitterCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
@@ -1400,6 +1460,26 @@ model Bsda {
   @@index([updatedAt], map: "_BsdaUpdatedAtIdx")
   @@index([intermediariesOrgIds], map: "_BsdaIntermediariesOrgIdsIdx", type: Gin)
   @@index([transportersOrgIds], map: "_BsdaTransportersOrgIdsIdx", type: Gin)
+}
+
+model BsdaFinalOperation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  operationCode String
+  // quantité qui doit être affectée à ce traitement final
+  quantity      Decimal @db.Decimal(65, 30)
+
+  finalBsdaId String
+  finalBsda   Bsda   @relation("FinalOperationToFinalBsda", fields: [finalBsdaId], references: [id], onDelete: Cascade)
+
+  initialBsdaId String
+  initialBsda   Bsda   @relation("FinalOperationToInitialBsda", fields: [initialBsdaId], references: [id], onDelete: Cascade)
+
+  @@unique([initialBsdaId, finalBsdaId], map: "_FinalOperationBsdasUniqueTogether")
+  @@index([initialBsdaId], map: "_FinalOperationInitialBsdaIdIdx")
+  @@index([finalBsdaId], map: "_FinalOperationFinalBsdaIdIdx")
 }
 
 model BsdaTransporter {
@@ -1649,8 +1729,8 @@ model WebhookSetting {
   orgId       String
   activated   Boolean  @default(false)
 
-  @@index([orgId], map: "_WebhookSettingOrgIdIdx")
   @@unique([orgId, endpointUri], name: "WebhookSetting_orgId_endpointUri_unique_together")
+  @@index([orgId], map: "_WebhookSettingOrgIdIdx")
 }
 
 model MigrationScript {

@@ -19,12 +19,27 @@ import {
 } from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { getWasteDescription } from "./utils";
+import { RegistryBsdasri } from "../registry/elastic";
 
 const getOperationData = (bsdasri: Bsdasri) => ({
   destinationPlannedOperationCode: bsdasri.destinationOperationCode,
   destinationOperationCode: bsdasri.destinationOperationCode,
   destinationOperationMode: bsdasri.destinationOperationMode
 });
+
+const getFinalOperationsData = (bsdasri: RegistryBsdasri) => {
+  const destinationFinalOperationCodes: string[] = [];
+  const destinationFinalOperationWeights: number[] = [];
+  // Check if finalOperations is defined and has elements
+  if (bsdasri.finalOperations && bsdasri.finalOperations.length > 0) {
+    // Iterate through each operation once and fill both arrays
+    bsdasri.finalOperations.forEach(ope => {
+      destinationFinalOperationCodes.push(ope.operationCode);
+      destinationFinalOperationWeights.push(ope.quantity.toNumber());
+    });
+  }
+  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+};
 
 const getTransporterData = (bsdasri: Bsdasri) => ({
   transporterRecepisseIsExempted: bsdasri.transporterRecepisseIsExempted,
@@ -113,7 +128,7 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
 }
 
 export function toIncomingWaste(
-  bsdasri: Bsdasri & { grouping: Bsdasri[] }
+  bsdasri: RegistryBsdasri
 ): Required<IncomingWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
@@ -167,7 +182,7 @@ export function toIncomingWaste(
 }
 
 export function toOutgoingWaste(
-  bsdasri: Bsdasri & { grouping: Bsdasri[] }
+  bsdasri: RegistryBsdasri
 ): Required<OutgoingWaste> {
   const initialEmitter: Pick<
     OutgoingWaste,
@@ -219,12 +234,13 @@ export function toOutgoingWaste(
       : null,
     emitterCustomInfo: bsdasri.emitterCustomInfo,
     destinationCompanyMail: bsdasri.destinationCompanyMail,
-    ...getOperationData(bsdasri)
+    ...getOperationData(bsdasri),
+    ...getFinalOperationsData(bsdasri)
   };
 }
 
 export function toTransportedWaste(
-  bsdasri: Bsdasri & { grouping: Bsdasri[] }
+  bsdasri: RegistryBsdasri
 ): Required<TransportedWaste> {
   const initialEmitter: Pick<
     TransportedWaste,
@@ -284,7 +300,7 @@ export function toTransportedWaste(
  * be called. We implement it anyway in case it is added later on
  */
 export function toManagedWaste(
-  bsdasri: Bsdasri & { grouping: Bsdasri[] }
+  bsdasri: RegistryBsdasri
 ): Required<ManagedWaste> {
   const initialEmitter: Pick<
     ManagedWaste,
@@ -336,9 +352,7 @@ export function toManagedWaste(
   };
 }
 
-export function toAllWaste(
-  bsdasri: Bsdasri & { grouping: Bsdasri[] }
-): Required<AllWaste> {
+export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
   const initialEmitter: Pick<
     AllWaste,
     | "initialEmitterCompanyAddress"
@@ -393,6 +407,7 @@ export function toAllWaste(
     traderRecepisseNumber: null,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     destinationCompanyMail: bsdasri.destinationCompanyMail,
-    ...getOperationData(bsdasri)
+    ...getOperationData(bsdasri),
+    ...getFinalOperationsData(bsdasri)
   };
 }
