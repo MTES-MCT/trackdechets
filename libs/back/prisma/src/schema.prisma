@@ -509,6 +509,7 @@ model Form {
   receivedBy                            String?
   receivedAt                            DateTime?               @db.Timestamptz(6)
   quantityReceived                      Decimal?                @db.Decimal(65, 30)
+  quantityRefused                       Decimal?                @db.Decimal(65, 30)
   processedBy                           String?
   processedAt                           DateTime?               @db.Timestamptz(6)
   processingOperationDone               String?
