@@ -1206,6 +1206,27 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
     .label("Réception")
     .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
     .when("transporters", weightConditions.transporters(WeightUnits.Tonne)),
+  quantityRefused: weight(WeightUnits.Tonne)
+    .test(
+      "undefined-if-accepted-or-refused",
+      "La quantité refusée (quantityRefused) ne peut être définie que si le déchet est partiellement refusé",
+      (value, context) => {
+        const { wasteAcceptationStatus } = context.parent;
+        if (value === null || value === undefined) return true;
+        return (
+          wasteAcceptationStatus === WasteAcceptationStatus.PARTIALLY_REFUSED
+        );
+      }
+    )
+    .test(
+      "lower-than-quantityReceived",
+      "La quantité refusée (quantityRefused) doit être inférieure à la quantité réceptionnée (quantityReceived)",
+      (value, context) => {
+        const { quantityReceived } = context.parent;
+        if (!value) return true;
+        return value <= quantityReceived;
+      }
+    ),
   wasteAcceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
     .test(

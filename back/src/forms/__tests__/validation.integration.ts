@@ -1072,6 +1072,139 @@ describe("receivedInfosSchema", () => {
       );
     });
   });
+
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  describe("quantityRefused", () => {
+    const form = {
+      receivedBy: "Bill",
+      receivedAt: new Date("2020-01-17T10:12:00+0100"),
+      signedAt: new Date("2020-01-17T10:12:00+0100")
+    };
+
+    it("quantityRefused is not mandatory", async () => {
+      // Given
+      const update = {
+        ...form,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        wasteRefusalReason: "Reason",
+        quantityReceived: 10
+      };
+
+      // When
+      const isValid = await receivedInfoSchema.validate(update);
+
+      // Then
+      expect(isValid).toBeTruthy();
+    });
+
+    it.each([0, 3])(
+      "waste is ACCEPTED > quantityRefused cannot be defined (case '%p')",
+      async quantityRefused => {
+        // Given
+        const update = {
+          ...form,
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 10,
+          quantityRefused
+        };
+
+        // When
+        const validateFn = () => receivedInfoSchema.validate(update);
+
+        // Then
+        await expect(validateFn()).rejects.toThrow(
+          "La quantité refusée (quantityRefused) ne peut être définie que si le déchet est partiellement refusé"
+        );
+      }
+    );
+
+    it.each([null, undefined])(
+      "waste is ACCEPTED > quantityRefused can be %p",
+      async quantityRefused => {
+        // Given
+        const update = {
+          ...form,
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 10,
+          quantityRefused
+        };
+
+        // When
+        const isValid = await receivedInfoSchema.validate(update);
+
+        // Then
+        expect(isValid).toBeTruthy();
+      }
+    );
+
+    it.each([0, 3])(
+      "waste is REFUSED > quantityRefused cannot be defined (case '%p')",
+      async quantityRefused => {
+        // Given
+        const update = {
+          ...form,
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Reason",
+          quantityReceived: 10,
+          quantityRefused
+        };
+
+        // When
+        const validateFn = () => receivedInfoSchema.validate(update);
+
+        // Then
+        await expect(validateFn()).rejects.toThrow(
+          "La quantité refusée (quantityRefused) ne peut être définie que si le déchet est partiellement refusé"
+        );
+      }
+    );
+
+    it.each([null, undefined])(
+      "waste is REFUSED > quantityRefused can be %p",
+      async quantityRefused => {
+        // Given
+        const update = {
+          ...form,
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Reason",
+          quantityReceived: 0,
+          quantityRefused
+        };
+
+        // When
+        const isValid = await receivedInfoSchema.validate(update);
+
+        // Then
+        expect(isValid).toBeTruthy();
+      }
+    );
+
+    it("quantityRefused must be lower than quantityReceived", async () => {
+      // Given
+      const update = {
+        ...form,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        wasteRefusalReason: "Reason",
+        quantityReceived: 10,
+        quantityRefused: 10.1
+      };
+
+      // When
+      const validateFn = () => receivedInfoSchema.validate(update);
+
+      // Then
+      await expect(validateFn()).rejects.toThrow(
+        "La quantité refusée (quantityRefused) doit être inférieure à la quantité réceptionnée (quantityReceived)"
+      );
+    });
+  });
 });
 
 describe("draftFormSchema", () => {

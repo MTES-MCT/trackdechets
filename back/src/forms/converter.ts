@@ -724,6 +724,7 @@ export function expandFormFromDb(
     quantityReceived: forwardedIn
       ? processDecimal(forwardedIn.quantityReceived)?.toNumber()
       : processDecimal(form.quantityReceived)?.toNumber(),
+    quantityRefused: form.quantityRefused?.toNumber(),
     quantityGrouped: form.quantityGrouped,
     processingOperationDone: forwardedIn
       ? forwardedIn.processingOperationDone

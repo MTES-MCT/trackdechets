@@ -128,9 +128,19 @@ input ReceivedFormInput {
   Doit être supérieure à 0 lorsque le déchet est accepté.
   Doit être égale à 0 lorsque le déchet est refusé.
 
-  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  Doit être inférieure à 40T en cas de transport routier et inférieure à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float
+
+  """
+  Quantité refusée (optionnelle)
+
+  Si définie:
+  - doit être supérieure à 0 si le refus est partiellement refusé.
+  - doit être égale à 0 si le déchet est totalement accepté.
+  - doit être inférieure à quantityReceived dans tous les cas.
+  """
+  quantityRefused: Float
 }
 
 "Payload de traitement d'un BSD"

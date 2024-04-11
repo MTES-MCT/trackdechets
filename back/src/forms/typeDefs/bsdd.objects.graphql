@@ -103,6 +103,12 @@ type Form {
   "Quantité réelle présentée en tonnes (case 10)"
   quantityReceived: Float
 
+  "Quantité acceptée"
+  quantityAccepted: Float
+
+  "Quantité refusée"
+  quantityRefused: Float
+
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
 
