@@ -62,25 +62,20 @@ export default async function duplicate(
     enableCompletionTransformers: true
   });
 
-  // FIXME gérer le cas où il n'y a aucun transporteur
-  const firstTransporter = parsedBsda.transporters![0];
+  const firstTransporter = parsedBsda.transporters?.[0];
+
   const {
-    id: transporterId,
-    bsdaId: transporterBsdaId,
-    transporterTransportPlates,
-    transporterTransportTakenOverAt,
-    transporterTransportSignatureAuthor,
-    transporterTransportSignatureDate,
-    transporterCustomInfo,
-    // transporter values that should be duplicated
-    ...transporterData
-  } = firstTransporter;
-  const { id: bsdaId, intermediaries, ...bsda } = parsedBsda;
+    id: bsdaId,
+    intermediaries,
+    transporters,
+    transportersOrgIds,
+    ...bsda
+  } = parsedBsda;
 
   const companiesOrgIds: string[] = [
     bsda.emitterCompanySiret,
-    firstTransporter.transporterCompanySiret,
-    firstTransporter.transporterCompanyVatNumber,
+    firstTransporter?.transporterCompanySiret,
+    firstTransporter?.transporterCompanyVatNumber,
     bsda.brokerCompanySiret,
     bsda.workerCompanySiret,
     bsda.destinationCompanySiret
@@ -109,16 +104,12 @@ export default async function duplicate(
   const broker = companies.find(
     company => company.orgId === bsda.brokerCompanySiret
   );
-  const transporterCompany = companies.find(
-    company =>
-      company.orgId === firstTransporter.transporterCompanySiret ||
-      company.orgId === firstTransporter.transporterCompanyVatNumber
-  );
+
   const worker = companies.find(
     company => company.orgId === bsda.workerCompanySiret
   );
 
-  const data: Prisma.BsdaCreateInput = {
+  let data: Prisma.BsdaCreateInput = {
     ...bsda,
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
@@ -166,30 +157,68 @@ export default async function duplicate(
     workerCertificationCertificationNumber:
       worker?.workerCertification?.certificationNumber ??
       bsda.workerCertificationCertificationNumber,
-    transporters: {
-      create: {
-        ...transporterData,
-        number: 1,
-        // Transporter company info
-        transporterCompanyMail:
-          transporterCompany?.contactEmail ??
-          firstTransporter.transporterCompanyMail,
-        transporterCompanyPhone:
-          transporterCompany?.contactPhone ??
-          firstTransporter.transporterCompanyPhone,
-        transporterCompanyContact:
-          transporterCompany?.contact ??
-          firstTransporter.transporterCompanyContact,
-        // Transporter recepisse
-        transporterRecepisseNumber:
-          transporterCompany?.transporterReceipt?.receiptNumber ?? null,
-        transporterRecepisseValidityLimit:
-          transporterCompany?.transporterReceipt?.validityLimit ?? null,
-        transporterRecepisseDepartment:
-          transporterCompany?.transporterReceipt?.department ?? null
+    transportersOrgIds: [],
+    intermediariesOrgIds: [],
+    grouping: undefined,
+    forwarding: undefined
+  };
+
+  if (firstTransporter) {
+    const transporterCompany = firstTransporter
+      ? companies.find(
+          company =>
+            company.orgId === firstTransporter.transporterCompanySiret ||
+            company.orgId === firstTransporter.transporterCompanyVatNumber
+        )
+      : null;
+    const {
+      // transport values that should not be duplicated
+      id: transporterId,
+      bsdaId: transporterBsdaId,
+      transporterTransportPlates,
+      transporterTransportTakenOverAt,
+      transporterTransportSignatureAuthor,
+      transporterTransportSignatureDate,
+      transporterCustomInfo,
+      number,
+      // transporter values that should be duplicated
+      ...transporterData
+    } = firstTransporter;
+    data = {
+      ...data,
+      transportersOrgIds: [
+        firstTransporter.transporterCompanySiret,
+        firstTransporter.transporterCompanyVatNumber
+      ].filter(Boolean),
+      transporters: {
+        create: {
+          ...transporterData,
+          number: 1,
+          // Transporter company info
+          transporterCompanyMail:
+            transporterCompany?.contactEmail ??
+            firstTransporter.transporterCompanyMail,
+          transporterCompanyPhone:
+            transporterCompany?.contactPhone ??
+            firstTransporter.transporterCompanyPhone,
+          transporterCompanyContact:
+            transporterCompany?.contact ??
+            firstTransporter.transporterCompanyContact,
+          // Transporter recepisse
+          transporterRecepisseNumber:
+            transporterCompany?.transporterReceipt?.receiptNumber ?? null,
+          transporterRecepisseValidityLimit:
+            transporterCompany?.transporterReceipt?.validityLimit ?? null,
+          transporterRecepisseDepartment:
+            transporterCompany?.transporterReceipt?.department ?? null
+        }
       }
-    },
-    ...(intermediaries && {
+    };
+  }
+
+  if (intermediaries) {
+    data = {
+      ...data,
       intermediaries: {
         createMany: {
           data: intermediaries.map(intermediary => ({
@@ -204,10 +233,8 @@ export default async function duplicate(
         }
       },
       intermediariesOrgIds
-    }),
-    grouping: undefined,
-    forwarding: undefined
-  };
+    };
+  }
 
   const newBsda = await getBsdaRepository(user).create(data);
 
