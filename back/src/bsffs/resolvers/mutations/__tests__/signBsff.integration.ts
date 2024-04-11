@@ -30,6 +30,7 @@ import {
   createBsffBeforeAcceptation
 } from "../../../__tests__/factories";
 import { REQUIRED_RECEIPT_NUMBER } from "../../../../common/validation";
+import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 
 const SIGN = gql`
   mutation Sign($id: ID!, $input: BsffSignatureInput!) {
@@ -740,6 +741,57 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
+
+      await new Promise(resolve => {
+        operationHooksQueue.once("global:drained", () => resolve(true));
+      });
+
+      const signedBsff = await prisma.bsff.findUniqueOrThrow({
+        where: { id: data.signBsff.id },
+        include: { packagings: { include: { finalOperations: true } } }
+      });
+
+      // final operation should be set
+      expect(signedBsff.packagings[0].finalOperations).toHaveLength(1);
+    });
+
+    it("should allow destination to sign operation for a specific packaging", async () => {
+      const bsff = await createBsffBeforeOperation({
+        emitter,
+        transporter,
+        destination
+      });
+
+      const { mutate } = makeClient(destination.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            type: "OPERATION",
+            date: new Date().toISOString() as any,
+            author: destination.user.name,
+            packagingId: bsff.packagings[0].id
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.signBsff.id).toBeTruthy();
+
+      await new Promise(resolve => {
+        operationHooksQueue.once("global:drained", () => resolve(true));
+      });
+
+      const signedBsff = await prisma.bsff.findUniqueOrThrow({
+        where: { id: data.signBsff.id },
+        include: { packagings: { include: { finalOperations: true } } }
+      });
+
+      // final operation should be set
+      expect(signedBsff.packagings[0].finalOperations).toHaveLength(1);
     });
 
     it("should allow signing a bsff for reexpedition", async () => {

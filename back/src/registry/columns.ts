@@ -41,10 +41,10 @@ const formatOperationCode = (code?: string) =>
 /**
  * Clean Final Operation lists
  */
-// const formatFinalOperations = (val?: string[]) =>
-//   val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
-// const formatFinalReceptionWeights = (val?: number[]) =>
-//   val ? val.map(quant => quant.toFixed(2)).join("; ") : "";
+const formatFinalOperations = (val?: string[]) =>
+  val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
+const formatFinalOperationWeights = (val?: number[]) =>
+  val ? val.map(quant => quant.toFixed(2)).join("; ") : "";
 
 export const columns: Column[] = [
   // Dénomination, nature et quantité :
@@ -194,18 +194,16 @@ export const columns: Column[] = [
     label: "Rupture de traçabilité autorisée",
     format: formatBoolean
   },
-  // En attente des correctifs recette sur TRA-12745
-  // {
-  //   field: "finalOperationCodes",
-  //   label:
-  //     "Opération(s) finale(s) réalisée(s) par la traçabilité suite (le(s) code(s) de traitement renseigné(s) par l'exutoire)",
-  //   format: formatFinalOperations
-  // },
-  // {
-  //   field: "finalReceptionWeights",
-  //   label: "Quantité(s) liée(s)",
-  //   format: formatFinalReceptionWeights
-  // },
+  {
+    field: "destinationFinalOperationCodes",
+    label: "Opération(s) finale(s) réalisée(s) par la traçabilité suite",
+    format: formatFinalOperations
+  },
+  {
+    field: "destinationFinalOperationWeights",
+    label: "Quantité(s) liée(s)",
+    format: formatFinalOperationWeights
+  },
   {
     field: "transporter2CompanyName",
     label: "Transporteur n°2 raison sociale"

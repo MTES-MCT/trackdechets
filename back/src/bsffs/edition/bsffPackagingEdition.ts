@@ -27,6 +27,8 @@ type EditableBsffPackagingFields = Required<
     | "bsff"
     | "nextPackaging"
     | "previousPackagings"
+    | "finalOperations"
+    | "FinalOperationToFinalBsffPackaging"
   >
 >;
 // Defines until which signature BsffPackaging fields can be modified

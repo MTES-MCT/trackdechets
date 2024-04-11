@@ -1,4 +1,4 @@
-import { Bsff, BsffPackaging, BsffType, OperationMode } from "@prisma/client";
+import { Bsff, BsffType, OperationMode } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
@@ -18,12 +18,9 @@ import {
 } from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { toBsffDestination } from "./compat";
+import { RegistryBsff } from "../registry/elastic";
 
-const getOperationData = (
-  bsff: Bsff & {
-    packagings: BsffPackagingWithPrevious[];
-  }
-) => {
+const getOperationData = (bsff: RegistryBsff) => {
   const bsffDestination = toBsffDestination(bsff.packagings);
 
   return {
@@ -31,6 +28,23 @@ const getOperationData = (
     destinationOperationMode: bsffDestination.operationMode as OperationMode,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode
   };
+};
+
+const getFinalOperationsData = (bsff: RegistryBsff) => {
+  const destinationFinalOperationCodes: string[] = [];
+  const destinationFinalOperationWeights: number[] = [];
+  // Check if finalOperations is defined and has elements
+  for (const packaging of bsff.packagings) {
+    if (packaging.finalOperations && packaging.finalOperations.length > 0) {
+      // Iterate through each operation once and fill both arrays
+      packaging.finalOperations.forEach(ope => {
+        destinationFinalOperationCodes.push(ope.operationCode);
+        destinationFinalOperationWeights.push(ope.quantity.toNumber());
+      });
+    }
+  }
+
+  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
 const getTransporterData = (bsff: Bsff) => ({
@@ -44,10 +58,6 @@ const getTransporterData = (bsff: Bsff) => ({
   transporterCustomInfo: bsff.transporterCustomInfo,
   transporterNumberPlates: bsff.transporterTransportPlates
 });
-
-type BsffPackagingWithPrevious = BsffPackaging & {
-  previousPackagings: BsffPackaging & { bsff: Bsff };
-};
 
 type RegistryFields =
   | "isIncomingWasteFor"
@@ -87,11 +97,7 @@ export function getRegistryFields(
   return registryFields;
 }
 
-function toGenericWaste(
-  bsff: Bsff & {
-    packagings: BsffPackagingWithPrevious[];
-  }
-): GenericWaste {
+function toGenericWaste(bsff: RegistryBsff): GenericWaste {
   const bsffDestination = toBsffDestination(bsff.packagings);
 
   return {
@@ -123,11 +129,7 @@ function toGenericWaste(
   };
 }
 
-export function toIncomingWaste(
-  bsff: Bsff & {
-    packagings: BsffPackagingWithPrevious[];
-  }
-): Required<IncomingWaste> {
+export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -185,11 +187,7 @@ export function toIncomingWaste(
   };
 }
 
-export function toOutgoingWaste(
-  bsff: Bsff & {
-    packagings: BsffPackagingWithPrevious[];
-  }
-): Required<OutgoingWaste> {
+export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyAddress"
@@ -253,14 +251,13 @@ export function toOutgoingWaste(
       : null,
     emitterCustomInfo: bsff.emitterCustomInfo,
     destinationCompanyMail: bsff.destinationCompanyMail,
-    ...getOperationData(bsff)
+    ...getOperationData(bsff),
+    ...getFinalOperationsData(bsff)
   };
 }
 
 export function toTransportedWaste(
-  bsff: Bsff & {
-    packagings: BsffPackagingWithPrevious[];
-  }
+  bsff: RegistryBsff
 ): Required<TransportedWaste> {
   const initialEmitter: Pick<
     TransportedWaste,
@@ -325,11 +322,7 @@ export function toTransportedWaste(
  * BSFF has no trader or broker so this function should not
  * be called. We implement it anyway in case it is added later on
  */
-export function toManagedWaste(
-  bsff: Bsff & {
-    packagings: BsffPackagingWithPrevious[];
-  }
-): Required<ManagedWaste> {
+export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
   const initialEmitter: Pick<
     ManagedWaste,
     | "initialEmitterCompanyAddress"
@@ -388,11 +381,7 @@ export function toManagedWaste(
   };
 }
 
-export function toAllWaste(
-  bsff: Bsff & {
-    packagings: BsffPackagingWithPrevious[];
-  }
-): Required<AllWaste> {
+export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
   const initialEmitter: Pick<
     IncomingWaste,
     | "initialEmitterCompanyAddress"
@@ -453,6 +442,7 @@ export function toAllWaste(
     traderRecepisseNumber: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
     destinationCompanyMail: bsff.destinationCompanyMail,
-    ...getOperationData(bsff)
+    ...getOperationData(bsff),
+    ...getFinalOperationsData(bsff)
   };
 }
