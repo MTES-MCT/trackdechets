@@ -34,10 +34,10 @@ export const bsdaFactory = async ({
 
   const data: Prisma.BsdaCreateInput = {
     ...bsdaObject,
-    ...opt,
     transporters: {
       create: { ...bsdaObject.transporters!.create!, ...transporterOpt }
-    }
+    },
+    ...opt
   };
 
   const created = await prisma.bsda.create({

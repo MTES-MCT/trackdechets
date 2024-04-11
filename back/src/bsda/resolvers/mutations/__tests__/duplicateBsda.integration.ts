@@ -395,10 +395,45 @@ describe("Mutation.Bsda.duplicate", () => {
     expect(duplicatedBsda.workerWorkSignatureAuthor).toBeNull();
     expect(duplicatedBsda.destinationOperationSignatureDate).toBeNull();
     expect(duplicatedBsda.destinationOperationSignatureAuthor).toBeNull();
+    expect(duplicatedBsda.transportersOrgIds).toEqual([
+      transporterCompanySiret
+    ]);
     expect(duplicatedTransporter.transporterTransportSignatureDate).toBeNull();
     expect(
       duplicatedTransporter.transporterTransportSignatureAuthor
     ).toBeNull();
+  });
+
+  it("should duplicate a BSDA COLLECTION_2710 with no transporters", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const bsda = await bsdaFactory({
+      opt: {
+        type: "COLLECTION_2710",
+        workerCompanySiret: null,
+        workerCompanyName: null,
+        emitterCompanySiret: emitter.company.siret,
+        // no transporters
+        transporters: {}
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+
+    const { data, errors } = await mutate<Pick<Mutation, "duplicateBsda">>(
+      DUPLICATE_BSDA,
+      {
+        variables: {
+          id: bsda.id
+        }
+      }
+    );
+
+    const duplicated = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data.duplicateBsda.id },
+      include: { transporters: true }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(duplicated.transporters).toEqual([]);
   });
 
   test("duplicated BSDA should have the updated data when company info changes", async () => {
