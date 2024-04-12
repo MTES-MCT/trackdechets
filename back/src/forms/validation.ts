@@ -1204,7 +1204,7 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
   signedAt: yup.date().nullable(),
   quantityReceived: weight(WeightUnits.Tonne)
     .label("Réception")
-    .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
+    .when("wasteAcceptationStatus", weightConditions.bsddWasteAcceptationStatus)
     .when("transporters", weightConditions.transporters(WeightUnits.Tonne)),
   quantityRefused: weight(WeightUnits.Tonne)
     .min(0)
@@ -1310,7 +1310,7 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
     .required("${path} : Le poids reçu en tonnes est obligatoire")
     .when(
       "wasteAcceptationStatus",
-      weightConditions.wasteAcceptationStatus as any
+      weightConditions.bsddWasteAcceptationStatus as any
     ),
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
   wasteRefusalReason: yup

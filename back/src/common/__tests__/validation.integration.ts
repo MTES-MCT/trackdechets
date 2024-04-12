@@ -68,20 +68,20 @@ describe("weight validation", () => {
     );
   });
 
-  // test("a weight should be equal to 0 when acceptation status is REFUSED", async () => {
-  //   const schema = yup.object({
-  //     wasteAcceptationStatus: yup.string(),
-  //     weight: weight()
-  //       .label("Destinataire")
-  //       .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
-  //   });
-  //   const validateFn = () =>
-  //     schema.validate({ weight: 1, wasteAcceptationStatus: "REFUSED" });
+  test("a weight should be equal to 0 when acceptation status is REFUSED", async () => {
+    const schema = yup.object({
+      wasteAcceptationStatus: yup.string(),
+      weight: weight()
+        .label("Destinataire")
+        .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
+    });
+    const validateFn = () =>
+      schema.validate({ weight: 1, wasteAcceptationStatus: "REFUSED" });
 
-  //   await expect(validateFn()).rejects.toThrow(
-  //     "Destinataire : le poids doit être égal à 0 lorsque le déchet est refusé"
-  //   );
-  // });
+    await expect(validateFn()).rejects.toThrow(
+      "Destinataire : le poids doit être égal à 0 lorsque le déchet est refusé"
+    );
+  });
 
   test("a weight should be positive when acceptation status is ACCEPTED", async () => {
     const schema = yup.object({

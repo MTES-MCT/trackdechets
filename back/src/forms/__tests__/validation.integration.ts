@@ -1028,15 +1028,6 @@ describe("receivedInfosSchema", () => {
         "Vous devez saisir un motif de refus"
       );
     });
-
-    // No longer relevant
-    // it("should be invalid if quantity received is different from 0", async () => {
-    //   const validateFn = () =>
-    //     receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 1.0 });
-    //   await expect(validateFn()).rejects.toThrow(
-    //     "Réception : le poids doit être égal à 0 lorsque le déchet est refusé"
-    //   );
-    // });
   });
 
   describe("waste is partially refused", () => {
