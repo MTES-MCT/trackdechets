@@ -35,6 +35,7 @@ import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../common/operationModes";
 import { FormCompanyDetails } from "../../common/pdf/components/FormCompanyDetails";
 import { isFrenchCompany } from "../../companies/validation";
+import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -317,6 +318,8 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
     Boolean(form.wasteDetails?.isDangerous) ||
     isDangerous(form.wasteDetails?.code) ||
     Boolean(form.wasteDetails?.pop);
+
+  const wasteQuantities = bsddWasteQuantities(form);
 
   const html = ReactDOMServer.renderToStaticMarkup(
     <Document title={form.readableId}>
@@ -755,6 +758,16 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                 <p>
                   Quantité réelle présentée : {form.quantityReceived} tonne(s)
                   <br />
+                  {wasteQuantities && (
+                    <>
+                      Quantité acceptée : {wasteQuantities.quantityAccepted}{" "}
+                      tonne(s)
+                      <br />
+                      Quantité refusée : {wasteQuantities.quantityRefused}{" "}
+                      tonne(s)
+                      <br />
+                    </>
+                  )}
                   Date de présentation : {formatDate(form.receivedAt)}
                 </p>
                 <AcceptationFields {...form} />
