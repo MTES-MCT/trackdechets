@@ -1000,6 +1000,10 @@ type AllWaste {
   ##########################################
   "La quantité de déchet entrant exprimée en tonne"
   destinationReceptionWeight: Float
+  "La quantité de déchet entrant acceptée exprimée en tonne"
+  destinationReceptionAcceptedWeight: Float
+  "La quantité de déchet entrant refusée exprimée en tonne"
+  destinationReceptionRefusedWeight: Float
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
   "Le N°SIRET de l'établissement vers lequel le déchet est expédié"

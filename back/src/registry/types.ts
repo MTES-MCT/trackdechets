@@ -358,6 +358,8 @@ export const emptyAllWaste: Required<AllWaste> = {
   brokerCompanySiret: null,
   brokerRecepisseNumber: null,
   destinationReceptionWeight: null,
+  destinationReceptionAcceptedWeight: null,
+  destinationReceptionRefusedWeight: null,
   destinationCompanyName: null,
   destinationCompanySiret: null,
   destinationCompanyAddress: null,

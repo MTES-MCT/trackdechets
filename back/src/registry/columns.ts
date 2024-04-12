@@ -176,6 +176,16 @@ export const columns: Column[] = [
     format: formatNumber
   },
   {
+    field: "destinationReceptionAcceptedWeight",
+    label: "Quantité de déchet entrant acceptée (t)",
+    format: formatNumber
+  },
+  {
+    field: "destinationReceptionRefusedWeight",
+    label: "Quantité de déchet entrant refusée (t)",
+    format: formatNumber
+  },
+  {
     field: "destinationPlannedOperationCode",
     label: "Code opération prévu",
     format: formatOperationCode

@@ -7,6 +7,7 @@ import {
 import { prisma } from "@td/prisma";
 import { RegistryFormInclude } from "../../registry/elastic";
 import { formToBsdd } from "../compat";
+import { Decimal } from "@prisma/client/runtime/library";
 
 describe("simpleFormToBsdd", () => {
   it("should convert a Form to a Bsdd", async () => {
@@ -143,6 +144,8 @@ describe("simpleFormToBsdd", () => {
       destinationCustomInfo: null,
       destinationReceptionDate: null,
       destinationReceptionWeight: null,
+      destinationReceptionAcceptedWeight: null,
+      destinationReceptionRefusedWeight: null,
       destinationReceptionAcceptationStatus: null,
       destinationReceptionRefusalReason: null,
       destinationReceptionSignatureAuthor: null,
@@ -391,6 +394,8 @@ describe("simpleFormToBsdd", () => {
       destinationReceptionDate: fullForwardedInForm.receivedAt,
       destinationReceptionWeight:
         fullForwardedInForm.quantityReceived?.toNumber(),
+      destinationReceptionAcceptedWeight: null,
+      destinationReceptionRefusedWeight: null,
       destinationReceptionAcceptationStatus:
         fullForwardedInForm.wasteAcceptationStatus,
       destinationReceptionRefusalReason: null,
@@ -535,6 +540,8 @@ describe("simpleFormToBsdd", () => {
         destinationCustomInfo: null,
         destinationReceptionDate: form.receivedAt,
         destinationReceptionWeight: form.quantityReceived,
+        destinationReceptionAcceptedWeight: null,
+        destinationReceptionRefusedWeight: null,
         destinationReceptionAcceptationStatus: form.wasteAcceptationStatus,
         destinationReceptionRefusalReason: null,
         destinationReceptionSignatureAuthor: form.receivedBy,
@@ -557,5 +564,56 @@ describe("simpleFormToBsdd", () => {
         grouping: []
       }
     });
+  });
+
+  it("should compute quantityAccepted & quantityRefused (destinationReceptionAcceptedWeight & destinationReceptionRefusedWeight)", async () => {
+    // Given
+    const { user } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: new Decimal(10),
+        quantityRefused: new Decimal(3)
+      }
+    });
+
+    // When
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+
+    const bsdd = formToBsdd(fullForm);
+
+    // Then
+    expect(bsdd.destinationReceptionWeight).toEqual(10);
+    expect(bsdd.destinationReceptionAcceptedWeight).toEqual(7);
+    expect(bsdd.destinationReceptionRefusedWeight).toEqual(3);
+  });
+
+  it("[legacy] should return quantityReceived (destinationReceptionWeight)", async () => {
+    // Given
+    const { user } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: new Decimal(10)
+      }
+    });
+
+    // When
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+
+    const bsdd = formToBsdd(fullForm);
+
+    // Then
+    expect(bsdd.destinationReceptionWeight).toEqual(10);
+    expect(bsdd.destinationReceptionAcceptedWeight).toEqual(null);
+    expect(bsdd.destinationReceptionRefusedWeight).toEqual(null);
   });
 });
