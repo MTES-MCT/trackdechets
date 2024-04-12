@@ -1207,23 +1207,64 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
     .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
     .when("transporters", weightConditions.transporters(WeightUnits.Tonne)),
   quantityRefused: weight(WeightUnits.Tonne)
+    .min(0)
     .test(
-      "undefined-if-accepted-or-refused",
-      "La quantité refusée (quantityRefused) ne peut être définie que si le déchet est partiellement refusé",
+      "not-defined-if-no-quantity-received",
+      "La quantité refusée (quantityRefused) ne peut être définie si la quantité reçue (quantityReceived) ne l'est pas",
       (value, context) => {
-        const { wasteAcceptationStatus } = context.parent;
-        if (value === null || value === undefined) return true;
-        return (
-          wasteAcceptationStatus === WasteAcceptationStatus.PARTIALLY_REFUSED
-        );
+        const { quantityReceived } = context.parent;
+
+        const quantityReceivedIsDefined =
+          quantityReceived !== null && quantityReceived !== undefined;
+        const quantityRefusedIsDefined = value !== null && value !== undefined;
+
+        if (!quantityReceivedIsDefined && quantityRefusedIsDefined)
+          return false;
+        return true;
       }
     )
     .test(
-      "lower-than-quantityReceived",
+      "waste-is-accepted",
+      "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)",
+      (value, context) => {
+        const { wasteAcceptationStatus } = context.parent;
+
+        if (wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED)
+          return true;
+
+        // Legacy
+        if (value === null || value === undefined) return true;
+
+        return value === 0;
+      }
+    )
+    .test(
+      "waste-is-refused",
+      "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)",
+      (value, context) => {
+        const { wasteAcceptationStatus, quantityReceived } = context.parent;
+
+        if (wasteAcceptationStatus !== WasteAcceptationStatus.REFUSED)
+          return true;
+
+        // Legacy
+        if (value === null || value === undefined) return true;
+
+        return value === quantityReceived;
+      }
+    )
+    .test(
+      "lower-than-quantity-received",
       "La quantité refusée (quantityRefused) doit être inférieure à la quantité réceptionnée (quantityReceived)",
       (value, context) => {
         const { quantityReceived } = context.parent;
-        if (!value) return true;
+
+        if (quantityReceived === null || quantityReceived === undefined)
+          return true;
+
+        // Legacy
+        if (value === null || value === undefined) return true;
+
         return value <= quantityReceived;
       }
     ),

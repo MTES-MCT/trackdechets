@@ -1029,13 +1029,14 @@ describe("receivedInfosSchema", () => {
       );
     });
 
-    it("should be invalid if quantity received is different from 0", async () => {
-      const validateFn = () =>
-        receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 1.0 });
-      await expect(validateFn()).rejects.toThrow(
-        "Réception : le poids doit être égal à 0 lorsque le déchet est refusé"
-      );
-    });
+    // No longer relevant
+    // it("should be invalid if quantity received is different from 0", async () => {
+    //   const validateFn = () =>
+    //     receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 1.0 });
+    //   await expect(validateFn()).rejects.toThrow(
+    //     "Réception : le poids doit être égal à 0 lorsque le déchet est refusé"
+    //   );
+    // });
   });
 
   describe("waste is partially refused", () => {
@@ -1073,14 +1074,6 @@ describe("receivedInfosSchema", () => {
     });
   });
 
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  // TODO
   describe("quantityRefused", () => {
     const form = {
       receivedBy: "Bill",
@@ -1104,29 +1097,24 @@ describe("receivedInfosSchema", () => {
       expect(isValid).toBeTruthy();
     });
 
-    it.each([0, 3])(
-      "waste is ACCEPTED > quantityRefused cannot be defined (case '%p')",
-      async quantityRefused => {
-        // Given
-        const update = {
-          ...form,
-          wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 10,
-          quantityRefused
-        };
+    it("quantityRefused cannot be defined if quantityReceived is not", async () => {
+      // Given
+      const update = {
+        ...form,
+        quantityRefused: 10
+      };
 
-        // When
-        const validateFn = () => receivedInfoSchema.validate(update);
+      // When
+      const validateFn = () => receivedInfoSchema.validate(update);
 
-        // Then
-        await expect(validateFn()).rejects.toThrow(
-          "La quantité refusée (quantityRefused) ne peut être définie que si le déchet est partiellement refusé"
-        );
-      }
-    );
+      // Then
+      await expect(validateFn()).rejects.toThrow(
+        "La quantité refusée (quantityRefused) ne peut être définie si la quantité reçue (quantityReceived) ne l'est pas"
+      );
+    });
 
-    it.each([null, undefined])(
-      "waste is ACCEPTED > quantityRefused can be %p",
+    it.each([null, undefined, 0])(
+      "waste is ACCEPTED > quantityReceived = 10 > quantityRefused can be %p",
       async quantityRefused => {
         // Given
         const update = {
@@ -1144,8 +1132,49 @@ describe("receivedInfosSchema", () => {
       }
     );
 
-    it.each([0, 3])(
-      "waste is REFUSED > quantityRefused cannot be defined (case '%p')",
+    it.each([5, 10, 15])(
+      "waste is ACCEPTED > quantityReceived = 10 > quantityRefused can NOT be %p",
+      async quantityRefused => {
+        // Given
+        const update = {
+          ...form,
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 10,
+          quantityRefused
+        };
+
+        // When
+        const validateFn = () => receivedInfoSchema.validate(update);
+
+        // Then
+        await expect(validateFn()).rejects.toThrow(
+          "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
+        );
+      }
+    );
+
+    it.each([null, undefined, 10])(
+      "waste is REFUSED > quantityReceived = 10 > quantityRefused can be %p",
+      async quantityRefused => {
+        // Given
+        const update = {
+          ...form,
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Reason",
+          quantityReceived: 10,
+          quantityRefused
+        };
+
+        // When
+        const isValid = await receivedInfoSchema.validate(update);
+
+        // Then
+        expect(isValid).toBeTruthy();
+      }
+    );
+
+    it.each([0, 3, 15])(
+      "waste is REFUSED > quantityReceived = 10 > quantityRefused can NOT be %p",
       async quantityRefused => {
         // Given
         const update = {
@@ -1161,28 +1190,8 @@ describe("receivedInfosSchema", () => {
 
         // Then
         await expect(validateFn()).rejects.toThrow(
-          "La quantité refusée (quantityRefused) ne peut être définie que si le déchet est partiellement refusé"
+          "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)"
         );
-      }
-    );
-
-    it.each([null, undefined])(
-      "waste is REFUSED > quantityRefused can be %p",
-      async quantityRefused => {
-        // Given
-        const update = {
-          ...form,
-          wasteAcceptationStatus: "REFUSED",
-          wasteRefusalReason: "Reason",
-          quantityReceived: 0,
-          quantityRefused
-        };
-
-        // When
-        const isValid = await receivedInfoSchema.validate(update);
-
-        // Then
-        expect(isValid).toBeTruthy();
       }
     );
 
@@ -1202,6 +1211,25 @@ describe("receivedInfosSchema", () => {
       // Then
       await expect(validateFn()).rejects.toThrow(
         "La quantité refusée (quantityRefused) doit être inférieure à la quantité réceptionnée (quantityReceived)"
+      );
+    });
+
+    it("quantityRefused must be positive", async () => {
+      // Given
+      const update = {
+        ...form,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        wasteRefusalReason: "Reason",
+        quantityReceived: 10,
+        quantityRefused: -5
+      };
+
+      // When
+      const validateFn = () => receivedInfoSchema.validate(update);
+
+      // Then
+      await expect(validateFn()).rejects.toThrow(
+        "quantityRefused must be greater than or equal to 0"
       );
     });
   });

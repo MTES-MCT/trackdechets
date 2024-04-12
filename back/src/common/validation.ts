@@ -75,14 +75,19 @@ const maxWeightByRoadErrorMessage =
 
 export const weightConditions: WeightConditions = {
   wasteAcceptationStatus: (status, weight) => {
-    if (status === WasteAcceptationStatus.REFUSED) {
-      return weight.test({
-        name: "is-0",
-        test: weight => weight === 0,
-        message:
-          "${path} : le poids doit être égal à 0 lorsque le déchet est refusé"
-      });
-    } else if (
+    // We've removed these conditions to allow the transition to using quantityRefused.
+    // quantityReceived is now supposed to be the actual received quantity, hence
+    // it should NEVER be 0 (or undefined).
+
+    // if (status === WasteAcceptationStatus.REFUSED) {
+    //   return weight.test({
+    //     name: "is-0",
+    //     test: weight => weight === 0,
+    //     message:
+    //       "${path} : le poids doit être égal à 0 lorsque le déchet est refusé"
+    //   });
+    // } else
+    if (
       [
         WasteAcceptationStatus.ACCEPTED,
         WasteAcceptationStatus.PARTIALLY_REFUSED
