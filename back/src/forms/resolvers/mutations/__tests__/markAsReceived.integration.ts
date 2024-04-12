@@ -1099,4 +1099,51 @@ describe("Test Form reception", () => {
       expect(refreshedItem3.isDeleted).toBe(true);
     });
   });
+
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  it("should work with quantityRefused", async () => {
+    // Given
+    const {
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form: initialForm
+    } = await prepareDB();
+    const form = await prisma.form.update({
+      where: { id: initialForm.id },
+      data: { currentTransporterOrgId: siretify(3) }
+    });
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    // When
+    const { mutate } = makeClient(recipient);
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Carol",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          wasteRefusalReason: "Dolor sit amet",
+          quantityReceived: 12.5,
+          quantityRefused: 7.5
+        }
+      }
+    });
+
+    // Then
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
+    expect(frm.quantityReceived?.toNumber()).toEqual(12.5);
+    expect(frm.quantityRefused?.toNumber()).toEqual(7.5);
+  });
 });
