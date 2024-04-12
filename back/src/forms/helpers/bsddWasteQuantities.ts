@@ -13,42 +13,32 @@ export const bsddWasteQuantities = ({
   quantityReceived?: Decimal | number | null;
   quantityRefused?: Decimal | number | null;
 }): BsddQuantities | null => {
-  console.log(">> bsddWasteQuantities");
-  console.log("wasteAcceptationStatus", wasteAcceptationStatus);
-  console.log("quantityReceived", quantityReceived);
-  console.log("quantityRefused", quantityRefused);
   // BSDD hasn't been received yet
-  if (!wasteAcceptationStatus || !quantityReceived) {
+  if (
+    !wasteAcceptationStatus ||
+    quantityReceived === null ||
+    quantityReceived === undefined
+  ) {
     return null;
   }
 
-  // Use-case n°1: everything was accepted
-  if (wasteAcceptationStatus === "ACCEPTED") {
-    return {
-      quantityAccepted: new Decimal(quantityReceived),
-      quantityRefused: new Decimal(0)
-    };
+  // Legacy
+  if (quantityRefused === null || quantityRefused === undefined) {
+    return null;
   }
 
-  // Use-case n°2: everything was refused
+  // ACCEPTED
+  let quantityAccepted = new Decimal(quantityReceived);
   if (wasteAcceptationStatus === "REFUSED") {
-    return {
-      quantityAccepted: new Decimal(0),
-      quantityRefused: new Decimal(quantityReceived)
-    };
+    quantityAccepted = new Decimal(0);
+  } else if (wasteAcceptationStatus === "PARTIALLY_REFUSED") {
+    quantityAccepted = new Decimal(quantityReceived).minus(
+      new Decimal(quantityRefused)
+    );
   }
 
-  // Use-case n°3: partial acceptance
-  if (wasteAcceptationStatus === "PARTIALLY_REFUSED") {
-    // So that we can distinguish legacy BSDs from new ones, leave
-    // quantityRefused if not filled
-    return {
-      quantityAccepted: new Decimal(quantityReceived).minus(
-        quantityRefused ?? 0
-      ),
-      quantityRefused: quantityRefused ? new Decimal(quantityRefused) : null
-    };
-  }
-
-  return null;
+  return {
+    quantityAccepted,
+    quantityRefused: new Decimal(quantityRefused)
+  };
 };

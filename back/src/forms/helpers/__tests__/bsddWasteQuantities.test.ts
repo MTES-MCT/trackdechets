@@ -66,7 +66,7 @@ describe("bsddWasteQuantities", () => {
       expect(quantities?.quantityRefused?.toNumber()).toEqual(0);
     });
 
-    test("[legacy] should return quantityAccepted = quantityReceived and quantityRefused = 0", () => {
+    test("[legacy] should return null", () => {
       // Given
       const bsdd = {
         wasteAcceptationStatus: "ACCEPTED",
@@ -78,24 +78,7 @@ describe("bsddWasteQuantities", () => {
       const quantities = bsddWasteQuantities(bsdd);
 
       // Then
-      expect(quantities?.quantityAccepted?.toNumber()).toEqual(15);
-      expect(quantities?.quantityRefused?.toNumber()).toEqual(0);
-    });
-
-    test("[edge-case] quantityReceived & quantityRefused are inconsistent > should return result based on quantityReceived", () => {
-      // Given
-      const bsdd = {
-        wasteAcceptationStatus: "ACCEPTED",
-        quantityReceived: new Decimal(15),
-        quantityRefused: new Decimal(3)
-      };
-
-      // When
-      const quantities = bsddWasteQuantities(bsdd);
-
-      // Then
-      expect(quantities?.quantityAccepted?.toNumber()).toEqual(15);
-      expect(quantities?.quantityRefused?.toNumber()).toEqual(0);
+      expect(quantities).toBeNull();
     });
   });
 
@@ -116,7 +99,7 @@ describe("bsddWasteQuantities", () => {
       expect(quantities?.quantityRefused?.toNumber()).toEqual(15);
     });
 
-    test("[legacy] should return quantityAccepted = 0 and quantityRefused = quantityReceived", () => {
+    test("[legacy] should return null", () => {
       // Given
       const bsdd = {
         wasteAcceptationStatus: "REFUSED",
@@ -128,24 +111,7 @@ describe("bsddWasteQuantities", () => {
       const quantities = bsddWasteQuantities(bsdd);
 
       // Then
-      expect(quantities?.quantityAccepted?.toNumber()).toEqual(0);
-      expect(quantities?.quantityRefused?.toNumber()).toEqual(15);
-    });
-
-    test("[edge-case] quantityReceived & quantityRefused are inconsistent > should return result based on quantityReceived", () => {
-      // Given
-      const bsdd = {
-        wasteAcceptationStatus: "REFUSED",
-        quantityReceived: new Decimal(15),
-        quantityRefused: new Decimal(3)
-      };
-
-      // When
-      const quantities = bsddWasteQuantities(bsdd);
-
-      // Then
-      expect(quantities?.quantityAccepted?.toNumber()).toEqual(0);
-      expect(quantities?.quantityRefused?.toNumber()).toEqual(15);
+      expect(quantities).toBeNull();
     });
   });
 
@@ -182,7 +148,7 @@ describe("bsddWasteQuantities", () => {
       expect(quantities?.quantityRefused?.toNumber()).toEqual(7.987);
     });
 
-    test("[legacy] quantityRefused is null > quantityAccepted = quantityReceived and quantityRefused stays null", () => {
+    test("[legacy] should return null", () => {
       // Given
       const bsdd = {
         wasteAcceptationStatus: "PARTIALLY_REFUSED",
@@ -194,8 +160,7 @@ describe("bsddWasteQuantities", () => {
       const quantities = bsddWasteQuantities(bsdd);
 
       // Then
-      expect(quantities?.quantityAccepted?.toNumber()).toEqual(15);
-      expect(quantities?.quantityRefused).toEqual(null);
+      expect(quantities).toBeNull();
     });
   });
 });
