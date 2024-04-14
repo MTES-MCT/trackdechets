@@ -48,7 +48,7 @@ query {
 ```
 
 
-#### Egalité stricte: Sur le siret d'un producteur
+#### Egalité stricte : Sur le siret d'un producteur
 
 Renvoie les dasris dont le siret de l'émetteur est "UN-SIRET".
 

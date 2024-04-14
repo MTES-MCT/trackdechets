@@ -30,7 +30,7 @@ Le [protocole OAuth2](https://tools.ietf.org/html/rfc6749) permet à des logicie
                     Abstract Protocol Flow
 ```
 
-Seul le "grant" par échange de de code d'autorisation est implémentée dans Trackdéchets [https://tools.ietf.org/html/rfc6749#section-4.1](https://tools.ietf.org/html/rfc6749#section-4.1). Le schéma de flux est le suivant
+Seul le "grant" par échange de code d'autorisation est implémenté dans Trackdéchets [https://tools.ietf.org/html/rfc6749#section-4.1](https://tools.ietf.org/html/rfc6749#section-4.1). Le schéma de flux est le suivant :
 
 ```
      +----------+
@@ -65,23 +65,23 @@ Seul le "grant" par échange de de code d'autorisation est implémentée dans Tr
                      Authorization Code Flow
 ```
 
-- (A) L'application cliente initie le protocole en redirigeant l'utilisateur ("resource owner") sur l'URL d'autorisation Trackdéchets `https://app.trackdechets.beta.gouv.fr/oauth2/authorize/dialog`
+- (A) L'application cliente initie le protocole en redirigeant l'utilisateur ("resource owner") sur l'URL d'autorisation Trackdéchets `https://app.trackdechets.beta.gouv.fr/oauth2/authorize/dialog`.
 
-Les arguments suivants doivent être passés en "query string" de la requête (Cf [https://tools.ietf.org/html/rfc6749#section-4.1.1](https://tools.ietf.org/html/rfc6749#section-4.1.1)):
+Les arguments suivants doivent être passés en "query string" de la requête (Cf [https://tools.ietf.org/html/rfc6749#section-4.1.1](https://tools.ietf.org/html/rfc6749#section-4.1.1)) :
 
-- `client_id={client_id}`: L'identifiant de l'application cliente
+- `client_id={client_id}` : L'identifiant de l'application cliente
 - `response_type=code`
-- `redirect_uri={redirect_uri}`: URL de redirection
+- `redirect_uri={redirect_uri}` : URL de redirection
 
-Exemple: `https://app.trackdechets.beta.gouv.fr/oauth2/authorize/dialog?response_type=code&redirect_uri=https://client.example.com/cb&client_id=ck7d66y9s00x20784u4u7fp8l`
+Exemple : `https://app.trackdechets.beta.gouv.fr/oauth2/authorize/dialog?response_type=code&redirect_uri=https://client.example.com/cb&client_id=ck7d66y9s00x20784u4u7fp8l`
 
 Si la requête échoue à cause d'un paramètre invalide, une erreur est retournée [https://tools.ietf.org/html/rfc6749#section-4.1.2.1](https://tools.ietf.org/html/rfc6749#section-4.1.2.1)
 
-- (B) Le serveur d'autorisation authentifie l'utilisateur via le navigateur ("resource owner") et établit si oui ou non l'utilisateur autorise ou non l'application autorise l'accès
+- (B) Le serveur d'autorisation authentifie l'utilisateur via le navigateur ("resource owner") et établit si oui ou non l'utilisateur autorise ou non l'application autorise l'accès.
 
 ![oauth2-dialog.png](../../static/img/oauth2-dialog.png)
 
-- (C) Si l'utilisateur donne accès, le serveur d'autorisation redirige l'utilisateur vers l'application cliente en utilisant l'URL de redirection fournit à l'étape (A) [https://tools.ietf.org/html/rfc6749#section-4.1.2](https://tools.ietf.org/html/rfc6749#section-4.1.2). L'URL de redirection inclut un code d'autorisation avec une durée de validité de 10 minutes. Par exemple: `https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA`.
+- (C) Si l'utilisateur donne accès, le serveur d'autorisation redirige l'utilisateur vers l'application cliente en utilisant l'URL de redirection fournit à l'étape (A) [https://tools.ietf.org/html/rfc6749#section-4.1.2](https://tools.ietf.org/html/rfc6749#section-4.1.2). L'URL de redirection inclut un code d'autorisation avec une durée de validité de 10 minutes. Par exemple : `https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA`.
 
 * (D) L'application cliente demande un jeton d'accès au serveur d'autorisation en incluant le code d'autorisation reçu à l'étape précédente en faisant un `POST` sur l'URL `https://api.trackdechets.beta.gouv.fr/oauth2/token`. Cf [https://tools.ietf.org/html/rfc6749#section-4.1.3](https://tools.ietf.org/html/rfc6749#section-4.1.3). Les paramètres suivants doivent être passés en utilisant le format "application/x-www-form-urlencoded".
 
@@ -91,7 +91,7 @@ Si la requête échoue à cause d'un paramètre invalide, une erreur est retourn
 
 La requête doit être authentifiée avec le `client_id` et `client_secret` ([méthode basique](https://fr.wikipedia.org/wiki/Authentification_HTTP#M%C3%A9thode_%C2%AB_Basic_%C2%BB)).
 
-```
+```http
 POST /oauth2/token HTTP/1.1
 Host: api.trackdechets.beta.gouv.fr
 Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
@@ -101,9 +101,9 @@ grant_type=authorization_code&code=SplxlOBeZQQYbYS6WxSbIA
 &redirect_uri=https://client.example.com/cb
 ```
 
-- (E) Si la requête est valide et autorisée, le serveur d'autorisation émet un jeton d'accès. Par exemple
+- (E) Si la requête est valide et autorisée, le serveur d'autorisation émet un jeton d'accès. Par exemple :
 
-```
+```http
 HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
 Cache-Control: no-store
@@ -123,7 +123,7 @@ Pragma: no-cache
 
 Vous pouvez ensuite stocker ce token et l'utiliser pour accéder aux ressources de l'utilisateur sur la plateforme Trackdéchets.
 
-Si la requête échoue, le serveur répond par un message d'erreur tel que décrit [ici](https://tools.ietf.org/html/rfc6749#section-5.2)
+Si la requête échoue, le serveur répond par un message d'erreur tel que décrit [ici](https://tools.ietf.org/html/rfc6749#section-5.2).
 
 :::tip
 Une application OAuth2 de démonstration a été créée à l'adresse [https://td-oauth2-demo.osc-fr1.scalingo.io/](https://td-oauth2-demo.osc-fr1.scalingo.io/)

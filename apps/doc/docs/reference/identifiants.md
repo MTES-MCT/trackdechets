@@ -10,7 +10,7 @@ Les identifiants Trackdéchets ont des formats différents en fonction du type d
 - `VHU-YYYYMMDD-XXXXXXXXX` : Bordereau de suivi des véhicules hors d'usage
 - `BSDA-YYYYMMDD-XXXXXXXXX` : Bordereau de suivi des déchets d'amiante
 
-où `YYYYMMDD` correspond à la date du jour et `XXXXXXXXX` une chaine de caractère aléatoire
+où `YYYYMMDD` correspond à la date du jour et `XXXXXXXXX` une chaine de caractère aléatoire.
 
 :::note
 Dans le cas du bordereau de suivi de déchets dangereux, deux identifiants sont exposés : un identifiant "opaque" `id` de la forme `ckqqe8vw67139753fru1giv885i` et un identifiant "lisible" `readableId` au format décrit ci-dessus.

@@ -60,7 +60,7 @@ puis exécuter la requête à l'aide du bouton "Play" au milieu. Vous devrez rec
 Bravo, vous venez d'effectuer votre première requête à l'API Trackdéchets 🎉. En terminologie GraphQL, la requête ci-dessous est une `query`. Ce genre de requête se comporte comme un `GET` dans le standard REST, c'est à dire qu'elle permet de lire des données mais pas d'en modifier. Il existe aussi un autre type de requête appelée `mutation` qui va nous permettre de créer et modifier des ressources à l'instar d'un `POST` / `PUT` / `PATCH` en standard `REST`. C'est ce que nous allons voir à l'étape suivante pour la création de votre premier bordereau.
 
 :::tip
-Les arguments et le type de retour de chaque `query` ou `mutation` est documentée dans la référence de l'API. Exemple avec [la requête que nous venons d'effectuer](../../reference/api-reference/user-company/queries#me)
+Les arguments et le type de retour de chaque `query` ou `mutation` sont documentés dans la référence de l'API. Exemple avec [la requête que nous venons d'effectuer](../../reference/api-reference/user-company/queries#me).
 :::
 
 

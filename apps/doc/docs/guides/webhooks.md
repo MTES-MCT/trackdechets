@@ -14,7 +14,7 @@ Pour recevoir des Webhooks, vous devez suivre ces étapes :
 1. Configurer les Webhooks en utilisant l'API des ["WebhookSettings"](../reference/api-reference/webhooks/mutations#createwebhooksetting).
 2. Autoriser votre SI à recevoir des requêtes HTTP de Trackdéchets.
 3. Effectuer des modifications sur les bordereaux contenant les établissements correspondants aux "WebhookSettings" ou attendre que d'autres acteurs le fassent.
-4. Recevez la requête dde notification de mise à jour sur l'URL de votre SI configuré comme Webhook.
+4. Recevez la requête de notification de mise à jour sur l'URL de votre SI configuré comme Webhook.
 
 ## Configuration
 
@@ -49,7 +49,7 @@ L'URL du point de terminaison ("endpoint") doit toujours renvoyer un code HTTP 2
 Le payload est minimal et se présente sous la forme d'un tableau JSON contenant un objet {"action", "id"}. L'ID correspond à l'identifiant lisible du bordereau de suivi des déchets (BSD), et l'action peut être l'une des chaînes suivantes : "CREATED", "UPDATED", "DELETED". Actuellement, un seul objet est renvoyé dans le tableau, mais à l'avenir, il est possible que nous regroupions les informations de plusieurs BSD dans un seul Webhook.
 
 Exemple de requête :
-```json
+```http
 POST / HTTP/1.1
 
 Host: votre-si.com
@@ -62,8 +62,8 @@ Content-Type: application/json
 [{"action":"CREATED","id":"BSD-20230412-JYE9095HY"}]
 ```
 
-Remarque: Si votre SIRET est retiré d'un BSD ou ajouté à un BSD existant, vous recevrez une action "UPDATED".
+Remarque : Si votre SIRET est retiré d'un BSD ou ajouté à un BSD existant, vous recevrez une action "UPDATED".
 
 ### Sécurité
 
-Un token est requis pour configurer vos Webhooks, cependant, vous êtes responsables de la mise en place du contrôle d'accès sur votre SI. Assurez-vous qu'un endpoint non protégé représente un risque de sécurité pour votre SI et pour Trackdéchets.
+Un token est requis pour configurer vos Webhooks, cependant, vous êtes responsables de la mise en place du contrôle d'accès sur votre SI. Assurez-vous que votre endpoint est protégé. Un endpoint non protégé représente un risque de sécurité pour votre SI et pour Trackdéchets.

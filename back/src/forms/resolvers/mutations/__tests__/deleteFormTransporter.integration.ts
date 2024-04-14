@@ -204,7 +204,7 @@ describe("Mutation.deleteFormTransporter", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Ce transporteur BSDD ne peut-être supprimé car il a déjà signé l'enlèvement du déchet"
+          "Ce transporteur BSDD ne peut être supprimé car il a déjà signé l'enlèvement du déchet"
       })
     ]);
   });

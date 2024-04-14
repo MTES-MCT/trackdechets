@@ -7,16 +7,16 @@ import Mermaid from '../../../src/components/Mermaid';
 Au cours de son cycle de vie, le BSPAOH peut passer par différents états décrits [ici](../api-reference/bspaoh/enums/#bspaohstatus).
 
 
-- `INITIAL` (initial): C'est l'état dans lequel le PAOH est créé.
-- `SIGNED_BY_PRODUCER` (prêt à être emporté) : PAOH signé par l'émetteur
-- `SENT` (envoyé): BSPAOH en transit vers l'installation de destination, d'entreposage ou de reconditionnement
-- `RECEIVED` (reçu): BSPAOH reçu sur l'installation de destination, d'entreposage ou de reconditionnement
-- `ACCEPTED` (accepté): BSPAOH accepté sur l'installation de destination, d'entreposage ou de reconditionnement
-- `PROCESSED` (traité): BSPAOH dont l'opération de traitement a été effectué
-- `REFUSED` (refusé): BSPAOH refusé, par le tranporteur ou le destinataire
+- `INITIAL` (initial) : C'est l'état dans lequel le PAOH est créé.
+- `SIGNED_BY_PRODUCER` (prêt à être emporté) : PAOH signé par l'émetteur.
+- `SENT` (envoyé) : BSPAOH en transit vers l'installation de destination, d'entreposage ou de reconditionnement.
+- `RECEIVED` (reçu) : BSPAOH reçu sur l'installation de destination, d'entreposage ou de reconditionnement.
+- `ACCEPTED` (accepté) : BSPAOH accepté sur l'installation de destination, d'entreposage ou de reconditionnement.
+- `PROCESSED` (traité) : BSPAOH dont l'opération de traitement a été effectué.
+- `REFUSED` (refusé) : BSPAOH refusé, par le tranporteur ou le destinataire.
 
 
-Le diagramme ci dessous retrace le cycle de vie d'un BSPAOH dans Trackdéchets:
+Le diagramme ci dessous retrace le cycle de vie d'un BSPAOH dans Trackdéchets :
 
 <Mermaid chart={`
 graph TD
@@ -40,7 +40,7 @@ D -->|"signBspaoh (RECEPTION *)"| G(REFUSED)
 
  
 
-- `INITIAL` (initial): C'est l'état dans lequel le PAOH est créé. `readableId` est affecté.
-- `SENT` (envoyé): BSPAOH en transit vers l'installation de destination, d'entreposage ou de reconditionnement
-- `RECEIVED` (reçu): BSPAOH reçu sur l'installation de destination, d'entreposage ou de reconditionnement
-- `PROCESSED` (traité): BSPAOH dont l'opération de traitement a été effectué
+- `INITIAL` (initial) : C'est l'état dans lequel le PAOH est créé. `readableId` est affecté.
+- `SENT` (envoyé) : BSPAOH en transit vers l'installation de destination, d'entreposage ou de reconditionnement.
+- `RECEIVED` (reçu) : BSPAOH reçu sur l'installation de destination, d'entreposage ou de reconditionnement.
+- `PROCESSED` (traité) : BSPAOH dont l'opération de traitement a été effectué.

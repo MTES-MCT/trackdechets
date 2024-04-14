@@ -100,9 +100,9 @@ Les résultats sont paginés. Pour récupérer tous les déchets :
 
 ## Export CSV ou Excel
 
-Les données peuvent également être téléchargées au format `CSV` ou Excel (`XLXS`)
+Les données peuvent également être téléchargées au format `CSV` ou Excel (`XLXS`).
 
-Pour ce faire vous devez utiliser la query [`wastesDownloadLink`](../reference/api-reference/registre/queries#wastesdownloadlink) de la façon suivante
+Pour ce faire vous devez utiliser la query [`wastesDownloadLink`](../reference/api-reference/registre/queries#wastesdownloadlink) de la façon suivante :
 
 ```graphql
 query {
