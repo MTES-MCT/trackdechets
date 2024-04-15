@@ -24,7 +24,7 @@ jest.mock("../../../../mailer/mailing");
 // Mock getCodeCommune
 jest.mock("../../../geo/getCodeCommune");
 
-const CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF = gql`
+const CREATE_ANONYMOUS_COMPANY_FROM_PDF = gql`
   mutation CreateAnonymousCompanyFromPDF(
     $input: CreateAnonymousCompanyFromPDFInput!
   ) {
@@ -73,7 +73,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -109,7 +109,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "",
@@ -133,7 +133,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "siret",
@@ -168,7 +168,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "95207811100012",
@@ -203,7 +203,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -251,7 +251,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -275,7 +275,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -297,7 +297,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -331,7 +331,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -378,7 +378,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -425,7 +425,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
     // When
     const { errors } = await mutate<
       Pick<Mutation, "createAnonymousCompanyFromPDF">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST_FROM_PDF, {
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
