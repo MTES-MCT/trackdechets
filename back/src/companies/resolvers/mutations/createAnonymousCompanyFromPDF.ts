@@ -21,7 +21,7 @@ const anonymousCompanyInputSchema: yup.SchemaOf<CreateAnonymousCompanyFromPdfInp
 const createAnonymousCompanyFromPDFResolver: MutationResolvers["createAnonymousCompanyFromPDF"] =
   async (_, { input }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
-    const user = checkIsAuthenticated(context);
+    checkIsAuthenticated(context);
 
     // Yup validation
     await anonymousCompanyInputSchema.validate(input);
