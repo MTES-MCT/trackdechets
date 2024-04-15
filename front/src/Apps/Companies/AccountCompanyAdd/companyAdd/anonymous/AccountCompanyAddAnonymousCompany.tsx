@@ -15,9 +15,7 @@ const CREATE_ANONYMOUS_COMPANY_FROM_PDF = gql`
   mutation CreateAnonymousCompanyFromPDF(
     $input: CreateAnonymousCompanyFromPDFInput!
   ) {
-    createAnonymousCompanyFromPDF(input: $input) {
-      orgId
-    }
+    createAnonymousCompanyFromPDF(input: $input)
   }
 `;
 

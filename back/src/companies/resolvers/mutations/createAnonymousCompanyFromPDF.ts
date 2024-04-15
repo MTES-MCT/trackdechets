@@ -73,7 +73,7 @@ const createAnonymousCompanyFromPDFResolver: MutationResolvers["createAnonymousC
       }
     });
 
-    return createdCompany;
+    return true;
   };
 
 export default createAnonymousCompanyFromPDFResolver;

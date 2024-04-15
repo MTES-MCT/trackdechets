@@ -65,5 +65,5 @@ type Mutation {
   """
   createAnonymousCompanyFromPDF(
     input: CreateAnonymousCompanyFromPDFInput!
-  ): AnonymousCompany
+  ): Boolean
 }
