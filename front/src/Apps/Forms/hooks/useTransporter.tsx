@@ -4,6 +4,7 @@ import { isForeignVat } from "@td/constants";
 import { CreateOrUpdateTransporterInput } from "../../../form/bsdd/utils/initial-state";
 import { AnyTransporterInput } from "../types";
 import { mapBsdTransporter } from "../bsdTransporterMapper";
+import { CreateOrUpdateBsdaTransporterInput } from "../../../form/bsda/stepper/initial-state";
 
 // Hook multi-bordereaux qui appelle `useField` et qui renvoie les helpers et
 // champs nécessaires pour read / update les infos d'un transporteur
@@ -20,11 +21,21 @@ export function useTransporter<T extends AnyTransporterInput>(
     transporter?.company?.siret ?? transporter?.company?.vatNumber ?? null;
 
   const setTransporter = (company: CompanySearchResult) => {
-    const recepisseIsExempted = isForeignVat(company.vatNumber)
-      ? // l'obligation de récépissé ne concerne pas les transporteurs étrangers
-        // on force la valeur à `false` et on désactive le champ
-        false
-      : (transporter as CreateOrUpdateTransporterInput).isExemptedOfReceipt;
+    let recepisseIsExempted =
+      bsdType === BsdType.Bsdd
+        ? Boolean(
+            (transporter as CreateOrUpdateTransporterInput).isExemptedOfReceipt
+          )
+        : Boolean(
+            (transporter as CreateOrUpdateBsdaTransporterInput).recepisse
+              ?.isExempted
+          );
+
+    if (isForeignVat(company.vatNumber)) {
+      // l'obligation de récépissé ne concerne pas les transporteurs étrangers
+      // on force la valeur à `false` et on désactive le champ
+      recepisseIsExempted = false;
+    }
 
     const updatedTransporter = {
       ...transporter,
@@ -68,17 +79,17 @@ export function useTransporter<T extends AnyTransporterInput>(
     setValue(updatedTransporter);
   };
 
-  const transportPlatesField =
+  const transportPlatesFieldName =
     bsdType === BsdType.Bsdd
       ? `${fieldName}.numberPlate`
       : `${fieldName}.transport.plates`;
 
-  const transportModeField =
+  const transportModeFieldName =
     bsdType === BsdType.Bsdd
       ? `${fieldName}.mode`
       : `${fieldName}.transport.mode`;
 
-  const transporterRecepisseIsExemptedField =
+  const transporterRecepisseIsExemptedFieldName =
     bsdType === BsdType.Bsdd
       ? `${fieldName}.isExemptedOfReceipt`
       : `${fieldName}.recepisse.isExempted`;
@@ -87,8 +98,8 @@ export function useTransporter<T extends AnyTransporterInput>(
     transporterOrgId,
     transporter: mapBsdTransporter(transporter, bsdType),
     setTransporter,
-    transportPlatesField,
-    transportModeField,
-    transporterRecepisseIsExemptedField
+    transportPlatesFieldName,
+    transportModeFieldName,
+    transporterRecepisseIsExemptedFieldName
   };
 }

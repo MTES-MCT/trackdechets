@@ -76,7 +76,7 @@
 4. Démarrer les containers de bases de données
 
    ```bash
-   docker-compose docker-compose.yml up -d
+   docker compose docker-compose.yml up -d
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
@@ -307,14 +307,14 @@ npx nx run front:storybook
 La commande pour faire tourner tous les tests unitaires est la suivante :
 
 ```bash
-docker-compose -f docker-compose.test.yml up
+docker compose -f docker-compose.test.yml up
 ```
 
 Il est également possible de faire tourner les tests unitaires sur l'environnement de `dev` en se connectant à chacun des containers. Par exemple :
 
 1. Démarrer les différents services
    ```
-   docker-compose up -d
+   docker compose up -d
    ```
 2. Faire tourner les tests back
    ```bash
@@ -469,15 +469,25 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 
 ## Migrations
 
-Les migrations de base peuvent se faire soit en SQL, soit via des script TypeScript.
-Pour le SQL elles sont situées dans `libs/back/prisma/migrate/migrations`. Les fichiers sont numérotés dans l'ordre croissant. Ils doivent être nommé `XX_any-namme.sql`.
-A noter que une fois que ces migrations ont été jouées, le contenu des fichiers est hashé dans la table migration et il ne faut donc surtout pas les modifier.
+### Modèle de données
 
-Pour les migrations scriptées, c'est dans `back/prisma/scripts`. Les migrations doivent prendre la forme d'une classe, implémentant `Updater` et décorée par `registerUpdater`.
-Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une seules fois. Il faut donc s'assurer qu'elles sont idempotentes, ou les désactiver après chaque mise en production.
+Les migrations de modèle sont gérées avec [Prisma migrate](https://www.prisma.io/docs/orm/prisma-migrate).
 
-Les scripts sont joués avec la commande `npx nx run back:update`.
-Les migrations SQL sont joués avec Prisma migrate `npx prisma migrate dev`.
+Le workflow est le suivant:
+
+- modification du schéma de la base de donnée, dans le fichier `libs/back/prisma/src/schema.prisma`
+- génération de la migration correspondante en jouant `npx prisma migrate dev`. Le CLI demandera de nommer sa migration. Les migrations peuvent être retrouvées dans `libs/back/prisma/src/migrations`
+- si on souhaite modifier le SQL généré par Prisma avant qu'il soit appliqué, il est possible de jouer `npx prisma migrate dev --create-only`. C'est notamment utile lorsque l'on souhaite utiliser des fonctionnalitées non supportées par Prisma (ex: index partiel)
+
+Pour plus d'informations sur l'utilisation de Prisma migrate, allez [consulter leur documentation](https://www.prisma.io/docs/orm/prisma-migrate).
+
+### Scripts de migration
+
+Les scripts sont gérés par le projet `libs/back/scripts`.
+
+Pour générer un script, on utilise `npx nx run @td/scripts:generate`. Le CLI demandera alors à nomemr le script, et un boilerplate d'écriture de script sera généré. Les fichiers sont générés dans le dossier `libs/back/scripts/src/scripts`.
+
+Pour jouer les scripts, on utilise `npx nx run @td/scripts:migrate`. Les scripts exécutés avec succès sont sauvegardés en base de données pour s'assurer qu'ils ne sont joués qu'une seule fois.
 
 ## Réindexation Elasticsearch des BSDs
 
@@ -531,6 +541,14 @@ Depuis un one-off container de taille XL
 - Si ES est surchargé, il peut être opportun de diminuer le nombre de workers.
 - À la fin de la réindexation, set le nombre de workers `bulkindexqueuemaster` et `bulkindexqueue` à 0.
 
+## Rattrapage SIRENE
+
+Si les données de raison sociale et d'adresses enregistrés sur les bordereaux sont erronnées suite à un dysfonctionnement de l'index SIRENE, un rattrapage peut être effectué à postériori grâce au script suivante. Tous les bordereaux qui ont été crées ou modifiés entre ces deux dates seront mis à jour.
+
+`npx nx run back:sirenify-bulk --since 2024-04-01 --before 2024-04-03`
+
+Les jobs de "sirenification" sont dépilés par le worker `bulkindexqueue` qui doit donc être démarré sur Scalingo avant de lancer le script.
+
 ## Guides
 
 ### Mettre à jour le changelog
@@ -571,7 +589,7 @@ $ ./restore-db.sh
 1. Télécharger un backup de la base de donnée nommée `prisma` que vous souhaitez restaurer
 2. Démarrer le conteneur postgres
    ```
-   docker-compose -f docker-compose.dev.yml up --build postgres
+   docker compose -f docker-compose.dev.yml up --build postgres
    ```
 3. Copier le fichier de backup à l'intérieur du conteneur
    ```

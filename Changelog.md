@@ -15,10 +15,17 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Le siret de l'établissement est précisé dans les emails d'invitation [PR 3151](https://github.com/MTES-MCT/trackdechets/pull/3151)
+- Renommage & correctif dans le cadre 1.1 du PDF d'un BSDD (entreprise française / étrangère) [PR 3181](https://github.com/MTES-MCT/trackdechets/pull/3181)
+- Le titre d'un PDF de BSDD affiche clairement si le déchet est dangereux ou non [PR 3183](https://github.com/MTES-MCT/trackdechets/pull/3183)
+- Amélioration du contenu du mail en cas d'attente de révision [PR 3141](https://github.com/MTES-MCT/trackdechets/pull/3141)
+- Message d'erreur clair si l'utilisateur tente de créer un établissement avec un SIRET non diffusible fermé [PR 3148](https://github.com/MTES-MCT/trackdechets/pull/3148)
+- Ajout de nouveaux types & sous-types d'entreprises [PR 3206](https://github.com/MTES-MCT/trackdechets/pull/3206)
 
 #### :bug: Corrections de bugs
 
 - Correction des registres éco-organisme et intermédiaires [PR 3196](https://github.com/MTES-MCT/trackdechets/pull/3196/)
+- Correction des révisions avec un mode de traitement null [PR 3193](https://github.com/MTES-MCT/trackdechets/pull/3193)
+- Correction de la gestion du poids lors de la création d'un Bsdasri de groupement [PR 3236](https://github.com/MTES-MCT/trackdechets/pull/3236)
 
 #### :house: Interne
 

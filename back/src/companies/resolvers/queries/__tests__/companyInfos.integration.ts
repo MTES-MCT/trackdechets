@@ -3,7 +3,10 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { AnonymousCompanyError } from "../../../sirene/errors";
+import {
+  AnonymousCompanyError,
+  ClosedCompanyError
+} from "../../../sirene/errors";
 
 const mockSearchSirene = jest.fn();
 jest.mock("../../../sirene/searchCompany", () => ({
@@ -410,5 +413,25 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
       siret,
       website: null
     });
+  });
+
+  it("should return explicit error if non-diffusible AND closed", async () => {
+    // Given
+    mockSearchSirene.mockRejectedValueOnce(new ClosedCompanyError());
+    const siret = siretify(8);
+
+    // When
+    const gqlquery = `
+      query {
+        companyInfos(siret: "${siret}") {
+          siret
+        }
+      }`;
+    const { errors } = await query<any>(gqlquery);
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe("Cet établissement est fermé");
+    expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
   });
 });
