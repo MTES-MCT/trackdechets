@@ -64,7 +64,7 @@ const createAnonymousCompanyFromPDFResolver: MutationResolvers["createAnonymousC
     }
 
     // Create the request
-    const createdCompany = await prisma.anonymousCompany.create({
+    await prisma.anonymousCompany.create({
       data: {
         ...data,
         orgId: input.siret,
