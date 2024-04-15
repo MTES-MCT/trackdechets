@@ -75,7 +75,7 @@ export function CreateAnonymousCompanyForm() {
 
   return (
     <>
-      <h3 className="fr-h3 fr-mt-2w">Créer une entreprise</h3>
+      <h3 className="fr-h3 fr-mt-2w">Créer une entreprise anonyme</h3>
 
       <Formik
         initialValues={{
@@ -102,7 +102,7 @@ export function CreateAnonymousCompanyForm() {
           }
         }}
       >
-        {({ errors, values }) => (
+        {({ errors, values, setFieldValue }) => (
           <Form className="fr-my-3w">
             <Field name="siret">
               {({ field }) => {
@@ -112,7 +112,17 @@ export function CreateAnonymousCompanyForm() {
                     state={errors.siret ? "error" : "default"}
                     stateRelatedMessage={errors.siret as string}
                     disabled={loading}
-                    nativeInputProps={field}
+                    nativeInputProps={{
+                      // force remove whitespace
+                      onKeyUp: (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const siret = e.target.value
+                          .split(" ")
+                          .join("")
+                          .toUpperCase();
+                        setFieldValue("siret", siret);
+                      },
+                      ...field
+                    }}
                   />
                 );
               }}
