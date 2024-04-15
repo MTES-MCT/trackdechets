@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 
 interface BsddQuantities {
   quantityAccepted: Decimal;
-  quantityRefused: Decimal | null;
+  quantityRefused: Decimal;
 }
 export const bsddWasteQuantities = ({
   wasteAcceptationStatus,

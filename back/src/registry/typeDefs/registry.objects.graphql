@@ -34,6 +34,10 @@ type IncomingWaste {
   id: ID
   "La quantité de déchet entrant exprimée en tonne"
   destinationReceptionWeight: Float
+  "La quantité de déchet entrant acceptée exprimée en tonne"
+  destinationReceptionAcceptedWeight: Float
+  "La quantité de déchet entrant refusée exprimée en tonne"
+  destinationReceptionRefusedWeight: Float
 
   #################################################################
   # c) Concernant l'origine, la gestion et le transport du déchet :

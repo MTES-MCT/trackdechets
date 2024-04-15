@@ -760,11 +760,12 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                   <br />
                   {wasteQuantities && (
                     <>
-                      Quantité acceptée : {wasteQuantities.quantityAccepted}{" "}
-                      tonne(s)
+                      Quantité acceptée :{" "}
+                      {wasteQuantities.quantityAccepted.toNumber()} tonne(s)
                       <br />
-                      Quantité refusée : {wasteQuantities.quantityRefused}{" "}
-                      tonne(s)
+                      Quantité refusée :{" "}
+                      {wasteQuantities.quantityRefused.toNumber()} tonne(s)
+                      <br />
                       <br />
                     </>
                   )}
