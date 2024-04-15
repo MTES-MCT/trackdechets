@@ -168,8 +168,6 @@ async function creators(input: BsdaInput) {
   return [
     input.emitter?.company?.siret,
     input.ecoOrganisme?.siret,
-    input.transporter?.company?.siret,
-    input.transporter?.company?.vatNumber,
     ...transporters.flatMap(t => [
       t.transporterCompanySiret,
       t.transporterCompanyVatNumber
