@@ -49,11 +49,17 @@ interface AmianteCertification {
   organisation: "QUALIBAT" | "AFNOR Certification" | "GLOBAL CERTIFICATION";
 }
 
+const isOnlyWasteProducter = (roles: CompanyRole[]): boolean => {
+  return (
+    roles.length === 1 &&
+    roles[0] === "Producteur de déchets : producteurs de déchets, y compris T&S"
+  );
+};
+
 /**
- * In the "/companies/create", returns the correct "Créer votre établissement" button index
- * matching company role.
+ * Return the correct create-button-label regarding company roles
  */
-export const getCreateButtonIndex = (roles: CompanyRole[]) => {
+export const getCreateButtonName = (roles: CompanyRole[]) => {
   // "La gestion des déchets fait partie de votre activité"
   for (const role of roles) {
     if (
@@ -69,7 +75,7 @@ export const getCreateButtonIndex = (roles: CompanyRole[]) => {
         "Entreprise de travaux amiante"
       ].includes(role)
     ) {
-      return 1;
+      return "Créer un établissement";
     }
   }
 
@@ -80,12 +86,12 @@ export const getCreateButtonIndex = (roles: CompanyRole[]) => {
         "Producteur de déchets : producteurs de déchets, y compris T&S"
       ].includes(role)
     ) {
-      return 0;
+      return "Créer votre établissement producteur";
     }
   }
 
   // "Transporteur hors France, Non-French carrier"
-  return 2;
+  return "Créer un établissement transporteur hors France";
 };
 
 /**
@@ -153,14 +159,11 @@ export const generateSiretAndInitiateCompanyCreation = async (
   }
 
   // "Créer votre établissement" button. Select correct one regarding company activity.
-  const createButtonIndex = getCreateButtonIndex(roles);
-  await page
-    .getByRole("button", { name: "Créer votre établissement" })
-    .nth(createButtonIndex)
-    .click();
+  const createButtonName = getCreateButtonName(roles);
+  await page.getByRole("button", { name: createButtonName }).click();
 
   // For waste producers...
-  if (createButtonIndex === 0) {
+  if (isOnlyWasteProducter(roles)) {
     // ...help message should be visible (and closable)
     const helpMessage = page.getByRole("heading", {
       name: "Vous rencontrez des difficultés dans la création d'un établissement ?"
