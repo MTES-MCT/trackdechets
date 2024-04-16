@@ -2170,4 +2170,57 @@ describe("Mutation.updateBsda", () => {
     expect(updateEvent).toBeDefined();
     expect(updateEvent?.data?.["wasteCode"]).toBe("06 13 04*");
   });
+
+  it("should be possible to update destination without erasing destination reception weight", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+
+    // Create a form that has already been sent
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SENT",
+        weightValue: 1000,
+        emitterEmissionSignatureDate: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        destinationCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(destination.user);
+
+    let input: BsdaInput = {
+      destination: { reception: { weight: 2 } }
+    };
+    const { errors: errors1 } = await mutate<Pick<Mutation, "updateBsda">>(
+      UPDATE_BSDA,
+      {
+        variables: { id: bsda.id, input }
+      }
+    );
+    expect(errors1).toBeUndefined();
+
+    let updatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+    expect(updatedBsda.destinationReceptionWeight!.toNumber()).toEqual(
+      2000 // 2 * 1000
+    );
+    input = {
+      destination: { operation: { code: "D 5" } }
+    };
+    const { errors: errors2 } = await mutate<Pick<Mutation, "updateBsda">>(
+      UPDATE_BSDA,
+      {
+        variables: { id: bsda.id, input }
+      }
+    );
+    expect(errors2).toBeUndefined();
+
+    updatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+    expect(updatedBsda.destinationReceptionWeight!.toNumber()).toEqual(
+      2000 // 2 * 1000
+    );
+  });
 });
