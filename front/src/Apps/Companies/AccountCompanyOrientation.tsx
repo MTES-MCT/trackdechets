@@ -14,10 +14,8 @@ export default function AccountCompanyOrientation() {
           <CallOut
             title="Vous produisez des déchets dans le cadre de votre activité."
             buttonProps={{
-              title: "Créer votre établissement",
-              children: "Créer votre établissement",
-              iconId: "ri-arrow-right-line",
-              iconPosition: "right",
+              title: "Créer votre établissement producteur",
+              children: "Créer votre établissement producteur",
               onClick: () => {
                 navigate(routes.companies.create.simple);
               }
@@ -55,10 +53,8 @@ export default function AccountCompanyOrientation() {
           <CallOut
             title="La gestion des déchets fait partie de votre activité."
             buttonProps={{
-              title: "Créer votre établissement",
-              children: "Créer votre établissement",
-              iconId: "ri-arrow-right-line",
-              iconPosition: "right",
+              title: "Créer un établissement",
+              children: "Créer un établissement",
               onClick: () => {
                 navigate(routes.companies.create.pro);
               }
@@ -76,10 +72,8 @@ export default function AccountCompanyOrientation() {
           <CallOut
             title="Transporteur hors France, Non-French carrier"
             buttonProps={{
-              title: "Créer votre établissement",
-              children: "Créer votre établissement",
-              iconId: "ri-arrow-right-line",
-              iconPosition: "right",
+              title: "Créer un établissement transporteur hors France",
+              children: "Créer un établissement transporteur hors France",
               onClick: () => {
                 navigate(routes.companies.create.foreign);
               }
