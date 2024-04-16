@@ -51,6 +51,8 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   pop: null,
   id: null,
   destinationReceptionWeight: null,
+  destinationReceptionAcceptedWeight: null,
+  destinationReceptionRefusedWeight: null,
   initialEmitterCompanyName: null,
   initialEmitterCompanySiret: null,
   initialEmitterCompanyAddress: null,
