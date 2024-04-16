@@ -160,7 +160,9 @@ export const generateSiretAndInitiateCompanyCreation = async (
 
   // "Créer votre établissement" button. Select correct one regarding company activity.
   const createButtonName = getCreateButtonName(roles);
-  await page.getByRole("button", { name: createButtonName }).click();
+  await page
+    .getByRole("button", { name: createButtonName, exact: true })
+    .click();
 
   // For waste producers...
   if (isOnlyWasteProducter(roles)) {
