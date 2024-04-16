@@ -84,16 +84,35 @@ export type BsdMenu =
   | "Pour action"
   | "Suivi"
   | "Archives"
-  | "Toutes les révisions"
+  | "En cours"
+  | "Révisés"
   | "À collecter"
-  | "Collecté";
+  | "Collectés";
+
+const BsdMenuUrls = {
+  "Tous les bordereaux": "/bsds/all",
+  Brouillons: "/bsds/drafts",
+  "Pour action": "/bsds/act",
+  Suivi: "/bsds/follow",
+  Archives: "/bsds/history",
+  "En cours": "/bsds/to-review",
+  Révisés: "/bsds/reviewed",
+  "À collecter": "/transport/to-collect",
+  Collectés: "/transport/collected"
+};
 export const selectBsdMenu = async (page, menu: BsdMenu) => {
+  // Don't navigate if already there
+  const currentPath = new URL(page.url()).pathname;
+  if (currentPath.endsWith(BsdMenuUrls[menu])) return;
+
   const targetedTab = page
     .locator(".dashboard-tabs")
-    .getByRole("link", { name: menu });
+    .getByRole("link", { name: menu, exact: true });
   const ariaCurrent = await targetedTab.getAttribute("aria-current");
 
   if (ariaCurrent !== "page") {
     await targetedTab.click();
   }
+
+  await page.waitForURL(`**${BsdMenuUrls[menu]}`);
 };

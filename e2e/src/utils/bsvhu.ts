@@ -1,5 +1,6 @@
 import { Page, expect } from "@playwright/test";
-import { expectInputValue, navigateInDashboard } from "./utils";
+import { expectInputValue } from "./utils";
+import { selectBsdMenu } from "./navigation";
 import { toDDMMYYYY } from "./time";
 
 /**
@@ -18,6 +19,25 @@ const getVHUCardDiv = (page: Page, id: string) => {
 const clickCreateVhuButton = async (page: Page) => {
   await page.getByRole("button", { name: "Créer un bordereau" }).click();
   await page.getByRole("link", { name: "Véhicule Hors d’Usage" }).click();
+};
+
+/**
+ * Click on secondary menu action button. Will check if secondary menu is already open.
+ */
+type Action = "Dupliquer" | "Supprimer";
+const clickOnVhuSecondaryMenuButton = async (
+  page: Page,
+  id: string,
+  action: Action
+) => {
+  const vhuDiv = getVHUCardDiv(page, id);
+
+  const button = vhuDiv.getByRole("button").getByText(action);
+  if (!(await button.isVisible())) {
+    await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
+  }
+
+  await button.click();
 };
 
 /**
@@ -393,7 +413,7 @@ export const verifyOverviewData = async (
  * Publish a VHU
  */
 export const publishBsvhu = async (page: Page, { id }) => {
-  await navigateInDashboard(page, "Brouillons", "**/bsds/drafts");
+  await selectBsdMenu(page, "Brouillons");
 
   let vhuDiv = getVHUCardDiv(page, id);
 
@@ -402,7 +422,7 @@ export const publishBsvhu = async (page: Page, { id }) => {
   // Confirm publication in modal
   await page.getByRole("button", { name: "Publier le bordereau" }).click();
 
-  await navigateInDashboard(page, "Tous les bordereaux", "**/bsds/all");
+  await selectBsdMenu(page, "Tous les bordereaux");
   vhuDiv = getVHUCardDiv(page, id);
 
   await expect(vhuDiv).toBeVisible();
@@ -423,7 +443,7 @@ export const publishBsvhu = async (page: Page, { id }) => {
  * Fix VHU adding missing data, then publish
  */
 export const fixAndPublishBsvhu = async (page: Page, { id }) => {
-  await navigateInDashboard(page, "Brouillons", "**/bsds/drafts");
+  await selectBsdMenu(page, "Brouillons");
 
   const vhuDiv = getVHUCardDiv(page, id);
 
@@ -455,16 +475,15 @@ export const fixAndPublishBsvhu = async (page: Page, { id }) => {
  * Duplicate a VHU
  */
 export const duplicateBsvhu = async (page: Page, { id }) => {
-  await navigateInDashboard(page, "Tous les bordereaux", "**/bsds/all");
+  await selectBsdMenu(page, "Tous les bordereaux");
 
   const vhuDiv = getVHUCardDiv(page, id);
 
   // Duplicate
-  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
-  await vhuDiv.getByRole("button").getByText("Dupliquer").click();
+  await clickOnVhuSecondaryMenuButton(page, id, "Dupliquer");
 
   // Check in drafts
-  await navigateInDashboard(page, "Brouillons", "**/bsds/drafts");
+  await selectBsdMenu(page, "Brouillons");
 
   // Make sure VHU pops out in results list
   const duplicatedVhuDiv = page.locator(".bsd-card-list li").first();
@@ -481,13 +500,14 @@ export const duplicateBsvhu = async (page: Page, { id }) => {
  * Delete a VHU
  */
 export const deleteBsvhu = async (page: Page, { id }) => {
-  await navigateInDashboard(page, "Tous les bordereaux", "**/bsds/all");
+  await selectBsdMenu(page, "Tous les bordereaux");
 
   const vhuDiv = getVHUCardDiv(page, id);
 
   // Delete
-  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
-  await vhuDiv.getByRole("button").getByText("Supprimer").click();
+  await clickOnVhuSecondaryMenuButton(page, id, "Supprimer");
+
+  // Confirmation modal
   await page.getByRole("button", { name: "Supprimer" }).click();
 
   await expect(vhuDiv).not.toBeVisible();
