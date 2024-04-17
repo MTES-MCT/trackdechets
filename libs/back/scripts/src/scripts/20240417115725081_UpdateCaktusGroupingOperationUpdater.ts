@@ -48,7 +48,7 @@ async function loadExcelData(filePath: string) {
 }
 
 export async function run() {
-  const pathXlsx = path.join(__dirname, "fix-appendix2-caktus-042024.xlsx");
+  const pathXlsx = path.join(__dirname, "..", "fix-appendix2-caktus-042024.xlsx");
   const user = { id: "support-td", authType: "script" };
   if (!fs.existsSync(pathXlsx)) {
     logger.info(`Missing file ${pathXlsx}, aborting script`);
