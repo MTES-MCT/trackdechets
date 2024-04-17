@@ -6,10 +6,8 @@ import {
   getFormRepository,
   runInTransaction,
   getFormOrFormNotFound,
-  validateGroupement,
-  InitialFormFractionInput
+  validateGroupement
 } from "back";
-import { prisma } from "@td/prisma";
 
 type Row = {
   nextFormId: string;
@@ -51,40 +49,55 @@ export async function run() {
     logger.info(`Missing file ${pathXlsx}, aborting script`);
   } else {
     const rows = await loadExcelData(pathXlsx);
-    await runInTransaction(async transaction => {
-      const formRepository = getFormRepository(user as any, transaction);
-      for (const row of rows) {
-        try {
-          const nextForm = await getFormOrFormNotFound({ id: row.nextFormId });
-          const initialForms = await prisma.form.findMany({
-            where: { id: { in: row.initialFormIds } }
+
+    for (const row of rows) {
+      await runInTransaction(async prisma => {
+        const { updateAppendix2Forms } = getFormRepository(user as any, prisma);
+
+        const nextForm = await getFormOrFormNotFound({ id: row.nextFormId });
+        const initialForms = await prisma.form.findMany({
+          where: { id: { in: row.initialFormIds } }
+        });
+
+        const grouping = initialForms.map(f => {
+          return {
+            form: { id: f.id }
+          };
+        });
+
+        const formFractions = await validateGroupement(nextForm, grouping);
+
+        const formGroupementToCreate: {
+          nextFormId: string;
+          initialFormId: string;
+          quantity: number;
+        }[] = [];
+
+        for (const { form: initialForm, quantity } of formFractions) {
+          formGroupementToCreate.push({
+            nextFormId: nextForm.id,
+            initialFormId: initialForm.id,
+            quantity: quantity
           });
-
-          const grouping: InitialFormFractionInput[] = initialForms.map(f => {
-            return {
-              form: { id: f.id },
-              quantity: f.quantityReceived?.toNumber()
-            };
-          });
-
-          const formFractions = await validateGroupement(nextForm, grouping);
-          const existingFormFractions = await prisma.form
-            .findUnique({ where: { id: nextForm.id } })
-            .grouping({ include: { initialForm: true } });
-
-          const existingAppendixForms =
-            existingFormFractions?.map(({ initialForm }) => initialForm) ?? [];
-
-          await formRepository.setAppendix2({
-            form: nextForm,
-            appendix2: formFractions!,
-            currentAppendix2Forms: existingAppendixForms
-          });
-        } catch {
-          continue;
         }
-      }
-      console.log("Insertion et mise à jour terminées.");
-    });
+
+        if (formGroupementToCreate.length > 0) {
+          await prisma.formGroupement.createMany({
+            data: formGroupementToCreate
+          });
+
+          const dirtyFormIds = initialForms.map(f => f.id);
+
+          const dirtyForms = await prisma.form.findMany({
+            where: { id: { in: dirtyFormIds } },
+            include: { forwardedIn: true }
+          });
+
+          await updateAppendix2Forms(dirtyForms);
+        }
+      });
+    }
+
+    console.log("Insertion et mise à jour terminées.");
   }
 }
