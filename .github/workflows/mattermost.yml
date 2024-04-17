@@ -1,8 +1,8 @@
 name: Send reviewable PRs to Mattermost
 
-on: push
-  # schedule:
-  #   - cron:  '0 9 * * 1-5'
+on:
+  schedule:
+    - cron:  '0 9 * * 1-5'
 
 jobs:
   notify:
