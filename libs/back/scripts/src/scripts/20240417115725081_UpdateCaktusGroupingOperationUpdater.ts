@@ -4,12 +4,15 @@ import { logger } from "@td/logger";
 import * as ExcelJS from "exceljs";
 import {
   getFormRepository,
-  UpdateFormInput,
   runInTransaction,
   getFormOrFormNotFound,
   validateGroupement
 } from "back";
-import { prisma } from "@td/prisma";
+
+type Row = {
+  nextFormId: string;
+  initialFormIds: string[];
+};
 
 async function loadExcelData(filePath: string) {
   const workbook = new ExcelJS.Workbook();
@@ -22,64 +25,79 @@ async function loadExcelData(filePath: string) {
     process.exit(1);
   }
   const worksheet = workbook.worksheets[0];
-  const rows: Array<UpdateFormInput> = [];
+  const rows: Array<Row> = [];
   worksheet.eachRow((row, rowNumber) => {
     // Ignorer l'en-tête
     if (rowNumber > 1 && row?.cellCount) {
-      const cell2 = row.getCell(2) as unknown as string;
-      const cell3 = row.getCell(3) as unknown as string;
       const nextFormId = row.getCell(1) as unknown as string;
+      const cell2 = row.getCell(2) as unknown as string;
       const initialFormIds = cell2.split ? cell2.split(",") : [];
-      const quantities = (cell3.split ? cell3.split(",") : []).map(q =>
-        parseFloat(q)
-      );
-      rows.push({
-        id: nextFormId,
-        grouping: initialFormIds.map((initialFormId, index) => ({
-          form: {
-            id: initialFormId
-          },
-          quantity: quantities[index]
-        }))
-      });
+      rows.push({ nextFormId, initialFormIds });
     }
   });
   return rows;
 }
 
 export async function run() {
-  const pathXlsx = path.join(__dirname, "..", "fix-appendix2-caktus-042024.xlsx");
+  const pathXlsx = path.join(
+    __dirname,
+    "..",
+    "fix-appendix2-caktus-042024.xlsx"
+  );
   const user = { id: "support-td", authType: "script" };
   if (!fs.existsSync(pathXlsx)) {
     logger.info(`Missing file ${pathXlsx}, aborting script`);
   } else {
     const rows = await loadExcelData(pathXlsx);
-    await runInTransaction(async transaction => {
-      const formRepository = getFormRepository(user as any, transaction);
-      for (const row of rows) {
-        try {
-          const existingForm = await getFormOrFormNotFound({ id: row.id });
-          const formFractions = await validateGroupement(
-            existingForm,
-            row.grouping!
-          );
-          const existingFormFractions = await prisma.form
-            .findUnique({ where: { id: existingForm.id } })
-            .grouping({ include: { initialForm: true } });
 
-          const existingAppendixForms =
-            existingFormFractions?.map(({ initialForm }) => initialForm) ?? [];
+    for (const row of rows) {
+      await runInTransaction(async prisma => {
+        const { updateAppendix2Forms } = getFormRepository(user as any, prisma);
 
-          await formRepository.setAppendix2({
-            form: existingForm,
-            appendix2: formFractions!,
-            currentAppendix2Forms: existingAppendixForms
+        const nextForm = await getFormOrFormNotFound({ id: row.nextFormId });
+        const initialForms = await prisma.form.findMany({
+          where: { id: { in: row.initialFormIds } }
+        });
+
+        const grouping = initialForms.map(f => {
+          return {
+            form: { id: f.id }
+          };
+        });
+
+        const formFractions = await validateGroupement(nextForm, grouping);
+
+        const formGroupementToCreate: {
+          nextFormId: string;
+          initialFormId: string;
+          quantity: number;
+        }[] = [];
+
+        for (const { form: initialForm, quantity } of formFractions) {
+          formGroupementToCreate.push({
+            nextFormId: nextForm.id,
+            initialFormId: initialForm.id,
+            quantity: quantity
           });
-        } catch {
-          continue;
         }
-      }
-      console.log("Insertion et mise à jour terminées.");
-    });
+
+        if (formGroupementToCreate.length > 0) {
+          await prisma.formGroupement.createMany({
+            data: formGroupementToCreate
+          });
+
+          const dirtyFormIds = initialForms.map(f => f.id);
+
+          const dirtyForms = await prisma.form.findMany({
+            where: { id: { in: dirtyFormIds } },
+            include: { forwardedIn: true }
+          });
+
+          await updateAppendix2Forms(dirtyForms);
+        }
+      });
+    }
+
+    console.log("Insertion et mise à jour terminées.");
   }
 }
