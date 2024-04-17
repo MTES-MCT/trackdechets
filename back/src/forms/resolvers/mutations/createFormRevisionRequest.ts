@@ -174,14 +174,10 @@ async function checkIfUserCanRequestRevisionOnBsdd(
   bsdd: Form
 ): Promise<void> {
   await checkCanRequestRevision(user, bsdd);
+
   if (bsdd.emitterIsPrivateIndividual || bsdd.emitterIsForeignShip) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau car l'émetteur est un particulier ou un navire étranger."
-    );
-  }
-  if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-    throw new ForbiddenError(
-      "Impossible de créer une révision sur un bordereau d'annexe 1."
     );
   }
   if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {
@@ -248,6 +244,13 @@ async function getFlatContent(
     );
   }
 
+  if (
+    flatContent.isCanceled &&
+    bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER
+  ) {
+    throw new ForbiddenError("Impossible d'annuler un bordereau d'annexe 1'.");
+  }
+
   // One cannot request a CANCELATION if the BSDD has advanced too far in the workflow
   if (
     flatContent.isCanceled &&
@@ -278,7 +281,11 @@ async function getFlatContent(
     );
   }
 
-  await bsddRevisionRequestSchema.validate(flatContent);
+  if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+    await appendix1ProducerRevisionRequestSchema.validate(flatContent);
+  } else {
+    await bsddRevisionRequestSchema.validate(flatContent);
+  }
 
   if (
     bsdd.emitterType === EmitterType.APPENDIX1 &&
@@ -447,3 +454,9 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
     true,
     "Révision impossible, certains champs saisis ne sont pas modifiables"
   );
+
+const appendix1ProducerRevisionRequestSchema = bsddRevisionRequestSchema.pick([
+  "wasteDetailsCode",
+  "wasteDetailsPackagingInfos",
+  "quantityReceived"
+]);
