@@ -293,7 +293,7 @@ model Company {
   bsddRevisionRequests                 BsddRevisionRequest[]
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
   receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
-  webhookSettingsLimit                 Int @default(1)
+  webhookSettingsLimit                 Int                       @default(1)
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -621,6 +621,8 @@ model BsddRevisionRequest {
   wasteDetailsName                                String?
   wasteDetailsPop                                 Boolean?
   wasteDetailsPackagingInfos                      Json?
+  wasteDetailsSampleNumber                        String?
+  wasteDetailsQuantity                            Decimal?       @db.Decimal(65, 30)
   quantityReceived                                Float?
   processingOperationDone                         String?
   destinationOperationMode                        OperationMode?
@@ -1666,8 +1668,8 @@ model WebhookSetting {
   orgId       String
   activated   Boolean  @default(false)
 
-  @@index([orgId], map: "_WebhookSettingOrgIdIdx")
   @@unique([orgId, endpointUri], name: "WebhookSetting_orgId_endpointUri_unique_together")
+  @@index([orgId], map: "_WebhookSettingOrgIdIdx")
 }
 
 model MigrationScript {

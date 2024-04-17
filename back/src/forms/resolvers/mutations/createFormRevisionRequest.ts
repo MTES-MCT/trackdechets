@@ -13,9 +13,11 @@ import {
   isSiret,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   BSDD_WASTE_CODES,
-  BSDD_APPENDIX1_WASTE_CODES
+  BSDD_APPENDIX1_WASTE_CODES,
+  BSDD_SAMPLE_NUMBER_WASTE_CODES
 } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { WeightUnits, weight } from "../../../common/validation";
 import {
   FormRevisionRequestContentInput,
   MutationCreateFormRevisionRequestArgs
@@ -283,6 +285,16 @@ async function getFlatContent(
 
   if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
     await appendix1ProducerRevisionRequestSchema.validate(flatContent);
+
+    if (
+      flatContent.wasteDetailsSampleNumber &&
+      bsdd.wasteDetailsCode &&
+      !BSDD_SAMPLE_NUMBER_WASTE_CODES.includes(bsdd.wasteDetailsCode)
+    ) {
+      throw new ForbiddenError(
+        "Impossible de saisir un numéro d'échantillon, le code déchet ne permet pas d'en avoir."
+      );
+    }
   } else {
     await bsddRevisionRequestSchema.validate(flatContent);
   }
@@ -455,8 +467,16 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
     "Révision impossible, certains champs saisis ne sont pas modifiables"
   );
 
-const appendix1ProducerRevisionRequestSchema = bsddRevisionRequestSchema.pick([
-  "wasteDetailsCode",
-  "wasteDetailsPackagingInfos",
-  "quantityReceived"
-]);
+const appendix1ProducerRevisionRequestSchema = yup
+  .object({
+    wasteDetailsSampleNumber: yup.string().nullable(),
+    wasteDetailsPackagingInfos: yup
+      .array()
+      .of(packagingInfoFn({ isDraft: false }))
+      .transform(v => (v === null ? Prisma.JsonNull : v)),
+    wasteDetailsQuantity: weight(WeightUnits.Tonne)
+  })
+  .noUnknown(
+    true,
+    "Révision impossible, certains champs saisis ne sont pas modifiables"
+  );

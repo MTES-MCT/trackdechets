@@ -771,6 +771,20 @@ type FormRevisionRequestWasteDetails {
 
   "Conditionnements"
   packagingInfos: [PackagingInfo!]
+
+  """
+  Numéro d'échantillon
+  Uniquement révisable sur les annexes 1 pour les codes déchets concernés.
+  """
+  sampleNumber: String
+
+  """
+  Poids en tonnes
+  Uniquement révisable sur les annexes 1.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
+  quantity: Float
 }
 
 type FormRevisionRequestRecipient {

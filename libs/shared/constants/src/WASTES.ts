@@ -5609,6 +5609,17 @@ export const BSDD_APPENDIX1_WASTE_TREE = toWasteTree(ALL_WASTES_TREE, {
   include: BSDD_APPENDIX1_WASTE_CODES
 });
 
+export const BSDD_SAMPLE_NUMBER_WASTE_CODES = [
+  "13 01 10*",
+  "13 01 11*",
+  "13 01 12*",
+  "13 01 13*",
+  "13 02 05*",
+  "13 02 06*",
+  " 13 02 07*",
+  "13 02 08*"
+];
+
 function flatten(wastes: WasteNode[]): WasteNode[] {
   return wastes
     .reduce(
