@@ -71,3 +71,4 @@ export { UpdateFormInput } from "./generated/graphql/types";
 export { runInTransaction } from "./common/repository/helper";
 export { getFormOrFormNotFound } from "./forms/database";
 export { validateGroupement } from "./forms/validation";
+export { InitialFormFractionInput } from "./generated/graphql/types";
