@@ -172,7 +172,6 @@ export default function ExportsForm({ companies }: IProps) {
       wasteCode,
       exportFormat
     } = values;
-
     const downloadFile =
       exportFormat === "CSV" ? wastesRegistryCsv : wastesRegistryXls;
 

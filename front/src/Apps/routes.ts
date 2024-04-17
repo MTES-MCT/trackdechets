@@ -5,7 +5,8 @@ const routes = {
     anonymousCompany: "/admin/anonymous-company",
     reindex: "/admin/reindex",
     user: "/admin/user",
-    impersonate: "/admin/impersonate"
+    impersonate: "/admin/impersonate",
+    registry: "/admin/registry"
   },
   login: "/login",
   invite: "/invite",

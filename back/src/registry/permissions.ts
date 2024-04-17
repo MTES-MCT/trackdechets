@@ -27,8 +27,10 @@ export async function hasGovernmentRegistryPerm(
   const { permissions, authorizedIPs, authorizedOrgIds } = governmentAccount;
 
   if (permissions.includes(GovernmentPermission.REGISTRY_CAN_READ_ALL)) {
+    const allIpsAuthorized =
+      authorizedIPs.length === 1 && authorizedIPs.includes("ALL");
     const authorizedIP = (authorizedIPs ?? []).find(ip => ip === user.ip);
-    if (!authorizedIP) {
+    if (!authorizedIP && !allIpsAuthorized) {
       // la requête ne provient pas d'une IP autorisée
       return false;
     } else {

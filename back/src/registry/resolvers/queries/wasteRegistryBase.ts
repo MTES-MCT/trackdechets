@@ -30,6 +30,7 @@ export async function checkWastesRegistryDownloadPermissions(
       );
     }
   }
+
   const hits = await searchBsds(args.registryType, args.sirets, args.where, {
     size: 1,
     sort: [{ id: "ASC" }]
