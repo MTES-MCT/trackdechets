@@ -65,3 +65,9 @@ export { generateUniqueTestSiret } from "./companies/resolvers/mutations/createT
 export { createUser } from "./users/database";
 export { default as getReadableId, ReadableIdPrefix } from "./forms/readableId";
 export { reindex } from "./bsds/indexation/reindexBsdHelpers";
+
+export { getFormRepository } from "./forms/repository";
+export { UpdateFormInput } from "./generated/graphql/types";
+export { runInTransaction } from "./common/repository/helper";
+export { getFormOrFormNotFound } from "./forms/database";
+export { validateGroupement } from "./forms/validation";
