@@ -324,7 +324,10 @@ function BsdCard({
                       hasEditableInfos
                       isDisabled={
                         isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberPlate(bsdDisplay)
+                        !canEditCustomInfoOrTransporterNumberPlate(
+                          bsdDisplay,
+                          permissions
+                        )
                       }
                       onClick={e =>
                         handleEditableInfoClick(e, "transporterCustomInfo")
@@ -343,7 +346,10 @@ function BsdCard({
                       hasEditableInfos
                       isDisabled={
                         isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberPlate(bsdDisplay)
+                        !canEditCustomInfoOrTransporterNumberPlate(
+                          bsdDisplay,
+                          permissions
+                        )
                       }
                       onClick={e =>
                         handleEditableInfoClick(e, "transporterNumberPlate")

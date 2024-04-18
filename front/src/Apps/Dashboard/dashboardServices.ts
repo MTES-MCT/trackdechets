@@ -1328,8 +1328,12 @@ export const hasRoadControlButton = (
 };
 
 export const canEditCustomInfoOrTransporterNumberPlate = (
-  bsd: BsdDisplay
+  bsd: BsdDisplay,
+  permissions: UserPermission[]
 ): boolean => {
+  if (!permissions.includes(UserPermission.BsdCanUpdate)) {
+    return false;
+  }
   if (isBsdd(bsd.type)) {
     return ["SEALED", "RESEALED", "SIGNED_BY_PRODUCER"].includes(bsd.status);
   }
