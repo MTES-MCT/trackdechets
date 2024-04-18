@@ -6,11 +6,15 @@ import { toDDMMYYYY } from "./time";
 /**
  * In the bsd card list, get the one corresponding to target bsd
  */
-const getVHUCardDiv = (page: Page, id: string) => {
-  return page
+const getVHUCardDiv = async (page: Page, id: string) => {
+  const div = page
     .locator(".bsd-card-list li")
     .filter({ hasText: `N°: ${id}` })
     .first();
+
+  await expect(div).toBeVisible();
+
+  return div;
 };
 
 /**
@@ -30,9 +34,11 @@ const clickOnVhuSecondaryMenuButton = async (
   id: string,
   action: Action
 ) => {
-  const vhuDiv = getVHUCardDiv(page, id);
+  const vhuDiv = await getVHUCardDiv(page, id);
 
   const button = vhuDiv.getByRole("button").getByText(action);
+
+  // If secondary menu is already open, do not click again (or it will close)
   if (!(await button.isVisible())) {
     await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
   }
@@ -286,7 +292,14 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   await page.getByRole("combobox").selectOption("R 12");
 
   // Create VHU
+  const responsePromise = page.waitForResponse(async response => {
+    return (await response.text()).includes("createDraftBsvhu");
+  });
   await page.getByRole("button", { name: "Créer" }).click();
+  const response = await responsePromise;
+  const id = (await response.json()).data?.createDraftBsvhu?.id;
+
+  return id;
 };
 
 /**
@@ -303,18 +316,14 @@ export const createBsvhu = async (
   await fillEmitterTab(page, emitter);
   await fillWasteTab(page);
   await fillTransporterTab(page, transporter);
-  await fillDestinationTab(page, destination, broyeur);
+  const id = await fillDestinationTab(page, destination, broyeur);
 
   // Navigate to BSDs view
   await page.getByRole("link", { name: "Tous les bordereaux" }).click();
 
-  // Make sure VHU pops out in results list
-  const vhuDiv = page.locator(".bsd-card-list li").first();
+  // Make sure VHU is visible
+  const vhuDiv = page.locator(".bsd-card-list li").getByText(`N°: ${id}`);
   await expect(vhuDiv).toBeVisible();
-
-  // Extract VHU id
-  const idDiv = vhuDiv.getByText("N°: ");
-  const id = (await idDiv.innerText()).replace("N°: ", "");
 
   return { id };
 };
@@ -326,7 +335,7 @@ export const verifyCardData = async (
   page: Page,
   { id, emitter, transporter, destination }
 ) => {
-  const vhuDiv = getVHUCardDiv(page, id);
+  const vhuDiv = await getVHUCardDiv(page, id);
 
   // Verify card info
   await expect(vhuDiv.getByText("16 01 06")).toBeVisible();
@@ -362,7 +371,7 @@ export const verifyOverviewData = async (
   { id, emitter, transporter, destination }
 ) => {
   // Open overview and verify data
-  const vhuDiv = getVHUCardDiv(page, id);
+  const vhuDiv = await getVHUCardDiv(page, id);
   await vhuDiv.getByRole("button").getByText("Aperçu").click();
 
   // Producteur
@@ -415,15 +424,16 @@ export const verifyOverviewData = async (
 export const publishBsvhu = async (page: Page, { id }) => {
   await selectBsdMenu(page, "Brouillons");
 
-  let vhuDiv = getVHUCardDiv(page, id);
+  let vhuDiv = await getVHUCardDiv(page, id);
 
   // Try to publish
   await vhuDiv.getByRole("button").getByText("Publier").click();
+
   // Confirm publication in modal
   await page.getByRole("button", { name: "Publier le bordereau" }).click();
 
   await selectBsdMenu(page, "Tous les bordereaux");
-  vhuDiv = getVHUCardDiv(page, id);
+  vhuDiv = await getVHUCardDiv(page, id);
 
   await expect(vhuDiv).toBeVisible();
 
@@ -445,7 +455,7 @@ export const publishBsvhu = async (page: Page, { id }) => {
 export const fixAndPublishBsvhu = async (page: Page, { id }) => {
   await selectBsdMenu(page, "Brouillons");
 
-  const vhuDiv = getVHUCardDiv(page, id);
+  const vhuDiv = await getVHUCardDiv(page, id);
 
   // Try to publish
   await vhuDiv.getByRole("button").getByText("Publier").click();
@@ -477,21 +487,22 @@ export const fixAndPublishBsvhu = async (page: Page, { id }) => {
 export const duplicateBsvhu = async (page: Page, { id }) => {
   await selectBsdMenu(page, "Tous les bordereaux");
 
-  const vhuDiv = getVHUCardDiv(page, id);
-
   // Duplicate
+  const responsePromise = page.waitForResponse(async response => {
+    return (await response.text()).includes("duplicateBsvhu");
+  });
   await clickOnVhuSecondaryMenuButton(page, id, "Dupliquer");
+  const response = await responsePromise;
+  const duplicatedId = (await response.json()).data?.duplicateBsvhu?.id;
 
   // Check in drafts
   await selectBsdMenu(page, "Brouillons");
 
   // Make sure VHU pops out in results list
-  const duplicatedVhuDiv = page.locator(".bsd-card-list li").first();
+  const duplicatedVhuDiv = page
+    .locator(".bsd-card-list li")
+    .getByText(`N°: ${duplicatedId}`);
   await expect(duplicatedVhuDiv).toBeVisible();
-
-  // Extract VHU id
-  const duplicatedIdDiv = duplicatedVhuDiv.getByText("N°: ");
-  const duplicatedId = (await duplicatedIdDiv.innerText()).replace("N°: ", "");
 
   return { id: duplicatedId };
 };
@@ -502,7 +513,7 @@ export const duplicateBsvhu = async (page: Page, { id }) => {
 export const deleteBsvhu = async (page: Page, { id }) => {
   await selectBsdMenu(page, "Tous les bordereaux");
 
-  const vhuDiv = getVHUCardDiv(page, id);
+  const vhuDiv = await getVHUCardDiv(page, id);
 
   // Delete
   await clickOnVhuSecondaryMenuButton(page, id, "Supprimer");
