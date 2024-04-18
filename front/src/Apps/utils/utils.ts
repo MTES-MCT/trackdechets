@@ -44,3 +44,17 @@ export const copyToClipboard = async (textToCopy: string) => {
     }
   }
 };
+
+/**
+ * Transforms a string into a suitable var name (camelCase)
+ * ex: "Bordereaux de l'entreprise" > "bordreaux_de_lentreprise"
+ */
+export const toCamelCaseVarName = (str: string) => {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s]/gi, "")
+    .toLocaleLowerCase()
+    .replace(/\s/g, "_")
+    .trim();
+};

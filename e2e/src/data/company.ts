@@ -35,7 +35,7 @@ export const seedCompany = async (
     data: {
       siret: siret,
       orgId: siret ?? companyInput.vatNumber!,
-      name: "Établissement de test",
+      name: companyInput.name ?? "Établissement de test",
       address: "Adresse test",
       codeCommune: "00000",
       codeNaf: "XXXXX",

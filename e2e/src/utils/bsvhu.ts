@@ -57,7 +57,7 @@ const fillEmitterTab = async (page: Page, emitter) => {
   // Then, fill siret and select company
   await page.getByLabel("N°SIRET ou raison sociale").fill(emitter.orgId);
   await page
-    .getByRole("button", { name: `Établissement de test - ${emitter.orgId}` })
+    .getByRole("button", { name: `${emitter.name} - ${emitter.orgId}` })
     .click();
 
   // Make sure auto-filled info matches company
@@ -341,16 +341,23 @@ export const verifyCardData = async (
   await expect(vhuDiv.getByText("16 01 06")).toBeVisible();
   await expect(vhuDiv.getByText("Brouillon")).toBeVisible();
   await expect(vhuDiv.getByText("VHU dépollués")).toBeVisible();
+
   // Companies names
-  await expect(
-    page.locator("div").filter({ hasText: emitter.name }).first()
-  ).toBeVisible();
-  await expect(
-    page.locator("div").filter({ hasText: transporter.name }).nth(1)
-  ).toBeVisible();
-  await expect(
-    page.locator("div").filter({ hasText: destination.name }).nth(2)
-  ).toBeVisible();
+  const emitterName = await vhuDiv
+    .locator(".actors__label")
+    .first()
+    .getAttribute("aria-label");
+  await expect(emitterName).toEqual(emitter.name);
+  const transporterName = await vhuDiv
+    .locator(".actors__label")
+    .nth(1)
+    .getAttribute("aria-label");
+  await expect(transporterName).toEqual(transporter.name);
+  const destinationName = await vhuDiv
+    .locator(".actors__label")
+    .nth(2)
+    .getAttribute("aria-label");
+  await expect(destinationName).toEqual(destination.name);
 
   // Primary button
   await expect(vhuDiv.getByRole("button").getByText("Publier")).toBeVisible();
@@ -374,45 +381,45 @@ export const verifyOverviewData = async (
   const vhuDiv = await getVHUCardDiv(page, id);
   await vhuDiv.getByRole("button").getByText("Aperçu").click();
 
+  const modalContent = page.getByRole("tabpanel");
+  const expectValue = async (testId, value) => {
+    const content = await modalContent.getByTestId(testId).textContent();
+    await expect(content).toEqual(value);
+  };
+
   // Producteur
   await page.getByRole("tab", { name: "Producteur" }).click();
-  const modalContent = page.getByRole("tabpanel");
-  await expect(await modalContent.getByText(emitter.orgId)).toBeVisible();
-  await expect(await modalContent.getByText(emitter.contact)).toBeVisible();
-  await expect(
-    await modalContent.getByText(emitter.contactPhone)
-  ).toBeVisible();
-  await expect(
-    await modalContent.getByText(emitter.contactEmail)
-  ).toBeVisible();
+  await expectValue("siret", emitter.orgId);
+  await expectValue("contact", emitter.contact);
+  await expectValue("tel", emitter.contactPhone);
+  await expectValue("mel", emitter.contactEmail);
 
   // Transporter
   await page.getByRole("tab", { name: "Transporteur" }).click();
-  await expect(modalContent.getByText(transporter.orgId)).toBeVisible();
-  await expect(modalContent.getByText(transporter.contact)).toBeVisible();
-  await expect(modalContent.getByText(transporter.contactPhone)).toBeVisible();
-  await expect(modalContent.getByText(transporter.contactEmail)).toBeVisible();
-  await expect(
-    modalContent.getByText(transporter.transporterReceipt.receiptNumber)
-  ).toBeVisible();
-  await expect(
-    modalContent.getByText(transporter.transporterReceipt.department)
-  ).toBeVisible();
-  await expect(
-    modalContent.getByText(
-      toDDMMYYYY(transporter.transporterReceipt.validityLimit)
-    )
-  ).toBeVisible();
+  await expectValue("siret", transporter.orgId);
+  await expectValue("contact", transporter.contact);
+  await expectValue("tel", transporter.contactPhone);
+  await expectValue("mel", transporter.contactEmail);
+  await expectValue(
+    "numero_de_recepisse",
+    transporter.transporterReceipt.receiptNumber
+  );
+  await expectValue("departement", transporter.transporterReceipt.department);
+  await expectValue(
+    "date_de_validite_de_recepisse",
+    toDDMMYYYY(transporter.transporterReceipt.validityLimit)
+  );
 
   // Destination
   await page.getByRole("tab", { name: "Destinataire" }).click();
-  await expect(modalContent.getByText(destination.orgId)).toBeVisible();
-  await expect(modalContent.getByText(destination.contact)).toBeVisible();
-  await expect(modalContent.getByText(destination.contactPhone)).toBeVisible();
-  await expect(modalContent.getByText(destination.contactEmail)).toBeVisible();
-  await expect(
-    modalContent.getByText(destination.vhuAgrementDemolisseur.agrementNumber)
-  ).toBeVisible();
+  await expectValue("siret", destination.orgId);
+  await expectValue("contact", destination.contact);
+  await expectValue("tel", destination.contactPhone);
+  await expectValue("mel", destination.contactEmail);
+  await expectValue(
+    "agrement",
+    destination.vhuAgrementDemolisseur.agrementNumber
+  );
 
   // Close the modal
   await page.getByLabel("Close").click();
@@ -430,11 +437,15 @@ export const publishBsvhu = async (page: Page, { id }) => {
   await vhuDiv.getByRole("button").getByText("Publier").click();
 
   // Confirm publication in modal
+  const responsePromise = page.waitForResponse(async response => {
+    return (await response.text()).includes("publishBsvhu");
+  });
   await page.getByRole("button", { name: "Publier le bordereau" }).click();
+  await responsePromise;
 
+  // Should be visible
   await selectBsdMenu(page, "Tous les bordereaux");
   vhuDiv = await getVHUCardDiv(page, id);
-
   await expect(vhuDiv).toBeVisible();
 
   // Status should be updated

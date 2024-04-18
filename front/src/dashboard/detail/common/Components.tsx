@@ -10,6 +10,7 @@ import {
 } from "@td/codegen-ui";
 import { getPackagingInfosSummary } from "../../../form/bsdd/utils/packagings";
 import { isForeignVat } from "@td/constants";
+import { toCamelCaseVarName } from "../../../Apps/utils/utils";
 const nbsp = "\u00A0";
 export const DetailRow = ({
   value,
@@ -29,7 +30,7 @@ export const DetailRow = ({
   return (
     <>
       <dt>{label}</dt>
-      <dd>
+      <dd data-testid={toCamelCaseVarName(label)}>
         {value}
         {!!units ? `${nbsp}${units}` : null}
       </dd>
@@ -56,7 +57,7 @@ export const DateRow = ({ value, label }) => {
   return (
     <>
       <dt>{label}</dt>
-      <dd>{formatDate(value)}</dd>
+      <dd data-testid={toCamelCaseVarName(label)}>{formatDate(value)}</dd>
     </>
   );
 };

@@ -17,7 +17,7 @@ test.describe
   const USER_EMAIL = "user.e2e.companies@mail.com";
   const USER_PASSWORD = "Us3r_E2E_C0mp4ni3s$$";
 
-  let transporterWithReceiptSiret;
+  let transporterWithReceipt;
 
   test("Seed user", async () => {
     await seedUser({
@@ -54,7 +54,10 @@ test.describe
         }
       });
 
-      transporterWithReceiptSiret = siret;
+      transporterWithReceipt = {
+        siret,
+        name: "001 - Transporteur avec récépissé "
+      };
     });
 
     await test.step("#002 - Transporteur sans récépissé de transport", async () => {
@@ -91,7 +94,7 @@ test.describe
       await test.step("Ajout du transporteur", async () => {
         await addAutomaticSignaturePartner(page, {
           siret: producerSiret,
-          partnerSiret: transporterWithReceiptSiret
+          partner: transporterWithReceipt
         });
       });
     });
