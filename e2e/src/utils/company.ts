@@ -521,7 +521,7 @@ export const createWasteProducerCompany = async (
  */
 export const addAutomaticSignaturePartner = async (
   page,
-  { siret, partner }
+  { siret, partnerSiret }
 ) => {
   // Click on company's signature tab
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Signature" });
@@ -531,11 +531,11 @@ export const addAutomaticSignaturePartner = async (
     .getByText("Signature automatique (annexe 1)")
     .locator("..");
   await signatureDiv.getByText("Modifier").click();
-  await signatureDiv.getByPlaceholder("SIRET").fill(partner.siret);
+  await signatureDiv.getByPlaceholder("SIRET").fill(partnerSiret);
   await signatureDiv.getByRole("button", { name: "Rechercher" }).click();
   // Partner company should pop in the results
   await expect(
-    signatureDiv.getByText(`${partner.name} - ${partner.siret}Ajouter`)
+    signatureDiv.getByText(`Établissement de test - ${partnerSiret}Ajouter`)
   ).toBeVisible();
   await signatureDiv.getByRole("button", { name: "Ajouter" }).click();
 
@@ -545,7 +545,7 @@ export const addAutomaticSignaturePartner = async (
 
   // We should see the partner company
   await expect(
-    signatureDiv.getByText(`${partner.name} (${partner.siret})`)
+    signatureDiv.getByText(`Établissement de test (${partnerSiret})`)
   ).toBeVisible();
 };
 

@@ -82,7 +82,7 @@ export type BsdMenu =
   | "Tous les bordereaux"
   | "Brouillons"
   | "Pour action"
-  | "Suivi"
+  | "Suivis"
   | "Archives"
   | "En cours"
   | "Révisés"
@@ -93,7 +93,7 @@ const BsdMenuUrls = {
   "Tous les bordereaux": "/bsds/all",
   Brouillons: "/bsds/drafts",
   "Pour action": "/bsds/act",
-  Suivi: "/bsds/follow",
+  Suivis: "/bsds/follow",
   Archives: "/bsds/history",
   "En cours": "/bsds/to-review",
   Révisés: "/bsds/reviewed",
