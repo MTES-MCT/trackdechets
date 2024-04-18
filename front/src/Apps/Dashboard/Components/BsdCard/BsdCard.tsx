@@ -50,6 +50,8 @@ import DeleteModal from "../DeleteModal/DeleteModal";
 import { useMedia } from "../../../../common/use-media";
 import { MEDIA_QUERIES } from "../../../../common/config";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
+import TransporterInfoEditModal from "../TransporterInfoEditModal/TransporterInfoEditModal";
+import { NON_RENSEIGNE } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./bsdCard.scss";
 
@@ -58,7 +60,6 @@ function BsdCard({
   bsdCurrentTab,
   currentSiret,
   onValidate,
-  onEditTransportInfo,
   secondaryActions: {
     onOverview,
     onUpdate,
@@ -115,6 +116,8 @@ function BsdCard({
   });
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isTransportEditModalOpen, setIsTransportEditModalOpen] =
+    useState(false);
 
   const isDuplicating =
     isDuplicatingBsdd ||
@@ -174,11 +177,8 @@ function BsdCard({
   ) => {
     onValidate(bsd);
   };
-  const handleEditableInfoClick = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    infoName: string
-  ) => {
-    onEditTransportInfo!(bsd, infoName);
+  const handleEditableInfoClick = () => {
+    setIsTransportEditModalOpen(true);
   };
 
   const onPdf = useCallback(
@@ -239,6 +239,10 @@ function BsdCard({
     setIsDeleteModalOpen(false);
   };
 
+  const onCloseTransportEditModal = () => {
+    setIsTransportEditModalOpen(false);
+  };
+
   const onDelete = () => {
     setIsDeleteModalOpen(true);
   };
@@ -252,7 +256,7 @@ function BsdCard({
     ? bsdDisplay?.emitter?.company?.name
     : bsdDisplay?.transporter?.company?.name;
 
-  const transporterName = transporterNameEmmiter || "Non renseigné";
+  const transporterName = transporterNameEmmiter || NON_RENSEIGNE;
 
   const unitOfMeasure =
     isBsdasri(bsdDisplay?.type!) || isBsff(bsdDisplay?.type!) ? "kg" : "t";
@@ -332,9 +336,7 @@ function BsdCard({
                           permissions
                         )
                       }
-                      onClick={e =>
-                        handleEditableInfoClick(e, "transporterCustomInfo")
-                      }
+                      onClick={handleEditableInfoClick}
                     />
                   )}
                   {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
@@ -354,9 +356,7 @@ function BsdCard({
                           permissions
                         )
                       }
-                      onClick={e =>
-                        handleEditableInfoClick(e, "transporterNumberPlate")
-                      }
+                      onClick={handleEditableInfoClick}
                     />
                   )}
                 </div>
@@ -466,6 +466,12 @@ function BsdCard({
         )}
       </div>
       {isDuplicating && <Loader />}
+
+      <TransporterInfoEditModal
+        bsd={bsdDisplay!}
+        isOpen={isTransportEditModalOpen}
+        onClose={onCloseTransportEditModal}
+      />
     </>
   );
 }

@@ -10,7 +10,7 @@ import {
 } from "@td/codegen-ui";
 import { RedErrorMessage } from "../../../../../common/components";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
-import { SIGN_BSFF } from "../../../../../form/bsff/utils/queries";
+import { SIGN_BSFF } from "../../../../../Apps/common/queries/bsff/queries";
 import { SignBsff } from "./SignBsff";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";

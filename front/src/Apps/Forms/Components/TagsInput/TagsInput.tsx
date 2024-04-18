@@ -51,11 +51,12 @@ const TagsInput: React.FC<TagsInputProps> = ({
         }
       />
       <div style={{ display: "flex" }}>
-        {tags.map((plate, idx) => (
+        {tags?.map((plate, idx) => (
           <div key={idx} style={{ padding: "0 2px" }}>
             <Tag
               dismissible
               nativeButtonProps={{
+                type: "button",
                 onClick: () => {
                   onDeleteTag(idx);
                 }

@@ -26,7 +26,7 @@ import {
   CREATE_BSDASRI,
   GET_BSDASRI,
   UPDATE_BSDASRI
-} from "./utils/queries";
+} from "../../Apps/common/queries/bsdasri/queries";
 import { TOAST_DURATION } from "../../common/config";
 
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));

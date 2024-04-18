@@ -2,7 +2,7 @@ import React from "react";
 import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
 import styles from "./Modal.module.scss";
-import { IconDelete1 } from "../Icons/Icons";
+import { IconDelete } from "../Icons/Icons";
 import classNames from "classnames";
 
 type ModalProps = {
@@ -44,7 +44,7 @@ export function Modal({
             onClick={state.close}
             aria-label="Close"
           >
-            <IconDelete1 aria-hidden />
+            Fermer <IconDelete aria-hidden />
           </button>
           {children}
         </div>

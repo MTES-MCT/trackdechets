@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 
 import { Query, QueryBsffArgs } from "@td/codegen-ui";
 import Loader from "../../../Apps/common/Components/Loader/Loaders";
-import { GET_BSFF_FORM } from "../../../form/bsff/utils/queries";
+import { GET_BSFF_FORM } from "../../../Apps/common/queries/bsff/queries";
 import { InlineError } from "../../../Apps/common/Components/Error/Error";
 import EmptyDetail from "../common/EmptyDetailView";
 

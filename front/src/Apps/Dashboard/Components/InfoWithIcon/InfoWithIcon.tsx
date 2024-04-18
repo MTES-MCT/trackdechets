@@ -2,7 +2,6 @@ import React, { useCallback } from "react";
 import { InfoIconCode, InfoWithIconProps } from "./infoWithIconTypes";
 import { getLabelValue } from "./infoWithIconUtils";
 import "./infoWithIcon.scss";
-import { NON_RENSEIGNE } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 function InfoWithIcon({
   labelCode,
@@ -20,12 +19,12 @@ function InfoWithIcon({
         return plates.join(", ");
       }
 
-      return !!plates ? plates : NON_RENSEIGNE;
+      return !!plates ? plates : "-";
     },
     []
   );
 
-  const customInfo = editableInfos?.customInfo || NON_RENSEIGNE;
+  const customInfo = editableInfos?.customInfo || "-";
   return !hasEditableInfos ? (
     <p className={`label-icon label-icon__${labelCode}`}>
       {!info ? labelValue : `${labelValue} ${info}`}
@@ -43,7 +42,9 @@ function InfoWithIcon({
           ? customInfo
           : formatTranporterPlates(editableInfos?.transporterNumberPlate)}
       </p>
-      {!isDisabled && <span className="edition-pencil-icon" />}
+      {labelCode === InfoIconCode.TransporterNumberPlate && !isDisabled && (
+        <span className="edition-pencil-icon" />
+      )}
     </button>
   );
 }

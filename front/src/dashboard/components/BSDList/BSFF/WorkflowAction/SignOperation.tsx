@@ -28,7 +28,7 @@ import {
   GET_BSFF_FORM,
   SIGN_BSFF,
   UPDATE_BSFF_PACKAGING
-} from "../../../../../form/bsff/utils/queries";
+} from "../../../../../Apps/common/queries/bsff/queries";
 import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
 import { BsffSummary } from "./BsffSummary";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";

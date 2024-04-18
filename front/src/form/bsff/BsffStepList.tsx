@@ -20,7 +20,7 @@ import {
   CREATE_DRAFT_BSFF,
   UPDATE_BSFF_FORM,
   GET_BSFF_FORM
-} from "./utils/queries";
+} from "../../Apps/common/queries/bsff/queries";
 import { validationSchema } from "./utils/schema";
 
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));

@@ -1,0 +1,24 @@
+.transporterInfoEditForm {
+  margin: 16px 0;
+  &__title {
+    font-size: 1.5rem; //24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  &__plates {
+    margin-bottom: 16px;
+  }
+  &__tags {
+    display: inline-flex;
+    padding: 4px;
+    align-items: center;
+  }
+  &__cta {
+    display: flex;
+    margin-top: 40px;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    align-self: stretch;
+  }
+}

@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-import { fullDasriFragment } from "../../../Apps/common/queries/fragments";
+import { fullDasriFragment } from "../fragments";
 
 export const GET_BSDASRI = gql`
   query Bsdasri($id: ID!) {
