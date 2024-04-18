@@ -151,10 +151,14 @@ export const generateSiretAndInitiateCompanyCreation = async (
 
   // WARNING: page is different if one company has already been created
   // One more click is needed
-  const createACompanyInput = page.getByRole("button", {
-    name: "Créer un établissement"
-  });
-  if (await createACompanyInput.isVisible()) {
+  const hasCompanies = await page
+    .getByRole("button", { name: "Rechercher" })
+    .isVisible();
+  if (hasCompanies) {
+    const createACompanyInput = page.getByRole("button", {
+      name: "Créer un établissement"
+    });
+
     await createACompanyInput.click();
   }
 
