@@ -5,6 +5,20 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.45.1] 07/05/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
+- ETQ admin je peux télécharger le regsitre d'un utilisateur [PR 3267](https://github.com/MTES-MCT/trackdechets/pull/3267)
+
 # [2024.4.1] 09/04/2024
 
 #### :rocket: Nouvelles fonctionnalités
