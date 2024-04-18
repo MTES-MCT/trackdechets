@@ -17,7 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
-- ETQ admin je peux télécharger le regsitre d'un utilisateur [PR 3267](https://github.com/MTES-MCT/trackdechets/pull/3267)
+- ETQ admin je peux télécharger le registre d'un utilisateur [PR 3267](https://github.com/MTES-MCT/trackdechets/pull/3267)
 
 # [2024.4.1] 09/04/2024
 

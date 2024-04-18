@@ -13,16 +13,16 @@ import {
   WASTES_REGISTRY_CSV,
   WASTES_REGISTRY_XLS
 } from "../../dashboard/exports/ExportsForm";
+import { format } from "date-fns";
 
-const DATE_FMT = "en-CA"; // YYYY-MM-DD for date inputs
-
+const DATE_FMT = "yyyy-MM-dd";
 const validationSchema = z
   .object({
     siret: z
       .string({
         required_error: "Le siret est requis"
       })
-      .transform(value => value.replaceAll(" ", ""))
+      .transform(value => value.replace(/\s+/g, ""))
       .pipe(
         z
           .string()
@@ -165,9 +165,7 @@ export function Registry() {
           nativeInputProps={{
             ...register("startDate", { required: true }),
             type: "date",
-            defaultValue: new Date(now.getFullYear(), 0, 1).toLocaleDateString(
-              DATE_FMT
-            )
+            defaultValue: format(new Date(now.getFullYear(), 0, 1), DATE_FMT)
           }}
           stateRelatedMessage={
             (formState?.errors?.startDate?.message as string) ?? ""
@@ -181,7 +179,7 @@ export function Registry() {
           nativeInputProps={{
             ...register("endDate", { required: true }),
             type: "date",
-            defaultValue: now.toLocaleDateString(DATE_FMT)
+            defaultValue: format(now, DATE_FMT)
           }}
           stateRelatedMessage={
             (formState?.errors?.endDate?.message as string) ?? ""
