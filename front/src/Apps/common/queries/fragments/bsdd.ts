@@ -444,6 +444,7 @@ export const dashboardFormFragment = gql`
     }
     ecoOrganisme {
       siret
+      name
     }
     stateSummary {
       transporterCustomInfo

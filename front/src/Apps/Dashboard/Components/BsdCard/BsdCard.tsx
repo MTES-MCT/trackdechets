@@ -304,8 +304,11 @@ function BsdCard({
                       info={updatedAt}
                     />
                   )}
-                  {bsdDisplay?.emittedByEcoOrganisme && (
-                    <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
+                  {bsdDisplay?.ecoOrganisme?.name && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.EcoOrganism}
+                      info={bsdDisplay?.ecoOrganisme?.name}
+                    />
                   )}
                   {pickupSiteName && (
                     <InfoWithIcon
