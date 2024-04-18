@@ -550,7 +550,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
 
         // Change to another menu. Filter should still be filled, and results
         // filtered accordingly
-        await selectBsdMenu(page, "Suivi");
+        await selectBsdMenu(page, "Suivis");
         await expectInputValue(page, "N° libre / BSD / contenant", "BSDA-");
         await expectFilteredResults(page, [bsda1]);
 
