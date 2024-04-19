@@ -93,13 +93,23 @@ type AcceptationFieldsProps = {
   wasteAcceptationStatus?: WasteAcceptationStatus | null;
   wasteRefusalReason?: string | null;
   signedAt?: Date | null;
+  quantityReceived?: number | null;
+  quantityRefused?: number | null;
 };
 
 function AcceptationFields({
   wasteAcceptationStatus,
   wasteRefusalReason,
-  signedAt
+  signedAt,
+  quantityReceived,
+  quantityRefused
 }: AcceptationFieldsProps) {
+  const wasteQuantities = bsddWasteQuantities({
+    wasteAcceptationStatus,
+    quantityReceived,
+    quantityRefused
+  });
+
   return (
     <p>
       Lot accepté :{" "}
@@ -127,6 +137,17 @@ function AcceptationFields({
       Motif de refus (même partiel) :<br />
       {wasteRefusalReason}
       <br />
+      {wasteQuantities && (
+        <>
+          Quantité de déchets refusée :{" "}
+          {wasteQuantities.quantityRefused.toNumber()} tonne(s)
+          <br />
+          Quantité de déchets acceptée :{" "}
+          {wasteQuantities.quantityAccepted.toNumber()} tonne(s)
+          <br />
+          <br />
+        </>
+      )}
       Date de signature : {formatDate(signedAt)}
       <br />
     </p>
@@ -318,8 +339,6 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
     Boolean(form.wasteDetails?.isDangerous) ||
     isDangerous(form.wasteDetails?.code) ||
     Boolean(form.wasteDetails?.pop);
-
-  const wasteQuantities = bsddWasteQuantities(form);
 
   const html = ReactDOMServer.renderToStaticMarkup(
     <Document title={form.readableId}>
@@ -756,19 +775,9 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
             ) : (
               <>
                 <p>
-                  Quantité réelle présentée : {form.quantityReceived} tonne(s)
+                  Quantité de déchets réceptionnée : {form.quantityReceived}{" "}
+                  tonne(s)
                   <br />
-                  {wasteQuantities && (
-                    <>
-                      Quantité acceptée :{" "}
-                      {wasteQuantities.quantityAccepted.toNumber()} tonne(s)
-                      <br />
-                      Quantité refusée :{" "}
-                      {wasteQuantities.quantityRefused.toNumber()} tonne(s)
-                      <br />
-                      <br />
-                    </>
-                  )}
                   Date de présentation : {formatDate(form.receivedAt)}
                 </p>
                 <AcceptationFields {...form} />

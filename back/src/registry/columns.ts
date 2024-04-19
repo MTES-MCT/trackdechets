@@ -90,7 +90,11 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   { field: "pop", label: "POP", format: formatBoolean },
-  { field: "weight", label: "Quantité de déchet", format: formatNumber },
+  {
+    field: "weight",
+    label: "Quantité de déchets émise (t)",
+    format: formatNumber
+  },
   // Origine du déchet
   {
     field: "initialEmitterCompanyName",
@@ -172,17 +176,17 @@ export const columns: Column[] = [
   },
   {
     field: "destinationReceptionWeight",
-    label: "Quantité de déchet entrant (t)",
-    format: formatNumber
-  },
-  {
-    field: "destinationReceptionAcceptedWeight",
-    label: "Quantité de déchet entrant acceptée (t)",
+    label: "Quantité de déchets réceptionnée (t)",
     format: formatNumber
   },
   {
     field: "destinationReceptionRefusedWeight",
-    label: "Quantité de déchet entrant refusée (t)",
+    label: "Quantité de déchets refusée (t)",
+    format: formatNumber
+  },
+  {
+    field: "destinationReceptionAcceptedWeight",
+    label: "Quantité de déchets acceptée (t)",
     format: formatNumber
   },
   {
