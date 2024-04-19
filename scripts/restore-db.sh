@@ -33,9 +33,9 @@ else
             break
         else
             echo -e "\e[91m$backupPath is not a valid path.\e[m"
-        fi 
+        fi
     done
-fi 
+fi
 
 echo -e "\e[1m→ Using backup file \e[36m$backupPath\e[m"
 
