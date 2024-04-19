@@ -108,7 +108,7 @@ describe("formatRow", () => {
       "Code opération prévu": "R10",
       "Mode de traitement réalisé": "RECYCLAGE",
       "Date de réception": "2021-01-01",
-      "Quantité de déchet entrant (t)": 1.2
+      "Quantité de déchets réceptionnée (t)": 1.2
     });
     expect(Object.keys(formattedWithLabels).length).toEqual(
       Object.keys(waste).length + CUSTOM_WASTE_COLUMNS.length
