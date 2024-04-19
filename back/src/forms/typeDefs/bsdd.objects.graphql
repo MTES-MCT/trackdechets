@@ -329,6 +329,10 @@ type TemporaryStorer {
   quantityType: QuantityType
   "Quantité reçue en tonnes"
   quantityReceived: Float
+  "Quantité refusée en tonnes"
+  quantityRefused: Float
+  "Quantité acceptée en tonnes"
+  quantityAccepted: Float
   wasteAcceptationStatus: WasteAcceptationStatus
   wasteRefusalReason: String
 

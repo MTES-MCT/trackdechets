@@ -108,9 +108,9 @@ input AcceptedFormInput {
   Quantité refusée (optionnelle)
 
   Si définie:
-  - doit être supérieure à 0 si le déchet est partiellement refusé.
+  - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
-  - doit être inférieure à quantityReceived dans tous les cas.
+  - doit être égale à quantityReceived si le déchet est totalement refusé.
   """
   quantityRefused: Float
 }
@@ -146,9 +146,9 @@ input ReceivedFormInput {
   Quantité refusée (optionnelle)
 
   Si définie:
-  - doit être supérieure à 0 si le déchet est partiellement refusé.
+  - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
-  - doit être inférieure à quantityReceived dans tous les cas.
+  - doit être égale à quantityReceived si le déchet est totalement refusé.
   """
   quantityRefused: Float
 }
@@ -746,6 +746,16 @@ input TempStoredFormInput {
   Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
+
+  """
+  Quantité refusée (optionnelle)
+
+  Si définie:
+  - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
+  - doit être égale à 0 si le déchet est totalement accepté.
+  - doit être égale à quantityReceived si le déchet est totalement refusé.
+  """
+  quantityRefused: Float
 
   "Réelle ou estimée"
   quantityType: QuantityType!
