@@ -37,14 +37,38 @@ export async function run() {
   for (const row of rows) {
     await runInTransaction(async prisma => {
       const { updateAppendix2Forms } = getFormRepository(user as any, prisma);
-      const nextForm = await getFormOrFormNotFound({ id: row.nextFormId });
-
+      let nextForm = await getFormOrFormNotFound({ id: row.nextFormId });
+      // Fix emitterType for validation
+      nextForm = await prisma.form.update({
+        where: {
+          id: row.nextFormId
+        },
+        data: {
+          emitterType: "APPENDIX2"
+        }
+      });
       const existingFormFractions = await prisma.form
         .findUnique({ where: { id: nextForm.id } })
         .grouping({ include: { initialForm: true } });
 
+      const initialFormIdsFiltered = (await Promise.all(row.initialFormIds.map((id) => prisma.form.findUnique({
+        where: {
+          id
+        },
+        select: {
+          id: true
+        }
+      })))).map((form) => form?.id as string).filter((f) => !!f);
+
+      // Fix status for validation
+      await prisma.form.updateMany({
+        where: { id: { in: initialFormIdsFiltered } },
+        data: {
+          status: "GROUPED"
+        }
+      });
       const initialForms = await prisma.form.findMany({
-        where: { id: { in: row.initialFormIds } }
+        where: { id: { in: initialFormIdsFiltered } }
       });
 
       const grouping = initialForms.map(f => {
@@ -87,7 +111,7 @@ export async function run() {
         }
       }
 
-      console.log(`formGroupementToCreate = ${formGroupementToCreate.length}`);
+      console.log(`FormGroupement To Create = ${formGroupementToCreate.length}`);
 
       if (formGroupementToCreate.length > 0) {
         await prisma.formGroupement.createMany({
@@ -109,7 +133,7 @@ export async function run() {
           return existingGroupement?.quantity !== update.quantity;
         });
 
-        console.log(`formGroupementToUpdate = ${validUpdates.length}`);
+        console.log(`FormGroupement To Update = ${validUpdates.length}`);
 
         await Promise.all(
           validUpdates.map(({ initialFormId, quantity }) =>
@@ -135,7 +159,7 @@ export async function run() {
           where: { id: { in: dirtyFormIds } },
           include: { forwardedIn: true }
         });
-
+        console.log(`updateAppendix2Forms for ${dirtyForms.length} Form`);
         await updateAppendix2Forms(dirtyForms);
       }
     });
