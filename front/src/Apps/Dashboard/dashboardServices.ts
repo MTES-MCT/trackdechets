@@ -1262,9 +1262,23 @@ const canUpdateBsda = bsd =>
     BsdStatusCode.AwaitingChild
   ].includes(bsd.status);
 
-const canUpdateBsdasri = bsd =>
+const canUpdateBsdasri = (bsd, siret) =>
   bsd.type === BsdType.Bsdasri &&
-  ![BsdStatusCode.Processed, BsdStatusCode.Refused].includes(bsd.status);
+  ![
+    BsdStatusCode.Accepted,
+    BsdStatusCode.Received,
+    BsdStatusCode.Processed,
+    BsdStatusCode.Refused
+  ].includes(bsd.status) &&
+  !(
+    isSynthesis(bsd.bsdWorkflowType?.toString()) &&
+    bsd.status === BsdStatusCode.Accepted
+  ) &&
+  !(
+    isSynthesis(bsd.bsdWorkflowType?.toString()) &&
+    [BsdStatusCode.Sealed, BsdStatusCode.Sent].includes(bsd.status) &&
+    isSameSiretDestination(siret, bsd)
+  );
 
 const canUpdateBsvhu = bsd =>
   bsd.type === BsdType.Bsvhu &&
@@ -1273,7 +1287,7 @@ const canUpdateBsvhu = bsd =>
 export const canUpdateBsd = (bsd, siret) =>
   canUpdateBsdd(bsd) ||
   canUpdateBsda(bsd) ||
-  canUpdateBsdasri(bsd) ||
+  canUpdateBsdasri(bsd, siret) ||
   canUpdateBsff(bsd, siret) ||
   canUpdateBsvhu(bsd);
 
