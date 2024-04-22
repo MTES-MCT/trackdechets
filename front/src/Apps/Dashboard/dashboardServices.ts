@@ -1235,7 +1235,8 @@ export const canReviewBsdd = (bsd, siret) => {
     !(
       bsd.emitterType === EmitterType.Appendix2 &&
       isSameSiretEmmiter(siret, bsd) &&
-      canUpdateBsd(bsd, siret)
+      canUpdateBsd(bsd, siret) &&
+      bsd.status === BsdStatusCode.SignedByProducer
     )
   );
 };
