@@ -2375,7 +2375,7 @@ describe("Mutation.createForm", () => {
     });
   });
 
-  describe.only("annexe2 + quantityRefused", () => {
+  describe("annexe2 + quantityRefused", () => {
     const createAppendix2 = async (
       userId,
       recipientCompanySiret,
