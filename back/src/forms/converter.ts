@@ -62,6 +62,7 @@ import { prisma } from "@td/prisma";
 import { extractPostalCode } from "../utils";
 import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";
+import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
@@ -884,7 +885,9 @@ export function expandInitialFormFromDb(
     transporter,
     takenOverAt,
     signedAt,
+    wasteAcceptationStatus,
     quantityReceived,
+    quantityRefused,
     processingOperationDone,
     quantityGrouped
   } = expandFormFromDb({
@@ -895,6 +898,12 @@ export function expandInitialFormFromDb(
 
   const hasPickupSite =
     emitter?.workSite?.postalCode && emitter.workSite.postalCode.length > 0;
+
+  const wasteQuantities = bsddWasteQuantities({
+    wasteAcceptationStatus,
+    quantityReceived,
+    quantityRefused
+  });
 
   return {
     id,
@@ -910,6 +919,8 @@ export function expandInitialFormFromDb(
     recipient,
     transporter,
     quantityReceived,
+    quantityRefused,
+    quantityAccepted: wasteQuantities?.quantityAccepted?.toNumber() ?? null,
     quantityGrouped,
     processingOperationDone
   };

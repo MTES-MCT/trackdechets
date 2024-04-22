@@ -372,6 +372,14 @@ const Recipient = ({
           value={form?.quantityReceived && `${form?.quantityReceived} tonnes`}
           label="Quantité reçue"
         />
+        <DetailRow
+          value={form?.quantityRefused && `${form?.quantityRefused} tonnes`}
+          label="Quantité refusée"
+        />
+        <DetailRow
+          value={form?.quantityAccepted && `${form?.quantityAccepted} tonnes`}
+          label="Quantité acceptée"
+        />
         <DetailRow value={form.wasteRefusalReason} label="Motif de refus" />
       </div>
       <div className={styles.detailGrid}>
@@ -450,7 +458,11 @@ const Appendix2 = ({
             <td>{form?.readableId}</td>
             <td>{form?.wasteDetails?.code}</td>
             <td>{form?.wasteDetails?.name}</td>
-            <td>{form?.quantityReceived ?? form?.wasteDetails?.quantity}</td>
+            <td>
+              {form?.quantityAccepted ??
+                form?.quantityReceived ??
+                form?.wasteDetails?.quantity}
+            </td>
             <td>
               {form?.quantityReceived
                 ? "R"
