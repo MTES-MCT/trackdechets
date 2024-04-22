@@ -218,6 +218,13 @@ type InitialForm {
   dont la provenance reste identifiable (en tonnes)
   """
   quantityReceived: Float
+
+  "Quantité acceptée"
+  quantityAccepted: Float
+
+  "Quantité refusée"
+  quantityRefused: Float
+
   """
   Opération de transformation ou un traitement aboutissant à des déchets dont la provenance reste identifiable effectuée
   par l'installation de regroupement

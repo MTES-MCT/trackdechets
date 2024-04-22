@@ -71,6 +71,7 @@ import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
 import { flattenFormInput } from "./converter";
+import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 // set yup default error messages
 configureYup();
 
@@ -1920,10 +1921,15 @@ export async function validateAppendix2Groupement(
         ];
       }
 
+      const getQuantity = form => {
+        const wasteQuantities = bsddWasteQuantities(form);
+        return wasteQuantities?.quantityAccepted ?? form.quantityReceived;
+      };
+
       const quantityLeftToGroup = new Decimal(
         initialForm.forwardedIn
-          ? initialForm.forwardedIn.quantityReceived!
-          : initialForm.quantityReceived!
+          ? getQuantity(initialForm.forwardedIn)
+          : getQuantity(initialForm)
       )
         .minus(quantityGroupedInOtherForms)
         .toDecimalPlaces(6); // set precision to gramme

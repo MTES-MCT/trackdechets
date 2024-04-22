@@ -539,7 +539,7 @@ model Form {
   canAccessDraftSirets String[] @default([])
 
   // Fraction du bordereau regroupée dans des bordereaux de regroupement
-  // La quantité restante à regrouper s'obtient en faisant quantityReceived - quantityGrouped
+  // La quantité restante à regrouper s'obtient en faisant quantityReceived (- quantityRefused?) - quantityGrouped
   quantityGrouped Float @default(0)
 
   // Relation vers les infos de traçabilité finales

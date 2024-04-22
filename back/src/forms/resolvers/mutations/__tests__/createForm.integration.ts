@@ -21,7 +21,12 @@ import {
   MutationCreateFormArgs,
   ParcelNumber
 } from "../../../../generated/graphql/types";
-import { EmitterType, Status, UserRole } from "@prisma/client";
+import {
+  EmitterType,
+  Status,
+  UserRole,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
@@ -2367,6 +2372,291 @@ describe("Mutation.createForm", () => {
           }
         })
       ]);
+    });
+  });
+
+  describe.only("annexe2 + quantityRefused", () => {
+    const createAppendix2 = async (
+      userId,
+      recipientCompanySiret,
+      {
+        wasteAcceptationStatus,
+        quantityReceived,
+        quantityRefused
+      }: {
+        wasteAcceptationStatus: WasteAcceptationStatus;
+        quantityReceived: number;
+        quantityRefused?: number;
+      }
+    ) => {
+      return formFactory({
+        ownerId: userId,
+        opt: {
+          status: "AWAITING_GROUP",
+          recipientCompanySiret,
+          wasteAcceptationStatus,
+          quantityReceived,
+          quantityRefused: quantityRefused ?? null
+        }
+      });
+    };
+
+    const createAppendix2GroupingForm = async (
+      user,
+      companySiret,
+      grouping
+    ) => {
+      const createFormInput = {
+        emitter: {
+          type: EmitterType.APPENDIX2,
+          company: {
+            siret: companySiret
+          }
+        },
+        grouping
+      };
+      const { mutate } = makeClient(user);
+      return mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+        variables: { createFormInput }
+      });
+    };
+
+    it("can create annexe2 because quantityAccepted is equal to quantity", async () => {
+      // Given
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+      const appendix2 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 7
+      });
+
+      // When
+      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
+        { form: { id: appendix2.id }, quantity: 3 }
+      ]);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedAppendix2 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2.id }
+      });
+      expect(updatedAppendix2.quantityGrouped).toEqual(3);
+    });
+
+    it("cannot create annexe2 because quantityAccepted is lower than quantity", async () => {
+      // Given
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+      const appendix2 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 7
+      });
+
+      // When
+      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
+        { form: { id: appendix2.id }, quantity: 6 }
+      ]);
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toEqual(
+        `La quantité restante à regrouper sur le BSDD ${appendix2.readableId} est de 3 T. Vous tentez de regrouper 6 T.`
+      );
+    });
+
+    it("grouping multiple BSDs with too high quantities", async () => {
+      // Given
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+      const appendix2_1 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 7
+      });
+
+      const appendix2_2 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "ACCEPTED",
+        quantityReceived: 10,
+        quantityRefused: 0
+      });
+
+      const appendix2_3 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 15,
+        quantityRefused: 2
+      });
+
+      // When
+      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
+        { form: { id: appendix2_1.id }, quantity: 3.5 },
+        { form: { id: appendix2_2.id }, quantity: 11 },
+        { form: { id: appendix2_3.id }, quantity: 13.7 }
+      ]);
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toContain(
+        `La quantité restante à regrouper sur le BSDD ${appendix2_3.readableId} est de 13 T. Vous tentez de regrouper 13.7 T.`
+      );
+      expect(errors[0].message).toContain(
+        `La quantité restante à regrouper sur le BSDD ${appendix2_1.readableId} est de 3 T. Vous tentez de regrouper 3.5 T.`
+      );
+      expect(errors[0].message).toContain(
+        `La quantité restante à regrouper sur le BSDD ${appendix2_2.readableId} est de 10 T. Vous tentez de regrouper 11 T.`
+      );
+    });
+
+    it("grouping multiple BSDs with legit quantities", async () => {
+      // Given
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+      const appendix2_1 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 7
+      });
+
+      const appendix2_2 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "ACCEPTED",
+        quantityReceived: 10,
+        quantityRefused: 0
+      });
+
+      const appendix2_3 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 15,
+        quantityRefused: 2
+      });
+
+      // When
+      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
+        { form: { id: appendix2_1.id }, quantity: 3 },
+        { form: { id: appendix2_2.id }, quantity: 10 },
+        { form: { id: appendix2_3.id }, quantity: 10 }
+      ]);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedAppendix2_1 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2_1.id }
+      });
+      expect(updatedAppendix2_1.quantityGrouped).toEqual(3);
+
+      const updatedAppendix2_2 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2_2.id }
+      });
+      expect(updatedAppendix2_2.quantityGrouped).toEqual(10);
+
+      const updatedAppendix2_3 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2_3.id }
+      });
+      expect(updatedAppendix2_3.quantityGrouped).toEqual(10);
+    });
+
+    it("grouping annexe2 multiple times until quantity is too high", async () => {
+      // Given
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+      const appendix2 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 7
+      });
+
+      // When
+      const { errors: errors1 } = await createAppendix2GroupingForm(
+        user,
+        ttr.siret,
+        [{ form: { id: appendix2.id }, quantity: 1.5 }]
+      );
+
+      // Then
+      expect(errors1).toBeUndefined();
+
+      const updatedAppendix2_1 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2.id }
+      });
+      expect(updatedAppendix2_1.quantityGrouped).toEqual(1.5);
+
+      // When
+      const { errors: errors2 } = await createAppendix2GroupingForm(
+        user,
+        ttr.siret,
+        [{ form: { id: appendix2.id }, quantity: 1 }]
+      );
+
+      // Then
+      expect(errors2).toBeUndefined();
+
+      const updatedAppendix2_2 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2.id }
+      });
+      expect(updatedAppendix2_2.quantityGrouped).toEqual(2.5);
+
+      // When
+      const { errors: errors3 } = await createAppendix2GroupingForm(
+        user,
+        ttr.siret,
+        [{ form: { id: appendix2.id }, quantity: 1 }]
+      );
+
+      // Then
+      expect(errors3).not.toBeUndefined();
+      expect(errors3[0].message).toEqual(
+        `La quantité restante à regrouper sur le BSDD ${appendix2.readableId} est de 0.5 T. Vous tentez de regrouper 1 T.`
+      );
+    });
+
+    it("grouping multiple BSDs including legacy", async () => {
+      // Given
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+      const appendix2_1 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 7
+      });
+
+      const appendix2_2 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "ACCEPTED",
+        quantityReceived: 10,
+        quantityRefused: 0
+      });
+
+      // Legacy
+      const appendix2_3 = await createAppendix2(user.id, ttr.siret, {
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 15
+      });
+
+      // When
+      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
+        { form: { id: appendix2_1.id }, quantity: 3 },
+        { form: { id: appendix2_2.id }, quantity: 10 },
+        { form: { id: appendix2_3.id }, quantity: 10 }
+      ]);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedAppendix2_1 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2_1.id }
+      });
+      expect(updatedAppendix2_1.quantityGrouped).toEqual(3);
+
+      const updatedAppendix2_2 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2_2.id }
+      });
+      expect(updatedAppendix2_2.quantityGrouped).toEqual(10);
+
+      const updatedAppendix2_3 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2_3.id }
+      });
+      expect(updatedAppendix2_3.quantityGrouped).toEqual(10);
     });
   });
 });
