@@ -396,11 +396,6 @@ export function flattenBsddRevisionRequestInput(
         chain(t.temporaryStorer, s => s.quantityReceived)
       )
     ),
-    temporaryStorageTemporaryStorerQuantityRefused: chain(reviewContent, c =>
-      chain(c.temporaryStorageDetail, t =>
-        chain(t.temporaryStorer, s => s.quantityRefused)
-      )
-    ),
     temporaryStorageDestinationProcessingOperation: chain(reviewContent, c =>
       chain(c.temporaryStorageDetail, t =>
         chain(t.destination, d => d.processingOperation)
@@ -1006,9 +1001,7 @@ export function expandBsddRevisionRequestContent(
       nullIfNoValues<FormRevisionRequestTemporaryStorageDetail>({
         temporaryStorer: nullIfNoValues<FormRevisionRequestTemporaryStorer>({
           quantityReceived:
-            bsddRevisionRequest.temporaryStorageTemporaryStorerQuantityReceived,
-          quantityRefused:
-            bsddRevisionRequest.temporaryStorageTemporaryStorerQuantityRefused
+            bsddRevisionRequest.temporaryStorageTemporaryStorerQuantityReceived
         }),
         destination: nullIfNoValues<FormRevisionRequestDestination>({
           cap: bsddRevisionRequest.temporaryStorageDestinationCap,
