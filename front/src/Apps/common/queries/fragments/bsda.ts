@@ -27,6 +27,13 @@ export const bsdaFragment = gql`
       reception {
         weight
       }
+      operation {
+        nextDestination {
+          company {
+            orgId
+          }
+        }
+      }
     }
     worker {
       isDisabled

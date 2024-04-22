@@ -1207,9 +1207,25 @@ const canUpdateBsff = (bsd, siret) =>
   [BsdStatusCode.Initial, BsdStatusCode.SignedByEmitter].includes(bsd.status) &&
   canDuplicateBsff(bsd, siret);
 
-const canReviewBsda = (bsd, siret) =>
-  bsd.type === BsdType.Bsda && !canDeleteBsda(bsd, siret);
+const canReviewBsda = (bsd, siret) => {
+  const isTransporter = isSameSiretTransporter(siret, bsd);
+  const isDestination = isSameSiretDestination(siret, bsd);
+  const isProducer = isSameSiretEmmiter(siret, bsd);
+  const isWorker = isSameSiretWorker(siret, bsd);
 
+  const isFinalDestinationOnly =
+    !isDestination &&
+    !isTransporter &&
+    !isProducer &&
+    !isWorker &&
+    siret === bsd.destination?.operation?.nextDestination?.company?.orgId;
+
+  return (
+    bsd.type === BsdType.Bsda &&
+    !canDeleteBsda(bsd, siret) &&
+    !isFinalDestinationOnly
+  );
+};
 export const canReviewBsdd = (bsd, siret) => {
   const isSentStatus = BsdStatusCode.Sent === bsd.status;
   return (
