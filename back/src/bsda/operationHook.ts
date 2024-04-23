@@ -12,7 +12,10 @@ export type OperationHookOpts = {
 // Fonction principale qui est appelée sur les BSDAs lorsqu'un
 // traitement a lieu (ou lorsque le traitement est révisé)
 export async function operationHook(
-  bsda: Bsda,
+  bsda: Pick<
+    Bsda,
+    "id" | "destinationOperationSignatureDate" | "destinationOperationCode"
+  >,
   { runSync }: OperationHookOpts
 ) {
   if (
