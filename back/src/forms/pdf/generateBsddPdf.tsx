@@ -1132,7 +1132,8 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                       <td>{groupedForm?.wasteDetails?.code}</td>
                       <td>{groupedForm?.wasteDetails?.name}</td>
                       <td>
-                        {groupedForm?.quantityReceived ??
+                        {groupedForm?.quantityAccepted ??
+                          groupedForm?.quantityReceived ??
                           groupedForm?.wasteDetails?.quantity}
                       </td>
                       <td>
