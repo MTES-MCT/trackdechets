@@ -12,7 +12,10 @@ export type OperationHookOpts = {
 // Fonction principale qui est appelée sur les BSDASRIs lorsqu'un
 // traitement a lieu (ou lorsque le traitement est révisé)
 export async function operationHook(
-  bsdasri: Bsdasri,
+  bsdasri: Pick<
+    Bsdasri,
+    "id" | "destinationOperationSignatureDate" | "destinationOperationCode"
+  >,
   { runSync }: OperationHookOpts
 ) {
   if (

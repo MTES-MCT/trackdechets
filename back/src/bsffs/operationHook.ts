@@ -12,7 +12,10 @@ export type OperationHookOpts = {
 // Fonction principale qui est appelée sur un packaging BSFF lorsqu'un
 // traitement a lieu
 export async function operationHook(
-  bsffPackaging: BsffPackaging,
+  bsffPackaging: Pick<
+    BsffPackaging,
+    "operationSignatureDate" | "operationCode" | "operationNoTraceability"
+  >,
   { runSync }: OperationHookOpts
 ) {
   if (

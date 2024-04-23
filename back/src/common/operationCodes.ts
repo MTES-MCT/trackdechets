@@ -31,7 +31,7 @@ export const FINAL_OPERATION_CODES = [
   // "D 14",
   // "D 15"
 ];
-const TRIMMED_FINAL_OPERATION_CODES = FINAL_OPERATION_CODES.map(trim);
+export const TRIMMED_FINAL_OPERATION_CODES = FINAL_OPERATION_CODES.map(trim);
 
 export const isFinalOperationCode = (operationCode: string | null): boolean => {
   if (!operationCode) return false;

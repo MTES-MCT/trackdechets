@@ -13,7 +13,10 @@ export type OperationHookOpts = {
 // Fonction principale qui est appelée sur les BSDDs lorsqu'un
 // traitement a lieu (ou lorsque le traitement est révisé)
 export async function operationHook(
-  form: Form,
+  form: Pick<
+    Form,
+    "id" | "processedAt" | "processingOperationDone" | "noTraceability"
+  >,
   { runSync }: OperationHookOpts
 ) {
   if (
