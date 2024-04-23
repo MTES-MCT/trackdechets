@@ -5,9 +5,11 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2024.45.1] 07/05/2024
+# [2024.5.1] 07/05/2024
 
 #### :rocket: Nouvelles fonctionnalités
+
+- Ajouter l'information du traitement final sur le registre sortant et exhaustif pour les BSD ayant un BSD suite [PR 3254](https://github.com/MTES-MCT/trackdechets/pull/3254)
 
 #### :bug: Corrections de bugs
 
