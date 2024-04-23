@@ -1,43 +1,16 @@
-import { AnonymousCompaniesRequests } from "./AnonymousCompaniesRequests";
-import React, { useState } from "react";
-import { CreateAnonymousCompany } from "./CreateAnonymousCompany";
-import Button from "@codegouvfr/react-dsfr/Button";
+import React from "react";
 import styles from "./AnonymousCompany.module.scss";
+import { CreateAnonymousCompanyForm } from "./CreateAnonymousCompanyForm";
 
-export const AnonymousCompaniesDashboard = () => {
-  const [requestSiret, setRequestSiret] = useState<string | boolean>(false);
-
-  // Either display the table of all anonymous company requests...
-  if (!requestSiret) {
-    return (
-      <AnonymousCompaniesRequests
-        onCreateAnonymousCompany={(siret?: string) => {
-          setRequestSiret(siret ?? true);
-        }}
-      />
-    );
-  }
-
-  // ...or the form to create an anonymous company
+export const AnonymousCompanyDashboard = () => {
   return (
     <div className={styles.h100}>
-      <div>
-        <Button
-          iconId="fr-icon-arrow-left-line"
-          onClick={() => setRequestSiret(false)}
-          priority="tertiary no outline"
-        >
-          Précédent
-        </Button>
-      </div>
-
-      <div className={styles.h100}>
-        <CreateAnonymousCompany
-          onCompanyCreated={() => setRequestSiret(false)}
-          anonymousCompanyRequestSiret={
-            typeof requestSiret == "boolean" ? undefined : requestSiret
-          }
-        />
+      <div className={`fr-container--fluid ${styles.h100}`}>
+        <div className={`fr-grid-row fr-grid-row--gutters ${styles.h100}`}>
+          <div className="fr-col-12 fr-col-lg-6">
+            <CreateAnonymousCompanyForm />
+          </div>
+        </div>
       </div>
     </div>
   );

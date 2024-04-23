@@ -11,9 +11,9 @@ import {
   METADATA,
   INFO,
   EXTRACTED_STRINGS
-} from "./createAnonymousCompanyRequest.helpers.test";
-import { renderMail, createAnonymousCompanyRequestEmail } from "@td/mail";
+} from "./createAnonymousCompanyFromPDF.helpers.test";
 import { getCodeCommune } from "../../../geo/getCodeCommune";
+import { libelleFromCodeNaf } from "../../../sirene/utils";
 
 jest.mock("pdf-parse", () => jest.fn());
 
@@ -24,22 +24,30 @@ jest.mock("../../../../mailer/mailing");
 // Mock getCodeCommune
 jest.mock("../../../geo/getCodeCommune");
 
-const CREATE_ANONYMOUS_COMPANY_REQUEST = gql`
-  mutation CreateAnonymousCompanyRequest(
-    $input: CreateAnonymousCompanyRequestInput!
+const CREATE_ANONYMOUS_COMPANY_FROM_PDF = gql`
+  mutation CreateAnonymousCompanyFromPDF(
+    $input: CreateAnonymousCompanyFromPDFInput!
   ) {
-    createAnonymousCompanyRequest(input: $input)
+    createAnonymousCompanyFromPDF(input: $input)
   }
 `;
 
-describe("mutation createAnonymousCompanyRequest", () => {
+describe("mutation createAnonymousCompanyFromPDF", () => {
+  beforeEach(async () => {
+    (getCodeCommune as jest.Mock).mockImplementation((address: string) => {
+      if (address === "4 BD PASTEUR 44100 NANTES")
+        return Promise.resolve("44109");
+      return Promise.resolve();
+    });
+  });
+
   afterEach(async () => {
     await resetDatabase();
     jest.resetAllMocks();
     jest.restoreAllMocks();
   });
 
-  it("should create the AnonymousCompanyRequest", async () => {
+  it("should create the AnonymousCompany", async () => {
     // Given
     const user = await userFactory();
     const { mutate } = makeClient(user);
@@ -57,8 +65,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -70,21 +78,19 @@ describe("mutation createAnonymousCompanyRequest", () => {
     // Then
     expect(errors).toBeUndefined();
 
-    const anonymousCompanyRequest =
-      await prisma.anonymousCompanyRequest.findFirst({
-        where: {
-          siret: "98254982600013"
-        }
-      });
+    const anonymousCompany = await prisma.anonymousCompany.findFirst({
+      where: {
+        siret: "98254982600013"
+      }
+    });
 
-    expect(anonymousCompanyRequest).not.toBeUndefined();
-    expect(anonymousCompanyRequest).toMatchObject({
-      userId: user.id,
+    expect(anonymousCompany).not.toBeUndefined();
+    expect(anonymousCompany).toMatchObject({
+      orgId: "98254982600013",
       address: "4 BD PASTEUR 44100 NANTES",
       codeNaf: "6202A",
       name: "ACME CORP",
-      pdf: "dGVzdAo=",
-      siret: "98254982600013"
+      libelleNaf: libelleFromCodeNaf("6202A")
     });
   });
 
@@ -95,8 +101,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "",
@@ -119,8 +125,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "siret",
@@ -154,8 +160,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "95207811100012",
@@ -176,9 +182,51 @@ describe("mutation createAnonymousCompanyRequest", () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
 
+    pdfParser.mockImplementation(
+      () =>
+        new Promise(res =>
+          res({
+            metadata: { _metadata: METADATA },
+            info: INFO,
+            text: EXTRACTED_STRINGS.join("\n")
+          })
+        )
+    );
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
+      variables: {
+        input: {
+          siret: "98254982600013",
+          pdf: "dGVzdAo="
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const anonymousCompany = await prisma.anonymousCompany.findFirst({
+      where: {
+        siret: "98254982600013"
+      }
+    });
+
+    expect(anonymousCompany).not.toBeUndefined();
+    expect(anonymousCompany?.codeCommune).toEqual("44109");
+    expect(getCodeCommune).toBeCalledTimes(1);
+    expect(getCodeCommune).toBeCalledWith("4 BD PASTEUR 44100 NANTES");
+  });
+
+  it("if getCodeCommune doesn't return anything, should throw", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+
     (getCodeCommune as jest.Mock).mockImplementation((address: string) => {
-      if (address === "4 BD PASTEUR 44100 NANTES")
-        return Promise.resolve("44109");
+      if (address === "4 BD PASTEUR 44100 NANTES") return Promise.resolve(null);
       return Promise.resolve();
     });
 
@@ -195,8 +243,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -206,104 +254,9 @@ describe("mutation createAnonymousCompanyRequest", () => {
     });
 
     // Then
-    expect(errors).toBeUndefined();
-
-    const anonymousCompanyRequest =
-      await prisma.anonymousCompanyRequest.findFirst({
-        where: {
-          siret: "98254982600013"
-        }
-      });
-
-    expect(anonymousCompanyRequest).not.toBeUndefined();
-    expect(anonymousCompanyRequest?.codeCommune).toEqual("44109");
-    expect(getCodeCommune).toBeCalledTimes(1);
-    expect(getCodeCommune).toBeCalledWith("4 BD PASTEUR 44100 NANTES");
-  });
-
-  it("if getCodeCommune doesn't return anything, should persist null", async () => {
-    // Given
-    const user = await userFactory();
-    const { mutate } = makeClient(user);
-
-    pdfParser.mockImplementation(
-      () =>
-        new Promise(res =>
-          res({
-            metadata: { _metadata: METADATA },
-            info: INFO,
-            text: EXTRACTED_STRINGS.join("\n")
-          })
-        )
-    );
-
-    // When
-    const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
-      variables: {
-        input: {
-          siret: "98254982600013",
-          pdf: "dGVzdAo="
-        }
-      }
-    });
-
-    // Then
-    expect(errors).toBeUndefined();
-
-    const anonymousCompanyRequest =
-      await prisma.anonymousCompanyRequest.findFirst({
-        where: {
-          siret: "98254982600013"
-        }
-      });
-
-    expect(anonymousCompanyRequest).not.toBeUndefined();
-    expect(anonymousCompanyRequest?.codeCommune).toEqual(null);
-    expect(getCodeCommune).toBeCalledTimes(1);
-    expect(getCodeCommune).toBeCalledWith("4 BD PASTEUR 44100 NANTES");
-  });
-
-  it("should send an email to the user", async () => {
-    // Given
-    jest.mock("../../../../mailer/mailing");
-    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
-
-    const user = await userFactory();
-    const { mutate } = makeClient(user);
-
-    pdfParser.mockImplementation(
-      () =>
-        new Promise(res =>
-          res({
-            metadata: { _metadata: METADATA },
-            info: INFO,
-            text: EXTRACTED_STRINGS.join("\n")
-          })
-        )
-    );
-
-    // When
-    const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
-      variables: {
-        input: {
-          siret: "98254982600013",
-          pdf: "dGVzdAo="
-        }
-      }
-    });
-
-    // Then
-    expect(errors).toBeUndefined();
-
-    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
-      renderMail(createAnonymousCompanyRequestEmail, {
-        to: [{ email: user.email, name: user.name }],
-        variables: { siret: "98254982600013" }
-      })
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      `Le code commune associé au SIRET "98254982600013" n'a pas pu être trouvé`
     );
   });
 
@@ -314,8 +267,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -336,8 +289,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -370,8 +323,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -417,8 +370,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -430,7 +383,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toEqual(
-      "L'entreprise avec le SIRET 98254982600013 existe déjà"
+      `L'entreprise avec le SIRET "98254982600013" existe déjà`
     );
   });
 
@@ -464,8 +417,8 @@ describe("mutation createAnonymousCompanyRequest", () => {
 
     // When
     const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
+      Pick<Mutation, "createAnonymousCompanyFromPDF">
+    >(CREATE_ANONYMOUS_COMPANY_FROM_PDF, {
       variables: {
         input: {
           siret: "98254982600013",
@@ -477,54 +430,7 @@ describe("mutation createAnonymousCompanyRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toEqual(
-      "L'entreprise avec le SIRET 98254982600013 existe déjà"
-    );
-  });
-
-  it("should fail because anonymous company request already exists", async () => {
-    // Given
-    const user = await userFactory();
-    const { mutate } = makeClient(user);
-
-    pdfParser.mockImplementation(
-      () =>
-        new Promise(res =>
-          res({
-            metadata: { _metadata: METADATA },
-            info: INFO,
-            text: EXTRACTED_STRINGS.join("\n")
-          })
-        )
-    );
-
-    await prisma.anonymousCompanyRequest.create({
-      data: {
-        address: "4 BD PASTEUR 44100 NANTES",
-        codeNaf: "6202A",
-        name: "ACME CORP",
-        siret: "98254982600013",
-        pdf: "dGVzdAo=",
-        codeCommune: "44109",
-        userId: user.id
-      }
-    });
-
-    // When
-    const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompanyRequest">
-    >(CREATE_ANONYMOUS_COMPANY_REQUEST, {
-      variables: {
-        input: {
-          siret: "98254982600013",
-          pdf: "dGVzdAo="
-        }
-      }
-    });
-
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual(
-      "Une demande pour l'entreprise 98254982600013 est déjà en cours"
+      `L'entreprise avec le SIRET "98254982600013" existe déjà`
     );
   });
 });

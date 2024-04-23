@@ -3,7 +3,7 @@ import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import routes, { getRelativeRoute } from "../Apps/routes";
 import React from "react";
 import { NavLink, Routes, Route, Navigate } from "react-router-dom";
-import { AnonymousCompaniesDashboard } from "./anonymousCompany";
+import { AnonymousCompanyDashboard } from "./anonymousCompany/AnonymousCompaniesDashboard";
 import Reindex from "./reindex/Reindex";
 import AnonymizeUser from "./user/anonymizeUser";
 import CompaniesVerification from "./verification/CompaniesVerification";
@@ -37,14 +37,14 @@ export default function Admin() {
             </li>
             <li className="tw-mb-1">
               <NavLink
-                to={routes.admin.anonymousCompanies}
+                to={routes.admin.anonymousCompany}
                 className={({ isActive }) =>
                   isActive
                     ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
                     : "sidebarv2__item sidebarv2__item--indented"
                 }
               >
-                Entreprises anonymes
+                Entreprise anonyme
               </NavLink>
             </li>
             <li className="tw-mb-1">
@@ -95,8 +95,8 @@ export default function Admin() {
           />
 
           <Route
-            path={toRelative(routes.admin.anonymousCompanies)}
-            element={<AnonymousCompaniesDashboard />}
+            path={toRelative(routes.admin.anonymousCompany)}
+            element={<AnonymousCompanyDashboard />}
           />
 
           <Route

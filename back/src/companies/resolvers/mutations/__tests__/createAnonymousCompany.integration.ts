@@ -6,12 +6,6 @@ import {
 import { prisma } from "@td/prisma";
 import { siretify, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { sendMail } from "../../../../mailer/mailing";
-import { anonymousCompanyCreatedEmail, renderMail } from "@td/mail";
-
-// Mock emails
-jest.mock("../../../../mailer/mailing");
-(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const CREATE_ANONYMOUS_COMPANY = `
   mutation CreateAnonymousCompany($input: AnonymousCompanyInput!) {
@@ -213,95 +207,5 @@ describe("createAnonymousCompany", () => {
         message: `L'entreprise "${input.vatNumber}" est déjà connue de notre répertoire privé.`
       })
     ]);
-  });
-
-  it("should delete any associated anonymousCompanyRequest", async () => {
-    // Given
-    const user = await userFactory({ isAdmin: true });
-    const { mutate } = makeClient(user);
-
-    await prisma.anonymousCompanyRequest.create({
-      data: {
-        userId: user.id,
-        address: "4 BD PASTEUR 44100 NANTES",
-        codeNaf: "6202A",
-        name: "ACME CORP",
-        pdf: "[pdf1 in base64]",
-        siret: validInput.siret,
-        codeCommune: "44100"
-      }
-    });
-
-    // When
-    const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompany">,
-      MutationCreateAnonymousCompanyArgs
-    >(CREATE_ANONYMOUS_COMPANY, { variables: { input: validInput } });
-
-    // Then
-    expect(errors).toBeUndefined();
-    const res = await prisma.anonymousCompanyRequest.findFirst({
-      where: {
-        siret: validInput.siret
-      }
-    });
-    expect(res).toBeNull();
-  });
-
-  it("if associated anonymousCompanyRequest, should send an email to user", async () => {
-    // Given
-    jest.mock("../../../../mailer/mailing");
-    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
-
-    const user = await userFactory({ isAdmin: true });
-    const { mutate } = makeClient(user);
-
-    await prisma.anonymousCompanyRequest.create({
-      data: {
-        userId: user.id,
-        address: "4 BD PASTEUR 44100 NANTES",
-        codeNaf: "6202A",
-        name: "ACME CORP",
-        pdf: "[pdf1 in base64]",
-        siret: validInput.siret,
-        codeCommune: "44100"
-      }
-    });
-
-    // When
-    const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompany">,
-      MutationCreateAnonymousCompanyArgs
-    >(CREATE_ANONYMOUS_COMPANY, { variables: { input: validInput } });
-
-    // Then
-    expect(errors).toBeUndefined();
-
-    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
-      renderMail(anonymousCompanyCreatedEmail, {
-        to: [{ email: user.email, name: user.name }],
-        variables: { siret: validInput.siret }
-      })
-    );
-  });
-
-  it("if no associated anonymousCompanyRequest, should not send any email", async () => {
-    // Given
-    jest.mock("../../../../mailer/mailing");
-    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
-
-    const user = await userFactory({ isAdmin: true });
-    const { mutate } = makeClient(user);
-
-    // When
-    const { errors } = await mutate<
-      Pick<Mutation, "createAnonymousCompany">,
-      MutationCreateAnonymousCompanyArgs
-    >(CREATE_ANONYMOUS_COMPANY, { variables: { input: validInput } });
-
-    // Then
-    expect(errors).toBeUndefined();
-
-    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
   });
 });

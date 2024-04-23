@@ -12,7 +12,7 @@ import {
   validateAndExtractSireneDataFromPDFInBase64,
   validateInfoOrThrow,
   validateMetadataOrThrow
-} from "../createAnonymousCompanyRequest.helpers";
+} from "../createAnonymousCompanyFromPDF.helpers";
 
 import pdfParser from "pdf-parse";
 jest.mock("pdf-parse", () => jest.fn());
@@ -72,7 +72,7 @@ export const EXTRACTED_STRINGS = [
   "REPUBLIQUE FRANCAISE"
 ];
 
-describe("createAnonymousCompanyRequest.helpers", () => {
+describe("createAnonymousCompanyFromPDF.helpers", () => {
   describe("validateInfoOrThrow", () => {
     it("should return true", async () => {
       // Given

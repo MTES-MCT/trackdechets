@@ -44,9 +44,9 @@ input UpdateTransporterReceiptInput {
 }
 
 """
-Payload pour créer une demande de création d'entreprise non-diffusible
+Payload pour créer une entreprise non-diffusible via un PDF SIRENE
 """
-input CreateAnonymousCompanyRequestInput {
+input CreateAnonymousCompanyFromPDFInput {
   """
   Le SIRET de l'entreprise
   """
