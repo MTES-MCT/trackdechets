@@ -103,7 +103,7 @@
    À noter que ce script peut aussi être utiliser pour indexer tous les documents en base de donnée.
 
    ```bash
-   npm --prefix back run reindex-all-bsds-bulk:dev
+   npx nx run back:reindex-all-bsds-bulk -- -f
    ```
 
 8. Lancer les services.
@@ -282,7 +282,7 @@ echo v20 > .nvmrc
 nvm use && npm install && npm nx run back:codegen
 ```
 
-8. Ajouter un fichier `.env` dans le répertoire racive en copiant le fichier .env.model et un fichier `.env` dans le répertoire `front` en copiant le fichier front/.env.model. (demander à un dev)
+8. Ajouter un fichier `.env` dans le répertoire racine en copiant le fichier .env.model et un fichier `.env` dans le répertoire `front` en copiant le fichier front/.env.model. (demander à un dev)
 
 9. Pousser le schéma de la base de données dans la table `prisma` et ajouter des données de tests en ajoutant un fichier `seed.dev.ts` dans le répertoire `back/prisma` (demander à un dev) :
 
