@@ -151,6 +151,8 @@ brew services start elasticsearch@6
 
 puis vérifier qu'ils tournent avec `brew services list`. Vous pouvez vérifier également que Nginx est bien démarré en allant sur `http://localhost:8080`.
 
+En cas d'erreur à l'exécution d'elasticsearch (jdk.app corrupted ou autre), il est possible de faire l'installation en téléchargeant directement les binaires depuis [Le site d'elasticsearch](https://www.elastic.co/fr/downloads/past-releases#elasticsearch). Vous pouvez ensuite ajouter le dossier bin/ à votre PATH ou démarrer elasticsearch en vous rendant dans le dossier directement.
+
 5. Configurer Nginx pour servir l'API, l'UI et le notifier en créant les fichiers suivants :
 
 ```
@@ -231,6 +233,25 @@ server {
 }
 ```
 
+Si vous voulez utiliser le domaine es.trackdechets.local pour elasticsearch, ajouter:
+
+```
+# /opt/homebrew/etc/nginx/servers/es.trackdechets.local
+server {
+   listen 80;
+   listen [::]:80;
+   server_name es.trackdechets.local;
+
+   location / {
+      proxy_pass http://localhost:9200;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+   }
+}
+```
+
 Re-charger la config et redémarrer NGINX
 
 ```
@@ -247,20 +268,21 @@ brew services restart nginx
 127.0.0.1 notifier.trackdechets.local
 127.0.0.1 storybook.trackdechets.local
 ```
+Si vous avez mappé le domaine es.trackdechets.local dans la config nginx:
+```
+127.0.0.1 es.trackdechets.local
+```
 
 7. Installer `nvm`
 
 ```
 brew install nvm
-nvm install 16.18.1 // version pour le back
-nvm install 14.21.1 // version pour le front
-echo v16.18.1 > back/.nvmrc
-echo 14.21.1 > front/.nvmrc
-cd back && nvm use && npm install && npm run generate
-cd front && nvm use && npm install
+nvm install 20 // version pour le back
+echo v20 > .nvmrc
+nvm use && npm install && npm nx run back:codegen
 ```
 
-8. Ajouter un fichier `.env` dans le répertoire back et un fichier `.env.development` dans le répertoire `front`. (demander à un dev)
+8. Ajouter un fichier `.env` dans le répertoire racive en copiant le fichier .env.model et un fichier `.env` dans le répertoire `front` en copiant le fichier front/.env.model. (demander à un dev)
 
 9. Pousser le schéma de la base de données dans la table `prisma` et ajouter des données de tests en ajoutant un fichier `seed.dev.ts` dans le répertoire `back/prisma` (demander à un dev) :
 
@@ -269,7 +291,7 @@ npx prisma db push
 npx prisma db seed
 ```
 
-10. Créer l'index Elasticsearch : `npm --prefix back run reindex-all-bsds-bulk:dev -- -f`. Puis vérifier qu'un index a bien été crée : `curl localhost:9200/_cat/indices`
+10. Créer l'index Elasticsearch : `npx nx run back:reindex-all-bsds-bulk -- -f`. Puis vérifier qu'un index a bien été crée : `curl localhost:9200/_cat/indices` (ou via [elasticvue](https://elasticvue.com/))
 
 11. Créer un utilisateur Mongo :
 
@@ -283,6 +305,12 @@ mongosh
 
 ```
 npx nx run-many -t serve
+```
+ou pour démarrer dans des consoles différentes:
+```
+npx nx run api:serve # API
+npx nx run front:serve # Frontend
+npx nx run-many --parallel=4 -t serve --projects=tag:backend:background
 ```
 
 13. (Optionnel) Démarrer Storybook
@@ -723,3 +751,26 @@ Vous pouvez également augmenter la taille mémoire allouée au container Docker
       - "ES_JAVA_OPTS=-Xms1G -Xmx1G"
 [...]
 ```
+---
+Si l'indexage ne fonctionne pas et que vous voyez des erreurs de type:
+```
+[TOO_MANY_REQUESTS/12/disk usage exceeded flood-stage watermark, index has read-only-allow-delete block]
+```
+dans les logs elastic, il est probable que votre disque dur soit plein à plus de 95% et que elastic passe donc en read&delete only. Pour résoudre le problème, en admettant qu'il reste quand même un peu de place pour créer l'index (quelques Go max), il faut ajouter cette ligne:
+```
+cluster.routing.allocation.disk.threshold_enabled: false
+```
+au fichier elasticsearch.yml qui se trouve généralement dans elasticsearch/config/.
+
+---
+Si une erreur NGINX "413 Request Entity too large" interromp le process
+```
+{"meta":{"body":"<html>\r\n<head><title>413 Request Entity Too Large</title></head>\r\n<body>\r\n<center><h1>413 Request Entity Too Large</h1></center>\r\n<hr><center>nginx/1.25.5</center>
+[...]
+```
+et que vous utilisez Elastic derrière le proxy NGINX (es.trackdechets.local), il faut augmenter la taille max de body acceptée par NGINX. Pour celà ajouter cette ligne:
+```
+client_max_body_size 100M;
+```
+dans le fichier nginx.conf à l'intérieur du bloc "http" ou "server"  (qui se trouve généralement dans le dossier nginx/ ou nginx/conf/).
+redémarrez ensuite nginx pour appliquer la config.
