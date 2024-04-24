@@ -268,7 +268,9 @@ brew services restart nginx
 127.0.0.1 notifier.trackdechets.local
 127.0.0.1 storybook.trackdechets.local
 ```
+
 Si vous avez mappé le domaine es.trackdechets.local dans la config nginx:
+
 ```
 127.0.0.1 es.trackdechets.local
 ```
@@ -306,7 +308,9 @@ mongosh
 ```
 npx nx run-many -t serve
 ```
+
 ou pour démarrer dans des consoles différentes:
+
 ```
 npx nx run api:serve # API
 npx nx run front:serve # Frontend
@@ -751,26 +755,37 @@ Vous pouvez également augmenter la taille mémoire allouée au container Docker
       - "ES_JAVA_OPTS=-Xms1G -Xmx1G"
 [...]
 ```
+
 ---
+
 Si l'indexage ne fonctionne pas et que vous voyez des erreurs de type:
+
 ```
 [TOO_MANY_REQUESTS/12/disk usage exceeded flood-stage watermark, index has read-only-allow-delete block]
 ```
+
 dans les logs elastic, il est probable que votre disque dur soit plein à plus de 95% et que elastic passe donc en read&delete only. Pour résoudre le problème, en admettant qu'il reste quand même un peu de place pour créer l'index (quelques Go max), il faut ajouter cette ligne:
+
 ```
 cluster.routing.allocation.disk.threshold_enabled: false
 ```
+
 au fichier elasticsearch.yml qui se trouve généralement dans elasticsearch/config/.
 
 ---
+
 Si une erreur NGINX "413 Request Entity too large" interromp le process
+
 ```
 {"meta":{"body":"<html>\r\n<head><title>413 Request Entity Too Large</title></head>\r\n<body>\r\n<center><h1>413 Request Entity Too Large</h1></center>\r\n<hr><center>nginx/1.25.5</center>
 [...]
 ```
+
 et que vous utilisez Elastic derrière le proxy NGINX (es.trackdechets.local), il faut augmenter la taille max de body acceptée par NGINX. Pour celà ajouter cette ligne:
+
 ```
 client_max_body_size 100M;
 ```
-dans le fichier nginx.conf à l'intérieur du bloc "http" ou "server"  (qui se trouve généralement dans le dossier nginx/ ou nginx/conf/).
+
+dans le fichier nginx.conf à l'intérieur du bloc "http" ou "server" (qui se trouve généralement dans le dossier nginx/ ou nginx/conf/).
 redémarrez ensuite nginx pour appliquer la config.
