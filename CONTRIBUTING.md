@@ -758,7 +758,7 @@ Vous pouvez également augmenter la taille mémoire allouée au container Docker
 
 ---
 
-Si l'indexage ne fonctionne pas et que vous voyez des erreurs de type:
+Si l'indexation ne fonctionne pas et que vous voyez des erreurs de type:
 
 ```
 [TOO_MANY_REQUESTS/12/disk usage exceeded flood-stage watermark, index has read-only-allow-delete block]
