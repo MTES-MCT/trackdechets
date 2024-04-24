@@ -2,7 +2,7 @@ import React from "react";
 import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
 import AccountFormCompanyTypes from "./forms/AccountFormCompanyTypes";
-import { COMPANY_CONSTANTS } from "../../../login/CompanyType";
+import { COMPANY_CONSTANTS } from "../../Companies/common/utils";
 import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 

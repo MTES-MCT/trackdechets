@@ -1,8 +1,8 @@
 import React from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 
-const ContactFormCtaFragment = ({ handleReset, handleSubmit, disabled }) => (
-  <div className="contactForm__topActions__formCTA">
+const CompanyFormCtaFragment = ({ handleReset, handleSubmit, disabled }) => (
+  <div className="companyFormWrapper__topActions__formCTA">
     <Button
       priority="secondary"
       size="small"
@@ -25,4 +25,4 @@ const ContactFormCtaFragment = ({ handleReset, handleSubmit, disabled }) => (
     </Button>
   </div>
 );
-export default ContactFormCtaFragment;
+export default CompanyFormCtaFragment;

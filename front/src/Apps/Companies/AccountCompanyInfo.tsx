@@ -14,22 +14,19 @@ import AccountFieldCompanyVerificationStatus from "../Account/fields/AccountFiel
 import AccountFieldCompanyVhuAgrementBroyeur from "../Account/fields/AccountFieldCompanyVhuAgrementBroyeur";
 import AccountFieldCompanyVhuAgrementDemolisseur from "../Account/fields/AccountFieldCompanyVhuAgrementDemolisseur";
 import AccountFieldCompanyWorkerCertification from "../Account/fields/AccountFieldCompanyWorkerCertification";
-import { isSiret, isVat, PROFESSIONALS } from "@td/constants";
-import AccountInfoAutoUpdate from "../Account/fields/AccountInfoAutoUpdate";
+import { PROFESSIONALS } from "@td/constants";
 
 type Props = { company: CompanyPrivate };
 
 const { VITE_VERIFY_COMPANY } = import.meta.env;
 
 export default function AccountCompanyInfo({ company }: Props) {
-  const isAdmin = company.userRole === UserRole.Admin;
-
   const isWasteProfessional = company.companyTypes.some(ct =>
     PROFESSIONALS.includes(ct)
   );
   return (
     <>
-      <div className="tw-flex">
+      {/* <div className="tw-flex">
         {isSiret(
           company.siret!,
           import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"
@@ -53,8 +50,8 @@ export default function AccountCompanyInfo({ company }: Props) {
             }
           />
         )}
-      </div>
-      <AccountFieldNotEditable
+      </div> */}
+      {/* <AccountFieldNotEditable
         name="naf"
         label="Code NAF"
         value={`${company.naf} - ${company.libelleNaf}`}
@@ -78,31 +75,31 @@ export default function AccountCompanyInfo({ company }: Props) {
             </a>
           }
         />
-      )}
-      <AccountFieldCompanyGerepId company={company} />
-      <AccountFieldCompanyTypes company={company} />
-      {isWasteProfessional && VITE_VERIFY_COMPANY === "true" && (
+      )} */}
+      {/* <AccountFieldCompanyGerepId company={company} /> */}
+      {/* <AccountFieldCompanyTypes company={company} /> */}
+      {/* {isWasteProfessional && VITE_VERIFY_COMPANY === "true" && (
         <AccountFieldCompanyVerificationStatus company={company} />
-      )}
-      {company.companyTypes.includes(CompanyType.Transporter) && (
+      )} */}
+      {/* {company.companyTypes.includes(CompanyType.Transporter) && (
         <AccountFieldCompanyTransporterReceipt company={company} />
-      )}
-      {company.companyTypes.includes(CompanyType.Trader) && (
+      )} */}
+      {/* {company.companyTypes.includes(CompanyType.Trader) && (
         <AccountFieldCompanyTraderReceipt company={company} />
-      )}
-      {company.companyTypes.includes(CompanyType.Broker) && (
+      )} */}
+      {/* {company.companyTypes.includes(CompanyType.Broker) && (
         <AccountFieldCompanyBrokerReceipt company={company} />
-      )}
-      {company.companyTypes.includes(CompanyType.WasteVehicles) && (
+      )} */}
+      {/* {company.companyTypes.includes(CompanyType.WasteVehicles) && (
         <>
           <AccountFieldCompanyVhuAgrementBroyeur company={company} />
           <AccountFieldCompanyVhuAgrementDemolisseur company={company} />
         </>
-      )}
-      {company.companyTypes.includes(CompanyType.Worker) && (
+      )} */}
+      {/* {company.companyTypes.includes(CompanyType.Worker) && (
         <AccountFieldCompanyWorkerCertification company={company} />
-      )}
-      {isAdmin ? (
+      )} */}
+      {/* {isAdmin ? (
         <AccountFieldCompanyGivenName company={company} />
       ) : (
         company.givenName && (
@@ -113,7 +110,7 @@ export default function AccountCompanyInfo({ company }: Props) {
             value={company.givenName}
           />
         )
-      )}
+      )} */}
     </>
   );
 }

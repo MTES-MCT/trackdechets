@@ -19,6 +19,7 @@ import {
   UPDATE_COMPANY_WORKER_CERTIFICATION,
   UPDATE_WORKER_CERTIFICATION
 } from "./AccountFormCompanyWorkerCertification";
+import { UPDATE_COMPANY_TYPES } from "../../../Companies/common/queries";
 
 type Props = {
   name: string;
@@ -37,15 +38,6 @@ type V = {
     organisation: string;
   };
 };
-
-export const UPDATE_COMPANY_TYPES = gql`
-  mutation UpdateCompany($id: String!, $companyTypes: [CompanyType!]) {
-    updateCompany(id: $id, companyTypes: $companyTypes) {
-      id
-      companyTypes
-    }
-  }
-`;
 
 export default function AccountFormCompanyTypes({
   name,
