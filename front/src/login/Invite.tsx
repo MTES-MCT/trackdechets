@@ -7,6 +7,9 @@ import { Mutation, MutationJoinWithInviteArgs, Query } from "@td/codegen-ui";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import * as queryString from "query-string";
 import { decodeHash } from "../common/helper";
+import PasswordHelper, {
+  getPasswordHint
+} from "../common/components/PasswordHelper";
 import routes from "../Apps/routes";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -201,7 +204,19 @@ export default function Invite() {
           password: yup
             .string()
             .required("Le mot de passe est un champ requis")
-            .min(8, "Le mot de passe doit faire au moins 8 caractères")
+            .test({
+              name: "is-valid-password",
+              test: value => {
+                if (!value) {
+                  return false;
+                }
+                const { hintType } = getPasswordHint(value);
+                if (hintType === "error") {
+                  return false;
+                }
+                return true;
+              }
+            })
         })}
         onSubmit={(values, { setSubmitting }) => {
           const { name, password } = values;
@@ -257,26 +272,13 @@ export default function Invite() {
                 <Field name="password">
                   {({ field }) => {
                     return (
-                      <PasswordInput
-                        label="Mot de passe"
-                        messages={[
-                          {
-                            severity: "info",
-                            message: "8 caractères minimum"
-                          },
-                          {
-                            severity:
-                              errors.password && touched.password
-                                ? "error"
-                                : "info",
-                            message:
-                              errors.password && touched.password
-                                ? errors.password
-                                : ""
-                          }
-                        ]}
-                        nativeInputProps={{ required: true, ...field }}
-                      />
+                      <>
+                        <PasswordInput
+                          label="Mot de passe"
+                          nativeInputProps={{ required: true, ...field }}
+                        />
+                        <PasswordHelper password={field.value} />
+                      </>
                     );
                   }}
                 </Field>
