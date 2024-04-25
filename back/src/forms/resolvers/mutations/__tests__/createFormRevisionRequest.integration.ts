@@ -15,7 +15,7 @@ import {
   CANCELLABLE_BSDD_STATUSES,
   NON_CANCELLABLE_BSDD_STATUSES
 } from "../createFormRevisionRequest";
-import { prisma } from "../../../../../../libs/back/prisma/src";
+import { prisma } from "@td/prisma";
 
 const CREATE_FORM_REVISION_REQUEST = `
   mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
