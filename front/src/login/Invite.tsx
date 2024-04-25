@@ -39,7 +39,7 @@ const JOIN_WITH_INVITE = gql`
       email
       companies {
         name
-        siret
+        orgId
       }
     }
   }
@@ -114,8 +114,8 @@ export default function Invite() {
             </p>
             <ul className="bullets">
               {user.companies?.map(company => (
-                <li key={company.siret}>
-                  {company.name} - ({company.siret})
+                <li key={company.orgId}>
+                  {company.name} - ({company.orgId})
                 </li>
               ))}
             </ul>
