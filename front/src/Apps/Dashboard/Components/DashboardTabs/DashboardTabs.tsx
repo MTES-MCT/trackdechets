@@ -31,20 +31,8 @@ import CompanySwitcher from "../../../common/Components/CompanySwitcher/CompanyS
 import { gql, useQuery } from "@apollo/client";
 
 const NOTIFICATION_QUERY = gql`
-  query GetBsds(
-    $after: String
-    $first: Int
-    $clue: String
-    $where: BsdWhere
-    $orderBy: OrderBy
-  ) {
-    bsds(
-      after: $after
-      first: $first
-      clue: $clue
-      where: $where
-      orderBy: $orderBy
-    ) {
+  query GetBsds($where: BsdWhere) {
+    bsds(first: 1, where: $where) {
       totalCount
     }
   }
