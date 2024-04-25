@@ -59,7 +59,8 @@ export async function createUserAccountHash(
 }
 
 /**
- * Delete UserAccountHash objects linked to a user's mail (association between user and siret with a hash)
+ * Delete UserAccountHash objects linked to a user's mail
+ * (association between user and siret with a hash used for invitations)
  * @param user
  * @param prisma
  */
@@ -259,6 +260,11 @@ export async function updateUserPassword({
   });
 }
 
+/**
+ * Determine if a user is the sole admin for a company
+ * used in deletion pipeline to prevent deleting a user
+ * @param user
+ */
 export async function checkCompanyAssociations(user: User): Promise<string[]> {
   const errors: string[] = [];
   const companyAssociations = await prisma.companyAssociation.findMany({
@@ -302,6 +308,11 @@ export async function checkCompanyAssociations(user: User): Promise<string[]> {
   return errors;
 }
 
+/**
+ * Determine if a user is the sole admin for an application
+ * used in deletion pipeline to prevent deleting a user
+ * @param user
+ */
 export async function checkApplications(user: User): Promise<string[]> {
   const errors: string[] = [];
   const applications = await prisma.application.findMany({
@@ -318,6 +329,11 @@ export async function checkApplications(user: User): Promise<string[]> {
   return errors;
 }
 
+/**
+ * Delete all associations between a user and companies
+ * @param user
+ * @param prisma
+ */
 export async function deleteUserCompanyAssociations(
   user: User,
   prisma: PrismaTransaction
@@ -331,6 +347,11 @@ export async function deleteUserCompanyAssociations(
   });
 }
 
+/**
+ * Delete all membership requests from a user
+ * @param user
+ * @param prisma
+ */
 export async function deleteMembershipRequest(
   user: User,
   prisma: PrismaTransaction
@@ -344,6 +365,11 @@ export async function deleteMembershipRequest(
   });
 }
 
+/**
+ * Delete all UserActivationHashes of a user
+ * @param user
+ * @param prisma
+ */
 export async function deleteUserActivationHashes(
   user: User,
   prisma: PrismaTransaction
@@ -357,6 +383,11 @@ export async function deleteUserActivationHashes(
   });
 }
 
+/**
+ * Delete all access tokens of a user
+ * @param user
+ * @param prisma
+ */
 export async function deleteUserAccessTokens(
   user: User,
   prisma: PrismaTransaction
@@ -370,6 +401,11 @@ export async function deleteUserAccessTokens(
   });
 }
 
+/**
+ * Delete all grants of a user
+ * @param user
+ * @param prisma
+ */
 export async function deleteUserGrants(user: User, prisma: PrismaTransaction) {
   await prisma.grant.deleteMany({
     where: {
