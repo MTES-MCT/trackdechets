@@ -1168,7 +1168,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
   );
   const stream = await generatePdf(html);
 
-  return { filename: `${form.readableId}.pdf`, stream };
+  return { filename: form.readableId, stream };
 }
 
 export async function generateBsddPdfToBase64(
