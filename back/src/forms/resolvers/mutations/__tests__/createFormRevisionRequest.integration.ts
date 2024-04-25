@@ -10,11 +10,12 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
-import { EmitterType, Status } from "@prisma/client";
+import { EmitterType, Status, WasteAcceptationStatus } from "@prisma/client";
 import {
   CANCELLABLE_BSDD_STATUSES,
   NON_CANCELLABLE_BSDD_STATUSES
 } from "../createFormRevisionRequest";
+import { prisma } from "../../../../../../libs/back/prisma/src";
 
 const CREATE_FORM_REVISION_REQUEST = `
   mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
@@ -976,5 +977,526 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     expect(errors).toBeUndefined();
+  });
+
+  describe("wasteAcceptationStatus & quantityRefused", () => {
+    it.each([Status.ACCEPTED, Status.TEMP_STORER_ACCEPTED])(
+      "can review BSD wasteAcceptationStatus if status is %p",
+      async status => {
+        // Given
+        const { company: recipientCompany } = await userWithCompanyFactory(
+          "ADMIN"
+        );
+        const { user, company } = await userWithCompanyFactory("ADMIN");
+        const bsdd = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status,
+            emitterCompanySiret: company.siret,
+            recipientCompanySiret: recipientCompany.siret,
+            wasteAcceptationStatus: Status.ACCEPTED,
+            quantityReceived: 10,
+            receivedAt: new Date()
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "createFormRevisionRequest">,
+          MutationCreateFormRevisionRequestArgs
+        >(CREATE_FORM_REVISION_REQUEST, {
+          variables: {
+            input: {
+              formId: bsdd.id,
+              content: {
+                wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+                wasteRefusalReason: "Raison",
+                quantityReceived: 0
+              },
+              comment: "A comment",
+              authoringCompanySiret: company.siret!
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(revisionRequest.wasteAcceptationStatus).toEqual(
+          WasteAcceptationStatus.REFUSED
+        );
+        expect(revisionRequest.wasteRefusalReason).toEqual("Raison");
+        expect(revisionRequest.quantityReceived).toEqual(0);
+        expect(revisionRequest.quantityRefused).toEqual(null);
+      }
+    );
+
+    it("can NOT review BSD wasteAcceptationStatus if status is NOT ACCEPTED or TEMP_STORED_ACCEPTED", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.PROCESSED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+          quantityReceived: 10
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+              wasteRefusalReason: "Raison",
+              quantityReceived: 0
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le statut d'acceptation des déchets n'est modifiable que si le bordereau est au stade de la réception."
+      );
+    });
+
+    it.each([Status.ACCEPTED, Status.TEMP_STORER_ACCEPTED])(
+      "can review BSD wasteAcceptationStatus if status is %p with quantityRefused",
+      async status => {
+        // Given
+        const { company: recipientCompany } = await userWithCompanyFactory(
+          "ADMIN"
+        );
+        const { user, company } = await userWithCompanyFactory("ADMIN");
+        const bsdd = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status,
+            emitterCompanySiret: company.siret,
+            recipientCompanySiret: recipientCompany.siret,
+            wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+            quantityReceived: 10,
+            receivedAt: new Date()
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "createFormRevisionRequest">,
+          MutationCreateFormRevisionRequestArgs
+        >(CREATE_FORM_REVISION_REQUEST, {
+          variables: {
+            input: {
+              formId: bsdd.id,
+              content: {
+                wasteAcceptationStatus:
+                  WasteAcceptationStatus.PARTIALLY_REFUSED,
+                wasteRefusalReason: "Raison",
+                quantityReceived: 10,
+                quantityRefused: 7
+              },
+              comment: "A comment",
+              authoringCompanySiret: company.siret!
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(revisionRequest.wasteAcceptationStatus).toEqual(
+          WasteAcceptationStatus.PARTIALLY_REFUSED
+        );
+        expect(revisionRequest.wasteRefusalReason).toEqual("Raison");
+        expect(revisionRequest.quantityReceived).toEqual(10);
+        expect(revisionRequest.quantityRefused).toEqual(7);
+      }
+    );
+
+    it("can NOT review BSD wasteAcceptationStatus if not defined", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+              wasteRefusalReason: "Raison",
+              quantityReceived: 0
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le statut d'acceptation des déchets n'est modifiable que s'il a déjà une valeur."
+      );
+    });
+
+    it("cannot specify quantityRefused < quantityReceived if wasteAcceptationStatus = REFUSED", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+          quantityReceived: 10,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+              wasteRefusalReason: "Raison",
+              quantityReceived: 10,
+              quantityRefused: 5
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)"
+      );
+    });
+
+    it("cannot specify quantityRefused > 0 if wasteAcceptationStatus = ACCEPTED", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          wasteRefusalReason: "Reason",
+          quantityReceived: 0,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+              quantityReceived: 10,
+              quantityRefused: 1
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
+      );
+    });
+
+    it("cannot specify quantityRefused = quantityReceived if wasteAcceptationStatus = PARTIALLY_ACCEPTED", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          wasteRefusalReason: "Reason",
+          quantityReceived: 0,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              wasteRefusalReason: "Reason",
+              quantityReceived: 10,
+              quantityRefused: 10
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+      );
+    });
+
+    it("bsdd waste is refused > should not be able to update quantityRefused to 0", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          wasteRefusalReason: "Reason",
+          quantityReceived: 0,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              quantityReceived: 10,
+              quantityRefused: 0
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)"
+      );
+    });
+
+    it("bsdd waste is accepted > should not be able to update quantityRefused to > 0", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+          wasteRefusalReason: "Reason",
+          quantityReceived: 0,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              quantityReceived: 10,
+              quantityRefused: 10
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
+      );
+    });
+
+    it("bsdd waste is partially refused > should not be able to update quantityRefused to >= quantityReceived", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+          wasteRefusalReason: "Reason",
+          quantityReceived: 0,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              quantityReceived: 10,
+              quantityRefused: 10
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+      );
+    });
+
+    it("one can update quantityRefused even if not undefined in original bsdd, without specifying the waste acceptation status", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+          wasteRefusalReason: "Reason",
+          quantityReceived: 0,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              quantityReceived: 10,
+              quantityRefused: 5
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+    });
   });
 });

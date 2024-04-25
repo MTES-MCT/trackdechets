@@ -6,7 +6,8 @@ import {
   Prisma,
   RevisionRequestStatus,
   Status,
-  User
+  User,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import * as yup from "yup";
 import {
@@ -27,7 +28,7 @@ import { flattenBsddRevisionRequestInput } from "../../converter";
 import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
-import { packagingInfoFn } from "../../validation";
+import { packagingInfoFn, quantityRefused } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 
@@ -223,6 +224,24 @@ async function getFlatContent(
 
   const { isCanceled, ...revisionFields } = flatContent;
 
+  // Trying to change the acceptation status
+  if (content.wasteAcceptationStatus) {
+    if (!bsdd.wasteAcceptationStatus) {
+      throw new UserInputError(
+        "Le statut d'acceptation des déchets n'est modifiable que s'il a déjà une valeur."
+      );
+    }
+
+    if (
+      content.wasteAcceptationStatus !== bsdd.wasteAcceptationStatus &&
+      ![Status.ACCEPTED, Status.TEMP_STORER_ACCEPTED].includes(bsdd.status)
+    ) {
+      throw new UserInputError(
+        "Le statut d'acceptation des déchets n'est modifiable que si le bordereau est au stade de la réception."
+      );
+    }
+  }
+
   if (!isCanceled && Object.keys(revisionFields).length === 0) {
     throw new UserInputError(
       "Impossible de créer une révision sans modifications."
@@ -279,6 +298,12 @@ async function getFlatContent(
   }
 
   await bsddRevisionRequestSchema.validate(flatContent);
+
+  // Double-check the waste quantities
+  await bsddRevisionRequestWasteQuantitiesSchema.validate({
+    ...bsdd,
+    ...flatContent
+  });
 
   if (
     bsdd.emitterType === EmitterType.APPENDIX1 &&
@@ -346,6 +371,26 @@ function hasTemporaryStorageUpdate(
   );
 }
 
+const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
+  wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
+  wasteRefusalReason: yup
+    .string()
+    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+      ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+        ? schema.ensure().required("Vous devez saisir un motif de refus")
+        : schema
+            .notRequired()
+            .nullable()
+            .test(
+              "is-empty",
+              "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+              v => !v
+            )
+    ),
+  quantityReceived: yup.number().min(0).nullable(),
+  quantityRefused
+});
+
 const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
   .object({
     isCanceled: yup.bool().transform(v => (v === null ? false : v)),
@@ -359,7 +404,6 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
       .array()
       .of(packagingInfoFn({ isDraft: false }))
       .transform(v => (v === null ? Prisma.JsonNull : v)),
-    quantityReceived: yup.number().min(0).nullable(),
     processingOperationDone: yup
       .string()
       .oneOf(
@@ -443,6 +487,7 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
       )
       .nullable()
   })
+  .concat(bsddRevisionRequestWasteQuantitiesSchema)
   .noUnknown(
     true,
     "Révision impossible, certains champs saisis ne sont pas modifiables"

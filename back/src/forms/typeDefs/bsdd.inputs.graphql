@@ -904,8 +904,17 @@ input FormRevisionRequestContentInput {
   "Informations sur l'installation de destination ou d’entreposage ou de reconditionnement prévue (édition partielle uniquement)"
   recipient: FormRevisionRequestRecipientInput
 
+  "Statut d'acceptation du déchet (case 10)"
+  wasteAcceptationStatus: WasteAcceptationStatus
+
+  "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
+  wasteRefusalReason: String
+
   "Quantité reçue sur l'installation de destination, en tonnes"
   quantityReceived: Float
+
+  "Quantité refusée, en tonnes"
+  quantityRefused: Float
 
   "Traitement réalisé (code D/R)"
   processingOperationDone: String

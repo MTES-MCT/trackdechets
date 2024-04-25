@@ -186,6 +186,9 @@ async function getUpdateFromFormRevisionRequest(
         }
       : {
           quantityReceived: revisionRequest.quantityReceived,
+          quantityRefused: revisionRequest.quantityRefused,
+          wasteAcceptationStatus: revisionRequest.wasteAcceptationStatus,
+          wasteRefusalReason: revisionRequest.wasteRefusalReason,
           processingOperationDone: revisionRequest.processingOperationDone,
           destinationOperationMode: revisionRequest.destinationOperationMode,
           processingOperationDescription:

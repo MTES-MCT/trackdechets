@@ -374,7 +374,10 @@ export function flattenBsddRevisionRequestInput(
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       chain(reviewContent, c => chain(c.wasteDetails, w => w.packagingInfos))
     ),
+    wasteAcceptationStatus: chain(reviewContent, c => c.wasteAcceptationStatus),
+    wasteRefusalReason: chain(reviewContent, c => c.wasteRefusalReason),
     quantityReceived: chain(reviewContent, c => c.quantityReceived),
+    quantityRefused: chain(reviewContent, c => c.quantityRefused),
     processingOperationDone: chain(
       reviewContent,
       c => c.processingOperationDone

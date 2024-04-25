@@ -622,7 +622,10 @@ model BsddRevisionRequest {
   wasteDetailsName                                String?
   wasteDetailsPop                                 Boolean?
   wasteDetailsPackagingInfos                      Json?
+  wasteAcceptationStatus                          WasteAcceptationStatus?
+  wasteRefusalReason                              String?
   quantityReceived                                Float?
+  quantityRefused                                 Float?
   processingOperationDone                         String?
   destinationOperationMode                        OperationMode?
   processingOperationDescription                  String?

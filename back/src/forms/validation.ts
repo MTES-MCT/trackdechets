@@ -254,7 +254,7 @@ export const hasPipeline = (value: {
 }): boolean =>
   value.wasteDetailsPackagingInfos?.some(i => i.type === "PIPELINE");
 
-const quantityRefused = weight(WeightUnits.Tonne)
+export const quantityRefused = weight(WeightUnits.Tonne)
   .min(0)
   .test(
     "not-defined-if-no-quantity-received",
@@ -301,8 +301,23 @@ const quantityRefused = weight(WeightUnits.Tonne)
     }
   )
   .test(
+    "waste-is-partially-refused",
+    "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)",
+    (value, context) => {
+      const { wasteAcceptationStatus, quantityReceived } = context.parent;
+
+      if (wasteAcceptationStatus !== WasteAcceptationStatus.PARTIALLY_REFUSED)
+        return true;
+
+      // Legacy
+      if (value === null || value === undefined) return true;
+
+      return value > 0 && value < quantityReceived;
+    }
+  )
+  .test(
     "lower-than-quantity-received",
-    "La quantité refusée (quantityRefused) doit être inférieure à la quantité réceptionnée (quantityReceived)",
+    "La quantité refusée (quantityRefused) doit être inférieure ou égale à la quantité réceptionnée (quantityReceived)",
     (value, context) => {
       const { quantityReceived } = context.parent;
 

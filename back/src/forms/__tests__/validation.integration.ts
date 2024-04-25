@@ -22,6 +22,7 @@ import {
 } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { REQUIRED_RECEIPT_NUMBER } from "../../common/validation";
+import Decimal from "decimal.js";
 
 const siret1 = siretify(1);
 const siret2 = siretify(2);
@@ -58,7 +59,7 @@ const formData: Partial<Form> = {
     { type: "FUT", other: null, quantity: 1 },
     { type: "GRV", other: null, quantity: 1 }
   ],
-  wasteDetailsQuantity: 1.5,
+  wasteDetailsQuantity: new Decimal(1.5),
   wasteDetailsQuantityType: "REAL",
   wasteDetailsConsistence: "SOLID",
   wasteDetailsPop: false
@@ -1186,24 +1187,47 @@ describe("receivedInfosSchema", () => {
       }
     );
 
-    it("quantityRefused must be lower than quantityReceived", async () => {
-      // Given
-      const update = {
-        ...form,
-        wasteAcceptationStatus: "PARTIALLY_REFUSED",
-        wasteRefusalReason: "Reason",
-        quantityReceived: 10,
-        quantityRefused: 10.1
-      };
+    it.each([0, 10, 15])(
+      "waste is PARTIALLY_REFUSED > quantityReceived = 10 > quantityRefused can NOT be %p",
+      async quantityRefused => {
+        // Given
+        const update = {
+          ...form,
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          wasteRefusalReason: "Reason",
+          quantityReceived: 10,
+          quantityRefused
+        };
 
-      // When
-      const validateFn = () => receivedInfoSchema.validate(update);
+        // When
+        const validateFn = () => receivedInfoSchema.validate(update);
 
-      // Then
-      await expect(validateFn()).rejects.toThrow(
-        "La quantité refusée (quantityRefused) doit être inférieure à la quantité réceptionnée (quantityReceived)"
-      );
-    });
+        // Then
+        await expect(validateFn()).rejects.toThrow(
+          "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+        );
+      }
+    );
+
+    it.each([1, 5, 9.99])(
+      "waste is PARTIALLY_REFUSED > quantityReceived = 10 > quantityRefused can be %p",
+      async quantityRefused => {
+        // Given
+        const update = {
+          ...form,
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          wasteRefusalReason: "Reason",
+          quantityReceived: 10,
+          quantityRefused
+        };
+
+        // When
+        const isValid = await receivedInfoSchema.validate(update);
+
+        // Then
+        expect(isValid).toBeTruthy();
+      }
+    );
 
     it("quantityRefused must be positive", async () => {
       // Given
