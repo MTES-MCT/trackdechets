@@ -114,8 +114,8 @@ export default function Invite() {
             </p>
             <ul className="bullets">
               {user.companies?.map(company => (
-                <li key={company.orgId}>
-                  {company.name} - ({company.orgId})
+                <li key={company.siret}>
+                  {company.name} - ({company.siret})
                 </li>
               ))}
             </ul>
@@ -225,7 +225,7 @@ export default function Invite() {
           }).then(_ => setSubmitting(false));
         }}
       >
-        {({ isSubmitting, errors, touched, isValid, submitForm }) => (
+        {({ isSubmitting, errors, touched, isValid }) => (
           <Form>
             <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
               <div className="fr-col fr-m-auto">
@@ -290,7 +290,6 @@ export default function Invite() {
                   iconId="ri-arrow-right-line"
                   iconPosition="right"
                   size="medium"
-                  onClick={submitForm}
                   disabled={!isValid}
                   title={
                     isSubmitting ? "Création en cours..." : "Créer mon compte"
