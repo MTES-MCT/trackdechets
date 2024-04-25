@@ -24,12 +24,11 @@ schema
 
 function startConsumers() {
   console.info(`General queues consumers started`);
-
   mailQueue.process(sendMailJob);
   geocodeCompanyQueue.process(geocodeJob);
   setCompanyDepartementQueue.process(setDepartementJob);
   syncEventsQueue.process(syncEventsJob);
-  operationHooksQueue.process(operationHookJob);
+  operationHooksQueue.process(3, operationHookJob);
 }
 
 startConsumers();
