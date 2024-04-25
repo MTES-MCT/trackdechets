@@ -14,7 +14,10 @@ export type OperationHookOpts = {
 export async function operationHook(
   bsffPackaging: Pick<
     BsffPackaging,
-    "operationSignatureDate" | "operationCode" | "operationNoTraceability"
+    | "id"
+    | "operationSignatureDate"
+    | "operationCode"
+    | "operationNoTraceability"
   >,
   { runSync }: OperationHookOpts
 ) {

@@ -28,7 +28,7 @@ function startConsumers() {
   geocodeCompanyQueue.process(geocodeJob);
   setCompanyDepartementQueue.process(setDepartementJob);
   syncEventsQueue.process(syncEventsJob);
-  operationHooksQueue.process(3, operationHookJob);
+  operationHooksQueue.process(operationHookJob);
 }
 
 startConsumers();
