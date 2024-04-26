@@ -69,8 +69,8 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
                   ...register("vhuAgrementDemolisseur.department")
                 }}
               />
-              <br />
             </Highlight>
+            <br />
           </div>
         );
       }
@@ -85,48 +85,24 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
               <Input
                 label="Numéro de récépissé"
                 nativeInputProps={{
-                  ...register("transporterReceipt.receiptNumber", {
-                    required: true
-                  })
+                  ...register("transporterReceipt.receiptNumber")
                 }}
-                state={
-                  formState.errors.transporterReceipt?.receiptNumber
-                    ? "error"
-                    : "default"
-                }
-                stateRelatedMessage="Champ requis"
               />
               <Input
                 label="Limite de validité"
                 nativeInputProps={{
                   type: "date",
-                  ...register("transporterReceipt.validityLimit", {
-                    required: true
-                  })
+                  ...register("transporterReceipt.validityLimit")
                 }}
-                state={
-                  formState.errors.transporterReceipt?.validityLimit
-                    ? "error"
-                    : "default"
-                }
-                stateRelatedMessage="Champ requis"
               />
               <Input
                 label="Département"
                 nativeInputProps={{
-                  ...register("transporterReceipt.department", {
-                    required: true
-                  })
+                  ...register("transporterReceipt.department")
                 }}
-                state={
-                  formState.errors.transporterReceipt?.department
-                    ? "error"
-                    : "default"
-                }
-                stateRelatedMessage="Champ requis"
               />
-              <br />
             </Highlight>
+            <br />
           </div>
         );
       }
@@ -157,8 +133,8 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
                   ...register("brokerReceipt.department")
                 }}
               />
-              <br />
             </Highlight>
+            <br />
           </div>
         );
       }
@@ -189,8 +165,8 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
                   ...register("traderReceipt.department")
                 }}
               />
-              <br />
             </Highlight>
+            <br />
           </div>
         );
       }
@@ -281,8 +257,8 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
                   </Select>
                 </>
               )}
-              <br />
             </Highlight>
+            <br />
           </div>
         );
       }
