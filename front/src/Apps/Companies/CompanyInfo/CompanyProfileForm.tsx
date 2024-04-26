@@ -57,7 +57,7 @@ interface CompanyProfileFormFields {
   companyTypes: {
     label: string | undefined;
     value: CompanyType | undefined;
-    helpText?: string | undefined;
+    helpText?: string;
     isChecked: boolean;
   }[];
   workerCertification?: WorkerCertification;
@@ -113,9 +113,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
   };
 
   const formatDate = date => {
-    return date
-      ? format(parsedDate(date) as Date, "yyyy-MM-dd")
-      : format(new Date(), "yyyy-MM-dd");
+    return date ? format(parsedDate(date) as Date, "yyyy-MM-dd") : "";
   };
 
   const defaultValues: CompanyProfileFormFields = {
@@ -392,16 +390,24 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     }
   };
   const handleCreateOrUpdateWorkerCertification = async dataToUpdate => {
-    const input = {
+    let input = {
       ...(company.workerCertification?.id
         ? { id: company.workerCertification.id }
         : {}),
       hasSubSectionFour: dataToUpdate.workerCertification.hasSubSectionFour,
-      hasSubSectionThree: dataToUpdate.workerCertification.hasSubSectionThree,
-      certificationNumber: dataToUpdate.workerCertification.certificationNumber,
-      validityLimit: dataToUpdate.workerCertification.validityLimit ?? null,
-      organisation: dataToUpdate.workerCertification.organisation
+      hasSubSectionThree: dataToUpdate.workerCertification.hasSubSectionThree
     };
+
+    if (dataToUpdate.workerCertification.hasSubSectionThree) {
+      input = {
+        ...input,
+        hasSubSectionThree: dataToUpdate.workerCertification.hasSubSectionThree,
+        certificationNumber:
+          dataToUpdate.workerCertification.certificationNumber,
+        validityLimit: dataToUpdate.workerCertification.validityLimit ?? null,
+        organisation: dataToUpdate.workerCertification.organisation
+      } as WorkerCertification;
+    }
     const { data } = await createOrUpdateWorkerCertification({
       variables: { input }
     });
@@ -456,8 +462,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     }
   };
 
-  const handleCreateOrUpdateVhuAgrement = async dataToUpdate => {
-    // broyeur
+  const handleCreateOrUpdateVhuAgrementBroyeur = async dataToUpdate => {
     const inputBroyeur = {
       ...(company.vhuAgrementBroyeur?.id
         ? { id: company.vhuAgrementBroyeur.id }
@@ -477,9 +482,9 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
         }
       });
     }
+  };
 
-    // demolisseur
-
+  const handleCreateOrUpdateVhuAgrementDemolisseur = async dataToUpdate => {
     const inputDemolisseur = {
       ...(company.vhuAgrementDemolisseur?.id
         ? { id: company.vhuAgrementDemolisseur.id }
@@ -502,62 +507,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     }
   };
 
-  const handleUpdateCompanyTypes = async data => {
-    const companyTypesToUpdate = data.companyTypes
-      .map(type => {
-        if (type.isChecked) {
-          return type.value;
-        }
-        return null;
-      })
-      .filter(f => f !== null);
-
-    await updateCompanyTypes({
-      variables: {
-        id: company.id,
-        companyTypes: companyTypesToUpdate
-      }
-    });
-    const shouldCreateOrUpdateWorkerCertification =
-      companyTypesToUpdate.includes(CompanyType.Worker) &&
-      (data.workerCertification.hasSubSectionThree ||
-        data.workerCertification.hasSubSectionFour);
-    const shouldCreateOrUpdateTransporterReceipt =
-      companyTypesToUpdate.includes(CompanyType.Transporter) &&
-      data.transporterReceipt.receiptNumber;
-    const shouldCreateOrUpdateBrokerReceipt =
-      companyTypesToUpdate.includes(CompanyType.Broker) &&
-      data.brokerReceipt.receiptNumber;
-    const shouldCreateOrUpdateTraderReceipt =
-      companyTypesToUpdate.includes(CompanyType.Trader) &&
-      data.traderReceipt.receiptNumber;
-    const shouldCreateOrUpdateVhuAgrementBroyeur =
-      companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
-      data.vhuAgrementBroyeur.agrementNumber;
-    const shouldCreateOrUpdateVhuAgrementDemolisseur =
-      companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
-      data.vhuAgrementDemolisseur.agrementNumber;
-
-    if (shouldCreateOrUpdateWorkerCertification) {
-      await handleCreateOrUpdateWorkerCertification(data);
-    }
-    if (shouldCreateOrUpdateBrokerReceipt) {
-      await handleCreateOrUpdateBrokerReceipt(data);
-    }
-    if (shouldCreateOrUpdateTraderReceipt) {
-      await handleCreateOrUpdateTraderReceipt(data);
-    }
-    if (shouldCreateOrUpdateTransporterReceipt) {
-      await handleCreateOrUpdateTransporterReceipt(data);
-    }
-    if (
-      shouldCreateOrUpdateVhuAgrementBroyeur ||
-      shouldCreateOrUpdateVhuAgrementDemolisseur
-    ) {
-      await handleCreateOrUpdateVhuAgrement(data);
-    }
-
-    //deletes
+  const handleDeletes = async companyTypesToUpdate => {
     const shouldDeleteWorkerCertification =
       !companyTypesToUpdate.includes(CompanyType.Worker) &&
       company.workerCertification;
@@ -619,6 +569,69 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
         }
       });
     }
+  };
+
+  const handleUpdates = async (data, companyTypesToUpdate) => {
+    const shouldCreateOrUpdateWorkerCertification =
+      companyTypesToUpdate.includes(CompanyType.Worker);
+    const shouldCreateOrUpdateTransporterReceipt =
+      companyTypesToUpdate.includes(CompanyType.Transporter) &&
+      data.transporterReceipt.receiptNumber;
+    const shouldCreateOrUpdateBrokerReceipt =
+      companyTypesToUpdate.includes(CompanyType.Broker) &&
+      data.brokerReceipt.receiptNumber;
+    const shouldCreateOrUpdateTraderReceipt =
+      companyTypesToUpdate.includes(CompanyType.Trader) &&
+      data.traderReceipt.receiptNumber;
+    const shouldCreateOrUpdateVhuAgrementBroyeur =
+      companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
+      data.vhuAgrementBroyeur.agrementNumber;
+    const shouldCreateOrUpdateVhuAgrementDemolisseur =
+      companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
+      data.vhuAgrementDemolisseur.agrementNumber;
+
+    if (shouldCreateOrUpdateWorkerCertification) {
+      await handleCreateOrUpdateWorkerCertification(data);
+    }
+    if (shouldCreateOrUpdateBrokerReceipt) {
+      await handleCreateOrUpdateBrokerReceipt(data);
+    }
+    if (shouldCreateOrUpdateTraderReceipt) {
+      await handleCreateOrUpdateTraderReceipt(data);
+    }
+    if (shouldCreateOrUpdateTransporterReceipt) {
+      await handleCreateOrUpdateTransporterReceipt(data);
+    }
+    if (shouldCreateOrUpdateVhuAgrementBroyeur) {
+      await handleCreateOrUpdateVhuAgrementBroyeur(data);
+    }
+    if (shouldCreateOrUpdateVhuAgrementDemolisseur) {
+      await handleCreateOrUpdateVhuAgrementDemolisseur(data);
+    }
+  };
+
+  const handleUpdateCompanyTypes = async data => {
+    const companyTypesToUpdate = data.companyTypes
+      .map(type => {
+        if (type.isChecked) {
+          return type.value;
+        }
+        return null;
+      })
+      .filter(f => f !== null);
+
+    await updateCompanyTypes({
+      variables: {
+        id: company.id,
+        companyTypes: companyTypesToUpdate
+      }
+    });
+
+    //updates
+    handleUpdates(data, companyTypesToUpdate);
+
+    //deletes
+    handleDeletes(companyTypesToUpdate);
   };
 
   const loading =

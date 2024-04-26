@@ -44,7 +44,7 @@ const CompanyIdentificationForm = ({
   };
   const isAdmin = company.userRole === UserRole.Admin;
   const isASiret = isSiret(
-    company.siret!,
+    company.siret,
     import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"
   );
 
@@ -81,6 +81,7 @@ const CompanyIdentificationForm = ({
   const ctaSynchroLabel = isASiret
     ? "Synchroniser avec l'INSEE"
     : "Synchroniser avec le registre européen";
+  const naf = `${company.naf} - ${company.libelleNaf}`;
   return (
     <CompanyFormWrapper
       title="Identification"
@@ -126,9 +127,7 @@ const CompanyIdentificationForm = ({
           </p>
 
           <p className="companyFormWrapper__title-field">Code NAF</p>
-          <p className="companyFormWrapper__value-field">
-            {`${company.naf} - ${company.libelleNaf}` || "-"}
-          </p>
+          <p className="companyFormWrapper__value-field">{naf || "-"}</p>
 
           <p className="companyFormWrapper__title-field">Adresse</p>
           <p className="companyFormWrapper__value-field">
