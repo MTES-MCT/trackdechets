@@ -376,6 +376,9 @@ export function flattenBsddRevisionRequestInput(
     wasteDetailsSampleNumber: chain(reviewContent, c =>
       chain(c.wasteDetails, w => w.sampleNumber)
     ),
+    wasteDetailsQuantity: chain(reviewContent, c =>
+      chain(c.wasteDetails, w => w.quantity)
+    ),
     quantityReceived: chain(reviewContent, c => c.quantityReceived),
     processingOperationDone: chain(
       reviewContent,
@@ -963,7 +966,11 @@ export function expandBsddRevisionRequestContent(
       name: bsddRevisionRequest.wasteDetailsName,
       pop: bsddRevisionRequest.wasteDetailsPop,
       packagingInfos:
-        bsddRevisionRequest.wasteDetailsPackagingInfos as PackagingInfo[]
+        bsddRevisionRequest.wasteDetailsPackagingInfos as PackagingInfo[],
+      sampleNumber: bsddRevisionRequest.wasteDetailsSampleNumber,
+      quantity: bsddRevisionRequest.wasteDetailsQuantity
+        ? processDecimal(bsddRevisionRequest.wasteDetailsQuantity).toNumber()
+        : null
     }),
     trader: nullIfNoValues<Trader>({
       company: nullIfNoValues<FormCompany>({

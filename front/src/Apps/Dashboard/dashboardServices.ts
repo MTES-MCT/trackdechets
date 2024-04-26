@@ -1219,7 +1219,6 @@ export const canReviewBsdd = (bsd, siret) => {
       BsdStatusCode.Sealed,
       BsdStatusCode.Refused
     ].includes(bsd.status) &&
-    bsd.emitterType !== EmitterType.Appendix1Producer &&
     !(
       bsd.emitterType === EmitterType.Producer &&
       !isSentStatus &&

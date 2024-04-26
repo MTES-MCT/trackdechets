@@ -35,7 +35,9 @@ export enum DataNameEnum {
   POLLUANTS_ORG = "Présence de polluants organiques persistants",
   CAP_FINAL_DEST = "CAP (destination finale)",
   CAP = "CAP",
+  SAMPLE_NUMBER = "Numéro d'échantillon",
   CAP_TEMP_STORAGE = "CAP (entreposage provisoire ou reconditionnement)",
+  QTY_ESTIMATED = "Poids estimé (en tonnes)",
   QTY_RECEIVED = "Quantité reçue (tonnes)",
   QTY_PROCESSED = "Quantité traitée (en tonnes)",
   QTY_RECEIVED_TEMP_STORAGE = "Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)",
@@ -180,6 +182,16 @@ export const mapRevision = (
       dataNewValue: review?.content?.packagings
         ?.map(p => formatPackagingName(p))
         .join(", ")
+    },
+    {
+      dataName: DataNameEnum.QTY_ESTIMATED,
+      dataOldValue: review?.[bsdName]?.content?.wasteDetails?.quantity,
+      dataNewValue: review?.content?.wasteDetails?.quantity
+    },
+    {
+      dataName: DataNameEnum.SAMPLE_NUMBER,
+      dataOldValue: review?.[bsdName]?.content?.wasteDetails?.sampleNumber,
+      dataNewValue: review?.content?.wasteDetails?.sampleNumber
     },
     {
       dataName: DataNameEnum.POLLUANTS_ORG,

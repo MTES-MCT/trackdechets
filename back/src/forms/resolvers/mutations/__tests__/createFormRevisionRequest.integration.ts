@@ -978,7 +978,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     expect(errors).toBeUndefined();
   });
 
-  it.only("should work for APPENDIX1_PRODUCER", async () => {
+  it("should work for APPENDIX1_PRODUCER", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
@@ -987,7 +987,8 @@ describe("Mutation.createFormRevisionRequest", () => {
       opt: {
         emitterType: EmitterType.APPENDIX1_PRODUCER,
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: recipientCompany.siret
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "13 01 12*"
       }
     });
 
@@ -999,18 +1000,48 @@ describe("Mutation.createFormRevisionRequest", () => {
       variables: {
         input: {
           formId: bsdd.id,
-          content: { wasteDetails: {code: ""} },
+          content: { wasteDetails: { sampleNumber: "Num échantillon" } },
           comment: "A comment",
           authoringCompanySiret: company.siret!
         }
       }
     });
 
-    // Because the error messages vary depending on the status,
-    // let's just check that there is an error and not focus on the msg
-    expect(errors.length).toBeGreaterThan(0);
+    expect(errors).toBeUndefined();
+  });
+
+  it("should not allow to revise sample number on a non APPENDIX1_PRODUCER BSDD", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterType: EmitterType.OTHER,
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "13 01 12*"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { sampleNumber: "Num échantillon" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Impossible d'annuler un bordereau de tournée dédiée."
+      "Révision impossible, certains champs saisis ne sont pas modifiables"
     );
   });
 });

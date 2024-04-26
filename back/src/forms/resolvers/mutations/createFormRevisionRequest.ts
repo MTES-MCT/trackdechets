@@ -284,7 +284,9 @@ async function getFlatContent(
   }
 
   if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-    await appendix1ProducerRevisionRequestSchema.validate(flatContent);
+    await appendix1ProducerRevisionRequestSchema.validate(flatContent, {
+      strict: true
+    });
 
     if (
       flatContent.wasteDetailsSampleNumber &&
@@ -296,7 +298,7 @@ async function getFlatContent(
       );
     }
   } else {
-    await bsddRevisionRequestSchema.validate(flatContent);
+    await bsddRevisionRequestSchema.validate(flatContent, { strict: true });
   }
 
   if (
@@ -469,6 +471,7 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
 
 const appendix1ProducerRevisionRequestSchema = yup
   .object({
+    isCanceled: yup.bool().transform(v => (v === null ? false : v)),
     wasteDetailsSampleNumber: yup.string().nullable(),
     wasteDetailsPackagingInfos: yup
       .array()
