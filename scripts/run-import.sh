@@ -43,6 +43,7 @@ fi
 
 scalingo --region osc-secnum-fr1 --app trackdechets-production-api run --file "$OUTPUT_DIR" bash << EOF
   tar -C /tmp -xvf /tmp/uploads/csv.tar.gz
-  node ./dist/src/users/bulk-creation/index.js --csvDir=/tmp/
+  npm i
+  tsx --tsconfig back/tsconfig.lib.json back/src/users/bulk-creation/index.ts --csvDir=/tmp/
   exit
 EOF
