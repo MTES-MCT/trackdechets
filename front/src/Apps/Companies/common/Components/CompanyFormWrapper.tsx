@@ -9,6 +9,7 @@ const CompanyFormWrapper = ({
   reset,
   disabled,
   defaultValues,
+  dataTestId,
   children
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -47,7 +48,7 @@ const CompanyFormWrapper = ({
         <h4>{title}</h4>
         {showEditCta && (
           <Button
-            data-testid="company-contact-edit"
+            data-testid={dataTestId}
             size="small"
             onClick={onEditionClick}
           >

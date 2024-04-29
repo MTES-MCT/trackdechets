@@ -89,6 +89,7 @@ const CompanyIdentificationForm = ({
       disabled={!formState.isDirty || formState.isSubmitting}
       defaultValues={defaultValues}
       isAdmin={isAdmin}
+      dataTestId="company-identification-edit"
     >
       {(formRef, isEditing, onClose) => (
         <form

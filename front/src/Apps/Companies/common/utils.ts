@@ -1,4 +1,6 @@
 import { CompanyType } from "@td/codegen-ui";
+import { format, isValid } from "date-fns";
+import { parseDate } from "../../../common/datetime";
 
 export const COMPANY_CONSTANTS = [
   {
@@ -70,3 +72,18 @@ export const COMPANY_CONSTANTS = [
       "Un crématorium autorisé prend en charge l'incinération des pièces anatomiques d'origine humaine"
   }
 ];
+
+export const parsedDate = date => {
+  const parsedDate = date ? parseDate(date) : null;
+  if (isValid(parsedDate)) {
+    return parsedDate;
+  }
+};
+
+export const formatDate = date => {
+  return date ? format(parsedDate(date) as Date, "yyyy-MM-dd") : "";
+};
+
+export const formatDateViewDisplay = date => {
+  return date ? format(parsedDate(date) as Date, "dd/MM/yyyy") : "";
+};

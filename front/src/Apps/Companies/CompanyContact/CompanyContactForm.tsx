@@ -70,6 +70,7 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
       disabled={!formState.isDirty || formState.isSubmitting}
       defaultValues={defaultValues}
       isAdmin={isAdmin}
+      dataTestId="company-contact-edit"
     >
       {(formRef, isEditing, onClose) =>
         isEditing ? (

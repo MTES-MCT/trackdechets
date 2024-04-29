@@ -12,7 +12,7 @@ import {
   WorkerCertification
 } from "@td/codegen-ui";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-import { COMPANY_CONSTANTS } from "../common/utils";
+import { COMPANY_CONSTANTS, formatDate } from "../common/utils";
 import TdTooltip from "../../../common/components/Tooltip";
 import {
   CREATE_BROKER_RECEIPT_,
@@ -39,14 +39,12 @@ import {
   UPDATE_WORKER_CERTIFICATION
 } from "../common/queries";
 import { gql, useMutation } from "@apollo/client";
-import { format, isValid } from "date-fns";
-import { parseDate } from "../../../common/datetime";
 import { Loader } from "../../common/Components";
 import CompanyProfileSubForm from "./CompanyProfileSubForm";
 import { NotificationError } from "../../common/Components/Error/Error";
 import AccountFieldCompanyVerificationStatus from "../../Account/fields/AccountFieldCompanyVerificationStatus";
 import { PROFESSIONALS } from "@td/constants";
-import { Highlight } from "@codegouvfr/react-dsfr/Highlight";
+import CompanyProfileInformation from "./CompanyProfileInformation";
 
 const { VITE_VERIFY_COMPANY } = import.meta.env;
 
@@ -104,17 +102,6 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     return companyTypesAllValues;
   };
   const companyTypesFormatted = getFormattedComapnyTypes(company.companyTypes);
-
-  const parsedDate = date => {
-    const parsedDate = date ? parseDate(date) : null;
-    if (isValid(parsedDate)) {
-      return parsedDate;
-    }
-  };
-
-  const formatDate = date => {
-    return date ? format(parsedDate(date) as Date, "yyyy-MM-dd") : "";
-  };
 
   const defaultValues: CompanyProfileFormFields = {
     companyTypes: companyTypesFormatted || [],
@@ -684,6 +671,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       disabled={!formState.isDirty || formState.isSubmitting}
       defaultValues={defaultValues}
       isAdmin={company.userRole === UserRole.Admin}
+      dataTestId="company-profile-edit"
     >
       {(formRef, isEditing, onClose) =>
         isEditing ? (
@@ -732,152 +720,10 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
             {error && <NotificationError apolloError={error} />}
           </form>
         ) : (
-          <ul>
-            {companyTypesFormatted.map(companyType => {
-              return (
-                companyType.isChecked && (
-                  <li key={companyType.value}>
-                    {companyType.label}
-
-                    {companyType.value === CompanyType.Worker && (
-                      <Highlight>
-                        <p className="companyFormWrapper__title-field">
-                          Travaux relevant de la sous-section 4
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.workerCertification?.hasSubSectionFour
-                            ? "✅"
-                            : "❌"}
-                        </p>
-                        <p className="companyFormWrapper__title-field">
-                          Travaux relevant de la sous-section 3
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.workerCertification?.hasSubSectionThree
-                            ? "✅"
-                            : "❌"}
-                        </p>
-                        {company.workerCertification?.hasSubSectionThree && (
-                          <>
-                            <p className="companyFormWrapper__title-field">
-                              Numéro de certification
-                            </p>
-                            <p className="companyFormWrapper__value-field">
-                              {company.workerCertification.certificationNumber}
-                            </p>
-                            <p className="companyFormWrapper__title-field">
-                              Date de validité
-                            </p>
-                            <p className="companyFormWrapper__value-field">
-                              {formatDate(
-                                company.workerCertification.validityLimit
-                              )}
-                            </p>
-                            <p className="companyFormWrapper__title-field">
-                              Organisme
-                            </p>
-                            <p className="companyFormWrapper__value-field">
-                              {company.workerCertification.organisation}
-                            </p>
-                          </>
-                        )}
-                      </Highlight>
-                    )}
-                    {companyType.value === CompanyType.Broker && (
-                      <Highlight>
-                        <p className="companyFormWrapper__title-field">
-                          Numéro de récépissé
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.brokerReceipt?.receiptNumber || "-"}
-                        </p>
-                        <p className="companyFormWrapper__title-field">
-                          Limite de validité
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {formatDate(company.brokerReceipt?.validityLimit) ||
-                            "-"}
-                        </p>
-                        <p className="companyFormWrapper__title-field">
-                          Département
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.brokerReceipt?.department || "-"}
-                        </p>
-                      </Highlight>
-                    )}
-                    {companyType.value === CompanyType.Trader && (
-                      <Highlight>
-                        <p className="companyFormWrapper__title-field">
-                          Numéro de récépissé
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.traderReceipt?.receiptNumber || "-"}
-                        </p>
-                        <p className="companyFormWrapper__title-field">
-                          Limite de validité
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {formatDate(company.traderReceipt?.validityLimit) ||
-                            "-"}
-                        </p>
-                        <p className="companyFormWrapper__title-field">
-                          Département
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.traderReceipt?.department || "-"}
-                        </p>
-                      </Highlight>
-                    )}
-                    {companyType.value === CompanyType.Transporter && (
-                      <Highlight>
-                        <p className="companyFormWrapper__title-field">
-                          Numéro de récépissé
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.transporterReceipt?.receiptNumber || "-"}
-                        </p>
-                        <p className="companyFormWrapper__title-field">
-                          Limite de validité
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {formatDate(
-                            company.transporterReceipt?.validityLimit
-                          ) || "-"}
-                        </p>
-                        <p className="companyFormWrapper__title-field">
-                          Département
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.transporterReceipt?.department || "-"}
-                        </p>
-                      </Highlight>
-                    )}
-                    {companyType.value === CompanyType.WasteVehicles && (
-                      <Highlight>
-                        <p className="companyFormWrapper__title-field">
-                          Numéro de récépissé
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.vhuAgrementBroyeur?.agrementNumber || "-"}
-                          {company.vhuAgrementDemolisseur?.agrementNumber ||
-                            "-"}
-                        </p>
-
-                        <p className="companyFormWrapper__title-field">
-                          Département
-                        </p>
-                        <p className="companyFormWrapper__value-field">
-                          {company.vhuAgrementBroyeur?.department || "-"}
-                          {company.vhuAgrementDemolisseur?.department || "-"}
-                        </p>
-                      </Highlight>
-                    )}
-                  </li>
-                )
-              );
-            })}
-          </ul>
+          <CompanyProfileInformation
+            company={company}
+            companyTypesFormatted={companyTypesFormatted}
+          />
         )
       }
     </CompanyFormWrapper>
