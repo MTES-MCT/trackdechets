@@ -1,7 +1,7 @@
 import { ApolloError } from "@apollo/client";
 import React, { FunctionComponent, ReactElement } from "react";
 import styles from "./Error.module.scss";
-
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 type Props = {
   apolloError: ApolloError;
   className?: string;
@@ -59,6 +59,21 @@ export function NotificationError({ apolloError, className, message }: Props) {
         >
           {message ? message(apolloError) : error.message}
         </div>
+      )}
+    </ErrorProvider>
+  );
+}
+
+export function DsfrNotificationError({ apolloError, message }: Props) {
+  return (
+    <ErrorProvider apolloError={apolloError}>
+      {({ error, idx }) => (
+        <Alert
+          key={`${idx}-${error.message}`}
+          title="Erreur"
+          description={message ? message(apolloError) : error.message}
+          severity="error"
+        />
       )}
     </ErrorProvider>
   );
