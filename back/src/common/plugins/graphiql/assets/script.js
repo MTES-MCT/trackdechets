@@ -1,11 +1,13 @@
-window.addEventListener("load", function (event) {
-  const loadingWrapper = document.getElementById("loading-wrapper");
-  loadingWrapper.classList.add("fadeOut");
-
-  const root = document.getElementById("root");
-  root.classList.add("playgroundIn");
-
-  GraphQLPlayground.init(root, {
-    // you can add more options here
-  });
+const root = ReactDOM.createRoot(document.getElementById("graphiql"));
+const fetcher = GraphiQL.createFetcher({
+  url: window.location,
+  headers: { "X-Example-Header": "foo" }
 });
+const explorerPlugin = GraphiQLPluginExplorer.explorerPlugin();
+root.render(
+  React.createElement(GraphiQL, {
+    fetcher,
+    defaultEditorToolsVisibility: true,
+    plugins: [explorerPlugin]
+  })
+);
