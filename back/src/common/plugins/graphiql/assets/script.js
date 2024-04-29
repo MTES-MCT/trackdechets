@@ -1,7 +1,7 @@
 const root = ReactDOM.createRoot(document.getElementById("graphiql"));
 const fetcher = GraphiQL.createFetcher({
   url: window.location,
-  headers: { "X-Example-Header": "foo" }
+  headers: { "X-TD-Playground": "true" }
 });
 const explorerPlugin = GraphiQLPluginExplorer.explorerPlugin();
 root.render(
