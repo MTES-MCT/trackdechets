@@ -61,7 +61,7 @@ env:
   API_HOST: api.trackdechets.local
   UI_HOST: trackdechets.local
   ELASTIC_SEARCH_URL: http://localhost:9200
-  DD_TRACE_ENABLED: false
+  OTEL_SDK_DISABLED: true
   TD_COMPANY_ELASTICSEARCH_INDEX: stocketablissement-production
   ALLOW_TEST_COMPANY: true
   OIDC_PRIVATE_KEY: |

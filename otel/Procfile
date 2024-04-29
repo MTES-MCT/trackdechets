@@ -1,0 +1,1 @@
+web: bash -c "otelcol --config ./collector-config.yaml --config ./collector-config.prod.yaml"
