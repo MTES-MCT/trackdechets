@@ -5,7 +5,7 @@ export const getLabelValue = (code: InfoIconCode): InfoIconValue => {
     case InfoIconCode.TempStorage:
       return InfoIconValue.TempStorage;
     case InfoIconCode.EcoOrganism:
-      return InfoIconValue.EcoOrganism;
+      return InfoIconValue.default;
     case InfoIconCode.LastModificationDate:
       return InfoIconValue.LastModificationDate;
     case InfoIconCode.CustomInfo:
