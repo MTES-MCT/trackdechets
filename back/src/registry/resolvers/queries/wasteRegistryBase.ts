@@ -19,8 +19,8 @@ export async function checkWastesRegistryDownloadPermissions(
     args.sirets
   );
 
-  // bypass authorization if the user is authenticated from a service account
-  if (!hasGovernmentPermission) {
+  // bypass authorization if the user is authenticated from a service account or is admin
+  if (!hasGovernmentPermission && !user.isAdmin) {
     for (const siret of args.sirets) {
       syncCheckUserPermissions(
         userRoles,
