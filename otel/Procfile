@@ -1,1 +1,1 @@
-web: bash -c "otelcol --config ./collector-config.yaml --config ./collector-config.prod.yaml"
+web: bash -c "otelcol --config ./collector-config.yaml $OTEL_START_ARG"
