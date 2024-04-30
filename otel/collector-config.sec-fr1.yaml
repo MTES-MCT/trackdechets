@@ -1,0 +1,37 @@
+receivers:
+  postgresql/prod:
+    endpoint: ${env:PROD_DB_ENDPOINT}
+    username: ${env:PROD_DB_USER}
+    password: ${env:PROD_DB_PWD}
+
+  postgresql/sandbox:
+    endpoint: ${env:SANDBOX_DB_ENDPOINT}
+    username: ${env:SANDBOX_DB_USER}
+    password: ${env:SANDBOX_DB_PWD}
+
+processors:
+  batch/datadog:
+    send_batch_max_size: 100
+    send_batch_size: 10
+    timeout: 10s
+
+exporters:
+  datadog:
+    api:
+      site: datadoghq.eu
+      key: ${env:DD_API_KEY}
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, memory_limiter]
+      exporters: [datadog]
+    metrics:
+      receivers: [otlp, postgresql/prod, postgresql/sandbox]
+      processors: [batch/datadog, memory_limiter]
+      exporters: [datadog]
+    logs:
+      receivers: [otlp]
+      processors: [batch, memory_limiter]
+      exporters: [datadog]
