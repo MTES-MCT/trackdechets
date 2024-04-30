@@ -19,7 +19,7 @@ export const getPasswordHint = (password: string): PasswordHintResult => {
     return {
       title: "Trop court",
       hintType: "error",
-      message: `Votre mot de passe est trop court (${password.length} caractères), la longueur minimale est de 10 caractères`
+      message: `Votre mot de passe est trop court (${password.length} caractères), la longueur minimale est de ${MIN_LENGTH} caractères`
     };
   const { score } = zxcvbn(password);
   return score >= MIN_SCORE
