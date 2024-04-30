@@ -7,6 +7,7 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
 import { BsdaWithTransporters } from "../../types";
 import { getTransportersSync } from "../../database";
+import { objectDiff } from "../../../forms/workflow/diff";
 
 export type UpdateBsdaFn = (
   where: Prisma.BsdaWhereUniqueInput,
@@ -29,11 +30,10 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       forwarding: { select: { id: true } }
     };
 
-    const { grouping, forwarding, ...bsda } =
-      await prisma.bsda.findUniqueOrThrow({
-        where,
-        include: { ...previousBsdaInclude, transporters: true }
-      });
+    const previousBsda = await prisma.bsda.findUniqueOrThrow({
+      where,
+      include: { ...previousBsdaInclude, transporters: true }
+    });
 
     const updatedBsda = await prisma.bsda.update({
       where,
@@ -70,7 +70,7 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       } else {
         const deletedTransporterId = data.transporters.delete.id;
         if (deletedTransporterId) {
-          const deletedTransporter = bsda.transporters.find(
+          const deletedTransporter = previousBsda.transporters.find(
             t => t.id === deletedTransporterId
           )!;
           const transporterIdsToDecrement = updatedBsda.transporters
@@ -84,28 +84,16 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       }
     }
 
+    const updateDiff = objectDiff(previousBsda, updatedBsda);
     await prisma.event.create({
       data: {
         streamId: updatedBsda.id,
         actor: user.id,
-        type: bsdaEventTypes.updated,
-        data: data as Prisma.InputJsonObject,
+        type: data.status ? bsdaEventTypes.signed : bsdaEventTypes.updated,
+        data: updateDiff,
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-
-    // Status updates are done only through signature
-    if (data.status) {
-      await prisma.event.create({
-        data: {
-          streamId: updatedBsda.id,
-          actor: user.id,
-          type: bsdaEventTypes.signed,
-          data: { status: data.status },
-          metadata: { ...logMetadata, authType: user.auth }
-        }
-      });
-    }
 
     if (data.transporters) {
       // recompute transporterOrgIds
@@ -128,11 +116,11 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
 
     if (data.grouping !== undefined) {
       // Identifiants des bordereaux regroupés avant l'update
-      const initialGroupedIds = grouping.map(({ id }) => id);
+      const initialGroupedIds = previousBsda.grouping.map(({ id }) => id);
       // Identifiants des bordereaux regroupés après l'update
       const groupedIds = updatedBsda.grouping.map(({ id }) => id);
       // Identifiants des bordereaux qui ont été enlevés du regroupement
-      const removedIds = grouping
+      const removedIds = previousBsda.grouping
         .map(({ id }) => id)
         .filter(id => !groupedIds.includes(id));
       // Identifiants des bordereaux qui ont été ajoutés dans le regroupement
@@ -147,12 +135,13 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       }
     }
 
-    if (forwarding?.id !== updatedBsda.forwardingId) {
+    if (previousBsda.forwarding?.id !== updatedBsda.forwardingId) {
       // Identifiants des bordereaux qui doivent être réindexés pour que rawBsd.forwardedIn
       // ne soit pas désynchronisé
-      const dirtyIds = [forwarding?.id, updatedBsda.forwardingId].filter(
-        Boolean
-      );
+      const dirtyIds = [
+        previousBsda.forwarding?.id,
+        updatedBsda.forwardingId
+      ].filter(Boolean);
       for (const id of dirtyIds) {
         prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
       }

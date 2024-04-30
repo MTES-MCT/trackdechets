@@ -5,6 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
+import { objectDiff } from "../../../forms/workflow/diff";
 
 export type UpdateBsvhuFn = (
   where: Prisma.BsvhuWhereUniqueInput,
@@ -16,30 +17,19 @@ export function buildUpdateBsvhu(deps: RepositoryFnDeps): UpdateBsvhuFn {
   return async (where, data, logMetadata?) => {
     const { prisma, user } = deps;
 
+    const previousBsvhu = await prisma.bsvhu.findUnique({ where });
     const bsvhu = await prisma.bsvhu.update({ where, data });
 
+    const updateDiff = objectDiff(previousBsvhu, bsvhu);
     await prisma.event.create({
       data: {
         streamId: bsvhu.id,
         actor: user.id,
-        type: bsvhuEventTypes.updated,
-        data: data as Prisma.InputJsonObject,
+        type: data.status ? bsvhuEventTypes.signed : bsvhuEventTypes.updated,
+        data: updateDiff,
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-
-    // Status updates are done only through signature
-    if (data.status) {
-      await prisma.event.create({
-        data: {
-          streamId: bsvhu.id,
-          actor: user.id,
-          type: bsvhuEventTypes.signed,
-          data: { status: data.status },
-          metadata: { ...logMetadata, authType: user.auth }
-        }
-      });
-    }
 
     prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bsvhu.id));
 
