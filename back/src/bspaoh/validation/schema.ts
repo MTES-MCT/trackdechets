@@ -14,7 +14,7 @@ export const BSPAOH_OPERATIONS = ["R 1", "D 10"] as const;
 const bspaohPackagingSchema = z.object({
   id: z.string(),
   type: z.enum(["LITTLE_BOX", "BIG_BOX", "RELIQUAIRE"]),
-  volume: z.number().nonnegative(),
+  volume: z.number().nonnegative().nullish(),
   containerNumber: z.string(),
   quantity: z.number().positive().lte(1),
   identificationCodes: z.array(z.string()).default([]),

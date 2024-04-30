@@ -14,15 +14,16 @@ import {
   BspaohSignatureType,
   Bspaoh
 } from "@td/codegen-ui";
-import React from "react";
+import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { SignBspaoh } from "./SignBspaoh";
 import { subMonths } from "date-fns";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { datetimeToYYYYMMDDHHSS } from "../paohUtils";
 import { SignatureTimestamp } from "./components/Signature";
-import { PlatesWidget } from "../../../../../form/bspaoh/components/TransporterPlates";
+
+import { RhfTagsInputWrapper } from "../../../../../Apps/Forms/Components/TagsInput/TagsInputWrapper";
 
 // instanciate schema in component to have an up-to-date max datetime validaton
 const getSchema = () =>
@@ -116,13 +117,7 @@ function SignTransportModal({
     onCancel();
   };
   const validationSchema = getSchema();
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting }
-  } = useForm<z.infer<typeof validationSchema>>({
+  const methods = useForm<z.infer<typeof validationSchema>>({
     mode: "onTouched",
     defaultValues: {
       takenOverAt: datetimeToYYYYMMDDHHSS(new Date()),
@@ -131,17 +126,33 @@ function SignTransportModal({
     },
     resolver: zodResolver(validationSchema)
   });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting }
+  } = methods;
+
+  useEffect(() => {
+    // register fields managed under the hood by company selector
+    register("plates");
+  }, [register]);
 
   const loading = loadingSign || loadingUpdate;
-  register("plates");
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <PlatesWidget
-        maxPlates={2}
-        fieldName="plates"
-        setValue={setValue}
-        watch={watch}
-      />
+      <div className="fr-grid-row">
+        <div className="fr-col-6 fr-mb-5v">
+          <FormProvider {...methods}>
+            <RhfTagsInputWrapper
+              maxTags={2}
+              label="Immatriculations"
+              fieldName={"plates"}
+            />
+          </FormProvider>
+        </div>
+      </div>
+
       <p>
         En qualité de <strong>transporteur du déchet</strong>, j'atteste que les
         informations ci-dessus sont correctes. En signant ce document, je

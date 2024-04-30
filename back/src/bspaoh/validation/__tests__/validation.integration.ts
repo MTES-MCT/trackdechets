@@ -675,7 +675,7 @@ describe("BSPAOH validation", () => {
     );
   });
 
-  it.only("should not be possible to update a field sealed by reception signature", async () => {
+  it("should not be possible to update a field sealed by reception signature", async () => {
     const bspaoh = await bspaohFactory({
       opt: {
         status: "RECEIVED",

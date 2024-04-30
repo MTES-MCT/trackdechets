@@ -168,6 +168,7 @@ function SignReceptionModal({
     useMutation<Pick<Mutation, "signBspaoh">, MutationSignBspaohArgs>(
       SIGN_BSPAOH
     );
+  const hasManyPackagings = (bspaoh?.waste?.packagings?.length ?? 0) > 1;
 
   const onSubmit = async data => {
     const {
@@ -311,8 +312,9 @@ function SignReceptionModal({
               (errors?.receivedWeight?.message as string) ?? ""
             }
             nativeInputProps={{
+              inputMode: "decimal",
+              step: "0.1",
               type: "number",
-
               ...register("receivedWeight")
             }}
           />
@@ -339,9 +341,11 @@ function SignReceptionModal({
           },
           {
             label: "Refus partiel",
+
             nativeInputProps: {
               ...register("acceptationStatus", {}),
               value: "PARTIALLY_REFUSED",
+              disabled: !hasManyPackagings,
               defaultChecked: acceptationStatus === "PARTIALLY_REFUSED"
             }
           },
@@ -390,9 +394,10 @@ function SignReceptionModal({
               (errors?.refusedWeight?.message as string) ?? ""
             }
             nativeInputProps={{
-              type: "number",
-
-              ...register("refusedWeight")
+              ...register("refusedWeight"),
+              inputMode: "decimal",
+              step: "0.1",
+              type: "number"
             }}
           />
           <p className="fr-info-text fr-mt-5v">
@@ -407,8 +412,10 @@ function SignReceptionModal({
             label="Poids total en kg"
             disabled
             nativeInputProps={{
-              type: "number",
-              value: acceptedWeight
+              value: acceptedWeight,
+              inputMode: "decimal",
+              step: "0.1",
+              type: "number"
             }}
           />
           <p className="fr-info-text fr-mt-5v">

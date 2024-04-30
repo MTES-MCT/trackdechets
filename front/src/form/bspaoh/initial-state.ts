@@ -13,7 +13,7 @@ export function getInitialEmitterPickupSite(pickupSite) {
 export const emptyPackaging = {
   quantity: 1,
   type: null,
-  volume: 0,
+  volume: null,
 
   containerNumber: "",
   consistence: null,

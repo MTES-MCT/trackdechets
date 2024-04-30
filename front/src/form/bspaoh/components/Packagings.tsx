@@ -40,7 +40,7 @@ function packagingReducer(state, action) {
   throw Error("Unknown action: " + action.type);
 }
 const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
-  const { register, setValue, getValues } = useFormContext();
+  const { register, setValue, getValues, getFieldState } = useFormContext();
   const name = `waste.packagings.${idx}`;
   const tagInputRef = useRef<HTMLInputElement>(null);
 
@@ -70,6 +70,12 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
     setValue(`${name}.identificationCodes`, state.codes);
   }, [state, name, setValue]);
 
+  const { error: typeError } = getFieldState(`${name}.type`);
+  const { error: consistenceError } = getFieldState(`${name}.consistence`);
+  const { error: identificationCodesError } = getFieldState(
+    `${name}.identificationCodes`
+  );
+
   return (
     <div>
       {idx > 0 && <hr />}
@@ -79,6 +85,8 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
             label="Type"
             disabled={disabled}
             nativeSelectProps={{ ...register(`${name}.type`) }}
+            state={typeError && "error"}
+            stateRelatedMessage={(typeError?.message as string) ?? ""}
           >
             <option value="">…</option>
 
@@ -97,12 +105,17 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
           <Input
             label="Volume (opt)"
             disabled={disabled}
-            nativeInputProps={{ ...register(`${name}.volume`) }}
+            nativeInputProps={{
+              ...register(`${name}.volume`),
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+              type: "number"
+            }}
           ></Input>
         </div>
         <div className="fr-col-12 fr-col-md-4">
           <Input
-            label="N° de contenants (optionnel)"
+            label="N° de contenant (optionnel)"
             disabled={disabled}
             nativeInputProps={{ ...register(`${name}.containerNumber`) }}
           ></Input>
@@ -175,7 +188,11 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
             )}
           </div>
 
-          <p className="fr-info-text fr-mt-5v">
+          <p
+            className={`${
+              identificationCodesError ? "fr-error-text" : "fr-info-text"
+            } fr-mt-5v`}
+          >
             Vous avez {state.codes.length} {paohType} pour ce contenant
           </p>
         </div>
@@ -185,6 +202,8 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
           orientation="horizontal"
           disabled={disabled}
           legend="Consistance"
+          state={consistenceError && "error"}
+          stateRelatedMessage={(consistenceError?.message as string) ?? ""}
           options={[
             {
               label: "Solide",
@@ -214,8 +233,9 @@ export const PaohPackagings = ({ paohType, disabled = false }) => {
   const { setValue, watch } = useFormContext();
 
   const packagings = watch("waste.packagings");
+
   useEffect(() => {
-    setValue(`emitter.emission.waste.detail.quantity`, packagings.length);
+    setValue(`emitter.emission.detail.quantity`, packagings.length);
   }, [packagings, setValue]);
 
   return (

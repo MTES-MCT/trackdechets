@@ -8,8 +8,10 @@ import { FavoriteType, TransportMode, BspaohRecepisse } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../Apps/Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import TransporterRecepisse from "../../../Apps/Forms/Components/TransporterRecepisse/TransporterRecepisse";
+import { RhfTagsInputWrapper } from "../../../Apps/Forms/Components/TagsInput/TagsInputWrapper";
+
 import { isForeignVat } from "@td/constants";
-import { PlatesWidget } from "../components/TransporterPlates";
+
 import { SealedFieldsContext } from "../context";
 
 const actor = "transporter";
@@ -27,7 +29,7 @@ export function Transporter() {
     register(`${actor}.company.vatNumber`);
     register(`${actor}.company.address`);
     register(`${actor}.company.mail`);
-    register("transporter.transport.plates");
+    register(`${actor}.transport.plates`);
   }, [register]);
 
   register(`${actor}.recepisse.isExempted`);
@@ -79,7 +81,6 @@ export function Transporter() {
           }
         }}
       />
-
       <CompanyContactInfo
         fieldName={`${actor}.company`}
         disabled={sealedFields.includes(`transporter.company.siret`)}
@@ -95,7 +96,6 @@ export function Transporter() {
             validityLimit={recepisse?.validityLimit}
           />
         )}
-
       <h3 className="fr-h4">
         Exemption de récépissé de déclaration de transport de déchets
       </h3>
@@ -118,30 +118,34 @@ export function Transporter() {
         checked={transporter.recepisse?.isExempted}
         onChange={v => setValue(`${actor}.recepisse.isExempted`, v)}
       />
-
       <h3 className="fr-h3">Transport du déchet</h3>
-      <Select
-        label="Mode de transport"
-        disabled={sealedFields.includes(`transporter.transport.mode`)}
-        nativeSelectProps={{
-          ...register("transporter.transport.mode")
-        }}
-      >
-        <option value="ROAD">Route</option>
-        <option value="RAIL">Voie Ferroviaire</option>
-        <option value="AIR">Voie Aérienne</option>
-        <option value="RIVER">Voie Fluviale</option>
-        <option value="SEA">Voie Maritime</option>
-        <option value="OTHER">Autre</option>
-      </Select>
-
-      <PlatesWidget
-        maxPlates={2}
-        fieldName="transporter.transport.plates"
-        setValue={setValue}
-        disabled={sealedFields.includes(`transporter.transport.plates`)}
-        watch={watch}
-      />
+      <div className="fr-grid-row">
+        <div className="fr-col-6">
+          <Select
+            label="Mode de transport"
+            disabled={sealedFields.includes(`transporter.transport.mode`)}
+            nativeSelectProps={{
+              ...register("transporter.transport.mode")
+            }}
+          >
+            <option value="ROAD">Route</option>
+            <option value="RAIL">Voie Ferroviaire</option>
+            <option value="AIR">Voie Aérienne</option>
+            <option value="RIVER">Voie Fluviale</option>
+            <option value="SEA">Voie Maritime</option>
+            <option value="OTHER">Autre</option>
+          </Select>
+        </div>
+      </div>
+      <div className="fr-grid-row">
+        <div className="fr-col-6">
+          <RhfTagsInputWrapper
+            maxTags={2}
+            label="Immatriculations"
+            fieldName={`${actor}.transport.plates`}
+          />
+        </div>
+      </div>
 
       <Input
         label="Champ libre (optionnel)"

@@ -3,12 +3,18 @@ import { z } from "zod";
 import { BSPAOH_WASTE_CODES, BSPAOH_WASTE_TYPES } from "@td/constants";
 
 const bspaohPackagingSchema = z.object({
-  type: z.enum(["LITTLE_BOX", "BIG_BOX", "RELIQUAIRE"]),
-  volume: z.coerce.number(),
-  containerNumber: z.string(),
+  type: z.enum(["LITTLE_BOX", "BIG_BOX", "RELIQUAIRE"], {
+    required_error: "Ce champ est requis",
+    invalid_type_error: "Ce champ est requis"
+  }),
+  volume: z.coerce.number().nullish(),
+  containerNumber: z.string().nullish(),
   quantity: z.number().positive().lte(1),
-  identificationCodes: z.array(z.string()).default([]),
-  consistence: z.enum(["SOLIDE", "LIQUIDE"])
+  identificationCodes: z.array(z.string()).nonempty(),
+  consistence: z.enum(["SOLIDE", "LIQUIDE"], {
+    required_error: "Ce champ est requis",
+    invalid_type_error: "Ce champ est requis"
+  })
 });
 
 const zodCompany = z.object({
@@ -22,30 +28,57 @@ const zodCompany = z.object({
 const zodWaste = z.object({
   type: z.enum(BSPAOH_WASTE_TYPES),
   adr: z.string().nullish(),
-  code: z.enum(BSPAOH_WASTE_CODES),
+  code: z.enum(BSPAOH_WASTE_CODES).nullish(),
   packagings: z
     .array(bspaohPackagingSchema)
     .default([])
     .transform(val => val ?? [])
 });
-const zodEmitter = z.object({
-  company: zodCompany,
 
-  emission: z.object({
-    detail: z.object({
-      quantity: z.coerce.number().nullish(),
-      weight: z.object({
-        value: z.coerce.number().nullish(),
+const zodEmitter = z
+  .object({
+    company: zodCompany,
 
-        isEstimate: z.coerce
-          .boolean()
-          .nullish()
-          .transform(v => Boolean(v))
+    emission: z.object({
+      detail: z.object({
+        quantity: z.coerce.number().nonnegative().nullish(),
+        weight: z.object({
+          value: z.coerce
+            .number()
+            .nonnegative()
+            .nullish()
+            .transform(v => {
+              return !v ? null : v;
+            }),
+
+          isEstimate: z.boolean().nullish()
+        })
       })
-    })
-  }),
-  customInfo: z.string().nullish()
-});
+    }),
+    customInfo: z.string().nullish()
+  })
+  .superRefine((val, ctx) => {
+    if (
+      val?.emission?.detail?.weight?.value &&
+      val?.emission?.detail?.weight?.isEstimate === null
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["emission.detail.weight.isEstimate"],
+        message: `Vous devez péciser si le poids est estimé`
+      });
+    }
+    if (
+      !val?.emission?.detail?.weight?.value &&
+      val?.emission?.detail?.weight?.isEstimate !== null
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["emission.detail.weight.value"],
+        message: `Vous devez péciser le poids`
+      });
+    }
+  });
 const zodTransporter = z.object({
   company: zodCompany,
   customInfo: z.string().nullish(),

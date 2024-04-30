@@ -170,17 +170,13 @@ export const editionRules: BspaohEditionRules = {
     required: {
       from: "EMISSION",
       when: bspaoh =>
-        !bspaoh.emitterWasteQuantityValue ||
-        !!bspaoh.emitterWasteWeightIsEstimate
+        bspaoh.emitterWasteWeightIsEstimate !== null &&
+        bspaoh.emitterWasteWeightIsEstimate !== undefined
     }
   },
   emitterWasteWeightIsEstimate: {
-    readableFieldName: "la quantité émise (estimée ou non)",
-    sealed: { from: "EMISSION" },
-    required: {
-      from: "EMISSION",
-      when: bspaoh => !!bspaoh.emitterWasteQuantityValue
-    }
+    readableFieldName: "la quantité émise",
+    sealed: { from: "EMISSION" }
   },
   emitterWasteQuantityValue: {
     readableFieldName: "la quantité émise (nombre)",

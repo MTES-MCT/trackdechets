@@ -1,5 +1,7 @@
-import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import React, { useState, useMemo } from "react";
+import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+
 import { GET_BSDS } from "../../Apps/common/queries";
 import omitDeep from "omit-deep-lodash";
 import { useMutation, useQuery } from "@apollo/client";
@@ -32,7 +34,7 @@ import { Transporter } from "./steps/Transporter";
 import { Destination } from "./steps/Destination";
 import { Waste } from "./steps/Waste";
 import initialState from "./initial-state";
-import { rawBspaohSchema } from "./schema";
+import { rawBspaohSchema, ZodBspaoh } from "./schema";
 import { Loader } from "../../Apps/common/Components";
 
 const tabIds = ["tab1", "tab2", "tab3", "tab4"];
@@ -95,18 +97,20 @@ export function ControlledTabs(props: Readonly<Props>) {
   const sealedFields = useMemo(
     () =>
       (formQuery?.data?.bspaoh?.metadata?.fields?.sealed ?? [])
-
         ?.map(f => f?.name!)
         .filter(Boolean),
     [formQuery.data]
   );
 
-  const methods = useForm({
+  const methods = useForm<ZodBspaoh>({
     values: formState,
+
     resolver: async (data, context, options) => {
       return zodResolver(rawBspaohSchema)(data, context, options);
     }
   });
+  const errors = methods?.formState?.errors;
+  const formHasErrors = Object.keys(errors)?.length > 0;
 
   const [createDraftBspaoh, { loading: creatingDraft }] = useMutation<
     Pick<Mutation, "createDraftBspaoh">,
@@ -146,9 +150,13 @@ export function ControlledTabs(props: Readonly<Props>) {
       });
     } else {
       if (draft) {
-        return createDraftBspaoh({ variables: { input: cleanedInput } });
+        return createDraftBspaoh({
+          variables: { input: cleanPayload(cleanedInput) }
+        });
       } else {
-        return createBspaoh({ variables: { input: cleanedInput } });
+        return createBspaoh({
+          variables: { input: cleanPayload(cleanedInput) }
+        });
       }
     }
   }
@@ -202,7 +210,14 @@ export function ControlledTabs(props: Readonly<Props>) {
               onSubmit={methods.handleSubmit((data, e) => onSubmit(data, e))}
             >
               {tabsContent[selectedTabId] ?? <p></p>}
-
+              {formHasErrors && (
+                <Alert
+                  severity="error"
+                  title="Erreur"
+                  className="fr-mt-5v"
+                  description="Le formulaire comporte des erreurs"
+                />
+              )}
               <div className={styles.form__actions}>
                 <Button
                   onClick={() => setSelectedTabId(getPrevTab(selectedTabId))}

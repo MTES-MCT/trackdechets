@@ -133,8 +133,7 @@ export const schema = z.object({
     .optional()
     .default("false")
     .refine(isBoolean),
-  MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z.string().datetime().optional(),
-  FLAG_PAOH_ACTIVATED: z.string().optional().default("false").refine(isBoolean)
+  MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z.string().datetime().optional()
 });
 
 export const envVariables = schema.superRefine((val, ctx) => {

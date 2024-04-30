@@ -40,9 +40,9 @@ interface CompanySelectorWrapperProps {
  * - Il stocke l'établissement sélectionné et les résultats de recherche
  * pour piloter l'affiche du CompanySelector.
  * - Il implémente le search et gère les erreurs.
- * - Il initialise l'établissement sélectionné à partir des données du store (Formik).
+ * - Il initialise l'établissement sélectionné à partir des données du store.
  * - Il propage l'événement de sélection d'un établissement au parent pour modifier.
- * les données du store (Formik)
+ * les données du store
  */
 
 export default function RhfCompanySelectorWrapper({

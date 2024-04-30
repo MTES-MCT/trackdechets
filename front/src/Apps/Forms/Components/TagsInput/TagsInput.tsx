@@ -9,6 +9,8 @@ export type TagsInputProps = {
   readonly onAddTag: (tag: string) => void;
   readonly onDeleteTag: (idx: number) => void;
   readonly maxTags?: number;
+  readonly disabled?: boolean;
+  readonly errorMessage?: string;
 };
 
 /**
@@ -20,7 +22,9 @@ const TagsInput: React.FC<TagsInputProps> = ({
   tags,
   onAddTag,
   onDeleteTag,
-  maxTags
+  maxTags,
+  disabled = false,
+  errorMessage
 }) => {
   const [tag, setTag] = useState("");
 
@@ -30,6 +34,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
     <>
       <Input
         label={label}
+        disabled={disabled}
         style={{ marginBottom: "10px" }}
         nativeInputProps={{
           value: tag,
@@ -37,7 +42,8 @@ const TagsInput: React.FC<TagsInputProps> = ({
         }}
         addon={
           <Button
-            disabled={addButtonIsDisabled}
+            disabled={addButtonIsDisabled || disabled}
+            type="button"
             onClick={e => {
               e.preventDefault();
               if (tag.length > 0) {
@@ -67,6 +73,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
           </div>
         ))}
       </div>
+      {errorMessage && <p className="fr-error-text fr-mt-0">{errorMessage}</p>}
     </>
   );
 };

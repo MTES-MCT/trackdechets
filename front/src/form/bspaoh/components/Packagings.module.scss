@@ -16,8 +16,26 @@
 
 .multiTagsInput {
   line-height: 1.8rem;
-  background-color: rgb(245, 245, 245);
-  border-radius: 0.25rem 0.25rem 0 0;
-  border-bottom: 1px solid #ccc;
-  padding: 0 0.5rem;
+  background-color: transparent;
+  padding: 0 0.4rem;
+
+  // fake blinking caret
+  animation: caret 1s infinite;
+  background-image: linear-gradient(currentcolor, currentcolor);
+  background-position: 7px center;
+  background-repeat: no-repeat;
+  background-size: 1px 1.2em;
+  @keyframes caret {
+    30%,
+    75% {
+      background-size: 1px 1.2em;
+    }
+
+    50% {
+      background-size: 0 1.2em;
+    }
+  }
+  &:focus {
+    background-image: none;
+  }
 }

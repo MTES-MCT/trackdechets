@@ -18,7 +18,10 @@ export function BspaohJourneySummary({
     INITIAL: ["active", "incomplete", "incomplete"],
     SIGNED_BY_PRODUCER: ["complete", "active", "incomplete"],
     SENT: ["complete", "complete", "incomplete"],
-    RECEIVED: ["complete", "complete", "active"]
+    RECEIVED: ["complete", "complete", "active"],
+    PROCESSED: ["complete", "complete", "complete"],
+    REFUSED: ["complete", "complete", "complete"],
+    PARTIALLY_REFUSED: ["complete", "complete", "complete"]
   };
   const status = bspaoh["bspaohStatus"];
 

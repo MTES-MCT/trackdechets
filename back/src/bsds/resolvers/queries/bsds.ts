@@ -61,8 +61,6 @@ type PrismaBsdMap = {
   bspaohs: BspaohForElastic[];
 };
 
-const FLAG_PAOH_ACTIVATED = process.env.FLAG_PAOH_ACTIVATED === "true";
-
 /**
  * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
  */
@@ -78,9 +76,7 @@ async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
     bsvhus: BSVHU.map(bsdElastic => bsdElastic.rawBsd as BsvhuForElastic),
     bsdas: BSDA.map(bsdElastic => bsdElastic.rawBsd as BsdaForElastic),
     bsffs: BSFF.map(bsdsElastic => bsdsElastic.rawBsd as BsffForElastic),
-    bspaohs: FLAG_PAOH_ACTIVATED
-      ? BSPAOH.map(bsdsElastic => bsdsElastic.rawBsd as BspaohForElastic)
-      : []
+    bspaohs: BSPAOH.map(bsdsElastic => bsdsElastic.rawBsd as BspaohForElastic)
   };
 }
 

@@ -3,16 +3,18 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { useFormContext } from "react-hook-form";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { PaohPackagings } from "../components/Packagings";
-
+import { ZodBspaoh } from "../schema";
 import { SealedFieldsContext } from "../context";
 
 export function Waste() {
-  const { register, watch, setValue } = useFormContext(); // retrieve all hook methods
+  const { register, watch, setValue, formState } = useFormContext<ZodBspaoh>(); // retrieve all hook methods
   const wasteType = watch("waste.type");
   const emitter = watch("emitter") ?? {};
+
   const quantity = watch("emitter.emission.detail.quantity") ?? 0;
   const isEstimate = watch("emitter.emission.detail.weight.isEstimate");
   const sealedFields = useContext(SealedFieldsContext);
+  const { errors } = formState;
 
   return (
     <div>
@@ -44,7 +46,7 @@ export function Waste() {
         nativeInputProps={{
           ...register("waste.adr")
         }}
-      ></Input>
+      />
 
       <PaohPackagings
         paohType={wasteType}
@@ -59,9 +61,8 @@ export function Waste() {
             label="En nombre"
             disabled
             nativeInputProps={{
-              inputMode: "numeric",
+              inputMode: "decimal",
               pattern: "[0-9]*",
-
               type: "number",
               value: quantity
             }}
@@ -75,11 +76,16 @@ export function Waste() {
             disabled={sealedFields.includes(
               "emitter.emission.detail.weight.value"
             )}
+            state={errors?.emitter?.emission?.detail?.weight?.value && "error"}
+            stateRelatedMessage={
+              (errors?.emitter?.emission?.detail?.weight?.value
+                ?.message as string) ?? ""
+            }
             nativeInputProps={{
-              ...register("emitter.emission.detail.weight.value"),
-              inputMode: "numeric",
-              pattern: "[0-9]*",
-              type: "number"
+              inputMode: "decimal",
+              step: "0.1",
+              type: "number",
+              ...register("emitter.emission.detail.weight.value")
             }}
           />
 
@@ -95,6 +101,13 @@ export function Waste() {
               "emitter.emission.detail.weight.isEstimate"
             )}
             orientation="horizontal"
+            state={
+              errors?.emitter?.emission?.detail?.weight?.isEstimate && "error"
+            }
+            stateRelatedMessage={
+              (errors?.emitter?.emission?.detail?.weight?.isEstimate
+                ?.message as string) ?? ""
+            }
             options={[
               {
                 label: "réelle",

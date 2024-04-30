@@ -122,7 +122,7 @@ const Emitter = ({ form }: { form: Bspaoh }) => {
   );
 };
 const Transporter = ({ form }: { form: Bspaoh }) => {
-  const { transporter } = form;
+  const { transporter, destination } = form;
 
   return (
     <>
@@ -158,6 +158,16 @@ const Transporter = ({ form }: { form: Bspaoh }) => {
           value={transporter?.transport?.signature?.author}
           label="Signé par"
         />
+
+        <DateRow
+          value={destination?.handedOverToDestination?.signature?.date}
+          label="Dépôt signé le"
+        />
+        <DetailRow
+          value={destination?.handedOverToDestination?.signature?.author}
+          label="Dépôt signé par"
+        />
+
         <DetailRow
           value={transporter?.customInfo}
           label="Informations tranporteur"

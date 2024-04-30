@@ -56,6 +56,7 @@ const ActBspaohValidation = ({
         renderSignedByProducerModal()}
       {status === BspaohStatus.Sent && renderSentModal()}
       {status === BspaohStatus.Received && renderReceivedModal()}
+      {status === BspaohStatus.PartiallyRefused && renderReceivedModal()}
     </>
   );
 };

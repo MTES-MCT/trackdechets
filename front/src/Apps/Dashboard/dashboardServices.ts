@@ -720,6 +720,7 @@ export const getReceivedBtnLabel = (
   ) {
     return VALIDER_TRAITEMENT;
   }
+
   if (
     isBspaoh(bsd.type) &&
     isSameSiretDestination(currentSiret, bsd) &&
