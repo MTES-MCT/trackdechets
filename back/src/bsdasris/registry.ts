@@ -54,10 +54,7 @@ export function getRegistryFields(
     isManagedWasteFor: []
   };
 
-  if (
-    bsdasri.emitterEmissionSignatureDate &&
-    bsdasri.transporterTransportSignatureDate
-  ) {
+  if (bsdasri.transporterTransportSignatureDate) {
     if (bsdasri.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsdasri.emitterCompanySiret);
     }
