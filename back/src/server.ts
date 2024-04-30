@@ -198,12 +198,18 @@ app.use(
         frameAncestors: ["'self'"],
         imgSrc: ["'self'"],
         objectSrc: ["'none'"],
-        scriptSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'sha256-KDSP72yw7Yss7rIt6vgkQo/ROHXYTHPTj3fdIW/CTn8='",
+          "'sha256-+QRKXpw524uxogTf+STlJuwKYh5pW7ad4QNYEb6HCeQ='",
+          "'sha256-FC1QdPlDgsjmWJtkJfO6Tt7pKFza/bZuwKtw25R/7m4='",
+          "'sha256-/KjN0AtQm74p7exR84hK/woqhc2pYBdNQamcxHOkiDA='"
+        ],
         scriptSrcAttr: ["'none'"],
         styleSrc: [
           "'self'",
           "https:",
-          "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='"
+          "'sha256-dihQy2mHNADQqxc3xhWK7pH1w4GVvEow7gKjxdWvTgE='"
         ],
         connectSrc: [process.env.API_HOST],
         formAction: ["self"],

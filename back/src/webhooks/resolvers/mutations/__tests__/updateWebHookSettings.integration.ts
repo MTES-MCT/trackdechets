@@ -142,7 +142,7 @@ describe("Mutation.updateWebhookSetting", () => {
     expect(dbWebhookSetting.endpointUri).toEqual("https://url3.fr");
   });
 
-  it.only("two companies can have the same endpointUri (weird but ok)", async () => {
+  it("two companies can have the same endpointUri (weird but ok)", async () => {
     // Given
     const { user, company: company1 } = await userWithCompanyFactory("ADMIN");
     const { company: company2 } = await userWithCompanyFactory("ADMIN");
@@ -184,7 +184,7 @@ describe("Mutation.updateWebhookSetting", () => {
     expect(dbWebhookSetting.endpointUri).toEqual("https://url2.fr");
   });
 
-  it.only("cannot update another company's webhookSetting", async () => {
+  it("cannot update another company's webhookSetting", async () => {
     // Given
     const { user, company: company1 } = await userWithCompanyFactory("ADMIN");
     const { company: company2 } = await userWithCompanyFactory("ADMIN");
