@@ -12,6 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Modification de la validation de mot de passe sur page Invite [PR 3278](https://github.com/MTES-MCT/trackdechets/pull/3278)
+- La date de prise en charge initiale des BSD initiaux sur le PDF de l'Annexe 2 est complétée avec la date d'enlèvement initiale et non la date de la signature [PR 3280](https://github.com/MTES-MCT/trackdechets/pull/3280)
 
 #### :boom: Breaking changes
 
