@@ -19,6 +19,8 @@ import { getBsdaOrNotFound } from "../../../database";
 import { checkCanRequestRevision } from "../../../permissions";
 import { getBsdaRepository } from "../../../repository";
 import { rawBsdaSchema } from "../../../validation/schema";
+import { bsdaEditionRules } from "../../../validation/rules";
+import { capitalize } from "../../../../common/strings";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -246,7 +248,7 @@ const schema = rawBsdaSchema
     emitterPickupSitePostalCode: true,
     emitterPickupSiteInfos: true
   })
-  .merge(z.object({ isCanceled: z.boolean().nullish() }))
+  .extend({ isCanceled: z.boolean().nullish() })
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {
@@ -269,6 +271,31 @@ const schema = rawBsdaSchema
           code: z.ZodIssueCode.custom,
           message:
             "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        });
+      }
+    }
+
+    // The difference with the raw bsda schema is that most fields must not be empty
+    const nonEmptyFields = [
+      "wasteCode",
+      "wastePop",
+      "wasteSealNumbers",
+      "wasteMaterialName",
+      "packagings",
+      "destinationCap",
+      "destinationOperationCode",
+      "destinationOperationMode",
+      "destinationOperationDescription",
+      "destinationReceptionWeight"
+    ] as const;
+    for (const field of nonEmptyFields) {
+      if (field in val && val[field] === null) {
+        const readableFieldName = bsdaEditionRules[field].readableFieldName;
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `${
+            readableFieldName ? capitalize(readableFieldName) : field
+          } ne peut pas être vide`
         });
       }
     }
