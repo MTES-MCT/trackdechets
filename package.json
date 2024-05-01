@@ -17,7 +17,7 @@
     "scalingo-postbuild": "bash scripts/build/scalingo.sh",
     "nx": "nx",
     "dev": "npx nx run-many -t serve --parallel=6 --projects=front,api,tag:backend:background",
-    "bg:integration": "npx nx run-many -t serve --configuration=integration --projects=tag:backend:queues"
+    "bg:integration": "npx nx run-many -t serve --configuration=integration --projects=tag:backend:queues --parallel=5"
   },
   "engines": {
     "node": "^20"

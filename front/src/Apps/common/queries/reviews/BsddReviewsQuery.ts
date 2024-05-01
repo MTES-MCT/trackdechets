@@ -44,6 +44,8 @@ const reviewFragment = gql`
           other
           quantity
         }
+        quantity
+        sampleNumber
       }
       trader {
         company {
@@ -96,6 +98,8 @@ const reviewFragment = gql`
           other
           quantity
         }
+        quantity
+        sampleNumber
       }
       trader {
         company {

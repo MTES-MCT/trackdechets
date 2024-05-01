@@ -34,15 +34,16 @@ const CANCELATION_MSG = `Si votre demande d'annulation est approuvée, ce border
 statut Annulé pour tous les acteurs du bordereau.`;
 
 const CANCELATION_NOT_POSSIBLE_MSG = `Impossible d'annuler ce bordereau. Il est à un statut trop avancé.`;
+const CANCELATION_NOT_POSSIBLE_FOR_APPENDIX1_MSG = `Impossible d'annuler un bordereau de tournée dédiée à partir du moment où au moins une Annexe 1 a été signée par le transporteur.`;
 
 export function BsddRequestRevisionCancelationInput({
   defaultValue = false,
   bsdd,
   onChange
 }: Props) {
+  const isAppendix1 = bsdd.emitter?.type === "APPENDIX1";
   const canBeCancelled =
-    CANCELLABLE_BSDD_STATUSES.includes(bsdd.status) &&
-    bsdd.emitter?.type !== "APPENDIX1";
+    CANCELLABLE_BSDD_STATUSES.includes(bsdd.status) && !isAppendix1;
 
   return (
     <Switch
@@ -51,7 +52,11 @@ export function BsddRequestRevisionCancelationInput({
       disabled={!canBeCancelled}
       onChange={onChange}
     >
-      {canBeCancelled ? CANCELATION_MSG : CANCELATION_NOT_POSSIBLE_MSG}
+      {isAppendix1
+        ? CANCELATION_NOT_POSSIBLE_FOR_APPENDIX1_MSG
+        : canBeCancelled
+        ? CANCELATION_MSG
+        : CANCELATION_NOT_POSSIBLE_MSG}
     </Switch>
   );
 }

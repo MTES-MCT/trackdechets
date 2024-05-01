@@ -13,9 +13,11 @@ import {
   isSiret,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   BSDD_WASTE_CODES,
-  BSDD_APPENDIX1_WASTE_CODES
+  BSDD_APPENDIX1_WASTE_CODES,
+  BSDD_SAMPLE_NUMBER_WASTE_CODES
 } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { WeightUnits, weight } from "../../../common/validation";
 import {
   FormRevisionRequestContentInput,
   MutationCreateFormRevisionRequestArgs
@@ -174,14 +176,10 @@ async function checkIfUserCanRequestRevisionOnBsdd(
   bsdd: Form
 ): Promise<void> {
   await checkCanRequestRevision(user, bsdd);
+
   if (bsdd.emitterIsPrivateIndividual || bsdd.emitterIsForeignShip) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau car l'émetteur est un particulier ou un navire étranger."
-    );
-  }
-  if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-    throw new ForbiddenError(
-      "Impossible de créer une révision sur un bordereau d'annexe 1."
     );
   }
   if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {
@@ -248,6 +246,13 @@ async function getFlatContent(
     );
   }
 
+  if (
+    flatContent.isCanceled &&
+    bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER
+  ) {
+    throw new ForbiddenError("Impossible d'annuler un bordereau d'annexe 1'.");
+  }
+
   // One cannot request a CANCELATION if the BSDD has advanced too far in the workflow
   if (
     flatContent.isCanceled &&
@@ -278,7 +283,23 @@ async function getFlatContent(
     );
   }
 
-  await bsddRevisionRequestSchema.validate(flatContent);
+  if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+    await appendix1ProducerRevisionRequestSchema.validate(flatContent, {
+      strict: true
+    });
+
+    if (
+      flatContent.wasteDetailsSampleNumber &&
+      bsdd.wasteDetailsCode &&
+      !BSDD_SAMPLE_NUMBER_WASTE_CODES.includes(bsdd.wasteDetailsCode)
+    ) {
+      throw new ForbiddenError(
+        "Impossible de saisir un numéro d'échantillon, le code déchet ne permet pas d'en avoir."
+      );
+    }
+  } else {
+    await bsddRevisionRequestSchema.validate(flatContent, { strict: true });
+  }
 
   if (
     bsdd.emitterType === EmitterType.APPENDIX1 &&
@@ -442,6 +463,21 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
         INVALID_PROCESSING_OPERATION
       )
       .nullable()
+  })
+  .noUnknown(
+    true,
+    "Révision impossible, certains champs saisis ne sont pas modifiables"
+  );
+
+const appendix1ProducerRevisionRequestSchema = yup
+  .object({
+    isCanceled: yup.bool().transform(v => (v === null ? false : v)),
+    wasteDetailsSampleNumber: yup.string().nullable(),
+    wasteDetailsPackagingInfos: yup
+      .array()
+      .of(packagingInfoFn({ isDraft: false }))
+      .transform(v => (v === null ? Prisma.JsonNull : v)),
+    wasteDetailsQuantity: weight(WeightUnits.Tonne)
   })
   .noUnknown(
     true,
