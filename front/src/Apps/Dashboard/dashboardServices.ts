@@ -1213,17 +1213,10 @@ const canReviewBsda = (bsd, siret) => {
   const isProducer = isSameSiretEmmiter(siret, bsd);
   const isWorker = isSameSiretWorker(siret, bsd);
 
-  const isFinalDestinationOnly =
-    !isDestination &&
-    !isTransporter &&
-    !isProducer &&
-    !isWorker &&
-    siret === bsd.destination?.operation?.nextDestination?.company?.orgId;
-
   return (
     bsd.type === BsdType.Bsda &&
     !canDeleteBsda(bsd, siret) &&
-    !isFinalDestinationOnly
+    (isTransporter || isDestination || isProducer || isWorker)
   );
 };
 export const canReviewBsdd = (bsd, siret) => {
