@@ -1,8 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  FullBsffFragment,
-  PreviousBsffPackagingFragment
-} from "../../../Apps/common/queries/fragments";
+import { FullBsffFragment, PreviousBsffPackagingFragment } from "../fragments";
 
 export const GET_BSFF_FORM = gql`
   query Bsff($id: ID!) {

@@ -1,5 +1,5 @@
 import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { PDF_BSFF_FORM } from "../../../../form/bsff/utils/queries";
+import { PDF_BSFF_FORM } from "../../../common/queries/bsff/queries";
 import {
   Query,
   QueryBsdaPdfArgs,

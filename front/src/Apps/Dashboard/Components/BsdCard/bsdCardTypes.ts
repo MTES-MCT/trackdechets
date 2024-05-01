@@ -22,7 +22,6 @@ export interface BsdCardProps {
   bsdCurrentTab?: BsdCurrentTab;
   currentSiret: string;
   onValidate: (bsd: Bsd) => void;
-  onEditTransportInfo?: (bsd: Bsd, infoName: string) => void;
   secondaryActions: {
     onUpdate?: Function;
     onOverview: Function;

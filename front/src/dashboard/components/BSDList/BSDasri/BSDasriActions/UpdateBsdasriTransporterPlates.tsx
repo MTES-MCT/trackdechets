@@ -4,7 +4,7 @@ import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icon
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationUpdateBsdasriArgs, Bsdasri } from "@td/codegen-ui";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
-import { UPDATE_BSDASRI } from "../../../../../form/bsdasri/utils/queries";
+import { UPDATE_BSDASRI } from "../../../../../Apps/common/queries/bsdasri/queries";
 
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import Tooltip from "../../../../../common/components/Tooltip";

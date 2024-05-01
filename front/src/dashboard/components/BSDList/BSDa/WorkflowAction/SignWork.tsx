@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
 import routes from "../../../../../Apps/routes";
-import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
+import { UPDATE_BSDA } from "../../../../../Apps/common/queries/bsda/queries";
 import { WasteInfoWorker } from "../../../../../form/bsda/stepper/steps/WasteInfo";
 import { getComputedState } from "../../../../../form/common/getComputedState";
 import { Field, Form, Formik } from "formik";

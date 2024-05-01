@@ -19,8 +19,6 @@ import {
   FormStatus,
   Bsdasri
 } from "@td/codegen-ui";
-
-import "./bsdCardList.scss";
 import {
   getOverviewPath,
   getRevisionPath,
@@ -41,15 +39,10 @@ import {
   hasRoadControlButton,
   isSynthesis
 } from "../../dashboardServices";
-import { default as TransporterInfoEditBsdd } from "../../../../dashboard/components/BSDList/BSDD/TransporterInfoEdit";
-import { TransporterInfoEdit as TransporterInfoEditBsda } from "../../../../dashboard/components/BSDList/BSDa/WorkflowAction/TransporterInfoEdit";
-import { UpdateTransporterCustomInfo } from "../../../../dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterCustomInfo";
-import { BsffFragment } from "../../../../dashboard/components/BSDList/BSFF";
-import { UpdateTransporterPlates } from "../../../../dashboard/components/BSDList/BSFF/BsffActions/UpdateTransporterPlates";
-import { UpdateBsdasriTransporterPlates } from "../../../../dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterPlates";
-import { UpdateBsdasriTransporterInfo } from "../../../../dashboard/components/BSDList/BSDasri/BSDasriActions/UpdateBsdasriTransporterInfo";
 import { formatBsd, mapBsdasri } from "../../bsdMapper";
 import RevisionModal, { ActionType } from "../Revision/RevisionModal";
+
+import "./bsdCardList.scss";
 
 function BsdCardList({
   siret,
@@ -293,39 +286,6 @@ function BsdCardList({
     ]
   );
 
-  const handleEditTransportInfo = useCallback((bsd: Bsd, infoName: string) => {
-    if (bsd.__typename === "Form") {
-      if (infoName === "transporterCustomInfo") {
-        setValidationWorkflowType("UPDATE_CUSTOM_INFO_BSDD");
-      } else if (infoName === "transporterNumberPlate") {
-        setValidationWorkflowType("UPDATE_PLATE_INFO_BSDD");
-      }
-    }
-
-    if (bsd.__typename === "Bsda") {
-      setValidationWorkflowType("UPDATE_INFO_BSDA");
-    }
-
-    if (bsd.__typename === "Bsff") {
-      if (infoName === "transporterCustomInfo") {
-        setValidationWorkflowType("UPDATE_CUSTOM_INFO_BSFF");
-      } else {
-        setValidationWorkflowType("UPDATE_CUSTOM_PLATE_BSFF");
-      }
-    }
-
-    if (bsd.__typename === "Bsdasri") {
-      if (infoName === "transporterCustomInfo") {
-        setValidationWorkflowType("UPDATE_CUSTOM_INFO_BSDASRI");
-      } else {
-        setValidationWorkflowType("UPDATE_PLATE_BSDASRI");
-      }
-    }
-
-    setBsdClicked(bsd);
-    setIsModalOpen(true);
-  }, []);
-
   const onBsdUpdate = useCallback(
     (bsd: BsdDisplay) => {
       const path = getUpdatePath(bsd);
@@ -408,7 +368,6 @@ function BsdCardList({
                 currentSiret={siret}
                 bsdCurrentTab={bsdCurrentTab}
                 onValidate={onBsdValidation}
-                onEditTransportInfo={handleEditTransportInfo}
                 secondaryActions={{
                   onUpdate: onBsdUpdate,
                   onOverview: onBsdOverview,
@@ -524,59 +483,6 @@ function BsdCardList({
           bsdType={BsdType.Bsda}
           onModalCloseFromParent={onClose}
           actionType={ActionType.CONSUlT}
-        />
-      )}
-      {validationWorkflowType === "UPDATE_CUSTOM_INFO_BSDD" && (
-        <TransporterInfoEditBsdd
-          fieldName="customInfo"
-          verboseFieldName="champ libre"
-          form={bsdClicked as Form}
-          isModalOpenFromParent={isModalOpen}
-          onModalCloseFromParent={onClose}
-        />
-      )}
-      {validationWorkflowType === "UPDATE_CUSTOM_INFO_BSFF" && (
-        <UpdateTransporterCustomInfo
-          bsff={bsdClicked as unknown as BsffFragment}
-          isModalOpenFromParent={isModalOpen}
-          onModalCloseFromParent={onClose}
-        />
-      )}
-      {validationWorkflowType === "UPDATE_PLATE_INFO_BSDD" && (
-        <TransporterInfoEditBsdd
-          fieldName="numberPlate"
-          verboseFieldName="plaque d'immatriculation"
-          form={bsdClicked as Form}
-          isModalOpenFromParent={isModalOpen}
-          onModalCloseFromParent={onClose}
-        />
-      )}
-      {validationWorkflowType === "UPDATE_CUSTOM_PLATE_BSFF" && (
-        <UpdateTransporterPlates
-          bsff={bsdClicked as unknown as BsffFragment}
-          isModalOpenFromParent={isModalOpen}
-          onModalCloseFromParent={onClose}
-        />
-      )}
-      {validationWorkflowType === "UPDATE_INFO_BSDA" && (
-        <TransporterInfoEditBsda
-          bsda={bsdClicked as Bsda}
-          isModalOpenFromParent={isModalOpen}
-          onModalCloseFromParent={onClose}
-        />
-      )}
-      {validationWorkflowType === "UPDATE_PLATE_BSDASRI" && (
-        <UpdateBsdasriTransporterPlates
-          bsdasri={bsdClicked as Bsdasri}
-          isModalOpenFromParent={isModalOpen}
-          onModalCloseFromParent={onClose}
-        />
-      )}
-      {validationWorkflowType === "UPDATE_CUSTOM_INFO_BSDASRI" && (
-        <UpdateBsdasriTransporterInfo
-          bsdasri={bsdClicked as Bsdasri}
-          isModalOpenFromParent={isModalOpen}
-          onModalCloseFromParent={onClose}
         />
       )}
     </>

@@ -8,7 +8,7 @@ import {
   TableRow
 } from "../../../../common/components";
 import { Loader } from "../../../../Apps/common/Components";
-import { GET_BSDAS } from "../../stepper/queries";
+import { GET_BSDAS } from "../../../../Apps/common/queries/bsda/queries";
 import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 import { FieldArray, useFormikContext } from "formik";
 import {

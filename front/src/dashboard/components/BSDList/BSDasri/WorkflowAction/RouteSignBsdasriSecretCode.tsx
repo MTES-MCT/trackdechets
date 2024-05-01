@@ -36,7 +36,7 @@ import { removeSections } from "./PartialForms";
 import {
   SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE,
   UPDATE_BSDASRI
-} from "../../../../../form/bsdasri/utils/queries";
+} from "../../../../../Apps/common/queries/bsdasri/queries";
 import {
   emissionSignatureSecretCodeValidationSchema,
   prefillWasteDetails

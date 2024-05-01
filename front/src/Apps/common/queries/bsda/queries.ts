@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { FullBsdaFragment } from "../../../Apps/common/queries/fragments";
+import { FullBsdaFragment } from "../fragments";
 
 export const GET_BSDA = gql`
   query Bsda($id: ID!) {

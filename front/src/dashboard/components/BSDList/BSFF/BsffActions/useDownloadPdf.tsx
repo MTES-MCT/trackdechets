@@ -1,5 +1,5 @@
 import { LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { PDF_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
+import { PDF_BSFF_FORM } from "../../../../../Apps/common/queries/bsff/queries";
 import { Query, QueryBsffPdfArgs } from "@td/codegen-ui";
 
 export function useDownloadPdf(
