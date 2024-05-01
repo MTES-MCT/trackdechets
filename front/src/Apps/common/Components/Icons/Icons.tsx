@@ -811,36 +811,21 @@ export const IconProfile = ({
   </svg>
 );
 
-export const IconQuestionCircle = ({
-  color = "currentColor",
-  size = "1em",
-  ...props
-}: IconProps) => (
+export const IconQuestionCircle = ({ ...props }: IconProps) => (
   <svg
     {...props}
-    className={classNames(props.className, {
-      [styles.blue]: color === "blue",
-      [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white"
-    })}
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 140 140"
-    width={size}
-    height={size}
   >
-    <g fill="none" stroke="currentColor" strokeWidth={1.5}>
-      <path
-        d="M52.5 52.5a17.5 17.5 0 1123.333 16.503A8.75 8.75 0 0070 77.257v5.868M70 100.625a2.188 2.188 0 102.188 2.188A2.188 2.188 0 0070 100.624h0"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={8.749995}
-      />
-      <path
-        d="M4.375 70a65.625 65.625 0 10131.25 0 65.625 65.625 0 10-131.25 0z"
-        strokeMiterlimit={10}
-        strokeWidth={8.749995}
-      />
-    </g>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.355V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.7902 11.5 13.4448 10.887 13.4967 10.0985C13.5486 9.31006 12.9799 8.61655 12.1966 8.51295C11.4133 8.40935 10.6839 8.93117 10.529 9.706L8.567 9.313C8.90349 7.63124 10.4087 6.44085 12.1228 6.50102C13.8368 6.56119 15.2549 7.8542 15.4726 9.55541C15.6904 11.2566 14.6436 12.8651 13 13.355Z"
+      fill="#000091"
+    />
   </svg>
 );
 

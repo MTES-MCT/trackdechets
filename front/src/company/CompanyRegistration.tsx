@@ -1,7 +1,7 @@
 import React from "react";
 import { CompanySearchResult } from "@td/codegen-ui";
 import routes from "../Apps/routes";
-import { COMPANY_CONSTANTS } from "../login/CompanyType";
+import { COMPANY_CONSTANTS } from "../Apps/Companies/common/utils";
 
 type Props = Pick<
   CompanySearchResult,

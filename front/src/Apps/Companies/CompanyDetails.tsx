@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
-import AccountCompanyInfo from "./AccountCompanyInfo";
+import CompanyInfo from "./CompanyInfo/CompanyInfo";
 import AccountCompanySecurity from "./AccountCompanySecurity";
 import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import CompanyContactForm from "./CompanyContact/CompanyContactForm";
@@ -126,7 +126,7 @@ export default function CompanyDetails() {
           aria-labelledby="tabpanel-404"
           tabIndex={0}
         >
-          <AccountCompanyInfo company={company} />
+          <CompanyInfo company={company} />
         </div>
         <div
           id="tabpanel-405-panel"

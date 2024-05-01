@@ -330,8 +330,12 @@ export const submitAndVerifyGenericInfo = async (
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
   // Company info
-  await expect(companyDiv.getByText(`Numéro SIRET${siret}`)).toBeVisible();
-  const rolesDiv = companyDiv.getByText("Profil de l'entreprise").locator("..");
+  await expect(
+    companyDiv.getByText(
+      `Numéro de SIRET ou n° de TVA intra-communautaire${siret}`
+    )
+  ).toBeVisible();
+  const rolesDiv = companyDiv.getByTestId("company-types");
   await expect(rolesDiv).toBeVisible();
   for (const role of company.roles) {
     await expect(rolesDiv.getByText(role)).toBeVisible();
@@ -366,7 +370,7 @@ export const verifyReceipt = async (
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
   // Check data
-  const receiptDiv = companyDiv.locator(`#${receipt.type}Receipt`);
+  const receiptDiv = companyDiv.getByTestId(`${receipt.type}Receipt`);
   await expect(receiptDiv).toBeVisible();
   await expect(receiptDiv.getByTestId("receiptNumber")).toHaveText(
     receipt.number
@@ -392,9 +396,7 @@ export const verifyAmianteCertification = async (
   // Select correct company & correct tab
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
-  const amianteDiv = companyDiv
-    .getByText("Catégorie entreprise de travaux amiante")
-    .locator("..");
+  const amianteDiv = companyDiv.getByTestId("company-worker-section");
   await expect(amianteDiv).toBeVisible();
 
   // Check data
