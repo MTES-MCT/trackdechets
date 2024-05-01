@@ -19,7 +19,7 @@ const deleteBsdaTransporterResolver: MutationResolvers["deleteBsdaTransporter"] 
     if (transporter.bsdaId) {
       if (transporter.transporterTransportSignatureDate) {
         throw new UserInputError(
-          `Ce transporteur BSDA ne peut-être supprimé car il a déjà signé l'enlèvement du déchet`
+          `Ce transporteur BSDA ne peut être supprimé car il a déjà signé l'enlèvement du déchet`
         );
       }
       const bsda = await getBsdaOrNotFound(transporter.bsdaId, {

@@ -7,17 +7,17 @@ import Mermaid from '../../../src/components/Mermaid';
 Au cours de son cycle de vie, le BSDA peut passer par différents états décrits [ici](../api-reference/bsdasri/enums#bsdasristatus).
 
 
-- `INITIAL` (initial): C'est l'état dans lequel le Bsda est créé. `readableId` est affecté.
-- `SIGNED_BY_PRODUCER` : Bsda signé par le producteur
-- `SIGNED_BY_WORKER` : Bsda signé par l'entreprise de travaux
-- `SENT` : Bsda pris en charge par le transporteur
-- `PROCESSED` : Bsda traité
-- `REFUSED` : Bsda refusé
-- `AWAITING_CHILD` : Bsda en attente d'un bordereau suite
-- `CANCELED`: (annulé): BSD annulé suite à approbation des parties prenantes (via le processus de révision)
+- `INITIAL` (initial) : C'est l'état dans lequel le Bsda est créé. `readableId` est affecté.
+- `SIGNED_BY_PRODUCER` : Bsda signé par le producteur.
+- `SIGNED_BY_WORKER` : Bsda signé par l'entreprise de travaux.
+- `SENT` : Bsda pris en charge par le transporteur.
+- `PROCESSED` : Bsda traité.
+- `REFUSED` : Bsda refusé.
+- `AWAITING_CHILD` : Bsda en attente d'un bordereau suite.
+- `CANCELED`: (annulé) : BSD annulé suite à approbation des parties prenantes (via le processus de révision).
 
 
-Le diagramme ci dessous retrace le cycle de vie d'un Bsda dans Trackdéchets:
+Le diagramme ci dessous retrace le cycle de vie d'un Bsda dans Trackdéchets :
 
 <Mermaid chart={`
 graph TD

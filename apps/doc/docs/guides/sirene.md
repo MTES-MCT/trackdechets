@@ -6,17 +6,17 @@ title: Rechercher un établissement partenaire sur l'API Trackdéchets
 
 Nous exposons une query [`searchCompanies`](../reference/api-reference/user-company/queries#searchcompanies) qui interroge la base SIRENE (via [les données ouvertes de l'INSEE](https://files.data.gouv.fr/insee-sirene/)), ou la base VIES (via [le service la commission européenne](https://ec.europa.eu/taxation_customs/vies/)) la base des installations classées pour la protection de l'environnement (ICPE) et la base Trackdéchets pour obtenir des informations sur un établissement à partir de son numéro SIRET, sa raison sociale, ou son numéro de TVA intra-communautaire.
 
-Elle requiert un token d'API Trackdéchets et permets d'accéder à toutes les informations d'un établissement sur Trackdéchet et à jour des bases de l'INSEE ou de VIES (via [le service la commission européenne](https://ec.europa.eu/taxation_customs/vies/)).
+Elle requiert un token d'API Trackdéchets et permet d'accéder à toutes les informations d'un établissement sur Trackdéchet et à jour des bases de l'INSEE ou de VIES (via [le service la commission européenne](https://ec.europa.eu/taxation_customs/vies/)).
 
 La query renvoie un objet de type [`CompanySearchResult`](../reference/api-reference/user-company/objects#companysearchresult) et permet notamment de savoir si un établissement est inscrit sur Trackdéchets grâce au champ `isRegistered`, mais aussi les coordonnées de l'établissement, comme le type d'établissement sur Trackdéchets. 
 
-Pour retourner les établissement étrangers quand on cherche par `clue : "NUMERODETVA"`, il faut activer à `true` le paramètre `allowForeignCompanies`
+Pour retourner les établissements étrangers quand on cherche par `clue : "NUMERODETVA"`, il faut activer à `true` le paramètre `allowForeignCompanies`.
 
-Pour rechercher par raison sociale un établissement français, en filtrant par département, il faut utiliser le paramètre `department`
+Pour rechercher par raison sociale un établissement français, en filtrant par département, il faut utiliser le paramètre `department`.
 
-Même si l'établissement demandé est enregistré aurpès de l'INSEE comme "non-diffusible" ou "protégé" (c'est-à-dire si `statutDiffusionEtablissement` ne renvoie pas "O"), nous les renverrons dans cette requête `searchCompanies` car elle est protégée par authentification sur l'API Trackdechets et que ces informations sont renseignées dans la base Trackdéchets.
+Même si l'établissement demandé est enregistré auprès de l'INSEE comme "non-diffusible" ou "protégé" (c'est-à-dire si `statutDiffusionEtablissement` ne renvoie pas "O"), nous les renverrons dans cette requête `searchCompanies` car elle est protégée par authentification sur l'API Trackdechets et que ces informations sont renseignées dans la base Trackdéchets.
 
-Exemple d'utilisation avec `clue` comme recherfche plein-texte dans le nom d'établissement ou d'unité légale:
+Exemple d'utilisation avec `clue` comme recherche plein-texte dans le nom d'établissement ou d'unité légale :
 
 ```graphql
 query {
@@ -30,7 +30,7 @@ query {
 }
 ```
 
-```
+```json
 {
   "data": {
     "searchCompanies": [{
@@ -65,7 +65,7 @@ query {
 }
 ```
 
-```
+```json
 {
   "data": {
     "companyInfos": {
@@ -80,4 +80,4 @@ query {
 ```
 
 :::note
-Nous avons crée une **fiche entreprise publique** pour chaque établissement sur l'interface graphique Trackdéchets qui illustre l'utilisation de cette query. Exemple avec la DREAL Nouvelle Aquitaine: [https://app.trackdechets.beta.gouv.fr/company/13001045700013](https://app.trackdechets.beta.gouv.fr/company/13001045700013)
+Nous avons créé une **fiche entreprise publique** pour chaque établissement sur l'interface graphique Trackdéchets qui illustre l'utilisation de cette query. Exemple avec la DREAL Nouvelle Aquitaine: [https://app.trackdechets.beta.gouv.fr/company/13001045700013](https://app.trackdechets.beta.gouv.fr/company/13001045700013)

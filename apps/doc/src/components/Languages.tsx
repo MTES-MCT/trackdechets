@@ -7,7 +7,7 @@ import MePython from "!!raw-loader!../snippets/me.py";
 const Languages = () => (
   <Tabs defaultValue="python" values={[{ label: "Python", value: "python" }]}>
     <TabItem value="python">
-      <CodeBlock className="python">{MePython}</CodeBlock>
+      <CodeBlock className="language-python">{MePython}</CodeBlock>
     </TabItem>
   </Tabs>
 );

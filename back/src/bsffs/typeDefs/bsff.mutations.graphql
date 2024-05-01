@@ -172,7 +172,7 @@ type Mutation {
 
   **Champs additionnels requis pour `ACCEPTATION` :**
 
-  À mettre à jour via la mutation `updateBsffPackaging`. L'acceptation de chaque contenant peut-être signée séparement
+  À mettre à jour via la mutation `updateBsffPackaging`. L'acceptation de chaque contenant peut être signée séparement
   en précisant un identifiant de contenant.
 
   ```
@@ -187,7 +187,7 @@ type Mutation {
 
   **Champs additionnels requis pour `OPERATION` :**
 
-  À mettre à jour via la mutation `updateBsffPackaging`. L'opération de chaque contenant peut-être signée séparement
+  À mettre à jour via la mutation `updateBsffPackaging`. L'opération de chaque contenant peut être signée séparement
   en précisant un identifiant de contenant.
 
   ```
@@ -212,7 +212,7 @@ type Mutation {
   Mutation permettant de créer une fiche d'intervention dans Trackdéchets.
   Permet de reporter une partie des infos d'une fiche d'intervention papier
   et d'identifier un détenteur d'équipement. Une fois créee, la fiche d'intervention
-  peut-être jointe à un BSFF.
+  peut être jointe à un BSFF.
   """
   createFicheInterventionBsff(
     input: BsffFicheInterventionInput!
