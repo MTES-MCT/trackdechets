@@ -62,8 +62,9 @@ export async function operationHookFn(
     }
   });
 
+  // Les dasris inclus dans une synthèse n'ont pas forcément `destinationReceptionWasteWeightValue` renseigné
   const quantity =
-    quantityArgs ?? initialBsdasri.destinationReceptionWasteWeightValue!;
+    quantityArgs ?? initialBsdasri.destinationReceptionWasteWeightValue! ?? 0;
 
   const finalOperation: Prisma.BsdasriFinalOperationCreateInput = {
     initialBsdasri: { connect: { id: initialBsdId } },
@@ -77,10 +78,10 @@ export async function operationHookFn(
   });
 
   if (initialBsdasri.grouping) {
-    for (const groupedBsda of initialBsdasri.grouping) {
+    for (const groupedBsdasri of initialBsdasri.grouping) {
       const jobsArgs: OperationHookJobArgs = {
         bsdType,
-        initialBsdId: groupedBsda.id,
+        initialBsdId: groupedBsdasri.id,
         finalBsdId,
         operationCode,
         noTraceability
@@ -94,10 +95,10 @@ export async function operationHookFn(
   }
 
   if (initialBsdasri.synthesizing) {
-    for (const synthesizedBsda of initialBsdasri.synthesizing) {
+    for (const synthesizedBsdasri of initialBsdasri.synthesizing) {
       const jobsArgs: OperationHookJobArgs = {
         bsdType,
-        initialBsdId: synthesizedBsda.id,
+        initialBsdId: synthesizedBsdasri.id,
         finalBsdId,
         operationCode,
         noTraceability
