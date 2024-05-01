@@ -16,7 +16,8 @@ import {
   getWorkflowLabel,
   isBsdasri,
   isBsff,
-  isBsvhu
+  isBsvhu,
+  isBspaoh
 } from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
 import Actors from "../Actors/Actors";
@@ -276,7 +277,11 @@ function BsdCard({
   const transporterName = transporterNameEmmiter || NON_RENSEIGNE;
 
   const unitOfMeasure =
-    isBsdasri(bsdDisplay?.type!) || isBsff(bsdDisplay?.type!) ? "kg" : "t";
+    isBsdasri(bsdDisplay?.type!) ||
+    isBsff(bsdDisplay?.type!) ||
+    isBspaoh(bsdDisplay?.type!)
+      ? "kg"
+      : "t";
 
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
   const pickupSiteName =
