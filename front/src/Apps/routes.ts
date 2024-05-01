@@ -74,6 +74,11 @@ const routes = {
       view: "/dashboard/:siret/bsdas/view/:id",
       review: "/dashboard/:siret/bsdas/review/:id"
     },
+    bspaohs: {
+      create: "/dashboard/:siret/bspaohs/create",
+      edit: "/dashboard/:siret/bspaohs/edit/:id",
+      view: "/dashboard/:siret/bspaohs/view/:id"
+    },
     transport: {
       index: "/dashboard/:siret/transport",
       toCollect: "/dashboard/:siret/transport/to-collect",

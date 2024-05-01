@@ -207,7 +207,8 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
       bspaoh.transporterTransportTakenOverAt?.getTime(),
     destinationReceptionDate: bspaoh.destinationReceptionDate?.getTime(),
     destinationAcceptationDate: bspaoh.destinationReceptionDate?.getTime(),
-    destinationAcceptationWeight: bspaoh.destinationReceptionWasteWeightValue,
+    destinationAcceptationWeight:
+      bspaoh.destinationReceptionWasteAcceptedWeightValue,
     destinationOperationDate: bspaoh.destinationOperationDate?.getTime(),
     ...where,
     isInRevisionFor: [],

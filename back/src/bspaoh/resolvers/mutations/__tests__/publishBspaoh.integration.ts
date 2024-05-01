@@ -150,7 +150,7 @@ describe("Mutation.publishBspaoh", () => {
       opt: {
         status: BspaohStatus.DRAFT,
         emitterCompanySiret: company.siret,
-        destinationCap: null,
+        destinationCompanyAddress: null,
         canAccessDraftSirets: [company.siret as string]
       }
     });
@@ -167,7 +167,7 @@ describe("Mutation.publishBspaoh", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le CAP du destinataire est obligatoire.`,
+        message: `L'adresse de l'entreprise de destination est obligatoire.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

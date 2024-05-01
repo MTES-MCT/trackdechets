@@ -1,0 +1,41 @@
+.multiTags {
+  display: flex;
+  width: 100%;
+  border-radius: 0.25rem 0.25rem 0 0;
+  font-size: 1rem;
+  line-height: 1.2rem;
+  padding: 0.5rem 1rem 0.5rem 1rem;
+  color: var(--text-default-grey);
+  background-color: rgb(238, 238, 238);
+  --idle: transparent;
+  --hover: var(--background-contrast-grey-hover);
+  --active: var(--background-contrast-grey-active);
+  box-shadow: inset 0 -2px 0 0 var(--border-plain-grey);
+  row-gap: 10px;
+}
+
+.multiTagsInput {
+  line-height: 1.8rem;
+  background-color: transparent;
+  padding: 0 0.4rem;
+
+  // fake blinking caret
+  animation: caret 1s infinite;
+  background-image: linear-gradient(currentcolor, currentcolor);
+  background-position: 7px center;
+  background-repeat: no-repeat;
+  background-size: 1px 1.2em;
+  @keyframes caret {
+    30%,
+    75% {
+      background-size: 1px 1.2em;
+    }
+
+    50% {
+      background-size: 0 1.2em;
+    }
+  }
+  &:focus {
+    background-image: none;
+  }
+}

@@ -517,7 +517,7 @@ Pour plus d'informations sur l'utilisation de Prisma migrate, allez [consulter l
 
 Les scripts sont gérés par le projet `libs/back/scripts`.
 
-Pour générer un script, on utilise `npx nx run @td/scripts:generate`. Le CLI demandera alors à nomemr le script, et un boilerplate d'écriture de script sera généré. Les fichiers sont générés dans le dossier `libs/back/scripts/src/scripts`.
+Pour générer un script, on utilise `npx nx run @td/scripts:generate`. Le CLI demandera alors à nommer le script, et un boilerplate d'écriture de script sera généré. Les fichiers sont générés dans le dossier `libs/back/scripts/src/scripts`.
 
 Pour jouer les scripts, on utilise `npx nx run @td/scripts:migrate`. Les scripts exécutés avec succès sont sauvegardés en base de données pour s'assurer qu'ils ne sont joués qu'une seule fois.
 

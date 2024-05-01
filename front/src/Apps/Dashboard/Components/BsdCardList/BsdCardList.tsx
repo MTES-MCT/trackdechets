@@ -17,7 +17,8 @@ import {
   Bsvhu,
   Form,
   FormStatus,
-  Bsdasri
+  Bsdasri,
+  Bspaoh
 } from "@td/codegen-ui";
 import {
   getOverviewPath,
@@ -31,6 +32,7 @@ import ActBsdSuiteValidation from "../Validation/Act/ActBsdSuiteValidation";
 import ActBsdaValidation from "../Validation/Act/ActBsdaValidation";
 import ActBsffValidation from "../Validation/Act/ActBsffValidation";
 import ActBsvhuValidation from "../Validation/Act/ActBsvhuValidation";
+import ActBspaohValidation from "../Validation/Act/ActBspaohValidation";
 import { BsdDisplay } from "../../../common/types/bsdTypes";
 import {
   canApproveOrRefuseReview,
@@ -117,7 +119,8 @@ function BsdCardList({
       if (
         bsd.__typename === "Bsda" ||
         bsd.__typename === "Bsff" ||
-        bsd.__typename === "Bsvhu"
+        bsd.__typename === "Bsvhu" ||
+        bsd.__typename === "Bspaoh"
       ) {
         setValidationWorkflowType("INITIAL_DRAFT");
         setBsdClicked(bsd);
@@ -212,6 +215,11 @@ function BsdCardList({
         setBsdClicked(bsd);
         setIsModalOpen(true);
       }
+      if (bsd.__typename === "Bspaoh") {
+        setValidationWorkflowType("ACT_BSPAOH");
+        setBsdClicked(bsd);
+        setIsModalOpen(true);
+      }
     },
     [handleActBsdasri]
   );
@@ -262,11 +270,15 @@ function BsdCardList({
           bsd["bsdaStatus"] ||
           bsd["bsffStatus"] ||
           bsd["bsdasriStatus"] ||
-          bsd["bsvhuStatus"];
+          bsd["bsvhuStatus"] ||
+          bsd["bspaohStatus"];
+
+        const bsdDisplay = formatBsd(bsd) ?? { status };
+
         if (status === FormStatus.Draft || bsd["isDraft"]) {
           handleDraftValidation(bsd as Bsd);
         } else {
-          if (hasRoadControlButton({ status } as BsdDisplay, isCollectedTab)) {
+          if (hasRoadControlButton(bsdDisplay as BsdDisplay, isCollectedTab)) {
             const path = routes.dashboard.roadControl;
             redirectToPath(path, bsd.id);
           } else {
@@ -431,6 +443,15 @@ function BsdCardList({
       {validationWorkflowType === "ACT_BSVHU" && (
         <ActBsvhuValidation
           bsd={bsdClicked as Bsvhu}
+          currentSiret={siret}
+          isOpen={isModalOpen}
+          onClose={onClose}
+        />
+      )}
+
+      {validationWorkflowType === "ACT_BSPAOH" && (
+        <ActBspaohValidation
+          bsd={bsdClicked as Bspaoh}
           currentSiret={siret}
           isOpen={isModalOpen}
           onClose={onClose}

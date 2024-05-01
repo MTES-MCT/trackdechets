@@ -148,19 +148,19 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSPAOHs between two reception weights (strict)", async () => {
     const bspaoh1 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 1 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 1 }
     });
 
     const bspaoh2 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 2 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 2 }
     });
 
     const bspaoh3 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 3 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 3 }
     });
 
     const bspaoh4 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 4 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 4 }
     });
 
     await Promise.all(
@@ -378,19 +378,19 @@ describe("toElasticFilter", () => {
 
   it("should filter BSPAOHs between two reception weights (not strict)", async () => {
     const bspaoh1 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 1 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 1 }
     });
 
     const bspaoh2 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 2 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 2 }
     });
 
     const bspaoh3 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 3 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 3 }
     });
 
     const bspaoh4 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 4 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 4 }
     });
 
     await Promise.all(
@@ -603,19 +603,19 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSPAOHs on reception weight (exact)", async () => {
     const bspaoh1 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 1 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 1 }
     });
 
     const bspaoh2 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 2 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 2 }
     });
 
     const bspaoh3 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 3 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 3 }
     });
 
     const bspaoh4 = await bspaohFactory({
-      opt: { destinationReceptionWasteWeightValue: 4 }
+      opt: { destinationReceptionWasteAcceptedWeightValue: 4 }
     });
 
     await Promise.all(

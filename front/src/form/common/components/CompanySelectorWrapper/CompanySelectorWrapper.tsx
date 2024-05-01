@@ -1,3 +1,5 @@
+// Wrapper CompanySelectorWrapper cloned in RhfCompanySelectorWrapper for react-hook-forms
+
 import { useLazyQuery, ApolloError } from "@apollo/client";
 import React, { useCallback, useEffect, useState } from "react";
 import CompanySelector from "../../../../Apps/common/Components/CompanySelector/CompanySelector";
@@ -15,7 +17,7 @@ import {
 } from "../../../../Apps/common/queries/company/query";
 
 interface CompanySelectorWrapperProps {
-  // Expose le state Formik depuis le composant parent
+  // Expose le state depuis le composant parent
   // afin d'initialiser le `selectedCompany` au premier
   // render lorsqu'on est dans le cas d'un update de bordereau
   selectedCompanyOrgId?: string | null;
@@ -43,7 +45,8 @@ interface CompanySelectorWrapperProps {
  * - Il propage l'événement de sélection d'un établissement au parent pour modifier.
  * les données du store (Formik)
  */
-export default function CompanySelectorWrapper({
+
+export default function RhfCompanySelectorWrapper({
   selectedCompanyOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
@@ -51,7 +54,7 @@ export default function CompanySelectorWrapper({
   orgId,
   disabled = false,
   onCompanySelected
-}: CompanySelectorWrapperProps) {
+}: Readonly<CompanySelectorWrapperProps>) {
   // Établissement sélectionné
   const [selectedCompany, setSelectedCompany] =
     useState<CompanySearchResult | null>(null);
@@ -192,6 +195,7 @@ export default function CompanySelectorWrapper({
           }}
         />
       )}
+
       <CompanySelector
         loading={isLoadingFavorites || isLoadingSearch}
         onSelect={onSelectCompany}

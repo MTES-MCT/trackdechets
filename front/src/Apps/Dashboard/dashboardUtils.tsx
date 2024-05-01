@@ -12,6 +12,7 @@ import {
   dropdown_create_bsdd,
   dropdown_create_bsff,
   dropdown_create_bsvhu,
+  dropdown_create_bspaoh,
   filter_acceptation_sign_date,
   filter_bsd_number,
   filter_bsd_type,
@@ -40,7 +41,8 @@ import {
   IconBSDa,
   IconBSVhu,
   IconBSDD,
-  IconBSDasri
+  IconBSDasri,
+  IconBSPaohThin
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
@@ -453,7 +455,7 @@ export const filterPredicates: {
   }
 ];
 
-export const dropdownCreateLinks = siret => [
+export const dropdownCreateLinks = (siret, location) => [
   {
     title: dropdown_create_bsdd,
     route: generatePath(routes.dashboard.bsdds.create, { siret }),
@@ -479,6 +481,12 @@ export const dropdownCreateLinks = siret => [
     title: dropdown_create_bsda,
     route: generatePath(routes.dashboard.bsdas.create, { siret }),
     icon: <IconBSDa />
+  },
+  {
+    title: dropdown_create_bspaoh,
+    route: generatePath(routes.dashboard.bspaohs.create, { siret }),
+    state: { background: location },
+    icon: <IconBSPaohThin />
   }
 ];
 
@@ -494,6 +502,8 @@ export const getOverviewPath = bsd => {
       return routes.dashboard.bsffs.view;
     case BsdType.Bsvhu:
       return routes.dashboard.bsvhus.view;
+    case BsdType.Bspaoh:
+      return routes.dashboard.bspaohs.view;
 
     default:
       break;
@@ -512,7 +522,8 @@ export const getUpdatePath = bsd => {
       return routes.dashboard.bsffs.edit;
     case BsdType.Bsvhu:
       return routes.dashboard.bsvhus.edit;
-
+    case BsdType.Bspaoh:
+      return routes.dashboard.bspaohs.edit;
     default:
       break;
   }

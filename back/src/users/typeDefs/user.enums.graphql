@@ -44,6 +44,8 @@ enum UserPermission {
   BSD_CAN_SIGN_WORK
   "Signer l'enlèvement d'un BSD."
   BSD_CAN_SIGN_TRANSPORT
+  "Signer le dépôt d'un BSD."
+  BSD_CAN_SIGN_DELIVERY
   "Signer la réception et l'acceptation d'un BSD."
   BSD_CAN_SIGN_ACCEPTATION
   "Signer l'opération d'un BSD."

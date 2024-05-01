@@ -111,8 +111,6 @@ export function SignTransport({
           t => !t.transport?.signature?.date
         )!;
 
-        console.log(signingTransporter);
-
         return (
           <Formik<FormikValues>
             initialValues={{

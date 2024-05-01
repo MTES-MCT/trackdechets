@@ -112,12 +112,14 @@ async function duplicateBspaoh(
     emitterEmissionSignatureDate,
     emitterEmissionSignatureAuthor,
 
-    handedOverToDestinationDate,
     handedOverToDestinationSignatureDate,
     handedOverToDestinationSignatureAuthor,
+    destinationReceptionWasteQuantityValue,
 
-    destinationReceptionWasteWeightValue,
-    destinationReceptionWasteWeightIsEstimate,
+    destinationReceptionWasteReceivedWeightValue,
+    destinationReceptionWasteAcceptedWeightValue,
+    destinationReceptionWasteRefusedWeightValue,
+
     destinationReceptionAcceptationStatus,
     destinationReceptionWasteRefusalReason,
     destinationReceptionWastePackagingsAcceptation,

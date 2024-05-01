@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajouter l'information du traitement final sur le registre sortant et exhaustif pour les BSD ayant un BSD suite [PR 3254](https://github.com/MTES-MCT/trackdechets/pull/3254)
+- Interface utilisateur des PAOHs [PR 3274](https://github.com/MTES-MCT/trackdechets/pull/3274)
 
 #### :bug: Corrections de bugs
 

@@ -38,6 +38,7 @@ const BsdasriFormContainer = lazy(
 const BsdaFormContainer = lazy(
   () => import("../../../../form/bsda/FormContainer")
 );
+
 const WasteSelector = lazy(() => import("../../../../login/WasteSelector"));
 
 const Invite = lazy(() => import("../../../../login/Invite"));

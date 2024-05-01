@@ -20,5 +20,7 @@ export * from "./Slideshow";
 export * from "./List";
 export * from "./Table";
 export * from "./Journey";
+export * from "./DsfrJourney";
 export * from "./DataList";
+export * from "./DsfrDataList";
 export * from "./TransportModeSelect";

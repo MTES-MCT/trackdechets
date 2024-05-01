@@ -20,29 +20,14 @@ export async function applyDynamicRefinement(
     ctx
   );
 
-  validateDeliveryFields(bspaoh, validationContext.currentSignatureType, ctx);
   validatePackagingsReception(
     bspaoh,
     validationContext.currentSignatureType,
     ctx
   );
+  validateWeightFields(bspaoh, validationContext.currentSignatureType, ctx);
 }
 
-function validateDeliveryFields(
-  bspaoh: ZodBspaoh,
-  currentSignatureType: BspaohSignatureType | undefined,
-  ctx: RefinementCtx
-) {
-  if (currentSignatureType !== "DELIVERY") {
-    return;
-  }
-  if (!bspaoh.handedOverToDestinationDate) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `La date de remise l'installation destinataire doit être précisée`
-    });
-  }
-}
 /**
  *
  * IOT receive a PAOH, we have to check `destinationReceptionWastePackagingsAcceptation` against `wastePackagings`
@@ -152,6 +137,44 @@ function validatePackagingsReception(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `Le bordereau ne peut être partiellement refusé si tous les packagings sont refusés ou acceptés`
+    });
+  }
+}
+
+function validateWeightFields(
+  bspaoh: ZodBspaoh,
+  currentSignatureType: BspaohSignatureType | undefined,
+  ctx: RefinementCtx
+) {
+  // received weight is required to fill accepted/refused weights
+  if (
+    !bspaoh.destinationReceptionWasteReceivedWeightValue &&
+    !!bspaoh.destinationReceptionWasteRefusedWeightValue
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le poids reçu est requis pour renseigner le poid refusé`
+    });
+  }
+
+  if (
+    (bspaoh.destinationReceptionWasteRefusedWeightValue ?? 0) >
+    (bspaoh.destinationReceptionWasteReceivedWeightValue ?? 0)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le poids refusé ne eut être supérieur au poids accepté`
+    });
+  }
+
+  // no refused weight if PAOH is accepted
+  if (
+    bspaoh.destinationReceptionWasteRefusedWeightValue &&
+    bspaoh.destinationReceptionAcceptationStatus === "ACCEPTED"
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le poids refusé ne peut être renseigné si le PAOH est accepté`
     });
   }
 }

@@ -25,7 +25,8 @@ import {
   useBsdasriDownloadPdf,
   useBsddDownloadPdf,
   useBsffDownloadPdf,
-  useBsvhuDownloadPdf
+  useBsvhuDownloadPdf,
+  useBspaohDownloadPdf
 } from "../Pdf/useDownloadPdf";
 import {
   BsdType,
@@ -41,7 +42,8 @@ import {
   useBsdasriDuplicate,
   useBsddDuplicate,
   useBsffDuplicate,
-  useBsvhuDuplicate
+  useBsvhuDuplicate,
+  useBspaohDuplicate
 } from "../Duplicate/useDuplicate";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../common/queries/company/query";
 import { Loader } from "../../../common/Components";
@@ -97,7 +99,9 @@ function BsdCard({
   const [downloadBsvhuPdf] = useBsvhuDownloadPdf({
     ...options
   });
-
+  const [downloadBspaohPdf] = useBspaohDownloadPdf({
+    ...options
+  });
   const [duplicateBsdd, { loading: isDuplicatingBsdd }] = useBsddDuplicate({
     ...options
   });
@@ -114,6 +118,10 @@ function BsdCard({
   const [duplicateBsvhu, { loading: isDuplicatingBsvhu }] = useBsvhuDuplicate({
     ...options
   });
+  const [duplicateBspaoh, { loading: isDuplicatingBspaoh }] =
+    useBspaohDuplicate({
+      ...options
+    });
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isTransportEditModalOpen, setIsTransportEditModalOpen] =
@@ -124,7 +132,8 @@ function BsdCard({
     isDuplicatingBsda ||
     isDuplicatingBsdasri ||
     isDuplicatingBsff ||
-    isDuplicatingBsvhu;
+    isDuplicatingBsvhu ||
+    isDuplicatingBspaoh;
 
   const updatedAt = bsdDisplay?.updatedAt
     ? formatDate(bsdDisplay.updatedAt)
@@ -198,13 +207,17 @@ function BsdCard({
       if (bsd.type === BsdType.Bsvhu) {
         downloadBsvhuPdf();
       }
+      if (bsd.type === BsdType.Bspaoh) {
+        downloadBspaohPdf();
+      }
     },
     [
       downloadBsdaPdf,
       downloadBsdasriPdf,
       downloadBsddPdf,
       downloadBsffPdf,
-      downloadBsvhuPdf
+      downloadBsvhuPdf,
+      downloadBspaohPdf
     ]
   );
 
@@ -225,13 +238,17 @@ function BsdCard({
       if (bsd.type === BsdType.Bsvhu) {
         duplicateBsvhu();
       }
+      if (bsd.type === BsdType.Bspaoh) {
+        duplicateBspaoh();
+      }
     },
     [
       duplicateBsda,
       duplicateBsdasri,
       duplicateBsdd,
       duplicateBsff,
-      duplicateBsvhu
+      duplicateBsvhu,
+      duplicateBspaoh
     ]
   );
 

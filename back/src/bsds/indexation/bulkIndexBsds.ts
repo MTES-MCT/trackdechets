@@ -26,6 +26,7 @@ import {
   toBsdElastic as formToBsdElastic
 } from "../../forms/elastic";
 import { toBsdElastic as bsvhuToBsdElastic } from "../../bsvhu/elastic";
+import { toBsdElastic as bspaohToBsdElastic } from "../../bspaoh/elastic";
 import { bulkIndexQueue } from "../../queue/producers/elastic";
 import { IndexAllFnSignature, FindManyAndIndexBsdsFnSignature } from "./types";
 
@@ -46,7 +47,8 @@ const bsdNameToBsdElasticFns: {
   bsvhu: bsvhuToBsdElastic,
   bsda: bsdaToBsdElastic,
   bsdasri: bsdasriToBsdElastic,
-  bsdd: formToBsdElastic
+  bsdd: formToBsdElastic,
+  bspaoh: bspaohToBsdElastic
 };
 
 const prismaModels = {
@@ -54,7 +56,8 @@ const prismaModels = {
   bsvhu: prisma.bsvhu,
   bsda: prisma.bsda,
   bsdasri: prisma.bsdasri,
-  bsdd: prisma.form
+  bsdd: prisma.form,
+  bspaoh: prisma.bspaoh
 };
 
 const prismaFindManyOptions = {
@@ -423,7 +426,14 @@ export async function indexAllBsds(
 ): Promise<void> {
   const startDate = new Date();
 
-  const allBsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
+  const allBsdTypes: BsdType[] = [
+    "BSDD",
+    "BSDA",
+    "BSDASRI",
+    "BSVHU",
+    "BSFF",
+    "BSPAOH"
+  ];
 
   for (const loopType of allBsdTypes) {
     if (!bsdType || bsdType === loopType) {
