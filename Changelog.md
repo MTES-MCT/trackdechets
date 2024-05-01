@@ -17,6 +17,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Ajout de la mise à jour de l'immatriculation dans la modale de signature du bordereau de synthèse BSDASRI [PR 3290](https://github.com/MTES-MCT/trackdechets/pull/3290)
+
 #### :house: Interne
 
 # [2024.5.1] 07/05/2024
