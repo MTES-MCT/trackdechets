@@ -461,7 +461,7 @@ function processPackagings(
 
 function flattenWasteInput(input: { waste?: BspaohWasteInput | null }) {
   return {
-    wasteType: chain(input.waste, w => w.type) ?? BspaohType.PAOH,
+    wasteType: chain(input.waste, w => w.type),
     wasteCode: chain(input.waste, w => w.code),
     wasteAdr: chain(input.waste, w => w.adr),
     wastePackagings: undefinedOrDefault(
