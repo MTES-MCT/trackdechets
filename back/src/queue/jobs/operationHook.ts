@@ -34,7 +34,7 @@ export async function operationHookJob(
   } else if (bsdType === BsdType.BSFF) {
     await bsffOperationHookFn(job.data, { runSync: false });
   } else if (bsdType === BsdType.BSDASRI) {
-    await bsdasriOperationHookFn(job.data, { runSync: true });
+    await bsdasriOperationHookFn(job.data, { runSync: false });
   } else {
     throw new Error(`Operation hook is not handled for bsd type ${bsdType}`);
   }
