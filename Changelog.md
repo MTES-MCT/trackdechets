@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajouter l'information du traitement final sur le registre sortant et exhaustif pour les BSD ayant un BSD suite [PR 3254](https://github.com/MTES-MCT/trackdechets/pull/3254)
+
 #### :bug: Corrections de bugs
 
 - Modification de la validation de mot de passe sur page Invite [PR 3278](https://github.com/MTES-MCT/trackdechets/pull/3278)

@@ -24,7 +24,6 @@ schema
 
 function startConsumers() {
   console.info(`General queues consumers started`);
-
   mailQueue.process(sendMailJob);
   geocodeCompanyQueue.process(geocodeJob);
   setCompanyDepartementQueue.process(setDepartementJob);

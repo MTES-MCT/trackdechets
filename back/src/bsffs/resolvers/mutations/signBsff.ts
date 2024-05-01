@@ -30,6 +30,8 @@ import {
 import { checkCanSignFor } from "../../../permissions";
 import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
+import { operationHook } from "../../operationHook";
+import { prisma } from "@td/prisma";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,
@@ -313,6 +315,13 @@ async function signOperation(
       update: updateBsffPackaging,
       findPreviousPackagings
     } = getBsffPackagingRepository(user, transaction);
+
+    const {
+      update: updateBsff,
+      findMany: findManyBsffs,
+      findUniqueGetPackagings
+    } = getBsffRepository(user, transaction);
+
     if (packagingId) {
       const packaging = bsff.packagings.find(p => p.id === packagingId);
       if (!packaging) {
@@ -323,12 +332,16 @@ async function signOperation(
 
       await validateBeforeOperation(packaging);
 
-      await updateBsffPackaging({
+      const updatedBsffPackaging = await updateBsffPackaging({
         where: { id: packagingId },
         data: {
           operationSignatureDate: input.date,
           operationSignatureAuthor: input.author
         }
+      });
+
+      transaction.addAfterCommitCallback(async () => {
+        await operationHook(updatedBsffPackaging, { runSync: false });
       });
     } else {
       await Promise.all(bsff.packagings.map(p => validateBeforeOperation(p)));
@@ -341,12 +354,18 @@ async function signOperation(
           operationSignatureAuthor: input.author
         }
       });
+
+      transaction.addAfterCommitCallback(async () => {
+        const { packagings: updatedPackagings } =
+          await prisma.bsff.findUniqueOrThrow({
+            where: { id: bsff.id },
+            include: { packagings: true }
+          });
+        for (const updatedPackgaing of updatedPackagings) {
+          await operationHook(updatedPackgaing, { runSync: false });
+        }
+      });
     }
-    const {
-      update: updateBsff,
-      findMany: findManyBsffs,
-      findUniqueGetPackagings
-    } = getBsffRepository(user, transaction);
 
     const packagings =
       (await findUniqueGetPackagings({

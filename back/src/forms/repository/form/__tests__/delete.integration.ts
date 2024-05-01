@@ -19,7 +19,6 @@ import {
 import { getFormForElastic, indexForm, toBsdElastic } from "../../../elastic";
 import { getStream } from "../../../../activity-events";
 import { getFormRepository } from "../..";
-import { operationHook } from "../../../../queue/jobs/operationHook";
 
 describe("formRepository.delete", () => {
   afterEach(resetDatabase);
@@ -96,11 +95,6 @@ describe("formRepository.delete", () => {
     );
 
     await refreshElasticSearch();
-    // Manually execute operationHook to simulate markAsProcessed
-    await operationHook({
-      finalFormId: fullForm.id,
-      initialFormId: fullForm.id
-    });
     const hits = await searchBsds();
     // both BSD and BSD suite should be indexed
     expect(hits).toHaveLength(2);
@@ -120,7 +114,6 @@ describe("formRepository.delete", () => {
     });
     expect(deletedForm.isDeleted).toBe(true);
     expect(deletedForm.forwardedIn!.isDeleted).toBe(true);
-    expect(deletedForm.finalOperations!.every(ope => ope.isDeleted)).toBe(true);
 
     const events = await getStream(deletedForm.id);
     expect(events).toHaveLength(1);

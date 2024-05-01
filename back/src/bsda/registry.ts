@@ -28,6 +28,20 @@ const getOperationData = (bsda: Bsda) => ({
   destinationOperationMode: bsda.destinationOperationMode
 });
 
+const getFinalOperationsData = (bsda: RegistryBsda) => {
+  const destinationFinalOperationCodes: string[] = [];
+  const destinationFinalOperationWeights: number[] = [];
+  // Check if finalOperations is defined and has elements
+  if (bsda.finalOperations && bsda.finalOperations.length > 0) {
+    // Iterate through each operation once and fill both arrays
+    bsda.finalOperations.forEach(ope => {
+      destinationFinalOperationCodes.push(ope.operationCode);
+      destinationFinalOperationWeights.push(ope.quantity.toNumber());
+    });
+  }
+  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+};
+
 const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
   const transporters = getTransportersSync(bsda);
 
@@ -271,7 +285,8 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
       : null,
     emitterCustomInfo: bsda.emitterCustomInfo,
     destinationCompanyMail: bsda.destinationCompanyMail,
-    ...getOperationData(bsda)
+    ...getOperationData(bsda),
+    ...getFinalOperationsData(bsda)
   };
 }
 
@@ -470,6 +485,7 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     traderRecepisseNumber: null,
     emitterCompanyMail: bsda.emitterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail,
-    ...getOperationData(bsda)
+    ...getOperationData(bsda),
+    ...getFinalOperationsData(bsda)
   };
 }

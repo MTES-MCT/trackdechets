@@ -40,6 +40,7 @@ import { AllBsdaSignatureType, BsdaWithTransporters } from "../../types";
 import { parseBsdaAsync } from "../../validation";
 import { prismaToZodBsda } from "../../validation/helpers";
 import { AlreadySignedError } from "../../../bsvhu/errors";
+import { operationHook } from "../../operationHook";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -292,6 +293,7 @@ async function signOperation(
   }
 
   const updated = await updateBsda(user, bsda, updateInput);
+  await operationHook(updated, { runSync: false });
 
   if (refusedEmail) {
     sendMail(refusedEmail);
