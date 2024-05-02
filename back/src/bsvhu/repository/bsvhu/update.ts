@@ -20,7 +20,7 @@ export function buildUpdateBsvhu(deps: RepositoryFnDeps): UpdateBsvhuFn {
     const previousBsvhu = await prisma.bsvhu.findUnique({ where });
     const bsvhu = await prisma.bsvhu.update({ where, data });
 
-    const updateDiff = objectDiff(previousBsvhu, bsvhu);
+    const { updatedAt, ...updateDiff } = objectDiff(previousBsvhu, bsvhu);
     await prisma.event.create({
       data: {
         streamId: bsvhu.id,

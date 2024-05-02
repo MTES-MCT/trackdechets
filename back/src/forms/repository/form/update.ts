@@ -116,7 +116,7 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       });
     }
 
-    const updateDiff = objectDiff(oldForm, updatedForm);
+    const { updatedAt, ...updateDiff } = objectDiff(oldForm, updatedForm);
     await prisma.event.create({
       data: {
         streamId: updatedForm.id,

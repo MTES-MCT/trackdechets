@@ -84,7 +84,7 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       }
     }
 
-    const updateDiff = objectDiff(previousBsda, updatedBsda);
+    const { updatedAt, ...updateDiff } = objectDiff(previousBsda, updatedBsda);
     await prisma.event.create({
       data: {
         streamId: updatedBsda.id,

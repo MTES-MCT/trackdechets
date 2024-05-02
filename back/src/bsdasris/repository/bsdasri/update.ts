@@ -60,7 +60,7 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
       });
     }
 
-    const updateDiff = objectDiff(previousBsdasri, bsdasri);
+    const { updatedAt, ...updateDiff } = objectDiff(previousBsdasri, bsdasri);
     await prisma.event.create({
       data: {
         streamId: bsdasri.id,

@@ -19,7 +19,7 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
     const previousBsff = await prisma.bsff.findUnique({ where: args.where });
     const bsff = await prisma.bsff.update(args);
 
-    const updateDiff = objectDiff(previousBsff, bsff);
+    const { updatedAt, ...updateDiff } = objectDiff(previousBsff, bsff);
     await prisma.event.create({
       data: {
         streamId: bsff.id,
