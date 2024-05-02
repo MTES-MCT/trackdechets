@@ -2155,19 +2155,19 @@ describe("Mutation.updateBsda", () => {
         id: bsda.id,
         input: {
           waste: {
-            materialName: "New material name"
+            code: "06 13 04*"
           }
         }
       }
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updateBsda.waste?.materialName).toBe("New material name");
+    expect(data.updateBsda.waste?.code).toBe("06 13 04*");
 
     const events = await getStream(bsda.id);
     const updateEvent = events.find(evt => evt.type === "BsdaUpdated");
 
     expect(updateEvent).toBeDefined();
-    expect(updateEvent?.data?.["wasteMaterialName"]).toBe("New material name");
+    expect(updateEvent?.data?.["wasteCode"]).toBe("06 13 04*");
   });
 });
