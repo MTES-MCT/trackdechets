@@ -10,7 +10,7 @@ import {
 } from "./rules";
 import { getSignatureAncestors } from "./helpers";
 import { capitalize } from "../../common/strings";
-import { isArray } from "../../forms/workflow/diff";
+import { isArray } from "../../common/dataTypes";
 import {
   isDestinationRefinement,
   isRegisteredVatNumberRefinement,

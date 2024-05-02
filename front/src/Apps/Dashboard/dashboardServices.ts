@@ -1243,7 +1243,7 @@ export const canDeleteBsd = (bsd, siret) =>
   canDeleteBsda(bsd, siret) ||
   canDeleteBsdasri(bsd, siret) ||
   canDeleteBsff(bsd, siret) ||
-  canDeleteBspaoh(bsd, siret) ||
+  canDeleteBspaoh(bsd) ||
   canDeleteBsvhu(bsd);
 
 const canUpdateBsff = (bsd, siret) =>

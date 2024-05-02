@@ -666,7 +666,7 @@ describe("BSPAOH validation", () => {
       {
         input: {
           destination: {
-            reception: { detail: { weight: { value: 10, isEstimate: false } } }
+            reception: { detail: { receivedWeight: { value: 10 } } }
           }
         },
         persisted: preparedExistingBspaoh
