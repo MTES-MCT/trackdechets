@@ -3,6 +3,7 @@ import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { bsdasriFactory } from "../../../bsdasris/__tests__/factories";
 import { getStreamEvents, insertStreamEvents } from "../../../events/mongodb";
 import { cleanMongoEvents } from "../cleanMongoEvents.helper";
+import { randomUUID } from "node:crypto";
 
 describe("cleanMongoEvents script", () => {
   afterEach(resetDatabase);
@@ -18,8 +19,8 @@ describe("cleanMongoEvents script", () => {
     });
 
     // Simulate 10 updates
-    const events = Array.from({ length: 10 }).map((_, index) => ({
-      id: `event-${index}`,
+    const events = Array.from({ length: 10 }).map(() => ({
+      id: randomUUID(),
       streamId: dasri.id,
       data: { emitterCompanyMail: "test@test.test" },
       createdAt: new Date(),
@@ -29,15 +30,15 @@ describe("cleanMongoEvents script", () => {
     }));
     await insertStreamEvents(events);
 
-    // Check that we have 11 events
+    // Check that we have 10 events
     const eventsBeforeClean = await getStreamEvents(dasri.id).toArray();
-    expect(eventsBeforeClean).toBe(10);
+    expect(eventsBeforeClean.length).toBe(10);
 
     // Run the script
     await cleanMongoEvents();
 
-    // Check that we have 2 events remaining
+    // Check that we have 1 event remaining
     const eventsAfterClean = await getStreamEvents(dasri.id).toArray();
-    expect(eventsAfterClean).toBe(1);
+    expect(eventsAfterClean.length).toBe(1);
   });
 });

@@ -12,7 +12,7 @@ export async function getStream(
   const events: EventCollection[] = [];
   // Events might be dispatched between Psql & Mongo so we fetch from both
   const [stream, psqlEvents] = await Promise.all([
-    getStreamEvents(streamId, until),
+    getStreamEvents(streamId, until).stream(),
     prisma.event.findMany({
       where: {
         streamId,

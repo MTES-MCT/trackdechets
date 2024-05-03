@@ -56,15 +56,11 @@ async function iterateOverModelAndCleanEvents(
   let bsdProcessedCounter = 0;
   let bsdDeletedEventsCounter = 0;
   let cursor: string | null = null;
-  let reachedEnd = false;
 
-  do {
+  /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
+  while (true) {
     const bsds = await getter(cursor);
-
-    cursor = bsds[bsds.length - 1].id;
-    if (bsds.length < PAGE_SIZE) {
-      reachedEnd = true;
-    }
+    cursor = bsds[bsds.length - 1]?.id;
 
     for (const bsd of bsds) {
       bsdDeletedEventsCounter += await cleanStreamEvents(bsd.id);
@@ -72,7 +68,15 @@ async function iterateOverModelAndCleanEvents(
         `Processed ${modelName}: \x1b[32m${++bsdProcessedCounter}\x1b[0m - Deleted events: \x1b[31m${bsdDeletedEventsCounter}\x1b[0m`
       );
     }
-  } while (!reachedEnd);
+
+    if (bsds.length < PAGE_SIZE || !cursor) {
+      break;
+    }
+  }
+
+  console.info(
+    `Done with ${modelName}: Processed bsd=${bsdProcessedCounter} - Deleted events=${bsdDeletedEventsCounter}`
+  );
 }
 
 async function cleanStreamEvents(streamId: string): Promise<number> {
