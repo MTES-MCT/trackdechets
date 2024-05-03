@@ -24,7 +24,7 @@ import { PrismaInstrumentation } from "@prisma/instrumentation";
 import { ElasticsearchInstrumentation } from "opentelemetry-instrumentation-elasticsearch";
 import { findPkg } from "./pkg";
 
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== "test" && !process.env.OTEL_SDK_DISABLED) {
   const packageJson = findPkg();
 
   const sdk = new NodeSDK({
