@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajouter l'information du traitement final sur le registre sortant et exhaustif pour les BSD ayant un BSD suite [PR 3254](https://github.com/MTES-MCT/trackdechets/pull/3254)
 - Interface utilisateur des PAOHs [PR 3274](https://github.com/MTES-MCT/trackdechets/pull/3274)
+- Ajout de pastilles sur le dashboard indiquant le nombre d'actions en attente [PR 3275](https://github.com/MTES-MCT/trackdechets/pull/3275)
 
 #### :bug: Corrections de bugs
 
