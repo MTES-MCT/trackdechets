@@ -1,5 +1,6 @@
 import { deleteStreamEvent, getStreamEvents } from "../../events/mongodb";
 import { prisma } from "@td/prisma";
+import { cursorTo, clearLine } from "node:readline";
 
 const PAGE_SIZE = 1_000; // Keep it relatively small as iterating over all events can be slow
 
@@ -99,7 +100,7 @@ async function cleanStreamEvents(streamId: string): Promise<number> {
 }
 
 function printProgress(text: string) {
-  process.stdout.clearLine(0);
-  process.stdout.cursorTo(0);
+  clearLine(process.stdout, 0);
+  cursorTo(process.stdout, 0);
   process.stdout.write(text);
 }
