@@ -49,7 +49,12 @@ export function graphiqlLandingPagePlugin(): ApolloServerPlugin {
       crossorigin
       integrity="sha256-FC1QdPlDgsjmWJtkJfO6Tt7pKFza/bZuwKtw25R/7m4="
     ></script>
-    <link rel="stylesheet" href="https://unpkg.com/graphiql/graphiql.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/graphiql/graphiql.min.css"
+      crossorigin
+      integrity="sha256-wTzfn13a+pLMB5rMeysPPR1hO7x0SwSeQI+cnw7VdbE="
+    />
     <!-- 
       These are imports for the GraphIQL Explorer plugin.
      -->

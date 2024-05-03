@@ -209,7 +209,9 @@ app.use(
         styleSrc: [
           "'self'",
           "https:",
-          "'sha256-dihQy2mHNADQqxc3xhWK7pH1w4GVvEow7gKjxdWvTgE='"
+          "'sha256-dihQy2mHNADQqxc3xhWK7pH1w4GVvEow7gKjxdWvTgE='",
+          "'sha256-wTzfn13a+pLMB5rMeysPPR1hO7x0SwSeQI+cnw7VdbE='",
+          "'sha256-LFhQK3cog1BLYeE/LUUJthR1mUCLSLwgkyqlF+epuq8='"
         ],
         connectSrc: [process.env.API_HOST],
         formAction: ["self"],
