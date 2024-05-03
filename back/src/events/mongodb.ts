@@ -32,6 +32,16 @@ export const getStreamsEvents = (streamIds: string[]) =>
     })
     .stream();
 
+export function deleteStreamEvent({
+  streamId,
+  eventId
+}: {
+  streamId: string;
+  eventId: string;
+}) {
+  return eventsCollection.deleteOne({ streamId, _id: eventId });
+}
+
 export async function insertStreamEvents(tdEvents: Event[]) {
   try {
     await eventsCollection.bulkWrite(
