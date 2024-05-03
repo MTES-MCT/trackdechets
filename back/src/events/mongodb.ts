@@ -21,8 +21,7 @@ export async function closeMongoClient() {
 }
 
 export const getStreamEvents = (streamId: string, lte?: Date) =>
-  eventsCollection
-    .find({ streamId, ...(lte && { createdAt: { $lte: lte } }) });
+  eventsCollection.find({ streamId, ...(lte && { createdAt: { $lte: lte } }) });
 
 export const getStreamsEvents = (streamIds: string[]) =>
   eventsCollection
