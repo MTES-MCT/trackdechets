@@ -5,6 +5,8 @@ import {
   BsdaStatus,
   BsdasriStatus,
   Bsff,
+  Bspaoh,
+  BspaohStatus,
   Bsvhu,
   BsvhuStatus,
   Company,
@@ -36,6 +38,8 @@ import {
   userWithAccessTokenFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
+import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
+import { getBspaohForElastic, indexBspaoh } from "../../../../bspaoh/elastic";
 import makeClient from "../../../../__tests__/testClient";
 import { ALL_WASTES } from "./queries";
 import supertest from "supertest";
@@ -53,6 +57,7 @@ describe("All wastes registry", () => {
   let bsd3: Bsdasri;
   let bsd4: Bsvhu;
   let bsd5: Bsff;
+  let bsd6: Bspaoh;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -174,12 +179,33 @@ describe("All wastes registry", () => {
         operationCode: "R2"
       }
     );
+    bsd6 = await bspaohFactory({
+      opt: {
+        status: BspaohStatus.PROCESSED,
+        emitterCompanySiret: emitter.company.siret,
+
+        destinationCompanySiret: destination.company.siret,
+
+        destinationReceptionDate: new Date("2021-09-01"),
+        destinationReceptionSignatureDate: new Date("2021-09-01"),
+        destinationOperationDate: new Date("2021-09-01"),
+        destinationOperationCode: "D 10",
+        transporterTransportTakenOverAt: new Date("2021-09-02"),
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
+      }
+    });
     await Promise.all([
       indexForm(await getFormForElastic(bsd1)),
       indexBsda(await getBsdaForElastic(bsd2)),
       indexBsdasri(await getBsdasriForElastic(bsd3)),
       indexBsvhu(bsd4),
-      indexBsff(await getBsffForElastic(bsd5))
+      indexBsff(await getBsffForElastic(bsd5)),
+      indexBspaoh(await getBspaohForElastic(bsd6))
     ]);
     await refreshElasticSearch();
   });
@@ -257,9 +283,10 @@ describe("All wastes registry", () => {
     const { data: page1 } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
       variables: { sirets: [destination.company.siret], first: 2 }
     });
+
     let ids = page1.allWastes.edges.map(edge => edge.node.id);
     expect(ids).toEqual([bsd1.readableId, bsd2.id]);
-    expect(page1.allWastes.totalCount).toEqual(5);
+    expect(page1.allWastes.totalCount).toEqual(6);
     expect(page1.allWastes.pageInfo.endCursor).toEqual(bsd2.id);
     expect(page1.allWastes.pageInfo.hasNextPage).toEqual(true);
 
@@ -273,7 +300,7 @@ describe("All wastes registry", () => {
 
     ids = page2.allWastes.edges.map(edge => edge.node.id);
     expect(ids).toEqual([bsd3.id, bsd4.id]);
-    expect(page2.allWastes.totalCount).toEqual(5);
+    expect(page2.allWastes.totalCount).toEqual(6);
     expect(page2.allWastes.pageInfo.endCursor).toEqual(bsd4.id);
     expect(page2.allWastes.pageInfo.hasNextPage).toEqual(true);
 
@@ -284,10 +311,12 @@ describe("All wastes registry", () => {
         after: page2.allWastes.pageInfo.endCursor
       }
     });
+
     ids = page3.allWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd5.id]);
-    expect(page3.allWastes.totalCount).toEqual(5);
-    expect(page3.allWastes.pageInfo.endCursor).toEqual(bsd5.id);
+
+    expect(ids).toEqual([bsd5.id, bsd6.id]);
+    expect(page3.allWastes.totalCount).toEqual(6);
+    expect(page3.allWastes.pageInfo.endCursor).toEqual(bsd6.id);
     expect(page3.allWastes.pageInfo.hasNextPage).toEqual(false);
   });
 
@@ -297,9 +326,9 @@ describe("All wastes registry", () => {
       variables: { sirets: [destination.company.siret], last: 2 }
     });
     let ids = page1.allWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd4.id, bsd5.id]);
-    expect(page1.allWastes.totalCount).toEqual(5);
-    expect(page1.allWastes.pageInfo.startCursor).toEqual(bsd4.id);
+    expect(ids).toEqual([bsd5.id, bsd6.id]);
+    expect(page1.allWastes.totalCount).toEqual(6);
+    expect(page1.allWastes.pageInfo.startCursor).toEqual(bsd5.id);
     expect(page1.allWastes.pageInfo.hasPreviousPage).toEqual(true);
 
     const { data: page2 } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
@@ -310,9 +339,9 @@ describe("All wastes registry", () => {
       }
     });
     ids = page2.allWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd2.id, bsd3.id]);
-    expect(page2.allWastes.totalCount).toEqual(5);
-    expect(page2.allWastes.pageInfo.startCursor).toEqual(bsd2.id);
+    expect(ids).toEqual([bsd3.id, bsd4.id]);
+    expect(page2.allWastes.totalCount).toEqual(6);
+    expect(page2.allWastes.pageInfo.startCursor).toEqual(bsd3.id);
     expect(page2.allWastes.pageInfo.hasPreviousPage).toEqual(true);
 
     const { data: page3 } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
@@ -323,8 +352,8 @@ describe("All wastes registry", () => {
       }
     });
     ids = page3.allWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd1.readableId]);
-    expect(page3.allWastes.totalCount).toEqual(5);
+    expect(ids).toEqual([bsd1.readableId, bsd2.id]);
+    expect(page3.allWastes.totalCount).toEqual(6);
     expect(page3.allWastes.pageInfo.startCursor).toEqual(bsd1.id);
     expect(page3.allWastes.pageInfo.hasPreviousPage).toEqual(false);
   });
