@@ -26,7 +26,7 @@ export function Emitter() {
 
   const { siret } = useParams<{ siret: string }>();
   const emitter = watch(actor) ?? {};
-  console.log(emitter.company.contact);
+
   const orgId = useMemo(
     () => emitter?.company?.orgId ?? emitter?.company?.siret ?? null,
     [emitter?.company?.orgId, emitter?.company?.siret]
@@ -50,10 +50,7 @@ export function Emitter() {
               `${actor}.company.contact`,
               company.contact || emitter?.company?.contact
             );
-            console.log(
-              `${actor}.company.contact`,
-              company.contact || emitter?.company?.contact
-            );
+
             setValue(
               `${actor}.company.phone`,
               company.contactPhone || emitter?.company?.phone
