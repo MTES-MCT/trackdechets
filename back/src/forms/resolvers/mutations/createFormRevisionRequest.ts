@@ -331,7 +331,9 @@ async function getApproversSirets(
       ? []
       : [bsdd.emitterCompanySiret, bsdd.ecoOrganismeSiret]),
     bsdd.traderCompanySiret,
-    bsdd.recipientCompanySiret
+    ...(bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER
+      ? [bsdd.currentTransporterOrgId]
+      : [bsdd.recipientCompanySiret])
   ].filter(Boolean);
 
   if (hasTemporaryStorageUpdate(content)) {
