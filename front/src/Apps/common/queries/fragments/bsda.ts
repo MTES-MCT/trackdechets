@@ -43,6 +43,10 @@ export const bsdaFragment = gql`
         orgId
       }
     }
+    ecoOrganisme {
+      name
+      siret
+    }
     transporter {
       company {
         name
