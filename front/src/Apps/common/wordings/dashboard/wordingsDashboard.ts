@@ -120,6 +120,7 @@ export const bsd_type_option_bsff = "Déchets de Fluides Frigorigènes";
 export const bsd_type_option_bsda = "Déchets d'Amiante";
 export const bsd_type_option_bsdasri =
   "Déchets d'Activités de Soins à Risque Infectieux";
+export const bsd_type_option_bspaoh = "Pièces Anatomiques d'Origine Humaine";
 export const filter_type_select_option_placeholder = "Sélectionner une option";
 export const max_filter_autorized_label =
   "Vous avez atteint le nombre de filtres maximum";

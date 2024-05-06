@@ -60,16 +60,16 @@ export function Transporter() {
             setValue(`${actor}.company.address`, company.address);
             setValue(
               `${actor}.company.contact`,
-              transporter?.company?.contact || company.contact
+              company.contact || transporter?.company?.contact
             );
             setValue(
               `${actor}.company.phone`,
-              transporter?.company?.phone || company.contactPhone
+              company.contactPhone || transporter?.company?.phone
             );
 
             setValue(
               `${actor}.company.mail`,
-              transporter?.company?.mail || company.contactEmail
+              company.contactEmail || transporter?.company?.mail
             );
             setRecepisse({
               number: company.transporterReceipt?.receiptNumber,
