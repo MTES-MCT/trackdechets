@@ -116,24 +116,21 @@ export function ControlledTabs(props: Readonly<Props>) {
     Pick<Mutation, "createDraftBspaoh">,
     MutationCreateDraftBspaohArgs
   >(CREATE_DRAFT_BSPAOH, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
+    refetchQueries: [GET_BSDS]
   });
 
   const [createBspaoh, { loading: creating }] = useMutation<
     Pick<Mutation, "createBspaoh">,
     MutationCreateBspaohArgs
   >(CREATE_BSPAOH, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
+    refetchQueries: [GET_BSDS]
   });
 
   const [updateBspaoh, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBspaoh">,
     MutationUpdateBspaohArgs
   >(UPDATE_BSPAOH, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
+    refetchQueries: [GET_BSDS]
   });
   const loading = creatingDraft || updating || creating;
   const mainCtaLabel = formState.id ? "Enregistrer" : "Publier";
