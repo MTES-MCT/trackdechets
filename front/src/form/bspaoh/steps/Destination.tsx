@@ -48,16 +48,16 @@ export function Destination() {
             setValue(`${actor}.company.address`, company.address);
             setValue(
               `${actor}.company.contact`,
-              destination?.company?.contact || company.contact
+              company.contact || destination?.company?.contact
             );
             setValue(
               `${actor}.company.phone`,
-              destination?.company?.phone || company.contactPhone
+              company.contactPhone || destination?.company?.phone
             );
 
             setValue(
               `${actor}.company.mail`,
-              destination?.company?.mail || company.contactEmail
+              company.contactEmail || destination?.company?.mail
             );
           }
         }}
