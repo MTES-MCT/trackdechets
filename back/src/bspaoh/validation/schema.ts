@@ -17,7 +17,9 @@ const bspaohPackagingSchema = z.object({
   volume: z.number().nonnegative().nullish(),
   containerNumber: z.string(),
   quantity: z.number().positive().lte(1),
-  identificationCodes: z.array(z.string()).default([]),
+  identificationCodes: z
+    .array(z.string())
+    .nonempty("Au moins un code est requis"),
   consistence: z.enum(["SOLIDE", "LIQUIDE"])
 });
 

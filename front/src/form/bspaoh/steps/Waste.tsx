@@ -58,7 +58,7 @@ export function Waste() {
       <div className="fr-grid-row">
         <div className="fr-col-12 fr-col-md-6">
           <Input
-            label="En nombre"
+            label="En nombre de conditionnement(s)"
             disabled
             nativeInputProps={{
               inputMode: "decimal",

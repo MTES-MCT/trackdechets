@@ -103,7 +103,7 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
         </div>
         <div className="fr-col-12 fr-col-md-2">
           <Input
-            label="Volume (opt)"
+            label="Volume (optionnel)"
             disabled={disabled}
             nativeInputProps={{
               ...register(`${name}.volume`),

@@ -2,6 +2,8 @@ import React from "react";
 import { IconTrash } from "../../../common/Components/Icons/Icons";
 import { TOAST_DURATION } from "../../../../common/config";
 import { gql, useMutation } from "@apollo/client";
+import Button from "@codegouvfr/react-dsfr/Button";
+
 import {
   BsdType,
   Mutation,
@@ -9,7 +11,8 @@ import {
   MutationDeleteBsdasriArgs,
   MutationDeleteBsffArgs,
   MutationDeleteBsvhuArgs,
-  MutationDeleteFormArgs
+  MutationDeleteFormArgs,
+  MutationDeleteBspaohArgs
 } from "@td/codegen-ui";
 import toast from "react-hot-toast";
 import TdModal from "../../../common/Components/Modal/Modal";
@@ -53,6 +56,15 @@ const DELETE_BSFF = gql`
 const DELETE_BSVHU = gql`
   mutation DeleteBsvhu($id: ID!) {
     deleteBsvhu(id: $id) {
+      id
+      status
+    }
+  }
+`;
+
+const DELETE_BSPAOH = gql`
+  mutation DeleteBspaoh($id: ID!) {
+    deleteBspaoh(id: $id) {
       id
       status
     }
@@ -136,12 +148,28 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
       })
   });
 
+  const [deleteBspaoh, { loading: deletingBspaoh }] = useMutation<
+    Pick<Mutation, "deleteBspaoh">,
+    MutationDeleteBspaohArgs
+  >(DELETE_BSPAOH, {
+    variables: { id: bsdId },
+    onCompleted: () => {
+      toast.success(messageSuccess, { duration: TOAST_DURATION });
+      !!onClose && onClose();
+    },
+    onError: () =>
+      toast.error(messageError, {
+        duration: TOAST_DURATION
+      })
+  });
+
   const loading =
     deletingBsda ||
     deletingBsdasri ||
     deletingBsdd ||
     deletingBsff ||
-    deletingBsvhu;
+    deletingBsvhu ||
+    deletingBspaoh;
 
   const onDelete = () => {
     if (bsdType === BsdType.Bsdd) {
@@ -159,6 +187,9 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
     if (bsdType === BsdType.Bsvhu) {
       deleteBsvhu();
     }
+    if (bsdType === BsdType.Bspaoh) {
+      deleteBspaoh();
+    }
   };
 
   return (
@@ -170,13 +201,14 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
       <h2 className="td-modal-title">Confirmer la suppression ?</h2>
       <p>Cette action est irréversible.</p>
       <div className="td-modal-actions">
-        <button className="btn btn--outline-primary" onClick={onClose}>
+        <Button onClick={onClose} priority="secondary">
           Annuler
-        </button>
-        <button className="btn btn--primary" onClick={onDelete}>
+        </Button>
+        <Button onClick={onDelete}>
           <IconTrash />
           <span> Supprimer</span>
-        </button>
+        </Button>
+
         {loading && <Loader />}
       </div>
     </TdModal>

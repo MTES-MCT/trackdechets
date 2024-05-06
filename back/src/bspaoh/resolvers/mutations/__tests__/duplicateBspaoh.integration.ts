@@ -116,7 +116,7 @@ describe("Mutation.duplicateBspaoh", () => {
     expect(data.duplicateBspaoh.isDraft).toBe(true);
 
     const duplicated = await prisma.bspaoh.findUnique({
-      where: { id: bspaoh.id },
+      where: { id: data.duplicateBspaoh.id },
       include: { transporters: true }
     });
 
@@ -436,5 +436,55 @@ describe("Mutation.duplicateBspaoh", () => {
     expect(duplicatedBspaohTransporter.transporterCompanyAddress).toEqual(
       "updated transporter address"
     );
+  });
+
+  it("should clean packagings on duplication", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const bspaoh = await bspaohFactory({
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBspaoh">>(
+      DUPLICATE_BSPAOH,
+      {
+        variables: {
+          id: bspaoh.id
+        }
+      }
+    );
+
+    expect(data.duplicateBspaoh.status).toBe("INITIAL");
+    expect(data.duplicateBspaoh.isDraft).toBe(true);
+
+    const duplicated = await prisma.bspaoh.findUnique({
+      where: { id: data.duplicateBspaoh.id },
+      include: { transporters: true }
+    });
+
+    expect(duplicated?.wastePackagings).toEqual([
+      {
+        id: "packaging_1",
+        type: "LITTLE_BOX",
+        volume: 10,
+        quantity: 1,
+        consistence: "SOLIDE",
+        containerNumber: "abcd123",
+        identificationCodes: []
+      },
+      {
+        id: "packaging_2",
+        type: "LITTLE_BOX",
+        volume: 29,
+        quantity: 1,
+        consistence: "SOLIDE",
+        containerNumber: "abcd123",
+        identificationCodes: []
+      }
+    ]);
   });
 });

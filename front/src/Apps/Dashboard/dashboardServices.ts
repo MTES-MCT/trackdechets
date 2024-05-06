@@ -1197,6 +1197,9 @@ const canDeleteBsdasri = (bsd, siret) =>
 const canDeleteBsvhu = bsd =>
   bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.Initial;
 
+const canDeleteBspaoh = bsd =>
+  bsd.type === BsdType.Bspaoh && bsd.status === BsdStatusCode.Initial;
+
 const canDuplicateBsdasri = bsd =>
   bsd.type === BsdType.Bsdasri && bsd.bsdWorkflowType === BsdasriType.Simple;
 
@@ -1240,6 +1243,7 @@ export const canDeleteBsd = (bsd, siret) =>
   canDeleteBsda(bsd, siret) ||
   canDeleteBsdasri(bsd, siret) ||
   canDeleteBsff(bsd, siret) ||
+  canDeleteBspaoh(bsd) ||
   canDeleteBsvhu(bsd);
 
 const canUpdateBsff = (bsd, siret) =>

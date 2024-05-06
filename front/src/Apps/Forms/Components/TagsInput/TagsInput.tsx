@@ -29,7 +29,13 @@ const TagsInput: React.FC<TagsInputProps> = ({
   const [tag, setTag] = useState("");
 
   const addButtonIsDisabled = maxTags ? tags.length >= maxTags : false;
-
+  const saveTag = () => {
+    if (addButtonIsDisabled || tag.length === 0) {
+      return;
+    }
+    onAddTag(tag);
+    setTag("");
+  };
   return (
     <>
       <Input
@@ -38,7 +44,15 @@ const TagsInput: React.FC<TagsInputProps> = ({
         style={{ marginBottom: "10px" }}
         nativeInputProps={{
           value: tag,
-          onChange: e => setTag(e.target.value)
+          onChange: e => setTag(e.target.value),
+          onBlur: () => {
+            saveTag();
+          },
+          onKeyDown: e => {
+            if (e.key === "Enter") {
+              saveTag();
+            }
+          }
         }}
         addon={
           <Button
@@ -46,10 +60,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
             type="button"
             onClick={e => {
               e.preventDefault();
-              if (tag.length > 0) {
-                onAddTag(tag);
-                setTag("");
-              }
+              saveTag();
             }}
           >
             Ajouter

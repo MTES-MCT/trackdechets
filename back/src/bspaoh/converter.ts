@@ -40,8 +40,7 @@ import {
 import {
   BspaohTransporter as PrismaBspaohTransporter,
   BspaohStatus,
-  Bspaoh as PrismaBspaoh,
-  BspaohType
+  Bspaoh as PrismaBspaoh
 } from "@prisma/client";
 import { BspaohForElastic } from "./elastic";
 import { getTransporterCompanyOrgId } from "@td/constants";
@@ -461,7 +460,7 @@ function processPackagings(
 
 function flattenWasteInput(input: { waste?: BspaohWasteInput | null }) {
   return {
-    wasteType: chain(input.waste, w => w.type) ?? BspaohType.PAOH,
+    wasteType: chain(input.waste, w => w.type) ?? undefined,
     wasteCode: chain(input.waste, w => w.code),
     wasteAdr: chain(input.waste, w => w.adr),
     wastePackagings: undefinedOrDefault(
