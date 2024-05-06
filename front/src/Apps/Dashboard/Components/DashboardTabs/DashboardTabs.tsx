@@ -29,6 +29,7 @@ import {
 import "./DashboardTabs.scss";
 import CompanySwitcher from "../../../common/Components/CompanySwitcher/CompanySwitcher";
 import { gql, useQuery } from "@apollo/client";
+import { useNotifier } from "../../../../dashboard/components/BSDList/useNotifier";
 
 const NOTIFICATION_QUERY = gql`
   query GetBsds($where: BsdWhere) {
@@ -55,20 +56,32 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
   const { permissions, role } = usePermissions();
   const navigate = useNavigate();
 
-  const { data: dataAction } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
-    NOTIFICATION_QUERY,
-    { variables: { where: { isForActionFor: [currentCompany.orgId] } } }
-  );
+  const { data: dataAction, refetch: refetchAction } = useQuery<
+    Pick<Query, "bsds">,
+    QueryBsdsArgs
+  >(NOTIFICATION_QUERY, {
+    variables: { where: { isForActionFor: [currentCompany.orgId] } }
+  });
 
-  const { data: dataRevise } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
-    NOTIFICATION_QUERY,
-    { variables: { where: { isInRevisionFor: [currentCompany.orgId] } } }
-  );
+  const { data: dataRevision, refetch: refetchRevision } = useQuery<
+    Pick<Query, "bsds">,
+    QueryBsdsArgs
+  >(NOTIFICATION_QUERY, {
+    variables: { where: { isInRevisionFor: [currentCompany.orgId] } }
+  });
 
-  const { data: dataTransport } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
-    NOTIFICATION_QUERY,
-    { variables: { where: { isToCollectFor: [currentCompany.orgId] } } }
-  );
+  const { data: dataTransport, refetch: refetchTransport } = useQuery<
+    Pick<Query, "bsds">,
+    QueryBsdsArgs
+  >(NOTIFICATION_QUERY, {
+    variables: { where: { isToCollectFor: [currentCompany.orgId] } }
+  });
+
+  useNotifier(currentCompany.orgId, () => {
+    refetchAction();
+    refetchRevision();
+    refetchTransport();
+  });
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
@@ -207,7 +220,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {TO_REVIEW}
                 </NavLink>
-                {displayNotification(dataRevise?.bsds.totalCount)}
+                {displayNotification(dataRevision?.bsds.totalCount)}
               </li>
               <li>
                 <NavLink

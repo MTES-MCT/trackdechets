@@ -44,10 +44,10 @@ export const useShowTransportTabs = (companyTypes, companySiret) => {
   });
 
   useNotifier(companySiret, () => {
-    if (!isTransporter) refetchIsToCollectForData();
-  });
-  useNotifier(companySiret, () => {
-    if (!isTransporter) refetchIsCollectedForData();
+    if (!isTransporter) {
+      refetchIsToCollectForData();
+      refetchIsCollectedForData();
+    }
   });
 
   return {
