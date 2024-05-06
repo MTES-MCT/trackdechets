@@ -7,6 +7,7 @@ import {
   bsd_type_option_bsdd,
   bsd_type_option_bsff,
   bsd_type_option_bsvhu,
+  bsd_type_option_bspaoh,
   dropdown_create_bsda,
   dropdown_create_bsdasri,
   dropdown_create_bsdd,
@@ -70,6 +71,10 @@ const bsdTypeFilterSelectOptions = [
   {
     value: BsdType.Bsda,
     label: bsd_type_option_bsda
+  },
+  {
+    value: BsdType.Bspaoh,
+    label: bsd_type_option_bspaoh
   }
 ];
 
