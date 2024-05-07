@@ -148,7 +148,7 @@ export function prismaToZodBsda(bsda: PrismaBsdaForParsing): ZodBsda {
   return {
     ...data,
     weightValue: data.weightValue?.toNumber(),
-    destinationReceptionWeight: data.weightValue?.toNumber(),
+    destinationReceptionWeight: data.destinationReceptionWeight?.toNumber(),
     wasteCode: wasteCode as ZodWasteCodeEnum,
     destinationPlannedOperationCode:
       destinationPlannedOperationCode as ZodOperationEnum,
