@@ -75,7 +75,8 @@ type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
   | "isTransportedWasteFor"
-  | "isManagedWasteFor";
+  | "isManagedWasteFor"
+  | "isAllWasteFor";
 export function getRegistryFields(
   bsda: BsdaForElastic
 ): Pick<BsdElastic, RegistryFields> {
@@ -83,7 +84,8 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
 
   const transporter = getFirstTransporterSync(bsda);
@@ -91,22 +93,27 @@ export function getRegistryFields(
   if (transporter?.transporterTransportSignatureDate) {
     if (bsda.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsda.emitterCompanySiret);
+      registryFields.isAllWasteFor.push(bsda.emitterCompanySiret);
     }
     if (bsda.ecoOrganismeSiret) {
       registryFields.isOutgoingWasteFor.push(bsda.ecoOrganismeSiret);
+      registryFields.isAllWasteFor.push(bsda.ecoOrganismeSiret);
     }
 
     if (bsda.workerCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsda.workerCompanySiret);
+      registryFields.isAllWasteFor.push(bsda.workerCompanySiret);
     }
     if (bsda.brokerCompanySiret) {
       registryFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
+      registryFields.isAllWasteFor.push(bsda.brokerCompanySiret);
     }
     if (bsda.intermediaries?.length) {
       for (const intermediary of bsda.intermediaries) {
         const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
         if (intermediaryOrgId) {
           registryFields.isManagedWasteFor.push(intermediaryOrgId);
+          registryFields.isAllWasteFor.push(intermediaryOrgId);
         }
       }
     }
@@ -117,6 +124,7 @@ export function getRegistryFields(
       const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
       if (transporterCompanyOrgId) {
         registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+        registryFields.isAllWasteFor.push(transporterCompanyOrgId);
       }
     }
   }
@@ -124,6 +132,7 @@ export function getRegistryFields(
   // There is no signature at reception on the BSDA so we use the operation signature
   if (bsda.destinationOperationSignatureDate && bsda.destinationCompanySiret) {
     registryFields.isIncomingWasteFor.push(bsda.destinationCompanySiret);
+    registryFields.isAllWasteFor.push(bsda.destinationCompanySiret);
   }
 
   return registryFields;

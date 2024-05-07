@@ -39,7 +39,8 @@ type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
   | "isTransportedWasteFor"
-  | "isManagedWasteFor";
+  | "isManagedWasteFor"
+  | "isAllWasteFor";
 export function getRegistryFields(
   bsvhu: Bsvhu
 ): Pick<BsdElastic, RegistryFields> {
@@ -47,7 +48,8 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
 
   if (
@@ -56,9 +58,11 @@ export function getRegistryFields(
   ) {
     if (bsvhu.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsvhu.emitterCompanySiret);
+      registryFields.isAllWasteFor.push(bsvhu.emitterCompanySiret);
     }
     if (bsvhu.transporterCompanySiret) {
       registryFields.isTransportedWasteFor.push(bsvhu.transporterCompanySiret);
+      registryFields.isAllWasteFor.push(bsvhu.transporterCompanySiret);
     }
   }
 
@@ -67,6 +71,7 @@ export function getRegistryFields(
     bsvhu.destinationCompanySiret
   ) {
     registryFields.isIncomingWasteFor.push(bsvhu.destinationCompanySiret);
+    registryFields.isAllWasteFor.push(bsvhu.destinationCompanySiret);
   }
 
   return registryFields;

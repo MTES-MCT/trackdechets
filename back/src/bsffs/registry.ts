@@ -63,7 +63,8 @@ type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
   | "isTransportedWasteFor"
-  | "isManagedWasteFor";
+  | "isManagedWasteFor"
+  | "isAllWasteFor";
 
 export function getRegistryFields(
   bsff: Bsff
@@ -72,7 +73,8 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
 
   if (
@@ -81,17 +83,21 @@ export function getRegistryFields(
   ) {
     if (bsff.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsff.emitterCompanySiret);
+      registryFields.isAllWasteFor.push(bsff.emitterCompanySiret);
     }
     registryFields.isOutgoingWasteFor.push(...bsff.detenteurCompanySirets);
+    registryFields.isAllWasteFor.push(...bsff.detenteurCompanySirets);
 
     const transporterOrgId = getTransporterCompanyOrgId(bsff);
     if (transporterOrgId) {
       registryFields.isTransportedWasteFor.push(transporterOrgId);
+      registryFields.isAllWasteFor.push(transporterOrgId);
     }
   }
 
   if (bsff.destinationReceptionSignatureDate && bsff.destinationCompanySiret) {
     registryFields.isIncomingWasteFor.push(bsff.destinationCompanySiret);
+    registryFields.isAllWasteFor.push(bsff.destinationCompanySiret);
   }
 
   return registryFields;

@@ -55,7 +55,8 @@ type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
   | "isTransportedWasteFor"
-  | "isManagedWasteFor";
+  | "isManagedWasteFor"
+  | "isAllWasteFor";
 
 export function getRegistryFields(
   form: FormForElastic
@@ -64,7 +65,8 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
 
   if (form.receivedAt) {
@@ -74,17 +76,24 @@ export function getRegistryFields(
   }
 
   if (form.sentAt) {
+    if (form.recipientCompanySiret) {
+      registryFields.isAllWasteFor.push(form.recipientCompanySiret);
+    }
     if (form.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(form.emitterCompanySiret);
+      registryFields.isAllWasteFor.push(form.emitterCompanySiret);
     }
     if (form.ecoOrganismeSiret) {
       registryFields.isOutgoingWasteFor.push(form.ecoOrganismeSiret);
+      registryFields.isAllWasteFor.push(form.ecoOrganismeSiret);
     }
     if (form.traderCompanySiret) {
       registryFields.isManagedWasteFor.push(form.traderCompanySiret);
+      registryFields.isAllWasteFor.push(form.traderCompanySiret);
     }
     if (form.brokerCompanySiret) {
       registryFields.isManagedWasteFor.push(form.brokerCompanySiret);
+      registryFields.isAllWasteFor.push(form.brokerCompanySiret);
     }
 
     if (form.intermediaries?.length) {
@@ -92,6 +101,7 @@ export function getRegistryFields(
         const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
         if (intermediaryOrgId) {
           registryFields.isManagedWasteFor.push(intermediaryOrgId);
+          registryFields.isAllWasteFor.push(intermediaryOrgId);
         }
       }
     }
@@ -102,6 +112,7 @@ export function getRegistryFields(
       const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
       if (transporterCompanyOrgId) {
         registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+        registryFields.isAllWasteFor.push(transporterCompanyOrgId);
       }
     }
   }
