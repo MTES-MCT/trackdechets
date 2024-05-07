@@ -6,6 +6,8 @@ import {
   BsdasriStatus,
   Bsff,
   Bsvhu,
+  Bspaoh,
+  BspaohStatus,
   BsvhuStatus,
   Company,
   Status,
@@ -30,6 +32,8 @@ import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories"
 import { indexBsvhu } from "../../../../bsvhu/elastic";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
+import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
+import { getBspaohForElastic, indexBspaoh } from "../../../../bspaoh/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
   companyFactory,
@@ -56,6 +60,7 @@ describe("Incoming wastes registry", () => {
   let bsd3: Bsdasri;
   let bsd4: Bsvhu;
   let bsd5: Bsff;
+  let bsd6: Bspaoh;
 
   const OLD_ENV = process.env;
 
@@ -184,12 +189,33 @@ describe("Incoming wastes registry", () => {
         operationSignatureDate: new Date("2021-08-01")
       }
     );
+    bsd6 = await bspaohFactory({
+      opt: {
+        status: BspaohStatus.PROCESSED,
+        emitterCompanySiret: emitter.company.siret,
+
+        destinationCompanySiret: destination.company.siret,
+
+        destinationReceptionDate: new Date("2021-09-01"),
+        destinationReceptionSignatureDate: new Date("2021-09-01"),
+        destinationOperationDate: new Date("2021-09-01"),
+        destinationOperationCode: "D 10",
+        transporterTransportTakenOverAt: new Date("2021-09-02"),
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
+      }
+    });
     await Promise.all([
       indexForm(await getFormForElastic(bsd1)),
       indexBsda(await getBsdaForElastic(bsd2)),
       indexBsdasri(await getBsdasriForElastic(bsd3)),
       indexBsvhu(bsd4),
-      indexBsff(await getBsffForElastic(bsd5))
+      indexBsff(await getBsffForElastic(bsd5)),
+      indexBspaoh(await getBspaohForElastic(bsd6))
     ]);
     await refreshElasticSearch();
   });
@@ -246,7 +272,7 @@ describe("Incoming wastes registry", () => {
     );
     let ids = page1.incomingWastes.edges.map(edge => edge.node.id);
     expect(ids).toEqual([bsd1.readableId, bsd2.id]);
-    expect(page1.incomingWastes.totalCount).toEqual(5);
+    expect(page1.incomingWastes.totalCount).toEqual(6);
     expect(page1.incomingWastes.pageInfo.endCursor).toEqual(bsd2.id);
     expect(page1.incomingWastes.pageInfo.hasNextPage).toEqual(true);
 
@@ -263,7 +289,7 @@ describe("Incoming wastes registry", () => {
 
     ids = page2.incomingWastes.edges.map(edge => edge.node.id);
     expect(ids).toEqual([bsd3.id, bsd4.id]);
-    expect(page2.incomingWastes.totalCount).toEqual(5);
+    expect(page2.incomingWastes.totalCount).toEqual(6);
     expect(page2.incomingWastes.pageInfo.endCursor).toEqual(bsd4.id);
     expect(page2.incomingWastes.pageInfo.hasNextPage).toEqual(true);
 
@@ -278,9 +304,10 @@ describe("Incoming wastes registry", () => {
       }
     );
     ids = page3.incomingWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd5.id]);
-    expect(page3.incomingWastes.totalCount).toEqual(5);
-    expect(page3.incomingWastes.pageInfo.endCursor).toEqual(bsd5.id);
+    expect(ids).toEqual([bsd5.id, bsd6.id]);
+
+    expect(page3.incomingWastes.totalCount).toEqual(6);
+    expect(page3.incomingWastes.pageInfo.endCursor).toEqual(bsd6.id);
     expect(page3.incomingWastes.pageInfo.hasNextPage).toEqual(false);
   });
 
@@ -293,9 +320,9 @@ describe("Incoming wastes registry", () => {
       }
     );
     let ids = page1.incomingWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd4.id, bsd5.id]);
-    expect(page1.incomingWastes.totalCount).toEqual(5);
-    expect(page1.incomingWastes.pageInfo.startCursor).toEqual(bsd4.id);
+    expect(ids).toEqual([bsd5.id, bsd6.id]);
+    expect(page1.incomingWastes.totalCount).toEqual(6);
+    expect(page1.incomingWastes.pageInfo.startCursor).toEqual(bsd5.id);
     expect(page1.incomingWastes.pageInfo.hasPreviousPage).toEqual(true);
 
     const { data: page2 } = await query<Pick<Query, "incomingWastes">>(
@@ -309,9 +336,9 @@ describe("Incoming wastes registry", () => {
       }
     );
     ids = page2.incomingWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd2.id, bsd3.id]);
-    expect(page2.incomingWastes.totalCount).toEqual(5);
-    expect(page2.incomingWastes.pageInfo.startCursor).toEqual(bsd2.id);
+    expect(ids).toEqual([bsd3.id, bsd4.id]);
+    expect(page2.incomingWastes.totalCount).toEqual(6);
+    expect(page2.incomingWastes.pageInfo.startCursor).toEqual(bsd3.id);
     expect(page2.incomingWastes.pageInfo.hasPreviousPage).toEqual(true);
 
     const { data: page3 } = await query<Pick<Query, "incomingWastes">>(
@@ -325,8 +352,8 @@ describe("Incoming wastes registry", () => {
       }
     );
     ids = page3.incomingWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd1.readableId]);
-    expect(page3.incomingWastes.totalCount).toEqual(5);
+    expect(ids).toEqual([bsd1.readableId, bsd2.id]);
+    expect(page3.incomingWastes.totalCount).toEqual(6);
     expect(page3.incomingWastes.pageInfo.startCursor).toEqual(bsd1.id);
     expect(page3.incomingWastes.pageInfo.hasPreviousPage).toEqual(false);
   });
@@ -399,7 +426,7 @@ describe("Incoming wastes registry", () => {
       .set("Authorization", `Bearer ${accessToken}`)
       .set("X-Forwarded-For", allowedIP);
 
-    expect(res.body).toEqual({ data: { incomingWastes: { totalCount: 5 } } });
+    expect(res.body).toEqual({ data: { incomingWastes: { totalCount: 6 } } });
   });
 
   it("should allow user to request any siret if authenticated from a service account and orgId is specified in white list", async () => {
@@ -426,7 +453,7 @@ describe("Incoming wastes registry", () => {
       .set("Authorization", `Bearer ${accessToken}`)
       .set("X-Forwarded-For", allowedIP);
 
-    expect(res.body).toEqual({ data: { incomingWastes: { totalCount: 5 } } });
+    expect(res.body).toEqual({ data: { incomingWastes: { totalCount: 6 } } });
   });
 
   it("should not accept service account connection from IP address not in the white list", async () => {
