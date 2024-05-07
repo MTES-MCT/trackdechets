@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { bsffEventTypes } from "../types";
+import { objectDiff } from "../../../forms/workflow/diff";
 
 export type UpdateBsffPackagingFn = (
   args: Prisma.BsffPackagingUpdateArgs,
@@ -16,14 +17,18 @@ export function buildUpdateBsffPackaging(
   return async (args, logMetadata?) => {
     const { prisma, user } = deps;
 
+    const previousBsffPackaging = await prisma.bsffPackaging.findUnique({
+      where: args.where
+    });
     const bsffPackaging = await prisma.bsffPackaging.update(args);
 
+    const updateDiff = objectDiff(previousBsffPackaging, bsffPackaging);
     await prisma.event.create({
       data: {
         streamId: bsffPackaging.bsffId,
         actor: user.id,
         type: bsffEventTypes.updated,
-        data: args.data as Prisma.InputJsonObject,
+        data: updateDiff,
         metadata: {
           ...logMetadata,
           authType: user.auth,

@@ -190,7 +190,7 @@ describe("ActivityEvent.Bsda", () => {
     expect(bsdaFromEventsAfterSealed.status).toBe("SIGNED_BY_PRODUCER");
 
     const eventsAfterSealed = await getStream(bsdaId);
-    expect(eventsAfterSealed.length).toBe(4); // +2, update + signature
+    expect(eventsAfterSealed.length).toBe(3); // +2, signature
   }, 10000);
 
   it("should create a bsda event when a revision request is applied", async () => {

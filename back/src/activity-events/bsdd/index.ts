@@ -1,8 +1,8 @@
 import { Form } from "@prisma/client";
-import { aggregateStream, getStream, persistEvent } from "..";
+import { aggregateStream, getStream } from "..";
 import { AppDataloaders } from "../../types";
 import { bsddReducer } from "./reducer";
-import { BsddEvent, BsddRevisionRequestEvent } from "./types";
+import { BsddEvent } from "./types";
 
 export * from "./types";
 export * from "./reducer";
@@ -11,16 +11,6 @@ type BsddEventsParams = {
   bsddId: string;
   at?: Date;
 };
-
-export function persistBsddEvent(bsddEvent: BsddEvent) {
-  return persistEvent(bsddEvent);
-}
-
-export function persistBsddRevisionRequestEvent(
-  bsddRevisionRequestEvent: BsddRevisionRequestEvent
-) {
-  return persistEvent(bsddRevisionRequestEvent);
-}
 
 export async function getBsddFromActivityEvents(
   { bsddId, at }: BsddEventsParams,

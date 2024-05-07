@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { bsffEventTypes } from "../types";
+import { objectDiff } from "../../../forms/workflow/diff";
 
 export type UpdateBsffFicheInterventionFn = (
   args: Prisma.BsffFicheInterventionUpdateArgs,
@@ -16,18 +17,22 @@ export function buildUpdateBsffFicheIntervention(
   return async (args, logMetadata?) => {
     const { prisma, user } = deps;
 
-    const FI = await prisma.bsffFicheIntervention.update(args);
+    const previousFi = await prisma.bsffFicheIntervention.findUnique({
+      where: args.where
+    });
+    const fi = await prisma.bsffFicheIntervention.update(args);
 
+    const updateDiff = objectDiff(previousFi, fi);
     await prisma.event.create({
       data: {
-        streamId: FI.id,
+        streamId: fi.id,
         actor: user.id,
         type: bsffEventTypes.updated,
-        data: args.data as Prisma.InputJsonObject,
+        data: updateDiff,
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
 
-    return FI;
+    return fi;
   };
 }

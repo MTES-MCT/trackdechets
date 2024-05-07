@@ -5,7 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
-import { formDiff } from "../../workflow/diff";
+import { formDiff, objectDiff } from "../../workflow/diff";
 import { getUserCompanies } from "../../../users/database";
 import { FormWithForwardedIn, FormWithTransporters } from "../../types";
 
@@ -116,12 +116,13 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       });
     }
 
+    const { updatedAt, ...updateDiff } = objectDiff(oldForm, updatedForm);
     await prisma.event.create({
       data: {
         streamId: updatedForm.id,
         actor: user.id,
         type: "BsddUpdated",
-        data: { content: data } as Prisma.InputJsonObject,
+        data: { content: updateDiff } as Prisma.InputJsonObject,
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
