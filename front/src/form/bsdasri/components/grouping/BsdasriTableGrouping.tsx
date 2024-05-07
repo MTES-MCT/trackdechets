@@ -56,6 +56,10 @@ export default function BsdasriTableGrouping({
   selectedItems,
   onToggle,
   regroupedInDB
+}: {
+  selectedItems: string[];
+  onToggle: (payload: Bsdasri | Bsdasri[]) => void;
+  regroupedInDB: string[];
 }) {
   const { values, setFieldValue } = useFormikContext<
     Bsdasri & { dbRegroupedBsdasris: string[] }
@@ -94,18 +98,18 @@ export default function BsdasriTableGrouping({
     const selectedDasris = bsdasris
       .filter(bsd => selectedItems.indexOf(bsd.node.id) >= 0)
       .map(edge => edge?.node);
-    setFieldValue(
-      "emitter.emission.weight.value",
-      selectedDasris.reduce(
-        (prev, cur) => prev + (cur?.destination?.operation?.weight?.value ?? 0),
-        0
-      ) ?? 0
-    );
+    // compute the total weight and assume that if some weights are missing, the total is estimated
+    let isEstimate = false;
+    const weight = selectedDasris.reduce((prev, cur) => {
+      if (cur?.destination?.operation?.weight?.value) {
+        return prev + cur.destination.operation.weight.value;
+      }
+      isEstimate = true;
+      return prev;
+    }, 0);
+    setFieldValue("emitter.emission.weight.value", weight);
     // Manually set isEstimate which is usually handled by the weight widget main switch
-    setFieldValue(
-      "emitter.emission.weight.isEstimate",
-      values?.emitter?.emission?.weight?.isEstimate ?? false
-    );
+    setFieldValue("emitter.emission.weight.isEstimate", isEstimate);
 
     const packagings: BsdasriPackaging[][] = selectedDasris.map(
       item => item?.destination?.reception?.packagings ?? []

@@ -17,6 +17,7 @@ import {
 } from "../../../__tests__/factories";
 import { buildPdfAsBase64 } from "../../../pdf/generator";
 import { getTransportersSync } from "../../../database";
+import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
@@ -890,7 +891,9 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureDate: new Date(),
           workerWorkSignatureAuthor: "Worker",
           workerWorkSignatureDate: new Date(),
-          destinationCompanySiret: company.siret
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "R 5",
+          destinationOperationMode: "RECYCLAGE"
         },
         transporterOpt: {
           transporterCompanySiret: transporter.company.siret,
@@ -903,7 +906,7 @@ describe("Mutation.Bsda.sign", () => {
       });
 
       const { mutate } = makeClient(user);
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "signBsda">,
         MutationSignBsdaArgs
       >(SIGN_BSDA, {
@@ -916,7 +919,21 @@ describe("Mutation.Bsda.sign", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
+
       expect(data.signBsda.id).toBeTruthy();
+
+      await new Promise(resolve => {
+        operationHooksQueue.once("global:drained", () => resolve(true));
+      });
+
+      const signedBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id },
+        include: { finalOperations: true }
+      });
+
+      // final operation should be set
+      expect(signedBsda.finalOperations).toHaveLength(1);
     });
 
     it("should mark as AWAITING_CHILD if operation code implies it", async () => {

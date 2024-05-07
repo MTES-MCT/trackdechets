@@ -66,10 +66,18 @@ export const machine = createMachine<Record<string, never>, Event>(
           ]
         }
       },
+      [BspaohStatus.PARTIALLY_REFUSED]: {
+        on: {
+          OPERATION: [
+            {
+              target: BspaohStatus.PROCESSED
+            }
+          ]
+        }
+      },
       [BspaohStatus.REFUSED]: { type: "final" },
       [BspaohStatus.PROCESSED]: { type: "final" },
-      [BspaohStatus.CANCELED]: { type: "final" },
-      [BspaohStatus.PARTIALLY_REFUSED]: { type: "final" }
+      [BspaohStatus.CANCELED]: { type: "final" }
     }
   },
   {

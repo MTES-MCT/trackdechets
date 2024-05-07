@@ -455,6 +455,7 @@ describe("query { myCompanies }", () => {
       "BSD_CAN_SIGN_EMISSION",
       "BSD_CAN_SIGN_WORK",
       "BSD_CAN_SIGN_TRANSPORT",
+      "BSD_CAN_SIGN_DELIVERY",
       "BSD_CAN_SIGN_ACCEPTATION",
       "BSD_CAN_SIGN_OPERATION",
       "BSD_CAN_DELETE",

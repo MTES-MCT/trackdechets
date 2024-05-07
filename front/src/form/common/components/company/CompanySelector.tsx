@@ -89,6 +89,7 @@ export default function CompanySelector({
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
+
   const [hasAutoselected, setHasAutoselected] = useState(false);
   const [selectedCompanyDetails, setSelectedCompanyDetails] = useState({
     name: field.value?.name,

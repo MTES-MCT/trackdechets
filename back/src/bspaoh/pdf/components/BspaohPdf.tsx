@@ -29,8 +29,6 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
             <p className="TextAlignCenter">
               Code de la Santé publique art. R 1335-10.
             </p>
-            <p>Décret</p>
-            <p>Arrêté</p>
           </div>
           <div className="BoxCol TextAlignCenter">
             <p>Ministère en charge de la Santé</p>
@@ -200,13 +198,15 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
             <p>
               <strong>Date et heure : </strong>
               {formatDateTime(
-                bspaoh?.destination?.handedOverToDestination?.date
+                bspaoh?.destination?.handedOverToDestination?.signature?.date
               )}
             </p>
             <p>
               <strong>Signature</strong>
               <Signature
-                signature={bspaoh?.transporter?.transport?.signature}
+                signature={
+                  bspaoh?.destination?.handedOverToDestination?.signature
+                }
               />
             </p>
           </div>
@@ -268,7 +268,15 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
                 ))}
               <Quantity
                 label="Quantité réceptionnée"
-                weight={bspaoh?.destination?.reception?.detail?.weight}
+                weight={bspaoh?.destination?.reception?.detail?.receivedWeight}
+              />
+              <Quantity
+                label="Quantité refusée"
+                weight={bspaoh?.destination?.reception?.detail?.refusedWeight}
+              />
+              <Quantity
+                label="Quantité acceptée"
+                weight={bspaoh?.destination?.reception?.detail?.acceptedWeight}
               />
               <p>
                 Date et heure de réception/acceptation/refus:{" "}

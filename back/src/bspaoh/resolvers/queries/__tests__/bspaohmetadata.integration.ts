@@ -103,7 +103,7 @@ describe("Query.Bspaoh", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(48);
+    expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(49);
   });
 
   it("should return PROCESSED bspaoh sealed fields", async () => {
@@ -122,6 +122,6 @@ describe("Query.Bspaoh", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(51);
+    expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(52);
   });
 });

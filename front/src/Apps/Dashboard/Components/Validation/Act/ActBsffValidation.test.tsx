@@ -1,7 +1,7 @@
 import { MockedProvider } from "@apollo/client/testing";
 import { screen } from "@testing-library/dom";
 import { render } from "@testing-library/react";
-import { GET_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
+import { GET_BSFF_FORM } from "../../../../common/queries/bsff/queries";
 import React from "react";
 import ActBsffValidation from "./ActBsffValidation";
 import { Bsff } from "@td/codegen-ui";

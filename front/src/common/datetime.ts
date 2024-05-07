@@ -3,7 +3,9 @@ import { parseISO, format, toDate, isValid } from "date-fns";
 // eslint-disable-next-line import/no-duplicates
 import fr from "date-fns/locale/fr";
 
-export function parseDate(date: Date | number | string): Date {
+type Props = Date | number | string;
+
+export function parseDate(date: Props): Date {
   if (typeof date === "string") {
     return parseISO(date);
   }
@@ -11,11 +13,20 @@ export function parseDate(date: Date | number | string): Date {
   return toDate(date);
 }
 
-export function formatDate(date: Date | number | string): string {
+export function formatDate(date: Props): string {
   const parsedDate = parseDate(date);
   if (!isValid(parsedDate)) return "";
 
   return format(parsedDate, "dd/MM/y", {
+    locale: fr
+  });
+}
+
+export function formatDateTime(date: Props): string {
+  const parsedDate = parseDate(date);
+  if (!isValid(parsedDate)) return "";
+
+  return format(parsedDate, "dd/MM/y à HH:mm", {
     locale: fr
   });
 }

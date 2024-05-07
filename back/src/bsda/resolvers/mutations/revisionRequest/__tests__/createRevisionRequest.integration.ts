@@ -618,4 +618,54 @@ describe("Mutation.createBsdaRevisionRequest", () => {
 
     expect(errors).toBeUndefined();
   });
+
+  it("should fail if all fields are empty", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { waste: { code: "" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe("Le code déchet ne peut pas être vide");
+  });
+
+  it("should fail if the packaging is other with no description", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { packagings: [{ type: "OTHER", quantity: 1, other: "" }] },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
+    );
+  });
 });

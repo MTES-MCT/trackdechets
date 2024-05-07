@@ -12,6 +12,8 @@ import {
 } from "../../../../../generated/graphql/types";
 import { NON_CANCELLABLE_BSDA_STATUSES } from "../createRevisionRequest";
 import { BsdaStatus, UserRole } from "@prisma/client";
+import { operationHook } from "../../../../operationHook";
+import { operationHooksQueue } from "../../../../../queue/producers/operationHook";
 
 const SUBMIT_BSDA_REVISION_REQUEST_APPROVAL = `
   mutation SubmitBsdaRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -867,4 +869,123 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
     expect(updatedBsda.destinationOperationCode).toBe("D 15");
     expect(updatedBsda.destinationOperationMode).toBeNull();
   });
+
+  it(
+    "should delete the finalOperations rows when changing operation " +
+      "code from a final to a non-final code",
+    async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const destination = await userWithCompanyFactory("ADMIN");
+
+      const { mutate } = makeClient(emitter.user);
+
+      const initialBsda = await bsdaFactory({
+        opt: { destinationOperationCode: "D 15" }
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
+          destinationOperationCode: "R 1",
+          destinationOperationSignatureDate: new Date(),
+          destinationOperationMode: "VALORISATION_ENERGETIQUE",
+          grouping: { connect: { id: initialBsda.id } }
+        }
+      });
+
+      await operationHook(bsda, { runSync: true });
+
+      const initialBsdaWithFinalOperations =
+        await prisma.bsda.findUniqueOrThrow({
+          where: { id: initialBsda.id },
+          include: { finalOperations: true }
+        });
+
+      expect(initialBsdaWithFinalOperations.finalOperations).toHaveLength(1);
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: destination.company.id,
+          approvals: { create: { approverSiret: emitter.company.siret! } },
+          comment: "",
+          destinationOperationCode: "D 15"
+        }
+      });
+
+      await mutate<Pick<Mutation, "submitBsdaRevisionRequestApproval">>(
+        SUBMIT_BSDA_REVISION_REQUEST_APPROVAL,
+        {
+          variables: {
+            id: revisionRequest.id,
+            isApproved: true
+          }
+        }
+      );
+
+      const updatedInitialBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: initialBsda.id },
+        include: { finalOperations: true }
+      });
+
+      expect(updatedInitialBsda.finalOperations).toHaveLength(0);
+    }
+  );
+  it(
+    "should create the final operation using the job queue" +
+      " when changing operation code to a final one",
+    async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const destination = await userWithCompanyFactory("ADMIN");
+
+      const { mutate } = makeClient(emitter.user);
+
+      const initialBsda = await bsdaFactory({
+        opt: { destinationOperationCode: "D 15" }
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
+          destinationOperationCode: "D 15",
+          destinationOperationSignatureDate: new Date(),
+          destinationOperationMode: "VALORISATION_ENERGETIQUE",
+          grouping: { connect: { id: initialBsda.id } }
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: destination.company.id,
+          approvals: { create: { approverSiret: emitter.company.siret! } },
+          comment: "",
+          destinationOperationCode: "R 1"
+        }
+      });
+
+      await mutate<Pick<Mutation, "submitBsdaRevisionRequestApproval">>(
+        SUBMIT_BSDA_REVISION_REQUEST_APPROVAL,
+        {
+          variables: {
+            id: revisionRequest.id,
+            isApproved: true
+          }
+        }
+      );
+
+      await new Promise(resolve => {
+        operationHooksQueue.once("global:drained", () => resolve(true));
+      });
+
+      const updatedInitialBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: initialBsda.id },
+        include: { finalOperations: true }
+      });
+
+      expect(updatedInitialBsda.finalOperations).toHaveLength(1);
+    }
+  );
 });

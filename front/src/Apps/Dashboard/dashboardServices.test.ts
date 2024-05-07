@@ -1304,7 +1304,7 @@ describe("dashboardServices", () => {
       expect(result).toBe(false);
     });
 
-    it("should return false when emitterType is Appendix1Producer", () => {
+    it("should return true when emitterType is Appendix1Producer", () => {
       const bsd = {
         type: BsdType.Bsdd,
         status: BsdStatusCode.Accepted,
@@ -1313,7 +1313,7 @@ describe("dashboardServices", () => {
 
       const result = canReviewBsdd(bsd);
 
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
   });
 

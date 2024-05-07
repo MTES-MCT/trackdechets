@@ -117,13 +117,13 @@ export function BsvhuDetailContent({ form }: Props) {
 function Company({ company, label }: CompanyProps) {
   return (
     <>
-      <dt>{label}</dt> <dd>{company?.name}</dd>
-      <dt>Siret</dt> <dd>{company?.siret}</dd>
-      <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
-      <dt>Adresse</dt> <dd>{company?.address}</dd>
-      <dt>Tél</dt> <dd>{company?.phone}</dd>
-      <dt>Mél</dt> <dd>{company?.mail}</dd>
-      <dt>Contact</dt> <dd>{company?.contact}</dd>
+      <DetailRow label={label} value={company?.name} />
+      <DetailRow label="Siret" value={company?.siret} />
+      <DetailRow label="Numéro de TVA" value={company?.vatNumber} />
+      <DetailRow label="Adresse" value={company?.address} />
+      <DetailRow label="Tél" value={company?.phone} />
+      <DetailRow label="Mél" value={company?.mail} />
+      <DetailRow label="Contact" value={company?.contact} />
     </>
   );
 }

@@ -1,134 +1,20 @@
-import { User } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAdmin } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import { PrismaTransaction } from "../../../common/repository/types";
 import { hashPassword } from "../../utils";
 import { clearUserSessions } from "../../clearUserSessions";
 import { getUid } from "../../../utils";
 import { UserInputError } from "../../../common/errors";
-
-export async function checkCompanyAssociations(user: User): Promise<string[]> {
-  const errors: string[] = [];
-  const companyAssociations = await prisma.companyAssociation.findMany({
-    where: {
-      user: {
-        id: user.id
-      }
-    },
-    include: {
-      company: { select: { id: true, siret: true, vatNumber: true } }
-    }
-  });
-
-  for (const association of companyAssociations) {
-    if (association.role !== "ADMIN") {
-      continue;
-    }
-
-    const otherAdmins = await prisma.companyAssociation.findMany({
-      where: {
-        role: "ADMIN",
-        user: {
-          id: { not: user.id }
-        },
-        company: {
-          id: association.company.id
-        }
-      }
-    });
-    if (otherAdmins.length <= 0) {
-      errors.push(
-        `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'entreprise ${
-          association.company.id
-        } (SIRET OU TVA: ${
-          association.company.siret ?? association.company.vatNumber
-        }).`
-      );
-    }
-  }
-
-  return errors;
-}
-
-export async function checkApplications(user: User): Promise<string[]> {
-  const errors: string[] = [];
-  const applications = await prisma.application.findMany({
-    where: {
-      adminId: user.id
-    }
-  });
-  for (const application of applications) {
-    errors.push(
-      `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'application ${application.id} (${application.name}).`
-    );
-  }
-
-  return errors;
-}
-
-export async function deleteUserCompanyAssociations(
-  user: User,
-  prisma: PrismaTransaction
-) {
-  await prisma.companyAssociation.deleteMany({
-    where: {
-      user: {
-        id: user.id
-      }
-    }
-  });
-}
-
-export async function deleteMembershipRequest(
-  user: User,
-  prisma: PrismaTransaction
-) {
-  await prisma.membershipRequest.deleteMany({
-    where: {
-      user: {
-        id: user.id
-      }
-    }
-  });
-}
-
-export async function deleteUserActivationHashes(
-  user: User,
-  prisma: PrismaTransaction
-) {
-  await prisma.userActivationHash.deleteMany({
-    where: {
-      user: {
-        id: user.id
-      }
-    }
-  });
-}
-
-export async function deleteUserAccessTokens(
-  user: User,
-  prisma: PrismaTransaction
-) {
-  await prisma.accessToken.deleteMany({
-    where: {
-      user: {
-        id: user.id
-      }
-    }
-  });
-}
-
-export async function deleteUserGrants(user: User, prisma: PrismaTransaction) {
-  await prisma.grant.deleteMany({
-    where: {
-      user: {
-        id: user.id
-      }
-    }
-  });
-}
+import {
+  checkCompanyAssociations,
+  checkApplications,
+  deleteUserCompanyAssociations,
+  deleteUserActivationHashes,
+  deleteUserAccessTokens,
+  deleteUserGrants,
+  deleteMembershipRequest
+} from "../../database";
 
 /**
  * Soft-delete by anonymizing a User

@@ -24,7 +24,7 @@ import { Formik, Field, Form } from "formik";
 import {
   SIGN_BSDASRI,
   UPDATE_BSDASRI
-} from "../../../../../form/bsdasri/utils/queries";
+} from "../../../../../Apps/common/queries/bsdasri/queries";
 
 import { getComputedState } from "../../../../../form/common/getComputedState";
 import getInitialState from "../../../../../form/bsdasri/utils/initial-state";

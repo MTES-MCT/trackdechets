@@ -52,6 +52,16 @@
   @extend %actions;
 }
 
+.dsfr-modal-actions {
+  border-top: 1px solid #ddd;
+  padding-top: 2rem;
+  margin-top: 1rem;
+  @extend %actions;
+  & > * {
+    align-self: center;
+  }
+}
+
 @keyframes emphasis-animation {
   0% {
     border-color: rgb(24, 0, 159);

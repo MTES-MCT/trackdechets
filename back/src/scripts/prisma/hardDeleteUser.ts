@@ -7,8 +7,9 @@ import {
   deleteUserAccessTokens,
   deleteUserActivationHashes,
   deleteUserCompanyAssociations,
-  deleteUserGrants
-} from "../../users/resolvers/mutations/anonymizeUser";
+  deleteUserGrants,
+  deleteUserAccountHash
+} from "../../users/database";
 import { clearUserSessions } from "../../users/clearUserSessions";
 
 /**
@@ -31,6 +32,7 @@ export default async function deleteUser(user: User) {
   await deleteUserAccessTokens(user, prisma);
   await deleteUserGrants(user, prisma);
   await deleteMembershipRequest(user, prisma);
+  await deleteUserAccountHash(user, prisma);
 
   await prisma.user.delete({
     where: { id: user.id }

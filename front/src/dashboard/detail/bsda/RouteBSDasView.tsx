@@ -6,7 +6,7 @@ import { Query, QueryBsdaArgs } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import { InlineError } from "../../../Apps/common/Components/Error/Error";
 import EmptyDetail from "../common/EmptyDetailView";
-import { GET_BSDA } from "../../../form/bsda/stepper/queries";
+import { GET_BSDA } from "../../../Apps/common/queries/bsda/queries";
 
 export function RouteBSDasView() {
   const { id: formId } = useParams<{ id: string }>();

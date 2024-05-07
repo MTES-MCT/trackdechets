@@ -811,36 +811,21 @@ export const IconProfile = ({
   </svg>
 );
 
-export const IconQuestionCircle = ({
-  color = "currentColor",
-  size = "1em",
-  ...props
-}: IconProps) => (
+export const IconQuestionCircle = ({ ...props }: IconProps) => (
   <svg
     {...props}
-    className={classNames(props.className, {
-      [styles.blue]: color === "blue",
-      [styles.blueLight]: color === "blueLight",
-      [styles.white]: color === "white"
-    })}
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 140 140"
-    width={size}
-    height={size}
   >
-    <g fill="none" stroke="currentColor" strokeWidth={1.5}>
-      <path
-        d="M52.5 52.5a17.5 17.5 0 1123.333 16.503A8.75 8.75 0 0070 77.257v5.868M70 100.625a2.188 2.188 0 102.188 2.188A2.188 2.188 0 0070 100.624h0"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={8.749995}
-      />
-      <path
-        d="M4.375 70a65.625 65.625 0 10131.25 0 65.625 65.625 0 10-131.25 0z"
-        strokeMiterlimit={10}
-        strokeWidth={8.749995}
-      />
-    </g>
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 22C6.477 22 2 17.523 2 12C2 6.477 6.477 2 12 2C17.523 2 22 6.477 22 12C22 17.523 17.523 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.355V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.7902 11.5 13.4448 10.887 13.4967 10.0985C13.5486 9.31006 12.9799 8.61655 12.1966 8.51295C11.4133 8.40935 10.6839 8.93117 10.529 9.706L8.567 9.313C8.90349 7.63124 10.4087 6.44085 12.1228 6.50102C13.8368 6.56119 15.2549 7.8542 15.4726 9.55541C15.6904 11.2566 14.6436 12.8651 13 13.355Z"
+      fill="#000091"
+    />
   </svg>
 );
 
@@ -1231,6 +1216,23 @@ export const IconDelete1 = ({
         strokeWidth={8.749995}
       />
     </g>
+  </svg>
+);
+export const IconDelete = ({ ...props }: IconProps) => (
+  <svg
+    {...props}
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M7.99999 7.05732L11.3 3.75732L12.2427 4.69999L8.94266 7.99999L12.2427 11.3L11.3 12.2427L7.99999 8.94266L4.69999 12.2427L3.75732 11.3L7.05732 7.99999L3.75732 4.69999L4.69999 3.75732L7.99999 7.05732Z"
+      fill="#000091"
+    />
   </svg>
 );
 
@@ -2128,6 +2130,86 @@ export function IconRefuse({ ...props }: IconProps) {
         d="M16.625 3.0791C17.0623 3.0791 17.4167 3.43354 17.4167 3.87077V14.9541C17.4167 15.3913 17.0623 15.7458 16.625 15.7458H5.11025L1.58337 18.5166V3.87077C1.58337 3.43354 1.93782 3.0791 2.37504 3.0791H16.625ZM15.8334 4.66243H3.16671V15.2589L4.56242 14.1624H15.8334V4.66243ZM11.4594 6.33364L12.5788 7.45306L10.6195 9.41244L12.5788 11.3718L11.4594 12.4912L9.50004 10.5319L7.54067 12.492L6.42125 11.3726L8.38062 9.41244L6.42046 7.45306L7.53987 6.33364L9.50004 8.29302L11.4594 6.33364Z"
         fill="#000091"
       />
+    </svg>
+  );
+}
+
+export function IconBSPaohThin(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 28 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <g clipPath="url(#clip0_1204_23182)">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M13.7492 17.2276C13.9202 17.2835 14.05 17.4241 14.092 17.5991C14.134 17.774 14.0822 17.9582 13.9552 18.0856L11.5172 20.5226C11.5372 20.5026 11.7502 20.6626 11.8742 20.7886C12.4475 21.3628 12.7678 22.1422 12.7638 22.9535C12.7599 23.7649 12.4321 24.5411 11.8532 25.1096C10.6389 26.3025 8.68999 26.2931 7.48723 25.0886C6.76099 24.3612 6.44944 23.3171 6.65823 22.3106C5.33796 22.5887 3.99272 21.9613 3.35739 20.771C2.72205 19.5807 2.9494 18.1138 3.91523 17.1716C5.15121 15.9863 7.10928 16.0108 8.31523 17.2266C8.47469 17.3829 8.61684 17.5559 8.73923 17.7426L11.1552 15.3276C11.2844 15.1984 11.4722 15.147 11.6492 15.1924C11.8262 15.2378 11.9662 15.3732 12.0172 15.5486L12.3752 16.7776L13.7492 17.2276Z"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M18.3482 14.2626C18.4482 14.4098 18.6167 14.4954 18.7945 14.4894C18.9723 14.4833 19.1346 14.3863 19.2242 14.2326L21.0722 11.0556C21.0582 11.0806 21.2722 11.2446 21.4202 11.3336C22.1219 11.7404 22.9569 11.8501 23.7398 11.6383C24.5226 11.4265 25.1884 10.9107 25.5892 10.2056C26.2644 9.02847 26.0916 7.54845 25.1634 6.55847C24.2353 5.56849 22.7694 5.30073 21.5512 5.89864C21.4737 4.54439 20.5178 3.40101 19.1987 3.08488C17.8795 2.76875 16.5091 3.35462 15.8262 4.52664C15.0234 6.05263 15.5717 7.94032 17.0672 8.79864C17.2593 8.91291 17.4632 9.00611 17.6752 9.07664L15.8412 12.2296C15.7495 12.3857 15.7462 12.5784 15.8326 12.7374C15.919 12.8965 16.0824 12.9986 16.2632 13.0066L17.5382 13.0686L18.3482 14.2626Z"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M9.00224 10.9986H7.00224"
+          stroke="black"
+          strokeWidth="0.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M9.88124 8.87764L8.46624 7.46264"
+          stroke="black"
+          strokeWidth="0.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M12.0022 7.99864V5.99864"
+          stroke="black"
+          strokeWidth="0.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M20.0022 17.9986H22.0022"
+          stroke="black"
+          strokeWidth="0.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M19.1232 20.1196L20.5382 21.5346"
+          stroke="black"
+          strokeWidth="0.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M17.0022 20.9986V22.9986"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_1204_23182">
+          <rect width="28" height="28" fill="white" />
+        </clipPath>
+      </defs>
     </svg>
   );
 }

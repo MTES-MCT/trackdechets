@@ -16,7 +16,8 @@ import {
   getWorkflowLabel,
   isBsdasri,
   isBsff,
-  isBsvhu
+  isBsvhu,
+  isBspaoh
 } from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
 import Actors from "../Actors/Actors";
@@ -25,7 +26,8 @@ import {
   useBsdasriDownloadPdf,
   useBsddDownloadPdf,
   useBsffDownloadPdf,
-  useBsvhuDownloadPdf
+  useBsvhuDownloadPdf,
+  useBspaohDownloadPdf
 } from "../Pdf/useDownloadPdf";
 import {
   BsdType,
@@ -41,7 +43,8 @@ import {
   useBsdasriDuplicate,
   useBsddDuplicate,
   useBsffDuplicate,
-  useBsvhuDuplicate
+  useBsvhuDuplicate,
+  useBspaohDuplicate
 } from "../Duplicate/useDuplicate";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../common/queries/company/query";
 import { Loader } from "../../../common/Components";
@@ -50,6 +53,8 @@ import DeleteModal from "../DeleteModal/DeleteModal";
 import { useMedia } from "../../../../common/use-media";
 import { MEDIA_QUERIES } from "../../../../common/config";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
+import TransporterInfoEditModal from "../TransporterInfoEditModal/TransporterInfoEditModal";
+import { NON_RENSEIGNE } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./bsdCard.scss";
 
@@ -58,7 +63,6 @@ function BsdCard({
   bsdCurrentTab,
   currentSiret,
   onValidate,
-  onEditTransportInfo,
   secondaryActions: {
     onOverview,
     onUpdate,
@@ -96,7 +100,9 @@ function BsdCard({
   const [downloadBsvhuPdf] = useBsvhuDownloadPdf({
     ...options
   });
-
+  const [downloadBspaohPdf] = useBspaohDownloadPdf({
+    ...options
+  });
   const [duplicateBsdd, { loading: isDuplicatingBsdd }] = useBsddDuplicate({
     ...options
   });
@@ -113,15 +119,22 @@ function BsdCard({
   const [duplicateBsvhu, { loading: isDuplicatingBsvhu }] = useBsvhuDuplicate({
     ...options
   });
+  const [duplicateBspaoh, { loading: isDuplicatingBspaoh }] =
+    useBspaohDuplicate({
+      ...options
+    });
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isTransportEditModalOpen, setIsTransportEditModalOpen] =
+    useState(false);
 
   const isDuplicating =
     isDuplicatingBsdd ||
     isDuplicatingBsda ||
     isDuplicatingBsdasri ||
     isDuplicatingBsff ||
-    isDuplicatingBsvhu;
+    isDuplicatingBsvhu ||
+    isDuplicatingBspaoh;
 
   const updatedAt = bsdDisplay?.updatedAt
     ? formatDate(bsdDisplay.updatedAt)
@@ -174,11 +187,8 @@ function BsdCard({
   ) => {
     onValidate(bsd);
   };
-  const handleEditableInfoClick = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    infoName: string
-  ) => {
-    onEditTransportInfo!(bsd, infoName);
+  const handleEditableInfoClick = () => {
+    setIsTransportEditModalOpen(true);
   };
 
   const onPdf = useCallback(
@@ -198,13 +208,17 @@ function BsdCard({
       if (bsd.type === BsdType.Bsvhu) {
         downloadBsvhuPdf();
       }
+      if (bsd.type === BsdType.Bspaoh) {
+        downloadBspaohPdf();
+      }
     },
     [
       downloadBsdaPdf,
       downloadBsdasriPdf,
       downloadBsddPdf,
       downloadBsffPdf,
-      downloadBsvhuPdf
+      downloadBsvhuPdf,
+      downloadBspaohPdf
     ]
   );
 
@@ -225,18 +239,26 @@ function BsdCard({
       if (bsd.type === BsdType.Bsvhu) {
         duplicateBsvhu();
       }
+      if (bsd.type === BsdType.Bspaoh) {
+        duplicateBspaoh();
+      }
     },
     [
       duplicateBsda,
       duplicateBsdasri,
       duplicateBsdd,
       duplicateBsff,
-      duplicateBsvhu
+      duplicateBsvhu,
+      duplicateBspaoh
     ]
   );
 
   const onCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
+  };
+
+  const onCloseTransportEditModal = () => {
+    setIsTransportEditModalOpen(false);
   };
 
   const onDelete = () => {
@@ -252,10 +274,14 @@ function BsdCard({
     ? bsdDisplay?.emitter?.company?.name
     : bsdDisplay?.transporter?.company?.name;
 
-  const transporterName = transporterNameEmmiter || "Non renseigné";
+  const transporterName = transporterNameEmmiter || NON_RENSEIGNE;
 
   const unitOfMeasure =
-    isBsdasri(bsdDisplay?.type!) || isBsff(bsdDisplay?.type!) ? "kg" : "t";
+    isBsdasri(bsdDisplay?.type!) ||
+    isBsff(bsdDisplay?.type!) ||
+    isBspaoh(bsdDisplay?.type!)
+      ? "kg"
+      : "t";
 
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
   const pickupSiteName =
@@ -304,8 +330,11 @@ function BsdCard({
                       info={updatedAt}
                     />
                   )}
-                  {bsdDisplay?.emittedByEcoOrganisme && (
-                    <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
+                  {bsdDisplay?.ecoOrganisme?.name && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.EcoOrganism}
+                      info={bsdDisplay?.ecoOrganisme?.name}
+                    />
                   )}
                   {pickupSiteName && (
                     <InfoWithIcon
@@ -324,11 +353,12 @@ function BsdCard({
                       hasEditableInfos
                       isDisabled={
                         isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberPlate(bsdDisplay)
+                        !canEditCustomInfoOrTransporterNumberPlate(
+                          bsdDisplay,
+                          permissions
+                        )
                       }
-                      onClick={e =>
-                        handleEditableInfoClick(e, "transporterCustomInfo")
-                      }
+                      onClick={handleEditableInfoClick}
                     />
                   )}
                   {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
@@ -343,11 +373,12 @@ function BsdCard({
                       hasEditableInfos
                       isDisabled={
                         isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberPlate(bsdDisplay)
+                        !canEditCustomInfoOrTransporterNumberPlate(
+                          bsdDisplay,
+                          permissions
+                        )
                       }
-                      onClick={e =>
-                        handleEditableInfoClick(e, "transporterNumberPlate")
-                      }
+                      onClick={handleEditableInfoClick}
                     />
                   )}
                 </div>
@@ -457,6 +488,12 @@ function BsdCard({
         )}
       </div>
       {isDuplicating && <Loader />}
+
+      <TransporterInfoEditModal
+        bsd={bsdDisplay!}
+        isOpen={isTransportEditModalOpen}
+        onClose={onCloseTransportEditModal}
+      />
     </>
   );
 }

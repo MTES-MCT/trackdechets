@@ -628,4 +628,80 @@ describe("Mutation.Bspaoh.create", () => {
       })
     ]);
   });
+
+  it("should forbid incomplete packagings", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory();
+
+    const input: BspaohInput = {
+      waste: {
+        type: "PAOH",
+        adr: "plop",
+        code: "18 01 02",
+        packagings: [
+          {
+            type: "RELIQUAIRE",
+            containerNumber: "abc123",
+            quantity: 1,
+            volume: 11,
+            identificationCodes: [],
+            consistence: "SOLIDE"
+          }
+        ]
+      },
+      emitter: {
+        company: {
+          name: "emitter",
+          siret: company.siret,
+          contact: "jean valjean",
+          phone: "123",
+          mail: "emitter@test.fr",
+          address: "rue jean jaures toulon"
+        },
+        emission: {
+          detail: { weight: { value: 10, isEstimate: false }, quantity: 3 }
+        }
+      },
+      transporter: {
+        company: {
+          siret: company.siret,
+          name: "transporter",
+          contact: "jean valjean",
+          phone: "123",
+          mail: "emitter@test.fr",
+          address: "rue jean jaures toulon"
+        }
+      },
+      destination: {
+        company: {
+          name: "dest",
+          siret: destinationCompany.siret,
+          mail: "erci@dest.fr",
+          phone: "9999",
+          contact: "eric",
+          address: "rue jean jaures toulon"
+        },
+        cap: "cap number"
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBspaoh">>(
+      CREATE_BSPAOH,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Au moins un code est requis",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
 });

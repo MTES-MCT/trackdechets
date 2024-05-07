@@ -73,7 +73,7 @@ type Mutation {
     }
     receipt // non requis si isExemptedOfReceipt=true
     department // non requis si isExemptedOfReceipt=true
-    validityLimit // peut-être omis si isExemptedOfReceipt=true
+    validityLimit // peut être omis si isExemptedOfReceipt=true
   }
   wasteDetails {
     code
@@ -184,7 +184,7 @@ type Mutation {
   Permet d'importer les informations d'un BSD papier dans Trackdéchet après la réalisation de l'opération
   de traitement. Le BSD signé papier original doit être conservé à l'installation de destination qui doit
   être en mesure de retrouver le bordereau papier correspondant à un bordereau numérique. Le champ `customId`
-  de l'input peut-être utilisé pour faire le lien.
+  de l'input peut être utilisé pour faire le lien.
   """
   importPaperForm(input: ImportPaperFormInput!): Form!
 

@@ -7,7 +7,7 @@ export function createBsda(
   fixtures = defaultFixtures
 ): WorkflowStep {
   return {
-    description: `Les informations du BSDA sont remplies. Cette action peut-être effectuée
+    description: `Les informations du BSDA sont remplies. Cette action peut être effectuée
     par n'importe quel établissement apparaissant sur le BSDA. À ce stade il est toujours possible
     d'effectuer des modifications grâce à la mutation updateBsda.`,
     mutation: mutations.createBsda,
@@ -39,7 +39,7 @@ export function createPrivateIndividualBsda(
 ): WorkflowStep {
   return {
     description: `Les informations du BSDA sont remplies. L'émetteur est ici un particulier. Il n'aura pas à signer le bordereau sur Trackdéchets.
-    La création du BSDA peut-être effectuée
+    La création du BSDA peut être effectuée
       par n'importe quel établissement apparaissant sur le BSDA. À ce stade il est toujours possible
       d'effectuer des modifications grâce à la mutation updateBsda.`,
     mutation: mutations.createBsda,

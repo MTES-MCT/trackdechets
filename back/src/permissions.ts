@@ -23,6 +23,7 @@ export enum Permission {
   BsdCanSignEmission = "BsdCanSign:Emission",
   BsdCanSignWork = "BsdCanSign:Work",
   BsdCanSignTransport = "BsdCanSign:Transport",
+  BsdCanSignDelivery = "BsdCanSign:Delivery",
   BsdCanSignAcceptation = "BsdCanSign:Acceptation",
   BsdCanSignOperation = "BsdCanSign:Operation",
   BsdCanRevise = "BsdCanRevise",
@@ -45,6 +46,7 @@ export function toGraphQLPermission(permission: Permission): UserPermission {
     [Permission.BsdCanSignEmission]: "BSD_CAN_SIGN_EMISSION",
     [Permission.BsdCanSignWork]: "BSD_CAN_SIGN_WORK",
     [Permission.BsdCanSignTransport]: "BSD_CAN_SIGN_TRANSPORT",
+    [Permission.BsdCanSignDelivery]: "BSD_CAN_SIGN_DELIVERY",
     [Permission.BsdCanSignAcceptation]: "BSD_CAN_SIGN_ACCEPTATION",
     [Permission.BsdCanSignOperation]: "BSD_CAN_SIGN_OPERATION",
     [Permission.BsdCanRevise]: "BSD_CAN_REVISE",
@@ -79,7 +81,8 @@ const readerPermissions = [
 const driverPermissions = [
   ...readerPermissions,
   Permission.BsdCanUpdate, // the driver must be able to update immat
-  Permission.BsdCanSignTransport
+  Permission.BsdCanSignTransport,
+  Permission.BsdCanSignDelivery
 ];
 
 const memberPermissions = [
@@ -89,6 +92,7 @@ const memberPermissions = [
   Permission.BsdCanSignEmission,
   Permission.BsdCanSignWork,
   Permission.BsdCanSignTransport,
+  Permission.BsdCanSignDelivery,
   Permission.BsdCanSignAcceptation,
   Permission.BsdCanSignOperation,
   Permission.BsdCanDelete,
@@ -228,7 +232,7 @@ export const signatureTypeToPermission: {
   TRANSPORT_3: Permission.BsdCanSignTransport,
   TRANSPORT_4: Permission.BsdCanSignTransport,
   TRANSPORT_5: Permission.BsdCanSignTransport,
-  DELIVERY: Permission.BsdCanSignTransport,
+  DELIVERY: Permission.BsdCanSignDelivery,
   WORK: Permission.BsdCanSignWork,
   RECEPTION: Permission.BsdCanSignAcceptation,
   ACCEPTATION: Permission.BsdCanSignAcceptation,

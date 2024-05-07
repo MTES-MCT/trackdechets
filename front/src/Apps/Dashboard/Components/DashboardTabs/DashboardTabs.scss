@@ -35,4 +35,24 @@
     font-weight: bold;
     overflow-wrap: break-word;
   }
+
+  ul {
+    li {
+      position: relative;
+    }
+  }
+
+  .dashboard-tabs-notifications {
+    position: absolute;
+    pointer-events: none;
+    right: 0px;
+    top: 3px;
+    background-color: #000091;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 14px;
+    padding: 5px 8px;
+    border-radius: 20px;
+  }
 }

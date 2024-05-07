@@ -38,7 +38,6 @@ export const schema = z.object({
   MAX_REQUESTS_PER_WINDOW: z.string().optional().default("1000"),
   TRUST_PROXY_HOPS: z.string().optional().default("1").refine(isNumber),
   CRON_ONBOARDING_SCHEDULE: z.string().optional(),
-  LOG_TO_HTTP: z.string().optional().default("false").refine(isBoolean),
   FORCE_LOGGER_CONSOLE: z
     .string()
     .optional()
@@ -114,11 +113,6 @@ export const schema = z.object({
   ALLOW_TEST_COMPANY: z.string().refine(isBoolean),
   INSEE_SECRET: z.string(),
   // -------
-  // Datadog
-  DD_ENV: z.string(),
-  DD_API_KEY: z.string(),
-  DD_APP_NAME: z.string().optional(),
-  // -------
   // S3
   S3_ENDPOINT: z.string(),
   S3_REGION: z.string(),
@@ -139,8 +133,7 @@ export const schema = z.object({
     .optional()
     .default("false")
     .refine(isBoolean),
-  MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z.string().datetime().optional(),
-  FLAG_PAOH_ACTIVATED: z.string().optional().default("false").refine(isBoolean)
+  MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z.string().datetime().optional()
 });
 
 export const envVariables = schema.superRefine((val, ctx) => {

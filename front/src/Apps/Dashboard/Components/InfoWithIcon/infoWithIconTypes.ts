@@ -12,7 +12,6 @@ export enum InfoIconCode {
 }
 export enum InfoIconValue {
   TempStorage = "Entreposage provisoire",
-  EcoOrganism = "Éco-organisme",
   LastModificationDate = "Modifié le",
   CustomInfo = "Champ libre",
   TransporterNumberPlate = "Plaque d'immatriculation",

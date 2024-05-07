@@ -43,7 +43,7 @@ La clé JSON utilisée est toujours `"query"`, que ce soit pour une *query* ou u
 
 Les *queries* GraphQL retournent uniquement les données spécifiées. Pour construire une *query* il faut spécifier les champs imbriqués jusqu'à un champs de type scalaire (string, int, etc).
 
-Exemple avec une requête de profil utilisateur
+Exemple avec une requête de profil utilisateur :
 
 
 ```graphql
@@ -74,7 +74,7 @@ query {
 
 ### Mutations
 
-Pour construire une mutation, il faut spécifier trois choses:
+Pour construire une mutation, il faut spécifier trois choses :
 
 1. Le nom de la mutation qui correspond à l'opération à exécuter
 2. Les données d'input passées en argument

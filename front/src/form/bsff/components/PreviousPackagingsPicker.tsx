@@ -9,7 +9,7 @@ import {
   Query,
   QueryBsffPackagingsArgs
 } from "@td/codegen-ui";
-import { GET_PREVIOUS_PACKAGINGS } from "../utils/queries";
+import { GET_PREVIOUS_PACKAGINGS } from "../../../Apps/common/queries/bsff/queries";
 import {
   Table,
   TableBody,

@@ -27,6 +27,13 @@ export const bsdaFragment = gql`
       reception {
         weight
       }
+      operation {
+        nextDestination {
+          company {
+            orgId
+          }
+        }
+      }
     }
     worker {
       isDisabled
@@ -35,6 +42,10 @@ export const bsdaFragment = gql`
         siret
         orgId
       }
+    }
+    ecoOrganisme {
+      name
+      siret
     }
     transporter {
       company {

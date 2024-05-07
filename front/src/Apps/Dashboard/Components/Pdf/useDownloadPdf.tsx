@@ -1,12 +1,13 @@
 import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
-import { PDF_BSFF_FORM } from "../../../../form/bsff/utils/queries";
+import { PDF_BSFF_FORM } from "../../../common/queries/bsff/queries";
 import {
   Query,
   QueryBsdaPdfArgs,
   QueryBsdasriPdfArgs,
   QueryBsffPdfArgs,
   QueryBsvhuPdfArgs,
-  QueryFormPdfArgs
+  QueryFormPdfArgs,
+  QueryBspaohPdfArgs
 } from "@td/codegen-ui";
 
 const FORMS_PDF = gql`
@@ -44,7 +45,14 @@ const BSVHU_PDF = gql`
     }
   }
 `;
-
+const BSPAOH_PDF = gql`
+  query Bspaohdf($id: ID!) {
+    bspaohPdf(id: $id) {
+      downloadLink
+      token
+    }
+  }
+`;
 export function useBsddDownloadPdf(
   options: LazyQueryHookOptions<Pick<Query, "formPdf">, QueryFormPdfArgs>
 ) {
@@ -121,4 +129,22 @@ export function useBsvhuDownloadPdf(
       window.open(bsvhuPdf.downloadLink, "_blank");
     }
   });
+}
+
+export function useBspaohDownloadPdf(
+  options: LazyQueryHookOptions<Pick<Query, "bspaohPdf">, QueryBspaohPdfArgs>
+) {
+  return useLazyQuery<Pick<Query, "bspaohPdf">, QueryBspaohPdfArgs>(
+    BSPAOH_PDF,
+    {
+      ...options,
+      fetchPolicy: "network-only",
+      onCompleted: ({ bspaohPdf }) => {
+        if (bspaohPdf.downloadLink == null) {
+          return;
+        }
+        window.open(bspaohPdf.downloadLink, "_blank");
+      }
+    }
+  );
 }

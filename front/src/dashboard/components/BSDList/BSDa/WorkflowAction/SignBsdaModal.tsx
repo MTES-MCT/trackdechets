@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { Loader } from "../../../../../Apps/common/Components";
 import { Modal } from "../../../../../common/components";
-import { GET_BSDA } from "../../../../../form/bsda/stepper/queries";
+import { GET_BSDA } from "../../../../../Apps/common/queries/bsda/queries";
 import { Query, QueryBsdaArgs } from "@td/codegen-ui";
 import React from "react";
 import { BsdaSummary } from "./BsdaSummary";

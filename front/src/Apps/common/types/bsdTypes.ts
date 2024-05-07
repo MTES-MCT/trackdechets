@@ -34,6 +34,8 @@ import {
   InitialBsda,
   InitialBsdasri,
   InitialFormFraction,
+  BspaohTransporter,
+  BspaohDestination,
   Maybe,
   Recipient,
   RevisionRequestApprovalStatus,
@@ -48,7 +50,8 @@ export enum BsdTypename {
   Bsda = "Bsda",
   Bsdasri = "Bsdasri",
   Bsvhu = "Bsvhu",
-  Bsff = "Bsff"
+  Bsff = "Bsff",
+  Bspaoh = "Bspaoh"
 }
 
 export const BsdStatusCode = {
@@ -87,20 +90,23 @@ export interface BsdDisplay {
     Maybe<BsdaEmitter> &
     Maybe<BsdasriEmitter> &
     Maybe<BsvhuEmitter> &
-    Maybe<BsffEmitter>;
+    Maybe<BsffEmitter> &
+    Maybe<BspaohTransporter>;
   emitterType?: Maybe<EmitterType>;
   destination?:
     | Maybe<Recipient>
     | Maybe<BsdasriDestination>
     | Maybe<BsdaDestination>
     | Maybe<BsvhuDestination>
-    | Maybe<BsffDestination>;
+    | Maybe<BsffDestination>
+    | Maybe<BspaohDestination>;
   transporter?:
     | Maybe<Transporter>
     | Maybe<BsdaTransporter>
     | Maybe<BsdasriTransporter>
     | Maybe<BsvhuTransporter>
-    | Maybe<BsffTransporter>;
+    | Maybe<BsffTransporter>
+    | Maybe<BspaohTransporter>;
   transporters?: Transporter[] | BsdaTransporter[];
   ecoOrganisme?:
     | Maybe<FormEcoOrganisme>

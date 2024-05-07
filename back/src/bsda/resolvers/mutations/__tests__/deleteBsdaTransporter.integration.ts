@@ -202,7 +202,7 @@ describe("Mutation.deleteBsdaTransporter", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Ce transporteur BSDA ne peut-être supprimé car il a déjà signé l'enlèvement du déchet"
+          "Ce transporteur BSDA ne peut être supprimé car il a déjà signé l'enlèvement du déchet"
       })
     ]);
   });

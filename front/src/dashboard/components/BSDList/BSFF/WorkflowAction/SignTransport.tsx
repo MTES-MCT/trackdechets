@@ -15,7 +15,7 @@ import { NotificationError } from "../../../../../Apps/common/Components/Error/E
 import {
   SIGN_BSFF,
   UPDATE_BSFF_FORM
-} from "../../../../../form/bsff/utils/queries";
+} from "../../../../../Apps/common/queries/bsff/queries";
 import { SignBsff } from "./SignBsff";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";

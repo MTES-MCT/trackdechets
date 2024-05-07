@@ -15,7 +15,7 @@ import DateInput from "../../../../../form/common/components/custom-inputs/DateI
 import {
   SIGN_BSFF,
   UPDATE_BSFF_FORM
-} from "../../../../../form/bsff/utils/queries";
+} from "../../../../../Apps/common/queries/bsff/queries";
 import { SignBsff } from "./SignBsff";
 import { subMonths } from "date-fns";
 

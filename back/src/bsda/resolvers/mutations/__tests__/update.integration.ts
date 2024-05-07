@@ -18,6 +18,7 @@ import {
   bsdaTransporterFactory
 } from "../../../__tests__/factories";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
+import { getStream } from "../../../../activity-events";
 
 const UPDATE_BSDA = `
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
@@ -2134,6 +2135,40 @@ describe("Mutation.updateBsda", () => {
           " Le transporteur n°1 a déjà signé le BSDA, il ne peut pas être supprimé ou modifié"
       })
     ]);
+  });
+
+  it("should log in an event the updated data", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          waste: {
+            code: "06 13 04*"
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsda.waste?.code).toBe("06 13 04*");
+
+    const events = await getStream(bsda.id);
+    const updateEvent = events.find(evt => evt.type === "BsdaUpdated");
+
+    expect(updateEvent).toBeDefined();
+    expect(updateEvent?.data?.["wasteCode"]).toBe("06 13 04*");
   });
 
   it("should be possible to update destination without erasing destination reception weight", async () => {

@@ -22,7 +22,11 @@ import {
   CreateOrUpdateBsdaTransporterInput,
   getInitialState
 } from "./initial-state";
-import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
+import {
+  CREATE_BSDA,
+  UPDATE_BSDA,
+  GET_BSDA
+} from "../../../Apps/common/queries/bsda/queries";
 import omitDeep from "omit-deep-lodash";
 import { toastApolloError } from "../../common/stepper/toaster";
 import { bsdaValidationSchema } from "./schema";

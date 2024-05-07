@@ -9,7 +9,7 @@ import {
   getUpdatedFields,
   getUserFunctions
 } from "./helpers";
-import { fullBspaohSchema } from "./schema";
+import { fullBspaohSchema, ZodFullBspaoh } from "./schema";
 import { checkSealedAndRequiredFields, getSealedFields } from "./rules";
 import { applyDynamicRefinement } from "./dynamicRefinements";
 import { runTransformers } from "./transformers";
@@ -52,7 +52,7 @@ export async function parseBspaohInContext(
 
   const contextualSchema = fullBspaohSchema
     .transform(async val => {
-      // for transformers, we dont want selaed fields at creation time
+      // for transformers, we don't want sealed fields at creation time
       const signaturesToCheckForTransformers = validationContext?.isCreation
         ? []
         : signaturesToCheck;
@@ -83,7 +83,26 @@ export async function parseBspaohInContext(
       );
 
       await applyDynamicRefinement(val, validationContext, ctx);
+    })
+    .transform(val => {
+      return processDestinationWeights(val);
     });
 
   return contextualSchema.parseAsync(unparsedBspaoh);
 }
+
+/**
+ * Compute destinationaccepted weight
+ * Must run after full validation
+ */
+const processDestinationWeights = (val: ZodFullBspaoh) => {
+  if (val?.destinationReceptionWasteReceivedWeightValue) {
+    const destinationReceptionWasteAcceptedWeightValue =
+      val?.destinationReceptionWasteReceivedWeightValue -
+      (val?.destinationReceptionWasteRefusedWeightValue ?? 0);
+
+    val.destinationReceptionWasteAcceptedWeightValue =
+      destinationReceptionWasteAcceptedWeightValue;
+  }
+  return val;
+};
