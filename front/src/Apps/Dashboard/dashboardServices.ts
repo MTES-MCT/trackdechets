@@ -1410,23 +1410,24 @@ export const canEditCustomInfoOrTransporterNumberPlate = (
   if (!permissions.includes(UserPermission.BsdCanUpdate)) {
     return false;
   }
-  if (isBsdd(bsd.type)) {
-    return ["SEALED", "RESEALED", "SIGNED_BY_PRODUCER"].includes(bsd.status);
-  }
+  return true;
+  // if (isBsdd(bsd.type)) {
+  //   return ["SEALED", "RESEALED", "SIGNED_BY_PRODUCER"].includes(bsd.status);
+  // }
 
-  if (isBsda(bsd.type)) {
-    return ["SIGNED_BY_PRODUCER", "SIGNED_BY_WORKER", "INITIAL"].includes(
-      bsd.status
-    );
-  }
-  if (isBsff(bsd.type)) {
-    return ["INITIAL", "SIGNED_BY_EMITTER"].includes(bsd.status);
-  }
-  if (isBsdasri(bsd.type)) {
-    return ["SIGNED_BY_PRODUCER", "INITIAL"].includes(bsd.status);
-  }
+  // if (isBsda(bsd.type)) {
+  //   return ["SIGNED_BY_PRODUCER", "SIGNED_BY_WORKER", "INITIAL"].includes(
+  //     bsd.status
+  //   );
+  // }
+  // if (isBsff(bsd.type)) {
+  //   return ["INITIAL", "SIGNED_BY_EMITTER"].includes(bsd.status);
+  // }
+  // if (isBsdasri(bsd.type)) {
+  //   return ["SIGNED_BY_PRODUCER", "INITIAL"].includes(bsd.status);
+  // }
 
-  return false;
+  // return false;
 };
 
 export const getOperationCodesFromSearchString = (value: any): string[] => {

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { FullBsdaFragment } from "../fragments";
+import { FullBsdaFragment, FullBsdaTransporterFragment } from "../fragments";
 
 export const GET_BSDA = gql`
   query Bsda($id: ID!) {
@@ -59,10 +59,10 @@ export const UPDATE_BSDA = gql`
 export const UPDATE_BSDA_TRANSPORTER = gql`
   mutation UpdateBsdaTransporter($id: ID!, $input: BsdaTransporterInput!) {
     updateBsdaTransporter(id: $id, input: $input) {
-      ...FullBsda
+      ...FullBsdaTransporter
     }
   }
-  ${FullBsdaFragment}
+  ${FullBsdaTransporterFragment}
 `;
 
 export const SIGN_BSDA = gql`

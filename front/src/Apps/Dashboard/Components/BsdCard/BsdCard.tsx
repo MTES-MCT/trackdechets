@@ -16,7 +16,6 @@ import {
   getWorkflowLabel,
   isBsdasri,
   isBsff,
-  isBsvhu,
   isBspaoh
 } from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
@@ -57,6 +56,7 @@ import TransporterInfoEditModal from "../TransporterInfoEditModal/TransporterInf
 import { NON_RENSEIGNE } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./bsdCard.scss";
+import { getCurrentTransporterInfos } from "../../bsdMapper";
 
 function BsdCard({
   bsd,
@@ -181,6 +181,13 @@ function BsdCard({
   const ctaPrimaryReviewLabel = bsdDisplay?.type
     ? getPrimaryActionsReviewsLabel(bsdDisplay, currentSiret)
     : "";
+
+  const currentTransporterInfos = useMemo(() => {
+    if (!isToCollectTab && !isCollectedTab) {
+      return null;
+    }
+    return getCurrentTransporterInfos(bsd, currentSiret);
+  }, [bsd, currentSiret, isToCollectTab, isCollectedTab]);
 
   const handleValidationClick = (
     _: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -342,45 +349,50 @@ function BsdCard({
                       info={pickupSiteName}
                     />
                   )}
-                  {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
-                    (isCollectedTab &&
-                      Boolean(bsdDisplay?.transporterCustomInfo?.length))) && (
-                    <InfoWithIcon
-                      labelCode={InfoIconCode.CustomInfo}
-                      editableInfos={{
-                        customInfo: bsdDisplay?.transporterCustomInfo
-                      }}
-                      hasEditableInfos
-                      isDisabled={
-                        isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberPlate(
-                          bsdDisplay,
-                          permissions
-                        )
-                      }
-                      onClick={handleEditableInfoClick}
-                    />
-                  )}
-                  {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
-                    (isCollectedTab &&
-                      Boolean(bsdDisplay?.transporterNumberPlate?.length))) && (
-                    <InfoWithIcon
-                      labelCode={InfoIconCode.TransporterNumberPlate}
-                      editableInfos={{
-                        transporterNumberPlate:
-                          bsdDisplay?.transporterNumberPlate
-                      }}
-                      hasEditableInfos
-                      isDisabled={
-                        isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberPlate(
-                          bsdDisplay,
-                          permissions
-                        )
-                      }
-                      onClick={handleEditableInfoClick}
-                    />
-                  )}
+                  {!!currentTransporterInfos &&
+                    (isToCollectTab ||
+                      (isCollectedTab &&
+                        !!currentTransporterInfos?.transporterCustomInfo
+                          ?.length)) && (
+                      <InfoWithIcon
+                        labelCode={InfoIconCode.CustomInfo}
+                        editableInfos={{
+                          customInfo:
+                            currentTransporterInfos?.transporterCustomInfo
+                        }}
+                        hasEditableInfos
+                        isDisabled={
+                          isCollectedTab ||
+                          !canEditCustomInfoOrTransporterNumberPlate(
+                            bsdDisplay,
+                            permissions
+                          )
+                        }
+                        onClick={handleEditableInfoClick}
+                      />
+                    )}
+                  {!!currentTransporterInfos &&
+                    (isToCollectTab ||
+                      (isCollectedTab &&
+                        !!currentTransporterInfos?.transporterNumberPlate
+                          ?.length)) && (
+                      <InfoWithIcon
+                        labelCode={InfoIconCode.TransporterNumberPlate}
+                        editableInfos={{
+                          transporterNumberPlate:
+                            currentTransporterInfos?.transporterNumberPlate
+                        }}
+                        hasEditableInfos
+                        isDisabled={
+                          isCollectedTab ||
+                          !canEditCustomInfoOrTransporterNumberPlate(
+                            bsdDisplay,
+                            permissions
+                          )
+                        }
+                        onClick={handleEditableInfoClick}
+                      />
+                    )}
                 </div>
                 {isMobile && <div className="bsd-card-border" />}
               </div>
@@ -491,6 +503,7 @@ function BsdCard({
 
       <TransporterInfoEditModal
         bsd={bsdDisplay!}
+        currentTransporter={currentTransporterInfos!}
         isOpen={isTransportEditModalOpen}
         onClose={onCloseTransportEditModal}
       />

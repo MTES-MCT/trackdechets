@@ -429,6 +429,7 @@ export const dashboardFormFragment = gql`
       isTempStorage
     }
     transporter {
+      id
       company {
         siret
         orgId
@@ -438,9 +439,12 @@ export const dashboardFormFragment = gql`
       customInfo
     }
     transporters {
+      id
       company {
         orgId
       }
+      numberPlate
+      customInfo
       takenOverAt
     }
     ecoOrganisme {

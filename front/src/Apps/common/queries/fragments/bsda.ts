@@ -1,6 +1,32 @@
 import { gql } from "@apollo/client";
 import { companyFragment } from "./company";
 
+export const FullBsdaTransporterFragment = gql`
+  fragment FullBsdaTransporter on BsdaTransporter {
+    id
+    company {
+      ...CompanyFragment
+    }
+    customInfo
+    recepisse {
+      number
+      department
+      validityLimit
+      isExempted
+    }
+    transport {
+      mode
+      plates
+      takenOverAt
+      signature {
+        author
+        date
+      }
+    }
+  }
+  ${companyFragment}
+`;
+
 export const bsdaFragment = gql`
   fragment BsdaFragment on Bsda {
     id
@@ -48,32 +74,34 @@ export const bsdaFragment = gql`
       siret
     }
     transporter {
+      id
       company {
         name
         siret
         orgId
       }
       customInfo
-      transport {
-        plates
-      }
       recepisse {
         number
         department
         validityLimit
         isExempted
+      }
+      transport {
+        plates
+        signature {
+          date
+        }
       }
     }
     transporters {
+      id
       company {
         name
         siret
         orgId
       }
       customInfo
-      transport {
-        plates
-      }
       recepisse {
         number
         department
@@ -81,6 +109,7 @@ export const bsdaFragment = gql`
         isExempted
       }
       transport {
+        plates
         signature {
           date
         }
@@ -238,47 +267,10 @@ export const FullBsdaFragment = gql`
       }
     }
     transporter {
-      company {
-        ...CompanyFragment
-      }
-      customInfo
-      recepisse {
-        number
-        department
-        validityLimit
-        isExempted
-      }
-      transport {
-        mode
-        plates
-        takenOverAt
-        signature {
-          author
-          date
-        }
-      }
+      ...FullBsdaTransporter
     }
     transporters {
-      id
-      company {
-        ...CompanyFragment
-      }
-      customInfo
-      recepisse {
-        number
-        department
-        validityLimit
-        isExempted
-      }
-      transport {
-        mode
-        plates
-        takenOverAt
-        signature {
-          author
-          date
-        }
-      }
+      ...FullBsdaTransporter
     }
     ecoOrganisme {
       name
@@ -364,4 +356,5 @@ export const FullBsdaFragment = gql`
     }
   }
   ${companyFragment}
+  ${FullBsdaTransporterFragment}
 `;

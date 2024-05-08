@@ -11,6 +11,7 @@ import {
 } from "@td/codegen-ui";
 
 import {
+  BsdCurrentTransporterInfos,
   BsdDisplay,
   BsdStatusCode,
   BsdTypename,
@@ -62,6 +63,104 @@ export const formatBsd = (bsd: Bsd): BsdDisplay | null => {
     default:
       return null;
   }
+};
+
+export const getCurrentTransporterInfos = (
+  bsd: Bsd,
+  currentSiret: string
+): BsdCurrentTransporterInfos | null => {
+  switch (bsd.__typename) {
+    case BsdTypename.Bsdd:
+      return getBsddCurrentTransporterInfos(bsd, currentSiret);
+    case BsdTypename.Bsda:
+      return getBsdaCurrentTransporterInfos(bsd, currentSiret);
+    case BsdTypename.Bsdasri:
+      return getBsdasriCurrentTransporterInfos(bsd, currentSiret);
+    case BsdTypename.Bsvhu:
+      return null;
+    case BsdTypename.Bsff:
+      return getBsffCurrentTransporterInfos(bsd, currentSiret);
+    case BsdTypename.Bspaoh:
+      return getBspaohCurrentTransporterInfos(bsd, currentSiret);
+    default:
+      return null;
+  }
+};
+
+export const getBsddCurrentTransporterInfos = (
+  bsdd: Form,
+  currentSiret: string
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bsdd.transporters?.find(
+    transporter => transporter.company?.orgId === currentSiret
+  );
+  if (!currentTransporter) {
+    return {};
+  }
+  return {
+    transporterId: currentTransporter?.id,
+    transporterNumberPlate: currentTransporter?.numberPlate,
+    transporterCustomInfo: currentTransporter?.customInfo
+  };
+};
+
+export const getBsdaCurrentTransporterInfos = (
+  bsda: Bsda,
+  currentSiret: string
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bsda.transporters?.find(
+    transporter => transporter.company?.orgId === currentSiret
+  );
+  if (!currentTransporter) {
+    return {};
+  }
+  return {
+    transporterId: currentTransporter?.id,
+    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterCustomInfo: currentTransporter?.customInfo
+  };
+};
+
+export const getBsdasriCurrentTransporterInfos = (
+  bsdasri: Bsdasri,
+  currentSiret: string
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bsdasri.transporter;
+  if (currentTransporter?.company?.orgId !== currentSiret) {
+    return {};
+  }
+  return {
+    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterCustomInfo: currentTransporter?.customInfo
+  };
+};
+
+export const getBsffCurrentTransporterInfos = (
+  bsff: Bsff,
+  currentSiret: string
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bsff.transporter || bsff["bsffTransporter"];
+  if (currentTransporter?.company?.orgId !== currentSiret) {
+    return {};
+  }
+  return {
+    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterCustomInfo: currentTransporter?.customInfo
+  };
+};
+
+export const getBspaohCurrentTransporterInfos = (
+  bspaoh: Bspaoh,
+  currentSiret: string
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bspaoh.transporter;
+  if (currentTransporter?.company?.orgId !== currentSiret) {
+    return {};
+  }
+  return {
+    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterCustomInfo: currentTransporter?.customInfo
+  };
 };
 
 export const mapBsdd = (bsdd: Form): BsdDisplay => {

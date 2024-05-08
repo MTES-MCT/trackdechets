@@ -149,3 +149,9 @@ export enum WorkflowDisplayType {
 
   DEFAULT = ""
 }
+
+export type BsdCurrentTransporterInfos = {
+  transporterId?: string;
+  transporterCustomInfo?: string | Maybe<string[]>;
+  transporterNumberPlate?: string | Maybe<string[]>;
+};

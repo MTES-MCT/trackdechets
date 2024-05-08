@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { BsdDisplay } from "../../../common/types/bsdTypes";
+import { BsdCurrentTransporterInfos } from "../../../common/types/bsdTypes";
 import TagsInput from "../../../Forms/Components/TagsInput/TagsInput";
 
 import "./transporterInfoEditForm.scss";
 
 interface TransporterInfoEditFormProps {
-  bsd: BsdDisplay;
+  currentTransporter: BsdCurrentTransporterInfos;
   onClose: () => void;
   onSubmitForm: (data) => Promise<void>;
 }
@@ -18,12 +18,12 @@ type TransporterFormInputs = {
 };
 
 const TransporterInfoEditForm = ({
-  bsd,
+  currentTransporter,
   onClose,
   onSubmitForm
 }: TransporterInfoEditFormProps) => {
   const formatInitialPlates = () => {
-    const transporterNumberPlate = bsd?.transporterNumberPlate;
+    const transporterNumberPlate = currentTransporter.transporterNumberPlate;
 
     if (typeof transporterNumberPlate === "string") {
       const regex = /,+|,\s+/;
@@ -42,7 +42,7 @@ const TransporterInfoEditForm = ({
   const initialPlates = formatInitialPlates();
   const [platesTags, setPlatestags] = useState<string[]>(initialPlates);
   const defaultValues = {
-    customInfo: bsd?.transporterCustomInfo as string,
+    customInfo: currentTransporter.transporterCustomInfo as string,
     plates: initialPlates
   };
   const { register, handleSubmit, reset, formState, setValue } =
