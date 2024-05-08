@@ -21,6 +21,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
+- Retrait de la possibilité de sélectionner un mode de traitement pour le code non final D9 [PR 3308](https://github.com/MTES-MCT/trackdechets/pull/3308
+
 #### :nail_care: Améliorations
 
 - Ajout de la mise à jour de l'immatriculation dans la modale de signature du bordereau de synthèse BSDASRI [PR 3290](https://github.com/MTES-MCT/trackdechets/pull/3290)

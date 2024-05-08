@@ -146,7 +146,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   destinationReceptionWeight: 1.2,
   destinationReceptionAcceptationStatus: "ACCEPTED",
   destinationReceptionRefusalReason: null,
-  destinationOperationCode: "D 9",
+  destinationOperationCode: "D 5",
   destinationOperationMode: "ELIMINATION",
   destinationOperationDate: "2019-11-28T00:00:00.000Z",
 
