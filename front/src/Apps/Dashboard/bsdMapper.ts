@@ -9,7 +9,8 @@ import {
   Bspaoh,
   BsdasriType,
   FormStatus,
-  Transporter
+  Transporter,
+  BsdaTransporter
 } from "@td/codegen-ui";
 
 import {
@@ -69,13 +70,14 @@ export const formatBsd = (bsd: Bsd): BsdDisplay | null => {
 
 export const getCurrentTransporterInfos = (
   bsd: Bsd,
-  currentSiret: string
+  currentSiret: string,
+  isToCollectTab: boolean
 ): BsdCurrentTransporterInfos | null => {
   switch (bsd.__typename) {
     case BsdTypename.Bsdd:
-      return getBsddCurrentTransporterInfos(bsd, currentSiret);
+      return getBsddCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
     case BsdTypename.Bsda:
-      return getBsdaCurrentTransporterInfos(bsd, currentSiret);
+      return getBsdaCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
     case BsdTypename.Bsdasri:
       return getBsdasriCurrentTransporterInfos(bsd, currentSiret);
     case BsdTypename.Bsvhu:
@@ -91,9 +93,12 @@ export const getCurrentTransporterInfos = (
 
 export const getBsddCurrentTransporterInfos = (
   bsdd: Form,
-  currentSiret: string
+  currentSiret: string,
+  isToCollectTab: boolean
 ): BsdCurrentTransporterInfos => {
   let currentTransporter: Transporter | undefined;
+  // in case the BSD is going through temporary storage,
+  // fetch the transporter from the temporaryStorageDetail property
   if (
     bsdd.status === FormStatus.Resealed ||
     bsdd.status === FormStatus.Resent ||
@@ -107,9 +112,23 @@ export const getBsddCurrentTransporterInfos = (
         ? bsdd.temporaryStorageDetail?.transporter
         : undefined;
   } else {
-    currentTransporter = bsdd.transporters?.find(
-      transporter => transporter.company?.orgId === currentSiret
-    );
+    if (isToCollectTab) {
+      // find the first transporter with this SIRET who hasn't taken over yet
+      currentTransporter = bsdd.transporters?.find(
+        transporter =>
+          transporter.company?.orgId === currentSiret &&
+          !transporter.takenOverAt
+      );
+    } else {
+      // find the last transporter with this SIRET who has taken over
+      currentTransporter = [...(bsdd.transporters ?? [])]
+        .reverse()
+        .find(
+          transporter =>
+            transporter.company?.orgId === currentSiret &&
+            !!transporter.takenOverAt
+        );
+    }
   }
   if (!currentTransporter) {
     return {};
@@ -123,11 +142,27 @@ export const getBsddCurrentTransporterInfos = (
 
 export const getBsdaCurrentTransporterInfos = (
   bsda: Bsda,
-  currentSiret: string
+  currentSiret: string,
+  isToCollectTab: boolean
 ): BsdCurrentTransporterInfos => {
-  const currentTransporter = bsda.transporters?.find(
-    transporter => transporter.company?.orgId === currentSiret
-  );
+  let currentTransporter: BsdaTransporter | undefined;
+  if (isToCollectTab) {
+    // find the first transporter with this SIRET who hasn't taken over yet
+    currentTransporter = bsda.transporters?.find(
+      transporter =>
+        transporter.company?.orgId === currentSiret &&
+        !transporter.transport?.takenOverAt
+    );
+  } else {
+    // find the last transporter with this SIRET who has taken over
+    currentTransporter = [...(bsda.transporters ?? [])]
+      .reverse()
+      .find(
+        transporter =>
+          transporter.company?.orgId === currentSiret &&
+          !!transporter.transport?.takenOverAt
+      );
+  }
   if (!currentTransporter) {
     return {};
   }
@@ -146,6 +181,8 @@ export const getBsdasriCurrentTransporterInfos = (
   if (currentTransporter?.company?.orgId !== currentSiret) {
     return {};
   }
+  // since there is only one transporter per BSDASRI, transporterId is useless,
+  // the update is done through the BSD using its id
   return {
     transporterNumberPlate: currentTransporter?.transport?.plates,
     transporterCustomInfo: currentTransporter?.customInfo

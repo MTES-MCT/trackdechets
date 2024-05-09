@@ -186,7 +186,7 @@ function BsdCard({
     if (!isToCollectTab && !isCollectedTab) {
       return null;
     }
-    return getCurrentTransporterInfos(bsd, currentSiret);
+    return getCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
   }, [bsd, currentSiret, isToCollectTab, isCollectedTab]);
 
   const handleValidationClick = (
