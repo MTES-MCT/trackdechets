@@ -484,6 +484,7 @@ export const dashboardFormFragment = gql`
         processingOperation
       }
       transporter {
+        id
         company {
           siret
           orgId
@@ -494,6 +495,8 @@ export const dashboardFormFragment = gql`
           phone
           mail
         }
+        numberPlate
+        customInfo
       }
       wasteDetails {
         packagingInfos {

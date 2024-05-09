@@ -38,8 +38,17 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       where,
       data,
       include: hasPossibleSiretChange
-        ? { ...SIRETS_BY_ROLE_INCLUDE, forwardedIn: true, transporters: true }
-        : { forwardedIn: true, transporters: true }
+        ? {
+            ...SIRETS_BY_ROLE_INCLUDE,
+            forwardedIn: true,
+            transporters: true,
+            forwarding: { select: { readableId: true } }
+          }
+        : {
+            forwardedIn: true,
+            transporters: true,
+            forwarding: { select: { readableId: true } }
+          }
     });
 
     // update transporters ordering when connecting transporters records
@@ -170,8 +179,13 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     }
 
     if (needsReindex) {
+      // if the form is forwarded in another form, reindex the "parent" form. The forwarded form will get reindexed too.
       prisma.addAfterCommitCallback(() =>
-        enqueueUpdatedBsdToIndex(updatedForm.readableId)
+        enqueueUpdatedBsdToIndex(
+          updatedForm.forwarding?.readableId
+            ? updatedForm.forwarding.readableId
+            : updatedForm.readableId
+        )
       );
     }
 

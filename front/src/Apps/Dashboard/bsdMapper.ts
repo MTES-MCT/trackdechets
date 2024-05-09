@@ -7,7 +7,9 @@ import {
   Bsd,
   Bsda,
   Bspaoh,
-  BsdasriType
+  BsdasriType,
+  FormStatus,
+  Transporter
 } from "@td/codegen-ui";
 
 import {
@@ -91,9 +93,24 @@ export const getBsddCurrentTransporterInfos = (
   bsdd: Form,
   currentSiret: string
 ): BsdCurrentTransporterInfos => {
-  const currentTransporter = bsdd.transporters?.find(
-    transporter => transporter.company?.orgId === currentSiret
-  );
+  let currentTransporter: Transporter | undefined;
+  if (
+    bsdd.status === FormStatus.Resealed ||
+    bsdd.status === FormStatus.Resent ||
+    bsdd.status === FormStatus.SignedByTempStorer ||
+    bsdd.status === FormStatus.TempStored ||
+    bsdd.status === FormStatus.TempStorerAccepted
+  ) {
+    currentTransporter =
+      bsdd.temporaryStorageDetail?.transporter &&
+      bsdd.temporaryStorageDetail?.transporter.company?.orgId === currentSiret
+        ? bsdd.temporaryStorageDetail?.transporter
+        : undefined;
+  } else {
+    currentTransporter = bsdd.transporters?.find(
+      transporter => transporter.company?.orgId === currentSiret
+    );
+  }
   if (!currentTransporter) {
     return {};
   }
