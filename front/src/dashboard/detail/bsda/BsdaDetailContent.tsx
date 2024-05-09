@@ -383,18 +383,21 @@ const NextBsda = ({ bsda }: { bsda: Bsda }) => {
 
         <dt>CAP</dt>
         <dd>{bsda.destination?.cap}</dd>
-
-        <dt>PDF</dt>
-        <dd>
-          <button
-            type="button"
-            className="btn btn--slim btn--small btn--outline-primary"
-            onClick={() => downloadPdf({ variables: { id: bsda.id } })}
-          >
-            <IconPdf size="18px" color="blueLight" />
-            <span>Pdf</span>
-          </button>
-        </dd>
+        {!bsda.isDraft ? (
+          <>
+            <dt>PDF</dt>
+            <dd>
+              <button
+                type="button"
+                className="btn btn--slim btn--small btn--outline-primary"
+                onClick={() => downloadPdf({ variables: { id: bsda.id } })}
+              >
+                <IconPdf size="18px" color="blueLight" />
+                <span>Pdf</span>
+              </button>
+            </dd>
+          </>
+        ) : null}
       </div>
     </div>
   );
