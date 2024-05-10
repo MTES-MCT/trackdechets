@@ -348,7 +348,7 @@ export default function ExportsForm({ companies }: IProps) {
                   </select>
                 )}
               </Field>
-              <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
+              {/* <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
                 Code déchet (optionnel)
               </label>
               <div className="tw-col-span-2 tw-max-w-md">
@@ -367,7 +367,7 @@ export default function ExportsForm({ companies }: IProps) {
                 </div>
                 {wasteCodeDetail && <div>{wasteCodeDetail.description}</div>}
                 <RedErrorMessage name="wasteCode"></RedErrorMessage>
-              </div>
+              </div> */}
 
               <WasteTreeModal
                 wasteTree={ALL_WASTES_TREE}
