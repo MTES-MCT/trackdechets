@@ -228,10 +228,6 @@ export default function ExportsForm({ companies }: IProps) {
       validate={validate}
     >
       {({ values, setFieldValue }) => {
-        const wasteCodeDetail = ALL_WASTES.find(
-          waste => waste.code === values.wasteCode
-        );
-
         const exportTypes = getPossibleExportTypes(values.companies);
         if (!exportTypes.includes(values.exportType)) {
           setFieldValue("exportType", exportTypes[0]);
@@ -348,26 +344,6 @@ export default function ExportsForm({ companies }: IProps) {
                   </select>
                 )}
               </Field>
-              {/* <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
-                Code déchet (optionnel)
-              </label>
-              <div className="tw-col-span-2 tw-max-w-md">
-                <div className="tw-container tw-flex tw-flex-row">
-                  <Field
-                    name="wasteCode"
-                    className={`${styles["max-w-xxs"]} tw-mr-4 td-input`}
-                  />
-                  <button
-                    type="button"
-                    className={`btn btn--outline-primary btn--small-text ${styles["max-w-xxs"]} tw-mr-4`}
-                    onClick={() => setOpenWasteTreeModal(true)}
-                  >
-                    Liste des codes déchets
-                  </button>
-                </div>
-                {wasteCodeDetail && <div>{wasteCodeDetail.description}</div>}
-                <RedErrorMessage name="wasteCode"></RedErrorMessage>
-              </div> */}
 
               <WasteTreeModal
                 wasteTree={ALL_WASTES_TREE}
