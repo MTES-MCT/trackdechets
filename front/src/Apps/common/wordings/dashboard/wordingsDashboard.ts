@@ -12,6 +12,8 @@ export const VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE =
   "Valider l'acceptation de l'entreposage provisoire";
 export const SIGNATURE_ACCEPTATION_CONTENANT = "Gérer les contenants";
 export const AJOUTER_ANNEXE_1 = "Ajouter une annexe 1";
+// PAOH valider dépôt
+export const FIN_DE_MISSION = "Fin de mission";
 
 // status badge
 export const BROUILLON = "Brouillon";
@@ -118,6 +120,7 @@ export const bsd_type_option_bsff = "Déchets de Fluides Frigorigènes";
 export const bsd_type_option_bsda = "Déchets d'Amiante";
 export const bsd_type_option_bsdasri =
   "Déchets d'Activités de Soins à Risque Infectieux";
+export const bsd_type_option_bspaoh = "Pièces Anatomiques d'Origine Humaine";
 export const filter_type_select_option_placeholder = "Sélectionner une option";
 export const max_filter_autorized_label =
   "Vous avez atteint le nombre de filtres maximum";
@@ -132,6 +135,7 @@ export const dropdown_create_bsda = "Amiante";
 export const dropdown_create_bsdasri = "DASRI";
 export const dropdown_create_bsvhu = "Véhicule Hors d’Usage";
 export const dropdown_create_bsff = "Fluide Frigorigène";
+export const dropdown_create_bspaoh = "PAOH";
 
 export const bsddValidationDraftText = `Cette action aura pour effet de valider les données du bordereau et
             de le faire apparaitre dans l'onglet "Pour action" de l'émetteur
@@ -156,7 +160,11 @@ export const bsvhuPublishDraft = `Cette action aura pour effet de démarrer le c
             <strong>“Pour action”</strong> du tableau de bord de l'émetteur. Le
             bordereau pourra toujours être modifié ou supprimé tant qu'aucune
             signature n'a été apposée.`;
-
+export const bpaohPublishDraft = `Cette action aura pour effet de démarrer le cycle de vie du
+            bordereau en le faisant apparaître dans l'onglet
+            <strong>“Pour action”</strong> du tableau de bord de l'émetteur. Le
+            bordereau pourra toujours être modifié ou supprimé tant qu'aucune
+            signature n'a été apposée.`;
 // tabs
 export const ALL_BSDS = "Tous les bordereaux";
 export const ALL_REVIEWS = "Toutes les révisions";

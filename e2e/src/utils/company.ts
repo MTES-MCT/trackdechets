@@ -49,11 +49,17 @@ interface AmianteCertification {
   organisation: "QUALIBAT" | "AFNOR Certification" | "GLOBAL CERTIFICATION";
 }
 
+const isOnlyWasteProducter = (roles: CompanyRole[]): boolean => {
+  return (
+    roles.length === 1 &&
+    roles[0] === "Producteur de déchets : producteurs de déchets, y compris T&S"
+  );
+};
+
 /**
- * In the "/companies/create", returns the correct "Créer votre établissement" button index
- * matching company role.
+ * Return the correct create-button-label regarding company roles
  */
-export const getCreateButtonIndex = (roles: CompanyRole[]) => {
+export const getCreateButtonName = (roles: CompanyRole[]) => {
   // "La gestion des déchets fait partie de votre activité"
   for (const role of roles) {
     if (
@@ -69,7 +75,7 @@ export const getCreateButtonIndex = (roles: CompanyRole[]) => {
         "Entreprise de travaux amiante"
       ].includes(role)
     ) {
-      return 1;
+      return "Créer un établissement";
     }
   }
 
@@ -80,12 +86,12 @@ export const getCreateButtonIndex = (roles: CompanyRole[]) => {
         "Producteur de déchets : producteurs de déchets, y compris T&S"
       ].includes(role)
     ) {
-      return 0;
+      return "Créer votre établissement producteur";
     }
   }
 
   // "Transporteur hors France, Non-French carrier"
-  return 2;
+  return "Créer un établissement transporteur hors France";
 };
 
 /**
@@ -145,22 +151,25 @@ export const generateSiretAndInitiateCompanyCreation = async (
 
   // WARNING: page is different if one company has already been created
   // One more click is needed
-  const createACompanyInput = page.getByRole("button", {
-    name: "Créer un établissement"
-  });
-  if (await createACompanyInput.isVisible()) {
+  const hasCompanies = await page
+    .getByRole("button", { name: "Rechercher" })
+    .isVisible();
+  if (hasCompanies) {
+    const createACompanyInput = page.getByRole("button", {
+      name: "Créer un établissement"
+    });
+
     await createACompanyInput.click();
   }
 
   // "Créer votre établissement" button. Select correct one regarding company activity.
-  const createButtonIndex = getCreateButtonIndex(roles);
+  const createButtonName = getCreateButtonName(roles);
   await page
-    .getByRole("button", { name: "Créer votre établissement" })
-    .nth(createButtonIndex)
+    .getByRole("button", { name: createButtonName, exact: true })
     .click();
 
   // For waste producers...
-  if (createButtonIndex === 0) {
+  if (isOnlyWasteProducter(roles)) {
     // ...help message should be visible (and closable)
     const helpMessage = page.getByRole("heading", {
       name: "Vous rencontrez des difficultés dans la création d'un établissement ?"
@@ -321,8 +330,12 @@ export const submitAndVerifyGenericInfo = async (
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
   // Company info
-  await expect(companyDiv.getByText(`Numéro SIRET${siret}`)).toBeVisible();
-  const rolesDiv = companyDiv.getByText("Profil de l'entreprise").locator("..");
+  await expect(
+    companyDiv.getByText(
+      `Numéro de SIRET ou n° de TVA intra-communautaire${siret}`
+    )
+  ).toBeVisible();
+  const rolesDiv = companyDiv.getByTestId("company-types");
   await expect(rolesDiv).toBeVisible();
   for (const role of company.roles) {
     await expect(rolesDiv.getByText(role)).toBeVisible();
@@ -357,7 +370,7 @@ export const verifyReceipt = async (
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
   // Check data
-  const receiptDiv = companyDiv.locator(`#${receipt.type}Receipt`);
+  const receiptDiv = companyDiv.getByTestId(`${receipt.type}Receipt`);
   await expect(receiptDiv).toBeVisible();
   await expect(receiptDiv.getByTestId("receiptNumber")).toHaveText(
     receipt.number
@@ -383,9 +396,7 @@ export const verifyAmianteCertification = async (
   // Select correct company & correct tab
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Informations" });
 
-  const amianteDiv = companyDiv
-    .getByText("Catégorie entreprise de travaux amiante")
-    .locator("..");
+  const amianteDiv = companyDiv.getByTestId("company-worker-section");
   await expect(amianteDiv).toBeVisible();
 
   // Check data

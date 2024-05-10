@@ -26,7 +26,7 @@ import {
   GET_BSFF_FORM,
   SIGN_BSFF,
   UPDATE_BSFF_PACKAGING
-} from "../../../../../form/bsff/utils/queries";
+} from "../../../../../Apps/common/queries/bsff/queries";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { BSFF_WASTES } from "@td/constants";
 import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";

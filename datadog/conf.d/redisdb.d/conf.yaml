@@ -1,8 +1,0 @@
-init_config:
-instances:
-  - host: <DD_REDIS_HOST>
-    port: <DD_REDIS_PORT>
-    password: <DD_REDIS_PASSWORD>
-    tags:
-      - service.name:redis
-      - env:%%env_DD_ENV%%

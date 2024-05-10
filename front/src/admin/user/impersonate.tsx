@@ -62,7 +62,7 @@ export function Impersonate() {
             </div>
           </div>
         </form>
-        <h3 className="fr-h3">Recherche par entreprise</h3>
+        <h3 className="fr-h3 fr-mt-4w">Recherche par entreprise</h3>
         <form
           onSubmit={e => {
             e.preventDefault();

@@ -5,7 +5,7 @@ import { NotificationError } from "../../../../../Apps/common/Components/Error/E
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 import Tooltip from "../../../../../common/components/Tooltip";
-import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
+import { UPDATE_BSDA } from "../../../../../Apps/common/queries/bsda/queries";
 import { Bsda, Mutation, MutationUpdateBsdaArgs } from "@td/codegen-ui";
 const TagsInput = lazy(
   () => import("../../../../../common/components/tags-input/TagsInput")

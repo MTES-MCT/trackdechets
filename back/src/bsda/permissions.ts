@@ -145,12 +145,33 @@ async function contributors(
 /**
  * Retrieves organisations allowed to create a BSDA of the given payload
  */
-function creators(input: BsdaInput) {
+async function creators(input: BsdaInput) {
+  let transporters: Pick<
+    BsdaTransporter,
+    "transporterCompanySiret" | "transporterCompanyVatNumber"
+  >[] = [];
+
+  if (input?.transporters) {
+    // on prend en compte la nouvelle liste de tranporteurs fournit
+    transporters = await prisma.bsdaTransporter.findMany({
+      where: { id: { in: input.transporters } }
+    });
+  } else if (input?.transporter) {
+    transporters = [
+      {
+        transporterCompanySiret: input?.transporter?.company?.siret ?? null,
+        transporterCompanyVatNumber:
+          input?.transporter?.company?.vatNumber ?? null
+      }
+    ];
+  }
   return [
     input.emitter?.company?.siret,
     input.ecoOrganisme?.siret,
-    input.transporter?.company?.siret,
-    input.transporter?.company?.vatNumber,
+    ...transporters.flatMap(t => [
+      t.transporterCompanySiret,
+      t.transporterCompanyVatNumber
+    ]),
     input.destination?.company?.siret,
     input.worker?.company?.siret,
     input.broker?.company?.siret,
@@ -188,7 +209,7 @@ export async function checkCanReadPdf(user: User, bsda: BsdaWithTransporters) {
 }
 
 export async function checkCanCreate(user: User, bsdaInput: BsdaInput) {
-  const authorizedOrgIds = creators(bsdaInput);
+  const authorizedOrgIds = await creators(bsdaInput);
   return checkUserPermissions(
     user,
     authorizedOrgIds,

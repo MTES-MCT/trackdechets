@@ -272,6 +272,44 @@ describe("Mutation.Bsda.createDraft", () => {
     expect(updatedTransporter2.number).toEqual(2);
   });
 
+  it("should be possible to create a bsda as a transporter with existing bsdaTransporters", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+    const { user: userTransporter, company: transporter } =
+      await userWithCompanyFactory("MEMBER");
+    const transporter1 = await prisma.bsdaTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter.siret
+      }
+    });
+
+    const { mutate } = makeClient(userTransporter);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createDraftBsda">,
+      MutationCreateDraftBsdaArgs
+    >(CREATE_BSDA, {
+      variables: {
+        input: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporters: [transporter1.id]
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    const bsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data.createDraftBsda.id },
+      include: { transporters: true }
+    });
+    expect(bsda.transporters.length).toEqual(1);
+    expect(bsda.transporters.map(t => t.id)).toContain(transporter1.id);
+    const updatedTransporter1 = bsda.transporters.find(
+      t => t.id === transporter1.id
+    )!;
+    expect(updatedTransporter1.number).toEqual(1);
+  });
+
   it("should throw an error when trying to connect a non existant bsdaTransporter", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);

@@ -15,5 +15,5 @@ L'interface graphique Trackdéchets utilise la même API que l'API publique docu
 - À l'inverse, des fonctionnalités avancées de l'API peuvent ne pas être exploitées dans l'interface graphique.
 
 :::info
-L'interface graphique Trackdéchets n'a pas vocation à se substituer à des solutions logicielles existantes mais plutôt à fournir un point d'accès basique pour la consultation et l'édition de bordereaux numériques. Elle permet notamemnt d'assurer l'accès à la plateforme aux acteurs de la chaîne de traçabilité qui ne sont pas équipés de solutions logicielles.
+L'interface graphique Trackdéchets n'a pas vocation à se substituer à des solutions logicielles existantes mais plutôt à fournir un point d'accès basique pour la consultation et l'édition de bordereaux numériques. Elle permet notamment d'assurer l'accès à la plateforme aux acteurs de la chaîne de traçabilité qui ne sont pas équipés de solutions logicielles.
 :::

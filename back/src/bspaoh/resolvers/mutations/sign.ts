@@ -201,10 +201,11 @@ async function signDelivery(
     throw new AlreadySignedError();
   }
   const nextStatus = await getNextStatus(bspaoh, input.type);
-
+  const timestamp = new Date(input.date ?? Date.now());
   const updateInput: Prisma.BspaohUpdateInput = {
     status: nextStatus,
-    handedOverToDestinationSignatureDate: new Date(input.date ?? Date.now()),
+    handedOverToDestinationSignatureDate: timestamp,
+
     handedOverToDestinationSignatureAuthor: input.author
   };
 

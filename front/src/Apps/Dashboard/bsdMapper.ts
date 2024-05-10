@@ -1,4 +1,15 @@
-import { Bsff, Bsdasri, Bsvhu, BsdType, Form, Bsd, Bsda } from "@td/codegen-ui";
+import {
+  Bsff,
+  Bsdasri,
+  Bsvhu,
+  BsdType,
+  Form,
+  Bsd,
+  Bsda,
+  Bspaoh,
+  BsdasriType
+} from "@td/codegen-ui";
+
 import {
   BsdDisplay,
   BsdStatusCode,
@@ -27,7 +38,8 @@ const mapBsdTypeNameToBsdType = (
       return BsdType.Bsvhu;
     case BsdTypename.Bsff:
       return BsdType.Bsff;
-
+    case BsdTypename.Bspaoh:
+      return BsdType.Bspaoh;
     default:
       return undefined;
   }
@@ -45,7 +57,8 @@ export const formatBsd = (bsd: Bsd): BsdDisplay | null => {
       return mapBsvhu(bsd);
     case BsdTypename.Bsff:
       return mapBsff(bsd);
-
+    case BsdTypename.Bspaoh:
+      return mapBspaoh(bsd);
     default:
       return null;
   }
@@ -214,4 +227,41 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     packagings: bsff?.packagings
   };
   return bsffFormatted;
+};
+
+export const mapBspaoh = (bspaoh: Bspaoh): BsdDisplay => {
+  const statusCode = bspaoh?.status || bspaoh["bspaohStatus"];
+  const wasteCode = bspaoh.waste?.code || bspaoh["bspaohWaste"]?.code;
+  const wasteType = bspaoh.waste?.type || bspaoh["bspaohWaste"]?.type;
+  const wasteName =
+    wasteType === "FOETUS" ? "Foetus" : "Pièces anatomiques d'origine humaine";
+  const bspaohFormatted: BsdDisplay = {
+    id: bspaoh.id,
+    readableid: bspaoh.id,
+    type: mapBsdTypeNameToBsdType(bspaoh.__typename) || BsdType.Bsdasri,
+    isDraft: bspaoh.isDraft,
+    status: mapBsdStatusToBsdStatusEnum(statusCode),
+    wasteDetails: {
+      code: wasteCode,
+      weight:
+        bspaoh.destination?.reception?.detail?.acceptedWeight?.value ??
+        bspaoh.emitter?.emission?.detail?.weight?.value,
+      name: wasteName
+    },
+    emitter: bspaoh.emitter || bspaoh["bsdasriEmitter"],
+    destination: bspaoh.destination || bspaoh["bsdasriDestination"],
+    transporter: bspaoh.transporter || bspaoh["bsdasriTransporter"],
+
+    updatedAt: bspaoh.updatedAt,
+
+    bsdWorkflowType: BsdasriType.Simple, // currently there is no specific type on PAOH
+
+    transporterCustomInfo: truncateTransporterInfo(
+      bspaoh.transporter?.customInfo || bspaoh["bsdasriTransporter"]?.customInfo
+    ),
+    transporterNumberPlate:
+      bspaoh.transporter?.transport?.plates ||
+      bspaoh["bsdasriTransporter"]?.transport?.plates
+  };
+  return bspaohFormatted;
 };

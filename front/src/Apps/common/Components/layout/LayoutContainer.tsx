@@ -38,6 +38,7 @@ const BsdasriFormContainer = lazy(
 const BsdaFormContainer = lazy(
   () => import("../../../../form/bsda/FormContainer")
 );
+
 const WasteSelector = lazy(() => import("../../../../login/WasteSelector"));
 
 const Invite = lazy(() => import("../../../../login/Invite"));
@@ -115,12 +116,12 @@ export default function LayoutContainer() {
               isAdmin={isAdmin}
               v2banner={
                 <SurveyBanner
-                  message="Afin de nous aider à évaluer votre expérience avec l'application Trackdéchets, répondez à ce court questionnaire."
+                  message="Pour en savoir plus sur les nouveautés du mois de mai, consultez notre FAQ."
                   button={{
-                    title: "Répondre",
-                    href: "https://tally.so/r/npKpGV"
+                    title: "Voir la FAQ",
+                    href: "https://faq.trackdechets.fr/pour-aller-plus-loin/les-dernieres-evolutions-de-trackdechets"
                   }}
-                  persistedSurveyName="td-20240409"
+                  persistedSurveyName="td-20240507"
                 />
               }
               defaultOrgId={defaultOrgId}

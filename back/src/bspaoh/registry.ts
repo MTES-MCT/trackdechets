@@ -111,7 +111,8 @@ function toGenericWaste(
     destinationReceptionAcceptationStatus:
       bspaoh.destinationReceptionAcceptationStatus,
     destinationOperationDate: bspaoh.destinationOperationDate,
-    destinationReceptionWeight: bspaoh.destinationReceptionWasteWeightValue,
+    destinationReceptionWeight:
+      bspaoh.destinationReceptionWasteReceivedWeightValue,
     wasteAdr: bspaoh.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,

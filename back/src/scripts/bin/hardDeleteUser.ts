@@ -40,4 +40,5 @@ import deleteUser from "../prisma/hardDeleteUser";
     process.exit(0);
   }
   await deleteUser(user);
+  process.exit(0);
 })();

@@ -15,6 +15,8 @@ import { PARTIAL_OPERATIONS } from "../../validation/constants";
 import { NON_CANCELLABLE_BSDA_STATUSES } from "../../resolvers/mutations/revisionRequest/createRevisionRequest";
 import { ForbiddenError } from "../../../common/errors";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
+import { operationHook } from "../../operationHook";
+import { isFinalOperationCode } from "../../../common/operationCodes";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -164,6 +166,9 @@ export async function approveAndApplyRevisionRequest(
     data: { status: RevisionRequestStatus.ACCEPTED }
   });
 
+  const bsdaBeforeRevision = await prisma.bsda.findUniqueOrThrow({
+    where: { id: updatedRevisionRequest.bsdaId }
+  });
   const updateData = await getUpdateFromRevisionRequest(
     updatedRevisionRequest,
     prisma
@@ -179,6 +184,24 @@ export async function approveAndApplyRevisionRequest(
     where: { id: updatedRevisionRequest.bsdaId },
     data: { ...updateData }
   });
+
+  if (updateData && updateData.destinationOperationCode) {
+    const beforeRevisionOperationIsFinal = isFinalOperationCode(
+      bsdaBeforeRevision.destinationOperationCode
+    );
+    const updatedOperationIsFinal = isFinalOperationCode(
+      updateData.destinationOperationCode
+    );
+    if (updatedOperationIsFinal && !beforeRevisionOperationIsFinal) {
+      prisma.addAfterCommitCallback?.(async () => {
+        await operationHook(updatedBsda, { runSync: false });
+      });
+    } else if (!updatedOperationIsFinal && beforeRevisionOperationIsFinal) {
+      await prisma.bsdaFinalOperation.deleteMany({
+        where: { finalBsdaId: updatedBsda.id }
+      });
+    }
+  }
 
   await prisma.event.create({
     data: {

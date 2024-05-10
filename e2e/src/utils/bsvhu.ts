@@ -1,15 +1,20 @@
 import { Page, expect } from "@playwright/test";
-import { expectInputValue, navigateInDashboard } from "./utils";
+import { expectInputValue } from "./utils";
+import { selectBsdMenu } from "./navigation";
 import { toDDMMYYYY } from "./time";
 
 /**
  * In the bsd card list, get the one corresponding to target bsd
  */
-const getVHUCardDiv = (page: Page, id: string) => {
-  return page
+const getVHUCardDiv = async (page: Page, id: string) => {
+  const div = page
     .locator(".bsd-card-list li")
     .filter({ hasText: `N°: ${id}` })
     .first();
+
+  await expect(div).toBeVisible();
+
+  return div;
 };
 
 /**
@@ -18,6 +23,27 @@ const getVHUCardDiv = (page: Page, id: string) => {
 const clickCreateVhuButton = async (page: Page) => {
   await page.getByRole("button", { name: "Créer un bordereau" }).click();
   await page.getByRole("link", { name: "Véhicule Hors d’Usage" }).click();
+};
+
+/**
+ * Click on secondary menu action button. Will check if secondary menu is already open.
+ */
+type Action = "Dupliquer" | "Supprimer";
+const clickOnVhuSecondaryMenuButton = async (
+  page: Page,
+  id: string,
+  action: Action
+) => {
+  const vhuDiv = await getVHUCardDiv(page, id);
+
+  const button = vhuDiv.getByRole("button").getByText(action);
+
+  // If secondary menu is already open, do not click again (or it will close)
+  if (!(await button.isVisible())) {
+    await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
+  }
+
+  await button.click();
 };
 
 /**
@@ -31,7 +57,7 @@ const fillEmitterTab = async (page: Page, emitter) => {
   // Then, fill siret and select company
   await page.getByLabel("N°SIRET ou raison sociale").fill(emitter.orgId);
   await page
-    .getByRole("button", { name: `Établissement de test - ${emitter.orgId}` })
+    .getByRole("button", { name: `${emitter.name} - ${emitter.orgId}` })
     .click();
 
   // Make sure auto-filled info matches company
@@ -266,7 +292,14 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   await page.getByRole("combobox").selectOption("R 12");
 
   // Create VHU
+  const responsePromise = page.waitForResponse(async response => {
+    return (await response.text()).includes("createDraftBsvhu");
+  });
   await page.getByRole("button", { name: "Créer" }).click();
+  const response = await responsePromise;
+  const id = (await response.json()).data?.createDraftBsvhu?.id;
+
+  return id;
 };
 
 /**
@@ -283,18 +316,14 @@ export const createBsvhu = async (
   await fillEmitterTab(page, emitter);
   await fillWasteTab(page);
   await fillTransporterTab(page, transporter);
-  await fillDestinationTab(page, destination, broyeur);
+  const id = await fillDestinationTab(page, destination, broyeur);
 
   // Navigate to BSDs view
   await page.getByRole("link", { name: "Tous les bordereaux" }).click();
 
-  // Make sure VHU pops out in results list
-  const vhuDiv = page.locator(".bsd-card-list li").first();
+  // Make sure VHU is visible
+  const vhuDiv = page.locator(".bsd-card-list li").getByText(`N°: ${id}`);
   await expect(vhuDiv).toBeVisible();
-
-  // Extract VHU id
-  const idDiv = vhuDiv.getByText("N°: ");
-  const id = (await idDiv.innerText()).replace("N°: ", "");
 
   return { id };
 };
@@ -306,22 +335,29 @@ export const verifyCardData = async (
   page: Page,
   { id, emitter, transporter, destination }
 ) => {
-  const vhuDiv = getVHUCardDiv(page, id);
+  const vhuDiv = await getVHUCardDiv(page, id);
 
   // Verify card info
   await expect(vhuDiv.getByText("16 01 06")).toBeVisible();
   await expect(vhuDiv.getByText("Brouillon")).toBeVisible();
   await expect(vhuDiv.getByText("VHU dépollués")).toBeVisible();
+
   // Companies names
-  await expect(
-    page.locator("div").filter({ hasText: emitter.name }).first()
-  ).toBeVisible();
-  await expect(
-    page.locator("div").filter({ hasText: transporter.name }).nth(1)
-  ).toBeVisible();
-  await expect(
-    page.locator("div").filter({ hasText: destination.name }).nth(2)
-  ).toBeVisible();
+  const emitterName = await vhuDiv
+    .locator(".actors__label")
+    .first()
+    .getAttribute("aria-label");
+  await expect(emitterName).toEqual(emitter.name);
+  const transporterName = await vhuDiv
+    .locator(".actors__label")
+    .nth(1)
+    .getAttribute("aria-label");
+  await expect(transporterName).toEqual(transporter.name);
+  const destinationName = await vhuDiv
+    .locator(".actors__label")
+    .nth(2)
+    .getAttribute("aria-label");
+  await expect(destinationName).toEqual(destination.name);
 
   // Primary button
   await expect(vhuDiv.getByRole("button").getByText("Publier")).toBeVisible();
@@ -342,48 +378,48 @@ export const verifyOverviewData = async (
   { id, emitter, transporter, destination }
 ) => {
   // Open overview and verify data
-  const vhuDiv = getVHUCardDiv(page, id);
+  const vhuDiv = await getVHUCardDiv(page, id);
   await vhuDiv.getByRole("button").getByText("Aperçu").click();
+
+  const modalContent = page.getByRole("tabpanel");
+  const expectValue = async (testId, value) => {
+    const content = await modalContent.getByTestId(testId).textContent();
+    await expect(content).toEqual(value);
+  };
 
   // Producteur
   await page.getByRole("tab", { name: "Producteur" }).click();
-  const modalContent = page.getByRole("tabpanel");
-  await expect(await modalContent.getByText(emitter.orgId)).toBeVisible();
-  await expect(await modalContent.getByText(emitter.contact)).toBeVisible();
-  await expect(
-    await modalContent.getByText(emitter.contactPhone)
-  ).toBeVisible();
-  await expect(
-    await modalContent.getByText(emitter.contactEmail)
-  ).toBeVisible();
+  await expectValue("siret", emitter.orgId);
+  await expectValue("contact", emitter.contact);
+  await expectValue("tel", emitter.contactPhone);
+  await expectValue("mel", emitter.contactEmail);
 
   // Transporter
   await page.getByRole("tab", { name: "Transporteur" }).click();
-  await expect(modalContent.getByText(transporter.orgId)).toBeVisible();
-  await expect(modalContent.getByText(transporter.contact)).toBeVisible();
-  await expect(modalContent.getByText(transporter.contactPhone)).toBeVisible();
-  await expect(modalContent.getByText(transporter.contactEmail)).toBeVisible();
-  await expect(
-    modalContent.getByText(transporter.transporterReceipt.receiptNumber)
-  ).toBeVisible();
-  await expect(
-    modalContent.getByText(transporter.transporterReceipt.department)
-  ).toBeVisible();
-  await expect(
-    modalContent.getByText(
-      toDDMMYYYY(transporter.transporterReceipt.validityLimit)
-    )
-  ).toBeVisible();
+  await expectValue("siret", transporter.orgId);
+  await expectValue("contact", transporter.contact);
+  await expectValue("tel", transporter.contactPhone);
+  await expectValue("mel", transporter.contactEmail);
+  await expectValue(
+    "numero_de_recepisse",
+    transporter.transporterReceipt.receiptNumber
+  );
+  await expectValue("departement", transporter.transporterReceipt.department);
+  await expectValue(
+    "date_de_validite_de_recepisse",
+    toDDMMYYYY(transporter.transporterReceipt.validityLimit)
+  );
 
   // Destination
   await page.getByRole("tab", { name: "Destinataire" }).click();
-  await expect(modalContent.getByText(destination.orgId)).toBeVisible();
-  await expect(modalContent.getByText(destination.contact)).toBeVisible();
-  await expect(modalContent.getByText(destination.contactPhone)).toBeVisible();
-  await expect(modalContent.getByText(destination.contactEmail)).toBeVisible();
-  await expect(
-    modalContent.getByText(destination.vhuAgrementDemolisseur.agrementNumber)
-  ).toBeVisible();
+  await expectValue("siret", destination.orgId);
+  await expectValue("contact", destination.contact);
+  await expectValue("tel", destination.contactPhone);
+  await expectValue("mel", destination.contactEmail);
+  await expectValue(
+    "agrement",
+    destination.vhuAgrementDemolisseur.agrementNumber
+  );
 
   // Close the modal
   await page.getByLabel("Close").click();
@@ -393,18 +429,23 @@ export const verifyOverviewData = async (
  * Publish a VHU
  */
 export const publishBsvhu = async (page: Page, { id }) => {
-  await navigateInDashboard(page, "Brouillons", "**/bsds/drafts");
+  await selectBsdMenu(page, "Brouillons");
 
-  let vhuDiv = getVHUCardDiv(page, id);
+  let vhuDiv = await getVHUCardDiv(page, id);
 
   // Try to publish
   await vhuDiv.getByRole("button").getByText("Publier").click();
+
   // Confirm publication in modal
+  const responsePromise = page.waitForResponse(async response => {
+    return (await response.text()).includes("publishBsvhu");
+  });
   await page.getByRole("button", { name: "Publier le bordereau" }).click();
+  await responsePromise;
 
-  await navigateInDashboard(page, "Tous les bordereaux", "**/bsds/all");
-  vhuDiv = getVHUCardDiv(page, id);
-
+  // Should be visible
+  await selectBsdMenu(page, "Tous les bordereaux");
+  vhuDiv = await getVHUCardDiv(page, id);
   await expect(vhuDiv).toBeVisible();
 
   // Status should be updated
@@ -423,9 +464,9 @@ export const publishBsvhu = async (page: Page, { id }) => {
  * Fix VHU adding missing data, then publish
  */
 export const fixAndPublishBsvhu = async (page: Page, { id }) => {
-  await navigateInDashboard(page, "Brouillons", "**/bsds/drafts");
+  await selectBsdMenu(page, "Brouillons");
 
-  const vhuDiv = getVHUCardDiv(page, id);
+  const vhuDiv = await getVHUCardDiv(page, id);
 
   // Try to publish
   await vhuDiv.getByRole("button").getByText("Publier").click();
@@ -455,24 +496,24 @@ export const fixAndPublishBsvhu = async (page: Page, { id }) => {
  * Duplicate a VHU
  */
 export const duplicateBsvhu = async (page: Page, { id }) => {
-  await navigateInDashboard(page, "Tous les bordereaux", "**/bsds/all");
-
-  const vhuDiv = getVHUCardDiv(page, id);
+  await selectBsdMenu(page, "Tous les bordereaux");
 
   // Duplicate
-  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
-  await vhuDiv.getByRole("button").getByText("Dupliquer").click();
+  const responsePromise = page.waitForResponse(async response => {
+    return (await response.text()).includes("duplicateBsvhu");
+  });
+  await clickOnVhuSecondaryMenuButton(page, id, "Dupliquer");
+  const response = await responsePromise;
+  const duplicatedId = (await response.json()).data?.duplicateBsvhu?.id;
 
   // Check in drafts
-  await navigateInDashboard(page, "Brouillons", "**/bsds/drafts");
+  await selectBsdMenu(page, "Brouillons");
 
   // Make sure VHU pops out in results list
-  const duplicatedVhuDiv = page.locator(".bsd-card-list li").first();
+  const duplicatedVhuDiv = page
+    .locator(".bsd-card-list li")
+    .getByText(`N°: ${duplicatedId}`);
   await expect(duplicatedVhuDiv).toBeVisible();
-
-  // Extract VHU id
-  const duplicatedIdDiv = duplicatedVhuDiv.getByText("N°: ");
-  const duplicatedId = (await duplicatedIdDiv.innerText()).replace("N°: ", "");
 
   return { id: duplicatedId };
 };
@@ -481,13 +522,14 @@ export const duplicateBsvhu = async (page: Page, { id }) => {
  * Delete a VHU
  */
 export const deleteBsvhu = async (page: Page, { id }) => {
-  await navigateInDashboard(page, "Tous les bordereaux", "**/bsds/all");
+  await selectBsdMenu(page, "Tous les bordereaux");
 
-  const vhuDiv = getVHUCardDiv(page, id);
+  const vhuDiv = await getVHUCardDiv(page, id);
 
   // Delete
-  await vhuDiv.getByTestId("bsd-actions-secondary-btn").click();
-  await vhuDiv.getByRole("button").getByText("Supprimer").click();
+  await clickOnVhuSecondaryMenuButton(page, id, "Supprimer");
+
+  // Confirmation modal
   await page.getByRole("button", { name: "Supprimer" }).click();
 
   await expect(vhuDiv).not.toBeVisible();

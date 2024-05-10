@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
 import routes from "../../../../../Apps/routes";
 import { format, subMonths } from "date-fns";
-import { UPDATE_BSDA } from "../../../../../form/bsda/stepper/queries";
+import { UPDATE_BSDA } from "../../../../../Apps/common/queries/bsda/queries";
 import Operation from "../../../../../form/bsda/stepper/steps/Operation";
 import { getInitialCompany } from "../../../../../form/bsdd/utils/initial-state";
 import { getComputedState } from "../../../../../form/common/getComputedState";

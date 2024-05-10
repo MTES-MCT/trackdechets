@@ -42,8 +42,11 @@
 
 .ModalCloseButton {
   position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   top: 1rem;
   right: 1rem;
-  font-size: 1.25rem;
-  color: $blue;
+  font-size: 0.875rem;
+  color: var(--light-text-action-high-blue-france, #000091);
 }

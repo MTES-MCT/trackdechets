@@ -6,6 +6,8 @@ import {
   Bsff,
   Bsvhu,
   BsvhuStatus,
+  Bspaoh,
+  BspaohStatus,
   Company,
   Status,
   User,
@@ -30,6 +32,8 @@ import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories"
 import { indexBsvhu } from "../../../../bsvhu/elastic";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
+import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
+import { getBspaohForElastic, indexBspaoh } from "../../../../bspaoh/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
   formFactory,
@@ -53,6 +57,7 @@ describe("Transported wastes registry", () => {
   let bsd3: Bsdasri;
   let bsd4: Bsvhu;
   let bsd5: Bsff;
+  let bsd6: Bspaoh;
 
   const OLD_ENV = process.env;
 
@@ -175,12 +180,34 @@ describe("Transported wastes registry", () => {
       }
     );
 
+    bsd6 = await bspaohFactory({
+      opt: {
+        status: BspaohStatus.PROCESSED,
+        emitterCompanySiret: emitter.company.siret,
+
+        destinationCompanySiret: destination.company.siret,
+        emitterEmissionSignatureDate: new Date("2021-09-01"),
+        destinationReceptionDate: new Date("2021-09-01"),
+        destinationReceptionSignatureDate: new Date("2021-09-01"),
+        destinationOperationDate: new Date("2021-09-01"),
+        destinationOperationCode: "D 10",
+        transporterTransportTakenOverAt: new Date("2021-09-02"),
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.company.siret,
+            transporterTransportSignatureDate: new Date("2021-09-02")
+          }
+        }
+      }
+    });
     await Promise.all([
       indexForm(await getFormForElastic(bsd1)),
       indexBsda(await getBsdaForElastic(bsd2)),
       indexBsdasri(await getBsdasriForElastic(bsd3)),
       indexBsvhu(bsd4),
-      indexBsff(await getBsffForElastic(bsd5))
+      indexBsff(await getBsffForElastic(bsd5)),
+      indexBspaoh(await getBspaohForElastic(bsd6))
     ]);
     await refreshElasticSearch();
   });
@@ -237,7 +264,7 @@ describe("Transported wastes registry", () => {
     );
     let ids = page1.transportedWastes.edges.map(edge => edge.node.id);
     expect(ids).toEqual([bsd1.readableId, bsd2.id]);
-    expect(page1.transportedWastes.totalCount).toEqual(5);
+    expect(page1.transportedWastes.totalCount).toEqual(6);
     expect(page1.transportedWastes.pageInfo.endCursor).toEqual(bsd2.id);
     expect(page1.transportedWastes.pageInfo.hasNextPage).toEqual(true);
 
@@ -254,7 +281,7 @@ describe("Transported wastes registry", () => {
 
     ids = page2.transportedWastes.edges.map(edge => edge.node.id);
     expect(ids).toEqual([bsd3.id, bsd4.id]);
-    expect(page2.transportedWastes.totalCount).toEqual(5);
+    expect(page2.transportedWastes.totalCount).toEqual(6);
     expect(page2.transportedWastes.pageInfo.endCursor).toEqual(bsd4.id);
     expect(page2.transportedWastes.pageInfo.hasNextPage).toEqual(true);
 
@@ -269,9 +296,9 @@ describe("Transported wastes registry", () => {
       }
     );
     ids = page3.transportedWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd5.id]);
-    expect(page3.transportedWastes.totalCount).toEqual(5);
-    expect(page3.transportedWastes.pageInfo.endCursor).toEqual(bsd5.id);
+    expect(ids).toEqual([bsd5.id, bsd6.id]);
+    expect(page3.transportedWastes.totalCount).toEqual(6);
+    expect(page3.transportedWastes.pageInfo.endCursor).toEqual(bsd6.id);
     expect(page3.transportedWastes.pageInfo.hasNextPage).toEqual(false);
   });
 
@@ -284,9 +311,9 @@ describe("Transported wastes registry", () => {
       }
     );
     let ids = page1.transportedWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd4.id, bsd5.id]);
-    expect(page1.transportedWastes.totalCount).toEqual(5);
-    expect(page1.transportedWastes.pageInfo.startCursor).toEqual(bsd4.id);
+    expect(ids).toEqual([bsd5.id, bsd6.id]);
+    expect(page1.transportedWastes.totalCount).toEqual(6);
+    expect(page1.transportedWastes.pageInfo.startCursor).toEqual(bsd5.id);
     expect(page1.transportedWastes.pageInfo.hasPreviousPage).toEqual(true);
 
     const { data: page2 } = await query<Pick<Query, "transportedWastes">>(
@@ -300,9 +327,10 @@ describe("Transported wastes registry", () => {
       }
     );
     ids = page2.transportedWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd2.id, bsd3.id]);
-    expect(page2.transportedWastes.totalCount).toEqual(5);
-    expect(page2.transportedWastes.pageInfo.startCursor).toEqual(bsd2.id);
+    expect(ids).toEqual([bsd3.id, bsd4.id]);
+
+    expect(page2.transportedWastes.totalCount).toEqual(6);
+    expect(page2.transportedWastes.pageInfo.startCursor).toEqual(bsd3.id);
     expect(page2.transportedWastes.pageInfo.hasPreviousPage).toEqual(true);
 
     const { data: page3 } = await query<Pick<Query, "transportedWastes">>(
@@ -316,8 +344,9 @@ describe("Transported wastes registry", () => {
       }
     );
     ids = page3.transportedWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd1.readableId]);
-    expect(page3.transportedWastes.totalCount).toEqual(5);
+    expect(ids).toEqual([bsd1.readableId, bsd2.id]);
+
+    expect(page3.transportedWastes.totalCount).toEqual(6);
     expect(page3.transportedWastes.pageInfo.startCursor).toEqual(bsd1.id);
     expect(page3.transportedWastes.pageInfo.hasPreviousPage).toEqual(false);
   });
@@ -347,7 +376,7 @@ describe("Transported wastes registry", () => {
       .set("X-Forwarded-For", allowedIP);
 
     expect(res.body).toEqual({
-      data: { transportedWastes: { totalCount: 5 } }
+      data: { transportedWastes: { totalCount: 6 } }
     });
   });
 
@@ -376,7 +405,7 @@ describe("Transported wastes registry", () => {
       .set("X-Forwarded-For", allowedIP);
 
     expect(res.body).toEqual({
-      data: { transportedWastes: { totalCount: 5 } }
+      data: { transportedWastes: { totalCount: 6 } }
     });
   });
 

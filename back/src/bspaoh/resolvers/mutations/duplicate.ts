@@ -14,6 +14,7 @@ import { getBspaohRepository } from "../../repository";
 
 import { prepareBspaohForParsing, prepareBspaohInputs } from "./utils";
 import { parseBspaohInContext } from "../../validation";
+import { isObject, isArray } from "../../../common/dataTypes";
 
 async function getBspaohCompanies(bspaoh: Bspaoh) {
   const firstTransporter = await getBspaohFirstTransporter(bspaoh);
@@ -99,6 +100,20 @@ const duplicateBspaohResolver: MutationResolvers["duplicateBspaoh"] = async (
   return expandBspaohFromDb(newBspaoh);
 };
 
+const cleanPackaging = packaging => {
+  if (isObject(packaging)) return { ...packaging, identificationCodes: [] };
+};
+
+const cleanPackagings = wastePackagings => {
+  if (wastePackagings === null) {
+    return Prisma.JsonNull;
+  }
+  if (isArray(wastePackagings)) {
+    return wastePackagings?.map(packaging => cleanPackaging(packaging));
+  }
+  return wastePackagings;
+};
+
 async function duplicateBspaoh(
   user: Express.User,
   bspaoh: Bspaoh,
@@ -112,12 +127,14 @@ async function duplicateBspaoh(
     emitterEmissionSignatureDate,
     emitterEmissionSignatureAuthor,
 
-    handedOverToDestinationDate,
     handedOverToDestinationSignatureDate,
     handedOverToDestinationSignatureAuthor,
+    destinationReceptionWasteQuantityValue,
 
-    destinationReceptionWasteWeightValue,
-    destinationReceptionWasteWeightIsEstimate,
+    destinationReceptionWasteReceivedWeightValue,
+    destinationReceptionWasteAcceptedWeightValue,
+    destinationReceptionWasteRefusedWeightValue,
+
     destinationReceptionAcceptationStatus,
     destinationReceptionWasteRefusalReason,
     destinationReceptionWastePackagingsAcceptation,
@@ -134,6 +151,7 @@ async function duplicateBspaoh(
     nextTransporterOrgId,
     transportersSirets,
     canAccessDraftSirets,
+    wastePackagings,
     ...fieldsToCopy
   } = bspaoh;
 
@@ -152,10 +170,7 @@ async function duplicateBspaoh(
 
   const input = {
     ...fieldsToCopy,
-    wastePackagings:
-      fieldsToCopy.wastePackagings === null
-        ? Prisma.JsonNull
-        : fieldsToCopy.wastePackagings,
+    wastePackagings: cleanPackagings(wastePackagings),
     id: getReadableId(ReadableIdPrefix.PAOH),
     status: BspaohStatus.DRAFT,
 
@@ -194,6 +209,7 @@ async function duplicateBspaoh(
       }
     }
   };
+
   const bspaohRepository = getBspaohRepository(user);
 
   return bspaohRepository.create({

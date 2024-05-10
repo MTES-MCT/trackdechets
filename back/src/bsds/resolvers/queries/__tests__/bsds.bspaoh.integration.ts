@@ -196,7 +196,7 @@ describe("Query.bsds.bspaohs base workflow", () => {
                 },
                 date: new Date().toISOString() as any,
                 detail: {
-                  weight: { value: 10, isEstimate: false }
+                  receivedWeight: { value: 10 }
                 }
               },
               operation: {
@@ -509,16 +509,15 @@ describe("Query.bsds.bspaohs base workflow", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(destination.user);
 
-      const res = await mutate<
-        Pick<Mutation, "signBspaoh">,
-        MutationSignBspaohArgs
-      >(SIGN_BSPAOH, {
-        variables: {
-          id: bspaohId,
-          input: { type: "RECEPTION", author: "Bill" }
+      await mutate<Pick<Mutation, "signBspaoh">, MutationSignBspaohArgs>(
+        SIGN_BSPAOH,
+        {
+          variables: {
+            id: bspaohId,
+            input: { type: "RECEPTION", author: "Bill" }
+          }
         }
-      });
-      console.log(res);
+      );
       await refreshElasticSearch();
     });
 

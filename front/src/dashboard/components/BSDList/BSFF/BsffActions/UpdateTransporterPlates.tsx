@@ -4,7 +4,7 @@ import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icon
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationUpdateBsffArgs } from "@td/codegen-ui";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
-import { UPDATE_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
+import { UPDATE_BSFF_FORM } from "../../../../../Apps/common/queries/bsff/queries";
 import { BsffFragment } from "../types";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import Tooltip from "../../../../../common/components/Tooltip";

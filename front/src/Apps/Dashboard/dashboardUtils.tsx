@@ -7,11 +7,13 @@ import {
   bsd_type_option_bsdd,
   bsd_type_option_bsff,
   bsd_type_option_bsvhu,
+  bsd_type_option_bspaoh,
   dropdown_create_bsda,
   dropdown_create_bsdasri,
   dropdown_create_bsdd,
   dropdown_create_bsff,
   dropdown_create_bsvhu,
+  dropdown_create_bspaoh,
   filter_acceptation_sign_date,
   filter_bsd_number,
   filter_bsd_type,
@@ -40,7 +42,8 @@ import {
   IconBSDa,
   IconBSVhu,
   IconBSDD,
-  IconBSDasri
+  IconBSDasri,
+  IconBSPaohThin
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
@@ -68,6 +71,10 @@ const bsdTypeFilterSelectOptions = [
   {
     value: BsdType.Bsda,
     label: bsd_type_option_bsda
+  },
+  {
+    value: BsdType.Bspaoh,
+    label: bsd_type_option_bspaoh
   }
 ];
 
@@ -453,7 +460,7 @@ export const filterPredicates: {
   }
 ];
 
-export const dropdownCreateLinks = siret => [
+export const dropdownCreateLinks = (siret, location) => [
   {
     title: dropdown_create_bsdd,
     route: generatePath(routes.dashboard.bsdds.create, { siret }),
@@ -479,6 +486,12 @@ export const dropdownCreateLinks = siret => [
     title: dropdown_create_bsda,
     route: generatePath(routes.dashboard.bsdas.create, { siret }),
     icon: <IconBSDa />
+  },
+  {
+    title: dropdown_create_bspaoh,
+    route: generatePath(routes.dashboard.bspaohs.create, { siret }),
+    state: { background: location },
+    icon: <IconBSPaohThin />
   }
 ];
 
@@ -494,6 +507,8 @@ export const getOverviewPath = bsd => {
       return routes.dashboard.bsffs.view;
     case BsdType.Bsvhu:
       return routes.dashboard.bsvhus.view;
+    case BsdType.Bspaoh:
+      return routes.dashboard.bspaohs.view;
 
     default:
       break;
@@ -512,7 +527,8 @@ export const getUpdatePath = bsd => {
       return routes.dashboard.bsffs.edit;
     case BsdType.Bsvhu:
       return routes.dashboard.bsvhus.edit;
-
+    case BsdType.Bspaoh:
+      return routes.dashboard.bspaohs.edit;
     default:
       break;
   }

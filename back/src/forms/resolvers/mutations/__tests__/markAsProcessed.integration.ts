@@ -16,6 +16,7 @@ import {
   Mutation,
   MutationMarkAsProcessedArgs
 } from "../../../../generated/graphql/types";
+import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 
 jest.mock("axios", () => ({
   default: {
@@ -75,30 +76,43 @@ describe("mutation.markAsProcessed", () => {
       ownerId: user.id,
       opt: {
         status: "ACCEPTED",
+        quantityReceived: 10,
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret
       }
     });
 
     const { mutate } = makeClient(user);
-    await mutate(MARK_AS_PROCESSED, {
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
       variables: {
         id: form.id,
         processedInfo: {
           processingOperationDescription: "Une description",
-          processingOperationDone: "D 1",
-          destinationOperationMode: OperationMode.ELIMINATION,
+          processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
       }
     });
 
+    expect(errors).toBeUndefined();
+
+    await new Promise(resolve => {
+      operationHooksQueue.once("global:drained", () => resolve(true));
+    });
+
     const resultingForm = await prisma.form.findUniqueOrThrow({
-      where: { id: form.id }
+      where: { id: form.id },
+      include: { finalOperations: true }
     });
     expect(resultingForm.status).toBe("PROCESSED");
-    expect(resultingForm.destinationOperationMode).toBe("ELIMINATION");
+    expect(resultingForm.destinationOperationMode).toBe(
+      OperationMode.VALORISATION_ENERGETIQUE
+    );
+
+    // final operation should be set
+    expect(resultingForm.finalOperations).toHaveLength(1);
 
     // check relevant statusLog is created
     const statusLogs = await prisma.statusLog.findMany({

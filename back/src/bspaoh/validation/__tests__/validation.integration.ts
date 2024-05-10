@@ -666,7 +666,7 @@ describe("BSPAOH validation", () => {
       {
         input: {
           destination: {
-            reception: { detail: { weight: { value: 10, isEstimate: false } } }
+            reception: { detail: { receivedWeight: { value: 10 } } }
           }
         },
         persisted: preparedExistingBspaoh
@@ -681,6 +681,12 @@ describe("BSPAOH validation", () => {
         status: "RECEIVED",
         emitterEmissionSignatureDate: new Date(),
         destinationReceptionSignatureDate: new Date(),
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionDate: new Date(),
+        destinationReceptionWastePackagingsAcceptation: [
+          { id: "packaging_1", acceptation: "ACCEPTED" },
+          { id: "packaging_2", acceptation: "ACCEPTED" }
+        ],
         transporters: {
           create: {
             transporterTransportSignatureDate: new Date(),
@@ -700,7 +706,7 @@ describe("BSPAOH validation", () => {
           input: {
             destination: {
               reception: {
-                detail: { weight: { value: 10, isEstimate: false } }
+                detail: { receivedWeight: { value: 10 } }
               }
             }
           },
@@ -721,8 +727,8 @@ describe("BSPAOH validation", () => {
         status: "RECEIVED",
         emitterEmissionSignatureDate: new Date(),
         destinationReceptionSignatureDate: new Date(),
-        destinationReceptionWasteWeightValue: 1,
-        destinationReceptionWasteWeightIsEstimate: false,
+        destinationReceptionWasteReceivedWeightValue: 1,
+
         destinationReceptionAcceptationStatus: "ACCEPTED",
         destinationReceptionDate: new Date(),
         destinationReceptionWastePackagingsAcceptation: [

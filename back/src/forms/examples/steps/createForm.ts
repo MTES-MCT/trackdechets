@@ -7,7 +7,7 @@ export function createForm(
   fixtures = defaultFixtures
 ): WorkflowStep {
   return {
-    description: `Les informations du BSDD sont remplies. Cette action peut-être effectuée
+    description: `Les informations du BSDD sont remplies. Cette action peut être effectuée
   par n'importe quel établissement apparaissant sur le BSDD. À ce stade il est toujours possible
   d'effectuer des modifications grâce à la mutation updateForm.`,
     mutation: mutations.createForm,

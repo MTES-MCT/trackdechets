@@ -53,9 +53,17 @@ a.link:hover {
 .body-text + .body-text {
   margin-top: 1rem;
 }
+
 .bullets {
   li {
     list-style: disc inside;
+    margin: 0.5rem 0 0.5rem 1rem;
+  }
+}
+
+.bullets--outside {
+  li {
+    list-style: disc outside;
     margin: 0.5rem 0 0.5rem 1rem;
   }
 }

@@ -6,7 +6,6 @@ import { signReception } from "../steps/signReception";
 import { signTransport } from "../steps/signTransport";
 import { updateReception } from "../steps/updateReception";
 import { updateOperation } from "../steps/updateOperation";
-import { updateDelivery } from "../steps/updateDelivery";
 import { signDelivery } from "../steps/signDelivery";
 import { updateTransport } from "../steps/updateTransport";
 
@@ -23,7 +22,6 @@ export default {
     signForProducer("emetteur"),
     updateTransport("transporteur"),
     signTransport("transporteur"),
-    updateDelivery("transporteur"),
     signDelivery("transporteur"),
     updateReception("crematorium"),
     signReception("crematorium"),

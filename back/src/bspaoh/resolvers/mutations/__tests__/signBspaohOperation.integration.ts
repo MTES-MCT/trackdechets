@@ -45,8 +45,8 @@ describe("Mutation.Bspaoh.sign", () => {
 
           destinationReceptionAcceptationStatus:
             WasteAcceptationStatus.ACCEPTED,
-          destinationReceptionWasteWeightValue: 10,
-          destinationReceptionWasteWeightIsEstimate: false,
+          destinationReceptionWasteReceivedWeightValue: 10,
+
           destinationReceptionWasteQuantityValue: 1,
           destinationReceptionDate: new Date(),
           destinationOperationCode: "R 1",
@@ -114,8 +114,8 @@ describe("Mutation.Bspaoh.sign", () => {
 
           destinationReceptionAcceptationStatus:
             WasteAcceptationStatus.ACCEPTED,
-          destinationReceptionWasteWeightValue: 10,
-          destinationReceptionWasteWeightIsEstimate: false,
+          destinationReceptionWasteReceivedWeightValue: 10,
+
           destinationReceptionWasteQuantityValue: 1,
           destinationReceptionDate: new Date(),
           destinationOperationCode: "R 1",

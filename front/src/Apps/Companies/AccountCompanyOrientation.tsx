@@ -14,10 +14,8 @@ export default function AccountCompanyOrientation() {
           <CallOut
             title="Vous produisez des déchets dans le cadre de votre activité."
             buttonProps={{
-              title: "Créer votre établissement",
-              children: "Créer votre établissement",
-              iconId: "ri-arrow-right-line",
-              iconPosition: "right",
+              title: "Créer votre établissement producteur",
+              children: "Créer votre établissement producteur",
               onClick: () => {
                 navigate(routes.companies.create.simple);
               }
@@ -55,31 +53,27 @@ export default function AccountCompanyOrientation() {
           <CallOut
             title="La gestion des déchets fait partie de votre activité."
             buttonProps={{
-              title: "Créer votre établissement",
-              children: "Créer votre établissement",
-              iconId: "ri-arrow-right-line",
-              iconPosition: "right",
+              title: "Créer un établissement",
+              children: "Créer un établissement",
               onClick: () => {
                 navigate(routes.companies.create.pro);
               }
             }}
           >
-            Votre entreprise gère une grande quantité de déchets. Vous souhaitez
-            créer un établissement avec les diverses options possibles : profils
-            de l'entreprise, récépissés, agréments, GEREP, etc.
-            <br />
-            Exemples : transporteur, incinérateur, déchetterie, casse
-            automobile, collecteur de déchets, etc.
+            Vous exploitez une entreprise de collecte et/ou tri et/ou transit
+            et/ou regroupement et/ou traitement de déchets. Vous êtes négociant
+            et/ou courtier de déchets et/ou eco-organisme. Exemples:
+            Déchetterie, collecteur de déchets, casse automobile, entreprise de
+            travaux amiante, transporteur, centre d'enfouissement, installation
+            de traitement de déchets, incinérateur, crématorium.
           </CallOut>
         </div>
         <div className="fr-col-12">
           <CallOut
             title="Transporteur hors France, Non-French carrier"
             buttonProps={{
-              title: "Créer votre établissement",
-              children: "Créer votre établissement",
-              iconId: "ri-arrow-right-line",
-              iconPosition: "right",
+              title: "Créer un établissement transporteur hors France",
+              children: "Créer un établissement transporteur hors France",
               onClick: () => {
                 navigate(routes.companies.create.foreign);
               }

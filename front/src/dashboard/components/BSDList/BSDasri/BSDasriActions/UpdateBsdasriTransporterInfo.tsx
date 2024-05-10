@@ -5,7 +5,7 @@ import { NotificationError } from "../../../../../Apps/common/Components/Error/E
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 
-import { UPDATE_BSDASRI } from "../../../../../form/bsdasri/utils/queries";
+import { UPDATE_BSDASRI } from "../../../../../Apps/common/queries/bsdasri/queries";
 import { Bsdasri, Mutation, MutationUpdateBsdasriArgs } from "@td/codegen-ui";
 
 type Props = {
@@ -19,7 +19,6 @@ export function UpdateBsdasriTransporterInfo({
   isModalOpenFromParent,
   onModalCloseFromParent
 }: Props) {
-  console.log(bsdasri);
   const [isOpen, setIsOpen] = useState(false);
   const [updateBsdasri, { error }] = useMutation<
     Pick<Mutation, "updateBsdasri">,

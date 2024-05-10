@@ -3,11 +3,13 @@ import { BsdaForElasticInclude, indexBsda } from "../../bsda/elastic";
 import { BsdasriForElasticInclude, indexBsdasri } from "../../bsdasris/elastic";
 import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 import { indexBsvhu } from "../../bsvhu/elastic";
+import { indexBspaoh } from "../../bspaoh/elastic";
 import { getFormForElastic, indexForm } from "../../forms/elastic";
 import { deleteBsd } from "../../common/elastic";
 import { getReadonlyBsdaRepository } from "../../bsda/repository";
 import { getReadonlyBsvhuRepository } from "../../bsvhu/repository";
 import { getReadonlyBsdasriRepository } from "../../bsdasris/repository";
+import { getReadonlyBspaohRepository } from "../../bspaoh/repository";
 
 export async function reindex(bsdId, exitFn) {
   if (bsdId.startsWith("BSDA-")) {
@@ -61,6 +63,19 @@ export async function reindex(bsdId, exitFn) {
 
     if (!!bsvhu && !bsvhu.isDeleted) {
       await indexBsvhu(bsvhu);
+    } else {
+      await deleteBsd({ id: bsdId });
+    }
+    return exitFn(true);
+  }
+
+  if (bsdId.startsWith("PAOH-")) {
+    const bspaoh = await getReadonlyBspaohRepository().findUnique({
+      id: bsdId
+    });
+
+    if (!!bspaoh && !bspaoh.isDeleted) {
+      await indexBspaoh(bspaoh);
     } else {
       await deleteBsd({ id: bsdId });
     }

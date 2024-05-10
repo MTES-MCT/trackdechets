@@ -1,0 +1,32 @@
+receivers:
+  postgresql/recette:
+    endpoint: ${env:RECETTE_DB_ENDPOINT}
+    username: ${env:RECETTE_DB_USER}
+    password: ${env:RECETTE_DB_PWD}
+
+processors:
+  batch/datadog:
+    send_batch_max_size: 100
+    send_batch_size: 10
+    timeout: 10s
+
+exporters:
+  datadog:
+    api:
+      site: datadoghq.eu
+      key: ${env:DD_API_KEY}
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, memory_limiter]
+      exporters: [datadog]
+    metrics:
+      receivers: [otlp, postgresql/recette]
+      processors: [batch/datadog, memory_limiter]
+      exporters: [datadog]
+    logs:
+      receivers: [otlp]
+      processors: [batch, memory_limiter]
+      exporters: [datadog]

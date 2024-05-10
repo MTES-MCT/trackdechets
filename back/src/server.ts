@@ -148,8 +148,8 @@ export const server = new ApolloServer<GraphQLContext>({
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
         maxRequestsPerWindow: 10 // 10 requests each 3 minutes
       },
-      createAnonymousCompanyRequest: {
-        // Prevent user from creating a huge number of requests
+      createAnonymousCompanyFromPDF: {
+        // Prevent user from creating a huge number of companies
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
         maxRequestsPerWindow: 10 // 10 requests each 3 minutes
       }
@@ -198,12 +198,20 @@ app.use(
         frameAncestors: ["'self'"],
         imgSrc: ["'self'"],
         objectSrc: ["'none'"],
-        scriptSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'sha256-KDSP72yw7Yss7rIt6vgkQo/ROHXYTHPTj3fdIW/CTn8='",
+          "'sha256-+QRKXpw524uxogTf+STlJuwKYh5pW7ad4QNYEb6HCeQ='",
+          "'sha256-FC1QdPlDgsjmWJtkJfO6Tt7pKFza/bZuwKtw25R/7m4='",
+          "'sha256-/KjN0AtQm74p7exR84hK/woqhc2pYBdNQamcxHOkiDA='"
+        ],
         scriptSrcAttr: ["'none'"],
         styleSrc: [
           "'self'",
           "https:",
-          "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='"
+          "'sha256-dihQy2mHNADQqxc3xhWK7pH1w4GVvEow7gKjxdWvTgE='",
+          "'sha256-wTzfn13a+pLMB5rMeysPPR1hO7x0SwSeQI+cnw7VdbE='",
+          "'sha256-LFhQK3cog1BLYeE/LUUJthR1mUCLSLwgkyqlF+epuq8='"
         ],
         connectSrc: [process.env.API_HOST],
         formAction: ["self"],
@@ -327,7 +335,7 @@ app.use(function checkBlacklist(req, res, next) {
 });
 
 // Returns 404 Not Found for every routes not handled by apollo
-app.use((req, res, next) => {
+app.use(function checkGqlPath(req, res, next) {
   if (req.path !== graphQLPath) {
     return res.status(404).send("Not found");
   }

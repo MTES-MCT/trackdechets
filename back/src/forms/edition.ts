@@ -75,6 +75,7 @@ type EditableBsddFields = Required<
     | "forwarding"
     | "quantityGrouped"
     | "finalOperations"
+    | "FinalOperationToFinalForm"
   >
 >;
 

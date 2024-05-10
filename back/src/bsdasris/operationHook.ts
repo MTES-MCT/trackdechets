@@ -1,0 +1,113 @@
+import { OperationHookJobArgs } from "../queue/jobs/operationHook";
+import { BsdType, Bsdasri, Prisma } from "@prisma/client";
+import { prisma } from "@td/prisma";
+import { enqueueOperationHookJob } from "../queue/producers/operationHook";
+import { isFinalOperationCode } from "../common/operationCodes";
+
+export type OperationHookOpts = {
+  // Permet de jouer la récursion des hooks en synchrone
+  runSync: boolean;
+};
+
+// Fonction principale qui est appelée sur les BSDASRIs lorsqu'un
+// traitement a lieu (ou lorsque le traitement est révisé)
+export async function operationHook(
+  bsdasri: Pick<
+    Bsdasri,
+    "id" | "destinationOperationSignatureDate" | "destinationOperationCode"
+  >,
+  { runSync }: OperationHookOpts
+) {
+  if (
+    bsdasri.destinationOperationSignatureDate &&
+    bsdasri.destinationOperationCode &&
+    isFinalOperationCode(bsdasri.destinationOperationCode)
+  ) {
+    const jobArgs: OperationHookJobArgs = {
+      bsdType: BsdType.BSDASRI,
+      initialBsdId: bsdasri.id,
+      finalBsdId: bsdasri.id,
+      operationCode: bsdasri.destinationOperationCode,
+      noTraceability: false
+    };
+
+    if (runSync) {
+      await operationHookFn(jobArgs, { runSync });
+    } else {
+      return enqueueOperationHookJob(jobArgs);
+    }
+  }
+}
+
+// Fonction récursive permettant de mettre à jour les informations de traitement
+// sur toute la chaîne de traçabilité "amont" d'un BSDASRI ayant reçu un traitement final.
+export async function operationHookFn(
+  args: OperationHookJobArgs,
+  { runSync }: OperationHookOpts
+) {
+  const {
+    bsdType,
+    initialBsdId,
+    finalBsdId,
+    operationCode,
+    noTraceability,
+    quantity: quantityArgs
+  } = args;
+
+  const initialBsdasri = await prisma.bsdasri.findUniqueOrThrow({
+    where: { id: initialBsdId },
+    include: {
+      synthesizing: true,
+      grouping: true
+    }
+  });
+
+  // Les dasris inclus dans une synthèse n'ont pas forcément `destinationReceptionWasteWeightValue` renseigné
+  const quantity =
+    quantityArgs ?? initialBsdasri.destinationReceptionWasteWeightValue! ?? 0;
+
+  const finalOperation: Prisma.BsdasriFinalOperationCreateInput = {
+    initialBsdasri: { connect: { id: initialBsdId } },
+    finalBsdasri: { connect: { id: finalBsdId } },
+    operationCode,
+    quantity
+  };
+
+  await prisma.bsdasriFinalOperation.create({
+    data: finalOperation
+  });
+
+  if (initialBsdasri.grouping) {
+    for (const groupedBsdasri of initialBsdasri.grouping) {
+      const jobsArgs: OperationHookJobArgs = {
+        bsdType,
+        initialBsdId: groupedBsdasri.id,
+        finalBsdId,
+        operationCode,
+        noTraceability
+      };
+      if (runSync) {
+        await operationHookFn(jobsArgs, { runSync });
+      } else {
+        await enqueueOperationHookJob(jobsArgs);
+      }
+    }
+  }
+
+  if (initialBsdasri.synthesizing) {
+    for (const synthesizedBsdasri of initialBsdasri.synthesizing) {
+      const jobsArgs: OperationHookJobArgs = {
+        bsdType,
+        initialBsdId: synthesizedBsdasri.id,
+        finalBsdId,
+        operationCode,
+        noTraceability
+      };
+      if (runSync) {
+        await operationHookFn(jobsArgs, { runSync });
+      } else {
+        await enqueueOperationHookJob(jobsArgs);
+      }
+    }
+  }
+}

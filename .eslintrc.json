@@ -1,7 +1,7 @@
 {
   "root": true,
   "ignorePatterns": ["**/*"],
-  "plugins": ["@nx"],
+  "plugins": ["@nx", "no-only-tests"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
@@ -60,7 +60,8 @@
       "rules": {
         "@typescript-eslint/no-var-requires": "off",
         "no-useless-escape": "off",
-        "no-global-assign": "off"
+        "no-global-assign": "off",
+        "no-only-tests/no-only-tests": "error"
       }
     }
   ]

@@ -27,7 +27,7 @@ const TdTooltip = ({ msg }: Props) => {
   return !!msg ? (
     <>
       <span className={style.button} role="tooltip" ref={setTriggerRef}>
-        <IconQuestionCircle color="blue" size="20px" />
+        <IconQuestionCircle />
       </span>
       {visible && (
         <div

@@ -25,8 +25,7 @@ import deleteCompany from "./mutations/deleteCompany";
 import createAnonymousCompany from "./mutations/createAnonymousCompany";
 import { addSignatureAutomation } from "./mutations/addSignatureAutomation";
 import { removeSignatureAutomation } from "./mutations/removeSignatureAutomation";
-import createAnonymousCompanyRequest from "./mutations/createAnonymousCompanyRequest";
-import deleteAnonymousCompanyRequest from "./mutations/deleteAnonymousCompanyRequest";
+import createAnonymousCompanyFromPDF from "./mutations/createAnonymousCompanyFromPDF";
 import standbyCompanyByAdmin from "./mutations/standbyCompanyByAdmin";
 
 const Mutation: MutationResolvers = {
@@ -57,8 +56,7 @@ const Mutation: MutationResolvers = {
   createAnonymousCompany,
   addSignatureAutomation: addSignatureAutomation as any,
   removeSignatureAutomation: removeSignatureAutomation as any,
-  createAnonymousCompanyRequest,
-  deleteAnonymousCompanyRequest
+  createAnonymousCompanyFromPDF
 };
 
 export default Mutation;

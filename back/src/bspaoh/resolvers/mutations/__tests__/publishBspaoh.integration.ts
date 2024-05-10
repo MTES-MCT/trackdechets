@@ -75,6 +75,48 @@ describe("Mutation.publishBspaoh", () => {
     expect(data.publishBspaoh?.transporter?.company?.siret).toBeTruthy();
   });
 
+  it("should not publish a draft bspaoh if required packagings infos are not complete", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const bspaoh = await bspaohFactory({
+      opt: {
+        status: BspaohStatus.DRAFT,
+        emitterCompanySiret: company.siret,
+        canAccessDraftSirets: [company.siret as string],
+        wastePackagings: [
+          {
+            id: "packaging_1",
+            type: "LITTLE_BOX",
+            volume: 10,
+            containerNumber: "abcd123",
+            quantity: 1,
+            consistence: "SOLIDE",
+            identificationCodes: [] // empty codes forbidden
+          }
+        ]
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { errors } = await mutate<Pick<Mutation, "publishBspaoh">>(
+      PUBLISH_BSPAOH,
+      {
+        variables: {
+          id: bspaoh.id
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Au moins un code est requis",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it("should forbid users other than inital creator to publish a draft bspaoh", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
     const { user: destinationUser, company: destinationCompany } =
@@ -150,7 +192,7 @@ describe("Mutation.publishBspaoh", () => {
       opt: {
         status: BspaohStatus.DRAFT,
         emitterCompanySiret: company.siret,
-        destinationCap: null,
+        destinationCompanyAddress: null,
         canAccessDraftSirets: [company.siret as string]
       }
     });
@@ -167,7 +209,7 @@ describe("Mutation.publishBspaoh", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le CAP du destinataire est obligatoire.`,
+        message: `L'adresse de l'entreprise de destination est obligatoire.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

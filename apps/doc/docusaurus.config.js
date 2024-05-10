@@ -13,6 +13,9 @@ module.exports = {
   organizationName: "MTES-MCT",
   projectName: "trackdechets",
   themeConfig: {
+    prism: {
+      additionalLanguages: ['bash', 'python', 'http', 'json'],
+    },
     colorMode: {
       disableSwitch: true
     },

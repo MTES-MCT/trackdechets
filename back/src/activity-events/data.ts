@@ -1,6 +1,6 @@
 import { ActivityEvent } from ".";
 import { prisma } from "@td/prisma";
-import { Event, Prisma } from "@prisma/client";
+import { Event } from "@prisma/client";
 import { getStreamEvents } from "../events/mongodb";
 import { EventCollection } from "../events/types";
 
@@ -62,16 +62,4 @@ export function dbEventToActivityEvent(
     data: event.data as Record<string, unknown>,
     metadata: event.metadata as Record<string, unknown>
   };
-}
-
-export function persistEvent(event: ActivityEvent): Promise<Event> {
-  return prisma.event.create({
-    data: {
-      streamId: event.streamId,
-      actor: event.actor,
-      type: event.type,
-      data: event.data as Prisma.InputJsonObject,
-      metadata: (event.metadata as Prisma.InputJsonObject) ?? Prisma.DbNull
-    }
-  });
 }

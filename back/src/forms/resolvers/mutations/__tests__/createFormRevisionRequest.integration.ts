@@ -632,7 +632,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     }
   );
 
-  it("should fail if the emitter type is APPENDIX1", async () => {
+  it("should fail to cancel if the emitter type is APPENDIX1", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
@@ -1498,5 +1498,73 @@ describe("Mutation.createFormRevisionRequest", () => {
       // Then
       expect(errors).toBeUndefined();
     });
+    it("should work for APPENDIX1_PRODUCER", async () => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsCode: "13 01 12*"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { wasteDetails: { sampleNumber: "Num échantillon" } },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+    });
+  });
+
+  it("should not allow to revise sample number on a non APPENDIX1_PRODUCER BSDD", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterType: EmitterType.OTHER,
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "13 01 12*"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { sampleNumber: "Num échantillon" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Révision impossible, certains champs saisis ne sont pas modifiables"
+    );
   });
 });

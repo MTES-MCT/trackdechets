@@ -1,4 +1,4 @@
-import { FinalOperation, QuantityType, Status } from "@prisma/client";
+import { BsddFinalOperation, QuantityType, Status } from "@prisma/client";
 import {
   AppendixFormInput,
   InitialFormFractionInput
@@ -184,7 +184,7 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
 } & {
   forwarding: (Bsdd & { grouping: Bsdd[] }) | null;
 } & {
-  finalOperations: FinalOperation[] | [];
+  finalOperations: BsddFinalOperation[];
 } {
   let grouping: Bsdd[] = [];
 

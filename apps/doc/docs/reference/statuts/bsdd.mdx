@@ -6,24 +6,24 @@ import Mermaid from "../../../src/components/Mermaid";
 
 Au cours de son cycle de vie, un BSDD numérique peut passer par différents états décrits [ici](../api-reference/bsdd/enums.md#formstatus).
 
-- `DRAFT` (brouillon): État initial à la création d'un BSD. Des champs obligatoires peuvent manquer.
-- `SEALED` (finalisé): BSD finalisé. Les données sont validées et un numéro de BSD `readableId` est affecté.
-- `SIGNED_BY_PRODUCER`: BSD signé par le producteur, en attente d'enlèvement par le transporteur
-- `SENT` (envoyé): BSD en transit vers l'installation de destination, d'entreposage ou de reconditionnement
-- `RECEIVED` (reçu): BSD reçu sur l'installation de destination
-- `ACCEPTED` (accepté): BSD accepté sur l'installation de destination
-- `REFUSED` (refusé): Déchet refusé
-- `PROCESSED` (traité): BSD dont l'opération de traitement a été effectué
-- `NO_TRACEABILITY` (rupture de traçabilité): Rupture de traçabilité autorisée par arrêté préfectoral avec transfert de responsabilité.
-- `AWAITING_GROUP`: BSD en attente de regroupement (code de traitement D 13, D 14, D 15, R 12, R 13)
-- `FOLLOWED_WITH_PNTTD` (traité): BSD sans rupture de traçabilité avec destination ultérieure à l'étranger
-- `GROUPED`: BSD qui a été ajouté à une annexe 2
-- `TEMP_STORED`: (reçu): BSD reçu sur l'installation d'entreposage provisoire ou de reconditionnement
-- `TEMP_STORED_ACCEPTED`: (accepté): BSD accepté sur l'installation d'entreposage provisoire ou de reconditionnement
-- `RESEALED`: (finalisé): BSD sur lequel les informations de l'entreposage provisoire ont été finalisées et validées
-- `SIGNED_BY_TEMP_STORER`: BSD signé par l'installation d'entreposage provisoire, en attente d'enlèvement par le transporteur
-- `RESENT`: (envoyé): BSD en transit vers l'installation de destination finale après un entreposage provisoire
-- `CANCELED`: (annulé): BSD annulé suite à approbation des parties prenantes (via le processus de révision)
+- `DRAFT` (brouillon) : État initial à la création d'un BSD. Des champs obligatoires peuvent manquer.
+- `SEALED` (finalisé) : BSD finalisé. Les données sont validées et un numéro de BSD `readableId` est affecté.
+- `SIGNED_BY_PRODUCER`: BSD signé par le producteur, en attente d'enlèvement par le transporteur.
+- `SENT` (envoyé) : BSD en transit vers l'installation de destination, d'entreposage ou de reconditionnement.
+- `RECEIVED` (reçu) : BSD reçu sur l'installation de destination.
+- `ACCEPTED` (accepté) : BSD accepté sur l'installation de destination.
+- `REFUSED` (refusé) : Déchet refusé.
+- `PROCESSED` (traité) : BSD dont l'opération de traitement a été effectué.
+- `NO_TRACEABILITY` (rupture de traçabilité) : Rupture de traçabilité autorisée par arrêté préfectoral avec transfert de responsabilité.
+- `AWAITING_GROUP`: BSD en attente de regroupement (code de traitement D 13, D 14, D 15, R 12, R 13).
+- `FOLLOWED_WITH_PNTTD` (traité) : BSD sans rupture de traçabilité avec destination ultérieure à l'étranger.
+- `GROUPED`: BSD qui a été ajouté à une annexe 2.
+- `TEMP_STORED`: (reçu) : BSD reçu sur l'installation d'entreposage provisoire ou de reconditionnement.
+- `TEMP_STORED_ACCEPTED`: (accepté) : BSD accepté sur l'installation d'entreposage provisoire ou de reconditionnement.
+- `RESEALED`: (finalisé) : BSD sur lequel les informations de l'entreposage provisoire ont été finalisées et validées.
+- `SIGNED_BY_TEMP_STORER`: BSD signé par l'installation d'entreposage provisoire, en attente d'enlèvement par le transporteur.
+- `RESENT`: (envoyé) : BSD en transit vers l'installation de destination finale après un entreposage provisoire.
+- `CANCELED`: (annulé) : BSD annulé suite à approbation des parties prenantes (via le processus de révision).
 
 Chaque changement d'état s'effectue grâce à une mutation.
 

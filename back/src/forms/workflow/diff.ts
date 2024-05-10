@@ -4,27 +4,13 @@ import {
   expandFormFromDb
 } from "../converter";
 import Decimal from "decimal.js";
-
-export function isArray(obj) {
-  return {}.toString.apply(obj) === "[object Array]";
-}
-
-export function isObject(obj) {
-  return {}.toString.apply(obj) === "[object Object]";
-}
-
-export function isString(obj) {
-  return {}.toString.call(obj) === "[object String]";
-}
-
-export function isNumber(obj) {
-  const objectType = {}.toString.apply(obj);
-  return objectType === "[object Decimal]" || objectType === "[object Number]";
-}
-
-export function isEmpty(obj) {
-  return Object.keys(obj).length === 0;
-}
+import {
+  isObject,
+  isArray,
+  isEmpty,
+  isNumber,
+  isString
+} from "../../common/dataTypes";
 
 export function arraysEqual(a, b) {
   if (a === b) return true;
@@ -64,54 +50,62 @@ export function numberEqual(
   return n1 === n2;
 }
 
-export function objectDiff(o1, o2) {
-  return Object.keys(o2).reduce((diff, key) => {
-    if (isObject(o2[key])) {
-      const innerDiff = objectDiff(o1[key] ?? {}, o2[key]);
+/**
+ * Calculates the diff between 2 objects, and returns the differences.
+ *
+ * @param baseObject
+ * @param updatedObject
+ * @returns subset of updatedObject that differs from baseObject
+ */
+export function objectDiff(baseObject, updatedObject) {
+  return Object.keys(updatedObject).reduce((diff, key) => {
+    if (isObject(updatedObject[key])) {
+      const innerDiff = objectDiff(baseObject[key] ?? {}, updatedObject[key]);
       return {
         ...diff,
         ...(isEmpty(innerDiff) ? {} : { [key]: innerDiff })
       };
     }
-    if (isArray(o2[key])) {
-      if (arraysEqual(o1[key], o2[key])) {
+    if (isArray(updatedObject[key])) {
+      if (arraysEqual(baseObject[key], updatedObject[key])) {
         return diff;
       }
       return {
         ...diff,
-        [key]: o2[key]
+        [key]: updatedObject[key]
       };
     }
-    if (isDate(o2[key])) {
-      if (o1[key] && isEqual(o2[key], o1[key])) {
+    if (isDate(updatedObject[key])) {
+      if (baseObject[key] && isEqual(updatedObject[key], baseObject[key])) {
         return diff;
       }
       return {
         ...diff,
-        [key]: o2[key]
+        [key]: updatedObject[key]
       };
     }
-    if (isString(o2[key]) || isString(o1[key])) {
-      if (stringEqual(o1[key], o2[key])) {
+    if (isString(updatedObject[key]) || isString(baseObject[key])) {
+      if (stringEqual(baseObject[key], updatedObject[key])) {
         return diff;
       }
       return {
         ...diff,
-        [key]: o2[key]
+        [key]: updatedObject[key]
       };
     }
 
-    if (isNumber(o2[key])) {
-      if (numberEqual(o1[key], o2[key])) {
+    if (isNumber(updatedObject[key])) {
+      if (numberEqual(baseObject[key], updatedObject[key])) {
         return diff;
       }
-      return { ...diff, [key]: o2[key] };
+      return { ...diff, [key]: updatedObject[key] };
     }
 
-    if (o1[key] === o2[key] || !(key in o1)) return diff;
+    if (baseObject[key] === updatedObject[key] || !(key in baseObject))
+      return diff;
     return {
       ...diff,
-      [key]: o2[key]
+      [key]: updatedObject[key]
     };
   }, {});
 }

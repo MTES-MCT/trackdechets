@@ -7,6 +7,7 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bspaohEventTypes } from "./eventTypes";
 import { PrismaBspaohWithTransporters } from "../../types";
 import { getDenormalizedSirets } from "./denormalizeHelpers";
+import { objectDiff } from "../../../forms/workflow/diff";
 
 export type UpdateBspaohFn = (
   where: Prisma.BspaohWhereUniqueInput,
@@ -17,6 +18,12 @@ export type UpdateBspaohFn = (
 export function buildUpdateBspaoh(deps: RepositoryFnDeps): UpdateBspaohFn {
   return async (where, data, logMetadata?) => {
     const { prisma, user } = deps;
+    const previousPaoh = await prisma.bspaoh.findUnique({
+      where,
+      include: {
+        transporters: true
+      }
+    });
     const updated = await prisma.bspaoh.update({
       where,
       data,
@@ -38,28 +45,16 @@ export function buildUpdateBspaoh(deps: RepositoryFnDeps): UpdateBspaohFn {
       include: { transporters: true }
     });
 
+    const updateDiff = objectDiff(previousPaoh, updated);
     await prisma.event.create({
       data: {
         streamId: bspaoh.id,
         actor: user.id,
-        type: bspaohEventTypes.updated,
-        data: data as Prisma.InputJsonObject,
+        type: data.status ? bspaohEventTypes.signed : bspaohEventTypes.updated,
+        data: updateDiff,
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-
-    // Status updates are done only through signature
-    if (data.status) {
-      await prisma.event.create({
-        data: {
-          streamId: bspaoh.id,
-          actor: user.id,
-          type: bspaohEventTypes.signed,
-          data: { status: data.status },
-          metadata: { ...logMetadata, authType: user.auth }
-        }
-      });
-    }
 
     prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bspaoh.id));
 

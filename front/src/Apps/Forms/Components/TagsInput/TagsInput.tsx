@@ -9,6 +9,8 @@ export type TagsInputProps = {
   readonly onAddTag: (tag: string) => void;
   readonly onDeleteTag: (idx: number) => void;
   readonly maxTags?: number;
+  readonly disabled?: boolean;
+  readonly errorMessage?: string;
 };
 
 /**
@@ -20,30 +22,45 @@ const TagsInput: React.FC<TagsInputProps> = ({
   tags,
   onAddTag,
   onDeleteTag,
-  maxTags
+  maxTags,
+  disabled = false,
+  errorMessage
 }) => {
   const [tag, setTag] = useState("");
 
   const addButtonIsDisabled = maxTags ? tags.length >= maxTags : false;
-
+  const saveTag = () => {
+    if (addButtonIsDisabled || tag.length === 0) {
+      return;
+    }
+    onAddTag(tag);
+    setTag("");
+  };
   return (
     <>
       <Input
         label={label}
+        disabled={disabled}
         style={{ marginBottom: "10px" }}
         nativeInputProps={{
           value: tag,
-          onChange: e => setTag(e.target.value)
+          onChange: e => setTag(e.target.value),
+          onBlur: () => {
+            saveTag();
+          },
+          onKeyDown: e => {
+            if (e.key === "Enter") {
+              saveTag();
+            }
+          }
         }}
         addon={
           <Button
-            disabled={addButtonIsDisabled}
+            disabled={addButtonIsDisabled || disabled}
+            type="button"
             onClick={e => {
               e.preventDefault();
-              if (tag.length > 0) {
-                onAddTag(tag);
-                setTag("");
-              }
+              saveTag();
             }}
           >
             Ajouter
@@ -51,11 +68,12 @@ const TagsInput: React.FC<TagsInputProps> = ({
         }
       />
       <div style={{ display: "flex" }}>
-        {tags.map((plate, idx) => (
+        {tags?.map((plate, idx) => (
           <div key={idx} style={{ padding: "0 2px" }}>
             <Tag
               dismissible
               nativeButtonProps={{
+                type: "button",
                 onClick: () => {
                   onDeleteTag(idx);
                 }
@@ -66,6 +84,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
           </div>
         ))}
       </div>
+      {errorMessage && <p className="fr-error-text fr-mt-0">{errorMessage}</p>}
     </>
   );
 };

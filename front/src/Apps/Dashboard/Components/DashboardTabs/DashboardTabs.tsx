@@ -1,6 +1,12 @@
 import React, { useCallback, useState } from "react";
 import { NavLink, generatePath, useNavigate } from "react-router-dom";
-import { CompanyPrivate, UserPermission, UserRole } from "@td/codegen-ui";
+import {
+  CompanyPrivate,
+  Query,
+  QueryBsdsArgs,
+  UserPermission,
+  UserRole
+} from "@td/codegen-ui";
 import routes from "../../../routes";
 
 import { useShowTransportTabs } from "../../hooks/useShowTransportTabs";
@@ -22,17 +28,60 @@ import {
 
 import "./DashboardTabs.scss";
 import CompanySwitcher from "../../../common/Components/CompanySwitcher/CompanySwitcher";
+import { gql, useQuery } from "@apollo/client";
+import { useNotifier } from "../../../../dashboard/components/BSDList/useNotifier";
+
+const NOTIFICATION_QUERY = gql`
+  query GetBsds($where: BsdWhere) {
+    bsds(first: 1, where: $where) {
+      totalCount
+    }
+  }
+`;
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
   companies: CompanyPrivate[];
 }
 
+const displayNotification = count => {
+  return count && count > 0 ? (
+    <p className="dashboard-tabs-notifications">{count}</p>
+  ) : null;
+};
+
 const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
   const [expanded, setExpanded] = useState(false);
 
   const { permissions, role } = usePermissions();
   const navigate = useNavigate();
+
+  const { data: dataAction, refetch: refetchAction } = useQuery<
+    Pick<Query, "bsds">,
+    QueryBsdsArgs
+  >(NOTIFICATION_QUERY, {
+    variables: { where: { isForActionFor: [currentCompany.orgId] } }
+  });
+
+  const { data: dataRevision, refetch: refetchRevision } = useQuery<
+    Pick<Query, "bsds">,
+    QueryBsdsArgs
+  >(NOTIFICATION_QUERY, {
+    variables: { where: { isInRevisionFor: [currentCompany.orgId] } }
+  });
+
+  const { data: dataTransport, refetch: refetchTransport } = useQuery<
+    Pick<Query, "bsds">,
+    QueryBsdsArgs
+  >(NOTIFICATION_QUERY, {
+    variables: { where: { isToCollectFor: [currentCompany.orgId] } }
+  });
+
+  useNotifier(currentCompany.orgId, () => {
+    refetchAction();
+    refetchRevision();
+    refetchTransport();
+  });
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
@@ -122,6 +171,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {ACTS}
                 </NavLink>
+                {displayNotification(dataAction?.bsds.totalCount)}
               </li>
 
               <li>
@@ -170,6 +220,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {TO_REVIEW}
                 </NavLink>
+                {displayNotification(dataRevision?.bsds.totalCount)}
               </li>
               <li>
                 <NavLink
@@ -206,6 +257,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               >
                 {TO_COLLECT}
               </NavLink>
+              {displayNotification(dataTransport?.bsds.totalCount)}
             </li>
             <li>
               <NavLink

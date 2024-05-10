@@ -24,6 +24,7 @@ import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { sub } from "date-fns";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
+import { getStream } from "../../../../activity-events";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -3597,5 +3598,35 @@ describe("Mutation.updateForm", () => {
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporters[0]"
       })
     ]);
+  });
+
+  it("should log in an event the updated data", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        code: "08 01 11*"
+      }
+    };
+    await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    const events = await getStream(form.id);
+
+    const updateEvent = events.find(evt => evt.type === "BsddUpdated");
+    expect(updateEvent).toBeDefined();
+    expect(updateEvent?.data?.["content"]?.["wasteDetailsCode"]).toBe(
+      "08 01 11*"
+    );
   });
 });

@@ -14,23 +14,6 @@ type CompanyForVerification {
   admin: AdminForVerification
 }
 
-type AnonymousCompanyRequestUser {
-  email: String!
-}
-
-type AnonymousCompanyRequest {
-  id: ID!
-  siret: String!
-  pdf: String!
-  createdAt: DateTime!
-  userId: ID!
-  name: String!
-  codeNaf: String!
-  address: String!
-  codeCommune: String
-  user: AnonymousCompanyRequestUser!
-}
-
 type AdminForVerification {
   email: String!
   name: String
@@ -40,11 +23,6 @@ type AdminForVerification {
 type CompanyForVerificationConnection {
   totalCount: Int!
   companies: [CompanyForVerification!]!
-}
-
-type AnonymousCompanyRequestConnection {
-  totalCount: Int!
-  anonymousCompanyRequests: [AnonymousCompanyRequest!]!
 }
 
 type AnonymousCompany {

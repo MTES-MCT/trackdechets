@@ -1144,11 +1144,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                       {form?.emitter?.type !== EmitterType.APPENDIX1 && (
                         <td>{quantity}</td>
                       )}
-                      <td>
-                        {form?.emitter?.type === EmitterType.APPENDIX1
-                          ? formatDate(groupedForm?.takenOverAt)
-                          : formatDate(groupedForm?.signedAt)}
-                      </td>
+                      <td>{formatDate(groupedForm?.takenOverAt)}</td>
                       <td>{groupedForm?.emitterPostalCode}</td>
                       {form?.emitter?.type === EmitterType.APPENDIX1 && (
                         <td>{groupedForm?.wasteDetails?.sampleNumber}</td>
@@ -1192,7 +1188,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
   );
   const stream = await generatePdf(html);
 
-  return { filename: `${form.readableId}.pdf`, stream };
+  return { filename: form.readableId, stream };
 }
 
 export async function generateBsddPdfToBase64(

@@ -7,12 +7,13 @@ import {
   Bsff,
   Bsvhu,
   BsvhuStatus,
+  Bspaoh,
+  BspaohStatus,
   Company,
   Status,
   User,
   UserRole,
-  GovernmentPermission,
-  CompanyType
+  GovernmentPermission
 } from "@prisma/client";
 import {
   refreshElasticSearch,
@@ -26,36 +27,37 @@ import {
 } from "../../../../bsdasris/elastic";
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
 import { getBsffForElastic, indexBsff } from "../../../../bsffs/elastic";
+import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
+import { getBspaohForElastic, indexBspaoh } from "../../../../bspaoh/elastic";
 import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../../../bsvhu/elastic";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
-  companyFactory,
   formFactory,
-  formWithTempStorageFactory,
   siretify,
   userWithAccessTokenFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OUTGOING_WASTES, OUTGOING_WASTES_TTR } from "./queries";
+import { OUTGOING_WASTES } from "./queries";
 import supertest from "supertest";
 import { app } from "../../../../server";
 import { faker } from "@faker-js/faker";
-import { operationHook } from "../../../../queue/jobs/operationHook";
 
 describe("Outgoing wastes registry", () => {
   let emitter: { user: User; company: Company };
   let emitter2: { user: User; company: Company };
   let transporter: { user: User; company: Company };
   let destination: { user: User; company: Company };
+
   let bsd1: Form;
   let bsd2: Bsda;
   let bsd3: Bsdasri;
   let bsd4: Bsvhu;
   let bsd5: Bsff;
+  let bsd6: Bspaoh;
 
   const OLD_ENV = process.env;
 
@@ -78,7 +80,7 @@ describe("Outgoing wastes registry", () => {
 
     destination = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
-        set: ["WASTEPROCESSOR"]
+        set: ["WASTEPROCESSOR", "COLLECTOR"]
       }
     });
 
@@ -103,6 +105,7 @@ describe("Outgoing wastes registry", () => {
         }
       }
     });
+
     bsd2 = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
@@ -178,13 +181,35 @@ describe("Outgoing wastes registry", () => {
         operationSignatureDate: new Date("2021-08-01")
       }
     );
+    bsd6 = await bspaohFactory({
+      opt: {
+        status: BspaohStatus.PROCESSED,
+        emitterCompanySiret: emitter.company.siret,
+
+        destinationCompanySiret: destination.company.siret,
+        emitterEmissionSignatureDate: new Date("2021-09-01"),
+        destinationReceptionDate: new Date("2021-09-01"),
+        destinationReceptionSignatureDate: new Date("2021-09-01"),
+        destinationOperationDate: new Date("2021-09-01"),
+        destinationOperationCode: "D 10",
+        transporterTransportTakenOverAt: new Date("2021-09-02"),
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.company.siret,
+            transporterTransportSignatureDate: new Date("2021-09-02")
+          }
+        }
+      }
+    });
 
     await Promise.all([
       indexForm(await getFormForElastic(bsd1)),
       indexBsda(await getBsdaForElastic(bsd2)),
       indexBsdasri(await getBsdasriForElastic(bsd3)),
       indexBsvhu(bsd4),
-      indexBsff(await getBsffForElastic(bsd5))
+      indexBsff(await getBsffForElastic(bsd5)),
+      indexBspaoh(await getBspaohForElastic(bsd6))
     ]);
     await refreshElasticSearch();
   });
@@ -241,7 +266,7 @@ describe("Outgoing wastes registry", () => {
     );
     let ids = page1.outgoingWastes.edges.map(edge => edge.node.id);
     expect(ids).toEqual([bsd1.readableId, bsd2.id]);
-    expect(page1.outgoingWastes.totalCount).toEqual(5);
+    expect(page1.outgoingWastes.totalCount).toEqual(6);
     expect(page1.outgoingWastes.pageInfo.endCursor).toEqual(bsd2.id);
     expect(page1.outgoingWastes.pageInfo.hasNextPage).toEqual(true);
 
@@ -258,7 +283,7 @@ describe("Outgoing wastes registry", () => {
 
     ids = page2.outgoingWastes.edges.map(edge => edge.node.id);
     expect(ids).toEqual([bsd3.id, bsd4.id]);
-    expect(page2.outgoingWastes.totalCount).toEqual(5);
+    expect(page2.outgoingWastes.totalCount).toEqual(6);
     expect(page2.outgoingWastes.pageInfo.endCursor).toEqual(bsd4.id);
     expect(page2.outgoingWastes.pageInfo.hasNextPage).toEqual(true);
 
@@ -273,9 +298,9 @@ describe("Outgoing wastes registry", () => {
       }
     );
     ids = page3.outgoingWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd5.id]);
-    expect(page3.outgoingWastes.totalCount).toEqual(5);
-    expect(page3.outgoingWastes.pageInfo.endCursor).toEqual(bsd5.id);
+    expect(ids).toEqual([bsd5.id, bsd6.id]);
+    expect(page3.outgoingWastes.totalCount).toEqual(6);
+    expect(page3.outgoingWastes.pageInfo.endCursor).toEqual(bsd6.id);
     expect(page3.outgoingWastes.pageInfo.hasNextPage).toEqual(false);
   });
 
@@ -288,9 +313,9 @@ describe("Outgoing wastes registry", () => {
       }
     );
     let ids = page1.outgoingWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd4.id, bsd5.id]);
-    expect(page1.outgoingWastes.totalCount).toEqual(5);
-    expect(page1.outgoingWastes.pageInfo.startCursor).toEqual(bsd4.id);
+    expect(ids).toEqual([bsd5.id, bsd6.id]);
+
+    expect(page1.outgoingWastes.pageInfo.startCursor).toEqual(bsd5.id);
     expect(page1.outgoingWastes.pageInfo.hasPreviousPage).toEqual(true);
 
     const { data: page2 } = await query<Pick<Query, "outgoingWastes">>(
@@ -304,9 +329,9 @@ describe("Outgoing wastes registry", () => {
       }
     );
     ids = page2.outgoingWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd2.id, bsd3.id]);
-    expect(page2.outgoingWastes.totalCount).toEqual(5);
-    expect(page2.outgoingWastes.pageInfo.startCursor).toEqual(bsd2.id);
+    expect(ids).toEqual([bsd3.id, bsd4.id]);
+    expect(page2.outgoingWastes.totalCount).toEqual(6);
+    expect(page2.outgoingWastes.pageInfo.startCursor).toEqual(bsd3.id);
     expect(page2.outgoingWastes.pageInfo.hasPreviousPage).toEqual(true);
 
     const { data: page3 } = await query<Pick<Query, "outgoingWastes">>(
@@ -320,8 +345,8 @@ describe("Outgoing wastes registry", () => {
       }
     );
     ids = page3.outgoingWastes.edges.map(edge => edge.node.id);
-    expect(ids).toEqual([bsd1.readableId]);
-    expect(page3.outgoingWastes.totalCount).toEqual(5);
+    expect(ids).toEqual([bsd1.readableId, bsd2.id]);
+    expect(page3.outgoingWastes.totalCount).toEqual(6);
     expect(page3.outgoingWastes.pageInfo.startCursor).toEqual(bsd1.id);
     expect(page3.outgoingWastes.pageInfo.hasPreviousPage).toEqual(false);
   });
@@ -350,7 +375,7 @@ describe("Outgoing wastes registry", () => {
       .set("Authorization", `Bearer ${accessToken}`)
       .set("X-Forwarded-For", allowedIP);
 
-    expect(res.body).toEqual({ data: { outgoingWastes: { totalCount: 5 } } });
+    expect(res.body).toEqual({ data: { outgoingWastes: { totalCount: 6 } } });
   });
 
   it("should allow user to request any siret if authenticated from a service account and orgId is in the withe list", async () => {
@@ -377,7 +402,7 @@ describe("Outgoing wastes registry", () => {
       .set("Authorization", `Bearer ${accessToken}`)
       .set("X-Forwarded-For", allowedIP);
 
-    expect(res.body).toEqual({ data: { outgoingWastes: { totalCount: 5 } } });
+    expect(res.body).toEqual({ data: { outgoingWastes: { totalCount: 6 } } });
   });
 
   it("should not accept service account connection from IP address not in the white list", async () => {
@@ -447,78 +472,5 @@ describe("Outgoing wastes registry", () => {
         })
       ]
     });
-  });
-
-  it.skip("should export the quantity received of the final destination in case of transit", async () => {
-    const { query } = makeClient(emitter.user);
-    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
-      UserRole.MEMBER,
-      {
-        companyTypes: { set: [CompanyType.COLLECTOR] }
-      }
-    );
-    const destination = await companyFactory({
-      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
-    });
-
-    const formWithTempStorage = await formWithTempStorageFactory({
-      ownerId: ttrUser.id,
-      opt: {
-        emitterCompanySiret: emitter.company.siret,
-        wasteDetailsCode: "05 01 02*",
-        status: Status.PROCESSED,
-        quantityReceived: 1000,
-        createdAt: new Date("2021-04-01"),
-        sentAt: new Date("2021-04-01"),
-        receivedAt: new Date("2021-04-01"),
-        processedAt: new Date("2021-04-01"),
-        processingOperationDone: "R 1",
-        transporters: {
-          create: {
-            transporterCompanySiret: transporter.company.siret,
-            number: 1
-          }
-        },
-        recipientCompanySiret: ttr.siret
-      },
-      forwardedInOpts: {
-        emitterCompanySiret: ttr.siret,
-        emitterCompanyName: ttr.name,
-        recipientCompanySiret: destination.siret,
-        quantityReceived: 100,
-        receivedAt: new Date(),
-        processingOperationDone: "R 1"
-      }
-    });
-    const formWithTempStorageFullForm = await getFormForElastic(
-      formWithTempStorage
-    );
-    const forwardedInithTempStorageFullForm = await getFormForElastic(
-      formWithTempStorage.forwardedIn!
-    );
-    await indexForm(formWithTempStorageFullForm);
-    await indexForm(forwardedInithTempStorageFullForm);
-    await refreshElasticSearch();
-    // Manually execute operationHook to simulate markAsProcessed
-    await operationHook({
-      finalFormId: forwardedInithTempStorageFullForm.id,
-      initialFormId: forwardedInithTempStorageFullForm.id
-    });
-
-    const { data } = await query<Pick<Query, "outgoingWastes">>(
-      OUTGOING_WASTES_TTR,
-      {
-        variables: {
-          sirets: [emitter.company.siret],
-          first: 2
-        }
-      }
-    );
-    expect(data.outgoingWastes.edges).toHaveLength(2);
-    const outgoingWastes = data.outgoingWastes.edges.map(e => e.node)[1];
-    expect(outgoingWastes.emitterCompanySiret).toEqual(emitter.company.siret);
-    // destinationReceptionWeight doit être celui de la destination finale et no pas de l'installation de transit
-    expect(outgoingWastes.finalReceptionWeights).toStrictEqual([100]);
-    expect(outgoingWastes.finalOperationCodes).toStrictEqual(["R 1"]);
   });
 });

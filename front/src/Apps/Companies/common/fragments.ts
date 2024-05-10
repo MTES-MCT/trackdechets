@@ -363,3 +363,43 @@ export const CompanyDetailsfragment = {
     ${AccountCompanyContactFragment.company}
   `
 };
+
+export const AccountInfoAutoUpdateFragments = {
+  company: gql`
+    fragment AccountInfoAutoUpdateFragment on CompanyPrivate {
+      id
+      orgId
+      name
+      siret
+      vatNumber
+      address
+      naf
+      libelleNaf
+      userRole
+      givenName
+      ...AccountFieldCompanyTypesFragment
+      ...AccountFieldCompanyGerepIdFragment
+      ...AccountFieldCompanyGivenNameFragment
+      ...AccountFieldCompanyTransporterReceiptFragment
+      ...AccountFieldCompanyTraderReceiptFragment
+      ...AccountFieldCompanyBrokerReceiptFragment
+      ...AccountFieldCompanyVerificationStatusFragment
+      ...AccountFieldCompanyVhuAgrementBroyeurFragment
+      ...AccountFieldCompanyVhuAgrementDemolisseurFragment
+      ...AccountFieldCompanyWorkerCertificationFragment
+      installation {
+        urlFiche
+      }
+    }
+    ${AccountFieldCompanyTypesFragment.company}
+    ${AccountFieldCompanyGerepIdFragment.company}
+    ${AccountFieldCompanyGivenNameFragment.company}
+    ${AccountFieldCompanyTransporterReceiptFragment.company}
+    ${AccountFieldCompanyTraderReceiptFragment.company}
+    ${AccountFieldCompanyBrokerReceiptFragment.company}
+    ${AccountFieldCompanyVerificationStatusFragment.company}
+    ${AccountFieldCompanyVhuAgrementBroyeurFragment.company}
+    ${AccountFieldCompanyVhuAgrementDemolisseurFragment.company}
+    ${AccountFieldCompanyWorkerCertificationFragment.company}
+  `
+};

@@ -7,6 +7,9 @@ import { Mutation, MutationJoinWithInviteArgs, Query } from "@td/codegen-ui";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import * as queryString from "query-string";
 import { decodeHash } from "../common/helper";
+import PasswordHelper, {
+  getPasswordHint
+} from "../common/components/PasswordHelper";
 import routes from "../Apps/routes";
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -36,7 +39,7 @@ const JOIN_WITH_INVITE = gql`
       email
       companies {
         name
-        siret
+        orgId
       }
     }
   }
@@ -201,7 +204,19 @@ export default function Invite() {
           password: yup
             .string()
             .required("Le mot de passe est un champ requis")
-            .min(8, "Le mot de passe doit faire au moins 8 caractères")
+            .test({
+              name: "is-valid-password",
+              test: value => {
+                if (!value) {
+                  return false;
+                }
+                const { hintType } = getPasswordHint(value);
+                if (hintType === "error") {
+                  return false;
+                }
+                return true;
+              }
+            })
         })}
         onSubmit={(values, { setSubmitting }) => {
           const { name, password } = values;
@@ -210,7 +225,7 @@ export default function Invite() {
           }).then(_ => setSubmitting(false));
         }}
       >
-        {({ isSubmitting, errors, touched, isValid, submitForm }) => (
+        {({ isSubmitting, errors, touched, isValid }) => (
           <Form>
             <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
               <div className="fr-col fr-m-auto">
@@ -257,26 +272,13 @@ export default function Invite() {
                 <Field name="password">
                   {({ field }) => {
                     return (
-                      <PasswordInput
-                        label="Mot de passe"
-                        messages={[
-                          {
-                            severity: "info",
-                            message: "8 caractères minimum"
-                          },
-                          {
-                            severity:
-                              errors.password && touched.password
-                                ? "error"
-                                : "info",
-                            message:
-                              errors.password && touched.password
-                                ? errors.password
-                                : ""
-                          }
-                        ]}
-                        nativeInputProps={{ required: true, ...field }}
-                      />
+                      <>
+                        <PasswordInput
+                          label="Mot de passe"
+                          nativeInputProps={{ required: true, ...field }}
+                        />
+                        <PasswordHelper password={field.value} />
+                      </>
                     );
                   }}
                 </Field>
@@ -288,7 +290,6 @@ export default function Invite() {
                   iconId="ri-arrow-right-line"
                   iconPosition="right"
                   size="medium"
-                  onClick={submitForm}
                   disabled={!isValid}
                   title={
                     isSubmitting ? "Création en cours..." : "Créer mon compte"

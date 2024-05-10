@@ -27,6 +27,13 @@ import {
   toAllWaste as bsdasriToAllWaste
 } from "../bsdasris/registry";
 import {
+  toIncomingWaste as bspaohToIncomingWaste,
+  toOutgoingWaste as bspaohToOutgoingWaste,
+  toTransportedWaste as bspaohToTransportedWaste,
+  toManagedWaste as bspaohToManagedWaste,
+  toAllWaste as bspaohToAllWaste
+} from "../bspaoh/registry";
+import {
   toIncomingWaste as formToIncomingWaste,
   toOutgoingWaste as formToOutgoingWaste,
   toTransportedWaste as formToTransportedWaste,
@@ -44,7 +51,8 @@ const bsdsToIncomingWastes = {
   BSDA: bsdaToIncomingWaste,
   BSDASRI: bsdasriToIncomingWaste,
   BSVHU: bsvhuToIncomingWaste,
-  BSFF: bsffToIncomingWaste
+  BSFF: bsffToIncomingWaste,
+  BSPAOH: bspaohToIncomingWaste
 };
 
 const bsdsToOutgoingWastes = {
@@ -52,7 +60,8 @@ const bsdsToOutgoingWastes = {
   BSDA: bsdaToOutgoingWaste,
   BSDASRI: bsdasriToOutgoingWaste,
   BSVHU: bsvhuToOutgoingWaste,
-  BSFF: bsffToOutgoingWaste
+  BSFF: bsffToOutgoingWaste,
+  BSPAOH: bspaohToOutgoingWaste
 };
 
 const bsdsToTransportedWastes = {
@@ -60,7 +69,8 @@ const bsdsToTransportedWastes = {
   BSDA: bsdaToTransportedWaste,
   BSDASRI: bsdasriToTransportedWaste,
   BSVHU: bsvhuToTransportedWaste,
-  BSFF: bsffToTransportedWaste
+  BSFF: bsffToTransportedWaste,
+  BSPAOH: bspaohToTransportedWaste
 };
 
 const bsdsToManagedWastes = {
@@ -68,7 +78,8 @@ const bsdsToManagedWastes = {
   BSDA: bsdaToManagedWaste,
   BSDASRI: bsdasriToManagedWaste,
   BSVHU: bsvhuToManagedWaste,
-  BSFF: bsffToManagedWaste
+  BSFF: bsffToManagedWaste,
+  BSPAOH: bspaohToManagedWaste
 };
 
 const bsdsToAllWastes = {
@@ -76,7 +87,8 @@ const bsdsToAllWastes = {
   BSDA: bsdaToAllWaste,
   BSDASRI: bsdasriToAllWaste,
   BSVHU: bsvhuToAllWaste,
-  BSFF: bsffToAllWaste
+  BSFF: bsffToAllWaste,
+  BSPAOH: bspaohToAllWaste
 };
 
 const bsdsToWastes: Record<WasteRegistryType, any> = {
@@ -93,6 +105,7 @@ type WasteMap<WasteType> = {
   BSDASRI: WasteType[];
   BSVHU: WasteType[];
   BSFF: WasteType[];
+  BSPAOH: WasteType[];
 };
 
 export function toWastes<WasteType extends GenericWaste>(
@@ -100,13 +113,14 @@ export function toWastes<WasteType extends GenericWaste>(
   bsds: RegistryBsdMap
 ): WasteMap<WasteType> {
   const converter = bsdsToWastes[registryType];
-  const { bsdds, bsdas, bsdasris, bsvhus, bsffs } = bsds;
+  const { bsdds, bsdas, bsdasris, bsvhus, bsffs, bspaohs } = bsds;
 
   return {
     BSDD: bsdds.map(form => converter.BSDD(formToBsdd(form))),
     BSDASRI: bsdasris.map(converter.BSDASRI),
     BSVHU: bsvhus.map(converter.BSVHU),
     BSDA: bsdas.map(converter.BSDA),
-    BSFF: bsffs.map(converter.BSFF)
+    BSFF: bsffs.map(converter.BSFF),
+    BSPAOH: bspaohs.map(converter.BSPAOH)
   };
 }

@@ -93,49 +93,46 @@ export async function searchBsds(
   return body.hits;
 }
 
-type RegistryFormIncludeType = {
-  forwarding: { include: { transporters: boolean } };
-  finalOperations?: boolean;
-  grouping: {
-    include: {
-      initialForm: {
-        include: { transporters: boolean };
-      };
-    };
-  };
-  transporters: boolean;
-};
-
-export const RegistryFormInclude: RegistryFormIncludeType = {
+export const RegistryFormInclude = Prisma.validator<Prisma.FormInclude>()({
   forwarding: { include: { transporters: true } },
   finalOperations: true,
   grouping: { include: { initialForm: { include: { transporters: true } } } },
   transporters: true
-};
+});
 
 export type RegistryForm = Prisma.FormGetPayload<{
-  include: RegistryFormIncludeType;
+  include: typeof RegistryFormInclude;
 }>;
 
 export const RegistryBsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
   grouping: true,
   forwarding: true,
-  transporters: true
+  transporters: true,
+  finalOperations: true
 });
 
 export type RegistryBsda = Prisma.BsdaGetPayload<{
   include: typeof RegistryBsdaInclude;
 }>;
 
-const RegistryBsdasriInclude = { grouping: true };
+export const RegistryBsdasriInclude = { grouping: true, finalOperations: true };
 
-type RegistryBsdasri = Prisma.BsdasriGetPayload<{
+export type RegistryBsdasri = Prisma.BsdasriGetPayload<{
   include: typeof RegistryBsdasriInclude;
 }>;
 
-const RegistryBsffInclude = {
+export const RegistryBspaohInclude = Prisma.validator<Prisma.BspaohInclude>()({
+  transporters: true
+});
+
+export type RegistryBspaoh = Prisma.BspaohGetPayload<{
+  include: typeof RegistryBspaohInclude;
+}>;
+
+export const RegistryBsffInclude = {
   packagings: {
     include: {
+      finalOperations: true,
       previousPackagings: {
         include: { bsff: true }
       }
@@ -143,7 +140,7 @@ const RegistryBsffInclude = {
   }
 };
 
-type RegistryBsff = Prisma.BsffGetPayload<{
+export type RegistryBsff = Prisma.BsffGetPayload<{
   include: typeof RegistryBsffInclude;
 }>;
 
@@ -155,6 +152,7 @@ export type RegistryBsdMap = {
   bsvhus: RegistryBsvhu[];
   bsdas: RegistryBsda[];
   bsffs: RegistryBsff[];
+  bspaohs: RegistryBspaoh[];
 };
 /**
  * Convert a list of BsdElastic to a mapping of prisma Bsds
@@ -162,14 +160,16 @@ export type RegistryBsdMap = {
 export async function toPrismaBsds(
   bsdsElastic: BsdElastic[]
 ): Promise<RegistryBsdMap> {
-  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = groupByBsdType(bsdsElastic);
+  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF, BSPAOH } =
+    groupByBsdType(bsdsElastic);
 
   const prismaBsdsPromises: [
     Promise<RegistryForm[]>,
     Promise<RegistryBsdasri[]>,
     Promise<RegistryBsvhu[]>,
     Promise<RegistryBsda[]>,
-    Promise<RegistryBsff[]>
+    Promise<RegistryBsff[]>,
+    Promise<RegistryBspaoh[]>
   ] = [
     prisma.form.findMany({
       where: {
@@ -205,11 +205,19 @@ export async function toPrismaBsds(
         }
       },
       include: RegistryBsffInclude
+    }),
+    prisma.bspaoh.findMany({
+      where: {
+        id: {
+          in: BSPAOH.map(bspaoh => bspaoh.id)
+        }
+      },
+      include: RegistryBspaohInclude
     })
   ];
 
-  const [bsdds, bsdasris, bsvhus, bsdas, bsffs] = await Promise.all(
+  const [bsdds, bsdasris, bsvhus, bsdas, bsffs, bspaohs] = await Promise.all(
     prismaBsdsPromises
   );
-  return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
+  return { bsdds, bsdasris, bsvhus, bsdas, bsffs, bspaohs };
 }

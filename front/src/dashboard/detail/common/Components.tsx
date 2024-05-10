@@ -1,15 +1,17 @@
 import React, { ReactNode, useMemo } from "react";
-import { formatDate } from "../../../common/datetime";
+import { formatDate, formatDateTime } from "../../../common/datetime";
 import styles from "./BSDDetailContent.module.scss";
 
 import {
   PackagingInfo,
   BsvhuTransporter,
   BsdaTransporter,
-  BsdasriTransporter
+  BsdasriTransporter,
+  BspaohTransporter
 } from "@td/codegen-ui";
 import { getPackagingInfosSummary } from "../../../form/bsdd/utils/packagings";
 import { isForeignVat } from "@td/constants";
+import { toCamelCaseVarName } from "../../../Apps/utils/utils";
 const nbsp = "\u00A0";
 export const DetailRow = ({
   value,
@@ -29,7 +31,7 @@ export const DetailRow = ({
   return (
     <>
       <dt>{label}</dt>
-      <dd>
+      <dd data-testid={toCamelCaseVarName(label)}>
         {value}
         {!!units ? `${nbsp}${units}` : null}
       </dd>
@@ -56,7 +58,18 @@ export const DateRow = ({ value, label }) => {
   return (
     <>
       <dt>{label}</dt>
-      <dd>{formatDate(value)}</dd>
+      <dd data-testid={toCamelCaseVarName(label)}>{formatDate(value)}</dd>
+    </>
+  );
+};
+export const DateTimeRow = ({ value, label }) => {
+  if (!value) {
+    return null;
+  }
+  return (
+    <>
+      <dt>{label}</dt>
+      <dd>{formatDateTime(value)}</dd>
     </>
   );
 };
@@ -84,7 +97,12 @@ export const PackagingRow = ({
 export const TransporterReceiptDetails = ({
   transporter
 }: {
-  transporter?: BsvhuTransporter | BsdaTransporter | BsdasriTransporter | null;
+  transporter?:
+    | BsvhuTransporter
+    | BsdaTransporter
+    | BsdasriTransporter
+    | BspaohTransporter
+    | null;
 }) => {
   return !isForeignVat(transporter?.company?.vatNumber!) ? (
     <div className={styles.detailGrid}>

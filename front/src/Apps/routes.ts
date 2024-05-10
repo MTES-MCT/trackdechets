@@ -2,10 +2,11 @@ const routes = {
   admin: {
     index: "/admin",
     verification: "/admin/verification",
-    anonymousCompanies: "/admin/anonymous-companies",
+    anonymousCompany: "/admin/anonymous-company",
     reindex: "/admin/reindex",
     user: "/admin/user",
-    impersonate: "/admin/impersonate"
+    impersonate: "/admin/impersonate",
+    registry: "/admin/registry"
   },
   login: "/login",
   invite: "/invite",
@@ -72,6 +73,11 @@ const routes = {
       edit: "/dashboard/:siret/bsdas/edit/:id",
       view: "/dashboard/:siret/bsdas/view/:id",
       review: "/dashboard/:siret/bsdas/review/:id"
+    },
+    bspaohs: {
+      create: "/dashboard/:siret/bspaohs/create",
+      edit: "/dashboard/:siret/bspaohs/edit/:id",
+      view: "/dashboard/:siret/bspaohs/view/:id"
     },
     transport: {
       index: "/dashboard/:siret/transport",

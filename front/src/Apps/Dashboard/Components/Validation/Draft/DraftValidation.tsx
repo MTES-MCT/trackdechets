@@ -6,22 +6,26 @@ import {
   MutationMarkAsSealedArgs,
   MutationPublishBsdaArgs,
   MutationPublishBsffArgs,
-  MutationPublishBsvhuArgs
+  MutationPublishBsvhuArgs,
+  MutationPublishBspaohArgs
 } from "@td/codegen-ui";
 import { statusChangeFragment } from "../../../../common/queries/fragments";
 import toast from "react-hot-toast";
 import { NotificationError } from "../../../../common/Components/Error/Error";
 import { Loader } from "../../../../common/Components";
 import TdModal from "../../../../common/Components/Modal/Modal";
+import { DsfrModal } from "../../../../common/Components/Modal/DsfrModal";
 import {
   bsdaPublishDraft,
   bsddValidationDraftText,
   bsffPublishDraft,
-  bsvhuPublishDraft
+  bsvhuPublishDraft,
+  bpaohPublishDraft
 } from "../../../../common/wordings/dashboard/wordingsDashboard";
 import { generatePath, Link } from "react-router-dom";
 import routes from "../../../../routes";
 import { TOAST_DURATION } from "../../../../../common/config";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   const MARK_AS_SEALED = gql`
@@ -52,6 +56,14 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   const PUBLISH_BSVHU = gql`
     mutation PublishBsvhu($id: ID!) {
       publishBsvhu(id: $id) {
+        id
+        isDraft
+      }
+    }
+  `;
+  const PUBLISH_BSPAOH = gql`
+    mutation PublishBsvpaoh($id: ID!) {
+      publishBspaoh(id: $id) {
         id
         isDraft
       }
@@ -123,6 +135,24 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       }
     );
 
+  const [publishBspaoh, { loading: loadingBspaoh, error: errorBspaoh }] =
+    useMutation<Pick<Mutation, "publishBspaoh">, MutationPublishBspaohArgs>(
+      PUBLISH_BSPAOH,
+      {
+        variables: { id: bsd.id },
+
+        onCompleted: () => {
+          toast.success(`Bordereau ${bsd.id} publié`, {
+            duration: TOAST_DURATION
+          });
+        },
+        onError: () =>
+          toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
+            duration: TOAST_DURATION
+          })
+      }
+    );
+
   const renderTitle = (): string => {
     if (bsd.__typename === "Form") {
       return "Valider le bordereau";
@@ -131,7 +161,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
     if (
       bsd.__typename === "Bsda" ||
       bsd.__typename === "Bsff" ||
-      bsd.__typename === "Bsvhu"
+      bsd.__typename === "Bsvhu" ||
+      bsd.__typename === "Bspaoh"
     ) {
       return "Publier le bordereau";
     }
@@ -297,11 +328,63 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
         </div>
       );
     }
-  };
 
-  return (
+    if (bsd.__typename === "Bspaoh") {
+      return (
+        <div>
+          <p dangerouslySetInnerHTML={{ __html: bpaohPublishDraft }} />
+
+          <div className="td-modal-actions">
+            <Button onClick={onClose} priority="secondary">
+              Annuler
+            </Button>
+            <Button
+              priority="primary"
+              onClick={async () => {
+                const res = await publishBspaoh({
+                  variables: {
+                    id: bsd.id
+                  }
+                });
+                if (!res.errors) {
+                  onClose();
+                }
+              }}
+            >
+              <span>Publier le bordereau</span>
+            </Button>
+          </div>
+
+          {errorBspaoh && (
+            <>
+              <NotificationError
+                className="action-error"
+                apolloError={errorBspaoh}
+              />
+              <Link
+                to={generatePath(routes.dashboard.bspaohs.edit, {
+                  siret: currentSiret,
+                  id: bsd.id
+                })}
+                className="btn btn--primary"
+              >
+                Mettre le bordereau à jour pour le publier
+              </Link>
+            </>
+          )}
+          {loadingBspaoh && <Loader />}
+        </div>
+      );
+    }
+  };
+  return bsd.__typename === "Bspaoh" ? (
+    <DsfrModal title={renderTitle()} onClose={onClose}>
+      {renderContent()}
+    </DsfrModal>
+  ) : (
     <TdModal isOpen={isOpen} onClose={onClose} ariaLabel={renderTitle()}>
       <h2 className="td-modal-title">{renderTitle()}</h2>
+
       {renderContent()}
     </TdModal>
   );

@@ -20,7 +20,7 @@ const deleteFormTransporterResolver: MutationResolvers["deleteFormTransporter"] 
     if (transporter.formId) {
       if (transporter.takenOverAt) {
         throw new UserInputError(
-          `Ce transporteur BSDD ne peut-être supprimé car il a déjà signé l'enlèvement du déchet`
+          `Ce transporteur BSDD ne peut être supprimé car il a déjà signé l'enlèvement du déchet`
         );
       }
       const form = await getFormOrFormNotFound({ id: transporter.formId });

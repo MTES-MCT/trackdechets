@@ -26,7 +26,7 @@ import {
   CREATE_BSDASRI,
   GET_BSDASRI,
   UPDATE_BSDASRI
-} from "./utils/queries";
+} from "../../Apps/common/queries/bsdasri/queries";
 import { TOAST_DURATION } from "../../common/config";
 
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
@@ -166,7 +166,6 @@ export default function BsdasriStepsList(props: Props) {
         // synthesis bsdasri are  never created in draft state
         const { grouping, emitter, ecoOrganisme, ...cleanedInput } = input;
 
-        console.log(input);
         return updateBsdasri({
           variables: {
             id: formState.id,

@@ -51,7 +51,7 @@ describe("splitArrayIntoChunks", () => {
   });
 });
 
-describe.only("sanitize", () => {
+describe("sanitize", () => {
   // Base on the payloads at https://book.hacktricks.xyz/pentesting-web/ssti-server-side-template-injection
   test.each`
     input             | expected

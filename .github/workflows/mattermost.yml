@@ -16,10 +16,8 @@ jobs:
           script: |
             const script = require('./scripts/gh-pr.js')
             await script({github, context, core})
-      - name: Create the Mattermost Message
-        run: |
-          echo "{\"text\":\"## PRs à review \n ${{ steps.list.outputs.prs }} \"}" > mattermost.json
       - name: Send to Mattermost
         uses: mattermost/action-mattermost-notify@master
-        env:
+        with:
           MATTERMOST_WEBHOOK_URL: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+          TEXT: "## PRs à review \n ${{ steps.list.outputs.prs }}"

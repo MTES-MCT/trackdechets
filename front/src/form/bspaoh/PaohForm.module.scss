@@ -1,0 +1,12 @@
+.form__actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1em;
+  margin-bottom: 2em;
+  gap: 1em;
+}
+.form__actions__right {
+  margin-left: auto;
+  display: flex;
+  gap: 1em;
+}

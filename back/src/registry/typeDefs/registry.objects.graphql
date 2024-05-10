@@ -389,6 +389,12 @@ type OutgoingWaste {
   "Extra - Date de réalisation de l'opération"
   destinationOperationDate: DateTime
 
+  "Extra - Code(s) de traitement renseigné(s) par l'exutoire finale (ou les exutoires finaux en cas de ventilation des quantités sur plusieurs BSDDs de regroupement)"
+  destinationFinalOperationCodes: [String!]
+
+  "Extra - Quantité(s) correspondante(s) au traitement réalisé par le ou les exutoires finaux"
+  destinationFinalOperationWeights: [Float!]
+
   "Extra - Adresse email de contact du transporteur"
   transporterCompanyMail: String
 
@@ -1052,6 +1058,12 @@ type AllWaste {
 
   "Extra - Statut d'acceptation du déchet"
   destinationReceptionAcceptationStatus: WasteAcceptationStatus
+
+  "Extra - Code(s) de traitement renseigné(s) par l'exutoire finale (ou les exutoires finaux en cas de ventilation des quantités sur plusieurs BSDDs de regroupement)"
+  destinationFinalOperationCodes: [String!]
+
+  "Extra - Quantité(s) correspondante(s) au traitement réalisé par le ou les exutoires finaux"
+  destinationFinalOperationWeights: [Float!]
 
   "Extra - Adresse email de contact de l'expéditeur du déchet"
   emitterCompanyMail: String

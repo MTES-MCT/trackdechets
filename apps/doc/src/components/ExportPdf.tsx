@@ -26,24 +26,24 @@ const ExportPdf = () => {
       ]}
     >
       <TabItem value="bsdd">
-        <CodeBlock className="graphql">{bsddPdf}</CodeBlock>
-        <CodeBlock className="json">{bsddPdfResponse}</CodeBlock>
+        <CodeBlock className="language-graphql">{bsddPdf}</CodeBlock>
+        <CodeBlock className="language-json">{bsddPdfResponse}</CodeBlock>
       </TabItem>
       <TabItem value="bsdasri">
-        <CodeBlock className="graphql">{bsdasriPdf}</CodeBlock>
-        <CodeBlock className="json">{bsdasriPdfResponse}</CodeBlock>
+        <CodeBlock className="language-graphql">{bsdasriPdf}</CodeBlock>
+        <CodeBlock className="language-json">{bsdasriPdfResponse}</CodeBlock>
       </TabItem>
       <TabItem value="bsvhu">
-        <CodeBlock className="graphql">{bsvhuPdf}</CodeBlock>
-        <CodeBlock className="json">{bsvhuPdfResponse}</CodeBlock>
+        <CodeBlock className="language-graphql">{bsvhuPdf}</CodeBlock>
+        <CodeBlock className="language-json">{bsvhuPdfResponse}</CodeBlock>
       </TabItem>
       <TabItem value="bsda">
-        <CodeBlock className="graphql">{bsdaPdf}</CodeBlock>
-        <CodeBlock className="json">{bsdaPdfResponse}</CodeBlock>
+        <CodeBlock className="language-graphql">{bsdaPdf}</CodeBlock>
+        <CodeBlock className="language-json">{bsdaPdfResponse}</CodeBlock>
       </TabItem>
       <TabItem value="bsff">
-        <CodeBlock className="graphql">{bsffPdf}</CodeBlock>
-        <CodeBlock className="json">{bsffPdfResponse}</CodeBlock>
+        <CodeBlock className="language-graphql">{bsffPdf}</CodeBlock>
+        <CodeBlock className="language-json">{bsffPdfResponse}</CodeBlock>
       </TabItem>
     </Tabs>
   );

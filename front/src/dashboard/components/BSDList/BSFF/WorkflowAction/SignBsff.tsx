@@ -4,7 +4,7 @@ import { Bsff, Query, QueryBsffArgs } from "@td/codegen-ui";
 import { ActionButton, Modal } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
 import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { GET_BSFF_FORM } from "../../../../../form/bsff/utils/queries";
+import { GET_BSFF_FORM } from "../../../../../Apps/common/queries/bsff/queries";
 import { BsffSummary } from "./BsffSummary";
 
 interface ChildrenProps {

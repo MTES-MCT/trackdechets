@@ -10,6 +10,7 @@ import { getUid, sanitizeEmail, hashToken } from "../utils";
 import { deleteCachedUserRoles } from "../common/redis/users";
 import { hashPassword, passwordVersion } from "./utils";
 import { UserInputError } from "../common/errors";
+import { PrismaTransaction } from "../common/repository/types";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.companyAssociation.findMany({
@@ -54,6 +55,21 @@ export async function createUserAccountHash(
       role,
       companySiret: siret
     }
+  });
+}
+
+/**
+ * Delete UserAccountHash objects linked to a user's mail
+ * (association between user and siret with a hash used for invitations)
+ * @param user
+ * @param prisma
+ */
+export async function deleteUserAccountHash(
+  user: User,
+  prisma: PrismaTransaction
+) {
+  await prisma.userAccountHash.deleteMany({
+    where: { email: user.email }
   });
 }
 
@@ -241,5 +257,161 @@ export async function updateUserPassword({
   return prisma.user.update({
     where: { id: userId },
     data: { password: hashedPassword, passwordVersion }
+  });
+}
+
+/**
+ * Determine if a user is the sole admin for a company
+ * used in deletion pipeline to prevent deleting a user
+ * @param user
+ */
+export async function checkCompanyAssociations(user: User): Promise<string[]> {
+  const errors: string[] = [];
+  const companyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      user: {
+        id: user.id
+      }
+    },
+    include: {
+      company: { select: { id: true, siret: true, vatNumber: true } }
+    }
+  });
+
+  for (const association of companyAssociations) {
+    if (association.role !== "ADMIN") {
+      continue;
+    }
+
+    const otherAdmins = await prisma.companyAssociation.findMany({
+      where: {
+        role: "ADMIN",
+        user: {
+          id: { not: user.id }
+        },
+        company: {
+          id: association.company.id
+        }
+      }
+    });
+    if (otherAdmins.length <= 0) {
+      errors.push(
+        `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'entreprise ${
+          association.company.id
+        } (SIRET OU TVA: ${
+          association.company.siret ?? association.company.vatNumber
+        }).`
+      );
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Determine if a user is the sole admin for an application
+ * used in deletion pipeline to prevent deleting a user
+ * @param user
+ */
+export async function checkApplications(user: User): Promise<string[]> {
+  const errors: string[] = [];
+  const applications = await prisma.application.findMany({
+    where: {
+      adminId: user.id
+    }
+  });
+  for (const application of applications) {
+    errors.push(
+      `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'application ${application.id} (${application.name}).`
+    );
+  }
+
+  return errors;
+}
+
+/**
+ * Delete all associations between a user and companies
+ * @param user
+ * @param prisma
+ */
+export async function deleteUserCompanyAssociations(
+  user: User,
+  prisma: PrismaTransaction
+) {
+  await prisma.companyAssociation.deleteMany({
+    where: {
+      user: {
+        id: user.id
+      }
+    }
+  });
+}
+
+/**
+ * Delete all membership requests from a user
+ * @param user
+ * @param prisma
+ */
+export async function deleteMembershipRequest(
+  user: User,
+  prisma: PrismaTransaction
+) {
+  await prisma.membershipRequest.deleteMany({
+    where: {
+      user: {
+        id: user.id
+      }
+    }
+  });
+}
+
+/**
+ * Delete all UserActivationHashes of a user
+ * @param user
+ * @param prisma
+ */
+export async function deleteUserActivationHashes(
+  user: User,
+  prisma: PrismaTransaction
+) {
+  await prisma.userActivationHash.deleteMany({
+    where: {
+      user: {
+        id: user.id
+      }
+    }
+  });
+}
+
+/**
+ * Delete all access tokens of a user
+ * @param user
+ * @param prisma
+ */
+export async function deleteUserAccessTokens(
+  user: User,
+  prisma: PrismaTransaction
+) {
+  await prisma.accessToken.deleteMany({
+    where: {
+      user: {
+        id: user.id
+      }
+    }
+  });
+}
+
+/**
+ * Delete all grants of a user
+ * @param user
+ * @param prisma
+ */
+export async function deleteUserGrants(user: User, prisma: PrismaTransaction) {
+  await prisma.grant.deleteMany({
+    where: {
+      user: {
+        id: user.id
+      }
+    }
   });
 }

@@ -22,6 +22,7 @@ import {
   isVat,
   PROCESSING_OPERATIONS
 } from "@td/constants";
+import { operationHook } from "../../operationHook";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -32,7 +33,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   const { id, processedInfo } = args;
 
-  const form = await getFormOrFormNotFound({ id });
+  const form = await getFormOrFormNotFound({ id }, { forwardedIn: true });
 
   await checkCanMarkAsProcessed(user, form);
 
@@ -129,15 +130,18 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
       });
     }
 
+    const finalForm = form.forwardedInId
+      ? processedForm.forwardedIn!
+      : processedForm;
+
+    transaction.addAfterCommitCallback(async () => {
+      await operationHook(finalForm, {
+        runSync: false
+      });
+    });
+
     return processedForm;
   });
-
-  // En attente des correctifs recette sur TRA-12745
-  //
-  // await operationHooksQueue.add({
-  //   finalFormId: processedForm.id,
-  //   initialFormId: processedForm.id
-  // });
 
   return getAndExpandFormFromDb(processedForm.id);
 };

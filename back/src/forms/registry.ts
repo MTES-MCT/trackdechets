@@ -1,4 +1,4 @@
-import { FinalOperation } from "@prisma/client";
+import { BsddFinalOperation } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -20,6 +20,7 @@ import {
 import { extractPostalCode } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
+import { formToBsdd } from "./compat";
 
 const getOperationData = (bsdd: Bsdd) => ({
   destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
@@ -114,28 +115,23 @@ export function getRegistryFields(
  */
 const getFinalOperationsData = (
   bsdd: Bsdd & {
-    finalOperations: FinalOperation[];
+    finalOperations: BsddFinalOperation[];
   }
-) => {
-  let result = {};
-  // Initialize empty arrays for codes and weights
-  const finalOperationCodes: string[] = [];
-  const finalReceptionWeights: number[] = [];
+): Pick<
+  OutgoingWaste | AllWaste,
+  "destinationFinalOperationCodes" | "destinationFinalOperationWeights"
+> => {
+  const destinationFinalOperationCodes: string[] = [];
+  const destinationFinalOperationWeights: number[] = [];
   // Check if finalOperations is defined and has elements
   if (bsdd.finalOperations && bsdd.finalOperations.length > 0) {
     // Iterate through each operation once and fill both arrays
     bsdd.finalOperations.forEach(ope => {
-      finalOperationCodes.push(ope.operationCode);
-      finalReceptionWeights.push(ope.quantity);
+      destinationFinalOperationCodes.push(ope.operationCode);
+      destinationFinalOperationWeights.push(ope.quantity.toNumber());
     });
-
-    // Build the object with both arrays
-    result = {
-      finalOperationCodes,
-      finalReceptionWeights
-    };
   }
-  return result;
+  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
 function toGenericWaste(bsdd: Bsdd): GenericWaste {
@@ -169,7 +165,7 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
 }
 
 export function toIncomingWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
+  bsdd: ReturnType<typeof formToBsdd>
 ): Required<IncomingWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
@@ -229,9 +225,7 @@ export function toIncomingWaste(
 }
 
 export function toOutgoingWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] } & {
-    finalOperations: FinalOperation[];
-  }
+  bsdd: ReturnType<typeof formToBsdd>
 ): Required<OutgoingWaste> {
   const initialEmitter: Record<string, string | string[] | null> = {
     initialEmitterCompanyAddress: null,
@@ -290,7 +284,7 @@ export function toOutgoingWaste(
 }
 
 export function toTransportedWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
+  bsdd: ReturnType<typeof formToBsdd>
 ): Required<TransportedWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
@@ -347,7 +341,7 @@ export function toTransportedWaste(
 }
 
 export function toManagedWaste(
-  bsdd: Bsdd & { forwarding: Bsdd | null } & { grouping: Bsdd[] }
+  bsdd: ReturnType<typeof formToBsdd>
 ): Required<ManagedWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
@@ -403,9 +397,7 @@ export function toManagedWaste(
 }
 
 export function toAllWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] } & {
-    finalOperations: FinalOperation[];
-  }
+  bsdd: ReturnType<typeof formToBsdd>
 ): Required<AllWaste> {
   const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
