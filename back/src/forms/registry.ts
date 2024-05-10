@@ -11,6 +11,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -50,13 +51,6 @@ const getTransportersData = (bsdd: Bsdd) => ({
   transporter3NumberPlates: bsdd.transporter3NumberPlates,
   transporter3CompanyMail: bsdd.transporter3CompanyMail
 });
-
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-  | "isAllWasteFor";
 
 export function getRegistryFields(
   form: FormForElastic

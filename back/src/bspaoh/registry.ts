@@ -11,6 +11,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -39,13 +40,6 @@ const getTransporterData = (
     transporterTakenOverAt: transporter?.transporterTakenOverAt
   };
 };
-
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-  | "isAllWasteFor";
 
 export function getRegistryFields(
   bspaoh: Bspaoh & {

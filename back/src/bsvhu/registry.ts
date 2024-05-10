@@ -9,6 +9,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -35,12 +36,6 @@ const getTransporterData = (bsvhu: Bsvhu) => ({
   transporterCompanyAddress: bsvhu.transporterCompanyAddress
 });
 
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-  | "isAllWasteFor";
 export function getRegistryFields(
   bsvhu: Bsvhu
 ): Pick<BsdElastic, RegistryFields> {

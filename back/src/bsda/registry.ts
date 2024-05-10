@@ -11,6 +11,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -71,12 +72,6 @@ const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
   };
 };
 
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-  | "isAllWasteFor";
 export function getRegistryFields(
   bsda: BsdaForElastic
 ): Pick<BsdElastic, RegistryFields> {

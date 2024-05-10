@@ -11,6 +11,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -52,13 +53,6 @@ const getTransporterData = (bsdasri: Bsdasri) => ({
   transporterCustomInfo: bsdasri.transporterCustomInfo,
   transporterTakenOverAt: bsdasri.transporterTakenOverAt
 });
-
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-  | "isAllWasteFor";
 
 export function getRegistryFields(
   bsdasri: Bsdasri

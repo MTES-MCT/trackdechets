@@ -286,6 +286,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isOutgoingWasteFor: stringField,
   isTransportedWasteFor: stringField,
   isManagedWasteFor: stringField,
+  isAllWasteFor: stringField,
   isInRevisionFor: stringField,
   isRevisedFor: stringField,
 
