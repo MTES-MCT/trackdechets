@@ -2,6 +2,7 @@ import {
   BsdasriStatus,
   BsdaStatus,
   BsffStatus,
+  BspaohStatus,
   BsvhuStatus,
   Company,
   Status,
@@ -40,6 +41,8 @@ import {
   userWithCompanyFactory
 } from "../../__tests__/factories";
 import { buildQuery } from "../elastic";
+import { bspaohFactory } from "../../bspaoh/__tests__/factories";
+import { getBspaohForElastic, indexBspaoh } from "../../bspaoh/elastic";
 
 describe("Retrieval of bsds in ES based on waste registry type", () => {
   let emitter: { user: User; company: Company };
@@ -347,6 +350,46 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await indexBsff(await getBsffForElastic(bsff));
       await refreshElasticSearch();
       const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
+      expect(bsds).toEqual([]);
+    });
+
+    it("should list a BSPAOH in destination's incoming wastes once it has been received", async () => {
+      // Given
+      const bspaoh = await bspaohFactory({
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
+          status: BspaohStatus.RECEIVED,
+          destinationReceptionSignatureDate: new Date()
+        }
+      });
+      await indexBspaoh(await getBspaohForElastic(bspaoh));
+      await refreshElasticSearch();
+
+      // When
+      const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
+
+      // Then
+      expect(bsds.map(bsd => bsd.id)).toEqual([bspaoh.id]);
+    });
+    it("should not list a BSPAOH in destination's incoming wastes before it has been received", async () => {
+      // Given
+      const bspaoh = await bspaohFactory({
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
+          status: BspaohStatus.SENT,
+          transporterTransportTakenOverAt: new Date(),
+          destinationReceptionSignatureDate: null
+        }
+      });
+      await indexBspaoh(await getBspaohForElastic(bspaoh));
+      await refreshElasticSearch();
+
+      // When
+      const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
+
+      // Then
       expect(bsds).toEqual([]);
     });
   });
@@ -1210,6 +1253,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         opt: {
           status: BsdaStatus.SENT,
           emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
           emitterEmissionSignatureDate: new Date(),
           transporterTransportSignatureDate: new Date()
         },
@@ -1223,7 +1267,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await refreshElasticSearch();
 
       // When
-      const bsds = await searchBsds("ALL", [emitter.company.siret!]);
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
 
       // Then
       expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
@@ -1243,7 +1287,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await refreshElasticSearch();
 
       // When
-      const bsds = await searchBsds("ALL", [emitter.company.siret!]);
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
 
       // Then
       expect(bsds).toEqual([]);
@@ -1283,21 +1327,6 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       const bsds = await searchBsds("ALL", [transporter.company.siret!]);
       expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
     });
-    it("should list a BSDA in destination's all wastes", async () => {
-      const bsda = await bsdaFactory({
-        opt: {
-          destinationCompanySiret: destination.company.siret,
-          emitterEmissionSignatureDate: new Date(),
-          transporterTransportSignatureDate: new Date(),
-          destinationOperationSignatureDate: new Date()
-        }
-      });
-      const bsdaForElastic = await getBsdaForElastic(bsda);
-      await indexBsda(bsdaForElastic);
-      await refreshElasticSearch();
-      const bsds = await searchBsds("ALL", [destination.company.siret!]);
-      expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
-    });
     it("should list a BSDA in broker's all wastes", async () => {
       const bsda = await bsdaFactory({
         opt: {
@@ -1322,6 +1351,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         opt: {
           status: BsdasriStatus.SENT,
           emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
           emitterEmissionSignatureDate: new Date(),
           transporterTransportSignatureDate: new Date()
         }
@@ -1330,7 +1360,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await refreshElasticSearch();
 
       // When
-      const bsds = await searchBsds("ALL", [emitter.company.siret!]);
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
 
       // Then
       expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
@@ -1349,7 +1379,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await refreshElasticSearch();
 
       // When
-      const bsds = await searchBsds("ALL", [emitter.company.siret!]);
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
 
       // Then
       expect(bsds).toEqual([]);
@@ -1400,6 +1430,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         opt: {
           status: BsvhuStatus.SENT,
           emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
           emitterEmissionSignatureDate: new Date(),
           transporterTransportSignatureDate: new Date()
         }
@@ -1408,7 +1439,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await refreshElasticSearch();
 
       // When
-      const bsds = await searchBsds("ALL", [emitter.company.siret!]);
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
 
       // Then
       expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
@@ -1427,7 +1458,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await refreshElasticSearch();
 
       // When
-      const bsds = await searchBsds("ALL", [emitter.company.siret!]);
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
 
       // Then
       expect(bsds).toEqual([]);
@@ -1490,7 +1521,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await refreshElasticSearch();
 
       // When
-      const bsds = await searchBsds("ALL", [emitter.company.siret!]);
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
 
       // Then
       expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
@@ -1513,7 +1544,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await refreshElasticSearch();
 
       // When
-      const bsds = await searchBsds("ALL", [emitter.company.siret!]);
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
 
       // Then
       expect(bsds).toEqual([]);
@@ -1569,6 +1600,107 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       await refreshElasticSearch();
       const bsds = await searchBsds("ALL", [destination.company.siret!]);
       expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
+    });
+
+    it("should list a BSPAOH in destination's all wastes as soon as transporter has signed", async () => {
+      // Given
+      const bspaoh = await bspaohFactory({
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
+          status: BspaohStatus.SENT,
+          emitterEmissionSignatureDate: new Date(),
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterTransportPlates: ["AA-00-XX"],
+              transporterTransportSignatureDate: new Date(),
+              number: 1
+            }
+          }
+        }
+      });
+      await indexBspaoh(await getBspaohForElastic(bspaoh));
+      await refreshElasticSearch();
+
+      // When
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
+
+      // Then
+      expect(bsds.map(bsd => bsd.id)).toEqual([bspaoh.id]);
+    });
+    it("should NOT list a BSPAOH in destination's all wastes if transporter hasn't signed", async () => {
+      // Given
+      const bspaoh = await bspaohFactory({
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
+          status: BspaohStatus.INITIAL,
+          transporterTransportTakenOverAt: null
+        }
+      });
+      await indexBspaoh(await getBspaohForElastic(bspaoh));
+      await refreshElasticSearch();
+
+      // When
+      const bsds = await searchBsds("ALL", [destination.company.siret!]);
+
+      // Then
+      expect(bsds).toEqual([]);
+    });
+    it("should list a BSPAOH in emitter's all wastes", async () => {
+      // Given
+      const bspaoh = await bspaohFactory({
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
+          status: BspaohStatus.SENT,
+          emitterEmissionSignatureDate: new Date(),
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterTransportPlates: ["AA-00-XX"],
+              transporterTransportSignatureDate: new Date(),
+              number: 1
+            }
+          }
+        }
+      });
+      await indexBspaoh(await getBspaohForElastic(bspaoh));
+      await refreshElasticSearch();
+
+      // When
+      const bsds = await searchBsds("ALL", [emitter.company.siret!]);
+
+      // Then
+      expect(bsds.map(bsd => bsd.id)).toEqual([bspaoh.id]);
+    });
+    it("should list a BSPAOH in transporter's all wastes", async () => {
+      // Given
+      const bspaoh = await bspaohFactory({
+        opt: {
+          emitterCompanySiret: emitter.company.siret,
+          destinationCompanySiret: destination.company.siret,
+          status: BspaohStatus.SENT,
+          emitterEmissionSignatureDate: new Date(),
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterTransportPlates: ["AA-00-XX"],
+              transporterTransportSignatureDate: new Date(),
+              number: 1
+            }
+          }
+        }
+      });
+      await indexBspaoh(await getBspaohForElastic(bspaoh));
+      await refreshElasticSearch();
+
+      // When
+      const bsds = await searchBsds("ALL", [transporter.company.siret!]);
+
+      // Then
+      expect(bsds.map(bsd => bsd.id)).toEqual([bspaoh.id]);
     });
   });
 });

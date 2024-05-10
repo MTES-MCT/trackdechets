@@ -91,6 +91,9 @@ export function getRegistryFields(
   const transporter = getFirstTransporterSync(bsda);
 
   if (transporter?.transporterTransportSignatureDate) {
+    if (bsda.destinationCompanySiret) {
+      registryFields.isAllWasteFor.push(bsda.destinationCompanySiret);
+    }
     if (bsda.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsda.emitterCompanySiret);
       registryFields.isAllWasteFor.push(bsda.emitterCompanySiret);
@@ -132,7 +135,6 @@ export function getRegistryFields(
   // There is no signature at reception on the BSDA so we use the operation signature
   if (bsda.destinationOperationSignatureDate && bsda.destinationCompanySiret) {
     registryFields.isIncomingWasteFor.push(bsda.destinationCompanySiret);
-    registryFields.isAllWasteFor.push(bsda.destinationCompanySiret);
   }
 
   return registryFields;

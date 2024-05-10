@@ -56,6 +56,9 @@ export function getRegistryFields(
     bsvhu.emitterEmissionSignatureDate &&
     bsvhu.transporterTransportSignatureDate
   ) {
+    if (bsvhu.destinationCompanySiret) {
+      registryFields.isAllWasteFor.push(bsvhu.destinationCompanySiret);
+    }
     if (bsvhu.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsvhu.emitterCompanySiret);
       registryFields.isAllWasteFor.push(bsvhu.emitterCompanySiret);
@@ -71,7 +74,6 @@ export function getRegistryFields(
     bsvhu.destinationCompanySiret
   ) {
     registryFields.isIncomingWasteFor.push(bsvhu.destinationCompanySiret);
-    registryFields.isAllWasteFor.push(bsvhu.destinationCompanySiret);
   }
 
   return registryFields;

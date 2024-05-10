@@ -72,6 +72,9 @@ export function getRegistryFields(
   };
 
   if (bsdasri.transporterTransportSignatureDate) {
+    if (bsdasri.destinationCompanySiret) {
+      registryFields.isAllWasteFor.push(bsdasri.destinationCompanySiret);
+    }
     if (bsdasri.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsdasri.emitterCompanySiret);
       registryFields.isAllWasteFor.push(bsdasri.emitterCompanySiret);
@@ -92,7 +95,6 @@ export function getRegistryFields(
     bsdasri.destinationCompanySiret
   ) {
     registryFields.isIncomingWasteFor.push(bsdasri.destinationCompanySiret);
-    registryFields.isAllWasteFor.push(bsdasri.destinationCompanySiret);
   }
 
   return registryFields;
