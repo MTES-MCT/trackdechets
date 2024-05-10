@@ -91,14 +91,14 @@ export default function RhfCompanySelectorWrapper({
   const onSelectCompany = useCallback(
     (company: CompanySearchResult) => {
       setSelectedCompany(company);
-      // propage l'événement au parent pour modifier les données du store (Formik)
+      // propage l'événement au parent pour modifier les données du store (RHF)
       onCompanySelected && onCompanySelected(company);
     },
     [setSelectedCompany, onCompanySelected]
   );
 
   // S'assure que `selectedCompany` reste sync avec les données
-  // du store Formik lors du render initial ou en cas modification
+  // du store RHF lors du render initial ou en cas modification
   // des données provoquée par un autre événement que la sélection d'un établissement
   // dans le CompanySelector (par exemple si on permute deux transporteurs
   // dans la liste des transporteurs multi-modaux)

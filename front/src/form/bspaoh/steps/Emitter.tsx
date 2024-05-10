@@ -48,16 +48,17 @@ export function Emitter() {
             setValue(`${actor}.company.address`, company.address);
             setValue(
               `${actor}.company.contact`,
-              emitter?.company?.contact || company.contact
+              company.contact || emitter?.company?.contact
             );
+
             setValue(
               `${actor}.company.phone`,
-              emitter?.company?.phone || company.contactPhone
+              company.contactPhone || emitter?.company?.phone
             );
 
             setValue(
               `${actor}.company.mail`,
-              emitter?.company?.mail || company.contactEmail
+              company.contactEmail || emitter?.company?.mail
             );
             // country: company.codePaysEtrangerEtablissement
           }

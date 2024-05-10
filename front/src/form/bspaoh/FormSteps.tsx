@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
-import { GET_BSDS } from "../../Apps/common/queries";
 import omitDeep from "omit-deep-lodash";
 import { useMutation, useQuery } from "@apollo/client";
 import { cleanPayload } from "./utils/payload";
@@ -115,26 +114,18 @@ export function ControlledTabs(props: Readonly<Props>) {
   const [createDraftBspaoh, { loading: creatingDraft }] = useMutation<
     Pick<Mutation, "createDraftBspaoh">,
     MutationCreateDraftBspaohArgs
-  >(CREATE_DRAFT_BSPAOH, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
-  });
+  >(CREATE_DRAFT_BSPAOH);
 
   const [createBspaoh, { loading: creating }] = useMutation<
     Pick<Mutation, "createBspaoh">,
     MutationCreateBspaohArgs
-  >(CREATE_BSPAOH, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
-  });
+  >(CREATE_BSPAOH);
 
   const [updateBspaoh, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBspaoh">,
     MutationUpdateBspaohArgs
-  >(UPDATE_BSPAOH, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true
-  });
+  >(UPDATE_BSPAOH);
+
   const loading = creatingDraft || updating || creating;
   const mainCtaLabel = formState.id ? "Enregistrer" : "Publier";
   const draftCtaLabel = formState.id ? "" : "Enregistrer en brouillon";
@@ -143,19 +134,20 @@ export function ControlledTabs(props: Readonly<Props>) {
     const cleanedInput = paohToInput(input);
     if (formState.id!) {
       // remove sealed fields then cleanup empty objects from payload
-      const theInput = cleanPayload(omitDeep(cleanedInput, sealedFields));
+      const cleanedPayload = cleanPayload(omitDeep(cleanedInput, sealedFields));
 
       return updateBspaoh({
-        variables: { id: formState.id, input: theInput }
+        variables: { id: formState.id, input: cleanedPayload }
       });
     } else {
+      const cleanedPayload = cleanPayload(cleanedInput);
       if (draft) {
         return createDraftBspaoh({
-          variables: { input: cleanPayload(cleanedInput) }
+          variables: { input: cleanedPayload }
         });
       } else {
         return createBspaoh({
-          variables: { input: cleanPayload(cleanedInput) }
+          variables: { input: cleanedPayload }
         });
       }
     }

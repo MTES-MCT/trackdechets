@@ -5,6 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
+import { objectDiff } from "../../../forms/workflow/diff";
 
 export type UpdateBsdasriFn = (
   where: Prisma.BsdasriWhereUniqueInput,
@@ -18,6 +19,14 @@ export type UpdateBsdasriFn = (
 export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
   return async (where, data, logMetadata?) => {
     const { prisma, user } = deps;
+    const previousBsdasri = await prisma.bsdasri.findUnique({
+      where,
+      include: {
+        synthesizing: true,
+        grouping: true
+      }
+    });
+
     const bsdasri = await prisma.bsdasri.update({
       where,
       data,
@@ -50,28 +59,19 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
         data: { groupingEmitterSirets }
       });
     }
+
+    const { updatedAt, ...updateDiff } = objectDiff(previousBsdasri, bsdasri);
     await prisma.event.create({
       data: {
         streamId: bsdasri.id,
         actor: user.id,
-        type: bsdasriEventTypes.updated,
-        data: data as Prisma.InputJsonObject,
+        type: data.status
+          ? bsdasriEventTypes.signed
+          : bsdasriEventTypes.updated,
+        data: updateDiff,
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-
-    // Status updates are done only through signature
-    if (data.status) {
-      await prisma.event.create({
-        data: {
-          streamId: bsdasri.id,
-          actor: user.id,
-          type: bsdasriEventTypes.signed,
-          data: { status: data.status },
-          metadata: { ...logMetadata, authType: user.auth }
-        }
-      });
-    }
 
     prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bsdasri.id));
 
