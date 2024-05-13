@@ -145,7 +145,7 @@ export default function ExportsForm({ companies }: IProps) {
     endDate: now.toISOString(),
     companies,
     wasteCode: "",
-    exportFormat: "CSV"
+    exportFormat: "XLSX"
   };
 
   const [
@@ -385,8 +385,8 @@ export default function ExportsForm({ companies }: IProps) {
                 name="exportFormat"
                 className="tw-col-span-2 tw-max-w-md td-select"
               >
-                <option value="CSV">.csv</option>
                 <option value="XLSX">.xlsx (Excel)</option>
+                <option value="CSV">.csv</option>
               </Field>
             </div>
             <div className="tw-mt-5">
