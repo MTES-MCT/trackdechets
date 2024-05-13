@@ -45,7 +45,11 @@ if (process.env.NODE_ENV !== "test" && !process.env.OTEL_SDK_DISABLED) {
       new DnsInstrumentation(),
       new ExpressInstrumentation(),
       new FsInstrumentation(),
-      new GraphQLInstrumentation(),
+      new GraphQLInstrumentation({
+        mergeItems: true,
+        ignoreTrivialResolveSpans: true,
+        ignoreResolveSpans: true
+      }),
       new HttpInstrumentation(),
       new IORedisInstrumentation(),
       new MongoDBInstrumentation(),
