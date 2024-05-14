@@ -8,7 +8,6 @@ import { InfoIconCode } from "../InfoWithIcon/infoWithIconTypes";
 import { BsdCardProps } from "./bsdCardTypes";
 import WasteDetails from "../WasteDetails/WasteDetails";
 import {
-  canEditCustomInfoOrTransporterNumberPlate,
   canPublishBsd,
   getBsdView,
   getPrimaryActionsLabelFromBsdStatus,
@@ -35,6 +34,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs,
   RevisionRequestStatus,
+  TransportMode,
   UserPermission
 } from "@td/codegen-ui";
 import {
@@ -363,15 +363,14 @@ function BsdCard({
                         hasEditableInfos
                         isDisabled={
                           isCollectedTab ||
-                          !canEditCustomInfoOrTransporterNumberPlate(
-                            bsdDisplay,
-                            permissions
-                          )
+                          !permissions.includes(UserPermission.BsdCanUpdate)
                         }
                         onClick={handleEditableInfoClick}
                       />
                     )}
                   {!!currentTransporterInfos &&
+                    currentTransporterInfos.transporterMode ===
+                      TransportMode.Road &&
                     (isToCollectTab ||
                       (isCollectedTab &&
                         !!currentTransporterInfos?.transporterNumberPlate
@@ -385,10 +384,7 @@ function BsdCard({
                         hasEditableInfos
                         isDisabled={
                           isCollectedTab ||
-                          !canEditCustomInfoOrTransporterNumberPlate(
-                            bsdDisplay,
-                            permissions
-                          )
+                          !permissions.includes(UserPermission.BsdCanUpdate)
                         }
                         onClick={handleEditableInfoClick}
                       />

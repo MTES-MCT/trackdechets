@@ -446,6 +446,7 @@ export const dashboardFormFragment = gql`
       numberPlate
       customInfo
       takenOverAt
+      mode
     }
     ecoOrganisme {
       siret
@@ -497,6 +498,7 @@ export const dashboardFormFragment = gql`
         }
         numberPlate
         customInfo
+        mode
       }
       wasteDetails {
         packagingInfos {

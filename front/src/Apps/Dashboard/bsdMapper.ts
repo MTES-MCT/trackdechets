@@ -136,7 +136,8 @@ export const getBsddCurrentTransporterInfos = (
   return {
     transporterId: currentTransporter?.id,
     transporterNumberPlate: currentTransporter?.numberPlate,
-    transporterCustomInfo: currentTransporter?.customInfo
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.mode ?? undefined
   };
 };
 
@@ -169,7 +170,8 @@ export const getBsdaCurrentTransporterInfos = (
   return {
     transporterId: currentTransporter?.id,
     transporterNumberPlate: currentTransporter?.transport?.plates,
-    transporterCustomInfo: currentTransporter?.customInfo
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
   };
 };
 
@@ -185,7 +187,8 @@ export const getBsdasriCurrentTransporterInfos = (
   // the update is done through the BSD using its id
   return {
     transporterNumberPlate: currentTransporter?.transport?.plates,
-    transporterCustomInfo: currentTransporter?.customInfo
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
   };
 };
 
@@ -199,7 +202,8 @@ export const getBsffCurrentTransporterInfos = (
   }
   return {
     transporterNumberPlate: currentTransporter?.transport?.plates,
-    transporterCustomInfo: currentTransporter?.customInfo
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
   };
 };
 
@@ -213,7 +217,8 @@ export const getBspaohCurrentTransporterInfos = (
   }
   return {
     transporterNumberPlate: currentTransporter?.transport?.plates,
-    transporterCustomInfo: currentTransporter?.customInfo
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
   };
 };
 

@@ -6,6 +6,7 @@ import { BsdCurrentTransporterInfos } from "../../../common/types/bsdTypes";
 import TagsInput from "../../../Forms/Components/TagsInput/TagsInput";
 
 import "./transporterInfoEditForm.scss";
+import { TransportMode } from "@td/codegen-ui";
 
 interface TransporterInfoEditFormProps {
   currentTransporter: BsdCurrentTransporterInfos;
@@ -105,21 +106,23 @@ const TransporterInfoEditForm = ({
         }}
       />
 
-      <div className="transporterInfoEditForm__plates">
-        <TagsInput
-          label="Immatriculations"
-          onAddTag={handleAddPlate}
-          onDeleteTag={dismissTag}
-          tags={platesTags}
-        />
-        {/* hidden tag field registered */}
-        <input
-          id="inputPlateHidden"
-          {...register("plates")}
-          className="sr-only"
-          aria-hidden
-        />
-      </div>
+      {currentTransporter.transporterMode === TransportMode.Road ? (
+        <div className="transporterInfoEditForm__plates">
+          <TagsInput
+            label="Immatriculations"
+            onAddTag={handleAddPlate}
+            onDeleteTag={dismissTag}
+            tags={platesTags}
+          />
+          {/* hidden tag field registered */}
+          <input
+            id="inputPlateHidden"
+            {...register("plates")}
+            className="sr-only"
+            aria-hidden
+          />
+        </div>
+      ) : null}
 
       <div className="transporterInfoEditForm__cta">
         <Button

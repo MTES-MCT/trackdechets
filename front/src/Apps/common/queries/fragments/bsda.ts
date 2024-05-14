@@ -110,6 +110,7 @@ export const bsdaFragment = gql`
       }
       transport {
         plates
+        mode
         signature {
           date
         }
