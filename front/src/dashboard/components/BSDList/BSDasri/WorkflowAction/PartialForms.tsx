@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { lazy, useEffect } from "react";
 import { RedErrorMessage } from "../../../../../common/components";
 import {
   BsdasriSignatureType,
@@ -11,6 +11,7 @@ import WeightWidget from "../../../../../form/bsdasri/components/Weight";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import Acceptation from "../../../../../form/bsdasri/components/acceptation/Acceptation";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+import { customInfoToolTip } from "../../../../../form/bsdasri/steps/Emitter";
 import { ExtraSignatureType, SignatureType } from "../types";
 import { Field, useFormikContext } from "formik";
 import omitDeep from "omit-deep-lodash";
@@ -19,7 +20,10 @@ import Transport from "../../../../../form/bsdasri/steps/Transport";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import { subMonths } from "date-fns";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
-
+import Tooltip from "../../../../../common/components/Tooltip";
+const TagsInput = lazy(
+  () => import("../../../../../common/components/tags-input/TagsInput")
+);
 export function EmitterSignatureForm() {
   return (
     <>
@@ -128,6 +132,15 @@ export function SynthesisTransportSignatureForm() {
           </div>
         </label>
       </div>
+      {values.transporter?.transport?.mode === "ROAD" ? (
+        <div className="form__row">
+          <label htmlFor="transporter.transport.plates">
+            Immatriculations
+            <Tooltip msg={customInfoToolTip} />
+          </label>
+          <TagsInput name="transporter.transport.plates" />
+        </div>
+      ) : null}
       <div className="form__row">
         <Field
           name="transporter.transport.packagingInfos"
