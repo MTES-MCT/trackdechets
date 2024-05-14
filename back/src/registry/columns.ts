@@ -29,7 +29,6 @@ type Column = {
   format?: (v: unknown, full: unknown) => string | number | null;
 };
 
-// const formatDate = (d: Date | null) => d?.toISOString().slice(0, 10) ?? "";
 export const formatDate = (d: Date | null) => {
   if (!d) return "";
   return format(d, "yyyy-MM-dd", {
