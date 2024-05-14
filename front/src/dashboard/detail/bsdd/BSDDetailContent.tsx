@@ -331,7 +331,7 @@ const GroupedIn = ({ form }: { form: Form }) => {
       value={
         <span>
           {form.readableId}
-          {showPDFDownload ? (
+          {showPDFDownload && (
             <>
               {" ("}
               <button
@@ -342,7 +342,7 @@ const GroupedIn = ({ form }: { form: Form }) => {
               </button>
               {")"}
             </>
-          ) : null}
+          )}
         </span>
       }
       label={`Annexé au bordereau n°`}

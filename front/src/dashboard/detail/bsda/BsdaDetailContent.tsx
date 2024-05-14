@@ -383,7 +383,7 @@ const NextBsda = ({ bsda }: { bsda: Bsda }) => {
 
         <dt>CAP</dt>
         <dd>{bsda.destination?.cap}</dd>
-        {!bsda.isDraft ? (
+        {!bsda.isDraft && (
           <>
             <dt>PDF</dt>
             <dd>
@@ -397,7 +397,7 @@ const NextBsda = ({ bsda }: { bsda: Bsda }) => {
               </button>
             </dd>
           </>
-        ) : null}
+        )}
       </div>
     </div>
   );
