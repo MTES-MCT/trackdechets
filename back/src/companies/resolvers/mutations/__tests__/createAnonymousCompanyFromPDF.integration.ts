@@ -58,7 +58,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
           res({
             metadata: { _metadata: METADATA },
             info: INFO,
-            text: EXTRACTED_STRINGS.join("\n")
+            text: EXTRACTED_STRINGS().join("\n")
           })
         )
     );
@@ -153,7 +153,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
           res({
             metadata: { _metadata: METADATA },
             info: INFO,
-            text: EXTRACTED_STRINGS.join("\n")
+            text: EXTRACTED_STRINGS().join("\n")
           })
         )
     );
@@ -188,7 +188,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
           res({
             metadata: { _metadata: METADATA },
             info: INFO,
-            text: EXTRACTED_STRINGS.join("\n")
+            text: EXTRACTED_STRINGS().join("\n")
           })
         )
     );
@@ -236,7 +236,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
           res({
             metadata: { _metadata: METADATA },
             info: INFO,
-            text: EXTRACTED_STRINGS.join("\n")
+            text: EXTRACTED_STRINGS().join("\n")
           })
         )
     );
@@ -316,7 +316,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
         new Promise(res =>
           res({
             metadata: { _metadata: METADATA },
-            text: EXTRACTED_STRINGS.join("\n")
+            text: EXTRACTED_STRINGS().join("\n")
           })
         )
     );
@@ -351,7 +351,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
           res({
             metadata: { _metadata: METADATA },
             info: INFO,
-            text: EXTRACTED_STRINGS.join("\n")
+            text: EXTRACTED_STRINGS().join("\n")
           })
         )
     );
@@ -398,7 +398,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
           res({
             metadata: { _metadata: METADATA },
             info: INFO,
-            text: EXTRACTED_STRINGS.join("\n")
+            text: EXTRACTED_STRINGS().join("\n")
           })
         )
     );
