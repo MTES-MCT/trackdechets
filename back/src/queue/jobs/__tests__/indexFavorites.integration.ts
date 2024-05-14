@@ -29,7 +29,7 @@ jest.mock("../../../companies/database", () => ({
 
 jest.mock("../../../companies/search");
 
-async function refreshIndices() {
+export async function refreshIndices() {
   await elasticSearch.indices.refresh(
     {
       index: index.alias

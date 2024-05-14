@@ -189,6 +189,12 @@ export function toIncomingWaste(
 
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
+  if(bsdd.id === "BSD-20230626-JH2PXE7BB"){
+    console.log("readableId", bsdd.id)
+    console.log("Date de réception (destinationReceptionDate / form.receivedAt): ", bsdd.destinationOperationDate)
+    console.log("Date de réalisation de l'opération (destinationOperationDate / form.processedAt):", bsdd?.destinationReceptionDate)
+  }
+
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyIncomingWaste,
@@ -418,6 +424,12 @@ export function toAllWaste(
   }
 
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
+
+  if(bsdd.id === "BSD-20230626-JH2PXE7BB"){
+    console.log("readableId", bsdd.id)
+    console.log("Date de réception (destinationReceptionDate / form.receivedAt): ", bsdd.destinationOperationDate)
+    console.log("Date de réalisation de l'opération (destinationOperationDate / form.processedAt):", bsdd?.destinationReceptionDate)
+  }
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
