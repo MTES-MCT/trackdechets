@@ -70,6 +70,13 @@ export function daysBetween(date1: Date, date2: Date): number {
 }
 
 /**
+ * Converts a date to a french-formatted string dd/MM/YYYY
+ */
+export function toddMMYYYY(date: Date): string {
+  return date.toLocaleDateString("fr-FR");
+}
+
+/**
  * Compute a past date relative to baseDate
  *
  * @param baseDate Date
