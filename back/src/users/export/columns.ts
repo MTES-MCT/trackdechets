@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { UserInCompany } from "./types";
+import * as Excel from "exceljs";
 
 type Column = {
   field: keyof UserInCompany;
@@ -36,4 +37,25 @@ export function formatRow(userInCompany: UserInCompany, useLabelAsKey = false) {
     }
     return acc;
   }, {});
+}
+
+/**
+ * GET XLSX headers based of the first row
+ */
+export function getXlsxHeaders(
+  userInCompany: UserInCompany
+): Partial<Excel.Column>[] {
+  return columns.reduce<Partial<Excel.Column>[]>((acc, column) => {
+    if (column.field in userInCompany) {
+      return [
+        ...acc,
+        {
+          header: column.label,
+          key: column.field,
+          width: 20
+        }
+      ];
+    }
+    return acc;
+  }, []);
 }

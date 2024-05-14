@@ -24,7 +24,10 @@ import {
   MyCompaniesCsvArgs,
   myCompaniesCsvDownloadHandler
 } from "../users/resolvers/queries/myCompaniesCsv";
-import { MyCompaniesXlsArgs } from "../users/resolvers/queries/myCompaniesXls";
+import {
+  MyCompaniesXlsArgs,
+  myCompaniesXlsDownloadHandler
+} from "../users/resolvers/queries/myCompaniesXls";
 
 // List all GraphQL resolvers that register a download handler
 // These values are used as serialization key in Redis
@@ -87,7 +90,8 @@ const downloadHandlers: DownloadHandlers = [
   bspaohPdfDownloadHandler,
   wastesRegistryCsvDownloadHandler,
   wastesRegistryXlsDownloadHandler,
-  myCompaniesCsvDownloadHandler
+  myCompaniesCsvDownloadHandler,
+  myCompaniesXlsDownloadHandler
 ].reduce((acc, { name, handler }) => {
   return { ...acc, [name]: handler };
 }, {} as DownloadHandlers);

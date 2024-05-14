@@ -21,7 +21,7 @@ const MY_COMPANIES_CSV = gql`
 describe("query { myCompaniesCsv }", () => {
   afterEach(resetDatabase);
 
-  it("should export all companies a user is part of", async () => {
+  it("should export all companies a user is part of in CSV", async () => {
     const user1 = await userFactory();
     const user2 = await userFactory();
     const user3 = await userFactory();
@@ -51,9 +51,10 @@ describe("query { myCompaniesCsv }", () => {
     );
 
     const { query } = makeClient(user1);
-    const { data } = await query<Pick<Query, "myCompaniesCsv">>(
+    const { data, errors } = await query<Pick<Query, "myCompaniesCsv">>(
       MY_COMPANIES_CSV
     );
+    expect(errors).toBeUndefined();
     expect(data.myCompaniesCsv?.token?.length).toBeGreaterThan(0);
     expect(data.myCompaniesCsv?.downloadLink?.length).toBeGreaterThan(0);
 
