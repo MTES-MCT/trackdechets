@@ -9,7 +9,7 @@ describe("formatDate", () => {
     ["2024-02-06T09:40:03.075Z", "2024-02-06"],
     ["2024-02-06T09:43:53.624Z", "2024-02-06"]
   ])(
-    "should match front-end formatting: input: '%p', expected: '%p'",
+    "should match front-end formatting: input: %p, expected: %p",
     (input, expected) => {
       // When
       const result = formatDate(new Date(input));
