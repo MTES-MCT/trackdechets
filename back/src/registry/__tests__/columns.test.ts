@@ -8,13 +8,16 @@ describe("formatDate", () => {
     ["2023-07-03T00:00:01.000Z", "2023-07-03"],
     ["2024-02-06T09:40:03.075Z", "2024-02-06"],
     ["2024-02-06T09:43:53.624Z", "2024-02-06"]
-  ])("should match front-end formatting", (input, expected) => {
-    // When
-    const result = formatDate(new Date(input));
+  ])(
+    "should match front-end formatting: input: '%p', expected: '%p'",
+    (input, expected) => {
+      // When
+      const result = formatDate(new Date(input));
 
-    // Then
-    expect(result).toEqual(expected);
-  });
+      // Then
+      expect(result).toEqual(expected);
+    }
+  );
 });
 
 describe("formatRow", () => {
