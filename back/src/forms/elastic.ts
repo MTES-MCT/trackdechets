@@ -58,18 +58,6 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
 
   const transporter1 = getFirstTransporterSync(form);
 
-  if (form.readableId === "BSD-20230626-JH2PXE7BB") {
-    console.log("readableId", form.readableId);
-    console.log(
-      "Date de réception (destinationReceptionDate / form.receivedAt): ",
-      form.receivedAt
-    );
-    console.log(
-      "Date de réalisation de l'opération (destinationOperationDate / form.processedAt):",
-      form?.processedAt
-    );
-  }
-
   return {
     type: "BSDD",
     createdAt: form.createdAt?.getTime(),
