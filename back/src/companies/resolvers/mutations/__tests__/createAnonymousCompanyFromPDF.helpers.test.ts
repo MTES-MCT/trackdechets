@@ -1,3 +1,4 @@
+import { toddMMYYYY } from "../../../../utils";
 import {
   extractAddress,
   extractBetween,
@@ -38,39 +39,43 @@ export const METADATA = {
   "pdfuaid:part": "1"
 };
 
-export const EXTRACTED_STRINGS = [
-  "Service Statistique ",
-  "Répertoire SIRENE",
-  "Service Info Sirene ",
-  "09 72 72 6000 ",
-  "prix d'un appel local",
-  "SITUATION AU REPERTOIRE SIRENE ",
-  "À la date du 14/02/2024",
-  "Description de l'entrepriseEntreprise active depuis le 02/01/2024",
-  "Identifiant SIREN982 549 826",
-  "Identifiant SIRET du siège982 549 826 00013",
-  "DénominationACME CORP",
-  "Catégorie juridique5499 - Société à responsabilité limitée (sans autre ",
-  "indication)",
-  "Activité Principale Exercée (APE)62.02A - Conseil en systèmes et logiciels informatiques",
-  "Appartenance au champ de l’ESS",
-  "1",
-  "Non",
-  "Appartenance au champ des ",
-  "sociétés à mission",
-  "Description de l'établissementEtablissement actif depuis le 02/01/2024",
-  "Identifiant SIRET982 549 826 00013",
-  "Adresse4 BD PASTEUR",
-  "44100 NANTES",
-  "Activité Principale Exercée (APE)62.02A - Conseil en systèmes et logiciels informatiques",
-  "1 : Economie Sociale et Solidaire",
-  "Important : A l'exception des informations relatives à l'identification de l'entreprise, les renseignements figurant dans ce ",
-  "document, en particulier le code APE, n'ont de valeur que pour les applications statistiques (décret n°2007-1888 du 26 ",
-  "décembre 2007 portant approbation des nomenclatures d'activités françaises et de produits, paru au JO du 30 décembre ",
-  "2007).",
-  "Avertissement : Aucune valeur juridique n'est attachée à l'avis de situation.",
-  "REPUBLIQUE FRANCAISE"
-];
+export const EXTRACTED_STRINGS = (date?: Date) => {
+  const nowAsddMMYYYY = toddMMYYYY(date ?? new Date());
+
+  return [
+    "Service Statistique ",
+    "Répertoire SIRENE",
+    "Service Info Sirene ",
+    "09 72 72 6000 ",
+    "prix d'un appel local",
+    "SITUATION AU REPERTOIRE SIRENE ",
+    `À la date du ${nowAsddMMYYYY}`,
+    `Description de l'entrepriseEntreprise active depuis le ${nowAsddMMYYYY}`,
+    "Identifiant SIREN982 549 826",
+    "Identifiant SIRET du siège982 549 826 00013",
+    "DénominationACME CORP",
+    "Catégorie juridique5499 - Société à responsabilité limitée (sans autre ",
+    "indication)",
+    "Activité Principale Exercée (APE)62.02A - Conseil en systèmes et logiciels informatiques",
+    "Appartenance au champ de l’ESS",
+    "1",
+    "Non",
+    "Appartenance au champ des ",
+    "sociétés à mission",
+    `Description de l'établissementEtablissement actif depuis le ${nowAsddMMYYYY}`,
+    "Identifiant SIRET982 549 826 00013",
+    "Adresse4 BD PASTEUR",
+    "44100 NANTES",
+    "Activité Principale Exercée (APE)62.02A - Conseil en systèmes et logiciels informatiques",
+    "1 : Economie Sociale et Solidaire",
+    "Important : A l'exception des informations relatives à l'identification de l'entreprise, les renseignements figurant dans ce ",
+    "document, en particulier le code APE, n'ont de valeur que pour les applications statistiques (décret n°2007-1888 du 26 ",
+    "décembre 2007 portant approbation des nomenclatures d'activités françaises et de produits, paru au JO du 30 décembre ",
+    "2007).",
+    "Avertissement : Aucune valeur juridique n'est attachée à l'avis de situation.",
+    "REPUBLIQUE FRANCAISE"
+  ];
+};
 
 describe("createAnonymousCompanyFromPDF.helpers", () => {
   describe("validateInfoOrThrow", () => {
@@ -198,7 +203,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
       // Given
 
       // When
-      const res = extractLine(EXTRACTED_STRINGS, "Identifiant SIREN");
+      const res = extractLine(EXTRACTED_STRINGS(), "Identifiant SIREN");
 
       // Then
       expect(res).toEqual("982 549 826");
@@ -234,7 +239,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
 
       // When
       const res = extractBetween(
-        EXTRACTED_STRINGS,
+        EXTRACTED_STRINGS(),
         "Adresse",
         "Activité Principale Exercée"
       );
@@ -302,7 +307,9 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
       // Given
 
       // When
-      const res = extractEmittedAt(EXTRACTED_STRINGS);
+      const res = extractEmittedAt(
+        EXTRACTED_STRINGS(new Date("2024-02-14T00:00:00.000Z"))
+      );
 
       // Then
       expect(res?.toISOString()).toEqual("2024-02-14T00:00:00.000Z");
@@ -343,7 +350,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
       // Given
 
       // When
-      const res = extractSiret(EXTRACTED_STRINGS);
+      const res = extractSiret(EXTRACTED_STRINGS());
 
       // Then
       expect(res).toEqual("98254982600013");
@@ -373,7 +380,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
       // Given
 
       // When
-      const res = extractName(EXTRACTED_STRINGS);
+      const res = extractName(EXTRACTED_STRINGS());
 
       // Then
       expect(res).toEqual("ACME CORP");
@@ -421,7 +428,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
       // Given
 
       // When
-      const res = extractCodeNaf(EXTRACTED_STRINGS);
+      const res = extractCodeNaf(EXTRACTED_STRINGS());
 
       // Then
       expect(res).toEqual("6202A");
@@ -461,7 +468,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
       // Given
 
       // When
-      const res = extractAddress(EXTRACTED_STRINGS);
+      const res = extractAddress(EXTRACTED_STRINGS());
 
       // Then
       expect(res).toEqual("4 BD PASTEUR 44100 NANTES");
@@ -528,7 +535,9 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
       // Given
 
       // When
-      const res = extractData(EXTRACTED_STRINGS.join("\n"));
+      const res = extractData(
+        EXTRACTED_STRINGS(new Date("2024-02-14T00:00:00.000Z")).join("\n")
+      );
 
       // Then
       expect(res).toEqual({
@@ -554,7 +563,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
             res({
               metadata: { _metadata: METADATA },
               info: INFO,
-              text: EXTRACTED_STRINGS.join("\n")
+              text: EXTRACTED_STRINGS().join("\n")
             })
           )
       );
@@ -579,7 +588,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
             res({
               metadata: { _metadata: METADATA },
               info: {},
-              text: EXTRACTED_STRINGS.join("\n")
+              text: EXTRACTED_STRINGS().join("\n")
             })
           )
       );
@@ -604,7 +613,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
             res({
               metadata: { _metadata: {} },
               info: INFO,
-              text: EXTRACTED_STRINGS.join("\n")
+              text: EXTRACTED_STRINGS().join("\n")
             })
           )
       );
@@ -623,13 +632,15 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
 
     it("pdf is too old > should throw", async () => {
       // Given
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
       pdfParser.mockImplementation(
         () =>
           new Promise(res =>
             res({
               metadata: { _metadata: METADATA },
               info: INFO,
-              text: ["À la date du 14/02/2023", ...EXTRACTED_STRINGS].join("\n")
+              text: EXTRACTED_STRINGS(threeMonthsAgo).join("\n")
             })
           )
       );
@@ -656,7 +667,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
               info: INFO,
               text: [
                 "Description de l'établissementEtablissement fermé depuis le 25/07/2022",
-                ...EXTRACTED_STRINGS
+                ...EXTRACTED_STRINGS()
               ].join("\n")
             })
           )
@@ -687,7 +698,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
                 }
               },
               info: INFO,
-              text: EXTRACTED_STRINGS.join("\n")
+              text: EXTRACTED_STRINGS().join("\n")
             })
           )
       );
@@ -715,7 +726,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
                 ...INFO,
                 Keywords: "Insee, Avis de situation, sirene${{7*7}}"
               },
-              text: EXTRACTED_STRINGS.join("\n")
+              text: EXTRACTED_STRINGS().join("\n")
             })
           )
       );
@@ -740,7 +751,7 @@ describe("createAnonymousCompanyFromPDF.helpers", () => {
             res({
               metadata: { _metadata: METADATA },
               info: INFO,
-              text: [...EXTRACTED_STRINGS, "${{7*7}}"].join("\n")
+              text: [...EXTRACTED_STRINGS(), "${{7*7}}"].join("\n")
             })
           )
       );
