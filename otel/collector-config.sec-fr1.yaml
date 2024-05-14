@@ -15,8 +15,11 @@ processors:
     send_batch_size: 10
     timeout: 10s
 
+connectors:
+  datadog/connector:
+
 exporters:
-  datadog:
+  datadog/exporter:
     api:
       site: datadoghq.eu
       key: ${env:DD_API_KEY}
@@ -26,12 +29,12 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch, memory_limiter]
-      exporters: [datadog]
+      exporters: [datadog/connector, datadog/exporter]
     metrics:
-      receivers: [otlp, postgresql/prod, postgresql/sandbox]
+      receivers: [datadog/connector, otlp, postgresql/prod, postgresql/sandbox]
       processors: [batch/datadog, memory_limiter]
-      exporters: [datadog]
+      exporters: [datadog/exporter]
     logs:
       receivers: [otlp]
       processors: [batch, memory_limiter]
-      exporters: [datadog]
+      exporters: [datadog/exporter]
