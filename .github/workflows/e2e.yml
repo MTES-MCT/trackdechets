@@ -105,7 +105,7 @@ jobs:
 
 
 env:
-  TZ: "Europe/Paris"
+  TZ: Europe/Paris
 
   # API
   API_HOST: api.trackdechets.local

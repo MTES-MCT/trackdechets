@@ -24,7 +24,7 @@ jobs:
       - run: npx nx affected -t lint --parallel=3
       - run: npx nx affected -t test --parallel=3
         env:
-          TZ: "Europe/Paris"
+          TZ: Europe/Paris
           EMAIL_BACKEND: "console"
           SIB_BASE_URL: "http://mailservice"
           MAIN_TEMPLATE_ID: "9"
