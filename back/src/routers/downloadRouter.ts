@@ -20,6 +20,11 @@ import {
   QueryWastesRegistryCsvArgs,
   QueryWastesRegistryXlsArgs
 } from "../generated/graphql/types";
+import {
+  MyCompaniesCsvArgs,
+  myCompaniesCsvDownloadHandler
+} from "../users/resolvers/queries/myCompaniesCsv";
+import { MyCompaniesXlsArgs } from "../users/resolvers/queries/myCompaniesXls";
 
 // List all GraphQL resolvers that register a download handler
 // These values are used as serialization key in Redis
@@ -33,6 +38,8 @@ type DownloadHandlerName = keyof Pick<
   | "bspaohPdf"
   | "wastesRegistryCsv"
   | "wastesRegistryXls"
+  | "myCompaniesCsv"
+  | "myCompaniesXls"
 >;
 
 // List all different params that can be passed to a download handler
@@ -45,7 +52,9 @@ type DownloadHandlerParams =
   | QueryBspaohPdfArgs
   | QueryFormsRegisterArgs
   | QueryWastesRegistryCsvArgs
-  | QueryWastesRegistryXlsArgs;
+  | QueryWastesRegistryXlsArgs
+  | MyCompaniesCsvArgs
+  | MyCompaniesXlsArgs;
 
 type DownloadHandlerFn<P extends DownloadHandlerParams> = (
   req: Request,
@@ -77,7 +86,8 @@ const downloadHandlers: DownloadHandlers = [
   bsvhuPdfDownloadHandler,
   bspaohPdfDownloadHandler,
   wastesRegistryCsvDownloadHandler,
-  wastesRegistryXlsDownloadHandler
+  wastesRegistryXlsDownloadHandler,
+  myCompaniesCsvDownloadHandler
 ].reduce((acc, { name, handler }) => {
   return { ...acc, [name]: handler };
 }, {} as DownloadHandlers);

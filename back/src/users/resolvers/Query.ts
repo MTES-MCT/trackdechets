@@ -8,6 +8,8 @@ import authorizedApplications from "./queries/authorizedApplications";
 import accessTokens from "./queries/accessTokens";
 import passwordResetRequest from "./queries/passwordResetRequest";
 import warningMessage from "./queries/warningMessage";
+import myCompaniesCsv from "./queries/myCompaniesCsv";
+import myCompaniesXls from "./queries/myCompaniesXls";
 
 const Query: QueryResolvers = {
   me,
@@ -18,7 +20,9 @@ const Query: QueryResolvers = {
   authorizedApplications,
   accessTokens,
   passwordResetRequest,
-  warningMessage
+  warningMessage,
+  myCompaniesCsv,
+  myCompaniesXls
 };
 
 export default Query;
