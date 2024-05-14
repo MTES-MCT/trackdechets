@@ -105,6 +105,8 @@ jobs:
 
 
 env:
+  TZ: "Europe/Paris"
+
   # API
   API_HOST: api.trackdechets.local
   API_PORT: 4000
