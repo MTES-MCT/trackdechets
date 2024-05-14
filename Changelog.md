@@ -37,6 +37,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout du nom usuel de l'établissement dans l'email de demande de rattachement [PR 3343](https://github.com/MTES-MCT/trackdechets/pull/3343)
 - Renommer Transit par Réexpédition (sous-type de BSDA) [PR 3351](https://github.com/MTES-MCT/trackdechets/pull/3351)
 - Rendre les liens de FAQ cliquable dans l'ajout d'établissement [PR 3342](https://github.com/MTES-MCT/trackdechets/pull/3342)
+- Faire remonter BSD dans dashboard à la création de demande de révision [PR 3315](https://github.com/MTES-MCT/trackdechets/pull/3315)
 
 #### :house: Interne
 
