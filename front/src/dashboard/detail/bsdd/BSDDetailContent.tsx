@@ -325,15 +325,24 @@ const GroupedIn = ({ form }: { form: Form }) => {
   const [downloadPdf] = useDownloadPdf({
     variables: { id: form.id }
   });
+  const showPDFDownload = form.status !== FormStatus.Draft;
   return (
     <DetailRow
       value={
         <span>
-          {form.readableId} (
-          <button className={styles.downloadLink} onClick={() => downloadPdf()}>
-            Télécharger le PDF
-          </button>
-          )
+          {form.readableId}
+          {showPDFDownload && (
+            <>
+              {" ("}
+              <button
+                className={styles.downloadLink}
+                onClick={() => downloadPdf()}
+              >
+                Télécharger le PDF
+              </button>
+              {")"}
+            </>
+          )}
         </span>
       }
       label={`Annexé au bordereau n°`}

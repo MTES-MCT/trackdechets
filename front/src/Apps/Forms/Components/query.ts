@@ -1,29 +1,5 @@
 import gql from "graphql-tag";
-
-export const TransporterFragment = gql`
-  fragment TransporterFragment on Transporter {
-    id
-    company {
-      name
-      orgId
-      siret
-      address
-      country
-      contact
-      phone
-      mail
-      vatNumber
-      omiNumber
-    }
-    isExemptedOfReceipt
-    receipt
-    department
-    validityLimit
-    numberPlate
-    customInfo
-    mode
-  }
-`;
+import { transporterFragment } from "../../common/queries/fragments";
 
 export const CREATE_FORM_TRANSPORTER = gql`
   mutation CreateFormTransporter($input: TransporterInput!) {
@@ -31,7 +7,7 @@ export const CREATE_FORM_TRANSPORTER = gql`
       ...TransporterFragment
     }
   }
-  ${TransporterFragment}
+  ${transporterFragment}
 `;
 
 export const UPDATE_FORM_TRANSPORTER = gql`
@@ -40,7 +16,7 @@ export const UPDATE_FORM_TRANSPORTER = gql`
       ...TransporterFragment
     }
   }
-  ${TransporterFragment}
+  ${transporterFragment}
 `;
 
 export const DELETE_FORM_TRANSPORTER = gql`
