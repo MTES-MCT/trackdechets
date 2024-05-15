@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { UserInCompany } from "./types";
 import * as Excel from "exceljs";
+import { UserRole } from "@prisma/client";
 
 type Column = {
   field: keyof UserInCompany;
@@ -9,6 +10,15 @@ type Column = {
 };
 
 const formatDate = (d: Date | null) => (d ? format(d, "yyyy-MM-dd") : "");
+
+const roleLabels = {
+  [UserRole.ADMIN]: "Administrateur",
+  [UserRole.MEMBER]: "Collaborateur",
+  [UserRole.READER]: "Lecteur",
+  [UserRole.DRIVER]: "Chauffeur"
+};
+
+const formatRole = (r: UserRole) => roleLabels[r];
 
 export const columns: Column[] = [
   { field: "orgId", label: "SIRET ou n° de TVA intracommunautaire" },
@@ -21,7 +31,7 @@ export const columns: Column[] = [
     label: "Date d'ajout du membre",
     format: formatDate
   },
-  { field: "userRole", label: "Rôle" }
+  { field: "userRole", label: "Rôle", format: formatRole }
 ];
 
 export function formatRow(userInCompany: UserInCompany, useLabelAsKey = false) {
@@ -39,23 +49,10 @@ export function formatRow(userInCompany: UserInCompany, useLabelAsKey = false) {
   }, {});
 }
 
-/**
- * GET XLSX headers based of the first row
- */
-export function getXlsxHeaders(
-  userInCompany: UserInCompany
-): Partial<Excel.Column>[] {
-  return columns.reduce<Partial<Excel.Column>[]>((acc, column) => {
-    if (column.field in userInCompany) {
-      return [
-        ...acc,
-        {
-          header: column.label,
-          key: column.field,
-          width: 20
-        }
-      ];
-    }
-    return acc;
-  }, []);
+export function getXlsxHeaders(): Partial<Excel.Column>[] {
+  return columns.map(c => ({
+    header: c.label,
+    key: c.field,
+    width: 25
+  }));
 }

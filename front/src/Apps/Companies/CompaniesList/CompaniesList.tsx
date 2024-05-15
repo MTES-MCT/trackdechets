@@ -13,6 +13,11 @@ import {
 import styles from "./CompaniesList.module.scss";
 import AccountContentWrapper from "../../Account/AccountContentWrapper";
 import { MY_COMPANIES } from "../common/queries";
+import DropdownMenu from "../../common/Components/DropdownMenu/DropdownMenu";
+import {
+  useDownloadMyCompaniesCsv,
+  useDownloadMyCompaniesXls
+} from "../common/hooks/useDownloadCompanies";
 
 // Prevent to short and long clues
 const isSearchClueValid = clue =>
@@ -119,14 +124,37 @@ export default function CompaniesList() {
     userCompaniesTotalCount
   )}`;
 
+  const [downloadMyCompaniesCsv] = useDownloadMyCompaniesCsv();
+  const [downloadMyCompaniesXls] = useDownloadMyCompaniesXls();
+
   const getPageContent = (content, subtitle?) => (
     <AccountContentWrapper
       title="Établissements"
       subtitle={subtitle}
       additional={
-        <Link className="fr-btn" to={routes.companies.orientation}>
-          Créer un établissement
-        </Link>
+        <>
+          <Link className="fr-btn fr-mr-1w" to={routes.companies.orientation}>
+            Créer un établissement
+          </Link>
+          <DropdownMenu
+            menuTitle="Exporter la liste"
+            links={[
+              {
+                title: "Format .XLS",
+                isButton: true,
+                iconId: "fr-icon-download-line",
+                handleClick: () => downloadMyCompaniesXls()
+              },
+              {
+                title: "Format .CSV",
+                isButton: true,
+                iconId: "fr-icon-download-line",
+                handleClick: () => downloadMyCompaniesCsv()
+              }
+            ]}
+            iconId="fr-icon-download-line"
+          />
+        </>
       }
     >
       <div className="fr-container--fluid">

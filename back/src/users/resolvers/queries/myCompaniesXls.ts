@@ -33,7 +33,7 @@ export const myCompaniesXlsDownloadHandler: DownloadHandler<MyCompaniesXlsArgs> 
       transformer.on("data", userInCompany => {
         if (worksheet.columns === null) {
           // write headers if not present
-          worksheet.columns = getXlsxHeaders(userInCompany);
+          worksheet.columns = getXlsxHeaders();
         }
 
         worksheet.addRow(userInCompany, "n").commit();

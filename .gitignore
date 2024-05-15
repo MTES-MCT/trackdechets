@@ -14,6 +14,7 @@ docker-compose.override.yml
 /out-tsc
 .nx/cache
 generated
+.DS_Store
 
 # Generated Docusaurus files
 .docusaurus/
