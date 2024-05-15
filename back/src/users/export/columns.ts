@@ -9,7 +9,8 @@ type Column = {
   format?: (v: unknown) => string | number | null;
 };
 
-const formatDate = (d: Date | null) => (d ? format(d, "yyyy-MM-dd") : "");
+export const formatDate = (d: Date | null) =>
+  d ? format(d, "yyyy-MM-dd") : "";
 
 const roleLabels = {
   [UserRole.ADMIN]: "Administrateur",
@@ -18,7 +19,7 @@ const roleLabels = {
   [UserRole.DRIVER]: "Chauffeur"
 };
 
-const formatRole = (r: UserRole) => roleLabels[r];
+export const formatRole = (r: UserRole) => roleLabels[r];
 
 export const columns: Column[] = [
   { field: "orgId", label: "SIRET ou n° de TVA intracommunautaire" },

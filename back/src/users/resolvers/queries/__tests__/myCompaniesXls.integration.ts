@@ -10,7 +10,7 @@ import supertest from "supertest";
 import { app } from "../../../../server";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import * as Excel from "exceljs";
-import { format } from "date-fns";
+import { formatDate, formatRole } from "../../../export/columns";
 
 const MY_COMPANIES_XLS = gql`
   query MyCompaniesCsv {
@@ -101,8 +101,8 @@ describe("query { myCompaniesXls }", () => {
       "Nom usuel de l'établissement": company1.givenName,
       "Nom et prénom": user1.name,
       "E-mail": user1.email,
-      "Date d'ajout du membre": format(association1.createdAt!, "yyyy-MM-dd"),
-      Rôle: association1.role
+      "Date d'ajout du membre": formatDate(association1.createdAt),
+      Rôle: formatRole(association1.role)
     });
     expect(rows[1]).toMatchObject({
       "SIRET ou n° de TVA intracommunautaire": company1.orgId,
@@ -110,8 +110,8 @@ describe("query { myCompaniesXls }", () => {
       "Nom usuel de l'établissement": company1.givenName,
       "Nom et prénom": user2.name,
       "E-mail": user2.email,
-      "Date d'ajout du membre": format(association2.createdAt!, "yyyy-MM-dd"),
-      Rôle: association2.role
+      "Date d'ajout du membre": formatDate(association2.createdAt),
+      Rôle: formatRole(association2.role)
     });
     expect(rows[2]).toMatchObject({
       "SIRET ou n° de TVA intracommunautaire": company2.orgId,
@@ -119,8 +119,8 @@ describe("query { myCompaniesXls }", () => {
       "Nom usuel de l'établissement": company2.givenName,
       "Nom et prénom": user1.name,
       "E-mail": user1.email,
-      "Date d'ajout du membre": format(association3.createdAt!, "yyyy-MM-dd"),
-      Rôle: association3.role
+      "Date d'ajout du membre": formatDate(association3.createdAt),
+      Rôle: formatRole(association3.role)
     });
     expect(rows[3]).toMatchObject({
       "SIRET ou n° de TVA intracommunautaire": company2.orgId,
@@ -128,8 +128,8 @@ describe("query { myCompaniesXls }", () => {
       "Nom usuel de l'établissement": company2.givenName,
       "Nom et prénom": user3.name,
       "E-mail": user3.email,
-      "Date d'ajout du membre": format(association4.createdAt!, "yyyy-MM-dd"),
-      Rôle: association4.role
+      "Date d'ajout du membre": formatDate(association4.createdAt),
+      Rôle: formatRole(association4.role)
     });
   });
 });
