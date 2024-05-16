@@ -8,6 +8,7 @@ import { Bsff, BsffStatus, Prisma } from "@prisma/client";
 import { getBsffRepository } from "../../repository";
 import { prisma } from "@td/prisma";
 import { sirenifyBsffCreateInput } from "../../sirenify";
+import { BsffWithTransportersInclude } from "../../types";
 
 const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
   _,
@@ -85,7 +86,7 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
   const sirenified = await sirenifyBsffCreateInput(createInput, []);
 
   const duplicatedBsff = await createBsff(
-    { data: sirenified },
+    { data: sirenified, include: BsffWithTransportersInclude },
     {
       duplicate: { id: existingBsff.id }
     }

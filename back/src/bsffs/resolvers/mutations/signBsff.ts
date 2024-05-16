@@ -32,6 +32,7 @@ import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
 import { operationHook } from "../../operationHook";
 import { prisma } from "@td/prisma";
+import { BsffWithTransporters, BsffWithTransportersInclude } from "../../types";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,
@@ -89,7 +90,7 @@ const signatures: Record<
     user: Express.User,
     bsff: Bsff & { packagings: BsffPackaging[] },
     input: BsffSignatureInput
-  ) => Promise<Bsff>
+  ) => Promise<BsffWithTransporters>
 > = {
   EMISSION: signEmission,
   TRANSPORT: signTransport,
@@ -121,7 +122,8 @@ async function signEmission(
       status: BsffStatus.SIGNED_BY_EMITTER,
       emitterEmissionSignatureDate: input.date,
       emitterEmissionSignatureAuthor: input.author
-    }
+    },
+    include: BsffWithTransportersInclude
   });
 }
 
@@ -150,7 +152,8 @@ async function signTransport(
       transporterTransportSignatureDate: input.date,
       transporterTransportSignatureAuthor: input.author,
       ...transporterReceipt
-    }
+    },
+    include: BsffWithTransportersInclude
   });
 }
 
@@ -177,7 +180,8 @@ async function signReception(
       status: BsffStatus.RECEIVED,
       destinationReceptionSignatureDate: input.date,
       destinationReceptionSignatureAuthor: input.author
-    }
+    },
+    include: BsffWithTransportersInclude
   });
 }
 
@@ -284,7 +288,8 @@ async function signAcceptation(
 
     const updatedBsff = await updateBsff({
       where: { id: bsff.id },
-      data: { status }
+      data: { status },
+      include: BsffWithTransportersInclude
     });
 
     return updatedBsff;
@@ -379,7 +384,8 @@ async function signOperation(
 
     const updatedBsff = await updateBsff({
       where: { id: bsff.id },
-      data: { status }
+      data: { status },
+      include: BsffWithTransportersInclude
     });
 
     const finalOperationPackagings = packagings.filter(

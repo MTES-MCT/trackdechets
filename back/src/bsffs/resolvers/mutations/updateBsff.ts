@@ -19,6 +19,7 @@ import { checkEditionRules } from "../../edition/bsffEdition";
 import { sirenifyBsffInput } from "../../sirenify";
 import { recipify } from "../../recipify";
 import { UserInputError } from "../../../common/errors";
+import { BsffWithTransportersInclude } from "../../types";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
   _,
@@ -143,7 +144,11 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       .filter(Boolean);
   }
 
-  const updatedBsff = await updateBsff({ where: { id }, data });
+  const updatedBsff = await updateBsff({
+    where: { id },
+    data,
+    include: BsffWithTransportersInclude
+  });
 
   return expandBsffFromDB(updatedBsff);
 };

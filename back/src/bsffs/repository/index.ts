@@ -5,7 +5,7 @@ import {
   BsffFicheInterventionActions,
   BsffPackagingActions
 } from "./types";
-import { buildCreateBsff } from "./bsff/create";
+import { CreateBsffFn, buildCreateBsff } from "./bsff/create";
 import { buildUpdateBsff } from "./bsff/update";
 import { buildUpdateBsffPackaging } from "./bsffPackaging/update";
 import {
@@ -22,7 +22,7 @@ import {
   buildFindUniqueBsffGetPackagings
 } from "./bsff/findUnique";
 import { buildFindNextPackagings } from "./bsffPackaging/findNextPackagings";
-import { buildDeleteBsff } from "./bsff/delete";
+import { DeleteBsffFn, buildDeleteBsff } from "./bsff/delete";
 import { buildCreateBsffFicheIntervention } from "./bsffFicheIntervention/create";
 import { buildUpdateBsffFicheIntervention } from "./bsffFicheIntervention/update";
 import { buildFindManyBsffFicheIntervention } from "./bsffFicheIntervention/findMany";
@@ -87,9 +87,9 @@ export function getBsffRepository(
   }
   return {
     ...getReadonlyBsffRepository(transaction),
-    create: useTransaction(buildCreateBsff),
+    create: useTransaction(buildCreateBsff) as CreateBsffFn,
     update: useTransaction(buildUpdateBsff),
-    delete: useTransaction(buildDeleteBsff)
+    delete: useTransaction(buildDeleteBsff) as DeleteBsffFn
   };
 }
 

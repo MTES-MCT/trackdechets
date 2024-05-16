@@ -1,4 +1,4 @@
-import { Bsff, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
@@ -6,13 +6,16 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 
-export type CreateBsffFn = (
-  args: Prisma.BsffCreateArgs,
+export type CreateBsffFn = <Args extends Prisma.BsffCreateArgs>(
+  args: Args,
   logMetadata?: LogMetadata
-) => Promise<Bsff>;
+) => Promise<Prisma.BsffGetPayload<Args>>;
 
 export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
-  return async (args, logMetadata?) => {
+  return async <Args extends Prisma.BsffCreateArgs>(
+    args: Args,
+    logMetadata?: LogMetadata
+  ) => {
     const { prisma, user } = deps;
 
     const bsff = await prisma.bsff.create(args);
@@ -29,6 +32,6 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
 
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsff.id));
 
-    return bsff;
+    return bsff as Prisma.BsffGetPayload<Args>;
   };
 }

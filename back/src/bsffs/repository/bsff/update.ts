@@ -1,4 +1,4 @@
-import { Bsff, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
@@ -7,13 +7,16 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 import { objectDiff } from "../../../forms/workflow/diff";
 
-export type UpdateBsffFn = (
-  args: Prisma.BsffUpdateArgs,
+export type UpdateBsffFn = <Args extends Prisma.BsffUpdateArgs>(
+  args: Args,
   logMetadata?: LogMetadata
-) => Promise<Bsff>;
+) => Promise<Prisma.BsffGetPayload<Args>>;
 
 export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
-  return async (args, logMetadata?) => {
+  return async <Args extends Prisma.BsffUpdateArgs>(
+    args: Args,
+    logMetadata?: LogMetadata
+  ) => {
     const { prisma, user } = deps;
 
     const previousBsff = await prisma.bsff.findUnique({ where: args.where });
@@ -34,6 +37,6 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
 
     prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bsff.id));
 
-    return bsff;
+    return bsff as Prisma.BsffGetPayload<Args>;
   };
 }

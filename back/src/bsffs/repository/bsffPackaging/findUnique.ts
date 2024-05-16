@@ -1,9 +1,11 @@
 import { Bsff, BsffPackaging, Prisma } from "@prisma/client";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
-export type FindUniqueBsffPackagingFn = (
-  args: Prisma.BsffPackagingFindUniqueArgs
-) => Promise<(BsffPackaging & { bsff: Bsff }) | null>;
+export type FindUniqueBsffPackagingFn = <
+  Args extends Prisma.BsffPackagingFindUniqueArgs
+>(
+  args: Args
+) => Promise<Prisma.BsffPackagingGetPayload<Args>>;
 
 export type FindUniqueBsffPackagingGetBsffFn = (
   args: Prisma.BsffPackagingFindUniqueArgs
@@ -16,11 +18,11 @@ export type FindUniqueBsffPackagingGetNextPackagingFn = (
 export function buildFindUniqueBsffPackaging({
   prisma
 }: ReadRepositoryFnDeps): FindUniqueBsffPackagingFn {
-  return async args => {
-    return prisma.bsffPackaging.findUnique({
-      where: args.where,
-      include: { bsff: true, ...(args.include ?? {}) }
-    });
+  return async <Args extends Prisma.BsffPackagingFindUniqueArgs>(
+    args: Args
+  ) => {
+    const p = await prisma.bsffPackaging.findUnique(args);
+    return p as Prisma.BsffPackagingGetPayload<Args>;
   };
 }
 
