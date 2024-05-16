@@ -70,7 +70,9 @@ import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
+import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
+
 // set yup default error messages
 configureYup();
 
@@ -1395,31 +1397,55 @@ const withNextDestination = (required: boolean) =>
       nextDestinationCompanyExtraEuropeanId: yup.string().nullable(),
       nextDestinationNotificationNumber: yup
         .string()
-        .when(["wasteDetailsCode", "nextDestinationCompanyExtraEuropeanId"], {
-          is: (
-            wasteDetailsCode: string,
-            nextDestinationCompanyExtraEuropeanId: string
-          ) =>
-            !!nextDestinationCompanyExtraEuropeanId &&
-            isDangerous(wasteDetailsCode),
-          then: schema =>
-            schema
-              .max(
-                15,
-                "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
-              )
-              .required(
-                "Destination ultérieure : le numéro de notification est obligatoire"
-              ),
-          otherwise: schema =>
-            schema
-              .max(
-                15,
-                "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
-              )
-              .notRequired()
-              .nullable()
-        })
+        .when(
+          [
+            "wasteDetailsCode",
+            "wasteDetailsPop",
+            "wasteDetailsIsDangerous",
+            "nextDestinationCompanyExtraEuropeanId",
+            "nextDestinationCompanyVatNumber"
+          ],
+          {
+            is: (
+              wasteDetailsCode: string,
+              wasteDetailsPop: boolean,
+              wasteDetailsIsDangerous: boolean,
+              nextDestinationCompanyExtraEuropeanId: string,
+              nextDestinationCompanyVatNumber: string
+            ) => {
+              const isNotFinal = !isFinalOperationCode(wasteDetailsCode);
+              const consideredAsDangerous =
+                isDangerous(wasteDetailsCode) ||
+                wasteDetailsPop ||
+                wasteDetailsIsDangerous;
+
+              const isForeignCompany =
+                !!nextDestinationCompanyExtraEuropeanId ||
+                (!!nextDestinationCompanyVatNumber &&
+                  isForeignVat(nextDestinationCompanyVatNumber));
+
+              return isNotFinal && isForeignCompany && consideredAsDangerous;
+            },
+            then: schema =>
+              schema
+                .max(
+                  15,
+                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                )
+                .nullable()
+                .required(
+                  "Destination ultérieure : le numéro de notification est obligatoire"
+                ),
+            otherwise: schema =>
+              schema
+                .max(
+                  15,
+                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                )
+                .notRequired()
+                .nullable()
+          }
+        )
     })
     .test(
       "XORIdRequired",
