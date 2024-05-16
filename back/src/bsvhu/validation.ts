@@ -221,7 +221,7 @@ const destinationSchema: FactorySchemaOf<
         context.emissionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`
       ),
-    destinationCompanyAddress: yup.string().when("$emitterSignature", {
+    destinationCompanyAddress: yup.string().when("$emissionSignature", {
       is: true,
       then: s => s.required(`Destination: ${MISSING_COMPANY_ADDRESS}`),
       otherwise: s => s.nullable()
