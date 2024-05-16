@@ -1,24 +1,5 @@
 import { IncomingWaste } from "../../generated/graphql/types";
-import { CUSTOM_WASTE_COLUMNS, formatDate, formatRow } from "../columns";
-
-describe("formatDate", () => {
-  it.each([
-    ["2023-07-02T22:00:00.000Z", "2023-07-03"],
-    ["2023-07-02T21:59:59.000Z", "2023-07-02"],
-    ["2023-07-03T00:00:01.000Z", "2023-07-03"],
-    ["2024-02-06T09:40:03.075Z", "2024-02-06"],
-    ["2024-02-06T09:43:53.624Z", "2024-02-06"]
-  ])(
-    "should match front-end formatting: input: %p, expected: %p",
-    (input, expected) => {
-      // When
-      const result = formatDate(new Date(input));
-
-      // Then
-      expect(result).toEqual(expected);
-    }
-  );
-});
+import { CUSTOM_WASTE_COLUMNS, formatRow } from "../columns";
 
 describe("formatRow", () => {
   it("should format waste", () => {
