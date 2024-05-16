@@ -325,15 +325,24 @@ const GroupedIn = ({ form }: { form: Form }) => {
   const [downloadPdf] = useDownloadPdf({
     variables: { id: form.id }
   });
+  const showPDFDownload = form.status !== FormStatus.Draft;
   return (
     <DetailRow
       value={
         <span>
-          {form.readableId} (
-          <button className={styles.downloadLink} onClick={() => downloadPdf()}>
-            Télécharger le PDF
-          </button>
-          )
+          {form.readableId}
+          {showPDFDownload && (
+            <>
+              {" ("}
+              <button
+                className={styles.downloadLink}
+                onClick={() => downloadPdf()}
+              >
+                Télécharger le PDF
+              </button>
+              {")"}
+            </>
+          )}
         </span>
       }
       label={`Annexé au bordereau n°`}
@@ -590,9 +599,10 @@ const Appendix1 = ({
                 </td>
                 <td>
                   {form.status
-                    ? !Boolean(form.emitter?.isPrivateIndividual)
-                      ? STATUS_LABELS[form.status]
-                      : STATUS_LABELS["SEALED_PRIVATE_INDIVIDUAL"]
+                    ? form.emitter?.isPrivateIndividual &&
+                      form.status === FormStatus.Sealed
+                      ? STATUS_LABELS["SEALED_PRIVATE_INDIVIDUAL"]
+                      : STATUS_LABELS[form.status]
                     : "-"}
                 </td>
                 <td>
@@ -689,13 +699,13 @@ export default function BSDDetailContent({
             <IconBSDD className="tw-mr-2" />
 
             <span className={styles.detailStatus}>
-              {!isAppendix1Producer
-                ? [STATUS_LABELS[form.status]]
-                : Boolean(form.emitter?.isPrivateIndividual)
-                ? [STATUS_LABELS["SEALED_PRIVATE_INDIVIDUAL"]]
-                : [STATUS_LABELS[form.status]]}
+              {isAppendix1Producer &&
+              form.emitter?.isPrivateIndividual &&
+              form.status === FormStatus.Sealed
+                ? STATUS_LABELS["SEALED_PRIVATE_INDIVIDUAL"]
+                : STATUS_LABELS[form.status]}
             </span>
-            {form.status !== "DRAFT" && <span>{form.readableId}</span>}
+            {form.status !== FormStatus.Draft && <span>{form.readableId}</span>}
 
             {!!form.customId && (
               <span className="tw-ml-auto">Numéro libre: {form.customId}</span>
@@ -704,7 +714,7 @@ export default function BSDDetailContent({
 
           <div className={styles.detailContent}>
             <div className={`${styles.detailQRCodeIcon}`}>
-              {form.status !== "DRAFT" && (
+              {form.status !== FormStatus.Draft && (
                 <div className={styles.detailQRCode}>
                   <QRCodeIcon value={form.readableId} size={96} />
                   <span>Ce QR code contient le numéro du bordereau </span>

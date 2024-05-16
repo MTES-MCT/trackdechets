@@ -5,6 +5,24 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.6.1] 04/06/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Fix statut des annexes lorsque l'émetteur est un particulier [PR 3287](https://github.com/MTES-MCT/trackdechets/pull/3287)
+- Fix de la redirection après signature d'un BSDASRI de groupement par l'émetteur [PR 3292](https://github.com/MTES-MCT/trackdechets/pull/3292)
+- Cacher liens PDF sur Annexes/Suite si le bordereau est un brouillon [PR 3310](https://github.com/MTES-MCT/trackdechets/pull/3310)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Ajout de la mise à jour de l'immatriculation dans la modale de signature du bordereau de synthèse BSDASRI [PR 3290](https://github.com/MTES-MCT/trackdechets/pull/3290)
+
+#### :house: Interne
+
 # [2024.5.1] 07/05/2024
 
 #### :rocket: Nouvelles fonctionnalités

@@ -333,6 +333,7 @@ export const FullBsdaFragment = gql`
     }
     forwardedIn {
       id
+      isDraft
       waste {
         code
       }
@@ -350,6 +351,7 @@ export const FullBsdaFragment = gql`
     }
     groupedIn {
       id
+      isDraft
       waste {
         code
       }

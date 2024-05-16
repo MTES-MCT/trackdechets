@@ -332,6 +332,7 @@ export const detailFormFragment = gql`
       form {
         id
         readableId
+        status
       }
     }
     grouping {
