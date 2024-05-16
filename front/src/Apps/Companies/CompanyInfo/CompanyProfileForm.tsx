@@ -42,11 +42,7 @@ import { gql, useMutation } from "@apollo/client";
 import { Loader } from "../../common/Components";
 import CompanyProfileSubForm from "./CompanyProfileSubForm";
 import { NotificationError } from "../../common/Components/Error/Error";
-import AccountFieldCompanyVerificationStatus from "../../Account/fields/AccountFieldCompanyVerificationStatus";
-import { PROFESSIONALS } from "@td/constants";
 import CompanyProfileInformation from "./CompanyProfileInformation";
-
-const { VITE_VERIFY_COMPANY } = import.meta.env;
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
@@ -660,10 +656,6 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     updateCompanyWorkerCertifError ||
     deleteErrorWorkerCertif;
 
-  const isWasteProfessional = company.companyTypes.some(ct =>
-    PROFESSIONALS.includes(ct)
-  );
-
   return (
     <CompanyFormWrapper
       title="Profil"
@@ -713,9 +705,6 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
                 </div>
               );
             })}
-            {isWasteProfessional && VITE_VERIFY_COMPANY === "true" && (
-              <AccountFieldCompanyVerificationStatus company={company} />
-            )}
             {loading && <Loader />}
             {error && <NotificationError apolloError={error} />}
           </form>
