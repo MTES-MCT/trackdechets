@@ -129,9 +129,11 @@ describe("wastesReader", () => {
           createBsffAfterReception(
             { emitter, transporter, destination },
             {
-              destinationCompanySiret: destination.company.siret,
-              destinationReceptionDate: new Date(),
-              destinationReceptionSignatureDate: new Date()
+              data: {
+                destinationCompanySiret: destination.company.siret,
+                destinationReceptionDate: new Date(),
+                destinationReceptionSignatureDate: new Date()
+              }
             }
           )
         )

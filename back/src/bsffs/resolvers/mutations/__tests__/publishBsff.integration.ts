@@ -80,12 +80,6 @@ describe("publishBsff", () => {
         emitterCompanyContact: "John Snow",
         emitterCompanyPhone: "0000000000",
         emitterCompanyMail: "john.snow@trackdechets.fr",
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name,
-        transporterCompanyAddress: transporter.company.address,
-        transporterCompanyContact: "John Snow",
-        transporterCompanyPhone: "0000000000",
-        transporterCompanyMail: "john.snow@trackdechets.fr",
         destinationCompanySiret: destination.company.siret,
         destinationCompanyName: destination.company.name,
         destinationCompanyAddress: destination.company.address,
@@ -105,6 +99,17 @@ describe("publishBsff", () => {
             emissionNumero: "123",
             weight: 1,
             volume: 1
+          }
+        },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            transporterCompanyAddress: transporter.company.address,
+            transporterCompanyContact: "John Snow",
+            transporterCompanyPhone: "0000000000",
+            transporterCompanyMail: "john.snow@trackdechets.fr"
           }
         }
       }

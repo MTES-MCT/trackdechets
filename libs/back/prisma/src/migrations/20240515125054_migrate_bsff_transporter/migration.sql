@@ -19,6 +19,31 @@
  - You are about to drop the column `transporterTransportTakenOverAt` on the `Bsff` table. All the data in the column will be lost.
  
  */
+ALTER TABLE
+  "Bsff"
+ADD
+  COLUMN "transportersOrgIds" TEXT [] DEFAULT ARRAY [] :: TEXT [];
+
+UPDATE
+  "Bsff"
+SET
+  "transportersOrgIds" = ARRAY_REMOVE(
+    ARRAY_REMOVE (
+      ARRAY ["transporterCompanySiret", "transporterCompanyVatNumber"],
+      NULL
+    ),
+    ''
+  )
+WHERE
+  (
+    "transporterCompanySiret" IS NOT NULL
+    OR "transporterCompanySiret" <> ''
+  )
+  OR (
+    "transporterCompanyVatNumber" IS NOT NULL
+    OR "transporterCompanyVatNumber" <> ''
+  );
+
 -- DropIndex
 DROP INDEX IF EXISTS "_BsffTransporterCompanySiretIdx";
 

@@ -1,5 +1,14 @@
 import { Prisma } from "@prisma/client";
 
+export const BsffWithTransportersInclude =
+  Prisma.validator<Prisma.BsffInclude>()({
+    transporters: true
+  });
+
+export type BsffWithTransporters = Prisma.BsffGetPayload<{
+  include: typeof BsffWithTransportersInclude;
+}>;
+
 export const BsffWithPackagingsInclude = Prisma.validator<Prisma.BsffInclude>()(
   {
     packagings: true

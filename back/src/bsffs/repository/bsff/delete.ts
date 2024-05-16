@@ -1,4 +1,4 @@
-import { Bsff, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
@@ -8,13 +8,16 @@ import { buildUpdateManyBsffPackagings } from "../bsffPackaging/updateMany";
 import { bsffEventTypes } from "../types";
 import { buildFindUniqueBsffGetPackagings } from "./findUnique";
 
-export type DeleteBsffFn = (
-  args: Prisma.BsffDeleteArgs,
+export type DeleteBsffFn = <Args extends Prisma.BsffDeleteArgs>(
+  args: Args,
   logMetadata?: LogMetadata
-) => Promise<Bsff>;
+) => Promise<Prisma.BsffGetPayload<Args>>;
 
 export function buildDeleteBsff(deps: RepositoryFnDeps): DeleteBsffFn {
-  return async (args, logMetadata?) => {
+  return async <Args extends Prisma.BsffDeleteArgs>(
+    args: Args,
+    logMetadata?: LogMetadata
+  ) => {
     const { prisma, user } = deps;
 
     const findUniqueGetPackagings = buildFindUniqueBsffGetPackagings(deps);
@@ -49,6 +52,6 @@ export function buildDeleteBsff(deps: RepositoryFnDeps): DeleteBsffFn {
     });
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsff.id));
 
-    return deletedBsff;
+    return deletedBsff as Prisma.BsffGetPayload<Args>;
   };
 }

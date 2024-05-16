@@ -1,14 +1,22 @@
-import { Bsff, BsffPackaging, User, Prisma } from "@prisma/client";
+import {
+  Bsff,
+  BsffPackaging,
+  User,
+  Prisma,
+  BsffTransporter
+} from "@prisma/client";
 import { safeInput } from "../../common/converter";
 import { SealedFieldError } from "../../common/errors";
 import { objectDiff } from "../../forms/workflow/diff";
 import { BsffInput, BsffSignatureType } from "../../generated/graphql/types";
-import { flattenBsffInput } from "../converter";
+import { flattenBsffInput, flattenBsffTransporterInput } from "../converter";
 import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
 } from "../repository";
 import { getUserRoles } from "../../permissions";
+import { getFirstTransporterSync } from "../database";
+import { BsffWithPackagings, BsffWithTransporters } from "../types";
 
 type BsffSignatureTypeUntilReception = Extract<
   BsffSignatureType,
@@ -31,6 +39,7 @@ type EditableBsffFields = Required<
     | "destinationReceptionSignatureAuthor"
     | "destinationReceptionSignatureDate"
     | "detenteurCompanySirets"
+    | "transportersOrgIds"
   >
 >;
 
@@ -57,21 +66,6 @@ export const editionRules: {
   wasteAdr: "EMISSION",
   weightValue: "EMISSION",
   weightIsEstimate: "EMISSION",
-  transporterCompanyName: "TRANSPORT",
-  transporterCompanySiret: "TRANSPORT",
-  transporterCompanyVatNumber: "TRANSPORT",
-  transporterCompanyAddress: "TRANSPORT",
-  transporterCompanyContact: "TRANSPORT",
-  transporterCompanyPhone: "TRANSPORT",
-  transporterCompanyMail: "TRANSPORT",
-  transporterCustomInfo: "TRANSPORT",
-  transporterRecepisseNumber: "TRANSPORT",
-  transporterRecepisseDepartment: "TRANSPORT",
-  transporterRecepisseValidityLimit: "TRANSPORT",
-  transporterRecepisseIsExempted: "TRANSPORT",
-  transporterTransportMode: "TRANSPORT",
-  transporterTransportPlates: "TRANSPORT",
-  transporterTransportTakenOverAt: "TRANSPORT",
   destinationCompanyName: "EMISSION",
   destinationCompanySiret: "EMISSION",
   destinationCompanyAddress: "EMISSION",
@@ -83,6 +77,7 @@ export const editionRules: {
   destinationReceptionDate: "RECEPTION",
   destinationPlannedOperationCode: "EMISSION",
   ficheInterventions: "EMISSION",
+  transporters: "RECEPTION",
   forwarding: "EMISSION",
   grouping: "EMISSION",
   repackaging: "EMISSION",
@@ -90,9 +85,7 @@ export const editionRules: {
 };
 
 export async function checkEditionRules(
-  existingBsff: Bsff & {
-    packagings: BsffPackaging[];
-  },
+  existingBsff: Bsff & BsffWithPackagings & BsffWithTransporters,
   input: BsffInput,
   user?: User
 ): Promise<string[]> {
@@ -151,11 +144,27 @@ export async function checkEditionRules(
 
   checkSealedFields(null, Object.keys(editionRules));
 
+  const firstTransporter = getFirstTransporterSync(existingBsff);
+  // Effectue une vérification spécifique pour le champ `transporter`
+  let updatedTransporterFields: string[] = [];
+  if (input.transporter && firstTransporter) {
+    updatedTransporterFields = getUpdatedTransporterFields(
+      firstTransporter,
+      input
+    );
+
+    if (firstTransporter.transporterTransportSignatureDate) {
+      for (const field of updatedTransporterFields) {
+        sealedFieldErrors.push(field);
+      }
+    }
+  }
+
   if (sealedFieldErrors?.length > 0) {
     throw new SealedFieldError([...new Set(sealedFieldErrors)]);
   }
 
-  return updatedFields;
+  return [...updatedFields, ...updatedTransporterFields];
 }
 
 /**
@@ -223,6 +232,23 @@ async function getUpdatedFields(
 
   const diff = objectDiff(flatInput, compareTo);
 
+  return Object.keys(diff);
+}
+
+function getUpdatedTransporterFields(
+  existingBsffTransporter: BsffTransporter,
+  input: BsffInput
+) {
+  const flatInput = flattenBsffTransporterInput(input);
+  // only pick keys present in the input to compute the diff between
+  // the input and the data in DB
+  const compareTo = {
+    ...Object.keys(flatInput).reduce((acc, field) => {
+      return { ...acc, [field]: existingBsffTransporter[field] };
+    }, {})
+  };
+
+  const diff = objectDiff(flatInput, compareTo);
   return Object.keys(diff);
 }
 

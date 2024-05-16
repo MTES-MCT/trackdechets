@@ -13,8 +13,7 @@ import {
   wasteDetailsSchemaFn,
   acceptationSchema,
   operationSchema,
-  ficheInterventionSchema,
-  validateBsff
+  ficheInterventionSchema
 } from "../validation";
 
 describe("emitterSchema", () => {
@@ -77,7 +76,10 @@ describe("transporterSchema", () => {
       transporterCompanyMail: "john@clim.com",
       transporterRecepisseNumber: "receiptNumber",
       transporterRecepisseDepartment: "25",
-      transporterRecepisseValidityLimit: new Date()
+      transporterRecepisseValidityLimit: new Date(),
+      transporterTransportMode: "ROAD",
+      transporterTransportTakenOverAt: new Date(),
+      transporterTransportPlates: ["AD-008-TS"]
     };
   });
 
@@ -116,25 +118,27 @@ describe("transporterSchema", () => {
     );
   });
 
-  test("missing Receipt", async () => {
-    expect.assertions(1);
-    try {
-      await validateBsff(
+  test("missing recepisse", async () => {
+    const validateFn = () =>
+      transporterSchema.validate(
         {
           ...transporterData,
           transporterRecepisseNumber: null,
           transporterRecepisseDepartment: null,
           transporterRecepisseValidityLimit: null
         },
-        {
-          isDraft: false,
-          transporterSignature: true
-        }
+        { abortEarly: false }
       );
+
+    expect.assertions(1);
+    try {
+      await validateFn();
     } catch (err) {
-      expect(err.message).toEqual(
-        "Erreur de validation des données. Des champs sont manquants ou mal formatés : \nDestination : le nom de l'établissement est requis\nDestination : le numéro SIRET est requis\nDestination : l'adresse de l'établissement est requise\nDestination : le nom du contact est requis\nDestination : le numéro de téléphone est requis\nDestination : l'adresse email est requise\nLe code de l'opération de traitement prévu est requis\nTransporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets\nTransporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets\nTransporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets\nLe code déchet est requis\nLa dénomination usuelle du déchet est obligatoire\nLa mention ADR est requise\nLe poids total est requis\nLe type de poids (estimé ou non) est un requis\nÉmetteur : le nom de l'établissement est requis\nÉmetteur : le n°SIRET de l'établissement est requis\nÉmetteur : l'adresse de l'établissement est requise\nÉmetteur : le nom du contact est requis\nÉmetteur : le numéro de téléphone est requis\nÉmetteur : l'adresse email est requise"
-      );
+      expect(err.errors).toEqual([
+        "Transporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets",
+        "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets",
+        "Transporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+      ]);
     }
   });
 

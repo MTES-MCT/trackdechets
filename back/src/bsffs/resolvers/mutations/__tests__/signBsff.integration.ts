@@ -268,8 +268,10 @@ describe("Mutation.signBsff", () => {
       const bsff = await createBsffBeforeTransport(
         { emitter, transporter, destination },
         {
-          emitterEmissionSignatureDate: null,
-          emitterEmissionSignatureAuthor: null
+          data: {
+            emitterEmissionSignatureDate: null,
+            emitterEmissionSignatureAuthor: null
+          }
         }
       );
 
@@ -334,8 +336,10 @@ describe("Mutation.signBsff", () => {
       const bsff = await createBsffBeforeEmission(
         { emitter, destination },
         {
-          emitterEmissionSignatureDate: null,
-          emitterEmissionSignatureAuthor: null
+          data: {
+            emitterEmissionSignatureDate: null,
+            emitterEmissionSignatureAuthor: null
+          }
         }
       );
 
@@ -524,17 +528,23 @@ describe("Mutation.signBsff", () => {
       const bsff = await createBsffAfterOperation(
         { emitter, transporter, destination: ttr },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R13.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R13.code }
+        }
       );
 
-      const nextBsff = await createBsffBeforeRefusal({
-        emitter: ttr,
-        transporter,
-        destination,
-        previousPackagings: bsff.packagings
-      });
+      const nextBsff = await createBsffBeforeRefusal(
+        {
+          emitter: ttr,
+          transporter,
+          destination
+        },
+        {
+          previousPackagings: bsff.packagings
+        }
+      );
 
       const { mutate } = makeClient(destination.user);
       await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
@@ -564,17 +574,21 @@ describe("Mutation.signBsff", () => {
       const bsff = await createBsffAfterOperation(
         { emitter, transporter, destination: ttr },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R13.code }
+          data: { status: BsffStatus.INTERMEDIATELY_PROCESSED },
+          packagingData: { operationCode: OPERATION.R13.code }
+        }
       );
 
-      const nextBsff = await createBsffBeforeRefusal({
-        emitter: ttr,
-        transporter,
-        destination,
-        previousPackagings: bsff.packagings
-      });
+      const nextBsff = await createBsffBeforeRefusal(
+        {
+          emitter: ttr,
+          transporter,
+          destination
+        },
+        {
+          previousPackagings: bsff.packagings
+        }
+      );
 
       const { mutate } = makeClient(destination.user);
       await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
@@ -613,7 +627,7 @@ describe("Mutation.signBsff", () => {
             transporter,
             destination
           },
-          { wasteCode: "14 06 01*" }
+          { data: { wasteCode: "14 06 01*" } }
         );
 
         // make sure packaging acceptation waste code is not defined
@@ -657,7 +671,7 @@ describe("Mutation.signBsff", () => {
             transporter,
             destination
           },
-          { wasteCode: "14 06 01*" }
+          { data: { wasteCode: "14 06 01*" } }
         );
 
         // make sure packaging acceptation waste code is not defined
@@ -801,19 +815,20 @@ describe("Mutation.signBsff", () => {
           transporter,
           destination
         },
-        {},
         {
-          operationCode: OPERATION.R13.code,
-          operationMode: null,
-          operationNextDestinationCompanyName: "ACME INC",
-          operationNextDestinationPlannedOperationCode: "R2",
-          operationNextDestinationCap: "cap",
-          operationNextDestinationCompanySiret: null,
-          operationNextDestinationCompanyVatNumber: "IE9513674T",
-          operationNextDestinationCompanyAddress: "Quelque part",
-          operationNextDestinationCompanyContact: "Mr Déchet",
-          operationNextDestinationCompanyPhone: "01 00 00 00 00",
-          operationNextDestinationCompanyMail: "contact@trackdechets.fr"
+          packagingData: {
+            operationCode: OPERATION.R13.code,
+            operationMode: null,
+            operationNextDestinationCompanyName: "ACME INC",
+            operationNextDestinationPlannedOperationCode: "R2",
+            operationNextDestinationCap: "cap",
+            operationNextDestinationCompanySiret: null,
+            operationNextDestinationCompanyVatNumber: "IE9513674T",
+            operationNextDestinationCompanyAddress: "Quelque part",
+            operationNextDestinationCompanyContact: "Mr Déchet",
+            operationNextDestinationCompanyPhone: "01 00 00 00 00",
+            operationNextDestinationCompanyMail: "contact@trackdechets.fr"
+          }
         }
       );
 
@@ -843,9 +858,11 @@ describe("Mutation.signBsff", () => {
       const bsff1 = await createBsffAfterOperation(
         { emitter, transporter, destination: ttr1 },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R13.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R13.code }
+        }
       );
 
       // bsff1 => bsff2
@@ -853,14 +870,16 @@ describe("Mutation.signBsff", () => {
         {
           emitter: ttr1,
           transporter,
-          destination: ttr2,
-          previousPackagings: bsff1.packagings
+          destination: ttr2
         },
         {
-          type: BsffType.REEXPEDITION,
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R13.code }
+          previousPackagings: bsff1.packagings,
+          data: {
+            type: BsffType.REEXPEDITION,
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R13.code }
+        }
       );
 
       // bsff1 => bsff2 => bsff3
@@ -868,11 +887,13 @@ describe("Mutation.signBsff", () => {
         {
           emitter: ttr2,
           transporter,
-          destination,
-          previousPackagings: bsff2.packagings
+          destination
         },
-        { type: BsffType.REEXPEDITION },
-        { operationCode: OPERATION.R2.code }
+        {
+          previousPackagings: bsff2.packagings,
+          data: { type: BsffType.REEXPEDITION },
+          packagingData: { operationCode: OPERATION.R2.code }
+        }
       );
 
       const { mutate } = makeClient(destination.user);

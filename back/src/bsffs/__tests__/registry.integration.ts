@@ -32,14 +32,15 @@ describe("toOutgoingWaste", () => {
           transporter,
           destination
         },
-        {},
         {
-          finalOperations: {
-            create: {
-              finalBsffPackagingId: finalPackaging.id,
-              quantity: 1,
-              operationCode: "R 1",
-              noTraceability: false
+          packagingData: {
+            finalOperations: {
+              create: {
+                finalBsffPackagingId: finalPackaging.id,
+                quantity: 1,
+                operationCode: "R 1",
+                noTraceability: false
+              }
             }
           }
         }
@@ -79,14 +80,15 @@ describe("toAllWaste", () => {
           transporter,
           destination: ttr
         },
-        {},
         {
-          finalOperations: {
-            create: {
-              finalBsffPackagingId: finalPackaging.id,
-              quantity: 1,
-              operationCode: "R 1",
-              noTraceability: false
+          packagingData: {
+            finalOperations: {
+              create: {
+                finalBsffPackagingId: finalPackaging.id,
+                quantity: 1,
+                operationCode: "R 1",
+                noTraceability: false
+              }
             }
           }
         }
@@ -113,7 +115,7 @@ describe("getSubType", () => {
     [BsffType.REEXPEDITION, "RESHIPMENT"]
   ])("type is %p > should return %p", async (type, expectedSubType) => {
     // Given
-    const bsff = await createBsff({}, { type });
+    const bsff = await createBsff({}, { data: { type } });
 
     // When
     const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({

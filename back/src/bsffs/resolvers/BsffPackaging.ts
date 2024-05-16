@@ -4,6 +4,7 @@ import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
 } from "../repository";
+import { BsffWithTransportersInclude } from "../types";
 
 export const BsffPackaging: BsffPackagingResolvers = {
   bsff: async packaging => {
@@ -42,7 +43,8 @@ export const BsffPackaging: BsffPackagingResolvers = {
     const nextPackagings = await findNextPackagings(packaging.id);
     const nextBsffIds = nextPackagings.map(p => p.bsffId);
     const bsffs = await findManyBsff({
-      where: { id: { in: nextPackagings.map(p => p.bsffId) } }
+      where: { id: { in: nextPackagings.map(p => p.bsffId) } },
+      include: BsffWithTransportersInclude
     });
     return nextBsffIds
       .map(id => bsffs.find(bsff => bsff.id === id))
@@ -62,7 +64,8 @@ export const BsffPackaging: BsffPackagingResolvers = {
     const previousPackagings = await findPreviousPackagings([packaging.id]);
     const previousBsffIds = [...new Set(previousPackagings.map(p => p.bsffId))];
     const bsffs = await findManyBsff({
-      where: { id: { in: previousBsffIds } }
+      where: { id: { in: previousBsffIds } },
+      include: BsffWithTransportersInclude
     });
     return previousBsffIds
       .map(id => bsffs.find(bsff => bsff.id === id))

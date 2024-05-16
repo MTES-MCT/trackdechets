@@ -130,10 +130,9 @@ describe("Bsff.ficheInterventions", () => {
     const nextBsff = await createBsff(
       {
         emitter: ttr,
-        destination: traiteur,
-        previousPackagings: bsff.packagings
+        destination: traiteur
       },
-      { type: "REEXPEDITION" }
+      { data: { type: "REEXPEDITION" }, previousPackagings: bsff.packagings }
     );
     const { query } = makeClient(traiteur.user);
     const { errors } = await query<Pick<Query, "bsff">>(GET_NEXT_BSFF, {
