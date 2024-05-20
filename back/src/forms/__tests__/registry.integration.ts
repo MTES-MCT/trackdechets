@@ -196,4 +196,22 @@ describe("getSubType", () => {
     // Then
     expect(subType).toBe("TEMP_STORED");
   });
+
+  it("regular form > should return INITIAL", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({
+      ownerId: user.id
+    });
+
+    // When
+    const bsddForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const subType = getSubType(formToBsdd(bsddForRegistry));
+
+    // Then
+    expect(subType).toBe("INITIAL");
+  });
 });
