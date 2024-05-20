@@ -104,6 +104,7 @@ function toGenericWaste(
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSPAOH",
+    bsdSubType: "INITIAL",
     status: bspaoh.status,
     customId: null,
     destinationCap: null,

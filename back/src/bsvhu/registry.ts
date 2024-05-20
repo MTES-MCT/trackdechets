@@ -84,6 +84,7 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSVHU",
+    bsdSubType: "INITIAL",
     status: bsvhu.status,
     customId: null,
     destinationCap: null,

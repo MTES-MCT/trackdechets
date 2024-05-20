@@ -1,6 +1,7 @@
 import * as Excel from "exceljs";
 import {
   AllWaste,
+  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -45,6 +46,34 @@ const formatFinalOperations = (val?: string[]) =>
   val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
 const formatFinalOperationWeights = (val?: number[]) =>
   val ? val.map(quant => quant.toFixed(2)).join("; ") : "";
+const formatSubType = (subType?: BsdSubType) => {
+  if (!subType) return "";
+
+  switch (subType) {
+    case "INITIAL":
+      return "Initial";
+    case "TOURNEE":
+      return "Tournée dédiée";
+    case "APPENDIX1":
+      return "Annexe 1";
+    case "APPENDIX2":
+      return "Annexe 2";
+    case "TEMP_STORED":
+      return "Entreposage provisoire";
+    case "COLLECTION_2710":
+      return "Collecte en déchetterie";
+    case "GATHERING":
+      return "Groupement";
+    case "RESHIPMENT":
+      return "Réexpédition";
+    case "RECONDITIONNEMENT":
+      return "Reconditionnement";
+    case "SYNTHESIS":
+      return "Synthèse";
+    default:
+      return "";
+  }
+};
 
 export const columns: Column[] = [
   // Dénomination, nature et quantité :
@@ -75,7 +104,7 @@ export const columns: Column[] = [
     format: formatDate
   },
   { field: "bsdType", label: "Type de bordereau" },
-  { field: "bsdSubType", label: "Sous-type" },
+  { field: "bsdSubType", label: "Sous-type", format: formatSubType },
   { field: "customId", label: "Identifiant secondaire" },
   { field: "status", label: "Statut du bordereau (code)" },
   {
