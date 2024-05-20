@@ -75,6 +75,7 @@ export const columns: Column[] = [
     format: formatDate
   },
   { field: "bsdType", label: "Type de bordereau" },
+  { field: "bsdSubType", label: "Sous-type" },
   { field: "customId", label: "Identifiant secondaire" },
   { field: "status", label: "Statut du bordereau (code)" },
   {
@@ -97,11 +98,6 @@ export const columns: Column[] = [
     label: "Producteur initial raison sociale"
   },
   { field: "initialEmitterCompanySiret", label: "Producteur initial SIRET" },
-  {
-    field: "initialEmitterPostalCodes",
-    label: "Producteurs initiaux code postaux",
-    format: formatArray
-  },
   {
     field: "initialEmitterCompanyAddress",
     label: "Producteur initial adresse"

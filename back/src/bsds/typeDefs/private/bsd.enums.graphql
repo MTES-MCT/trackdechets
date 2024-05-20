@@ -11,3 +11,74 @@ enum BsdType {
   BSVHU
   BSPAOH
 }
+
+enum BSDDSubType {
+  "Initial"
+  INITIAL
+
+  "Tournée dédiée"
+  TOURNEE
+
+  "Annexe 1"
+  ANNEXE_1
+
+  "Annexe 2"
+  ANNEXE_2
+
+  "Entreposage provisoire"
+  TEMP_STORED
+}
+
+enum BSDASubType {
+  "Initial"
+  INITIAL
+
+  "Groupement"
+  GATHERING
+
+  "Réexpédition"
+  RESHIPMENT
+}
+
+enum BSFFSubType {
+  "Initial"
+  INITIAL
+
+  "Groupement"
+  GATHERING
+
+  "Reconditionnement"
+  RECONDITIONNEMENT
+
+  "Réexpédition"
+  RESHIPMENT
+}
+
+enum BSVHUSubType {
+  "Initial"
+  INITIAL
+}
+
+enum BSDASRISubType {
+  "Initial"
+  INITIAL
+
+  "Synthèse"
+  SYNTHESIS
+
+  "Groupement"
+  GATHERING
+}
+
+enum BSPAOHSubType {
+  "Initial"
+  INITIAL
+}
+
+union BsdSubType =
+    BSDDSubType
+  | BSDASubType
+  | BSDASRISubType
+  | BSVHUSubType
+  | BSPAOHSubType
+  | BSFFSubType
