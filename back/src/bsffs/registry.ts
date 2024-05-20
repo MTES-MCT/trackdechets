@@ -3,6 +3,7 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,
+  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -97,6 +98,18 @@ export function getRegistryFields(
   return registryFields;
 }
 
+export const getSubType = (bsff: RegistryBsff): BsdSubType => {
+  if (bsff.type === "GROUPEMENT") {
+    return "GATHERING";
+  } else if (bsff.type === "RECONDITIONNEMENT") {
+    return "RECONDITIONNEMENT";
+  } else if (bsff.type === "REEXPEDITION") {
+    return "RESHIPMENT";
+  }
+
+  return "INITIAL";
+};
+
 function toGenericWaste(bsff: RegistryBsff): GenericWaste {
   const bsffDestination = toBsffDestination(bsff.packagings);
 
@@ -111,6 +124,7 @@ function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSFF",
+    bsdSubType: getSubType(bsff),
     status: bsff.status,
     customId: null,
     destinationOperationNoTraceability: false,
