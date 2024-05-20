@@ -4,6 +4,7 @@ import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
+  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -134,6 +135,22 @@ const getFinalOperationsData = (
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
+export const getSubType = (bsdd: Bsdd): BsdSubType => {
+  if (bsdd.emitterType === "APPENDIX1") {
+    return "TOURNEE";
+  } else if (bsdd.emitterType === "APPENDIX1_PRODUCER") {
+    return "APPENDIX1";
+  } else if (bsdd.emitterType === "APPENDIX2") {
+    return "APPENDIX2";
+  }
+
+  if (bsdd.forwardedInId) {
+    return "TEMP_STORED";
+  }
+
+  return "INITIAL";
+};
+
 function toGenericWaste(bsdd: Bsdd): GenericWaste {
   return {
     wasteDescription: bsdd.wasteDescription,
@@ -146,6 +163,7 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
     ecoOrganismeName: bsdd.ecoOrganismeName,
     ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDD",
+    bsdSubType: getSubType(bsdd),
     status: bsdd.status,
     customId: bsdd.customId,
     destinationCap: bsdd.destinationCap,

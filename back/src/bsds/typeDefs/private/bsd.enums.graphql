@@ -12,7 +12,7 @@ enum BsdType {
   BSPAOH
 }
 
-enum BSDDSubType {
+enum BsdSubType {
   "Initial"
   INITIAL
 
@@ -20,65 +20,26 @@ enum BSDDSubType {
   TOURNEE
 
   "Annexe 1"
-  ANNEXE_1
+  APPENDIX1
 
   "Annexe 2"
-  ANNEXE_2
+  APPENDIX2
 
   "Entreposage provisoire"
   TEMP_STORED
-}
 
-enum BSDASubType {
-  "Initial"
-  INITIAL
+  "Collecte en déchetterie"
+  COLLECTION_2710
 
   "Groupement"
   GATHERING
 
   "Réexpédition"
   RESHIPMENT
-}
-
-enum BSFFSubType {
-  "Initial"
-  INITIAL
-
-  "Groupement"
-  GATHERING
 
   "Reconditionnement"
   RECONDITIONNEMENT
 
-  "Réexpédition"
-  RESHIPMENT
-}
-
-enum BSVHUSubType {
-  "Initial"
-  INITIAL
-}
-
-enum BSDASRISubType {
-  "Initial"
-  INITIAL
-
   "Synthèse"
   SYNTHESIS
-
-  "Groupement"
-  GATHERING
 }
-
-enum BSPAOHSubType {
-  "Initial"
-  INITIAL
-}
-
-union BsdSubType =
-    BSDDSubType
-  | BSDASubType
-  | BSDASRISubType
-  | BSVHUSubType
-  | BSPAOHSubType
-  | BSFFSubType
