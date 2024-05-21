@@ -15,3 +15,35 @@ enum TransportMode {
   SEA
   OTHER
 }
+
+enum BsdSubType {
+  "Initial"
+  INITIAL
+
+  "Tournée dédiée"
+  TOURNEE
+
+  "Annexe 1"
+  APPENDIX1
+
+  "Annexe 2"
+  APPENDIX2
+
+  "Entreposage provisoire"
+  TEMP_STORED
+
+  "Collecte en déchetterie"
+  COLLECTION_2710
+
+  "Groupement"
+  GATHERING
+
+  "Réexpédition"
+  RESHIPMENT
+
+  "Reconditionnement"
+  RECONDITIONNEMENT
+
+  "Synthèse"
+  SYNTHESIS
+}
