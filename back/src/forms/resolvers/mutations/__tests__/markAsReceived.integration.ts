@@ -1100,13 +1100,6 @@ describe("Test Form reception", () => {
     });
   });
 
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  // TODO
   it("should work with quantityRefused", async () => {
     // Given
     const {
