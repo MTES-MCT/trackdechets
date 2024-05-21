@@ -1,5 +1,4 @@
 import {
-  companyFactory,
   formFactory,
   formWithTempStorageFactory,
   userFactory,
@@ -13,8 +12,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../integration-tests/helper";
-import { CompanyType, Status, UserRole } from "@prisma/client";
-import makeClient from "../../__tests__/testClient";
+import { UserRole } from "@prisma/client";
 import { indexForm, getFormForElastic } from "../elastic";
 
 const createTmpStorageBsdd = async () => {
