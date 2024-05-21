@@ -210,7 +210,19 @@ export default function AccountCompanyAddSiret({
                 }
                 if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
                   return {
-                    siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter via la FAQ https://faq.trackdechets.fr/pour-aller-plus-loin/assistance avec un justificatif légal du pays d'origine.`
+                    siret: (
+                      <span>
+                        {`Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter via la FAQ `}
+                        <a
+                          href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          https://faq.trackdechets.fr/pour-aller-plus-loin/assistance
+                        </a>
+                        {` avec un justificatif légal du pays d'origine.`}
+                      </span>
+                    )
                   };
                 }
                 if (isValidVat && isFRVat(values.siret)) {
