@@ -36,9 +36,7 @@ import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
 import { getBspaohForElastic, indexBspaoh } from "../../../../bspaoh/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
-  companyFactory,
   formFactory,
-  formWithTempStorageFactory,
   siretify,
   userWithAccessTokenFactory,
   userWithCompanyFactory
