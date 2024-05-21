@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Permettre un export .xls ou .csv de la liste des établissements avec les membres rattachés [PR 3329](https://github.com/MTES-MCT/trackdechets/pull/3329).
+
 #### :bug: Corrections de bugs
 
 - Fix statut des annexes lorsque l'émetteur est un particulier [PR 3287](https://github.com/MTES-MCT/trackdechets/pull/3287)

@@ -11,6 +11,7 @@ const DropdownMenu = ({
   menuTitle,
   links,
   isDisabled,
+  iconId,
   iconAlone,
   primary
 }: DropdownMenuProps) => {
@@ -40,7 +41,8 @@ const DropdownMenu = ({
             {
               isOpen: isOpen,
               "menu-btn__iconAlone": iconAlone
-            }
+            },
+            ...(iconId ? ["fr-btn--icon-left", iconId] : [])
           )}
           disabled={isDisabled}
           onClick={toggleMenu}
@@ -59,7 +61,10 @@ const DropdownMenu = ({
                   {link.isButton ? (
                     <button
                       type="button"
-                      className="fr-btn fr-btn--tertiary-no-outline"
+                      className={classNames(
+                        "fr-btn fr-btn--tertiary-no-outline",
+                        [...(link.iconId ? [iconId, "fr-btn--icon-left"] : [])]
+                      )}
                       onClick={e => {
                         closeMenu();
                         !!link.handleClick && link.handleClick(e);
@@ -86,6 +91,11 @@ const DropdownMenu = ({
                         <span className="dropdown-menu__content__icon">
                           {link.icon}
                         </span>
+                      )}
+                      {link.iconId && (
+                        <span
+                          className={classNames([iconId, "fr-btn--icon-left"])}
+                        ></span>
                       )}
                       {link.title}
                     </Link>
