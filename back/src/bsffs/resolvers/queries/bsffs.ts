@@ -23,8 +23,7 @@ const bsffs: QueryResolvers["bsffs"] = async (
   const mask: Prisma.Enumerable<Prisma.BsffWhereInput> = {
     OR: [
       { emitterCompanySiret: { in: orgIdsWithListPermission } },
-      { transporterCompanySiret: { in: orgIdsWithListPermission } },
-      { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
+      { transportersOrgIds: { hasSome: orgIdsWithListPermission } },
       { destinationCompanySiret: { in: orgIdsWithListPermission } },
       { detenteurCompanySirets: { hasSome: orgIdsWithListPermission } }
     ]

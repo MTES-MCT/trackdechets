@@ -6,7 +6,7 @@ import {
   BsffPackagingActions
 } from "./types";
 import { CreateBsffFn, buildCreateBsff } from "./bsff/create";
-import { buildUpdateBsff } from "./bsff/update";
+import { UpdateBsffFn, buildUpdateBsff } from "./bsff/update";
 import { buildUpdateBsffPackaging } from "./bsffPackaging/update";
 import {
   PrismaTransaction,
@@ -88,7 +88,7 @@ export function getBsffRepository(
   return {
     ...getReadonlyBsffRepository(transaction),
     create: useTransaction(buildCreateBsff) as CreateBsffFn,
-    update: useTransaction(buildUpdateBsff),
+    update: useTransaction(buildUpdateBsff) as UpdateBsffFn,
     delete: useTransaction(buildDeleteBsff) as DeleteBsffFn
   };
 }

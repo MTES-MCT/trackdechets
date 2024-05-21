@@ -66,7 +66,11 @@ export async function indexBsdJob(
   if (bsdId.startsWith("FF-")) {
     const bsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsdId },
-      include: { packagings: true, ficheInterventions: true }
+      include: {
+        packagings: true,
+        ficheInterventions: true,
+        transporters: true
+      }
     });
 
     const elasticBsff = toBsffElastic(bsff);

@@ -1193,11 +1193,14 @@ model Bsff {
   destinationReceptionSignatureDate   DateTime? @db.Timestamptz(6)
   destinationPlannedOperationCode     String?
 
+  ficheInterventions BsffFicheIntervention[] @relation("BsffToBsffFicheIntervention")
+  packagings         BsffPackaging[]
+  transporters       BsffTransporter[]
+
   // Denormalized detenteur sirets to speed up query `bsffs`
-  detenteurCompanySirets String[]                @default([])
-  ficheInterventions     BsffFicheIntervention[] @relation("BsffToBsffFicheIntervention")
-  packagings             BsffPackaging[]
-  transporters           BsffTransporter[]
+  detenteurCompanySirets String[] @default([])
+  // Denormalized transporter sirets to speed up query `bsffs`
+  transportersOrgIds     String[] @default([])
 
   // partial _BsffIsDeletedIdx, _BsffIsDraftIdx index see migration82_missing_indices.sql
   @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")

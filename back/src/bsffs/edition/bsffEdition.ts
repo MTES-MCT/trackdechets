@@ -9,6 +9,8 @@ import {
   getReadonlyBsffRepository
 } from "../repository";
 import { getUserRoles } from "../../permissions";
+import { getFirstTransporterSync } from "../database";
+import { BsffWithPackagings, BsffWithTransporters } from "../types";
 
 type BsffSignatureTypeUntilReception = Extract<
   BsffSignatureType,
@@ -31,6 +33,7 @@ type EditableBsffFields = Required<
     | "destinationReceptionSignatureAuthor"
     | "destinationReceptionSignatureDate"
     | "detenteurCompanySirets"
+    | "transportersOrgIds"
   >
 >;
 
@@ -57,21 +60,6 @@ export const editionRules: {
   wasteAdr: "EMISSION",
   weightValue: "EMISSION",
   weightIsEstimate: "EMISSION",
-  transporterCompanyName: "TRANSPORT",
-  transporterCompanySiret: "TRANSPORT",
-  transporterCompanyVatNumber: "TRANSPORT",
-  transporterCompanyAddress: "TRANSPORT",
-  transporterCompanyContact: "TRANSPORT",
-  transporterCompanyPhone: "TRANSPORT",
-  transporterCompanyMail: "TRANSPORT",
-  transporterCustomInfo: "TRANSPORT",
-  transporterRecepisseNumber: "TRANSPORT",
-  transporterRecepisseDepartment: "TRANSPORT",
-  transporterRecepisseValidityLimit: "TRANSPORT",
-  transporterRecepisseIsExempted: "TRANSPORT",
-  transporterTransportMode: "TRANSPORT",
-  transporterTransportPlates: "TRANSPORT",
-  transporterTransportTakenOverAt: "TRANSPORT",
   destinationCompanyName: "EMISSION",
   destinationCompanySiret: "EMISSION",
   destinationCompanyAddress: "EMISSION",
@@ -83,6 +71,7 @@ export const editionRules: {
   destinationReceptionDate: "RECEPTION",
   destinationPlannedOperationCode: "EMISSION",
   ficheInterventions: "EMISSION",
+  transporters: "RECEPTION",
   forwarding: "EMISSION",
   grouping: "EMISSION",
   repackaging: "EMISSION",
@@ -90,9 +79,7 @@ export const editionRules: {
 };
 
 export async function checkEditionRules(
-  existingBsff: Bsff & {
-    packagings: BsffPackaging[];
-  },
+  existingBsff: Bsff & BsffWithPackagings & BsffWithTransporters,
   input: BsffInput,
   user?: User
 ): Promise<string[]> {
@@ -150,6 +137,17 @@ export async function checkEditionRules(
   }
 
   checkSealedFields(null, Object.keys(editionRules));
+
+  // Effectue une vérification spécifique pour le champ `transporter`
+  if (input.transporter) {
+    const firstTransporter = getFirstTransporterSync(existingBsff);
+    if (
+      firstTransporter &&
+      firstTransporter.transporterTransportSignatureDate
+    ) {
+      sealedFieldErrors.push("transporter");
+    }
+  }
 
   if (sealedFieldErrors?.length > 0) {
     throw new SealedFieldError([...new Set(sealedFieldErrors)]);

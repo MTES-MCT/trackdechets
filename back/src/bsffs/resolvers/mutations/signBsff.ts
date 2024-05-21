@@ -19,7 +19,7 @@ import {
   validateBeforeTransport
 } from "../../validation";
 import { expandBsffFromDB } from "../../converter";
-import { getBsffOrNotFound } from "../../database";
+import { getBsffOrNotFound, getNextTransporterSync } from "../../database";
 import { isFinalOperation } from "../../constants";
 import { getStatus } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -32,7 +32,11 @@ import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
 import { operationHook } from "../../operationHook";
 import { prisma } from "@td/prisma";
-import { BsffWithTransporters, BsffWithTransportersInclude } from "../../types";
+import {
+  BsffWithPackagings,
+  BsffWithTransporters,
+  BsffWithTransportersInclude
+} from "../../types";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,
@@ -62,17 +66,22 @@ export default signBsff;
  * @returns a list of organisation identifiers
  */
 export function getAuthorizedOrgIds(
-  bsff: Bsff,
+  bsff: BsffWithTransporters,
   signatureType: BsffSignatureType
 ): string[] {
   const signatureTypeToFn: {
-    [Key in BsffSignatureType]: (bsff: Bsff) => (string | null)[];
+    [Key in BsffSignatureType]: (
+      bsff: BsffWithTransporters
+    ) => (string | null)[];
   } = {
     EMISSION: (bsff: Bsff) => [bsff.emitterCompanySiret],
-    TRANSPORT: (bsff: Bsff) => [
-      bsff.transporterCompanySiret,
-      bsff.transporterCompanyVatNumber
-    ],
+    TRANSPORT: (bsff: BsffWithTransporters) =>
+      bsff.transporters
+        .flatMap(t => [
+          t.transporterCompanySiret,
+          t.transporterCompanyVatNumber
+        ])
+        .filter(Boolean),
     ACCEPTATION: (bsff: Bsff) => [bsff.destinationCompanySiret],
     RECEPTION: (bsff: Bsff) => [bsff.destinationCompanySiret],
     OPERATION: (bsff: Bsff) => [bsff.destinationCompanySiret]
@@ -137,10 +146,20 @@ async function signEmission(
  */
 async function signTransport(
   user: Express.User,
-  bsff: Bsff & { packagings: BsffPackaging[] },
+  bsff: Bsff & BsffWithPackagings & BsffWithTransporters,
   input: BsffSignatureInput
 ) {
-  const transporterReceipt = await getTransporterReceipt(bsff);
+  if (bsff.transporters.length === 0) {
+    throw new UserInputError("Aucun transporteur n'est renseigné sur ce BSFF.");
+  }
+
+  const transporter = getNextTransporterSync(bsff);
+
+  if (!transporter) {
+    throw new UserInputError("Tous les transporteurs ont déjà signé");
+  }
+
+  const transporterReceipt = await getTransporterReceipt(transporter);
   await validateBeforeTransport({ ...bsff, ...transporterReceipt });
 
   const { update: updateBsff } = getBsffRepository(user);
@@ -149,9 +168,16 @@ async function signTransport(
     where: { id: bsff.id },
     data: {
       status: BsffStatus.SENT,
-      transporterTransportSignatureDate: input.date,
-      transporterTransportSignatureAuthor: input.author,
-      ...transporterReceipt
+      transporters: {
+        update: {
+          where: { id: transporter.id },
+          data: {
+            transporterTransportSignatureDate: input.date,
+            transporterTransportSignatureAuthor: input.author,
+            ...transporterReceipt
+          }
+        }
+      }
     },
     include: BsffWithTransportersInclude
   });

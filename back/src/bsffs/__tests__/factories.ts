@@ -32,7 +32,7 @@ export async function createBsff(
   initialData: Partial<Prisma.BsffCreateInput> = {},
   initialPackagingData: Partial<Prisma.BsffPackagingCreateInput> = {}
 ) {
-  const data: Prisma.BsffCreateInput = {
+  let data: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     type: BsffType.TRACER_FLUIDE,
     status: BsffStatus.INITIAL,
@@ -43,18 +43,20 @@ export async function createBsff(
   };
 
   if (emitter) {
-    Object.assign(data, {
+    data = {
+      ...data,
       emitterCompanyName: emitter.company.name,
       emitterCompanySiret: emitter.company.siret,
       emitterCompanyAddress: emitter.company.address,
       emitterCompanyContact: emitter.user.name,
       emitterCompanyPhone: emitter.company.contactPhone,
       emitterCompanyMail: emitter.company.contactEmail
-    });
+    };
   }
 
   if (transporter) {
-    Object.assign(data, {
+    let transporterData: Prisma.BsffTransporterCreateInput = {
+      number: 1,
       transporterCompanyName: transporter.company.name,
       transporterCompanySiret: transporter.company.siret,
       transporterCompanyAddress: transporter.company.address,
@@ -62,30 +64,33 @@ export async function createBsff(
       transporterCompanyPhone: transporter.company.contactPhone,
       transporterCompanyMail: transporter.company.contactEmail,
       transporterCompanyVatNumber: transporter.company.vatNumber
-    });
+    };
     const transporterReceipt = await prisma.company
       .findUnique({
         where: { id: transporter.company.id }
       })
       .transporterReceipt();
     if (transporterReceipt) {
-      Object.assign(data, {
+      transporterData = {
+        ...transporterData,
         transporterRecepisseNumber: transporterReceipt.receiptNumber,
         transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
         transporterRecepisseDepartment: transporterReceipt.department
-      });
+      };
     }
+    data = { ...data, transporters: { create: transporterData } };
   }
 
   if (destination) {
-    Object.assign(data, {
+    data = {
+      ...data,
       destinationCompanyName: destination.company.name,
       destinationCompanySiret: destination.company.siret,
       destinationCompanyAddress: destination.company.address,
       destinationCompanyContact: destination.user.name,
       destinationCompanyPhone: destination.company.contactPhone,
       destinationCompanyMail: destination.company.contactEmail
-    });
+    };
   }
 
   return prisma.bsff.create({ data, include: { packagings: true } });
@@ -148,10 +153,15 @@ export function createBsffBeforeTransport(
     packagings: {
       create: createBsffPackagingBeforeTransport({}, args.previousPackagings)
     },
-    transporterTransportMode: TransportMode.ROAD,
-    transporterTransportPlates: ["TRANSPORTER-PLATE"],
-    transporterTransportTakenOverAt: new Date(),
-    ...initialData
+    ...initialData,
+    transporters: {
+      create: {
+        ...initialData.transporters!.create!,
+        transporterTransportMode: TransportMode.ROAD,
+        transporterTransportPlates: ["TRANSPORTER-PLATE"],
+        transporterTransportTakenOverAt: new Date()
+      }
+    }
   });
 }
 
@@ -178,11 +188,17 @@ export function createBsffAfterTransport(
 ) {
   return createBsffBeforeTransport(args, {
     status: BsffStatus.SENT,
-    transporterTransportSignatureAuthor: args.transporter.user.name,
-    transporterTransportSignatureDate: new Date().toISOString(),
-    transporterTransportTakenOverAt: new Date().toISOString(),
-    transporterTransportPlates: ["TRANSPORER-PLATE"],
-    ...initialData
+    ...initialData,
+    ...initialData,
+    transporters: {
+      create: {
+        ...initialData.transporters!.create!,
+        transporterTransportSignatureAuthor: args.transporter.user.name,
+        transporterTransportSignatureDate: new Date().toISOString(),
+        transporterTransportTakenOverAt: new Date().toISOString(),
+        transporterTransportPlates: ["TRANSPORTER-PLATE"]
+      }
+    }
   });
 }
 

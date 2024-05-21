@@ -1,5 +1,4 @@
 import {
-  Bsff,
   BsffFicheIntervention as PrismaBsffFicheIntervention,
   BsffPackaging,
   BsffPackagingType,
@@ -105,7 +104,7 @@ export async function getFicheInterventions({
   bsff,
   context: { user }
 }: {
-  bsff: Bsff;
+  bsff: BsffWithTransporters;
   context: GraphQLContext;
 }): Promise<BsffFicheIntervention[]> {
   if (!user) {
@@ -120,15 +119,21 @@ export async function getFicheInterventions({
 
   const userRoles = await getUserRoles(user.id);
 
+  const transporter = getFirstTransporterSync(bsff);
+
   const isBsffReader = [
     bsff.emitterCompanySiret,
-    bsff.transporterCompanySiret,
-    bsff.transporterCompanyVatNumber,
+    transporter?.transporterCompanySiret,
+    transporter?.transporterCompanyVatNumber,
     bsff.destinationCompanySiret
-  ].some(
-    orgId =>
-      orgId && userRoles[orgId] && can(userRoles[orgId], Permission.BsdCanRead)
-  );
+  ]
+    .filter(Boolean)
+    .some(
+      orgId =>
+        orgId &&
+        userRoles[orgId] &&
+        can(userRoles[orgId], Permission.BsdCanRead)
+    );
 
   const isDetenteur = bsff.detenteurCompanySirets.some(
     siret => userRoles[siret] && can(userRoles[siret], Permission.BsdCanRead)
@@ -238,7 +243,7 @@ export async function createBsff(
 }
 
 export function getPackagingCreateInput(
-  bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
+  bsff: Partial<BsffWithTransporters | Prisma.BsffCreateInput> & {
     packagings?: (BsffPackagingInput & { type: BsffPackagingType })[];
   },
   previousPackagings: BsffPackaging[]
@@ -275,7 +280,7 @@ export function getPackagingCreateInput(
 }
 
 export async function getTransporters(
-  bsff: Pick<Bsff, "id">
+  bsff: Pick<BsffWithTransporters, "id">
 ): Promise<BsffTransporter[]> {
   const transporters = await prisma.bsff
     .findUnique({ where: { id: bsff.id } })
@@ -290,7 +295,7 @@ export function getTransportersSync(bsff: {
 }
 
 export async function getFirstTransporter(
-  bsff: Pick<Bsff, "id">
+  bsff: Pick<BsffWithTransporters, "id">
 ): Promise<BsffTransporter | null> {
   const transporters = await prisma.bsff
     .findUnique({ where: { id: bsff.id } })
