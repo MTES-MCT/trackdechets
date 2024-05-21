@@ -170,13 +170,15 @@ describe("Transported wastes registry", () => {
         createdAt: new Date("2021-08-01"),
         emitterEmissionSignatureDate: new Date("2021-08-01"),
         transporterTransportSignatureDate: new Date("2021-08-01"),
-        transporterTransportTakenOverAt: new Date("2021-08-01"),
         destinationReceptionDate: new Date("2021-08-01")
       },
       {
         acceptationWeight: 200,
         operationSignatureDate: new Date("2021-08-01"),
         operationCode: "R2"
+      },
+      {
+        transporterTransportTakenOverAt: new Date("2021-08-01")
       }
     );
 

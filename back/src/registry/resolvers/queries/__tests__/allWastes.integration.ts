@@ -169,7 +169,7 @@ describe("All wastes registry", () => {
       {
         wasteCode: "14 06 01*",
         createdAt: new Date("2021-08-01"),
-        transporterTransportTakenOverAt: new Date("2021-08-02"),
+
         destinationReceptionDate: new Date("2021-08-03")
       },
       {
@@ -177,7 +177,8 @@ describe("All wastes registry", () => {
         acceptationDate: new Date("2021-08-03"),
         operationSignatureDate: new Date("2021-08-04"),
         operationCode: "R2"
-      }
+      },
+      { transporterTransportTakenOverAt: new Date("2021-08-02") }
     );
     bsd6 = await bspaohFactory({
       opt: {

@@ -1,4 +1,4 @@
-import { Bsff, BsffPackaging, Prisma } from "@prisma/client";
+import { BsffPackaging, Prisma } from "@prisma/client";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 import { BsffWithTransporters } from "../../types";
 

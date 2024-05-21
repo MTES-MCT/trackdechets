@@ -30,6 +30,7 @@ export async function createBsff(
     previousPackagings
   }: CreateBsffArgs = {},
   initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {},
   initialPackagingData: Partial<Prisma.BsffPackagingCreateInput> = {}
 ) {
   let data: Prisma.BsffCreateInput = {
@@ -38,6 +39,12 @@ export async function createBsff(
     status: BsffStatus.INITIAL,
     packagings: {
       create: createBsffPackaging(initialPackagingData, previousPackagings)
+    },
+    transporters: {
+      create: {
+        ...initialTransporterData,
+        number: 1
+      }
     },
     ...initialData
   };
@@ -55,8 +62,7 @@ export async function createBsff(
   }
 
   if (transporter) {
-    let transporterData: Prisma.BsffTransporterCreateInput = {
-      number: 1,
+    let transporterData: Omit<Prisma.BsffTransporterCreateInput, "number"> = {
       transporterCompanyName: transporter.company.name,
       transporterCompanySiret: transporter.company.siret,
       transporterCompanyAddress: transporter.company.address,
@@ -84,7 +90,9 @@ export async function createBsff(
         transporter.company.siret,
         transporter.company.vatNumber
       ].filter(Boolean),
-      transporters: { create: transporterData }
+      transporters: {
+        create: { ...data.transporters!.create!, ...transporterData }
+      }
     };
   }
 
@@ -100,7 +108,10 @@ export async function createBsff(
     };
   }
 
-  return prisma.bsff.create({ data, include: { packagings: true } });
+  return prisma.bsff.create({
+    data,
+    include: { packagings: true, transporters: true }
+  });
 }
 
 export function createBsffPackaging(
@@ -126,50 +137,62 @@ export function createBsffPackaging(
 
 export function createBsffBeforeEmission(
   args: SetRequired<CreateBsffArgs, "emitter">,
-  initialData: Partial<Prisma.BsffCreateInput> = {}
+  initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
 ) {
-  return createBsff(args, {
-    isDraft: false,
-    wasteCode: BSFF_WASTE_CODES[0],
-    wasteAdr: "Mention ADR",
-    wasteDescription: "Fluides",
-    weightValue: 1,
-    weightIsEstimate: false,
-    destinationPlannedOperationCode: OPERATION.D10.code,
-    ...initialData
-  });
+  return createBsff(
+    args,
+    {
+      isDraft: false,
+      wasteCode: BSFF_WASTE_CODES[0],
+      wasteAdr: "Mention ADR",
+      wasteDescription: "Fluides",
+      weightValue: 1,
+      weightIsEstimate: false,
+      destinationPlannedOperationCode: OPERATION.D10.code,
+      ...initialData
+    },
+    initialTransporterData
+  );
 }
 
 export function createBsffAfterEmission(
   args: SetRequired<CreateBsffArgs, "emitter">,
-  initialData: Partial<Prisma.BsffCreateInput> = {}
+  initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
 ) {
-  return createBsffBeforeEmission(args, {
-    status: BsffStatus.SIGNED_BY_EMITTER,
-    emitterEmissionSignatureAuthor: args.emitter.user.name,
-    emitterEmissionSignatureDate: new Date().toISOString(),
-    ...initialData
-  });
+  return createBsffBeforeEmission(
+    args,
+    {
+      status: BsffStatus.SIGNED_BY_EMITTER,
+      emitterEmissionSignatureAuthor: args.emitter.user.name,
+      emitterEmissionSignatureDate: new Date().toISOString(),
+      ...initialData
+    },
+    initialTransporterData
+  );
 }
 
 export function createBsffBeforeTransport(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter">,
-  initialData: Partial<Prisma.BsffCreateInput> = {}
+  initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
 ) {
-  return createBsffAfterEmission(args, {
-    packagings: {
-      create: createBsffPackagingBeforeTransport({}, args.previousPackagings)
+  return createBsffAfterEmission(
+    args,
+    {
+      packagings: {
+        create: createBsffPackagingBeforeTransport({}, args.previousPackagings)
+      },
+      ...initialData
     },
-    ...initialData,
-    transporters: {
-      create: {
-        ...initialData.transporters!.create!,
-        transporterTransportMode: TransportMode.ROAD,
-        transporterTransportPlates: ["TRANSPORTER-PLATE"],
-        transporterTransportTakenOverAt: new Date()
-      }
+    {
+      transporterTransportMode: TransportMode.ROAD,
+      transporterTransportPlates: ["TRANSPORTER-PLATE"],
+      transporterTransportTakenOverAt: new Date(),
+      ...initialTransporterData
     }
-  });
+  );
 }
 
 export function createBsffPackagingBeforeTransport(
@@ -191,35 +214,42 @@ export function createBsffPackagingBeforeTransport(
 
 export function createBsffAfterTransport(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter">,
-  initialData: Partial<Prisma.BsffCreateInput> = {}
+  initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
 ) {
-  return createBsffBeforeTransport(args, {
-    status: BsffStatus.SENT,
-    ...initialData,
-    ...initialData,
-    transporters: {
-      create: {
-        ...initialData.transporters!.create!,
-        transporterTransportSignatureAuthor: args.transporter.user.name,
-        transporterTransportSignatureDate: new Date().toISOString(),
-        transporterTransportTakenOverAt: new Date().toISOString(),
-        transporterTransportPlates: ["TRANSPORTER-PLATE"]
-      }
+  return createBsffBeforeTransport(
+    args,
+    {
+      status: BsffStatus.SENT,
+      ...initialData
+    },
+    {
+      transporterTransportSignatureAuthor: args.transporter.user.name,
+      transporterTransportSignatureDate: new Date().toISOString(),
+      ...initialTransporterData
     }
-  });
+  );
 }
 
 export function createBsffBeforeReception(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {}
+  initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
 ) {
-  return createBsffAfterTransport(args, {
-    destinationReceptionDate: new Date().toISOString(),
-    packagings: {
-      create: createBsffPackagingBeforeAcceptation({}, args.previousPackagings)
+  return createBsffAfterTransport(
+    args,
+    {
+      destinationReceptionDate: new Date().toISOString(),
+      packagings: {
+        create: createBsffPackagingBeforeAcceptation(
+          {},
+          args.previousPackagings
+        )
+      },
+      ...initialData
     },
-    ...initialData
-  });
+    initialTransporterData
+  );
 }
 
 export function createBsffBeforeRefusal(
@@ -253,13 +283,18 @@ export function createBsffPackagingInputBeforeRefusal(
 
 export function createBsffAfterReception(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {}
+  initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
 ) {
-  return createBsffBeforeReception(args, {
-    status: BsffStatus.RECEIVED,
-    destinationReceptionSignatureDate: new Date().toISOString(),
-    ...initialData
-  });
+  return createBsffBeforeReception(
+    args,
+    {
+      status: BsffStatus.RECEIVED,
+      destinationReceptionSignatureDate: new Date().toISOString(),
+      ...initialData
+    },
+    initialTransporterData
+  );
 }
 
 export function createBsffPackagingBeforeAcceptation(
@@ -280,15 +315,23 @@ export function createBsffPackagingBeforeAcceptation(
 
 export function createBsffBeforeAcceptation(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {}
+  initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
 ) {
-  return createBsffAfterReception(args, {
-    status: BsffStatus.RECEIVED,
-    packagings: {
-      create: createBsffPackagingBeforeAcceptation({}, args.previousPackagings)
+  return createBsffAfterReception(
+    args,
+    {
+      status: BsffStatus.RECEIVED,
+      packagings: {
+        create: createBsffPackagingBeforeAcceptation(
+          {},
+          args.previousPackagings
+        )
+      },
+      ...initialData
     },
-    ...initialData
-  });
+    initialTransporterData
+  );
 }
 
 export function createBsffPackagingAfterAcceptation(
@@ -307,15 +350,20 @@ export function createBsffPackagingAfterAcceptation(
 
 export function createBsffAfterAcceptation(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {}
+  initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
 ) {
-  return createBsffBeforeAcceptation(args, {
-    status: BsffStatus.ACCEPTED,
-    packagings: {
-      create: createBsffPackagingAfterAcceptation({}, args.previousPackagings)
+  return createBsffBeforeAcceptation(
+    args,
+    {
+      status: BsffStatus.ACCEPTED,
+      packagings: {
+        create: createBsffPackagingAfterAcceptation({}, args.previousPackagings)
+      },
+      ...initialData
     },
-    ...initialData
-  });
+    initialTransporterData
+  );
 }
 
 export function createBsffPackagingBeforeOperation(
@@ -336,17 +384,22 @@ export function createBsffPackagingBeforeOperation(
 export function createBsffBeforeOperation(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
   initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {},
   packagingData: Partial<Prisma.BsffPackagingCreateInput> = {}
 ) {
-  return createBsffAfterReception(args, {
-    packagings: {
-      create: createBsffPackagingBeforeOperation(
-        packagingData,
-        args.previousPackagings
-      )
+  return createBsffAfterReception(
+    args,
+    {
+      packagings: {
+        create: createBsffPackagingBeforeOperation(
+          packagingData,
+          args.previousPackagings
+        )
+      },
+      ...initialData
     },
-    ...initialData
-  });
+    initialTransporterData
+  );
 }
 
 export function createBsffPackagingAfterOperation(
@@ -366,18 +419,23 @@ export function createBsffPackagingAfterOperation(
 export function createBsffAfterOperation(
   args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
   initialData: Partial<Prisma.BsffCreateInput> = {},
-  packagingData: Partial<Prisma.BsffPackagingCreateInput> = {}
+  packagingData: Partial<Prisma.BsffPackagingCreateInput> = {},
+  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
 ) {
-  return createBsffBeforeOperation(args, {
-    status: BsffStatus.PROCESSED,
-    packagings: {
-      create: createBsffPackagingAfterOperation(
-        packagingData,
-        args.previousPackagings
-      )
+  return createBsffBeforeOperation(
+    args,
+    {
+      status: BsffStatus.PROCESSED,
+      packagings: {
+        create: createBsffPackagingAfterOperation(
+          packagingData,
+          args.previousPackagings
+        )
+      },
+      ...initialData
     },
-    ...initialData
-  });
+    initialTransporterData
+  );
 }
 
 interface CreateFicheInterventionArgs {
