@@ -193,8 +193,15 @@ describe("getSubType", () => {
     });
     const subType = getSubType(formToBsdd(bsddForRegistry));
 
+    const bsddSuiteForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.forwardedInId! },
+      include: RegistryFormInclude
+    });
+    const bsdSuitesubType = getSubType(formToBsdd(bsddSuiteForRegistry));
+
     // Then
     expect(subType).toBe("TEMP_STORED");
+    expect(bsdSuitesubType).toBe("TEMP_STORED");
   });
 
   it("regular form > should return INITIAL", async () => {

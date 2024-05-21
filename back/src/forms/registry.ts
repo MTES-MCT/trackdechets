@@ -136,16 +136,16 @@ const getFinalOperationsData = (
 };
 
 export const getSubType = (bsdd: Bsdd): BsdSubType => {
+  if (bsdd.forwardedInId || bsdd.id.endsWith("-suite")) {
+    return "TEMP_STORED";
+  }
+
   if (bsdd.emitterType === "APPENDIX1") {
     return "TOURNEE";
   } else if (bsdd.emitterType === "APPENDIX1_PRODUCER") {
     return "APPENDIX1";
   } else if (bsdd.emitterType === "APPENDIX2") {
     return "APPENDIX2";
-  }
-
-  if (bsdd.forwardedInId) {
-    return "TEMP_STORED";
   }
 
   return "INITIAL";
