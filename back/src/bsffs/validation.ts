@@ -8,7 +8,8 @@ import {
   Prisma,
   WasteAcceptationStatus,
   BsffPackagingType,
-  OperationMode
+  OperationMode,
+  BsffTransporter
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
@@ -108,6 +109,17 @@ export type BsffLike = (Bsff | Prisma.BsffCreateInput) & {
   packagings?: Pick<
     BsffPackaging,
     "type" | "name" | "other" | "numero" | "volume" | "weight"
+  >[];
+  transporters?: Omit<
+    BsffTransporter,
+    | "id"
+    | "createdAt"
+    | "updatedAt"
+    | "number"
+    | "bsffId"
+    | "transporterTransportSignatureDate"
+    | "transporterTransportSignatureAuthor"
+    | "transporterTransportTakenOverAt"
   >[];
 };
 

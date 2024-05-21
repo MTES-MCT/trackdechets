@@ -4,7 +4,8 @@ import {
   BsffPackagingType,
   BsffType,
   Prisma,
-  BsffTransporter
+  BsffTransporter,
+  Bsff
 } from "@prisma/client";
 import {
   BsffFicheIntervention,
@@ -15,7 +16,8 @@ import getReadableId, { ReadableIdPrefix } from "../forms/readableId";
 import {
   flattenBsffInput,
   expandBsffFromDB,
-  expandFicheInterventionBsffFromDB
+  expandFicheInterventionBsffFromDB,
+  flattenBsffTransporterInput
 } from "./converter";
 import {
   validateBsff,
@@ -180,6 +182,8 @@ export async function createBsff(
     ...flattenBsffInput(autocompletedInput)
   };
 
+  const flatTransporterInput = flattenBsffTransporterInput(input);
+
   if (!input.type) {
     throw new UserInputError("Vous devez préciser le type de BSFF");
   }
@@ -201,7 +205,8 @@ export async function createBsff(
 
   const futureBsff = {
     ...flatInput,
-    packagings: packagingsInput
+    packagings: packagingsInput,
+    transporters: [flatTransporterInput]
   };
 
   await validateBsff(futureBsff, {
@@ -221,7 +226,13 @@ export async function createBsff(
 
   const data: Prisma.BsffCreateInput = {
     ...flatInput,
-    packagings: { create: packagings }
+    packagings: { create: packagings },
+    // On crée un premier transporteur par défaut (même si tous les champs sont nuls)
+    // Cela permet dans un premier temps d'être raccord avec le modèle "à plat"
+    // en attendant l'implémentation du multi-modal
+    transporters: {
+      create: { ...flatTransporterInput, number: 1 }
+    }
   };
 
   if (ficheInterventions.length > 0) {
@@ -243,7 +254,7 @@ export async function createBsff(
 }
 
 export function getPackagingCreateInput(
-  bsff: Partial<BsffWithTransporters | Prisma.BsffCreateInput> & {
+  bsff: Partial<Bsff | Omit<Prisma.BsffCreateInput, "transporters">> & {
     packagings?: (BsffPackagingInput & { type: BsffPackagingType })[];
   },
   previousPackagings: BsffPackaging[]

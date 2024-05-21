@@ -78,7 +78,14 @@ export async function createBsff(
         transporterRecepisseDepartment: transporterReceipt.department
       };
     }
-    data = { ...data, transporters: { create: transporterData } };
+    data = {
+      ...data,
+      transportersOrgIds: [
+        transporter.company.siret,
+        transporter.company.vatNumber
+      ].filter(Boolean),
+      transporters: { create: transporterData }
+    };
   }
 
   if (destination) {

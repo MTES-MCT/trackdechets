@@ -39,10 +39,10 @@ function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter | null }) {
   };
 }
 
-function flattenTransporterInput(input: {
+export function flattenBsffTransporterInput(input: {
   transporter?: GraphQL.BsffTransporter | null;
 }) {
-  return {
+  return safeInput({
     transporterCompanyName: chain(input.transporter, t =>
       chain(t.company, c => c.name)
     ),
@@ -87,7 +87,7 @@ function flattenTransporterInput(input: {
     transporterTransportTakenOverAt: chain(input.transporter, t =>
       chain(t.transport, tr => tr.takenOverAt)
     )
-  };
+  });
 }
 
 function flattenDestinationInput(input: {
@@ -165,7 +165,7 @@ export function flattenBsffInput(
   return safeInput({
     type: bsffInput.type,
     ...flattenEmitterInput(bsffInput),
-    ...flattenTransporterInput(bsffInput),
+    ...flattenBsffTransporterInput(bsffInput),
     ...flattenDestinationInput(bsffInput),
     ...flattenWasteDetailsInput(bsffInput)
   });
