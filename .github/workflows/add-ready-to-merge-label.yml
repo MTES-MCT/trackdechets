@@ -1,0 +1,16 @@
+on:
+  pull_request:
+    types: [synchronize]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: jsryudev/pr-review-labeler@v0.2.2
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        target-approved-count: 2
+        label-to-be-added: 'ready for merge'
+        label-to-be-removed: 'ready for review'
