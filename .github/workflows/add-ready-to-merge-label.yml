@@ -9,7 +9,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - id: 'reviews'
-        uses: 'jrylan/github-action-reviews-counter@main'
+        uses: 'jrylan/github-action-reviews-counter@v1.0.0'
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
       - name: Add Label if 2 Approvals
