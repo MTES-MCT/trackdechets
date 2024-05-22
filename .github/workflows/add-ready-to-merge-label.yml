@@ -1,16 +1,26 @@
 on:
-  pull_request:
-    types: [synchronize]
   pull_request_review:
-    types: [submitted]
-
+    types:
+      - 'edited'
+      - 'dismissed'
+      - 'submitted'
 jobs:
-  labeler:
-    runs-on: ubuntu-latest
+  your-action:
+    runs-on: 'ubuntu-latest'
     steps:
-    - uses: jsryudev/pr-review-labeler@v0.2.2
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        target-approved-count: 2
-        label-to-be-added: 'ready for merge'
-        label-to-be-removed: 'ready for review'
+      - id: 'reviews'
+        uses: 'jrylan/github-action-reviews-counter@main'
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Add Label if 2 Approvals
+        if: 'steps.reviews.outputs.approved >= 2 && steps.reviews.outputs.changes_requested == 0'
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ["ready to merge"]
+            })
