@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Fix statut des annexes lorsque l'émetteur est un particulier [PR 3287](https://github.com/MTES-MCT/trackdechets/pull/3287)
 - Fix de la redirection après signature d'un BSDASRI de groupement par l'émetteur [PR 3292](https://github.com/MTES-MCT/trackdechets/pull/3292)
 - Cacher liens PDF sur Annexes/Suite si le bordereau est un brouillon [PR 3310](https://github.com/MTES-MCT/trackdechets/pull/3310)
+- Au refus total d'un VHU, ne pas demander de compléter le code / mode de traitement [PR 3336](https://github.com/MTES-MCT/trackdechets/pull/3336)
 
 #### :boom: Breaking changes
 
