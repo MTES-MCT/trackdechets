@@ -69,11 +69,18 @@ const updateBsdasri = async ({
         "Un bordereau de groupement doit avoir des bordereaux associés."
       );
     }
-    const groupingDiff =
-      inputGrouping.some(
-        id => !dbGrouping.some(({ id: dbId }) => dbId === id)
-      ) || inputGrouping.length !== dbGrouping.length;
-    if (groupingDiff && dbBsdasri.status !== BsdasriStatus.INITIAL) {
+
+    const newDasrisToGroup = inputGrouping.filter(
+      id => !dbGrouping.some(({ id: dbId }) => dbId === id)
+    );
+    // there is a difference between existing grouping DASRIs and input
+    // if there are new ones or some were removed.
+    // checking if there are new ones or the arrays are of different size is equivalent
+    // but less costly
+    const hasGroupingDiff =
+      newDasrisToGroup.length > 0 || inputGrouping.length !== dbGrouping.length;
+
+    if (hasGroupingDiff && dbBsdasri.status !== BsdasriStatus.INITIAL) {
       throw new UserInputError(
         "Les bordereaux associés à ce bsd ne sont plus modifiables"
       );
@@ -81,9 +88,6 @@ const updateBsdasri = async ({
 
     await emitterIsAllowedToGroup(
       flattenedInput?.emitterCompanySiret ?? dbBsdasri?.emitterCompanySiret
-    );
-    const newDasrisToGroup = inputGrouping.filter(
-      id => !dbGrouping.some(({ id: dbId }) => dbId === id)
     );
     await checkDasrisAreGroupable(
       newDasrisToGroup,
