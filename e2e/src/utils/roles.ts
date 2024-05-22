@@ -33,10 +33,8 @@ export const inviteUserToCompany = async (
   });
 
   // Enter user details
-  await companyDiv
-    .getByPlaceholder("Email de la personne à inviter")
-    .fill(user.email);
-  await companyDiv.getByRole("combobox").selectOption(role);
+  await companyDiv.getByTestId("company-members-email").fill(user.email);
+  await companyDiv.getByTestId("company-members-role").selectOption(role);
   await companyDiv.getByRole("button", { name: "Inviter" }).click();
 
   // Toast should confirm invitation sent
@@ -47,14 +45,14 @@ export const inviteUserToCompany = async (
     .getByRole("cell", { name: user.email })
     .locator("..");
   await expect(memberDiv).toBeVisible();
-  await expect(memberDiv.getByText(role)).toBeVisible();
+  await expect(memberDiv.getByTestId("company-member-role")).toBeVisible();
 
   // User is registered on TD
   if (user.id) {
     await expect(memberDiv.getByText("Utilisateur actif")).toBeVisible();
     await expect(memberDiv.getByText("Temporairement masqué")).toBeVisible();
     await expect(
-      memberDiv.getByRole("button", { name: "Retirer les droits" })
+      memberDiv.getByRole("button", { name: "Révoquer l'utilisateur" })
     ).toBeVisible();
   } else {
     await expect(memberDiv.getByText("Invité")).toBeVisible();
@@ -215,7 +213,9 @@ export const verifyCompanyAccess = async (
     .getByRole("cell", { name: user.email })
     .locator("..");
   await expect(memberDiv).toBeVisible();
-  await expect(memberDiv.getByText(role)).toBeVisible();
+  await expect(memberDiv.getByTestId("company-member-role")).toContainText(
+    role
+  );
 };
 
 /**
@@ -245,7 +245,11 @@ export const revokeAccess = async (
   const memberDiv = companyDiv
     .getByRole("cell", { name: user.email })
     .locator("..");
-  await memberDiv.getByRole("button", { name: "Retirer les droits" }).click();
+  await memberDiv
+    .getByRole("button", { name: "Révoquer l'utilisateur" })
+    .click();
+
+  await page.getByTestId("member-delete-modal-button").click();
 
   // Member should no longer be visible
   await expect(memberDiv).not.toBeVisible();
