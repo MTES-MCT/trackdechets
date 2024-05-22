@@ -312,6 +312,21 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       .when("emitterIsForeignShip", siretConditions.isForeignShip)
       .when("emitterIsPrivateIndividual", siretConditions.isPrivateIndividual)
       .test(
+        "emitter-is-registered-for-appendix1-producer",
+        "L'émetteur doit être inscrit sur Trackdéchets pour apparaitre sur une annexe 1 sans éco-organisme",
+        async function (value) {
+          const { emitterType } = this.parent;
+          if (!value || emitterType !== EmitterType.APPENDIX1_PRODUCER) {
+            return true;
+          }
+
+          const company = await prisma.company.findFirst({
+            where: { orgId: value }
+          });
+          return company != null;
+        }
+      )
+      .test(
         "is-not-eco-organisme",
         "L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...). Un autre champ dédié existe et doit être utilisé pour viser l'éco-organisme concerné : https://faq.trackdechets.fr/dechets-dangereux-classiques/les-eco-organismes-sur-trackdechets#ou-etre-vise-en-tant-queco-organisme",
         async value => {
