@@ -152,12 +152,6 @@ const TransporterInfoEditModal = ({
     loadingBsff ||
     loadingBspaoh;
 
-  // if (
-  //   bsd.type === BsdType.Bsda &&
-  //   !["SIGNED_BY_PRODUCER", "SIGNED_BY_WORKER", "INITIAL"].includes(bsd.status)
-  // ) {
-  //   return null;
-  // }
   return (
     <TdModal
       isOpen={isOpen}

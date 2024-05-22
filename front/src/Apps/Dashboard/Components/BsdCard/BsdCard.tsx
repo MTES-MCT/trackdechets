@@ -189,6 +189,29 @@ function BsdCard({
     return getCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
   }, [bsd, currentSiret, isToCollectTab, isCollectedTab]);
 
+  // display the transporter's custom info if:
+  // - we are in the "To Collect" tab
+  // OR
+  // - we are in the "Collected" tab and there is a custom info
+  const displayTransporterCustomInfo =
+    !!currentTransporterInfos &&
+    (isToCollectTab ||
+      (isCollectedTab &&
+        !!currentTransporterInfos?.transporterCustomInfo?.length));
+
+  // display the transporter's number plate if:
+  // - the mode of transport is ROAD
+  // AND
+  // - we are in the "To Collect" tab
+  // OR
+  // - we are in the "Collected" tab and there is a number plate
+  const displayTransporterNumberPlate =
+    !!currentTransporterInfos &&
+    currentTransporterInfos.transporterMode === TransportMode.Road &&
+    (isToCollectTab ||
+      (isCollectedTab &&
+        !!currentTransporterInfos?.transporterNumberPlate?.length));
+
   const handleValidationClick = (
     _: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -349,46 +372,36 @@ function BsdCard({
                       info={pickupSiteName}
                     />
                   )}
-                  {!!currentTransporterInfos &&
-                    (isToCollectTab ||
-                      (isCollectedTab &&
-                        !!currentTransporterInfos?.transporterCustomInfo
-                          ?.length)) && (
-                      <InfoWithIcon
-                        labelCode={InfoIconCode.CustomInfo}
-                        editableInfos={{
-                          customInfo:
-                            currentTransporterInfos?.transporterCustomInfo
-                        }}
-                        hasEditableInfos
-                        isDisabled={
-                          isCollectedTab ||
-                          !permissions.includes(UserPermission.BsdCanUpdate)
-                        }
-                        onClick={handleEditableInfoClick}
-                      />
-                    )}
-                  {!!currentTransporterInfos &&
-                    currentTransporterInfos.transporterMode ===
-                      TransportMode.Road &&
-                    (isToCollectTab ||
-                      (isCollectedTab &&
-                        !!currentTransporterInfos?.transporterNumberPlate
-                          ?.length)) && (
-                      <InfoWithIcon
-                        labelCode={InfoIconCode.TransporterNumberPlate}
-                        editableInfos={{
-                          transporterNumberPlate:
-                            currentTransporterInfos?.transporterNumberPlate
-                        }}
-                        hasEditableInfos
-                        isDisabled={
-                          isCollectedTab ||
-                          !permissions.includes(UserPermission.BsdCanUpdate)
-                        }
-                        onClick={handleEditableInfoClick}
-                      />
-                    )}
+                  {displayTransporterCustomInfo && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.CustomInfo}
+                      editableInfos={{
+                        customInfo:
+                          currentTransporterInfos?.transporterCustomInfo
+                      }}
+                      hasEditableInfos
+                      isDisabled={
+                        isCollectedTab ||
+                        !permissions.includes(UserPermission.BsdCanUpdate)
+                      }
+                      onClick={handleEditableInfoClick}
+                    />
+                  )}
+                  {displayTransporterNumberPlate && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.TransporterNumberPlate}
+                      editableInfos={{
+                        transporterNumberPlate:
+                          currentTransporterInfos?.transporterNumberPlate
+                      }}
+                      hasEditableInfos
+                      isDisabled={
+                        isCollectedTab ||
+                        !permissions.includes(UserPermission.BsdCanUpdate)
+                      }
+                      onClick={handleEditableInfoClick}
+                    />
+                  )}
                 </div>
                 {isMobile && <div className="bsd-card-border" />}
               </div>
