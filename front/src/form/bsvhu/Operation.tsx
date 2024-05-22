@@ -108,8 +108,8 @@ export default function Operation() {
               <h4 className="form__section-heading">Identification</h4>
               <div className="form__row">
                 <label htmlFor="destination.reception.identification.numbers">
-                  Identification des numeros entrant des lots ou des VHU (livre
-                  de police)
+                  Identification des numeros entrant des lots ou de véhicules
+                  hors d'usage (livre de police)
                   <Tooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
                 </label>
                 <TagsInput name="destination.reception.identification.numbers" />
