@@ -72,7 +72,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const sirenifiedInput = await sirenifyBsffInput(input, user);
   const autocompletedInput = await recipify(sirenifiedInput);
   const flatInput = flattenBsffInput(autocompletedInput);
-  const flatTransporterInput = flattenBsffTransporterInput(sirenifiedInput);
+  const flatTransporterInput = flattenBsffTransporterInput(autocompletedInput);
 
   const futureBsff = {
     ...existingBsff,

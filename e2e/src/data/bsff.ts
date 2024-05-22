@@ -33,9 +33,14 @@ const optToBsffCreateInput = (opt: BsffOpt): Prisma.BsffCreateInput => {
     destinationCompanyName: opt.destination?.name,
     emitterCompanyName: opt.emitter?.name,
     emitterCompanySiret: opt.emitter?.siret,
-    transporterCompanySiret: opt.transporter?.siret,
-    transporterCompanyName: opt.transporter?.name,
     detenteurCompanySirets: opt.detenteur ? [opt.detenteur.siret!] : [],
+    transporters: {
+      create: {
+        number: 1,
+        transporterCompanySiret: opt.transporter?.siret,
+        transporterCompanyName: opt.transporter?.name
+      }
+    },
     ...(opt.packagings
       ? {
           packagings: {

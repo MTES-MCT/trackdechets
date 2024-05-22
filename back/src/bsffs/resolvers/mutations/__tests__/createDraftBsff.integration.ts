@@ -384,7 +384,7 @@ describe("Mutation.createDraftBsff", () => {
 
       bsff = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff.id },
-        include: { packagings: true }
+        include: { packagings: true, transporters: true }
       });
 
       const { mutate } = makeClient(destination.user);
@@ -565,10 +565,12 @@ describe("Mutation.createDraftBsff", () => {
         createBsff(
           { emitter, transporter, destination },
           {},
+          {},
           { acceptationWasteCode: "14 06 01*" }
         ),
         createBsff(
           { emitter, transporter, destination },
+          {},
           {},
           { acceptationWasteCode: "14 06 02*" }
         )

@@ -617,12 +617,11 @@ const operationSchemaFn: (value: any) => yup.SchemaOf<Operation> = value => {
 
 export const operationSchema = yup.lazy(operationSchemaFn);
 
-const bsffSchemaFn = (bsff: BsffValidationContext) => {
-  const transporterSchema = transporterSchemaFn(bsff);
-  return emitterSchemaFn(bsff)
-    .concat(wasteDetailsSchemaFn(bsff))
-    .concat(transporterSchemaFn(bsff))
-    .concat(destinationSchemaFn(bsff))
+const bsffSchemaFn = (context: BsffValidationContext) => {
+  const transporterSchema = transporterSchemaFn(context);
+  return emitterSchemaFn(context)
+    .concat(wasteDetailsSchemaFn(context))
+    .concat(destinationSchemaFn(context))
     .concat(
       yup.object({
         transporters: yup.array<Transporter>().of(transporterSchema)
@@ -932,10 +931,7 @@ export function validateBeforeEmission(bsff: BsffLike) {
   });
 }
 
-const beforeTransportSchemaFn = (
-  bsff: BsffLike,
-  context: BsffValidationContext
-) =>
+const beforeTransportSchemaFn = (context: BsffValidationContext) =>
   bsffSchemaFn(context).concat(
     yup.object({
       emitterEmissionSignatureDate: yup
@@ -956,7 +952,7 @@ const beforeTransportSchemaFn = (
   );
 
 export function validateBeforeTransport(bsff: BsffLike) {
-  return beforeTransportSchemaFn(bsff, {
+  return beforeTransportSchemaFn({
     isDraft: false,
     transporterSignature: true
   }).validate(bsff, {

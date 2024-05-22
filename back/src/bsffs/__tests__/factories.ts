@@ -221,6 +221,7 @@ export function createBsffAfterTransport(
     args,
     {
       status: BsffStatus.SENT,
+      transporterTransportSignatureDate: new Date().toISOString(),
       ...initialData
     },
     {

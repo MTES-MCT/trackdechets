@@ -19,7 +19,7 @@ import {
   validateBeforeTransport
 } from "../../validation";
 import { expandBsffFromDB } from "../../converter";
-import { getBsffOrNotFound, getNextTransporterSync } from "../../database";
+import { getBsffOrNotFound, getFirstTransporterSync } from "../../database";
 import { isFinalOperation } from "../../constants";
 import { getStatus } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -97,7 +97,7 @@ const signatures: Record<
   BsffSignatureType,
   (
     user: Express.User,
-    bsff: Bsff & { packagings: BsffPackaging[] },
+    bsff: Bsff & BsffWithPackagings & BsffWithTransporters,
     input: BsffSignatureInput
   ) => Promise<BsffWithTransporters>
 > = {
@@ -153,14 +153,18 @@ async function signTransport(
     throw new UserInputError("Aucun transporteur n'est renseigné sur ce BSFF.");
   }
 
-  const transporter = getNextTransporterSync(bsff);
+  const transporter = getFirstTransporterSync(bsff)!;
 
   if (!transporter) {
     throw new UserInputError("Tous les transporteurs ont déjà signé");
   }
 
   const transporterReceipt = await getTransporterReceipt(transporter);
-  await validateBeforeTransport({ ...bsff, ...transporterReceipt });
+
+  await validateBeforeTransport({
+    ...bsff,
+    transporters: [{ ...transporter, ...transporterReceipt }]
+  });
 
   const { update: updateBsff } = getBsffRepository(user);
 
@@ -168,6 +172,7 @@ async function signTransport(
     where: { id: bsff.id },
     data: {
       status: BsffStatus.SENT,
+      transporterTransportSignatureDate: input.date,
       transporters: {
         update: {
           where: { id: transporter.id },

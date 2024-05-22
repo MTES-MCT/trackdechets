@@ -165,7 +165,6 @@ export function flattenBsffInput(
   return safeInput({
     type: bsffInput.type,
     ...flattenEmitterInput(bsffInput),
-    ...flattenBsffTransporterInput(bsffInput),
     ...flattenDestinationInput(bsffInput),
     ...flattenWasteDetailsInput(bsffInput)
   });

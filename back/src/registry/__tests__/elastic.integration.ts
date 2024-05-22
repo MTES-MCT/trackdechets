@@ -1291,6 +1291,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       {
         emitterEmissionSignatureDate: new Date(),
         transporterTransportSignatureDate: new Date()
+      },
+      {
+        transporterTransportSignatureDate: new Date()
       }
     );
     await indexBsff(await getBsffForElastic(bsff));
@@ -1307,6 +1310,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       },
       {
         emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      {
         transporterTransportSignatureDate: new Date()
       }
     );

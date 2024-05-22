@@ -35,6 +35,7 @@ import {
   createBsffAfterAcceptation
 } from "../../../__tests__/factories";
 import { sirenifyBsffInput } from "../../../sirenify";
+import { getFirstTransporterSync } from "../../../database";
 
 jest.mock("../../../sirenify");
 (sirenifyBsffInput as jest.Mock).mockImplementation(input =>
@@ -129,16 +130,13 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
       { emitter, transporter: emitter },
-      { isDraft: true }
-    );
-    await prisma.bsff.update({
-      where: { id: bsff.id },
-      data: {
+      { isDraft: true },
+      {
         transporterRecepisseNumber: "abc",
         transporterRecepisseDepartment: "13",
         transporterRecepisseValidityLimit: new Date()
       }
-    });
+    );
 
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"]
@@ -168,17 +166,13 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
       { emitter, transporter: emitter },
-      { isDraft: true }
-    );
-    // write a receipt to the bsff
-    await prisma.bsff.update({
-      where: { id: bsff.id },
-      data: {
+      { isDraft: true },
+      {
         transporterRecepisseNumber: "abc",
         transporterRecepisseDepartment: "13",
         transporterRecepisseValidityLimit: new Date()
       }
-    });
+    );
 
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"]
@@ -213,14 +207,11 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
       { emitter, transporter: emitter },
-      { isDraft: true }
-    );
-    await prisma.bsff.update({
-      where: { id: bsff.id },
-      data: {
+      { isDraft: true },
+      {
         transporterRecepisseIsExempted: true
       }
-    });
+    );
 
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"]
@@ -1049,10 +1040,46 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " transporterTransportPlates, transporterTransportTakenOverAt"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporterTransportPlates, transporterTransportTakenOverAt"
       })
     ]);
+  });
+
+  test("after transporter signature > it should be possible to resend same transporter data", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      transporterReceipt: {
+        create: {
+          receiptNumber: "receipt",
+          department: "13",
+          validityLimit: new Date()
+        }
+      }
+    });
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterTransport({
+      emitter,
+      transporter,
+      destination
+    });
+    const bsffTransporter = getFirstTransporterSync(bsff)!;
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          transporter: {
+            transport: {
+              mode: bsffTransporter.transporterTransportMode
+            }
+          }
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
   });
 
   test("after transporter signature > it should be possible to update reception fields", async () => {

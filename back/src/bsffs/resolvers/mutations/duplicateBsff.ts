@@ -87,6 +87,10 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
       ...transporterData,
       number: 1,
       // Transporter company info
+      transporterCompanyName:
+        transporter?.name ?? bsffTransporter.transporterCompanyName,
+      transporterCompanyAddress:
+        transporter?.address ?? bsffTransporter.transporterCompanyAddress,
       transporterCompanyMail:
         transporter?.contactEmail ?? bsffTransporter.transporterCompanyMail,
       transporterCompanyPhone:

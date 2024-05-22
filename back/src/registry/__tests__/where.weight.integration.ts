@@ -221,10 +221,12 @@ describe("toElasticFilter", () => {
     const bsff1 = await createBsff(
       {},
       {},
+      {},
       { acceptationWeight: 1, acceptationSignatureDate: new Date() }
     );
 
     const bsff2 = await createBsff(
+      {},
       {},
       {},
       { acceptationWeight: 2, acceptationSignatureDate: new Date() }
@@ -233,10 +235,12 @@ describe("toElasticFilter", () => {
     const bsff3 = await createBsff(
       {},
       {},
+      {},
       { acceptationWeight: 3, acceptationSignatureDate: new Date() }
     );
 
     const bsff4 = await createBsff(
+      {},
       {},
       {},
       { acceptationWeight: 4, acceptationSignatureDate: new Date() }
@@ -451,10 +455,12 @@ describe("toElasticFilter", () => {
     const bsff1 = await createBsff(
       {},
       {},
+      {},
       { acceptationWeight: 1, acceptationSignatureDate: new Date() }
     );
 
     const bsff2 = await createBsff(
+      {},
       {},
       {},
       { acceptationWeight: 2, acceptationSignatureDate: new Date() }
@@ -463,10 +469,12 @@ describe("toElasticFilter", () => {
     const bsff3 = await createBsff(
       {},
       {},
+      {},
       { acceptationWeight: 3, acceptationSignatureDate: new Date() }
     );
 
     const bsff4 = await createBsff(
+      {},
       {},
       {},
       { acceptationWeight: 4, acceptationSignatureDate: new Date() }
@@ -674,10 +682,12 @@ describe("toElasticFilter", () => {
     const bsff1 = await createBsff(
       {},
       {},
+      {},
       { acceptationWeight: 1, acceptationSignatureDate: new Date() }
     );
 
     const bsff2 = await createBsff(
+      {},
       {},
       {},
       { acceptationWeight: 2, acceptationSignatureDate: new Date() }
@@ -686,10 +696,12 @@ describe("toElasticFilter", () => {
     const bsff3 = await createBsff(
       {},
       {},
+      {},
       { acceptationWeight: 3, acceptationSignatureDate: new Date() }
     );
 
     const bsff4 = await createBsff(
+      {},
       {},
       {},
       { acceptationWeight: 4, acceptationSignatureDate: new Date() }

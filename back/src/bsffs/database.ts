@@ -182,7 +182,7 @@ export async function createBsff(
     ...flattenBsffInput(autocompletedInput)
   };
 
-  const flatTransporterInput = flattenBsffTransporterInput(input);
+  const flatTransporterInput = flattenBsffTransporterInput(autocompletedInput);
 
   if (!input.type) {
     throw new UserInputError("Vous devez préciser le type de BSFF");
