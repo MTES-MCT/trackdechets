@@ -212,15 +212,15 @@ export default function AccountCompanyAddSiret({
                   return {
                     siret: (
                       <span>
-                        {`Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter via la FAQ `}
+                        {`Vous devez entrer un numéro de TVA intracommunautaire valide. Si vous continuez à rencontrer un souci de création avec votre numéro, veuillez nous partager un justificatif légal du pays d'origine via `}
                         <a
                           href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
                           target="_blank"
                           rel="noreferrer"
+                          className="fr-link--xs"
                         >
-                          https://faq.trackdechets.fr/pour-aller-plus-loin/assistance
+                          la FAQ
                         </a>
-                        {` avec un justificatif légal du pays d'origine.`}
                       </span>
                     )
                   };
