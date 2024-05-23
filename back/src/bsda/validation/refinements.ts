@@ -198,7 +198,17 @@ export const checkRequiredFields: (
       }
     }
 
-    (bsda.transporters ?? []).forEach((transporter, idx) => {
+    let checkableTransporters = bsda.transporters ?? [];
+
+    if (validationContext.currentSignatureType === "OPERATION") {
+      // Cas spécial permettant à l'installation de destination de valider l'opération
+      // même si tous les transporteurs multi-modaux n'ont pas signé.
+      checkableTransporters = checkableTransporters.filter(t =>
+        Boolean(t.transporterTransportSignatureDate)
+      );
+    }
+
+    checkableTransporters.forEach((transporter, idx) => {
       for (const bsdaTransporterField of Object.keys(
         bsdaTransporterEditionRules
       )) {

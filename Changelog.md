@@ -17,6 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Fix de la redirection après signature d'un BSDASRI de groupement par l'émetteur [PR 3292](https://github.com/MTES-MCT/trackdechets/pull/3292)
 - Cacher liens PDF sur Annexes/Suite si le bordereau est un brouillon [PR 3310](https://github.com/MTES-MCT/trackdechets/pull/3310)
 - Au refus total d'un VHU, ne pas demander de compléter le code / mode de traitement [PR 3336](https://github.com/MTES-MCT/trackdechets/pull/3336)
+- Retirer le fait que les champs des transporteurs soient requis à la signature de la réception même lorsqu'ils n'ont pas signé l'enlèvement sur un BSDA [PR 3331](https://github.com/MTES-MCT/trackdechets/pull/3331)
 
 #### :boom: Breaking changes
 
