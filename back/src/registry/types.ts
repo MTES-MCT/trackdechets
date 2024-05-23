@@ -178,7 +178,12 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   workerCompanySiret: null,
   workerCompanyAddress: null,
   destinationFinalOperationCodes: [],
-  destinationFinalOperationWeights: []
+  destinationFinalOperationWeights: [],
+  postTempStorageDestinationAddress: null,
+  postTempStorageDestinationCity: null,
+  postTempStorageDestinationName: null,
+  postTempStorageDestinationPostalCode: null,
+  postTempStorageDestinationSiret: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -385,5 +390,10 @@ export const emptyAllWaste: Required<AllWaste> = {
   workerCompanySiret: null,
   workerCompanyAddress: null,
   destinationFinalOperationCodes: [],
-  destinationFinalOperationWeights: []
+  destinationFinalOperationWeights: [],
+  postTempStorageDestinationAddress: null,
+  postTempStorageDestinationCity: null,
+  postTempStorageDestinationName: null,
+  postTempStorageDestinationPostalCode: null,
+  postTempStorageDestinationSiret: null
 };

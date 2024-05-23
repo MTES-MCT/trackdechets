@@ -167,6 +167,26 @@ export const columns: Column[] = [
   { field: "destinationCompanySiret", label: "Destination SIRET" },
   { field: "destinationCompanyAddress", label: "Destination adresse" },
   {
+    field: "postTempStorageDestinationName",
+    label: "Destination post entreposage provisoire Raison Sociale"
+  },
+  {
+    field: "postTempStorageDestinationSiret",
+    label: "Destination post entreposage provisoire SIRET"
+  },
+  {
+    field: "postTempStorageDestinationAddress",
+    label: "Destination post entreposage provisoire Adresse"
+  },
+  {
+    field: "postTempStorageDestinationPostalCode",
+    label: "Destination post entreposage provisoire Code Postal"
+  },
+  {
+    field: "postTempStorageDestinationCity",
+    label: "Destination post entreposage provisoire Ville"
+  },
+  {
     field: "destinationReceptionAcceptationStatus",
     label: "Statut d'acceptation du déchet"
   },

@@ -17,10 +17,27 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
+import { extractPostalCode, splitAddress } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
+
+const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
+  if (!bsdd.forwardedIn) return {};
+
+  const splittedAddress = splitAddress(
+    bsdd.forwardedIn.destinationCompanyAddress
+  );
+
+  return {
+    postTempStorageDestinationName: bsdd.forwardedIn.destinationCompanyName,
+    postTempStorageDestinationSiret: bsdd.forwardedIn.destinationCompanySiret,
+    postTempStorageDestinationAddress:
+      bsdd.forwardedIn.destinationCompanyAddress,
+    postTempStorageDestinationPostalCode: splittedAddress.postalCode,
+    postTempStorageDestinationCity: splittedAddress.city
+  };
+};
 
 const getOperationData = (bsdd: Bsdd) => ({
   destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
@@ -251,6 +268,7 @@ export function toOutgoingWaste(
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyOutgoingWaste,
     ...genericWaste,
+    ...getPostTempStorageDestination(bsdd),
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
@@ -423,6 +441,7 @@ export function toAllWaste(
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyAllWaste,
     ...genericWaste,
+    ...getPostTempStorageDestination(bsdd),
     createdAt: bsdd.createdAt,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     brokerCompanyName: bsdd.brokerCompanyName,

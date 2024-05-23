@@ -252,3 +252,40 @@ export const isBase64 = (str: string): boolean => {
     /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
   ).test(str);
 };
+
+/**
+ * Splits an address into:
+ * - street
+ * - postal code
+ * - city
+ */
+export const splitAddress = (address: string | null | undefined) => {
+  if (!address) {
+    return {
+      street: "",
+      postalCode: "",
+      city: ""
+    };
+  }
+
+  const postalCode = extractPostalCode(address);
+
+  if (!postalCode) {
+    return {
+      street: "",
+      postalCode: "",
+      city: ""
+    };
+  }
+
+  const splitted = address
+    .replace(/\r?\n|\r/g, " ") // line break
+    .replace(/\s+/g, " ") // double spaces
+    .split(/([0-9]{5})/);
+
+  return {
+    street: splitted[0]?.trim(),
+    postalCode: postalCode?.trim(),
+    city: splitted[2]?.trim()
+  };
+};
