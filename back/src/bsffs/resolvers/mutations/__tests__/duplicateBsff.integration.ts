@@ -114,7 +114,7 @@ describe("Mutation.duplicateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
 
-    const bsff = await createBsff({ emitter }, { isDeleted: true });
+    const bsff = await createBsff({ emitter }, { data: { isDeleted: true } });
     const { errors } = await mutate<
       Pick<Mutation, "duplicateBsff">,
       MutationDuplicateBsffArgs

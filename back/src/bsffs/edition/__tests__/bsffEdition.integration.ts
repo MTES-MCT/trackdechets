@@ -15,7 +15,7 @@ describe("edition rules", () => {
   afterAll(resetDatabase);
 
   it("should be possible to update any fields when BSFF status is INITIAL", async () => {
-    const bsff = await createBsff({}, { status: "INITIAL" });
+    const bsff = await createBsff({}, { data: { status: "INITIAL" } });
     const updateFields = await checkEditionRules(bsff, {
       emitter: { company: { name: "ACME" } }
     });

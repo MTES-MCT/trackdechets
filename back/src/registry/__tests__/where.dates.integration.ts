@@ -298,27 +298,27 @@ describe("toElasticFilter", () => {
 
       const bsff1 = await createBsff(
         {},
-        { [toBsffKey[date]]: new Date("2021-01-01") }
+        { data: { [toBsffKey[date]]: new Date("2021-01-01") } }
       );
 
       const bsff2 = await createBsff(
         {},
         {
-          [toBsffKey[date]]: new Date("2021-01-02")
+          data: { [toBsffKey[date]]: new Date("2021-01-02") }
         }
       );
 
       const bsff3 = await createBsff(
         {},
         {
-          [toBsffKey[date]]: new Date("2021-01-03")
+          data: { [toBsffKey[date]]: new Date("2021-01-03") }
         }
       );
 
       const bsff4 = await createBsff(
         {},
         {
-          [toBsffKey[date]]: new Date("2021-01-04")
+          data: { [toBsffKey[date]]: new Date("2021-01-04") }
         }
       );
 
@@ -345,26 +345,38 @@ describe("toElasticFilter", () => {
   it("should filter BSFFs between two transporterTakenOverAt dates (strict)", async () => {
     const bsff1 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-01") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-01")
+        }
+      }
     );
 
     const bsff2 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-02") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-02")
+        }
+      }
     );
 
     const bsff3 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-03") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-03")
+        }
+      }
     );
 
     const bsff4 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-04") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-04")
+        }
+      }
     );
 
     await Promise.all(
@@ -390,45 +402,45 @@ describe("toElasticFilter", () => {
   it("should filter BSFF between two operation dates (strict)", async () => {
     const bsff1 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-01"),
-        operationSignatureDate: new Date("2021-01-01"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-01"),
+          operationSignatureDate: new Date("2021-01-01"),
+          operationCode: "R2"
+        }
       }
     );
 
     const bsff2 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-02"),
-        operationSignatureDate: new Date("2021-01-02"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-02"),
+          operationSignatureDate: new Date("2021-01-02"),
+          operationCode: "R2"
+        }
       }
     );
 
     const bsff3 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-03"),
-        operationSignatureDate: new Date("2021-01-03"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-03"),
+          operationSignatureDate: new Date("2021-01-03"),
+          operationCode: "R2"
+        }
       }
     );
 
     const bsff4 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-04"),
-        operationSignatureDate: new Date("2021-01-04"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-04"),
+          operationSignatureDate: new Date("2021-01-04"),
+          operationCode: "R2"
+        }
       }
     );
 
@@ -777,27 +789,27 @@ describe("toElasticFilter", () => {
 
       const bsff1 = await createBsff(
         {},
-        { [toBsffKey[date]]: new Date("2021-01-01") }
+        { data: { [toBsffKey[date]]: new Date("2021-01-01") } }
       );
 
       const bsff2 = await createBsff(
         {},
         {
-          [toBsffKey[date]]: new Date("2021-01-02")
+          data: { [toBsffKey[date]]: new Date("2021-01-02") }
         }
       );
 
       const bsff3 = await createBsff(
         {},
         {
-          [toBsffKey[date]]: new Date("2021-01-03")
+          data: { [toBsffKey[date]]: new Date("2021-01-03") }
         }
       );
 
       const bsff4 = await createBsff(
         {},
         {
-          [toBsffKey[date]]: new Date("2021-01-04")
+          data: { [toBsffKey[date]]: new Date("2021-01-04") }
         }
       );
 
@@ -824,26 +836,38 @@ describe("toElasticFilter", () => {
   it("should filter BSFFs between two transporterTakenOverAt dates (not strict)", async () => {
     const bsff1 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-01") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-01")
+        }
+      }
     );
 
     const bsff2 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-02") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-02")
+        }
+      }
     );
 
     const bsff3 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-03") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-03")
+        }
+      }
     );
 
     const bsff4 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-04") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-04")
+        }
+      }
     );
 
     await Promise.all(
@@ -869,45 +893,45 @@ describe("toElasticFilter", () => {
   it("should filter BSFF between two operation dates (not strict)", async () => {
     const bsff1 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-01"),
-        operationSignatureDate: new Date("2021-01-01"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-01"),
+          operationSignatureDate: new Date("2021-01-01"),
+          operationCode: "R2"
+        }
       }
     );
 
     const bsff2 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-02"),
-        operationSignatureDate: new Date("2021-01-02"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-02"),
+          operationSignatureDate: new Date("2021-01-02"),
+          operationCode: "R2"
+        }
       }
     );
 
     const bsff3 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-03"),
-        operationSignatureDate: new Date("2021-01-03"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-03"),
+          operationSignatureDate: new Date("2021-01-03"),
+          operationCode: "R2"
+        }
       }
     );
 
     const bsff4 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-04"),
-        operationSignatureDate: new Date("2021-01-04"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-04"),
+          operationSignatureDate: new Date("2021-01-04"),
+          operationCode: "R2"
+        }
       }
     );
 
@@ -1242,27 +1266,27 @@ describe("toElasticFilter", () => {
 
       const bsff1 = await createBsff(
         {},
-        { [toBsffKey[date]]: new Date("2021-01-01") }
+        { data: { [toBsffKey[date]]: new Date("2021-01-01") } }
       );
 
       const bsff2 = await createBsff(
         {},
         {
-          [toBsffKey[date]]: new Date("2021-01-02")
+          data: { [toBsffKey[date]]: new Date("2021-01-02") }
         }
       );
 
       const bsff3 = await createBsff(
         {},
         {
-          [toBsffKey[date]]: new Date("2021-01-03")
+          data: { [toBsffKey[date]]: new Date("2021-01-03") }
         }
       );
 
       const bsff4 = await createBsff(
         {},
         {
-          [toBsffKey[date]]: new Date("2021-01-04")
+          data: { [toBsffKey[date]]: new Date("2021-01-04") }
         }
       );
 
@@ -1288,26 +1312,38 @@ describe("toElasticFilter", () => {
   it("should filter BSFFs between two transporterTakenOverAt dates (exact dates)", async () => {
     const bsff1 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-01") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-01")
+        }
+      }
     );
 
     const bsff2 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-02") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-02")
+        }
+      }
     );
 
     const bsff3 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-03") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-03")
+        }
+      }
     );
 
     const bsff4 = await createBsff(
       {},
-      {},
-      { transporterTransportTakenOverAt: new Date("2021-01-04") }
+      {
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-01-04")
+        }
+      }
     );
 
     await Promise.all(
@@ -1332,45 +1368,45 @@ describe("toElasticFilter", () => {
   it("should filter BSFF between two operation dates (exact date)", async () => {
     const bsff1 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-01"),
-        operationSignatureDate: new Date("2021-01-01"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-01"),
+          operationSignatureDate: new Date("2021-01-01"),
+          operationCode: "R2"
+        }
       }
     );
 
     const bsff2 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-02"),
-        operationSignatureDate: new Date("2021-01-02"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-02"),
+          operationSignatureDate: new Date("2021-01-02"),
+          operationCode: "R2"
+        }
       }
     );
 
     const bsff3 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-03"),
-        operationSignatureDate: new Date("2021-01-03"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-03"),
+          operationSignatureDate: new Date("2021-01-03"),
+          operationCode: "R2"
+        }
       }
     );
 
     const bsff4 = await createBsff(
       {},
-      {},
-      {},
       {
-        operationDate: new Date("2021-01-04"),
-        operationSignatureDate: new Date("2021-01-04"),
-        operationCode: "R2"
+        packagingData: {
+          operationDate: new Date("2021-01-04"),
+          operationSignatureDate: new Date("2021-01-04"),
+          operationCode: "R2"
+        }
       }
     );
 

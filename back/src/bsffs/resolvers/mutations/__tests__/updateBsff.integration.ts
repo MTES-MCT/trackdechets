@@ -59,7 +59,7 @@ describe("Mutation.updateBsff", () => {
 
   it("should allow user to update a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter }, { isDraft: true });
+    const bsff = await createBsff({ emitter }, { data: { isDraft: true } });
 
     const { mutate } = makeClient(emitter.user);
     const { data, errors } = await mutate<
@@ -88,7 +88,7 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
       { emitter, transporter: emitter },
-      { isDraft: true }
+      { data: { isDraft: true } }
     );
 
     const transporter = await companyFactory({
@@ -130,11 +130,13 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
       { emitter, transporter: emitter },
-      { isDraft: true },
       {
-        transporterRecepisseNumber: "abc",
-        transporterRecepisseDepartment: "13",
-        transporterRecepisseValidityLimit: new Date()
+        data: { isDraft: true },
+        transporterData: {
+          transporterRecepisseNumber: "abc",
+          transporterRecepisseDepartment: "13",
+          transporterRecepisseValidityLimit: new Date()
+        }
       }
     );
 
@@ -166,11 +168,13 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
       { emitter, transporter: emitter },
-      { isDraft: true },
       {
-        transporterRecepisseNumber: "abc",
-        transporterRecepisseDepartment: "13",
-        transporterRecepisseValidityLimit: new Date()
+        data: { isDraft: true },
+        transporterData: {
+          transporterRecepisseNumber: "abc",
+          transporterRecepisseDepartment: "13",
+          transporterRecepisseValidityLimit: new Date()
+        }
       }
     );
 
@@ -207,9 +211,11 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
       { emitter, transporter: emitter },
-      { isDraft: true },
       {
-        transporterRecepisseIsExempted: true
+        data: { isDraft: true },
+        transporterData: {
+          transporterRecepisseIsExempted: true
+        }
       }
     );
 
@@ -245,15 +251,13 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsff(
       { emitter },
       {
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            weight: 1,
-            numero: "1",
-            emissionNumero: "1"
-          }
-        },
-        isDraft: true
+        data: { isDraft: true },
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          weight: 1,
+          numero: "1",
+          emissionNumero: "1"
+        }
       }
     );
 
@@ -309,13 +313,11 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffAfterEmission(
       { emitter, destination },
       {
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            weight: 1,
-            numero: "1",
-            emissionNumero: "1"
-          }
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          weight: 1,
+          numero: "1",
+          emissionNumero: "1"
         }
       }
     );
@@ -374,13 +376,11 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffAfterEmission(
       { emitter, destination },
       {
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            weight: 1,
-            numero: "1",
-            emissionNumero: "1"
-          }
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          weight: 1,
+          numero: "1",
+          emissionNumero: "1"
         }
       }
     );
@@ -432,14 +432,12 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffAfterEmission(
       { emitter, destination },
       {
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            weight: 1,
-            numero: "1",
-            emissionNumero: "1",
-            volume: 1
-          }
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          weight: 1,
+          numero: "1",
+          emissionNumero: "1",
+          volume: 1
         }
       }
     );
@@ -546,9 +544,11 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsff(
       { emitter: operateur },
       {
-        type: "COLLECTE_PETITES_QUANTITES",
-        ficheInterventions: { connect: { id: ficheIntervention1.id } },
-        isDraft: true
+        data: {
+          type: "COLLECTE_PETITES_QUANTITES",
+          ficheInterventions: { connect: { id: ficheIntervention1.id } },
+          isDraft: true
+        }
       }
     );
 
@@ -597,8 +597,10 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffAfterEmission(
       { emitter: operateur, destination },
       {
-        type: "COLLECTE_PETITES_QUANTITES",
-        ficheInterventions: { connect: { id: ficheIntervention1.id } }
+        data: {
+          type: "COLLECTE_PETITES_QUANTITES",
+          ficheInterventions: { connect: { id: ficheIntervention1.id } }
+        }
       }
     );
 
@@ -647,8 +649,10 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffAfterEmission(
       { emitter: operateur, destination },
       {
-        type: "COLLECTE_PETITES_QUANTITES",
-        ficheInterventions: { connect: { id: ficheIntervention1.id } }
+        data: {
+          type: "COLLECTE_PETITES_QUANTITES",
+          ficheInterventions: { connect: { id: ficheIntervention1.id } }
+        }
       }
     );
 
@@ -685,8 +689,10 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffAfterEmission(
       { emitter: operateur, destination },
       {
-        type: "COLLECTE_PETITES_QUANTITES",
-        ficheInterventions: { connect: { id: ficheIntervention.id } }
+        data: {
+          type: "COLLECTE_PETITES_QUANTITES",
+          ficheInterventions: { connect: { id: ficheIntervention.id } }
+        }
       }
     );
 
@@ -773,7 +779,7 @@ describe("Mutation.updateBsff", () => {
 
   it("should throw an error if the bsff being updated is deleted", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter }, { isDeleted: true });
+    const bsff = await createBsff({ emitter }, { data: { isDeleted: true } });
 
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
@@ -801,7 +807,7 @@ describe("Mutation.updateBsff", () => {
 
   it("prevent user from removing their own company from the bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter }, { isDraft: true });
+    const bsff = await createBsff({ emitter }, { data: { isDraft: true } });
 
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
@@ -1155,9 +1161,11 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       )
     ]);
     const newGroupingBsffs = await Promise.all([
@@ -1168,9 +1176,11 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       )
     ]);
 
@@ -1178,11 +1188,13 @@ describe("Mutation.updateBsff", () => {
       {
         emitter,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination: await userWithCompanyFactory(UserRole.ADMIN),
-        previousPackagings: oldGroupingBsffs.flatMap(bsff => bsff.packagings)
+        destination: await userWithCompanyFactory(UserRole.ADMIN)
       },
       {
-        type: BsffType.GROUPEMENT
+        data: {
+          type: BsffType.GROUPEMENT
+        },
+        previousPackagings: oldGroupingBsffs.flatMap(bsff => bsff.packagings)
       }
     );
 
@@ -1232,9 +1244,11 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       )
     ]);
     const newGroupingBsffs = await Promise.all([
@@ -1245,9 +1259,9 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: { status: BsffStatus.INTERMEDIATELY_PROCESSED },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       )
     ]);
 
@@ -1255,11 +1269,13 @@ describe("Mutation.updateBsff", () => {
       {
         emitter,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination: await userWithCompanyFactory(UserRole.ADMIN),
-        previousPackagings: oldGroupingBsffs.flatMap(bsff => bsff.packagings)
+        destination: await userWithCompanyFactory(UserRole.ADMIN)
       },
       {
-        type: BsffType.GROUPEMENT
+        data: {
+          type: BsffType.GROUPEMENT
+        },
+        previousPackagings: oldGroupingBsffs.flatMap(bsff => bsff.packagings)
       }
     );
 
@@ -1310,9 +1326,11 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       )
     ]);
     const newGroupingBsffs = await Promise.all([
@@ -1323,9 +1341,9 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: { status: BsffStatus.INTERMEDIATELY_PROCESSED },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       )
     ]);
 
@@ -1333,11 +1351,11 @@ describe("Mutation.updateBsff", () => {
       {
         emitter,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination,
-        previousPackagings: oldGroupingBsffs.flatMap(bsff => bsff.packagings)
+        destination
       },
       {
-        type: BsffType.GROUPEMENT
+        data: { type: BsffType.GROUPEMENT },
+        previousPackagings: oldGroupingBsffs.flatMap(bsff => bsff.packagings)
       }
     );
 
@@ -1376,9 +1394,11 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       )
     ]);
 
@@ -1386,11 +1406,13 @@ describe("Mutation.updateBsff", () => {
       {
         emitter,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination,
-        previousPackagings: groupingBsffs.flatMap(bsff => bsff.packagings)
+        destination
       },
       {
-        type: BsffType.GROUPEMENT
+        data: {
+          type: BsffType.GROUPEMENT
+        },
+        previousPackagings: groupingBsffs.flatMap(bsff => bsff.packagings)
       }
     );
 
@@ -1421,20 +1443,24 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.R13.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.R13.code }
+      }
     );
 
     const bsff = await createBsffBeforeEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination: await userWithCompanyFactory(UserRole.ADMIN),
-        previousPackagings: oldForwarded.packagings
+        destination: await userWithCompanyFactory(UserRole.ADMIN)
       },
       {
-        type: BsffType.REEXPEDITION
+        data: {
+          type: BsffType.REEXPEDITION
+        },
+        previousPackagings: oldForwarded.packagings
       }
     );
 
@@ -1445,9 +1471,13 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.R13.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: {
+          operationCode: OPERATION.R13.code
+        }
+      }
     );
 
     const { mutate } = makeClient(ttr.user);
@@ -1489,9 +1519,11 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.R13.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.R13.code }
+      }
     );
 
     const newForwarded = await createBsffAfterOperation(
@@ -1501,20 +1533,24 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.R13.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.R13.code }
+      }
     );
 
     const bsff = await createBsffAfterEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination: await userWithCompanyFactory(UserRole.ADMIN),
-        previousPackagings: oldForwarded.packagings
+        destination: await userWithCompanyFactory(UserRole.ADMIN)
       },
       {
-        type: BsffType.REEXPEDITION
+        data: {
+          type: BsffType.REEXPEDITION
+        },
+        previousPackagings: oldForwarded.packagings
       }
     );
 
@@ -1558,9 +1594,11 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.R13.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.R13.code }
+      }
     );
 
     const newForwarded = await createBsffAfterOperation(
@@ -1570,20 +1608,22 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.R13.code }
+        data: { status: BsffStatus.INTERMEDIATELY_PROCESSED },
+        packagingData: { operationCode: OPERATION.R13.code }
+      }
     );
 
     const bsff = await createBsffAfterEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination,
-        previousPackagings: oldForwarded.packagings
+        destination
       },
       {
-        type: BsffType.REEXPEDITION
+        data: {
+          type: BsffType.REEXPEDITION
+        },
+        previousPackagings: oldForwarded.packagings
       }
     );
 
@@ -1618,20 +1658,24 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.R13.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.R13.code }
+      }
     );
 
     const bsff = await createBsffAfterEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination,
-        previousPackagings: forwarded.packagings
+        destination
       },
       {
-        type: BsffType.REEXPEDITION
+        data: {
+          type: BsffType.REEXPEDITION
+        },
+        previousPackagings: forwarded.packagings
       }
     );
 
@@ -1660,30 +1704,32 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.D14.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.D14.code }
+      }
     );
 
     const bsff = await createBsffBeforeEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination: await userWithCompanyFactory(UserRole.ADMIN),
-        previousPackagings: oldRepackaged.packagings
+        destination: await userWithCompanyFactory(UserRole.ADMIN)
       },
       {
-        type: BsffType.RECONDITIONNEMENT,
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            numero: "numero",
-            emissionNumero: "numero",
-            volume: 1,
-            weight: 1,
-            previousPackagings: {
-              connect: oldRepackaged.packagings.map(p => ({ id: p.id }))
-            }
+        previousPackagings: oldRepackaged.packagings,
+        data: {
+          type: BsffType.RECONDITIONNEMENT
+        },
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          numero: "numero",
+          emissionNumero: "numero",
+          volume: 1,
+          weight: 1,
+          previousPackagings: {
+            connect: oldRepackaged.packagings.map(p => ({ id: p.id }))
           }
         }
       }
@@ -1696,9 +1742,13 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.D14.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: {
+          operationCode: OPERATION.D14.code
+        }
+      }
     );
 
     const { mutate } = makeClient(ttr.user);
@@ -1738,30 +1788,32 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.D14.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.D14.code }
+      }
     );
 
     const bsff = await createBsffAfterEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination: await userWithCompanyFactory(UserRole.ADMIN),
-        previousPackagings: oldRepackaged.packagings
+        destination: await userWithCompanyFactory(UserRole.ADMIN)
       },
       {
-        type: BsffType.RECONDITIONNEMENT,
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            numero: "numero",
-            emissionNumero: "numero",
-            volume: 1,
-            weight: 1,
-            previousPackagings: {
-              connect: oldRepackaged.packagings.map(p => ({ id: p.id }))
-            }
+        previousPackagings: oldRepackaged.packagings,
+        data: {
+          type: BsffType.RECONDITIONNEMENT
+        },
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          numero: "numero",
+          emissionNumero: "numero",
+          volume: 1,
+          weight: 1,
+          previousPackagings: {
+            connect: oldRepackaged.packagings.map(p => ({ id: p.id }))
           }
         }
       }
@@ -1774,9 +1826,13 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.D14.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: {
+          operationCode: OPERATION.D14.code
+        }
+      }
     );
 
     const { mutate } = makeClient(ttr.user);
@@ -1817,30 +1873,32 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.D14.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.D14.code }
+      }
     );
 
     const bsff = await createBsffAfterEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination,
-        previousPackagings: oldRepackaged.packagings
+        destination
       },
       {
-        type: BsffType.RECONDITIONNEMENT,
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            numero: "numero",
-            emissionNumero: "numero",
-            volume: 1,
-            weight: 1,
-            previousPackagings: {
-              connect: oldRepackaged.packagings.map(p => ({ id: p.id }))
-            }
+        previousPackagings: oldRepackaged.packagings,
+        data: {
+          type: BsffType.RECONDITIONNEMENT
+        },
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          numero: "numero",
+          emissionNumero: "numero",
+          volume: 1,
+          weight: 1,
+          previousPackagings: {
+            connect: oldRepackaged.packagings.map(p => ({ id: p.id }))
           }
         }
       }
@@ -1853,9 +1911,11 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.D14.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.D14.code }
+      }
     );
 
     const { mutate } = makeClient(destination.user);
@@ -1889,30 +1949,32 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.D14.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.D14.code }
+      }
     );
 
     const bsff = await createBsffAfterEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination,
-        previousPackagings: repackaged.packagings
+        destination
       },
       {
-        type: BsffType.RECONDITIONNEMENT,
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            numero: "numero",
-            emissionNumero: "numero",
-            volume: 1,
-            weight: 1,
-            previousPackagings: {
-              connect: repackaged.packagings.map(p => ({ id: p.id }))
-            }
+        previousPackagings: repackaged.packagings,
+        data: {
+          type: BsffType.RECONDITIONNEMENT
+        },
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          numero: "numero",
+          emissionNumero: "numero",
+          volume: 1,
+          weight: 1,
+          previousPackagings: {
+            connect: repackaged.packagings.map(p => ({ id: p.id }))
           }
         }
       }
@@ -1981,19 +2043,23 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       )
     ]);
     const bsff = await createBsffBeforeEmission(
       {
-        emitter,
-        previousPackagings: groupingBsffs.flatMap(bsff => bsff.packagings)
+        emitter
       },
       {
-        type: BsffType.GROUPEMENT,
-        isDraft: true
+        previousPackagings: groupingBsffs.flatMap(bsff => bsff.packagings),
+        data: {
+          type: BsffType.GROUPEMENT,
+          isDraft: true
+        }
       }
     );
 
@@ -2027,15 +2093,21 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.R13.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.R13.code }
+      }
     );
     const bsff = await createBsffBeforeEmission(
-      { emitter: ttr, previousPackagings: forwardedBsff.packagings },
+      { emitter: ttr },
+
       {
-        type: BsffType.REEXPEDITION,
-        isDraft: true
+        previousPackagings: forwardedBsff.packagings,
+        data: {
+          type: BsffType.REEXPEDITION,
+          isDraft: true
+        }
       }
     );
 
@@ -2069,15 +2141,20 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED
-      },
-      { operationCode: OPERATION.D14.code }
+        data: {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        packagingData: { operationCode: OPERATION.D14.code }
+      }
     );
     const bsff = await createBsffBeforeEmission(
-      { emitter: ttr, previousPackagings: repackagingBsff.packagings },
+      { emitter: ttr },
       {
-        type: BsffType.RECONDITIONNEMENT,
-        isDraft: true
+        data: {
+          type: BsffType.RECONDITIONNEMENT,
+          isDraft: true
+        },
+        previousPackagings: repackagingBsff.packagings
       }
     );
 
@@ -2118,11 +2195,13 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffBeforeEmission(
       { emitter },
       {
-        isDraft: true,
-        type: "COLLECTE_PETITES_QUANTITES",
-        detenteurCompanySirets: [detenteur1.company.siret!],
-        ficheInterventions: {
-          connect: ficheInterventions.map(({ id }) => ({ id }))
+        data: {
+          isDraft: true,
+          type: "COLLECTE_PETITES_QUANTITES",
+          detenteurCompanySirets: [detenteur1.company.siret!],
+          ficheInterventions: {
+            connect: ficheInterventions.map(({ id }) => ({ id }))
+          }
         }
       }
     );
@@ -2163,8 +2242,10 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffBeforeEmission(
       { emitter },
       {
-        type: BsffType.GROUPEMENT,
-        isDraft: true
+        data: {
+          type: BsffType.GROUPEMENT,
+          isDraft: true
+        }
       }
     );
     const { mutate } = makeClient(emitter.user);
@@ -2197,8 +2278,10 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffBeforeEmission(
       { emitter },
       {
-        type: BsffType.GROUPEMENT,
-        isDraft: true
+        data: {
+          type: BsffType.GROUPEMENT,
+          isDraft: true
+        }
       }
     );
     const { mutate } = makeClient(emitter.user);

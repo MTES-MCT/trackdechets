@@ -15,43 +15,58 @@ import { UserWithCompany } from "../../__tests__/factories";
 import { OPERATION } from "../constants";
 import { BSFF_WASTE_CODES } from "@td/constants";
 
-interface CreateBsffArgs {
+interface BsffFactoryCompanies {
   emitter?: UserWithCompany;
   transporter?: UserWithCompany;
   destination?: UserWithCompany;
+}
+
+interface BsffFactoryOpts {
+  data?: Partial<Prisma.BsffCreateInput>;
+  transporterData?: Partial<Prisma.BsffTransporterCreateInput>;
+  packagingData?: Partial<Prisma.BsffPackagingCreateInput>;
   previousPackagings?: BsffPackaging[];
 }
 
+/**
+ * Bsff factory utilisé dans les tests.
+ * Elle crée un bordereau à l'état initial avec un contenant et un transporteur.
+ * Les données des établissements peuvent être injectés via le premier paramètre
+ * et les données du BSFF, du transporteur et du packaging peuvent être modifiés
+ * via le second paramètre.
+ *
+ * Les fonctions suivantes `createBsffBeforeEmission`, `createBsffAfterEmission`, etc
+ * se composent de façon récursive à partir de cette première fonction pour créer des
+ * BSFFs a différentes étapes du workflow.
+ */
 export async function createBsff(
+  { emitter, transporter, destination }: BsffFactoryCompanies = {},
   {
-    emitter,
-    transporter,
-    destination,
+    data,
+    transporterData,
+    packagingData,
     previousPackagings
-  }: CreateBsffArgs = {},
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {},
-  initialPackagingData: Partial<Prisma.BsffPackagingCreateInput> = {}
+  }: BsffFactoryOpts = {}
 ) {
-  let data: Prisma.BsffCreateInput = {
+  let input: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     type: BsffType.TRACER_FLUIDE,
     status: BsffStatus.INITIAL,
     packagings: {
-      create: createBsffPackaging(initialPackagingData, previousPackagings)
+      create: createBsffPackaging(packagingData ?? {}, previousPackagings)
     },
     transporters: {
       create: {
-        ...initialTransporterData,
+        ...transporterData,
         number: 1
       }
     },
-    ...initialData
+    ...data
   };
 
   if (emitter) {
-    data = {
-      ...data,
+    input = {
+      ...input,
       emitterCompanyName: emitter.company.name,
       emitterCompanySiret: emitter.company.siret,
       emitterCompanyAddress: emitter.company.address,
@@ -84,21 +99,21 @@ export async function createBsff(
         transporterRecepisseDepartment: transporterReceipt.department
       };
     }
-    data = {
-      ...data,
+    input = {
+      ...input,
       transportersOrgIds: [
         transporter.company.siret,
         transporter.company.vatNumber
       ].filter(Boolean),
       transporters: {
-        create: { ...data.transporters!.create!, ...transporterData }
+        create: { ...input.transporters!.create!, ...transporterData }
       }
     };
   }
 
   if (destination) {
-    data = {
-      ...data,
+    input = {
+      ...input,
       destinationCompanyName: destination.company.name,
       destinationCompanySiret: destination.company.siret,
       destinationCompanyAddress: destination.company.address,
@@ -109,8 +124,210 @@ export async function createBsff(
   }
 
   return prisma.bsff.create({
-    data,
+    data: input,
     include: { packagings: true, transporters: true }
+  });
+}
+
+export function createBsffBeforeEmission(
+  companies: SetRequired<BsffFactoryCompanies, "emitter">,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsff(companies, {
+    ...opts,
+    data: {
+      isDraft: false,
+      wasteCode: BSFF_WASTE_CODES[0],
+      wasteAdr: "Mention ADR",
+      wasteDescription: "Fluides",
+      weightValue: 1,
+      weightIsEstimate: false,
+      destinationPlannedOperationCode: OPERATION.D10.code,
+      ...opts.data
+    }
+  });
+}
+
+export function createBsffAfterEmission(
+  companies: SetRequired<BsffFactoryCompanies, "emitter">,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffBeforeEmission(companies, {
+    ...opts,
+    data: {
+      status: BsffStatus.SIGNED_BY_EMITTER,
+      emitterEmissionSignatureAuthor: companies.emitter.user.name,
+      emitterEmissionSignatureDate: new Date().toISOString(),
+      ...opts.data
+    }
+  });
+}
+
+export function createBsffBeforeTransport(
+  companies: SetRequired<BsffFactoryCompanies, "emitter" | "transporter">,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffAfterEmission(companies, {
+    ...opts,
+    transporterData: {
+      transporterTransportMode: TransportMode.ROAD,
+      transporterTransportPlates: ["TRANSPORTER-PLATE"],
+      transporterTransportTakenOverAt: new Date(),
+      ...opts.transporterData
+    }
+  });
+}
+
+export function createBsffAfterTransport(
+  companies: SetRequired<BsffFactoryCompanies, "emitter" | "transporter">,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffBeforeTransport(companies, {
+    ...opts,
+    data: {
+      status: BsffStatus.SENT,
+      transporterTransportSignatureDate: new Date().toISOString(),
+      ...opts.data
+    },
+    transporterData: {
+      transporterTransportSignatureAuthor: companies.transporter.user.name,
+      transporterTransportSignatureDate: new Date().toISOString(),
+      ...opts.transporterData
+    }
+  });
+}
+
+export function createBsffBeforeReception(
+  companies: SetRequired<
+    BsffFactoryCompanies,
+    "emitter" | "transporter" | "destination"
+  >,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffAfterTransport(companies, {
+    ...opts,
+    data: {
+      destinationReceptionDate: new Date().toISOString(),
+      ...opts.data
+    },
+    packagingData: {
+      acceptationWeight: 1,
+      acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+      acceptationWasteCode: "14 06 01*",
+      acceptationWasteDescription: "fluide",
+      ...opts.packagingData
+    }
+  });
+}
+
+export function createBsffBeforeRefusal(
+  companies: SetRequired<
+    BsffFactoryCompanies,
+    "emitter" | "transporter" | "destination"
+  >,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffAfterReception(companies, {
+    ...opts,
+    packagingData: {
+      acceptationWeight: 0,
+      acceptationStatus: WasteAcceptationStatus.REFUSED,
+      acceptationRefusalReason: "non conforme",
+      acceptationWasteCode: "14 06 01*",
+      acceptationWasteDescription: "fluide",
+      ...opts.packagingData
+    }
+  });
+}
+
+export function createBsffAfterReception(
+  companies: SetRequired<
+    BsffFactoryCompanies,
+    "emitter" | "transporter" | "destination"
+  >,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffBeforeReception(companies, {
+    ...opts,
+    data: {
+      status: BsffStatus.RECEIVED,
+      destinationReceptionSignatureDate: new Date().toISOString(),
+      ...opts.data
+    }
+  });
+}
+
+export function createBsffBeforeAcceptation(
+  companies: SetRequired<
+    BsffFactoryCompanies,
+    "emitter" | "transporter" | "destination"
+  >,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffAfterReception(companies, {
+    ...opts,
+    data: { status: BsffStatus.RECEIVED, ...opts.data },
+    packagingData: {
+      acceptationWeight: 1,
+      acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+      acceptationWasteCode: "14 06 01*",
+      acceptationWasteDescription: "fluide",
+      ...opts.packagingData
+    }
+  });
+}
+
+export function createBsffAfterAcceptation(
+  companies: SetRequired<
+    BsffFactoryCompanies,
+    "emitter" | "transporter" | "destination"
+  >,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffBeforeAcceptation(companies, {
+    ...opts,
+    data: { status: BsffStatus.ACCEPTED, ...opts.data },
+    packagingData: {
+      acceptationSignatureAuthor: "Juste Leblanc",
+      acceptationSignatureDate: new Date().toISOString(),
+      ...opts.packagingData
+    }
+  });
+}
+
+export function createBsffBeforeOperation(
+  companies: SetRequired<
+    BsffFactoryCompanies,
+    "emitter" | "transporter" | "destination"
+  >,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffAfterAcceptation(companies, {
+    ...opts,
+    packagingData: {
+      operationCode: OPERATION.R2.code,
+      operationMode: OperationMode.REUTILISATION,
+      operationDate: new Date(),
+      ...opts.packagingData
+    }
+  });
+}
+
+export function createBsffAfterOperation(
+  companies: SetRequired<
+    BsffFactoryCompanies,
+    "emitter" | "transporter" | "destination"
+  >,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffBeforeOperation(companies, {
+    ...opts,
+    data: { status: BsffStatus.PROCESSED, ...opts.data },
+    packagingData: {
+      operationSignatureAuthor: "Juste Leblanc",
+      operationSignatureDate: new Date().toISOString(),
+      ...opts.packagingData
+    }
   });
 }
 
@@ -133,310 +350,6 @@ export function createBsffPackaging(
         }
       : {})
   };
-}
-
-export function createBsffBeforeEmission(
-  args: SetRequired<CreateBsffArgs, "emitter">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
-) {
-  return createBsff(
-    args,
-    {
-      isDraft: false,
-      wasteCode: BSFF_WASTE_CODES[0],
-      wasteAdr: "Mention ADR",
-      wasteDescription: "Fluides",
-      weightValue: 1,
-      weightIsEstimate: false,
-      destinationPlannedOperationCode: OPERATION.D10.code,
-      ...initialData
-    },
-    initialTransporterData
-  );
-}
-
-export function createBsffAfterEmission(
-  args: SetRequired<CreateBsffArgs, "emitter">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
-) {
-  return createBsffBeforeEmission(
-    args,
-    {
-      status: BsffStatus.SIGNED_BY_EMITTER,
-      emitterEmissionSignatureAuthor: args.emitter.user.name,
-      emitterEmissionSignatureDate: new Date().toISOString(),
-      ...initialData
-    },
-    initialTransporterData
-  );
-}
-
-export function createBsffBeforeTransport(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
-) {
-  return createBsffAfterEmission(
-    args,
-    {
-      packagings: {
-        create: createBsffPackagingBeforeTransport({}, args.previousPackagings)
-      },
-      ...initialData
-    },
-    {
-      transporterTransportMode: TransportMode.ROAD,
-      transporterTransportPlates: ["TRANSPORTER-PLATE"],
-      transporterTransportTakenOverAt: new Date(),
-      ...initialTransporterData
-    }
-  );
-}
-
-export function createBsffPackagingBeforeTransport(
-  args: Partial<Prisma.BsffPackagingCreateInput>,
-  previousPackagings?: BsffPackaging[]
-) {
-  return createBsffPackaging(
-    {
-      type: "AUTRE",
-      other: "BOUTEILLE de récup",
-      operationSignatureAuthor: "John Snow",
-      weight: 1,
-      volume: 1,
-      ...args
-    },
-    previousPackagings
-  );
-}
-
-export function createBsffAfterTransport(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
-) {
-  return createBsffBeforeTransport(
-    args,
-    {
-      status: BsffStatus.SENT,
-      transporterTransportSignatureDate: new Date().toISOString(),
-      ...initialData
-    },
-    {
-      transporterTransportSignatureAuthor: args.transporter.user.name,
-      transporterTransportSignatureDate: new Date().toISOString(),
-      ...initialTransporterData
-    }
-  );
-}
-
-export function createBsffBeforeReception(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
-) {
-  return createBsffAfterTransport(
-    args,
-    {
-      destinationReceptionDate: new Date().toISOString(),
-      packagings: {
-        create: createBsffPackagingBeforeAcceptation(
-          {},
-          args.previousPackagings
-        )
-      },
-      ...initialData
-    },
-    initialTransporterData
-  );
-}
-
-export function createBsffBeforeRefusal(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {}
-) {
-  return createBsffAfterReception(args, {
-    packagings: {
-      create: createBsffPackagingInputBeforeRefusal({}, args.previousPackagings)
-    },
-    ...initialData
-  });
-}
-
-export function createBsffPackagingInputBeforeRefusal(
-  args: Partial<Prisma.BsffPackagingCreateInput>,
-  previousPackagings?: BsffPackaging[]
-) {
-  return createBsffPackaging(
-    {
-      acceptationWeight: 0,
-      acceptationStatus: WasteAcceptationStatus.REFUSED,
-      acceptationRefusalReason: "non conforme",
-      acceptationWasteCode: "14 06 01*",
-      acceptationWasteDescription: "fluide",
-      ...args
-    },
-    previousPackagings
-  );
-}
-
-export function createBsffAfterReception(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
-) {
-  return createBsffBeforeReception(
-    args,
-    {
-      status: BsffStatus.RECEIVED,
-      destinationReceptionSignatureDate: new Date().toISOString(),
-      ...initialData
-    },
-    initialTransporterData
-  );
-}
-
-export function createBsffPackagingBeforeAcceptation(
-  args: Partial<Prisma.BsffPackagingCreateInput>,
-  previousPackagings?: BsffPackaging[]
-) {
-  return createBsffPackagingBeforeTransport(
-    {
-      acceptationWeight: 1,
-      acceptationStatus: WasteAcceptationStatus.ACCEPTED,
-      acceptationWasteCode: "14 06 01*",
-      acceptationWasteDescription: "fluide",
-      ...args
-    },
-    previousPackagings
-  );
-}
-
-export function createBsffBeforeAcceptation(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
-) {
-  return createBsffAfterReception(
-    args,
-    {
-      status: BsffStatus.RECEIVED,
-      packagings: {
-        create: createBsffPackagingBeforeAcceptation(
-          {},
-          args.previousPackagings
-        )
-      },
-      ...initialData
-    },
-    initialTransporterData
-  );
-}
-
-export function createBsffPackagingAfterAcceptation(
-  args: Partial<Prisma.BsffPackagingCreateInput>,
-  previousPackagings?: BsffPackaging[]
-) {
-  return createBsffPackagingBeforeAcceptation(
-    {
-      acceptationSignatureAuthor: "Juste Leblanc",
-      acceptationSignatureDate: new Date().toISOString(),
-      ...args
-    },
-    previousPackagings
-  );
-}
-
-export function createBsffAfterAcceptation(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
-) {
-  return createBsffBeforeAcceptation(
-    args,
-    {
-      status: BsffStatus.ACCEPTED,
-      packagings: {
-        create: createBsffPackagingAfterAcceptation({}, args.previousPackagings)
-      },
-      ...initialData
-    },
-    initialTransporterData
-  );
-}
-
-export function createBsffPackagingBeforeOperation(
-  args: Partial<Prisma.BsffPackagingCreateInput>,
-  previousPackagings?: BsffPackaging[]
-) {
-  return createBsffPackagingAfterAcceptation(
-    {
-      operationCode: OPERATION.R2.code,
-      operationMode: OperationMode.REUTILISATION,
-      operationDate: new Date(),
-      ...args
-    },
-    previousPackagings
-  );
-}
-
-export function createBsffBeforeOperation(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {},
-  packagingData: Partial<Prisma.BsffPackagingCreateInput> = {}
-) {
-  return createBsffAfterReception(
-    args,
-    {
-      packagings: {
-        create: createBsffPackagingBeforeOperation(
-          packagingData,
-          args.previousPackagings
-        )
-      },
-      ...initialData
-    },
-    initialTransporterData
-  );
-}
-
-export function createBsffPackagingAfterOperation(
-  args: Partial<Prisma.BsffPackagingCreateInput>,
-  previousPackagings?: BsffPackaging[]
-) {
-  return createBsffPackagingBeforeOperation(
-    {
-      operationSignatureAuthor: "Juste Leblanc",
-      operationSignatureDate: new Date().toISOString(),
-      ...args
-    },
-    previousPackagings
-  );
-}
-
-export function createBsffAfterOperation(
-  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
-  initialData: Partial<Prisma.BsffCreateInput> = {},
-  packagingData: Partial<Prisma.BsffPackagingCreateInput> = {},
-  initialTransporterData: Partial<Prisma.BsffTransporterCreateInput> = {}
-) {
-  return createBsffBeforeOperation(
-    args,
-    {
-      status: BsffStatus.PROCESSED,
-      packagings: {
-        create: createBsffPackagingAfterOperation(
-          packagingData,
-          args.previousPackagings
-        )
-      },
-      ...initialData
-    },
-    initialTransporterData
-  );
 }
 
 interface CreateFicheInterventionArgs {

@@ -10,7 +10,6 @@ import {
   createBsff,
   createBsffAfterOperation
 } from "../../../__tests__/factories";
-import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { gql } from "graphql-tag";
 import { fullBsff } from "../../../fragments";
 
@@ -71,7 +70,7 @@ describe("Query.bsff", () => {
 
   it("should throw an error not found if the bsff is deleted", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter }, { isDeleted: true });
+    const bsff = await createBsff({ emitter }, { data: { isDeleted: true } });
 
     const { query } = makeClient(emitter.user);
     const { errors } = await query<Pick<Query, "bsff">, QueryBsffArgs>(
@@ -115,8 +114,6 @@ describe("Query.bsff", () => {
 
   it("should list the bsff's fiche d'interventions", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
     const ficheInterventionNumero = "0000001";
     const siret = siretify(3);
     const bsff = await createBsff(
@@ -124,27 +121,28 @@ describe("Query.bsff", () => {
         emitter
       },
       {
-        id: bsffId,
-        ficheInterventions: {
-          create: [
-            {
-              numero: ficheInterventionNumero,
-              weight: 2,
-              detenteurCompanyName: "Acme",
-              detenteurCompanySiret: siret,
-              detenteurCompanyAddress: "12 rue de la Tige, 69000",
-              detenteurCompanyMail: "contact@gmail.com",
-              detenteurCompanyPhone: "06",
-              detenteurCompanyContact: "Jeanne Michelin",
-              operateurCompanyName: "Clim'op",
-              operateurCompanySiret: siret,
-              operateurCompanyAddress: "12 rue de la Tige, 69000",
-              operateurCompanyMail: "contact@climop.com",
-              operateurCompanyPhone: "06",
-              operateurCompanyContact: "Jean Dupont",
-              postalCode: "69000"
-            }
-          ]
+        data: {
+          ficheInterventions: {
+            create: [
+              {
+                numero: ficheInterventionNumero,
+                weight: 2,
+                detenteurCompanyName: "Acme",
+                detenteurCompanySiret: siret,
+                detenteurCompanyAddress: "12 rue de la Tige, 69000",
+                detenteurCompanyMail: "contact@gmail.com",
+                detenteurCompanyPhone: "06",
+                detenteurCompanyContact: "Jeanne Michelin",
+                operateurCompanyName: "Clim'op",
+                operateurCompanySiret: siret,
+                operateurCompanyAddress: "12 rue de la Tige, 69000",
+                operateurCompanyMail: "contact@climop.com",
+                operateurCompanyPhone: "06",
+                operateurCompanyContact: "Jean Dupont",
+                postalCode: "69000"
+              }
+            ]
+          }
         }
       }
     );
@@ -178,15 +176,16 @@ describe("Query.bsff", () => {
         transporter,
         destination
       },
-      {},
-      { operationCode: "R13" }
+      { packagingData: { operationCode: "R13" } }
     );
     const bsff = await createBsff(
       {
-        emitter: destination,
-        previousPackagings: previousBsff.packagings
+        emitter: destination
       },
-      { type: "GROUPEMENT" }
+      {
+        previousPackagings: previousBsff.packagings,
+        data: { type: "GROUPEMENT" }
+      }
     );
 
     const { query } = makeClient(destination.user);
@@ -218,10 +217,12 @@ describe("Query.bsff", () => {
     });
     const bsff = await createBsff(
       {
-        emitter: destination,
-        previousPackagings: forwardedBsff.packagings
+        emitter: destination
       },
-      { type: "REEXPEDITION" }
+      {
+        previousPackagings: forwardedBsff.packagings,
+        data: { type: "REEXPEDITION" }
+      }
     );
     const { query } = makeClient(destination.user);
     const { data, errors } = await query<Pick<Query, "bsff">, QueryBsffArgs>(

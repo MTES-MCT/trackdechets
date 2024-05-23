@@ -166,19 +166,21 @@ describe("Transported wastes registry", () => {
         destination
       },
       {
-        wasteCode: "14 06 01*",
-        createdAt: new Date("2021-08-01"),
-        emitterEmissionSignatureDate: new Date("2021-08-01"),
-        transporterTransportSignatureDate: new Date("2021-08-01"),
-        destinationReceptionDate: new Date("2021-08-01")
-      },
-      {
-        acceptationWeight: 200,
-        operationSignatureDate: new Date("2021-08-01"),
-        operationCode: "R2"
-      },
-      {
-        transporterTransportTakenOverAt: new Date("2021-08-01")
+        data: {
+          wasteCode: "14 06 01*",
+          createdAt: new Date("2021-08-01"),
+          emitterEmissionSignatureDate: new Date("2021-08-01"),
+          transporterTransportSignatureDate: new Date("2021-08-01"),
+          destinationReceptionDate: new Date("2021-08-01")
+        },
+        packagingData: {
+          acceptationWeight: 200,
+          operationSignatureDate: new Date("2021-08-01"),
+          operationCode: "R2"
+        },
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-08-01")
+        }
       }
     );
 

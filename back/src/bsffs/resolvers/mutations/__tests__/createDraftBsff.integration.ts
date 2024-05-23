@@ -149,9 +149,11 @@ describe("Mutation.createDraftBsff", () => {
     await createBsffBeforeEmission(
       { emitter },
       {
-        ficheInterventions: {
-          connect: {
-            id: ficheIntervention.id
+        data: {
+          ficheInterventions: {
+            connect: {
+              id: ficheIntervention.id
+            }
           }
         }
       }
@@ -236,9 +238,13 @@ describe("Mutation.createDraftBsff", () => {
       const previousBsff = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: {
+            operationCode: OPERATION.R12.code
+          }
+        }
       );
 
       const { mutate } = makeClient(destination.user);
@@ -283,9 +289,11 @@ describe("Mutation.createDraftBsff", () => {
       const forwarded = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R13.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R13.code }
+        }
       );
       const { mutate } = makeClient(destination.user);
       const { data, errors } = await mutate<
@@ -324,16 +332,18 @@ describe("Mutation.createDraftBsff", () => {
       const bsff1 = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R13.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R13.code }
+        }
       );
       const bsff2 = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R13.code }
+          data: { status: BsffStatus.INTERMEDIATELY_PROCESSED },
+          packagingData: { operationCode: OPERATION.R13.code }
+        }
       );
       const { mutate } = makeClient(destination.user);
       const { errors } = await mutate<
@@ -372,9 +382,14 @@ describe("Mutation.createDraftBsff", () => {
       let bsff = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R13.code, acceptationWasteCode: "14 06 01*" }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: {
+            operationCode: OPERATION.R13.code,
+            acceptationWasteCode: "14 06 01*"
+          }
+        }
       );
 
       const { id, ...packagingData } = bsff.packagings[0];
@@ -422,9 +437,13 @@ describe("Mutation.createDraftBsff", () => {
         createBsffAfterOperation(
           { emitter, transporter, destination },
           {
-            status: BsffStatus.INTERMEDIATELY_PROCESSED
-          },
-          { operationCode: OPERATION.D14.code }
+            data: {
+              status: BsffStatus.INTERMEDIATELY_PROCESSED
+            },
+            packagingData: {
+              operationCode: OPERATION.D14.code
+            }
+          }
         )
       ]);
 
@@ -524,9 +543,11 @@ describe("Mutation.createDraftBsff", () => {
       const previousBsff = await createBsffAfterOperation(
         { emitter, transporter, destination: otherDestination },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       );
 
       const { mutate } = makeClient(destination.user);
@@ -564,15 +585,11 @@ describe("Mutation.createDraftBsff", () => {
       const previousBsffs = await Promise.all([
         createBsff(
           { emitter, transporter, destination },
-          {},
-          {},
-          { acceptationWasteCode: "14 06 01*" }
+          { packagingData: { acceptationWasteCode: "14 06 01*" } }
         ),
         createBsff(
           { emitter, transporter, destination },
-          {},
-          {},
-          { acceptationWasteCode: "14 06 02*" }
+          { packagingData: { acceptationWasteCode: "14 06 02*" } }
         )
       ]);
 
@@ -614,16 +631,18 @@ describe("Mutation.createDraftBsff", () => {
       const previousBsff1 = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       );
       const previousBsff2 = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED
-        },
-        { operationCode: OPERATION.R12.code }
+          data: { status: BsffStatus.INTERMEDIATELY_PROCESSED },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
       );
       const previousBsffs = [previousBsff1, previousBsff2];
 
