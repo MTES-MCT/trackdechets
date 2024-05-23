@@ -23,7 +23,7 @@ export const COMPANY_CONSTANTS = [
   },
   {
     value: CompanyType.Wasteprocessor,
-    label: "Installation de traitement de déchets",
+    label: "Installation de traitement",
     helpText:
       "Installations sur lesquelles sont traités les déchets, et relevant des rubriques suivantes de la nomenclature ICPE :  2720, 2730, 2740, 2750, 2751, 2752, 2760, 2770, 2771, 2780, 2781, 2782, 2790, 2791, 2792-2, 2793-3, 2794, 2795, 2797-2 et 3510, 3520, 3531, 3532, 3540, 3550, 3560."
   },

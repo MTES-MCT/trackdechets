@@ -232,7 +232,11 @@ const CompanyProfileInformation = ({
                       option => option.value === wasteProcessorType
                     );
                     if (wasteProcessorFound) {
-                      return <p>{wasteProcessorFound.label}</p>;
+                      return (
+                        <p key={wasteProcessorFound.value}>
+                          {wasteProcessorFound.label}
+                        </p>
+                      );
                     }
                     return null;
                   })}
@@ -245,7 +249,9 @@ const CompanyProfileInformation = ({
                       option => option.value === collector
                     );
                     if (collectorFound) {
-                      return <p>{collectorFound.label}</p>;
+                      return (
+                        <p key={collectorFound.value}>{collectorFound.label}</p>
+                      );
                     }
                     return null;
                   })}

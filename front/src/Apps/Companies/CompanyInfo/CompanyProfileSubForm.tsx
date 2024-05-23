@@ -286,6 +286,7 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
             <br />
             {WASTE_PROCESSOR_OPTIONS.map(option => (
               <Checkbox
+                key={option.value}
                 options={[
                   {
                     label: option.label,
@@ -310,6 +311,7 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
             <br />
             {COLLECTOR_OPTIONS.map(option => (
               <Checkbox
+                key={option.value}
                 options={[
                   {
                     label: option.label,
