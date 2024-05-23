@@ -1,7 +1,11 @@
 import { Highlight } from "@codegouvfr/react-dsfr/Highlight";
 import { CompanyPrivate, CompanyType } from "@td/codegen-ui";
 import React from "react";
-import { formatDateViewDisplay } from "../common/utils";
+import {
+  COLLECTOR_OPTIONS,
+  WASTE_PROCESSOR_OPTIONS,
+  formatDateViewDisplay
+} from "../common/utils";
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
@@ -221,6 +225,33 @@ const CompanyProfileInformation = ({
                   </Highlight>
                 </div>
               )}
+              {companyType.value === CompanyType.Wasteprocessor && (
+                <Highlight>
+                  {company.wasteProcessorTypes?.map(wasteProcessorType => {
+                    const wasteProcessorFound = WASTE_PROCESSOR_OPTIONS.find(
+                      option => option.value === wasteProcessorType
+                    );
+                    if (wasteProcessorFound) {
+                      return <p>{wasteProcessorFound.label}</p>;
+                    }
+                    return null;
+                  })}
+                </Highlight>
+              )}
+              {companyType.value === CompanyType.Collector && (
+                <Highlight>
+                  {company.collectorTypes?.map(collector => {
+                    const collectorFound = COLLECTOR_OPTIONS.find(
+                      option => option.value === collector
+                    );
+                    if (collectorFound) {
+                      return <p>{collectorFound.label}</p>;
+                    }
+                    return null;
+                  })}
+                </Highlight>
+              )}
+              <br />
             </li>
           )
         );
