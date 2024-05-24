@@ -279,8 +279,8 @@ export const splitAddress = (address: string | null | undefined) => {
   }
 
   const splitted = address
-    .replace(/\r?\n|\r/g, " ") // line break
-    .replace(/\s+/g, " ") // double spaces
+    .replace(/\r?\n|\r/g, " ") // remove line breaks
+    .replace(/\s+/g, " ") // double spaces to single spaces
     .split(/([0-9]{5})/);
 
   return {
