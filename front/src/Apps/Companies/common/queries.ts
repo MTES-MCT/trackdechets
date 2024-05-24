@@ -424,3 +424,50 @@ export const DELETE_WORKER_CERTIFICATION = gql`
     }
   }
 `;
+
+export const RENEW_SECURITY_CODE = gql`
+  mutation RenewSecurityCode($siret: String!) {
+    renewSecurityCode(siret: $siret) {
+      id
+      securityCode
+    }
+  }
+`;
+
+export const UPDATE_DASRI_DIRECT_TAKEOVER = gql`
+  mutation UpdateCompany(
+    $id: String!
+    $allowBsdasriTakeOverWithoutSignature: Boolean!
+  ) {
+    updateCompany(
+      id: $id
+      allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature
+    ) {
+      id
+      siret
+      allowBsdasriTakeOverWithoutSignature
+    }
+  }
+`;
+
+export const ADD_SIGNATURE_DELEGATION = gql`
+  mutation AddSignatureAutomation($input: SignatureAutomationInput!) {
+    addSignatureAutomation(input: $input) {
+      id
+      createdAt
+      to {
+        name
+        siret
+        vatNumber
+      }
+    }
+  }
+`;
+
+export const REMOVE_SIGNATURE_DELEGATION = gql`
+  mutation RemoveSignatureAutomation($id: ID!) {
+    removeSignatureAutomation(id: $id) {
+      id
+    }
+  }
+`;
