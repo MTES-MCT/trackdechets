@@ -59,6 +59,11 @@ describe("extractPostalCode", () => {
     expect(extractPostalCode(address)).toEqual("07100");
   });
 
+  test("when there are multiple matches, should return the last one", () => {
+    const address = "134 AV DU GENERAL EISENHOWER CS 42326 31100 TOULOUSE";
+    expect(extractPostalCode(address)).toEqual("31100");
+  });
+
   test("when there is not match", () => {
     expect(extractPostalCode("Somewhere")).toEqual("");
   });
@@ -145,6 +150,7 @@ describe("splitAddress", () => {
         city: "FIUMICINO RM"
       }
     ],
+    // Foreign postal code - not handled yet
     [
       "IZ Noe Sued Str 14 AT-2355 Wiener Neudorf",
       {
@@ -195,6 +201,15 @@ describe("splitAddress", () => {
         street: "ZI DES AJONCS",
         postalCode: "85000",
         city: "LA ROCHE-SUR-YON"
+      }
+    ],
+    // Misleading example with postalCode-like number in it
+    [
+      "109 AV DU GENERAL EISENHOWER CS 42326 31100 TOULOUSE",
+      {
+        street: "109 AV DU GENERAL EISENHOWER CS 42326",
+        postalCode: "31100",
+        city: "TOULOUSE"
       }
     ]
   ])("%p should return %p", (address, expected) => {

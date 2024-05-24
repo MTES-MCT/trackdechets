@@ -138,9 +138,11 @@ export const hashToken = (token: string) =>
  */
 export function extractPostalCode(address: string | null | undefined) {
   if (address) {
-    const matches = address.match(/([0-9]{5})/);
+    const matches = address.match(/([0-9]{5})/g);
     if (matches && matches.length > 0) {
-      return matches[0];
+      // Some addresses might have misleading numbers that look like postal codes
+      // ex: 134 AV DU GENERAL EISENHOWER CS 42326 31100 TOULOUSE
+      return matches[matches.length - 1];
     }
   }
   return "";
@@ -281,11 +283,11 @@ export const splitAddress = (address: string | null | undefined) => {
   const splitted = address
     .replace(/\r?\n|\r/g, " ") // remove line breaks
     .replace(/\s+/g, " ") // double spaces to single spaces
-    .split(/([0-9]{5})/);
+    .split(postalCode);
 
   return {
     street: splitted[0]?.trim(),
     postalCode: postalCode?.trim(),
-    city: splitted[2]?.trim()
+    city: splitted[1]?.trim()
   };
 };
