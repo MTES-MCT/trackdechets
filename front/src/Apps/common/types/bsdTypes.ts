@@ -145,6 +145,7 @@ export enum WorkflowDisplayType {
   ANNEXE_1 = "Annexe 1",
   ANNEXE_2 = "Regroupement",
   RECONDITIONNEMENT = "Reconditionnement",
+  REEXPEDITION = "Réexpédition",
 
   DEFAULT = ""
 }
