@@ -127,7 +127,6 @@ export type FormWithRevisionRequests = Prisma.FormGetPayload<{
  * foo(form)
  */
 export interface FullForm extends Form {
-  forwardedIn: (Form & { transporters: BsddTransporter[] }) | null;
   transporters: BsddTransporter[];
   intermediaries: IntermediaryFormAssociation[] | null;
 }
