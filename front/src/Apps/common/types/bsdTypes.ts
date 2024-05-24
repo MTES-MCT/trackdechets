@@ -143,7 +143,7 @@ export enum WorkflowDisplayType {
   SYNTH = "Synth",
   TOURNEE = "Tournée dédiée",
   ANNEXE_1 = "Annexe 1",
-  ANNEXE_2 = "Regroupement",
+  ANNEXE_2 = "Annexe 2",
   RECONDITIONNEMENT = "Reconditionnement",
 
   DEFAULT = ""

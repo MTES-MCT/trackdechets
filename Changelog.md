@@ -24,6 +24,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Ajout de la mise à jour de l'immatriculation dans la modale de signature du bordereau de synthèse BSDASRI [PR 3290](https://github.com/MTES-MCT/trackdechets/pull/3290)
+- Renommer Regroupement par Annexe 2 (sous-type de BSDD) [PR 3352](https://github.com/MTES-MCT/trackdechets/pull/3352)
 
 #### :house: Interne
 
