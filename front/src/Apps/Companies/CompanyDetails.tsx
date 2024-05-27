@@ -1,7 +1,6 @@
 import React from "react";
 import { useQuery } from "@apollo/client";
 import CompanyInfo from "./CompanyInfo/CompanyInfo";
-import AccountCompanySecurity from "./AccountCompanySecurity";
 import AccountCompanyMemberList from "./AccountCompanyMemberList";
 import CompanyContactForm from "./CompanyContact/CompanyContactForm";
 import CompanyAdvanced from "./CompanyAdvanced/CompanyAdvanced";
@@ -13,6 +12,7 @@ import { Loader } from "../common/Components";
 import { NotificationError } from "../common/Components/Error/Error";
 import routes from "../routes";
 import AccountContentWrapper from "../Account/AccountContentWrapper";
+import CompanySignature from "./CompanySignature/CompanySignature";
 
 export default function CompanyDetails() {
   const { siret } = useParams<{ siret: string }>();
@@ -135,7 +135,7 @@ export default function CompanyDetails() {
           aria-labelledby="tabpanel-405"
           tabIndex={0}
         >
-          <AccountCompanySecurity company={company} />
+          <CompanySignature company={company} />
         </div>
         <div
           id="tabpanel-406-panel"
