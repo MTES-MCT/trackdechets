@@ -10,6 +10,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { NotificationError } from "../../common/Components/Error/Error";
 import { InlineLoader } from "../../common/Components/Loader/Loaders";
+import { userRoleSwitchOptions } from "./CompanyMembersList";
 import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../../../common/config";
 
@@ -30,7 +31,7 @@ const yupSchema = object()
   .required();
 
 const CompanyMembersInvite = ({ company }: CompanyMembersInviteProps) => {
-  const [addMemberToCompany, { data, error, loading }] = useMutation(
+  const [inviteUserToCompany, { data, error, loading }] = useMutation(
     INVITE_USER_TO_COMPANY
   );
 
@@ -46,7 +47,7 @@ const CompanyMembersInvite = ({ company }: CompanyMembersInviteProps) => {
   });
 
   const updateCompanyMembers = data => {
-    addMemberToCompany({
+    inviteUserToCompany({
       variables: { siret: company.orgId, ...data },
       onCompleted: () => {
         toast.success("Invitation envoyée", { duration: TOAST_DURATION });
@@ -78,10 +79,7 @@ const CompanyMembersInvite = ({ company }: CompanyMembersInviteProps) => {
               ...{ "data-testid": "company-members-role" }
             }}
           >
-            <option value={UserRole.Admin}>Administrateur</option>
-            <option value={UserRole.Member}>Collaborateur</option>
-            <option value={UserRole.Reader}>Lecteur</option>
-            <option value={UserRole.Driver}>Chauffeur</option>
+            {userRoleSwitchOptions()}
           </Select>
 
           <Button

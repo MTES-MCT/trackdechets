@@ -6,7 +6,8 @@ import {
   Mutation,
   MutationRemoveUserFromCompanyArgs,
   MutationDeleteInvitationArgs,
-  CompanyMember
+  CompanyMember,
+  MutationResendInvitationArgs
 } from "@td/codegen-ui";
 import {
   REMOVE_USER_FROM_COMPANY,
@@ -30,7 +31,7 @@ const deleteModal = createModal({
   isOpenedByDefault: false
 });
 
-const userRole = role => {
+const userRoleLabel = role => {
   switch (role) {
     case UserRole.Admin:
       return "Administrateur";
@@ -41,6 +42,14 @@ const userRole = role => {
     case UserRole.Reader:
       return "Lecteur";
   }
+};
+
+export const userRoleSwitchOptions = () => {
+  return Object.keys(UserRole).map(role => (
+    <option key={UserRole[role]} value={UserRole[role]}>
+      {userRoleLabel(UserRole[role])}
+    </option>
+  ));
 };
 
 const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
@@ -86,7 +95,10 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
     }
   });
 
-  const [resendInvitation] = useMutation(RESEND_INVITATION, {
+  const [resendInvitation] = useMutation<
+    Pick<Mutation, "resendInvitation">,
+    MutationResendInvitationArgs
+  >(RESEND_INVITATION, {
     onCompleted: () => {
       toast.success("Invitation renvoyée", { duration: TOAST_DURATION });
     },
@@ -123,15 +135,15 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
       return;
     }
 
-    function filterUsers(users, string) {
+    function filterUsers(users: CompanyMember[], filterString: string) {
       return users.filter(
         user =>
-          user.name.toLowerCase().includes(string.toLowerCase()) ||
-          user.email.toLowerCase().includes(string.toLowerCase())
+          user.name?.toLowerCase().includes(filterString.toLowerCase()) ||
+          user.email.toLowerCase().includes(filterString.toLowerCase())
       );
     }
 
-    if (company && company.users && company.users.length > 0) {
+    if (company?.users?.length && company?.users?.length > 0) {
       setFilteredMembers(filterUsers(company.users, predicate));
     }
   };
@@ -197,13 +209,10 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
                             ...{ "data-testid": "company-member-role" }
                           }}
                         >
-                          <option value={UserRole.Admin}>Administrateur</option>
-                          <option value={UserRole.Member}>Collaborateur</option>
-                          <option value={UserRole.Reader}>Lecteur</option>
-                          <option value={UserRole.Driver}>Chauffeur</option>
+                          {userRoleSwitchOptions()}
                         </Select>
                       ) : (
-                        userRole(user.role)
+                        userRoleLabel(user.role)
                       )}
                     </td>
                     <td>
@@ -278,7 +287,7 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
             }
           ]}
         >
-          Êtes vous sûr de vouloir révoquer{" "}
+          Êtes-vous sûr de vouloir révoquer{" "}
           {memberToDelete ? memberToDelete.name : ""} ?
         </deleteModal.Component>
       )}
