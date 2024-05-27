@@ -31,6 +31,22 @@ export const UPDATE_CONTACT_INFOS = gql`
   }
 `;
 
+export const INVITE_USER_TO_COMPANY = gql`
+  mutation InviteUserToCompany(
+    $email: String!
+    $siret: String!
+    $role: UserRole!
+  ) {
+    inviteUserToCompany(email: $email, siret: $siret, role: $role) {
+      id
+      users {
+        ...AccountCompanyMemberUserFragment
+      }
+    }
+  }
+  ${AccountCompanyMemberFragment.user}
+`;
+
 export const GET_ME = gql`
   {
     me {
