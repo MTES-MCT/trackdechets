@@ -2,7 +2,9 @@
 
 type Query {
   """
-  Registre de déchets entrants, trié par date de réception
+  Registre entrant.
+  Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
+  a été signé et sont triés par date de réception du déchet.
   https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884574
   """
   incomingWastes(
@@ -21,7 +23,9 @@ type Query {
   ): IncomingWasteConnection!
 
   """
-  Registre de déchets sortants, trié par date d'expédition du déchet
+  Registre sortant.
+  Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
+  a été signé et sont triés par date d'enlèvement du déchet.
   https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884583
   """
   outgoingWastes(
@@ -40,7 +44,9 @@ type Query {
   ): OutgoingWasteConnection!
 
   """
-  Registre de déchets collectés, trié par date de prise en charge du déchet
+  Registre de transport.
+  Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
+  a été signé et sont triés par date d'enlèvement du déchet.
   https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884592
   """
   transportedWastes(
@@ -59,10 +65,11 @@ type Query {
   ): TransportedWasteConnection!
 
   """
-  Registre de déchets gérés, trié par date d'expédition du déchet
-  (la date d'acquisition ou de début de gestion du déchet n'apparaissant pas
-  sur les bordereaux de suivi de déchet, il n'est pas possible de trier
-  le registre suivant cette date)
+  Registre de gestion.
+  Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
+  a été signé et sont triés par date d'enlèvement du déchet (la date d'acquisition ou
+  de début de gestion du déchet n'apparaissant pas sur les bordereaux de suivi de déchet,
+  il n'est pas possible de trier le registre suivant cette date).
   https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884599
   """
   managedWastes(
@@ -81,9 +88,11 @@ type Query {
   ): ManagedWasteConnection!
 
   """
-  Registre de déchets "exhaustif" permettant d'exporter l'intégralité
-  des déchets sortants, entrants, collectés ou gérés, trié par la date
-  d'expédition du déchet.
+  Registre exhaustif.
+  Registre qui n'est pas réglementaire et qui est indépendant des autres registres. Il permet
+  d'exporter un nombre d'informations conséquent sur l'ensemble des bordereaux sur lesquels un
+  acteur a été visé à partir du moment où l'enlèvement a été signé. Dans cet export, les bordereaux
+  sont triés par date d'enlèvement du déchet.
   """
   allWastes(
     "Liste d'établissements à inclure dans le registre de déchets exhaustifs"

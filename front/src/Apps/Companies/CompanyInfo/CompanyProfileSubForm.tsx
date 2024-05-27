@@ -4,6 +4,7 @@ import Select from "@codegouvfr/react-dsfr/Select";
 import { CompanyType } from "@td/codegen-ui";
 import React from "react";
 import { Highlight } from "@codegouvfr/react-dsfr/Highlight";
+import { COLLECTOR_OPTIONS, WASTE_PROCESSOR_OPTIONS } from "../common/utils";
 
 const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
   const COMPOSED_COMPANY_TYPES = [
@@ -11,7 +12,9 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
     CompanyType.Transporter,
     CompanyType.Broker,
     CompanyType.Trader,
-    CompanyType.Worker
+    CompanyType.Worker,
+    CompanyType.Collector,
+    CompanyType.Wasteprocessor
   ];
   const companyTypesValues = watch("companyTypes");
   const hasSubSectionThree = watch("workerCertification.hasSubSectionThree");
@@ -36,6 +39,10 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
     companyType === field.value && companyType === CompanyType.Trader;
   const isWorker = companyType =>
     companyType === field.value && companyType === CompanyType.Worker;
+  const isCollector = companyType =>
+    companyType === field.value && companyType === CompanyType.Collector;
+  const isWasteProcessor = companyType =>
+    companyType === field.value && companyType === CompanyType.Wasteprocessor;
 
   return composedCompanyTypes.map(companyType => {
     if (isWasteVehicules(companyType)) {
@@ -269,6 +276,56 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
           </Highlight>
           <br />
         </div>
+      );
+    }
+    if (isWasteProcessor(companyType)) {
+      return (
+        <>
+          <Highlight>
+            <h4>Déchets traités</h4>
+            <br />
+            {WASTE_PROCESSOR_OPTIONS.map(option => (
+              <Checkbox
+                key={option.value}
+                options={[
+                  {
+                    label: option.label,
+                    nativeInputProps: {
+                      ...register("wasteProcessorTypes"),
+                      value: option.value
+                    }
+                  }
+                ]}
+              />
+            ))}
+          </Highlight>
+          <br />
+        </>
+      );
+    }
+    if (isCollector(companyType)) {
+      return (
+        <>
+          <Highlight>
+            <h4>Déchets concernés</h4>
+            <br />
+            {COLLECTOR_OPTIONS.map(option => (
+              <Checkbox
+                key={option.value}
+                options={[
+                  {
+                    label: option.label,
+                    nativeInputProps: {
+                      ...register("collectorTypes"),
+                      value: option.value
+                    }
+                  }
+                ]}
+              />
+            ))}
+          </Highlight>
+          <br />
+        </>
       );
     }
 

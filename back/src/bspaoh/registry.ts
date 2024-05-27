@@ -11,6 +11,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -40,12 +41,6 @@ const getTransporterData = (
   };
 };
 
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor";
-
 export function getRegistryFields(
   bspaoh: Bspaoh & {
     transporters: BspaohTransporter[] | null;
@@ -55,15 +50,20 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
   const transporter = getFirstTransporterSync(bspaoh);
   if (
     bspaoh.emitterEmissionSignatureDate &&
     transporter?.transporterTransportSignatureDate
   ) {
+    if (bspaoh.destinationCompanySiret) {
+      registryFields.isAllWasteFor.push(bspaoh.destinationCompanySiret);
+    }
     if (bspaoh.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bspaoh.emitterCompanySiret);
+      registryFields.isAllWasteFor.push(bspaoh.emitterCompanySiret);
     }
 
     if (bspaoh.transporters?.length) {
@@ -71,6 +71,7 @@ export function getRegistryFields(
         const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
         if (transporterCompanyOrgId) {
           registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+          registryFields.isAllWasteFor.push(transporterCompanyOrgId);
         }
       }
     }

@@ -193,8 +193,8 @@ export function Registry() {
             ...register("exportFormat", { required: true })
           }}
         >
-          <option value="CSV">.csv</option>
           <option value="XLSX">.xlsx (Excel)</option>
+          <option value="CSV">.csv</option>
         </Select>
 
         <Button>

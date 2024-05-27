@@ -101,6 +101,8 @@ export interface BsdElastic {
   isOutgoingWasteFor: string[];
   isTransportedWasteFor: string[];
   isManagedWasteFor: string[];
+  isAllWasteFor: string[];
+
   // Liste des établissements concernés par une demande de révision en cours sur ce bordereau
   isInRevisionFor: string[];
   // Liste des établissements concernés par une demande de révision passée sur ce bordereau
@@ -284,6 +286,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isOutgoingWasteFor: stringField,
   isTransportedWasteFor: stringField,
   isManagedWasteFor: stringField,
+  isAllWasteFor: stringField,
   isInRevisionFor: stringField,
   isRevisedFor: stringField,
 

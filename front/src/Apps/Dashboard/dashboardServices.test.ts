@@ -1207,7 +1207,7 @@ describe("dashboardServices", () => {
 
       const result = getWorkflowLabel(bsdWorkflowType);
 
-      expect(result).toBe(WorkflowDisplayType.TRANSIT);
+      expect(result).toBe(WorkflowDisplayType.REEXPEDITION);
     });
 
     it("should return correct label for BsdasriType.Grouping", () => {

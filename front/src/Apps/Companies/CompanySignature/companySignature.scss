@@ -1,0 +1,5 @@
+.company-signature {
+  // This is a dirty fix so the CompanySelector is not clipped by the DSFR tabs
+  // (which hides its dirt with an overflow hidden)
+  min-height: 1100px;
+}

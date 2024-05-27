@@ -9,17 +9,26 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Permettre un export .xls ou .csv de la liste des établissements avec les membres rattachés [PR 3329](https://github.com/MTES-MCT/trackdechets/pull/3329).
+- Ajouter des profils et sous-types de profils (TTR et Installation de traitement) FRONT - T1 [PR 3350](https://github.com/MTES-MCT/trackdechets/pull/3350).
+
 #### :bug: Corrections de bugs
 
 - Fix statut des annexes lorsque l'émetteur est un particulier [PR 3287](https://github.com/MTES-MCT/trackdechets/pull/3287)
 - Fix de la redirection après signature d'un BSDASRI de groupement par l'émetteur [PR 3292](https://github.com/MTES-MCT/trackdechets/pull/3292)
 - Cacher liens PDF sur Annexes/Suite si le bordereau est un brouillon [PR 3310](https://github.com/MTES-MCT/trackdechets/pull/3310)
+- Au refus total d'un VHU, ne pas demander de compléter le code / mode de traitement [PR 3336](https://github.com/MTES-MCT/trackdechets/pull/3336)
+- Retirer le fait que les champs des transporteurs soient requis à la signature de la réception même lorsqu'ils n'ont pas signé l'enlèvement sur un BSDA [PR 3331](https://github.com/MTES-MCT/trackdechets/pull/3331)
+- Ne pas afficher les pastilles d'alertes pour le profil Lecteur [PR 3353](https://github.com/MTES-MCT/trackdechets/pull/3353)
 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
 - Ajout de la mise à jour de l'immatriculation dans la modale de signature du bordereau de synthèse BSDASRI [PR 3290](https://github.com/MTES-MCT/trackdechets/pull/3290)
+- Renommer Regroupement par Annexe 2 (sous-type de BSDD) [PR 3352](https://github.com/MTES-MCT/trackdechets/pull/3352)
+
+- Renommer Transit par Réexpédition (sous-type de BSDA) [PR 3351](https://github.com/MTES-MCT/trackdechets/pull/3351)
 
 #### :house: Interne
 

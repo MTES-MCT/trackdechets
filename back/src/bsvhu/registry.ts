@@ -9,6 +9,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -35,11 +36,6 @@ const getTransporterData = (bsvhu: Bsvhu) => ({
   transporterCompanyAddress: bsvhu.transporterCompanyAddress
 });
 
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor";
 export function getRegistryFields(
   bsvhu: Bsvhu
 ): Pick<BsdElastic, RegistryFields> {
@@ -47,18 +43,24 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
 
   if (
     bsvhu.emitterEmissionSignatureDate &&
     bsvhu.transporterTransportSignatureDate
   ) {
+    if (bsvhu.destinationCompanySiret) {
+      registryFields.isAllWasteFor.push(bsvhu.destinationCompanySiret);
+    }
     if (bsvhu.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsvhu.emitterCompanySiret);
+      registryFields.isAllWasteFor.push(bsvhu.emitterCompanySiret);
     }
     if (bsvhu.transporterCompanySiret) {
       registryFields.isTransportedWasteFor.push(bsvhu.transporterCompanySiret);
+      registryFields.isAllWasteFor.push(bsvhu.transporterCompanySiret);
     }
   }
 

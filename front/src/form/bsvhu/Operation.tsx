@@ -1,5 +1,5 @@
 import { Field, useFormikContext } from "formik";
-import React, { lazy } from "react";
+import React, { lazy, useEffect } from "react";
 import { RedErrorMessage } from "../../common/components";
 import Tooltip from "../../common/components/Tooltip";
 import DateInput from "../common/components/custom-inputs/DateInput";
@@ -13,9 +13,15 @@ const TagsInput = lazy(
 );
 
 export default function Operation() {
-  const { values } = useFormikContext<Bsvhu>();
+  const { values, setFieldValue } = useFormikContext<Bsvhu>();
 
   const TODAY = new Date();
+
+  useEffect(() => {
+    if (values.destination?.reception?.acceptationStatus === "REFUSED") {
+      setFieldValue("destination.reception.weight", 0);
+    }
+  }, [values.destination?.reception?.acceptationStatus, setFieldValue]);
 
   return (
     <>
@@ -82,6 +88,9 @@ export default function Operation() {
           Poids accepté en tonnes
           <Field
             component={NumberInput}
+            disabled={
+              values.destination?.reception?.acceptationStatus === "REFUSED"
+            }
             name="destination.reception.weight"
             className="td-input td-input--small"
             placeholder="0"
@@ -92,62 +101,64 @@ export default function Operation() {
 
         <RedErrorMessage name="destination.reception.weight" />
       </div>
-
-      {values.destination?.type === BsvhuDestinationType.Demolisseur && (
+      {values.destination?.reception?.acceptationStatus !== "REFUSED" && (
         <>
-          <h4 className="form__section-heading">Identification</h4>
+          {values.destination?.type === BsvhuDestinationType.Demolisseur && (
+            <>
+              <h4 className="form__section-heading">Identification</h4>
+              <div className="form__row">
+                <label htmlFor="destination.reception.identification.numbers">
+                  Identification des numeros entrant des lots ou de véhicules
+                  hors d'usage (livre de police)
+                  <Tooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
+                </label>
+                <TagsInput name="destination.reception.identification.numbers" />
+              </div>
+            </>
+          )}
+
+          <h4 className="form__section-heading">Opération</h4>
           <div className="form__row">
-            <label htmlFor="destination.reception.identification.numbers">
-              Identification des numeros entrant des lots ou des VHU (livre de
-              police)
-              <Tooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
+            <label>
+              Date de l'opération
+              <Field
+                component={DateInput}
+                name="destination.operation.date"
+                className="td-input td-input--small"
+                minDate={subMonths(TODAY, 2)}
+                maxDate={TODAY}
+                required
+              />
             </label>
-            <TagsInput name="destination.reception.identification.numbers" />
+
+            <RedErrorMessage name="destination.operation.date" />
           </div>
+
+          <div className="form__row tw-pb-6">
+            <label>Opération d’élimination / valorisation effectuée</label>
+            <Field
+              as="select"
+              name="destination.operation.code"
+              className="td-select"
+            >
+              <option value="...">Sélectionnez une valeur...</option>
+              <option value="R 4">
+                R 4 - Recyclage ou récupération des métaux et des composés
+                métalliques
+              </option>
+              <option value="R 12">
+                R 12 - Échange de déchets en vue de les soumettre à l'une des
+                opérations numérotées R1 à R11
+              </option>
+            </Field>
+          </div>
+
+          <OperationModeSelect
+            operationCode={values?.destination?.operation?.code}
+            name="destination.operation.mode"
+          />
         </>
       )}
-
-      <h4 className="form__section-heading">Opération</h4>
-      <div className="form__row">
-        <label>
-          Date de l'opération
-          <Field
-            component={DateInput}
-            name="destination.operation.date"
-            className="td-input td-input--small"
-            minDate={subMonths(TODAY, 2)}
-            maxDate={TODAY}
-            required
-          />
-        </label>
-
-        <RedErrorMessage name="destination.operation.date" />
-      </div>
-
-      <div className="form__row tw-pb-6">
-        <label>Opération d’élimination / valorisation effectuée</label>
-        <Field
-          as="select"
-          name="destination.operation.code"
-          className="td-select"
-        >
-          <option value="...">Sélectionnez une valeur...</option>
-          <option value="R 4">
-            R 4 - Recyclage ou récupération des métaux et des composés
-            métalliques
-          </option>
-          <option value="R 12">
-            R 12 - Échange de déchets en vue de les soumettre à l'une des
-            opérations numérotées R1 à R11
-          </option>
-        </Field>
-      </div>
-
-      <OperationModeSelect
-        operationCode={values?.destination?.operation?.code}
-        name="destination.operation.mode"
-      />
-
       <br />
     </>
   );
