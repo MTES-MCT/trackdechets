@@ -70,25 +70,23 @@ export function getRegistryFields(
   }
 
   if (form.sentAt) {
-    if (form.recipientCompanySiret) {
-      registryFields.isAllWasteFor.push(form.recipientCompanySiret);
-    }
-    if (form.emitterCompanySiret) {
-      registryFields.isOutgoingWasteFor.push(form.emitterCompanySiret);
-      registryFields.isAllWasteFor.push(form.emitterCompanySiret);
-    }
-    if (form.ecoOrganismeSiret) {
-      registryFields.isOutgoingWasteFor.push(form.ecoOrganismeSiret);
-      registryFields.isAllWasteFor.push(form.ecoOrganismeSiret);
-    }
-    if (form.traderCompanySiret) {
-      registryFields.isManagedWasteFor.push(form.traderCompanySiret);
-      registryFields.isAllWasteFor.push(form.traderCompanySiret);
-    }
-    if (form.brokerCompanySiret) {
-      registryFields.isManagedWasteFor.push(form.brokerCompanySiret);
-      registryFields.isAllWasteFor.push(form.brokerCompanySiret);
-    }
+    registryFields.isAllWasteFor = [
+      form.recipientCompanySiret,
+      form.emitterCompanySiret,
+      form.ecoOrganismeSiret,
+      form.traderCompanySiret,
+      form.brokerCompanySiret
+    ].filter(Boolean);
+
+    registryFields.isOutgoingWasteFor = [
+      form.emitterCompanySiret,
+      form.ecoOrganismeSiret
+    ].filter(Boolean);
+
+    registryFields.isManagedWasteFor = [
+      form.traderCompanySiret,
+      form.brokerCompanySiret
+    ].filter(Boolean);
 
     if (form.intermediaries?.length) {
       for (const intermediary of form.intermediaries) {

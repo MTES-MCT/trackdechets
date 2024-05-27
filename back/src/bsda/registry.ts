@@ -86,26 +86,24 @@ export function getRegistryFields(
   const transporter = getFirstTransporterSync(bsda);
 
   if (transporter?.transporterTransportSignatureDate) {
-    if (bsda.destinationCompanySiret) {
-      registryFields.isAllWasteFor.push(bsda.destinationCompanySiret);
-    }
-    if (bsda.emitterCompanySiret) {
-      registryFields.isOutgoingWasteFor.push(bsda.emitterCompanySiret);
-      registryFields.isAllWasteFor.push(bsda.emitterCompanySiret);
-    }
-    if (bsda.ecoOrganismeSiret) {
-      registryFields.isOutgoingWasteFor.push(bsda.ecoOrganismeSiret);
-      registryFields.isAllWasteFor.push(bsda.ecoOrganismeSiret);
-    }
+    registryFields.isOutgoingWasteFor = [
+      bsda.emitterCompanySiret,
+      bsda.ecoOrganismeSiret,
+      bsda.workerCompanySiret
+    ].filter(Boolean);
 
-    if (bsda.workerCompanySiret) {
-      registryFields.isOutgoingWasteFor.push(bsda.workerCompanySiret);
-      registryFields.isAllWasteFor.push(bsda.workerCompanySiret);
-    }
+    registryFields.isAllWasteFor = [
+      bsda.destinationCompanySiret,
+      bsda.emitterCompanySiret,
+      bsda.ecoOrganismeSiret,
+      bsda.workerCompanySiret,
+      bsda.brokerCompanySiret
+    ].filter(Boolean);
+
     if (bsda.brokerCompanySiret) {
       registryFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
-      registryFields.isAllWasteFor.push(bsda.brokerCompanySiret);
     }
+
     if (bsda.intermediaries?.length) {
       for (const intermediary of bsda.intermediaries) {
         const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
