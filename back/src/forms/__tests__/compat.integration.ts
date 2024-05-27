@@ -67,6 +67,7 @@ describe("simpleFormToBsdd", () => {
       emitterPickupSiteAddress: form.emitterWorkSiteAddress,
       emitterPickupSiteCity: form.emitterWorkSiteCity,
       emitterPickupSitePostalCode: form.emitterWorkSitePostalCode,
+      emitterType: "PRODUCER",
       emitterPickupSiteInfos: form.emitterWorkSiteInfos,
       emitterEmissionSignatureAuthor: form.sentBy,
       emitterEmissionSignatureDate: form.sentAt,
@@ -162,6 +163,7 @@ describe("simpleFormToBsdd", () => {
       destinationOperationNextDestinationCompanyContact: null,
       destinationOperationNextDestinationCompanyPhone: null,
       destinationOperationNextDestinationCompanyMail: null,
+      forwardedInId: null,
       forwarding: null,
       grouping: [],
       finalOperations: []
@@ -309,6 +311,7 @@ describe("simpleFormToBsdd", () => {
       emitterPickupSiteCity: fullForwardedInForm.emitterWorkSiteCity,
       emitterPickupSitePostalCode:
         fullForwardedInForm.emitterWorkSitePostalCode,
+      emitterType: null,
       emitterPickupSiteInfos: fullForwardedInForm.emitterWorkSiteInfos,
       emitterEmissionSignatureAuthor: fullForwardedInForm.sentBy,
       emitterEmissionSignatureDate: fullForwardedInForm.sentAt,
@@ -414,6 +417,7 @@ describe("simpleFormToBsdd", () => {
       destinationOperationNextDestinationCompanyMail: null,
       grouping: [],
       finalOperations: [],
+      forwardedInId: null,
       forwarding: {
         id: form.readableId,
         customId: form.customId,
@@ -457,6 +461,7 @@ describe("simpleFormToBsdd", () => {
         emitterPickupSiteAddress: form.emitterWorkSiteAddress,
         emitterPickupSiteCity: form.emitterWorkSiteCity,
         emitterPickupSitePostalCode: form.emitterWorkSitePostalCode,
+        emitterType: "PRODUCER",
         emitterPickupSiteInfos: form.emitterWorkSiteInfos,
         emitterEmissionSignatureAuthor: form.sentBy,
         emitterEmissionSignatureDate: form.sentAt,
@@ -554,6 +559,7 @@ describe("simpleFormToBsdd", () => {
         destinationOperationNextDestinationCompanyContact: null,
         destinationOperationNextDestinationCompanyPhone: null,
         destinationOperationNextDestinationCompanyMail: null,
+        forwardedInId: fullForwardedInForm.id,
         grouping: []
       }
     });
