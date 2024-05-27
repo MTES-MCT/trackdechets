@@ -321,7 +321,8 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
           }
 
           const company = await prisma.company.findFirst({
-            where: { orgId: value }
+            where: { orgId: value },
+            select: { id: true }
           });
           return company != null;
         }
