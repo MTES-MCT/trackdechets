@@ -20,6 +20,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Au refus total d'un VHU, ne pas demander de compléter le code / mode de traitement [PR 3336](https://github.com/MTES-MCT/trackdechets/pull/3336)
 - Retirer le fait que les champs des transporteurs soient requis à la signature de la réception même lorsqu'ils n'ont pas signé l'enlèvement sur un BSDA [PR 3331](https://github.com/MTES-MCT/trackdechets/pull/3331)
 - Ne pas afficher les pastilles d'alertes pour le profil Lecteur [PR 3353](https://github.com/MTES-MCT/trackdechets/pull/3353)
+- Correction d'une incohérence entre les dates affichées dans l'Aperçu et les dates affichées dans le registre [PR 3319](https://github.com/MTES-MCT/trackdechets/pull/3319)
 
 #### :boom: Breaking changes
 
@@ -27,8 +28,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout de la mise à jour de l'immatriculation dans la modale de signature du bordereau de synthèse BSDASRI [PR 3290](https://github.com/MTES-MCT/trackdechets/pull/3290)
 - Renommer Regroupement par Annexe 2 (sous-type de BSDD) [PR 3352](https://github.com/MTES-MCT/trackdechets/pull/3352)
-
 - Renommer Transit par Réexpédition (sous-type de BSDA) [PR 3351](https://github.com/MTES-MCT/trackdechets/pull/3351)
+- Registre:
+  - Ajout des informations relatives à l'installation de destination post-entreposage provisoire sur les registres sortants et exhaustifs [PR 3349](https://github.com/MTES-MCT/trackdechets/pull/3349)
+  - Inversion des options de téléchargement du registre .csv et .xls pour éviter les erreurs [PR 3311](https://github.com/MTES-MCT/trackdechets/pull/3311)
+  - Retrait de la possibilité de filtrer le registre par code déchet via le sélecteur [PR 3312](https://github.com/MTES-MCT/trackdechets/pull/3312)
+  - Incrémentation des registres Exhaustif, Sortant, Transport & Gestion dès la signature transporteur et le registre Entrant dès la signature de réception [PR 3306](https://github.com/MTES-MCT/trackdechets/pull/3306)
+  - Ajout du producteur initial dans les bordereaux suite [PR 3337](https://github.com/MTES-MCT/trackdechets/pull/3337)
+  - Ajout d'une colonne "sous-type de bordereau" dans tous les registres [PR 3339](https://github.com/MTES-MCT/trackdechets/pull/3339)
 
 #### :house: Interne
 
