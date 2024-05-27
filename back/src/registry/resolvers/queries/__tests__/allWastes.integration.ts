@@ -147,6 +147,7 @@ describe("All wastes registry", () => {
       opt: {
         emitterCompanySiret: emitter.company.siret,
         transporterCompanySiret: transporter.company.siret,
+        emitterEmissionSignatureDate: new Date("2021-07-01"),
         transporterTransportSignatureDate: new Date("2021-07-01"),
         destinationCompanySiret: destination.company.siret,
         wasteCode: "16 01 04*",
@@ -170,6 +171,7 @@ describe("All wastes registry", () => {
         wasteCode: "14 06 01*",
         createdAt: new Date("2021-08-01"),
         transporterTransportTakenOverAt: new Date("2021-08-02"),
+        transporterTransportSignatureDate: new Date("2021-08-02"),
         destinationReceptionDate: new Date("2021-08-03")
       },
       {
@@ -183,7 +185,7 @@ describe("All wastes registry", () => {
       opt: {
         status: BspaohStatus.PROCESSED,
         emitterCompanySiret: emitter.company.siret,
-
+        emitterEmissionSignatureDate: new Date("2021-09-02"),
         destinationCompanySiret: destination.company.siret,
 
         destinationReceptionDate: new Date("2021-09-01"),
@@ -194,7 +196,8 @@ describe("All wastes registry", () => {
         transporters: {
           create: {
             number: 1,
-            transporterCompanySiret: transporter.company.siret
+            transporterCompanySiret: transporter.company.siret,
+            transporterTransportSignatureDate: new Date("2021-09-02")
           }
         }
       }

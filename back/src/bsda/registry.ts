@@ -11,6 +11,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -71,11 +72,6 @@ const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
   };
 };
 
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor";
 export function getRegistryFields(
   bsda: BsdaForElastic
 ): Pick<BsdElastic, RegistryFields> {
@@ -83,30 +79,37 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
 
   const transporter = getFirstTransporterSync(bsda);
 
   if (transporter?.transporterTransportSignatureDate) {
-    if (bsda.emitterCompanySiret) {
-      registryFields.isOutgoingWasteFor.push(bsda.emitterCompanySiret);
-    }
-    if (bsda.ecoOrganismeSiret) {
-      registryFields.isOutgoingWasteFor.push(bsda.ecoOrganismeSiret);
-    }
+    registryFields.isOutgoingWasteFor = [
+      bsda.emitterCompanySiret,
+      bsda.ecoOrganismeSiret,
+      bsda.workerCompanySiret
+    ].filter(Boolean);
 
-    if (bsda.workerCompanySiret) {
-      registryFields.isOutgoingWasteFor.push(bsda.workerCompanySiret);
-    }
+    registryFields.isAllWasteFor = [
+      bsda.destinationCompanySiret,
+      bsda.emitterCompanySiret,
+      bsda.ecoOrganismeSiret,
+      bsda.workerCompanySiret,
+      bsda.brokerCompanySiret
+    ].filter(Boolean);
+
     if (bsda.brokerCompanySiret) {
       registryFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
     }
+
     if (bsda.intermediaries?.length) {
       for (const intermediary of bsda.intermediaries) {
         const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
         if (intermediaryOrgId) {
           registryFields.isManagedWasteFor.push(intermediaryOrgId);
+          registryFields.isAllWasteFor.push(intermediaryOrgId);
         }
       }
     }
@@ -117,6 +120,7 @@ export function getRegistryFields(
       const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
       if (transporterCompanyOrgId) {
         registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+        registryFields.isAllWasteFor.push(transporterCompanyOrgId);
       }
     }
   }

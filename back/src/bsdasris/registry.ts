@@ -11,6 +11,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -53,12 +54,6 @@ const getTransporterData = (bsdasri: Bsdasri) => ({
   transporterTakenOverAt: bsdasri.transporterTakenOverAt
 });
 
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor";
-
 export function getRegistryFields(
   bsdasri: Bsdasri
 ): Pick<BsdElastic, RegistryFields> {
@@ -66,19 +61,26 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
 
   if (bsdasri.transporterTransportSignatureDate) {
+    if (bsdasri.destinationCompanySiret) {
+      registryFields.isAllWasteFor.push(bsdasri.destinationCompanySiret);
+    }
     if (bsdasri.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsdasri.emitterCompanySiret);
+      registryFields.isAllWasteFor.push(bsdasri.emitterCompanySiret);
     }
     if (bsdasri.ecoOrganismeSiret) {
       registryFields.isOutgoingWasteFor.push(bsdasri.ecoOrganismeSiret);
+      registryFields.isAllWasteFor.push(bsdasri.ecoOrganismeSiret);
     }
     const transporterCompanyOrgId = getTransporterCompanyOrgId(bsdasri);
     if (transporterCompanyOrgId) {
       registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+      registryFields.isAllWasteFor.push(transporterCompanyOrgId);
     }
   }
 

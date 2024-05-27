@@ -12,6 +12,13 @@ import {
 } from "../generated/graphql/types";
 import { estypes } from "@elastic/elasticsearch";
 
+export type RegistryFields =
+  | "isIncomingWasteFor"
+  | "isOutgoingWasteFor"
+  | "isTransportedWasteFor"
+  | "isManagedWasteFor"
+  | "isAllWasteFor";
+
 export type GenericWaste =
   | IncomingWaste
   | OutgoingWaste
