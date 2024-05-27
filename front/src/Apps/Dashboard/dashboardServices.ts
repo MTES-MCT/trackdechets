@@ -8,6 +8,7 @@ import { formatBsd } from "./bsdMapper";
 import {
   Bsda,
   BsdasriType,
+  Bsdasri,
   BsdaType,
   BsdType,
   BsffType,
@@ -214,8 +215,13 @@ const hasEmitterTransporterAndEcoOrgSiret = (
   ].includes(siret);
 };
 
-const isSameSiretEmmiter = (currentSiret: string, bsd: BsdDisplay): boolean =>
+const isSameSiretEmitter = (currentSiret: string, bsd: BsdDisplay): boolean =>
   currentSiret === bsd.emitter?.company?.siret;
+
+const isSameSiretEcorganisme = (
+  currentSiret: string,
+  bsd: BsdDisplay
+): boolean => currentSiret === bsd.ecoOrganisme?.siret;
 
 const isSameSiretDestination = (
   currentSiret: string,
@@ -325,7 +331,7 @@ export const isBsdaSignWorker = (bsd: BsdDisplay, currentSiret: string) => {
 };
 
 export const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
-  isBsvhu(bsd.type) && isSameSiretEmmiter(currentSiret, bsd);
+  isBsvhu(bsd.type) && isSameSiretEmitter(currentSiret, bsd);
 
 export const isBsffSign = (
   bsd: BsdDisplay,
@@ -333,7 +339,7 @@ export const isBsffSign = (
   bsdCurrentTab: BsdCurrentTab
 ) => {
   const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
-  return isBsff(bsd.type) && !isActTab && isSameSiretEmmiter(currentSiret, bsd);
+  return isBsff(bsd.type) && !isActTab && isSameSiretEmitter(currentSiret, bsd);
 };
 
 export const isEmetteurSign = (bsd: BsdDisplay, isTransporter: boolean) =>
@@ -355,7 +361,7 @@ export const getIsNonDraftLabel = (
   if (
     isBsda(bsd.type) &&
     isCollection_2710(bsd.bsdWorkflowType?.toString()) &&
-    isSameSiretEmmiter(currentSiret, bsd) &&
+    isSameSiretEmitter(currentSiret, bsd) &&
     !isSameSiretDestination(currentSiret, bsd) &&
     bsd.ecoOrganisme?.siret !== currentSiret
   ) {
@@ -381,7 +387,7 @@ export const getIsNonDraftLabel = (
 
   if (isBsdasri(bsd.type)) {
     const isEcoOrganisme = currentSiret === bsd.ecoOrganisme?.siret;
-    const isHolder = isSameSiretEmmiter(currentSiret, bsd) || isEcoOrganisme;
+    const isHolder = isSameSiretEmitter(currentSiret, bsd) || isEcoOrganisme;
     const isTransporter = isSameSiretTransporter(currentSiret, bsd);
 
     if (
@@ -423,7 +429,7 @@ export const getIsNonDraftLabel = (
 
   if (
     !isFollowTab &&
-    isSameSiretEmmiter(currentSiret, bsd) &&
+    isSameSiretEmitter(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignEmission)
   ) {
     return SIGNER;
@@ -552,7 +558,7 @@ export const getSealedBtnLabel = (
         return FAIRE_SIGNER;
       }
     }
-    if (isSameSiretEmmiter(currentSiret, bsd)) {
+    if (isSameSiretEmitter(currentSiret, bsd)) {
       return SIGNER;
     }
     if (hasEmitterTransporterAndEcoOrgSiret(bsd, currentSiret)) {
@@ -891,7 +897,7 @@ export const getResealedBtnLabel = (
     (permissions.includes(UserPermission.BsdCanSignEmission) ||
       permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
-    if (isSameSiretEmmiter(currentSiret, bsd)) {
+    if (isSameSiretEmitter(currentSiret, bsd)) {
       return SIGNER;
     }
     if (currentSiret === bsd.destination?.company?.siret) {
@@ -952,7 +958,7 @@ export const getSignTempStorerBtnLabel = (
 };
 
 const getReviewCurrentApproval = (
-  bsd: BsdDisplay | Form | Bsda,
+  bsd: BsdDisplay | Form | Bsda | Bsdasri,
   siret: string
 ) => {
   return bsd?.metadata?.latestRevision?.approvals?.find(
@@ -961,7 +967,7 @@ const getReviewCurrentApproval = (
 };
 
 export const canApproveOrRefuseReview = (
-  bsd: BsdDisplay | Form | Bsda,
+  bsd: BsdDisplay | Form | Bsda | Bsdasri,
   siret: string
 ) => {
   const currentApproval = getReviewCurrentApproval(bsd, siret);
@@ -1180,7 +1186,7 @@ const canDeleteBsdd = (bsd, siret) =>
   bsd.emitterType !== EmitterType.Appendix1Producer &&
   ([BsdStatusCode.Draft, BsdStatusCode.Sealed].includes(bsd.status) ||
     (bsd.status === BsdStatusCode.SignedByProducer &&
-      isSameSiretEmmiter(siret, bsd)));
+      isSameSiretEmitter(siret, bsd)));
 
 const canDeleteBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda &&
@@ -1191,7 +1197,7 @@ const canDeleteBsda = (bsd, siret) =>
 const canDeleteBsdasri = (bsd, siret) =>
   bsd.type === BsdType.Bsdasri &&
   (bsd.status === BsdStatusCode.Initial ||
-    (isSameSiretEmmiter(siret, bsd) &&
+    (isSameSiretEmitter(siret, bsd) &&
       bsd.status === BsdStatusCode.SignedByProducer));
 
 const canDeleteBsvhu = bsd =>
@@ -1234,7 +1240,7 @@ export const canDuplicate = (bsd, siret) =>
 const canDeleteBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
   (bsd.status === BsdStatusCode.Initial ||
-    (isSameSiretEmmiter(siret, bsd) &&
+    (isSameSiretEmitter(siret, bsd) &&
       bsd.status === BsdStatusCode.SignedByEmitter)) &&
   canDuplicateBsff(bsd, siret);
 
@@ -1254,7 +1260,7 @@ const canUpdateBsff = (bsd, siret) =>
 const canReviewBsda = (bsd, siret) => {
   const isTransporter = isSameSiretTransporter(siret, bsd);
   const isDestination = isSameSiretDestination(siret, bsd);
-  const isProducer = isSameSiretEmmiter(siret, bsd);
+  const isProducer = isSameSiretEmitter(siret, bsd);
   const isWorker = isSameSiretWorker(siret, bsd);
 
   return (
@@ -1263,6 +1269,26 @@ const canReviewBsda = (bsd, siret) => {
     (isTransporter || isDestination || isProducer || isWorker)
   );
 };
+
+const canReviewBsdasri = (bsd, siret) => {
+  // these types are not implemented yet
+  if ([BsdasriType.Synthesis, BsdasriType.Grouping].includes(bsd.type)) {
+    return false;
+  }
+  if (bsd.groupedInId || bsd.synthesizedInId) {
+    return false;
+  }
+  const isDestination = isSameSiretDestination(siret, bsd);
+  const isProducer = isSameSiretEmitter(siret, bsd);
+  const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
+
+  return (
+    bsd.type === BsdType.Bsdasri &&
+    !canDeleteBsdasri(bsd, siret) &&
+    (isDestination || isProducer || isEcoOrganisme)
+  );
+};
+
 export const canReviewBsdd = (bsd, siret) => {
   const isSentStatus = BsdStatusCode.Sent === bsd.status;
   return (
@@ -1275,7 +1301,7 @@ export const canReviewBsdd = (bsd, siret) => {
     !(
       bsd.emitterType === EmitterType.Producer &&
       !isSentStatus &&
-      isSameSiretEmmiter(siret, bsd) &&
+      isSameSiretEmitter(siret, bsd) &&
       canUpdateBsd(bsd, siret)
     ) &&
     !(
@@ -1286,7 +1312,7 @@ export const canReviewBsdd = (bsd, siret) => {
     ) &&
     !(
       bsd.emitterType === EmitterType.Appendix2 &&
-      isSameSiretEmmiter(siret, bsd) &&
+      isSameSiretEmitter(siret, bsd) &&
       canUpdateBsd(bsd, siret) &&
       bsd.status === BsdStatusCode.SignedByProducer
     )
@@ -1296,13 +1322,15 @@ export const canReviewBsdd = (bsd, siret) => {
 export const canReviewBsd = (bsd, siret) => {
   const isTransporter = isSameSiretTransporter(siret, bsd);
   const isDestination = isSameSiretDestination(siret, bsd);
-  const isProducer = isSameSiretEmmiter(siret, bsd);
+  const isProducer = isSameSiretEmitter(siret, bsd);
   const isWorker = isSameSiretWorker(siret, bsd);
   const isTransporterOnly =
     isTransporter && !isDestination && !isProducer && !isWorker;
 
   return (
-    (canReviewBsdd(bsd, siret) || canReviewBsda(bsd, siret)) &&
+    (canReviewBsdd(bsd, siret) ||
+      canReviewBsda(bsd, siret) ||
+      canReviewBsdasri(bsd, siret)) &&
     !isTransporterOnly
   );
 };

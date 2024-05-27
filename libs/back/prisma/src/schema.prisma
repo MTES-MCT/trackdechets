@@ -289,11 +289,14 @@ model Company {
   companyAssociations                  CompanyAssociation[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   MembershipRequest                    MembershipRequest[]
+  // Révisions
   bsdaRevisionRequests                 BsdaRevisionRequest[]
   bsddRevisionRequests                 BsddRevisionRequest[]
-  givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
-  receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
-  webhookSettingsLimit                 Int                       @default(1)
+  bsdasriRevisionRequests              BsdasriRevisionRequest[]
+
+  givenSignatureAutomations    SignatureAutomation[] @relation("SignatureAutomationFrom")
+  receivedSignatureAutomations SignatureAutomation[] @relation("SignatureAutomationTo")
+  webhookSettingsLimit         Int                   @default(1)
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -1102,6 +1105,8 @@ model Bsdasri {
   synthesizedIn   Bsdasri?  @relation("BsdasriSynthesizing", fields: [synthesizedInId], references: [id])
   synthesizedInId String?
 
+  bsdasriRevisionRequests BsdasriRevisionRequest[]
+
   // Denormalized fields, storing associated dasri sirets to speed up some queries
   // Emitter sirets list in case of synthesis bsd
   groupingEmitterSirets  String[] @default([])
@@ -1149,6 +1154,62 @@ model BsdasriFinalOperation {
   @@index([initialBsdasriId], map: "_FinalOperationInitialBsdasriIdIdx")
   @@index([finalBsdasriId], map: "_FinalOperationFinalBsdasriIdIdx")
 }
+
+// dasri revisions
+model BsdasriRevisionRequest {
+  id                 String                @id @default(cuid())
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  status             RevisionRequestStatus @default(PENDING)
+  comment            String
+  isCanceled         Boolean               @default(false)
+  bsdasriId          String
+  bsdasri            Bsdasri               @relation(fields: [bsdasriId], references: [id], onDelete: Cascade)
+  authoringCompanyId String
+  authoringCompany   Company               @relation(fields: [authoringCompanyId], references: [id], onDelete: Cascade)
+
+  approvals BsdasriRevisionRequestApproval[]
+
+  // Code déchet
+  wasteCode String?
+
+  // Conditionnement
+  destinationWastePackagings Json?
+
+  // Quantité traitée
+  destinationReceptionWasteWeightValue Float?
+
+  // Code de l'opération D/R et mode de traitement 
+  destinationOperationCode String?
+  destinationOperationMode OperationMode?
+
+  // Adresse de collecte ou d'enlèvement
+  emitterPickupSiteName       String?
+  emitterPickupSiteAddress    String?
+  emitterPickupSiteCity       String?
+  emitterPickupSitePostalCode String?
+  emitterPickupSiteInfos      String?
+
+  @@index([authoringCompanyId], map: "_BsdasriRevisionRequestAuthoringCompanyIdIdx")
+  @@index([status], map: "_BsdasriRevisionRequestStatusIdx")
+  @@index([bsdasriId], map: "_BsdasriRevisionRequestBsdaIdIdx")
+}
+
+model BsdasriRevisionRequestApproval {
+  id                String                        @id @default(cuid())
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+  revisionRequestId String
+  revisionRequest   BsdasriRevisionRequest        @relation(fields: [revisionRequestId], references: [id], onDelete: Cascade)
+  approverSiret     String
+  status            RevisionRequestApprovalStatus @default(PENDING)
+  comment           String?
+
+  @@index([revisionRequestId], map: "_BsdasriRevisionRequestApprovalRevisionRequestIdIdx")
+  @@index([approverSiret], map: "_BsdasriRevisionRequestApprovalApproverSiretIdx")
+}
+
+// end dasri revisions
 
 model Bsff {
   id        String     @id
@@ -1811,6 +1872,7 @@ enum BsdasriStatus {
   PROCESSED
   REFUSED
   AWAITING_GROUP
+  CANCELED
 }
 
 enum BsdasriEmitterType {

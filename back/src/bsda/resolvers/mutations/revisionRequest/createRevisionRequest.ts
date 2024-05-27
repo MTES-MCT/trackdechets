@@ -193,6 +193,10 @@ async function getAuthoringCompany(
 async function getFlatContent(
   content: BsdaRevisionRequestContentInput,
   bsda: Bsda
+);
+async function getFlatContent(
+  content: BsdaRevisionRequestContentInput,
+  bsda: Bsda
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsdaRevisionRequestInput(content);
   const { isCanceled, ...fields } = flatContent;

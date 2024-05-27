@@ -30,7 +30,14 @@ import {
   BsdasriEcoOrganismeInput,
   BsdasriIdentification,
   BsdasriIdentificationInput,
-  BsdasriStatus
+  BsdasriStatus,
+  BsdasriRevisionRequestContentInput,
+  BsdasriRevisionRequestContent,
+  BsdasriRevisionRequestEmitter,
+  BsdasriRevisionRequestWaste,
+  BsdasriRevisionRequestDestination,
+  BsdasriRevisionRequestOperation,
+  BsdasriRevisionRequestReception
 } from "../generated/graphql/types";
 import {
   nullIfNoValues,
@@ -40,7 +47,7 @@ import {
   undefinedOrDefault,
   processDecimal
 } from "../common/converter";
-import { Bsdasri } from "@prisma/client";
+import { Bsdasri, Prisma, BsdasriRevisionRequest } from "@prisma/client";
 import { Decimal } from "decimal.js";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdasriForElastic } from "./elastic";
@@ -225,8 +232,31 @@ export function expandBsdasriFromElastic(
     // on souhaite utiliser directement les champs `grouping` et `synthesizing`
     // du BsdasriForElastic (Cf resolver Bsdasri).
     grouping: bsdasri.grouping,
-    synthesizing: bsdasri.synthesizing
+    synthesizing: bsdasri.synthesizing,
+    metadata: {
+      latestRevision: computeLatestRevision(
+        bsdasri.bsdasriRevisionRequests
+      ) as any
+    }
   };
+}
+
+export function computeLatestRevision(
+  revisionRequests: BsdasriRevisionRequest[] | null
+) {
+  if (!revisionRequests || revisionRequests.length === 0) {
+    return null;
+  }
+
+  return revisionRequests.reduce((latestRevision, currentRevision) => {
+    if (
+      !latestRevision ||
+      currentRevision.updatedAt > latestRevision.updatedAt
+    ) {
+      return currentRevision;
+    }
+    return latestRevision;
+  });
 }
 
 const extractPostalCode = address => {
@@ -588,4 +618,88 @@ export function flattenBsdasriInput(
 
     ...flattenContainersInput(formInput)
   });
+}
+
+// Revisions
+
+export function flattenBsdasriRevisionRequestInput(
+  reviewContent: BsdasriRevisionRequestContentInput
+): Partial<Prisma.BsdasriRevisionRequestCreateInput> {
+  return safeInput(<Prisma.BsdasriRevisionRequestCreateInput>{
+    emitterPickupSiteName: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.name))
+    ),
+    emitterPickupSiteAddress: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.address))
+    ),
+    emitterPickupSiteCity: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.city))
+    ),
+    emitterPickupSitePostalCode: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.postalCode))
+    ),
+    emitterPickupSiteInfos: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.infos))
+    ),
+    wasteCode: chain(reviewContent, r => chain(r.waste, w => w.code)),
+
+    destinationWastePackagings: undefinedOrDefault(
+      chain(reviewContent, r =>
+        chain(r.destination, d => chain(d.reception, rec => rec.packagings))
+      ),
+      []
+    ),
+    destinationOperationCode: chain(reviewContent, r =>
+      chain(r.destination, d => chain(d.operation, o => o.code))
+    ),
+    destinationOperationMode: chain(reviewContent, r =>
+      chain(r.destination, d => chain(d.operation, o => o.mode))
+    ),
+    destinationReceptionWasteWeightValue: chain(reviewContent, r =>
+      chain(r.destination, d => chain(d.operation, o => o.weight))
+    ),
+
+    isCanceled: undefinedOrDefault(
+      chain(reviewContent, c => chain(c, r => r.isCanceled)),
+      false
+    )
+  });
+}
+
+export function expandBsdasriRevisionRequestContent(
+  bsdasriRevisionRequest: BsdasriRevisionRequest
+): BsdasriRevisionRequestContent {
+  return {
+    emitter: nullIfNoValues<BsdasriRevisionRequestEmitter>({
+      pickupSite: nullIfNoValues<PickupSite>({
+        address: bsdasriRevisionRequest.emitterPickupSiteAddress,
+        city: bsdasriRevisionRequest.emitterPickupSiteCity,
+        infos: bsdasriRevisionRequest.emitterPickupSiteInfos,
+        name: bsdasriRevisionRequest.emitterPickupSiteName,
+        postalCode: bsdasriRevisionRequest.emitterPickupSitePostalCode
+      })
+    }),
+
+    waste: nullIfNoValues<BsdasriRevisionRequestWaste>({
+      code: bsdasriRevisionRequest.wasteCode
+    }),
+
+    destination: nullIfNoValues<BsdasriRevisionRequestDestination>({
+      reception: nullIfNoValues<BsdasriRevisionRequestReception>({
+        packagings:
+          bsdasriRevisionRequest.destinationWastePackagings as BsdasriPackaging[]
+      }),
+      operation: nullIfNoValues<BsdasriRevisionRequestOperation>({
+        code: bsdasriRevisionRequest.destinationOperationCode,
+        mode: bsdasriRevisionRequest.destinationOperationMode,
+        weight: bsdasriRevisionRequest.destinationReceptionWasteWeightValue
+          ? new Decimal(
+              bsdasriRevisionRequest.destinationReceptionWasteWeightValue
+            ).toNumber()
+          : bsdasriRevisionRequest.destinationReceptionWasteWeightValue
+      })
+    }),
+
+    isCanceled: bsdasriRevisionRequest.isCanceled
+  };
 }

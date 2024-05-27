@@ -332,7 +332,8 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     transporterNumberPlate:
       bsdasri.transporter?.transport?.plates ||
       bsdasri["bsdasriTransporter"]?.transport?.plates,
-    synthesizedIn: bsdasri.synthesizedIn
+    synthesizedIn: bsdasri.synthesizedIn,
+    metadata: bsdasri.metadata
   };
   return bsdasriFormatted;
 };

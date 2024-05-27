@@ -18,10 +18,9 @@ import {
   sendPendingMembershipRequestDetailsEmail,
   sendPendingMembershipRequestToAdminDetailsEmail,
   sendPendingRevisionRequestToAdminDetailsEmail,
-  sendSecondOnboardingEmail,
-  xDaysAgo
+  sendSecondOnboardingEmail
 } from "../onboarding.helpers";
-
+import { xDaysAgo } from "../helpers";
 // Intercept calls
 // Simulate queue error in order to test with sendMailSync
 jest.mock("back");
@@ -444,9 +443,9 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
     // BSDA
     const bsda = await bsdaFactory({
       opt: {
-        emitterCompanySiret: company2.siret,
-        transporterCompanySiret: companyOfSomeoneElse2.siret
-      }
+        emitterCompanySiret: company2.siret
+      },
+      transporterOpt: { transporterCompanySiret: companyOfSomeoneElse2.siret }
     });
 
     await prisma.bsdaRevisionRequest.create({
