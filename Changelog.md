@@ -11,6 +11,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Permettre un export .xls ou .csv de la liste des établissements avec les membres rattachés [PR 3329](https://github.com/MTES-MCT/trackdechets/pull/3329).
 - Ajouter des profils et sous-types de profils (TTR et Installation de traitement) FRONT - T1 [PR 3350](https://github.com/MTES-MCT/trackdechets/pull/3350).
+- Mise à niveau au DSFR de la partie "Membres" des établissements [PR 3345](https://github.com/MTES-MCT/trackdechets/pull/3345)
+- Mise à niveau au DSFR de la partie "Signature" des établissements [PR 3354](https://github.com/MTES-MCT/trackdechets/pull/3354)
 
 #### :bug: Corrections de bugs
 
@@ -20,6 +22,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Au refus total d'un VHU, ne pas demander de compléter le code / mode de traitement [PR 3336](https://github.com/MTES-MCT/trackdechets/pull/3336)
 - Retirer le fait que les champs des transporteurs soient requis à la signature de la réception même lorsqu'ils n'ont pas signé l'enlèvement sur un BSDA [PR 3331](https://github.com/MTES-MCT/trackdechets/pull/3331)
 - Ne pas afficher les pastilles d'alertes pour le profil Lecteur [PR 3353](https://github.com/MTES-MCT/trackdechets/pull/3353)
+- Correction de l'affichage de la parte "Mes établissements" [PRA 3328](https://github.com/MTES-MCT/trackdechets/pull/3328)
 
 #### :boom: Breaking changes
 
