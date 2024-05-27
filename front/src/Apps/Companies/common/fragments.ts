@@ -6,6 +6,8 @@ const AccountFieldCompanyTypesFragment = {
       id
       siret
       companyTypes
+      collectorTypes
+      wasteProcessorTypes
       userRole
       workerCertification {
         id

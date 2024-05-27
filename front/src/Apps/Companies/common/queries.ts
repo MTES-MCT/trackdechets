@@ -186,6 +186,27 @@ export const UPDATE_COMPANY_TYPES = gql`
   }
 `;
 
+export const UPDATE_COMPANY_COLLECTOR_TYPES = gql`
+  mutation UpdateCompany($id: String!, $collectorTypes: [CollectorType!]) {
+    updateCompany(id: $id, collectorTypes: $collectorTypes) {
+      id
+      collectorTypes
+    }
+  }
+`;
+
+export const UPDATE_COMPANY_WASTE_PROCESSOR_TYPES = gql`
+  mutation UpdateCompany(
+    $id: String!
+    $wasteProcessorTypes: [WasteProcessorType!]
+  ) {
+    updateCompany(id: $id, wasteProcessorTypes: $wasteProcessorTypes) {
+      id
+      wasteProcessorTypes
+    }
+  }
+`;
+
 export const CREATE_TRANSPORTER_RECEIPT_ = gql`
   mutation CreateTransporterReceipt($input: CreateTransporterReceiptInput!) {
     createTransporterReceipt(input: $input) {
