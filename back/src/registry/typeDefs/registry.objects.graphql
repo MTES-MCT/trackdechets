@@ -141,6 +141,9 @@ type IncomingWaste {
   "Extra - Type de bordereau"
   bsdType: BsdType
 
+  "Extra - Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
+  bsdSubType: BsdSubType
+
   "Extra - Statut du bordereau"
   status: String
 
@@ -363,6 +366,9 @@ type OutgoingWaste {
 
   "Extra - Type de bordereau"
   bsdType: BsdType
+
+  "Extra - Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
+  bsdSubType: BsdSubType
 
   "Extra - Statut du bordereau"
   status: String
@@ -590,6 +596,9 @@ type TransportedWaste {
   "Extra - Type de bordereau"
   bsdType: BsdType
 
+  "Extra - Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
+  bsdSubType: BsdSubType
+
   "Extra - Statut du bordereau"
   status: String
 
@@ -783,6 +792,9 @@ type ManagedWaste {
 
   "Extra - Type de bordereau"
   bsdType: BsdType
+
+  "Extra - Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
+  bsdSubType: BsdSubType
 
   "Extra - Statut du bordereau"
   status: String
@@ -1035,6 +1047,9 @@ type AllWaste {
 
   "Extra - Type de bordereau"
   bsdType: BsdType
+
+  "Extra - Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
+  bsdSubType: BsdSubType
 
   "Extra - Statut du bordereau"
   status: String

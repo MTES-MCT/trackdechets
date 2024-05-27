@@ -4,6 +4,7 @@ import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
+  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -133,6 +134,14 @@ export function getRegistryFields(
   return registryFields;
 }
 
+export const getSubType = (bsda: RegistryBsda): BsdSubType => {
+  if (bsda.type === "OTHER_COLLECTIONS") {
+    return "INITIAL";
+  }
+
+  return bsda.type;
+};
+
 function toGenericWaste(bsda: RegistryBsda): GenericWaste {
   return {
     wasteDescription: bsda.wasteMaterialName,
@@ -145,6 +154,7 @@ function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     ecoOrganismeName: bsda.ecoOrganismeName,
     ecoOrganismeSiren: bsda.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDA",
+    bsdSubType: getSubType(bsda),
     status: bsda.status,
     customId: null,
     destinationCap: bsda.destinationCap,
