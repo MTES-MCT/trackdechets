@@ -28,7 +28,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
-- Retrait de la possibilité de sélectionner un mode de traitement pour le code non final D9 [PR 3308](https://github.com/MTES-MCT/trackdechets/pull/3308
+- Retrait de la possibilité de sélectionner un mode de traitement pour le code non final D9 [PR 3308](https://github.com/MTES-MCT/trackdechets/pull/3308)
 
 #### :nail_care: Améliorations
 
@@ -1975,7 +1975,7 @@ TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP 
 - Segmentation des emails d'embarquement en fonction du profil utilisateur [PR 803](https://github.com/MTES-MCT/trackdechets/pull/803)
 - Utilisation d'un resolver GraphQL pour le scalaire DateTime [PR 802](https://github.com/MTES-MCT/trackdechets/pull/802)
 - Conversion du champ `processedAt` en champ date [PR 802](https://github.com/MTES-MCT/trackdechets/pull/802)
-- Les URLs de l'application ont évolués en vue de l'ajout future d'autres types de bordereaux, des redirections ont ét�� mises en place [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
+- Les URLs de l'application ont évolués en vue de l'ajout future d'autres types de bordereaux, des redirections ont été mises en place [PR 809](https://github.com/MTES-MCT/trackdechets/pull/809)
 
 # [2021.02.2] 10/02/2021
 
