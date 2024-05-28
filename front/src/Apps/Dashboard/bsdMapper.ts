@@ -152,7 +152,7 @@ export const getBsdaCurrentTransporterInfos = (
     currentTransporter = bsda.transporters?.find(
       transporter =>
         transporter.company?.orgId === currentSiret &&
-        !transporter.transport?.takenOverAt
+        !transporter.transport?.signature?.date
     );
   } else {
     // find the last transporter with this SIRET who has taken over
@@ -161,7 +161,7 @@ export const getBsdaCurrentTransporterInfos = (
       .find(
         transporter =>
           transporter.company?.orgId === currentSiret &&
-          !!transporter.transport?.takenOverAt
+          !!transporter.transport?.signature?.date
       );
   }
   if (!currentTransporter) {
