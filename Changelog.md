@@ -23,7 +23,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Retirer le fait que les champs des transporteurs soient requis à la signature de la réception même lorsqu'ils n'ont pas signé l'enlèvement sur un BSDA [PR 3331](https://github.com/MTES-MCT/trackdechets/pull/3331)
 - Ne pas afficher les pastilles d'alertes pour le profil Lecteur [PR 3353](https://github.com/MTES-MCT/trackdechets/pull/3353)
 - Correction de l'affichage de la parte "Mes établissements" [PRA 3328](https://github.com/MTES-MCT/trackdechets/pull/3328)
-- Réinitialiser correctement emitterCompany lors du switch en tre privateIndividual/foreignShip/company [PR 3344](https://github.com/MTES-MCT/trackdechets/pull/3344)
+- Réinitialiser correctement emitterCompany lors du switch entre privateIndividual/foreignShip/company [PR 3344](https://github.com/MTES-MCT/trackdechets/pull/3344)
 
 #### :boom: Breaking changes
 
