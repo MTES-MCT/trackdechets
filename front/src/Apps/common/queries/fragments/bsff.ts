@@ -24,6 +24,7 @@ export const dashboardBsffFragment = gql`
       }
       transport {
         plates
+        mode
       }
       customInfo
     }

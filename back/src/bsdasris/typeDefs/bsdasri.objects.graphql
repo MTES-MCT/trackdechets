@@ -119,7 +119,7 @@ type BsdasriTransport {
   handedOverAt: DateTime
   takenOverAt: DateTime
   signature: BsdasriSignature
-  mode: TransportMode!
+  mode: TransportMode
   "Plaque(s) d'immatriculation"
   plates: [String!]
 }

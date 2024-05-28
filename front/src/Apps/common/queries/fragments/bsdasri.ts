@@ -114,6 +114,7 @@ export const dashboardDasriFragment = gql`
       customInfo
       transport {
         plates
+        mode
       }
       recepisse {
         number

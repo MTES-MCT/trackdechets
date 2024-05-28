@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { transporterFragment } from "../fragments";
 
 export const UPDATE_TRANSPORT_INFO = gql`
   mutation updateTransporterFields(
@@ -23,4 +24,13 @@ export const UPDATE_TRANSPORT_INFO = gql`
       }
     }
   }
+`;
+
+export const UPDATE_BSDD_TRANSPORTER = gql`
+  mutation updateFormTransporter($id: ID!, $input: TransporterInput!) {
+    updateFormTransporter(id: $id, input: $input) {
+      ...TransporterFragment
+    }
+  }
+  ${transporterFragment}
 `;
