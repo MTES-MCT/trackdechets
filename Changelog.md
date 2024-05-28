@@ -30,7 +30,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Renommer Regroupement par Annexe 2 (sous-type de BSDD) [PR 3352](https://github.com/MTES-MCT/trackdechets/pull/3352)
 - Renommer Transit par Réexpédition (sous-type de BSDA) [PR 3351](https://github.com/MTES-MCT/trackdechets/pull/3351)
 - Registre:
-  - Ajout des informations relatives à l'installation de destination post-entreposage provisoire sur les registres sortants et exhaustifs [PR 3349](https://github.com/MTES-MCT/trackdechets/pull/3349)
   - Inversion des options de téléchargement du registre .csv et .xls pour éviter les erreurs [PR 3311](https://github.com/MTES-MCT/trackdechets/pull/3311)
   - Retrait de la possibilité de filtrer le registre par code déchet via le sélecteur [PR 3312](https://github.com/MTES-MCT/trackdechets/pull/3312)
   - Incrémentation des registres Exhaustif, Sortant, Transport & Gestion dès la signature transporteur et le registre Entrant dès la signature de réception [PR 3306](https://github.com/MTES-MCT/trackdechets/pull/3306)
