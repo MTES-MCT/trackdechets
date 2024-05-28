@@ -24,10 +24,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ne pas afficher les pastilles d'alertes pour le profil Lecteur [PR 3353](https://github.com/MTES-MCT/trackdechets/pull/3353)
 - Correction de l'affichage de la parte "Mes établissements" [PRA 3328](https://github.com/MTES-MCT/trackdechets/pull/3328)
 - Réinitialiser correctement emitterCompany lors du switch entre privateIndividual/foreignShip/company [PR 3344](https://github.com/MTES-MCT/trackdechets/pull/3344)
+- Rendre possible l'update d'un BSDASRI de groupement en SIGNED_BY_PRODUCER [PR 3330](https://github.com/MTES-MCT/trackdechets/pull/3330)
 
 #### :boom: Breaking changes
 
-- Retrait de la possibilité de sélectionner un mode de traitement pour le code non final D9 [PR 3308](https://github.com/MTES-MCT/trackdechets/pull/3308
+- Retrait de la possibilité de sélectionner un mode de traitement pour le code non final D9 [PR 3308](https://github.com/MTES-MCT/trackdechets/pull/3308)
 
 #### :nail_care: Améliorations
 
