@@ -37,6 +37,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Multi-modal BSFF : migrer les données transporteur dans une table à part (refacto interne du code) [PR 3340](https://github.com/MTES-MCT/trackdechets/pull/3340)
+
 # [2024.5.1] 07/05/2024
 
 #### :rocket: Nouvelles fonctionnalités

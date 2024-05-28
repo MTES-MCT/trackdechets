@@ -645,8 +645,14 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           destination
         },
         {
-          detenteurCompanySirets: [detenteur.company.siret!],
-          ficheInterventions: { connect: { id: ficheIntervention.id } }
+          data: {
+            detenteurCompanySirets: [detenteur.company.siret!],
+            ficheInterventions: { connect: { id: ficheIntervention.id } },
+            transporterTransportSignatureDate: new Date()
+          },
+          transporterData: {
+            transporterTransportSignatureDate: new Date()
+          }
         }
       );
 
@@ -1512,9 +1518,14 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           destination
         },
         {
-          status: BsffStatus.SENT,
-          emitterEmissionSignatureDate: new Date(),
-          transporterTransportSignatureDate: new Date()
+          data: {
+            status: BsffStatus.SENT,
+            emitterEmissionSignatureDate: new Date(),
+            transporterTransportSignatureDate: new Date()
+          },
+          transporterData: {
+            transporterTransportSignatureDate: new Date()
+          }
         }
       );
       await indexBsff(await getBsffForElastic(bsff));
@@ -1535,9 +1546,14 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           destination
         },
         {
-          status: BsffStatus.INITIAL,
-          emitterEmissionSignatureDate: new Date(),
-          transporterTransportSignatureDate: null
+          data: {
+            status: BsffStatus.INITIAL,
+            emitterEmissionSignatureDate: new Date(),
+            transporterTransportSignatureDate: null
+          },
+          transporterData: {
+            transporterTransportSignatureDate: null
+          }
         }
       );
       await indexBsff(await getBsffForElastic(bsff));
@@ -1557,8 +1573,13 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           destination
         },
         {
-          emitterEmissionSignatureDate: new Date(),
-          transporterTransportSignatureDate: new Date()
+          data: {
+            emitterEmissionSignatureDate: new Date(),
+            transporterTransportSignatureDate: new Date()
+          },
+          transporterData: {
+            transporterTransportSignatureDate: new Date()
+          }
         }
       );
       await indexBsff(await getBsffForElastic(bsff));
@@ -1574,8 +1595,13 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           destination
         },
         {
-          emitterEmissionSignatureDate: new Date(),
-          transporterTransportSignatureDate: new Date()
+          data: {
+            emitterEmissionSignatureDate: new Date(),
+            transporterTransportSignatureDate: new Date()
+          },
+          transporterData: {
+            transporterTransportSignatureDate: new Date()
+          }
         }
       );
       await indexBsff(await getBsffForElastic(bsff));
@@ -1591,9 +1617,14 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           destination
         },
         {
-          emitterEmissionSignatureDate: new Date(),
-          transporterTransportSignatureDate: new Date(),
-          destinationReceptionSignatureDate: new Date()
+          data: {
+            emitterEmissionSignatureDate: new Date(),
+            transporterTransportSignatureDate: new Date(),
+            destinationReceptionSignatureDate: new Date()
+          },
+          transporterData: {
+            transporterTransportSignatureDate: new Date()
+          }
         }
       );
       await indexBsff(await getBsffForElastic(bsff));

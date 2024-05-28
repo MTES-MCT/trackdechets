@@ -8,38 +8,13 @@ import { getBsffOrNotFound } from "../../database";
 import { checkCanRead } from "../../permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
-import { buildPdf } from "../../pdf/generator";
-import { prisma } from "@td/prisma";
-import { getReadonlyBsffPackagingRepository } from "../../repository";
-import { UserInputError } from "../../../common/errors";
+import { buildPdf, getBsffForBuildPdf } from "../../pdf/generator";
 
 export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
   name: "bsffPdf",
   handler: async (_, res, { id }) => {
-    const bsff = await prisma.bsff.findUnique({
-      where: { id },
-      include: {
-        ficheInterventions: true,
-        packagings: true
-      }
-    });
-    if (bsff == null) {
-      throw new UserInputError(`Le BSFF n°${id} n'existe pas.`);
-    }
-    const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
-
-    const previousPackagings = await findPreviousPackagings(
-      bsff.packagings.map(p => p.id)
-    );
-    const previousBsffIds = [...new Set(previousPackagings.map(p => p.bsffId))];
-    const previousBsffs = await prisma.bsff.findMany({
-      where: { id: { in: previousBsffIds } },
-      include: {
-        // includes only packagings in the dependency graph of the BSFF
-        packagings: { where: { id: { in: previousPackagings.map(p => p.id) } } }
-      }
-    });
-    const readableStream = await buildPdf({ ...bsff, previousBsffs });
+    const bsff = await getBsffForBuildPdf({ id });
+    const readableStream = await buildPdf(bsff);
     readableStream.pipe(createPDFResponse(res, bsff.id));
   }
 };

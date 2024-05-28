@@ -116,7 +116,8 @@ export type RegistryBspaoh = Prisma.BspaohGetPayload<{
   include: typeof RegistryBspaohInclude;
 }>;
 
-export const RegistryBsffInclude = {
+export const RegistryBsffInclude = Prisma.validator<Prisma.BsffInclude>()({
+  transporters: true,
   packagings: {
     include: {
       finalOperations: true,
@@ -125,7 +126,7 @@ export const RegistryBsffInclude = {
       }
     }
   }
-};
+});
 
 export type RegistryBsff = Prisma.BsffGetPayload<{
   include: typeof RegistryBsffInclude;

@@ -175,18 +175,22 @@ describe("Incoming wastes registry", () => {
         destination
       },
       {
-        wasteCode: "14 06 01*",
-        createdAt: new Date("2021-08-01"),
-        emitterEmissionSignatureDate: new Date("2021-08-01"),
-        transporterTransportSignatureDate: new Date("2021-08-01"),
-        transporterTransportTakenOverAt: new Date("2021-08-01"),
-        destinationReceptionDate: new Date("2021-08-01")
-      },
-      {
-        acceptationWeight: 200,
-        acceptationDate: new Date("2021-08-01"),
-        operationCode: "R2",
-        operationSignatureDate: new Date("2021-08-01")
+        data: {
+          wasteCode: "14 06 01*",
+          createdAt: new Date("2021-08-01"),
+          emitterEmissionSignatureDate: new Date("2021-08-01"),
+          transporterTransportSignatureDate: new Date("2021-08-01"),
+          destinationReceptionDate: new Date("2021-08-01")
+        },
+        packagingData: {
+          acceptationWeight: 200,
+          acceptationDate: new Date("2021-08-01"),
+          operationCode: "R2",
+          operationSignatureDate: new Date("2021-08-01")
+        },
+        transporterData: {
+          transporterTransportTakenOverAt: new Date("2021-08-01")
+        }
       }
     );
     bsd6 = await bspaohFactory({
