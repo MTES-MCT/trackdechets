@@ -11,7 +11,7 @@ export async function cleanMongoEvents() {
     prisma.bsdasri.findMany({
       take: PAGE_SIZE,
       orderBy: { rowNumber: "asc" },
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+      ...(cursor ? { skip: 1, cursor: { rowNumber: cursor } } : {})
     })
   );
 
@@ -19,7 +19,7 @@ export async function cleanMongoEvents() {
     prisma.form.findMany({
       take: PAGE_SIZE,
       orderBy: { rowNumber: "asc" },
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+      ...(cursor ? { skip: 1, cursor: { rowNumber: cursor } } : {})
     })
   );
 
@@ -27,7 +27,7 @@ export async function cleanMongoEvents() {
     prisma.bsda.findMany({
       take: PAGE_SIZE,
       orderBy: { rowNumber: "asc" },
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+      ...(cursor ? { skip: 1, cursor: { rowNumber: cursor } } : {})
     })
   );
 
@@ -35,7 +35,7 @@ export async function cleanMongoEvents() {
     prisma.bsff.findMany({
       take: PAGE_SIZE,
       orderBy: { rowNumber: "asc" },
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+      ...(cursor ? { skip: 1, cursor: { rowNumber: cursor } } : {})
     })
   );
 
@@ -43,25 +43,27 @@ export async function cleanMongoEvents() {
     prisma.bsvhu.findMany({
       take: PAGE_SIZE,
       orderBy: { rowNumber: "asc" },
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+      ...(cursor ? { skip: 1, cursor: { rowNumber: cursor } } : {})
     })
   );
 }
 
 async function iterateOverModelAndCleanEvents(
   modelName: string,
-  getter: (cursor: string | null) => Promise<{ id: string }[]>
+  getter: (
+    cursor: number | null
+  ) => Promise<{ id: string; rowNumber: number }[]>
 ) {
   console.info(`Starting to clean events for ${modelName}...`);
 
   let bsdProcessedCounter = 0;
   let bsdDeletedEventsCounter = 0;
-  let cursor: string | null = null;
+  let cursor: number | null = null;
 
   /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
   while (true) {
     const bsds = await getter(cursor);
-    cursor = bsds[bsds.length - 1]?.id;
+    cursor = bsds[bsds.length - 1]?.rowNumber;
 
     for (const bsd of bsds) {
       bsdDeletedEventsCounter += await cleanStreamEvents(bsd.id);
