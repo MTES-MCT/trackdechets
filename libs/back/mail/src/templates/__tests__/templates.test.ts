@@ -256,16 +256,19 @@ describe("templates", () => {
     const companyName = "ACME";
     const companySiret = "000000000000001";
     const membershipRequestId = "4567";
+    const companyGivenName = "The Company";
     const rendered = renderMail(membershipRequest, {
       variables: {
         userEmail,
         companyName,
         companySiret,
-        membershipRequestId
+        membershipRequestId,
+        companyGivenName
       },
       to
     });
     expect(rendered.body).toContain(companyName);
+    expect(rendered.body).toContain(companyGivenName);
     expect(rendered.body).toContain(userEmail);
     expect(rendered.body).toContain(membershipRequestId);
   });
