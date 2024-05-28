@@ -111,6 +111,58 @@ describe("Mutation.signBsdasri operation", () => {
     expect(receivedDasri.finalOperations).toHaveLength(1);
   });
 
+  it("should accept D9 code without destinationOperationMode", async () => {
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
+
+    // no destinationOperationMode when code is D9
+    const readyToProcessDataForD9 = {
+      destinationOperationCode: "D9",
+
+      destinationReceptionWasteWeightValue: 70,
+      destinationOperationDate: new Date()
+    };
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
+        ...readyToTakeOverData(transporterCompany),
+        ...readyToReceiveData(),
+        ...readyToProcessDataForD9,
+        status: BsdasriStatus.RECEIVED
+      }
+    });
+    const { mutate } = makeClient(recipient); // recipient
+
+    await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "OPERATION", author: "Martine" }
+      }
+    });
+
+    // we can't wait for global:drained event as no operationHook job should be queued
+    // however we check the queue is empty
+    const jobsCount = await operationHooksQueue.getJobCounts();
+    expect(jobsCount?.active + jobsCount?.waiting).toEqual(0);
+
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: { finalOperations: true }
+    });
+    expect(receivedDasri.status).toEqual("PROCESSED");
+    expect(receivedDasri.destinationOperationSignatureAuthor).toEqual(
+      "Martine"
+    );
+    expect(receivedDasri.operationSignatoryId).toEqual(recipient.id);
+    expect(receivedDasri.destinationOperationSignatureDate).toBeTruthy();
+    expect(receivedDasri.finalOperations).toHaveLength(0);
+  });
+
   it("should put operation signature on a dasri and set status to AWAITING_GROUP", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
