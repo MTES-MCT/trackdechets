@@ -627,17 +627,23 @@ export const renewCompanyAutomaticSignatureCode = async (page, { siret }) => {
       "Attention, un nouveau code de signature va vous être attribué de façon aléatoire"
     )
   ).toBeVisible();
-  await companyDiv.getByTestId("signature-renew-modal-button").click();
-  // Wait for the loading to end
-  await expect(
-    companyDiv.getByTestId("company-security-code-loader")
-  ).not.toBeVisible();
 
-  // Code should be brand new
+  // Click on confirmation button
+  const responsePromise = page.waitForResponse(async response => {
+    return (await response.text()).includes("renewSecurityCode");
+  });
+  await companyDiv.getByTestId("signature-renew-modal-button").click();
+
+  // Extract new code sent back by API
+  const response = await responsePromise;
+  const apiNewCode = (await response.json()).data?.renewSecurityCode
+    ?.securityCode;
+
+  // New code should be displayed
   const newCode = await companyDiv
     .getByTestId("company-security-code")
     .textContent();
-  expect(newCode).not.toEqual(code);
+  expect(newCode).toEqual(`${apiNewCode}`);
 
   return { code: newCode };
 };
