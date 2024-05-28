@@ -31,6 +31,18 @@ export function buildCreateRevisionRequest(
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+    // touch the bsd to make it come up in the dashboard
+    await prisma.bsda.update({
+      where: {
+        id: revisionRequest.bsdaId
+      },
+      data: {
+        updatedAt: new Date()
+      },
+      select: {
+        id: true
+      }
+    });
 
     prisma.addAfterCommitCallback(() =>
       enqueueUpdatedBsdToIndex(revisionRequest.bsdaId)
