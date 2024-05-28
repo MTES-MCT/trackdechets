@@ -1301,7 +1301,36 @@ const withNextDestination = (required: boolean) =>
           required,
           `Destination ultérieure : ${MISSING_COMPANY_NAME}`
         ),
-      nextDestinationCompanySiret: siret.label("Destination ultérieure prévue"),
+      nextDestinationCompanySiret: siret
+        .label("Destination ultérieure prévue")
+        .when(
+          [
+            "wasteDetailsCode",
+            "noTraceability",
+            "wasteDetailsPop",
+            "wasteDetailsIsDangerous"
+          ],
+          {
+            is: (
+              wasteDetailsCode,
+              noTraceability,
+              wasteDetailsPop,
+              wasteDetailsIsDangerous
+            ) => {
+              // si déchet dangereux sans rupture de traça et entreprise francaise: doit être inscrite sur TD
+              // le siret est nullable, required géré par  XORIdRequired",
+              const hasNoTraceabilityBreak = !noTraceability;
+              const wasteIsDangerous =
+                isDangerous(wasteDetailsCode) ||
+                wasteDetailsPop ||
+                wasteDetailsIsDangerous;
+
+              return wasteIsDangerous && hasNoTraceabilityBreak;
+            },
+            then: schema => schema.test(siretTests.isRegistered("DESTINATION"))
+          }
+        ),
+
       nextDestinationCompanyVatNumber: vatNumber.label(
         "Destination ultérieure prévue"
       ),

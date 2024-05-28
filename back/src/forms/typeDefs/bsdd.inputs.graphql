@@ -172,7 +172,12 @@ input NextDestinationInput {
   """
   notificationNumber: String
 
-  "Établissement de destination ultérieur"
+  """
+  Établissement de destination ultérieur
+
+  Si le déchet est dangereux (code *, forcé en dangereux ou pop), sans rupture de traçabilité,
+  le siret des entreprises françaises doit correspondre à un établissment inscrit sur Trackdéchets.
+  """
   company: CompanyInput
 }
 
