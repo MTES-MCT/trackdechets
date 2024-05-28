@@ -1,18 +1,22 @@
-import { Bsff, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
+import { getTransporters } from "../../database";
 
-export type CreateBsffFn = (
-  args: Prisma.BsffCreateArgs,
+export type CreateBsffFn = <Args extends Prisma.BsffCreateArgs>(
+  args: Args,
   logMetadata?: LogMetadata
-) => Promise<Bsff>;
+) => Promise<Prisma.BsffGetPayload<Args>>;
 
 export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
-  return async (args, logMetadata?) => {
+  return async <Args extends Prisma.BsffCreateArgs>(
+    args: Args,
+    logMetadata?: LogMetadata
+  ) => {
     const { prisma, user } = deps;
 
     const bsff = await prisma.bsff.create(args);
@@ -27,8 +31,24 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       }
     });
 
+    if (args.data.transporters) {
+      const transporters = await getTransporters(bsff);
+      // compute transporterOrgIds
+      await prisma.bsff.update({
+        where: { id: bsff.id },
+        data: {
+          transportersOrgIds: transporters
+            .flatMap(t => [
+              t.transporterCompanySiret,
+              t.transporterCompanyVatNumber
+            ])
+            .filter(Boolean)
+        }
+      });
+    }
+
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsff.id));
 
-    return bsff;
+    return bsff as Prisma.BsffGetPayload<Args>;
   };
 }

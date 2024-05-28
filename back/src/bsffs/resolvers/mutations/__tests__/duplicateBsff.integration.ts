@@ -12,6 +12,7 @@ import { createBsff } from "../../../__tests__/factories";
 import { xDaysAgo } from "../../../../utils";
 import { prisma } from "@td/prisma";
 import { searchCompany } from "../../../../companies/search";
+import { getFirstTransporterSync } from "../../../database";
 
 jest.mock("../../../../companies/search");
 
@@ -113,7 +114,7 @@ describe("Mutation.duplicateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
 
-    const bsff = await createBsff({ emitter }, { isDeleted: true });
+    const bsff = await createBsff({ emitter }, { data: { isDeleted: true } });
     const { errors } = await mutate<
       Pick<Mutation, "duplicateBsff">,
       MutationDuplicateBsffArgs
@@ -199,8 +200,11 @@ describe("Mutation.duplicateBsff", () => {
     });
 
     const duplicatedBsff = await prisma.bsff.findUniqueOrThrow({
-      where: { id: data.duplicateBsff.id }
+      where: { id: data.duplicateBsff.id },
+      include: { transporters: true }
     });
+
+    const bsffTransporter = getFirstTransporterSync(duplicatedBsff)!;
 
     expect(duplicatedBsff.emitterCompanyName).toEqual("UPDATED-EMITTER-NAME");
     expect(duplicatedBsff.emitterCompanyAddress).toEqual(
@@ -212,29 +216,29 @@ describe("Mutation.duplicateBsff", () => {
     expect(duplicatedBsff.emitterCompanyMail).toEqual("UPDATED-EMITTER-MAIL");
     expect(duplicatedBsff.emitterCompanyPhone).toEqual("UPDATED-EMITTER-PHONE");
 
-    expect(duplicatedBsff.transporterCompanyName).toEqual(
+    expect(bsffTransporter.transporterCompanyName).toEqual(
       "UPDATED-TRANSPORTER-NAME"
     );
-    expect(duplicatedBsff.transporterCompanyAddress).toEqual(
+    expect(bsffTransporter.transporterCompanyAddress).toEqual(
       "UPDATED-TRANSPORTER-ADDRESS"
     );
-    expect(duplicatedBsff.transporterCompanyContact).toEqual(
+    expect(bsffTransporter.transporterCompanyContact).toEqual(
       "UPDATED-TRANSPORTER-CONTACT"
     );
-    expect(duplicatedBsff.transporterCompanyMail).toEqual(
+    expect(bsffTransporter.transporterCompanyMail).toEqual(
       "UPDATED-TRANSPORTER-MAIL"
     );
-    expect(duplicatedBsff.transporterCompanyPhone).toEqual(
+    expect(bsffTransporter.transporterCompanyPhone).toEqual(
       "UPDATED-TRANSPORTER-PHONE"
     );
 
-    expect(duplicatedBsff.transporterRecepisseNumber).toEqual(
+    expect(bsffTransporter.transporterRecepisseNumber).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-NUMBER"
     );
-    expect(duplicatedBsff.transporterRecepisseValidityLimit).toEqual(
+    expect(bsffTransporter.transporterRecepisseValidityLimit).toEqual(
       FOUR_DAYS_AGO
     );
-    expect(duplicatedBsff.transporterRecepisseDepartment).toEqual(
+    expect(bsffTransporter.transporterRecepisseDepartment).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
     );
 
@@ -267,12 +271,15 @@ describe("Mutation.duplicateBsff", () => {
     });
 
     const duplicatedBsff2 = await prisma.bsff.findUniqueOrThrow({
-      where: { id: data2.duplicateBsff.id }
+      where: { id: data2.duplicateBsff.id },
+      include: { transporters: true }
     });
 
-    expect(duplicatedBsff2.transporterRecepisseNumber).toBeNull();
-    expect(duplicatedBsff2.transporterRecepisseValidityLimit).toBeNull();
-    expect(duplicatedBsff2.transporterRecepisseDepartment).toBeNull();
+    const bsffTransporter2 = getFirstTransporterSync(duplicatedBsff2)!;
+
+    expect(bsffTransporter2.transporterRecepisseNumber).toBeNull();
+    expect(bsffTransporter2.transporterRecepisseValidityLimit).toBeNull();
+    expect(bsffTransporter2.transporterRecepisseDepartment).toBeNull();
   });
 
   test("duplicated BSFF should have the updated SIRENE data when company info changes", async () => {
@@ -320,8 +327,11 @@ describe("Mutation.duplicateBsff", () => {
     });
 
     const duplicatedBsff = await prisma.bsff.findUniqueOrThrow({
-      where: { id: data.duplicateBsff.id }
+      where: { id: data.duplicateBsff.id },
+      include: { transporters: true }
     });
+
+    const bsffTransporter = getFirstTransporterSync(duplicatedBsff)!;
 
     // Emitter
     expect(duplicatedBsff.emitterCompanyName).toEqual("updated emitter name");
@@ -330,10 +340,10 @@ describe("Mutation.duplicateBsff", () => {
     );
 
     // Transporter
-    expect(duplicatedBsff.transporterCompanyName).toEqual(
+    expect(bsffTransporter.transporterCompanyName).toEqual(
       "updated transporter name"
     );
-    expect(duplicatedBsff.transporterCompanyAddress).toEqual(
+    expect(bsffTransporter.transporterCompanyAddress).toEqual(
       "updated transporter address"
     );
 

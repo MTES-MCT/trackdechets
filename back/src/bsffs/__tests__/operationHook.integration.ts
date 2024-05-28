@@ -36,8 +36,7 @@ describe("BSFF operationHook job", () => {
         transporter,
         destination
       },
-      {},
-      operationData
+      { packagingData: operationData }
     );
 
     const packaging = bsff.packagings[0];
@@ -70,8 +69,7 @@ describe("BSFF operationHook job", () => {
           transporter,
           destination
         },
-        {},
-        operationData
+        { packagingData: operationData }
       );
 
       const packaging = bsff.packagings[0];
@@ -108,11 +106,12 @@ describe("BSFF operationHook job", () => {
           transporter,
           destination
         },
-        {},
         {
-          ...operationData,
-          operationCode: "D 13",
-          operationNoTraceability: true
+          packagingData: {
+            ...operationData,
+            operationCode: "D 13",
+            operationNoTraceability: true
+          }
         }
       );
 
@@ -150,10 +149,11 @@ describe("BSFF operationHook job", () => {
           transporter,
           destination
         },
-        {},
         {
-          ...operationData,
-          operationCode: "D 13"
+          packagingData: {
+            ...operationData,
+            operationCode: "D 13"
+          }
         }
       );
 
@@ -180,10 +180,11 @@ describe("BSFF operationHook job", () => {
           transporter,
           destination: ttr
         },
-        {},
         {
-          ...operationData,
-          operationCode: "D 15"
+          packagingData: {
+            ...operationData,
+            operationCode: "D 15"
+          }
         }
       );
       const packaging = bsff.packagings[0];
@@ -194,12 +195,14 @@ describe("BSFF operationHook job", () => {
           transporter,
           destination
         },
-        { type: "REEXPEDITION" },
         {
-          ...operationData,
-          acceptationWeight: 120,
-          operationCode: "R 1",
-          previousPackagings: { connect: { id: packaging.id } }
+          data: { type: "REEXPEDITION" },
+          packagingData: {
+            ...operationData,
+            acceptationWeight: 120,
+            operationCode: "R 1",
+            previousPackagings: { connect: { id: packaging.id } }
+          }
         }
       );
 
@@ -237,10 +240,11 @@ describe("BSFF operationHook job", () => {
           transporter,
           destination: ttr
         },
-        {},
         {
-          ...operationData,
-          operationCode: "D 15"
+          packagingData: {
+            ...operationData,
+            operationCode: "D 15"
+          }
         }
       );
       const packaging = bsff.packagings[0];
@@ -251,12 +255,14 @@ describe("BSFF operationHook job", () => {
           transporter,
           destination
         },
-        { type: "GROUPEMENT" },
         {
-          ...operationData,
-          acceptationWeight: 120,
-          operationCode: "R 1",
-          previousPackagings: { connect: { id: packaging.id } }
+          data: { type: "GROUPEMENT" },
+          packagingData: {
+            ...operationData,
+            acceptationWeight: 120,
+            operationCode: "R 1",
+            previousPackagings: { connect: { id: packaging.id } }
+          }
         }
       );
 
@@ -294,10 +300,11 @@ describe("BSFF operationHook job", () => {
           transporter,
           destination: ttr
         },
-        {},
         {
-          ...operationData,
-          operationCode: "D 15"
+          packagingData: {
+            ...operationData,
+            operationCode: "D 15"
+          }
         }
       );
       const packaging = bsff.packagings[0];
@@ -308,12 +315,14 @@ describe("BSFF operationHook job", () => {
           transporter,
           destination
         },
-        { type: "RECONDITIONNEMENT" },
         {
-          ...operationData,
-          acceptationWeight: 120,
-          operationCode: "R 1",
-          previousPackagings: { connect: { id: packaging.id } }
+          data: { type: "RECONDITIONNEMENT" },
+          packagingData: {
+            ...operationData,
+            acceptationWeight: 120,
+            operationCode: "R 1",
+            previousPackagings: { connect: { id: packaging.id } }
+          }
         }
       );
 

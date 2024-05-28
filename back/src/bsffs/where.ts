@@ -17,15 +17,23 @@ function toPrismaBsffSimpleWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
     emitterEmissionSignatureDate: toPrismaDateFilter(
       where.emitter?.emission?.signature?.date
     ),
-    transporterCompanySiret: toPrismaStringFilter(
-      where.transporter?.company?.siret
-    ),
-    transporterCompanyVatNumber: toPrismaStringFilter(
-      where.transporter?.company?.vatNumber
-    ),
-    transporterTransportSignatureDate: toPrismaDateFilter(
-      where.transporter?.transport?.signature?.date
-    ),
+    ...(where.transporter
+      ? {
+          transporters: {
+            some: {
+              transporterCompanySiret: toPrismaStringFilter(
+                where.transporter?.company?.siret
+              ),
+              transporterCompanyVatNumber: toPrismaStringFilter(
+                where.transporter?.company?.vatNumber
+              ),
+              transporterTransportSignatureDate: toPrismaDateFilter(
+                where.transporter?.transport?.signature?.date
+              )
+            }
+          }
+        }
+      : {}),
     destinationCompanySiret: toPrismaStringFilter(
       where.destination?.company?.siret
     ),

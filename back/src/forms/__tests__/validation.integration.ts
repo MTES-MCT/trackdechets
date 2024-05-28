@@ -1856,7 +1856,8 @@ describe("processedInfoSchema", () => {
     });
 
     test.each([
-      ["D9", "VALORISATION_ENERGETIQUE"], // Correct modes are ELIMINATION
+      ["D8", "VALORISATION_ENERGETIQUE"], // correct mode is ELIMINATION
+      ["D9", "VALORISATION_ENERGETIQUE"], // D9 has no associated mode
       ["R12", "VALORISATION_ENERGETIQUE"] // R12 has no associated mode
     ])(
       "should not be valid if operation mode is not compatible with operation code (mode: %p, code: %p)",
@@ -1897,24 +1898,27 @@ describe("processedInfoSchema", () => {
       );
     });
 
-    it("should be valid if operationCode has no potential operationModes associated and none is specified", async () => {
-      const processedInfo = {
-        processedBy: "John Snow",
-        processedAt: new Date(),
-        processingOperationDone: "D 13",
-        processingOperationDescription: "Regroupement",
-        noTraceability: false,
-        nextDestinationProcessingOperation: "D 8",
-        nextDestinationCompanyName: "Exutoire",
-        nextDestinationCompanySiret: siretify(1),
-        nextDestinationCompanyAddress: "4 rue du déchet",
-        nextDestinationCompanyCountry: "FR",
-        nextDestinationCompanyContact: "Arya Stark",
-        nextDestinationCompanyPhone: "06 XX XX XX XX",
-        nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
-      };
+    it.each(["D 9", "D 13"])(
+      "should be valid if operationCode has no potential operationModes associated and none is specified",
+      async code => {
+        const processedInfo = {
+          processedBy: "John Snow",
+          processedAt: new Date(),
+          processingOperationDone: code,
+          processingOperationDescription: "test",
+          noTraceability: false,
+          nextDestinationProcessingOperation: "D 8",
+          nextDestinationCompanyName: "Exutoire",
+          nextDestinationCompanySiret: siretify(1),
+          nextDestinationCompanyAddress: "4 rue du déchet",
+          nextDestinationCompanyCountry: "FR",
+          nextDestinationCompanyContact: "Arya Stark",
+          nextDestinationCompanyPhone: "06 XX XX XX XX",
+          nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+        };
 
-      expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
-    });
+        expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
+      }
+    );
   });
 });

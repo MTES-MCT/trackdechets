@@ -82,7 +82,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                   acceptationStatus: ACCEPTED
               }
               operation: {
-                  code: "D 9"
+                  code: "D 5"
                   mode: ELIMINATION
                   date: "2020-06-30"
               }
@@ -243,7 +243,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                       acceptationStatus: ACCEPTED
                   }
                   operation: {
-                      code: "D 9"
+                      code: "D 5"
                       mode: ELIMINATION
                       date: "2020-06-30"
                   }
@@ -433,7 +433,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                       acceptationStatus: ACCEPTED
                   }
                   operation: {
-                      code: "D 9"
+                      code: "D 5"
                       mode: ELIMINATION
                       date: "2020-06-30"
                   }
