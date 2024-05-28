@@ -8,7 +8,7 @@ import { FileDownload } from "../generated/graphql/types";
  *
  * Creates a temporary token stored in Redis used to download
  * a file from the /download route.
- * When it is passed to the /download toute, the token is
+ * When it is passed to the /download route, the token is
  * deserialized and params are passed to the relevant handler
  */
 export async function getFileDownload({

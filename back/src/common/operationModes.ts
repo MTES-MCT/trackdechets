@@ -20,7 +20,7 @@ export const getOperationModesFromOperationCode = (
       "D6",
       "D7",
       "D8",
-      "D9",
+      // "D9" traitement non final
       "D9F",
       "D10",
       "D11",
@@ -47,6 +47,7 @@ export const getOperationModesFromOperationCode = (
   }
 
   // Regroupements: D13, D14, D15, R12, R13
+  // D9 traitement non final
   return [];
 };
 

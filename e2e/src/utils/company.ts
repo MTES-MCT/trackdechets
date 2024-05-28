@@ -541,18 +541,14 @@ export const addAutomaticSignaturePartner = async (
   const signatureDiv = await companyDiv
     .getByText("Signature automatique (annexe 1)")
     .locator("..");
-  await signatureDiv.getByText("Modifier").click();
-  await signatureDiv.getByPlaceholder("SIRET").fill(partnerSiret);
-  await signatureDiv.getByRole("button", { name: "Rechercher" }).click();
-  // Partner company should pop in the results
-  await expect(
-    signatureDiv.getByText(`Établissement de test - ${partnerSiret}Ajouter`)
-  ).toBeVisible();
-  await signatureDiv.getByRole("button", { name: "Ajouter" }).click();
+  await signatureDiv.getByLabel("N°SIRET ou raison sociale").fill(partnerSiret);
 
-  // Click on other tab, then come back
-  await companyDiv.getByRole("tab", { name: "Membres" }).click();
-  await companyDiv.getByRole("tab", { name: "Signature" }).click();
+  // Partner company should pop in the results
+  const partnerDiv = signatureDiv.getByText(
+    `Établissement de test - ${partnerSiret}`
+  );
+
+  await partnerDiv.click();
 
   // We should see the partner company
   await expect(
@@ -619,29 +615,29 @@ export const renewCompanyAutomaticSignatureCode = async (page, { siret }) => {
   const companyDiv = await getCompanyDiv(page, { siret, tab: "Signature" });
 
   // Current code
-  const code = await companyDiv.locator("#securityCode").textContent();
+  const code = await companyDiv
+    .getByTestId("company-security-code")
+    .textContent();
 
   // Renew
-  await companyDiv.getByText("Renouveler").click();
+  await companyDiv.getByTestId("company-signature-renew").click();
   // Warning message should pop
   await expect(
     companyDiv.getByText(
       "Attention, un nouveau code de signature va vous être attribué de façon aléatoire"
     )
   ).toBeVisible();
-  await companyDiv.getByRole("button", { name: "Renouveler" }).click();
+  await companyDiv.getByTestId("signature-renew-modal-button").click();
   // Wait for the loading to end
   await expect(
-    companyDiv.getByText("Renouvellement en cours")
+    companyDiv.getByTestId("company-security-code-loader")
   ).not.toBeVisible();
 
   // Code should be brand new
-  const newCode = await companyDiv.locator("#securityCode").textContent();
+  const newCode = await companyDiv
+    .getByTestId("company-security-code")
+    .textContent();
   expect(newCode).not.toEqual(code);
-
-  await expect(
-    companyDiv.getByText(`Code de signature${newCode}`)
-  ).toBeVisible();
 
   return { code: newCode };
 };

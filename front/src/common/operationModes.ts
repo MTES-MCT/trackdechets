@@ -19,7 +19,7 @@ export const getOperationModesFromOperationCode = (
       "D6",
       "D7",
       "D8",
-      "D9",
+      // "D9", non final
       "D9F",
       "D10",
       "D11",
@@ -45,7 +45,7 @@ export const getOperationModesFromOperationCode = (
     return [OperationMode.Recyclage];
   }
 
-  // Regroupements: D13, D14, D15, R12, R13
+  // Regroupements: D13, D14, D15, R12, R13 and D9
   return [];
 };
 

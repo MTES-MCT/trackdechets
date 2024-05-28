@@ -185,10 +185,21 @@ const destinationSchema: FactorySchemaOf<
     destinationOperationCode: yup
       .string()
       .oneOf([...PROCESSING_OPERATIONS_CODES, null, ""])
-      .requiredIf(
-        context.operationSignature,
-        `Destinataire: l'opération réalisée est obligatoire`
-      ),
+      .when("destinationReceptionAcceptationStatus", {
+        is: (
+          destinationReceptionAcceptationStatus:
+            | WasteAcceptationStatus
+            | undefined
+        ) =>
+          !!context.operationSignature &&
+          destinationReceptionAcceptationStatus !==
+            WasteAcceptationStatus.REFUSED,
+        then: s =>
+          s
+            .nullable()
+            .required(`Destinataire: l'opération réalisée est obligatoire`),
+        otherwise: s => s.nullable().notRequired()
+      }),
     destinationOperationMode: destinationOperationModeValidation(context),
     destinationPlannedOperationCode: yup
       .string()
@@ -210,7 +221,7 @@ const destinationSchema: FactorySchemaOf<
         context.emissionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`
       ),
-    destinationCompanyAddress: yup.string().when("$emitterSignature", {
+    destinationCompanyAddress: yup.string().when("$emissionSignature", {
       is: true,
       then: s => s.required(`Destination: ${MISSING_COMPANY_ADDRESS}`),
       otherwise: s => s.nullable()

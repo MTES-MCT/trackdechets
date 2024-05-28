@@ -5,7 +5,7 @@ import {
   userFactory
 } from "../../__tests__/factories";
 import { formToBsdd } from "../compat";
-import { toAllWaste, toOutgoingWaste } from "../registry";
+import { getSubType, toAllWaste, toOutgoingWaste } from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryFormInclude } from "../../registry/elastic";
 import { resetDatabase } from "../../../integration-tests/helper";
@@ -217,5 +217,109 @@ describe("toAllWaste", () => {
     expect(waste.postTempStorageDestinationAddress).toBe("25 rue Voltaire");
     expect(waste.postTempStorageDestinationCity).toBe("TOURS");
     expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
+  });
+});
+
+describe("getSubType", () => {
+  afterAll(resetDatabase);
+
+  it("emitter type is APPENDIX1 > should return TOURNEE", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterType: "APPENDIX1" }
+    });
+
+    // When
+    const bsddForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const subType = getSubType(formToBsdd(bsddForRegistry));
+
+    // Then
+    expect(subType).toBe("TOURNEE");
+  });
+
+  it("emitter type is APPENDIX1_PRODUCER > should return APPENDIX1", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterType: "APPENDIX1_PRODUCER" }
+    });
+
+    // When
+    const bsddForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const subType = getSubType(formToBsdd(bsddForRegistry));
+
+    // Then
+    expect(subType).toBe("APPENDIX1");
+  });
+
+  it("emitter type is APPENDIX2 > should return APPENDIX2", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterType: "APPENDIX2" }
+    });
+
+    // When
+    const bsddForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const subType = getSubType(formToBsdd(bsddForRegistry));
+
+    // Then
+    expect(subType).toBe("APPENDIX2");
+  });
+
+  it("form is temp stored > should return TEMP_STORED", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formWithTempStorageFactory({
+      ownerId: user.id
+    });
+
+    // When
+    const bsddForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const subType = getSubType(formToBsdd(bsddForRegistry));
+
+    const bsddSuiteForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.forwardedInId! },
+      include: RegistryFormInclude
+    });
+    const bsdSuitesubType = getSubType(formToBsdd(bsddSuiteForRegistry));
+
+    // Then
+    expect(subType).toBe("TEMP_STORED");
+    expect(bsdSuitesubType).toBe("TEMP_STORED");
+  });
+
+  it("regular form > should return INITIAL", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({
+      ownerId: user.id
+    });
+
+    // When
+    const bsddForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const subType = getSubType(formToBsdd(bsddForRegistry));
+
+    // Then
+    expect(subType).toBe("INITIAL");
   });
 });

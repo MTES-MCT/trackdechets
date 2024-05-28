@@ -22,7 +22,7 @@ describe("getOperationModesFromOperationCode", () => {
     "D 6",
     "D 7",
     "D 8",
-    "D 9",
+
     "D 9 F",
     "D 10",
     "D 11",
@@ -31,7 +31,7 @@ describe("getOperationModesFromOperationCode", () => {
     test(code, [OperationMode.ELIMINATION]);
   });
 
-  it.each(["D 13", "D 14", "D 15", "R 12", "R 13"])(
+  it.each(["D 13", "D 14", "D 15", "R 12", "R 13", "D 9"])(
     "Regroupement code %p > []",
     code => {
       test(code, []);

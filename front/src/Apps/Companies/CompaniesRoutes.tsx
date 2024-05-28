@@ -35,7 +35,7 @@ export default function CompaniesRoutes() {
     return (
       <div id="companies" className="companies dashboard">
         {!isMobile && <CompaniesMenu />}
-        <div className="dashboard-content">
+        <div className="fr-container fr-p-0">
           <Routes>
             <Route index element={<CompaniesList />} />
 

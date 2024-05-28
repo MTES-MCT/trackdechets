@@ -1,8 +1,9 @@
-import { toAllWaste, toOutgoingWaste } from "../registry";
+import { getSubType, toAllWaste, toOutgoingWaste } from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryBsdasriInclude } from "../../registry/elastic";
 import { bsdasriFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { BsdasriType } from "@prisma/client";
 
 describe("toOutgoingWaste", () => {
   afterAll(resetDatabase);
@@ -88,4 +89,27 @@ describe("toAllWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
     }
   );
+});
+
+describe("getSubType", () => {
+  afterAll(resetDatabase);
+
+  it.each([
+    [BsdasriType.SIMPLE, "INITIAL"],
+    [BsdasriType.SYNTHESIS, "SYNTHESIS"],
+    [BsdasriType.GROUPING, "GATHERING"]
+  ])("type is %p > should return %p", async (type, expectedSubType) => {
+    // Given
+    const bsdasri = await bsdasriFactory({ opt: { type } });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const subType = getSubType(bsdasriForRegistry);
+
+    // Then
+    expect(subType).toBe(expectedSubType);
+  });
 });

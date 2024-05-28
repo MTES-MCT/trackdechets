@@ -4,6 +4,7 @@ import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
+  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -11,6 +12,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -67,12 +69,6 @@ const getTransportersData = (bsdd: Bsdd) => ({
   transporter3CompanyMail: bsdd.transporter3CompanyMail
 });
 
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor";
-
 export function getRegistryFields(
   form: FormForElastic
 ): Pick<BsdElastic, RegistryFields> {
@@ -80,7 +76,8 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
 
   if (form.receivedAt) {
@@ -90,24 +87,30 @@ export function getRegistryFields(
   }
 
   if (form.sentAt) {
-    if (form.emitterCompanySiret) {
-      registryFields.isOutgoingWasteFor.push(form.emitterCompanySiret);
-    }
-    if (form.ecoOrganismeSiret) {
-      registryFields.isOutgoingWasteFor.push(form.ecoOrganismeSiret);
-    }
-    if (form.traderCompanySiret) {
-      registryFields.isManagedWasteFor.push(form.traderCompanySiret);
-    }
-    if (form.brokerCompanySiret) {
-      registryFields.isManagedWasteFor.push(form.brokerCompanySiret);
-    }
+    registryFields.isAllWasteFor = [
+      form.recipientCompanySiret,
+      form.emitterCompanySiret,
+      form.ecoOrganismeSiret,
+      form.traderCompanySiret,
+      form.brokerCompanySiret
+    ].filter(Boolean);
+
+    registryFields.isOutgoingWasteFor = [
+      form.emitterCompanySiret,
+      form.ecoOrganismeSiret
+    ].filter(Boolean);
+
+    registryFields.isManagedWasteFor = [
+      form.traderCompanySiret,
+      form.brokerCompanySiret
+    ].filter(Boolean);
 
     if (form.intermediaries?.length) {
       for (const intermediary of form.intermediaries) {
         const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
         if (intermediaryOrgId) {
           registryFields.isManagedWasteFor.push(intermediaryOrgId);
+          registryFields.isAllWasteFor.push(intermediaryOrgId);
         }
       }
     }
@@ -118,6 +121,7 @@ export function getRegistryFields(
       const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
       if (transporterCompanyOrgId) {
         registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+        registryFields.isAllWasteFor.push(transporterCompanyOrgId);
       }
     }
   }
@@ -150,6 +154,22 @@ const getFinalOperationsData = (
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
+export const getSubType = (bsdd: Bsdd): BsdSubType => {
+  if (bsdd.forwardedInId || bsdd.id.endsWith("-suite")) {
+    return "TEMP_STORED";
+  }
+
+  if (bsdd.emitterType === "APPENDIX1") {
+    return "TOURNEE";
+  } else if (bsdd.emitterType === "APPENDIX1_PRODUCER") {
+    return "APPENDIX1";
+  } else if (bsdd.emitterType === "APPENDIX2") {
+    return "APPENDIX2";
+  }
+
+  return "INITIAL";
+};
+
 function toGenericWaste(bsdd: Bsdd): GenericWaste {
   return {
     wasteDescription: bsdd.wasteDescription,
@@ -162,6 +182,7 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
     ecoOrganismeName: bsdd.ecoOrganismeName,
     ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDD",
+    bsdSubType: getSubType(bsdd),
     status: bsdd.status,
     customId: bsdd.customId,
     destinationCap: bsdd.destinationCap,

@@ -1127,7 +1127,7 @@ export const getWorkflowLabel = (
     case BsdaType.Gathering:
       return WorkflowDisplayType.GRP;
     case BsdaType.Reshipment:
-      return WorkflowDisplayType.TRANSIT;
+      return WorkflowDisplayType.REEXPEDITION;
 
     case BsdasriType.Grouping:
       return WorkflowDisplayType.GRP;
