@@ -13,6 +13,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajouter des profils et sous-types de profils (TTR et Installation de traitement) FRONT - T1 [PR 3350](https://github.com/MTES-MCT/trackdechets/pull/3350).
 - Mise à niveau au DSFR de la partie "Membres" des établissements [PR 3345](https://github.com/MTES-MCT/trackdechets/pull/3345)
 - Mise à niveau au DSFR de la partie "Signature" des établissements [PR 3354](https://github.com/MTES-MCT/trackdechets/pull/3354)
+- Permettre la révision d'un DASRI initial[PR 3341](https://github.com/MTES-MCT/trackdechets/pull/3341).
 
 #### :bug: Corrections de bugs
 

@@ -8,6 +8,7 @@ import { BsdType, FormCompany } from "../generated/graphql/types";
 import {
   BsdaRevisionRequest,
   BsddRevisionRequest,
+  BsdasriRevisionRequest,
   OperationMode
 } from "@prisma/client";
 import { FormForElastic } from "../forms/elastic";
@@ -114,7 +115,10 @@ export interface BsdElastic {
   companyNames: string;
   companyOrgIds: string[];
 
-  revisionRequests: BsdaRevisionRequest[] | BsddRevisionRequest[];
+  revisionRequests:
+    | BsdaRevisionRequest[]
+    | BsddRevisionRequest[]
+    | BsdasriRevisionRequest[];
 
   rawBsd:
     | FormForElastic

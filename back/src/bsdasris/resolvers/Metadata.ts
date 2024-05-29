@@ -6,6 +6,8 @@ import {
 import { getBsdasriOrNotFound } from "../database";
 import { validateBsdasri, getRequiredFor } from "../validation";
 import { ValidationError } from "yup";
+import { prisma } from "@td/prisma";
+import { computeLatestRevision } from "../converter";
 
 const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
   errors: async (metadata: BsdasriMetadata & { id: string }) => {
@@ -26,6 +28,19 @@ const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
         requiredFor: getRequiredFor(e.path)
       }));
     }
+  },
+  latestRevision: async (metadata: BsdasriMetadata & { id: string }) => {
+    // When loaded from ES, this field is already populated
+    // We check only for undefined as the field can be null
+    if (metadata.latestRevision !== undefined) {
+      return metadata.latestRevision;
+    }
+
+    const revisions = await prisma.bsdasri
+      .findUnique({ where: { id: metadata.id } })
+      .bsdasriRevisionRequests();
+
+    return computeLatestRevision(revisions) as any;
   }
 };
 

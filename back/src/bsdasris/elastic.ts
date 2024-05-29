@@ -8,17 +8,22 @@ import {
   BsdasriWithGrouping,
   BsdasriWithSynthesizing,
   BsdasriWithGroupingInclude,
-  BsdasriWithSynthesizingInclude
+  BsdasriWithSynthesizingInclude,
+  BsdasriWithRevisionRequests,
+  BsdasriWithRevisionRequestsInclude
 } from "./types";
 import { prisma } from "@td/prisma";
+import { getRevisionOrgIds } from "../common/elasticHelpers";
 
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &
-  BsdasriWithSynthesizing;
+  BsdasriWithSynthesizing &
+  BsdasriWithRevisionRequests;
 
 export const BsdasriForElasticInclude = {
   ...BsdasriWithGroupingInclude,
-  ...BsdasriWithSynthesizingInclude
+  ...BsdasriWithSynthesizingInclude,
+  ...BsdasriWithRevisionRequestsInclude
 };
 
 export async function getBsdasriForElastic(
@@ -214,12 +219,13 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
       : null,
     destinationOperationDate: bsdasri.destinationOperationDate?.getTime(),
     ...where,
-    isInRevisionFor: [],
-    isRevisedFor: [],
+
+    ...getBsdasriRevisionOrgIds(bsdasri),
+    revisionRequests: bsdasri.bsdasriRevisionRequests,
+
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
     rawBsd: bsdasri,
-    revisionRequests: [],
 
     // ALL actors from the BSDASRI, for quick search
     companyNames: [
@@ -242,4 +248,13 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
 
 export function indexBsdasri(bsdasri: BsdasriForElastic, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsdasri), ctx);
+}
+/**
+ * Pour un Dasri donné, retourne l'ensemble des identifiants d'établissements
+ * pour lesquels il y a une demande de révision en cours ou passée.
+ */
+export function getBsdasriRevisionOrgIds(
+  bsdasri: BsdasriForElastic
+): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
+  return getRevisionOrgIds(bsdasri.bsdasriRevisionRequests);
 }

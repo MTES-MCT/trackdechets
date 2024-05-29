@@ -152,6 +152,20 @@ export const dashboardDasriFragment = gql`
     synthesizedIn {
       id
     }
+    metadata {
+      latestRevision {
+        id
+        status
+        authoringCompany {
+          siret
+          name
+        }
+        approvals {
+          approverSiret
+          status
+        }
+      }
+    }
   }
   ${dashboardCompanyFragment}
 `;

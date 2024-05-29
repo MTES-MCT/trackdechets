@@ -43,7 +43,8 @@ import {
   Scalars,
   TemporaryStorageDetail,
   Transporter,
-  TransportMode
+  TransportMode,
+  BsdasriMetadata
 } from "@td/codegen-ui";
 
 export enum BsdTypename {
@@ -135,7 +136,7 @@ export interface BsdDisplay {
   transporterNumberPlate?: string | Maybe<string[]>;
   packagings?: Array<BsffPackaging>;
   synthesizedIn?: Maybe<Bsdasri>;
-  metadata?: FormMetadata | BsdaMetadata;
+  metadata?: FormMetadata | BsdaMetadata | BsdasriMetadata;
 }
 
 export enum WorkflowDisplayType {
