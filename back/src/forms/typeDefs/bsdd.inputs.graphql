@@ -168,7 +168,13 @@ input NextDestinationInput {
   N° du document prévu à l'annexe I-B du règlement n°1013/2006
   ou le numéro de notification et numéro de saisie du document
   prévue à l'annexe I-B du règlement N°1013/2006 (si connu).
-  Format: PPNNNN, avec PP le code pays et NNNN un numéro d'ordre
+  Format: PPNNNN, avec PP le code pays et NNNN un numéro d'ordre.
+
+  Obligatoire quand:
+  - avec ou sans rupture de traçabilité
+  - code déchet dangereux, ou signalé comme dangereux (isDangerous), ou présence de POP
+  - et le  traitement est non final
+  - et la destination ultérieure est à l'étranger ( UE et non UE)
   """
   notificationNumber: String
 

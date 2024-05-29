@@ -38,6 +38,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
     }),
     []
   );
+
   const [isExtraEuropeanCompany, setIsExtraEuropeanCompany] = useState(
     nextDestination?.company?.extraEuropeanId ? true : false
   );
@@ -102,22 +103,41 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const TODAY = new Date();
   const isFRCompany = Boolean(nextDestination?.company?.siret);
   const hasVatNumber = Boolean(nextDestination?.company?.vatNumber);
-  const showNotificationNumber =
-    isExtraEuropeanCompany || (!isFRCompany && noTraceability) || hasVatNumber;
+
   const isDangerousWaste =
     isDangerous(form.wasteDetails?.code ?? "") ||
     (form.wasteDetails?.isDangerous && " (dangereux)");
   const isPop = form?.wasteDetails?.pop;
-  const notificationNumberPlaceHolder =
-    isDangerousWaste || isPop ? "PP AAAA DDDRRR" : "A7E AAAA DDDRRR";
-  const notificationNumberLabel =
-    isDangerousWaste || isPop
-      ? "Numéro de notification"
-      : "Numéro de déclaration Annexe 7 (optionnel)";
-  const notificationNumberTooltip =
-    isDangerousWaste || isPop
-      ? "En cas d'export, indiquer ici le N° de notification prévu à l'annexe 1-B du règlement N°1013/2006, au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre."
-      : "En cas d'export, indiquer ici le N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre. ";
+
+  // le déchet: comporte un code * || est marqué comme dangereux || est marqué POP
+  const isDangerousOrPop = isDangerousWaste || isPop;
+
+  // Notification number
+  const showNotificationNumber =
+    isExtraEuropeanCompany || (!isFRCompany && noTraceability) || hasVatNumber;
+
+  // Le numéro de notif est obligatoire quand : (-avec ou sans rupture de traçabilité)
+  // - le code de traitement est non final
+  // - que le déchet est DD, pop ou marqué comme dangereux
+  // - entreprise (destination ultérieure) hors ue
+  // - ou entreprise (destination ultérieure) UE non française
+  const notificationNumberIsMandatory =
+    (nextDestination && isExtraEuropeanCompany && isDangerousOrPop) ||
+    (nextDestination && hasVatNumber && isDangerousOrPop);
+
+  const notificationNumberIsOptional = !notificationNumberIsMandatory;
+  // nextDestination + hasVatNumber + isDangerousOrPop
+  const notificationNumberPlaceHolder = isDangerousOrPop
+    ? "PP AAAA DDDRRR"
+    : "A7E AAAA DDDRRR";
+  const notificationNumberLabel = isDangerousOrPop
+    ? `Numéro de notification ${
+        notificationNumberIsOptional ? "(Optionnel)" : ""
+      }`
+    : "Numéro de déclaration Annexe 7 (optionnel)";
+  const notificationNumberTooltip = isDangerousOrPop
+    ? "En cas d'export, indiquer ici le N° de notification prévu à l'annexe 1-B du règlement N°1013/2006, au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre."
+    : "En cas d'export, indiquer ici le N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre. ";
 
   return (
     <Form>
@@ -277,7 +297,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
                   name="nextDestination.notificationNumber"
                   className="td-input"
                   placeholder={notificationNumberPlaceHolder}
-                  required={isExtraEuropeanCompany}
+                  required={notificationNumberIsMandatory}
                 />
               </>
             )}

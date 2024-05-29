@@ -31,6 +31,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Retrait de la possibilité de sélectionner un mode de traitement pour le code non final D9 [PR 3308](https://github.com/MTES-MCT/trackdechets/pull/3308)
 - Le SIRET de destination ultérieure doit obligatoirement être inscrit sur Trackdéchets [PR 3355](https://github.com/MTES-MCT/trackdechets/pull/3355)
+- Rendre obligatoire le champ "Numéro de notification" lorsque la destination ultérieure renseignée est étrangère [PR 3332](https://github.com/MTES-MCT/trackdechets/pull/3332)
 
 #### :nail_care: Améliorations
 
