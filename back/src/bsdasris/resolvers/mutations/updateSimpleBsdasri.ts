@@ -80,7 +80,11 @@ const updateBsdasri = async ({
     const hasGroupingDiff =
       newDasrisToGroup.length > 0 || inputGrouping.length !== dbGrouping.length;
 
-    if (hasGroupingDiff && dbBsdasri.status !== BsdasriStatus.INITIAL) {
+    if (
+      hasGroupingDiff &&
+      dbBsdasri.status !== BsdasriStatus.INITIAL &&
+      dbBsdasri.status !== BsdasriStatus.SIGNED_BY_PRODUCER
+    ) {
       throw new UserInputError(
         "Les bordereaux associés à ce bsd ne sont plus modifiables"
       );
