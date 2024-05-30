@@ -38,26 +38,42 @@ type Props = {
   readonly bsdasri: Bsdasri;
 };
 
-const bsdasriPackagingSchema = z.object({
-  type: z.enum(
-    [
-      "BOITE_CARTON",
-      "FUT",
-      "BOITE_PERFORANTS",
-      "GRAND_EMBALLAGE",
-      "GRV",
-      "AUTRE"
-    ],
-    {
-      required_error: "Ce champ est requis",
-      invalid_type_error: "Ce champ est requis"
-    }
-  ),
-  other: z.string(),
-  volume: z.coerce.number().positive().nullish(),
+const bsdasriPackagingSchema = z
+  .object({
+    type: z.enum(
+      [
+        "BOITE_CARTON",
+        "FUT",
+        "BOITE_PERFORANTS",
+        "GRAND_EMBALLAGE",
+        "GRV",
+        "AUTRE"
+      ],
+      {
+        required_error: "Ce champ est requis",
+        invalid_type_error: "Ce champ est requis"
+      }
+    ),
+    other: z.string(),
+    volume: z.coerce
+      .number()
+      .positive("Ce champ est requis est doit être supérieur à 0"),
 
-  quantity: z.coerce.number().positive()
-});
+    quantity: z.coerce
+      .number()
+      .positive("Ce champ est requis est doit être supérieur à 0")
+  })
+  .superRefine((values, context) => {
+    if (values.type === "AUTRE" && !values.other) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+
+        message: "Veuillez préciser le conditionnement",
+
+        path: ["other"]
+      });
+    }
+  });
 
 const getSchema = () =>
   z.object({
@@ -87,7 +103,9 @@ const getSchema = () =>
       .nullish(),
     waste: z.object({ code: z.string().nullish() }),
     isCanceled: z.boolean().nullish(),
-    comment: z.string().min(3)
+    comment: z
+      .string()
+      .min(3, "Le commentaire doit faire au moins 3 caractères")
   });
 
 const revisionRules = {
@@ -129,28 +147,6 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
     Pick<Mutation, "createBsdasriRevisionRequest">,
     MutationCreateBsdasriRevisionRequestArgs
   >(CREATE_BSDASRI_REVISION_REQUEST);
-
-  // const defaultValues = {
-  //   emitter: {
-  //     pickupSite: {
-  //       name: "",
-  //       address: "",
-  //       city: "",
-  //       postalCode: "",
-  //       infos: ""
-  //     }
-  //   },
-  //   destination: {
-  //     reception: { packagings: [] },
-  //     operation: {
-  //       weight: null,
-  //       code: null,
-  //       mode: null
-  //     }
-  //   },
-  //   waste: { code: null },
-  //   isCanceled: false
-  // };
 
   const initialReview = {
     emitter: {
@@ -236,13 +232,17 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
     bsdasri?.destination?.reception?.packagings || []
   );
 
-  const pickuSiteSummary = [
-    bsdasri.emitter?.pickupSite?.address,
-    bsdasri.emitter?.pickupSite?.postalCode,
-    bsdasri.emitter?.pickupSite?.city
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const pickuSiteSummary =
+    [
+      bsdasri.emitter?.pickupSite?.address,
+      bsdasri.emitter?.pickupSite?.postalCode,
+      bsdasri.emitter?.pickupSite?.city
+    ]
+      .filter(Boolean)
+      .join(" ") || "Non renseigné";
+
+  const status = bsdasri["bsdasriStatus"];
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>
@@ -260,10 +260,7 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             path="emitter.pickupSite"
             value={pickuSiteSummary}
             defaultValue={initialReview?.emitter?.pickupSite}
-            disabled={isDisabled(
-              "emitter.pickupSite",
-              bsdasri["bsdasriStatus"]
-            )}
+            disabled={isDisabled("emitter.pickupSite", status)}
           >
             <Input
               label="Nom du site d'enlèvement"
@@ -304,10 +301,8 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             path="destination.reception.packagings"
             value={packagingsSummary}
             defaultValue={initialReview?.destination?.reception?.packagings}
-            disabled={isDisabled(
-              "destination.reception.packagings",
-              bsdasri["bsdasriStatus"]
-            )}
+            initialValue={bsdasri?.destination?.reception?.packagings}
+            disabled={isDisabled("destination.reception.packagings", status)}
           >
             <BsdasriPackagings />
           </RhfReviewableField>
@@ -318,7 +313,7 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             value={bsdasri?.waste?.code}
             defaultValue={initialReview?.waste?.code}
             initialValue={null}
-            disabled={isDisabled("waste.code", bsdasri["bsdasriStatus"])}
+            disabled={isDisabled("waste.code", status)}
           >
             <RadioButtons
               options={[
@@ -348,10 +343,7 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             path="destination.operation.weight"
             value={bsdasri?.destination?.operation?.weight?.value}
             defaultValue={initialReview?.destination?.operation?.weight}
-            disabled={isDisabled(
-              "destination.operation.weight",
-              bsdasri["bsdasriStatus"]
-            )}
+            disabled={isDisabled("destination.operation.weight", status)}
           >
             <Input
               label="Poids en kilos"
@@ -382,10 +374,7 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             path="destination.operation.code"
             value={bsdasri?.destination?.operation?.code}
             defaultValue={initialReview?.destination?.operation?.code}
-            disabled={isDisabled(
-              "destination.operation.code",
-              bsdasri["bsdasriStatus"]
-            )}
+            disabled={isDisabled("destination.operation.code", status)}
           >
             <Select
               label="Code de l'opération"

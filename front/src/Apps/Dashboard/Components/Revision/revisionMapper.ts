@@ -152,7 +152,7 @@ export const mapRevision = (
             } ${review?.[bsdName]?.emitter?.pickupSite?.city} ${
               review?.[bsdName]?.emitter?.pickupSite?.infos ?? ""
             }`
-          : "",
+          : "Non renseigné",
         dataNewValue: review?.content?.emitter?.pickupSite
           ? `${review?.content?.emitter?.pickupSite?.address}, ${
               review?.content?.emitter?.pickupSite?.postalCode
@@ -166,11 +166,13 @@ export const mapRevision = (
         dataOldValue: review?.[bsdName]?.wasteDetails?.code,
         dataNewValue: review?.content?.wasteDetails?.code
       },
+
       {
         dataName: DataNameEnum.WASTE_CODE,
-        dataOldValue: review?.bsda?.waste?.code,
+        dataOldValue: review?.[bsdName]?.waste?.code,
         dataNewValue: review?.content?.waste?.code
       },
+
       {
         dataName: DataNameEnum.POP,
         dataOldValue: review?.bsda?.waste?.pop
