@@ -1740,7 +1740,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
   });
 
-  it.only("BSDA should contain forwardedIn", async () => {
+  it("BSDA should contain forwardedIn", async () => {
     // Given
     const forwardedInNextDestination = await companyFactory({
       name: "ForwardedIn next destination",
