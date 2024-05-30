@@ -8,12 +8,14 @@ import {
   getReadonlyBsffRepository
 } from "../repository";
 import { isGetBsdsQuery } from "../../bsds/resolvers/queries/bsds";
+import { BsffWithTransportersInclude } from "../types";
 
 export const Bsff: BsffResolvers = {
   ficheInterventions: async ({ id }, _, context) => {
     const { findUnique } = getReadonlyBsffRepository();
     const prismaBsff = await findUnique({
-      where: { id }
+      where: { id },
+      include: BsffWithTransportersInclude
     });
     const ficheInterventions = await getFicheInterventions({
       bsff: prismaBsff!,

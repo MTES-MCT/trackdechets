@@ -114,6 +114,7 @@ export const dashboardDasriFragment = gql`
       customInfo
       transport {
         plates
+        mode
       }
       recepisse {
         number
@@ -150,6 +151,20 @@ export const dashboardDasriFragment = gql`
     allowDirectTakeOver
     synthesizedIn {
       id
+    }
+    metadata {
+      latestRevision {
+        id
+        status
+        authoringCompany {
+          siret
+          name
+        }
+        approvals {
+          approverSiret
+          status
+        }
+      }
     }
   }
   ${dashboardCompanyFragment}

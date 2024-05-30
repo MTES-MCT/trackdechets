@@ -39,6 +39,7 @@ type EditableBsdasriFields = Required<
     | "emittedByEcoOrganisme"
     | "finalOperations"
     | "FinalOperationToFinalBsdasri"
+    | "bsdasriRevisionRequests"
   >
 >;
 // Defines until which signature BSDASRI fields can be modified

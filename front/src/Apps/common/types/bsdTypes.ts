@@ -42,7 +42,9 @@ import {
   RevisionRequestStatus,
   Scalars,
   TemporaryStorageDetail,
-  Transporter
+  Transporter,
+  TransportMode,
+  BsdasriMetadata
 } from "@td/codegen-ui";
 
 export enum BsdTypename {
@@ -134,7 +136,7 @@ export interface BsdDisplay {
   transporterNumberPlate?: string | Maybe<string[]>;
   packagings?: Array<BsffPackaging>;
   synthesizedIn?: Maybe<Bsdasri>;
-  metadata?: FormMetadata | BsdaMetadata;
+  metadata?: FormMetadata | BsdaMetadata | BsdasriMetadata;
 }
 
 export enum WorkflowDisplayType {
@@ -149,3 +151,10 @@ export enum WorkflowDisplayType {
 
   DEFAULT = ""
 }
+
+export type BsdCurrentTransporterInfos = {
+  transporterId?: string;
+  transporterCustomInfo?: string | Maybe<string[]>;
+  transporterNumberPlate?: string | Maybe<string[]>;
+  transporterMode?: TransportMode;
+};

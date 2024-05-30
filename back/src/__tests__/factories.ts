@@ -82,6 +82,7 @@ export const companyFactory = async (
         ]
       },
       name: `company_${companyIndex}`,
+      givenName: `Company Given Name`,
       contact: "Company Contact",
       securityCode: 1234,
       verificationCode: "34567",

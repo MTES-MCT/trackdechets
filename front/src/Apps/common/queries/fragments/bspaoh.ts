@@ -29,6 +29,7 @@ export const dashboardBspaohFragment = gql`
       customInfo
       transport {
         plates
+        mode
       }
       recepisse {
         number

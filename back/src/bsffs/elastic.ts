@@ -8,17 +8,22 @@ import {
   BsffWithFicheInterventions,
   BsffWithPackagings,
   BsffWithPackagingsInclude,
-  BsffWithFicheInterventionInclude
+  BsffWithFicheInterventionInclude,
+  BsffWithTransporters,
+  BsffWithTransportersInclude
 } from "./types";
 import { prisma } from "@td/prisma";
+import { getFirstTransporterSync } from "./database";
 
 export type BsffForElastic = Bsff &
   BsffWithPackagings &
-  BsffWithFicheInterventions;
+  BsffWithFicheInterventions &
+  BsffWithTransporters;
 
 export const BsffForElasticInclude = {
   ...BsffWithPackagingsInclude,
-  ...BsffWithFicheInterventionInclude
+  ...BsffWithFicheInterventionInclude,
+  ...BsffWithTransportersInclude
 };
 
 export async function getBsffForElastic(
@@ -32,6 +37,7 @@ export async function getBsffForElastic(
 
 export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
   const bsffDestination = toBsffDestination(bsff.packagings);
+  const transporter = getFirstTransporterSync(bsff);
 
   const bsd = {
     type: BsdType.BSFF,
@@ -59,13 +65,13 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     workerCompanySiret: "",
     workerCompanyAddress: "",
 
-    transporterCompanyName: bsff.transporterCompanyName ?? "",
-    transporterCompanySiret: bsff.transporterCompanySiret ?? "",
-    transporterCompanyVatNumber: bsff.transporterCompanyVatNumber ?? "",
-    transporterCompanyAddress: bsff.transporterCompanyAddress ?? "",
-    transporterCustomInfo: bsff.transporterCustomInfo ?? "",
+    transporterCompanyName: transporter?.transporterCompanyName ?? "",
+    transporterCompanySiret: transporter?.transporterCompanySiret ?? "",
+    transporterCompanyVatNumber: transporter?.transporterCompanyVatNumber ?? "",
+    transporterCompanyAddress: transporter?.transporterCompanyAddress ?? "",
+    transporterCustomInfo: transporter?.transporterCustomInfo ?? "",
     transporterTransportPlates:
-      bsff.transporterTransportPlates.map(transportPlateFilter) ?? [],
+      transporter?.transporterTransportPlates.map(transportPlateFilter) ?? [],
 
     destinationCompanyName: bsff.destinationCompanyName ?? "",
     destinationCompanySiret: bsff.destinationCompanySiret ?? "",
@@ -95,8 +101,8 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     emitterEmissionDate: bsff.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: undefined,
     transporterTransportTakenOverAt:
-      bsff.transporterTransportTakenOverAt?.getTime() ??
-      bsff.transporterTransportSignatureDate?.getTime(),
+      transporter?.transporterTransportTakenOverAt?.getTime() ??
+      transporter?.transporterTransportSignatureDate?.getTime(),
     destinationReceptionDate: bsff.destinationReceptionDate?.getTime(),
     destinationAcceptationDate: bsffDestination?.receptionDate?.getTime(),
     destinationAcceptationWeight: bsffDestination?.receptionWeight,
@@ -111,7 +117,10 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     isRevisedFor: [] as string[],
     sirets: [
       bsff.emitterCompanySiret,
-      bsff.transporterCompanySiret,
+      ...bsff.transporters.flatMap(t => [
+        t.transporterCompanySiret,
+        t.transporterCompanyVatNumber
+      ]),
       bsff.destinationCompanySiret,
       ...bsff.detenteurCompanySirets
     ].filter(Boolean),
@@ -122,7 +131,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     // ALL actors from the BSFF, for quick search
     companyNames: [
       bsff.emitterCompanyName,
-      bsff.transporterCompanyName,
+      ...bsff.transporters.map(t => t.transporterCompanyName),
       bsff.destinationCompanyName,
       ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanyName)
     ]
@@ -130,19 +139,21 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
       .join(" "),
     companyOrgIds: [
       bsff.emitterCompanySiret,
-      bsff.transporterCompanySiret,
-      bsff.transporterCompanyVatNumber,
+      ...bsff.transporters.flatMap(t => [
+        t.transporterCompanySiret,
+        t.transporterCompanyVatNumber
+      ]),
       bsff.destinationCompanySiret,
       ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanySiret)
     ].filter(Boolean)
   };
 
-  const transporterCompanyOrgId = getTransporterCompanyOrgId(bsff);
+  const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
   if (bsff.isDraft) {
     bsd.isDraftFor.push(
       ...[
         bsff.emitterCompanySiret,
-        getTransporterCompanyOrgId(bsff),
+        transporterCompanyOrgId,
         bsff.destinationCompanySiret
       ].filter(Boolean)
     );
@@ -154,7 +165,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
         }
         bsd.isFollowFor.push(
           ...[
-            getTransporterCompanyOrgId(bsff),
+            transporterCompanyOrgId,
             bsff.destinationCompanySiret,
             ...bsff.detenteurCompanySirets
           ].filter(Boolean)
@@ -194,7 +205,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
         bsd.isFollowFor.push(
           ...[
             bsff.emitterCompanySiret,
-            getTransporterCompanyOrgId(bsff),
+            transporterCompanyOrgId,
             ...bsff.detenteurCompanySirets
           ].filter(Boolean)
         );
@@ -207,7 +218,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
         bsd.isFollowFor.push(
           ...[
             bsff.emitterCompanySiret,
-            getTransporterCompanyOrgId(bsff),
+            transporterCompanyOrgId,
             bsff.destinationCompanySiret,
             ...bsff.detenteurCompanySirets
           ].filter(Boolean)
@@ -219,7 +230,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
         bsd.isArchivedFor.push(
           ...[
             bsff.emitterCompanySiret,
-            getTransporterCompanyOrgId(bsff),
+            transporterCompanyOrgId,
             bsff.destinationCompanySiret,
             ...bsff.detenteurCompanySirets
           ].filter(Boolean)

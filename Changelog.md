@@ -13,6 +13,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajouter des profils et sous-types de profils (TTR et Installation de traitement) FRONT - T1 [PR 3350](https://github.com/MTES-MCT/trackdechets/pull/3350).
 - Mise à niveau au DSFR de la partie "Membres" des établissements [PR 3345](https://github.com/MTES-MCT/trackdechets/pull/3345)
 - Mise à niveau au DSFR de la partie "Signature" des établissements [PR 3354](https://github.com/MTES-MCT/trackdechets/pull/3354)
+- Permettre la révision d'un DASRI initial[PR 3341](https://github.com/MTES-MCT/trackdechets/pull/3341).
 
 #### :bug: Corrections de bugs
 
@@ -22,20 +23,37 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Au refus total d'un VHU, ne pas demander de compléter le code / mode de traitement [PR 3336](https://github.com/MTES-MCT/trackdechets/pull/3336)
 - Retirer le fait que les champs des transporteurs soient requis à la signature de la réception même lorsqu'ils n'ont pas signé l'enlèvement sur un BSDA [PR 3331](https://github.com/MTES-MCT/trackdechets/pull/3331)
 - Ne pas afficher les pastilles d'alertes pour le profil Lecteur [PR 3353](https://github.com/MTES-MCT/trackdechets/pull/3353)
+- Correction d'une incohérence entre les dates affichées dans l'Aperçu et les dates affichées dans le registre [PR 3319](https://github.com/MTES-MCT/trackdechets/pull/3319)
 - Correction de l'affichage de la parte "Mes établissements" [PRA 3328](https://github.com/MTES-MCT/trackdechets/pull/3328)
+- Réinitialiser correctement emitterCompany lors du switch entre privateIndividual/foreignShip/company [PR 3344](https://github.com/MTES-MCT/trackdechets/pull/3344)
+- Rendre possible l'update d'un BSDASRI de groupement en SIGNED_BY_PRODUCER [PR 3330](https://github.com/MTES-MCT/trackdechets/pull/3330)
 
 #### :boom: Breaking changes
 
-- Retrait de la possibilité de sélectionner un mode de traitement pour le code non final D9 [PR 3308](https://github.com/MTES-MCT/trackdechets/pull/3308
+- Retrait de la possibilité de sélectionner un mode de traitement pour le code non final D9 [PR 3308](https://github.com/MTES-MCT/trackdechets/pull/3308)
+- Le SIRET de destination ultérieure doit obligatoirement être inscrit sur Trackdéchets [PR 3355](https://github.com/MTES-MCT/trackdechets/pull/3355)
+- Rendre obligatoire le champ "Numéro de notification" lorsque la destination ultérieure renseignée est étrangère [PR 3332](https://github.com/MTES-MCT/trackdechets/pull/3332)
 
 #### :nail_care: Améliorations
 
 - Ajout de la mise à jour de l'immatriculation dans la modale de signature du bordereau de synthèse BSDASRI [PR 3290](https://github.com/MTES-MCT/trackdechets/pull/3290)
 - Renommer Regroupement par Annexe 2 (sous-type de BSDD) [PR 3352](https://github.com/MTES-MCT/trackdechets/pull/3352)
-
 - Renommer Transit par Réexpédition (sous-type de BSDA) [PR 3351](https://github.com/MTES-MCT/trackdechets/pull/3351)
+- Registre:
+  - Inversion des options de téléchargement du registre .csv et .xls pour éviter les erreurs [PR 3311](https://github.com/MTES-MCT/trackdechets/pull/3311)
+  - Retrait de la possibilité de filtrer le registre par code déchet via le sélecteur [PR 3312](https://github.com/MTES-MCT/trackdechets/pull/3312)
+  - Incrémentation des registres Exhaustif, Sortant, Transport & Gestion dès la signature transporteur et le registre Entrant dès la signature de réception [PR 3306](https://github.com/MTES-MCT/trackdechets/pull/3306)
+  - Ajout du producteur initial dans les bordereaux suite [PR 3337](https://github.com/MTES-MCT/trackdechets/pull/3337)
+  - Ajout d'une colonne "sous-type de bordereau" dans tous les registres [PR 3339](https://github.com/MTES-MCT/trackdechets/pull/3339)
+- Ajout du nom usuel de l'établissement dans l'email de demande de rattachement [PR 3343](https://github.com/MTES-MCT/trackdechets/pull/3343)
+- Renommer Transit par Réexpédition (sous-type de BSDA) [PR 3351](https://github.com/MTES-MCT/trackdechets/pull/3351)
+- Rendre les liens de FAQ cliquable dans l'ajout d'établissement [PR 3342](https://github.com/MTES-MCT/trackdechets/pull/3342)
+- Faire remonter BSD dans dashboard à la création de demande de révision [PR 3315](https://github.com/MTES-MCT/trackdechets/pull/3315)
+- Afficher infos du transporteur actuel sur BsdCard + permettre leur mise à jour [PR 3309](https://github.com/MTES-MCT/trackdechets/pull/3309)
 
 #### :house: Interne
+
+- Multi-modal BSFF : migrer les données transporteur dans une table à part (refacto interne du code) [PR 3340](https://github.com/MTES-MCT/trackdechets/pull/3340)
 
 # [2024.5.1] 07/05/2024
 

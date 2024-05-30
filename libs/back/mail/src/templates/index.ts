@@ -120,6 +120,7 @@ export const membershipRequest: MailTemplate<{
   userEmail: string;
   companyName: string;
   companySiret: string;
+  companyGivenName: string;
   membershipRequestId: string;
 }> = {
   subject: "Un utilisateur souhaite rejoindre votre établissement",

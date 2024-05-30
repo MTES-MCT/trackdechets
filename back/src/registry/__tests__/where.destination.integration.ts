@@ -157,16 +157,16 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSFFs on destinationCompanySiret (exact)", async () => {
     const testInput = { destinationCompanySiret: siretify(1) };
-    const bsff1 = await createBsff({}, testInput);
+    const bsff1 = await createBsff({}, { data: testInput });
 
     const bsff2 = await createBsff(
       {},
-      { destinationCompanySiret: siretify(2) }
+      { data: { destinationCompanySiret: siretify(2) } }
     );
 
     const bsff3 = await createBsff(
       {},
-      { destinationCompanySiret: siretify(3) }
+      { data: { destinationCompanySiret: siretify(3) } }
     );
 
     await Promise.all(
@@ -386,14 +386,14 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSFFs on a list of destinationCompanySiret", async () => {
     const testInput_1 = { destinationCompanySiret: siretify(1) };
-    const bsff1 = await createBsff({}, testInput_1);
+    const bsff1 = await createBsff({}, { data: testInput_1 });
 
     const testInput = { destinationCompanySiret: siretify(2) };
-    const bsff2 = await createBsff({}, testInput);
+    const bsff2 = await createBsff({}, { data: testInput });
 
     const bsff3 = await createBsff(
       {},
-      { destinationCompanySiret: siretify(3) }
+      { data: { destinationCompanySiret: siretify(3) } }
     );
 
     await Promise.all(
@@ -561,16 +561,16 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSFFs on a substring of destinationCompanySiret", async () => {
     const testInput_1 = { destinationCompanySiret: siretify(1) };
-    const bsff1 = await createBsff({}, testInput_1);
+    const bsff1 = await createBsff({}, { data: testInput_1 });
 
     const bsff2 = await createBsff(
       {},
-      { destinationCompanySiret: siretify(2) }
+      { data: { destinationCompanySiret: siretify(2) } }
     );
 
     const bsff3 = await createBsff(
       {},
-      { destinationCompanySiret: siretify(3) }
+      { data: { destinationCompanySiret: siretify(3) } }
     );
 
     await Promise.all(

@@ -600,18 +600,23 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     const shouldCreateOrUpdateVhuAgrementDemolisseur =
       companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
       data.vhuAgrementDemolisseur.agrementNumber;
+    const hasCollectorType = companyTypesToUpdate.includes(
+      CompanyType.Collector
+    );
+    const hasWasteProcessorType = companyTypesToUpdate.includes(
+      CompanyType.Wasteprocessor
+    );
     const shouldUpdateCollectorTypes =
-      companyTypesToUpdate.includes(CompanyType.Collector) &&
-      data.collectorTypes.length;
+      hasCollectorType || (!hasCollectorType && data.collectorTypes);
     const shouldUpdateWasteProcessorTypes =
-      companyTypesToUpdate.includes(CompanyType.Wasteprocessor) &&
-      data.wasteProcessorTypes.length;
+      hasWasteProcessorType ||
+      (!hasWasteProcessorType && data.wasteProcessorTypes);
 
     if (shouldUpdateCollectorTypes) {
       await updateCompanyCollectorTypes({
         variables: {
           id: company.id,
-          collectorTypes: data.collectorTypes
+          collectorTypes: hasCollectorType ? data.collectorTypes : []
         }
       });
     }
@@ -619,10 +624,13 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       await updateCompanyWasteProcessorTypes({
         variables: {
           id: company.id,
-          wasteProcessorTypes: data.wasteProcessorTypes
+          wasteProcessorTypes: hasWasteProcessorType
+            ? data.wasteProcessorTypes
+            : []
         }
       });
     }
+
     if (shouldCreateOrUpdateWorkerCertification) {
       await handleCreateOrUpdateWorkerCertification(data);
     }

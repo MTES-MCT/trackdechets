@@ -216,3 +216,19 @@ export function checkCanEditBsdasri(bsdasri: Bsdasri) {
     );
   return true;
 }
+
+export async function checkCanRequestRevision(user: User, bsdasri: Bsdasri) {
+  const authorizedOrgIds = [
+    bsdasri.emitterCompanySiret,
+
+    bsdasri.destinationCompanySiret,
+    bsdasri.ecoOrganismeSiret
+  ].filter(Boolean);
+
+  return checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanRevise,
+    `Vous n'êtes pas autorisé à réviser ce bordereau`
+  );
+}

@@ -30,6 +30,18 @@ const buildCreateRevisionRequest: (
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+    // touch the bsd to make it come up in the dashboard
+    await prisma.form.update({
+      where: {
+        readableId: createdRevisionRequest.bsdd.readableId
+      },
+      data: {
+        updatedAt: new Date()
+      },
+      select: {
+        id: true
+      }
+    });
 
     prisma.addAfterCommitCallback(() =>
       enqueueUpdatedBsdToIndex(createdRevisionRequest.bsdd.readableId)

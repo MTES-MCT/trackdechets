@@ -8,7 +8,6 @@ import { InfoIconCode } from "../InfoWithIcon/infoWithIconTypes";
 import { BsdCardProps } from "./bsdCardTypes";
 import WasteDetails from "../WasteDetails/WasteDetails";
 import {
-  canEditCustomInfoOrTransporterNumberPlate,
   canPublishBsd,
   getBsdView,
   getPrimaryActionsLabelFromBsdStatus,
@@ -16,7 +15,6 @@ import {
   getWorkflowLabel,
   isBsdasri,
   isBsff,
-  isBsvhu,
   isBspaoh
 } from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
@@ -36,6 +34,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs,
   RevisionRequestStatus,
+  TransportMode,
   UserPermission
 } from "@td/codegen-ui";
 import {
@@ -57,6 +56,7 @@ import TransporterInfoEditModal from "../TransporterInfoEditModal/TransporterInf
 import { NON_RENSEIGNE } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./bsdCard.scss";
+import { getCurrentTransporterInfos } from "../../bsdMapper";
 
 function BsdCard({
   bsd,
@@ -181,6 +181,36 @@ function BsdCard({
   const ctaPrimaryReviewLabel = bsdDisplay?.type
     ? getPrimaryActionsReviewsLabel(bsdDisplay, currentSiret)
     : "";
+
+  const currentTransporterInfos = useMemo(() => {
+    if (!isToCollectTab && !isCollectedTab) {
+      return null;
+    }
+    return getCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
+  }, [bsd, currentSiret, isToCollectTab, isCollectedTab]);
+
+  // display the transporter's custom info if:
+  // - we are in the "To Collect" tab
+  // OR
+  // - we are in the "Collected" tab and there is a custom info
+  const displayTransporterCustomInfo =
+    !!currentTransporterInfos &&
+    (isToCollectTab ||
+      (isCollectedTab &&
+        !!currentTransporterInfos?.transporterCustomInfo?.length));
+
+  // display the transporter's number plate if:
+  // - the mode of transport is ROAD
+  // AND
+  // - we are in the "To Collect" tab
+  // OR
+  // - we are in the "Collected" tab and there is a number plate
+  const displayTransporterNumberPlate =
+    !!currentTransporterInfos &&
+    currentTransporterInfos.transporterMode === TransportMode.Road &&
+    (isToCollectTab ||
+      (isCollectedTab &&
+        !!currentTransporterInfos?.transporterNumberPlate?.length));
 
   const handleValidationClick = (
     _: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -342,41 +372,32 @@ function BsdCard({
                       info={pickupSiteName}
                     />
                   )}
-                  {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
-                    (isCollectedTab &&
-                      Boolean(bsdDisplay?.transporterCustomInfo?.length))) && (
+                  {displayTransporterCustomInfo && (
                     <InfoWithIcon
                       labelCode={InfoIconCode.CustomInfo}
                       editableInfos={{
-                        customInfo: bsdDisplay?.transporterCustomInfo
+                        customInfo:
+                          currentTransporterInfos?.transporterCustomInfo
                       }}
                       hasEditableInfos
                       isDisabled={
                         isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberPlate(
-                          bsdDisplay,
-                          permissions
-                        )
+                        !permissions.includes(UserPermission.BsdCanUpdate)
                       }
                       onClick={handleEditableInfoClick}
                     />
                   )}
-                  {((isToCollectTab && !isBsvhu(bsdDisplay.type)) ||
-                    (isCollectedTab &&
-                      Boolean(bsdDisplay?.transporterNumberPlate?.length))) && (
+                  {displayTransporterNumberPlate && (
                     <InfoWithIcon
                       labelCode={InfoIconCode.TransporterNumberPlate}
                       editableInfos={{
                         transporterNumberPlate:
-                          bsdDisplay?.transporterNumberPlate
+                          currentTransporterInfos?.transporterNumberPlate
                       }}
                       hasEditableInfos
                       isDisabled={
                         isCollectedTab ||
-                        !canEditCustomInfoOrTransporterNumberPlate(
-                          bsdDisplay,
-                          permissions
-                        )
+                        !permissions.includes(UserPermission.BsdCanUpdate)
                       }
                       onClick={handleEditableInfoClick}
                     />
@@ -491,6 +512,7 @@ function BsdCard({
 
       <TransporterInfoEditModal
         bsd={bsdDisplay!}
+        currentTransporter={currentTransporterInfos!}
         isOpen={isTransportEditModalOpen}
         onClose={onCloseTransportEditModal}
       />

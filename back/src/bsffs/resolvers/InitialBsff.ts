@@ -10,7 +10,8 @@ export const InitialBsff: BsffResolvers = {
   emitter: async ({ id, emitter }, _, { user }) => {
     const { findUnique } = getReadonlyBsffRepository();
     const bsff = await findUnique({
-      where: { id }
+      where: { id },
+      include: { transporters: true }
     });
     try {
       await checkCanRead(user!, bsff!);

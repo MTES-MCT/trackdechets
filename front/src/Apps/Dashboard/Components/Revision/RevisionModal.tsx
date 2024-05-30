@@ -5,11 +5,13 @@ import {
   Query,
   QueryBsdaRevisionRequestsArgs,
   QueryFormRevisionRequestsArgs,
+  QueryBsdasriRevisionRequestsArgs,
   RevisionRequestStatus
 } from "@td/codegen-ui";
 import { useLazyQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
 import { GET_BSDA_REVISION_REQUESTS } from "../../../common/queries/reviews/BsdaReviewQuery";
+import { GET_BSDASRI_REVISION_REQUESTS } from "../../../common/queries/reviews/BsdasriReviewQuery";
 import { ReviewInterface, mapRevision } from "./revisionMapper";
 import RevisionList from "./RevisionList/RevisionList";
 import { Modal } from "../../../../common/components";
@@ -59,6 +61,7 @@ const RevisionModal = ({
 }: RevisionModalProps) => {
   const [reviewList, setReviewList] = useState<ReviewInterface[]>();
   const { siret } = useParams<{ siret: string }>();
+
   const [fetchFormRevision, { data: dataForm, loading: loadingFormRevision }] =
     useLazyQuery<
       Pick<Query, "formRevisionRequests">,
@@ -67,6 +70,7 @@ const RevisionModal = ({
       fetchPolicy: "cache-and-network",
       variables: { siret: siret!, where: { bsddId: { _eq: bsdId } } }
     });
+
   const [fetchBsdaRevision, { data: dataBsda, loading: loadingBsdaRevision }] =
     useLazyQuery<
       Pick<Query, "bsdaRevisionRequests">,
@@ -76,6 +80,17 @@ const RevisionModal = ({
       variables: { siret: siret!, where: { bsdaId: { _eq: bsdId } } }
     });
 
+  const [
+    fetchBsdasriRevision,
+    { data: dataBsdasri, loading: loadingBsdasriRevision }
+  ] = useLazyQuery<
+    Pick<Query, "bsdasriRevisionRequests">,
+    QueryBsdasriRevisionRequestsArgs
+  >(GET_BSDASRI_REVISION_REQUESTS, {
+    fetchPolicy: "cache-and-network",
+    variables: { siret: siret!, where: { bsdasriId: { _eq: bsdId } } }
+  });
+
   useEffect(() => {
     if (bsdType === BsdType.Bsdd) {
       fetchFormRevision();
@@ -83,7 +98,11 @@ const RevisionModal = ({
     if (bsdType === BsdType.Bsda) {
       fetchBsdaRevision();
     }
-  }, [bsdType, fetchBsdaRevision, fetchFormRevision]);
+
+    if (bsdType === BsdType.Bsdasri) {
+      fetchBsdasriRevision();
+    }
+  }, [bsdType, fetchBsdaRevision, fetchFormRevision, fetchBsdasriRevision]);
 
   useEffect(() => {
     if (bsdType === BsdType.Bsdd && dataForm) {
@@ -91,15 +110,33 @@ const RevisionModal = ({
         buildReviewList(bsdType, dataForm.formRevisionRequests.edges)
       );
     }
+
     if (bsdType === BsdType.Bsda && dataBsda) {
       setReviewList(
         buildReviewList(bsdType, dataBsda.bsdaRevisionRequests.edges)
       );
     }
-  }, [dataForm, dataBsda, bsdType]);
+
+    if (bsdType === BsdType.Bsdasri && dataBsdasri) {
+      setReviewList(
+        buildReviewList(bsdType, dataBsdasri.bsdasriRevisionRequests.edges)
+      );
+    }
+  }, [dataForm, dataBsda, dataBsdasri, bsdType]);
 
   const buildReviewList = (bsdType, data) => {
-    const bsdName = bsdType === BsdType.Bsdd ? "form" : "bsda";
+    let bsdName = "";
+
+    if (bsdType === BsdType.Bsdd) {
+      bsdName = "form";
+    }
+    if (bsdType === BsdType.Bsda) {
+      bsdName = "bsda";
+    }
+    if (bsdType === BsdType.Bsdasri) {
+      bsdName = "bsdasri";
+    }
+
     return data?.map(review => {
       return mapRevision(review.node, bsdName);
     });
@@ -154,7 +191,9 @@ const RevisionModal = ({
   return (
     <Modal onClose={onModalCloseFromParent!} ariaLabel={ariaLabel} isOpen>
       <div className="revision-modal">
-        {(loadingFormRevision || loadingBsdaRevision) && (
+        {(loadingFormRevision ||
+          loadingBsdaRevision ||
+          loadingBsdasriRevision) && (
           <div className="revision-modal-loader">
             <div>
               <InlineLoader />
@@ -172,7 +211,9 @@ const RevisionModal = ({
             </Button>
           )}
 
-          {(!loadingFormRevision || !loadingBsdaRevision) &&
+          {(!loadingFormRevision ||
+            !loadingBsdaRevision ||
+            !loadingBsdasriRevision) &&
             actualActionType === ActionType.UPDATE && (
               <RevisionApproveFragment
                 reviewId={latestRevision?.id}
@@ -181,7 +222,9 @@ const RevisionModal = ({
                 onClose={onModalCloseFromParent!}
               />
             )}
-          {(!loadingFormRevision || !loadingBsdaRevision) &&
+          {(!loadingFormRevision ||
+            !loadingBsdaRevision ||
+            !loadingBsdasriRevision) &&
             actualActionType === ActionType.DELETE && (
               <RevisionCancelFragment
                 reviewId={latestRevision?.id}

@@ -1,7 +1,6 @@
 import { BsffPackagingType, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
 import {
   userWithCompanyFactory,
@@ -66,8 +65,10 @@ describe("Query.bsffs", () => {
     const bsff = await createBsff(
       { emitter: operateur },
       {
-        ficheInterventions: { connect: { id: ficheIntervention.id } },
-        detenteurCompanySirets: [detenteur.company.siret!]
+        data: {
+          ficheInterventions: { connect: { id: ficheIntervention.id } },
+          detenteurCompanySirets: [detenteur.company.siret!]
+        }
       }
     );
     const { query } = makeClient(detenteur.user);
@@ -145,7 +146,7 @@ describe("Query.bsffs", () => {
 
   it("should not return deleted bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    await createBsff({ emitter }, { isDeleted: true });
+    await createBsff({ emitter }, { data: { isDeleted: true } });
 
     const { query } = makeClient(emitter.user);
     const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
@@ -158,34 +159,34 @@ describe("Query.bsffs", () => {
   it("should list the fiche d'interventions", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const bsffId = getReadableId(ReadableIdPrefix.FF);
     const ficheInterventionNumero = "0000001";
     await createBsff(
       {
         emitter
       },
       {
-        id: bsffId,
-        ficheInterventions: {
-          create: [
-            {
-              numero: ficheInterventionNumero,
-              weight: 2,
-              detenteurCompanyName: "Acme",
-              detenteurCompanySiret: siretify(1),
-              detenteurCompanyAddress: "12 rue de la Tige, 69000",
-              detenteurCompanyMail: "contact@gmail.com",
-              detenteurCompanyPhone: "06",
-              detenteurCompanyContact: "Jeanne Michelin",
-              operateurCompanyName: "Clim'op",
-              operateurCompanySiret: siretify(2),
-              operateurCompanyAddress: "12 rue de la Tige, 69000",
-              operateurCompanyMail: "contact@climop.com",
-              operateurCompanyPhone: "06",
-              operateurCompanyContact: "Jean Dupont",
-              postalCode: "69000"
-            }
-          ]
+        data: {
+          ficheInterventions: {
+            create: [
+              {
+                numero: ficheInterventionNumero,
+                weight: 2,
+                detenteurCompanyName: "Acme",
+                detenteurCompanySiret: siretify(1),
+                detenteurCompanyAddress: "12 rue de la Tige, 69000",
+                detenteurCompanyMail: "contact@gmail.com",
+                detenteurCompanyPhone: "06",
+                detenteurCompanyContact: "Jeanne Michelin",
+                operateurCompanyName: "Clim'op",
+                operateurCompanySiret: siretify(2),
+                operateurCompanyAddress: "12 rue de la Tige, 69000",
+                operateurCompanyMail: "contact@climop.com",
+                operateurCompanyPhone: "06",
+                operateurCompanyContact: "Jean Dupont",
+                postalCode: "69000"
+              }
+            ]
+          }
         }
       }
     );
@@ -211,39 +212,33 @@ describe("Query.bsffs", () => {
     const bsff1 = await createBsff(
       { emitter },
       {
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            numero: "AAAAA",
-            emissionNumero: "AAAAA",
-            weight: 1
-          }
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          numero: "AAAAA",
+          emissionNumero: "AAAAA",
+          weight: 1
         }
       }
     );
     const bsff2 = await createBsff(
       { emitter },
       {
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            numero: "BBBBB",
-            emissionNumero: "BBBBB",
-            weight: 1
-          }
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          numero: "BBBBB",
+          emissionNumero: "BBBBB",
+          weight: 1
         }
       }
     );
     const bsff3 = await createBsff(
       { emitter },
       {
-        packagings: {
-          create: {
-            type: BsffPackagingType.BOUTEILLE,
-            numero: "CCCCC",
-            emissionNumero: "CCCCC",
-            weight: 1
-          }
+        packagingData: {
+          type: BsffPackagingType.BOUTEILLE,
+          numero: "CCCCC",
+          emissionNumero: "CCCCC",
+          weight: 1
         }
       }
     );
@@ -335,19 +330,21 @@ describe("Query.bsffs", () => {
     const bsff1 = await createBsff(
       { emitter: operateur },
       {
-        ficheInterventions: { connect: { id: ficheIntervention1.id } }
+        data: {
+          ficheInterventions: { connect: { id: ficheIntervention1.id } }
+        }
       }
     );
     await createBsff(
       { emitter: operateur },
       {
-        ficheInterventions: { connect: { id: ficheIntervention2.id } }
+        data: { ficheInterventions: { connect: { id: ficheIntervention2.id } } }
       }
     );
     await createBsff(
       { emitter: operateur },
       {
-        ficheInterventions: { connect: { id: ficheIntervention3.id } }
+        data: { ficheInterventions: { connect: { id: ficheIntervention3.id } } }
       }
     );
 
@@ -396,19 +393,19 @@ describe("Query.bsffs", () => {
     const bsff1 = await createBsff(
       { emitter: operateur },
       {
-        ficheInterventions: { connect: { id: ficheIntervention1.id } }
+        data: { ficheInterventions: { connect: { id: ficheIntervention1.id } } }
       }
     );
     await createBsff(
       { emitter: operateur },
       {
-        ficheInterventions: { connect: { id: ficheIntervention2.id } }
+        data: { ficheInterventions: { connect: { id: ficheIntervention2.id } } }
       }
     );
     await createBsff(
       { emitter: operateur },
       {
-        ficheInterventions: { connect: { id: ficheIntervention3.id } }
+        data: { ficheInterventions: { connect: { id: ficheIntervention3.id } } }
       }
     );
 
@@ -435,15 +432,15 @@ describe("Query.bsffs", () => {
     const newDestination = {
       destinationCompanySiret: siretify(1)
     };
-    const bsff1 = await createBsff({ emitter }, newDestination);
+    const bsff1 = await createBsff({ emitter }, { data: newDestination });
     const newDestination_1 = {
       destinationCompanySiret: siretify(2)
     };
-    const bsff2 = await createBsff({ emitter }, newDestination_1);
+    const bsff2 = await createBsff({ emitter }, { data: newDestination_1 });
     const newDestination_2 = {
       destinationCompanySiret: siretify(3)
     };
-    await createBsff({ emitter }, newDestination_2);
+    await createBsff({ emitter }, { data: newDestination_2 });
 
     const { query } = makeClient(emitter.user);
     const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
