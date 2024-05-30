@@ -4,15 +4,19 @@ import {
   BsffInput
 } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
+import { BsffWithTransporters } from "./types";
+import { getFirstTransporterSync } from "./database";
 
 /**
  * Retrieves organisations allowed to read a BSFF
  */
-export function readers(bsff: Bsff) {
+export function readers(bsff: BsffWithTransporters) {
   return [
     bsff.emitterCompanySiret,
-    bsff.transporterCompanySiret,
-    bsff.transporterCompanyVatNumber,
+    ...bsff.transporters.flatMap(t => [
+      t.transporterCompanySiret,
+      t.transporterCompanyVatNumber
+    ]),
     bsff.destinationCompanySiret,
     ...bsff.detenteurCompanySirets
   ].filter(Boolean);
@@ -24,12 +28,14 @@ export function readers(bsff: Bsff) {
  * parameter to pre-compute the form contributors after the update, hence verifying
  * a user is not removing his own company from the BSFF
  */
-function contributors(bsff: Bsff, input?: BsffInput) {
+function contributors(bsff: BsffWithTransporters, input?: BsffInput) {
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateTransporterCompanySiret = input?.transporter?.company?.siret;
   const updateTransporterCompanyVatNumber =
     input?.transporter?.company?.vatNumber;
   const updateDestinationCompanySiret = input?.destination?.company?.siret;
+
+  const transporter = getFirstTransporterSync(bsff);
 
   const emitterCompanySiret =
     updateEmitterCompanySiret !== undefined
@@ -39,12 +45,12 @@ function contributors(bsff: Bsff, input?: BsffInput) {
   const transporterCompanySiret =
     updateTransporterCompanySiret !== undefined
       ? updateTransporterCompanySiret
-      : bsff.transporterCompanySiret;
+      : transporter?.transporterCompanySiret;
 
   const transporterCompanyVatNumber =
     updateTransporterCompanyVatNumber !== undefined
       ? updateTransporterCompanyVatNumber
-      : bsff.transporterCompanyVatNumber;
+      : transporter?.transporterCompanyVatNumber;
 
   const destinationCompanySiret =
     updateDestinationCompanySiret !== undefined
@@ -71,7 +77,7 @@ function creators(input: BsffInput) {
   ].filter(Boolean);
 }
 
-export async function checkCanRead(user: User, bsff: Bsff) {
+export async function checkCanRead(user: User, bsff: BsffWithTransporters) {
   const authorizedOrgIds = readers(bsff);
 
   return checkUserPermissions(
@@ -93,7 +99,10 @@ export async function checkCanCreate(user: User, bsffInput: BsffInput) {
   );
 }
 
-export async function checkCanDuplicate(user: User, bsff: Bsff) {
+export async function checkCanDuplicate(
+  user: User,
+  bsff: BsffWithTransporters
+) {
   const authorizedOrgIds = contributors(bsff);
 
   return checkUserPermissions(
@@ -122,7 +131,7 @@ export async function checkCanCreateFicheIntervention(
 
 export async function checkCanUpdate(
   user: User,
-  bsff: Bsff,
+  bsff: BsffWithTransporters,
   input?: BsffInput
 ) {
   const authorizedOrgIds = contributors(bsff);
@@ -183,7 +192,7 @@ export async function checkCanUpdateFicheIntervention(
   return true;
 }
 
-export async function checkCanDelete(user: User, bsff: Bsff) {
+export async function checkCanDelete(user: User, bsff: BsffWithTransporters) {
   const authorizedOrgIds =
     bsff.status === BsffStatus.INITIAL
       ? contributors(bsff)

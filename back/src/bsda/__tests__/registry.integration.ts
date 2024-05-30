@@ -1,8 +1,9 @@
-import { toAllWaste, toOutgoingWaste } from "../registry";
+import { getSubType, toAllWaste, toOutgoingWaste } from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryBsdaInclude } from "../../registry/elastic";
 import { bsdaFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { BsdaType } from "@prisma/client";
 
 describe("toOutgoingWaste", () => {
   afterAll(resetDatabase);
@@ -86,6 +87,43 @@ describe("toAllWaste", () => {
         "D 5"
       ]);
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
+    }
+  );
+});
+
+describe("getSubType", () => {
+  afterAll(resetDatabase);
+
+  it("type is OTHER_COLLECTIONS > should return INITIAL", async () => {
+    // Given
+    const bsda = await bsdaFactory({ opt: { type: "OTHER_COLLECTIONS" } });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const subType = getSubType(bsdaForRegistry);
+
+    // Then
+    expect(subType).toBe("INITIAL");
+  });
+
+  it.each([BsdaType.GATHERING, BsdaType.RESHIPMENT, BsdaType.COLLECTION_2710])(
+    "type is %p > should return %p",
+    async type => {
+      // Given
+      const bsda = await bsdaFactory({ opt: { type } });
+
+      // When
+      const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id },
+        include: RegistryBsdaInclude
+      });
+      const subType = getSubType(bsdaForRegistry);
+
+      // Then
+      expect(subType).toBe(type);
     }
   );
 });

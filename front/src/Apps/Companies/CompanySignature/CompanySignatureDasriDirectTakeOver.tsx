@@ -30,7 +30,7 @@ const CompanySignatureDasriDirectTakeOver = ({
     MutationUpdateCompanyArgs
   >(UPDATE_DASRI_DIRECT_TAKEOVER, {
     onCompleted: () => {
-      toast.success("Paramètre enregistrée", { duration: TOAST_DURATION });
+      toast.success("Paramètre enregistré", { duration: TOAST_DURATION });
     },
     onError: () => {
       toast.error(

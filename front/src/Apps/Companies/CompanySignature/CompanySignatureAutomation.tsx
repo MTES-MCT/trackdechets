@@ -17,6 +17,7 @@ import {
 import { SEARCH_COMPANIES } from "../../common/queries/company/query";
 import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../../../common/config";
+import { formatDate } from "../../../common/datetime";
 
 import "./companySignature.scss";
 
@@ -178,7 +179,7 @@ const CompanySignatureAutomation = ({
                     {delegation.to.name} (
                     {delegation.to.siret ?? delegation.to.vatNumber})
                   </td>
-                  <td>{delegation.createdAt}</td>
+                  <td>{formatDate(delegation.createdAt)}</td>
                   {isAdmin && (
                     <td>
                       <button
@@ -195,12 +196,14 @@ const CompanySignatureAutomation = ({
           </table>
         </div>
       ) : (
-        <div className="fr-alert fr-alert--info fr-alert--sm fr-mt-2w">
-          <p>
-            Recherchez un premier établissement ci-dessus afin de l’ajouter à la
-            liste des collecteurs autorisés
-          </p>
-        </div>
+        isAdmin && (
+          <div className="fr-alert fr-alert--info fr-alert--sm fr-mt-2w">
+            <p>
+              Recherchez un premier établissement ci-dessus afin de l’ajouter à
+              la liste des collecteurs autorisés
+            </p>
+          </div>
+        )
       )}
     </div>
   );

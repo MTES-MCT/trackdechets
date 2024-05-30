@@ -1,8 +1,9 @@
-import { Bsff, BsffType, OperationMode } from "@prisma/client";
+import { BsffTransporter, BsffType, OperationMode } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,
+  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -20,6 +21,8 @@ import {
 import { extractPostalCode } from "../utils";
 import { toBsffDestination } from "./compat";
 import { RegistryBsff } from "../registry/elastic";
+import { getFirstTransporterSync } from "./database";
+import { BsffWithTransporters } from "./types";
 
 const getOperationData = (bsff: RegistryBsff) => {
   const bsffDestination = toBsffDestination(bsff.packagings);
@@ -48,20 +51,20 @@ const getFinalOperationsData = (bsff: RegistryBsff) => {
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
-const getTransporterData = (bsff: Bsff) => ({
-  transporterRecepisseIsExempted: bsff.transporterRecepisseIsExempted,
-  transporterTakenOverAt: bsff.transporterTransportTakenOverAt,
-  transporterCompanyAddress: bsff.transporterCompanyAddress,
-  transporterCompanyName: bsff.transporterCompanyName,
-  transporterCompanySiret: bsff.transporterCompanySiret,
-  transporterRecepisseNumber: bsff.transporterRecepisseNumber,
-  transporterCompanyMail: bsff.transporterCompanyMail,
-  transporterCustomInfo: bsff.transporterCustomInfo,
-  transporterNumberPlates: bsff.transporterTransportPlates
+const getTransporterData = (transporter: BsffTransporter) => ({
+  transporterRecepisseIsExempted: transporter.transporterRecepisseIsExempted,
+  transporterTakenOverAt: transporter.transporterTransportTakenOverAt,
+  transporterCompanyAddress: transporter.transporterCompanyAddress,
+  transporterCompanyName: transporter.transporterCompanyName,
+  transporterCompanySiret: transporter.transporterCompanySiret,
+  transporterRecepisseNumber: transporter.transporterRecepisseNumber,
+  transporterCompanyMail: transporter.transporterCompanyMail,
+  transporterCustomInfo: transporter.transporterCustomInfo,
+  transporterNumberPlates: transporter.transporterTransportPlates
 });
 
 export function getRegistryFields(
-  bsff: Bsff
+  bsff: BsffWithTransporters
 ): Pick<BsdElastic, RegistryFields> {
   const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
@@ -71,9 +74,11 @@ export function getRegistryFields(
     isAllWasteFor: []
   };
 
+  const transporter = getFirstTransporterSync(bsff);
+
   if (
     bsff.emitterEmissionSignatureDate &&
-    bsff.transporterTransportSignatureDate
+    transporter?.transporterTransportSignatureDate
   ) {
     if (bsff.destinationCompanySiret) {
       registryFields.isAllWasteFor.push(bsff.destinationCompanySiret);
@@ -85,7 +90,7 @@ export function getRegistryFields(
     registryFields.isOutgoingWasteFor.push(...bsff.detenteurCompanySirets);
     registryFields.isAllWasteFor.push(...bsff.detenteurCompanySirets);
 
-    const transporterOrgId = getTransporterCompanyOrgId(bsff);
+    const transporterOrgId = getTransporterCompanyOrgId(transporter);
     if (transporterOrgId) {
       registryFields.isTransportedWasteFor.push(transporterOrgId);
       registryFields.isAllWasteFor.push(transporterOrgId);
@@ -99,8 +104,21 @@ export function getRegistryFields(
   return registryFields;
 }
 
+export const getSubType = (bsff: RegistryBsff): BsdSubType => {
+  if (bsff.type === "GROUPEMENT") {
+    return "GATHERING";
+  } else if (bsff.type === "RECONDITIONNEMENT") {
+    return "RECONDITIONNEMENT";
+  } else if (bsff.type === "REEXPEDITION") {
+    return "RESHIPMENT";
+  }
+
+  return "INITIAL";
+};
+
 function toGenericWaste(bsff: RegistryBsff): GenericWaste {
   const bsffDestination = toBsffDestination(bsff.packagings);
+  const transporter = getFirstTransporterSync(bsff);
 
   return {
     wasteDescription: bsff.wasteDescription,
@@ -113,6 +131,7 @@ function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSFF",
+    bsdSubType: getSubType(bsff),
     status: bsff.status,
     customId: null,
     destinationOperationNoTraceability: false,
@@ -127,7 +146,7 @@ function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransporterData(bsff)
+    ...(transporter ? getTransporterData(transporter) : {})
   };
 }
 

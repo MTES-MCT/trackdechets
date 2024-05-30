@@ -85,8 +85,11 @@ describe("Query.bsffPackagings", () => {
         transporter,
         destination
       },
-      {},
-      { operationCode: OPERATION.R12.code }
+      {
+        packagingData: {
+          operationCode: OPERATION.R12.code
+        }
+      }
     );
 
     // this bsff packagings should not be included
@@ -96,8 +99,11 @@ describe("Query.bsffPackagings", () => {
         transporter,
         destination
       },
-      {},
-      { operationCode: OPERATION.R2.code }
+      {
+        packagingData: {
+          operationCode: OPERATION.R2.code
+        }
+      }
     );
 
     const { query } = makeClient(emitter.user);
@@ -127,7 +133,7 @@ describe("Query.bsffPackagings", () => {
         transporter,
         destination
       },
-      { isDraft: false }
+      { data: { isDraft: false } }
     );
 
     // this bsff packagings should not be included
@@ -137,7 +143,7 @@ describe("Query.bsffPackagings", () => {
         transporter,
         destination
       },
-      { isDraft: true }
+      { data: { isDraft: true } }
     );
 
     const { query } = makeClient(emitter.user);
@@ -168,17 +174,21 @@ describe("Query.bsffPackagings", () => {
         transporter,
         destination
       },
-      {},
-      { operationCode: OPERATION.R12.code }
+
+      { packagingData: { operationCode: OPERATION.R12.code } }
     );
 
     // this bsff packagings should  be included
-    const bsff2 = await createBsff({
-      emitter,
-      transporter,
-      destination,
-      previousPackagings: bsff.packagings
-    });
+    const bsff2 = await createBsff(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        previousPackagings: bsff.packagings
+      }
+    );
 
     const { query } = makeClient(emitter.user);
 
@@ -207,17 +217,18 @@ describe("Query.bsffPackagings", () => {
         transporter,
         destination
       },
-      {},
-      { operationCode: OPERATION.R12.code }
+      { packagingData: { operationCode: OPERATION.R12.code } }
     );
 
     // this bsff packagings should not be included
-    const bsff2 = await createBsff({
-      emitter,
-      transporter,
-      destination,
-      previousPackagings: bsff.packagings
-    });
+    const bsff2 = await createBsff(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      { previousPackagings: bsff.packagings }
+    );
 
     const { query } = makeClient(emitter.user);
 

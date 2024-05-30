@@ -7,36 +7,35 @@ describe("findPreviousPackagings", () => {
   afterAll(resetDatabase);
 
   it("should return previous packagings according to the number of hops", async () => {
-    const bsff1 = await createBsff({}, { id: "bsff1" });
+    const bsff1 = await createBsff();
 
     // bsff2 is forwarding bsff1
     const bsff2 = await createBsff(
+      {},
       {
-        previousPackagings: bsff1.packagings
-      },
-      { id: "bsff2", type: BsffType.REEXPEDITION }
-    );
-
-    const bsff3 = await createBsff({}, { id: "bsff3" });
-    // bsff4 is repackaging bsff2 and bsff3
-    const bsff4 = await createBsff(
-      {
-        previousPackagings: [...bsff2.packagings, ...bsff3.packagings]
-      },
-      {
-        id: "bsff4",
-        type: BsffType.RECONDITIONNEMENT
+        previousPackagings: bsff1.packagings,
+        data: { type: BsffType.REEXPEDITION }
       }
     );
-    const bsff5 = await createBsff({}, { id: "bsff5" });
+
+    const bsff3 = await createBsff();
+    // bsff4 is repackaging bsff2 and bsff3
+    const bsff4 = await createBsff(
+      {},
+      {
+        previousPackagings: [...bsff2.packagings, ...bsff3.packagings],
+        data: {
+          type: BsffType.RECONDITIONNEMENT
+        }
+      }
+    );
+    const bsff5 = await createBsff();
     // bsff6 is grouping bsff5 and bsff4
     const bsff6 = await createBsff(
+      {},
       {
-        previousPackagings: [...bsff4.packagings, ...bsff5.packagings]
-      },
-      {
-        id: "bsff6",
-        type: BsffType.GROUPEMENT
+        previousPackagings: [...bsff4.packagings, ...bsff5.packagings],
+        data: { type: BsffType.GROUPEMENT }
       }
     );
 
@@ -70,36 +69,35 @@ describe("getNextPackagings", () => {
   afterAll(resetDatabase);
 
   it("should return next packagings according to the number of hops", async () => {
-    const bsff1 = await createBsff({}, { id: "bsff1" });
+    const bsff1 = await createBsff();
 
     // bsff2 is forwarding bsff1
     const bsff2 = await createBsff(
+      {},
       {
-        previousPackagings: bsff1.packagings
-      },
-      { id: "bsff2", type: BsffType.REEXPEDITION }
-    );
-
-    const bsff3 = await createBsff({}, { id: "bsff3" });
-    // bsff4 is repackaging bsff2 and bsff3
-    const bsff4 = await createBsff(
-      {
-        previousPackagings: [...bsff2.packagings, ...bsff3.packagings]
-      },
-      {
-        id: "bsff4",
-        type: BsffType.RECONDITIONNEMENT
+        previousPackagings: bsff1.packagings,
+        data: {
+          type: BsffType.REEXPEDITION
+        }
       }
     );
-    const bsff5 = await createBsff({}, { id: "bsff5" });
+
+    const bsff3 = await createBsff();
+    // bsff4 is repackaging bsff2 and bsff3
+    const bsff4 = await createBsff(
+      {},
+      {
+        previousPackagings: [...bsff2.packagings, ...bsff3.packagings],
+        data: { type: BsffType.RECONDITIONNEMENT }
+      }
+    );
+    const bsff5 = await createBsff();
     // bsff6 is grouping bsff5 and bsff4
     const bsff6 = await createBsff(
+      {},
       {
-        previousPackagings: [...bsff4.packagings, ...bsff5.packagings]
-      },
-      {
-        id: "bsff6",
-        type: BsffType.GROUPEMENT
+        previousPackagings: [...bsff4.packagings, ...bsff5.packagings],
+        data: { type: BsffType.GROUPEMENT }
       }
     );
 

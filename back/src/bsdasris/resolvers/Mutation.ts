@@ -8,6 +8,10 @@ import signBsdasriEmissionWithSecretCode from "./mutations/signBsdasriEmissionWi
 import duplicateBsdasri from "./mutations/duplicateBsdasri";
 import { MutationResolvers } from "../../generated/graphql/types";
 
+import { createBsdasriRevisionRequest } from "./mutations/revisionRequest/createRevisionRequest";
+import { cancelBsdasriRevisionRequest } from "./mutations/revisionRequest/cancelRevisionRequest";
+import { submitBsdasriRevisionRequestApproval } from "./mutations/revisionRequest/submitRevisionRequestApproval";
+
 const Mutation: MutationResolvers = {
   createDraftBsdasri,
   createBsdasri,
@@ -16,7 +20,11 @@ const Mutation: MutationResolvers = {
   signBsdasri,
   signBsdasriEmissionWithSecretCode,
   duplicateBsdasri,
-  deleteBsdasri
+  deleteBsdasri,
+  createBsdasriRevisionRequest: createBsdasriRevisionRequest as any,
+  cancelBsdasriRevisionRequest,
+  submitBsdasriRevisionRequestApproval:
+    submitBsdasriRevisionRequestApproval as any
 };
 
 export default Mutation;

@@ -116,12 +116,12 @@ export default function LayoutContainer() {
               isAdmin={isAdmin}
               v2banner={
                 <SurveyBanner
-                  message="Pour en savoir plus sur les nouveautés du mois de mai, consultez notre FAQ."
+                  message="Pour les Installations de tri, transit et regroupement et Installations de traitement, merci de mettre à jour le sous-profil de votre établissement. Rendez-vous dans Mes établissements > Informations > Modifier le profil."
                   button={{
                     title: "Voir la FAQ",
-                    href: "https://faq.trackdechets.fr/pour-aller-plus-loin/les-dernieres-evolutions-de-trackdechets"
+                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#changer-le-profil-de-mon-etablissement-dechetterie-transporteur-etc"
                   }}
-                  persistedSurveyName="td-20240507"
+                  persistedSurveyName="td-20240604"
                 />
               }
               defaultOrgId={defaultOrgId}

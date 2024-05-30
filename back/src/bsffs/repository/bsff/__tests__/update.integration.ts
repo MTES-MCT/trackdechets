@@ -36,7 +36,11 @@ describe("bsffRepository.update", () => {
 
     const bsff = await prisma.bsff.create({
       data: { id: getReadableId(ReadableIdPrefix.FF), wasteCode: "14 06 01*" },
-      include: { packagings: true, ficheInterventions: true }
+      include: {
+        packagings: true,
+        ficheInterventions: true,
+        transporters: true
+      }
     });
 
     await indexBsd(toBsdElastic(bsff));

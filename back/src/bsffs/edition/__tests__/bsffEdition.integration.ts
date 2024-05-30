@@ -9,12 +9,13 @@ import {
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { checkEditionRules } from "../bsffEdition";
+import { getFirstTransporterSync } from "../../database";
 
 describe("edition rules", () => {
   afterAll(resetDatabase);
 
   it("should be possible to update any fields when BSFF status is INITIAL", async () => {
-    const bsff = await createBsff({}, { status: "INITIAL" });
+    const bsff = await createBsff({}, { data: { status: "INITIAL" } });
     const updateFields = await checkEditionRules(bsff, {
       emitter: { company: { name: "ACME" } }
     });
@@ -75,9 +76,10 @@ describe("edition rules", () => {
 
   it("should be possible to update a field not yet sealed by emission signature", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
-    const bsff = await createBsffAfterEmission({ emitter });
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsffAfterEmission({ emitter, transporter });
     const updatedFields = await checkEditionRules(bsff, {
-      transporter: { transport: { plates: ["AD-008-TS"] } }
+      transporter: { transport: { plates: ["AD-008-BX"] } }
     });
     expect(updatedFields).toEqual(["transporterTransportPlates"]);
   });
@@ -105,8 +107,11 @@ describe("edition rules", () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");
     const bsff = await createBsffAfterTransport({ emitter, transporter });
+    const bsffTransporter = getFirstTransporterSync(bsff)!;
     const updatedFields = await checkEditionRules(bsff, {
-      transporter: { company: { siret: bsff.transporterCompanySiret } }
+      transporter: {
+        company: { siret: bsffTransporter.transporterCompanySiret }
+      }
     });
     expect(updatedFields).toEqual([]);
   });

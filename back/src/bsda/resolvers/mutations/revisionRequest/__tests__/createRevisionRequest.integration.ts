@@ -512,6 +512,45 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     );
   });
 
+  it("should fail if no operation mode is provided but not expected", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: recipientCompany.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            destination: {
+              operation: {
+                code: "D 9",
+                mode: "ELIMINATION"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+    );
+  });
+
   it("should fail if operation mode is missing", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -584,40 +623,45 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     expect(errors).toBeUndefined();
   });
 
-  it("should succeed if operation code has no corresponding mode", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const bsda = await bsdaFactory({
-      opt: {
-        emitterCompanySiret: company.siret,
-        destinationCompanySiret: recipientCompany.siret,
-        status: "SENT"
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<
-      Pick<Mutation, "createBsdaRevisionRequest">,
-      MutationCreateBsdaRevisionRequestArgs
-    >(CREATE_BSDA_REVISION_REQUEST, {
-      variables: {
-        input: {
-          bsdaId: bsda.id,
-          content: {
-            destination: {
-              operation: {
-                code: "D 15"
-              }
-            }
-          },
-          comment: "A comment",
-          authoringCompanySiret: company.siret!
+  it.each(["D 9", "D 15"])(
+    "should succeed if operation code has no corresponding mode  code: %p",
+    async code => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: recipientCompany.siret,
+          status: "SENT"
         }
-      }
-    });
+      });
 
-    expect(errors).toBeUndefined();
-  });
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId: bsda.id,
+            content: {
+              destination: {
+                operation: {
+                  code
+                }
+              }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+    }
+  );
 
   it("should fail if all fields are empty", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");

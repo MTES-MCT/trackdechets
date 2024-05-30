@@ -173,7 +173,7 @@ export const emitterSchema: FactorySchemaOf<
     emitterPickupSiteInfos: yup.string().nullable()
   });
 
-const packagingsTypes: BsdasriPackagingType[] = [
+export const packagingsTypes: BsdasriPackagingType[] = [
   "BOITE_CARTON",
   "FUT",
   "BOITE_PERFORANTS",

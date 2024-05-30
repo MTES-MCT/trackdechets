@@ -119,7 +119,7 @@ type BsdasriTransport {
   handedOverAt: DateTime
   takenOverAt: DateTime
   signature: BsdasriSignature
-  mode: TransportMode!
+  mode: TransportMode
   "Plaque(s) d'immatriculation"
   plates: [String!]
 }
@@ -233,8 +233,11 @@ type BsdasriError {
   path: String!
   requiredFor: [BsdasriSignatureType!]!
 }
+
 type BsdasriMetadata {
-  errors: [BsdasriError]!
+  errors: [BsdasriError]
+  "EXPERIMENTAL, ne pas utiliser - Dernière révision du bordereau"
+  latestRevision: BsdasriRevisionRequest
 }
 
 type BsdasriConnection {
@@ -242,7 +245,106 @@ type BsdasriConnection {
   pageInfo: PageInfo!
   edges: [BsdasriEdge!]!
 }
+
 type BsdasriEdge {
   cursor: String!
   node: Bsdasri!
+}
+
+"Demande de révision Bsdasri"
+type BsdasriRevisionRequest {
+  "Identifiant de la demande de révison"
+  id: ID!
+
+  "Aperçu du bordereau concerné au moment de la création de la demande de révision. Il ne reflète pas le bordereau actuel."
+  bsdasri: Bsdasri!
+
+  "Date de création de la demande"
+  createdAt: DateTime!
+
+  "Entreprise à l'origine de la demande de révision"
+  authoringCompany: FormCompany!
+
+  "Liste des approbations apposées sur la révision"
+  approvals: [BsdasriRevisionRequestApproval!]!
+
+  "Contenu de la révision"
+  content: BsdasriRevisionRequestContent!
+
+  "Commentaire explicatif, saisi par l'auteur de la demande de révision"
+  comment: String!
+
+  "Statut d'acceptation de la révision"
+  status: RevisionRequestStatus!
+}
+
+"Approbation d'une demande de révision"
+type BsdasriRevisionRequestApproval {
+  "Siret de l'entreprise responsable de cette approbation"
+  approverSiret: String!
+
+  "Commentaire explicatif, saisi par l'approbateur"
+  comment: String
+
+  "Statut d'acceptation de l'approbation"
+  status: RevisionRequestApprovalStatus!
+}
+
+"Payload de révision d'un bordereau. Disponible sur une liste restreinte de champs."
+type BsdasriRevisionRequestContent {
+  "Maitre d'ouvrage ou détenteur du déchet"
+  emitter: BsdasriRevisionRequestEmitter
+
+  "Installation de destination"
+  destination: BsdasriRevisionRequestDestination
+
+  "Description du déchet"
+  waste: BsdasriRevisionRequestWaste
+
+  "Demande d'annulation du bordereau"
+  isCanceled: Boolean
+}
+
+type BsdasriRevisionRequestEmitter {
+  "Informations site d'enlèvement"
+  pickupSite: PickupSite
+}
+
+type BsdasriRevisionRequestDestination {
+  "Réception"
+  reception: BsdasriRevisionRequestReception
+  "Réalisation de l'opération"
+  operation: BsdasriRevisionRequestOperation
+}
+
+type BsdasriRevisionRequestReception {
+  "Conditionnement"
+  packagings: [BsdasriPackaging!]
+}
+
+type BsdasriRevisionRequestOperation {
+  "Poids de déchets traité"
+  weight: Float
+
+  "Code de traitement"
+  code: String
+
+  "Mode de traitement"
+  mode: OperationMode
+}
+
+type BsdasriRevisionRequestWaste {
+  "Rubrique Déchet"
+  code: String
+}
+
+type BsdasriRevisionRequestConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [BsdasriRevisionRequestEdge!]!
+}
+
+type BsdasriRevisionRequestEdge {
+  cursor: String!
+  node: BsdasriRevisionRequest!
 }

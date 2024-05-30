@@ -6,6 +6,7 @@ import React, { useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "../common/components/work-site/WorkSite";
 import {
+  getInitialCompany,
   getInitialEmitterWorkSite,
   initialFormTransporter
 } from "./utils/initial-state";
@@ -157,7 +158,7 @@ export default function Emitter({ disabled }) {
               className="td-checkbox"
               onChange={e => {
                 handleChange(e);
-                setFieldValue("emitter.company", null);
+                setFieldValue("emitter.company", getInitialCompany(null));
                 setFieldValue("emitter.isForeignShip", false);
               }}
             />
@@ -171,7 +172,7 @@ export default function Emitter({ disabled }) {
               className="td-checkbox"
               onChange={e => {
                 handleChange(e);
-                setFieldValue("emitter.company", null);
+                setFieldValue("emitter.company", getInitialCompany(null));
                 setFieldValue("emitter.isPrivateIndividual", false);
               }}
             />

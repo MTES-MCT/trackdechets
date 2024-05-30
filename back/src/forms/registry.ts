@@ -4,6 +4,7 @@ import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
+  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -137,7 +138,39 @@ const getFinalOperationsData = (
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
-function toGenericWaste(bsdd: Bsdd): GenericWaste {
+export const getSubType = (bsdd: Bsdd): BsdSubType => {
+  if (bsdd.forwardedInId || bsdd.id.endsWith("-suite")) {
+    return "TEMP_STORED";
+  }
+
+  if (bsdd.emitterType === "APPENDIX1") {
+    return "TOURNEE";
+  } else if (bsdd.emitterType === "APPENDIX1_PRODUCER") {
+    return "APPENDIX1";
+  } else if (bsdd.emitterType === "APPENDIX2") {
+    return "APPENDIX2";
+  }
+
+  return "INITIAL";
+};
+
+function toGenericWaste(bsdd: ReturnType<typeof formToBsdd>): GenericWaste {
+  const initialEmitter: Record<string, string | string[] | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  // Bsd suite. Fill initial emitter data.
+  if (bsdd.forwarding) {
+    initialEmitter.initialEmitterCompanyAddress =
+      bsdd.forwarding.emitterCompanyAddress;
+    initialEmitter.initialEmitterCompanyName =
+      bsdd.forwarding.emitterCompanyName;
+    initialEmitter.initialEmitterCompanySiret =
+      bsdd.forwarding.emitterCompanySiret;
+  }
+
   return {
     wasteDescription: bsdd.wasteDescription,
     wasteCode: bsdd.wasteCode,
@@ -149,6 +182,7 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
     ecoOrganismeName: bsdd.ecoOrganismeName,
     ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDD",
+    bsdSubType: getSubType(bsdd),
     status: bsdd.status,
     customId: bsdd.customId,
     destinationCap: bsdd.destinationCap,
@@ -161,17 +195,15 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransportersData(bsdd)
+    ...getTransportersData(bsdd),
+    ...initialEmitter
   };
 }
 
 export function toIncomingWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<IncomingWaste> {
-  const initialEmitter: Record<string, string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
+  const initialEmitter: Record<string, string | string[] | null> = {
     initialEmitterPostalCodes: null
   };
 
@@ -227,20 +259,8 @@ export function toOutgoingWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<OutgoingWaste> {
   const initialEmitter: Record<string, string | string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     initialEmitterPostalCodes: null
   };
-
-  if (bsdd.forwarding) {
-    initialEmitter.initialEmitterCompanyAddress =
-      bsdd.forwarding.emitterCompanyAddress;
-    initialEmitter.initialEmitterCompanyName =
-      bsdd.forwarding.emitterCompanyName;
-    initialEmitter.initialEmitterCompanySiret =
-      bsdd.forwarding.emitterCompanySiret;
-  }
 
   if (bsdd.grouping?.length > 0) {
     initialEmitter.initialEmitterPostalCodes = bsdd.grouping
@@ -399,9 +419,6 @@ export function toAllWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<AllWaste> {
   const initialEmitter: Record<string, string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     initialEmitterPostalCodes: null
   };
 

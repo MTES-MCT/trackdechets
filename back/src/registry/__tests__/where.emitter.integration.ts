@@ -196,11 +196,17 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSFFs on emitterCompanySiret (exact)", async () => {
     const testInput_3 = { emitterCompanySiret: siretify(1) };
-    const bsff1 = await createBsff({}, testInput_3);
+    const bsff1 = await createBsff({}, { data: testInput_3 });
 
-    const bsff2 = await createBsff({}, { emitterCompanySiret: siretify(2) });
+    const bsff2 = await createBsff(
+      {},
+      { data: { emitterCompanySiret: siretify(2) } }
+    );
 
-    const bsff3 = await createBsff({}, { emitterCompanySiret: siretify(3) });
+    const bsff3 = await createBsff(
+      {},
+      { data: { emitterCompanySiret: siretify(3) } }
+    );
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
@@ -379,12 +385,15 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSFFs on a list of emitterCompanySiret", async () => {
     const testInput = { emitterCompanySiret: siretify(1) };
-    const bsff1 = await createBsff({}, testInput);
+    const bsff1 = await createBsff({}, { data: testInput });
 
     const testInput_1 = { emitterCompanySiret: siretify(2) };
-    const bsff2 = await createBsff({}, testInput_1);
+    const bsff2 = await createBsff({}, { data: testInput_1 });
 
-    const bsff3 = await createBsff({}, { emitterCompanySiret: siretify(3) });
+    const bsff3 = await createBsff(
+      {},
+      { data: { emitterCompanySiret: siretify(3) } }
+    );
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
@@ -553,11 +562,17 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSFFs on a substring of emitterCompanySiret", async () => {
     const testInput = { emitterCompanySiret: siretify(1) };
-    const bsff1 = await createBsff({}, testInput);
+    const bsff1 = await createBsff({}, { data: testInput });
 
-    const bsff2 = await createBsff({}, { emitterCompanySiret: siretify(2) });
+    const bsff2 = await createBsff(
+      {},
+      { data: { emitterCompanySiret: siretify(2) } }
+    );
 
-    const bsff3 = await createBsff({}, { emitterCompanySiret: siretify(3) });
+    const bsff3 = await createBsff(
+      {},
+      { data: { emitterCompanySiret: siretify(3) } }
+    );
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {

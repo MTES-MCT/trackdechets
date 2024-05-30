@@ -12,7 +12,7 @@ type RevisionRequest = {
 };
 
 /**
- * Pour une liste de demandes de révisions BSDD ou BSDA, retourne l'ensemble
+ * Pour une liste de demandes de révisions BSDD, BSDA ou Bsdasri, retourne l'ensemble
  * des identifiants d'établissements pour lesquels il y a une demande de révision
  * en cours ou passée.
  */

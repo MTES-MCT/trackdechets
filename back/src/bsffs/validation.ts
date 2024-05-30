@@ -8,7 +8,8 @@ import {
   Prisma,
   WasteAcceptationStatus,
   BsffPackagingType,
-  OperationMode
+  OperationMode,
+  BsffTransporter
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
@@ -53,7 +54,7 @@ type Destination = Pick<
 >;
 
 type Transporter = Pick<
-  Prisma.BsffCreateInput,
+  Prisma.BsffTransporterCreateInput,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyVatNumber"
@@ -65,6 +66,8 @@ type Transporter = Pick<
   | "transporterRecepisseDepartment"
   | "transporterRecepisseValidityLimit"
   | "transporterRecepisseIsExempted"
+  | "transporterTransportMode"
+  | "transporterTransportTakenOverAt"
 >;
 
 type WasteDetails = Pick<
@@ -75,11 +78,6 @@ type WasteDetails = Pick<
   | "weightValue"
   | "weightIsEstimate"
 > & { packagings?: Omit<BsffPackaging, "__typename">[] };
-
-type Transport = Pick<
-  Prisma.BsffCreateInput,
-  "transporterTransportMode" | "transporterTransportTakenOverAt"
->;
 
 type Reception = Pick<Prisma.BsffCreateInput, "destinationReceptionDate">;
 
@@ -111,6 +109,17 @@ export type BsffLike = (Bsff | Prisma.BsffCreateInput) & {
   packagings?: Pick<
     BsffPackaging,
     "type" | "name" | "other" | "numero" | "volume" | "weight"
+  >[];
+  transporters?: Omit<
+    BsffTransporter,
+    | "id"
+    | "createdAt"
+    | "updatedAt"
+    | "number"
+    | "bsffId"
+    | "transporterTransportSignatureDate"
+    | "transporterTransportSignatureAuthor"
+    | "transporterTransportTakenOverAt"
   >[];
 };
 
@@ -218,6 +227,23 @@ export const transporterSchemaFn: FactorySchemaOf<
       .requiredIf(
         transporterSignature,
         "Transporteur : l'adresse email est requise"
+      ),
+    transporterTransportMode: yup
+      .mixed<TransportMode>()
+      .nullable()
+      .oneOf(
+        [null, ...Object.values(TransportMode)],
+        "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
+      )
+      .requiredIf(
+        transporterSignature,
+        "Le mode de transport utilisé par le transporteur est requis"
+      ),
+    transporterTransportTakenOverAt: yup
+      .date()
+      .requiredIf(
+        transporterSignature,
+        "La date de prise en charge par le transporteur est requise"
       ),
     ...transporterRecepisseSchema({ transportSignature: transporterSignature })
   });
@@ -360,20 +386,6 @@ export const destinationSchemaFn: FactorySchemaOf<
         "Le code de l'opération de traitement prévu est requis"
       )
   });
-
-export const transportSchema: yup.SchemaOf<Transport> = yup.object({
-  transporterTransportMode: yup
-    .mixed<TransportMode>()
-    .nullable()
-    .oneOf(
-      [null, ...Object.values(TransportMode)],
-      "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
-    )
-    .required("Le mode de transport utilisé par le transporteur est requis"),
-  transporterTransportTakenOverAt: yup
-    .date()
-    .required("La date de prise en charge par le transporteur est requise")
-});
 
 export const receptionSchema: yup.SchemaOf<Reception> = yup.object({
   destinationReceptionDate: yup
@@ -605,11 +617,17 @@ const operationSchemaFn: (value: any) => yup.SchemaOf<Operation> = value => {
 
 export const operationSchema = yup.lazy(operationSchemaFn);
 
-const bsffSchemaFn = (bsff: BsffValidationContext) =>
-  emitterSchemaFn(bsff)
-    .concat(wasteDetailsSchemaFn(bsff))
-    .concat(transporterSchemaFn(bsff))
-    .concat(destinationSchemaFn(bsff));
+const bsffSchemaFn = (context: BsffValidationContext) => {
+  const transporterSchema = transporterSchemaFn(context);
+  return emitterSchemaFn(context)
+    .concat(wasteDetailsSchemaFn(context))
+    .concat(destinationSchemaFn(context))
+    .concat(
+      yup.object({
+        transporters: yup.array<Transporter>().of(transporterSchema)
+      })
+    );
+};
 
 export async function validateBsff(
   bsff: BsffLike,
@@ -913,33 +931,28 @@ export function validateBeforeEmission(bsff: BsffLike) {
   });
 }
 
-const beforeTransportSchemaFn = (
-  bsff: BsffLike,
-  context: BsffValidationContext
-) =>
-  bsffSchemaFn(context)
-    .concat(transportSchema)
-    .concat(
-      yup.object({
-        emitterEmissionSignatureDate: yup
-          .date()
-          .nullable()
-          .required(
-            "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
-          ) as any, // https://github.com/jquense/yup/issues/1302
-        transporterTransportSignatureDate: yup
-          .date()
-          .nullable()
-          .test(
-            "is-not-signed",
-            "Le transporteur a déjà signé ce bordereau",
-            value => value == null
-          ) as any // https://github.com/jquense/yup/issues/1302
-      })
-    );
+const beforeTransportSchemaFn = (context: BsffValidationContext) =>
+  bsffSchemaFn(context).concat(
+    yup.object({
+      emitterEmissionSignatureDate: yup
+        .date()
+        .nullable()
+        .required(
+          "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
+        ) as any, // https://github.com/jquense/yup/issues/1302
+      transporterTransportSignatureDate: yup
+        .date()
+        .nullable()
+        .test(
+          "is-not-signed",
+          "Le transporteur a déjà signé ce bordereau",
+          value => value == null
+        ) as any // https://github.com/jquense/yup/issues/1302
+    })
+  );
 
 export function validateBeforeTransport(bsff: BsffLike) {
-  return beforeTransportSchemaFn(bsff, {
+  return beforeTransportSchemaFn({
     isDraft: false,
     transporterSignature: true
   }).validate(bsff, {
@@ -952,7 +965,6 @@ export const beforeReceptionSchemaFn = (
   context: BsffValidationContext
 ) =>
   bsffSchemaFn(context)
-    .concat(transportSchema)
     .concat(receptionSchema)
     .concat(
       yup.object({
@@ -984,7 +996,6 @@ export function validateBeforeReception(bsff: BsffLike) {
 
 export const afterReceptionSchemaFn = (context: BsffValidationContext) =>
   bsffSchemaFn(context)
-    .concat(transportSchema)
     .concat(receptionSchema)
     .concat(
       yup.object({

@@ -23,8 +23,7 @@ const bsffs: QueryResolvers["bsffs"] = async (
   const mask: Prisma.Enumerable<Prisma.BsffWhereInput> = {
     OR: [
       { emitterCompanySiret: { in: orgIdsWithListPermission } },
-      { transporterCompanySiret: { in: orgIdsWithListPermission } },
-      { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
+      { transportersOrgIds: { hasSome: orgIdsWithListPermission } },
       { destinationCompanySiret: { in: orgIdsWithListPermission } },
       { detenteurCompanySirets: { hasSome: orgIdsWithListPermission } }
     ]
@@ -48,9 +47,10 @@ const bsffs: QueryResolvers["bsffs"] = async (
       findManyBsff({
         where,
         ...prismaPaginationArgs,
-        orderBy: { rowNumber: "desc" }
+        orderBy: { rowNumber: "desc" },
+        include: { transporters: true }
       }),
-    formatNode: expandBsffFromDB,
+    formatNode: bsff => expandBsffFromDB(bsff),
     ...gqlPaginationArgs
   });
 };

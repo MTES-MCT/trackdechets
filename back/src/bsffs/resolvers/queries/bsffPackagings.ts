@@ -24,8 +24,7 @@ const bsffPackagings: QueryResolvers["bsffPackagings"] = async (
     bsff: {
       OR: [
         { emitterCompanySiret: { in: orgIdsWithListPermission } },
-        { transporterCompanySiret: { in: orgIdsWithListPermission } },
-        { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
+        { transportersOrgIds: { hasSome: orgIdsWithListPermission } },
         { destinationCompanySiret: { in: orgIdsWithListPermission } }
       ]
     }

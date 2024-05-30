@@ -69,6 +69,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
           userEmail: user.email,
           companyName: company.name,
           companySiret: company.orgId,
+          companyGivenName: company.givenName,
           membershipRequestId: membershipRequest.id
         }
       })

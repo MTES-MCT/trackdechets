@@ -5,6 +5,7 @@ import {
   BsddTransporter,
   Bsff,
   BsffFicheIntervention,
+  BsffTransporter,
   Bspaoh,
   BspaohTransporter,
   Bsvhu,
@@ -244,7 +245,7 @@ export async function sirenifyBsdasri(id: string) {
 export async function sirenifyBsff(id: string) {
   const bsff = await prisma.bsff.findUniqueOrThrow({
     where: { id },
-    include: { ficheInterventions: true }
+    include: { ficheInterventions: true, transporters: true }
   });
 
   const sirenifyOpts: SirenifyOpts<Bsff, Prisma.BsffUpdateInput>[] = [
@@ -257,19 +258,25 @@ export async function sirenifyBsff(id: string) {
       })
     },
     {
-      getter: bsff => bsff.transporterCompanySiret,
-      setter: (data, company) => ({
-        ...data,
-        transporterCompanyName: company.name,
-        transporterCompanyAddress: company.address
-      })
-    },
-    {
       getter: bsff => bsff.destinationCompanySiret,
       setter: (data, company) => ({
         ...data,
         destinationCompanyName: company.name,
         destinationCompanyAddress: company.address
+      })
+    }
+  ];
+
+  const transporterSirenifyOpts: SirenifyOpts<
+    BsffTransporter,
+    Prisma.BsffTransporterUpdateInput
+  >[] = [
+    {
+      getter: transporter => transporter.transporterCompanySiret,
+      setter: (data, company) => ({
+        ...data,
+        transporterCompanyName: company.name,
+        transporterCompanyAddress: company.address
       })
     }
   ];
@@ -307,6 +314,17 @@ export async function sirenifyBsff(id: string) {
       where: { id: ficheIntervention.id },
       data: ficheInterventionData
     });
+
+    for (const transporter of bsff.transporters) {
+      const transporterData = await sirenify(
+        transporter,
+        transporterSirenifyOpts
+      );
+      await prisma.bsffTransporter.update({
+        where: { id: transporter.id },
+        data: transporterData
+      });
+    }
   }
 
   await prisma.bsff.update({ data, where: { id } });

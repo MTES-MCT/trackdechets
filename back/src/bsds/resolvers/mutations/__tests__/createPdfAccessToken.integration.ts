@@ -339,7 +339,7 @@ describe("Mutation.creatPdfAccessToken", () => {
     const currentUser = await userFactory();
     const bsff = await createBsff(
       { emitter: { user, company } },
-      { status: BsffStatus.SENT }
+      { data: { status: BsffStatus.SENT } }
     );
     const { mutate } = makeClient(currentUser);
 
@@ -364,7 +364,7 @@ describe("Mutation.creatPdfAccessToken", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const bsff = await createBsff(
       { emitter: { user, company } },
-      { status: BsffStatus.RECEIVED }
+      { data: { status: BsffStatus.RECEIVED } }
     );
     const { mutate } = makeClient(user);
 
@@ -391,7 +391,7 @@ describe("Mutation.creatPdfAccessToken", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const bsff = await createBsff(
       { emitter: { user, company } },
-      { status: BsffStatus.SENT }
+      { data: { status: BsffStatus.SENT } }
     );
     const { mutate } = makeClient(user);
 

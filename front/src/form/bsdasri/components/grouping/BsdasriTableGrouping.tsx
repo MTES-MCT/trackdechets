@@ -117,7 +117,8 @@ export default function BsdasriTableGrouping({
     const aggregatedPackagings = aggregatePackagings(packagings);
 
     setFieldValue("emitter.emission.packagings", aggregatedPackagings);
-  }, [selectedItems, data, setFieldValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedItems, setFieldValue]);
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <InlineError apolloError={error} />;

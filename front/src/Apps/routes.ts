@@ -56,7 +56,9 @@ const routes = {
         transporter: "/dashboard/:siret/bsdasris/sign-transporter/:id",
         reception: "/dashboard/:siret/bsdasris/sign-reception/:id",
         operation: "/dashboard/:siret/bsdasris/sign-operation/:id"
-      }
+      },
+
+      review: "/dashboard/:siret/bsdasris/review/:id"
     },
     bsvhus: {
       create: "/dashboard/:siret/bsvhus/create",

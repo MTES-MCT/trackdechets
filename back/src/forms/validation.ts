@@ -70,7 +70,9 @@ import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
+import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
+
 // set yup default error messages
 configureYup();
 
@@ -311,6 +313,22 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       .label("Émetteur")
       .when("emitterIsForeignShip", siretConditions.isForeignShip)
       .when("emitterIsPrivateIndividual", siretConditions.isPrivateIndividual)
+      .test(
+        "emitter-is-registered-for-appendix1-producer",
+        "L'émetteur doit être inscrit sur Trackdéchets pour apparaitre sur une annexe 1 sans éco-organisme",
+        async function (value) {
+          const { emitterType } = this.parent;
+          if (!value || emitterType !== EmitterType.APPENDIX1_PRODUCER) {
+            return true;
+          }
+
+          const company = await prisma.company.findFirst({
+            where: { orgId: value },
+            select: { id: true }
+          });
+          return company != null;
+        }
+      )
       .test(
         "is-not-eco-organisme",
         "L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...). Un autre champ dédié existe et doit être utilisé pour viser l'éco-organisme concerné : https://faq.trackdechets.fr/dechets-dangereux-classiques/les-eco-organismes-sur-trackdechets#ou-etre-vise-en-tant-queco-organisme",
@@ -1285,7 +1303,36 @@ const withNextDestination = (required: boolean) =>
           required,
           `Destination ultérieure : ${MISSING_COMPANY_NAME}`
         ),
-      nextDestinationCompanySiret: siret.label("Destination ultérieure prévue"),
+      nextDestinationCompanySiret: siret
+        .label("Destination ultérieure prévue")
+        .when(
+          [
+            "wasteDetailsCode",
+            "noTraceability",
+            "wasteDetailsPop",
+            "wasteDetailsIsDangerous"
+          ],
+          {
+            is: (
+              wasteDetailsCode,
+              noTraceability,
+              wasteDetailsPop,
+              wasteDetailsIsDangerous
+            ) => {
+              // si déchet dangereux sans rupture de traça et entreprise francaise: doit être inscrite sur TD
+              // le siret est nullable, required géré par  XORIdRequired",
+              const hasNoTraceabilityBreak = !noTraceability;
+              const wasteIsDangerous =
+                isDangerous(wasteDetailsCode) ||
+                wasteDetailsPop ||
+                wasteDetailsIsDangerous;
+
+              return wasteIsDangerous && hasNoTraceabilityBreak;
+            },
+            then: schema => schema.test(siretTests.isRegistered("DESTINATION"))
+          }
+        ),
+
       nextDestinationCompanyVatNumber: vatNumber.label(
         "Destination ultérieure prévue"
       ),
@@ -1350,31 +1397,55 @@ const withNextDestination = (required: boolean) =>
       nextDestinationCompanyExtraEuropeanId: yup.string().nullable(),
       nextDestinationNotificationNumber: yup
         .string()
-        .when(["wasteDetailsCode", "nextDestinationCompanyExtraEuropeanId"], {
-          is: (
-            wasteDetailsCode: string,
-            nextDestinationCompanyExtraEuropeanId: string
-          ) =>
-            !!nextDestinationCompanyExtraEuropeanId &&
-            isDangerous(wasteDetailsCode),
-          then: schema =>
-            schema
-              .max(
-                15,
-                "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
-              )
-              .required(
-                "Destination ultérieure : le numéro de notification est obligatoire"
-              ),
-          otherwise: schema =>
-            schema
-              .max(
-                15,
-                "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
-              )
-              .notRequired()
-              .nullable()
-        })
+        .when(
+          [
+            "wasteDetailsCode",
+            "wasteDetailsPop",
+            "wasteDetailsIsDangerous",
+            "nextDestinationCompanyExtraEuropeanId",
+            "nextDestinationCompanyVatNumber"
+          ],
+          {
+            is: (
+              wasteDetailsCode: string,
+              wasteDetailsPop: boolean,
+              wasteDetailsIsDangerous: boolean,
+              nextDestinationCompanyExtraEuropeanId: string,
+              nextDestinationCompanyVatNumber: string
+            ) => {
+              const isNotFinal = !isFinalOperationCode(wasteDetailsCode);
+              const consideredAsDangerous =
+                isDangerous(wasteDetailsCode) ||
+                wasteDetailsPop ||
+                wasteDetailsIsDangerous;
+
+              const isForeignCompany =
+                !!nextDestinationCompanyExtraEuropeanId ||
+                (!!nextDestinationCompanyVatNumber &&
+                  isForeignVat(nextDestinationCompanyVatNumber));
+
+              return isNotFinal && isForeignCompany && consideredAsDangerous;
+            },
+            then: schema =>
+              schema
+                .max(
+                  15,
+                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                )
+                .nullable()
+                .required(
+                  "Destination ultérieure : le numéro de notification est obligatoire"
+                ),
+            otherwise: schema =>
+              schema
+                .max(
+                  15,
+                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                )
+                .notRequired()
+                .nullable()
+          }
+        )
     })
     .test(
       "XORIdRequired",
