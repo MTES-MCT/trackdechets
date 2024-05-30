@@ -51,7 +51,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Faire remonter BSD dans dashboard à la création de demande de révision [PR 3315](https://github.com/MTES-MCT/trackdechets/pull/3315)
 - Afficher infos du transporteur actuel sur BsdCard + permettre leur mise à jour [PR 3309](https://github.com/MTES-MCT/trackdechets/pull/3309)
 
-
 #### :house: Interne
 
 - Multi-modal BSFF : migrer les données transporteur dans une table à part (refacto interne du code) [PR 3340](https://github.com/MTES-MCT/trackdechets/pull/3340)
