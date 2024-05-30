@@ -19,10 +19,26 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
+import { extractPostalCode, splitAddress } from "../utils";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { RegistryBsda } from "../registry/elastic";
 import { BsdaForElastic } from "./elastic";
+
+const getPostTempStorageDestination = (bsda: RegistryBsda) => {
+  if (!bsda.forwardedIn) return {};
+
+  const splittedAddress = splitAddress(
+    bsda.forwardedIn.destinationCompanyAddress
+  );
+
+  return {
+    postTempStorageDestinationName: bsda.forwardedIn.destinationCompanyName,
+    postTempStorageDestinationSiret: bsda.forwardedIn.destinationCompanySiret,
+    postTempStorageDestinationAddress: splittedAddress.street,
+    postTempStorageDestinationPostalCode: splittedAddress.postalCode,
+    postTempStorageDestinationCity: splittedAddress.city
+  };
+};
 
 const getOperationData = (bsda: Bsda) => ({
   destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
@@ -272,6 +288,7 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyOutgoingWaste,
     ...genericWaste,
+    ...getPostTempStorageDestination(bsda),
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
@@ -468,6 +485,7 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyAllWaste,
     ...genericWaste,
+    ...getPostTempStorageDestination(bsda),
     createdAt: bsda.createdAt,
     destinationReceptionDate: bsda.destinationReceptionDate,
     brokerCompanyName: bsda.brokerCompanyName,
