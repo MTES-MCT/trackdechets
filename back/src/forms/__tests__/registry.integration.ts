@@ -226,7 +226,7 @@ describe("toOutgoingWaste", () => {
     expect(waste.postTempStorageDestinationCity).toBe("TOURS");
     expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
   });
-  
+
   it("initial producer should be filled when forwarded BSD", async () => {
     // Given
     const bdd = await createTmpStorageBsdd();
@@ -353,7 +353,7 @@ describe("toAllWaste", () => {
     expect(waste.postTempStorageDestinationCity).toBe("TOURS");
     expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
   });
-  
+
   it("initial producer should be filled when forwarded BSD", async () => {
     // Given
     const bdd = await createTmpStorageBsdd();
