@@ -4,7 +4,10 @@ import { RegistryBsdaInclude } from "../../registry/elastic";
 import { bsdaFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { BsdaType } from "@prisma/client";
-import { companyFactory, toIntermediaryCompany } from "../../__tests__/factories";
+import {
+  companyFactory,
+  toIntermediaryCompany
+} from "../../__tests__/factories";
 
 describe("toOutgoingWaste", () => {
   afterAll(resetDatabase);
@@ -133,9 +136,7 @@ describe("toAllWaste", () => {
     const bsda = await bsdaFactory({
       opt: {
         intermediaries: {
-          create: [
-            toIntermediaryCompany(intermediary1),
-          ]
+          create: [toIntermediaryCompany(intermediary1)]
         }
       }
     });
