@@ -1,0 +1,53 @@
+{
+  "name": "partial-backup",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/back/partial-backup/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/libs/back/partial-backup",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "libs/back/partial-backup/src/main.ts",
+        "tsConfig": "libs/back/partial-backup/tsconfig.app.json",
+        "assets": ["libs/back/partial-backup/src/assets"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "run": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "partial-backup:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "partial-backup:build:development"
+        }
+      }
+    }
+  },
+  "tags": []
+}
