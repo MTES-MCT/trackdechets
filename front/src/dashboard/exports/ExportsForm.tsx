@@ -10,7 +10,7 @@ import {
 } from "@td/codegen-ui";
 import WasteTreeModal from "../../search/WasteTreeModal";
 
-import { ALL_WASTES, ALL_WASTES_TREE } from "@td/constants";
+import { ALL_WASTES_TREE } from "@td/constants";
 import { useLazyQuery, gql } from "@apollo/client";
 import { NotificationError } from "../../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
@@ -145,7 +145,7 @@ export default function ExportsForm({ companies }: IProps) {
     endDate: now.toISOString(),
     companies,
     wasteCode: "",
-    exportFormat: "CSV"
+    exportFormat: "XLSX"
   };
 
   const [
@@ -228,10 +228,6 @@ export default function ExportsForm({ companies }: IProps) {
       validate={validate}
     >
       {({ values, setFieldValue }) => {
-        const wasteCodeDetail = ALL_WASTES.find(
-          waste => waste.code === values.wasteCode
-        );
-
         const exportTypes = getPossibleExportTypes(values.companies);
         if (!exportTypes.includes(values.exportType)) {
           setFieldValue("exportType", exportTypes[0]);
@@ -348,26 +344,6 @@ export default function ExportsForm({ companies }: IProps) {
                   </select>
                 )}
               </Field>
-              <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
-                Code déchet (optionnel)
-              </label>
-              <div className="tw-col-span-2 tw-max-w-md">
-                <div className="tw-container tw-flex tw-flex-row">
-                  <Field
-                    name="wasteCode"
-                    className={`${styles["max-w-xxs"]} tw-mr-4 td-input`}
-                  />
-                  <button
-                    type="button"
-                    className={`btn btn--outline-primary btn--small-text ${styles["max-w-xxs"]} tw-mr-4`}
-                    onClick={() => setOpenWasteTreeModal(true)}
-                  >
-                    Liste des codes déchets
-                  </button>
-                </div>
-                {wasteCodeDetail && <div>{wasteCodeDetail.description}</div>}
-                <RedErrorMessage name="wasteCode"></RedErrorMessage>
-              </div>
 
               <WasteTreeModal
                 wasteTree={ALL_WASTES_TREE}
@@ -385,8 +361,8 @@ export default function ExportsForm({ companies }: IProps) {
                 name="exportFormat"
                 className="tw-col-span-2 tw-max-w-md td-select"
               >
-                <option value="CSV">.csv</option>
                 <option value="XLSX">.xlsx (Excel)</option>
+                <option value="CSV">.csv</option>
               </Field>
             </div>
             <div className="tw-mt-5">

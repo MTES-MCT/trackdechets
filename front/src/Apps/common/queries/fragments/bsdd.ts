@@ -334,6 +334,7 @@ export const detailFormFragment = gql`
       form {
         id
         readableId
+        status
       }
     }
     grouping {
@@ -432,6 +433,7 @@ export const dashboardFormFragment = gql`
       isTempStorage
     }
     transporter {
+      id
       company {
         siret
         orgId
@@ -441,10 +443,14 @@ export const dashboardFormFragment = gql`
       customInfo
     }
     transporters {
+      id
       company {
         orgId
       }
+      numberPlate
+      customInfo
       takenOverAt
+      mode
     }
     ecoOrganisme {
       siret
@@ -483,6 +489,7 @@ export const dashboardFormFragment = gql`
         processingOperation
       }
       transporter {
+        id
         company {
           siret
           orgId
@@ -493,6 +500,9 @@ export const dashboardFormFragment = gql`
           phone
           mail
         }
+        numberPlate
+        customInfo
+        mode
       }
       wasteDetails {
         packagingInfos {

@@ -3,7 +3,10 @@ import {
   getBsdaForElastic,
   toBsdElastic as toBsdaElastic
 } from "../../bsda/elastic";
-import { toBsdElastic as toBsdasriElastic } from "../../bsdasris/elastic";
+import {
+  toBsdElastic as toBsdasriElastic,
+  getBsdasriForElastic
+} from "../../bsdasris/elastic";
 import { toBsdElastic as toBsvhuElastic } from "../../bsvhu/elastic";
 import { toBsdElastic as toBsffElastic } from "../../bsffs/elastic";
 import { toBsdElastic as toBspaohElastic } from "../../bspaoh/elastic";
@@ -37,14 +40,7 @@ export async function indexBsdJob(
   }
 
   if (bsdId.startsWith("DASRI-")) {
-    const bsdasri = await prisma.bsdasri.findUniqueOrThrow({
-      where: { id: bsdId },
-      include: {
-        // required for dashboard queries
-        grouping: { select: { id: true } },
-        synthesizing: { select: { id: true } }
-      }
-    });
+    const bsdasri = await getBsdasriForElastic({ id: bsdId });
 
     const elasticBsdasri = toBsdasriElastic(bsdasri);
     await indexBsd(elasticBsdasri);
@@ -66,7 +62,11 @@ export async function indexBsdJob(
   if (bsdId.startsWith("FF-")) {
     const bsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsdId },
-      include: { packagings: true, ficheInterventions: true }
+      include: {
+        packagings: true,
+        ficheInterventions: true,
+        transporters: true
+      }
     });
 
     const elasticBsff = toBsffElastic(bsff);

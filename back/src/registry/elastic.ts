@@ -21,25 +21,12 @@ export function buildQuery(
     OUTGOING: "isOutgoingWasteFor",
     INCOMING: "isIncomingWasteFor",
     TRANSPORTED: "isTransportedWasteFor",
-    MANAGED: "isManagedWasteFor"
+    MANAGED: "isManagedWasteFor",
+    ALL: "isAllWasteFor"
   };
 
   // Fonction permettant de construire le filtre ES pour un type de registre donné.
-  // On considère qu'un BSD doit apparaitre dans le registre exhaustif d'un établissement
-  // s'il apparait dans au moins un des registres classiques (entrants, sortants, transportés, gérés)
   function registryTypeFilter(type: WasteRegistryType): estypes.QueryContainer {
-    if (type === "ALL") {
-      return {
-        bool: {
-          should: [
-            registryTypeFilter("OUTGOING"),
-            registryTypeFilter("INCOMING"),
-            registryTypeFilter("TRANSPORTED"),
-            registryTypeFilter("MANAGED")
-          ]
-        }
-      };
-    }
     return { terms: { [elasticKey[type]!]: sirets } };
   }
 
@@ -129,7 +116,8 @@ export type RegistryBspaoh = Prisma.BspaohGetPayload<{
   include: typeof RegistryBspaohInclude;
 }>;
 
-export const RegistryBsffInclude = {
+export const RegistryBsffInclude = Prisma.validator<Prisma.BsffInclude>()({
+  transporters: true,
   packagings: {
     include: {
       finalOperations: true,
@@ -138,7 +126,7 @@ export const RegistryBsffInclude = {
       }
     }
   }
-};
+});
 
 export type RegistryBsff = Prisma.BsffGetPayload<{
   include: typeof RegistryBsffInclude;

@@ -59,42 +59,43 @@ describe("Query.bsffPackaging", () => {
     const destination1 = await userWithCompanyFactory(UserRole.MEMBER);
     const destination2 = await userWithCompanyFactory(UserRole.MEMBER);
 
-    const bsff1 = await createBsff(
-      { emitter: emitter1, destination: destination1 },
-      { id: "bsff1" }
-    );
+    const bsff1 = await createBsff({
+      emitter: emitter1,
+      destination: destination1
+    });
 
     // bsff2 is forwarding bsff1
     const bsff2 = await createBsff(
       {
         emitter: destination1,
-        destination: destination2,
-        previousPackagings: bsff1.packagings
+        destination: destination2
       },
-      { id: "bsff2", type: BsffType.REEXPEDITION }
+      {
+        previousPackagings: bsff1.packagings,
+        data: { type: BsffType.REEXPEDITION }
+      }
     );
 
-    const bsff3 = await createBsff({}, { id: "bsff3" });
+    const bsff3 = await createBsff();
     // bsff4 is repackaging bsff2 and bsff3
     const bsff4 = await createBsff(
       {
-        emitter: destination2,
-        previousPackagings: [...bsff2.packagings, ...bsff3.packagings]
+        emitter: destination2
       },
       {
-        id: "bsff4",
-        type: BsffType.RECONDITIONNEMENT
+        previousPackagings: [...bsff2.packagings, ...bsff3.packagings],
+        data: {
+          type: BsffType.RECONDITIONNEMENT
+        }
       }
     );
-    const bsff5 = await createBsff({}, { id: "bsff5" });
+    const bsff5 = await createBsff();
     // bsff6 is grouping bsff5 and bsff4
     const bsff6 = await createBsff(
+      {},
       {
-        previousPackagings: [...bsff4.packagings, ...bsff5.packagings]
-      },
-      {
-        id: "bsff6",
-        type: BsffType.GROUPEMENT
+        previousPackagings: [...bsff4.packagings, ...bsff5.packagings],
+        data: { type: BsffType.GROUPEMENT }
       }
     );
 

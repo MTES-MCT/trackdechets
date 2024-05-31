@@ -303,7 +303,7 @@ describe("query { wastesRegistryXls }", () => {
 
       const workbook = new Excel.Workbook();
       await workbook.xlsx.readFile(filename);
-      const worksheet = workbook.getWorksheet("registre");
+      const worksheet = workbook.getWorksheet("registre")!;
       expect(worksheet.rowCount).toBe(2);
       const row1 = worksheet.getRow(1);
       const row2 = worksheet.getRow(2);
@@ -377,7 +377,7 @@ describe("query { wastesRegistryXls }", () => {
       // Then
       const workbook = new Excel.Workbook();
       await workbook.xlsx.readFile(filename);
-      const worksheet = workbook.getWorksheet("registre");
+      const worksheet = workbook.getWorksheet("registre")!;
 
       // Actual columns of the sheet
       const row1 = worksheet.getRow(1);

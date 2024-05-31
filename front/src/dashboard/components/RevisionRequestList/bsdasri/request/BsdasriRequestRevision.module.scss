@@ -1,0 +1,43 @@
+@import "../../../../../scss/Constants.scss";
+@import "../../../../../scss/Breakpoints.scss";
+
+.container {
+  padding: 2rem 1rem;
+}
+
+.title {
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.fields {
+  margin-bottom: 2rem;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid $grey;
+  padding: 1rem;
+
+  @include phone {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  > * {
+    // space buttons and divs
+    margin-left: 1rem;
+    margin-bottom: 1rem;
+    @include phone {
+      margin-bottom: 0;
+    }
+  }
+}
+
+@media only screen and (min-width: 640px) {
+  .actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}

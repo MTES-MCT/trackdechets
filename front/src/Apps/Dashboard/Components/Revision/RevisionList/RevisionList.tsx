@@ -13,6 +13,7 @@ interface RevisionListProps {
 }
 const RevisionList = ({ reviews, title }: RevisionListProps) => {
   const latestRevision = reviews?.[0];
+
   return (
     <div className="revision-list">
       <p className="revision-list__title">

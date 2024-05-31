@@ -93,14 +93,6 @@ const bsffCreateInputAccessors = (
     }
   },
   {
-    siret: input?.transporterCompanySiret,
-    skip: sealedFields.includes("transporterCompanySiret"),
-    setter: (input: Prisma.BsffCreateInput, companyInput: CompanyInput) => {
-      input.transporterCompanyName = companyInput.name;
-      input.transporterCompanyAddress = companyInput.address;
-    }
-  },
-  {
     siret: input?.destinationCompanySiret,
     skip: sealedFields.includes("destinationCompanySiret"),
     setter: (input: Prisma.BsffCreateInput, companyInput: CompanyInput) => {
@@ -112,4 +104,25 @@ const bsffCreateInputAccessors = (
 
 export const sirenifyBsffCreateInput = nextBuildSirenify(
   bsffCreateInputAccessors
+);
+
+const bsffTransporterCreateInputAccessors = (
+  input: Prisma.BsffTransporterCreateInput,
+  sealedFields: string[] = []
+) => [
+  {
+    siret: input?.transporterCompanySiret,
+    skip: sealedFields.includes("transporterCompanySiret"),
+    setter: (
+      input: Prisma.BsffTransporterCreateInput,
+      companyInput: CompanyInput
+    ) => {
+      input.transporterCompanyName = companyInput.name;
+      input.transporterCompanyAddress = companyInput.address;
+    }
+  }
+];
+
+export const sirenifyBsffTransporterCreateInput = nextBuildSirenify(
+  bsffTransporterCreateInputAccessors
 );

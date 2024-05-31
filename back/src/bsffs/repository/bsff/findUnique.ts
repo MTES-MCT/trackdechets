@@ -1,17 +1,9 @@
-import {
-  Bsff,
-  BsffFicheIntervention,
-  BsffPackaging,
-  Prisma
-} from "@prisma/client";
+import { BsffFicheIntervention, BsffPackaging, Prisma } from "@prisma/client";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
-export type FindUniqueBsffFn = (args: Prisma.BsffFindUniqueArgs) => Promise<
-  | (Bsff & { packagings: BsffPackaging[] } & {
-      ficheInterventions: BsffFicheIntervention[];
-    })
-  | null
->;
+export type FindUniqueBsffFn = <Args extends Prisma.BsffFindUniqueArgs>(
+  args: Args
+) => Promise<Prisma.BsffGetPayload<Args>>;
 
 export type FindUniqueBsffGetPackagingsFn = (
   bsffFindUniqueArgs: Prisma.BsffFindUniqueArgs,
@@ -26,17 +18,13 @@ export type FindUniqueBsffGetFicheInterventionsFn = (
 export function buildFinduniqueBsff({
   prisma
 }: ReadRepositoryFnDeps): FindUniqueBsffFn {
-  return async args => {
+  return async <Args extends Prisma.BsffFindUniqueArgs>(args: Args) => {
     const bsff = await prisma.bsff.findFirst({
-      where: { ...args.where, isDeleted: false },
-      include: {
-        packagings: true,
-        ficheInterventions: true,
-        ...(args.include ?? {})
-      }
+      ...args,
+      where: { ...args.where, isDeleted: false }
     });
 
-    return bsff;
+    return bsff as Prisma.BsffGetPayload<Args>;
   };
 }
 

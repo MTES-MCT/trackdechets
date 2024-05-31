@@ -36,7 +36,7 @@ async function runScripts() {
   const newScripts = scriptFiles.filter(file => {
     const fileInfo = parse(file);
 
-    if (fileInfo.ext !== "ts") {
+    if (fileInfo.ext !== ".ts") {
       throw new Error("❌ Only .ts files are supported for migration scripts");
     }
 

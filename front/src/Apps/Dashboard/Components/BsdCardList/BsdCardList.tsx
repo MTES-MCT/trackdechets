@@ -225,7 +225,7 @@ function BsdCardList({
   );
 
   const handleReviewsValidation = useCallback(
-    (bsd: Form | Bsda, siret: string) => {
+    (bsd: Form | Bsda | Bsdasri, siret: string) => {
       if (canApproveOrRefuseReview(bsd, siret)) {
         setBsdClicked(bsd);
         if (bsd.__typename === "Form") {
@@ -234,6 +234,10 @@ function BsdCardList({
         }
         if (bsd.__typename === "Bsda") {
           setValidationWorkflowType("REVIEW_BSDA_APPROVE");
+          setIsModalOpen(true);
+        }
+        if (bsd.__typename === "Bsdasri") {
+          setValidationWorkflowType("REVIEW_BSDASRI_APPROVE");
           setIsModalOpen(true);
         }
       } else {
@@ -255,6 +259,14 @@ function BsdCardList({
           }
           setIsModalOpen(true);
         }
+        if (bsd.__typename === "Bsdasri") {
+          if (canDeleteReview(bsdDisplay!, siret)) {
+            setValidationWorkflowType("REVIEW_BSDASRI_DELETE");
+          } else {
+            setValidationWorkflowType("REVIEW_BSDASRI_CONSULT");
+          }
+          setIsModalOpen(true);
+        }
       }
     },
     []
@@ -263,7 +275,7 @@ function BsdCardList({
   const onBsdValidation = useCallback(
     (bsd: Bsd) => {
       if (isReviewsTab) {
-        handleReviewsValidation(bsd as Form | Bsda, siret);
+        handleReviewsValidation(bsd as Form | Bsda | Bsdasri, siret);
       } else {
         const status =
           bsd.status ||
@@ -345,6 +357,10 @@ function BsdCardList({
     }
     if (bsd.type === BsdType.Bsda) {
       setValidationWorkflowType("REVIEW_BSDA_CONSULT");
+    }
+
+    if (bsd.type === BsdType.Bsdasri) {
+      setValidationWorkflowType("REVIEW_BSDASRI_CONSULT");
     }
     setBsdClicked(bsd);
     setIsModalOpen(true);
@@ -482,10 +498,26 @@ function BsdCardList({
           actionType={ActionType.UPDATE}
         />
       )}
+      {validationWorkflowType === "REVIEW_BSDASRI_DELETE" && isModalOpen && (
+        <RevisionModal
+          bsdId={bsdClicked?.id!}
+          bsdType={BsdType.Bsdasri}
+          onModalCloseFromParent={onClose}
+          actionType={ActionType.DELETE}
+        />
+      )}
       {validationWorkflowType === "REVIEW_BSDA_APPROVE" && isModalOpen && (
         <RevisionModal
           bsdId={bsdClicked?.id!}
           bsdType={BsdType.Bsda}
+          onModalCloseFromParent={onClose}
+          actionType={ActionType.UPDATE}
+        />
+      )}
+      {validationWorkflowType === "REVIEW_BSDASRI_APPROVE" && isModalOpen && (
+        <RevisionModal
+          bsdId={bsdClicked?.id!}
+          bsdType={BsdType.Bsdasri}
           onModalCloseFromParent={onClose}
           actionType={ActionType.UPDATE}
         />
@@ -502,6 +534,15 @@ function BsdCardList({
         <RevisionModal
           bsdId={bsdClicked?.id!}
           bsdType={BsdType.Bsda}
+          onModalCloseFromParent={onClose}
+          actionType={ActionType.CONSUlT}
+        />
+      )}
+
+      {validationWorkflowType === "REVIEW_BSDASRI_CONSULT" && isModalOpen && (
+        <RevisionModal
+          bsdId={bsdClicked?.id!}
+          bsdType={BsdType.Bsdasri}
           onModalCloseFromParent={onClose}
           actionType={ActionType.CONSUlT}
         />

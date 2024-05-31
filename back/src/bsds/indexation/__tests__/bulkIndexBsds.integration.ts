@@ -88,10 +88,10 @@ describe("getBsdIdentifiers", () => {
     "should return all BSFF's identifiers when paginating by %p",
     async paginateBy => {
       const bsff1 = await createBsff();
-      const bsff2 = await createBsff({});
-      const bsff3 = await createBsff({});
-      const bsff4 = await createBsff({});
-      const bsff5 = await createBsff({});
+      const bsff2 = await createBsff();
+      const bsff3 = await createBsff();
+      const bsff4 = await createBsff();
+      const bsff5 = await createBsff();
 
       const ids = await getBsdIdentifiers("bsff", { paginateBy });
       expect(ids).toEqual([bsff1.id, bsff2.id, bsff3.id, bsff4.id, bsff5.id]);

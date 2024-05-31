@@ -12,6 +12,13 @@ import {
 } from "../generated/graphql/types";
 import { estypes } from "@elastic/elasticsearch";
 
+export type RegistryFields =
+  | "isIncomingWasteFor"
+  | "isOutgoingWasteFor"
+  | "isTransportedWasteFor"
+  | "isManagedWasteFor"
+  | "isAllWasteFor";
+
 export type GenericWaste =
   | IncomingWaste
   | OutgoingWaste
@@ -91,6 +98,7 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   createdAt: null,
   updatedAt: null,
   bsdType: null,
+  bsdSubType: null,
   status: null,
   customId: null,
   destinationCustomInfo: null,
@@ -160,6 +168,7 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   createdAt: null,
   updatedAt: null,
   bsdType: null,
+  bsdSubType: null,
   status: null,
   customId: null,
   emitterCustomInfo: null,
@@ -229,6 +238,7 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   createdAt: null,
   updatedAt: null,
   bsdType: null,
+  bsdSubType: null,
   status: null,
   customId: null,
   transporterCustomInfo: null,
@@ -289,6 +299,7 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   createdAt: null,
   updatedAt: null,
   bsdType: null,
+  bsdSubType: null,
   status: null,
   customId: null,
   destinationCap: null,
@@ -372,6 +383,7 @@ export const emptyAllWaste: Required<AllWaste> = {
   createdAt: null,
   updatedAt: null,
   bsdType: null,
+  bsdSubType: null,
   status: null,
   customId: null,
   destinationCap: null,

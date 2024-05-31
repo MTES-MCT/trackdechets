@@ -149,4 +149,34 @@ type Mutation {
   Supprime un BSDASRI
   """
   deleteBsdasri("ID d'un Dasri" id: ID!): Bsdasri!
+
+  """
+  Crée une demande de révision sur un Bsdasri existant
+  """
+  createBsdasriRevisionRequest(
+    input: CreateBsdasriRevisionRequestInput!
+  ): BsdasriRevisionRequest!
+
+  """
+  Annule une demande de révision de Bsdasri.
+  Peut être fait uniquement par l'auteur de la révision, si celle-ci n'a pas encore été acceptée
+  """
+  cancelBsdasriRevisionRequest(
+    "Identifiant de la demande de révision"
+    id: ID!
+  ): Boolean!
+
+  """
+  Répond à une demande d'approbation d'une révision.
+  En cas de refus, la révision associée est automatiquement refusée et les autres validations supprimées.
+  En cas d'acceptation, si c'était la dernière approbation attendue, la révision associée est automatiquement approuvée et appliquée sur le Bsdasri.
+  """
+  submitBsdasriRevisionRequestApproval(
+    "Identifiant de la validation"
+    id: ID!
+    "Indique si la révision est acceptée ou non"
+    isApproved: Boolean!
+    "Commentaire facultatif"
+    comment: String
+  ): BsdasriRevisionRequest!
 }

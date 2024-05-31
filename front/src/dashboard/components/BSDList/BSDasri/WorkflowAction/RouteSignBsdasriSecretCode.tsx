@@ -138,7 +138,9 @@ export function RouteBSDasrisSignEmissionSecretCode() {
             }
           });
 
-          navigate(signTransporterRedirection);
+          navigate(signTransporterRedirection.pathname, {
+            state: signTransporterRedirection.state
+          });
         }}
       >
         {({ isSubmitting, handleReset }) => {

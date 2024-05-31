@@ -221,16 +221,16 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSFFs on transporterCompanySiret (exact)", async () => {
     const testInput_1 = { transporterCompanySiret: siretify(1) };
-    const bsff1 = await createBsff({}, testInput_1);
+    const bsff1 = await createBsff({}, { transporterData: testInput_1 });
 
     const bsff2 = await createBsff(
       {},
-      { transporterCompanySiret: siretify(2) }
+      { transporterData: { transporterCompanySiret: siretify(2) } }
     );
 
     const bsff3 = await createBsff(
       {},
-      { transporterCompanySiret: siretify(3) }
+      { transporterData: { transporterCompanySiret: siretify(3) } }
     );
 
     await Promise.all(
@@ -443,14 +443,14 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSFFs on a list of transporterCompanySiret", async () => {
     const testInput_1 = { transporterCompanySiret: siretify(1) };
-    const bsff1 = await createBsff({}, testInput_1);
+    const bsff1 = await createBsff({}, { transporterData: testInput_1 });
 
     const testInput = { transporterCompanySiret: siretify(2) };
-    const bsff2 = await createBsff({}, testInput);
+    const bsff2 = await createBsff({}, { transporterData: testInput });
 
     const bsff3 = await createBsff(
       {},
-      { transporterCompanySiret: siretify(3) }
+      { transporterData: { transporterCompanySiret: siretify(3) } }
     );
 
     await Promise.all(
@@ -652,16 +652,16 @@ describe("toElasticFilter", () => {
   });
   it("should filter BSFFs on a substring of transporterCompanySiret", async () => {
     const testInput_1 = { transporterCompanySiret: siretify(1) };
-    const bsff1 = await createBsff({}, testInput_1);
+    const bsff1 = await createBsff({}, { transporterData: testInput_1 });
 
     const bsff2 = await createBsff(
       {},
-      { transporterCompanySiret: siretify(2) }
+      { transporterData: { transporterCompanySiret: siretify(2) } }
     );
 
     const bsff3 = await createBsff(
       {},
-      { transporterCompanySiret: siretify(3) }
+      { transporterData: { transporterCompanySiret: siretify(3) } }
     );
 
     await Promise.all(

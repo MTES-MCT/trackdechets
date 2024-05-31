@@ -31,6 +31,22 @@ export const UPDATE_CONTACT_INFOS = gql`
   }
 `;
 
+export const INVITE_USER_TO_COMPANY = gql`
+  mutation InviteUserToCompany(
+    $email: String!
+    $siret: String!
+    $role: UserRole!
+  ) {
+    inviteUserToCompany(email: $email, siret: $siret, role: $role) {
+      id
+      users {
+        ...AccountCompanyMemberUserFragment
+      }
+    }
+  }
+  ${AccountCompanyMemberFragment.user}
+`;
+
 export const GET_ME = gql`
   {
     me {
@@ -182,6 +198,27 @@ export const UPDATE_COMPANY_TYPES = gql`
     updateCompany(id: $id, companyTypes: $companyTypes) {
       id
       companyTypes
+    }
+  }
+`;
+
+export const UPDATE_COMPANY_COLLECTOR_TYPES = gql`
+  mutation UpdateCompany($id: String!, $collectorTypes: [CollectorType!]) {
+    updateCompany(id: $id, collectorTypes: $collectorTypes) {
+      id
+      collectorTypes
+    }
+  }
+`;
+
+export const UPDATE_COMPANY_WASTE_PROCESSOR_TYPES = gql`
+  mutation UpdateCompany(
+    $id: String!
+    $wasteProcessorTypes: [WasteProcessorType!]
+  ) {
+    updateCompany(id: $id, wasteProcessorTypes: $wasteProcessorTypes) {
+      id
+      wasteProcessorTypes
     }
   }
 `;
@@ -420,6 +457,53 @@ export const UPDATE_COMPANY_WORKER_CERTIFICATION = gql`
 export const DELETE_WORKER_CERTIFICATION = gql`
   mutation DeleteWorkerCertification($input: DeleteWorkerCertificationInput!) {
     deleteWorkerCertification(input: $input) {
+      id
+    }
+  }
+`;
+
+export const RENEW_SECURITY_CODE = gql`
+  mutation RenewSecurityCode($siret: String!) {
+    renewSecurityCode(siret: $siret) {
+      id
+      securityCode
+    }
+  }
+`;
+
+export const UPDATE_DASRI_DIRECT_TAKEOVER = gql`
+  mutation UpdateCompany(
+    $id: String!
+    $allowBsdasriTakeOverWithoutSignature: Boolean!
+  ) {
+    updateCompany(
+      id: $id
+      allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature
+    ) {
+      id
+      siret
+      allowBsdasriTakeOverWithoutSignature
+    }
+  }
+`;
+
+export const ADD_SIGNATURE_DELEGATION = gql`
+  mutation AddSignatureAutomation($input: SignatureAutomationInput!) {
+    addSignatureAutomation(input: $input) {
+      id
+      createdAt
+      to {
+        name
+        siret
+        vatNumber
+      }
+    }
+  }
+`;
+
+export const REMOVE_SIGNATURE_DELEGATION = gql`
+  mutation RemoveSignatureAutomation($id: ID!) {
+    removeSignatureAutomation(id: $id) {
       id
     }
   }

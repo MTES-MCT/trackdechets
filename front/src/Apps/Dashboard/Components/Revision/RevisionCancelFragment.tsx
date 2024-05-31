@@ -12,6 +12,10 @@ import {
   GET_BSDA_REVISION_REQUESTS
 } from "../../../common/queries/reviews/BsdaReviewQuery";
 import {
+  CANCEL_BSDASRI_REVISION_REQUEST,
+  GET_BSDASRI_REVISION_REQUESTS
+} from "../../../common/queries/reviews/BsdasriReviewQuery";
+import {
   CANCEL_FORM_REVISION_REQUEST,
   GET_FORM_REVISION_REQUESTS
 } from "../../../common/queries/reviews/BsddReviewsQuery";
@@ -44,6 +48,16 @@ const RevisionCancelFragment = ({
     ]
   });
 
+  const [cancelBsdasriRevisionRequest, { loading: cancelingBsdasri }] =
+    useMutation<
+      Pick<Mutation, "cancelBsdasriRevisionRequest">,
+      MutationCancelBsdaRevisionRequestArgs
+    >(CANCEL_BSDASRI_REVISION_REQUEST, {
+      refetchQueries: [
+        { query: GET_BSDASRI_REVISION_REQUESTS, variables: { siret } }
+      ]
+    });
+
   const handleClose = () => onClose!();
 
   const handleRevisionCancel = async () => {
@@ -58,6 +72,13 @@ const RevisionCancelFragment = ({
         variables: { id: reviewId }
       });
     }
+
+    if (bsdType === BsdType.Bsdasri) {
+      await cancelBsdasriRevisionRequest({
+        variables: { id: reviewId }
+      });
+    }
+
     handleClose();
   };
 
@@ -69,7 +90,7 @@ const RevisionCancelFragment = ({
       <Button
         priority="primary"
         onClick={handleRevisionCancel}
-        disabled={cancelingForm || cancelingBsda}
+        disabled={cancelingForm || cancelingBsda || cancelingBsdasri}
       >
         Annuler la révision
       </Button>

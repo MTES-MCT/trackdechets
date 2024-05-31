@@ -5,7 +5,8 @@ import {
   TransportMode,
   WasteAcceptationStatus,
   IntermediaryFormAssociation,
-  OperationMode
+  OperationMode,
+  EmitterType
 } from "@prisma/client";
 import { FormStatus } from "../generated/graphql/types";
 
@@ -141,7 +142,9 @@ export type Bsdd = {
   isDeleted: boolean;
   isDraft: boolean;
   status: FormStatus;
+  forwardedInId: string | null;
   pop: boolean | null;
+  emitterType: EmitterType | null;
   ecoOrganismeName: string | null;
   ecoOrganismeSiret: string | null;
   emitterCompanyName: string | null;

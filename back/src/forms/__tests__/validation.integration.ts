@@ -1721,22 +1721,186 @@ describe("processedInfoSchema", () => {
       "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré"
     );
   });
+  // NotificationNumber tests
+  // non-UE company
 
-  it("nextDestinationCompany return an error when waste is not dangerous with a foreign extraEuropeanId is given without notificationNumber", async () => {
+  const testMatrix = [
+    //  Traceability
+    {
+      // traceability, dangerous*, non EU country
+      noTraceability: false,
+      wasteDetailsCode: "07 07 07*",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: false,
+      nextDestinationCompanyCountry: "BY",
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005" // Non eu company
+    },
+    {
+      // traceability, pop, non EU country
+      noTraceability: false,
+      wasteDetailsCode: "07 07 07",
+      wasteDetailsPop: true,
+      wasteDetailsIsDangerous: false,
+      nextDestinationCompanyCountry: "BY",
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005" // Non eu company
+    },
+    {
+      // traceability, isDangerous, non EU country
+      noTraceability: false,
+      wasteDetailsCode: "07 07 07",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: true,
+      nextDestinationCompanyCountry: "BY",
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005" // Non eu company
+    },
+    // european countries
+    {
+      // traceability, dangerous*,  EU country
+      noTraceability: false,
+      wasteDetailsCode: "07 07 07*",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: false,
+      nextDestinationCompanyCountry: "BE",
+      nextDestinationCompanyVatNumber: "BE0541696005" // EU company
+    },
+    {
+      // traceability, pop, EU country
+      noTraceability: false,
+      wasteDetailsCode: "07 07 07",
+      wasteDetailsPop: true,
+      wasteDetailsIsDangerous: false,
+      nextDestinationCompanyCountry: "BE",
+      nextDestinationCompanyVatNumber: "BE0541696005" // EU company
+    },
+    {
+      // traceability,isDangerous, EU country
+      noTraceability: false,
+      wasteDetailsCode: "07 07 07",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: true,
+      nextDestinationCompanyCountry: "BE",
+      nextDestinationCompanyVatNumber: "BE0541696005" // EU company
+    },
+    // No Traceability
+    {
+      // no traceability, dangerous*,  EU country
+      noTraceability: true,
+      wasteDetailsCode: "07 07 07*",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: false,
+      nextDestinationCompanyCountry: "BY",
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005" // Non eu company
+    },
+    {
+      // not traceability, pop, non EU country
+
+      noTraceability: true,
+      wasteDetailsCode: "07 07 07",
+      wasteDetailsPop: true,
+      wasteDetailsIsDangerous: false,
+      nextDestinationCompanyCountry: "BY",
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005" // Non eu company
+    },
+    {
+      // not traceability, isDangerous, non EU country
+      noTraceability: true,
+      wasteDetailsCode: "07 07 07",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: true,
+      nextDestinationCompanyCountry: "BY",
+      nextDestinationCompanyExtraEuropeanId: "BRU0541696005" // Non eu company
+    },
+    // european countries
+    {
+      // no traceability, dangerous*,  EU country
+      noTraceability: true,
+      wasteDetailsCode: "07 07 07*",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: false,
+      nextDestinationCompanyCountry: "BE",
+      nextDestinationCompanyVatNumber: "BE0541696005" // EU company
+    },
+    {
+      // no traceability, pop,  EU country
+      noTraceability: true,
+      wasteDetailsCode: "07 07 07",
+      wasteDetailsPop: true,
+      wasteDetailsIsDangerous: false,
+      nextDestinationCompanyCountry: "BE",
+      nextDestinationCompanyVatNumber: "BE0541696005" // EU company
+    },
+    {
+      // no traceability, isDangerous,  EU country
+      noTraceability: true,
+      wasteDetailsCode: "07 07 07",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: true,
+      nextDestinationCompanyCountry: "BE",
+      nextDestinationCompanyVatNumber: "BE0541696005" // EU company
+    }
+  ];
+
+  it.each(testMatrix)(
+    "should throw when `nextDestinationNotificationNumber` is missing %o",
+    async ({
+      noTraceability,
+      wasteDetailsCode,
+      wasteDetailsPop,
+      wasteDetailsIsDangerous,
+      nextDestinationCompanyCountry,
+      nextDestinationCompanyExtraEuropeanId = null,
+      nextDestinationCompanyVatNumber = null
+    }) => {
+      const processedInfo = {
+        processedBy: "John Snow",
+        processedAt: new Date(),
+        processingOperationDone: "D 13", // non final
+        processingOperationDescription: "Regroupement",
+        noTraceability,
+        nextDestinationProcessingOperation: "D 8",
+        nextDestinationCompanyName: "Exutoire",
+        nextDestinationCompanyAddress: "4 rue du déchet",
+        nextDestinationCompanyCountry,
+        nextDestinationCompanyVatNumber,
+        nextDestinationCompanyExtraEuropeanId,
+        nextDestinationCompanyContact: "Arya Stark",
+        nextDestinationCompanyPhone: "06 XX XX XX XX",
+        nextDestinationCompanyMail: "arya.stark@trackdechets.fr",
+        wasteDetailsCode,
+        wasteDetailsPop,
+        wasteDetailsIsDangerous
+        // missing nextDestinationNotificationNumber
+      };
+      const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+      await expect(validateFn()).rejects.toThrow(
+        "Destination ultérieure : le numéro de notification est obligatoire"
+      );
+    }
+  );
+
+  it("should also throw when `nextDestinationNotificationNumber` is null", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
-      processingOperationDone: "D 13",
+      processingOperationDone: "D 13", // non final
       processingOperationDescription: "Regroupement",
+
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
       nextDestinationCompanyAddress: "4 rue du déchet",
-      nextDestinationCompanyCountry: "FR",
+
+      wasteDetailsCode: "07 07 07*",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: false,
+      nextDestinationCompanyCountry: "BY",
       nextDestinationCompanyExtraEuropeanId: "BRU0541696005",
+
       nextDestinationCompanyContact: "Arya Stark",
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr",
-      wasteDetailsCode: "07 07 07*"
+
+      nextDestinationNotificationNumber: null
     };
     const validateFn = () => processedInfoSchema.validate(processedInfo);
 
@@ -1745,26 +1909,38 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  it("nextDestinationCompany not return an error when waste is not dangerous with a foreign extraEuropeanId", async () => {
-    const processedInfo = {
-      processedBy: "John Snow",
-      processedAt: new Date(),
-      processingOperationDone: "D 13",
-      processingOperationDescription: "Regroupement",
-      nextDestinationProcessingOperation: "D 8",
-      nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanyAddress: "4 rue du déchet",
-      nextDestinationCompanyCountry: "FR",
-      nextDestinationCompanyExtraEuropeanId: "BRU0541696005",
-      nextDestinationCompanyContact: "Arya Stark",
-      nextDestinationCompanyPhone: "06 XX XX XX XX",
-      nextDestinationCompanyMail: "arya.stark@trackdechets.fr",
-      wasteDetailsCode: "07 07 07"
-    };
-    const validateFn = () => processedInfoSchema.validate(processedInfo);
-
-    await expect(validateFn()).resolves.toMatchObject({});
-  });
+  it.each(testMatrix)(
+    "should pas when `nextDestinationNotificationNumber` is provided %o",
+    async ({
+      wasteDetailsCode,
+      wasteDetailsPop,
+      wasteDetailsIsDangerous,
+      nextDestinationCompanyCountry,
+      nextDestinationCompanyExtraEuropeanId = null,
+      nextDestinationCompanyVatNumber = null
+    }) => {
+      const processedInfo = {
+        processedBy: "John Snow",
+        processedAt: new Date(),
+        processingOperationDone: "D 13", // non final
+        processingOperationDescription: "Regroupement",
+        nextDestinationProcessingOperation: "D 8",
+        nextDestinationCompanyName: "Exutoire",
+        nextDestinationCompanyAddress: "4 rue du déchet",
+        nextDestinationCompanyCountry,
+        nextDestinationCompanyVatNumber,
+        nextDestinationCompanyExtraEuropeanId,
+        nextDestinationCompanyContact: "Arya Stark",
+        nextDestinationCompanyPhone: "06 XX XX XX XX",
+        nextDestinationCompanyMail: "arya.stark@trackdechets.fr",
+        wasteDetailsCode,
+        wasteDetailsPop,
+        wasteDetailsIsDangerous,
+        nextDestinationNotificationNumber: "xyz"
+      };
+      expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
+    }
+  );
 
   it("nextDestinationCompany return an error when a foreign extraEuropeanId is given with a VAT number", async () => {
     const processedInfo = {
@@ -2032,7 +2208,8 @@ describe("processedInfoSchema", () => {
     });
 
     test.each([
-      ["D9", "VALORISATION_ENERGETIQUE"], // Correct modes are ELIMINATION
+      ["D8", "VALORISATION_ENERGETIQUE"], // correct mode is ELIMINATION
+      ["D9", "VALORISATION_ENERGETIQUE"], // D9 has no associated mode
       ["R12", "VALORISATION_ENERGETIQUE"] // R12 has no associated mode
     ])(
       "should not be valid if operation mode is not compatible with operation code (mode: %p, code: %p)",
@@ -2073,24 +2250,27 @@ describe("processedInfoSchema", () => {
       );
     });
 
-    it("should be valid if operationCode has no potential operationModes associated and none is specified", async () => {
-      const processedInfo = {
-        processedBy: "John Snow",
-        processedAt: new Date(),
-        processingOperationDone: "D 13",
-        processingOperationDescription: "Regroupement",
-        noTraceability: false,
-        nextDestinationProcessingOperation: "D 8",
-        nextDestinationCompanyName: "Exutoire",
-        nextDestinationCompanySiret: siretify(1),
-        nextDestinationCompanyAddress: "4 rue du déchet",
-        nextDestinationCompanyCountry: "FR",
-        nextDestinationCompanyContact: "Arya Stark",
-        nextDestinationCompanyPhone: "06 XX XX XX XX",
-        nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
-      };
+    it.each(["D 9", "D 13"])(
+      "should be valid if operationCode has no potential operationModes associated and none is specified",
+      async code => {
+        const processedInfo = {
+          processedBy: "John Snow",
+          processedAt: new Date(),
+          processingOperationDone: code,
+          processingOperationDescription: "test",
+          noTraceability: false,
+          nextDestinationProcessingOperation: "D 8",
+          nextDestinationCompanyName: "Exutoire",
+          nextDestinationCompanySiret: siretify(1),
+          nextDestinationCompanyAddress: "4 rue du déchet",
+          nextDestinationCompanyCountry: "FR",
+          nextDestinationCompanyContact: "Arya Stark",
+          nextDestinationCompanyPhone: "06 XX XX XX XX",
+          nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+        };
 
-      expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
-    });
+        expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
+      }
+    );
   });
 });

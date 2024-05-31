@@ -97,6 +97,7 @@ describe("mutation sendMembershipRequest", () => {
           membershipRequestId: membershipRequest.id,
           companyName: company.name,
           companySiret: company.siret,
+          companyGivenName: company.givenName,
           userEmail: requester.email
         }
       })
@@ -170,6 +171,7 @@ describe("mutation sendMembershipRequest", () => {
           membershipRequestId: membershipRequest.id,
           companyName: company.name,
           companySiret: company.siret,
+          companyGivenName: company.givenName,
           userEmail: requester.email
         }
       })

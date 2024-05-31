@@ -55,6 +55,7 @@ type Mutation {
       mail
       phone
     }
+    agrementNumber
   }
   ```
 
@@ -84,14 +85,13 @@ type Mutation {
   ```
   destination {
     reception {
-      weight
+      weight # doit être 0 si acceptationStatus est REFUSED
       acceptationStatus
     }
     operation {
-      code
-      mode
+      code # requis sauf si acceptationStatus est REFUSED
+      mode # requis sauf si acceptationStatus est REFUSED
     }
-    agrementNumber
   }
   ```
   """

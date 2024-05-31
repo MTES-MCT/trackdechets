@@ -1,4 +1,4 @@
-import { Bsff, BsffFicheIntervention, BsffPackaging } from "@prisma/client";
+import { Bsff } from "@prisma/client";
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
 import * as QRCode from "qrcode";
@@ -10,12 +10,57 @@ import {
   expandBsffPackagingFromDB,
   expandFicheInterventionBsffFromDB
 } from "../converter";
+import {
+  BsffWithFicheInterventionInclude,
+  BsffWithFicheInterventions,
+  BsffWithPackagings,
+  BsffWithPackagingsInclude,
+  BsffWithTransporters,
+  BsffWithTransportersInclude
+} from "../types";
+import { prisma } from "@td/prisma";
+import { getReadonlyBsffPackagingRepository } from "../repository";
 
-export async function buildPdf(
-  bsff: Bsff & { packagings: BsffPackaging[] } & {
-    ficheInterventions: BsffFicheIntervention[];
-  } & { previousBsffs: (Bsff & { packagings: BsffPackaging[] })[] }
-) {
+export type BsffForBuildPdf = Bsff &
+  BsffWithPackagings &
+  BsffWithFicheInterventions &
+  BsffWithTransporters & {
+    previousBsffs: (Bsff & BsffWithPackagings & BsffWithTransporters)[];
+  };
+
+export const BsffForBuildPdfInclude = {
+  ...BsffWithPackagingsInclude,
+  ...BsffWithFicheInterventionInclude,
+  ...BsffWithTransportersInclude
+};
+
+export async function getBsffForBuildPdf({
+  id
+}: Pick<Bsff, "id">): Promise<BsffForBuildPdf> {
+  const bsff = await prisma.bsff.findUniqueOrThrow({
+    where: { id },
+    include: BsffForBuildPdfInclude
+  });
+
+  const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
+
+  const previousPackagings = await findPreviousPackagings(
+    bsff.packagings.map(p => p.id)
+  );
+  const previousBsffIds = [...new Set(previousPackagings.map(p => p.bsffId))];
+  const previousBsffs = await prisma.bsff.findMany({
+    where: { id: { in: previousBsffIds } },
+    include: {
+      ...BsffWithTransportersInclude,
+      // includes only packagings in the dependency graph of the BSFF
+      packagings: { where: { id: { in: previousPackagings.map(p => p.id) } } }
+    }
+  });
+
+  return { ...bsff, previousBsffs };
+}
+
+export async function buildPdf(bsff: BsffForBuildPdf) {
   const qrCode = await QRCode.toString(bsff.id, { type: "svg" });
   const html = ReactDOMServer.renderToStaticMarkup(
     <BsffPdf

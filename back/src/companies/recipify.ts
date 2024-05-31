@@ -5,10 +5,10 @@ import {
 import { prisma } from "@td/prisma";
 import {
   Bsdasri,
-  Bsff,
   Bsvhu,
   BspaohTransporter,
-  BsdaTransporter
+  BsdaTransporter,
+  BsffTransporter
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 
@@ -111,7 +111,12 @@ export interface BsdTransporterReceiptPart {
 }
 
 export async function getTransporterReceipt(
-  existingBsd: Bsdasri | Bsvhu | BsdaTransporter | Bsff | BspaohTransporter
+  existingBsd:
+    | Bsdasri
+    | Bsvhu
+    | BsdaTransporter
+    | BsffTransporter
+    | BspaohTransporter
 ): Promise<BsdTransporterReceiptPart> {
   // fetch TransporterReceipt
   const orgId = getTransporterCompanyOrgId(existingBsd);

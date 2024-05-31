@@ -6,6 +6,13 @@ import { FindRelatedEntityFn } from "./bsdasri/findRelatedEntity";
 import { FindUniqueBsdasriFn } from "./bsdasri/findUnique";
 import { UpdateBsdasriFn } from "./bsdasri/update";
 import { UpdateManyBsdasriFn } from "./bsdasri/updateMany";
+import { AcceptRevisionRequestApprovalFn } from "./revisionRequest/accept";
+import { CancelRevisionRequestFn } from "./revisionRequest/cancel";
+import { CountRevisionRequestFn } from "./revisionRequest/count";
+import { CreateRevisionRequestFn } from "./revisionRequest/create";
+import { FindManyBsdasriRevisionRequestFn } from "./revisionRequest/findMany";
+import { FindUniqueRevisionRequestFn } from "./revisionRequest/findUnique";
+import { RefuseRevisionRequestApprovalFn } from "./revisionRequest/refuse";
 
 export type BsdasriActions = {
   findUnique: FindUniqueBsdasriFn;
@@ -16,4 +23,12 @@ export type BsdasriActions = {
   updateMany: UpdateManyBsdasriFn;
   delete: DeleteBsdasriFn;
   count: CountBsdasrisFn;
+
+  countRevisionRequests: CountRevisionRequestFn;
+  findUniqueRevisionRequest: FindUniqueRevisionRequestFn;
+  findManyBsdasriRevisionRequest: FindManyBsdasriRevisionRequestFn;
+  createRevisionRequest: CreateRevisionRequestFn;
+  cancelRevisionRequest: CancelRevisionRequestFn;
+  acceptRevisionRequestApproval: AcceptRevisionRequestApprovalFn;
+  refuseRevisionRequestApproval: RefuseRevisionRequestApprovalFn;
 };

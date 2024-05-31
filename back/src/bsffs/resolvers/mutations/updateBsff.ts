@@ -1,8 +1,16 @@
 import { Prisma, BsffType } from "@prisma/client";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsffOrNotFound, getPackagingCreateInput } from "../../database";
-import { flattenBsffInput, expandBsffFromDB } from "../../converter";
+import {
+  getBsffOrNotFound,
+  getFirstTransporterSync,
+  getPackagingCreateInput
+} from "../../database";
+import {
+  flattenBsffInput,
+  expandBsffFromDB,
+  flattenBsffTransporterInput
+} from "../../converter";
 import { checkCanUpdate } from "../../permissions";
 import {
   validateBsff,
@@ -19,6 +27,7 @@ import { checkEditionRules } from "../../edition/bsffEdition";
 import { sirenifyBsffInput } from "../../sirenify";
 import { recipify } from "../../recipify";
 import { UserInputError } from "../../../common/errors";
+import { BsffWithTransportersInclude } from "../../types";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
   _,
@@ -28,6 +37,11 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const user = checkIsAuthenticated(context);
 
   const existingBsff = await getBsffOrNotFound({ id });
+
+  // Un premier transporteur est initialisé dans la mutation `createBsff`
+  // ce qui permet d'être certain que `transporter` est défini
+  const existingTransporter = getFirstTransporterSync(existingBsff)!;
+
   await checkCanUpdate(user, existingBsff, input);
 
   const { findPreviousPackagings } = getBsffPackagingRepository(user);
@@ -58,12 +72,14 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const sirenifiedInput = await sirenifyBsffInput(input, user);
   const autocompletedInput = await recipify(sirenifiedInput);
   const flatInput = flattenBsffInput(autocompletedInput);
+  const flatTransporterInput = flattenBsffTransporterInput(autocompletedInput);
 
   const futureBsff = {
     ...existingBsff,
     ...flatInput,
     packagings:
-      input.packagings?.map(toBsffPackagingWithType) ?? existingBsff.packagings
+      input.packagings?.map(toBsffPackagingWithType) ?? existingBsff.packagings,
+    transporters: [{ ...existingTransporter, ...flatTransporterInput }]
   };
 
   const updatedFields = await checkEditionRules(existingBsff, input, user);
@@ -131,6 +147,18 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
             )
           }
         }
+      : {}),
+    ...(input.transporter
+      ? {
+          transporters: {
+            update: {
+              where: {
+                id: existingTransporter.id
+              },
+              data: flatTransporterInput
+            }
+          }
+        }
       : {})
   };
 
@@ -143,7 +171,11 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       .filter(Boolean);
   }
 
-  const updatedBsff = await updateBsff({ where: { id }, data });
+  const updatedBsff = await updateBsff({
+    where: { id },
+    data,
+    include: BsffWithTransportersInclude
+  });
 
   return expandBsffFromDB(updatedBsff);
 };

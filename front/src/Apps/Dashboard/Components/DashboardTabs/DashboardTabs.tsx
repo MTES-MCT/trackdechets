@@ -44,8 +44,8 @@ interface DashboardTabsProps {
   companies: CompanyPrivate[];
 }
 
-const displayNotification = count => {
-  return count && count > 0 ? (
+const displayNotification = (count, isReaderRole) => {
+  return !isReaderRole && count && count > 0 ? (
     <p className="dashboard-tabs-notifications">{count}</p>
   ) : null;
 };
@@ -111,6 +111,8 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
     setExpanded(!expanded);
   };
 
+  const isReaderRole = role === UserRole.Reader;
+
   return (
     <div className="dashboard-tabs">
       <div className="company-select">
@@ -171,7 +173,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {ACTS}
                 </NavLink>
-                {displayNotification(dataAction?.bsds.totalCount)}
+                {displayNotification(dataAction?.bsds.totalCount, isReaderRole)}
               </li>
 
               <li>
@@ -220,7 +222,10 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {TO_REVIEW}
                 </NavLink>
-                {displayNotification(dataRevision?.bsds.totalCount)}
+                {displayNotification(
+                  dataRevision?.bsds.totalCount,
+                  isReaderRole
+                )}
               </li>
               <li>
                 <NavLink
@@ -257,7 +262,10 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               >
                 {TO_COLLECT}
               </NavLink>
-              {displayNotification(dataTransport?.bsds.totalCount)}
+              {displayNotification(
+                dataTransport?.bsds.totalCount,
+                isReaderRole
+              )}
             </li>
             <li>
               <NavLink

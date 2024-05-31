@@ -35,3 +35,26 @@ export const BsdasriWithSynthesizingInclude =
 export type BsdasriWithSynthesizing = Prisma.BsdasriGetPayload<{
   include: typeof BsdasriWithSynthesizingInclude;
 }>;
+
+export const BsdasriRevisionRequestWithAuthoringCompanyInclude =
+  Prisma.validator<Prisma.BsdasriRevisionRequestInclude>()({
+    authoringCompany: { select: { orgId: true } }
+  });
+export const BsdasriRevisionRequestWithApprovalsInclude =
+  Prisma.validator<Prisma.BsdasriRevisionRequestInclude>()({
+    approvals: { select: { approverSiret: true } }
+  });
+
+export const BsdasriWithRevisionRequestsInclude =
+  Prisma.validator<Prisma.BsdasriInclude>()({
+    bsdasriRevisionRequests: {
+      include: {
+        ...BsdasriRevisionRequestWithAuthoringCompanyInclude,
+        ...BsdasriRevisionRequestWithApprovalsInclude
+      }
+    }
+  });
+
+export type BsdasriWithRevisionRequests = Prisma.BsdasriGetPayload<{
+  include: typeof BsdasriWithRevisionRequestsInclude;
+}>;

@@ -7,10 +7,14 @@ import {
   Bsd,
   Bsda,
   Bspaoh,
-  BsdasriType
+  BsdasriType,
+  FormStatus,
+  Transporter,
+  BsdaTransporter
 } from "@td/codegen-ui";
 
 import {
+  BsdCurrentTransporterInfos,
   BsdDisplay,
   BsdStatusCode,
   BsdTypename,
@@ -62,6 +66,160 @@ export const formatBsd = (bsd: Bsd): BsdDisplay | null => {
     default:
       return null;
   }
+};
+
+export const getCurrentTransporterInfos = (
+  bsd: Bsd,
+  currentSiret: string,
+  isToCollectTab: boolean
+): BsdCurrentTransporterInfos | null => {
+  switch (bsd.__typename) {
+    case BsdTypename.Bsdd:
+      return getBsddCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
+    case BsdTypename.Bsda:
+      return getBsdaCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
+    case BsdTypename.Bsdasri:
+      return getBsdasriCurrentTransporterInfos(bsd, currentSiret);
+    case BsdTypename.Bsvhu:
+      return null;
+    case BsdTypename.Bsff:
+      return getBsffCurrentTransporterInfos(bsd, currentSiret);
+    case BsdTypename.Bspaoh:
+      return getBspaohCurrentTransporterInfos(bsd, currentSiret);
+    default:
+      return null;
+  }
+};
+
+export const getBsddCurrentTransporterInfos = (
+  bsdd: Form,
+  currentSiret: string,
+  isToCollectTab: boolean
+): BsdCurrentTransporterInfos => {
+  let currentTransporter: Transporter | undefined;
+  // in case the BSD is going through temporary storage,
+  // fetch the transporter from the temporaryStorageDetail property
+  if (
+    bsdd.status === FormStatus.Resealed ||
+    bsdd.status === FormStatus.Resent ||
+    bsdd.status === FormStatus.SignedByTempStorer ||
+    bsdd.status === FormStatus.TempStored ||
+    bsdd.status === FormStatus.TempStorerAccepted
+  ) {
+    currentTransporter =
+      bsdd.temporaryStorageDetail?.transporter &&
+      bsdd.temporaryStorageDetail?.transporter.company?.orgId === currentSiret
+        ? bsdd.temporaryStorageDetail?.transporter
+        : undefined;
+  } else {
+    if (isToCollectTab) {
+      // find the first transporter with this SIRET who hasn't taken over yet
+      currentTransporter = bsdd.transporters?.find(
+        transporter =>
+          transporter.company?.orgId === currentSiret &&
+          !transporter.takenOverAt
+      );
+    } else {
+      // find the last transporter with this SIRET who has taken over
+      currentTransporter = [...(bsdd.transporters ?? [])]
+        .reverse()
+        .find(
+          transporter =>
+            transporter.company?.orgId === currentSiret &&
+            !!transporter.takenOverAt
+        );
+    }
+  }
+  if (!currentTransporter) {
+    return {};
+  }
+  return {
+    transporterId: currentTransporter?.id,
+    transporterNumberPlate: currentTransporter?.numberPlate,
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.mode ?? undefined
+  };
+};
+
+export const getBsdaCurrentTransporterInfos = (
+  bsda: Bsda,
+  currentSiret: string,
+  isToCollectTab: boolean
+): BsdCurrentTransporterInfos => {
+  let currentTransporter: BsdaTransporter | undefined;
+  if (isToCollectTab) {
+    // find the first transporter with this SIRET who hasn't taken over yet
+    currentTransporter = bsda.transporters?.find(
+      transporter =>
+        transporter.company?.orgId === currentSiret &&
+        !transporter.transport?.signature?.date
+    );
+  } else {
+    // find the last transporter with this SIRET who has taken over
+    currentTransporter = [...(bsda.transporters ?? [])]
+      .reverse()
+      .find(
+        transporter =>
+          transporter.company?.orgId === currentSiret &&
+          !!transporter.transport?.signature?.date
+      );
+  }
+  if (!currentTransporter) {
+    return {};
+  }
+  return {
+    transporterId: currentTransporter?.id,
+    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
+  };
+};
+
+export const getBsdasriCurrentTransporterInfos = (
+  bsdasri: Bsdasri,
+  currentSiret: string
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bsdasri.transporter;
+  if (currentTransporter?.company?.orgId !== currentSiret) {
+    return {};
+  }
+  // since there is only one transporter per BSDASRI, transporterId is useless,
+  // the update is done through the BSD using its id
+  return {
+    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
+  };
+};
+
+export const getBsffCurrentTransporterInfos = (
+  bsff: Bsff,
+  currentSiret: string
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bsff.transporter || bsff["bsffTransporter"];
+  if (currentTransporter?.company?.orgId !== currentSiret) {
+    return {};
+  }
+  return {
+    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
+  };
+};
+
+export const getBspaohCurrentTransporterInfos = (
+  bspaoh: Bspaoh,
+  currentSiret: string
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bspaoh.transporter;
+  if (currentTransporter?.company?.orgId !== currentSiret) {
+    return {};
+  }
+  return {
+    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
+  };
 };
 
 export const mapBsdd = (bsdd: Form): BsdDisplay => {
@@ -174,7 +332,8 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     transporterNumberPlate:
       bsdasri.transporter?.transport?.plates ||
       bsdasri["bsdasriTransporter"]?.transport?.plates,
-    synthesizedIn: bsdasri.synthesizedIn
+    synthesizedIn: bsdasri.synthesizedIn,
+    metadata: bsdasri.metadata
   };
   return bsdasriFormatted;
 };

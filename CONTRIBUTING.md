@@ -120,6 +120,16 @@
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
 
+### Développement
+
+Lors du développement, vous aurez sûrement besoin de pull des mises à jour depuis le repo. Après avoir pull le repo localement, vous pouvez utiliser la commande :
+
+```bash
+npm run afterpull
+```
+
+Qui automatise les tâches redondantes (mettre à jour les packages, appliquer les nouvelles migrations, générer les types back et front).
+
 ### Installation alternative sans docker sur MacOS avec puce Apple
 
 > L'utilisation de Docker sur MacOS avec puce Apple est problématique car il n'existe pas d'image officielle pour Elasticsearch@6. Par ailleurs des problèmes de networking existe sur l'image Docker utilisée pour le back.
