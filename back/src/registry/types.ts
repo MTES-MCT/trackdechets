@@ -397,5 +397,11 @@ export const emptyAllWaste: Required<AllWaste> = {
   workerCompanySiret: null,
   workerCompanyAddress: null,
   destinationFinalOperationCodes: [],
-  destinationFinalOperationWeights: []
+  destinationFinalOperationWeights: [],
+  intermediary1CompanyName: null,
+  intermediary1CompanySiret: null,
+  intermediary2CompanyName: null,
+  intermediary2CompanySiret: null,
+  intermediary3CompanyName: null,
+  intermediary3CompanySiret: null
 };

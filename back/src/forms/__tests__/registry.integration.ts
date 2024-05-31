@@ -1,6 +1,7 @@
 import {
   formFactory,
   formWithTempStorageFactory,
+  toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
@@ -274,6 +275,63 @@ describe("toAllWaste", () => {
     expect(wasteRegistry.initialEmitterCompanySiret).toBe(
       bdd.emitterCompanySiret
     );
+  });
+
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  // TODO
+  it("should contain intermediaries", async () => {
+    // Given
+    const user = await userFactory();
+    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary3 = await userWithCompanyFactory(UserRole.MEMBER);
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1.company),
+            toIntermediaryCompany(intermediary2.company),
+            toIntermediaryCompany(intermediary3.company)
+          ]
+        }
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.company.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.company.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.company.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.company.siret);
+    expect(waste.intermediary3CompanyName).toBe(intermediary3.company.name);
+    expect(waste.intermediary3CompanySiret).toBe(intermediary3.company.siret);
+  });
+
+  it("should not crash if no intermediaries", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({ ownerId: user.id });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste).not.toBeUndefined();
   });
 });
 

@@ -171,6 +171,23 @@ export const columns: Column[] = [
   { field: "brokerRecepisseNumber", label: "Courtier N°récepissé" },
   // Transport du déchet
 
+  // Intermédiaires
+  {
+    field: "intermediary1CompanyName",
+    label: "Intermédiaire n°1 - Raison sociale"
+  },
+  { field: "intermediary1CompanySiret", label: "Intermédiaire n°1 - SIRET" },
+  {
+    field: "intermediary2CompanyName",
+    label: "Intermédiaire n°2 - Raison sociale"
+  },
+  { field: "intermediary2CompanySiret", label: "Intermédiaire n°2 - SIRET" },
+  {
+    field: "intermediary3CompanyName",
+    label: "Intermédiaire n°3 - Raison sociale"
+  },
+  { field: "intermediary3CompanySiret", label: "Intermédiaire n°3 - SIRET" },
+
   {
     field: "transporterCustomInfo",
     label: "Champ libre transporteur"

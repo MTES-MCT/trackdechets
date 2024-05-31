@@ -1102,6 +1102,19 @@ type AllWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+
+  "Intermédiaire n°1 - Raison sociale"
+  intermediary1CompanyName: String
+  "Intermédiaire n°1 - SIRET"
+  intermediary1CompanySiret: String
+  "Intermédiaire n°2 - Raison sociale"
+  intermediary2CompanyName: String
+  "Intermédiaire n°2 - SIRET"
+  intermediary2CompanySiret: String
+  "Intermédiaire n°3 - Raison sociale"
+  intermediary3CompanyName: String
+  "Intermédiaire n°3 - SIRET"
+  intermediary3CompanySiret: String
 }
 
 type AllWasteEdge {

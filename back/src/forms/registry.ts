@@ -439,6 +439,15 @@ export function toAllWaste(
 
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
+  const intermediariesInfo: Record<string, string | null> = {
+    intermediary1CompanyName: bsdd.intermediaries?.[0]?.name ?? null,
+    intermediary1CompanySiret: bsdd.intermediaries?.[0]?.siret ?? null,
+    intermediary2CompanyName: bsdd.intermediaries?.[1]?.name ?? null,
+    intermediary2CompanySiret: bsdd.intermediaries?.[1]?.siret ?? null,
+    intermediary3CompanyName: bsdd.intermediaries?.[2]?.name ?? null,
+    intermediary3CompanySiret: bsdd.intermediaries?.[2]?.siret ?? null
+  };
+
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyAllWaste,
@@ -471,6 +480,7 @@ export function toAllWaste(
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     ...getOperationData(bsdd),
-    ...getFinalOperationsData(bsdd)
+    ...getFinalOperationsData(bsdd),
+    ...intermediariesInfo
   };
 }

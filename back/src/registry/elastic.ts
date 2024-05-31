@@ -82,6 +82,7 @@ export async function searchBsds(
 
 export const RegistryFormInclude = Prisma.validator<Prisma.FormInclude>()({
   forwarding: { include: { transporters: true } },
+  intermediaries: true,
   finalOperations: true,
   grouping: { include: { initialForm: { include: { transporters: true } } } },
   transporters: true
