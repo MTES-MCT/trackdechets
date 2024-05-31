@@ -317,8 +317,12 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
         "emitter-is-registered-for-appendix1-producer",
         "L'émetteur doit être inscrit sur Trackdéchets pour apparaitre sur une annexe 1 sans éco-organisme",
         async function (value) {
-          const { emitterType } = this.parent;
-          if (!value || emitterType !== EmitterType.APPENDIX1_PRODUCER) {
+          const { emitterType, ecoOrganismeSiret } = this.parent;
+          if (
+            !value ||
+            emitterType !== EmitterType.APPENDIX1_PRODUCER ||
+            ecoOrganismeSiret
+          ) {
             return true;
           }
 

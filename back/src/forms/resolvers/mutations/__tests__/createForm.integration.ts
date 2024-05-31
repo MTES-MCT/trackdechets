@@ -2402,5 +2402,40 @@ describe("Mutation.createForm", () => {
         })
       ]);
     });
+
+    it("should allow to create a APPENDIX1_PRODUCER form with an emitter that is not registered if there is an eco organisme", async () => {
+      const destination = await userWithCompanyFactory(UserRole.MEMBER);
+      const ecoOrganisme = await userWithCompanyFactory("MEMBER", {
+        companyTypes: {
+          set: ["ECO_ORGANISME"]
+        }
+      });
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<Pick<Mutation, "createForm">>(
+        CREATE_FORM,
+        {
+          variables: {
+            createFormInput: {
+              ecoOrganisme: {
+                name: ecoOrganisme.company.name,
+                siret: ecoOrganisme.company.siret
+              },
+              recipient: {
+                company: {
+                  siret: destination.company.siret
+                }
+              },
+              emitter: {
+                type: "APPENDIX1_PRODUCER",
+                company: {
+                  siret: "42172923700022"
+                }
+              }
+            }
+          }
+        }
+      );
+      expect(errors.length).toEqual(0);
+    });
   });
 });
