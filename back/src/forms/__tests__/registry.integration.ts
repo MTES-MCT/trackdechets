@@ -277,12 +277,7 @@ describe("toAllWaste", () => {
     );
   });
 
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  // TODO
-  it("should contain intermediaries", async () => {
+  it("should contain all 3 intermediaries", async () => {
     // Given
     const user = await userFactory();
     const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
@@ -316,6 +311,70 @@ describe("toAllWaste", () => {
     expect(waste.intermediary2CompanySiret).toBe(intermediary2.company.siret);
     expect(waste.intermediary3CompanyName).toBe(intermediary3.company.name);
     expect(waste.intermediary3CompanySiret).toBe(intermediary3.company.siret);
+  });
+
+  it("should work with only 1 intermediary", async () => {
+    // Given
+    const user = await userFactory();
+    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary1.company)]
+        }
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.company.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.company.siret);
+    expect(waste.intermediary2CompanyName).toBe(null);
+    expect(waste.intermediary2CompanySiret).toBe(null);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+
+  it("should work with 2 intermediaries", async () => {
+    // Given
+    const user = await userFactory();
+    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1.company),
+            toIntermediaryCompany(intermediary2.company)
+          ]
+        }
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.company.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.company.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.company.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.company.siret);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
   });
 
   it("should not crash if no intermediaries", async () => {
