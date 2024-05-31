@@ -1,4 +1,4 @@
-import { Company, Status } from "@prisma/client";
+import { Company, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import {
@@ -6,6 +6,7 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
@@ -13,6 +14,9 @@ import { getFirstTransporterSync, getFullForm } from "../database";
 import { getSiretsByTab } from "../elasticHelpers";
 import { getFormForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
+import { RegistryFormInclude, toPrismaBsds } from "../../registry/elastic";
+import { formToBsdd } from "../compat";
+import { toAllWaste } from "../registry";
 
 describe("getSiretsByTab", () => {
   afterEach(resetDatabase);
@@ -532,5 +536,41 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsd.companyOrgIds).toContain(
       forwardedInTransporter.vatNumber
     );
+  });
+});
+
+describe("toPrismaBsds", () => {
+  afterEach(resetDatabase);
+
+  it("BSDD should contain intermediaries", async () => {
+    // Given
+    const user = await userFactory();
+    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary3 = await userWithCompanyFactory(UserRole.MEMBER);
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1.company),
+            toIntermediaryCompany(intermediary2.company),
+            toIntermediaryCompany(intermediary3.company)
+          ]
+        }
+      }
+    });
+
+    // When
+    const formForElastic = await getFormForElastic(bsdd);
+    const elasticBsd = toBsdElastic(formForElastic);
+    const result = await toPrismaBsds([elasticBsd]);
+
+    // Then
+    expect(result).not.toBeUndefined();
+    expect(result.bsdds).not.toBeUndefined();
+    expect(result.bsdds.length).toEqual(1);
+    expect(result.bsdds[0].intermediaries).not.toBeUndefined();
+    expect(result.bsdds[0].intermediaries.length).toEqual(3);
   });
 });
