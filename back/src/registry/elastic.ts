@@ -95,6 +95,7 @@ export type RegistryForm = Prisma.FormGetPayload<{
 export const RegistryBsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
   grouping: true,
   forwarding: true,
+  intermediaries: true,
   transporters: true,
   finalOperations: true
 });

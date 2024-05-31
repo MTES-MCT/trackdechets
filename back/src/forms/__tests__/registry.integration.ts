@@ -391,6 +391,12 @@ describe("toAllWaste", () => {
 
     // Then
     expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(null);
+    expect(waste.intermediary1CompanySiret).toBe(null);
+    expect(waste.intermediary2CompanyName).toBe(null);
+    expect(waste.intermediary2CompanySiret).toBe(null);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
   });
 });
 
