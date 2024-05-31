@@ -10,11 +10,13 @@ type Props = {
   readonly hint?: string;
   // The variable path: eg; `destination.operation.weight`
   readonly path: string;
+  // The value to display
+  readonly value: string | number | React.ReactNode;
   // Value coming from revised bsd, allowing reset when component is closed
   readonly defaultValue: any;
   // Optional value to initialize children field value, useful for booleans
   readonly initialValue?: any;
-  readonly value: string | number | React.ReactNode;
+
   // is the field disabled
   readonly disabled?: boolean;
 
@@ -24,7 +26,6 @@ type Props = {
 const LabelContent = ({
   labelText,
   suffix,
-
   value
 }: {
   labelText: string;
@@ -46,11 +47,11 @@ const LabelContent = ({
 export function RhfReviewableField({
   title,
   suffix,
-  defaultValue,
   value,
+  defaultValue,
+  initialValue,
   path,
   hint,
-  initialValue,
 
   children,
   disabled = false
@@ -61,7 +62,6 @@ export function RhfReviewableField({
   function handleIsEditingChange() {
     if (isEditing) {
       // When toggling visibility to off, set children value to pre-existing value
-
       setValue(path, defaultValue);
     } else {
       // When toggling visibility to on, set children value to optional initialValue (to tell apart empty strings from boolean)

@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-
+import { BsdasriPackagingType } from "@td/codegen-ui";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { PACKAGINGS_NAMES } from "../../utils/packagings";
 
@@ -16,22 +16,39 @@ export const emptyPackaging = {
 
 const path = "destination.reception.packagings";
 
-const PaohPackaging = ({ idx, remove, disabled }) => {
-  const { register, getFieldState } = useFormContext();
+const BsdasriPackaging = ({ idx, remove, disabled }) => {
+  const { register, getFieldState, getValues, setValue } = useFormContext();
   const name = `${path}.${idx}`;
+  const packagingType = getValues(`${name}.type`);
 
+  useEffect(() => {
+    // reset `other` detail field when packaging type is not `Autre`
+    if (packagingType !== BsdasriPackagingType.Autre) {
+      setValue(`${name}.other`, "");
+    }
+  }, [packagingType, setValue, name]);
+
+  // can't manage to retrieve typesafe state through formState
+  const { error: quantityError } = getFieldState(`${name}.quantity`);
   const { error: typeError } = getFieldState(`${name}.type`);
+  const { error: volumeError } = getFieldState(`${name}.volume`);
+  const { error: otherError } = getFieldState(`${name}.other`);
 
   return (
     <div>
       {idx > 0 && <hr />}
-      <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-1v">
+      <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top fr-mb-1v">
         <div className="fr-col-12 fr-col-md-2">
           <Input
             label="Nombre de coli(s)"
+            state={quantityError && "error"}
+            stateRelatedMessage={(quantityError?.message as string) ?? ""}
             nativeInputProps={{
               defaultValue: 1,
-              ...register(`${name}.quantity`)
+              ...register(`${name}.quantity`),
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+              type: "number"
             }}
           />
         </div>
@@ -43,8 +60,6 @@ const PaohPackaging = ({ idx, remove, disabled }) => {
             state={typeError && "error"}
             stateRelatedMessage={(typeError?.message as string) ?? ""}
           >
-            <option value="">…</option>
-
             {(
               Object.entries(PACKAGINGS_NAMES) as Array<
                 [keyof typeof PACKAGINGS_NAMES, string]
@@ -59,6 +74,12 @@ const PaohPackaging = ({ idx, remove, disabled }) => {
         <div className="fr-col-12 fr-col-md-2">
           <Input
             label="Précisez"
+            disabled={
+              disabled ||
+              getValues(`${name}.type`) !== BsdasriPackagingType.Autre
+            }
+            state={otherError && "error"}
+            stateRelatedMessage={(otherError?.message as string) ?? ""}
             nativeInputProps={{
               defaultValue: "",
               ...register(`${name}.other`)
@@ -69,13 +90,15 @@ const PaohPackaging = ({ idx, remove, disabled }) => {
           <Input
             label="Volume unitaire (l)"
             disabled={disabled}
+            state={volumeError && "error"}
+            stateRelatedMessage={(volumeError?.message as string) ?? ""}
             nativeInputProps={{
               ...register(`${name}.volume`),
               inputMode: "numeric",
               pattern: "[0-9]*",
               type: "number"
             }}
-          ></Input>
+          />
         </div>
 
         <div className="fr-col-12 fr-col-md-1">
@@ -95,14 +118,16 @@ const PaohPackaging = ({ idx, remove, disabled }) => {
 };
 
 export const BsdasriPackagings = ({ disabled = false }) => {
+  const { control } = useFormContext(); // retrieve  control for initial values
   const { fields, append, remove } = useFieldArray({
+    control,
     name: path
   });
 
   return (
     <div>
       {fields.map((packaging, index) => (
-        <PaohPackaging
+        <BsdasriPackaging
           idx={index}
           key={packaging.id}
           remove={remove}
