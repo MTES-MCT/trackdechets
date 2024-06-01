@@ -515,7 +515,7 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it("should mark a form as NO_TRACEABILITY when user declares it and with non-french EU destination", async () => {
+  it("should mark a form as NO_TRACEABILITY when user declares it, next destination is not provided and notificationNumber is missing", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -537,11 +537,9 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true,
           nextDestination: {
-            notificationNumber: "abc",
-            processingOperation: "D 1",
-            company: {
-              vatNumber: "IE9513674T"
-            }
+            processingOperation: "D 1"
+            // next destination is not provided
+            // notification number not provided
           }
         }
       }
@@ -678,6 +676,7 @@ describe("mutation.markAsProcessed", () => {
           nextDestination: {
             processingOperation: "D 1",
             company: null
+            // no notification number
           }
         }
       }
