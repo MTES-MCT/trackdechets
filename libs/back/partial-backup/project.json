@@ -40,7 +40,8 @@
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "partial-backup:build"
+        "buildTarget": "partial-backup:build",
+        "watch": false
       },
       "configurations": {
         "development": {
