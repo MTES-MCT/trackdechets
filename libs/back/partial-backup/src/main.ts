@@ -237,7 +237,7 @@ const run = async () => {
   }
 
   print(`DUMP COMPLETE!`);
-  console.log("What will be copied :");
+  console.log("\n\nWhat will be copied :");
   console.log(statsByType);
 
   // console.log(statsByType);
