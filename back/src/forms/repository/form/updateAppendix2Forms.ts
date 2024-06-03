@@ -11,6 +11,8 @@ type FormForUpdateAppendix2Forms = Form & FormWithForwardedIn;
 
 export const FormForUpdateAppendix2FormsInclude = FormWithForwardedInInclude;
 
+const DECIMAL_WEIGHT_PRECISION = 6; // gramme
+
 export type UpdateAppendix2Forms = (
   forms: FormForUpdateAppendix2Forms[]
 ) => Promise<void>;
@@ -46,7 +48,7 @@ const buildUpdateAppendix2Forms: (
         .filter(grp => grp.initialFormId === form.id)
         .map(grp => grp.quantity)
         .reduce((prev, cur) => prev + cur, 0) ?? 0
-    ).toDecimalPlaces(6); // set precision to gramme
+    ).toDecimalPlaces(DECIMAL_WEIGHT_PRECISION); // set precision to gramme
 
     quantitGroupedByFormId[form.id] = quantityGrouped.toNumber();
 
@@ -54,9 +56,12 @@ const buildUpdateAppendix2Forms: (
       .filter(grp => grp.initialFormId === form.id)
       .map(g => g.nextForm);
 
+    // on a quelques quantityReceived avec des décimales au delà du gramme
     const groupedInTotality =
       quantityReceived &&
-      quantityGrouped.greaterThanOrEqualTo(quantityReceived); // case > should not happen
+      quantityGrouped.greaterThanOrEqualTo(
+        new Decimal(quantityReceived).toDecimalPlaces(DECIMAL_WEIGHT_PRECISION) // limit precision to circumvent rogue decimal digits
+      ); // case > should not happen
 
     const allSealed =
       groupementForms.length &&
