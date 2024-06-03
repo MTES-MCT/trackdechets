@@ -106,7 +106,7 @@ export function getRegistryFields(
 
 export const getSubType = (bsff: RegistryBsff): BsdSubType => {
   if (bsff.type === "GROUPEMENT") {
-    return "GATHERING";
+    return "GROUPEMENT";
   } else if (bsff.type === "RECONDITIONNEMENT") {
     return "RECONDITIONNEMENT";
   } else if (bsff.type === "REEXPEDITION") {
