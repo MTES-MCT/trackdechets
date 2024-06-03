@@ -166,7 +166,9 @@ describe("simpleFormToBsdd", () => {
       forwardedInId: null,
       forwarding: null,
       grouping: [],
-      finalOperations: []
+      finalOperations: [],
+      nextDestinationNotificationNumber: null,
+      nextDestinationProcessingOperation: null
     });
   });
 
@@ -274,6 +276,8 @@ describe("simpleFormToBsdd", () => {
       updatedAt: fullForwardedInForm.updatedAt,
       isDeleted: fullForwardedInForm.isDeleted,
       isDraft: fullForwardedInForm.status === "DRAFT",
+      nextDestinationNotificationNumber: null,
+      nextDestinationProcessingOperation: null,
       status: fullForwardedInForm.status,
       wasteCode: fullForwardedInForm.wasteDetailsCode,
       wasteIsDangerous: true,
@@ -560,6 +564,8 @@ describe("simpleFormToBsdd", () => {
         destinationOperationNextDestinationCompanyPhone: null,
         destinationOperationNextDestinationCompanyMail: null,
         forwardedInId: fullForwardedInForm.id,
+        nextDestinationNotificationNumber: null,
+        nextDestinationProcessingOperation: null,
         grouping: []
       }
     });
