@@ -168,7 +168,9 @@ export function simpleFormToBsdd(
     destinationOperationNextDestinationCompanyPhone:
       form.nextDestinationCompanyPhone,
     destinationOperationNextDestinationCompanyMail:
-      form.nextDestinationCompanyMail
+      form.nextDestinationCompanyMail,
+    nextDestinationNotificationNumber: form.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: form.nextDestinationProcessingOperation
   };
 }
 

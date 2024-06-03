@@ -251,7 +251,9 @@ export function toIncomingWaste(
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
     destinationCustomInfo: null,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    ...getOperationData(bsdd)
+    ...getOperationData(bsdd),
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
 
@@ -298,7 +300,9 @@ export function toOutgoingWaste(
     emitterCustomInfo: null,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     ...getOperationData(bsdd),
-    ...getFinalOperationsData(bsdd)
+    ...getFinalOperationsData(bsdd),
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
 
@@ -411,7 +415,9 @@ export function toManagedWaste(
     ]),
     ...initialEmitter,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
 
@@ -471,6 +477,8 @@ export function toAllWaste(
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     ...getOperationData(bsdd),
-    ...getFinalOperationsData(bsdd)
+    ...getFinalOperationsData(bsdd),
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
