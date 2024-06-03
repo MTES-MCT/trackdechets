@@ -110,7 +110,7 @@ describe("getSubType", () => {
   it.each([
     [BsffType.COLLECTE_PETITES_QUANTITES, "INITIAL"],
     [BsffType.TRACER_FLUIDE, "INITIAL"],
-    [BsffType.GROUPEMENT, "GATHERING"],
+    [BsffType.GROUPEMENT, "GROUPEMENT"],
     [BsffType.RECONDITIONNEMENT, "RECONDITIONNEMENT"],
     [BsffType.REEXPEDITION, "RESHIPMENT"]
   ])("type is %p > should return %p", async (type, expectedSubType) => {
