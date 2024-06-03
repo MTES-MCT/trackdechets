@@ -1,9 +1,38 @@
-import { getSubType, toAllWaste, toOutgoingWaste } from "../registry";
+import {
+  getSubType,
+  toAllWaste,
+  toIncomingWaste,
+  toManagedWaste,
+  toOutgoingWaste
+} from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryBsdaInclude } from "../../registry/elastic";
 import { bsdaFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { BsdaType } from "@prisma/client";
+
+describe("toIncomingWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain next destination operation code", async () => {
+    // Given
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationOperationNextDestinationPlannedOperationCode: "D9"
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toIncomingWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+});
 
 describe("toOutgoingWaste", () => {
   afterAll(resetDatabase);
@@ -47,6 +76,48 @@ describe("toOutgoingWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
     }
   );
+
+  it("should contain next destination operation code", async () => {
+    // Given
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationOperationNextDestinationPlannedOperationCode: "D9"
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toOutgoingWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+});
+
+describe("toManagedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain next destination operation code", async () => {
+    // Given
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationOperationNextDestinationPlannedOperationCode: "D9"
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toManagedWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
 });
 
 describe("toAllWaste", () => {
@@ -89,6 +160,25 @@ describe("toAllWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
     }
   );
+
+  it("should contain next destination operation code", async () => {
+    // Given
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationOperationNextDestinationPlannedOperationCode: "D9"
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
 });
 
 describe("getSubType", () => {
