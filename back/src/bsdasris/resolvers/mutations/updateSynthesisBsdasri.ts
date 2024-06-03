@@ -73,29 +73,25 @@ const updateSynthesisBsdasri = async ({
   }
 
   if (inputSynthesizing !== undefined) {
+    if (dbBsdasri.status !== BsdasriStatus.INITIAL) {
+      throw new UserInputError(
+        "Les bordereaux associés à ce bsd ne sont plus modifiables"
+      );
+    }
     // Forbid empty associated dasris
     if (!inputSynthesizing?.length) {
       throw new UserInputError(
         "Un bordereau de synthèse doit comporter des bordereaux associés"
       );
     }
+  }
+
+  if (!!inputSynthesizing?.length) {
     // filter dasris already associated to current dasri
     const newDasrisToAssociate = inputSynthesizing.filter(
       el => !dbSynthesizing.map(el => el.id).includes(el)
     );
-    // there is a difference between existing synthesised DASRIs and input
-    // if there are new ones or some were removed.
-    // checking if there are new ones or the arrays are of different size is equivalent
-    // but less costly
-    const hasSynthesisDiff =
-      newDasrisToAssociate.length > 0 ||
-      inputSynthesizing.length !== dbSynthesizing.length;
-
-    if (hasSynthesisDiff && dbBsdasri.status !== BsdasriStatus.INITIAL) {
-      throw new UserInputError(
-        "Les bordereaux associés à ce bsd ne sont plus modifiables"
-      );
-    }
+    // check associated dasris meet eligibility criteria
     await getEligibleDasrisForSynthesis(newDasrisToAssociate, dbBsdasri);
   }
 
