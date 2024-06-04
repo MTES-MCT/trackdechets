@@ -505,11 +505,11 @@ const traversals = {
       localKey: "id",
       foreignKey: "adminId"
     },
-    {
-      type: "CompanyAssociation",
-      localKey: "id",
-      foreignKey: "userId"
-    },
+    // {
+    //   type: "CompanyAssociation",
+    //   localKey: "id",
+    //   foreignKey: "userId"
+    // },
     {
       type: "FeatureFlag",
       localKey: "id",
