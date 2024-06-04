@@ -99,8 +99,8 @@ describe("query { myCompaniesXls }", () => {
       "SIRET ou n° de TVA intracommunautaire": company1.orgId,
       "Raison sociale": company1.name,
       "Nom usuel de l'établissement": company1.givenName,
-      "Nom et prénom": user1.name,
-      "E-mail": user1.email,
+      "Nom et prénom du membre": user1.name,
+      "E-mail du membre": user1.email,
       "Date d'ajout du membre": formatDate(association1.createdAt),
       Rôle: formatRole(association1.role)
     });
@@ -108,8 +108,8 @@ describe("query { myCompaniesXls }", () => {
       "SIRET ou n° de TVA intracommunautaire": company1.orgId,
       "Raison sociale": company1.name,
       "Nom usuel de l'établissement": company1.givenName,
-      "Nom et prénom": user2.name,
-      "E-mail": user2.email,
+      "Nom et prénom du membre": user2.name,
+      "E-mail du membre": user2.email,
       "Date d'ajout du membre": formatDate(association2.createdAt),
       Rôle: formatRole(association2.role)
     });
@@ -117,8 +117,8 @@ describe("query { myCompaniesXls }", () => {
       "SIRET ou n° de TVA intracommunautaire": company2.orgId,
       "Raison sociale": company2.name,
       "Nom usuel de l'établissement": company2.givenName,
-      "Nom et prénom": user1.name,
-      "E-mail": user1.email,
+      "Nom et prénom du membre": user1.name,
+      "E-mail du membre": user1.email,
       "Date d'ajout du membre": formatDate(association3.createdAt),
       Rôle: formatRole(association3.role)
     });
@@ -126,8 +126,8 @@ describe("query { myCompaniesXls }", () => {
       "SIRET ou n° de TVA intracommunautaire": company2.orgId,
       "Raison sociale": company2.name,
       "Nom usuel de l'établissement": company2.givenName,
-      "Nom et prénom": user3.name,
-      "E-mail": user3.email,
+      "Nom et prénom du membre": user3.name,
+      "E-mail du membre": user3.email,
       "Date d'ajout du membre": formatDate(association4.createdAt),
       Rôle: formatRole(association4.role)
     });
