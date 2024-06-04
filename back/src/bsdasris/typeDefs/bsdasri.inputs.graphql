@@ -315,3 +315,69 @@ input BsdasriSignatureWithSecretCodeInput {
   "Dénomination de l'auteur de la signature, par défaut il s'agit de l'émetteur"
   signatureAuthor: SignatureAuthor
 }
+
+"Payload de révision d'un bordereau."
+input CreateBsdasriRevisionRequestInput {
+  "Identifiant du bordereau à réviser"
+  bsdasriId: ID!
+  "Numéro SIRET du demandeur"
+  authoringCompanySiret: String!
+  "Contenu de la révision"
+  content: BsdasriRevisionRequestContentInput!
+  "Commentaire pour expliquer la demande de révision"
+  comment: String!
+}
+
+"Payload de révision d'un bordereau. Disponible sur une liste restreinte de champs."
+input BsdasriRevisionRequestContentInput {
+  "Maitre d'ouvrage ou détenteur du déchet"
+  emitter: BsdasriRevisionRequestEmitterInput
+
+  "Installation de destination"
+  destination: BsdasriRevisionRequestDestinationInput
+
+  "Description du déchet"
+  waste: BsdasriRevisionRequestWasteInput
+
+  "NON ACTIF  Annuler le bordereau. Exclusif des autres opérations. "
+  isCanceled: Boolean
+}
+
+input BsdasriRevisionRequestEmitterInput {
+  "Informations chantier (si différente de l'adresse de l'entreprise)"
+  pickupSite: PickupSiteInput
+}
+
+input BsdasriRevisionRequestDestinationInput {
+  "Réception"
+  reception: BsdasriRevisionRequestReceptionInput
+  "Réalisation du traitement"
+  operation: BsdasriRevisionRequestOperationInput
+}
+
+input BsdasriRevisionRequestOperationInput {
+  "Poids présenté"
+  weight: Float
+  "Code D/R"
+  code: String
+
+  "Mode de traitement"
+  mode: OperationMode
+}
+
+input BsdasriRevisionRequestReceptionInput {
+  "Conditionnement"
+  packagings: [BsdasriPackagingsInput!]
+}
+
+input BsdasriRevisionRequestWasteInput {
+  "Rubrique Déchet"
+  code: String
+}
+
+input BsdasriRevisionRequestWhere {
+  "Permet de filtrer sur un statut de demande de révision"
+  status: RevisionRequestStatus
+  "Permet de filtrer sur un numéro de bordereau"
+  bsdasriId: StringFilter
+}

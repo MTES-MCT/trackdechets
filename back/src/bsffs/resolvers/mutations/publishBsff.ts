@@ -14,6 +14,7 @@ import {
   getBsffPackagingRepository,
   getBsffRepository
 } from "../../repository";
+import { BsffWithTransportersInclude } from "../../types";
 
 const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   _,
@@ -66,6 +67,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
     where: {
       id: existingBsff.id
     },
+    include: BsffWithTransportersInclude,
     data: {
       isDraft: false
     }

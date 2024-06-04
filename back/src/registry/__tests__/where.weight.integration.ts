@@ -220,26 +220,42 @@ describe("toElasticFilter", () => {
   it("should filter BSFFs between two reception weights (strict)", async () => {
     const bsff1 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 1, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 1,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     const bsff2 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 2, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 2,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     const bsff3 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 3, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 3,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     const bsff4 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 4, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 4,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     await Promise.all(
@@ -450,26 +466,42 @@ describe("toElasticFilter", () => {
   it("should filter BSFFs between two reception weights (not strict)", async () => {
     const bsff1 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 1, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 1,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     const bsff2 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 2, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 2,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     const bsff3 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 3, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 3,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     const bsff4 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 4, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 4,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     await Promise.all(
@@ -673,26 +705,42 @@ describe("toElasticFilter", () => {
   it("should filter BSFFs on reception weight (exact)", async () => {
     const bsff1 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 1, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 1,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     const bsff2 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 2, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 2,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     const bsff3 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 3, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 3,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     const bsff4 = await createBsff(
       {},
-      {},
-      { acceptationWeight: 4, acceptationSignatureDate: new Date() }
+      {
+        packagingData: {
+          acceptationWeight: 4,
+          acceptationSignatureDate: new Date()
+        }
+      }
     );
 
     await Promise.all(

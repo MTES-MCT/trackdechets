@@ -4,6 +4,7 @@ import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
+  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -11,6 +12,7 @@ import {
 } from "../generated/graphql/types";
 import {
   GenericWaste,
+  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -53,12 +55,6 @@ const getTransporterData = (bsdasri: Bsdasri) => ({
   transporterTakenOverAt: bsdasri.transporterTakenOverAt
 });
 
-type RegistryFields =
-  | "isIncomingWasteFor"
-  | "isOutgoingWasteFor"
-  | "isTransportedWasteFor"
-  | "isManagedWasteFor";
-
 export function getRegistryFields(
   bsdasri: Bsdasri
 ): Pick<BsdElastic, RegistryFields> {
@@ -66,19 +62,26 @@ export function getRegistryFields(
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
-    isManagedWasteFor: []
+    isManagedWasteFor: [],
+    isAllWasteFor: []
   };
 
   if (bsdasri.transporterTransportSignatureDate) {
+    if (bsdasri.destinationCompanySiret) {
+      registryFields.isAllWasteFor.push(bsdasri.destinationCompanySiret);
+    }
     if (bsdasri.emitterCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsdasri.emitterCompanySiret);
+      registryFields.isAllWasteFor.push(bsdasri.emitterCompanySiret);
     }
     if (bsdasri.ecoOrganismeSiret) {
       registryFields.isOutgoingWasteFor.push(bsdasri.ecoOrganismeSiret);
+      registryFields.isAllWasteFor.push(bsdasri.ecoOrganismeSiret);
     }
     const transporterCompanyOrgId = getTransporterCompanyOrgId(bsdasri);
     if (transporterCompanyOrgId) {
       registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+      registryFields.isAllWasteFor.push(transporterCompanyOrgId);
     }
   }
 
@@ -91,6 +94,17 @@ export function getRegistryFields(
 
   return registryFields;
 }
+
+export const getSubType = (bsdasri: Bsdasri): BsdSubType => {
+  switch (bsdasri.type) {
+    case "SIMPLE":
+      return "INITIAL";
+    case "SYNTHESIS":
+      return "SYNTHESIS";
+    case "GROUPING":
+      return "GATHERING";
+  }
+};
 
 function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
   return {
@@ -106,6 +120,7 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     ecoOrganismeName: bsdasri.ecoOrganismeName,
     ecoOrganismeSiren: bsdasri.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDASRI",
+    bsdSubType: getSubType(bsdasri),
     status: bsdasri.status,
     customId: null,
     destinationCap: null,

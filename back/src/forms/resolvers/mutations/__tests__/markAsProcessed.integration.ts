@@ -17,6 +17,7 @@ import {
   MutationMarkAsProcessedArgs
 } from "../../../../generated/graphql/types";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
+import { ErrorCode } from "../../../../common/errors";
 
 jest.mock("axios", () => ({
   default: {
@@ -171,6 +172,7 @@ describe("mutation.markAsProcessed", () => {
         recipientCompanySiret: company.siret
       }
     });
+    const nextDestination = await companyFactory();
 
     const { mutate } = makeClient(user);
     await mutate(MARK_AS_PROCESSED, {
@@ -185,7 +187,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              siret: siretify(3),
+              siret: nextDestination.siret,
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
@@ -204,6 +206,52 @@ describe("mutation.markAsProcessed", () => {
     expect(updatedForm.recipientIsTempStorage).toEqual(false);
     expect(updatedForm.forwardedInId).toBeNull();
     expect(updatedForm.status).toEqual("AWAITING_GROUP");
+  });
+
+  it("should fail to mark a form with temporary storage as FOLLOWED_WITH_PNTTD if notification number is missing", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            // No notificationNumber
+            company: {
+              mail: "m@m.fr",
+              siret: null,
+              vatNumber: "IE9513674T",
+              country: "IE",
+              name: "IE company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Destination ultérieure : le numéro de notification est obligatoire"
+      })
+    ]);
   });
 
   it("should mark a form with temporary storage as FOLLOWED_WITH_PNTTD and delete BSD suite", async () => {
@@ -228,6 +276,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
             processingOperation: "D 1",
+            notificationNumber: "xyz",
             company: {
               mail: "m@m.fr",
               siret: null,
@@ -342,6 +391,7 @@ describe("mutation.markAsProcessed", () => {
         recipientCompanySiret: company.siret
       }
     });
+    const nextDestination = await companyFactory();
 
     const { mutate } = makeClient(user);
     await mutate(MARK_AS_PROCESSED, {
@@ -356,7 +406,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              siret: siretify(3),
+              siret: nextDestination.siret,
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
@@ -433,7 +483,7 @@ describe("mutation.markAsProcessed", () => {
         recipientCompanySiret: company.siret
       }
     });
-
+    const nextDestination = await companyFactory();
     const { mutate } = makeClient(user);
     await mutate(MARK_AS_PROCESSED, {
       variables: {
@@ -448,7 +498,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              siret: siretify(3),
+              siret: nextDestination.siret,
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
@@ -465,7 +515,7 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it("should mark a form as NO_TRACEABILITY when user declares it and with non-french EU destination", async () => {
+  it("should mark a form as NO_TRACEABILITY when user declares it, next destination is not provided and notificationNumber is missing", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -487,10 +537,9 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true,
           nextDestination: {
-            processingOperation: "D 1",
-            company: {
-              vatNumber: "IE9513674T"
-            }
+            processingOperation: "D 1"
+            // next destination is not provided
+            // notification number not provided
           }
         }
       }
@@ -501,6 +550,68 @@ describe("mutation.markAsProcessed", () => {
     });
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
+
+  it.each([
+    {
+      wasteDetailsCode: "05 01 12*",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: false
+    },
+    {
+      wasteDetailsCode: "05 01 13",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: true
+    },
+    {
+      wasteDetailsCode: "05 01 13",
+      wasteDetailsPop: true,
+      wasteDetailsIsDangerous: false
+    }
+  ])(
+    "should fail to mark a form as NO_TRACEABILITY when user declares it and with non-french EU destination if notificationNumber is missing",
+    async ({ wasteDetailsCode, wasteDetailsPop, wasteDetailsIsDangerous }) => {
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "ACCEPTED",
+          recipientCompanyName: company.name,
+          recipientCompanySiret: company.siret,
+          wasteDetailsCode,
+          wasteDetailsPop,
+          wasteDetailsIsDangerous
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 13",
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z",
+            noTraceability: true,
+            nextDestination: {
+              //  missing notificationNumber
+              processingOperation: "D 1",
+              company: {
+                vatNumber: "IE9513674T"
+              }
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Destination ultérieure : le numéro de notification est obligatoire"
+        })
+      ]);
+    }
+  );
 
   it("should mark a form as NO_TRACEABILITY when user declares it and with foreign extraEuropean destination, with optional company infos", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -565,6 +676,7 @@ describe("mutation.markAsProcessed", () => {
           nextDestination: {
             processingOperation: "D 1",
             company: null
+            // no notification number
           }
         }
       }
@@ -586,7 +698,7 @@ describe("mutation.markAsProcessed", () => {
         recipientCompanySiret: company.siret
       }
     });
-
+    const nextDestination = await companyFactory();
     const { mutate } = makeClient(user);
     await mutate(MARK_AS_PROCESSED, {
       variables: {
@@ -600,7 +712,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              siret: siretify(4),
+              siret: nextDestination.siret,
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
@@ -619,6 +731,326 @@ describe("mutation.markAsProcessed", () => {
       nextDestinationCompanyCountry: "FR"
     });
   });
+
+  it.each([
+    {
+      wasteDetailsCode: "05 01 04*",
+      wasteDetailsIsDangerous: false,
+      wasteDetailsPop: false
+    },
+    {
+      wasteDetailsCode: "05 01 04",
+      wasteDetailsIsDangerous: true,
+      wasteDetailsPop: false
+    },
+    {
+      wasteDetailsCode: "05 01 04",
+      wasteDetailsIsDangerous: false,
+      wasteDetailsPop: true
+    }
+  ])(
+    "should require nextDestination to be registered when noTraceability is false and: %o",
+    async ({ wasteDetailsCode, wasteDetailsIsDangerous, wasteDetailsPop }) => {
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "ACCEPTED",
+          recipientCompanyName: company.name,
+          recipientCompanySiret: company.siret,
+          wasteDetailsCode,
+          wasteDetailsIsDangerous,
+          wasteDetailsPop
+        }
+      });
+      const nextDestinationSiret = siretify(4);
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 14",
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z",
+
+            nextDestination: {
+              processingOperation: "D 1",
+              company: {
+                mail: "m@m.fr",
+                siret: nextDestinationSiret,
+                name: "company",
+                phone: "0101010101",
+                contact: "The famous bot",
+                address: "A beautiful place..."
+              }
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Destination ultérieure prévue : l'établissement avec le SIRET ${nextDestinationSiret} n'est pas inscrit sur Trackdéchets`,
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
+        })
+      ]);
+      const resultingForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
+      expect(resultingForm).toMatchObject({
+        status: "ACCEPTED",
+        nextDestinationCompanyCountry: null
+      });
+    }
+  );
+
+  it("should require nextDestination to be a valid siret before checking if company is registered", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        wasteDetailsCode: "05 01 04*",
+        wasteDetailsIsDangerous: false,
+        wasteDetailsPop: false
+      }
+    });
+    const nextDestinationSiret = "1234";
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: nextDestinationSiret,
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          `Destination ultérieure prévue: ${nextDestinationSiret} n'est pas un numéro de SIRET valide\n` +
+          `Destination ultérieure prévue : l'établissement avec le SIRET ${nextDestinationSiret} n'est pas inscrit sur Trackdéchets`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it.each([
+    {
+      wasteDetailsCode: "05 01 04*",
+      wasteDetailsIsDangerous: false,
+      wasteDetailsPop: false
+    },
+    {
+      wasteDetailsCode: "05 01 04",
+      wasteDetailsIsDangerous: true,
+      wasteDetailsPop: false
+    },
+    {
+      wasteDetailsCode: "05 01 04",
+      wasteDetailsIsDangerous: false,
+      wasteDetailsPop: true
+    }
+  ])(
+    "should not require nextDestination to be registered when noTraceability is true and: %o",
+    async ({ wasteDetailsCode, wasteDetailsIsDangerous, wasteDetailsPop }) => {
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "ACCEPTED",
+          recipientCompanyName: company.name,
+          recipientCompanySiret: company.siret,
+          wasteDetailsCode,
+          wasteDetailsIsDangerous,
+          wasteDetailsPop
+        }
+      });
+      const nextDestinationSiret = siretify(4);
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 14",
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z",
+            noTraceability: true,
+
+            nextDestination: {
+              processingOperation: "D 1",
+              company: {
+                mail: "m@m.fr",
+                siret: nextDestinationSiret,
+                name: "company",
+                phone: "0101010101",
+                contact: "The famous bot",
+                address: "A beautiful place..."
+              }
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual(undefined);
+
+      const resultingForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
+      expect(resultingForm).toMatchObject({
+        status: "NO_TRACEABILITY",
+        nextDestinationCompanyCountry: "FR"
+      });
+    }
+  );
+
+  it("should check nextDestination siret format when noTraceability is true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        wasteDetailsCode: "05 01 04*",
+        wasteDetailsIsDangerous: false,
+        wasteDetailsPop: false
+      }
+    });
+    const nextDestinationSiret = "12345";
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          noTraceability: true,
+
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: nextDestinationSiret,
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Destination ultérieure prévue: ${nextDestinationSiret} n'est pas un numéro de SIRET valide`,
+
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it.each([
+    {
+      wasteDetailsCode: "05 01 04*",
+      wasteDetailsIsDangerous: false,
+      wasteDetailsPop: false
+    },
+    {
+      wasteDetailsCode: "05 01 04",
+      wasteDetailsIsDangerous: true,
+      wasteDetailsPop: false
+    },
+    {
+      wasteDetailsCode: "05 01 04",
+      wasteDetailsIsDangerous: false,
+      wasteDetailsPop: true
+    }
+  ])(
+    "should not require nextDestination to be registered when next destination is foreign and: %o",
+    async ({ wasteDetailsCode, wasteDetailsIsDangerous, wasteDetailsPop }) => {
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "ACCEPTED",
+          recipientCompanyName: company.name,
+          recipientCompanySiret: company.siret,
+          wasteDetailsCode,
+          wasteDetailsIsDangerous,
+          wasteDetailsPop
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 14",
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z",
+
+            nextDestination: {
+              processingOperation: "D 1",
+              notificationNumber: "GB 2000 123456",
+              company: {
+                mail: "m@m.fr",
+                siret: null,
+                vatNumber: "IE9513674T",
+                country: "IE",
+                name: "IE company",
+                phone: "0101010101",
+                contact: "The famous bot",
+                address: "A beautiful place..."
+              }
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual(undefined);
+
+      const resultingForm = await prisma.form.findUnique({
+        where: { id: form.id }
+      });
+      expect(resultingForm).toMatchObject({
+        status: "FOLLOWED_WITH_PNTTD",
+        nextDestinationCompanyCountry: "IE"
+      });
+    }
+  );
 
   it("should mark a form FOLLOWED_WITH_PNTTD with foreign next destination", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -642,6 +1074,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
             processingOperation: "D 1",
+            notificationNumber: "xyz",
             company: {
               mail: "m@m.fr",
               siret: null,
@@ -684,10 +1117,12 @@ describe("mutation.markAsProcessed", () => {
         processedInfo: {
           processingOperationDescription: "Une description",
           processingOperationDone: "D 14",
+
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
             processingOperation: "D 1",
+            notificationNumber: "abc",
             company: {
               mail: "m@m.fr",
               siret: null,
@@ -732,6 +1167,7 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           nextDestination: {
             processingOperation: "D 1",
+            notificationNumber: "xyz",
             company: {
               mail: "m@m.fr",
               siret: null,
@@ -1171,7 +1607,72 @@ describe("mutation.markAsProcessed", () => {
     ]);
   });
 
-  test("nextDestinationNotificationNumber should be mandatory when noTraceability is true and wasteCode is dangerous", async () => {
+  it.each([
+    {
+      wasteDetailsCode: "07 07 07*",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: false
+    },
+    {
+      wasteDetailsCode: "05 01 13",
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: true
+    },
+    {
+      wasteDetailsCode: "05 01 13",
+      wasteDetailsPop: true,
+      wasteDetailsIsDangerous: false
+    }
+  ])(
+    "nextDestinationNotificationNumber should be mandatory when noTraceability is true and wasteCode is considered as dangerous. %o",
+    async ({ wasteDetailsCode, wasteDetailsPop, wasteDetailsIsDangerous }) => {
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "ACCEPTED",
+          recipientCompanyName: company.name,
+          recipientCompanySiret: company.siret,
+          wasteDetailsCode,
+          wasteDetailsPop,
+          wasteDetailsIsDangerous
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "markAsProcessed">,
+        MutationMarkAsProcessedArgs
+      >(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 14",
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z" as any,
+            noTraceability: true,
+            nextDestination: {
+              processingOperation: "D 1",
+              company: {
+                extraEuropeanId: "AZERTY"
+              }
+              //  missing notificationNumber
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Destination ultérieure : le numéro de notification est obligatoire"
+        })
+      ]);
+    }
+  );
+
+  it("nextDestinationNotificationNumber should have the right format when noTraceability is true and wasteCode is considered as dangerous.", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -1179,7 +1680,7 @@ describe("mutation.markAsProcessed", () => {
         status: "ACCEPTED",
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        wasteDetailsCode: "07 07 07*"
+        wasteDetailsCode: "07 07 07*" // dangerous
       }
     });
 
@@ -1201,7 +1702,7 @@ describe("mutation.markAsProcessed", () => {
             company: {
               extraEuropeanId: "AZERTY"
             },
-            notificationNumber: "123456AZERTY1234" // too long
+            notificationNumber: "longlonglonglong"
           }
         }
       }
@@ -1215,7 +1716,7 @@ describe("mutation.markAsProcessed", () => {
     ]);
   });
 
-  test("nextDestinationNotificationNumber should not be mandatory when wasteCode is not dangerous", async () => {
+  test("nextDestinationNotificationNumber should not be mandatory when wasteCode is not conisdered as dangerous", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -1223,7 +1724,10 @@ describe("mutation.markAsProcessed", () => {
         status: "ACCEPTED",
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        wasteDetailsCode: "07 07 07"
+        // no pop, no *, no isDangerous
+        wasteDetailsCode: "07 07 07",
+        wasteDetailsIsDangerous: false,
+        wasteDetailsPop: false
       }
     });
 

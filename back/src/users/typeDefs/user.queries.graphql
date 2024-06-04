@@ -20,6 +20,20 @@ type Query {
   ): CompanyPrivateConnection!
 
   """
+  Export CSV de la liste des établissements de l'utilisateur authentifié et
+  de tous les utilisateurs appartenant à ces établissements (une ligne par établissement
+  et par utilisateur)
+  """
+  myCompaniesCsv: FileDownload
+
+  """
+  Export Excel de la liste des établissements de l'utilisateur authentifié et
+  de tous les utilisateurs appartenant à ces établissements (une ligne par établissement
+  et par utilisateur)
+  """
+  myCompaniesXls: FileDownload
+
+  """
   Récupère une demande de rattachement effectuée par l'utilisateur courant
   à partir de l'identifiant de cette demande ou du SIRET de l'établissement
   auquel l'utilisateur a demandé à être rattaché. L'un ou l'autre des

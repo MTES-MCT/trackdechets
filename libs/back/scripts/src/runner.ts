@@ -36,7 +36,7 @@ async function runScripts() {
   const newScripts = scriptFiles.filter(file => {
     const fileInfo = parse(file);
 
-    if (fileInfo.ext !== "ts") {
+    if (fileInfo.ext !== ".ts") {
       throw new Error("❌ Only .ts files are supported for migration scripts");
     }
 
@@ -62,31 +62,36 @@ async function runScripts() {
     const fileName = parse(file).name;
     console.info(`⌛️ Running script "${fileName}"`);
 
-    await prisma.$transaction(async tx => {
-      const migrationScript = await tx.migrationScript.create({
-        data: {
-          name: fileName,
-          startedAt: new Date()
+    await prisma.$transaction(
+      async tx => {
+        const migrationScript = await tx.migrationScript.create({
+          data: {
+            name: fileName,
+            startedAt: new Date()
+          }
+        });
+
+        try {
+          await scriptModule.run(tx);
+
+          await tx.migrationScript.update({
+            where: { id: migrationScript.id },
+            data: { finishedAt: new Date() }
+          });
+          console.log(`✅ Completed execution of "${fileName}"`);
+        } catch (error) {
+          console.error(`🚨 Error executing script "${fileName}"`, error);
+
+          await tx.migrationScript.update({
+            where: { id: migrationScript.id },
+            data: { error: String(error) }
+          });
         }
-      });
-
-      try {
-        await scriptModule.run(tx);
-
-        await tx.migrationScript.update({
-          where: { id: migrationScript.id },
-          data: { finishedAt: new Date() }
-        });
-        console.log(`✅ Completed execution of "${fileName}"`);
-      } catch (error) {
-        console.error(`🚨 Error executing script "${fileName}"`, error);
-
-        await tx.migrationScript.update({
-          where: { id: migrationScript.id },
-          data: { error: String(error) }
-        });
+      },
+      {
+        timeout: 600_000
       }
-    });
+    );
   }
 
   console.info("✅ Data migrations completed.");

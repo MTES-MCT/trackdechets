@@ -8,6 +8,7 @@ import { BsdType, FormCompany } from "../generated/graphql/types";
 import {
   BsdaRevisionRequest,
   BsddRevisionRequest,
+  BsdasriRevisionRequest,
   OperationMode
 } from "@prisma/client";
 import { FormForElastic } from "../forms/elastic";
@@ -101,6 +102,8 @@ export interface BsdElastic {
   isOutgoingWasteFor: string[];
   isTransportedWasteFor: string[];
   isManagedWasteFor: string[];
+  isAllWasteFor: string[];
+
   // Liste des établissements concernés par une demande de révision en cours sur ce bordereau
   isInRevisionFor: string[];
   // Liste des établissements concernés par une demande de révision passée sur ce bordereau
@@ -112,7 +115,10 @@ export interface BsdElastic {
   companyNames: string;
   companyOrgIds: string[];
 
-  revisionRequests: BsdaRevisionRequest[] | BsddRevisionRequest[];
+  revisionRequests:
+    | BsdaRevisionRequest[]
+    | BsddRevisionRequest[]
+    | BsdasriRevisionRequest[];
 
   rawBsd:
     | FormForElastic
@@ -284,6 +290,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isOutgoingWasteFor: stringField,
   isTransportedWasteFor: stringField,
   isManagedWasteFor: stringField,
+  isAllWasteFor: stringField,
   isInRevisionFor: stringField,
   isRevisedFor: stringField,
 

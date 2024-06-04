@@ -3,12 +3,14 @@ import CompanyFormWrapper from "../common/Components/CompanyFormWrapper";
 import { useForm, useFieldArray } from "react-hook-form";
 import {
   BrokerReceipt,
+  CollectorType,
   CompanyPrivate,
   CompanyType,
   TraderReceipt,
   TransporterReceipt,
   UserRole,
   VhuAgrement,
+  WasteProcessorType,
   WorkerCertification
 } from "@td/codegen-ui";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
@@ -27,11 +29,13 @@ import {
   DELETE_WORKER_CERTIFICATION,
   UPDATE_BROKER_RECEIPT,
   UPDATE_COMPANY_BROKER_RECEIPT,
+  UPDATE_COMPANY_COLLECTOR_TYPES,
   UPDATE_COMPANY_TRADER_RECEIPT,
   UPDATE_COMPANY_TRANSPORTER_RECEIPT,
   UPDATE_COMPANY_TYPES,
   UPDATE_COMPANY_VHU_AGREMENT,
   UPDATE_COMPANY_VHU_AGREMENT_DEMOLISSEUR,
+  UPDATE_COMPANY_WASTE_PROCESSOR_TYPES,
   UPDATE_COMPANY_WORKER_CERTIFICATION,
   UPDATE_TRADER_RECEIPT,
   UPDATE_TRANSPORTER_RECEIPT,
@@ -60,6 +64,8 @@ interface CompanyProfileFormFields {
   traderReceipt?: TraderReceipt;
   vhuAgrementBroyeur?: VhuAgrement;
   vhuAgrementDemolisseur?: VhuAgrement;
+  collectorTypes: CollectorType[];
+  wasteProcessorTypes: WasteProcessorType[];
 }
 
 const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
@@ -118,7 +124,9 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     workerCertification: {
       ...company.workerCertification,
       validityLimit: formatDate(company.workerCertification?.validityLimit)
-    } as WorkerCertification
+    } as WorkerCertification,
+    collectorTypes: company.collectorTypes,
+    wasteProcessorTypes: company.wasteProcessorTypes
   };
 
   const { handleSubmit, reset, formState, register, control, watch } =
@@ -137,6 +145,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     control, // control props comes from useForm (optional: if you are using FormProvider)
     name: "companyTypes"
   });
+
   const [
     createOrUpdateTransporterReceipt,
     { loading: LoadingTransportReceipt, error: errorTransportReceipt }
@@ -153,6 +162,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       error: errorUpdateCompanyTransportReceipt
     }
   ] = useMutation(UPDATE_COMPANY_TRANSPORTER_RECEIPT);
+
   const [deleteTransporterReceipt] = useMutation(DELETE_TRANSPORTER_RECEIPT, {
     update(cache) {
       cache.writeFragment({
@@ -169,12 +179,14 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       });
     }
   });
+
   const [
     createOrUpdateVhuAgrementBroyeur,
     { loading: LoadingVhuBroyeur, error: errorVhuBroyeur }
   ] = useMutation(
     company.vhuAgrementBroyeur ? UPDATE_VHU_AGREMENT : CREATE_VHU_AGREMENT_
   );
+
   const [
     createOrUpdateVhuAgrementDemolisseur,
     { loading: LoadingVhuDemolisseur, error: errorVhuDemolisseur }
@@ -353,6 +365,22 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     }
   });
 
+  const [
+    updateCompanyCollectorTypes,
+    {
+      loading: updateCompanyCollectorTypesLoading,
+      error: updateCompanyCollectorTypesError
+    }
+  ] = useMutation(UPDATE_COMPANY_COLLECTOR_TYPES);
+
+  const [
+    updateCompanyWasteProcessorTypes,
+    {
+      loading: updateCompanyWasteProcessorTypesLoading,
+      error: updateCompanyWasteProcessorTypesError
+    }
+  ] = useMutation(UPDATE_COMPANY_WASTE_PROCESSOR_TYPES);
+
   const handleCreateOrUpdateBrokerReceipt = async dataToUpdate => {
     const input = {
       ...(company.brokerReceipt?.id ? { id: company.brokerReceipt.id } : {}),
@@ -490,7 +518,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     }
   };
 
-  const handleDeletes = async companyTypesToUpdate => {
+  const handleSubTypesDeletes = async companyTypesToUpdate => {
     const shouldDeleteWorkerCertification =
       !companyTypesToUpdate.includes(CompanyType.Worker) &&
       company.workerCertification;
@@ -554,7 +582,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     }
   };
 
-  const handleUpdates = async (data, companyTypesToUpdate) => {
+  const handleSubTypesUpdates = async (data, companyTypesToUpdate) => {
     const shouldCreateOrUpdateWorkerCertification =
       companyTypesToUpdate.includes(CompanyType.Worker);
     const shouldCreateOrUpdateTransporterReceipt =
@@ -572,6 +600,36 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     const shouldCreateOrUpdateVhuAgrementDemolisseur =
       companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
       data.vhuAgrementDemolisseur.agrementNumber;
+    const hasCollectorType = companyTypesToUpdate.includes(
+      CompanyType.Collector
+    );
+    const hasWasteProcessorType = companyTypesToUpdate.includes(
+      CompanyType.Wasteprocessor
+    );
+    const shouldUpdateCollectorTypes =
+      hasCollectorType || (!hasCollectorType && data.collectorTypes);
+    const shouldUpdateWasteProcessorTypes =
+      hasWasteProcessorType ||
+      (!hasWasteProcessorType && data.wasteProcessorTypes);
+
+    if (shouldUpdateCollectorTypes) {
+      await updateCompanyCollectorTypes({
+        variables: {
+          id: company.id,
+          collectorTypes: hasCollectorType ? data.collectorTypes : []
+        }
+      });
+    }
+    if (shouldUpdateWasteProcessorTypes) {
+      await updateCompanyWasteProcessorTypes({
+        variables: {
+          id: company.id,
+          wasteProcessorTypes: hasWasteProcessorType
+            ? data.wasteProcessorTypes
+            : []
+        }
+      });
+    }
 
     if (shouldCreateOrUpdateWorkerCertification) {
       await handleCreateOrUpdateWorkerCertification(data);
@@ -611,10 +669,10 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     });
 
     //updates
-    handleUpdates(data, companyTypesToUpdate);
+    handleSubTypesUpdates(data, companyTypesToUpdate);
 
     //deletes
-    handleDeletes(companyTypesToUpdate);
+    handleSubTypesDeletes(companyTypesToUpdate);
   };
 
   const loading =
@@ -635,7 +693,9 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     deleteLoadingBrokerReceipt ||
     updateOrCreateLoadingWorkerCertif ||
     updateCompanyWorkerCertifLoading ||
-    deleteLoadingWorkerCertif;
+    deleteLoadingWorkerCertif ||
+    updateCompanyCollectorTypesLoading ||
+    updateCompanyWasteProcessorTypesLoading;
   const error =
     errorCompanyTypes ||
     errorTransportReceipt ||
@@ -654,7 +714,9 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     deleteErrorBrokerReceipt ||
     updateOrCreateErrorWorkerCertif ||
     updateCompanyWorkerCertifError ||
-    deleteErrorWorkerCertif;
+    deleteErrorWorkerCertif ||
+    updateCompanyCollectorTypesError ||
+    updateCompanyWasteProcessorTypesError;
 
   return (
     <CompanyFormWrapper

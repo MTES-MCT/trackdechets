@@ -1,9 +1,10 @@
-import { toOutgoingWaste } from "../registry";
+import { getSubType, toOutgoingWaste } from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryBsffInclude } from "../../registry/elastic";
-import { createBsffAfterOperation } from "./factories";
+import { createBsff, createBsffAfterOperation } from "./factories";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { BsffType } from "@prisma/client";
 
 describe("toOutgoingWaste", () => {
   afterAll(resetDatabase);
@@ -31,14 +32,15 @@ describe("toOutgoingWaste", () => {
           transporter,
           destination
         },
-        {},
         {
-          finalOperations: {
-            create: {
-              finalBsffPackagingId: finalPackaging.id,
-              quantity: 1,
-              operationCode: "R 1",
-              noTraceability: false
+          packagingData: {
+            finalOperations: {
+              create: {
+                finalBsffPackagingId: finalPackaging.id,
+                quantity: 1,
+                operationCode: "R 1",
+                noTraceability: false
+              }
             }
           }
         }
@@ -78,14 +80,15 @@ describe("toAllWaste", () => {
           transporter,
           destination: ttr
         },
-        {},
         {
-          finalOperations: {
-            create: {
-              finalBsffPackagingId: finalPackaging.id,
-              quantity: 1,
-              operationCode: "R 1",
-              noTraceability: false
+          packagingData: {
+            finalOperations: {
+              create: {
+                finalBsffPackagingId: finalPackaging.id,
+                quantity: 1,
+                operationCode: "R 1",
+                noTraceability: false
+              }
             }
           }
         }
@@ -99,4 +102,29 @@ describe("toAllWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1]);
     }
   );
+});
+
+describe("getSubType", () => {
+  afterAll(resetDatabase);
+
+  it.each([
+    [BsffType.COLLECTE_PETITES_QUANTITES, "INITIAL"],
+    [BsffType.TRACER_FLUIDE, "INITIAL"],
+    [BsffType.GROUPEMENT, "GROUPEMENT"],
+    [BsffType.RECONDITIONNEMENT, "RECONDITIONNEMENT"],
+    [BsffType.REEXPEDITION, "RESHIPMENT"]
+  ])("type is %p > should return %p", async (type, expectedSubType) => {
+    // Given
+    const bsff = await createBsff({}, { data: { type } });
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const subType = getSubType(bsffForRegistry);
+
+    // Then
+    expect(subType).toBe(expectedSubType);
+  });
 });

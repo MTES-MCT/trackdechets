@@ -28,6 +28,9 @@ enum BsdasriStatus {
 
   "En attente de groupement"
   AWAITING_GROUP
+
+  "Bordereau annulé. L'annulation peut être demandée via le processus de révision"
+  CANCELED
 }
 
 "Type de packaging du déchet"

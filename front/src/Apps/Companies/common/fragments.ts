@@ -6,6 +6,8 @@ const AccountFieldCompanyTypesFragment = {
       id
       siret
       companyTypes
+      collectorTypes
+      wasteProcessorTypes
       userRole
       workerCertification {
         id
@@ -401,5 +403,33 @@ export const AccountInfoAutoUpdateFragments = {
     ${AccountFieldCompanyVhuAgrementBroyeurFragment.company}
     ${AccountFieldCompanyVhuAgrementDemolisseurFragment.company}
     ${AccountFieldCompanyWorkerCertificationFragment.company}
+  `
+};
+
+export const AccountFieldCompanyDasriDirectTakeOverFragments = {
+  company: gql`
+    fragment AccountFieldCompanySecurityCodeFragment on CompanyPrivate {
+      id
+      siret
+      userRole
+      allowBsdasriTakeOverWithoutSignature
+    }
+  `
+};
+
+export const AccountFieldCompanySignatureAutomationFragments = {
+  company: gql`
+    fragment AccountFieldCompanySignatureAutomationFragment on CompanyPrivate {
+      siret
+      signatureAutomations {
+        id
+        createdAt
+        to {
+          siret
+          vatNumber
+          name
+        }
+      }
+    }
   `
 };

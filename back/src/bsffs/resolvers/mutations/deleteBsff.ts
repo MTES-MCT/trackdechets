@@ -4,6 +4,7 @@ import { expandBsffFromDB } from "../../converter";
 import { checkCanDelete } from "../../permissions";
 import { getBsffOrNotFound } from "../../database";
 import { getBsffRepository } from "../../repository";
+import { BsffWithTransportersInclude } from "../../types";
 
 const deleteBsff: MutationResolvers["deleteBsff"] = async (
   _,
@@ -17,7 +18,10 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
 
   const { delete: deleteBsff } = getBsffRepository(user);
 
-  const deletedBsff = await deleteBsff({ where: { id } });
+  const deletedBsff = await deleteBsff({
+    where: { id },
+    include: BsffWithTransportersInclude
+  });
 
   return expandBsffFromDB(deletedBsff);
 };

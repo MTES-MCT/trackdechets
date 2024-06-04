@@ -1,10 +1,11 @@
 import {
-  Bsff,
   BsffFicheIntervention as PrismaBsffFicheIntervention,
   BsffPackaging,
   BsffPackagingType,
   BsffType,
-  Prisma
+  Prisma,
+  BsffTransporter,
+  Bsff
 } from "@prisma/client";
 import {
   BsffFicheIntervention,
@@ -15,7 +16,8 @@ import getReadableId, { ReadableIdPrefix } from "../forms/readableId";
 import {
   flattenBsffInput,
   expandBsffFromDB,
-  expandFicheInterventionBsffFromDB
+  expandFicheInterventionBsffFromDB,
+  flattenBsffTransporterInput
 } from "./converter";
 import {
   validateBsff,
@@ -35,11 +37,23 @@ import { sirenifyBsffInput } from "./sirenify";
 import { Permission, can, getUserRoles } from "../permissions";
 import { recipify } from "./recipify";
 import { ForbiddenError, UserInputError } from "../common/errors";
+import { prisma } from "@td/prisma";
+import {
+  BsffWithFicheInterventionInclude,
+  BsffWithPackagingsInclude,
+  BsffWithTransporters,
+  BsffWithTransportersInclude
+} from "./types";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();
   const bsff = await findUnique({
-    where
+    where,
+    include: {
+      ...BsffWithTransportersInclude,
+      ...BsffWithPackagingsInclude,
+      ...BsffWithFicheInterventionInclude
+    }
   });
 
   if (bsff == null) {
@@ -55,7 +69,8 @@ export async function getBsffPackagingOrNotFound(
   const { findUnique } = getReadonlyBsffPackagingRepository();
 
   const bsffpackaging = await findUnique({
-    where
+    where,
+    include: { bsff: { include: BsffWithTransportersInclude } }
   });
 
   if (bsffpackaging == null) {
@@ -91,7 +106,7 @@ export async function getFicheInterventions({
   bsff,
   context: { user }
 }: {
-  bsff: Bsff;
+  bsff: BsffWithTransporters;
   context: GraphQLContext;
 }): Promise<BsffFicheIntervention[]> {
   if (!user) {
@@ -106,15 +121,21 @@ export async function getFicheInterventions({
 
   const userRoles = await getUserRoles(user.id);
 
+  const transporter = getFirstTransporterSync(bsff);
+
   const isBsffReader = [
     bsff.emitterCompanySiret,
-    bsff.transporterCompanySiret,
-    bsff.transporterCompanyVatNumber,
+    transporter?.transporterCompanySiret,
+    transporter?.transporterCompanyVatNumber,
     bsff.destinationCompanySiret
-  ].some(
-    orgId =>
-      orgId && userRoles[orgId] && can(userRoles[orgId], Permission.BsdCanRead)
-  );
+  ]
+    .filter(Boolean)
+    .some(
+      orgId =>
+        orgId &&
+        userRoles[orgId] &&
+        can(userRoles[orgId], Permission.BsdCanRead)
+    );
 
   const isDetenteur = bsff.detenteurCompanySirets.some(
     siret => userRoles[siret] && can(userRoles[siret], Permission.BsdCanRead)
@@ -161,6 +182,8 @@ export async function createBsff(
     ...flattenBsffInput(autocompletedInput)
   };
 
+  const flatTransporterInput = flattenBsffTransporterInput(autocompletedInput);
+
   if (!input.type) {
     throw new UserInputError("Vous devez préciser le type de BSFF");
   }
@@ -182,7 +205,8 @@ export async function createBsff(
 
   const futureBsff = {
     ...flatInput,
-    packagings: packagingsInput
+    packagings: packagingsInput,
+    transporters: [flatTransporterInput]
   };
 
   await validateBsff(futureBsff, {
@@ -202,7 +226,13 @@ export async function createBsff(
 
   const data: Prisma.BsffCreateInput = {
     ...flatInput,
-    packagings: { create: packagings }
+    packagings: { create: packagings },
+    // On crée un premier transporteur par défaut (même si tous les champs sont nuls)
+    // Cela permet dans un premier temps d'être raccord avec le modèle "à plat"
+    // en attendant l'implémentation du multi-modal
+    transporters: {
+      create: { ...flatTransporterInput, number: 1 }
+    }
   };
 
   if (ficheInterventions.length > 0) {
@@ -215,13 +245,16 @@ export async function createBsff(
   }
 
   const bsffRepository = getBsffRepository(user);
-  const bsff = await bsffRepository.create({ data });
+  const bsff = await bsffRepository.create({
+    data,
+    include: BsffWithTransportersInclude
+  });
 
   return expandBsffFromDB(bsff);
 }
 
 export function getPackagingCreateInput(
-  bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
+  bsff: Partial<Bsff | Omit<Prisma.BsffCreateInput, "transporters">> & {
     packagings?: (BsffPackagingInput & { type: BsffPackagingType })[];
   },
   previousPackagings: BsffPackaging[]
@@ -255,4 +288,58 @@ export function getPackagingCreateInput(
         }
       ]
     : bsff.packagings?.map(p => ({ ...p, emissionNumero: p.numero })) ?? [];
+}
+
+export async function getTransporters(
+  bsff: Pick<BsffWithTransporters, "id">
+): Promise<BsffTransporter[]> {
+  const transporters = await prisma.bsffTransporter.findMany({
+    orderBy: { number: "asc" },
+    where: { bsffId: bsff.id }
+  });
+  return transporters ?? [];
+}
+
+export function getTransportersSync(bsff: {
+  transporters: BsffTransporter[] | null;
+}): BsffTransporter[] {
+  return (bsff.transporters ?? []).sort((t1, t2) => t1.number - t2.number);
+}
+
+export async function getFirstTransporter(
+  bsff: Pick<BsffWithTransporters, "id">
+): Promise<BsffTransporter | null> {
+  const transporters = await prisma.bsffTransporter.findMany({
+    where: { number: 1, bsffId: bsff.id }
+  });
+  if (transporters && transporters.length > 0) {
+    return transporters[0];
+  }
+  return null;
+}
+
+export function getFirstTransporterSync(bsff: {
+  transporters: BsffTransporter[] | null;
+}): BsffTransporter | null {
+  const transporters = getTransportersSync(bsff);
+  const firstTransporter = transporters.find(t => t.number === 1);
+  return firstTransporter ?? null;
+}
+
+export function getNthTransporterSync(
+  bsff: BsffWithTransporters,
+  n: number
+): BsffTransporter | null {
+  return (bsff.transporters ?? []).find(t => t.number === n) ?? null;
+}
+
+// Renvoie le premier transporteur qui n'a pas encore signé
+export function getNextTransporterSync(bsff: {
+  transporters: BsffTransporter[] | null;
+}): BsffTransporter | null {
+  const transporters = getTransportersSync(bsff);
+  const nextTransporter = transporters.find(
+    t => !t.transporterTransportSignatureDate
+  );
+  return nextTransporter ?? null;
 }

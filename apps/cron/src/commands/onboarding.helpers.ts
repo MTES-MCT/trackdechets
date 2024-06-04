@@ -10,7 +10,9 @@ import {
   BsdaRevisionRequest,
   BsdaRevisionRequestApproval,
   BsddRevisionRequest,
+  BsdasriRevisionRequestApproval,
   BsddRevisionRequestApproval,
+  BsdasriRevisionRequest,
   Company,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus,
@@ -345,6 +347,9 @@ type RequestWithApprovals =
     })
   | (BsdaRevisionRequest & {
       approvals: BsdaRevisionRequestApproval[];
+    })
+  | (BsdasriRevisionRequest & {
+      approvals: BsdasriRevisionRequestApproval[];
     });
 
 type RequestWithWrappedApprovals =
@@ -356,6 +361,12 @@ type RequestWithWrappedApprovals =
     })
   | (BsdaRevisionRequest & {
       approvals: (BsdaRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    })
+  | (BsdasriRevisionRequest & {
+      approvals: (BsdasriRevisionRequestApproval & {
         admins: User[];
         company: Company;
       })[];
@@ -433,6 +444,27 @@ export const getPendingBSDARevisionRequestsWithAdmins = async (
 
   // Get all pending requests
   const requests = await prisma.bsdaRevisionRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: RevisionRequestStatus.PENDING
+    },
+    include: { approvals: true }
+  });
+
+  // Add admins to requests
+  return await addPendingApprovalsCompanyAdmins(requests);
+};
+
+export const getPendingBSDASRIRevisionRequestsWithAdmins = async (
+  daysAgo: number
+): Promise<RequestWithWrappedApprovals[]> => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  // Get all pending requests
+  const requests = await prisma.bsdasriRevisionRequest.findMany({
     where: {
       createdAt: { gte: requestDateGt, lt: requestDateLt },
       status: RevisionRequestStatus.PENDING

@@ -28,8 +28,7 @@ export default function AccountCompanyOrientation() {
             ateliers de traitement de surfaces, détenteurs d'équipements
             contenant des fluides frigorigènes et les opérateurs, producteurs de
             déchets infectieux (hôpitaux, EHPAD, médecins, infirmier(e)s,
-            tatoueurs, dentistes, etc.) maître d'ouvrage d'amiante,
-            intermédiaires, etc.
+            tatoueurs, dentistes, etc.) maître d'ouvrage d'amiante, etc.
           </CallOut>
         </div>
         {/* <div className="fr-col-12">

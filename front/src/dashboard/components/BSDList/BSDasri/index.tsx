@@ -10,7 +10,8 @@ const dasriVerboseStatuses: Record<BsdasriStatus, string> = {
   RECEIVED: "Reçu",
   PROCESSED: "Traité",
   REFUSED: "Refusé",
-  AWAITING_GROUP: "En attente de regroupement"
+  AWAITING_GROUP: "En attente de regroupement",
+  CANCELED: "Annulé"
 };
 
 const getDasriVerboseStatus = (bsdasri: Bsdasri): string => {

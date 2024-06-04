@@ -70,7 +70,9 @@ import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
+import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
+
 // set yup default error messages
 configureYup();
 
@@ -1285,7 +1287,36 @@ const withNextDestination = (required: boolean) =>
           required,
           `Destination ultérieure : ${MISSING_COMPANY_NAME}`
         ),
-      nextDestinationCompanySiret: siret.label("Destination ultérieure prévue"),
+      nextDestinationCompanySiret: siret
+        .label("Destination ultérieure prévue")
+        .when(
+          [
+            "wasteDetailsCode",
+            "noTraceability",
+            "wasteDetailsPop",
+            "wasteDetailsIsDangerous"
+          ],
+          {
+            is: (
+              wasteDetailsCode,
+              noTraceability,
+              wasteDetailsPop,
+              wasteDetailsIsDangerous
+            ) => {
+              // si déchet dangereux sans rupture de traça et entreprise francaise: doit être inscrite sur TD
+              // le siret est nullable, required géré par  XORIdRequired",
+              const hasNoTraceabilityBreak = !noTraceability;
+              const wasteIsDangerous =
+                isDangerous(wasteDetailsCode) ||
+                wasteDetailsPop ||
+                wasteDetailsIsDangerous;
+
+              return wasteIsDangerous && hasNoTraceabilityBreak;
+            },
+            then: schema => schema.test(siretTests.isRegistered("DESTINATION"))
+          }
+        ),
+
       nextDestinationCompanyVatNumber: vatNumber.label(
         "Destination ultérieure prévue"
       ),
@@ -1350,31 +1381,55 @@ const withNextDestination = (required: boolean) =>
       nextDestinationCompanyExtraEuropeanId: yup.string().nullable(),
       nextDestinationNotificationNumber: yup
         .string()
-        .when(["wasteDetailsCode", "nextDestinationCompanyExtraEuropeanId"], {
-          is: (
-            wasteDetailsCode: string,
-            nextDestinationCompanyExtraEuropeanId: string
-          ) =>
-            !!nextDestinationCompanyExtraEuropeanId &&
-            isDangerous(wasteDetailsCode),
-          then: schema =>
-            schema
-              .max(
-                15,
-                "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
-              )
-              .required(
-                "Destination ultérieure : le numéro de notification est obligatoire"
-              ),
-          otherwise: schema =>
-            schema
-              .max(
-                15,
-                "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
-              )
-              .notRequired()
-              .nullable()
-        })
+        .when(
+          [
+            "wasteDetailsCode",
+            "wasteDetailsPop",
+            "wasteDetailsIsDangerous",
+            "nextDestinationCompanyExtraEuropeanId",
+            "nextDestinationCompanyVatNumber"
+          ],
+          {
+            is: (
+              wasteDetailsCode: string,
+              wasteDetailsPop: boolean,
+              wasteDetailsIsDangerous: boolean,
+              nextDestinationCompanyExtraEuropeanId: string,
+              nextDestinationCompanyVatNumber: string
+            ) => {
+              const isNotFinal = !isFinalOperationCode(wasteDetailsCode);
+              const consideredAsDangerous =
+                isDangerous(wasteDetailsCode) ||
+                wasteDetailsPop ||
+                wasteDetailsIsDangerous;
+
+              const isForeignCompany =
+                !!nextDestinationCompanyExtraEuropeanId ||
+                (!!nextDestinationCompanyVatNumber &&
+                  isForeignVat(nextDestinationCompanyVatNumber));
+
+              return isNotFinal && isForeignCompany && consideredAsDangerous;
+            },
+            then: schema =>
+              schema
+                .max(
+                  15,
+                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                )
+                .nullable()
+                .required(
+                  "Destination ultérieure : le numéro de notification est obligatoire"
+                ),
+            otherwise: schema =>
+              schema
+                .max(
+                  15,
+                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                )
+                .notRequired()
+                .nullable()
+          }
+        )
     })
     .test(
       "XORIdRequired",
@@ -1968,6 +2023,22 @@ export async function validateAppendix1Groupement(
       quantity: initialForm.quantityReceived?.toNumber() ?? 0
     };
   });
+
+  for (const initialForm of initialForms) {
+    if (initialForm.ecoOrganismeSiret || !initialForm.emitterCompanySiret) {
+      continue;
+    }
+
+    const company = await prisma.company.findFirst({
+      where: { orgId: initialForm.emitterCompanySiret },
+      select: { id: true }
+    });
+    if (!company) {
+      throw new UserInputError(
+        `L'émetteur du bordereau d'annexe 1 ${initialForm.id} n'est pas inscrit sur Trackdéchets. Il est impossible de joindre cette annexe à un bordereau chapeau sans éco-organisme.`
+      );
+    }
+  }
 
   // Once the first appendix has been signed by the transporter,
   // you have maximum 5 calendar days to add and sign new appendix.

@@ -13,7 +13,8 @@ import {
   formFactory,
   siretify,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  companyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -302,9 +303,10 @@ describe("mutation / importPaperForm", () => {
       input.recipient!.company!.siret = company.siret;
       input.processedInfo.processingOperationDone = "D 13";
       input.processedInfo.destinationOperationMode = undefined;
+      const nextCompany = await companyFactory();
       input.processedInfo.nextDestination = {
         company: {
-          siret: siretify(1),
+          siret: nextCompany.siret,
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",
@@ -716,7 +718,7 @@ describe("mutation / importPaperForm", () => {
           recipientCompanySiret: company.siret
         }
       });
-
+      const nextCompany = await companyFactory();
       const { mutate } = makeClient(user);
 
       const data = { ...importedData };
@@ -724,7 +726,7 @@ describe("mutation / importPaperForm", () => {
       data.processedInfo.destinationOperationMode = undefined;
       data.processedInfo.nextDestination = {
         company: {
-          siret: siretify(1),
+          siret: nextCompany.siret,
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",

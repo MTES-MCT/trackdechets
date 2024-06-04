@@ -1,6 +1,7 @@
 import * as Excel from "exceljs";
 import {
   AllWaste,
+  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -8,6 +9,8 @@ import {
 } from "../generated/graphql/types";
 import { GenericWaste } from "./types";
 import { formatStatusLabel } from "@td/constants";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)
@@ -27,7 +30,13 @@ type Column = {
   format?: (v: unknown, full: unknown) => string | number | null;
 };
 
-const formatDate = (d: Date | null) => d?.toISOString().slice(0, 10) ?? "";
+export const formatDate = (d: Date | null) => {
+  if (!d) return "";
+  return format(d, "yyyy-MM-dd", {
+    locale: fr
+  });
+};
+
 const formatBoolean = (b: boolean | null) => {
   if (b === null || b === undefined) {
     return "";
@@ -45,6 +54,36 @@ const formatFinalOperations = (val?: string[]) =>
   val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
 const formatFinalOperationWeights = (val?: number[]) =>
   val ? val.map(quant => quant.toFixed(2)).join("; ") : "";
+export const formatSubType = (subType?: BsdSubType) => {
+  if (!subType) return "";
+
+  switch (subType) {
+    case "INITIAL":
+      return "Initial";
+    case "TOURNEE":
+      return "Tournée dédiée";
+    case "APPENDIX1":
+      return "Annexe 1";
+    case "APPENDIX2":
+      return "Annexe 2";
+    case "TEMP_STORED":
+      return "Entreposage provisoire";
+    case "COLLECTION_2710":
+      return "Collecte en déchetterie";
+    case "GATHERING":
+      return "Groupement";
+    case "GROUPEMENT":
+      return "Regroupement";
+    case "RESHIPMENT":
+      return "Réexpédition";
+    case "RECONDITIONNEMENT":
+      return "Reconditionnement";
+    case "SYNTHESIS":
+      return "Synthèse";
+    default:
+      return "";
+  }
+};
 
 export const columns: Column[] = [
   // Dénomination, nature et quantité :
@@ -75,6 +114,7 @@ export const columns: Column[] = [
     format: formatDate
   },
   { field: "bsdType", label: "Type de bordereau" },
+  { field: "bsdSubType", label: "Sous-type", format: formatSubType },
   { field: "customId", label: "Identifiant secondaire" },
   { field: "status", label: "Statut du bordereau (code)" },
   {

@@ -113,7 +113,7 @@ describe("Mutation.deleteBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
 
-    const bsff = await createBsff({ emitter }, { isDeleted: true });
+    const bsff = await createBsff({ emitter }, { data: { isDeleted: true } });
     const { errors } = await mutate<
       Pick<Mutation, "deleteBsff">,
       MutationDeleteBsffArgs
@@ -247,7 +247,7 @@ describe("Mutation.deleteBsff", () => {
 
     initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
-      include: { packagings: true }
+      include: { packagings: true, transporters: true }
     });
 
     for (const packaging of initialBsff.packagings) {
@@ -273,7 +273,7 @@ describe("Mutation.deleteBsff", () => {
 
     initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
-      include: { packagings: true }
+      include: { packagings: true, transporters: true }
     });
 
     for (const packaging of initialBsff.packagings) {
@@ -317,7 +317,7 @@ describe("Mutation.deleteBsff", () => {
 
     initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
-      include: { packagings: true }
+      include: { packagings: true, transporters: true }
     });
 
     for (const packaging of initialBsff.packagings) {
@@ -343,7 +343,7 @@ describe("Mutation.deleteBsff", () => {
 
     initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
-      include: { packagings: true }
+      include: { packagings: true, transporters: true }
     });
 
     for (const packaging of initialBsff.packagings) {
@@ -387,7 +387,7 @@ describe("Mutation.deleteBsff", () => {
 
     initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
-      include: { packagings: true }
+      include: { packagings: true, transporters: true }
     });
 
     for (const packaging of initialBsff.packagings) {
@@ -413,7 +413,7 @@ describe("Mutation.deleteBsff", () => {
 
     initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
-      include: { packagings: true }
+      include: { packagings: true, transporters: true }
     });
 
     for (const packaging of initialBsff.packagings) {

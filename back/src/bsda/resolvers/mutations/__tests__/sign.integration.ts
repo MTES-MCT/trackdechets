@@ -1086,7 +1086,7 @@ describe("Mutation.Bsda.sign", () => {
           emitterCompanySiret: emitter.siret,
           destinationCompanySiret: ttr1.siret,
           status: BsdaStatus.AWAITING_CHILD,
-          destinationOperationCode: "D 9",
+          destinationOperationCode: "D 5",
           destinationOperationMode: "ELIMINATION"
         },
         transporterOpt: {
@@ -1102,7 +1102,7 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: emitter.siret,
           destinationCompanySiret: ttr2.siret,
-          destinationOperationCode: "D 9",
+          destinationOperationCode: "D 5",
           destinationOperationMode: "ELIMINATION",
           status: BsdaStatus.AWAITING_CHILD,
           forwarding: { connect: { id: bsda1.id } }
@@ -1120,7 +1120,7 @@ describe("Mutation.Bsda.sign", () => {
           status: BsdaStatus.SENT,
           emitterCompanySiret: ttr2.siret,
           destinationCompanySiret: destination.siret,
-          destinationOperationCode: "D 9",
+          destinationOperationCode: "D 5",
           destinationOperationMode: "ELIMINATION",
           forwarding: { connect: { id: bsda2.id } }
         },
@@ -1421,13 +1421,18 @@ describe("Mutation.Bsda.sign", () => {
       // Crée un second transporteur qui n'a pas encore signé
       await bsdaTransporterFactory({
         bsdaId: bsda.id,
-        opts: { transporterTransportSignatureDate: null }
+        opts: {
+          transporterTransportSignatureDate: null,
+          // On enlève la plaque immat pour vérifier que les règles de validation
+          // ne sont pas appliqués pour les transporteurs N > 1
+          transporterTransportPlates: []
+        }
       });
 
       const { mutate } = makeClient(user);
 
       // Finalement le déchet va directement au centre de traitement
-      const { data } = await mutate<
+      const { data, errors } = await mutate<
         Pick<Mutation, "signBsda">,
         MutationSignBsdaArgs
       >(SIGN_BSDA, {
@@ -1440,6 +1445,7 @@ describe("Mutation.Bsda.sign", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
       expect(data.signBsda.id).toBeTruthy();
 
       const updatedBsda = await prisma.bsda.findUniqueOrThrow({

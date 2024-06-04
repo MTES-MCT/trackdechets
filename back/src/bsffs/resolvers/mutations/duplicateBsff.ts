@@ -2,12 +2,16 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB } from "../../converter";
 import { checkCanDuplicate } from "../../permissions";
-import { getBsffOrNotFound } from "../../database";
+import { getBsffOrNotFound, getFirstTransporterSync } from "../../database";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { Bsff, BsffStatus, Prisma } from "@prisma/client";
+import { BsffStatus, Prisma } from "@prisma/client";
 import { getBsffRepository } from "../../repository";
 import { prisma } from "@td/prisma";
-import { sirenifyBsffCreateInput } from "../../sirenify";
+import {
+  sirenifyBsffCreateInput,
+  sirenifyBsffTransporterCreateInput
+} from "../../sirenify";
+import { BsffWithTransporters, BsffWithTransportersInclude } from "../../types";
 
 const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
   _,
@@ -23,7 +27,9 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
     existingBsff
   );
 
-  const createInput: Prisma.BsffCreateInput = {
+  const bsffTransporter = getFirstTransporterSync(existingBsff);
+
+  let createInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     isDraft: true,
     type: existingBsff.type,
@@ -43,27 +49,6 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
     wasteAdr: existingBsff.wasteAdr,
     weightValue: existingBsff.weightValue,
     weightIsEstimate: existingBsff.weightIsEstimate,
-    transporterCompanyName:
-      transporter?.name ?? existingBsff.transporterCompanyName,
-    transporterCompanySiret: existingBsff.transporterCompanySiret,
-    transporterCompanyVatNumber: existingBsff.transporterCompanyVatNumber,
-    transporterCompanyAddress:
-      transporter?.address ?? existingBsff.transporterCompanyAddress,
-    transporterCompanyContact:
-      transporter?.contact ?? existingBsff.transporterCompanyContact,
-    transporterCompanyPhone:
-      transporter?.contactPhone ?? existingBsff.transporterCompanyPhone,
-    transporterCompanyMail:
-      transporter?.contactEmail ?? existingBsff.transporterCompanyMail,
-    transporterRecepisseNumber:
-      transporter?.transporterReceipt?.receiptNumber ?? null,
-    transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ?? null,
-    transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ?? null,
-    transporterRecepisseIsExempted: existingBsff.transporterRecepisseIsExempted,
-    transporterTransportMode: existingBsff.transporterTransportMode,
-    transporterTransportPlates: existingBsff.transporterTransportPlates,
     destinationCap: existingBsff.destinationCap,
     destinationCompanyName:
       destination?.name ?? existingBsff.destinationCompanyName,
@@ -77,15 +62,67 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
     destinationCompanyMail:
       destination?.contactEmail ?? existingBsff.destinationCompanyMail,
     destinationPlannedOperationCode:
-      existingBsff.destinationPlannedOperationCode
+      existingBsff.destinationPlannedOperationCode,
+    transporters: {
+      create: { number: 1 }
+    }
   };
+
+  if (bsffTransporter) {
+    const {
+      // transport values that should not be duplicated
+      id: transporterId,
+      bsffId: transporterBsdaId,
+      transporterTransportPlates,
+      transporterTransportTakenOverAt,
+      transporterTransportSignatureAuthor,
+      transporterTransportSignatureDate,
+      transporterCustomInfo,
+      number,
+      // transporter values that should be duplicated
+      ...transporterData
+    } = bsffTransporter;
+
+    const bsffTransporterCreateInput: Prisma.BsffTransporterCreateInput = {
+      ...transporterData,
+      number: 1,
+      // Transporter company info
+      transporterCompanyName:
+        transporter?.name ?? bsffTransporter.transporterCompanyName,
+      transporterCompanyAddress:
+        transporter?.address ?? bsffTransporter.transporterCompanyAddress,
+      transporterCompanyMail:
+        transporter?.contactEmail ?? bsffTransporter.transporterCompanyMail,
+      transporterCompanyPhone:
+        transporter?.contactPhone ?? bsffTransporter.transporterCompanyPhone,
+      transporterCompanyContact:
+        transporter?.contact ?? bsffTransporter.transporterCompanyContact,
+      // Transporter recepisse
+      transporterRecepisseNumber:
+        transporter?.transporterReceipt?.receiptNumber ?? null,
+      transporterRecepisseValidityLimit:
+        transporter?.transporterReceipt?.validityLimit ?? null,
+      transporterRecepisseDepartment:
+        transporter?.transporterReceipt?.department ?? null
+    };
+
+    createInput = {
+      ...createInput,
+      transporters: {
+        create: await sirenifyBsffTransporterCreateInput(
+          bsffTransporterCreateInput,
+          []
+        )
+      }
+    };
+  }
 
   const { create: createBsff } = getBsffRepository(user);
 
   const sirenified = await sirenifyBsffCreateInput(createInput, []);
 
   const duplicatedBsff = await createBsff(
-    { data: sirenified },
+    { data: sirenified, include: BsffWithTransportersInclude },
     {
       duplicate: { id: existingBsff.id }
     }
@@ -94,11 +131,13 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
   return expandBsffFromDB(duplicatedBsff);
 };
 
-async function getBsffCompanies(bsff: Bsff) {
+async function getBsffCompanies(bsff: BsffWithTransporters) {
+  const bsffTransporter = getFirstTransporterSync(bsff);
+
   const companiesOrgIds = [
     bsff.emitterCompanySiret,
-    bsff.transporterCompanySiret,
-    bsff.transporterCompanyVatNumber,
+    bsffTransporter?.transporterCompanySiret,
+    bsffTransporter?.transporterCompanyVatNumber,
     bsff.destinationCompanySiret
   ].filter(Boolean);
 
@@ -120,8 +159,8 @@ async function getBsffCompanies(bsff: Bsff) {
 
   const transporter = companies.find(
     company =>
-      company.orgId === bsff.transporterCompanySiret ||
-      company.orgId === bsff.transporterCompanyVatNumber
+      company.orgId === bsffTransporter?.transporterCompanySiret ||
+      company.orgId === bsffTransporter?.transporterCompanyVatNumber
   );
 
   return { emitter, destination, transporter };

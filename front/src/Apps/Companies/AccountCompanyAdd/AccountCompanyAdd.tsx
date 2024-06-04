@@ -41,6 +41,8 @@ import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import AccountCompanyAddCollector from "./companyAdd/AccountCompanyAddCollector";
+import AccountCompanyAddWasteProcessor from "./companyAdd/AccountCompanyAddWasteProcessor";
 
 const GET_ME = gql`
   {
@@ -160,6 +162,13 @@ export default function AccountCompanyAdd() {
 
   function isWorker(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Worker);
+  }
+
+  function isCollector(companyTypes: _CompanyType[]) {
+    return companyTypes.includes(_CompanyType.Collector);
+  }
+  function isWasteProcessor(companyTypes: _CompanyType[]) {
+    return companyTypes.includes(_CompanyType.Wasteprocessor);
   }
 
   /**
@@ -430,6 +439,8 @@ export default function AccountCompanyAdd() {
                 givenName: "",
                 address: companyInfos?.address ?? "",
                 companyTypes: initCompanyTypes(companyInfos),
+                collectorTypes: [],
+                wasteProcessorTypes: [],
                 gerepId: companyInfos?.installation?.codeS3ic ?? "",
                 codeNaf: companyInfos?.naf ?? "",
                 isAllowed: false,
@@ -763,7 +774,13 @@ export default function AccountCompanyAdd() {
                             ) && <AccountCompanyAddEcoOrganisme />,
                             [_CompanyType.WasteVehicles]: isVhu(
                               values.companyTypes
-                            ) && <AccountCompanyAddVhuAgrement />
+                            ) && <AccountCompanyAddVhuAgrement />,
+                            [_CompanyType.Collector]: isCollector(
+                              values.companyTypes
+                            ) && <AccountCompanyAddCollector />,
+                            [_CompanyType.Wasteprocessor]: isWasteProcessor(
+                              values.companyTypes
+                            ) && <AccountCompanyAddWasteProcessor />
                           }}
                         />
                       )}

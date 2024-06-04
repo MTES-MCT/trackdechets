@@ -363,7 +363,22 @@ describe("BSVHU validation", () => {
     test("should work if operation code & mode are compatible", async () => {
       const data = {
         ...bsvhu,
-        destinationOperationCode: "D 9",
+        destinationOperationCode: "R 4",
+        destinationOperationMode: "REUTILISATION",
+        destinationReceptionWeight: 10,
+        destinationReceptionAcceptationStatus: "ACCEPTED"
+      };
+
+      const res = await validateBsvhu(data as any, {
+        operationSignature: true
+      });
+      expect(res).not.toBeUndefined();
+    });
+
+    test("should FAIL", async () => {
+      const data = {
+        ...bsvhu,
+        destinationOperationCode: "D 1",
         destinationOperationMode: "ELIMINATION",
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED"
@@ -378,8 +393,8 @@ describe("BSVHU validation", () => {
     test("should work if operation mode is missing but step is not operation", async () => {
       const data = {
         ...bsvhu,
-        destinationOperationCode: "D 9",
-        destinationOperationMode: undefined, // Correct modes is ELIMINATION
+        destinationOperationCode: "R 4",
+        destinationOperationMode: undefined, // Correct mode is REUTILISATION | RECYCLAGE
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED"
       };
@@ -391,8 +406,8 @@ describe("BSVHU validation", () => {
     });
 
     test.each([
-      ["D 9", OperationMode.VALORISATION_ENERGETIQUE], // Correct modes is ELIMINATION
-      ["R 12", OperationMode.VALORISATION_ENERGETIQUE] // R12 has no associated mode
+      ["R 4", OperationMode.ELIMINATION], // Correct mode is  REUTILISATION | RECYCLAGE
+      ["R 12", OperationMode.REUTILISATION] // R12 has no associated mode
     ])(
       "should not be valid if operation mode is not compatible with operation code (mode: %p, code: %p)",
       async (code, mode) => {
