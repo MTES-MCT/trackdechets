@@ -225,6 +225,10 @@ export const columns: Column[] = [
     label: "Destination post entreposage provisoire Ville"
   },
   {
+    field: "postTempStorageDestinationCountry",
+    label: "Destination post entreposage provisoire Pays"
+  },
+  {
     field: "destinationReceptionAcceptationStatus",
     label: "Statut d'acceptation du déchet"
   },

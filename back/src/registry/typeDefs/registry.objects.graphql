@@ -353,6 +353,8 @@ type OutgoingWaste {
   postTempStorageDestinationPostalCode: String
   "Destination post entreposage provisoire Ville"
   postTempStorageDestinationCity: String
+  "Destination post entreposage provisoire Pays"
+  postTempStorageDestinationCountry: String
 
   "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
   destinationOperationMode: OperationMode
@@ -1056,6 +1058,8 @@ type AllWaste {
   postTempStorageDestinationPostalCode: String
   "Destination post entreposage provisoire Ville"
   postTempStorageDestinationCity: String
+  "Destination post entreposage provisoire Pays"
+  postTempStorageDestinationCountry: String
 
   ###########################################################
   # Champs additionnels non mentionnés dans l'arrêté registre

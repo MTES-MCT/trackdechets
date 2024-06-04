@@ -36,7 +36,9 @@ const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
     postTempStorageDestinationSiret: bsdd.forwardedIn.destinationCompanySiret,
     postTempStorageDestinationAddress: splittedAddress.street,
     postTempStorageDestinationPostalCode: splittedAddress.postalCode,
-    postTempStorageDestinationCity: splittedAddress.city
+    postTempStorageDestinationCity: splittedAddress.city,
+    // Always FR for now, as destination must be FR
+    postTempStorageDestinationCountry: "FR"
   };
 };
 

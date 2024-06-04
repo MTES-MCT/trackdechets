@@ -192,7 +192,8 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   postTempStorageDestinationCity: null,
   postTempStorageDestinationName: null,
   postTempStorageDestinationPostalCode: null,
-  postTempStorageDestinationSiret: null
+  postTempStorageDestinationSiret: null,
+  postTempStorageDestinationCountry: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -407,5 +408,6 @@ export const emptyAllWaste: Required<AllWaste> = {
   postTempStorageDestinationCity: null,
   postTempStorageDestinationName: null,
   postTempStorageDestinationPostalCode: null,
-  postTempStorageDestinationSiret: null
+  postTempStorageDestinationSiret: null,
+  postTempStorageDestinationCountry: null
 };

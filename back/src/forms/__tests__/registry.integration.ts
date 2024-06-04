@@ -225,6 +225,7 @@ describe("toOutgoingWaste", () => {
     expect(waste.postTempStorageDestinationAddress).toBe("25 rue Voltaire");
     expect(waste.postTempStorageDestinationCity).toBe("TOURS");
     expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
+    expect(waste.postTempStorageDestinationCountry).toBe("FR");
   });
 
   it("initial producer should be filled when forwarded BSD", async () => {
@@ -352,6 +353,7 @@ describe("toAllWaste", () => {
     expect(waste.postTempStorageDestinationAddress).toBe("25 rue Voltaire");
     expect(waste.postTempStorageDestinationCity).toBe("TOURS");
     expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
+    expect(waste.postTempStorageDestinationCountry).toBe("FR");
   });
 
   it("initial producer should be filled when forwarded BSD", async () => {
