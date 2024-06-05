@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useMutation } from "@apollo/client";
 import {
   CompanyPrivate,
@@ -58,9 +58,7 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
   const [memberToDelete, setMemberToDelete] = useState<CompanyMember | null>(
     null
   );
-  const [filteredMembers, setFilteredMembers] = useState<
-    CompanyMember[] | null
-  >(null);
+  const [filter, setFilter] = useState<string>("");
 
   const isAdmin = company.userRole === UserRole.Admin;
 
@@ -152,24 +150,34 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
     });
   };
 
-  const onFilterMembers = predicate => {
-    if (predicate.length === 0) {
-      setFilteredMembers(null);
-      return;
+  const filteredMembers = useMemo(() => {
+    if (filter.length === 0 || !company?.users?.length) {
+      return null;
     }
+    return company.users.filter(
+      user =>
+        user.name?.toLowerCase().includes(filter.toLowerCase()) ||
+        user.email.toLowerCase().includes(filter.toLowerCase())
+    );
+  }, [filter, company]);
+  // const onFilterMembers = predicate => {
+  //   if (predicate.length === 0) {
+  //     setFilteredMembers(null);
+  //     return;
+  //   }
 
-    function filterUsers(users: CompanyMember[], filterString: string) {
-      return users.filter(
-        user =>
-          user.name?.toLowerCase().includes(filterString.toLowerCase()) ||
-          user.email.toLowerCase().includes(filterString.toLowerCase())
-      );
-    }
+  //   function filterUsers(users: CompanyMember[], filterString: string) {
+  //     return users.filter(
+  //       user =>
+  //         user.name?.toLowerCase().includes(filterString.toLowerCase()) ||
+  //         user.email.toLowerCase().includes(filterString.toLowerCase())
+  //     );
+  //   }
 
-    if (company?.users?.length && company?.users?.length > 0) {
-      setFilteredMembers(filterUsers(company.users, predicate));
-    }
-  };
+  //   if (company?.users?.length && company?.users?.length > 0) {
+  //     setFilteredMembers(filterUsers(company.users, predicate));
+  //   }
+  // };
 
   return (
     <div className="company-members__list">
@@ -185,8 +193,9 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
                   label="Filtrer"
                   nativeInputProps={{
                     type: "text",
+                    value: filter,
                     onChange: e => {
-                      onFilterMembers(e.target.value);
+                      setFilter(e.target.value);
                     }
                   }}
                 />
