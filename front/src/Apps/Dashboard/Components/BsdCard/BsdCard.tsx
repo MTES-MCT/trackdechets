@@ -34,7 +34,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs,
   RevisionRequestStatus,
-  // TransportMode,
+  TransportMode,
   UserPermission
 } from "@td/codegen-ui";
 import {
@@ -208,6 +208,11 @@ function BsdCard({
   const displayTransporterNumberPlate =
     !!currentTransporterInfos &&
     // currentTransporterInfos.transporterMode === TransportMode.Road &&
+    (currentTransporterInfos.transporterMode === TransportMode.Road ||
+      // permet de gérer un trou dans la raquette en terme de validation des données
+      // qui ne rend pas le mode de transport obligatoire à la signature transporteur
+      // en attente de correction Cf ticket tra-14517
+      !currentTransporterInfos.transporterMode) &&
     (isToCollectTab ||
       (isCollectedTab &&
         !!currentTransporterInfos?.transporterNumberPlate?.length));
