@@ -551,7 +551,7 @@ describe("TransporterForm", () => {
       );
 
       const notRegisteredError = await screen.findByText(
-        "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau."
+        "Cet établissement n'est pas inscrit sur Trackdéchets."
       );
 
       expect(notRegisteredError).toBeInTheDocument();
@@ -576,10 +576,7 @@ describe("TransporterForm", () => {
       );
 
       const notRegisteredWithTransporterProfile = await screen.findByText(
-        "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur." +
-          " Il ne peut pas être ajouté sur le bordereau." +
-          " Si vous transportez vos propres déchets, veuillez cocher la case d'exemption après avoir vérifié" +
-          " que vous remplissez bien les conditions."
+        "Cet établissement n'a pas le profil Transporteur. Si vous transportez vos propres déchets, veuillez cocher la case d'exemption."
       );
 
       expect(notRegisteredWithTransporterProfile).toBeInTheDocument();
@@ -618,10 +615,7 @@ describe("TransporterForm", () => {
 
       await expect(() =>
         screen.findByText(
-          "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur." +
-            " Il ne peut pas être ajouté sur le bordereau." +
-            " Si vous transportez vos propres déchets, veuillez cocher la case d'exemption après avoir vérifié" +
-            " que vous remplissez bien les conditions."
+          "Cet établissement n'a pas le profil Transporteur. Si vous transportez vos propres déchets, veuillez cocher la case d'exemption."
         )
       ).rejects.toThrow();
     }
