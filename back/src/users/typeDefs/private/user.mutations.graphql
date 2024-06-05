@@ -111,4 +111,10 @@ type Mutation {
   Tente de désactiver un compte utilisateur (soft-delete et anonymisation)
   """
   anonymizeUser(id: ID!): String!
+
+  """
+  USAGE INTERNE
+  Change le rôle d'un utilisateur de l'entreprise
+  """
+  changeUserRole(userId: ID!, siret: ID!, role: UserRole!): CompanyMember!
 }

@@ -7,12 +7,14 @@ import {
   MutationRemoveUserFromCompanyArgs,
   MutationDeleteInvitationArgs,
   CompanyMember,
-  MutationResendInvitationArgs
+  MutationResendInvitationArgs,
+  MutationChangeUserRoleArgs
 } from "@td/codegen-ui";
 import {
   REMOVE_USER_FROM_COMPANY,
   DELETE_INVITATION,
-  RESEND_INVITATION
+  RESEND_INVITATION,
+  CHANGE_USER_ROLE
 } from "../common/queries";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
@@ -46,7 +48,7 @@ const userRoleLabel = role => {
 
 export const userRoleSwitchOptions = () => {
   return Object.keys(UserRole).map(role => (
-    <option key={UserRole[role]} value={UserRole[role]}>
+    <option key={role} value={UserRole[role]}>
       {userRoleLabel(UserRole[role])}
     </option>
   ));
@@ -112,6 +114,17 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
     }
   });
 
+  const [changeUserRole] = useMutation<
+    Pick<Mutation, "changeUserRole">,
+    MutationChangeUserRoleArgs
+  >(CHANGE_USER_ROLE, {
+    onError: () => {
+      toast.error("Le rôle de l'utilisateur n'a pas pu être modifié", {
+        duration: TOAST_DURATION
+      });
+    }
+  });
+
   const onClickRemoveUser = user => {
     setMemberToDelete(user);
     deleteModal.open();
@@ -126,6 +139,16 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
   const onClickResendInvitation = user => {
     resendInvitation({
       variables: { email: user.email, siret: company.orgId }
+    });
+  };
+
+  const onUserRoleChange = (user: CompanyMember, role: UserRole) => {
+    changeUserRole({
+      variables: {
+        userId: user.id,
+        siret: company.orgId,
+        role
+      }
     });
   };
 
@@ -203,9 +226,15 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
                       {isAdmin ? (
                         <Select
                           label=""
-                          disabled={true}
+                          disabled={!!user.isMe}
                           nativeSelectProps={{
                             value: user.role!,
+                            onChange: event => {
+                              onUserRoleChange(
+                                user,
+                                event.target.value as UserRole
+                              );
+                            },
                             ...{ "data-testid": "company-member-role" }
                           }}
                         >

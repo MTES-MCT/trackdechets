@@ -140,7 +140,7 @@ const OBFUSCATED_USER_NAME = "Temporairement masqué";
  * @param association
  * @returns
  */
-const userNameDisplay = (
+export const userNameDisplay = (
   association: CompanyAssociation & {
     user: User;
   },
@@ -185,6 +185,7 @@ export async function getCompanyActiveUsers(
   return associations.map(a => {
     return {
       ...a.user,
+      orgId,
       name: userNameDisplay(a, requestingUserid),
       role: a.role,
       isPendingInvitation: false
@@ -205,6 +206,7 @@ export async function getCompanyInvitedUsers(
   return hashes.map(h => {
     return {
       id: h.id,
+      orgId,
       name: "Invité",
       email: h.email,
       role: h.role,
@@ -398,4 +400,27 @@ export async function getUpdatedCompanyNameAndAddress(
   }
   // return existing and unchanged values
   return null;
+}
+
+/**
+ * get a CompanyAssociation by orgId + userId
+ * @param orgId
+ * @param userId
+ */
+export async function getCompanyAssociation({
+  orgId,
+  userId
+}: {
+  orgId: string;
+  userId: string;
+}) {
+  const association = await prisma.companyAssociation.findFirstOrThrow({
+    where: {
+      company: {
+        orgId
+      },
+      userId
+    }
+  });
+  return association;
 }

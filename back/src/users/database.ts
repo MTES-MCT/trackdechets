@@ -4,7 +4,13 @@
 
 import { prisma } from "@td/prisma";
 
-import { User, UserRole, Prisma, Company } from "@prisma/client";
+import {
+  User,
+  UserRole,
+  Prisma,
+  Company,
+  UserAccountHash
+} from "@prisma/client";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
 import { deleteCachedUserRoles } from "../common/redis/users";
@@ -258,6 +264,53 @@ export async function updateUserPassword({
     where: { id: userId },
     data: { password: hashedPassword, passwordVersion }
   });
+}
+
+/**
+ * Update a CompanyAssociation
+ * @param associationId
+ * @param data
+ */
+export async function updateCompanyAssociation({
+  associationId,
+  data
+}: {
+  associationId: string;
+  data: Prisma.CompanyAssociationUpdateInput;
+}): Promise<Prisma.CompanyAssociationGetPayload<{
+  include: {
+    user: true;
+  };
+}> | null> {
+  const updatedAssociation = await prisma.companyAssociation.update({
+    where: {
+      id: associationId
+    },
+    data,
+    include: {
+      user: true
+    }
+  });
+  return updatedAssociation;
+}
+
+/**
+ * Update a UserAccountHash
+ * @param userId
+ * @param data
+ */
+export async function updateUserAccountHash({
+  userId,
+  data
+}: {
+  userId: string;
+  data: Prisma.UserAccountHashUpdateInput;
+}): Promise<UserAccountHash | null> {
+  const updatedUserAccountHash = await prisma.userAccountHash.update({
+    where: { id: userId },
+    data
+  });
+  return updatedUserAccountHash;
 }
 
 /**

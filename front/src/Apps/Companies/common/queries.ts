@@ -508,3 +508,12 @@ export const REMOVE_SIGNATURE_DELEGATION = gql`
     }
   }
 `;
+
+export const CHANGE_USER_ROLE = gql`
+  mutation ChangeUserRole($userId: ID!, $siret: ID!, $role: UserRole!) {
+    changeUserRole(userId: $userId, siret: $siret, role: $role) {
+      ...AccountCompanyMemberUserFragment
+    }
+  }
+  ${AccountCompanyMemberFragment.user}
+`;
