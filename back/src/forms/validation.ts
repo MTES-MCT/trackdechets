@@ -2025,7 +2025,7 @@ export async function validateAppendix1Groupement(
   });
 
   for (const initialForm of initialForms) {
-    if (initialForm.ecoOrganismeSiret || !initialForm.emitterCompanySiret) {
+    if (form.ecoOrganismeSiret || !initialForm.emitterCompanySiret) {
       continue;
     }
 
