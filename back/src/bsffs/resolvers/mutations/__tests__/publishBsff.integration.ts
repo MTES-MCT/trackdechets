@@ -42,25 +42,23 @@ describe("publishBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          "Destination : le nom de l'établissement est requis\n" +
-          "Destination : le numéro SIRET est requis\n" +
-          "Destination : l'adresse de l'établissement est requise\n" +
-          "Destination : le nom du contact est requis\n" +
-          "Destination : le numéro de téléphone est requis\n" +
-          "Destination : l'adresse email est requise\n" +
-          "Le code de l'opération de traitement prévu est requis\n" +
-          "Le code déchet est requis\n" +
-          "La dénomination usuelle du déchet est obligatoire\n" +
-          "La mention ADR est requise\n" +
-          "Le poids total est requis\n" +
-          "Le type de poids (estimé ou non) est un requis\n" +
-          "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1\n" +
-          "Émetteur : le nom de l'établissement est requis\n" +
-          "Émetteur : l'adresse de l'établissement est requise\n" +
-          "Émetteur : le nom du contact est requis\n" +
-          "Émetteur : le numéro de téléphone est requis\n" +
-          "Émetteur : l'adresse email est requise"
+          "Le champ emitterCompanyName est obligatoire.\n" +
+          "Le champ emitterCompanyAddress est obligatoire.\n" +
+          "Le champ emitterCompanyContact est obligatoire.\n" +
+          "Le champ emitterCompanyPhone est obligatoire.\n" +
+          "Le champ emitterCompanyMail est obligatoire.\n" +
+          "Le champ wasteCode est obligatoire.\n" +
+          "Le champ wasteDescription est obligatoire.\n" +
+          "Le champ wasteAdr est obligatoire.\n" +
+          "Le champ weightValue est obligatoire.\n" +
+          "Le champ destinationCompanyName est obligatoire.\n" +
+          "Le champ destinationCompanySiret est obligatoire.\n" +
+          "Le champ destinationCompanyAddress est obligatoire.\n" +
+          "Le champ destinationCompanyContact est obligatoire.\n" +
+          "Le champ destinationCompanyPhone est obligatoire.\n" +
+          "Le champ destinationPlannedOperationCode est obligatoire.\n" +
+          "Le champ destinationCompanyMail est obligatoire.\n" +
+          "Le champ packagings est obligatoire."
       })
     ]);
   });

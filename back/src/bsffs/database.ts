@@ -12,20 +12,11 @@ import {
   BsffInput,
   BsffPackagingInput
 } from "../generated/graphql/types";
-import getReadableId, { ReadableIdPrefix } from "../forms/readableId";
 import {
-  flattenBsffInput,
   expandBsffFromDB,
-  expandFicheInterventionBsffFromDB,
-  flattenBsffTransporterInput
+  expandFicheInterventionBsffFromDB
 } from "./converter";
-import {
-  validateBsff,
-  validateFicheInterventions,
-  validatePreviousPackagings
-} from "./validation";
 import { GraphQLContext } from "../types";
-import { toBsffPackagingWithType } from "./compat";
 import { checkCanCreate, checkCanUpdateFicheIntervention } from "./permissions";
 import {
   getBsffRepository,
@@ -33,17 +24,18 @@ import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
 } from "./repository";
-import { sirenifyBsffInput } from "./sirenify";
 import { Permission, can, getUserRoles } from "../permissions";
-import { recipify } from "./recipify";
 import { ForbiddenError, UserInputError } from "../common/errors";
 import { prisma } from "@td/prisma";
 import {
   BsffWithFicheInterventionInclude,
-  BsffWithPackagingsInclude,
+  BsffWithFicheInterventions,
   BsffWithTransporters,
   BsffWithTransportersInclude
 } from "./types";
+import { graphQlInputToZodBsff } from "./validation/bsff/helpers";
+import { parseBsffAsync } from "./validation/bsff";
+import { PrismaTransaction } from "../common/repository/types";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();
@@ -51,8 +43,8 @@ export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
     where,
     include: {
       ...BsffWithTransportersInclude,
-      ...BsffWithPackagingsInclude,
-      ...BsffWithFicheInterventionInclude
+      ...BsffWithFicheInterventionInclude,
+      packagings: { include: { previousPackagings: true } }
     }
   });
 
@@ -166,27 +158,50 @@ export async function getFicheInterventions({
   );
 }
 
+/**
+ * Permet de mettre à jour le champ dénormalisé `transportersOrgIds`
+ */
+export async function updateTransporterOrgIds(
+  bsff: BsffWithTransporters,
+  transaction: PrismaTransaction
+) {
+  const transporters = getTransportersSync(bsff);
+  await transaction.bsff.update({
+    where: { id: bsff.id },
+    data: {
+      transportersOrgIds: transporters
+        .flatMap(t => [
+          t.transporterCompanySiret,
+          t.transporterCompanyVatNumber
+        ])
+        .filter(Boolean)
+    }
+  });
+}
+
+/**
+ * Permet de mettre à jour le champ dénormalisé `detenteurCompanySirets`
+ */
+export async function updateDetenteurCompanySirets(
+  bsff: BsffWithFicheInterventions,
+  transaction: PrismaTransaction
+) {
+  await transaction.bsff.update({
+    where: { id: bsff.id },
+    data: {
+      detenteurCompanySirets: bsff.ficheInterventions
+        .map(fi => fi.detenteurCompanySiret)
+        .filter(Boolean)
+    }
+  });
+}
+
 export async function createBsff(
   user: Express.User,
   input: BsffInput,
   { isDraft } = { isDraft: false }
 ) {
   await checkCanCreate(user, input);
-
-  const sirenifiedInput = await sirenifyBsffInput(input, user);
-  const autocompletedInput = await recipify(sirenifiedInput);
-
-  const flatInput: Prisma.BsffCreateInput = {
-    id: getReadableId(ReadableIdPrefix.FF),
-    isDraft,
-    ...flattenBsffInput(autocompletedInput)
-  };
-
-  const flatTransporterInput = flattenBsffTransporterInput(autocompletedInput);
-
-  if (!input.type) {
-    throw new UserInputError("Vous devez préciser le type de BSFF");
-  }
 
   const { findMany: findManyFicheInterventions } =
     getReadonlyBsffFicheInterventionRepository();
@@ -198,51 +213,63 @@ export async function createBsff(
         })
       : [];
 
-  const packagingsInput = input.packagings?.map(toBsffPackagingWithType);
   for (const ficheIntervention of ficheInterventions) {
     await checkCanUpdateFicheIntervention(user, ficheIntervention);
   }
 
-  const futureBsff = {
-    ...flatInput,
-    packagings: packagingsInput,
-    transporters: [flatTransporterInput]
-  };
+  if (!input.type) {
+    // Même si une valeur par défaut est fournie dans le schéma Zod pour
+    // réconcilier le schéma GraphQL (qui permet de ne pas saisir de `type` ou un type null)
+    // et le schéma prisma (dans lequel `type` est un champ requis), on lève ici
+    // une erreur pour forcer l'utilisateur à saisir le type de bordereau de façon explicite.
+    throw new UserInputError("Vous devez renseigner le type de bordereau");
+  }
 
-  await validateBsff(futureBsff, {
-    isDraft,
-    transporterSignature: false
-  });
-  await validateFicheInterventions(futureBsff, ficheInterventions);
-  const { forwarding, grouping, repackaging } = input;
+  const zodBsff = await graphQlInputToZodBsff(input);
 
-  const previousPackagings = await validatePreviousPackagings(futureBsff, {
-    forwarding,
-    grouping,
-    repackaging
-  });
+  const { packagings, transporters, ...parsedZodBsff } = await parseBsffAsync(
+    { ...zodBsff, isDraft },
+    {
+      user,
+      currentSignatureType: !isDraft ? "EMISSION" : undefined
+    }
+  );
 
-  const packagings = getPackagingCreateInput(futureBsff, previousPackagings);
+  const firstTransporter = (() => {
+    if (transporters && transporters.length > 0) {
+      const { id, bsffId, number, ...rest } = transporters[0];
+      return rest;
+    }
+    return {};
+  })();
 
   const data: Prisma.BsffCreateInput = {
-    ...flatInput,
-    packagings: { create: packagings },
+    ...parsedZodBsff,
+    ...(packagings
+      ? {
+          packagings: {
+            create: packagings.map(packaging => {
+              const { id, previousPackagings, ...packagingData } = packaging;
+              return {
+                ...packagingData,
+                previousPackagings: {
+                  connect: (previousPackagings ?? []).map(id => ({ id }))
+                }
+              };
+            })
+          }
+        }
+      : {}),
+    ficheInterventions: {
+      connect: ficheInterventions.map(fi => ({ id: fi.id }))
+    },
     // On crée un premier transporteur par défaut (même si tous les champs sont nuls)
     // Cela permet dans un premier temps d'être raccord avec le modèle "à plat"
     // en attendant l'implémentation du multi-modal
     transporters: {
-      create: { ...flatTransporterInput, number: 1 }
+      create: { ...firstTransporter, number: 1 }
     }
   };
-
-  if (ficheInterventions.length > 0) {
-    data.ficheInterventions = {
-      connect: ficheInterventions.map(({ id }) => ({ id }))
-    };
-    data.detenteurCompanySirets = ficheInterventions
-      .map(fi => fi.detenteurCompanySiret)
-      .filter(Boolean);
-  }
 
   const bsffRepository = getBsffRepository(user);
   const bsff = await bsffRepository.create({
