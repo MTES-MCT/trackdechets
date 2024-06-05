@@ -34,7 +34,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs,
   RevisionRequestStatus,
-  TransportMode,
+  // TransportMode,
   UserPermission
 } from "@td/codegen-ui";
 import {
@@ -207,7 +207,7 @@ function BsdCard({
   // - we are in the "Collected" tab and there is a number plate
   const displayTransporterNumberPlate =
     !!currentTransporterInfos &&
-    currentTransporterInfos.transporterMode === TransportMode.Road &&
+    // currentTransporterInfos.transporterMode === TransportMode.Road &&
     (isToCollectTab ||
       (isCollectedTab &&
         !!currentTransporterInfos?.transporterNumberPlate?.length));
