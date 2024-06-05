@@ -2745,6 +2745,14 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: ecoOrganisme.company.name,
+        siret: ecoOrganisme.company.siret!
+      }
+    });
+
     const { mutate } = makeClient(user);
 
     const appendix1_1 = await prisma.form.create({
@@ -2759,8 +2767,6 @@ describe("Mutation.updateForm", () => {
         emitterCompanyPhone: "01 01 01 01 01",
         emitterCompanyMail: "annexe1@test.com",
         wasteDetailsCode: "16 06 01*",
-        ecoOrganismeName: ecoOrganisme.company.name,
-        ecoOrganismeSiret: ecoOrganisme.company.siret,
         owner: { connect: { id: user.id } }
       }
     });
@@ -2772,7 +2778,9 @@ describe("Mutation.updateForm", () => {
         status: Status.SEALED,
         wasteDetailsCode: "16 06 01*",
         emitterCompanySiret: company.siret,
-        emitterType: EmitterType.APPENDIX1
+        emitterType: EmitterType.APPENDIX1,
+        ecoOrganismeName: ecoOrganisme.company.name,
+        ecoOrganismeSiret: ecoOrganisme.company.siret
       }
     });
 
