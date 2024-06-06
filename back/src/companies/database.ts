@@ -125,9 +125,14 @@ export async function isCompanyMember(user: User, company: Company) {
 export async function getCompanyUsers(
   orgId: string,
   dataloaders: AppDataloaders,
-  requestingUserid: string
+  requestingUserid: string,
+  isTDAdmin?: boolean
 ): Promise<CompanyMember[]> {
-  const activeUsers = await getCompanyActiveUsers(orgId, requestingUserid);
+  const activeUsers = await getCompanyActiveUsers(
+    orgId,
+    requestingUserid,
+    isTDAdmin
+  );
   const invitedUsers = await getCompanyInvitedUsers(orgId, dataloaders);
 
   return [...activeUsers, ...invitedUsers];
@@ -144,7 +149,8 @@ export const userNameDisplay = (
   association: CompanyAssociation & {
     user: User;
   },
-  requestingUserid?: string
+  requestingUserid?: string,
+  isTDAdmin?: boolean
 ): string => {
   const today = new Date();
   // In the following cases, we return clear user name:
@@ -156,7 +162,8 @@ export const userNameDisplay = (
     !association.createdAt ||
     !association.automaticallyAccepted ||
     association.userId === requestingUserid ||
-    !requestingUserid
+    !requestingUserid ||
+    isTDAdmin
   ) {
     return association.user.name;
   }
@@ -176,7 +183,8 @@ export const userNameDisplay = (
  */
 export async function getCompanyActiveUsers(
   orgId: string,
-  requestingUserid?: string
+  requestingUserid?: string,
+  isTDAdmin?: boolean
 ): Promise<CompanyMember[]> {
   const associations = await prisma.company
     .findUniqueOrThrow({ where: { orgId } })
@@ -186,7 +194,7 @@ export async function getCompanyActiveUsers(
     return {
       ...a.user,
       orgId,
-      name: userNameDisplay(a, requestingUserid),
+      name: userNameDisplay(a, requestingUserid, isTDAdmin),
       role: a.role,
       isPendingInvitation: false
     };

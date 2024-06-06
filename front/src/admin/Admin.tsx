@@ -10,6 +10,7 @@ import CompaniesVerification from "./verification/CompaniesVerification";
 import "../Apps/Dashboard/dashboard.scss";
 import { Impersonate } from "./user/impersonate";
 import { Registry } from "./registry/Registry";
+import { MembersAdmin } from "./company/MembersAdmin";
 
 const toRelative = route => {
   return getRelativeRoute(routes.admin.index, route);
@@ -96,6 +97,18 @@ export default function Admin() {
                 Registre
               </NavLink>
             </li>
+            <li className="tw-mb-1">
+              <NavLink
+                to={routes.admin.membersAdmin}
+                className={({ isActive }) =>
+                  isActive
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
+                }
+              >
+                Gestion des admins
+              </NavLink>
+            </li>
           </ul>
         </Accordion>
       </SideBar>
@@ -130,6 +143,11 @@ export default function Admin() {
           <Route
             path={toRelative(routes.admin.registry)}
             element={<Registry />}
+          />
+
+          <Route
+            path={toRelative(routes.admin.membersAdmin)}
+            element={<MembersAdmin />}
           />
 
           <Route

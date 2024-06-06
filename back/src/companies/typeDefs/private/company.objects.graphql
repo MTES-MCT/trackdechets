@@ -57,7 +57,7 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   securityCode: Int
 
   "État du processus de vérification de l'établissement"
-  verificationStatus: CompanyVerificationStatus
+  verificationStatus: CompanyVerificationStatus!
 
   "Email de contact (visible sur la fiche entreprise)"
   contactEmail: String

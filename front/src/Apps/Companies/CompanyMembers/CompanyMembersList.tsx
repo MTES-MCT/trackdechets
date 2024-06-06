@@ -1,14 +1,14 @@
 import React, { useMemo, useState } from "react";
 import { useMutation } from "@apollo/client";
 import {
-  CompanyPrivate,
   UserRole,
   Mutation,
   MutationRemoveUserFromCompanyArgs,
   MutationDeleteInvitationArgs,
   CompanyMember,
   MutationResendInvitationArgs,
-  MutationChangeUserRoleArgs
+  MutationChangeUserRoleArgs,
+  Query
 } from "@td/codegen-ui";
 import {
   REMOVE_USER_FROM_COMPANY,
@@ -23,9 +23,11 @@ import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../../../common/config";
 
 import "./companyMembers.scss";
+import { CompanyPrivateMembers } from "./CompanyMembers";
 
 interface CompanyMembersListProps {
-  company: CompanyPrivate;
+  company: CompanyPrivateMembers;
+  isTDAdmin: boolean;
 }
 
 const deleteModal = createModal({
@@ -54,13 +56,16 @@ export const userRoleSwitchOptions = () => {
   ));
 };
 
-const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
+const CompanyMembersList = ({
+  company,
+  isTDAdmin = false
+}: CompanyMembersListProps) => {
   const [memberToDelete, setMemberToDelete] = useState<CompanyMember | null>(
     null
   );
   const [filter, setFilter] = useState<string>("");
 
-  const isAdmin = company.userRole === UserRole.Admin;
+  const isAdmin = company.userRole === UserRole.Admin || isTDAdmin;
 
   const [removeUserFromCompany] = useMutation<
     Pick<Mutation, "removeUserFromCompany">,
@@ -78,6 +83,19 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
         }
       );
       setMemberToDelete(null);
+    },
+    updateQueries: {
+      CompanyPrivateInfos: (
+        prev: Pick<Query, "companyPrivateInfos">,
+        { mutationResult }
+      ) => {
+        return {
+          companyPrivateInfos: {
+            ...prev,
+            users: mutationResult.data?.removeUserFromCompany.users ?? []
+          }
+        };
+      }
     }
   });
 
@@ -92,6 +110,19 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
       toast.error("L'invitation n'a pas pu être supprimée", {
         duration: TOAST_DURATION
       });
+    },
+    updateQueries: {
+      CompanyPrivateInfos: (
+        prev: Pick<Query, "companyPrivateInfos">,
+        { mutationResult }
+      ) => {
+        return {
+          companyPrivateInfos: {
+            ...prev,
+            users: mutationResult.data?.deleteInvitation.users ?? []
+          }
+        };
+      }
     }
   });
 
@@ -160,24 +191,6 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
         user.email.toLowerCase().includes(filter.toLowerCase())
     );
   }, [filter, company]);
-  // const onFilterMembers = predicate => {
-  //   if (predicate.length === 0) {
-  //     setFilteredMembers(null);
-  //     return;
-  //   }
-
-  //   function filterUsers(users: CompanyMember[], filterString: string) {
-  //     return users.filter(
-  //       user =>
-  //         user.name?.toLowerCase().includes(filterString.toLowerCase()) ||
-  //         user.email.toLowerCase().includes(filterString.toLowerCase())
-  //     );
-  //   }
-
-  //   if (company?.users?.length && company?.users?.length > 0) {
-  //     setFilteredMembers(filterUsers(company.users, predicate));
-  //   }
-  // };
 
   return (
     <div className="company-members__list">

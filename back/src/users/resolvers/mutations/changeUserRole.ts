@@ -5,7 +5,10 @@ import {
   UserInputError
 } from "../../../common/errors";
 
-import { checkIsAuthenticated } from "../../../common/permissions";
+import {
+  checkIsAdmin,
+  checkIsAuthenticated
+} from "../../../common/permissions";
 import {
   getCompanyOrCompanyNotFound,
   userNameDisplay
@@ -31,12 +34,25 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ orgId: args.siret });
-  await checkUserPermissions(
-    user,
-    company.orgId,
-    Permission.CompanyCanManageMembers,
-    NotCompanyAdminErrorMsg(company.orgId)
-  );
+  let isTDAdmin = false;
+  try {
+    isTDAdmin = !!checkIsAdmin(context);
+  } catch (error) {
+    // do nothing
+  }
+  try {
+    await checkUserPermissions(
+      user,
+      company.orgId,
+      Permission.CompanyCanManageMembers,
+      NotCompanyAdminErrorMsg(company.orgId)
+    );
+  } catch (error) {
+    if (!isTDAdmin) {
+      throw error;
+    }
+  }
+
   try {
     const association = await getCompanyAssociationOrNotFound({
       company: {
@@ -58,7 +74,7 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
     return {
       ...updatedAssociation.user,
       orgId: company.orgId,
-      name: userNameDisplay(updatedAssociation, user.id),
+      name: userNameDisplay(updatedAssociation, user.id, isTDAdmin),
       role: updatedAssociation.role,
       isPendingInvitation: false
     };

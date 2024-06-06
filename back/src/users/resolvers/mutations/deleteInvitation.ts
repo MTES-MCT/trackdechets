@@ -1,6 +1,9 @@
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import { checkIsAuthenticated } from "../../../common/permissions";
+import {
+  checkIsAdmin,
+  checkIsAuthenticated
+} from "../../../common/permissions";
 import {
   convertUrls,
   getCompanyOrCompanyNotFound
@@ -18,12 +21,25 @@ const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ orgId: siret });
-  await checkUserPermissions(
-    user,
-    company.orgId,
-    Permission.CompanyCanManageMembers,
-    NotCompanyAdminErrorMsg(company.orgId)
-  );
+  let isTDAdmin = false;
+  try {
+    isTDAdmin = !!checkIsAdmin(context);
+  } catch (error) {
+    // do nothing
+  }
+  try {
+    await checkUserPermissions(
+      user,
+      company.orgId,
+      Permission.CompanyCanManageMembers,
+      NotCompanyAdminErrorMsg(company.orgId)
+    );
+  } catch (error) {
+    if (!isTDAdmin) {
+      throw error;
+    }
+  }
+
   const hash = await getUserAccountHashOrNotFound({
     email,
     companySiret: siret
