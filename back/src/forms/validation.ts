@@ -2035,7 +2035,7 @@ export async function validateAppendix1Groupement(
     });
     if (!company) {
       throw new UserInputError(
-        `L'émetteur du bordereau d'annexe 1 ${initialForm.id} n'est pas inscrit sur Trackdéchets. Il est impossible de joindre cette annexe à un bordereau chapeau sans éco-organisme.`
+        `L'émetteur du bordereau d'annexe 1 ${initialForm.readableId} n'est pas inscrit sur Trackdéchets. Il est impossible de joindre cette annexe à un bordereau chapeau sans éco-organisme.`
       );
     }
   }
