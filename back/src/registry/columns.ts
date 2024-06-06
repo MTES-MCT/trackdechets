@@ -165,9 +165,11 @@ export const columns: Column[] = [
   },
   { field: "traderCompanyName", label: "Négociant raison sociale" },
   { field: "traderCompanySiret", label: "Négociant SIRET" },
+  { field: "traderCompanyMail", label: "Négociant contact" },
   { field: "traderRecepisseNumber", label: "Négociant récépissé " },
   { field: "brokerCompanyName", label: "Courtier raison sociale" },
   { field: "brokerCompanySiret", label: "Courtier SIRET" },
+  { field: "brokerCompanyMail", label: "Courtier contact" },
   { field: "brokerRecepisseNumber", label: "Courtier N°récepissé" },
   // Transport du déchet
 
@@ -204,6 +206,7 @@ export const columns: Column[] = [
   { field: "destinationCompanyName", label: "Destination raison sociale" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },
   { field: "destinationCompanyAddress", label: "Destination adresse" },
+  { field: "destinationCompanyMail", label: "Destination Contact" },
   {
     field: "destinationReceptionAcceptationStatus",
     label: "Statut d'acceptation du déchet"

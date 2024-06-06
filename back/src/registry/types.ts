@@ -115,7 +115,10 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   wasteIsDangerous: null,
   workerCompanyName: null,
   workerCompanySiret: null,
-  workerCompanyAddress: null
+  workerCompanyAddress: null,
+  brokerCompanyMail: null,
+  destinationCompanyMail: null,
+  traderCompanyMail: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -187,7 +190,9 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   workerCompanySiret: null,
   workerCompanyAddress: null,
   destinationFinalOperationCodes: [],
-  destinationFinalOperationWeights: []
+  destinationFinalOperationWeights: [],
+  brokerCompanyMail: null,
+  traderCompanyMail: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -250,7 +255,9 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   workerCompanyName: null,
   workerCompanySiret: null,
   workerCompanyAddress: null,
-  wasteIsDangerous: null
+  wasteIsDangerous: null,
+  brokerCompanyMail: null,
+  traderCompanyMail: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -316,10 +323,12 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   wasteIsDangerous: null,
   workerCompanyName: null,
   workerCompanySiret: null,
-  workerCompanyAddress: null
+  workerCompanyAddress: null,
   // En attente des correctifs recette sur TRA-12745
   // finalOperationCodes: null,
   // finalReceptionWeights: null
+  brokerCompanyMail: null,
+  traderCompanyMail: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -397,5 +406,7 @@ export const emptyAllWaste: Required<AllWaste> = {
   workerCompanySiret: null,
   workerCompanyAddress: null,
   destinationFinalOperationCodes: [],
-  destinationFinalOperationWeights: []
+  destinationFinalOperationWeights: [],
+  brokerCompanyMail: null,
+  traderCompanyMail: null
 };

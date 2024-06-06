@@ -154,7 +154,9 @@ export const getSubType = (bsdd: Bsdd): BsdSubType => {
   return "INITIAL";
 };
 
-function toGenericWaste(bsdd: ReturnType<typeof formToBsdd>): GenericWaste {
+export function toGenericWaste(
+  bsdd: ReturnType<typeof formToBsdd>
+): GenericWaste {
   const initialEmitter: Record<string, string | string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
@@ -191,10 +193,13 @@ function toGenericWaste(bsdd: ReturnType<typeof formToBsdd>): GenericWaste {
       bsdd.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdd.destinationOperationDate,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationCompanyMail: bsdd.destinationCompanyMail,
     wasteAdr: bsdd.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    brokerCompanyMail: bsdd.brokerCompanyMail,
+    traderCompanyMail: bsdd.traderCompanyMail,
     ...getTransportersData(bsdd),
     ...initialEmitter
   };
@@ -296,7 +301,6 @@ export function toOutgoingWaste(
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     weight: bsdd.weightValue,
     emitterCustomInfo: null,
-    destinationCompanyMail: bsdd.destinationCompanyMail,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd)
   };
@@ -354,8 +358,7 @@ export function toTransportedWaste(
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    emitterCompanyMail: bsdd.emitterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail
+    emitterCompanyMail: bsdd.emitterCompanyMail
   };
 }
 
@@ -410,8 +413,7 @@ export function toManagedWaste(
       bsdd.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    emitterCompanyMail: bsdd.emitterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail
+    emitterCompanyMail: bsdd.emitterCompanyMail
   };
 }
 
@@ -469,7 +471,6 @@ export function toAllWaste(
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd)
   };
