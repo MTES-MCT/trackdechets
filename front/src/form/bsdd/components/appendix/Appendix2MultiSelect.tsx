@@ -210,7 +210,7 @@ export default function Appendix2MultiSelect() {
             </th>
             <th>Expéditeur initial</th>
             <th>Date de réception</th>
-            <th>Quantité reçue</th>
+            <th>Quantité acceptée</th>
             <th>Quantité restante</th>
             <th>Quantité à regrouper</th>
             <th>Opération réalisée</th>
