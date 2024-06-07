@@ -9,6 +9,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout de la possibilité de gérer les rôles des membres d'une entreprise depuis la liste des membres [PR 3384](https://github.com/MTES-MCT/trackdechets/pull/3384)
+- Ajout d'une gestion des membres d'entreprises pour les admin Trackdéchets [PR 3384](https://github.com/MTES-MCT/trackdechets/pull/3384)
+
 #### :bug: Corrections de bugs
 
 - Correctif de la mise à jour d'un paoh depuis la modale de publication [PR 3390](https://github.com/MTES-MCT/trackdechets/pull/3390)
