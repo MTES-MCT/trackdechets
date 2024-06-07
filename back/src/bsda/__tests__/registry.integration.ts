@@ -91,6 +91,29 @@ describe("toAllWaste", () => {
   );
 });
 
+describe("toGenericWaste", () => {
+  it("should return destinationCompanyEmail & brokerCompanyMail", async () => {
+    // Given
+    const form = await bsdaFactory({
+      opt: {
+        destinationCompanyMail: "destination@mail.com",
+        brokerCompanyMail: "broker@mail.com"
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyMail).toStrictEqual("destination@mail.com");
+    expect(waste.brokerCompanyMail).toStrictEqual("broker@mail.com");
+  });
+});
+
 describe("getSubType", () => {
   afterAll(resetDatabase);
 
