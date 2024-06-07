@@ -1,0 +1,111 @@
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import {
+  userWithCompanyFactory,
+  userFactory
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
+import { prisma } from "@td/prisma";
+import { AuthType } from "../../../../auth";
+import { Mutation } from "../../../../generated/graphql/types";
+import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
+
+const CHANGE_USER_ROLE = `
+  mutation ChangeUserRole($userId: ID!, $siret: ID!, $role: UserRole!){
+    changeUserRole(userId: $userId, siret: $siret, role: $role){
+      email
+      role
+    }
+  }
+`;
+
+describe("mutation changeUserRole", () => {
+  afterAll(resetDatabase);
+
+  test("admin can change a company user's role", async () => {
+    const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+    const userToModify = await userFactory({
+      companyAssociations: {
+        create: {
+          company: { connect: { id: company.id } },
+          role: "MEMBER"
+        }
+      }
+    });
+
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+    const { data } = await mutate<Pick<Mutation, "changeUserRole">>(
+      CHANGE_USER_ROLE,
+      {
+        variables: {
+          userId: userToModify.id,
+          siret: company.siret,
+          role: "ADMIN"
+        }
+      }
+    );
+    expect(data.changeUserRole.email).toEqual(userToModify.email);
+    expect(data.changeUserRole.role).toEqual("ADMIN");
+    const companyAssociations = await prisma.user
+      .findUniqueOrThrow({ where: { id: userToModify.id } })
+      .companyAssociations();
+    expect(companyAssociations).toHaveLength(1);
+    expect(companyAssociations[0].role).toEqual("ADMIN");
+  });
+
+  test("TD admin user can change a company user's role", async () => {
+    const { user: userToModify, company } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const tdAdminUser = await userFactory({
+      isAdmin: true
+    });
+    const { mutate } = makeClient({ ...tdAdminUser, auth: AuthType.Session });
+
+    const { data } = await mutate<Pick<Mutation, "changeUserRole">>(
+      CHANGE_USER_ROLE,
+      {
+        variables: {
+          userId: userToModify.id,
+          siret: company.siret,
+          role: "ADMIN"
+        }
+      }
+    );
+    expect(data.changeUserRole.email).toEqual(userToModify.email);
+    expect(data.changeUserRole.role).toEqual("ADMIN");
+    const companyAssociations = await prisma.user
+      .findUniqueOrThrow({ where: { id: userToModify.id } })
+      .companyAssociations();
+    expect(companyAssociations).toHaveLength(1);
+    expect(companyAssociations[0].role).toEqual("ADMIN");
+  });
+
+  test("user who isn't an admin of a company can't change a company user's role", async () => {
+    const { user: userToModify, company } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const notAdminUser = await userFactory({
+      isAdmin: false
+    });
+    const { mutate } = makeClient({ ...notAdminUser, auth: AuthType.Session });
+
+    const { errors } = await mutate<Pick<Mutation, "changeUserRole">>(
+      CHANGE_USER_ROLE,
+      {
+        variables: {
+          userId: userToModify.id,
+          siret: company.siret,
+          role: "ADMIN"
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: NotCompanyAdminErrorMsg(company.orgId),
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+  });
+});
