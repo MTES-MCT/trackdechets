@@ -5,10 +5,7 @@ import {
   UserInputError
 } from "../../../common/errors";
 
-import {
-  checkIsAdmin,
-  checkIsAuthenticated
-} from "../../../common/permissions";
+import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   getCompanyOrCompanyNotFound,
   userNameDisplay
@@ -18,7 +15,10 @@ import {
   MutationResolvers,
   UserRole
 } from "../../../generated/graphql/types";
-import { checkUserPermissions, Permission } from "../../../permissions";
+import {
+  checkUserIsAdminOrPermissions,
+  Permission
+} from "../../../permissions";
 import {
   getCompanyAssociationOrNotFound,
   getUserAccountHashOrNotFound,
@@ -34,24 +34,13 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ orgId: args.siret });
-  let isTDAdmin = false;
-  try {
-    isTDAdmin = !!checkIsAdmin(context);
-  } catch (error) {
-    // do nothing
-  }
-  try {
-    await checkUserPermissions(
-      user,
-      company.orgId,
-      Permission.CompanyCanManageMembers,
-      NotCompanyAdminErrorMsg(company.orgId)
-    );
-  } catch (error) {
-    if (!isTDAdmin) {
-      throw error;
-    }
-  }
+
+  const isTDAdmin = await checkUserIsAdminOrPermissions(
+    user,
+    company.orgId,
+    Permission.CompanyCanManageMembers,
+    NotCompanyAdminErrorMsg(company.orgId)
+  );
 
   try {
     const association = await getCompanyAssociationOrNotFound({
