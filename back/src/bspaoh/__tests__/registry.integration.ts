@@ -1,4 +1,4 @@
-import { prisma } from "../../../../libs/back/prisma/src";
+import { prisma } from "@td/prisma";
 import { RegistryBspaohInclude } from "../../registry/elastic";
 import { toOutgoingWaste } from "../registry";
 import { bspaohFactory } from "./factories";

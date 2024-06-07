@@ -1,4 +1,4 @@
-import { prisma } from "../../../../libs/back/prisma/src";
+import { prisma } from "@td/prisma";
 import { toOutgoingWaste } from "../registry";
 import { bsvhuFactory } from "./factories.vhu";
 
