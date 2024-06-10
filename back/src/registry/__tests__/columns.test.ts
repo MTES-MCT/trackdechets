@@ -1,5 +1,5 @@
-import { IncomingWaste } from "../../generated/graphql/types";
-import { CUSTOM_WASTE_COLUMNS, formatRow } from "../columns";
+import { BsdSubType, IncomingWaste } from "../../generated/graphql/types";
+import { CUSTOM_WASTE_COLUMNS, formatRow, formatSubType } from "../columns";
 
 describe("formatRow", () => {
   it("should format waste", () => {
@@ -113,5 +113,31 @@ describe("formatRow", () => {
     expect(Object.keys(formattedWithLabels).length).toEqual(
       Object.keys(waste).length + CUSTOM_WASTE_COLUMNS.length
     );
+  });
+});
+
+describe("formatSubType", () => {
+  it.each([
+    [null, ""],
+    [undefined, ""],
+    ["", ""],
+    ["NOT_A_BSD_SUBTYPE", ""],
+    ["INITIAL", "Initial"],
+    ["TOURNEE", "Tournée dédiée"],
+    ["APPENDIX1", "Annexe 1"],
+    ["APPENDIX2", "Annexe 2"],
+    ["TEMP_STORED", "Entreposage provisoire"],
+    ["COLLECTION_2710", "Collecte en déchetterie"],
+    ["GATHERING", "Groupement"],
+    ["GROUPEMENT", "Regroupement"],
+    ["RESHIPMENT", "Réexpédition"],
+    ["RECONDITIONNEMENT", "Reconditionnement"],
+    ["SYNTHESIS", "Synthèse"]
+  ])("%p should return %p", (input, expected) => {
+    // When
+    const result = formatSubType(input as BsdSubType);
+
+    // Then
+    expect(result).toEqual(expected);
   });
 });

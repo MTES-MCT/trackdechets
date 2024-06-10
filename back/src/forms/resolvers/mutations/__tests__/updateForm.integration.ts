@@ -2684,6 +2684,122 @@ describe("Mutation.updateForm", () => {
     );
   });
 
+  it("should not allow to group an APPENDIX1_PRODUCER form with an emitter that is not registered", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const appendix1_1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: "42172923700022",
+        emitterCompanyName: "UnregisteredProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    // Group with appendix1_1
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1
+      }
+    });
+
+    // Update container
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          grouping: [{ form: { id: appendix1_1.id }, quantity: 0 }]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'émetteur du bordereau d'annexe 1 ${appendix1_1.id} n'est pas inscrit sur Trackdéchets. Il est impossible de joindre cette annexe à un bordereau chapeau sans éco-organisme.`,
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
+  });
+
+  it("should allow to group an APPENDIX1_PRODUCER form with an emitter that is not registered if the container has an eco organisme", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const ecoOrganisme = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["ECO_ORGANISME"]
+      }
+    });
+    await prisma.ecoOrganisme.create({
+      data: {
+        address: "",
+        name: ecoOrganisme.company.name,
+        siret: ecoOrganisme.company.siret!
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const appendix1_1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: "42172923700022",
+        emitterCompanyName: "UnregisteredProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    // Group with appendix1_1
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1,
+        ecoOrganismeName: ecoOrganisme.company.name,
+        ecoOrganismeSiret: ecoOrganisme.company.siret
+      }
+    });
+
+    // Update container
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          grouping: [{ form: { id: appendix1_1.id }, quantity: 0 }]
+        }
+      }
+    });
+
+    expect(data.updateForm.grouping).toHaveLength(1);
+  });
+
   it(
     "should be possible to update a form where transport is ROAD and wasteDetailsQuantity is > 40T " +
       "if it was created before (<=) process.env.MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER",

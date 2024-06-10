@@ -54,7 +54,7 @@ const formatFinalOperations = (val?: string[]) =>
   val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
 const formatFinalOperationWeights = (val?: number[]) =>
   val ? val.map(quant => quant.toFixed(2)).join("; ") : "";
-const formatSubType = (subType?: BsdSubType) => {
+export const formatSubType = (subType?: BsdSubType) => {
   if (!subType) return "";
 
   switch (subType) {
@@ -72,6 +72,8 @@ const formatSubType = (subType?: BsdSubType) => {
       return "Collecte en déchetterie";
     case "GATHERING":
       return "Groupement";
+    case "GROUPEMENT":
+      return "Regroupement";
     case "RESHIPMENT":
       return "Réexpédition";
     case "RECONDITIONNEMENT":

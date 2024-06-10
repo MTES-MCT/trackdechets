@@ -515,7 +515,7 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it("should mark a form as NO_TRACEABILITY when user declares it and with non-french EU destination", async () => {
+  it("should mark a form as NO_TRACEABILITY when user declares it, next destination is not provided and notificationNumber is missing", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -537,11 +537,9 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z",
           noTraceability: true,
           nextDestination: {
-            notificationNumber: "abc",
-            processingOperation: "D 1",
-            company: {
-              vatNumber: "IE9513674T"
-            }
+            processingOperation: "D 1"
+            // next destination is not provided
+            // notification number not provided
           }
         }
       }
@@ -678,6 +676,7 @@ describe("mutation.markAsProcessed", () => {
           nextDestination: {
             processingOperation: "D 1",
             company: null
+            // no notification number
           }
         }
       }
@@ -1306,28 +1305,44 @@ describe("mutation.markAsProcessed", () => {
     });
     expect(updatedGroupedForm2.status).toEqual("PROCESSED");
   });
-
-  it("should not mark appendix2 forms as processed if they are partially grouped", async () => {
+  it("should mark appendix2 forms as processed  despite rogue decimal digits", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
-    const appendix2 = await formFactory({
+    const groupedForm1 = await formFactory({
       ownerId: user.id,
       opt: {
-        status: "AWAITING_GROUP",
-        quantityReceived: 1
+        status: "GROUPED",
+        quantityReceived: 1.000000000000001 // decimal digits after 6th place
       }
     });
+
+    // it should also work for BSD with temporary storage
+    const groupedForm2 = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        quantityReceived: 0.02
+      }
+    });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "ACCEPTED",
+        emitterType: "APPENDIX2",
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
         grouping: {
-          create: {
-            initialFormId: appendix2.id,
-            quantity: 0.1
-          }
+          create: [
+            {
+              initialFormId: groupedForm1.id,
+              quantity: 1
+            },
+            {
+              initialFormId: groupedForm2.id,
+              quantity: groupedForm2.forwardedIn!.quantityReceived!.toNumber()
+            }
+          ]
         }
       }
     });
@@ -1347,11 +1362,65 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const appendix2grouped = await prisma.form.findUniqueOrThrow({
-      where: { id: appendix2.id }
+    const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm1.id }
     });
-    expect(appendix2grouped.status).toEqual("AWAITING_GROUP");
+    expect(updatedGroupedForm1.status).toEqual("PROCESSED");
+
+    const updatedGroupedForm2 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm2.id }
+    });
+    expect(updatedGroupedForm2.status).toEqual("PROCESSED");
   });
+
+  it.each([0.1, 1])(
+    "should not mark appendix2 forms as processed if they are partially grouped - quantity grouped:  %p",
+    async quantityGrouped => {
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const appendix2 = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "AWAITING_GROUP",
+          quantityReceived: 1.0000001
+        }
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "ACCEPTED",
+          recipientCompanyName: company.name,
+          recipientCompanySiret: company.siret,
+          grouping: {
+            create: {
+              initialFormId: appendix2.id,
+              quantity: quantityGrouped
+            }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+
+      await mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 1",
+            destinationOperationMode: OperationMode.ELIMINATION,
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z"
+          }
+        }
+      });
+
+      const appendix2grouped = await prisma.form.findUniqueOrThrow({
+        where: { id: appendix2.id }
+      });
+      expect(appendix2grouped.status).toEqual("AWAITING_GROUP");
+    }
+  );
 
   test.each(allowedFormats)("%p is a valid format for processedAt", async f => {
     const { user, company } = await userWithCompanyFactory("ADMIN");

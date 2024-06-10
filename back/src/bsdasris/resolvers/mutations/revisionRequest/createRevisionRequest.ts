@@ -110,6 +110,11 @@ async function checkIfUserCanRequestRevisionOnBsdasri(
       "Impossible de créer une révision sur un bordereau de synthèse ou de groupement."
     );
   }
+  if (bsdasri.groupedInId || bsdasri.synthesizedInId) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur un bordereau inclus dans une synthèse ou un groupement."
+    );
+  }
   if (bsdasri.status === BsdasriStatus.INITIAL) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Vous pouvez le modifier directement, aucune signature bloquante n'a encore été apposée."

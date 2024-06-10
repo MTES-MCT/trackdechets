@@ -1,5 +1,5 @@
 import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
-import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
+import { BsdasriType, Bsdasri } from "@prisma/client";
 
 import { BsdasriInput } from "../../../generated/graphql/types";
 import { validateBsdasri } from "../../validation";
@@ -73,18 +73,6 @@ const updateBsdasri = async ({
     const newDasrisToGroup = inputGrouping.filter(
       id => !dbGrouping.some(({ id: dbId }) => dbId === id)
     );
-    // there is a difference between existing grouping DASRIs and input
-    // if there are new ones or some were removed.
-    // checking if there are new ones or the arrays are of different size is equivalent
-    // but less costly
-    const hasGroupingDiff =
-      newDasrisToGroup.length > 0 || inputGrouping.length !== dbGrouping.length;
-
-    if (hasGroupingDiff && dbBsdasri.status !== BsdasriStatus.INITIAL) {
-      throw new UserInputError(
-        "Les bordereaux associés à ce bsd ne sont plus modifiables"
-      );
-    }
 
     await emitterIsAllowedToGroup(
       flattenedInput?.emitterCompanySiret ?? dbBsdasri?.emitterCompanySiret
