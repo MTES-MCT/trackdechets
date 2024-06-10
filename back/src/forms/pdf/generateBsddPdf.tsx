@@ -36,6 +36,7 @@ import { getOperationModeLabel } from "../../common/operationModes";
 import { FormCompanyDetails } from "../../common/pdf/components/FormCompanyDetails";
 import { isFrenchCompany } from "../../companies/validation";
 import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
+import { displayWasteQuantity } from "../../registry/utils";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -134,20 +135,15 @@ function AcceptationFields({
       />{" "}
       partiellement
       <br />
+      Quantité refusée :{" "}
+      {displayWasteQuantity(wasteQuantities?.quantityRefused)}
+      <br />
+      Quantité acceptée :{" "}
+      {displayWasteQuantity(wasteQuantities?.quantityAccepted)}
+      <br />
       Motif de refus (même partiel) :<br />
       {wasteRefusalReason}
       <br />
-      {wasteQuantities && (
-        <>
-          Quantité de déchets refusée :{" "}
-          {wasteQuantities.quantityRefused.toNumber()} tonne(s)
-          <br />
-          Quantité de déchets acceptée :{" "}
-          {wasteQuantities.quantityAccepted.toNumber()} tonne(s)
-          <br />
-          <br />
-        </>
-      )}
       Date de signature : {formatDate(signedAt)}
       <br />
     </p>
@@ -775,8 +771,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
             ) : (
               <>
                 <p>
-                  Quantité de déchets réceptionnée : {form.quantityReceived}{" "}
-                  tonne(s)
+                  Quantité présentée nette : {form.quantityReceived} tonne(s)
                   <br />
                   Date de présentation : {formatDate(form.receivedAt)}
                 </p>
@@ -883,7 +878,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                     cadre 2
                   </strong>
                 </p>
-                <p>Quantité présentée :</p>
+                <p>Quantité présentée nette :</p>
                 <QuantityFields
                   quantity={
                     form.temporaryStorageDetail?.temporaryStorer
