@@ -286,7 +286,7 @@ const CompanyMembersList = ({
                         {user.isPendingInvitation && !user.isMe && (
                           <>
                             <button
-                              className="fr-btn fr-btn--secondary fr-icon-mail-line"
+                              className="fr-btn fr-btn--secondary fr-icon-mail-line fr-mr-1w"
                               onClick={() => onClickResendInvitation(user)}
                             >
                               Renvoyer l'invitation
