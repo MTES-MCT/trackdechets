@@ -1,40 +1,30 @@
-import React from "react";
-import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 import InfoWithIcon from "./InfoWithIcon";
 import { InfoIconCode } from "./infoWithIconTypes";
 
-export default {
-  title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/InfoWithIcon",
-  component: InfoWithIcon,
-  design: {
-    type: "figma",
-    url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2431&t=0tYb1cF2o4m4Id2g-4"
-  }
-} as ComponentMeta<typeof InfoWithIcon>;
+const meta: Meta<typeof InfoWithIcon> = {
+  component: InfoWithIcon
+};
+export default meta;
 
-const Template: ComponentStory<typeof InfoWithIcon> = args => (
-  <InfoWithIcon {...args} />
-);
+type Story = StoryObj<typeof InfoWithIcon>;
 
-export const EntreposageProvisoire = Template.bind({});
-export const DateDeDerniereModification = Template.bind({});
-export const EcoOrganisme = Template.bind({});
-export const CustomInfo = Template.bind({});
-export const TransporterNumberPlate = Template.bind({});
+export const EntreposageProvisoire: Story = {
+  args: { labelCode: InfoIconCode.TempStorage }
+};
 
-EntreposageProvisoire.args = {
-  labelCode: InfoIconCode.TempStorage
+export const DateDeDerniereModification: Story = {
+  args: { labelCode: InfoIconCode.LastModificationDate, info: "21/12/2022" }
 };
-DateDeDerniereModification.args = {
-  labelCode: InfoIconCode.LastModificationDate,
-  info: "21/12/2022"
+
+export const EcoOrganisme: Story = {
+  args: { labelCode: InfoIconCode.EcoOrganism }
 };
-EcoOrganisme.args = {
-  labelCode: InfoIconCode.EcoOrganism
+
+export const CustomInfo: Story = {
+  args: { labelCode: InfoIconCode.CustomInfo }
 };
-CustomInfo.args = {
-  labelCode: InfoIconCode.CustomInfo
-};
-TransporterNumberPlate.args = {
-  labelCode: InfoIconCode.TransporterNumberPlate
+
+export const TransporterNumberPlate: Story = {
+  args: { labelCode: InfoIconCode.TransporterNumberPlate }
 };
