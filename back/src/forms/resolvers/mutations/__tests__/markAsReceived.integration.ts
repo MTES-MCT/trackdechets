@@ -280,7 +280,7 @@ describe("Test Form reception", () => {
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
-          "Refus de prise en charge de votre déchet de l'entreprise company_1"
+          "Le déchet de l’entreprise company_1 a été totalement refusé à réception"
       })
     );
   });
