@@ -11,6 +11,14 @@ import { getFirstTransporterSync } from "../converter";
 import { PrismaBspaohWithTransporters } from "../types";
 import { buildPdfAsBase64 } from "../pdf/generator";
 
+const getValueDividedBy1000 = (quantity: number | null) => {
+  if (quantity !== null) {
+    return new Decimal(quantity).dividedBy(1000).toNumber().toString(); // mustache doesn't differenciate 0 and null, so return a string
+  }
+
+  return null;
+};
+
 export async function renderBspaohRefusedEmail(
   bspaoh: PrismaBspaohWithTransporters
 ): Promise<Mail | undefined> {
@@ -73,11 +81,15 @@ export async function renderBspaohRefusedEmail(
           ? transporter.transporterRecepisseNumber
           : "",
         sentBy: bspaoh.emitterEmissionSignatureAuthor,
-        quantityReceived: bspaoh.destinationReceptionWasteAcceptedWeightValue
-          ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
-              .dividedBy(1000)
-              .toNumber()
-          : "non précisé"
+        quantityReceived: getValueDividedBy1000(
+          bspaoh?.destinationReceptionWasteReceivedWeightValue
+        ),
+        quantityRefused: getValueDividedBy1000(
+          bspaoh?.destinationReceptionWasteRefusedWeightValue
+        ),
+        quantityAccepted: getValueDividedBy1000(
+          bspaoh?.destinationReceptionWasteAcceptedWeightValue
+        )
       }
     },
     attachment: attachmentData
