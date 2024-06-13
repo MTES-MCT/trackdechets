@@ -7,7 +7,8 @@ import {
   isWasteProcessor,
   isWasteVehicles,
   isWorker,
-  isCrematorium
+  isCrematorium,
+  hasCremationProfile
 } from "../../companies/validation";
 import { CompanyVerificationStatus } from "@prisma/client";
 import { prisma } from "@td/prisma";
@@ -123,12 +124,12 @@ export async function isDestinationRefinement(
 
 export async function isCrematoriumRefinement(siret: string, ctx) {
   const company = await refineSiretAndGetCompany(siret, ctx);
-  if (company && !isCrematorium(company)) {
+  if (company && !isCrematorium(company) && !hasCremationProfile(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:
         `L'entreprise avec le SIRET "${siret}" n'est pas inscrite` +
-        ` sur Trackdéchets en tant que crématorium. Cette installation ne peut` +
+        ` sur Trackdéchets en tant que crématorium et ne dispose pas d'une capacité de crémation. Cette installation ne peut` +
         ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
         ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
     });

@@ -27,7 +27,9 @@ trackdechetsId
 contact
 contactPhone
 contactEmail
-companyTypes`;
+companyTypes
+collectorTypes
+wasteProcessorTypes`;
 
 const transporterReceiptCompanySearchString = `
 transporterReceipt {

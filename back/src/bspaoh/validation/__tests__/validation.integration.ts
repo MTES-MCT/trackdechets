@@ -360,7 +360,7 @@ describe("BSPAOH validation", () => {
 
       expect(result.error.issues[0].message).toBe(
         `L'entreprise avec le SIRET "${company.siret}" n'est pas inscrite` +
-          ` sur Trackdéchets en tant que crématorium. Cette installation ne peut` +
+          ` sur Trackdéchets en tant que crématorium et ne dispose pas d'une capacité de crémation. Cette installation ne peut` +
           ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
           ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
       );
