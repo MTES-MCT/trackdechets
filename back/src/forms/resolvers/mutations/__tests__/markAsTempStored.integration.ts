@@ -285,7 +285,7 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
-          "Le déchet de l’entreprise PRODUCER a été totalement refusé à réception"
+          "Le déchet de l’entreprise WASTE PRODUCER a été totalement refusé à réception"
       })
     );
   });
@@ -715,8 +715,7 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(statusLogs.length).toEqual(1);
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject:
-          "Le déchet de l’entreprise PRODUCER a été totalement refusé à réception"
+        subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été totalement refusé à réception`
       })
     );
   });
@@ -845,11 +844,10 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(statusLogs.length).toEqual(1);
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject:
-          "Refus partiel de prise en charge de votre déchet de l'entreprise WASTE PRODUCER",
-        body: expect.stringContaining(`<li>Quantité de déchets réceptionnée: 10 tonnes</li>
-    <li>Quantité de déchets refusée: 7 tonnes</li>
-    <li>Quantité de déchets acceptée: 3 tonnes</li>`)
+        subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
+        body: expect.stringContaining(`<li>Quantité réelle présentée nette: 10 tonnes</li>
+    <li>Quantité refusée: 7 tonnes</li>
+    <li>Quantité acceptée: 3 tonnes</li>`)
       })
     );
   });
@@ -922,9 +920,10 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(statusLogs.length).toEqual(1);
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
-        subject:
-          "Refus partiel de prise en charge de votre déchet de l'entreprise WASTE PRODUCER",
-        body: expect.stringContaining(`<li>Quantité acceptée: 10 tonnes</li>`)
+        subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
+        body: expect.stringContaining(`<li>Quantité réelle présentée nette: 10 tonnes</li>
+    <li>Quantité refusée: Non renseigné</li>
+    <li>Quantité acceptée: Non renseigné</li>`)
       })
     );
   });
