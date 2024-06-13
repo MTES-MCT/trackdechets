@@ -650,7 +650,7 @@ const parcelNumber = yup.object({
     .max(5)
     .required("Parcelle: le numéro de parcelle est obligatoire")
 });
-const patternSixDigisAfterComma = /^\d+(\.\d{0,6})?$/;
+const patternSixDigisAfterComma = /^[-+]?\d+(\.\d{0,6})?$/;
 const parcelCoordinates = yup.object({
   x: yup
     .number()
