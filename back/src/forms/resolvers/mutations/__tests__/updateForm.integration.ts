@@ -2912,6 +2912,57 @@ describe("Mutation.updateForm", () => {
     );
   });
 
+  it("should not allow grouping appendix1 into a container if this container is still a draft", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    // Group with appendix1_1
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.DRAFT,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1
+      }
+    });
+
+    const appendix1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    // Try to add appendix1
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          grouping: [{ form: { id: appendix1.id } }]
+        }
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toContain(
+      "Impossible de regrouper des BSDD d'annexe 1 sur un bordereau de tournée en brouillon"
+    );
+  });
+
   it.each([Status.DRAFT, Status.SEALED, Status.SIGNED_BY_PRODUCER])(
     "should be possible to update transporter when status is %p",
     async status => {
