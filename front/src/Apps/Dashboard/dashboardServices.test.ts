@@ -1231,7 +1231,7 @@ describe("dashboardServices", () => {
 
       const result = getWorkflowLabel(bsdWorkflowType);
 
-      expect(result).toBe(WorkflowDisplayType.GRP);
+      expect(result).toBe(WorkflowDisplayType.REGROUPEMENT);
     });
 
     it("should return correct label for BsffType.Reexpedition", () => {
