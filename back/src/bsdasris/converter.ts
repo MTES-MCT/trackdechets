@@ -315,7 +315,7 @@ type ComputeTotalVolumeFn = (
 /**
  * Compute total volume according to packaging infos details
  */
-const computeTotalVolume: ComputeTotalVolumeFn = packagings => {
+export const computeTotalVolume: ComputeTotalVolumeFn = packagings => {
   if (!packagings) {
     return undefined;
   }

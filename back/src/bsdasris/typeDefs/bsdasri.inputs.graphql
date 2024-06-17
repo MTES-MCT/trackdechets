@@ -349,7 +349,7 @@ input BsdasriRevisionRequestContentInput {
 }
 
 input BsdasriRevisionRequestEmitterInput {
-  "Informations chantier (si différente de l'adresse de l'entreprise)"
+  "Informations chantier (si différente de l'adresse de l'entreprise). Disponible uniquement sur le dasri simple"
   pickupSite: PickupSiteInput
 }
 
@@ -371,12 +371,12 @@ input BsdasriRevisionRequestOperationInput {
 }
 
 input BsdasriRevisionRequestReceptionInput {
-  "Conditionnement"
+  "Conditionnement. Disponible sur bsdasri simple et de groupement."
   packagings: [BsdasriPackagingsInput!]
 }
 
 input BsdasriRevisionRequestWasteInput {
-  "Rubrique Déchet"
+  "Rubrique Déchet. Disponible sur bsdasri simple et de groupement."
   code: String
 }
 
