@@ -21,6 +21,7 @@ import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 import { CREATE_COMPANY_HOOK_OPTIONS } from "./AccountCompanyAdd";
 import { CREATE_COMPANY } from "../common/queries";
+import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotice";
 
 interface Values extends FormikValues {
   siret: string;
@@ -127,7 +128,7 @@ export default function AccountCompanyAddProducer() {
                       );
                     }}
                   </Field>
-
+                  <GivenNameNotice />
                   {companyInfos?.name ? (
                     <div className={styles.field}>
                       <label>Raison sociale</label>
