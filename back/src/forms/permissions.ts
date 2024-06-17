@@ -584,7 +584,10 @@ export async function hasSignatureAutomation({
   signedFor: string;
 }) {
   const firstMatchingAutomation = await prisma.signatureAutomation.findFirst({
-    where: { from: { siret: signedFor }, to: { siret: signedBy } }
+    where: {
+      from: { siret: signedFor, allowAppendix1SignatureAutomation: true },
+      to: { siret: signedBy }
+    }
   });
 
   return firstMatchingAutomation != null;

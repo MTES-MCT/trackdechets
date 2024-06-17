@@ -288,6 +288,7 @@ model Company {
   workerCertification                  WorkerCertification?      @relation(fields: [workerCertificationId], references: [id])
   companyAssociations                  CompanyAssociation[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
+  allowAppendix1SignatureAutomation    Boolean                   @default(false)
   MembershipRequest                    MembershipRequest[]
   // Révisions
   bsdaRevisionRequests                 BsdaRevisionRequest[]
