@@ -950,7 +950,9 @@ describe("signTransportForm", () => {
       const { company: producerCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        allowAppendix1SignatureAutomation: true
+      });
       await transporterReceiptFactory({ company });
       // Allow automatic signature
       await prisma.signatureAutomation.create({
