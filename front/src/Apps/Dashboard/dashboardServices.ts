@@ -1143,7 +1143,7 @@ export const getWorkflowLabel = (
     case BsffType.Groupement:
       return WorkflowDisplayType.GRP;
     case BsffType.Reexpedition:
-      return WorkflowDisplayType.TRANSIT;
+      return WorkflowDisplayType.REEXPEDITION;
     case BsffType.Reconditionnement:
       return WorkflowDisplayType.RECONDITIONNEMENT;
 
