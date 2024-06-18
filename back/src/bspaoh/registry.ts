@@ -37,7 +37,13 @@ const getTransporterData = (
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     transporterCompanyMail: transporter?.transporterCompanyMail,
     transporterCustomInfo: transporter?.transporterCustomInfo,
-    transporterTakenOverAt: transporter?.transporterTakenOverAt
+    transporterTakenOverAt: transporter?.transporterTakenOverAt,
+    transporterTransportMode: transporter?.transporterTransportMode,
+    // when switching to multi-modal
+    // if this is on the transporter, use it
+    // if it stays on the BSPAOH temporarily, attach it to the last transporter
+    transporterHandedOverSignatureDate:
+      bspaoh.handedOverToDestinationSignatureDate
   };
 };
 

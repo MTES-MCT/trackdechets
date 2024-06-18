@@ -47,10 +47,10 @@ const getFinalOperationsData = (bsda: RegistryBsda) => {
 const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
   const transporters = getTransportersSync(bsda);
 
-  const [transporter, transporter2, transporter3] = transporters;
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
 
   return {
-    transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
     transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
     transporterCompanyAddress: transporter?.transporterCompanyAddress,
     transporterCompanyName: transporter?.transporterCompanyName,
@@ -58,18 +58,42 @@ const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     transporterNumberPlates: transporter?.transporterTransportPlates,
     transporterCompanyMail: transporter?.transporterCompanyMail,
+    transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
+    transporterTransportMode: transporter?.transporterTransportMode,
     transporter2CompanyAddress: transporter2?.transporterCompanyAddress,
     transporter2CompanyName: transporter2?.transporterCompanyName,
     transporter2CompanySiret: transporter2?.transporterCompanySiret,
     transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
     transporter2NumberPlates: transporter2?.transporterTransportPlates,
     transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
     transporter3CompanyAddress: transporter3?.transporterCompanyAddress,
     transporter3CompanyName: transporter3?.transporterCompanyName,
     transporter3CompanySiret: transporter3?.transporterCompanySiret,
     transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
     transporter3NumberPlates: transporter3?.transporterTransportPlates,
-    transporter3CompanyMail: transporter3?.transporterCompanyMail
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter4CompanyAddress: transporter4?.transporterCompanyAddress,
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanySiret: transporter4?.transporterCompanySiret,
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter5CompanyAddress: transporter5?.transporterCompanyAddress,
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanySiret: transporter5?.transporterCompanySiret,
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5TransportMode: transporter5?.transporterTransportMode
   };
 };
 

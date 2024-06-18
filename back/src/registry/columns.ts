@@ -11,6 +11,7 @@ import { GenericWaste } from "./types";
 import { formatStatusLabel } from "@td/constants";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { TransportMode } from "@prisma/client";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)
@@ -47,6 +48,27 @@ const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // 
 const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
 const formatOperationCode = (code?: string) =>
   code ? code.replace(/ /g, "") : ""; // be consistent and remove all white spaces
+
+const formatTransportMode = (mode?: TransportMode): string => {
+  if (!mode) return "";
+
+  switch (mode) {
+    case "ROAD":
+      return "Route";
+    case "RAIL":
+      return "Voie ferrée";
+    case "AIR":
+      return "Voie aérienne";
+    case "RIVER":
+      return "Voie fluviale";
+    case "SEA":
+      return "Voie maritime";
+    case "OTHER":
+      return "Autre";
+    default:
+      return "";
+  }
+};
 /**
  * Clean Final Operation lists
  */
@@ -194,6 +216,16 @@ export const columns: Column[] = [
     label: "Transporteur immatriculation",
     format: formatArray
   },
+  {
+    field: "transporterTransportMode",
+    label: "Transporteur mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporterHandedOverSignatureDate",
+    label: "Transporteur date de dépôt",
+    format: formatDate
+  },
   { field: "transporterCompanyMail", label: "Transporteur contact" },
 
   { field: "wasteAdr", label: "ADR" },
@@ -261,6 +293,16 @@ export const columns: Column[] = [
     label: "Transporteur n°2 immatriculation",
     format: formatArray
   },
+  {
+    field: "transporter2TransportMode",
+    label: "Transporteur n°2 mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporter2HandedOverSignatureDate",
+    label: "Transporteur n°2 date de dépôt",
+    format: formatDate
+  },
   { field: "transporter2CompanyMail", label: "Transporteur n°2 contact" },
   {
     field: "transporter3CompanyName",
@@ -279,7 +321,63 @@ export const columns: Column[] = [
     label: "Transporteur n°3 immatriculation",
     format: formatArray
   },
-  { field: "transporter3CompanyMail", label: "Transporteur n°3 contact" }
+  {
+    field: "transporter3TransportMode",
+    label: "Transporteur n°3 mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporter3HandedOverSignatureDate",
+    label: "Transporteur n°3 date de dépôt",
+    format: formatDate
+  },
+  { field: "transporter3CompanyMail", label: "Transporteur n°3 contact" },
+  {
+    field: "transporter4CompanyName",
+    label: "Transporteur n°4 raison sociale"
+  },
+  { field: "transporter4CompanySiret", label: "Transporteur n°4 SIRET" },
+  { field: "transporter4CompanyAddress", label: "Transporteur n°4 adresse" },
+  {
+    field: "transporter4RecepisseIsExempted",
+    label: "Transporteur n°4 exemption de récépissé",
+    format: formatBoolean
+  },
+  { field: "transporter4RecepisseNumber", label: "Transporteur n°4 récépissé" },
+  {
+    field: "transporter4TransportMode",
+    label: "Transporteur n°4 mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporter4HandedOverSignatureDate",
+    label: "Transporteur n°4 date de dépôt",
+    format: formatDate
+  },
+  { field: "transporter4CompanyMail", label: "Transporteur n°3 contact" },
+  {
+    field: "transporter5CompanyName",
+    label: "Transporteur n°5 raison sociale"
+  },
+  { field: "transporter5CompanySiret", label: "Transporteur n°5 SIRET" },
+  { field: "transporter5CompanyAddress", label: "Transporteur n°5 adresse" },
+  {
+    field: "transporter5RecepisseIsExempted",
+    label: "Transporteur n°5 exemption de récépissé",
+    format: formatBoolean
+  },
+  { field: "transporter5RecepisseNumber", label: "Transporteur n°5 récépissé" },
+  {
+    field: "transporter5TransportMode",
+    label: "Transporteur n°5 mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporter5HandedOverSignatureDate",
+    label: "Transporteur n°5 date de dépôt",
+    format: formatDate
+  },
+  { field: "transporter5CompanyMail", label: "Transporteur n°5 contact" }
 ];
 
 export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
