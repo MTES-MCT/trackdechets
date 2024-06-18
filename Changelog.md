@@ -19,6 +19,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Amélioration du message d'erreur à l'ajout d'un Crématorium non inscrit / n'ayant pas le bon profil [PR 3401](https://github.com/MTES-MCT/trackdechets/pull/3401)
 - Ajout d'informations relatives au transport sur l'ensemble des registres [PR 3409](https://github.com/MTES-MCT/trackdechets/pull/3409)
+- Ajout d'informations relatives à la localisation des terres (parcelles) sur les registres Entrant, Sortant, Exhaustif et Gestion [PR 3410](https://github.com/MTES-MCT/trackdechets/pull/3410)
 
 #### :house: Interne
 
