@@ -163,9 +163,14 @@ function toGenericWaste(bsda: RegistryBsda): GenericWaste {
       bsda.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsda.destinationOperationDate,
     destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight.dividedBy(1000).toNumber()
+      ? bsda.destinationReceptionWeight
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
-
+    weight: bsda.weightValue
+      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
@@ -294,9 +299,6 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toNumber()
-      : null,
     emitterCustomInfo: bsda.emitterCustomInfo,
     destinationCompanyMail: bsda.destinationCompanyMail,
     ...getOperationData(bsda),
@@ -342,9 +344,6 @@ export function toTransportedWaste(
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsda.destinationReceptionDate,
-    weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toNumber()
-      : null,
     ...initialEmitter,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,

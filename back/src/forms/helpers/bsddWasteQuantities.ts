@@ -32,13 +32,13 @@ export const bsddWasteQuantities = ({
   if (wasteAcceptationStatus === "REFUSED") {
     quantityAccepted = new Decimal(0);
   } else if (wasteAcceptationStatus === "PARTIALLY_REFUSED") {
-    quantityAccepted = new Decimal(quantityReceived).minus(
-      new Decimal(quantityRefused)
-    );
+    quantityAccepted = new Decimal(quantityReceived)
+      .minus(new Decimal(quantityRefused))
+      .toDecimalPlaces(6);
   }
 
   return {
     quantityAccepted,
-    quantityRefused: new Decimal(quantityRefused)
+    quantityRefused: new Decimal(quantityRefused).toDecimalPlaces(6)
   };
 };
