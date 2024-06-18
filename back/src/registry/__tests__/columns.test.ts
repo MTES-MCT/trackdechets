@@ -1,4 +1,3 @@
-import { weight } from "../../common/validation";
 import { BsdSubType, IncomingWaste } from "../../generated/graphql/types";
 import { CUSTOM_WASTE_COLUMNS, formatRow, formatSubType } from "../columns";
 
