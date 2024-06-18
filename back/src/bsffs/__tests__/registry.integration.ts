@@ -1,10 +1,60 @@
-import { getSubType, toOutgoingWaste } from "../registry";
+import {
+  getSubType,
+  toAllWaste,
+  toIncomingWaste,
+  toManagedWaste,
+  toOutgoingWaste,
+  toTransportedWaste
+} from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryBsffInclude } from "../../registry/elastic";
-import { createBsff, createBsffAfterOperation } from "./factories";
+import {
+  createBsff,
+  createBsffAfterAcceptation,
+  createBsffAfterOperation
+} from "./factories";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { BsffType } from "@prisma/client";
+
+describe("toIncomingWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsffAfterAcceptation(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        data: {
+          weightValue: 89.6
+        },
+        packagingData: {
+          acceptationWeight: 55.4
+        }
+      }
+    );
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const wasteRegistry = toIncomingWaste(bsffForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0896);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0554);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+});
 
 describe("toOutgoingWaste", () => {
   afterAll(resetDatabase);
@@ -54,6 +104,41 @@ describe("toOutgoingWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1]);
     }
   );
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsffAfterAcceptation(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        data: {
+          weightValue: 89.6
+        },
+        packagingData: {
+          acceptationWeight: 55.4
+        }
+      }
+    );
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const wasteRegistry = toOutgoingWaste(bsffForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0896);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0554);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
 });
 
 describe("toAllWaste", () => {
@@ -102,6 +187,117 @@ describe("toAllWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1]);
     }
   );
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsffAfterAcceptation(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        data: {
+          weightValue: 89.6
+        },
+        packagingData: {
+          acceptationWeight: 55.4
+        }
+      }
+    );
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const wasteRegistry = toAllWaste(bsffForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0896);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0554);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+});
+
+describe("toManagedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsffAfterAcceptation(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        data: {
+          weightValue: 89.6
+        },
+        packagingData: {
+          acceptationWeight: 55.4
+        }
+      }
+    );
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const wasteRegistry = toManagedWaste(bsffForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0896);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0554);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+});
+
+describe("toTransportedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsffAfterAcceptation(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        data: {
+          weightValue: 89.6
+        },
+        packagingData: {
+          acceptationWeight: 55.4
+        }
+      }
+    );
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const wasteRegistry = toTransportedWaste(bsffForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0896);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0554);
+  });
 });
 
 describe("getSubType", () => {

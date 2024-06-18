@@ -23,6 +23,7 @@ import { toBsffDestination } from "./compat";
 import { RegistryBsff } from "../registry/elastic";
 import { getFirstTransporterSync } from "./database";
 import { BsffWithTransporters } from "./types";
+import Decimal from "decimal.js";
 
 const getOperationData = (bsff: RegistryBsff) => {
   const bsffDestination = toBsffDestination(bsff.packagings);
@@ -138,10 +139,15 @@ function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     destinationReceptionAcceptationStatus:
       bsffDestination.receptionAcceptationStatus,
     destinationOperationDate: bsffDestination.operationDate,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     destinationReceptionWeight: bsffDestination.receptionWeight
-      ? bsffDestination.receptionWeight / 1000
+      ? new Decimal(bsffDestination.receptionWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : bsffDestination.receptionWeight,
-
     wasteAdr: bsff.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
@@ -267,9 +273,6 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toNumber()
-      : null,
     emitterCustomInfo: bsff.emitterCustomInfo,
     destinationCompanyMail: bsff.destinationCompanyMail,
     ...getOperationData(bsff),
@@ -317,9 +320,6 @@ export function toTransportedWaste(
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsff.destinationReceptionDate,
-    weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toNumber()
-      : null,
     ...initialEmitter,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
@@ -453,9 +453,6 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toNumber()
-      : null,
     managedEndDate: null,
     managedStartDate: null,
     traderCompanyName: null,
