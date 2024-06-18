@@ -1,4 +1,11 @@
-import { getSubType, toAllWaste, toOutgoingWaste } from "../registry";
+import {
+  getSubType,
+  toAllWaste,
+  toIncomingWaste,
+  toManagedWaste,
+  toOutgoingWaste,
+  toTransportedWaste
+} from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryBsdasriInclude } from "../../registry/elastic";
 import { bsdasriFactory } from "./factories";
@@ -47,6 +54,58 @@ describe("toOutgoingWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
     }
   );
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const wasteRegistry = toOutgoingWaste(bsdasriForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+});
+
+describe("toIncomingWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const wasteRegistry = toIncomingWaste(bsdasriForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
 });
 
 describe("toAllWaste", () => {
@@ -89,6 +148,84 @@ describe("toAllWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
     }
   );
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const wasteRegistry = toAllWaste(bsdasriForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+});
+
+describe("toManagedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const wasteRegistry = toManagedWaste(bsdasriForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+});
+
+describe("toTransportedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const wasteRegistry = toTransportedWaste(bsdasriForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+  });
 });
 
 describe("getSubType", () => {

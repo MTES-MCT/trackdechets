@@ -129,12 +129,21 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
       bsdasri.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdasri.destinationOperationDate,
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue.dividedBy(1000).toNumber()
+      ? bsdasri.destinationReceptionWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
     wasteAdr: bsdasri.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    weight: bsdasri.emitterWasteWeightValue
+      ? bsdasri.emitterWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
     ...getTransporterData(bsdasri)
   };
 }
@@ -241,9 +250,6 @@ export function toOutgoingWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
-      : null,
     emitterCustomInfo: bsdasri.emitterCustomInfo,
     destinationCompanyMail: bsdasri.destinationCompanyMail,
     ...getOperationData(bsdasri),
@@ -280,9 +286,6 @@ export function toTransportedWaste(
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
-      : null,
     ...initialEmitter,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
@@ -409,9 +412,6 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
       bsdasri.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
-      : null,
     managedEndDate: null,
     managedStartDate: null,
     traderCompanyName: null,
