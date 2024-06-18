@@ -6,7 +6,8 @@ import {
 } from "@prisma/client";
 import {
   AppendixFormInput,
-  InitialFormFractionInput
+  InitialFormFractionInput,
+  ParcelNumber
 } from "../generated/graphql/types";
 import { Bsdd } from "./types";
 import { RegistryForm } from "../registry/elastic";
@@ -32,6 +33,8 @@ export function simpleFormToBsdd(
 
   const [transporter, transporter2, transporter3, transporter4, transporter5] =
     transporters;
+
+  const parcels = form.wasteDetailsParcelNumbers as ParcelNumber[] | null;
 
   return {
     id: form.readableId,
@@ -223,7 +226,27 @@ export function simpleFormToBsdd(
     destinationOperationNextDestinationCompanyPhone:
       form.nextDestinationCompanyPhone,
     destinationOperationNextDestinationCompanyMail:
-      form.nextDestinationCompanyMail
+      form.nextDestinationCompanyMail,
+    parcelCity: parcels?.length ? parcels.map(parcel => parcel.city) : null,
+    parcelPostalCode: parcels?.length
+      ? parcels.map(parcel => parcel.postalCode)
+      : null,
+    parcelNumber: parcels?.length
+      ? parcels.map(parcel => {
+          if (parcel.prefix && parcel.section && parcel.number) {
+            return `${parcel.prefix}-${parcel.section}-${parcel.number}`;
+          }
+          return null;
+        })
+      : null,
+    parcelCoordinates: parcels?.length
+      ? parcels.map(parcel => {
+          if (typeof parcel.x === "number" && typeof parcel.y === "number") {
+            return `N ${parcel.x} E ${parcel.y}`;
+          }
+          return null;
+        })
+      : null
   };
 }
 

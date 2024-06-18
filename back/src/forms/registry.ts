@@ -244,6 +244,10 @@ export function toGenericWaste(
     workerCompanyAddress: null,
     brokerCompanyMail: bsdd.brokerCompanyMail,
     traderCompanyMail: bsdd.traderCompanyMail,
+    parcelCity: bsdd.parcelCity,
+    parcelPostalCode: bsdd.parcelPostalCode,
+    parcelNumber: bsdd.parcelNumber,
+    parcelCoordinates: bsdd.parcelCoordinates,
     ...getTransportersData(bsdd),
     ...initialEmitter
   };
