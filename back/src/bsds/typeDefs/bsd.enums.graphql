@@ -6,12 +6,3 @@ enum QuantityType {
   "Quantité estimée"
   ESTIMATED
 }
-
-enum TransportMode {
-  ROAD
-  RAIL
-  AIR
-  RIVER
-  SEA
-  OTHER
-}
