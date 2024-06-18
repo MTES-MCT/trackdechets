@@ -17,6 +17,7 @@ import {
   emptyTransportedWaste
 } from "../registry/types";
 import { getWasteDescription } from "./utils";
+import Decimal from "decimal.js";
 
 const getOperationData = (bsvhu: Bsvhu) => ({
   destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
@@ -95,12 +96,21 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
       bsvhu.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsvhu.destinationOperationDate,
     destinationReceptionWeight: bsvhu.destinationReceptionWeight
-      ? bsvhu.destinationReceptionWeight / 1000
+      ? new Decimal(bsvhu.destinationReceptionWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : bsvhu.destinationReceptionWeight,
     wasteAdr: null,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    weight: bsvhu.weightValue
+      ? new Decimal(bsvhu.weightValue)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : bsvhu.weightValue,
     ...getTransporterData(bsvhu)
   };
 }
@@ -181,7 +191,6 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     emitterCustomInfo: bsvhu.emitterCustomInfo,
     destinationCompanyMail: bsvhu.destinationCompanyMail,
     ...getOperationData(bsvhu)
@@ -208,7 +217,6 @@ export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
-    weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     ...initialEmitter,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
@@ -306,7 +314,6 @@ export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     managedEndDate: null,
     managedStartDate: null,
     traderCompanyName: null,
