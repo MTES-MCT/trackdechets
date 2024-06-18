@@ -212,6 +212,10 @@ function toGenericWaste(bsdd: ReturnType<typeof formToBsdd>): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    parcelCity: bsdd.parcelCity,
+    parcelPostalCode: bsdd.parcelPostalCode,
+    parcelNumber: bsdd.parcelNumber,
+    parcelCoordinates: bsdd.parcelCoordinates,
     ...getTransportersData(bsdd),
     ...initialEmitter
   };
