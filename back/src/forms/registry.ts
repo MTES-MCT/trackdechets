@@ -23,6 +23,7 @@ import { extractPostalCode } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
+import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 
 const getOperationData = (bsdd: Bsdd) => ({
   destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
@@ -197,6 +198,7 @@ function toGenericWaste(bsdd: ReturnType<typeof formToBsdd>): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    weight: bsdd.weightValue,
     ...getTransportersData(bsdd),
     ...initialEmitter
   };
@@ -224,6 +226,12 @@ export function toIncomingWaste(
       .filter(s => !!s);
   }
 
+  const wasteQuantities = bsddWasteQuantities({
+    wasteAcceptationStatus: bsdd.destinationReceptionAcceptationStatus,
+    quantityReceived: bsdd.destinationReceptionWeight,
+    quantityRefused: bsdd.destinationReceptionRefusedWeight
+  });
+
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
@@ -234,9 +242,6 @@ export function toIncomingWaste(
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationReceptionDate: bsdd.destinationReceptionDate,
-    destinationReceptionWeight: bsdd.destinationReceptionWeight,
-    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
-    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
@@ -255,6 +260,9 @@ export function toIncomingWaste(
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
     destinationCustomInfo: null,
     emitterCompanyMail: bsdd.emitterCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd)
   };
 }
@@ -298,9 +306,11 @@ export function toOutgoingWaste(
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
-    weight: bsdd.weightValue,
     emitterCustomInfo: null,
     destinationCompanyMail: bsdd.destinationCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd)
   };
@@ -338,7 +348,6 @@ export function toTransportedWaste(
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsdd.destinationReceptionDate,
-    weight: bsdd.weightValue,
     ...initialEmitter,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
@@ -415,7 +424,10 @@ export function toManagedWaste(
     ]),
     ...initialEmitter,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight
   };
 }
 
@@ -466,7 +478,6 @@ export function toAllWaste(
       bsdd.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    weight: bsdd.weightValue,
     managedEndDate: null,
     managedStartDate: null,
     traderCompanyName: bsdd.traderCompanyName,
@@ -474,6 +485,9 @@ export function toAllWaste(
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd)
   };

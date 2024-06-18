@@ -109,10 +109,10 @@ async function findCompanyAndMergeInfos(
 export async function searchCompany(
   clue: string
 ): Promise<CompanySearchResult> {
-  console.log('>> searchCompany')
+  console.log(">> searchCompany");
   // remove non alphanumeric
   const cleanedClue = cleanClue(clue);
-  console.log("cleanedClue", cleanedClue)
+  console.log("cleanedClue", cleanedClue);
   const allowTestCompany = process.env.ALLOW_TEST_COMPANY === "true";
   const isTestCompany =
     allowTestCompany && cleanedClue.startsWith(TEST_COMPANY_PREFIX);
@@ -134,7 +134,7 @@ export async function searchCompany(
       orgId: cleanedClue
     }
   });
-  console.log("anonymousCompany", anonymousCompany)
+  console.log("anonymousCompany", anonymousCompany);
   // Anonymous Company search by-pass SIRENE or VAT search
   if (anonymousCompany) {
     let codePaysEtrangerEtablissement = "FR";
@@ -163,7 +163,7 @@ export async function searchCompany(
   }
   // Search public company databases
   if (isSiret(cleanedClue)) {
-    console.log("isSiret!!!")
+    console.log("isSiret!!!");
     const companyInfo = await searchSireneOrNotFound(cleanedClue);
     return findCompanyAndMergeInfos(cleanedClue, companyInfo);
   }
@@ -203,7 +203,7 @@ export const makeSearchCompanies =
     department?: string | null,
     allowForeignCompanies?: boolean | null
   ): Promise<CompanySearchResult[]> => {
-    console.log(">> makeSearchCompanies", clue)
+    console.log(">> makeSearchCompanies", clue);
     // Special case to handle "siret1,siret2,siret3"
     const splittedClue = clue.split(",").map(cleanClue);
     if (splittedClue.length > 1 && splittedClue.every(c => isSiret(c))) {
@@ -216,8 +216,8 @@ export const makeSearchCompanies =
     }
 
     const cleanedClue = cleanClue(clue);
-    console.log("cleanedClue", cleanedClue)
-    console.log("isSiret(cleanedClue)", isSiret(cleanedClue))
+    console.log("cleanedClue", cleanedClue);
+    console.log("isSiret(cleanedClue)", isSiret(cleanedClue));
     // clue can be formatted like a SIRET or a VAT number
     if (isSiret(cleanedClue) || isVat(cleanedClue)) {
       if (isForeignVat(cleanedClue) && allowForeignCompanies === false) {
@@ -287,16 +287,16 @@ export async function searchSireneOrNotFound(
   siret: string
 ): Promise<SireneSearchResult | null> {
   try {
-    console.log("redundantCachedSearchSirene")
+    console.log("redundantCachedSearchSirene");
     return await redundantCachedSearchSirene(siret);
   } catch (err) {
-    console.log("err", err)
+    console.log("err", err);
     // The SIRET was not found in public data
     // Try searching the anonymous companies
     const anonymousCompany = await prisma.anonymousCompany.findUnique({
       where: { siret }
     });
-    console.log("anonymousCompany", anonymousCompany)
+    console.log("anonymousCompany", anonymousCompany);
     if (anonymousCompany) {
       return {
         ...removeEmptyKeys(anonymousCompany),

@@ -90,11 +90,11 @@ export async function searchCompany(
   _source_includes?: string[] // ignored
 ): Promise<SireneSearchResult> {
   const searchUrl = `${SIRENE_API_BASE_URL}/siret/${siret}`;
-  console.log(">> INSEE searchCompany")
+  console.log(">> INSEE searchCompany");
   try {
     const response = await authorizedAxiosGet<SearchResponseInsee>(searchUrl);
     const company = searchResponseToCompany(response.data);
-    console.log("INSEE company", company)
+    console.log("INSEE company", company);
 
     if (company.etatAdministratif === ("F" as EtatAdministratif)) {
       throw new ClosedCompanyError();
@@ -108,11 +108,11 @@ export async function searchCompany(
     }
     return company;
   } catch (error) {
-    console.log("error", error.status)
+    console.log("error", error.status);
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
     if (error.response?.status === 404) {
-      console.log("Error 404!")
+      console.log("Error 404!");
       // 404 "no results found"
       throw new SiretNotFoundError();
     }
