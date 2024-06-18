@@ -106,7 +106,8 @@ const TransporterInfoEditForm = ({
         }}
       />
 
-      {currentTransporter.transporterMode === TransportMode.Road ? (
+      {currentTransporter.transporterMode === TransportMode.Road ||
+      !currentTransporter.transporterMode ? (
         <div className="transporterInfoEditForm__plates">
           <TagsInput
             label="Immatriculations"

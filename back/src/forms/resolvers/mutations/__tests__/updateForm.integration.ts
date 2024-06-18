@@ -2730,7 +2730,7 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'émetteur du bordereau d'annexe 1 ${appendix1_1.id} n'est pas inscrit sur Trackdéchets. Il est impossible de joindre cette annexe à un bordereau chapeau sans éco-organisme.`,
+        message: `L'émetteur du bordereau d'annexe 1 ${appendix1_1.readableId} n'est pas inscrit sur Trackdéchets. Il est impossible de joindre cette annexe à un bordereau chapeau sans éco-organisme.`,
         extensions: {
           code: "BAD_USER_INPUT"
         }

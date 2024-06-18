@@ -45,7 +45,10 @@ export function numberEqual(
   n2: number | Decimal | null | undefined
 ) {
   if (n1 && n2) {
-    return new Decimal(n1).equals(new Decimal(n2));
+    // Because of decimal issues in the DB, we round up
+    return new Decimal(n1)
+      .toDecimalPlaces(6)
+      .equals(new Decimal(n2).toDecimalPlaces(6));
   }
   return n1 === n2;
 }
