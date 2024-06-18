@@ -1,3 +1,4 @@
+import { weight } from "../../common/validation";
 import { BsdSubType, IncomingWaste } from "../../generated/graphql/types";
 import { CUSTOM_WASTE_COLUMNS, formatRow, formatSubType } from "../columns";
 
@@ -11,7 +12,6 @@ describe("formatRow", () => {
       destinationOperationCode: "R10",
       destinationOperationMode: "RECYCLAGE",
       destinationReceptionDate: new Date("2021-01-01"),
-      destinationReceptionWeight: 1.2,
       ecoOrganismeName: null,
       ecoOrganismeSiren: null,
       emitterCompanyAddress: "emitter address",
@@ -34,7 +34,9 @@ describe("formatRow", () => {
       transporterRecepisseNumber: "transporter recepisse",
       wasteCode: "01 01 01*",
       wasteDescription: "déchets dangereux",
-      destinationPlannedOperationCode: "R10"
+      destinationPlannedOperationCode: "R10",
+      weight: 10.5,
+      destinationReceptionWeight: 1.2
     };
     const formatted = formatRow(waste);
     // Fields in the waste object + custom fields added for user convenience
@@ -73,7 +75,8 @@ describe("formatRow", () => {
       destinationOperationMode: "RECYCLAGE",
       destinationReceptionDate: "2021-01-01",
       destinationReceptionWeight: 1.2,
-      destinationPlannedOperationCode: "R10"
+      destinationPlannedOperationCode: "R10",
+      weight: 10.5
     });
     const formattedWithLabels = formatRow(waste, true);
     expect(formattedWithLabels).toEqual({
@@ -108,7 +111,8 @@ describe("formatRow", () => {
       "Code opération prévu": "R10",
       "Mode de traitement réalisé": "RECYCLAGE",
       "Date de réception": "2021-01-01",
-      "Quantité de déchets réceptionnée (t)": 1.2
+      "Quantité réceptionnée nette": 1.2,
+      "Quantité de déchet": 10.5
     });
     expect(Object.keys(formattedWithLabels).length).toEqual(
       Object.keys(waste).length + CUSTOM_WASTE_COLUMNS.length
