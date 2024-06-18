@@ -56,6 +56,7 @@ const getTransportersData = (bsdd: Bsdd) => ({
   transporterCompanySiret: bsdd.transporterCompanySiret,
   transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
   transporterNumberPlates: bsdd.transporterNumberPlates,
+  transporterTransportMode: bsdd.transporterTransportMode,
   transporterCompanyMail: bsdd.transporterCompanyMail,
   transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
   transporter2CompanyName: bsdd.transporter2CompanyName,
@@ -63,12 +64,28 @@ const getTransportersData = (bsdd: Bsdd) => ({
   transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
   transporter2NumberPlates: bsdd.transporter2NumberPlates,
   transporter2CompanyMail: bsdd.transporter2CompanyMail,
+  transporter2TransportMode: bsdd.transporter2TransportMode,
   transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
   transporter3CompanyName: bsdd.transporter3CompanyName,
   transporter3CompanySiret: bsdd.transporter3CompanySiret,
   transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
   transporter3NumberPlates: bsdd.transporter3NumberPlates,
-  transporter3CompanyMail: bsdd.transporter3CompanyMail
+  transporter3CompanyMail: bsdd.transporter3CompanyMail,
+  transporter3TransportMode: bsdd.transporter3TransportMode,
+  transporter4CompanyAddress: bsdd.transporter4CompanyAddress,
+  transporter4CompanyName: bsdd.transporter4CompanyName,
+  transporter4CompanySiret: bsdd.transporter4CompanySiret,
+  transporter4RecepisseNumber: bsdd.transporter4RecepisseNumber,
+  transporter4NumberPlates: bsdd.transporter4NumberPlates,
+  transporter4CompanyMail: bsdd.transporter4CompanyMail,
+  transporter4TransportMode: bsdd.transporter4TransportMode,
+  transporter5CompanyAddress: bsdd.transporter5CompanyAddress,
+  transporter5CompanyName: bsdd.transporter5CompanyName,
+  transporter5CompanySiret: bsdd.transporter5CompanySiret,
+  transporter5RecepisseNumber: bsdd.transporter5RecepisseNumber,
+  transporter5NumberPlates: bsdd.transporter5NumberPlates,
+  transporter5CompanyMail: bsdd.transporter5CompanyMail,
+  transporter5TransportMode: bsdd.transporter5TransportMode
 });
 
 const getIntermediariesData = (bsdd: ReturnType<typeof formToBsdd>) => ({
