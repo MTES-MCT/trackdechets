@@ -19,7 +19,7 @@ import {
   EtatAdministratif,
   StatutDiffusionEtablissement
 } from "../../../generated/graphql/types";
-import { prisma } from "../../../../../libs/back/prisma/src";
+import { prisma } from "@td/prisma";
 
 const { ResponseError } = errors;
 /**

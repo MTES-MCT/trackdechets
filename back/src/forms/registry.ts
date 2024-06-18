@@ -23,7 +23,6 @@ import { extractPostalCode } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
-import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 
 const getOperationData = (bsdd: Bsdd) => ({
   destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
@@ -225,12 +224,6 @@ export function toIncomingWaste(
       .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
       .filter(s => !!s);
   }
-
-  const wasteQuantities = bsddWasteQuantities({
-    wasteAcceptationStatus: bsdd.destinationReceptionAcceptationStatus,
-    quantityReceived: bsdd.destinationReceptionWeight,
-    quantityRefused: bsdd.destinationReceptionRefusedWeight
-  });
 
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
