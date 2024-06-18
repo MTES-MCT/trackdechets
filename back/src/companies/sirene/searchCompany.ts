@@ -27,5 +27,6 @@ const decoratedSearchCompany = cache<SireneSearchResult | null>(
 export default function searchCompany(
   siret: string
 ): Promise<SireneSearchResult | null> {
+  console.log(">> SearchCompany")
   return decoratedSearchCompany(siret);
 }
