@@ -434,7 +434,11 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     required: { from: "EMISSION" }
   },
   other: { sealed: { from: "EMISSION" } },
-  volume: { sealed: { from: "EMISSION" }, required: { from: "EMISSION" } },
+  volume: {
+    sealed: { from: "EMISSION" }
+    // En attente de https://favro.com/organization/ab14a4f0460a99a9d64d4945/2c84e07578945e0ee8fb61f3?card=tra-14567
+    // required: { from: "EMISSION" }
+  },
   weight: { sealed: { from: "EMISSION" }, required: { from: "EMISSION" } },
   emissionNumero: {
     sealed: { from: "EMISSION" },
