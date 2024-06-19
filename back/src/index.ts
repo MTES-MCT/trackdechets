@@ -75,3 +75,6 @@ export { createUser } from "./users/database";
 export { default as getReadableId, ReadableIdPrefix } from "./forms/readableId";
 export { reindex } from "./bsds/indexation/reindexBsdHelpers";
 export { gericoQueue } from "./queue/producers/gerico";
+export { getBsdasriFromActivityEvents } from "./activity-events/bsdasri";
+export { getBsdaFromActivityEvents } from "./activity-events/bsda";
+export { getBsddFromActivityEvents } from "./activity-events/bsdd";

@@ -1,12 +1,11 @@
-import { getBsddFromActivityEvents } from "../../activity-events/bsdd";
 import {
   FormRevisionRequest,
   FormRevisionRequestResolvers
 } from "../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
+  PrismaFormWithForwardedInAndTransporters,
   expandBsddRevisionRequestContent,
-  expandableFormIncludes,
   expandFormFromDb
 } from "../converter";
 
@@ -34,31 +33,11 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
     return authoringCompany;
   },
   form: async (
-    parent: FormRevisionRequest & { bsddId: string },
-    _,
-    { dataloaders }
-  ) => {
-    const fullBsdd = await prisma.bsddRevisionRequest
-      .findUnique({ where: { id: parent.id } })
-      .bsdd({ include: expandableFormIncludes });
-
-    if (!fullBsdd) {
-      throw new Error(`FormRevisionRequest ${parent.id} has no form.`);
+    parent: FormRevisionRequest & {
+      bsddSnapshot: PrismaFormWithForwardedInAndTransporters;
     }
-    const bsdd = await getBsddFromActivityEvents(
-      {
-        bsddId: parent.bsddId,
-        at: parent.createdAt
-      },
-      { dataloader: dataloaders.events }
-    );
-
-    return expandFormFromDb({
-      ...fullBsdd,
-      ...bsdd,
-      forwardedIn: fullBsdd.forwardedIn,
-      transporters: fullBsdd.transporters
-    });
+  ) => {
+    return expandFormFromDb(parent.bsddSnapshot);
   }
 };
 

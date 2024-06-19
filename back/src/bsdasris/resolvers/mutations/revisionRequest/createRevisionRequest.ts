@@ -95,7 +95,8 @@ export async function createBsdasriRevisionRequest(
     approvals: {
       create: approversSirets.map(approverSiret => ({ approverSiret }))
     },
-    comment
+    comment,
+    bsdasriSnapshot: JSON.stringify(bsdasri)
   });
 }
 
