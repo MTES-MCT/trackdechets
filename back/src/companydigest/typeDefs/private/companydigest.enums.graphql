@@ -1,0 +1,11 @@
+"Représente les differents étapes du company digest au cours de son cycle de vie."
+enum CompanyDigestStatus {
+  "Création en db"
+  INITIAL
+  "Lancé sur le service distant"
+  PENDING
+  "Calcule, prêt à etre téléchargé"
+  PROCESSED
+  "Erreur"
+  ERROR
+}

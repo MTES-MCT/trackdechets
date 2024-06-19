@@ -127,6 +127,11 @@ type CompanyPrivate {
   Liste des automatisations de signature reçues par l'entreprise
   """
   receivedSignatureAutomations: [SignatureAutomation!]!
+
+  """
+  Liste des featureFlags
+  """
+  featureFlags: [String]!
 }
 
 type CompanyPrivateEdge {

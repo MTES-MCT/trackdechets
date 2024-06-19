@@ -68,7 +68,7 @@ const apiCallProcessor = async ({
   await handleWebhookFail(orgId, endpointUri);
   // throw to trigger bull retry mechanism
   throw new WebhookRequestError(
-    `Webhook requets fail for orgId ${orgId} and endpoint ${endpointUri}`
+    `Webhook request fail for orgId ${orgId} and endpoint ${endpointUri}`
   );
 };
 

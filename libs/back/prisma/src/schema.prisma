@@ -289,6 +289,7 @@ model Company {
   companyAssociations                  CompanyAssociation[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   allowAppendix1SignatureAutomation    Boolean                   @default(false)
+  featureFlags                         String[]                  @default([])
   MembershipRequest                    MembershipRequest[]
   // Révisions
   bsdaRevisionRequests                 BsdaRevisionRequest[]
@@ -852,6 +853,7 @@ model User {
   bsdasriOperationignatures  Bsdasri[]            @relation("BsdasriOperationSignature")
   Form                       Form[]
   UserActivationHash         UserActivationHash[]
+  CompanyDigest              CompanyDigest[]
 }
 
 enum GovernmentPermission {
@@ -1826,6 +1828,31 @@ model MigrationScript {
   startedAt  DateTime  @default(now()) @db.Timestamptz(6)
   finishedAt DateTime? @db.Timestamptz(6)
   error      String?
+}
+
+model CompanyDigest {
+  id        String              @id @default(cuid())
+  orgId     String
+  year      Int
+  distantId String?
+  state     CompanyDigestStatus @default(INITIAL)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  userId    String?  @db.VarChar(30)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([orgId], map: "_CompanyDigestOrgIdIdx")
+  @@index([year], map: "_CompanyDigestYearIdx")
+  @@index([state], map: "_CompanyDigestStatedIdx")
+  @@index([distantId], map: "_CompanyDigestdDstantIdIdx")
+}
+
+enum CompanyDigestStatus {
+  INITIAL
+  PENDING
+  PROCESSED
+  ERROR
 }
 
 enum RevisionRequestStatus {

@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import CompanyInfo from "./CompanyInfo/CompanyInfo";
 import CompanyContactForm from "./CompanyContact/CompanyContactForm";
 import CompanyAdvanced from "./CompanyAdvanced/CompanyAdvanced";
-import { Query, QueryMyCompaniesArgs, UserRole } from "@td/codegen-ui";
+import {
+  Query,
+  QueryMyCompaniesArgs,
+  UserRole,
+  CompanyPrivate
+} from "@td/codegen-ui";
 import { Navigate, useParams } from "react-router-dom";
 import { userRole } from "./CompaniesList/CompaniesList";
 import { MY_COMPANIES } from "./common/queries";
@@ -13,9 +18,81 @@ import routes from "../routes";
 import AccountContentWrapper from "../Account/AccountContentWrapper";
 import CompanySignature from "./CompanySignature/CompanySignature";
 import CompanyMembers from "./CompanyMembers/CompanyMembers";
+import CompanyDigestSheetForm from "./CompanyDigestSheet/CompanyDigestSheet";
+import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
+import { FrIconClassName } from "@codegouvfr/react-dsfr";
+
+export type TheProps = {
+  company: CompanyPrivate;
+};
+
+const COMPANY_DIGEST_FLAG = "COMPANY_DIGEST";
+
+const buildTabs = (
+  company: CompanyPrivate
+): {
+  tabs: TabsProps.Controlled["tabs"];
+  tabsContent: Record<string, React.FC<TheProps>>;
+} => {
+  const isAdmin = company.userRole === UserRole.Admin;
+  const isMember = company.userRole === UserRole.Member;
+  // Admin and member can access the gerico tab
+  const canViewCompanyDigestTab =
+    company.featureFlags.includes(COMPANY_DIGEST_FLAG) && (isAdmin || isMember);
+  const iconId = "fr-icon-checkbox-line" as FrIconClassName;
+  const tabs = [
+    {
+      tabId: "tab1",
+      label: "Informations",
+      iconId
+    },
+    {
+      tabId: "tab2",
+      label: "Signature",
+      iconId
+    },
+    {
+      tabId: "tab3",
+      label: "Membres",
+      iconId
+    },
+    {
+      tabId: "tab4",
+      label: "Contact",
+      iconId
+    }
+  ];
+  const tabsContent = {
+    tab1: CompanyInfo,
+    tab2: CompanySignature,
+    tab3: CompanyMembers,
+    tab4: CompanyContactForm
+  };
+  if (canViewCompanyDigestTab) {
+    tabs.push({
+      tabId: "tab5",
+      label: "Fiche",
+      iconId
+    });
+    tabsContent["tab5"] = CompanyDigestSheetForm;
+  }
+  if (isAdmin) {
+    tabs.push({
+      tabId: "tab6",
+      label: "Avancé",
+      iconId
+    });
+    tabsContent["tab6"] = CompanyAdvanced;
+  }
+
+  return { tabs, tabsContent };
+};
+
+const Dummy = () => <p></p>;
 
 export default function CompanyDetails() {
   const { siret } = useParams<{ siret: string }>();
+  const [selectedTabId, setSelectedTabId] = useState("tab1");
 
   const { data, loading, error } = useQuery<
     Pick<Query, "myCompanies">,
@@ -40,8 +117,11 @@ export default function CompanyDetails() {
     return <Navigate to={{ pathname: routes.companies.index }} />;
   }
 
-  const isAdmin = company.userRole === UserRole.Admin;
+  company.featureFlags.includes(COMPANY_DIGEST_FLAG);
 
+  const { tabs, tabsContent } = buildTabs(company);
+
+  const CurrenComponent = tabsContent[selectedTabId] ?? Dummy;
   return (
     <AccountContentWrapper
       title={`${company.name}${
@@ -50,123 +130,13 @@ export default function CompanyDetails() {
       subtitle={company.orgId}
       additional={userRole(company.userRole!)}
     >
-      <div className="fr-tabs" data-testid="company-details">
-        <ul
-          className="fr-tabs__list"
-          role="tablist"
-          aria-label="[A modifier | nom du système d'onglet]"
-        >
-          <li role="presentation">
-            <button
-              id="tabpanel-404"
-              className="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left"
-              tabIndex={0}
-              role="tab"
-              aria-selected="true"
-              aria-controls="tabpanel-404-panel"
-            >
-              Informations
-            </button>
-          </li>
-          <li role="presentation">
-            <button
-              id="tabpanel-405"
-              className="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left"
-              tabIndex={-1}
-              role="tab"
-              aria-selected="false"
-              aria-controls="tabpanel-405-panel"
-            >
-              Signature
-            </button>
-          </li>
-          <li role="presentation">
-            <button
-              id="tabpanel-406"
-              className="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left"
-              tabIndex={-1}
-              role="tab"
-              aria-selected="false"
-              aria-controls="tabpanel-406-panel"
-            >
-              Membres
-            </button>
-          </li>
-          <li role="presentation">
-            <button
-              id="tabpanel-407"
-              className="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left"
-              tabIndex={-1}
-              role="tab"
-              aria-selected="false"
-              aria-controls="tabpanel-407-panel"
-            >
-              Contact
-            </button>
-          </li>
-          {isAdmin && (
-            <li role="presentation">
-              <button
-                id="tabpanel-408"
-                className="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left"
-                tabIndex={-1}
-                role="tab"
-                aria-selected="false"
-                aria-controls="tabpanel-408-panel"
-              >
-                Avancé
-              </button>
-            </li>
-          )}
-        </ul>
-        <div
-          id="tabpanel-404-panel"
-          className="fr-tabs__panel fr-tabs__panel--selected"
-          role="tabpanel"
-          aria-labelledby="tabpanel-404"
-          tabIndex={0}
-        >
-          <CompanyInfo company={company} />
-        </div>
-        <div
-          id="tabpanel-405-panel"
-          className="fr-tabs__panel"
-          role="tabpanel"
-          aria-labelledby="tabpanel-405"
-          tabIndex={0}
-        >
-          <CompanySignature company={company} />
-        </div>
-        <div
-          id="tabpanel-406-panel"
-          className="fr-tabs__panel"
-          role="tabpanel"
-          aria-labelledby="tabpanel-406"
-          tabIndex={0}
-        >
-          <CompanyMembers company={company} />
-        </div>
-        <div
-          id="tabpanel-407-panel"
-          className="fr-tabs__panel"
-          role="tabpanel"
-          aria-labelledby="tabpanel-407"
-          tabIndex={0}
-        >
-          <CompanyContactForm company={company} />
-        </div>
-        {isAdmin && (
-          <div
-            id="tabpanel-408-panel"
-            className="fr-tabs__panel"
-            role="tabpanel"
-            aria-labelledby="tabpanel-408"
-            tabIndex={0}
-          >
-            <CompanyAdvanced company={company} />
-          </div>
-        )}
-      </div>
+      <Tabs
+        selectedTabId={selectedTabId}
+        tabs={tabs}
+        onTabChange={setSelectedTabId}
+      >
+        <CurrenComponent company={company} />
+      </Tabs>
     </AccountContentWrapper>
   );
 }
