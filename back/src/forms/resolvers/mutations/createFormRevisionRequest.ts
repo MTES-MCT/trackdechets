@@ -25,7 +25,10 @@ import {
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound } from "../../database";
-import { flattenBsddRevisionRequestInput } from "../../converter";
+import {
+  expandableFormIncludes,
+  flattenBsddRevisionRequestInput
+} from "../../converter";
 import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
@@ -103,7 +106,7 @@ export default async function createFormRevisionRequest(
   const user = checkIsAuthenticated(context);
   const existingBsdd = await getFormOrFormNotFound(
     { id: formId },
-    { transporters: true }
+    expandableFormIncludes
   );
 
   const formRepository = getFormRepository(user);
@@ -131,7 +134,8 @@ export default async function createFormRevisionRequest(
     approvals: {
       create: approversSirets.map(approverSiret => ({ approverSiret }))
     },
-    comment
+    comment,
+    bsddSnapshot: existingBsdd
   });
 }
 

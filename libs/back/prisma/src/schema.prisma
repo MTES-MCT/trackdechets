@@ -641,6 +641,8 @@ model BsddRevisionRequest {
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
 
+  bsddSnapshot Json? // TODO remove nullable after migration
+
   @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")
   @@index([status], map: "_BsddRevisionRequestStatusIdx")
@@ -1190,6 +1192,8 @@ model BsdasriRevisionRequest {
   emitterPickupSitePostalCode String?
   emitterPickupSiteInfos      String?
 
+  bsdasriSnapshot Json? // TODO remove nullable after migration
+
   @@index([authoringCompanyId], map: "_BsdasriRevisionRequestAuthoringCompanyIdIdx")
   @@index([status], map: "_BsdasriRevisionRequestStatusIdx")
   @@index([bsdasriId], map: "_BsdasriRevisionRequestBsdaIdIdx")
@@ -1636,6 +1640,8 @@ model BsdaRevisionRequest {
   emitterPickupSiteCity           String?
   emitterPickupSitePostalCode     String?
   emitterPickupSiteInfos          String?
+
+  bsdaSnapshot Json? // TODO remove nullable after migration
 
   @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
   @@index([status], map: "_BsdaRevisionRequestStatusIdx")

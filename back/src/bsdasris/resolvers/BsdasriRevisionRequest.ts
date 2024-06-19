@@ -1,4 +1,3 @@
-import { getBsdasriFromActivityEvents } from "../../activity-events/bsdasri";
 import {
   BsdasriRevisionRequest,
   BsdasriRevisionRequestResolvers
@@ -8,6 +7,7 @@ import {
   expandBsdasriRevisionRequestContent,
   expandBsdasriFromDB
 } from "../converter";
+import { FullDbBsdasri } from "../types";
 
 const bsdasriRevisionRequestResolvers: BsdasriRevisionRequestResolvers = {
   approvals: async parent => {
@@ -32,21 +32,9 @@ const bsdasriRevisionRequestResolvers: BsdasriRevisionRequestResolvers = {
     return authoringCompany;
   },
   bsdasri: async (
-    parent: BsdasriRevisionRequest & { bsdasriId: string },
-    _,
-    { dataloaders }
+    parent: BsdasriRevisionRequest & { bsdasriSnapshot: FullDbBsdasri }
   ) => {
-    const actualBsdasri = await prisma.bsdasriRevisionRequest
-      .findUnique({ where: { id: parent.id } })
-      .bsdasri();
-    const bsdasriFromEvents = await getBsdasriFromActivityEvents(
-      { bsdasriId: parent.bsdasriId, at: parent.createdAt },
-      { dataloader: dataloaders.events }
-    );
-    return expandBsdasriFromDB({
-      ...actualBsdasri,
-      ...bsdasriFromEvents
-    });
+    return expandBsdasriFromDB(parent.bsdasriSnapshot);
   }
 };
 
