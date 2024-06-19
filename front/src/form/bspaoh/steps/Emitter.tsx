@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useContext } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import { useFormContext } from "react-hook-form";
-import CompanySelectorWrapper from "../../../form/common/components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../Apps/common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 
 import { FavoriteType } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";

@@ -11,7 +11,7 @@ import {
 import {
   PACKAGINGS_NAMES,
   getPackagingInfosSummary
-} from "../../utils/packagings";
+} from "../../../../Apps/common/utils/packagingsBsddSummary";
 import React, { InputHTMLAttributes, useMemo } from "react";
 import "./Packagings.scss";
 

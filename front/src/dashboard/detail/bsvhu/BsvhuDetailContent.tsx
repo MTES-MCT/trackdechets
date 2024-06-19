@@ -17,7 +17,7 @@ import {
 
 import styles from "../common/BSDDetailContent.module.scss";
 import { getVerboseAcceptationStatus } from "../common/utils";
-import { getOperationModeLabel } from "../../../common/operationModes";
+import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { VHU_VERBOSE_STATUSES } from "@td/constants";
 
 type CompanyProps = {

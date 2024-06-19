@@ -34,7 +34,7 @@ import QRCodeIcon from "react-qr-code";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
-import { getOperationModeLabel } from "../../../common/operationModes";
+import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
 import { BSDA_VERBOSE_STATUSES } from "@td/constants";
 import ExpandableList from "./ExpandableList";

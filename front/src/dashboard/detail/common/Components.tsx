@@ -9,7 +9,7 @@ import {
   BsdasriTransporter,
   BspaohTransporter
 } from "@td/codegen-ui";
-import { getPackagingInfosSummary } from "../../../form/bsdd/utils/packagings";
+import { getPackagingInfosSummary } from "../../../Apps/common/utils/packagingsBsddSummary";
 import { isForeignVat } from "@td/constants";
 import { toCamelCaseVarName } from "../../../Apps/utils/utils";
 const nbsp = "\u00A0";
