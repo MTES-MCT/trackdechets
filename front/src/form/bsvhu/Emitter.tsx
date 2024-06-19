@@ -1,5 +1,5 @@
 import { RedErrorMessage } from "../../common/components";
-import CompanySelectorWrapper from "../common/components/CompanySelectorWrapper/CompanySelectorWrapper";
+import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { Field, useField } from "formik";
 import { FavoriteType, BsvhuEmitter } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";

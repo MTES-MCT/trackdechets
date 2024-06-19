@@ -21,9 +21,9 @@ import {
 } from "react-router-dom";
 import Loader from "../common/Components/Loader/Loaders";
 import { ExtraSignatureType } from "../../dashboard/components/BSDList/BSDasri/types";
-import { RouteBsdaRequestRevision } from "../../dashboard/components/RevisionRequestList/bsda/request";
-import { RouteBsdasriRequestRevision } from "../../dashboard/components/RevisionRequestList/bsdasri/request";
-import { RouteBsddRequestRevision } from "../../dashboard/components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
+import { RouteBsdaRequestRevision } from "./Components/RevisionRequestList/bsda/request";
+import { RouteBsdasriRequestRevision } from "./Components//RevisionRequestList/bsdasri/request";
+import { RouteBsddRequestRevision } from "./Components//RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 import {
   RouteBSDasrisView,
   RouteBSDasView,

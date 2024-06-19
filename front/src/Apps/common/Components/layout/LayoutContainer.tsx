@@ -51,7 +51,7 @@ const Signup = lazy(() => import("../../../../login/Signup"));
 const OauthDialog = lazy(() => import("../../../../oauth/Oauth2Dialog"));
 const OidcDialog = lazy(() => import("../../../../oauth/OidcDialog"));
 const Company = lazy(() => import("../../../../company/Company"));
-const WasteTree = lazy(() => import("../../../../search/WasteTree"));
+const WasteTree = lazy(() => import("../search/WasteTree"));
 
 const GET_ME = gql`
   query GetMe {
