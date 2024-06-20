@@ -175,7 +175,7 @@ const CompanyMembersList = ({
     changeUserRole({
       variables: {
         userId: user.id,
-        siret: company.orgId,
+        orgId: company.orgId,
         role
       }
     });

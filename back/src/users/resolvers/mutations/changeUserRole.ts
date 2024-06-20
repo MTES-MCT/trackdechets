@@ -60,6 +60,7 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
     return userAssociationToCompanyMember(
       updatedAssociation,
       company.orgId,
+      user.id,
       isTDAdmin
     );
   }

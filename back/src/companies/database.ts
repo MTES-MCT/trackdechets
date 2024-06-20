@@ -192,16 +192,13 @@ export const userNameDisplay = (
 export const userAssociationToCompanyMember = (
   companyAssociations: CompanyAssociation & { user: User },
   orgId: string,
+  requestingUserId?: string,
   isTDAdmin = false
 ) => {
   return {
     ...companyAssociations.user,
     orgId: orgId,
-    name: userNameDisplay(
-      companyAssociations,
-      companyAssociations.user.id,
-      isTDAdmin
-    ),
+    name: userNameDisplay(companyAssociations, requestingUserId, isTDAdmin),
     role: companyAssociations.role,
     isPendingInvitation: false
   };
@@ -234,7 +231,7 @@ export const userAccountHashToCompanyMember = (
  */
 export async function getCompanyActiveUsers(
   orgId: string,
-  requestingUserid?: string,
+  requestingUserId?: string,
   isTDAdmin?: boolean
 ): Promise<CompanyMember[]> {
   const associations = await prisma.company
@@ -242,7 +239,12 @@ export async function getCompanyActiveUsers(
     .companyAssociations({ include: { user: true } });
 
   return associations.map(a => {
-    return userAssociationToCompanyMember(a, orgId, isTDAdmin);
+    return userAssociationToCompanyMember(
+      a,
+      orgId,
+      requestingUserId,
+      isTDAdmin
+    );
   });
 }
 
