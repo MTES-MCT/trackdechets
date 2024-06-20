@@ -742,4 +742,39 @@ describe("Mutation.updateBsdasri", () => {
     });
     expect(updatedDasri.destinationOperationCode).toEqual("D10");
   });
+
+  it.only("should not allow code D9 and mode ELIMINATION", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.RECEIVED,
+        emitterCompanySiret: company.siret,
+        destinationReceptionSignatureAuthor: user.name,
+        receptionSignatory: { connect: { id: user.id } },
+        destinationReceptionSignatureDate: new Date().toISOString(),
+        ...readyToPublishData(await companyFactory())
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const input = {
+      destination: {
+        operation: { code: "D9", mode: "ELIMINATION", weight: { value: 20 } }
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: { id: dasri.id, input }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+    );
+  });
 });
