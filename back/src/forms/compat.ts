@@ -227,11 +227,11 @@ export function simpleFormToBsdd(
       form.nextDestinationCompanyPhone,
     destinationOperationNextDestinationCompanyMail:
       form.nextDestinationCompanyMail,
-    parcelCity: parcels?.length ? parcels.map(parcel => parcel.city) : null,
-    parcelPostalCode: parcels?.length
+    parcelCities: parcels?.length ? parcels.map(parcel => parcel.city) : null,
+    parcelPostalCodes: parcels?.length
       ? parcels.map(parcel => parcel.postalCode)
       : null,
-    parcelNumber: parcels?.length
+    parcelNumbers: parcels?.length
       ? parcels.map(parcel => {
           if (parcel.prefix && parcel.section && parcel.number) {
             return `${parcel.prefix}-${parcel.section}-${parcel.number}`;

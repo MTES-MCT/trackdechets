@@ -185,17 +185,17 @@ export const columns: Column[] = [
   { field: "workerCompanySiret", label: "Entreprise de travaux SIRET" },
   { field: "workerCompanyAddress", label: "Entreprise de travaux adresse" },
   {
-    field: "parcelCity",
+    field: "parcelCities",
     label: "Parcelle commune",
     format: formatArray
   },
   {
-    field: "parcelPostalCode",
+    field: "parcelPostalCodes",
     label: "Parcelle code postal",
     format: formatArray
   },
   {
-    field: "parcelNumber",
+    field: "parcelNumbers",
     label: "Parcelle numéro",
     format: formatArrayWithMissingElements
   },

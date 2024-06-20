@@ -286,10 +286,10 @@ describe("simpleFormToBsdd", () => {
       finalOperations: [],
       intermediaries: [],
       forwardedIn: null,
-      parcelCity: null,
+      parcelCities: null,
       parcelCoordinates: null,
-      parcelNumber: null,
-      parcelPostalCode: null
+      parcelNumbers: null,
+      parcelPostalCodes: null
     });
   });
 
@@ -403,13 +403,13 @@ describe("simpleFormToBsdd", () => {
     const bsdd = formToBsdd(fullForm);
 
     // check transporters are returned in the right order
-    expect(bsdd.parcelCity).toEqual(
+    expect(bsdd.parcelCities).toEqual(
       expect.arrayContaining(["Orléans", "Olivet"])
     );
-    expect(bsdd.parcelPostalCode).toEqual(
+    expect(bsdd.parcelPostalCodes).toEqual(
       expect.arrayContaining(["45100", "45160"])
     );
-    expect(bsdd.parcelNumber).toEqual(
+    expect(bsdd.parcelNumbers).toEqual(
       expect.arrayContaining(["000-EW-8", null])
     );
     expect(bsdd.parcelCoordinates).toEqual(
@@ -622,10 +622,10 @@ describe("simpleFormToBsdd", () => {
       intermediaries: [],
       finalOperations: [],
       forwardedIn: null,
-      parcelCity: null,
+      parcelCities: null,
       parcelCoordinates: null,
-      parcelNumber: null,
-      parcelPostalCode: null,
+      parcelNumbers: null,
+      parcelPostalCodes: null,
       forwardedInId: null,
       forwarding: {
         id: form.readableId,
@@ -803,10 +803,10 @@ describe("simpleFormToBsdd", () => {
         destinationOperationNextDestinationCompanyContact: null,
         destinationOperationNextDestinationCompanyPhone: null,
         destinationOperationNextDestinationCompanyMail: null,
-        parcelCity: null,
+        parcelCities: null,
         parcelCoordinates: null,
-        parcelNumber: null,
-        parcelPostalCode: null,
+        parcelNumbers: null,
+        parcelPostalCodes: null,
         forwardedInId: fullForwardedInForm.id,
         grouping: []
       }

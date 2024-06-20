@@ -161,11 +161,11 @@ type IncomingWaste {
   #########################################################################
 
   "La ville de localisation de la/des parcelles"
-  parcelCity: [String!]
+  parcelCities: [String!]
   "Le code postal de la/des parcelles"
-  parcelPostalCode: [String!]
+  parcelPostalCodes: [String!]
   "Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'"
-  parcelNumber: [String]
+  parcelNumbers: [String]
   "Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'"
   parcelCoordinates: [String]
 
@@ -340,11 +340,11 @@ type OutgoingWaste {
   #########################################################################
 
   "La ville de localisation de la/des parcelles"
-  parcelCity: [String!]
+  parcelCities: [String!]
   "Le code postal de la/des parcelles"
-  parcelPostalCode: [String!]
+  parcelPostalCodes: [String!]
   "Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'"
-  parcelNumber: [String]
+  parcelNumbers: [String]
   "Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'"
   parcelCoordinates: [String]
 
@@ -918,11 +918,11 @@ type ManagedWaste {
   #########################################################################
 
   "La ville de localisation de la/des parcelles"
-  parcelCity: [String!]
+  parcelCities: [String!]
   "Le code postal de la/des parcelles"
-  parcelPostalCode: [String!]
+  parcelPostalCodes: [String!]
   "Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'"
-  parcelNumber: [String]
+  parcelNumbers: [String]
   "Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'"
   parcelCoordinates: [String]
 
@@ -1191,11 +1191,11 @@ type AllWaste {
   #########################################################################
 
   "La ville de localisation de la/des parcelles"
-  parcelCity: [String!]
+  parcelCities: [String!]
   "Le code postal de la/des parcelles"
-  parcelPostalCode: [String!]
+  parcelPostalCodes: [String!]
   "Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'"
-  parcelNumber: [String]
+  parcelNumbers: [String]
   "Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'"
   parcelCoordinates: [String]
 

@@ -136,9 +136,9 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   brokerCompanyMail: null,
   destinationCompanyMail: null,
   traderCompanyMail: null,
-  parcelCity: null,
-  parcelPostalCode: null,
-  parcelNumber: null,
+  parcelCities: null,
+  parcelPostalCodes: null,
+  parcelNumbers: null,
   parcelCoordinates: null
 };
 
@@ -237,9 +237,9 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   postTempStorageDestinationCountry: null,
   brokerCompanyMail: null,
   traderCompanyMail: null,
-  parcelCity: null,
-  parcelPostalCode: null,
-  parcelNumber: null,
+  parcelCities: null,
+  parcelPostalCodes: null,
+  parcelNumbers: null,
   parcelCoordinates: null
 };
 
@@ -419,9 +419,9 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   workerCompanyName: null,
   workerCompanySiret: null,
   workerCompanyAddress: null,
-  parcelCity: null,
-  parcelPostalCode: null,
-  parcelNumber: null,
+  parcelCities: null,
+  parcelPostalCodes: null,
+  parcelNumbers: null,
   parcelCoordinates: null
   // En attente des correctifs recette sur TRA-12745
   // finalOperationCodes: null,
@@ -542,8 +542,8 @@ export const emptyAllWaste: Required<AllWaste> = {
   postTempStorageDestinationCountry: null,
   brokerCompanyMail: null,
   traderCompanyMail: null,
-  parcelCity: null,
-  parcelPostalCode: null,
-  parcelNumber: null,
+  parcelCities: null,
+  parcelPostalCodes: null,
+  parcelNumbers: null,
   parcelCoordinates: null
 };
