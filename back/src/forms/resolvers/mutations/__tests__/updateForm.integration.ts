@@ -275,7 +275,7 @@ describe("Mutation.updateForm", () => {
     expect(errors).toBeUndefined();
   });
 
-  it("should not be possible to update intermediaries whe emitter has signed", async () => {
+  it("should not be possible to update intermediaries when emitter has signed", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const destination = await userWithCompanyFactory("ADMIN");
     const intermediary1 = await companyFactory();
@@ -3598,6 +3598,97 @@ describe("Mutation.updateForm", () => {
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporters[0]"
       })
     ]);
+  });
+
+  it("should be possible to add a transporter even if BSD has intermediaries", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+    const intermediary1 = await userWithCompanyFactory("MEMBER", {
+      address: "Adresse intermédiaire 1",
+      contact: "Contact intermédiaire 1",
+      name: "Nom intermédiaire 1",
+      siret: siretify()
+    });
+    const intermediary2 = await userWithCompanyFactory("MEMBER", {
+      address: "Adresse intermédiaire 2",
+      contact: "Contact intermédiaire 2",
+      name: "Nom intermédiaire 2",
+      siret: siretify()
+    });
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SENT,
+        takenOverAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            number: 1,
+            readyToTakeOver: true,
+            takenOverAt: new Date()
+          }
+        },
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(
+              intermediary1.company,
+              intermediary1.company.contact!
+            ),
+            toIntermediaryCompany(
+              intermediary2.company,
+              intermediary2.company.contact!
+            )
+          ]
+        }
+      }
+    });
+
+    const bsddTransporter1 = await getFirstTransporter(form);
+
+    const bsddTransporter2 = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter2.company.siret,
+        readyToTakeOver: true
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // When
+    // Behave like our front and send back intermediaries data
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [bsddTransporter1!.id, bsddTransporter2.id],
+      intermediaries: [
+        {
+          address: "Adresse intermédiaire 2",
+          contact: "Contact intermédiaire 2",
+          country: "FR",
+          name: "Nom intermédiaire 2",
+          siret: intermediary2.company.siret,
+          vatNumber: null
+        },
+        {
+          address: "Adresse intermédiaire 1",
+          contact: "Contact intermédiaire 1",
+          country: "FR",
+          name: "Nom intermédiaire 1",
+          siret: intermediary1.company.siret,
+          vatNumber: null
+        }
+      ]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
   });
 
   it("should log in an event the updated data", async () => {
