@@ -313,6 +313,10 @@ export async function getUpdatedFields(
   return Object.keys(diff);
 }
 
+const stringsNonNullAndEqual = (str1, str2) => {
+  return Boolean(str1) && Boolean(str2) && str1 === str2;
+};
+
 /**
  * Computes the diff on `intermediaries` input
  * This is not trivial because it is an array of `CompanyInput`
@@ -331,8 +335,8 @@ function intermediariesDiff(
       for (const intermediary of existingIntermediaries) {
         const inputIntermediary = input.intermediaries.find(
           i =>
-            i.siret === intermediary.siret ||
-            i.vatNumber === intermediary.vatNumber
+            stringsNonNullAndEqual(i.siret, intermediary.siret) ||
+            stringsNonNullAndEqual(i.vatNumber, intermediary.vatNumber)
         );
         if (!inputIntermediary) {
           // un intermédiaire est présent dans l'input mais pas dans les données existantes
