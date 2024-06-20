@@ -164,9 +164,17 @@ type IncomingWaste {
   parcelCities: [String!]
   "Le code postal de la/des parcelles"
   parcelPostalCodes: [String!]
-  "Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'"
+  """
+  Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par coordonnées.
+  """
   parcelNumbers: [String]
-  "Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'"
+  """
+  Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par leur numéro.
+  """
   parcelCoordinates: [String]
 
   ###########################################################
@@ -343,9 +351,17 @@ type OutgoingWaste {
   parcelCities: [String!]
   "Le code postal de la/des parcelles"
   parcelPostalCodes: [String!]
-  "Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'"
+  """
+  Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par coordonnées.
+  """
   parcelNumbers: [String]
-  "Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'"
+  """
+  Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par leur numéro.
+  """
   parcelCoordinates: [String]
 
   ######################################################
@@ -921,9 +937,17 @@ type ManagedWaste {
   parcelCities: [String!]
   "Le code postal de la/des parcelles"
   parcelPostalCodes: [String!]
-  "Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'"
+  """
+  Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par coordonnées.
+  """
   parcelNumbers: [String]
-  "Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'"
+  """
+  Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par leur numéro.
+  """
   parcelCoordinates: [String]
 
   #################################################################
@@ -1194,9 +1218,17 @@ type AllWaste {
   parcelCities: [String!]
   "Le code postal de la/des parcelles"
   parcelPostalCodes: [String!]
-  "Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'"
+  """
+  Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par coordonnées.
+  """
   parcelNumbers: [String]
-  "Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'"
+  """
+  Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par leur numéro.
+  """
   parcelCoordinates: [String]
 
   #################################################################
