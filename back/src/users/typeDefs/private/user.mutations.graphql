@@ -116,5 +116,5 @@ type Mutation {
   USAGE INTERNE
   Change le rôle d'un utilisateur de l'entreprise
   """
-  changeUserRole(userId: ID!, siret: ID!, role: UserRole!): CompanyMember!
+  changeUserRole(userId: ID!, orgId: ID!, role: UserRole!): CompanyMember!
 }

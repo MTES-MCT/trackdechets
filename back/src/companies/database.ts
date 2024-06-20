@@ -3,7 +3,13 @@
  */
 
 import { prisma } from "@td/prisma";
-import { User, Prisma, Company, CompanyAssociation } from "@prisma/client";
+import {
+  User,
+  Prisma,
+  Company,
+  CompanyAssociation,
+  UserAccountHash
+} from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
@@ -178,6 +184,51 @@ export const userNameDisplay = (
 };
 
 /**
+ * map a user's company association to a CompanyMember
+ * @param companyAssociations
+ * @param company
+ * @param isTDAdmin
+ */
+export const userAssociationToCompanyMember = (
+  companyAssociations: CompanyAssociation & { user: User },
+  orgId: string,
+  isTDAdmin = false
+) => {
+  return {
+    ...companyAssociations.user,
+    orgId: orgId,
+    name: userNameDisplay(
+      companyAssociations,
+      companyAssociations.user.id,
+      isTDAdmin
+    ),
+    role: companyAssociations.role,
+    isPendingInvitation: false
+  };
+};
+
+/**
+ * map a user's company association to a CompanyMember
+ * @param userAccountHash
+ * @param company
+ * @param isTDAdmin
+ */
+export const userAccountHashToCompanyMember = (
+  userAccountHash: UserAccountHash,
+  orgId: string
+) => {
+  return {
+    id: userAccountHash.id,
+    orgId: orgId,
+    name: "Invité",
+    email: userAccountHash.email,
+    role: userAccountHash.role,
+    isActive: false,
+    isPendingInvitation: true
+  };
+};
+
+/**
  * Returns company members that already have an account in TD
  * @param siret
  */
@@ -191,13 +242,7 @@ export async function getCompanyActiveUsers(
     .companyAssociations({ include: { user: true } });
 
   return associations.map(a => {
-    return {
-      ...a.user,
-      orgId,
-      name: userNameDisplay(a, requestingUserid, isTDAdmin),
-      role: a.role,
-      isPendingInvitation: false
-    };
+    return userAssociationToCompanyMember(a, orgId, isTDAdmin);
   });
 }
 
@@ -212,15 +257,7 @@ export async function getCompanyInvitedUsers(
 ): Promise<CompanyMember[]> {
   const hashes = await dataloaders.activeUserAccountHashesBySiret.load(orgId);
   return hashes.map(h => {
-    return {
-      id: h.id,
-      orgId,
-      name: "Invité",
-      email: h.email,
-      role: h.role,
-      isActive: false,
-      isPendingInvitation: true
-    };
+    return userAccountHashToCompanyMember(h, orgId);
   });
 }
 

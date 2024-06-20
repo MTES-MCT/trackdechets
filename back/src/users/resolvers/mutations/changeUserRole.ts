@@ -1,3 +1,4 @@
+import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import {
@@ -8,7 +9,8 @@ import {
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   getCompanyOrCompanyNotFound,
-  userNameDisplay
+  userAccountHashToCompanyMember,
+  userAssociationToCompanyMember
 } from "../../../companies/database";
 import {
   CompanyMember,
@@ -20,20 +22,18 @@ import {
   Permission
 } from "../../../permissions";
 import {
-  getCompanyAssociationOrNotFound,
-  getUserAccountHashOrNotFound,
   updateCompanyAssociation,
   updateUserAccountHash
 } from "../../database";
 
 const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
   parent,
-  args: { userId: string; siret: string; role: UserRole },
+  args: { userId: string; orgId: string; role: UserRole },
   context: GraphQLContext
 ): Promise<CompanyMember> => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ orgId: args.siret });
+  const company = await getCompanyOrCompanyNotFound({ orgId: args.orgId });
 
   const isTDAdmin = await checkUserIsAdminOrPermissions(
     user,
@@ -42,13 +42,10 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
     NotCompanyAdminErrorMsg(company.orgId)
   );
 
-  try {
-    const association = await getCompanyAssociationOrNotFound({
-      company: {
-        orgId: args.siret
-      },
-      userId: args.userId
-    });
+  const association = await prisma.companyAssociation.findFirst({
+    where: { company: { orgId: args.orgId }, userId: args.userId }
+  });
+  if (association) {
     const updatedAssociation = await updateCompanyAssociation({
       associationId: association.id,
       data: {
@@ -60,22 +57,28 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
         `L'utilisateur n'est pas membre de l'entreprise`
       );
     }
-    return {
-      ...updatedAssociation.user,
-      orgId: company.orgId,
-      name: userNameDisplay(updatedAssociation, user.id, isTDAdmin),
-      role: updatedAssociation.role,
-      isPendingInvitation: false
-    };
-  } catch (error) {
-    //do nothing
+    return userAssociationToCompanyMember(
+      updatedAssociation,
+      company.orgId,
+      isTDAdmin
+    );
   }
-  const userAccountHash = await getUserAccountHashOrNotFound({
-    id: args.userId,
-    companySiret: args.siret,
-    acceptedAt: null
-  });
 
+  const userAccountHash = await prisma.userAccountHash.findUnique({
+    where: {
+      id: args.userId,
+      companySiret: args.orgId,
+      acceptedAt: null
+    },
+    select: {
+      id: true
+    }
+  });
+  if (!userAccountHash) {
+    throw new UserInputError(
+      `L'utilisateur ${args.userId} n'existe pas ou ne fait pas partie de l'établissement ${args.orgId}`
+    );
+  }
   const updatedUserAccountHash = await updateUserAccountHash({
     userId: userAccountHash.id,
     data: {
@@ -83,16 +86,10 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
     }
   });
   if (!updatedUserAccountHash) {
-    throw new UserInputError(`L'utilisateur n'existe pas`);
+    throw new UserInputError(
+      `L'utilisateur ${args.userId} n'existe pas ou ne fait pas partie de l'établissement ${args.orgId}`
+    );
   }
-  return {
-    id: updatedUserAccountHash.id,
-    orgId: company.orgId,
-    name: "Invité",
-    email: updatedUserAccountHash.email,
-    role: updatedUserAccountHash.role,
-    isActive: false,
-    isPendingInvitation: true
-  };
+  return userAccountHashToCompanyMember(updatedUserAccountHash, company.orgId);
 };
 export default changeUserRoleResolver;
