@@ -645,7 +645,7 @@ export const operationSchema: FactorySchemaOf<
           return true;
         }
       ),
-    destinationOperationMode: destinationOperationModeValidation(context),
+    destinationOperationMode: destinationOperationModeValidation(),
     destinationOperationDate: yup
       .date()
       .label("Date de traitement")

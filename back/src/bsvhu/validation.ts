@@ -200,7 +200,7 @@ const destinationSchema: FactorySchemaOf<
             .required(`Destinataire: l'opération réalisée est obligatoire`),
         otherwise: s => s.nullable().notRequired()
       }),
-    destinationOperationMode: destinationOperationModeValidation(context),
+    destinationOperationMode: destinationOperationModeValidation(),
     destinationPlannedOperationCode: yup
       .string()
       .oneOf([...PROCESSING_OPERATIONS_CODES, null, ""])
