@@ -32,7 +32,7 @@ export const checkAndSetPreviousPackagings: ZodBsffTransformer = async (
         volume: p.volume,
         weight: p.acceptationWeight ?? 0,
         operationNoTraceability: false,
-        previousPackagings: previousPackagings.map(p => p.id)
+        previousPackagings: [p.id]
       }))
     };
   } else if (bsff.type === BsffType.RECONDITIONNEMENT) {
@@ -44,5 +44,5 @@ export const checkAndSetPreviousPackagings: ZodBsffTransformer = async (
       }))
     };
   }
-  return bsff;
+  return rest;
 };

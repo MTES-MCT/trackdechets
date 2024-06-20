@@ -224,7 +224,7 @@ describe("Mutation.createDraftBsff", () => {
     });
 
     it("should add bsffs for groupement", async () => {
-      const previousBsff = await createBsffAfterOperation(
+      const previousBsff1 = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
           data: {
@@ -236,6 +236,22 @@ describe("Mutation.createDraftBsff", () => {
           }
         }
       );
+
+      const previousBsff2 = await createBsffAfterOperation(
+        { emitter, transporter, destination },
+        {
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: {
+            operationCode: OPERATION.R12.code,
+            operationSignatureDate: new Date()
+          }
+        }
+      );
+
+      const previousPackaging1 = previousBsff1.packagings[0];
+      const previousPackaging2 = previousBsff2.packagings[0];
 
       const { mutate } = makeClient(destination.user);
       const { data, errors } = await mutate<
@@ -254,25 +270,36 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            grouping: previousBsff.packagings.map(p => p.id)
+            grouping: [previousPackaging1.id, previousPackaging2.id]
           }
         }
       });
 
       expect(errors).toBeUndefined();
 
-      const previousPackagings =
-        await getReadonlyBsffPackagingRepository().findPreviousPackagings(
-          data.createDraftBsff.packagings.map(p => p.id)
-        );
+      const createdBsff = await prisma.bsff.findUniqueOrThrow({
+        where: { id: data.createDraftBsff.id },
+        include: {
+          packagings: {
+            include: { previousPackagings: { select: { id: true } } }
+          }
+        }
+      });
 
-      expect(previousPackagings).toHaveLength(previousBsff.packagings.length);
+      expect(createdBsff.packagings).toHaveLength(2);
 
-      for (const previousPackaging of previousPackagings) {
-        expect(previousBsff.packagings.map(p => p.id)).toContain(
-          previousPackaging.id
-        );
-      }
+      // packaging infos should be computed from previous packagings
+      const packaging1 = createdBsff.packagings[0];
+      const packaging2 = createdBsff.packagings[1];
+
+      expect(packaging1.numero).toEqual(previousPackaging1.numero);
+      expect(packaging1.previousPackagings).toEqual([
+        { id: previousPackaging1.id }
+      ]);
+      expect(packaging2.numero).toEqual(previousPackaging2.numero);
+      expect(packaging2.previousPackagings).toEqual([
+        { id: previousPackaging2.id }
+      ]);
     });
 
     it("should add a bsff for réexpedition", async () => {

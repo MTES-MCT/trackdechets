@@ -472,6 +472,7 @@ async function signOperation(
 
     const finalOperationPackagings = packagings.filter(
       p =>
+        p.operationSignatureDate &&
         p.operationCode &&
         isFinalOperation(p.operationCode, p.operationNoTraceability)
     );
