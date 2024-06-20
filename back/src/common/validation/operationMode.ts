@@ -2,7 +2,7 @@ import * as yup from "yup";
 import { OperationMode } from "@prisma/client";
 import { getOperationModesFromOperationCode } from "../operationModes";
 
-export const destinationOperationModeValidation = context =>
+export const destinationOperationModeValidation = () =>
   yup
     .mixed<OperationMode | null | undefined>()
     .oneOf([...Object.values(OperationMode), null, undefined])
