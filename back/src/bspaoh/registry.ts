@@ -119,7 +119,8 @@ function toGenericWaste(
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransporterData(bspaoh)
+    ...getTransporterData(bspaoh),
+    destinationCompanyMail: bspaoh.destinationCompanyMail
   };
 }
 
@@ -212,8 +213,7 @@ export function toOutgoingWaste(
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,
     emitterCustomInfo: bspaoh.emitterCustomInfo,
-    transporterCompanyMail: transporter?.transporterCompanyMail,
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    transporterCompanyMail: transporter?.transporterCompanyMail
   };
 }
 
@@ -261,8 +261,7 @@ export function toTransportedWaste(
     destinationCompanySiret: bspaoh.destinationCompanySiret,
     destinationCompanyAddress: bspaoh.destinationCompanyAddress,
     transporterCustomInfo: transporter?.transporterCustomInfo,
-    emitterCompanyMail: bspaoh.emitterCompanyMail,
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    emitterCompanyMail: bspaoh.emitterCompanyMail
   };
 }
 
@@ -310,8 +309,7 @@ export function toManagedWaste(
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     emitterCompanyMail: bspaoh.emitterCompanyMail,
-    transporterCompanyMail: transporter?.transporterCompanyMail,
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    transporterCompanyMail: transporter?.transporterCompanyMail
   };
 }
 
@@ -366,7 +364,6 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bspaoh.emitterCompanyMail,
-    transporterCompanyMail: transporter?.transporterCompanyMail,
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    transporterCompanyMail: transporter?.transporterCompanyMail
   };
 }

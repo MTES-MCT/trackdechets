@@ -170,7 +170,9 @@ function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress: bsda.workerCompanyAddress,
-    ...getTransportersData(bsda)
+    ...getTransportersData(bsda),
+    destinationCompanyMail: bsda.destinationCompanyMail,
+    brokerCompanyMail: bsda.brokerCompanyMail
   };
 }
 
@@ -298,7 +300,6 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
       ? bsda.weightValue.dividedBy(1000).toNumber()
       : null,
     emitterCustomInfo: bsda.emitterCustomInfo,
-    destinationCompanyMail: bsda.destinationCompanyMail,
     ...getOperationData(bsda),
     ...getFinalOperationsData(bsda)
   };
@@ -366,8 +367,7 @@ export function toTransportedWaste(
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationCompanyAddress: bsda.destinationCompanyAddress,
-    emitterCompanyMail: bsda.emitterCompanyMail,
-    destinationCompanyMail: bsda.destinationCompanyMail
+    emitterCompanyMail: bsda.emitterCompanyMail
   };
 }
 
@@ -428,8 +428,7 @@ export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
       ].filter(Boolean)
     ),
     ...initialEmitter,
-    emitterCompanyMail: bsda.emitterCompanyMail,
-    destinationCompanyMail: bsda.destinationCompanyMail
+    emitterCompanyMail: bsda.emitterCompanyMail
   };
 }
 
@@ -498,7 +497,6 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    destinationCompanyMail: bsda.destinationCompanyMail,
     ...getOperationData(bsda),
     ...getFinalOperationsData(bsda)
   };
