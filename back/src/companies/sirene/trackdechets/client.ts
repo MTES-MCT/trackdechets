@@ -19,7 +19,6 @@ import {
   EtatAdministratif,
   StatutDiffusionEtablissement
 } from "../../../generated/graphql/types";
-import { prisma } from "@td/prisma";
 
 const { ResponseError } = errors;
 /**
@@ -81,7 +80,6 @@ export const searchCompany = async (
   siret: string
 ): Promise<SireneSearchResult> => {
   try {
-    console.log(">> TD searchCompany");
     const response = await client.search<SearchResponse>({
       index,
       body: {
@@ -94,13 +92,10 @@ export const searchCompany = async (
         }
       }
     });
-    console.log("response", response);
-
     if (!response.body.hits.hits || !response.body.hits.hits[0]?._source) {
       throw new SiretNotFoundError();
     }
     const company = searchResponseToCompany(response.body.hits.hits[0]._source);
-    console.log("TD company", company);
 
     if (company.etatAdministratif === ("F" as EtatAdministratif)) {
       throw new ClosedCompanyError();
@@ -114,18 +109,6 @@ export const searchCompany = async (
     }
     return company;
   } catch (error) {
-    // Special companies
-    const companyInDB = await prisma.company.findFirst({
-      where: { orgId: siret }
-    });
-    if (companyInDB) {
-      return {
-        ...companyInDB,
-        statutDiffusionEtablissement: "O" as StatutDiffusionEtablissement
-      };
-    }
-
-    console.log("error", error);
     if (error instanceof ResponseError && error.meta.statusCode === 404) {
       throw new SiretNotFoundError();
     }

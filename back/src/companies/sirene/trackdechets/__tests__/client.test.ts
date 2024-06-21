@@ -276,6 +276,7 @@ describe("searchCompany", () => {
     try {
       await searchCompany(siret);
     } catch (e) {
+      console.log("e", e)
       expect(e.message).toEqual("Erreur inconnue");
     }
   });
