@@ -1,5 +1,6 @@
 import { logger } from "@td/logger";
 import { AsyncResource } from "node:async_hooks";
+import { join } from "node:path";
 import { Request, Response, NextFunction } from "express";
 
 /**
@@ -8,48 +9,55 @@ import { Request, Response, NextFunction } from "express";
  * A `request_timing` property indicates the timing of the log (start/end)
  */
 export function loggingMiddleware(graphQLPath: string) {
-  return function logging(req: Request, res: Response, next: NextFunction) {
-    logExpressRequest(req, res, { requestTiming: "start", graphQLPath });
+  return function logging(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    logExpressRequest(request, response, {
+      requestTiming: "start",
+      graphQLPath
+    });
 
     const startTime = Date.now();
 
-    const { send, end } = res;
+    const { send, end } = response;
 
-    res.send = body => {
-      res.send = send;
-      res.locals.body = body;
-      return res.send(body);
+    response.send = body => {
+      response.send = send;
+      response.locals.body = body;
+      return response.send(body);
     };
 
     // To keep the request correlationId we bind the event handler to its parent context
     const onClose = AsyncResource.bind(() => {
-      req.socket.off("close", onClose);
-      console.log("close", res.headersSent);
-      if (res.headersSent) {
+      request.socket.off("close", onClose);
+      if (response.headersSent) {
         return;
       }
 
-      logExpressRequest(req, res, {
+      logExpressRequest(request, response, {
         requestTiming: "error",
         graphQLPath
       });
     });
 
     // Sometimes the connection is closed without calling res.end (ex: gateway times out the request before app does)
-    req.socket.on("close", onClose);
+    request.socket.on("close", onClose);
 
-    res.end = ((chunk: any, encoding: BufferEncoding) => {
-      res.end = end;
+    response.end = ((chunk: any, encoding: BufferEncoding) => {
+      response.end = end;
+
       const responseTime = Date.now() - startTime;
-      req.socket.off("close", onClose);
+      request.socket.off("close", onClose);
 
-      logExpressRequest(req, res, {
+      logExpressRequest(request, response, {
         requestTiming: "end",
         responseTime,
         graphQLPath
       });
 
-      return res.end(chunk, encoding);
+      return response.end(chunk, encoding);
     }) as any;
 
     next();
@@ -69,22 +77,30 @@ function logExpressRequest(
     graphQLPath?: string;
   }
 ) {
-  const message = `${request.method} ${request.path}`;
+  const path =
+    request.path !== "/"
+      ? join(request.baseUrl, request.path)
+      : request.baseUrl; // In case the gql endpoint is mounted into a subpath
+  const message = `${request.method} ${path}`;
 
   let requestMetadata: Record<string, any> = {
     ip: request.ip,
     http_params: request.params,
     http_query: request.query,
-    http_path: request.path,
+    http_path: join(request.baseUrl, path),
     http_method: request.method,
     request_timing: requestTiming
   };
 
   // GraphQL specific fields
-  if (request.path === graphQLPath && request.method === "POST") {
+  if (
+    graphQLPath &&
+    path.startsWith(graphQLPath) &&
+    request.method === "POST"
+  ) {
     requestMetadata.graphql_operation_name = request.body?.operationName;
     requestMetadata.graphql_variables = request.body?.variables;
-    // requestMetadata.graphql_query = request.body?.query;
+    requestMetadata.graphql_query = request.body?.query;
   }
 
   if (["end", "error"].includes(requestTiming)) {
@@ -95,9 +111,9 @@ function logExpressRequest(
       http_status: response.statusCode,
       request_timing: "end",
       execution_time_num: responseTime, // in millis
-      // response_body: Buffer.isBuffer(response.locals.body)
-      //   ? null
-      //   : response.locals.body,
+      response_body: Buffer.isBuffer(response.locals.body)
+        ? null
+        : response.locals.body,
       graphql_operation: request.gqlInfos?.[0]?.operation,
       graphql_selection_name: request.gqlInfos?.[0]?.name
     };
