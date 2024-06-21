@@ -1,6 +1,7 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { isSiret, cleanClue as cleanClueFn } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { getUserRoles } from "../../../permissions";
 import {
   CompanySearchPrivate,
   QueryResolvers
@@ -8,49 +9,55 @@ import {
 import { prisma } from "@td/prisma";
 import { getCompanyInfos } from "./companyInfos";
 
-const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
-  _,
-  args,
-  context
-) => {
-  applyAuthStrategies(context, [AuthType.Session]);
-  checkIsAuthenticated(context);
+const companyPrivateInfosResolvers: QueryResolvers["companyPrivateInfos"] =
+  async (_, args, context) => {
+    // Warning: this query could expose sensitive informations if not handled properly,
+    //double check the returned data and subresolvers (CompanySearchPrivate)
+    applyAuthStrategies(context, [AuthType.Session]);
+    const user = checkIsAuthenticated(context);
 
-  const cleanClue = cleanClueFn(args.clue);
-  const where = isSiret(cleanClue)
-    ? { siret: cleanClue }
-    : { vatNumber: cleanClue };
+    const roles = await getUserRoles(user.id);
 
-  const [companyInfos, isAnonymousCompany, company] = await Promise.all([
-    getCompanyInfos(cleanClue),
-    prisma.anonymousCompany.count({
-      where: { siret: cleanClue }
-    }),
-    prisma.company.findUnique({
-      where,
-      select: {
-        id: true,
-        orgId: true,
-        gerepId: true,
-        securityCode: true,
-        verificationCode: true,
-        givenName: true
-      }
-    })
-  ]);
-  return {
-    ...(companyInfos as CompanySearchPrivate),
-    ...{
-      trackdechetsId: company?.id,
-      orgId: company?.orgId ?? companyInfos.orgId,
-      gerepId: company?.gerepId,
-      securityCode: company?.securityCode,
-      verificationCode: company?.verificationCode,
-      givenName: company?.givenName
-    },
-    isAnonymousCompany: isAnonymousCompany > 0,
-    receivedSignatureAutomations: []
-  } as CompanySearchPrivate;
-};
+    const userCompanies = Object.keys(roles);
 
-export default companyInfosResolvers;
+    const cleanClue = cleanClueFn(args.clue);
+    const where = isSiret(cleanClue)
+      ? { siret: cleanClue }
+      : { vatNumber: cleanClue };
+
+    const [companyInfos, isAnonymousCompany, company] = await Promise.all([
+      getCompanyInfos(cleanClue),
+      prisma.anonymousCompany.count({
+        where: { siret: cleanClue }
+      }),
+      prisma.company.findUnique({
+        where,
+        select: {
+          id: true,
+          orgId: true,
+          gerepId: true,
+          securityCode: true,
+          verificationCode: true,
+          givenName: true
+        }
+      })
+    ]);
+
+    const userBelongsToCompany = userCompanies.includes(company?.orgId ?? "");
+
+    return {
+      ...(companyInfos as CompanySearchPrivate),
+      ...{
+        trackdechetsId: company?.id,
+        orgId: company?.orgId ?? companyInfos.orgId,
+        gerepId: company?.gerepId,
+        securityCode: userBelongsToCompany ? company?.securityCode : null,
+        verificationCode: company?.verificationCode,
+        givenName: company?.givenName
+      },
+      isAnonymousCompany: isAnonymousCompany > 0,
+      receivedSignatureAutomations: []
+    } as CompanySearchPrivate;
+  };
+
+export default companyPrivateInfosResolvers;

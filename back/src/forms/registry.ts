@@ -154,7 +154,9 @@ export const getSubType = (bsdd: Bsdd): BsdSubType => {
   return "INITIAL";
 };
 
-function toGenericWaste(bsdd: ReturnType<typeof formToBsdd>): GenericWaste {
+export function toGenericWaste(
+  bsdd: ReturnType<typeof formToBsdd>
+): GenericWaste {
   const initialEmitter: Record<string, string | string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
@@ -193,11 +195,14 @@ function toGenericWaste(bsdd: ReturnType<typeof formToBsdd>): GenericWaste {
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationCompanyMail: bsdd.destinationCompanyMail,
     wasteAdr: bsdd.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
     weight: bsdd.weightValue,
+    brokerCompanyMail: bsdd.brokerCompanyMail,
+    traderCompanyMail: bsdd.traderCompanyMail,
     ...getTransportersData(bsdd),
     ...initialEmitter
   };
@@ -360,8 +365,7 @@ export function toTransportedWaste(
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    emitterCompanyMail: bsdd.emitterCompanyMail,
-    destinationCompanyMail: bsdd.destinationCompanyMail
+    emitterCompanyMail: bsdd.emitterCompanyMail
   };
 }
 

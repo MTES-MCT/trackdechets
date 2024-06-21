@@ -144,7 +144,8 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
           .toDecimalPlaces(6)
           .toNumber()
       : null,
-    ...getTransporterData(bsdasri)
+    ...getTransporterData(bsdasri),
+    destinationCompanyMail: bsdasri.destinationCompanyMail
   };
 }
 
@@ -251,7 +252,6 @@ export function toOutgoingWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCustomInfo: bsdasri.emitterCustomInfo,
-    destinationCompanyMail: bsdasri.destinationCompanyMail,
     ...getOperationData(bsdasri),
     ...getFinalOperationsData(bsdasri)
   };
@@ -305,8 +305,7 @@ export function toTransportedWaste(
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    emitterCompanyMail: bsdasri.emitterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
 
@@ -362,8 +361,7 @@ export function toManagedWaste(
       bsdasri.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    emitterCompanyMail: bsdasri.emitterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
 
@@ -418,7 +416,6 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail,
     ...getOperationData(bsdasri),
     ...getFinalOperationsData(bsdasri)
   };

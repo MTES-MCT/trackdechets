@@ -415,6 +415,32 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     });
   });
 
+  it("should return TD-specific infos even if company is anonymous", async () => {
+    // Given
+    mockSearchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
+    const siret = siretify(8);
+
+    await companyFactory({
+      siret,
+      allowBsdasriTakeOverWithoutSignature: true,
+      companyTypes: {
+        set: [CompanyType.WASTEPROCESSOR]
+      }
+    });
+    const gqlquery = `
+      query {
+        companyInfos(siret: "${siret}") {
+          allowBsdasriTakeOverWithoutSignature
+        }
+      }`;
+
+    // When
+    const { data } = await query<any>(gqlquery);
+
+    // Then
+    expect(data.companyInfos.allowBsdasriTakeOverWithoutSignature).toBeTruthy();
+  });
+
   it("should return explicit error if non-diffusible AND closed", async () => {
     // Given
     mockSearchSirene.mockRejectedValueOnce(new ClosedCompanyError());

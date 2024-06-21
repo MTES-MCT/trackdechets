@@ -1451,6 +1451,22 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
+  it("should be valid when passing a parcelNumber negative coordinates", async () => {
+    const isValid = await draftFormSchema.isValid({
+      ...form,
+      wasteDetailsParcelNumbers: [
+        {
+          city: "Paris",
+          postalCode: "750012",
+          x: -1.2,
+          y: -1.3
+        }
+      ]
+    });
+
+    expect(isValid).toBe(true);
+  });
+
   it("should be invalid when passing an incomplete parcelNumber number", async () => {
     const validateFn = () =>
       draftFormSchema.validate({

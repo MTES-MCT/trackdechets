@@ -228,6 +228,25 @@ describe("toTransportedWaste", () => {
   });
 });
 
+describe("toGenericWaste", () => {
+  it("should contain destinationCompanyMail", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: { destinationCompanyMail: "destination@mail.com" }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toAllWaste(bsdasriForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyMail).toBe("destination@mail.com");
+  });
+});
+
 describe("getSubType", () => {
   afterAll(resetDatabase);
 

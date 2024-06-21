@@ -152,7 +152,8 @@ function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...(transporter ? getTransporterData(transporter) : {})
+    ...(transporter ? getTransporterData(transporter) : {}),
+    destinationCompanyMail: bsff.destinationCompanyMail
   };
 }
 
@@ -274,7 +275,6 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCustomInfo: bsff.emitterCustomInfo,
-    destinationCompanyMail: bsff.destinationCompanyMail,
     ...getOperationData(bsff),
     ...getFinalOperationsData(bsff)
   };
@@ -334,8 +334,7 @@ export function toTransportedWaste(
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,
     destinationCompanyAddress: bsff.destinationCompanyAddress,
-    emitterCompanyMail: bsff.emitterCompanyMail,
-    destinationCompanyMail: bsff.destinationCompanyMail
+    emitterCompanyMail: bsff.emitterCompanyMail
   };
 }
 
@@ -397,8 +396,7 @@ export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    emitterCompanyMail: bsff.emitterCompanyMail,
-    destinationCompanyMail: bsff.destinationCompanyMail
+    emitterCompanyMail: bsff.emitterCompanyMail
   };
 }
 
@@ -459,7 +457,6 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
-    destinationCompanyMail: bsff.destinationCompanyMail,
     ...getOperationData(bsff),
     ...getFinalOperationsData(bsff)
   };

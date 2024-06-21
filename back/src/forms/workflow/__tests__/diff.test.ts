@@ -1,4 +1,5 @@
-import { arraysEqual, objectDiff, stringEqual } from "../diff";
+import Decimal from "decimal.js";
+import { arraysEqual, numberEqual, objectDiff, stringEqual } from "../diff";
 
 describe("arrayEquals", () => {
   test("arrays are equal", () => {
@@ -209,5 +210,19 @@ describe("dateDiff", () => {
     expect(objectDiff(o1, o2)).toEqual({});
     expect(objectDiff(o2, o1)).toEqual({});
     expect(objectDiff(o1, { a: "another" })).toEqual({ a: "another" });
+  });
+});
+
+describe("numberEqual", () => {
+  test("numbers with ridiculous number of decimals shoud be rounded and equal", () => {
+    // Given
+    const number1 = new Decimal("9.604");
+    const number2 = new Decimal("9.6039999999999990");
+
+    // When
+    const areEqual = numberEqual(number1, number2);
+
+    // Then
+    expect(areEqual).toBeTruthy();
   });
 });
