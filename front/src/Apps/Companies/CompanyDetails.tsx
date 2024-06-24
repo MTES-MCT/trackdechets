@@ -22,7 +22,7 @@ import CompanyDigestSheetForm from "./CompanyDigestSheet/CompanyDigestSheet";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import { FrIconClassName } from "@codegouvfr/react-dsfr";
 
-export type TheProps = {
+export type TabContentProps = {
   company: CompanyPrivate;
 };
 
@@ -32,7 +32,7 @@ const buildTabs = (
   company: CompanyPrivate
 ): {
   tabs: TabsProps.Controlled["tabs"];
-  tabsContent: Record<string, React.FC<TheProps>>;
+  tabsContent: Record<string, React.FC<TabContentProps>>;
 } => {
   const isAdmin = company.userRole === UserRole.Admin;
   const isMember = company.userRole === UserRole.Member;

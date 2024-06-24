@@ -39,7 +39,7 @@ Les webhooks sont authentifiés par un header contenant un token hardcodé en va
 
 ### Api Trackdéchets
 
-L'api TD reçoit 1 mutations et 2 queries privées.
+L'api TD reçoit 1 mutation et 2 queries privées.
 
 ### Api Gerico
 

@@ -15,6 +15,7 @@ import { getUserRoles } from "../../../permissions";
 
 import { UserInputError } from "../../../common/errors";
 import { CompanyDigestStatus } from "@prisma/client";
+import { logger } from "@td/logger";
 
 const { GERICO_API_KEY, GERICO_API_URL } = process.env;
 
@@ -41,7 +42,9 @@ export const companyDigestPdfDownloadHandler: DownloadHandler<QueryCompanyDigest
           createPDFResponse(res, `fiche-${companyDigest.orgId}.pdf`)
         );
       } catch (e) {
-        console.log("error");
+        logger.error(
+          `Failed to retrieve companyDigest ${companyDigest.distantId}`
+        );
       }
     }
   };

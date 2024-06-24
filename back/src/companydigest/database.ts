@@ -6,7 +6,7 @@ import { prisma } from "@td/prisma";
 import { CompanyDigest } from "@prisma/client";
 
 /**
- * Retrieves a companyDigest by id or throw a BsdasriNotFound error
+ * Retrieves a companyDigest by id or throw a CompanyDigestNotFound error
  */
 export async function getCompanyDigestOrNotFound({
   id
