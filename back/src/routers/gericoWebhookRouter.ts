@@ -7,7 +7,13 @@ import { CompanyDigestStatus } from "@prisma/client";
 const { GERICO_WEBHOOK_TOKEN } = process.env;
 
 export const gericoWebhookHandler = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
+  const { authorization } = req.headers;
+
+  if (!authorization) {
+    return res.status(403).send("Forbidden");
+  }
+
+  const token = authorization.split(" ")[1];
 
   if (!token || token !== GERICO_WEBHOOK_TOKEN) {
     return res.status(403).send("Forbidden");

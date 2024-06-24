@@ -23,18 +23,18 @@ La fonctionalité sera ouverte progressivement pour permettre d'ajuster les capa
 La fonctionalité est réservée aux utilisateurs UI disposant de l'accès à la fonctionalité.
 L'utilisateur doit être membre de l'établissement concerné.
 Seules les années N et N-1 sont accessibles.
-Une seule fiche est générable par jour et par établisesment.
+Une seule fiche est générable par jour et par établissement.
 Chaque établissement est autorisé par un featureFlag.
 
 ### Base de données
 
 Le modèle CompanyDigest centralise les données persistés necessaires à cette fonctionalité.
-Le modèle Compay reçoit une nouvelle colonne featureFlags (string[]) dans lequel la présence de la chaine `COMPANY_DIGEST` détermine l'accès à la fonctionalité.
+Le modèle Company reçoit une nouvelle colonne featureFlags (string[]) dans lequel la présence de la chaine `COMPANY_DIGEST` détermine l'accès à la fonctionalité.
 CompanyDigest comporte user pour suivre l'utilisateur à l'origine de la demande
 
 ### Webhook
 
-Le router présent back/src/routers/gericoWebhookRouter.ts gère les webhooks envoyés par gérico.
+Le router présent dans back/src/routers/gericoWebhookRouter.ts gère les webhooks envoyés par gérico.
 Les webhooks sont authentifiés par un header contenant un token hardcodé en variable d'environnement
 
 ### Api Trackdéchets

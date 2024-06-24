@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { format } from "date-fns";
@@ -41,7 +41,7 @@ const Description = () => (
     </ul>
     <br />
     <p>
-      En cas de constat d'erreur sur le fiche, il convient donc de procéder aux
+      En cas de constat d'erreur sur la fiche, il convient donc de procéder aux
       révisions prévues dans les outils, en aucun cas, le support n'interviendra
       pour des corrections de fiche.
     </p>
@@ -53,15 +53,19 @@ const Description = () => (
     <br />
     <p>
       Les données sont encore sous beta-test et vous pouvez consulter la
-      documentation en FAQ pour savoir à quoi elle correspondent.
+      documentation en FAQ pour savoir à quoi elles correspondent.
     </p>
     <br />
     <p>
       Les données sont mises à jour toutes les 24h concernant Trackdéchets, et
-      peuvent être mise à jour tous les mois, ou trimestres, concernant les
+      peuvent être mises à jour tous les mois, ou trimestres, concernant les
       autres sources.
     </p>
   </div>
+);
+
+const Spinner = () => (
+  <span className="fr-icon-refresh-line spinning fr-mx-1w" />
 );
 
 const CompanyDigestDownload = ({ companyDigests, year, onClick }) => {
@@ -77,7 +81,7 @@ const CompanyDigestDownload = ({ companyDigests, year, onClick }) => {
   const downloadIsFailing = companyDigest?.state === "ERROR";
 
   const label = `${
-    downloadIsReady ? "Télécharger" : `Générer l'année ${year}`
+    downloadIsReady ? `Télécharger l'année ${year}` : `Générer l'année ${year}`
   }  `;
 
   const generatedLabel = downloadIsReady
@@ -116,6 +120,7 @@ const CompanyDigestDownload = ({ companyDigests, year, onClick }) => {
       >
         {label}
       </Button>
+      {downloadIsPending && <Spinner />}
       {downloadIsPending && (
         <Alert
           severity="warning"
@@ -137,6 +142,8 @@ const CompanyDigestDownload = ({ companyDigests, year, onClick }) => {
   );
 };
 
+const pollIntervall = 1000;
+
 const CompanyDigestSheetForm = ({ company }) => {
   const { data, loading, error, refetch, startPolling, stopPolling } = useQuery<
     Pick<Query, "companyDigests">,
@@ -145,6 +152,21 @@ const CompanyDigestSheetForm = ({ company }) => {
     fetchPolicy: "network-only",
     variables: { orgId: company.siret }
   });
+
+  const needsPolling = data?.companyDigests.some(c =>
+    ["PENDING", "INITIAL"].includes(c?.state ?? "")
+  );
+
+  useEffect(() => {
+    if (needsPolling) {
+      startPolling(pollIntervall);
+    } else {
+      stopPolling();
+    }
+    return () => {
+      stopPolling();
+    };
+  }, [needsPolling, startPolling, stopPolling]);
 
   const [createCompanyDigest] = useMutation<
     Pick<Mutation, "createCompanyDigest">,
@@ -168,9 +190,7 @@ const CompanyDigestSheetForm = ({ company }) => {
         ["PENDING", "INITIAL"].includes(c?.state ?? "")
       )
     ) {
-      console.log(data?.companyDigests);
-
-      startPolling(500);
+      startPolling(pollIntervall);
     } else {
       stopPolling();
     }

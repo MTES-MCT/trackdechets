@@ -27,6 +27,7 @@ const companyDigestResolver: QueryResolvers["companyDigests"] = async (
     );
   }
   const today = format(new Date(), "yyyy-MM-dd");
+
   const currentYear = new Date().getFullYear();
   const lastYear = currentYear - 1;
 

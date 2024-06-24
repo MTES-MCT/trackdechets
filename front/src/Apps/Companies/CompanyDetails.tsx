@@ -117,8 +117,6 @@ export default function CompanyDetails() {
     return <Navigate to={{ pathname: routes.companies.index }} />;
   }
 
-  company.featureFlags.includes(COMPANY_DIGEST_FLAG);
-
   const { tabs, tabsContent } = buildTabs(company);
 
   const CurrenComponent = tabsContent[selectedTabId] ?? Dummy;
