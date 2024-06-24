@@ -135,7 +135,11 @@ export const getCompanyDiv = async (
   // Select tab
   await page.getByRole("tab", { name: tab }).click();
 
-  return page.getByTestId("company-details");
+  // Select content div right behind
+  const contentDiv = await page.getByLabel(tab, { exact: true });
+  await expect(contentDiv).toBeVisible();
+
+  return contentDiv;
 };
 
 /**
@@ -346,13 +350,14 @@ export const submitAndVerifyGenericInfo = async (
 
   // Contact info
   if (contact) {
-    await companyDiv.getByRole("tab", { name: "Contact" }).click();
+    const contactDiv = await getCompanyDiv(page, { siret, tab: "Contact" });
+
     await expect(
-      companyDiv.getByText(`Prénom et nom${contact.name}`)
+      contactDiv.getByText(`Prénom et nom${contact.name}`)
     ).toBeVisible();
-    await expect(companyDiv.getByText(`Email${contact.email}`)).toBeVisible();
+    await expect(contactDiv.getByText(`Email${contact.email}`)).toBeVisible();
     await expect(
-      companyDiv.getByText(`Téléphone${contact.phone}`)
+      contactDiv.getByText(`Téléphone${contact.phone}`)
     ).toBeVisible();
   }
 
