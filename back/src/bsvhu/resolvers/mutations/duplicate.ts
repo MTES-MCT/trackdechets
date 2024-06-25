@@ -51,6 +51,7 @@ async function getDuplicateData(
     destinationReceptionDate,
     destinationOperationDate,
     destinationOperationCode,
+    destinationOperationMode,
     destinationOperationSignatureAuthor,
     destinationOperationSignatureDate,
     ...rest
