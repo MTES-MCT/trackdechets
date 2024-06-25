@@ -223,9 +223,7 @@ describe("ActBsddValidation", () => {
     );
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
     await waitFor(async () => {
-      expect(
-        await screen.getByText("Valider la réception")
-      ).toBeInTheDocument();
+      expect(await screen.getByText("Signer la réception")).toBeInTheDocument();
     });
   });
 
@@ -276,7 +274,7 @@ describe("ActBsddValidation", () => {
     await waitFor(async () => {
       expect(
         await screen.getByText(
-          "Valider l'acceptation de l'entreposage provisoire"
+          "Signer l'acceptation de l'entreposage provisoire"
         )
       ).toBeInTheDocument();
     });
@@ -302,9 +300,7 @@ describe("ActBsddValidation", () => {
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
 
     await waitFor(async () => {
-      expect(
-        await screen.getByText("Valider la réception")
-      ).toBeInTheDocument();
+      expect(await screen.getByText("Signer la réception")).toBeInTheDocument();
     });
   });
 
@@ -329,7 +325,7 @@ describe("ActBsddValidation", () => {
 
     await waitFor(async () => {
       expect(
-        await screen.getByText("Valider l'entreposage provisoire")
+        await screen.getByText("Signer l'entreposage provisoire")
       ).toBeInTheDocument();
     });
   });
@@ -396,7 +392,7 @@ describe("ActBsddValidation", () => {
 
     await waitFor(async () => {
       expect(
-        await screen.getByText("Valider l'acceptation")
+        await screen.getByText("Signer l'acceptation")
       ).toBeInTheDocument();
     });
   });

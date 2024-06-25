@@ -191,6 +191,8 @@ const mutableFieldsFragment = gql`
     emittedByEcoOrganisme
     takenOverAt
     takenOverBy
+    receivedBy
+    receivedAt
     emitter {
       ...EmitterFragment
     }
