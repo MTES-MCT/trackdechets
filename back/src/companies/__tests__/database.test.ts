@@ -34,6 +34,7 @@ describe("getCompanyActiveUsers", () => {
     expect(users).toEqual(
       ASSOCIATIONS.map(association => ({
         ...association.user,
+        orgId: "123",
         role: association.role,
         isPendingInvitation: false
       }))

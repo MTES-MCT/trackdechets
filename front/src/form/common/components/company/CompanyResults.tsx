@@ -17,7 +17,7 @@ interface CompanyResultsProps<T> {
   selectedItem: T | null;
 }
 
-type CompanyResultBase = Pick<
+export type CompanyResultBase = Pick<
   CompanySearchResult,
   | "siret"
   | "orgId"

@@ -2,12 +2,14 @@ import { addToMailQueue } from "../../../../queue/producers/mail";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
-  userFactory
+  userFactory,
+  companyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth";
 import { Mutation } from "../../../../generated/graphql/types";
+import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 
 const INVITE_USER_TO_COMPANY = `
   mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!){
@@ -118,5 +120,54 @@ describe("mutation inviteUserToCompany", () => {
         hashValue
       )}\">`
     );
+  });
+
+  test("TD admin user can invite a new user to a company", async () => {
+    const company = await companyFactory();
+    const tdAdminUser = await userFactory({
+      isAdmin: true
+    });
+    const { mutate } = makeClient({ ...tdAdminUser, auth: AuthType.Session });
+
+    // Call the mutation to send an invitation
+    const invitedUserEmail = "newuser2@example.test";
+    await mutate(INVITE_USER_TO_COMPANY, {
+      variables: {
+        email: invitedUserEmail,
+        siret: company.siret,
+        role: "ADMIN"
+      }
+    });
+    // Check userAccountHash has been successfully created
+    const hashes = await prisma.userAccountHash.findMany({
+      where: { email: invitedUserEmail, companySiret: company.siret! }
+    });
+    expect(hashes.length).toEqual(1);
+  });
+
+  test("user who isn't an admin of a company can't invite a new user to a company", async () => {
+    const company = await companyFactory();
+    const notAdminUser = await userFactory({
+      isAdmin: false
+    });
+    const { mutate } = makeClient({ ...notAdminUser, auth: AuthType.Session });
+
+    // Call the mutation to send an invitation
+    const invitedUserEmail = "newuser3@example.test";
+    const { errors } = await mutate(INVITE_USER_TO_COMPANY, {
+      variables: {
+        email: invitedUserEmail,
+        siret: company.siret,
+        role: "ADMIN"
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: NotCompanyAdminErrorMsg(company.orgId),
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
   });
 });

@@ -3,6 +3,7 @@ import { CompanySearchPrivateResolvers } from "../../generated/graphql/types";
 import { CompanyBaseIdentifiers } from "../types";
 import { whereSiretOrVatNumber } from "./CompanySearchResult";
 import { getUserRoles } from "../../permissions";
+import { getCompanyUsers } from "../database";
 
 const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
   transporterReceipt: async parent => {
@@ -75,16 +76,12 @@ const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
     if (!ctx.user?.isAdmin || !parent.trackdechetsId) {
       return [];
     }
-
-    const associations = await prisma.companyAssociation.findMany({
-      where: { companyId: parent.trackdechetsId },
-      include: { user: true }
-    });
-
-    return associations.map(association => ({
-      ...association.user,
-      role: association.role
-    }));
+    return getCompanyUsers(
+      parent.orgId,
+      ctx.dataloaders,
+      ctx.user.id,
+      ctx.user!.isAdmin
+    );
   }
 };
 

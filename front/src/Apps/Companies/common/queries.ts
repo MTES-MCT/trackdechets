@@ -83,6 +83,27 @@ export const MY_COMPANIES = gql`
   ${CompanyDetailsfragment.company}
 `;
 
+export const COMPANY_ADMIN_PRIVATE_INFOS = gql`
+  query CompanyPrivateInfos($clue: String!) {
+    companyPrivateInfos(clue: $clue) {
+      orgId
+      siret
+      name
+      address
+      isRegistered
+      vatNumber
+      codePaysEtrangerEtablissement
+      userRole
+      companyTypes
+      verificationStatus
+      users {
+        ...AccountCompanyMemberUserFragment
+      }
+    }
+  }
+  ${AccountCompanyMemberFragment.user}
+`;
+
 export const REMOVE_USER_FROM_COMPANY = gql`
   mutation RemoveUserFromCompany($userId: ID!, $siret: String!) {
     removeUserFromCompany(userId: $userId, siret: $siret) {
@@ -507,4 +528,13 @@ export const REMOVE_SIGNATURE_DELEGATION = gql`
       id
     }
   }
+`;
+
+export const CHANGE_USER_ROLE = gql`
+  mutation ChangeUserRole($userId: ID!, $siret: ID!, $role: UserRole!) {
+    changeUserRole(userId: $userId, siret: $siret, role: $role) {
+      ...AccountCompanyMemberUserFragment
+    }
+  }
+  ${AccountCompanyMemberFragment.user}
 `;

@@ -6,7 +6,12 @@ import { getUserRole, grants, toGraphQLPermission } from "../../permissions";
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
     const userId = context.user!.id;
-    return getCompanyUsers(parent.orgId, context.dataloaders, userId);
+    return getCompanyUsers(
+      parent.orgId,
+      context.dataloaders,
+      userId,
+      context.user!.isAdmin
+    );
   },
   userRole: async (parent, _, context) => {
     if (parent.userRole) {
