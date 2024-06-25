@@ -2,8 +2,7 @@ import {
   Bsdasri,
   BsdasriStatus,
   Prisma,
-  RevisionRequestStatus,
-  BsdasriType
+  RevisionRequestStatus
 } from "@prisma/client";
 
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
@@ -105,11 +104,7 @@ async function checkIfUserCanRequestRevisionOnBsdasri(
   bsdasri: Bsdasri
 ): Promise<void> {
   await checkCanRequestRevision(user, bsdasri);
-  if ([BsdasriType.GROUPING, BsdasriType.SYNTHESIS].includes(bsdasri.type)) {
-    throw new ForbiddenError(
-      "Impossible de créer une révision sur un bordereau de synthèse ou de groupement."
-    );
-  }
+
   if (bsdasri.groupedInId || bsdasri.synthesizedInId) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur un bordereau inclus dans une synthèse ou un groupement."
@@ -215,7 +210,7 @@ async function getFlatContent(
   }
   revisionSchema.parse(flatContent); // Validate but don't parse as we want to keep empty fields empty
 
-  checkRevisionRules(fields, bsdasri.status);
+  checkRevisionRules(fields, bsdasri);
 
   return flatContent;
 }

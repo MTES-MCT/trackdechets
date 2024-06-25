@@ -137,6 +137,19 @@ const revisionRules = {
   }
 };
 
+const neverAvailableFields: Record<BsdasriType, string[]> = {
+  [BsdasriType.Simple]: [],
+  [BsdasriType.Grouping]: ["emitter.pickupSite"],
+  [BsdasriType.Synthesis]: [
+    "emitter.pickupSite",
+    "waste.code",
+    "destination.reception.packagings"
+  ]
+};
+
+const showField = (path: string, type: BsdasriType) =>
+  !(neverAvailableFields[type] ?? []).includes(path);
+
 const isDisabled = (path: string, status: BsdasriStatus) =>
   !(revisionRules?.[path] ?? [])?.revisable?.includes(status);
 
@@ -219,15 +232,6 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
   // live form values
   const formValues = watch();
 
-  if ([BsdasriType.Synthesis, BsdasriType.Grouping].includes(bsdasri.type)) {
-    return (
-      <p>
-        La révision n'est pas encore possible sur le dasri de groupement et de
-        synthèse
-      </p>
-    );
-  }
-
   const packagingsSummary = getDasriPackagingInfosSummary(
     bsdasri?.destination?.reception?.packagings || []
   );
@@ -242,6 +246,7 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
       .join(" ") || "Non renseigné";
 
   const status = bsdasri["bsdasriStatus"];
+  const bsdasriType = bsdasri.type;
 
   return (
     <div className={styles.container}>
@@ -254,88 +259,91 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             bsdasri={bsdasri}
             onChange={value => setValue("isCanceled", value)}
           />
-
-          <RhfReviewableField
-            title="Adresse d'enlèvement"
-            path="emitter.pickupSite"
-            value={pickuSiteSummary}
-            defaultValue={initialReview?.emitter?.pickupSite}
-            disabled={isDisabled("emitter.pickupSite", status)}
-          >
-            <Input
-              label="Nom du site d'enlèvement"
-              className="fr-col-9"
-              nativeInputProps={{
-                ...register("emitter.pickupSite.name"),
-                value: formValues?.emitter?.pickupSite?.name || ""
-              }}
-            />
-            <DsfrfWorkSiteAddress
-              address={initialReview?.emitter?.pickupSite?.address}
-              city={initialReview?.emitter?.pickupSite?.city}
-              postalCode={initialReview?.emitter?.pickupSite?.postalCode}
-              designation="du site d'enlèvement"
-              onAddressSelection={details => {
-                // `address` is passed as `name` because of adresse api return fields
-                setValue(`emitter.pickupSite.address`, details.name);
-                setValue(`emitter.pickupSite.city`, details.city);
-                setValue(`emitter.pickupSite.postalCode`, details.postcode);
-              }}
-            />
-
-            <div className="form__row">
+          {showField("emitter.pickupSite", bsdasriType) && (
+            <RhfReviewableField
+              title="Adresse d'enlèvement"
+              path="emitter.pickupSite"
+              value={pickuSiteSummary}
+              defaultValue={initialReview?.emitter?.pickupSite}
+              disabled={isDisabled("emitter.pickupSite", status)}
+            >
               <Input
-                label="Informations complémentaires (optionnel)"
-                textArea
-                nativeTextAreaProps={{
-                  placeholder: "Champ libre pour préciser…",
-                  ...register("emitter.pickupSite.infos"),
-                  value: formValues?.emitter?.pickupSite?.infos || ""
+                label="Nom du site d'enlèvement"
+                className="fr-col-9"
+                nativeInputProps={{
+                  ...register("emitter.pickupSite.name"),
+                  value: formValues?.emitter?.pickupSite?.name || ""
                 }}
               />
-            </div>
-          </RhfReviewableField>
+              <DsfrfWorkSiteAddress
+                address={initialReview?.emitter?.pickupSite?.address}
+                city={initialReview?.emitter?.pickupSite?.city}
+                postalCode={initialReview?.emitter?.pickupSite?.postalCode}
+                designation="du site d'enlèvement"
+                onAddressSelection={details => {
+                  // `address` is passed as `name` because of adresse api return fields
+                  setValue(`emitter.pickupSite.address`, details.name);
+                  setValue(`emitter.pickupSite.city`, details.city);
+                  setValue(`emitter.pickupSite.postalCode`, details.postcode);
+                }}
+              />
 
-          <RhfReviewableField
-            title="Conditionnement"
-            path="destination.reception.packagings"
-            value={packagingsSummary}
-            defaultValue={initialReview?.destination?.reception?.packagings}
-            initialValue={bsdasri?.destination?.reception?.packagings}
-            disabled={isDisabled("destination.reception.packagings", status)}
-          >
-            <BsdasriPackagings />
-          </RhfReviewableField>
-
-          <RhfReviewableField
-            title="Code déchet"
-            path="waste.code"
-            value={bsdasri?.waste?.code}
-            defaultValue={initialReview?.waste?.code}
-            initialValue={null}
-            disabled={isDisabled("waste.code", status)}
-          >
-            <RadioButtons
-              options={[
-                {
-                  label: "18 01 03* DASRI d'origine humaine",
-                  nativeInputProps: {
-                    onChange: () => setValue("waste.code", "18 01 03*"),
-                    disabled: bsdasri?.waste?.code === "18 01 03*",
-                    checked: formValues?.waste?.code === "18 01 03*"
+              <div className="form__row">
+                <Input
+                  label="Informations complémentaires (optionnel)"
+                  textArea
+                  nativeTextAreaProps={{
+                    placeholder: "Champ libre pour préciser…",
+                    ...register("emitter.pickupSite.infos"),
+                    value: formValues?.emitter?.pickupSite?.infos || ""
+                  }}
+                />
+              </div>
+            </RhfReviewableField>
+          )}
+          {showField("destination.reception.packagings", bsdasriType) && (
+            <RhfReviewableField
+              title="Conditionnement"
+              path="destination.reception.packagings"
+              value={packagingsSummary}
+              defaultValue={initialReview?.destination?.reception?.packagings}
+              initialValue={bsdasri?.destination?.reception?.packagings}
+              disabled={isDisabled("destination.reception.packagings", status)}
+            >
+              <BsdasriPackagings />
+            </RhfReviewableField>
+          )}
+          {showField("waste.code", bsdasriType) && (
+            <RhfReviewableField
+              title="Code déchet"
+              path="waste.code"
+              value={bsdasri?.waste?.code}
+              defaultValue={initialReview?.waste?.code}
+              initialValue={null}
+              disabled={isDisabled("waste.code", status)}
+            >
+              <RadioButtons
+                options={[
+                  {
+                    label: "18 01 03* DASRI d'origine humaine",
+                    nativeInputProps: {
+                      onChange: () => setValue("waste.code", "18 01 03*"),
+                      disabled: bsdasri?.waste?.code === "18 01 03*",
+                      checked: formValues?.waste?.code === "18 01 03*"
+                    }
+                  },
+                  {
+                    label: "18 02 02* DASRI d'origine animale",
+                    nativeInputProps: {
+                      onChange: () => setValue("waste.code", "18 02 02*"),
+                      disabled: bsdasri?.waste?.code === "18 02 02*",
+                      checked: formValues?.waste?.code === "18 02 02*"
+                    }
                   }
-                },
-                {
-                  label: "18 02 02* DASRI d'origine animale",
-                  nativeInputProps: {
-                    onChange: () => setValue("waste.code", "18 02 02*"),
-                    disabled: bsdasri?.waste?.code === "18 02 02*",
-                    checked: formValues?.waste?.code === "18 02 02*"
-                  }
-                }
-              ]}
-            />
-          </RhfReviewableField>
+                ]}
+              />
+            </RhfReviewableField>
+          )}
 
           <RhfReviewableField
             title="Quantité reçue"
