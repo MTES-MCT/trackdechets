@@ -32,13 +32,19 @@ import {
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { client, index } from "../../common/elastic";
-import { getFormForElastic, indexForm } from "../../forms/elastic";
+import {
+  getFormForElastic,
+  indexForm,
+  toBsdElastic
+} from "../../forms/elastic";
 import { WasteRegistryType } from "../../generated/graphql/types";
 import {
   bsddTransporterFactory,
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  toIntermediaryCompany,
+  userFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
 import {
@@ -48,6 +54,7 @@ import {
 } from "../elastic";
 import { bspaohFactory } from "../../bspaoh/__tests__/factories";
 import { getBspaohForElastic, indexBspaoh } from "../../bspaoh/elastic";
+import { toBsdElastic as toBsdaElastic } from "../../bsda/elastic";
 
 describe("Retrieval of bsds in ES based on waste registry type", () => {
   let emitter: { user: User; company: Company };
@@ -1790,5 +1797,72 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsd?.forwardedIn?.destinationCompanySiret).toEqual(
       forwardedInNextDestination.siret
     );
+  });
+});
+
+describe("toPrismaBsds", () => {
+  afterEach(resetDatabase);
+
+  it("BSDD should contain intermediaries", async () => {
+    // Given
+    const user = await userFactory();
+    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary3 = await userWithCompanyFactory(UserRole.MEMBER);
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1.company),
+            toIntermediaryCompany(intermediary2.company),
+            toIntermediaryCompany(intermediary3.company)
+          ]
+        }
+      }
+    });
+
+    // When
+    const formForElastic = await getFormForElastic(bsdd);
+    const elasticBsd = toBsdElastic(formForElastic);
+    const result = await toPrismaBsds([elasticBsd]);
+
+    // Then
+    expect(result).not.toBeUndefined();
+    expect(result.bsdds).not.toBeUndefined();
+    expect(result.bsdds.length).toEqual(1);
+    expect(result.bsdds[0].intermediaries).not.toBeUndefined();
+    expect(result.bsdds[0].intermediaries.length).toEqual(3);
+  });
+
+  it("BSDA should contain intermediaries", async () => {
+    // Given
+    const intermediary1 = await companyFactory({});
+    const intermediary2 = await companyFactory({});
+    const intermediary3 = await companyFactory({});
+
+    const bsda = await bsdaFactory({
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1),
+            toIntermediaryCompany(intermediary2),
+            toIntermediaryCompany(intermediary3)
+          ]
+        }
+      }
+    });
+
+    // When
+    const bsdaForElastic = await getBsdaForElastic(bsda);
+    const elasticBsda = toBsdaElastic(bsdaForElastic);
+    const result = await toPrismaBsds([elasticBsda]);
+
+    // Then
+    expect(result).not.toBeUndefined();
+    expect(result.bsdas).not.toBeUndefined();
+    expect(result.bsdas.length).toEqual(1);
+    expect(result.bsdas[0].intermediaries).not.toBeUndefined();
+    expect(result.bsdas[0].intermediaries.length).toEqual(3);
   });
 });

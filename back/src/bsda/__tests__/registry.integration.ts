@@ -4,7 +4,10 @@ import { RegistryBsdaInclude } from "../../registry/elastic";
 import { bsdaFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { BsdaType } from "@prisma/client";
-import { companyFactory } from "../../__tests__/factories";
+import {
+  companyFactory,
+  toIntermediaryCompany
+} from "../../__tests__/factories";
 
 describe("toOutgoingWaste", () => {
   afterAll(resetDatabase);
@@ -137,6 +140,41 @@ describe("toAllWaste", () => {
     }
   );
 
+  it("should contain all 3 intermediaries", async () => {
+    // Given
+    const intermediary1 = await companyFactory({});
+    const intermediary2 = await companyFactory({});
+    const intermediary3 = await companyFactory({});
+
+    const bsda = await bsdaFactory({
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1),
+            toIntermediaryCompany(intermediary2),
+            toIntermediaryCompany(intermediary3)
+          ]
+        }
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.siret);
+    expect(waste.intermediary3CompanyName).toBe(intermediary3.name);
+    expect(waste.intermediary3CompanySiret).toBe(intermediary3.siret);
+  });
+
   it("bsda with tmp storage should mention post-temp-storage destination", async () => {
     // Given
     const recipient = await companyFactory({ name: "Recipient" });
@@ -181,6 +219,88 @@ describe("toAllWaste", () => {
     expect(waste.postTempStorageDestinationCity).toBe("TOURS");
     expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
     expect(waste.postTempStorageDestinationCountry).toBe("FR");
+  });
+
+  it("should work with 1 intermediary", async () => {
+    // Given
+    const intermediary1 = await companyFactory({});
+
+    const bsda = await bsdaFactory({
+      opt: {
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary1)]
+        }
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
+    expect(waste.intermediary2CompanyName).toBe(null);
+    expect(waste.intermediary2CompanySiret).toBe(null);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+
+  it("should work with 2 intermediaries", async () => {
+    // Given
+    const intermediary1 = await companyFactory({});
+    const intermediary2 = await companyFactory({});
+    const bsda = await bsdaFactory({
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1),
+            toIntermediaryCompany(intermediary2)
+          ]
+        }
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.siret);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+
+  it("should not crash if no intermediary", async () => {
+    // Given
+    const bsda = await bsdaFactory({});
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(null);
+    expect(waste.intermediary1CompanySiret).toBe(null);
+    expect(waste.intermediary2CompanyName).toBe(null);
+    expect(waste.intermediary2CompanySiret).toBe(null);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
   });
 });
 
