@@ -3,7 +3,8 @@ import React from "react";
 const ModalSizesClass = {
   M: "fr-col-12 fr-col-md-6 fr-col-lg-6",
   L: "fr-col-12 fr-col-md-8 fr-col-lg-8",
-  XL: "fr-col-12 fr-col-md-12 fr-col-lg-12"
+  XL: "fr-col-12 fr-col-md-12 fr-col-lg-12",
+  BSD_FORM: "td-dsfr-modal-bsd-form" // custom class to host bsd forms
 };
 
 export type ModalSizes = keyof typeof ModalSizesClass;
@@ -23,7 +24,7 @@ export function DsfrModal({
   onClose,
   size = "M",
   closeLabel = "Fermer",
-  padding = true
+  padding
 }: Readonly<DsfrModalProps>) {
   // Handling react-dsfr modal is a bit hacky and tricky to customize, let's stick to a dsfr-ized custom modal component
   // Dsrf modal is vertically centered, it does not play nicely with tabs and varying children height, so we override the flex

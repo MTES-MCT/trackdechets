@@ -191,6 +191,12 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   workerCompanyAddress: null,
   destinationFinalOperationCodes: [],
   destinationFinalOperationWeights: [],
+  postTempStorageDestinationAddress: null,
+  postTempStorageDestinationCity: null,
+  postTempStorageDestinationName: null,
+  postTempStorageDestinationPostalCode: null,
+  postTempStorageDestinationSiret: null,
+  postTempStorageDestinationCountry: null,
   brokerCompanyMail: null,
   traderCompanyMail: null
 };
@@ -413,6 +419,12 @@ export const emptyAllWaste: Required<AllWaste> = {
   intermediary2CompanySiret: null,
   intermediary3CompanyName: null,
   intermediary3CompanySiret: null,
+  postTempStorageDestinationAddress: null,
+  postTempStorageDestinationCity: null,
+  postTempStorageDestinationName: null,
+  postTempStorageDestinationPostalCode: null,
+  postTempStorageDestinationSiret: null,
+  postTempStorageDestinationCountry: null,
   brokerCompanyMail: null,
   traderCompanyMail: null
 };
