@@ -203,6 +203,7 @@ const AccountFieldCompanySignatureAutomationFragment = {
   company: gql`
     fragment AccountFieldCompanySignatureAutomationFragment on CompanyPrivate {
       siret
+      allowAppendix1SignatureAutomation
       signatureAutomations {
         id
         createdAt
@@ -422,6 +423,7 @@ export const AccountFieldCompanySignatureAutomationFragments = {
   company: gql`
     fragment AccountFieldCompanySignatureAutomationFragment on CompanyPrivate {
       siret
+      allowAppendix1SignatureAutomation
       signatureAutomations {
         id
         createdAt

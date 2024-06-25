@@ -65,12 +65,20 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       .findUnique({ where: { id: parent.id } })
       .givenSignatureAutomations({ include: { from: true, to: true } }) as any;
   },
-  receivedSignatureAutomations: parent => {
-    return prisma.company
+  receivedSignatureAutomations: async parent => {
+    const automations = await prisma.company
       .findUnique({ where: { id: parent.id } })
       .receivedSignatureAutomations({
         include: { from: true, to: true }
-      }) as any;
+      });
+
+    if (!automations) {
+      return [];
+    }
+
+    return automations.filter(
+      a => a.from.allowAppendix1SignatureAutomation
+    ) as any;
   }
 };
 

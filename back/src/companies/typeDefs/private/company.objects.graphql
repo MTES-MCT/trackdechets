@@ -137,6 +137,11 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
   allowBsdasriTakeOverWithoutSignature: Boolean
 
+  """
+  L'entreprise autorise la signature automatique de l'annexe 1 pour les entreprises saisies
+  """
+  allowAppendix1SignatureAutomation: Boolean
+
   "Code pays de l'établissement"
   codePaysEtrangerEtablissement: String
 
