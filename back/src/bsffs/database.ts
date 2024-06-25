@@ -89,6 +89,26 @@ export async function getFicheInterventionBsffOrNotFound(
   return ficheIntervention;
 }
 
+export async function getBsffTransporterOrNotFound({ id }: { id: string }) {
+  if (!id) {
+    throw new UserInputError(
+      "Vous devez préciser un identifiant de transporteur"
+    );
+  }
+
+  const transporter = await prisma.bsffTransporter.findUnique({
+    where: { id }
+  });
+
+  if (transporter === null) {
+    throw new UserInputError(
+      `Le transporteur BSFF avec l'identifiant "${id}" n'existe pas.`
+    );
+  }
+
+  return transporter;
+}
+
 /**
  * Return the "ficheInterventions" of a bsff, hiding some fields depending
  * on the user reading it

@@ -9,6 +9,9 @@ import updateFicheInterventionBsff from "./mutations/updateFicheInterventionBsff
 import signBsff from "./mutations/signBsff";
 import duplicateBsff from "./mutations/duplicateBsff";
 import updateBsffPackaging from "./mutations/updateBsffPackaging";
+import createBsffTransporter from "./mutations/createBsffTransporter";
+import updateBsffTransporter from "./mutations/updateBsffTransporter";
+import deleteBsffTransporter from "./mutations/deleteBsffTransporter";
 
 export const Mutation: MutationResolvers = {
   createBsff: createBsffResolver,
@@ -20,5 +23,8 @@ export const Mutation: MutationResolvers = {
   createFicheInterventionBsff,
   updateFicheInterventionBsff,
   signBsff,
-  updateBsffPackaging
+  updateBsffPackaging,
+  createBsffTransporter,
+  updateBsffTransporter,
+  deleteBsffTransporter
 };

@@ -1,6 +1,7 @@
-import { ZodBsffTransformer } from "./types";
+import { ZodBsffTransformer, ZodBsffTransporterTransformer } from "./types";
 import { BsffType } from "@prisma/client";
 import { checkPreviousPackagings } from "./refinements";
+import { recipifyTransporter } from "../../../common/validation/zod/transformers";
 
 /**
  * Applique les vérifications sur les contenants à réexpédier / grouper / reconditionner puis applique
@@ -46,3 +47,6 @@ export const checkAndSetPreviousPackagings: ZodBsffTransformer = async (
   }
   return rest;
 };
+
+export const updateTransporterRecepisse: ZodBsffTransporterTransformer =
+  async bsffTransporter => recipifyTransporter(bsffTransporter);

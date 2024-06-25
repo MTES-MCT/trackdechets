@@ -220,6 +220,7 @@ export function expandBsffTransporterFromDb(
   transporter: Prisma.BsffTransporter
 ): GraphQL.BsffTransporter | null {
   return nullIfNoValues<GraphQL.BsffTransporter>({
+    id: transporter.id,
     company: nullIfNoValues<GraphQL.FormCompany>({
       name: transporter.transporterCompanyName,
       orgId: getTransporterCompanyOrgId(transporter),

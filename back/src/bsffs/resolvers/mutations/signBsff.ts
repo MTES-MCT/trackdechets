@@ -126,7 +126,7 @@ async function signEmission(
   const zodBsff = prismaToZodBsff(bsff);
   await parseBsffAsync(zodBsff, { user, currentSignatureType: "EMISSION" });
 
-  const { update: updateBsff } = getBsffRepository(user);
+  const { updateBsff: updateBsff } = getBsffRepository(user);
 
   return updateBsff({
     where: { id: bsff.id },
@@ -171,7 +171,7 @@ async function signTransport(
       t => t.number === transporter.number
     ) ?? null;
 
-  const { update: updateBsff } = getBsffRepository(user);
+  const { updateBsff: updateBsff } = getBsffRepository(user);
 
   return updateBsff({
     where: { id: bsff.id },
@@ -220,7 +220,7 @@ async function signReception(
   const zodBsff = prismaToZodBsff(bsff);
   await parseBsffAsync(zodBsff, { currentSignatureType: "RECEPTION" });
 
-  const { update: updateBsff } = getBsffRepository(user);
+  const { updateBsff: updateBsff } = getBsffRepository(user);
 
   return updateBsff({
     where: { id: bsff.id },
@@ -336,10 +336,8 @@ async function signAcceptation(
       }
     }
 
-    const { update: updateBsff, findUniqueGetPackagings } = getBsffRepository(
-      user,
-      transaction
-    );
+    const { updateBsff: updateBsff, findUniqueGetPackagings } =
+      getBsffRepository(user, transaction);
 
     const packagings =
       (await findUniqueGetPackagings({
@@ -388,7 +386,7 @@ async function signOperation(
     } = getBsffPackagingRepository(user, transaction);
 
     const {
-      update: updateBsff,
+      updateBsff: updateBsff,
       findMany: findManyBsffs,
       findUniqueGetPackagings
     } = getBsffRepository(user, transaction);

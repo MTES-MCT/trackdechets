@@ -225,4 +225,19 @@ type Mutation {
     id: ID!
     input: BsffFicheInterventionInput!
   ): BsffFicheIntervention!
+
+  """
+  Crée un transporteur BSFF
+  """
+  createBsffTransporter(input: BsffTransporterInput!): BsffTransporter
+
+  """
+  Modifie un transporteur BSFF
+  """
+  updateBsffTransporter(id: ID!, input: BsffTransporterInput!): BsffTransporter
+
+  """
+  Supprime un transporteur BSFF
+  """
+  deleteBsffTransporter("Identifiant du transporteur" id: ID!): ID!
 }

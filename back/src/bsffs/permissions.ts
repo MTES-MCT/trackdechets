@@ -1,11 +1,13 @@
 import { User, Bsff, BsffFicheIntervention, BsffStatus } from "@prisma/client";
 import {
   BsffFicheInterventionInput,
-  BsffInput
+  BsffInput,
+  BsffTransporterInput
 } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
 import { BsffWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";
+import { flattenBsffTransporterInput } from "./converter";
 
 /**
  * Retrieves organisations allowed to read a BSFF
@@ -210,4 +212,44 @@ export async function checkCanDelete(user: User, bsff: BsffWithTransporters) {
     Permission.BsdCanDelete,
     errorMsg
   );
+}
+
+export async function checkCanUpdateBsffTransporter(
+  user: User,
+  bsff: BsffWithTransporters,
+  transporterId: string,
+  input: BsffTransporterInput
+) {
+  const authorizedOrgIds = contributors(bsff);
+
+  await checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanUpdate,
+    "Vous n'êtes pas autorisé à modifier ce transporteur BSFF"
+  );
+
+  if (input) {
+    const futureTransporters = bsff.transporters.map(transporter => {
+      if (transporter.id === transporterId) {
+        return {
+          ...transporter,
+          ...flattenBsffTransporterInput(input)
+        };
+      }
+      return transporter;
+    });
+
+    const futureContributors = contributors({
+      ...bsff,
+      transporters: futureTransporters
+    });
+
+    return checkUserPermissions(
+      user,
+      futureContributors,
+      Permission.BsdCanUpdate,
+      "Vous ne pouvez pas enlever votre établissement du bordereau"
+    );
+  }
 }
