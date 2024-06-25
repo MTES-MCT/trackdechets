@@ -36,11 +36,16 @@ import { getFormForElastic, indexForm } from "../../forms/elastic";
 import { WasteRegistryType } from "../../generated/graphql/types";
 import {
   bsddTransporterFactory,
+  companyFactory,
   formFactory,
   formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-import { buildQuery } from "../elastic";
+import {
+  buildQuery,
+  searchBsds as originalSearchBsds,
+  toPrismaBsds
+} from "../elastic";
 import { bspaohFactory } from "../../bspaoh/__tests__/factories";
 import { getBspaohForElastic, indexBspaoh } from "../../bspaoh/elastic";
 
@@ -1733,5 +1738,57 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       // Then
       expect(bsds.map(bsd => bsd.id)).toEqual([bspaoh.id]);
     });
+  });
+
+  it("BSDA should contain forwardedIn", async () => {
+    // Given
+    const forwardedInNextDestination = await companyFactory({
+      name: "ForwardedIn next destination",
+      address: "25 rue Voltaire 37100 TOURS"
+    });
+    const bsda = await bsdaFactory({
+      opt: {
+        brokerCompanySiret: broker.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterTransportSignatureDate: new Date(),
+        transporterTransportTakenOverAt: new Date()
+      }
+    });
+    await bsdaFactory({
+      opt: {
+        forwarding: { connect: { id: bsda.id } },
+        destinationCompanySiret: forwardedInNextDestination.siret
+      }
+    });
+
+    // When
+    const bsdaForElastic = await getBsdaForElastic(bsda);
+    await indexBsda(bsdaForElastic);
+    await refreshElasticSearch();
+    const bsds = await originalSearchBsds(
+      "ALL",
+      [broker.company.siret!],
+      null,
+      {
+        size: 10,
+        sort: [{ readableId: "ASC" }]
+      }
+    );
+    const prismaBsds = await toPrismaBsds(
+      bsds.hits.map(hit => hit._source).filter(Boolean)
+    );
+
+    // Then
+    expect(prismaBsds.bsdas.length).toEqual(1);
+    const bsd = prismaBsds.bsdas[0];
+    expect(bsd?.id).toEqual(bsda.id);
+    expect(bsd?.forwardedIn).not.toBeNull();
+    expect(bsd?.forwardedIn).not.toBeUndefined();
+    expect(bsd?.forwardedIn?.destinationCompanySiret).toEqual(
+      forwardedInNextDestination.siret
+    );
   });
 });

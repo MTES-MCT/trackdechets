@@ -12,7 +12,10 @@ import { RegistryForm } from "../registry/elastic";
  * @returns
  */
 export function simpleFormToBsdd(
-  form: Omit<RegistryForm, "grouping" | "forwarding" | "finalOperations">
+  form: Omit<
+    RegistryForm,
+    "grouping" | "forwarding" | "forwardedIn" | "finalOperations"
+  >
 ): Bsdd {
   const transporters = (form.transporters ?? []).sort(
     (t1, t2) => t1.number - t2.number
@@ -175,6 +178,8 @@ export function simpleFormToBsdd(
 export function formToBsdd(form: RegistryForm): Bsdd & {
   grouping: Bsdd[];
 } & {
+  forwardedIn: (Bsdd & { grouping: Bsdd[] }) | null;
+} & {
   forwarding: (Bsdd & { grouping: Bsdd[] }) | null;
 } & {
   finalOperations: BsddFinalOperation[];
@@ -189,6 +194,14 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
 
   return {
     ...simpleFormToBsdd(form),
+    ...(form.forwardedIn
+      ? {
+          forwardedIn: {
+            ...simpleFormToBsdd(form.forwardedIn),
+            grouping: []
+          }
+        }
+      : { forwardedIn: null }),
     ...(form.forwarding
       ? {
           forwarding: {

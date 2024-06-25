@@ -1,4 +1,5 @@
 import {
+  companyFactory,
   formFactory,
   formWithTempStorageFactory,
   userFactory,
@@ -177,6 +178,57 @@ describe("toOutgoingWaste", () => {
     }
   );
 
+  it("bsd with bsd-suite should mention post-temp-storage destination", async () => {
+    // Given
+    const user = await userFactory();
+    const emitter = await companyFactory({ name: "Emitter" });
+    const recipient = await companyFactory({ name: "Recipient" });
+    const nextDestination = await companyFactory({ name: "Next destination" });
+    const forwardedInNextDestination = await companyFactory({
+      name: "ForwardedIn next destination",
+      address: "25 rue Voltaire 37100 TOURS"
+    });
+    const form = await formWithTempStorageFactory({
+      opt: {
+        emitterCompanyName: emitter.name,
+        emitterCompanySiret: emitter.siret,
+        recipientCompanyName: recipient.name,
+        recipientCompanySiret: recipient.siret,
+        nextDestinationCompanyName: nextDestination.name,
+        nextDestinationCompanySiret: nextDestination.siret
+      },
+      ownerId: user.id,
+      forwardedInOpts: {
+        recipientCompanyName: forwardedInNextDestination.name,
+        recipientCompanySiret: forwardedInNextDestination.siret,
+        recipientCompanyAddress: forwardedInNextDestination.address
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+
+    const formToBsdd_ = await formToBsdd(formForRegistry);
+    const waste = toOutgoingWaste(formToBsdd_);
+
+    // Then
+    expect(waste.postTempStorageDestinationSiret).toBe(
+      forwardedInNextDestination.siret
+    );
+    expect(waste.postTempStorageDestinationName).toBe(
+      "ForwardedIn next destination"
+    );
+
+    // Address
+    expect(waste.postTempStorageDestinationAddress).toBe("25 rue Voltaire");
+    expect(waste.postTempStorageDestinationCity).toBe("TOURS");
+    expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
+    expect(waste.postTempStorageDestinationCountry).toBe("FR");
+  });
+
   it("initial producer should be filled when forwarded BSD", async () => {
     // Given
     const bdd = await createTmpStorageBsdd();
@@ -253,6 +305,57 @@ describe("toAllWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2, 3]);
     }
   );
+
+  it("bsd with bsd-suite should mention post-temp-storage destination", async () => {
+    // Given
+    const user = await userFactory();
+    const emitter = await companyFactory({ name: "Emitter" });
+    const recipient = await companyFactory({ name: "Recipient" });
+    const nextDestination = await companyFactory({ name: "Next destination" });
+    const forwardedInNextDestination = await companyFactory({
+      name: "ForwardedIn next destination",
+      address: "25 rue Voltaire 37100 TOURS"
+    });
+    const form = await formWithTempStorageFactory({
+      opt: {
+        emitterCompanyName: emitter.name,
+        emitterCompanySiret: emitter.siret,
+        recipientCompanyName: recipient.name,
+        recipientCompanySiret: recipient.siret,
+        nextDestinationCompanyName: nextDestination.name,
+        nextDestinationCompanySiret: nextDestination.siret
+      },
+      ownerId: user.id,
+      forwardedInOpts: {
+        recipientCompanyName: forwardedInNextDestination.name,
+        recipientCompanySiret: forwardedInNextDestination.siret,
+        recipientCompanyAddress: forwardedInNextDestination.address
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+
+    const formToBsdd_ = await formToBsdd(formForRegistry);
+    const waste = toAllWaste(formToBsdd_);
+
+    // Then
+    expect(waste.postTempStorageDestinationSiret).toBe(
+      forwardedInNextDestination.siret
+    );
+    expect(waste.postTempStorageDestinationName).toBe(
+      "ForwardedIn next destination"
+    );
+
+    // Address
+    expect(waste.postTempStorageDestinationAddress).toBe("25 rue Voltaire");
+    expect(waste.postTempStorageDestinationCity).toBe("TOURS");
+    expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
+    expect(waste.postTempStorageDestinationCountry).toBe("FR");
+  });
 
   it("initial producer should be filled when forwarded BSD", async () => {
     // Given
