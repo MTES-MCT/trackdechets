@@ -1,15 +1,10 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  flattenBsffPackagingInput,
-  expandBsffPackagingFromDB
-} from "../../converter";
+import { expandBsffPackagingFromDB } from "../../converter";
 import { getBsffPackagingOrNotFound } from "../../database";
 import { getBsffPackagingRepository } from "../../repository";
-import { checkEditionRules } from "../../edition/bsffPackagingEdition";
-import { sirenifyBsffPackagingInput } from "../../sirenify";
 import { checkCanUpdateBsffPackaging } from "../../permissions";
-import { UserInputError } from "../../../common/errors";
+import { mergeInputAndParseBsffPackagingAsync } from "../../validation/bsffPackaging";
 
 const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
   _,
@@ -21,22 +16,25 @@ const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
 
   await checkCanUpdateBsffPackaging(user, existingBsffPackaging.bsff);
 
-  if (input.numero === null || input.numero === "") {
-    throw new UserInputError(
-      "Le numéro de contenant ne peut pas être nul ou vide"
+  const { parsedBsffPackaging, updatedFields } =
+    await mergeInputAndParseBsffPackagingAsync(
+      existingBsffPackaging,
+      input,
+      {}
     );
+
+  if (updatedFields.length === 0) {
+    // Évite de faire un update "à blanc" si l'input
+    // ne modifie pas les données. Cela permet de limiter
+    // le nombre d'évenements crées dans Mongo.
+    return expandBsffPackagingFromDB(existingBsffPackaging);
   }
-
-  const sirenifiedInput = await sirenifyBsffPackagingInput(input, user);
-  const flatInput = flattenBsffPackagingInput(sirenifiedInput);
-
-  await checkEditionRules(existingBsffPackaging, input);
 
   const { update: updateBsffPackaging } = getBsffPackagingRepository(user);
 
   const updatedBsffPackaging = await updateBsffPackaging({
     where: { id },
-    data: flatInput
+    data: parsedBsffPackaging
   });
 
   return expandBsffPackagingFromDB(updatedBsffPackaging);

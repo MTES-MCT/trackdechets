@@ -25,8 +25,8 @@ export const columns: Column[] = [
   { field: "orgId", label: "SIRET ou n° de TVA intracommunautaire" },
   { field: "name", label: "Raison sociale" },
   { field: "givenName", label: "Nom usuel de l'établissement" },
-  { field: "userName", label: "Nom et prénom" },
-  { field: "userEmail", label: "E-mail" },
+  { field: "userName", label: "Nom et prénom du membre" },
+  { field: "userEmail", label: "E-mail du membre" },
   {
     field: "userJoinedAt",
     label: "Date d'ajout du membre",
