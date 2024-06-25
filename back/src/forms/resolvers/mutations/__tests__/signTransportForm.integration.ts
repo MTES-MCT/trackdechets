@@ -948,11 +948,12 @@ describe("signTransportForm", () => {
 
     it("should allow marking an unsigned appendix1 item as sent when the transporter has automatic signature activated with the emitter", async () => {
       const { company: producerCompany } = await userWithCompanyFactory(
-        "MEMBER"
+        "MEMBER",
+        {
+          allowAppendix1SignatureAutomation: true
+        }
       );
-      const { user, company } = await userWithCompanyFactory("MEMBER", {
-        allowAppendix1SignatureAutomation: true
-      });
+      const { user, company } = await userWithCompanyFactory("MEMBER");
       await transporterReceiptFactory({ company });
       // Allow automatic signature
       await prisma.signatureAutomation.create({
