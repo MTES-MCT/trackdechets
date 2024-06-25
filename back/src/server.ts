@@ -49,6 +49,7 @@ import { GraphQLContext } from "./types";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
+import configureYup from "./common/yup/configureYup";
 
 const {
   SESSION_SECRET,
@@ -62,6 +63,7 @@ const {
 } = process.env;
 
 const Sentry = initSentry();
+configureYup();
 
 const UI_BASE_URL = getUIBaseURL();
 const RATE_LIMIT_WINDOW_SECONDS = 60;

@@ -21,6 +21,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Refacto de la validation BSFF [PR 3397](https://github.com/MTES-MCT/trackdechets/pull/3397)
+
 # [2024.6.1] 04/06/2024
 
 #### :rocket: Nouvelles fonctionnalités
