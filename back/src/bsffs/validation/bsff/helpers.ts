@@ -22,6 +22,8 @@ import { getTransportersSync } from "../../database";
 import { objectDiff } from "../../../forms/workflow/diff";
 import { toBsffPackagingWithType } from "../../compat";
 import { ZodBsffPackaging } from "../bsffPackaging/schema";
+import { UserInputError } from "../../../common/errors";
+import { prisma } from "@td/prisma";
 
 export function graphqlInputToZodBsffTransporter(
   input?: BsffTransporterInput | null
@@ -32,9 +34,42 @@ export function graphqlInputToZodBsffTransporter(
 export async function getZodTransporters(
   input: BsffInput
 ): Promise<ZodBsffTransporter[] | undefined> {
-  if (input.transporter) {
-    return [graphqlInputToZodBsffTransporter(input.transporter)];
+  if (input.transporter !== undefined && input.transporters) {
+    throw new UserInputError(
+      "Vous ne pouvez pas utiliser les champs `transporter` et `transporters` en même temps"
+    );
   }
+  if (input.transporter) {
+    // Couche de compatibilité avec l'API BSDA "pré multi-modal"
+    // Les données de `input.transporter` correspondent au premier
+    // transporteur.
+    return [graphqlInputToZodBsffTransporter(input.transporter)];
+  } else if (input.transporter === null || input.transporters?.length === 0) {
+    return [];
+  } else if (input.transporters?.length) {
+    const dbTransporters = await prisma.bsffTransporter.findMany({
+      where: { id: { in: input.transporters } }
+    });
+    // Vérifie que tous les identifiants correspondent bien à un transporteur BSFF en base
+    const unknownTransporters = input.transporters.filter(
+      id => !dbTransporters.map(t => t.id).includes(id)
+    );
+    if (unknownTransporters.length > 0) {
+      throw new UserInputError(
+        `Aucun transporteur ne possède le ou les identifiants suivants : ${unknownTransporters.join(
+          ", "
+        )}`
+      );
+    }
+
+    // garde le même ordre
+    return input.transporters.map(transporterId => {
+      const { createdAt, updatedAt, number, ...transporterData } =
+        dbTransporters.find(t => t.id === transporterId)!;
+      return transporterData;
+    });
+  }
+
   return undefined;
 }
 

@@ -13,6 +13,7 @@ import {
   TransporterInput,
   TransportMode
 } from "@td/codegen-ui";
+import { getInitialCompany } from "../../../Apps/common/data/initialState";
 
 /**
  * Computes initial values for trader fields in Formik's form
@@ -37,25 +38,6 @@ export function getInitialBroker(broker?: Broker | null) {
     department: broker?.department ?? "",
     validityLimit: broker?.validityLimit ?? null,
     company: getInitialCompany(broker?.company)
-  };
-}
-
-/**
- * Computes initial values for a company fields in Formik's form
- * by merging defaults with current state of the draft BSD (if any)
- */
-export function getInitialCompany(company?: FormCompany | null) {
-  return {
-    orgId: company?.orgId ?? "",
-    siret: company?.siret ?? "",
-    name: company?.name ?? "",
-    address: company?.address ?? "",
-    contact: company?.contact ?? "",
-    mail: company?.mail ?? "",
-    phone: company?.phone ?? "",
-    vatNumber: company?.vatNumber ?? "",
-    country: company?.country ?? "",
-    omiNumber: company?.omiNumber ?? ""
   };
 }
 

@@ -57,12 +57,18 @@ type Bsff {
   weight: BsffWeight
 
   """
-  Transporteur du déchet, effectue l'enlèvement du déchet auprès de l'émetteur et l'emporte à la destination.
+  Transporteur du déchet (1er transporteur en cas de transport multi-modal), effectue l'enlèvement du déchet auprès de l'émetteur et l'emporte à la destination.
 
   À noter que l'émetteur peut également être transporteur, par exemple dans le cas de l'opérateur qui dépose lui même ses contenants auprès d'une installation de collecte.
   Dans ce cas il nous faut quand même savoir qui a effectué le transport, et indiquer l'opérateur à la fois en tant qu'émetteur et transporteur.
   """
   transporter: BsffTransporter
+
+  """
+  Liste des transporteurs du déchet. Contient 1 seul transporteur en cas d'achemniment direct.
+  Peut contenir un maximum de 5 transporteurs différents en cas de transport multi-modal
+  """
+  transporters: [BsffTransporter!]!
 
   """
   Destination du déchet, qui peut le réceptionner pour traitement, groupement, reconditionnement ou réexpedition.
@@ -198,6 +204,8 @@ type BsffWeight {
 }
 
 type BsffTransporter {
+  "Identifiant du transporteur"
+  id: ID!
   "Entreprise responsable du transport du déchet."
   company: FormCompany
   "Récépissé du transporteur, laisser vide s'il déclare être exempté."

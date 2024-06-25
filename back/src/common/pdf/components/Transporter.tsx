@@ -1,20 +1,27 @@
 import React from "react";
-import { BsdaTransporter } from "../../../generated/graphql/types";
-import { CompanyContact, CompanyDescription } from "./Company";
-import { Recepisse } from "./Recepisse";
+import {
+  BsdaTransporter,
+  BsffTransporter
+} from "../../../generated/graphql/types";
 import { TRANSPORT_MODE_LABELS, formatDate } from "../../../common/pdf";
-import { Signature } from "./Signature";
+import { Signature } from "../../../common/pdf/components/Signature";
+import { Recepisse } from "./Recepisse";
+import { CompanyContact, CompanyDescription } from "./Company";
 
 type TransporterProps = {
-  transporter: BsdaTransporter;
+  transporter: BsdaTransporter | BsffTransporter;
+  frameNumber: number;
 };
 
-const Transporter: React.FC<TransporterProps> = ({ transporter }) => {
+const Transporter: React.FC<TransporterProps> = ({
+  transporter,
+  frameNumber
+}) => {
   return (
     <div className="BoxRow">
       <div className="BoxCol">
         <p>
-          <strong>6. Transporteur</strong>
+          <strong>{frameNumber}. Transporteur</strong>
         </p>
         <CompanyDescription company={transporter?.company} />
         <CompanyContact company={transporter?.company} />

@@ -5,9 +5,9 @@ import { Field, useField, useFormikContext } from "formik";
 import { CompanyPrivate, CreateFormInput, Query } from "@td/codegen-ui";
 import styles from "./CompanySelector.module.scss";
 import React, { useCallback, useMemo } from "react";
-import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 import { sortCompaniesByName } from "../../../../common/helper";
 import { CompanyResult } from "./CompanyResults";
+import { getInitialCompany } from "../../../../Apps/common/data/initialState";
 
 export const GET_ME = gql`
   {

@@ -1,7 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { InlineError } from "../../../../Apps/common/Components/Error/Error";
 import { BsdaPicker } from "../../components/bsdaPicker/BsdaPicker";
-import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 import { RadioButton } from "../../../common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
 import {
@@ -13,7 +12,10 @@ import {
 } from "@td/codegen-ui";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { initialBsdaTransporter } from "../initial-state";
+import {
+  getInitialCompany,
+  initialTransporter
+} from "../../../../Apps/common/data/initialState";
 
 type Props = { disabled: boolean };
 
@@ -83,7 +85,7 @@ export function Type({ disabled }: Props) {
       // transporteur vide par défaut au cas où on repasse sur un autre type
       // de BSDA. Un clean sera fait au moment de la soumission du formulaire
       // pour s'assurer que `transporters: []` en cas de collecte en déchetterie.
-      setFieldValue("transporters", [initialBsdaTransporter]);
+      setFieldValue("transporters", [initialTransporter]);
     }
   }, [type, setFieldValue, data]);
 

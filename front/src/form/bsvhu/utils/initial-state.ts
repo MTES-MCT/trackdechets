@@ -1,5 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { getInitialCompany } from "../../bsdd/utils/initial-state";
+
+import { getInitialCompany } from "../../../Apps/common/data/initialState";
 
 export default {
   emitter: {

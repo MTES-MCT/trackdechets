@@ -1,16 +1,19 @@
 import * as React from "react";
 import { Document, formatDate } from "../../../common/pdf";
 import { Bsda } from "../../../generated/graphql/types";
-import { CompanyContact, CompanyDescription } from "./Company";
 import { PickupSite } from "./PickupSite";
-import { Signature } from "./Signature";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { WasteDescription } from "./WasteDescription";
 import { WasteDetails } from "./WasteDetails";
 import { BsdaStatus, OperationMode } from "@prisma/client";
 import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import Transporter from "./Transporter";
+import { Signature } from "../../../bspaoh/pdf/components/Signature";
+import {
+  CompanyContact,
+  CompanyDescription
+} from "../../../common/pdf/components/Company";
+import Transporter from "../../../common/pdf/components/Transporter";
 
 const PACKAGINGS_NAMES = {
   BIG_BAG: "Big-bag / GRV",
@@ -290,7 +293,9 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           </div>
         </div>
 
-        {bsda?.transporter && <Transporter transporter={bsda?.transporter} />}
+        {bsda?.transporter && (
+          <Transporter transporter={bsda.transporter} frameNumber={6} />
+        )}
 
         <div className="BoxRow">
           <div className="BoxCol">
@@ -366,7 +371,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           {bsda.transporters
             .filter((_, idx) => idx > 0)
             .map((t, idx) => (
-              <Transporter transporter={t} key={idx} />
+              <Transporter transporter={t} key={t.id} frameNumber={9 + idx} />
             ))}
         </div>
       )}

@@ -3,8 +3,8 @@ import { BsdType, CompanySearchResult } from "@td/codegen-ui";
 import { isForeignVat } from "@td/constants";
 import { CreateOrUpdateTransporterInput } from "../../../form/bsdd/utils/initial-state";
 import { AnyTransporterInput } from "../types";
-import { mapBsdTransporter } from "../bsdTransporterMapper";
 import { CreateOrUpdateBsdaTransporterInput } from "../../../form/bsda/stepper/initial-state";
+import { mapBsdTransporter } from "../bsdTransporterMapper";
 
 // Hook multi-bordereaux qui appelle `useField` et qui renvoie les helpers et
 // champs nécessaires pour read / update les infos d'un transporteur

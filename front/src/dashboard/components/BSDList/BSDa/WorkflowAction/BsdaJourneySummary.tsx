@@ -18,9 +18,7 @@ export function BsdaJourneySummary({ bsda }: Props) {
 
   return (
     <Journey>
-      <JourneyStop
-        variant={bsda.emitter?.emission?.signature ? "complete" : "active"}
-      >
+      <JourneyStop variant={signedByEmitter ? "complete" : "active"}>
         <JourneyStopName>Émetteur</JourneyStopName>
         <JourneyStopDescription>
           {bsda.emitter?.company?.name} (

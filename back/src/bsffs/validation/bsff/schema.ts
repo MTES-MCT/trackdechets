@@ -14,8 +14,11 @@ import {
 import { BsffValidationContext } from "./types";
 import { weightSchema } from "../../../common/validation/weight";
 import { WeightUnits } from "../../../common/validation";
-import { sirenifyBsff } from "./sirenify";
-import { checkAndSetPreviousPackagings } from "./transformers";
+import { sirenifyBsff, sirenifyBsffTransporter } from "./sirenify";
+import {
+  checkAndSetPreviousPackagings,
+  updateTransporterRecepisse
+} from "./transformers";
 import { updateTransportersRecepisse } from "../../../common/validation/zod/transformers";
 import {
   rawTransporterSchema,
@@ -154,19 +157,6 @@ const rawBsffSchema = z.object({
 
 // Type inféré par Zod - avant parsing
 // Voir https://zod.dev/?id=type-inference
-export type ZodBsffTransporter = z.input<typeof rawBsffTransporterSchema>;
-
-// Type inféré par Zod - après parsing par le schéma "brut".
-// On pourra utiliser ce type en entrée et en sortie dans les refinements et
-// les transformers qui arrivent après le parsing initial (on fait pour cela
-// la supposition que les transformers n'apportent pas de modification au typage)
-// Voir https://zod.dev/?id=type-inference
-export type ParsedZodBsffTransporter = z.output<
-  typeof rawBsffTransporterSchema
->;
-
-// Type inféré par Zod - avant parsing
-// Voir https://zod.dev/?id=type-inference
 export type ZodBsffPackaging = z.input<typeof rawBsffPackagingSchema>;
 
 // Type inféré par Zod - après parsing par le schéma "brut".
@@ -219,3 +209,20 @@ export const contextualBsffSchemaAsync = (context: BsffValidationContext) => {
     .superRefine(checkFicheInterventions)
     .transform(checkAndSetPreviousPackagings);
 };
+
+// Type inféré par Zod - avant parsing
+// Voir https://zod.dev/?id=type-inference
+export type ZodBsffTransporter = z.input<typeof rawBsffTransporterSchema>;
+
+// Type inféré par Zod - après parsing par le schéma "brut".
+// On pourra utiliser ce type en entrée et en sortie dans les refinements et
+// les transformers qui arrivent après le parsing initial (on fait pour cela
+// la supposition que les transformers n'apportent pas de modification au typage)
+// Voir https://zod.dev/?id=type-inference
+export type ParsedZodBsffTransporter = z.output<
+  typeof rawBsffTransporterSchema
+>;
+
+export const transformedBsffTransporterSchema = rawBsffTransporterSchema
+  .transform(updateTransporterRecepisse)
+  .transform(sirenifyBsffTransporter);
