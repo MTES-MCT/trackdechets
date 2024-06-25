@@ -1,4 +1,5 @@
 import {
+  bsddTransporterFactory,
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
@@ -14,10 +15,38 @@ describe("simpleFormToBsdd", () => {
     // It is used as a compatibility data structure when we need homogeneus data (ex: to compute a cross bsds registry)
 
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter1 = await companyFactory();
+    const transporter2 = await companyFactory();
+    const transporter3 = await companyFactory();
+    const transporter4 = await companyFactory();
+    const transporter5 = await companyFactory();
     const form = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret }
+      opt: {
+        emitterCompanySiret: company.siret,
+        transporters: {
+          create: { number: 1, transporterCompanySiret: transporter1.siret }
+        }
+      }
     });
+
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: { transporterCompanySiret: transporter2.siret }
+    });
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: { transporterCompanySiret: transporter3.siret }
+    });
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: { transporterCompanySiret: transporter4.siret }
+    });
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: { transporterCompanySiret: transporter5.siret }
+    });
+
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: RegistryFormInclude
@@ -75,6 +104,7 @@ describe("simpleFormToBsdd", () => {
       weightValue: form.wasteDetailsQuantity?.toNumber(),
       wasteAdr: form.wasteDetailsOnuCode,
       weightIsEstimate: true,
+
       transporterCompanyName: fullForm.transporters[0].transporterCompanyName,
       transporterCompanySiret: fullForm.transporters[0].transporterCompanySiret,
       transporterCompanyVatNumber:
@@ -101,40 +131,127 @@ describe("simpleFormToBsdd", () => {
       transporterNumberPlates: [
         fullForm.transporters[0].transporterNumberPlate
       ],
-      transporter2CompanyName: undefined,
-      transporter2CompanySiret: undefined,
-      transporter2CompanyVatNumber: null,
-      transporter2CompanyAddress: undefined,
-      transporter2CompanyContact: undefined,
-      transporter2CompanyPhone: undefined,
-      transporter2CompanyMail: undefined,
+
+      transporter2CompanyName: fullForm.transporters[1].transporterCompanyName,
+      transporter2CompanySiret:
+        fullForm.transporters[1].transporterCompanySiret,
+      transporter2CompanyVatNumber:
+        fullForm.transporters[1].transporterCompanyVatNumber,
+      transporter2CompanyAddress:
+        fullForm.transporters[1].transporterCompanyAddress,
+      transporter2CompanyContact:
+        fullForm.transporters[1].transporterCompanyContact,
+      transporter2CompanyPhone:
+        fullForm.transporters[1].transporterCompanyPhone,
+      transporter2CompanyMail: fullForm.transporters[1].transporterCompanyMail,
       transporter2CustomInfo: null,
-      transporter2RecepisseIsExempted: undefined,
-      transporter2RecepisseNumber: undefined,
-      transporter2RecepisseDepartment: undefined,
-      transporter2RecepisseValidityLimit: undefined,
-      transporter2TransportMode: undefined,
-      transporter2TransportTakenOverAt: undefined,
-      transporter2TransportSignatureAuthor: undefined,
-      transporter2TransportSignatureDate: undefined,
-      transporter2NumberPlates: [],
-      transporter3CompanyName: undefined,
-      transporter3CompanySiret: undefined,
-      transporter3CompanyVatNumber: null,
-      transporter3CompanyAddress: undefined,
-      transporter3CompanyContact: undefined,
-      transporter3CompanyPhone: undefined,
-      transporter3CompanyMail: undefined,
+      transporter2RecepisseIsExempted:
+        fullForm.transporters[1].transporterIsExemptedOfReceipt,
+      transporter2RecepisseNumber: fullForm.transporters[1].transporterReceipt,
+      transporter2RecepisseDepartment:
+        fullForm.transporters[1].transporterDepartment,
+      transporter2RecepisseValidityLimit:
+        fullForm.transporters[1].transporterValidityLimit,
+      transporter2TransportMode:
+        fullForm.transporters[1].transporterTransportMode,
+      transporter2TransportTakenOverAt: fullForm.transporters[1].takenOverAt,
+      transporter2TransportSignatureAuthor:
+        fullForm.transporters[1].takenOverBy,
+      transporter2TransportSignatureDate: fullForm.transporters[1].takenOverAt,
+      transporter2NumberPlates: [
+        fullForm.transporters[1].transporterNumberPlate
+      ],
+
+      transporter3CompanyName: fullForm.transporters[2].transporterCompanyName,
+      transporter3CompanySiret:
+        fullForm.transporters[2].transporterCompanySiret,
+      transporter3CompanyVatNumber:
+        fullForm.transporters[2].transporterCompanyVatNumber,
+      transporter3CompanyAddress:
+        fullForm.transporters[2].transporterCompanyAddress,
+      transporter3CompanyContact:
+        fullForm.transporters[2].transporterCompanyContact,
+      transporter3CompanyPhone:
+        fullForm.transporters[2].transporterCompanyPhone,
+      transporter3CompanyMail: fullForm.transporters[2].transporterCompanyMail,
       transporter3CustomInfo: null,
-      transporter3RecepisseIsExempted: undefined,
-      transporter3RecepisseNumber: undefined,
-      transporter3RecepisseDepartment: undefined,
-      transporter3RecepisseValidityLimit: undefined,
-      transporter3TransportMode: undefined,
-      transporter3TransportTakenOverAt: undefined,
-      transporter3TransportSignatureAuthor: undefined,
-      transporter3TransportSignatureDate: undefined,
-      transporter3NumberPlates: [],
+      transporter3RecepisseIsExempted:
+        fullForm.transporters[2].transporterIsExemptedOfReceipt,
+      transporter3RecepisseNumber: fullForm.transporters[2].transporterReceipt,
+      transporter3RecepisseDepartment:
+        fullForm.transporters[2].transporterDepartment,
+      transporter3RecepisseValidityLimit:
+        fullForm.transporters[2].transporterValidityLimit,
+      transporter3TransportMode:
+        fullForm.transporters[2].transporterTransportMode,
+      transporter3TransportTakenOverAt: fullForm.transporters[2].takenOverAt,
+      transporter3TransportSignatureAuthor:
+        fullForm.transporters[2].takenOverBy,
+      transporter3TransportSignatureDate: fullForm.transporters[2].takenOverAt,
+      transporter3NumberPlates: [
+        fullForm.transporters[2].transporterNumberPlate
+      ],
+
+      transporter4CompanyName: fullForm.transporters[3].transporterCompanyName,
+      transporter4CompanySiret:
+        fullForm.transporters[3].transporterCompanySiret,
+      transporter4CompanyVatNumber:
+        fullForm.transporters[3].transporterCompanyVatNumber,
+      transporter4CompanyAddress:
+        fullForm.transporters[3].transporterCompanyAddress,
+      transporter4CompanyContact:
+        fullForm.transporters[3].transporterCompanyContact,
+      transporter4CompanyPhone:
+        fullForm.transporters[3].transporterCompanyPhone,
+      transporter4CompanyMail: fullForm.transporters[3].transporterCompanyMail,
+      transporter4CustomInfo: null,
+      transporter4RecepisseIsExempted:
+        fullForm.transporters[3].transporterIsExemptedOfReceipt,
+      transporter4RecepisseNumber: fullForm.transporters[3].transporterReceipt,
+      transporter4RecepisseDepartment:
+        fullForm.transporters[3].transporterDepartment,
+      transporter4RecepisseValidityLimit:
+        fullForm.transporters[3].transporterValidityLimit,
+      transporter4TransportMode:
+        fullForm.transporters[3].transporterTransportMode,
+      transporter4TransportTakenOverAt: fullForm.transporters[3].takenOverAt,
+      transporter4TransportSignatureAuthor:
+        fullForm.transporters[3].takenOverBy,
+      transporter4TransportSignatureDate: fullForm.transporters[3].takenOverAt,
+      transporter4NumberPlates: [
+        fullForm.transporters[3].transporterNumberPlate
+      ],
+
+      transporter5CompanyName: fullForm.transporters[4].transporterCompanyName,
+      transporter5CompanySiret:
+        fullForm.transporters[4].transporterCompanySiret,
+      transporter5CompanyVatNumber:
+        fullForm.transporters[4].transporterCompanyVatNumber,
+      transporter5CompanyAddress:
+        fullForm.transporters[4].transporterCompanyAddress,
+      transporter5CompanyContact:
+        fullForm.transporters[4].transporterCompanyContact,
+      transporter5CompanyPhone:
+        fullForm.transporters[4].transporterCompanyPhone,
+      transporter5CompanyMail: fullForm.transporters[4].transporterCompanyMail,
+      transporter5CustomInfo: null,
+      transporter5RecepisseIsExempted:
+        fullForm.transporters[4].transporterIsExemptedOfReceipt,
+      transporter5RecepisseNumber: fullForm.transporters[4].transporterReceipt,
+      transporter5RecepisseDepartment:
+        fullForm.transporters[4].transporterDepartment,
+      transporter5RecepisseValidityLimit:
+        fullForm.transporters[4].transporterValidityLimit,
+      transporter5TransportMode:
+        fullForm.transporters[4].transporterTransportMode,
+      transporter5TransportTakenOverAt: fullForm.transporters[4].takenOverAt,
+      transporter5TransportSignatureAuthor:
+        fullForm.transporters[4].takenOverBy,
+      transporter5TransportSignatureDate: fullForm.transporters[4].takenOverAt,
+      transporter5NumberPlates: [
+        fullForm.transporters[4].transporterNumberPlate
+      ],
+
       destinationCompanyName: form.recipientCompanyName,
       destinationCompanySiret: form.recipientCompanySiret,
       destinationCompanyAddress: form.recipientCompanyAddress,
@@ -386,6 +503,40 @@ describe("simpleFormToBsdd", () => {
       transporter3TransportSignatureAuthor: undefined,
       transporter3TransportSignatureDate: undefined,
       transporter3NumberPlates: [],
+      transporter4CompanyName: undefined,
+      transporter4CompanySiret: undefined,
+      transporter4CompanyVatNumber: null,
+      transporter4CompanyAddress: undefined,
+      transporter4CompanyContact: undefined,
+      transporter4CompanyPhone: undefined,
+      transporter4CompanyMail: undefined,
+      transporter4CustomInfo: null,
+      transporter4RecepisseIsExempted: undefined,
+      transporter4RecepisseNumber: undefined,
+      transporter4RecepisseDepartment: undefined,
+      transporter4RecepisseValidityLimit: undefined,
+      transporter4TransportMode: undefined,
+      transporter4TransportTakenOverAt: undefined,
+      transporter4TransportSignatureAuthor: undefined,
+      transporter4TransportSignatureDate: undefined,
+      transporter4NumberPlates: [],
+      transporter5CompanyName: undefined,
+      transporter5CompanySiret: undefined,
+      transporter5CompanyVatNumber: null,
+      transporter5CompanyAddress: undefined,
+      transporter5CompanyContact: undefined,
+      transporter5CompanyPhone: undefined,
+      transporter5CompanyMail: undefined,
+      transporter5CustomInfo: null,
+      transporter5RecepisseIsExempted: undefined,
+      transporter5RecepisseNumber: undefined,
+      transporter5RecepisseDepartment: undefined,
+      transporter5RecepisseValidityLimit: undefined,
+      transporter5TransportMode: undefined,
+      transporter5TransportTakenOverAt: undefined,
+      transporter5TransportSignatureAuthor: undefined,
+      transporter5TransportSignatureDate: undefined,
+      transporter5NumberPlates: [],
       destinationCompanyName: fullForwardedInForm.recipientCompanyName,
       destinationCompanySiret: fullForwardedInForm.recipientCompanySiret,
       destinationCompanyAddress: fullForwardedInForm.recipientCompanyAddress,
@@ -535,6 +686,41 @@ describe("simpleFormToBsdd", () => {
         transporter3TransportSignatureAuthor: undefined,
         transporter3TransportSignatureDate: undefined,
         transporter3NumberPlates: [],
+        transporter4CompanyName: undefined,
+        transporter4CompanySiret: undefined,
+        transporter4CompanyVatNumber: null,
+        transporter4CompanyAddress: undefined,
+        transporter4CompanyContact: undefined,
+        transporter4CompanyPhone: undefined,
+        transporter4CompanyMail: undefined,
+        transporter4CustomInfo: null,
+        transporter4RecepisseIsExempted: undefined,
+        transporter4RecepisseNumber: undefined,
+        transporter4RecepisseDepartment: undefined,
+        transporter4RecepisseValidityLimit: undefined,
+        transporter4TransportMode: undefined,
+        transporter4TransportTakenOverAt: undefined,
+        transporter4TransportSignatureAuthor: undefined,
+        transporter4TransportSignatureDate: undefined,
+        transporter4NumberPlates: [],
+
+        transporter5CompanyName: undefined,
+        transporter5CompanySiret: undefined,
+        transporter5CompanyVatNumber: null,
+        transporter5CompanyAddress: undefined,
+        transporter5CompanyContact: undefined,
+        transporter5CompanyPhone: undefined,
+        transporter5CompanyMail: undefined,
+        transporter5CustomInfo: null,
+        transporter5RecepisseIsExempted: undefined,
+        transporter5RecepisseNumber: undefined,
+        transporter5RecepisseDepartment: undefined,
+        transporter5RecepisseValidityLimit: undefined,
+        transporter5TransportMode: undefined,
+        transporter5TransportTakenOverAt: undefined,
+        transporter5TransportSignatureAuthor: undefined,
+        transporter5TransportSignatureDate: undefined,
+        transporter5NumberPlates: [],
         destinationCompanyName: form.recipientCompanyName,
         destinationCompanySiret: form.recipientCompanySiret,
         destinationCompanyAddress: form.recipientCompanyAddress,

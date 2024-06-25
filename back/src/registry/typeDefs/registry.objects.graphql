@@ -91,6 +91,8 @@ type IncomingWaste {
   transporterCompanyAddress: String
   "Le numéro de récépissé du trasnporteur mentionné à l'article R. 541-53 du code de l'environnement"
   transporterRecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur"
+  transporterTransportMode: TransportMode
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String
@@ -100,6 +102,8 @@ type IncomingWaste {
   transporter2CompanyAddress: String
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
   transporter2RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
+  transporter2TransportMode: TransportMode
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyName: String
@@ -109,6 +113,30 @@ type IncomingWaste {
   transporter3CompanyAddress: String
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
   transporter3RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
+  transporter3TransportMode: TransportMode
+
+  "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyName: String
+  "Le N°SIRET du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanySiret: String
+  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyAddress: String
+  "Le récepissé transporteur n°4 (en cas de transport multimodal)"
+  transporter4RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
+  transporter4TransportMode: TransportMode
+
+  "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyName: String
+  "Le N°SIRET du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanySiret: String
+  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyAddress: String
+  "Le récepissé transporteur n°5 (en cas de transport multimodal)"
+  transporter5RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
+  transporter5TransportMode: TransportMode
 
   #########################################################################
   # d) Concernant l'opération de traitement effectuée par l'établissement :
@@ -180,6 +208,12 @@ type IncomingWaste {
   "Extra - Adresse email de contact du transporteur n°3"
   transporter3CompanyMail: String
 
+  "Extra - Adresse email de contact du transporteur n°4"
+  transporter4CompanyMail: String
+
+  "Extra - Adresse email de contact du transporteur n°5"
+  transporter5CompanyMail: String
+
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean
 
@@ -188,6 +222,12 @@ type IncomingWaste {
 
   "Extra - Exemption de récépissé transporteur n°3"
   transporter3RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°4"
+  transporter4RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°5"
+  transporter5RecepisseIsExempted: Boolean
 
   "Extra - L'adresse email du contact du négociant"
   traderCompanyMail: String
@@ -320,6 +360,8 @@ type OutgoingWaste {
   transporterRecepisseNumber: String
   "L'adresse du transporteur"
   transporterCompanyAddress: String
+  "Le mode de transport utilisé par le transporteur"
+  transporterTransportMode: TransportMode
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String
@@ -329,6 +371,8 @@ type OutgoingWaste {
   transporter2CompanyAddress: String
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
   transporter2RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
+  transporter2TransportMode: TransportMode
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyName: String
@@ -338,6 +382,30 @@ type OutgoingWaste {
   transporter3CompanyAddress: String
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
   transporter3RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
+  transporter3TransportMode: TransportMode
+
+  "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyName: String
+  "Le N°SIRET du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanySiret: String
+  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyAddress: String
+  "Le récepissé transporteur n°4 (en cas de transport multimodal)"
+  transporter4RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
+  transporter4TransportMode: TransportMode
+
+  "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyName: String
+  "Le N°SIRET du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanySiret: String
+  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyAddress: String
+  "Le récepissé transporteur n°5 (en cas de transport multimodal)"
+  transporter5RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
+  transporter5TransportMode: TransportMode
 
   ##########################################
   # e) Concernant la destination du déchet :
@@ -428,6 +496,12 @@ type OutgoingWaste {
   "Extra - Adresse email de contact du transporteur n°3"
   transporter3CompanyMail: String
 
+  "Extra - Adresse email de contact du transporteur n°4"
+  transporter4CompanyMail: String
+
+  "Extra - Adresse email de contact du transporteur n°5"
+  transporter5CompanyMail: String
+
   "Extra - Adresse email de contact de l'installation de destination"
   destinationCompanyMail: String
 
@@ -445,6 +519,12 @@ type OutgoingWaste {
 
   "Extra - Exemption de récépissé transporteur n°3"
   transporter3RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°4"
+  transporter4RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°5"
+  transporter5RecepisseIsExempted: Boolean
 
   """
   Extra - Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
@@ -522,6 +602,12 @@ type TransportedWaste {
   transporterCompanyAddress: String
   "Le numéro d'immatriculation du ou des véhicules transportant le déchet"
   transporterNumberPlates: [String!]
+  "Le récepissé transporteur"
+  transporterRecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur"
+  transporterTransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur"
+  transporterHandedOverSignatureDate: String
 
   "La raison sociale du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyName: String
@@ -531,6 +617,12 @@ type TransportedWaste {
   transporter2CompanyAddress: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°2 (en cas de transport multi-modal)"
   transporter2NumberPlates: [String!]
+  "Le récepissé transporteur n°2 (en cas de transport multimodal)"
+  transporter2RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
+  transporter2TransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur n°2 (en cas de transport multimodal)"
+  transporter2HandedOverSignatureDate: String
 
   "La raison sociale du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyName: String
@@ -540,6 +632,38 @@ type TransportedWaste {
   transporter3CompanyAddress: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°3 (en cas de transport multi-modal)"
   transporter3NumberPlates: [String!]
+  "Le récepissé transporteur n°3 (en cas de transport multimodal)"
+  transporter3RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
+  transporter3TransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur n°3 (en cas de transport multimodal)"
+  transporter3HandedOverSignatureDate: String
+
+  "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyName: String
+  "Le N°SIRET du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanySiret: String
+  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyAddress: String
+  "Le récepissé transporteur n°4 (en cas de transport multimodal)"
+  transporter4RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
+  transporter4TransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur n°4 (en cas de transport multimodal)"
+  transporter4HandedOverSignatureDate: String
+
+  "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyName: String
+  "Le N°SIRET du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanySiret: String
+  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyAddress: String
+  "Le récepissé transporteur n°5 (en cas de transport multimodal)"
+  transporter5RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
+  transporter5TransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur n°5 (en cas de transport multimodal)"
+  transporter5HandedOverSignatureDate: String
 
   """
   Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
@@ -636,8 +760,35 @@ type TransportedWaste {
   "Extra - Champ libre fourni par le transporteur (tous les bordereaux sauf BSDD)"
   transporterCustomInfo: String
 
+  "Extra - Adresse email de contact du transporteur"
+  transporterCompanyMail: String
+
+  "Extra - Adresse email de contact du transporteur n°2"
+  transporter2CompanyMail: String
+
+  "Extra - Adresse email de contact du transporteur n°3"
+  transporter3CompanyMail: String
+
+  "Extra - Adresse email de contact du transporteur n°4"
+  transporter4CompanyMail: String
+
+  "Extra - Adresse email de contact du transporteur n°5"
+  transporter5CompanyMail: String
+
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°2"
+  transporter2RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°3"
+  transporter3RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°4"
+  transporter4RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°5"
+  transporter5RecepisseIsExempted: Boolean
 
   "Extra - N° de CAP (Certificat d'acceptation préalable)"
   destinationCap: String
@@ -780,6 +931,8 @@ type ManagedWaste {
   transporterCompanyAddress: String
   "Le récepissé transporteur"
   transporterRecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur"
+  transporterTransportMode: TransportMode
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String
@@ -789,6 +942,8 @@ type ManagedWaste {
   transporter2CompanyAddress: String
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
   transporter2RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
+  transporter2TransportMode: TransportMode
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyName: String
@@ -798,6 +953,30 @@ type ManagedWaste {
   transporter3CompanyAddress: String
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
   transporter3RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
+  transporter3TransportMode: TransportMode
+
+  "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyName: String
+  "Le N°SIRET du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanySiret: String
+  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyAddress: String
+  "Le récepissé transporteur n°4 (en cas de transport multimodal)"
+  transporter4RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
+  transporter4TransportMode: TransportMode
+
+  "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyName: String
+  "Le N°SIRET du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanySiret: String
+  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyAddress: String
+  "Le récepissé transporteur n°5 (en cas de transport multimodal)"
+  transporter5RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
+  transporter5TransportMode: TransportMode
 
   ##########################################
   # d) Concernant la destination du déchet :
@@ -860,6 +1039,12 @@ type ManagedWaste {
   "Extra - Adresse email de contact du transporteur n°3"
   transporter3CompanyMail: String
 
+  "Extra - Adresse email de contact du transporteur n°4"
+  transporter4CompanyMail: String
+
+  "Extra - Adresse email de contact du transporteur n°5"
+  transporter5CompanyMail: String
+
   "Extra - Adresse email de contact de l'installation de destination"
   destinationCompanyMail: String
 
@@ -877,6 +1062,12 @@ type ManagedWaste {
 
   "Extra - Exemption de récépissé transporteur n°3"
   transporter3RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°4"
+  transporter4RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°5"
+  transporter5RecepisseIsExempted: Boolean
 
   """
   Extra - Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
@@ -1004,6 +1195,10 @@ type AllWaste {
   transporterRecepisseNumber: String
   "Le numéro d'immatriculation du ou des véhicules transportant le déchet"
   transporterNumberPlates: [String!]
+  "Le mode de transport utilisé par le transporteur"
+  transporterTransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur"
+  transporterHandedOverSignatureDate: String
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String
@@ -1015,6 +1210,10 @@ type AllWaste {
   transporter2RecepisseNumber: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°2 (en cas de transport multimodal)"
   transporter2NumberPlates: [String!]
+  "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
+  transporter2TransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur n°2 (en cas de transport multimodal)"
+  transporter2HandedOverSignatureDate: String
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyName: String
@@ -1026,6 +1225,36 @@ type AllWaste {
   transporter3RecepisseNumber: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°3 (en cas de transport multimodal)"
   transporter3NumberPlates: [String!]
+  "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
+  transporter3TransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur n°3 (en cas de transport multimodal)"
+  transporter3HandedOverSignatureDate: String
+
+  "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyName: String
+  "Le N°SIRET du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanySiret: String
+  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyAddress: String
+  "Le récepissé transporteur n°4 (en cas de transport multimodal)"
+  transporter4RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
+  transporter4TransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur n°4 (en cas de transport multimodal)"
+  transporter4HandedOverSignatureDate: String
+
+  "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyName: String
+  "Le N°SIRET du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanySiret: String
+  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyAddress: String
+  "Le récepissé transporteur n°5 (en cas de transport multimodal)"
+  transporter5RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
+  transporter5TransportMode: TransportMode
+  "La date de signature de dépôt à la destination du transporteur n°5 (en cas de transport multimodal)"
+  transporter5HandedOverSignatureDate: String
 
   """
   Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
@@ -1137,6 +1366,12 @@ type AllWaste {
   "Extra - Adresse email de contact du transporteur n°3"
   transporter3CompanyMail: String
 
+  "Extra - Adresse email de contact du transporteur n°4"
+  transporter4CompanyMail: String
+
+  "Extra - Adresse email de contact du transporteur n°5"
+  transporter5CompanyMail: String
+
   "Extra - Adresse email de contact de l'installation de destination"
   destinationCompanyMail: String
 
@@ -1154,6 +1389,12 @@ type AllWaste {
 
   "Extra - Exemption de récépissé transporteur n°3"
   transporter3RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°4"
+  transporter4RecepisseIsExempted: Boolean
+
+  "Extra - Exemption de récépissé transporteur n°5"
+  transporter5RecepisseIsExempted: Boolean
 
   "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
