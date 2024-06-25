@@ -1,4 +1,3 @@
-import { getBsdaFromActivityEvents } from "../../activity-events/bsda";
 import {
   BsdaRevisionRequest,
   BsdaRevisionRequestResolvers
@@ -33,21 +32,9 @@ const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
     return authoringCompany;
   },
   bsda: async (
-    parent: BsdaRevisionRequest & { bsdaId: string },
-    _,
-    { dataloaders }
+    parent: BsdaRevisionRequest & { bsdaSnapshot: BsdaWithTransporters }
   ) => {
-    const actualBsda = await prisma.bsdaRevisionRequest
-      .findUnique({ where: { id: parent.id } })
-      .bsda({ include: { transporters: true } });
-    const bsdaFromEvents = await getBsdaFromActivityEvents(
-      { bsdaId: parent.bsdaId, at: parent.createdAt },
-      { dataloader: dataloaders.events }
-    );
-    return expandBsdaFromDb({
-      ...actualBsda,
-      ...bsdaFromEvents
-    } as BsdaWithTransporters);
+    return expandBsdaFromDb(parent.bsdaSnapshot);
   }
 };
 

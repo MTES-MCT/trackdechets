@@ -102,6 +102,10 @@ export async function createBsdaRevisionRequest(
   );
 
   const flatContent = await getFlatContent(content, bsda);
+  const bsdaSnapshot = await bsdaRepository.findUnique(
+    { id: bsda.id },
+    { include: { transporters: true } }
+  );
 
   return bsdaRepository.createRevisionRequest({
     bsda: { connect: { id: bsda.id } },
@@ -110,7 +114,8 @@ export async function createBsdaRevisionRequest(
     approvals: {
       create: approversSirets.map(approverSiret => ({ approverSiret }))
     },
-    comment
+    comment,
+    bsdaSnapshot
   });
 }
 
