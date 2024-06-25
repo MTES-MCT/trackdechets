@@ -422,7 +422,7 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   parcelCities: null,
   parcelPostalCodes: null,
   parcelNumbers: null,
-  parcelCoordinates: null
+  parcelCoordinates: null,
   // En attente des correctifs recette sur TRA-12745
   // finalOperationCodes: null,
   // finalReceptionWeights: null
