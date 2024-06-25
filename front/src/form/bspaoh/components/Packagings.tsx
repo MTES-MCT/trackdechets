@@ -240,7 +240,7 @@ export const PaohPackagings = ({ paohType, disabled = false }) => {
 
   return (
     <div>
-      <h3 className="fr-h3">Conditionnement</h3>
+      <h4 className="fr-h4">Conditionnement</h4>
       {fields.map((packaging, index) => (
         <PaohPackaging
           idx={index}
