@@ -196,7 +196,7 @@ const CompanySignatureAutomation = ({
         />
       ) : (
         <p className="fr-text">
-          {company.allowBsdasriTakeOverWithoutSignature
+          {company.allowAppendix1SignatureAutomation
             ? "Autorisé"
             : "Non autorisé"}
         </p>
