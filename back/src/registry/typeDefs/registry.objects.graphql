@@ -156,6 +156,11 @@ type IncomingWaste {
   "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
   destinationOperationMode: OperationMode
 
+  "N° de notification / déclaration"
+  nextDestinationNotificationNumber: String
+  "Code d'opération ultérieure prévue"
+  nextDestinationProcessingOperation: String
+
   #########################################################################
   # e) Concernant la localisation des terres (parcelles) pour la traçabilité des terres et sédiments
   #########################################################################
@@ -181,7 +186,7 @@ type IncomingWaste {
   # Champs additionnels non mentionnés dans l'arrêté registre
   ###########################################################
 
-  "Extra - Date de création du bordereeau"
+  "Extra - Date de création du bordereau"
   createdAt: DateTime
 
   "Extra - Date de dernière modification du bordereau"
@@ -485,6 +490,11 @@ type OutgoingWaste {
 
   "Extra - La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
   destinationReceptionWeight: Float
+
+  "N° de notification / déclaration"
+  nextDestinationNotificationNumber: String
+  "Code d'opération ultérieure prévue"
+  nextDestinationProcessingOperation: String
 
   ###########################################################
   # Champs additionnels non mentionnés dans l'arrêté registre
@@ -1056,6 +1066,11 @@ type ManagedWaste {
   "NON IMPLÉMENTÉ - La qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
   destinationPlannedOperationMode: OperationMode
 
+  "N° de notification / déclaration"
+  nextDestinationNotificationNumber: String
+  "Code d'opération ultérieure prévue"
+  nextDestinationProcessingOperation: String
+
   ###########################################################
   # Champs additionnels non mentionnés dans l'arrêté registre
   ###########################################################
@@ -1369,6 +1384,7 @@ type AllWaste {
   ##########################################
   # d) Concernant la destination du déchet :
   ##########################################
+
   "La quantité de déchet entrant exprimée en tonne"
   destinationReceptionWeight: Float
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
@@ -1387,6 +1403,11 @@ type AllWaste {
   destinationPlannedOperationMode: OperationMode
   "Extra - Date de réalisation de l'opération"
   destinationOperationDate: DateTime
+
+  "N° de notification / déclaration"
+  nextDestinationNotificationNumber: String
+  "Code d'opération ultérieure prévue"
+  nextDestinationProcessingOperation: String
 
   "Destination post entreposage provisoire Raison Sociale"
   postTempStorageDestinationName: String

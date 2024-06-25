@@ -304,7 +304,9 @@ export function toIncomingWaste(
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
     destinationCustomInfo: null,
     emitterCompanyMail: bsdd.emitterCompanyMail,
-    ...getOperationData(bsdd)
+    ...getOperationData(bsdd),
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
 
@@ -351,7 +353,9 @@ export function toOutgoingWaste(
     weight: bsdd.weightValue,
     emitterCustomInfo: null,
     ...getOperationData(bsdd),
-    ...getFinalOperationsData(bsdd)
+    ...getFinalOperationsData(bsdd),
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
 
@@ -462,7 +466,10 @@ export function toManagedWaste(
       bsdd.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    emitterCompanyMail: bsdd.emitterCompanyMail
+    emitterCompanyMail: bsdd.emitterCompanyMail,
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
 
@@ -523,6 +530,8 @@ export function toAllWaste(
     emitterCompanyMail: bsdd.emitterCompanyMail,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd),
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
     ...getIntermediariesData(bsdd)
   };
 }

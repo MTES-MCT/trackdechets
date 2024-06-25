@@ -12,6 +12,7 @@ import {
   toAllWaste,
   toGenericWaste,
   toIncomingWaste,
+  toManagedWaste,
   toOutgoingWaste
 } from "../registry";
 import { prisma } from "@td/prisma";
@@ -121,6 +122,29 @@ describe("toIncomingWaste", () => {
     expect(wasteRegistry.initialEmitterCompanySiret).toBe(
       bdd.emitterCompanySiret
     );
+  });
+
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toIncomingWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
   });
 });
 
@@ -252,6 +276,29 @@ describe("toOutgoingWaste", () => {
       bdd.emitterCompanySiret
     );
   });
+
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toOutgoingWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
 });
 
 describe("toAllWaste", () => {
@@ -381,6 +428,29 @@ describe("toAllWaste", () => {
     );
   });
 
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+
   it("should contain all 3 intermediaries", async () => {
     // Given
     const user = await userFactory();
@@ -415,6 +485,31 @@ describe("toAllWaste", () => {
     expect(waste.intermediary2CompanySiret).toBe(intermediary2.company.siret);
     expect(waste.intermediary3CompanyName).toBe(intermediary3.company.name);
     expect(waste.intermediary3CompanySiret).toBe(intermediary3.company.siret);
+  });
+});
+
+describe("toManagedWaste", () => {
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toManagedWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
   });
 
   it("should work with only 1 intermediary", async () => {

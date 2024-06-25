@@ -227,6 +227,8 @@ export function simpleFormToBsdd(
       form.nextDestinationCompanyPhone,
     destinationOperationNextDestinationCompanyMail:
       form.nextDestinationCompanyMail,
+    nextDestinationNotificationNumber: form.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: form.nextDestinationProcessingOperation,
     parcelCities: parcels?.length ? parcels.map(parcel => parcel.city) : null,
     parcelPostalCodes: parcels?.length
       ? parcels.map(parcel => parcel.postalCode)

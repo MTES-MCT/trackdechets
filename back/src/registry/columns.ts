@@ -347,6 +347,15 @@ export const columns: Column[] = [
     format: formatFinalOperationWeights
   },
   {
+    field: "nextDestinationNotificationNumber",
+    label: "N° de notification / déclaration"
+  },
+  {
+    field: "nextDestinationProcessingOperation",
+    label: "Code d'opération ultérieure prévue",
+    format: formatOperationCode
+  },
+  {
     field: "transporter2CompanyName",
     label: "Transporteur n°2 raison sociale"
   },

@@ -284,6 +284,8 @@ describe("simpleFormToBsdd", () => {
       forwarding: null,
       grouping: [],
       finalOperations: [],
+      nextDestinationNotificationNumber: null,
+      nextDestinationProcessingOperation: null,
       intermediaries: [],
       forwardedIn: null,
       parcelCities: null,
@@ -443,6 +445,8 @@ describe("simpleFormToBsdd", () => {
       updatedAt: fullForwardedInForm.updatedAt,
       isDeleted: fullForwardedInForm.isDeleted,
       isDraft: fullForwardedInForm.status === "DRAFT",
+      nextDestinationNotificationNumber: null,
+      nextDestinationProcessingOperation: null,
       status: fullForwardedInForm.status,
       wasteCode: fullForwardedInForm.wasteDetailsCode,
       wasteIsDangerous: true,
@@ -808,6 +812,8 @@ describe("simpleFormToBsdd", () => {
         parcelNumbers: null,
         parcelPostalCodes: null,
         forwardedInId: fullForwardedInForm.id,
+        nextDestinationNotificationNumber: null,
+        nextDestinationProcessingOperation: null,
         grouping: []
       }
     });

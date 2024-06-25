@@ -286,7 +286,9 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     brokerRecepisseNumber: null,
     destinationCustomInfo: bsda.destinationCustomInfo,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    ...getOperationData(bsda)
+    ...getOperationData(bsda),
+    nextDestinationProcessingOperation:
+      bsda.destinationOperationNextDestinationPlannedOperationCode
   };
 }
 
@@ -353,7 +355,9 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
       : null,
     emitterCustomInfo: bsda.emitterCustomInfo,
     ...getOperationData(bsda),
-    ...getFinalOperationsData(bsda)
+    ...getFinalOperationsData(bsda),
+    nextDestinationProcessingOperation:
+      bsda.destinationOperationNextDestinationPlannedOperationCode
   };
 }
 
@@ -480,7 +484,10 @@ export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
       ].filter(Boolean)
     ),
     ...initialEmitter,
-    emitterCompanyMail: bsda.emitterCompanyMail
+    emitterCompanyMail: bsda.emitterCompanyMail,
+    destinationCompanyMail: bsda.destinationCompanyMail,
+    nextDestinationProcessingOperation:
+      bsda.destinationOperationNextDestinationPlannedOperationCode
   };
 }
 
@@ -552,6 +559,8 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     emitterCompanyMail: bsda.emitterCompanyMail,
     ...getOperationData(bsda),
     ...getFinalOperationsData(bsda),
+    nextDestinationProcessingOperation:
+      bsda.destinationOperationNextDestinationPlannedOperationCode,
     ...getIntermediariesData(bsda)
   };
 }
