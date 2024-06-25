@@ -15,6 +15,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correctif de la mise à jour d'un paoh depuis la modale de publication [PR 3390](https://github.com/MTES-MCT/trackdechets/pull/3390)
+- Appliquer le traitement d'Annexes 2 récursivement [PR 3402](https://github.com/MTES-MCT/trackdechets/pull/3402)
 
 #### :boom: Breaking changes
 
