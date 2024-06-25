@@ -539,10 +539,10 @@ export const addAutomaticSignaturePartner = async (
 
   // Enable automatic signature
   await companyDiv
-    .getByLabel(
+    .getByText(
       "J'autorise Trackdéchets à apposer ma signature électronique au moment de la collecte de déchets avec une annexe 1 pour le ou les établissement(s) que je désigne ci-après comme collecteurs autorisés, et avec lesquels j'ai un contrat de collecte."
     )
-    .click({ force: true });
+    .click();
 
   // Let's add a partner
   const signatureDiv = await companyDiv
