@@ -168,7 +168,94 @@ describe("Mutation.Bspaoh.create", () => {
     }
   );
 
-  it("should allow bspaoh creation for tranporters", async () => {
+  it("should allow bspaoh creation for CREMATION companies", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: ["CREMATION"]
+    });
+
+    const input: BspaohInput = {
+      waste: {
+        type: "PAOH",
+        adr: "plop",
+        code: "18 01 02",
+        packagings: [
+          {
+            type: "RELIQUAIRE",
+            containerNumber: "abc123",
+            quantity: 1,
+            volume: 11,
+            identificationCodes: ["abc", "def"],
+            consistence: "SOLIDE"
+          }
+        ]
+      },
+      emitter: {
+        company: {
+          name: "emitter",
+          siret: company.siret,
+          contact: "jean valjean",
+          phone: "123",
+          mail: "emitter@test.fr",
+          address: "rue jean jaures toulon"
+        },
+        emission: {
+          detail: { weight: { value: 10, isEstimate: false }, quantity: 3 }
+        }
+      },
+      transporter: {
+        company: {
+          siret: company.siret,
+          name: "transporter",
+          contact: "jean valjean",
+          phone: "123",
+          mail: "emitter@test.fr",
+          address: "rue jean jaures toulon"
+        }
+      },
+      destination: {
+        company: {
+          name: "dest",
+          siret: destinationCompany.siret,
+          mail: "erci@dest.fr",
+          phone: "9999",
+          contact: "eric",
+          address: "rue jean jaures toulon"
+        },
+        cap: "cap number"
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBspaoh">>(
+      CREATE_BSPAOH,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    // check input is sirenified
+    expect(sirenifyBspaohInput as jest.Mock).toHaveBeenCalledTimes(1);
+
+    const created = data.createBspaoh;
+    expect(created.id).toMatch(/^PAOH-\d{8}-[A-Z0-9]{9}$/);
+    expect(created.destination!.company!.siret).toBe(
+      input.destination!.company!.siret
+    );
+    expect(created.destination!.company!.siret).toBe(
+      input.destination!.company!.siret
+    );
+    expect(created.status).toBe("INITIAL");
+    expect(created.isDraft).toBe(false);
+    // check transporter is populated
+    expect(created.transporter?.company?.siret).toEqual(company.siret);
+  });
+
+  it("should allow bspaoh creation for transporters", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory();
     const emitterCompany = await companyFactory();
@@ -246,6 +333,7 @@ describe("Mutation.Bspaoh.create", () => {
     expect(created.status).toBe("INITIAL");
     expect(created.isDraft).toBe(false);
   });
+
   it("should create a bspaoh and autocomplete transporter receipt", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -548,7 +636,7 @@ describe("Mutation.Bspaoh.create", () => {
     ]);
   });
 
-  it("should forbid non CREMATORIUM for destination company", async () => {
+  it("should forbid companies which are neither CREMATORIUM nor CREMATION for destination company", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
       companyTypes: ["WASTEPROCESSOR"]
@@ -620,8 +708,84 @@ describe("Mutation.Bspaoh.create", () => {
       expect.objectContaining({
         message:
           `L'entreprise avec le SIRET "${destinationCompany.siret}" n'est pas inscrite sur ` +
-          `Trackdéchets en tant que crématorium. Cette installation ne peut donc pas être visée sur le bordereau. ` +
+          `Trackdéchets en tant que crématorium et ne dispose pas d'une capacité de crémation. Cette installation ne peut donc pas être visée sur le bordereau. ` +
           `Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should forbid destination companies not registered on our amazing application", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationSiret = siretify(1);
+
+    const input: BspaohInput = {
+      waste: {
+        type: "PAOH",
+        adr: "plop",
+        code: "18 01 02",
+        packagings: [
+          {
+            type: "RELIQUAIRE",
+            containerNumber: "abc123",
+            quantity: 1,
+            volume: 11,
+            identificationCodes: ["abc", "def"],
+            consistence: "SOLIDE"
+          }
+        ]
+      },
+      emitter: {
+        company: {
+          name: "emitter",
+          siret: company.siret,
+          contact: "jean valjean",
+          phone: "123",
+          mail: "emitter@test.fr",
+          address: "rue jean jaures toulon"
+        },
+        emission: {
+          detail: { weight: { value: 10, isEstimate: false }, quantity: 3 }
+        }
+      },
+      transporter: {
+        company: {
+          siret: company.siret,
+          name: "transporter",
+          contact: "jean valjean",
+          phone: "123",
+          mail: "emitter@test.fr",
+          address: "rue jean jaures toulon"
+        }
+      },
+      destination: {
+        company: {
+          name: "dest",
+          siret: destinationSiret,
+          mail: "erci@dest.fr",
+          phone: "9999",
+          contact: "eric",
+          address: "rue jean jaures toulon"
+        },
+        cap: "cap number"
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBspaoh">>(
+      CREATE_BSPAOH,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'établissement avec le SIRET ${destinationSiret} n'est pas inscrit sur Trackdéchets`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

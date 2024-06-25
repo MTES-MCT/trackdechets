@@ -150,7 +150,7 @@ input BsffSignatureInput {
 
 input BsffInput {
   """
-  Type de BSFF, voir l'enum pour plus de détails. -
+  Type de BSFF, voir l'enum pour plus de détails. Valeur par défaut : COLLECTE_PETITES_QUANTITES -
   """
   type: BsffType
   """

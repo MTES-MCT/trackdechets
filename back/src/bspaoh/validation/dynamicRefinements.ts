@@ -1,11 +1,17 @@
 import { RefinementCtx, z } from "zod";
 
 import { BspaohSignatureType } from "../../generated/graphql/types";
-import { isTransporterRefinement } from "../../common/validation/siret";
-
 import { BspaohValidationContext } from "./index";
 import { ZodBspaoh, ZodFullBspaoh } from "./schema";
 import { distinct } from "../../common/arrays";
+import { CompanyVerificationStatus } from "@prisma/client";
+import { hasCremationProfile, isCrematorium } from "../../companies/validation";
+import {
+  isTransporterRefinement,
+  refineSiretAndGetCompany
+} from "../../common/validation/zod/refinement";
+
+const { VERIFY_COMPANY } = process.env;
 
 export async function applyDynamicRefinement(
   bspaoh: ZodFullBspaoh,
@@ -175,6 +181,31 @@ function validateWeightFields(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `Le poids refusé ne peut être renseigné si le PAOH est accepté`
+    });
+  }
+}
+export async function isCrematoriumRefinement(siret: string, ctx) {
+  const company = await refineSiretAndGetCompany(siret, ctx);
+  if (company && !isCrematorium(company) && !hasCremationProfile(company)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        `L'entreprise avec le SIRET "${siret}" n'est pas inscrite` +
+        ` sur Trackdéchets en tant que crématorium et ne dispose pas d'une capacité de crémation. Cette installation ne peut` +
+        ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
+        ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+    });
+  }
+  if (
+    company &&
+    VERIFY_COMPANY === "true" &&
+    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        `Le compte de l'installation du crématorium` +
+        ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
     });
   }
 }

@@ -2,7 +2,6 @@ import {
   BsdaConsistence,
   BsdaType,
   OperationMode,
-  TransportMode,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { z } from "zod";
@@ -11,10 +10,6 @@ import {
   intermediariesRefinement,
   intermediarySchema
 } from "../../common/validation/intermediaries";
-import {
-  siretSchema,
-  foreignVatNumberSchema
-} from "../../common/validation/siret";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { OPERATIONS, WORKER_CERTIFICATION_ORGANISM } from "./constants";
 import { BsdaValidationContext } from "./types";
@@ -35,12 +30,17 @@ import {
 } from "./refinements";
 import {
   fillIntermediariesOrgIds,
-  updateTransportersRecepisee,
   fillWasteConsistenceWhenForwarding,
   emptyWorkerCertificationWhenWorkerIsDisabled,
   updateTransporterRecepisse
 } from "./transformers";
 import { sirenifyBsda, sirenifyBsdaTransporter } from "./sirenify";
+import { updateTransportersRecepisse } from "../../common/validation/zod/transformers";
+import {
+  foreignVatNumberSchema,
+  rawTransporterSchema,
+  siretSchema
+} from "../../common/validation/zod/schema";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -80,34 +80,11 @@ export const bsdaPackagingSchema = z
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
   });
 
-const rawBsdaTransporterSchema = z.object({
-  id: z.string().nullish(),
-  number: z.number().nullish(),
-  bsdaId: z.string().nullish(),
-  transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema.nullish(),
-  transporterCompanyAddress: z.string().nullish(),
-  transporterCompanyContact: z.string().nullish(),
-  transporterCompanyPhone: z.string().nullish(),
-  transporterCompanyMail: z.string().nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema.nullish(),
-  transporterCustomInfo: z.string().nullish(),
-  transporterRecepisseIsExempted: z.coerce
-    .boolean()
-    .nullish()
-    .transform(v => Boolean(v)),
-  transporterRecepisseNumber: z.string().nullish(),
-  transporterRecepisseDepartment: z.string().nullish(),
-  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
-  transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
-  transporterTransportPlates: z
-    .array(z.string())
-    .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
-    .default([]),
-  transporterTransportTakenOverAt: z.coerce.date().nullish(),
-  transporterTransportSignatureAuthor: z.string().nullish(),
-  transporterTransportSignatureDate: z.coerce.date().nullish()
-});
+const rawBsdaTransporterSchema = z
+  .object({
+    bsdaId: z.string().nullish()
+  })
+  .merge(rawTransporterSchema);
 
 /**
  * Schéma de validation Zod de base permettant pour chaque champ de :
@@ -311,7 +288,7 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
       // `enableCompletionTransformers=false`;
       transformedSyncSchema
         .transform(sirenifyBsda(context))
-        .transform(updateTransportersRecepisee)
+        .transform(updateTransportersRecepisse)
         .transform(fillWasteConsistenceWhenForwarding)
     : transformedSyncSchema;
 

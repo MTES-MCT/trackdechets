@@ -1,6 +1,11 @@
 import React, { useMemo, useEffect, useContext } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { FavoriteType } from "@td/codegen-ui";
+import {
+  FavoriteType,
+  CompanyType,
+  CompanySearchResult,
+  WasteProcessorType
+} from "@td/codegen-ui";
 import { useFormContext, useWatch } from "react-hook-form";
 import CompanySelectorWrapper from "../../../form/common/components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 import { useParams } from "react-router-dom";
@@ -32,6 +37,22 @@ export function Destination() {
     () => destination?.company?.orgId ?? destination?.company?.siret ?? null,
     [destination?.company?.orgId, destination?.company?.siret]
   );
+
+  const selectedCompanyError = (company?: CompanySearchResult) => {
+    // Le destinatiare doi être inscrit et avec un profil crématorium ou sous-type crémation
+    // Le profil crématorium sera bientôt supprimé
+    if (company) {
+      if (!company.isRegistered) {
+        return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
+      } else if (
+        !company.companyTypes?.includes(CompanyType.Crematorium) &&
+        !company.wasteProcessorTypes?.includes(WasteProcessorType.Cremation)
+      ) {
+        return "Cet établissement n'a pas le profil Crématorium (et cimetières pour la Guyane).";
+      }
+    }
+    return null;
+  };
   return (
     <div>
       <CompanySelectorWrapper
@@ -39,6 +60,7 @@ export function Destination() {
         favoriteType={FavoriteType.Transporter}
         disabled={sealedFields.includes(`${actor}.company.siret`)}
         selectedCompanyOrgId={orgId}
+        selectedCompanyError={selectedCompanyError}
         onCompanySelected={company => {
           if (company) {
             setValue(`${actor}.company.orgId`, company.orgId);

@@ -2,6 +2,7 @@ import { prisma } from "@td/prisma";
 import { CompanySearchPrivateResolvers } from "../../generated/graphql/types";
 import { CompanyBaseIdentifiers } from "../types";
 import { whereSiretOrVatNumber } from "./CompanySearchResult";
+import { getUserRoles } from "../../permissions";
 
 const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
   transporterReceipt: async parent => {
@@ -41,10 +42,22 @@ const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
       })
       .vhuAgrementDemolisseur();
   },
-  receivedSignatureAutomations: async parent => {
+  receivedSignatureAutomations: async (parent, _, context) => {
+    const userId = context.user!.id;
+    const roles = await getUserRoles(userId);
+    const userOrgIds = Object.keys(roles);
+
+    const where = whereSiretOrVatNumber(parent as CompanyBaseIdentifiers);
+    const whereOrgId = where?.siret ?? where.vatNumber;
+
+    // prevent exposing sensitive data in companyPrivateInfos
+    // return empty result if user is not member of requested company and save a db query
+    if (!userOrgIds.includes(whereOrgId)) {
+      return [];
+    }
     const automations = await prisma.company
       .findUnique({
-        where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
+        where
       })
       .receivedSignatureAutomations({
         include: { from: true, to: true }

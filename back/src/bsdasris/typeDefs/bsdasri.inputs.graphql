@@ -240,7 +240,12 @@ input BsdasriDestinationInput {
 }
 
 input BsdasriReceptionInput {
-  volume: Int
+  "Volume total de tous les contenants"
+  volume: Float
+    @deprecated(
+      reason: "Ignoré - Calculé par Trackdéchets en faisant la somme des volumes des contenants"
+    )
+
   packagings: [BsdasriPackagingsInput!]
   date: DateTime
   acceptation: BsdasriAcceptationInput

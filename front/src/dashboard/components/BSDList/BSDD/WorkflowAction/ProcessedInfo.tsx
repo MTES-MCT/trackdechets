@@ -51,18 +51,11 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
    */
   useEffect(() => {
     if (isExtraEuropeanCompany) {
-      /**
-       * Hack the API requirement for "any" value in nextDestination.company.extraEuropeanId
-       * in order to require notificationNumber
-       * Soon notificationNumber will be required for intra-european companies too
-       */
       setFieldValue("nextDestination.company", initNextDestination.company);
       setFieldValue("nextDestination.company.country", "");
       setFieldValue(
         "nextDestination.company.extraEuropeanId",
-        !extraEuropeanCompany
-          ? "UNIDENTIFIED_EXTRA_EUROPEAN_COMPANY"
-          : extraEuropeanCompany
+        !extraEuropeanCompany ? "" : extraEuropeanCompany
       );
     } else {
       setIsExtraEuropeanCompany(false);
@@ -116,14 +109,24 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const showNotificationNumber =
     isExtraEuropeanCompany || (!isFRCompany && noTraceability) || hasVatNumber;
 
-  // Le numéro de notif est obligatoire quand : (-avec ou sans rupture de traçabilité)
+  // Le numéro de notif est obligatoire quand:
   // - le code de traitement est non final
   // - que le déchet est DD, pop ou marqué comme dangereux
-  // - entreprise (destination ultérieure) hors ue
-  // - ou entreprise (destination ultérieure) UE non française
+  // Si  sansrupture de traçabilité:
+  // - entreprise (destination ultérieure) non française
+  // Si avec rupture de traçabilité:
+  // - entreprise (destination ultérieure) UE non française renseignée (via TVA ou n° d'identifiant)
+
+  const hasNextDestinationCompany = !!(
+    nextDestination?.company?.extraEuropeanId ||
+    nextDestination?.company?.siret ||
+    nextDestination?.company?.vatNumber
+  );
+
   const notificationNumberIsMandatory =
-    (nextDestination && isExtraEuropeanCompany && isDangerousOrPop) ||
-    (nextDestination && hasVatNumber && isDangerousOrPop);
+    isDangerousOrPop && nextDestination && noTraceability
+      ? hasNextDestinationCompany
+      : isExtraEuropeanCompany || hasVatNumber;
 
   const notificationNumberIsOptional = !notificationNumberIsMandatory;
   // nextDestination + hasVatNumber + isDangerousOrPop
@@ -297,7 +300,6 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
                   name="nextDestination.notificationNumber"
                   className="td-input"
                   placeholder={notificationNumberPlaceHolder}
-                  required={notificationNumberIsMandatory}
                 />
               </>
             )}

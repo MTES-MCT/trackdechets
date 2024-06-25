@@ -59,21 +59,25 @@ describe("BSDA parsing", () => {
         orgId: "BE0541696005",
         vatNumber: "BE0541696005"
       });
-      const parsed = parseBsda(
-        {
-          ...bsda,
-          transporters: [
-            {
-              transporterCompanyVatNumber: foreignTransporter.vatNumber,
-              transporterCompanyName: "transporteur BE",
-              transporterRecepisseDepartment: null,
-              transporterRecepisseNumber: null,
-              transporterRecepisseIsExempted: null
-            }
-          ]
-        },
-        context
-      );
+
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterRecepisseDepartment: null,
+            transporterRecepisseNumber: null,
+            transporterRecepisseIsExempted: false,
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: foreignTransporter.vatNumber
+          }
+        ]
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
       expect(parsed).toBeDefined();
     });
 
@@ -82,58 +86,73 @@ describe("BSDA parsing", () => {
         orgId: "BE0541696005",
         vatNumber: "BE0541696005"
       });
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterCompanySiret: null,
-        transporterCompanyVatNumber: foreignTransporter.vatNumber
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: foreignTransporter.vatNumber
+          }
+        ]
       };
 
-      const parsed = parseBsda(data, context);
-      expect(parsed).toBeDefined();
-    });
-
-    test("when a foreign transporter vat number is specified and transporter siret is null", async () => {
-      const foreignTransporter = await companyFactory({
-        orgId: "BE0541696005",
-        vatNumber: "BE0541696005"
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
       });
-      const data = {
-        ...bsda,
-        transporterCompanySiret: null,
-        transporterCompanyVatNumber: foreignTransporter.vatNumber
-      };
-
-      const parsed = parseBsda(data, context);
       expect(parsed).toBeDefined();
     });
 
     test("when transporter recepisse is not present and transport mode is not ROAD", () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterRecepisseNumber: null,
-        transporterRecepisseDepartment: null,
-        transporterRecepisseValidityLimit: null,
-        transporterTransportMode: "AIR" as TransportMode
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterRecepisseNumber: null,
+            transporterRecepisseDepartment: null,
+            transporterRecepisseValidityLimit: null,
+            transporterTransportMode: "AIR" as TransportMode
+          }
+        ]
       };
 
-      const parsed = parseBsda(data, context);
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
       expect(parsed).toBeDefined();
     });
 
     test("when transporter plate is not present and transport mode is not ROAD", () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterTransportMode: "AIR" as TransportMode
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportPlates: [],
+            transporterTransportMode: "AIR" as TransportMode
+          }
+        ]
       };
-      const parsed = parseBsda(data, context);
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
       expect(parsed).toBeDefined();
     });
 
     test("when transport mode is ROAD & plates are defined", () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        transporterTransportMode: "ROAD" as TransportMode,
-        transporterTransportPlates: ["TRANSPORTER-PLATES"]
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportMode: "ROAD" as TransportMode,
+            transporterTransportPlates: ["TRANSPORTER-PLATES"]
+          }
+        ]
       };
 
       const parsed = parseBsda(data, {
@@ -148,11 +167,16 @@ describe("BSDA parsing", () => {
         companyTypes: ["PRODUCER"]
       });
 
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        emittedCompanySiret: emitterAndTransporter.siret,
-        transporterCompanySiret: emitterAndTransporter.siret,
-        transporterRecepisseIsExempted: true
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterCompanySiret: emitterAndTransporter.siret,
+            transporterRecepisseIsExempted: true
+          }
+        ]
       };
 
       const parsed = parseBsda(data, {
@@ -167,11 +191,9 @@ describe("BSDA parsing", () => {
     test("when type is COLLECTION_2710 and unused company fields are empty strings", () => {
       // on COLLECTION_2710 Bsdas worker and transporter fields are not used
 
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         type: BsdaType.COLLECTION_2710,
-        transporterCompanySiret: "",
-        transporterCompanyName: "",
         workerCompanyName: "",
         workerCompanySiret: ""
       };
@@ -198,7 +220,7 @@ describe("BSDA parsing", () => {
     });
 
     test("when emitter siret is not valid", () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         emitterCompanySiret: "1"
       };
@@ -342,7 +364,7 @@ describe("BSDA parsing", () => {
     });
 
     test("when destination is not registered in Trackdéchets", async () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         destinationCompanySiret: "85001946400021"
       };
@@ -355,7 +377,7 @@ describe("BSDA parsing", () => {
 
     test("when destination is registered with wrong profile", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         destinationCompanySiret: company.siret
       };
@@ -430,10 +452,15 @@ describe("BSDA parsing", () => {
     test.each([undefined, [], [""]])(
       "when transporter plate is %p invalid and transporter mode is ROAD",
       async invalidValue => {
-        const data = {
+        const data: ZodBsda = {
           ...bsda,
-          transporterTransportMode: "ROAD" as TransportMode,
-          transporterTransportPlates: invalidValue
+          transporters: [
+            {
+              ...bsda.transporters![0],
+              transporterTransportMode: "ROAD" as TransportMode,
+              transporterTransportPlates: invalidValue
+            }
+          ]
         };
 
         try {
@@ -444,7 +471,7 @@ describe("BSDA parsing", () => {
         } catch (err) {
           expect((err as ZodError).issues).toEqual([
             expect.objectContaining({
-              message: "L'immatriculation du transporteur est obligatoire."
+              message: "L'immatriculation du transporteur n° 1 est obligatoire."
             })
           ]);
         }
@@ -463,7 +490,7 @@ describe("BSDA parsing", () => {
         })
       ];
 
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         type: "GATHERING" as BsdaType,
         grouping: grouping.map(bsda => bsda.id)
@@ -491,11 +518,16 @@ describe("BSDA parsing", () => {
         companyTypes: ["PRODUCER"]
       });
 
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
-        emittedCompanySiret: emitterAndTransporter.siret,
-        transporterCompanySiret: emitterAndTransporter.siret,
-        transporterRecepisseIsExempted: false
+        emitterCompanySiret: emitterAndTransporter.siret,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterCompanySiret: emitterAndTransporter.siret,
+            transporterRecepisseIsExempted: false
+          }
+        ]
       };
 
       try {
@@ -524,7 +556,7 @@ describe("BSDA parsing", () => {
     ])(
       "should work if operation code & mode are compatible (code: %p, mode: %p)",
       (code, mode: OperationMode) => {
-        const data = {
+        const data: ZodBsda = {
           ...bsda,
           destinationOperationCode: code as ZodOperationEnum,
           destinationOperationMode: mode
@@ -544,7 +576,7 @@ describe("BSDA parsing", () => {
     ])(
       "should work if operation code & mode are compatible (code: %p, mode: %p)",
       (code, mode: OperationMode) => {
-        const data = {
+        const data: ZodBsda = {
           ...bsda,
           destinationOperationCode: code as ZodOperationEnum,
           destinationOperationMode: mode
@@ -564,7 +596,7 @@ describe("BSDA parsing", () => {
     ])(
       "should fail if operation mode is not compatible with operation code (code: %p, mode: %p)",
       (code, mode: OperationMode) => {
-        const data = {
+        const data: ZodBsda = {
           ...bsda,
           destinationOperationCode: code as ZodOperationEnum,
           destinationOperationMode: mode
@@ -589,7 +621,7 @@ describe("BSDA parsing", () => {
     );
 
     test("should not fail if operation code has associated operation modes but none is specified", () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         destinationOperationCode: "R 5" as ZodOperationEnum,
         destinationOperationMode: undefined
@@ -602,7 +634,7 @@ describe("BSDA parsing", () => {
     });
 
     test("should fail if operation code has associated operation modes but none is specified", () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         destinationOperationCode: "R 5" as ZodOperationEnum,
         destinationOperationMode: undefined
@@ -684,7 +716,7 @@ describe("BSDA parsing", () => {
     });
 
     it("should empty workerCertification when worker is disabled", async () => {
-      const data = {
+      const data: ZodBsda = {
         ...bsda,
         workerIsDisabled: true,
         workerCompanyName: null,

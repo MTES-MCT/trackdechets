@@ -165,6 +165,9 @@ type IncomingWaste {
   "Extra - Date de réalisation de l'opération"
   destinationOperationDate: DateTime
 
+  "Extra - L'adresse email du contact de l'établissement de destination"
+  destinationCompanyMail: String
+
   "Extra - Adresse email de contact de l'expéditeur du déchet"
   emitterCompanyMail: String
 
@@ -185,6 +188,12 @@ type IncomingWaste {
 
   "Extra - Exemption de récépissé transporteur n°3"
   transporter3RecepisseIsExempted: Boolean
+
+  "Extra - L'adresse email du contact du négociant"
+  traderCompanyMail: String
+
+  "Extra - L'adresse email du contact du courtier"
+  brokerCompanyMail: String
 
   """
   Extra - Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
@@ -422,6 +431,12 @@ type OutgoingWaste {
   "Extra - Adresse email de contact de l'installation de destination"
   destinationCompanyMail: String
 
+  "Extra - L'adresse email du contact du négociant"
+  traderCompanyMail: String
+
+  "Extra - L'adresse email du contact du courtier"
+  brokerCompanyMail: String
+
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean
 
@@ -642,6 +657,12 @@ type TransportedWaste {
   "Extra - Adresse email de contact de l'installation de destination"
   destinationCompanyMail: String
 
+  "Extra - L'adresse email du contact du négociant"
+  traderCompanyMail: String
+
+  "Extra - L'adresse email du contact du courtier"
+  brokerCompanyMail: String
+
   "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
   "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
@@ -841,6 +862,12 @@ type ManagedWaste {
 
   "Extra - Adresse email de contact de l'installation de destination"
   destinationCompanyMail: String
+
+  "Extra - L'adresse email du contact du négociant"
+  traderCompanyMail: String
+
+  "Extra - L'adresse email du contact du courtier"
+  brokerCompanyMail: String
 
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean
@@ -1112,6 +1139,12 @@ type AllWaste {
 
   "Extra - Adresse email de contact de l'installation de destination"
   destinationCompanyMail: String
+
+  "Extra - L'adresse email du contact du négociant"
+  traderCompanyMail: String
+
+  "Extra - L'adresse email du contact du courtier"
+  brokerCompanyMail: String
 
   "Extra - Exemption de récépissé transporteur"
   transporterRecepisseIsExempted: Boolean

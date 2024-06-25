@@ -398,7 +398,7 @@ async function canTransporterSignWithoutEmitterSignature(existingForm: Form) {
     });
 
     if (
-      emitterProfile &&
+      !emitterProfile ||
       [CompanyType.WASTEPROCESSOR, CompanyType.COLLECTOR].every(
         profile => !emitterProfile.companyTypes.includes(profile)
       )
