@@ -19,10 +19,28 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
+import { extractPostalCode, splitAddress } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
+
+const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
+  if (!bsdd.forwardedIn) return {};
+
+  const splittedAddress = splitAddress(
+    bsdd.forwardedIn.destinationCompanyAddress
+  );
+
+  return {
+    postTempStorageDestinationName: bsdd.forwardedIn.destinationCompanyName,
+    postTempStorageDestinationSiret: bsdd.forwardedIn.destinationCompanySiret,
+    postTempStorageDestinationAddress: splittedAddress.street,
+    postTempStorageDestinationPostalCode: splittedAddress.postalCode,
+    postTempStorageDestinationCity: splittedAddress.city,
+    // Always FR for now, as destination must be FR
+    postTempStorageDestinationCountry: "FR"
+  };
+};
 
 const getOperationData = (bsdd: Bsdd) => ({
   destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
@@ -38,6 +56,7 @@ const getTransportersData = (bsdd: Bsdd) => ({
   transporterCompanySiret: bsdd.transporterCompanySiret,
   transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
   transporterNumberPlates: bsdd.transporterNumberPlates,
+  transporterTransportMode: bsdd.transporterTransportMode,
   transporterCompanyMail: bsdd.transporterCompanyMail,
   transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
   transporter2CompanyName: bsdd.transporter2CompanyName,
@@ -45,12 +64,37 @@ const getTransportersData = (bsdd: Bsdd) => ({
   transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
   transporter2NumberPlates: bsdd.transporter2NumberPlates,
   transporter2CompanyMail: bsdd.transporter2CompanyMail,
+  transporter2TransportMode: bsdd.transporter2TransportMode,
   transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
   transporter3CompanyName: bsdd.transporter3CompanyName,
   transporter3CompanySiret: bsdd.transporter3CompanySiret,
   transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
   transporter3NumberPlates: bsdd.transporter3NumberPlates,
-  transporter3CompanyMail: bsdd.transporter3CompanyMail
+  transporter3CompanyMail: bsdd.transporter3CompanyMail,
+  transporter3TransportMode: bsdd.transporter3TransportMode,
+  transporter4CompanyAddress: bsdd.transporter4CompanyAddress,
+  transporter4CompanyName: bsdd.transporter4CompanyName,
+  transporter4CompanySiret: bsdd.transporter4CompanySiret,
+  transporter4RecepisseNumber: bsdd.transporter4RecepisseNumber,
+  transporter4NumberPlates: bsdd.transporter4NumberPlates,
+  transporter4CompanyMail: bsdd.transporter4CompanyMail,
+  transporter4TransportMode: bsdd.transporter4TransportMode,
+  transporter5CompanyAddress: bsdd.transporter5CompanyAddress,
+  transporter5CompanyName: bsdd.transporter5CompanyName,
+  transporter5CompanySiret: bsdd.transporter5CompanySiret,
+  transporter5RecepisseNumber: bsdd.transporter5RecepisseNumber,
+  transporter5NumberPlates: bsdd.transporter5NumberPlates,
+  transporter5CompanyMail: bsdd.transporter5CompanyMail,
+  transporter5TransportMode: bsdd.transporter5TransportMode
+});
+
+const getIntermediariesData = (bsdd: ReturnType<typeof formToBsdd>) => ({
+  intermediary1CompanyName: bsdd.intermediaries?.[0]?.name ?? null,
+  intermediary1CompanySiret: bsdd.intermediaries?.[0]?.siret ?? null,
+  intermediary2CompanyName: bsdd.intermediaries?.[1]?.name ?? null,
+  intermediary2CompanySiret: bsdd.intermediaries?.[1]?.siret ?? null,
+  intermediary3CompanyName: bsdd.intermediaries?.[2]?.name ?? null,
+  intermediary3CompanySiret: bsdd.intermediaries?.[2]?.siret ?? null
 });
 
 export function getRegistryFields(
@@ -203,6 +247,10 @@ export function toGenericWaste(
     weight: bsdd.weightValue,
     brokerCompanyMail: bsdd.brokerCompanyMail,
     traderCompanyMail: bsdd.traderCompanyMail,
+    parcelCities: bsdd.parcelCities,
+    parcelPostalCodes: bsdd.parcelPostalCodes,
+    parcelNumbers: bsdd.parcelNumbers,
+    parcelCoordinates: bsdd.parcelCoordinates,
     ...getTransportersData(bsdd),
     ...initialEmitter
   };
@@ -284,6 +332,7 @@ export function toOutgoingWaste(
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyOutgoingWaste,
     ...genericWaste,
+    ...getPostTempStorageDestination(bsdd),
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
@@ -456,6 +505,7 @@ export function toAllWaste(
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyAllWaste,
     ...genericWaste,
+    ...getPostTempStorageDestination(bsdd),
     createdAt: bsdd.createdAt,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     brokerCompanyName: bsdd.brokerCompanyName,
@@ -486,6 +536,7 @@ export function toAllWaste(
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd),
-    ...getFinalOperationsData(bsdd)
+    ...getFinalOperationsData(bsdd),
+    ...getIntermediariesData(bsdd)
   };
 }

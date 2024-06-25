@@ -96,9 +96,9 @@ export function Transporter() {
             validityLimit={recepisse?.validityLimit}
           />
         )}
-      <h3 className="fr-h4">
+      <h4 className="fr-h4">
         Exemption de récépissé de déclaration de transport de déchets
-      </h3>
+      </h4>
       <ToggleSwitch
         disabled={sealedFields.includes(`transporter.recepisse.isExempted`)}
         label={
@@ -118,7 +118,7 @@ export function Transporter() {
         checked={transporter.recepisse?.isExempted}
         onChange={v => setValue(`${actor}.recepisse.isExempted`, v)}
       />
-      <h3 className="fr-h3">Transport du déchet</h3>
+      <h4 className="fr-h4">Transport du déchet</h4>
       <div className="fr-grid-row">
         <div className="fr-col-6">
           <Select

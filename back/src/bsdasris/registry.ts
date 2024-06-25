@@ -52,7 +52,8 @@ const getTransporterData = (bsdasri: Bsdasri) => ({
   transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
   transporterCompanyMail: bsdasri.transporterCompanyMail,
   transporterCustomInfo: bsdasri.transporterCustomInfo,
-  transporterTakenOverAt: bsdasri.transporterTakenOverAt
+  transporterTakenOverAt: bsdasri.transporterTakenOverAt,
+  transporterTransportMode: bsdasri.transporterTransportMode
 });
 
 export function getRegistryFields(

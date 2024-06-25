@@ -1,5 +1,5 @@
 import React from "react";
-import { CompanyPrivate, UserRole } from "@td/codegen-ui";
+import { Query, UserRole } from "@td/codegen-ui";
 import { useForm } from "react-hook-form";
 import { object, string, ObjectSchema } from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -13,9 +13,10 @@ import { InlineLoader } from "../../common/Components/Loader/Loaders";
 import { userRoleSwitchOptions } from "./CompanyMembersList";
 import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../../../common/config";
+import { CompanyPrivateMembers } from "./CompanyMembers";
 
 interface CompanyMembersInviteProps {
-  company: CompanyPrivate;
+  company: CompanyPrivateMembers;
 }
 interface CompanyMembersInviteFields {
   email: string;
@@ -52,6 +53,19 @@ const CompanyMembersInvite = ({ company }: CompanyMembersInviteProps) => {
       onCompleted: () => {
         toast.success("Invitation envoyée", { duration: TOAST_DURATION });
         reset();
+      },
+      updateQueries: {
+        CompanyPrivateInfos: (
+          prev: Pick<Query, "companyPrivateInfos">,
+          { mutationResult }
+        ) => {
+          return {
+            companyPrivateInfos: {
+              ...prev,
+              users: mutationResult.data?.inviteUserToCompany.users ?? []
+            }
+          };
+        }
       }
     });
   };

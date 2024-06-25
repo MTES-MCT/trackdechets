@@ -5,6 +5,30 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.7.1] 02/07/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de la possibilité de gérer les rôles des membres d'une entreprise depuis la liste des membres [PR 3384](https://github.com/MTES-MCT/trackdechets/pull/3384)
+- Ajout d'une gestion des membres d'entreprises pour les admin Trackdéchets [PR 3384](https://github.com/MTES-MCT/trackdechets/pull/3384)
+
+#### :bug: Corrections de bugs
+
+- Correctif de la mise à jour d'un paoh depuis la modale de publication [PR 3390](https://github.com/MTES-MCT/trackdechets/pull/3390)
+- Appliquer le traitement d'Annexes 2 récursivement [PR 3402](https://github.com/MTES-MCT/trackdechets/pull/3402)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Amélioration du message d'erreur à l'ajout d'un Crématorium non inscrit / n'ayant pas le bon profil [PR 3401](https://github.com/MTES-MCT/trackdechets/pull/3401)
+- Ajout d'informations relatives au transport sur l'ensemble des registres [PR 3409](https://github.com/MTES-MCT/trackdechets/pull/3409)
+- Ajout d'informations relatives à la localisation des terres (parcelles) sur les registres Entrant, Sortant, Exhaustif et Gestion [PR 3410](https://github.com/MTES-MCT/trackdechets/pull/3410)
+
+#### :house: Interne
+
+- Refacto de la validation BSFF [PR 3397](https://github.com/MTES-MCT/trackdechets/pull/3397)
+
 # [2024.6.1] 04/06/2024
 
 #### :rocket: Nouvelles fonctionnalités

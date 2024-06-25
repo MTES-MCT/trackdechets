@@ -1,7 +1,6 @@
-import { getTransporterCompanyOrgId } from "@td/constants";
 import { prisma } from "@td/prisma";
 import { ZodBsdaTransformer, ZodBsdaTransporterTransformer } from "./types";
-import { ParsedZodBsdaTransporter } from "./schema";
+import { recipifyTransporter } from "../../common/validation/zod/transformers";
 
 export const fillIntermediariesOrgIds: ZodBsdaTransformer = bsda => {
   bsda.intermediariesOrgIds = bsda.intermediaries
@@ -29,47 +28,6 @@ export const fillWasteConsistenceWhenForwarding: ZodBsdaTransformer =
     }
     return bsda;
   };
-
-async function recipifyTransporter(transporter: ParsedZodBsdaTransporter) {
-  // Évite de modifier les données transporteur après
-  // la signature de celui-ci
-  if (transporter.transporterTransportSignatureDate) {
-    return transporter;
-  }
-  const orgId = getTransporterCompanyOrgId({
-    transporterCompanySiret: transporter.transporterCompanySiret ?? null,
-    transporterCompanyVatNumber: transporter.transporterCompanyVatNumber ?? null
-  });
-  if (orgId && !transporter.transporterRecepisseIsExempted) {
-    const transporterReceipt = await prisma.company
-      .findUnique({
-        where: {
-          orgId
-        }
-      })
-      .transporterReceipt();
-
-    return {
-      ...transporter,
-      transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
-      transporterRecepisseValidityLimit:
-        transporterReceipt?.validityLimit ?? null,
-      transporterRecepisseDepartment: transporterReceipt?.department ?? null
-    };
-  }
-  return transporter;
-}
-
-export const updateTransportersRecepisee: ZodBsdaTransformer = async bsda => {
-  const transporters = bsda.transporters;
-  if (transporters && transporters.length > 0) {
-    const recipifedTransporters = await Promise.all(
-      transporters.map(t => recipifyTransporter(t))
-    );
-    return { ...bsda, transporters: recipifedTransporters };
-  }
-  return bsda;
-};
 
 export const updateTransporterRecepisse: ZodBsdaTransporterTransformer =
   async bsdaTransporter => recipifyTransporter(bsdaTransporter);

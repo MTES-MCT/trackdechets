@@ -43,6 +43,11 @@ export function WorkflowAction(props: WorkflowActionProps) {
       if (isAppendix1Producer) {
         return (
           <>
+            {props.options?.canSkipEmission &&
+              form.transporter?.company?.orgId === siret && (
+                <SignTransportForm {...props} />
+              )}
+
             {[
               form.emitter?.company?.siret,
               form.ecoOrganisme?.siret,
@@ -50,11 +55,6 @@ export function WorkflowAction(props: WorkflowActionProps) {
             ].includes(siret) &&
               !form.emitter?.isPrivateIndividual && (
                 <SignEmissionForm {...props} />
-              )}
-
-            {props.options?.canSkipEmission &&
-              form.transporter?.company?.orgId === siret && (
-                <SignTransportForm {...props} />
               )}
           </>
         );

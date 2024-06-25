@@ -61,7 +61,8 @@ const getTransporterData = (transporter: BsffTransporter) => ({
   transporterRecepisseNumber: transporter.transporterRecepisseNumber,
   transporterCompanyMail: transporter.transporterCompanyMail,
   transporterCustomInfo: transporter.transporterCustomInfo,
-  transporterNumberPlates: transporter.transporterTransportPlates
+  transporterNumberPlates: transporter.transporterTransportPlates,
+  transporterTransportMode: transporter.transporterTransportMode
 });
 
 export function getRegistryFields(

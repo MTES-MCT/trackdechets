@@ -14,6 +14,7 @@ const COMPANY_ACCOUNT_ADD_PRIVATE_INFOS = gql`
       name
       users {
         id
+        orgId
         name
         email
         role

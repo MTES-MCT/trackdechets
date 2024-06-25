@@ -2052,6 +2052,12 @@ export async function validateAppendix1Groupement(
   }
 
   const formIds = grouping.map(({ form }) => form.id);
+  if (form.status === Status.DRAFT) {
+    throw new UserInputError(
+      "Impossible de regrouper des BSDD d'annexe 1 sur un bordereau de tournée en brouillon"
+    );
+  }
+
   const duplicates = formIds.filter(
     (id, index) => formIds.indexOf(id) !== index
   );

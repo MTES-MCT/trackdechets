@@ -138,6 +138,7 @@ export const searchCompanies = (
   requestOptions?
 ): Promise<SireneSearchResult[]> => {
   const qs = removeDiacritics(clue);
+
   // Match query on the merged field td_search_companies
   const must: estypes.QueryContainer[] = [
     {

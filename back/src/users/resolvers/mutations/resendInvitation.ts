@@ -5,7 +5,10 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { renderMail, inviteUserToJoin } from "@td/mail";
-import { checkUserPermissions, Permission } from "../../../permissions";
+import {
+  checkUserIsAdminOrPermissions,
+  Permission
+} from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,
   UserInputError
@@ -19,7 +22,7 @@ const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ orgId: siret });
-  await checkUserPermissions(
+  await checkUserIsAdminOrPermissions(
     user,
     company.orgId,
     Permission.CompanyCanManageMembers,

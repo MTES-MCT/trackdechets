@@ -1,7 +1,13 @@
-import { BsddFinalOperation, QuantityType, Status } from "@prisma/client";
+import {
+  BsddFinalOperation,
+  IntermediaryFormAssociation,
+  QuantityType,
+  Status
+} from "@prisma/client";
 import {
   AppendixFormInput,
-  InitialFormFractionInput
+  InitialFormFractionInput,
+  ParcelNumber
 } from "../generated/graphql/types";
 import { Bsdd } from "./types";
 import { RegistryForm } from "../registry/elastic";
@@ -13,13 +19,23 @@ import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
  * @returns
  */
 export function simpleFormToBsdd(
-  form: Omit<RegistryForm, "grouping" | "forwarding" | "finalOperations">
+  form: Omit<
+    RegistryForm,
+    | "grouping"
+    | "forwarding"
+    | "finalOperations"
+    | "intermediaries"
+    | "forwardedIn"
+  >
 ): Bsdd {
   const transporters = (form.transporters ?? []).sort(
     (t1, t2) => t1.number - t2.number
   );
 
-  const [transporter, transporter2, transporter3] = transporters;
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
+
+  const parcels = form.wasteDetailsParcelNumbers as ParcelNumber[] | null;
 
   const wasteQuantities = bsddWasteQuantities(form);
 
@@ -136,6 +152,48 @@ export function simpleFormToBsdd(
     transporter3NumberPlates: transporter3?.transporterNumberPlate
       ? [transporter3.transporterNumberPlate]
       : [],
+
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanySiret: transporter4?.transporterCompanySiret,
+    transporter4CompanyVatNumber: null,
+    transporter4CompanyAddress: transporter4?.transporterCompanyAddress,
+    transporter4CompanyContact: transporter4?.transporterCompanyContact,
+    transporter4CompanyPhone: transporter4?.transporterCompanyPhone,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter4CustomInfo: null,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterIsExemptedOfReceipt,
+    transporter4RecepisseNumber: transporter4?.transporterReceipt,
+    transporter4RecepisseDepartment: transporter4?.transporterDepartment,
+    transporter4RecepisseValidityLimit: transporter4?.transporterValidityLimit,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter4TransportTakenOverAt: transporter4?.takenOverAt,
+    transporter4TransportSignatureAuthor: transporter4?.takenOverBy,
+    transporter4TransportSignatureDate: transporter4?.takenOverAt,
+    transporter4NumberPlates: transporter4?.transporterNumberPlate
+      ? [transporter4.transporterNumberPlate]
+      : [],
+
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanySiret: transporter5?.transporterCompanySiret,
+    transporter5CompanyVatNumber: null,
+    transporter5CompanyAddress: transporter5?.transporterCompanyAddress,
+    transporter5CompanyContact: transporter5?.transporterCompanyContact,
+    transporter5CompanyPhone: transporter5?.transporterCompanyPhone,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
+    transporter5CustomInfo: null,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterIsExemptedOfReceipt,
+    transporter5RecepisseNumber: transporter5?.transporterReceipt,
+    transporter5RecepisseDepartment: transporter5?.transporterDepartment,
+    transporter5RecepisseValidityLimit: transporter5?.transporterValidityLimit,
+    transporter5TransportMode: transporter5?.transporterTransportMode,
+    transporter5TransportTakenOverAt: transporter5?.takenOverAt,
+    transporter5TransportSignatureAuthor: transporter5?.takenOverBy,
+    transporter5TransportSignatureDate: transporter5?.takenOverAt,
+    transporter5NumberPlates: transporter5?.transporterNumberPlate
+      ? [transporter5.transporterNumberPlate]
+      : [],
     destinationCompanyName: form.recipientCompanyName,
     destinationCompanySiret: form.recipientCompanySiret,
     destinationCompanyAddress: form.recipientCompanyAddress,
@@ -177,16 +235,40 @@ export function simpleFormToBsdd(
     destinationOperationNextDestinationCompanyPhone:
       form.nextDestinationCompanyPhone,
     destinationOperationNextDestinationCompanyMail:
-      form.nextDestinationCompanyMail
+      form.nextDestinationCompanyMail,
+    parcelCities: parcels?.length ? parcels.map(parcel => parcel.city) : null,
+    parcelPostalCodes: parcels?.length
+      ? parcels.map(parcel => parcel.postalCode)
+      : null,
+    parcelNumbers: parcels?.length
+      ? parcels.map(parcel => {
+          if (parcel.prefix && parcel.section && parcel.number) {
+            return `${parcel.prefix}-${parcel.section}-${parcel.number}`;
+          }
+          return null;
+        })
+      : null,
+    parcelCoordinates: parcels?.length
+      ? parcels.map(parcel => {
+          if (typeof parcel.x === "number" && typeof parcel.y === "number") {
+            return `N ${parcel.x} E ${parcel.y}`;
+          }
+          return null;
+        })
+      : null
   };
 }
 
 export function formToBsdd(form: RegistryForm): Bsdd & {
   grouping: Bsdd[];
 } & {
+  forwardedIn: (Bsdd & { grouping: Bsdd[] }) | null;
+} & {
   forwarding: (Bsdd & { grouping: Bsdd[] }) | null;
 } & {
   finalOperations: BsddFinalOperation[];
+} & {
+  intermediaries: IntermediaryFormAssociation[] | null;
 } {
   let grouping: Bsdd[] = [];
 
@@ -198,6 +280,14 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
 
   return {
     ...simpleFormToBsdd(form),
+    ...(form.forwardedIn
+      ? {
+          forwardedIn: {
+            ...simpleFormToBsdd(form.forwardedIn),
+            grouping: []
+          }
+        }
+      : { forwardedIn: null }),
     ...(form.forwarding
       ? {
           forwarding: {
@@ -211,6 +301,11 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
           finalOperations: form.finalOperations
         }
       : { finalOperations: [] }),
+    ...(form.intermediaries
+      ? {
+          intermediaries: form.intermediaries
+        }
+      : { intermediaries: null }),
     grouping
   };
 }

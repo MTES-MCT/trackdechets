@@ -169,9 +169,9 @@ export function prismaToZodBsda(bsda: PrismaBsdaForParsing): ZodBsda {
   };
 }
 
-export function getUpdatedFields(
-  val: ZodBsda | ZodBsdaTransporter,
-  update: ZodBsda | ZodBsdaTransporter
+export function getUpdatedFields<T extends ZodBsda | ZodBsdaTransporter>(
+  val: T,
+  update: T
 ): string[] {
   // only pick keys present in the input to compute the diff between
   // the input and the data in DB
