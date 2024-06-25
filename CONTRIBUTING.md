@@ -899,7 +899,7 @@ function mergeInputAndParseBsdAsync(persisted: PrismaBsd, input: GraphQLBsdInput
 }
 ```
 
-La workflow simplifié dans la mutation d'`update` ressemble alors à ça :
+Le workflow simplifié dans la mutation d'`update` ressemble alors à ça :
 
 ```typescript
 function updateBsdResolver(_, { id, input }: MutationUpdateBsdArgs, context: GraphQLContext) {
@@ -927,7 +927,7 @@ function updateBsdResolver(_, { id, input }: MutationUpdateBsdArgs, context: Gra
 }
 ```
 
-#### Utilisation des les mutations `sign`
+#### Utilisation dans les mutations `sign`
 
 Une modification de signature ne modifie pas les données mais nécessite quand même de réaliser le parsing car on va vérifier que les données sont toujours cohérentes avec le type de signature apposée, pour vérifier par exemple que les champs requis à cette étape sont bien présents. La signature courant est alors passée explicitement via le contexte de validation.
 
@@ -954,9 +954,9 @@ function signBsdResolver(_, { id, input }: MutationUpdateBsdArgs, context: Graph
 
 #### Définition des règles de champs requis et de verrouillage des champs
 
-Le cycle de vie du bordereau implique que le remplissage des champs se fasse au fur et à mesure et que des signatures viennent "verrouiller" certains champs. Les règles métier relatives aux champs requis et verrouillée sont définis dans des tableurs (ex pour le BSFF : [BSFF - Informations requises et scellées](https://docs.google.com/spreadsheets/d/1Uvd04DsmTNiMr4wzpfmS2uLd84i6IzJsgXssxzy_2ns/edit?gid=0#gid=0)).
+Le cycle de vie du bordereau implique que le remplissage des champs se fasse au fur et à mesure et que des signatures viennent "verrouiller" certains champs. Les règles métier relatives aux champs requis et verrouillés sont définies dans des tableurs (ex pour le BSFF : [BSFF - Informations requises et scellées](https://docs.google.com/spreadsheets/d/1Uvd04DsmTNiMr4wzpfmS2uLd84i6IzJsgXssxzy_2ns/edit?gid=0#gid=0)).
 
-La sémantique de définition pour chaque champ requis / scellé est très similaire : ¨un champ est requis / scellé à partir de telle signature si telle condition est remplie sur le bordereau¨. D'où l'idée de créer un fichier de définition commun `rules` permettant de regrouper la définition des champs scellés / requis. Exemple pour le BSDA
+La sémantique de définition pour chaque champ requis / verrouillée est très similaire : ¨un champ est requis / scellé à partir de telle signature si telle condition est remplie sur le bordereau¨. D'où l'idée de créer un fichier de définition commun `rules` permettant de regrouper la définition des champs verrouillés / requis. Exemple pour le BSDA
 
 ```typescript
 export const bsdaEditionRules: BsdaEditionRules = {

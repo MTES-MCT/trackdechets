@@ -46,7 +46,7 @@ export const ZodOperationEnum = z
         return {
           message:
             "Le code de l'opération de traitement ne fait pas" +
-            " partie de la liste reconnue : R1, R2, R3, R5, R12, R13, D10, D13, D14, D15"
+            ` partie de la liste reconnue : ${BSFF_OPERATION_CODES.join(", ")}`
         };
       }
       return { message: ctx.defaultError };
