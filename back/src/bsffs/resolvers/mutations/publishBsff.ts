@@ -3,18 +3,10 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { checkCanUpdate } from "../../permissions";
 import { expandBsffFromDB } from "../../converter";
-import {
-  validateBsff,
-  validateFicheInterventions,
-  validatePreviousPackagings
-} from "../../validation";
-import { BsffType } from "@prisma/client";
-import {
-  getBsffFicheInterventionRepository,
-  getBsffPackagingRepository,
-  getBsffRepository
-} from "../../repository";
+import { getBsffRepository } from "../../repository";
 import { BsffWithTransportersInclude } from "../../types";
+import { parseBsffAsync } from "../../validation/bsff";
+import { prismaToZodBsff } from "../../validation/bsff/helpers";
 
 const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   _,
@@ -24,44 +16,15 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
 
-  const { update: updateBsff, findUniqueGetPackagings } =
-    getBsffRepository(user);
-  const { findPreviousPackagings } = getBsffPackagingRepository(user);
-  const { findMany: findManyFicheIntervention } =
-    getBsffFicheInterventionRepository(user);
-
-  const packagings =
-    (await findUniqueGetPackagings({
-      where: { id: existingBsff.id }
-    })) ?? [];
+  const { update: updateBsff } = getBsffRepository(user);
 
   await checkCanUpdate(user, existingBsff);
 
-  const previousPackagings = await findPreviousPackagings(
-    existingBsff.packagings.map(p => p.id),
-    1
+  const zodBsff = prismaToZodBsff(existingBsff);
+  await parseBsffAsync(
+    { ...zodBsff, isDraft: false },
+    { currentSignatureType: "EMISSION" }
   );
-  const previousPackagingsIds = {
-    ...(existingBsff.type === BsffType.REEXPEDITION
-      ? { forwarding: previousPackagings.map(p => p.id) }
-      : {}),
-    ...(existingBsff.type === BsffType.GROUPEMENT
-      ? { grouping: previousPackagings.map(p => p.id) }
-      : {}),
-    ...(existingBsff.type === BsffType.RECONDITIONNEMENT
-      ? { repackaging: previousPackagings.map(p => p.id) }
-      : {})
-  };
-
-  const ficheInterventions = await findManyFicheIntervention({
-    where: { bsffs: { some: { id: { in: [existingBsff.id] } } } }
-  });
-
-  const fullBsff = { ...existingBsff, packagings, isDraft: false };
-
-  await validateBsff(fullBsff, { isDraft: false, transporterSignature: false });
-  await validateFicheInterventions(fullBsff, ficheInterventions);
-  await validatePreviousPackagings(fullBsff, previousPackagingsIds);
 
   const updatedBsff = await updateBsff({
     where: {

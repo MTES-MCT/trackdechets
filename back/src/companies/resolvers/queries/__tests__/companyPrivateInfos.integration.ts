@@ -3,10 +3,13 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth";
 import { TEST_COMPANY_PREFIX } from "@td/constants";
 import { prisma } from "@td/prisma";
+import { Query } from "../../../../generated/graphql/types";
+
 import {
   companyFactory,
   siretify,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AnonymousCompanyError } from "../../../sirene/errors";
@@ -19,8 +22,10 @@ jest.mock("../../../sirene/searchCompany", () => ({
 
 describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   let query: ReturnType<typeof makeClient>["query"];
+
   beforeAll(async () => {
     const user = await userFactory();
+
     const testClient = makeClient({
       ...user,
       auth: AuthType.Session
@@ -69,7 +74,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           }
         }
       }`;
-    const response = await query<any>(gqlquery);
+    const response = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
 
     expect(response.data.companyPrivateInfos).toEqual({
       siret,
@@ -141,7 +146,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           isAnonymousCompany
         }
       }`;
-    const response = await query<any>(gqlquery);
+    const response = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     // informations from insee, TD and ICPE database are merged
     expect(response.data.companyPrivateInfos).toEqual({
       siret,
@@ -205,7 +210,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           }
         }
       }`;
-    const response = await query<any>(gqlquery);
+    const response = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     expect(response.data.companyPrivateInfos.transporterReceipt).toEqual(
       receipt
     );
@@ -255,7 +260,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           }
         }
       }`;
-    const response = await query<any>(gqlquery);
+    const response = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     expect(response.data.companyPrivateInfos.traderReceipt).toEqual(receipt);
   });
 
@@ -292,11 +297,178 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           isRegistered
         }
       }`;
-    const response = await query<any>(gqlquery);
+    const response = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     expect(
       response.data.companyPrivateInfos.allowBsdasriTakeOverWithoutSignature
     ).toEqual(true);
     expect(response.data.companyPrivateInfos.isRegistered).toEqual(true);
+  });
+
+  it("Query companyPrivateInfos should not expose sensitive data to users who do not belong to company", async () => {
+    const siret = siretify(1);
+
+    mockSearchSirene.mockResolvedValueOnce({
+      siret,
+      etatAdministratif: "A",
+      name: "CODE EN STOCK",
+      address: "4 Boulevard Longchamp 13001 Marseille",
+      codeCommune: "13201",
+      naf: "62.01Z",
+      libelleNaf: "Programmation informatique",
+      addressVoie: "4 boulevard Longchamp",
+      addressCity: "Marseille",
+      addressPostalCode: "13001"
+    });
+
+    const { company } = await userWithCompanyFactory("ADMIN", {
+      siret,
+      name: "Code en Stock",
+      securityCode: 1234,
+      contactEmail: "john.snow@trackdechets.fr",
+      contactPhone: "0600000000",
+      website: "https://trackdechets.beta.gouv.fr"
+    });
+
+    const otherCompany = await companyFactory();
+
+    await prisma.signatureAutomation.create({
+      data: {
+        fromId: otherCompany.id,
+        toId: company.id
+      }
+    });
+    const user = await userFactory();
+    const { query: thisQuery } = makeClient({
+      ...user,
+      auth: AuthType.Session
+    });
+    const gqlquery = `
+      query {
+        companyPrivateInfos(clue: "${siret}") {
+          allowBsdasriTakeOverWithoutSignature
+          securityCode
+          users {
+            email
+          }
+          receivedSignatureAutomations {id}
+        }
+      }`;
+
+    const response = await thisQuery<Pick<Query, "companyPrivateInfos">>(
+      gqlquery
+    );
+
+    expect(response.data.companyPrivateInfos.securityCode).toEqual(null);
+    expect(
+      response.data.companyPrivateInfos.receivedSignatureAutomations
+    ).toEqual([]);
+  });
+
+  it("Query companyPrivateInfos should expose sensitive data to users who belong to company", async () => {
+    const siret = siretify(1);
+
+    mockSearchSirene.mockResolvedValueOnce({
+      siret,
+      etatAdministratif: "A",
+      name: "CODE EN STOCK",
+      address: "4 Boulevard Longchamp 13001 Marseille",
+      codeCommune: "13201",
+      naf: "62.01Z",
+      libelleNaf: "Programmation informatique",
+      addressVoie: "4 boulevard Longchamp",
+      addressCity: "Marseille",
+      addressPostalCode: "13001"
+    });
+
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      siret,
+      name: "Code en Stock",
+      securityCode: 9543,
+      contactEmail: "john.snow@trackdechets.fr",
+      contactPhone: "0600000000",
+      website: "https://trackdechets.beta.gouv.fr"
+    });
+
+    const otherCompany = await companyFactory();
+
+    const signatureAutomation = await prisma.signatureAutomation.create({
+      data: {
+        fromId: otherCompany.id,
+        toId: company.id
+      }
+    });
+    const { query: thisQuery } = makeClient({
+      ...user,
+      auth: AuthType.Session
+    });
+
+    const gqlquery = `
+      query {
+        companyPrivateInfos(clue: "${siret}") {
+          securityCode
+            receivedSignatureAutomations {
+              id
+            }
+        }
+      }`;
+
+    const response = await thisQuery<Pick<Query, "companyPrivateInfos">>(
+      gqlquery
+    );
+    expect(response.data.companyPrivateInfos.securityCode).toEqual(9543);
+    expect(
+      response.data.companyPrivateInfos.receivedSignatureAutomations
+    ).toEqual([{ id: signatureAutomation.id }]);
+  });
+
+  it("Query companyPrivateInfos should expose sensitive data if user is a Trackdéchets staff admin", async () => {
+    const siret = siretify(1);
+
+    mockSearchSirene.mockResolvedValueOnce({
+      siret,
+      etatAdministratif: "A",
+      name: "CODE EN STOCK",
+      address: "4 Boulevard Longchamp 13001 Marseille",
+      codeCommune: "13201",
+      naf: "62.01Z",
+      libelleNaf: "Programmation informatique",
+      addressVoie: "4 boulevard Longchamp",
+      addressCity: "Marseille",
+      addressPostalCode: "13001"
+    });
+
+    const user = await userFactory({ isAdmin: true });
+
+    const { user: companyMember } = await userWithCompanyFactory("ADMIN", {
+      siret,
+      name: "Code en Stock",
+      securityCode: 1234,
+      contactEmail: "john.snow@trackdechets.fr",
+      contactPhone: "0600000000",
+      website: "https://trackdechets.beta.gouv.fr"
+    });
+
+    const { query: thisQuery } = makeClient({
+      ...user,
+      auth: AuthType.Session
+    });
+    const gqlquery = `
+      query {
+        companyPrivateInfos(clue: "${siret}") {
+            securityCode
+          users {email}
+        }
+      }`;
+
+    const response = await thisQuery<Pick<Query, "companyPrivateInfos">>(
+      gqlquery
+    );
+
+    console.log(response);
+
+    expect(response.data.companyPrivateInfos.users).toEqual([
+      { email: companyMember.email }
+    ]);
   });
 
   it("Closed company in INSEE public data", async () => {
@@ -326,7 +498,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
         }
       }
     }`;
-    const response = await query<any>(gqlquery);
+    const response = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     const company = response.data.companyPrivateInfos;
     const expected = {
       siret,
@@ -367,7 +539,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           }
         }
       }`;
-    const { data } = await query<any>(gqlquery);
+    const { data } = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     expect(data.companyPrivateInfos).toMatchObject({
       address: null,
       contactEmail: null,
@@ -416,7 +588,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           companyTypes
         }
       }`;
-    const { data } = await query<any>(gqlquery);
+    const { data } = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     expect(data.companyPrivateInfos).toMatchObject({
       siret: company.siret,
       name: company.name,
@@ -465,7 +637,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           website
         }
       }`;
-    const { data } = await query<any>(gqlquery);
+    const { data } = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     expect(data.companyPrivateInfos).toMatchObject({
       siret: anoCompany.siret,
       name: anoCompany.name,
@@ -511,7 +683,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           website
         }
       }`;
-    const { data } = await query<any>(gqlquery);
+    const { data } = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     expect(data.companyPrivateInfos).toMatchObject({
       orgId: anoCompany.orgId,
       siret: anoCompany.siret,
@@ -567,7 +739,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           }
         }
       }`;
-    const { data } = await query<any>(gqlquery);
+    const { data } = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     expect(data.companyPrivateInfos).toMatchObject({
       address: company.address,
       name: company.name,
@@ -627,7 +799,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           }
         }
       }`;
-    const { data } = await query<any>(gqlquery);
+    const { data } = await query<Pick<Query, "companyPrivateInfos">>(gqlquery);
     expect(data.companyPrivateInfos).toMatchObject({
       orgId: company.orgId,
       address: company.address,

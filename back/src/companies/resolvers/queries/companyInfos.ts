@@ -86,7 +86,9 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
       companyTypes: companyInfos.companyTypes,
       ecoOrganismeAgreements: companyInfos.ecoOrganismeAgreements,
       statutDiffusionEtablissement: companyInfos.statutDiffusionEtablissement,
-      etatAdministratif: companyInfos.etatAdministratif
+      etatAdministratif: companyInfos.etatAdministratif,
+      allowBsdasriTakeOverWithoutSignature:
+        companyInfos.allowBsdasriTakeOverWithoutSignature
     };
   }
 };

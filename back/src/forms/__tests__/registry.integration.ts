@@ -8,6 +8,7 @@ import { formToBsdd } from "../compat";
 import {
   getSubType,
   toAllWaste,
+  toGenericWaste,
   toIncomingWaste,
   toManagedWaste,
   toOutgoingWaste
@@ -369,6 +370,33 @@ describe("toManagedWaste", () => {
     // Then
     expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
     expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+});
+
+describe("toGenericWaste", () => {
+  it("should contain the destination, trader & broker email addresses", async () => {
+    // Given
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        brokerCompanyMail: "broker@mail.com",
+        recipientCompanyMail: "destination@mail.com",
+        traderCompanyMail: "trader@mail.com"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+    const waste = toGenericWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.destinationCompanyMail).toEqual("destination@mail.com");
+    expect(waste.brokerCompanyMail).toEqual("broker@mail.com");
+    expect(waste.traderCompanyMail).toEqual("trader@mail.com");
   });
 });
 

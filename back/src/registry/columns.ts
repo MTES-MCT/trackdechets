@@ -54,7 +54,7 @@ const formatFinalOperations = (val?: string[]) =>
   val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
 const formatFinalOperationWeights = (val?: number[]) =>
   val ? val.map(quant => quant.toFixed(2)).join("; ") : "";
-const formatSubType = (subType?: BsdSubType) => {
+export const formatSubType = (subType?: BsdSubType) => {
   if (!subType) return "";
 
   switch (subType) {
@@ -72,6 +72,8 @@ const formatSubType = (subType?: BsdSubType) => {
       return "Collecte en déchetterie";
     case "GATHERING":
       return "Groupement";
+    case "GROUPEMENT":
+      return "Regroupement";
     case "RESHIPMENT":
       return "Réexpédition";
     case "RECONDITIONNEMENT":
@@ -165,9 +167,11 @@ export const columns: Column[] = [
   },
   { field: "traderCompanyName", label: "Négociant raison sociale" },
   { field: "traderCompanySiret", label: "Négociant SIRET" },
+  { field: "traderCompanyMail", label: "Négociant contact" },
   { field: "traderRecepisseNumber", label: "Négociant récépissé " },
   { field: "brokerCompanyName", label: "Courtier raison sociale" },
   { field: "brokerCompanySiret", label: "Courtier SIRET" },
+  { field: "brokerCompanyMail", label: "Courtier contact" },
   { field: "brokerRecepisseNumber", label: "Courtier N°récepissé" },
   // Transport du déchet
 
@@ -204,6 +208,7 @@ export const columns: Column[] = [
   { field: "destinationCompanyName", label: "Destination raison sociale" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },
   { field: "destinationCompanyAddress", label: "Destination adresse" },
+  { field: "destinationCompanyMail", label: "Destination Contact" },
   {
     field: "destinationReceptionAcceptationStatus",
     label: "Statut d'acceptation du déchet"

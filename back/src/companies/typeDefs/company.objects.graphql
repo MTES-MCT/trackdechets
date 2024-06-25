@@ -369,6 +369,12 @@ type CompanySearchResult implements CompanySearchPrivateCommon {
   """
   companyTypes: [CompanyType!]
 
+  "Sous-types d'entreprises pour les installation de Tri, Transit Regroupement de déchets"
+  collectorTypes: [CollectorType!]
+
+  "Sous-types d'entreprises pour les installation de traitement de déchets"
+  wasteProcessorTypes: [WasteProcessorType!]
+
   """
   Liste des agréments de l'éco-organisme
   """

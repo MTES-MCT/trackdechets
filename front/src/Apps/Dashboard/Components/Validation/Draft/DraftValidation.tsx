@@ -1,4 +1,5 @@
 import React from "react";
+
 import { gql, useMutation } from "@apollo/client";
 import {
   FormStatus,
@@ -22,12 +23,15 @@ import {
   bsvhuPublishDraft,
   bpaohPublishDraft
 } from "../../../../common/wordings/dashboard/wordingsDashboard";
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link, useLocation } from "react-router-dom";
+
 import routes from "../../../../routes";
 import { TOAST_DURATION } from "../../../../../common/config";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 
 const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
+  const location = useLocation();
+
   const MARK_AS_SEALED = gql`
     mutation MarkAsSealed($id: ID!) {
       markAsSealed(id: $id) {
@@ -366,9 +370,12 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                   siret: currentSiret,
                   id: bsd.id
                 })}
-                className="btn btn--primary"
+                onClick={onClose}
+                state={{ background: location }}
               >
-                Mettre le bordereau à jour pour le publier
+                <Button priority="primary">
+                  Mettre le bordereau à jour pour le publier
+                </Button>
               </Link>
             </>
           )}

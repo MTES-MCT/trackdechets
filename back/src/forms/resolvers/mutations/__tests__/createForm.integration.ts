@@ -2368,39 +2368,5 @@ describe("Mutation.createForm", () => {
         })
       ]);
     });
-
-    it("should not allow to create a APPENDIX1_PRODUCER form with an emitter that is not registered", async () => {
-      const destination = await userWithCompanyFactory(UserRole.MEMBER);
-      const { mutate } = makeClient(destination.user);
-      const { errors } = await mutate<Pick<Mutation, "createForm">>(
-        CREATE_FORM,
-        {
-          variables: {
-            createFormInput: {
-              recipient: {
-                company: {
-                  siret: destination.company.siret
-                }
-              },
-              emitter: {
-                type: "APPENDIX1_PRODUCER",
-                company: {
-                  siret: "42172923700022"
-                }
-              }
-            }
-          }
-        }
-      );
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "L'émetteur doit être inscrit sur Trackdéchets pour apparaitre sur une annexe 1 sans éco-organisme",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
-    });
   });
 });

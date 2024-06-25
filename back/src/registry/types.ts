@@ -117,7 +117,10 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   workerCompanySiret: null,
   workerCompanyAddress: null,
   nextDestinationNotificationNumber: null,
-  nextDestinationProcessingOperation: null
+  nextDestinationProcessingOperation: null,
+  brokerCompanyMail: null,
+  destinationCompanyMail: null,
+  traderCompanyMail: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -191,7 +194,9 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   destinationFinalOperationCodes: [],
   destinationFinalOperationWeights: [],
   nextDestinationNotificationNumber: null,
-  nextDestinationProcessingOperation: null
+  nextDestinationProcessingOperation: null,
+  brokerCompanyMail: null,
+  traderCompanyMail: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -254,7 +259,9 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   workerCompanyName: null,
   workerCompanySiret: null,
   workerCompanyAddress: null,
-  wasteIsDangerous: null
+  wasteIsDangerous: null,
+  brokerCompanyMail: null,
+  traderCompanyMail: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -322,10 +329,12 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   workerCompanySiret: null,
   workerCompanyAddress: null,
   nextDestinationNotificationNumber: null,
-  nextDestinationProcessingOperation: null
+  nextDestinationProcessingOperation: null,
   // En attente des correctifs recette sur TRA-12745
   // finalOperationCodes: null,
   // finalReceptionWeights: null
+  brokerCompanyMail: null,
+  traderCompanyMail: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -405,5 +414,7 @@ export const emptyAllWaste: Required<AllWaste> = {
   destinationFinalOperationCodes: [],
   destinationFinalOperationWeights: [],
   nextDestinationNotificationNumber: null,
-  nextDestinationProcessingOperation: null
+  nextDestinationProcessingOperation: null,
+  brokerCompanyMail: null,
+  traderCompanyMail: null
 };

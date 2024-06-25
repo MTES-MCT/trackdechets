@@ -416,7 +416,7 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors, data } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "createBsdasriRevisionRequest">,
       MutationCreateBsdasriRevisionRequestArgs
     >(CREATE_BSDASRI_REVISION_REQUEST, {
@@ -429,8 +429,6 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
         }
       }
     });
-
-    console.log(data);
 
     expect(errors[0].message).toBe(
       `Impossible de créer une révision sur ce bordereau, il a été annulé.`
