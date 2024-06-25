@@ -401,7 +401,8 @@ describe("mutaion.duplicateBsvhu", () => {
     // Given
     const emitter = await userWithCompanyFactory("MEMBER");
     const bsvhu = await bsvhuFactory({
-      opt: { emitterCompanySiret: emitter.company.siret,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
         destinationOperationCode: "R1",
         destinationOperationMode: "VALORISATION_ENERGETIQUE"
       }
