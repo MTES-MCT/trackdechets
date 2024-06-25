@@ -53,7 +53,7 @@ export function Waste() {
         disabled={sealedFields.includes("waste.packagings")}
       />
 
-      <h3 className="fr-h3">Quantité Émise</h3>
+      <h4 className="fr-h4">Quantité Émise</h4>
 
       <div className="fr-grid-row">
         <div className="fr-col-12 fr-col-md-6">

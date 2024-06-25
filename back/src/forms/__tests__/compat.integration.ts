@@ -168,7 +168,8 @@ describe("simpleFormToBsdd", () => {
       grouping: [],
       finalOperations: [],
       nextDestinationNotificationNumber: null,
-      nextDestinationProcessingOperation: null
+      nextDestinationProcessingOperation: null,
+      forwardedIn: null
     });
   });
 
@@ -421,6 +422,7 @@ describe("simpleFormToBsdd", () => {
       destinationOperationNextDestinationCompanyMail: null,
       grouping: [],
       finalOperations: [],
+      forwardedIn: null,
       forwardedInId: null,
       forwarding: {
         id: form.readableId,

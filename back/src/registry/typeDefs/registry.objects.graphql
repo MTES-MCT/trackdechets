@@ -357,6 +357,19 @@ type OutgoingWaste {
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
   destinationOperationCode: String
 
+  "Destination post entreposage provisoire Raison Sociale"
+  postTempStorageDestinationName: String
+  "Destination post entreposage provisoire SIRET"
+  postTempStorageDestinationSiret: String
+  "Destination post entreposage provisoire Adresse"
+  postTempStorageDestinationAddress: String
+  "Destination post entreposage provisoire Code Postal"
+  postTempStorageDestinationPostalCode: String
+  "Destination post entreposage provisoire Ville"
+  postTempStorageDestinationCity: String
+  "Destination post entreposage provisoire Pays"
+  postTempStorageDestinationCountry: String
+
   "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
   destinationOperationMode: OperationMode
 
@@ -1082,6 +1095,19 @@ type AllWaste {
   nextDestinationNotificationNumber: String
   "Code d'opération ultérieure prévue"
   nextDestinationProcessingOperation: String
+
+  "Destination post entreposage provisoire Raison Sociale"
+  postTempStorageDestinationName: String
+  "Destination post entreposage provisoire SIRET"
+  postTempStorageDestinationSiret: String
+  "Destination post entreposage provisoire Adresse"
+  postTempStorageDestinationAddress: String
+  "Destination post entreposage provisoire Code Postal"
+  postTempStorageDestinationPostalCode: String
+  "Destination post entreposage provisoire Ville"
+  postTempStorageDestinationCity: String
+  "Destination post entreposage provisoire Pays"
+  postTempStorageDestinationCountry: String
 
   ###########################################################
   # Champs additionnels non mentionnés dans l'arrêté registre

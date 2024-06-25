@@ -10,6 +10,7 @@ import { RegistryBsdaInclude } from "../../registry/elastic";
 import { bsdaFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { BsdaType } from "@prisma/client";
+import { companyFactory } from "../../__tests__/factories";
 
 describe("toIncomingWaste", () => {
   afterAll(resetDatabase);
@@ -95,6 +96,52 @@ describe("toOutgoingWaste", () => {
     // Then
     expect(waste.nextDestinationProcessingOperation).toBe("D9");
   });
+
+  it("bsda with tmp storage should mention post-temp-storage destination", async () => {
+    // Given
+    const recipient = await companyFactory({ name: "Recipient" });
+    const forwardedInNextDestination = await companyFactory({
+      name: "ForwardedIn next destination",
+      address: "25 rue Voltaire 37100 TOURS"
+    });
+
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: recipient.siret,
+        destinationCompanyName: recipient.name,
+        destinationCompanyAddress: recipient.address
+      }
+    });
+    await bsdaFactory({
+      opt: {
+        forwarding: { connect: { id: forwardedBsda.id } },
+        destinationCompanyAddress: forwardedInNextDestination.address,
+        destinationCompanyName: forwardedInNextDestination.name,
+        destinationCompanySiret: forwardedInNextDestination.siret
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: forwardedBsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toOutgoingWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.postTempStorageDestinationSiret).toBe(
+      forwardedInNextDestination.siret
+    );
+    expect(waste.postTempStorageDestinationName).toBe(
+      "ForwardedIn next destination"
+    );
+
+    // Address
+    expect(waste.postTempStorageDestinationAddress).toBe("25 rue Voltaire");
+    expect(waste.postTempStorageDestinationCity).toBe("TOURS");
+    expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
+    expect(waste.postTempStorageDestinationCountry).toBe("FR");
+  });
 });
 
 describe("toManagedWaste", () => {
@@ -160,7 +207,6 @@ describe("toAllWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
     }
   );
-
   it("should contain next destination operation code", async () => {
     // Given
     const bsda = await bsdaFactory({
@@ -178,6 +224,52 @@ describe("toAllWaste", () => {
 
     // Then
     expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+
+  it("bsda with tmp storage should mention post-temp-storage destination", async () => {
+    // Given
+    const recipient = await companyFactory({ name: "Recipient" });
+    const forwardedInNextDestination = await companyFactory({
+      name: "ForwardedIn next destination",
+      address: "25 rue Voltaire 37100 TOURS"
+    });
+
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: recipient.siret,
+        destinationCompanyName: recipient.name,
+        destinationCompanyAddress: recipient.address
+      }
+    });
+    await bsdaFactory({
+      opt: {
+        forwarding: { connect: { id: forwardedBsda.id } },
+        destinationCompanyAddress: forwardedInNextDestination.address,
+        destinationCompanyName: forwardedInNextDestination.name,
+        destinationCompanySiret: forwardedInNextDestination.siret
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: forwardedBsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.postTempStorageDestinationSiret).toBe(
+      forwardedInNextDestination.siret
+    );
+    expect(waste.postTempStorageDestinationName).toBe(
+      "ForwardedIn next destination"
+    );
+
+    // Address
+    expect(waste.postTempStorageDestinationAddress).toBe("25 rue Voltaire");
+    expect(waste.postTempStorageDestinationCity).toBe("TOURS");
+    expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
+    expect(waste.postTempStorageDestinationCountry).toBe("FR");
   });
 });
 
