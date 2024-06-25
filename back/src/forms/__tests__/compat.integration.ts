@@ -285,7 +285,11 @@ describe("simpleFormToBsdd", () => {
       grouping: [],
       finalOperations: [],
       intermediaries: [],
-      forwardedIn: null
+      forwardedIn: null,
+      parcelCities: null,
+      parcelCoordinates: null,
+      parcelNumbers: null,
+      parcelPostalCodes: null
     });
   });
 
@@ -365,6 +369,52 @@ describe("simpleFormToBsdd", () => {
     // check transporters are returned in the right order
     expect(bsdd.transporterCompanySiret).toEqual(transporter1.siret);
     expect(bsdd.transporter2CompanySiret).toEqual(transporter2.siret);
+  });
+
+  it("should convert a Form with waste parcel infos to a Bsdd", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        wasteDetailsParcelNumbers: [
+          {
+            city: "Orléans",
+            postalCode: "45100",
+            prefix: "000",
+            section: "EW",
+            number: "8"
+          },
+          {
+            city: "Olivet",
+            postalCode: "45160",
+            x: 47.853807,
+            y: 1.895882
+          }
+        ]
+      }
+    });
+
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+
+    const bsdd = formToBsdd(fullForm);
+
+    // check transporters are returned in the right order
+    expect(bsdd.parcelCities).toEqual(
+      expect.arrayContaining(["Orléans", "Olivet"])
+    );
+    expect(bsdd.parcelPostalCodes).toEqual(
+      expect.arrayContaining(["45100", "45160"])
+    );
+    expect(bsdd.parcelNumbers).toEqual(
+      expect.arrayContaining(["000-EW-8", null])
+    );
+    expect(bsdd.parcelCoordinates).toEqual(
+      expect.arrayContaining([null, "N 47.853807 E 1.895882"])
+    );
   });
 
   it("should convert a forwarding Form to a Bsdd", async () => {
@@ -572,6 +622,10 @@ describe("simpleFormToBsdd", () => {
       intermediaries: [],
       finalOperations: [],
       forwardedIn: null,
+      parcelCities: null,
+      parcelCoordinates: null,
+      parcelNumbers: null,
+      parcelPostalCodes: null,
       forwardedInId: null,
       forwarding: {
         id: form.readableId,
@@ -749,6 +803,10 @@ describe("simpleFormToBsdd", () => {
         destinationOperationNextDestinationCompanyContact: null,
         destinationOperationNextDestinationCompanyPhone: null,
         destinationOperationNextDestinationCompanyMail: null,
+        parcelCities: null,
+        parcelCoordinates: null,
+        parcelNumbers: null,
+        parcelPostalCodes: null,
         forwardedInId: fullForwardedInForm.id,
         grouping: []
       }

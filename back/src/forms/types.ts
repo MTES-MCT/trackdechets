@@ -299,4 +299,8 @@ export type Bsdd = {
   destinationOperationDate: Date | null;
   destinationOperationSignatureDate: Date | null;
   destinationCap: string | null;
+  parcelCities: string[] | null;
+  parcelPostalCodes: string[] | null;
+  parcelNumbers: (string | null)[] | null;
+  parcelCoordinates: (string | null)[] | null;
 };

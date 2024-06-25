@@ -46,6 +46,12 @@ const formatBoolean = (b: boolean | null) => {
 };
 const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // return as a number to allow xls cells formulas
 const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
+const formatArrayWithMissingElements = (arr: any[]) => {
+  if (!Array.isArray(arr)) {
+    return "";
+  }
+  return arr.map(elem => elem ?? "").join(",");
+};
 const formatOperationCode = (code?: string) =>
   code ? code.replace(/ /g, "") : ""; // be consistent and remove all white spaces
 
@@ -178,6 +184,26 @@ export const columns: Column[] = [
   { field: "workerCompanyName", label: "Entreprise de travaux raison sociale" },
   { field: "workerCompanySiret", label: "Entreprise de travaux SIRET" },
   { field: "workerCompanyAddress", label: "Entreprise de travaux adresse" },
+  {
+    field: "parcelCities",
+    label: "Parcelle commune",
+    format: formatArray
+  },
+  {
+    field: "parcelPostalCodes",
+    label: "Parcelle code postal",
+    format: formatArray
+  },
+  {
+    field: "parcelNumbers",
+    label: "Parcelle numéro",
+    format: formatArrayWithMissingElements
+  },
+  {
+    field: "parcelCoordinates",
+    label: "Parcelle coordonnées",
+    format: formatArrayWithMissingElements
+  },
   // Gestion du déchets
   { field: "ecoOrganismeName", label: "Éco-organisme raison sociale" },
   { field: "ecoOrganismeSiren", label: "Éco-organisme SIREN" },
