@@ -90,6 +90,8 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     destinationReceptionSignatureAuthor,
 
     destinationOperationDate,
+    destinationOperationCode,
+    destinationOperationMode,
 
     operationSignatoryId,
     destinationOperationSignatureDate,
