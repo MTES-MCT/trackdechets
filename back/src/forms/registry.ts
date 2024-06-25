@@ -71,6 +71,15 @@ const getTransportersData = (bsdd: Bsdd) => ({
   transporter3CompanyMail: bsdd.transporter3CompanyMail
 });
 
+const getIntermediariesData = (bsdd: ReturnType<typeof formToBsdd>) => ({
+  intermediary1CompanyName: bsdd.intermediaries?.[0]?.name ?? null,
+  intermediary1CompanySiret: bsdd.intermediaries?.[0]?.siret ?? null,
+  intermediary2CompanyName: bsdd.intermediaries?.[1]?.name ?? null,
+  intermediary2CompanySiret: bsdd.intermediaries?.[1]?.siret ?? null,
+  intermediary3CompanyName: bsdd.intermediaries?.[2]?.name ?? null,
+  intermediary3CompanySiret: bsdd.intermediaries?.[2]?.siret ?? null
+});
+
 export function getRegistryFields(
   form: FormForElastic
 ): Pick<BsdElastic, RegistryFields> {
@@ -501,6 +510,7 @@ export function toAllWaste(
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
-    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
+    ...getIntermediariesData(bsdd)
   };
 }

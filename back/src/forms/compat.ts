@@ -1,4 +1,9 @@
-import { BsddFinalOperation, QuantityType, Status } from "@prisma/client";
+import {
+  BsddFinalOperation,
+  IntermediaryFormAssociation,
+  QuantityType,
+  Status
+} from "@prisma/client";
 import {
   AppendixFormInput,
   InitialFormFractionInput
@@ -14,7 +19,11 @@ import { RegistryForm } from "../registry/elastic";
 export function simpleFormToBsdd(
   form: Omit<
     RegistryForm,
-    "grouping" | "forwarding" | "forwardedIn" | "finalOperations"
+    | "grouping"
+    | "forwarding"
+    | "finalOperations"
+    | "intermediaries"
+    | "forwardedIn"
   >
 ): Bsdd {
   const transporters = (form.transporters ?? []).sort(
@@ -185,6 +194,8 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
   forwarding: (Bsdd & { grouping: Bsdd[] }) | null;
 } & {
   finalOperations: BsddFinalOperation[];
+} & {
+  intermediaries: IntermediaryFormAssociation[] | null;
 } {
   let grouping: Bsdd[] = [];
 
@@ -217,6 +228,11 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
           finalOperations: form.finalOperations
         }
       : { finalOperations: [] }),
+    ...(form.intermediaries
+      ? {
+          intermediaries: form.intermediaries
+        }
+      : { intermediaries: null }),
     grouping
   };
 }

@@ -48,6 +48,15 @@ const getOperationData = (bsda: Bsda) => ({
   destinationOperationMode: bsda.destinationOperationMode
 });
 
+const getIntermediariesData = (bsda: RegistryBsda) => ({
+  intermediary1CompanyName: bsda.intermediaries?.[0]?.name ?? null,
+  intermediary1CompanySiret: bsda.intermediaries?.[0]?.siret ?? null,
+  intermediary2CompanyName: bsda.intermediaries?.[1]?.name ?? null,
+  intermediary2CompanySiret: bsda.intermediaries?.[1]?.siret ?? null,
+  intermediary3CompanyName: bsda.intermediaries?.[2]?.name ?? null,
+  intermediary3CompanySiret: bsda.intermediaries?.[2]?.siret ?? null
+});
+
 const getFinalOperationsData = (bsda: RegistryBsda) => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
@@ -527,6 +536,7 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     ...getOperationData(bsda),
     ...getFinalOperationsData(bsda),
     nextDestinationProcessingOperation:
-      bsda.destinationOperationNextDestinationPlannedOperationCode
+      bsda.destinationOperationNextDestinationPlannedOperationCode,
+    ...getIntermediariesData(bsda)
   };
 }
