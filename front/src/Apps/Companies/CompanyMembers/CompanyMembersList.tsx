@@ -1,18 +1,20 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useMutation } from "@apollo/client";
 import {
-  CompanyPrivate,
   UserRole,
   Mutation,
   MutationRemoveUserFromCompanyArgs,
   MutationDeleteInvitationArgs,
   CompanyMember,
-  MutationResendInvitationArgs
+  MutationResendInvitationArgs,
+  MutationChangeUserRoleArgs,
+  Query
 } from "@td/codegen-ui";
 import {
   REMOVE_USER_FROM_COMPANY,
   DELETE_INVITATION,
-  RESEND_INVITATION
+  RESEND_INVITATION,
+  CHANGE_USER_ROLE
 } from "../common/queries";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
@@ -21,9 +23,11 @@ import toast from "react-hot-toast";
 import { TOAST_DURATION } from "../../../common/config";
 
 import "./companyMembers.scss";
+import { CompanyPrivateMembers } from "./CompanyMembers";
 
 interface CompanyMembersListProps {
-  company: CompanyPrivate;
+  company: CompanyPrivateMembers;
+  isTDAdmin: boolean;
 }
 
 const deleteModal = createModal({
@@ -46,21 +50,22 @@ const userRoleLabel = role => {
 
 export const userRoleSwitchOptions = () => {
   return Object.keys(UserRole).map(role => (
-    <option key={UserRole[role]} value={UserRole[role]}>
+    <option key={role} value={UserRole[role]}>
       {userRoleLabel(UserRole[role])}
     </option>
   ));
 };
 
-const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
+const CompanyMembersList = ({
+  company,
+  isTDAdmin = false
+}: CompanyMembersListProps) => {
   const [memberToDelete, setMemberToDelete] = useState<CompanyMember | null>(
     null
   );
-  const [filteredMembers, setFilteredMembers] = useState<
-    CompanyMember[] | null
-  >(null);
+  const [filter, setFilter] = useState<string>("");
 
-  const isAdmin = company.userRole === UserRole.Admin;
+  const isAdmin = company.userRole === UserRole.Admin || isTDAdmin;
 
   const [removeUserFromCompany] = useMutation<
     Pick<Mutation, "removeUserFromCompany">,
@@ -78,6 +83,19 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
         }
       );
       setMemberToDelete(null);
+    },
+    updateQueries: {
+      CompanyPrivateInfos: (
+        prev: Pick<Query, "companyPrivateInfos">,
+        { mutationResult }
+      ) => {
+        return {
+          companyPrivateInfos: {
+            ...prev,
+            users: mutationResult.data?.removeUserFromCompany.users ?? []
+          }
+        };
+      }
     }
   });
 
@@ -92,6 +110,19 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
       toast.error("L'invitation n'a pas pu être supprimée", {
         duration: TOAST_DURATION
       });
+    },
+    updateQueries: {
+      CompanyPrivateInfos: (
+        prev: Pick<Query, "companyPrivateInfos">,
+        { mutationResult }
+      ) => {
+        return {
+          companyPrivateInfos: {
+            ...prev,
+            users: mutationResult.data?.deleteInvitation.users ?? []
+          }
+        };
+      }
     }
   });
 
@@ -112,6 +143,17 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
     }
   });
 
+  const [changeUserRole] = useMutation<
+    Pick<Mutation, "changeUserRole">,
+    MutationChangeUserRoleArgs
+  >(CHANGE_USER_ROLE, {
+    onError: () => {
+      toast.error("Le rôle de l'utilisateur n'a pas pu être modifié", {
+        duration: TOAST_DURATION
+      });
+    }
+  });
+
   const onClickRemoveUser = user => {
     setMemberToDelete(user);
     deleteModal.open();
@@ -129,24 +171,26 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
     });
   };
 
-  const onFilterMembers = predicate => {
-    if (predicate.length === 0) {
-      setFilteredMembers(null);
-      return;
-    }
-
-    function filterUsers(users: CompanyMember[], filterString: string) {
-      return users.filter(
-        user =>
-          user.name?.toLowerCase().includes(filterString.toLowerCase()) ||
-          user.email.toLowerCase().includes(filterString.toLowerCase())
-      );
-    }
-
-    if (company?.users?.length && company?.users?.length > 0) {
-      setFilteredMembers(filterUsers(company.users, predicate));
-    }
+  const onUserRoleChange = (user: CompanyMember, role: UserRole) => {
+    changeUserRole({
+      variables: {
+        userId: user.id,
+        orgId: company.orgId,
+        role
+      }
+    });
   };
+
+  const filteredMembers = useMemo(() => {
+    if (filter.length === 0 || !company?.users?.length) {
+      return null;
+    }
+    return company.users.filter(
+      user =>
+        user.name?.toLowerCase().includes(filter.toLowerCase()) ||
+        user.email.toLowerCase().includes(filter.toLowerCase())
+    );
+  }, [filter, company]);
 
   return (
     <div className="company-members__list">
@@ -162,8 +206,9 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
                   label="Filtrer"
                   nativeInputProps={{
                     type: "text",
+                    value: filter,
                     onChange: e => {
-                      onFilterMembers(e.target.value);
+                      setFilter(e.target.value);
                     }
                   }}
                 />
@@ -203,9 +248,15 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
                       {isAdmin ? (
                         <Select
                           label=""
-                          disabled={true}
+                          disabled={!!user.isMe}
                           nativeSelectProps={{
                             value: user.role!,
+                            onChange: event => {
+                              onUserRoleChange(
+                                user,
+                                event.target.value as UserRole
+                              );
+                            },
                             ...{ "data-testid": "company-member-role" }
                           }}
                         >
@@ -235,7 +286,7 @@ const CompanyMembersList = ({ company }: CompanyMembersListProps) => {
                         {user.isPendingInvitation && !user.isMe && (
                           <>
                             <button
-                              className="fr-btn fr-btn--secondary fr-icon-mail-line"
+                              className="fr-btn fr-btn--secondary fr-icon-mail-line fr-mr-1w"
                               onClick={() => onClickResendInvitation(user)}
                             >
                               Renvoyer l'invitation

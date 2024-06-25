@@ -38,7 +38,8 @@ const companyPrivateInfosResolvers: QueryResolvers["companyPrivateInfos"] =
           gerepId: true,
           securityCode: true,
           verificationCode: true,
-          givenName: true
+          givenName: true,
+          verificationStatus: true
         }
       })
     ]);
@@ -53,7 +54,8 @@ const companyPrivateInfosResolvers: QueryResolvers["companyPrivateInfos"] =
         gerepId: company?.gerepId,
         securityCode: userBelongsToCompany ? company?.securityCode : null,
         verificationCode: company?.verificationCode,
-        givenName: company?.givenName
+        givenName: company?.givenName,
+        verificationStatus: company?.verificationStatus
       },
       isAnonymousCompany: isAnonymousCompany > 0,
       receivedSignatureAutomations: []

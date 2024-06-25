@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import { inviteUserToJoin, notifyUserOfInvite, renderMail } from "@td/mail";
 import { siretify } from "../../../../__tests__/factories";
 import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompanyService";
@@ -46,9 +45,7 @@ describe("inviteUserToCompany", () => {
     const company = { siret, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
-    const adminUser = { name: "John Snow" } as User;
-
-    await inviteUserToCompany(adminUser, {
+    await inviteUserToCompany({
       email: "arya.stark@trackdechets.fr",
       siret,
       role: "MEMBER"
@@ -78,9 +75,7 @@ describe("inviteUserToCompany", () => {
     const company = { siret, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
-    const adminUser = { name: "John Snow" } as User;
-
-    await inviteUserToCompany(adminUser, {
+    await inviteUserToCompany({
       email: "arya.stark@trackdechets.fr",
       siret,
       role: "MEMBER"
@@ -121,9 +116,7 @@ describe("inviteUserToCompany", () => {
     const company = { siret, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
-    const adminUser = { name: "John Snow" } as User;
-
-    await inviteUserToCompany(adminUser, {
+    await inviteUserToCompany({
       email: "arya.stark@trackdechets.fr",
       siret,
       role: "MEMBER"

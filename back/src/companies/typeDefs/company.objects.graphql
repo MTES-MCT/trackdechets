@@ -561,6 +561,9 @@ type CompanyMember {
   "Identifiant opaque"
   id: ID!
 
+  "Identifiant de la company utile pour la gestion du cache"
+  orgId: ID!
+
   "Email"
   email: String!
 

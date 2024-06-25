@@ -6,7 +6,8 @@ const routes = {
     reindex: "/admin/reindex",
     user: "/admin/user",
     impersonate: "/admin/impersonate",
-    registry: "/admin/registry"
+    registry: "/admin/registry",
+    membersAdmin: "admin/members"
   },
   login: "/login",
   invite: "/invite",

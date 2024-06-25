@@ -71,3 +71,19 @@ enum SignatureAuthor {
   "L'auteur de la signature est l'éco-organisme figurant sur le BSD"
   ECO_ORGANISME
 }
+
+"Mode de transport"
+enum TransportMode {
+  "Route"
+  ROAD
+  "Voie ferrée"
+  RAIL
+  "Voie aérienne"
+  AIR
+  "Voie fluviale"
+  RIVER
+  "Voie maritime"
+  SEA
+  "Autre (utilisé avec Packaging = PIPELINE par exemple)"
+  OTHER
+}

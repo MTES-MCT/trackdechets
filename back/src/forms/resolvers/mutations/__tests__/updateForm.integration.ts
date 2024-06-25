@@ -2844,7 +2844,7 @@ describe("Mutation.updateForm", () => {
     const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
 
-    const threeDaysAgo = sub(new Date(), { days: 5 });
+    const fiveDaysAgo = sub(new Date(), { days: 5 });
     const appendix1_1 = await prisma.form.create({
       data: {
         readableId: getReadableId(),
@@ -2858,7 +2858,7 @@ describe("Mutation.updateForm", () => {
         emitterCompanyMail: "annexe1@test.com",
         wasteDetailsCode: "16 06 01*",
         owner: { connect: { id: user.id } },
-        takenOverAt: threeDaysAgo
+        takenOverAt: fiveDaysAgo
       }
     });
 
@@ -2961,6 +2961,76 @@ describe("Mutation.updateForm", () => {
     expect(errors[0].message).toContain(
       "Impossible de regrouper des BSDD d'annexe 1 sur un bordereau de tournée en brouillon"
     );
+  });
+
+  it("should allow updating appendix1 if one of them has been signed by the transporter for less than 5 days but more than 4", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const fourDaysAgo = sub(new Date(), { days: 4 });
+    const appendix1_1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.SENT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } },
+        takenOverAt: fourDaysAgo
+      }
+    });
+
+    // Group with appendix1_1
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SENT,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1,
+        grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
+      }
+    });
+
+    const appendix1_2 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    // Add appendix1_2
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          grouping: [
+            { form: { id: appendix1_1.id } },
+            { form: { id: appendix1_2.id } }
+          ]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
   });
 
   it.each([Status.DRAFT, Status.SEALED, Status.SIGNED_BY_PRODUCER])(

@@ -247,6 +247,7 @@ export const AccountCompanyMemberFragment = {
   user: gql`
     fragment AccountCompanyMemberUserFragment on CompanyMember {
       id
+      orgId
       isMe
       email
       name
