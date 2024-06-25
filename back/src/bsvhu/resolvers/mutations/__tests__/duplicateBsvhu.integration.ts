@@ -396,4 +396,33 @@ describe("mutaion.duplicateBsvhu", () => {
       "updated destination address"
     );
   });
+
+  it("should *not* duplicate destinationOperationCode & Mode", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const bsvhu = await bsvhuFactory({
+      opt: { emitterCompanySiret: emitter.company.siret,
+        destinationOperationCode: "R1",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+
+    // When
+    const { data, errors } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
+      {
+        variables: { id: bsvhu.id }
+      }
+    );
+    expect(errors).toBeUndefined();
+
+    // Then
+    const duplicatedVhu = await prisma.bsvhu.findFirstOrThrow({
+      where: { id: data.duplicateBsvhu.id }
+    });
+
+    expect(duplicatedVhu.destinationOperationCode).toBeNull();
+    expect(duplicatedVhu.destinationOperationMode).toBeNull();
+  });
 });
