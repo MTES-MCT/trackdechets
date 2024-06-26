@@ -520,11 +520,11 @@ const traversals = {
       localKey: "id",
       foreignKey: "userId"
     },
-    {
-      type: "MembershipRequest",
-      localKey: "id",
-      foreignKey: "userId"
-    },
+    // {
+    //   type: "MembershipRequest",
+    //   localKey: "id",
+    //   foreignKey: "userId"
+    // },
     // {
     //   type: "StatusLog",
     //   localKey: "id",
