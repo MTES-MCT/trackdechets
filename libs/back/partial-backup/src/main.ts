@@ -149,7 +149,12 @@ const run = async () => {
   /*
     Load the root BSD
   */
-  const bsds = await pipelines[originType].getter(originId, rootObjId);
+  let bsds;
+  try {
+    bsds = await pipelines[originType].getter(originId, rootObjId);
+  } catch (error) {
+    console.log(error);
+  }
   const bsd = bsds?.[0];
   if (!bsd) {
     console.error("Root BSD not found");
@@ -183,16 +188,11 @@ const run = async () => {
       return;
     }
     for (const item of traversals[root.type]) {
-      // console.log(
-      //   `fetching ${item.type}, fKey: ${item.foreignKey}, lKey: ${
-      //     root.obj[item.localKey]
-      //   }`
-      // );
       const getter = pipelines[item.type]?.getter;
       if (!getter) {
         // console.log(`MISSING GETTER FOR ${item.type}`);
+        continue;
       }
-      // const setter = pipelines[item.type]?.setter;
       const objects = await getter?.(item.foreignKey, root.obj[item.localKey]);
       const filteredObjects = objects?.filter(obj => {
         if (alreadyFetched[obj.id]) {
@@ -202,7 +202,6 @@ const run = async () => {
           type: item.type,
           obj
         };
-        // alreadyFetched[obj.id] = true;
         return true;
       });
       if (filteredObjects?.length) {
