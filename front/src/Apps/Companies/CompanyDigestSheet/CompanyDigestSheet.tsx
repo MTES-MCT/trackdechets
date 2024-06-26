@@ -99,6 +99,7 @@ const CompanyDigestDownload = ({ companyDigests, year, onClick }) => {
     ? () =>
         getPdf({
           variables: { id: companyDigest.id },
+          fetchPolicy: "network-only",
           onCompleted: r => {
             if (r.companyDigestPdf.downloadLink == null) {
               return;
