@@ -356,6 +356,7 @@ export const CompanyDetailsfragment = {
       siret
       vatNumber
       userRole
+      featureFlags
       ...AccountCompanyInfoFragment
       ...AccountCompanySecurityFragment
       ...AccountCompanyMemberListFragment

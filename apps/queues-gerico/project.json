@@ -1,0 +1,105 @@
+{
+  "name": "queues-gerico",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/queues-gerico/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "dependsOn": [
+        "^codegen",
+        {
+          "projects": ["@td/prisma"],
+          "target": "generate"
+        }
+      ],
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/queues-gerico",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "apps/queues-gerico/src/main.ts",
+        "tsConfig": "apps/queues-gerico/tsconfig.app.json",
+        "assets": [
+          {
+            "input": "./libs/back/mail/src",
+            "glob": "**/*.html",
+            "output": "./libs/back/mail/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/*.{graphql,pdf,png,ttf,html,css,svg,wsdl,mp3}",
+            "output": "./back/src"
+          },
+          {
+            "input": "./back/src",
+            "glob": "**/assets/*.js",
+            "output": "./back/src"
+          },
+          {
+            "input": "./libs/back/prisma/src",
+            "glob": "**/*.{prisma,sql}",
+            "output": "./libs/back/prisma/src"
+          }
+        ],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {
+          "skipTypeCheck": true
+        },
+        "integration": {
+          "skipTypeCheck": true
+        },
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "queues-gerico:build",
+        "inspect": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "queues-gerico:build:development"
+        },
+        "integration": {
+          "watch": false,
+          "buildTarget": "queues-gerico:build:integration"
+        },
+        "production": {
+          "buildTarget": "queues-gerico:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/queues-gerico/jest.config.ts"
+      }
+    }
+  },
+  "tags": ["backend:queues", "backend:background"]
+}
