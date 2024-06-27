@@ -570,60 +570,6 @@ describe("toAllWaste", () => {
     expect(waste.intermediary3CompanyName).toBe(intermediary3.company.name);
     expect(waste.intermediary3CompanySiret).toBe(intermediary3.company.siret);
   });
-});
-
-describe("toManagedWaste", () => {
-  afterAll(resetDatabase);
-
-  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
-    // Given
-    const user = await userFactory();
-    const bsdd = await formFactory({
-      ownerId: user.id,
-      opt: {
-        wasteDetailsQuantity: 10.5,
-        wasteAcceptationStatus: "PARTIALLY_REFUSED",
-        quantityReceived: 11.7,
-        quantityRefused: 8.6
-      }
-    });
-
-    // When
-    const formForRegistry = await prisma.form.findUniqueOrThrow({
-      where: { id: bsdd.id },
-      include: RegistryFormInclude
-    });
-    const wasteRegistry = toManagedWaste(formToBsdd(formForRegistry));
-
-    // Then
-    expect(wasteRegistry.weight).toBe(10.5);
-    expect(wasteRegistry.destinationReceptionWeight).toBe(11.7);
-    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBe(3.1);
-    expect(wasteRegistry.destinationReceptionRefusedWeight).toBe(8.6);
-  });
-
-  it("should contain nextDestination operation code & notification number", async () => {
-    // Given
-    const user = await userFactory();
-    const bdd = await formFactory({
-      ownerId: user.id,
-      opt: {
-        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
-        nextDestinationProcessingOperation: "D9"
-      }
-    });
-
-    // When
-    const formForRegistry = await prisma.form.findUniqueOrThrow({
-      where: { id: bdd.id },
-      include: RegistryFormInclude
-    });
-    const waste = toManagedWaste(formToBsdd(formForRegistry));
-
-    // Then
-    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
-    expect(waste.nextDestinationProcessingOperation).toBe("D9");
-  });
 
   it("should work with only 1 intermediary", async () => {
     // Given
@@ -653,35 +599,6 @@ describe("toManagedWaste", () => {
     expect(waste.intermediary2CompanySiret).toBe(null);
     expect(waste.intermediary3CompanyName).toBe(null);
     expect(waste.intermediary3CompanySiret).toBe(null);
-  });
-});
-
-describe("toTransportedWaste", () => {
-  afterAll(resetDatabase);
-
-  it("should contain emitted weight and destinationReception weight", async () => {
-    // Given
-    const user = await userFactory();
-    const bsdd = await formFactory({
-      ownerId: user.id,
-      opt: {
-        wasteDetailsQuantity: 10.5,
-        wasteAcceptationStatus: "PARTIALLY_REFUSED",
-        quantityReceived: 11.7,
-        quantityRefused: 8.6
-      }
-    });
-
-    // When
-    const formForRegistry = await prisma.form.findUniqueOrThrow({
-      where: { id: bsdd.id },
-      include: RegistryFormInclude
-    });
-    const wasteRegistry = toTransportedWaste(formToBsdd(formForRegistry));
-
-    // Then
-    expect(wasteRegistry.weight).toBe(10.5);
-    expect(wasteRegistry.destinationReceptionWeight).toBe(11.7);
   });
 
   it("should work with 2 intermediaries", async () => {
@@ -738,6 +655,89 @@ describe("toTransportedWaste", () => {
     expect(waste.intermediary2CompanySiret).toBe(null);
     expect(waste.intermediary3CompanyName).toBe(null);
     expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+});
+
+describe("toManagedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        wasteDetailsQuantity: 10.5,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 11.7,
+        quantityRefused: 8.6
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const wasteRegistry = toManagedWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(wasteRegistry.weight).toBe(10.5);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(11.7);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBe(3.1);
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBe(8.6);
+  });
+
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toManagedWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+});
+
+describe("toTransportedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        wasteDetailsQuantity: 10.5,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 11.7,
+        quantityRefused: 8.6
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const wasteRegistry = toTransportedWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(wasteRegistry.weight).toBe(10.5);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(11.7);
   });
 });
 

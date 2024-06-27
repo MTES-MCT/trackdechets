@@ -94,7 +94,7 @@ export function getRegistryFields(
   return registryFields;
 }
 
-function toGenericWaste(
+export function toGenericWaste(
   bspaoh: Bspaoh & {
     transporters: BspaohTransporter[];
   }

@@ -107,7 +107,7 @@ export const getSubType = (bsdasri: Bsdasri): BsdSubType => {
   }
 };
 
-function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
+export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
   return {
     wasteDescription: bsdasri.wasteCode
       ? getWasteDescription(bsdasri.wasteCode)

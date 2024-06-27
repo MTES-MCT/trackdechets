@@ -1,6 +1,7 @@
 import {
   getSubType,
   toAllWaste,
+  toGenericWaste,
   toIncomingWaste,
   toManagedWaste,
   toOutgoingWaste,
@@ -313,7 +314,7 @@ describe("toGenericWaste", () => {
       where: { id: bsff.id },
       include: RegistryBsffInclude
     });
-    const waste = toOutgoingWaste(bsffForRegistry);
+    const waste = toGenericWaste(bsffForRegistry);
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");

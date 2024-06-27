@@ -193,7 +193,7 @@ export const getSubType = (bsda: RegistryBsda): BsdSubType => {
   return bsda.type;
 };
 
-function toGenericWaste(bsda: RegistryBsda): GenericWaste {
+export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,

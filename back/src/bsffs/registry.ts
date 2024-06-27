@@ -118,7 +118,7 @@ export const getSubType = (bsff: RegistryBsff): BsdSubType => {
   return "INITIAL";
 };
 
-function toGenericWaste(bsff: RegistryBsff): GenericWaste {
+export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
   const bsffDestination = toBsffDestination(bsff.packagings);
   const transporter = getFirstTransporterSync(bsff);
 

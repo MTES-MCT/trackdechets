@@ -2,6 +2,7 @@ import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import {
   toAllWaste,
+  toGenericWaste,
   toIncomingWaste,
   toManagedWaste,
   toOutgoingWaste,
@@ -153,7 +154,7 @@ describe("toGenericWaste", () => {
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: bsvhu.id }
     });
-    const waste = toOutgoingWaste(bsvhuForRegistry);
+    const waste = toGenericWaste(bsvhuForRegistry);
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");

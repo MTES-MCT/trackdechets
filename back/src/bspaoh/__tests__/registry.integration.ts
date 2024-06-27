@@ -3,6 +3,7 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { RegistryBspaohInclude } from "../../registry/elastic";
 import {
   toAllWaste,
+  toGenericWaste,
   toIncomingWaste,
   toManagedWaste,
   toOutgoingWaste,
@@ -160,7 +161,7 @@ describe("toGenericWaste", () => {
       where: { id: paoh.id },
       include: RegistryBspaohInclude
     });
-    const waste = toOutgoingWaste(paohForRegistry);
+    const waste = toGenericWaste(paohForRegistry);
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");

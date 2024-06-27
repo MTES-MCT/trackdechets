@@ -1,6 +1,7 @@
 import {
   getSubType,
   toAllWaste,
+  toGenericWaste,
   toIncomingWaste,
   toManagedWaste,
   toOutgoingWaste,
@@ -366,6 +367,59 @@ describe("toAllWaste", () => {
     expect(waste.intermediary3CompanySiret).toBe(null);
   });
 
+  it("should work with 2 intermediaries", async () => {
+    // Given
+    const intermediary1 = await companyFactory({});
+    const intermediary2 = await companyFactory({});
+    const bsda = await bsdaFactory({
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1),
+            toIntermediaryCompany(intermediary2)
+          ]
+        }
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.siret);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+
+  it("should not crash if no intermediary", async () => {
+    // Given
+    const bsda = await bsdaFactory({});
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(null);
+    expect(waste.intermediary1CompanySiret).toBe(null);
+    expect(waste.intermediary2CompanyName).toBe(null);
+    expect(waste.intermediary2CompanySiret).toBe(null);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+
   it("bsda with tmp storage should mention post-temp-storage destination", async () => {
     // Given
     const recipient = await companyFactory({ name: "Recipient" });
@@ -439,59 +493,6 @@ describe("toManagedWaste", () => {
     expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
     expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
   });
-
-  it("should work with 2 intermediaries", async () => {
-    // Given
-    const intermediary1 = await companyFactory({});
-    const intermediary2 = await companyFactory({});
-    const bsda = await bsdaFactory({
-      opt: {
-        intermediaries: {
-          create: [
-            toIntermediaryCompany(intermediary1),
-            toIntermediaryCompany(intermediary2)
-          ]
-        }
-      }
-    });
-
-    // When
-    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
-      where: { id: bsda.id },
-      include: RegistryBsdaInclude
-    });
-    const waste = toAllWaste(bsdaForRegistry);
-
-    // Then
-    expect(waste).not.toBeUndefined();
-    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
-    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
-    expect(waste.intermediary2CompanyName).toBe(intermediary2.name);
-    expect(waste.intermediary2CompanySiret).toBe(intermediary2.siret);
-    expect(waste.intermediary3CompanyName).toBe(null);
-    expect(waste.intermediary3CompanySiret).toBe(null);
-  });
-
-  it("should not crash if no intermediary", async () => {
-    // Given
-    const bsda = await bsdaFactory({});
-
-    // When
-    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
-      where: { id: bsda.id },
-      include: RegistryBsdaInclude
-    });
-    const waste = toAllWaste(bsdaForRegistry);
-
-    // Then
-    expect(waste).not.toBeUndefined();
-    expect(waste.intermediary1CompanyName).toBe(null);
-    expect(waste.intermediary1CompanySiret).toBe(null);
-    expect(waste.intermediary2CompanyName).toBe(null);
-    expect(waste.intermediary2CompanySiret).toBe(null);
-    expect(waste.intermediary3CompanyName).toBe(null);
-    expect(waste.intermediary3CompanySiret).toBe(null);
-  });
 });
 
 describe("toTransportedWaste", () => {
@@ -535,7 +536,7 @@ describe("toGenericWaste", () => {
       where: { id: form.id },
       include: RegistryBsdaInclude
     });
-    const waste = toAllWaste(bsdaForRegistry);
+    const waste = toGenericWaste(bsdaForRegistry);
 
     // Then
     expect(waste.destinationCompanyMail).toStrictEqual("destination@mail.com");

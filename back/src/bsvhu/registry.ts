@@ -75,7 +75,7 @@ export function getRegistryFields(
   return registryFields;
 }
 
-function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
+export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
   return {
     wasteDescription: getWasteDescription(bsvhu.wasteCode),
     wasteCode: bsvhu.wasteCode,
