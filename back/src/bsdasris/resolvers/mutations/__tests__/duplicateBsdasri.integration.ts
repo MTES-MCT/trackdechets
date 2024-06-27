@@ -456,4 +456,36 @@ describe("Mutation.duplicateBsdasri", () => {
     expect(duplicatedDasri.emitterWasteVolume).toBeNull();
     expect(duplicatedDasri.emitterWastePackagings).toStrictEqual([]);
   });
+
+  it("should *not* duplicate destinationOperationCode & Mode", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        destinationOperationCode: "R1",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
+      DUPLICATE_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
+      }
+    );
+    expect(errors).toBeUndefined();
+
+    // When
+    const duplicatedDasri = await prisma.bsdasri.findFirstOrThrow({
+      where: { id: data.duplicateBsdasri.id }
+    });
+
+    expect(duplicatedDasri.destinationOperationCode).toBeNull();
+    expect(duplicatedDasri.destinationOperationMode).toBeNull();
+  });
 });

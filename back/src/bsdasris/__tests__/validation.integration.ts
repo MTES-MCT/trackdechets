@@ -539,11 +539,11 @@ describe("Mutation.signBsdasri emission", () => {
       }
     );
 
-    test("should work if operation mode is missing but step is not operation", async () => {
+    test("should work if operation code & mode are missing", async () => {
       const data = {
         ...bsdasri,
-        destinationOperationCode: "D10",
-        destinationOperationMode: undefined, // Correct mode is ELIMINATION
+        destinationOperationCode: undefined,
+        destinationOperationMode: undefined,
         destinationOperationDate: new Date(),
         destinationReceptionWasteWeightValue: 10
       };
