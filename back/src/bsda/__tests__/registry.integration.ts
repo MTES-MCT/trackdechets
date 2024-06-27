@@ -257,18 +257,17 @@ describe("toAllWaste", () => {
     expect(waste.intermediary3CompanyName).toBe(intermediary3.name);
     expect(waste.intermediary3CompanySiret).toBe(intermediary3.siret);
   });
-});
 
-describe("toManagedWaste", () => {
-  afterAll(resetDatabase);
 
-  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+  it("should work with 1 intermediary", async () => {
     // Given
+    const intermediary1 = await companyFactory({});
+
     const bsda = await bsdaFactory({
       opt: {
-        weightValue: 56.5,
-        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
-        destinationReceptionWeight: 78.9
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary1)]
+        }
       }
     });
 
@@ -277,14 +276,18 @@ describe("toManagedWaste", () => {
       where: { id: bsda.id },
       include: RegistryBsdaInclude
     });
-    const wasteRegistry = toManagedWaste(bsdaForRegistry);
+    const waste = toAllWaste(bsdaForRegistry);
 
     // Then
-    expect(wasteRegistry.weight).toBe(0.0565);
-    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
-    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
-    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
+    expect(waste.intermediary2CompanyName).toBe(null);
+    expect(waste.intermediary2CompanySiret).toBe(null);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
   });
+
 
   it("bsda with tmp storage should mention post-temp-storage destination", async () => {
     // Given
@@ -331,41 +334,12 @@ describe("toManagedWaste", () => {
     expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
     expect(waste.postTempStorageDestinationCountry).toBe("FR");
   });
-
-  it("should work with 1 intermediary", async () => {
-    // Given
-    const intermediary1 = await companyFactory({});
-
-    const bsda = await bsdaFactory({
-      opt: {
-        intermediaries: {
-          create: [toIntermediaryCompany(intermediary1)]
-        }
-      }
-    });
-
-    // When
-    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
-      where: { id: bsda.id },
-      include: RegistryBsdaInclude
-    });
-    const waste = toAllWaste(bsdaForRegistry);
-
-    // Then
-    expect(waste).not.toBeUndefined();
-    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
-    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
-    expect(waste.intermediary2CompanyName).toBe(null);
-    expect(waste.intermediary2CompanySiret).toBe(null);
-    expect(waste.intermediary3CompanyName).toBe(null);
-    expect(waste.intermediary3CompanySiret).toBe(null);
-  });
 });
 
-describe("toTransportedWaste", () => {
+describe("toManagedWaste", () => {
   afterAll(resetDatabase);
 
-  it("should contain emitted weight and destinationReception weight", async () => {
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
     // Given
     const bsda = await bsdaFactory({
       opt: {
@@ -380,11 +354,13 @@ describe("toTransportedWaste", () => {
       where: { id: bsda.id },
       include: RegistryBsdaInclude
     });
-    const wasteRegistry = toTransportedWaste(bsdaForRegistry);
+    const wasteRegistry = toManagedWaste(bsdaForRegistry);
 
     // Then
     expect(wasteRegistry.weight).toBe(0.0565);
     expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
   });
 
   it("should work with 2 intermediaries", async () => {
@@ -438,6 +414,32 @@ describe("toTransportedWaste", () => {
     expect(waste.intermediary2CompanySiret).toBe(null);
     expect(waste.intermediary3CompanyName).toBe(null);
     expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+});
+
+describe("toTransportedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight", async () => {
+    // Given
+    const bsda = await bsdaFactory({
+      opt: {
+        weightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWeight: 78.9
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const wasteRegistry = toTransportedWaste(bsdaForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
   });
 });
 
