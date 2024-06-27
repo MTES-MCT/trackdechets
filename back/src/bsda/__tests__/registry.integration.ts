@@ -42,6 +42,25 @@ describe("toIncomingWaste", () => {
     expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
     expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
   });
+
+  it("should contain next destination operation code", async () => {
+    // Given
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationOperationNextDestinationPlannedOperationCode: "D9"
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toIncomingWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
 });
 
 describe("toOutgoingWaste", () => {
@@ -111,6 +130,25 @@ describe("toOutgoingWaste", () => {
     expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
   });
 
+  it("should contain next destination operation code", async () => {
+    // Given
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationOperationNextDestinationPlannedOperationCode: "D9"
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toOutgoingWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+
   it("bsda with tmp storage should mention post-temp-storage destination", async () => {
     // Given
     const recipient = await companyFactory({ name: "Recipient" });
@@ -158,6 +196,29 @@ describe("toOutgoingWaste", () => {
   });
 });
 
+describe("toManagedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain next destination operation code", async () => {
+    // Given
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationOperationNextDestinationPlannedOperationCode: "D9"
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toManagedWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+});
+
 describe("toAllWaste", () => {
   it(
     "should compute destinationFinalOperationCodes" +
@@ -198,6 +259,24 @@ describe("toAllWaste", () => {
       expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
     }
   );
+  it("should contain next destination operation code", async () => {
+    // Given
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationOperationNextDestinationPlannedOperationCode: "D9"
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
 
   it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
     // Given
@@ -258,7 +337,6 @@ describe("toAllWaste", () => {
     expect(waste.intermediary3CompanySiret).toBe(intermediary3.siret);
   });
 
-
   it("should work with 1 intermediary", async () => {
     // Given
     const intermediary1 = await companyFactory({});
@@ -287,7 +365,6 @@ describe("toAllWaste", () => {
     expect(waste.intermediary3CompanyName).toBe(null);
     expect(waste.intermediary3CompanySiret).toBe(null);
   });
-
 
   it("bsda with tmp storage should mention post-temp-storage destination", async () => {
     // Given

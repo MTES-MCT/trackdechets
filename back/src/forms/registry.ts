@@ -309,7 +309,9 @@ export function toIncomingWaste(
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
-    ...getOperationData(bsdd)
+    ...getOperationData(bsdd),
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
 
@@ -359,7 +361,9 @@ export function toOutgoingWaste(
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd),
-    ...getFinalOperationsData(bsdd)
+    ...getFinalOperationsData(bsdd),
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
 
@@ -473,7 +477,9 @@ export function toManagedWaste(
     destinationCompanyMail: bsdd.destinationCompanyMail,
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
-    destinationReceptionWeight: bsdd.destinationReceptionWeight
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
   };
 }
 
@@ -537,6 +543,8 @@ export function toAllWaste(
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd),
+    nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
     ...getIntermediariesData(bsdd)
   };
 }
