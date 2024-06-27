@@ -24,7 +24,7 @@ export function DsfrModal({
   onClose,
   size = "M",
   closeLabel = "Fermer",
-  padding
+  padding = true
 }: Readonly<DsfrModalProps>) {
   // Handling react-dsfr modal is a bit hacky and tricky to customize, let's stick to a dsfr-ized custom modal component
   // Dsrf modal is vertically centered, it does not play nicely with tabs and varying children height, so we override the flex
