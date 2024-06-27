@@ -30,9 +30,12 @@ import {
   createBsffAfterOperation,
   createBsffBeforeAcceptation,
   createBsffAfterReception,
-  createBsffPackaging
+  createBsffPackaging,
+  createBsffAfterTransport,
+  addBsffTransporter
 } from "../../../__tests__/factories";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
+import { getTransportersSync } from "../../../database";
 
 const SIGN = gql`
   mutation Sign($id: ID!, $input: BsffSignatureInput!) {
@@ -481,6 +484,112 @@ describe("Mutation.signBsff", () => {
         })
       ]);
     });
+
+    it("should sign transport for transporter N", async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const destination = await userWithCompanyFactory("ADMIN");
+      const transporter1 = await userWithCompanyFactory("ADMIN");
+      const transporter2 = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({ company: transporter1.company });
+      await transporterReceiptFactory({ company: transporter2.company });
+
+      // Crée un BSFF avec la signature du premier transporteur
+      const bsff = await createBsffAfterTransport({
+        emitter,
+        transporter: transporter1,
+        destination
+      });
+
+      const bsffTransporter2 = await addBsffTransporter({
+        bsffId: bsff.id,
+        transporter: transporter2
+      });
+
+      const transporterTransportSignatureDate2 = new Date(
+        "2018-12-13T00:00:00.000Z"
+      );
+      const { mutate } = makeClient(transporter2.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            type: "TRANSPORT",
+            date: transporterTransportSignatureDate2.toISOString() as any,
+            author: "Transporteur n°2"
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      const updatedBsff = await prisma.bsff.findFirstOrThrow({
+        where: { id: bsff.id },
+        include: { transporters: true }
+      });
+
+      // Le statut ne doit pas être modifié
+      expect(updatedBsff.status).toEqual("SENT");
+
+      const transporters = getTransportersSync(updatedBsff);
+
+      expect(transporters[1].id).toEqual(bsffTransporter2.id);
+      expect(transporters[1].transporterTransportSignatureDate).toEqual(
+        transporterTransportSignatureDate2
+      );
+    });
+
+    it("should not be possible for transporter N+1 to sign if transporter N has not signed", async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const destination = await userWithCompanyFactory("ADMIN");
+      const transporter1 = await userWithCompanyFactory("ADMIN");
+      const transporter2 = await userWithCompanyFactory("ADMIN");
+      const transporter3 = await userWithCompanyFactory("ADMIN");
+
+      await transporterReceiptFactory({ company: transporter1.company });
+      await transporterReceiptFactory({ company: transporter2.company });
+
+      // Crée un BSFF avec un la signature du premier transporteur
+      const bsff = await createBsffAfterTransport({
+        emitter,
+        transporter: transporter1,
+        destination
+      });
+
+      // Ajoute un second transporteur qui n'a pas signé
+      await addBsffTransporter({
+        bsffId: bsff.id,
+        transporter: transporter2
+      });
+
+      // Ajoute un troisième transporteur
+      await addBsffTransporter({
+        bsffId: bsff.id,
+        transporter: transporter3
+      });
+
+      // tente de signer pour le 3ème transporteur
+      const { mutate } = makeClient(transporter3.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            type: "TRANSPORT",
+            author: "Transporteur n°3"
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: "Vous ne pouvez pas signer ce bordereau"
+        })
+      ]);
+    });
   });
 
   describe("RECEPTION", () => {
@@ -508,6 +617,62 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
+    });
+
+    it("should be possible to sign operation even if the last transporter multi-modal has not signed", async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const destination = await userWithCompanyFactory("ADMIN");
+      const transporter1 = await userWithCompanyFactory("ADMIN");
+      const transporter2 = await userWithCompanyFactory("ADMIN");
+
+      await transporterReceiptFactory({ company: transporter1.company });
+      await transporterReceiptFactory({ company: transporter2.company });
+
+      const bsff = await createBsffBeforeReception({
+        emitter,
+        transporter: transporter1,
+        destination
+      });
+
+      // Ajoute un second transporteur qui n'a pas signé
+      await addBsffTransporter({
+        bsffId: bsff.id,
+        transporter: transporter2
+      });
+
+      const { mutate } = makeClient(destination.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            type: "RECEPTION",
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.signBsff.id).toBeTruthy();
+
+      const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+        where: { id: bsff.id },
+        include: { transporters: true }
+      });
+
+      expect(updatedBsff.status).toEqual("RECEIVED");
+
+      // le second transporteur qui n'a pas signé ne doit plus apparaitre sur le bordereau
+      expect(updatedBsff.transporters).toHaveLength(1);
+      expect(updatedBsff.transporters[0].transporterCompanySiret).toEqual(
+        transporter1.company.siret
+      );
+      expect(
+        updatedBsff.transporters[0].transporterTransportSignatureDate
+      ).not.toBeNull();
     });
   });
 

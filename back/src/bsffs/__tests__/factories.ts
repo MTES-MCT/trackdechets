@@ -408,7 +408,7 @@ export const addBsffTransporter = async ({
       transporterRecepisseDepartment: transporterReceipt.department
     };
   }
-  await prisma.bsffTransporter.create({
+  return prisma.bsffTransporter.create({
     data: {
       ...transporterData,
       number: count + 1,

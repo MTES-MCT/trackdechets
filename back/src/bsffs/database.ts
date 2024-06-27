@@ -247,7 +247,7 @@ export async function createBsff(
 
   const zodBsff = await graphQlInputToZodBsff(input);
 
-  const { packagings, transporters, ...parsedZodBsff } = await parseBsffAsync(
+  const { packagings, ...parsedZodBsff } = await parseBsffAsync(
     { ...zodBsff, isDraft },
     {
       user,
@@ -255,13 +255,25 @@ export async function createBsff(
     }
   );
 
-  const firstTransporter = (() => {
-    if (transporters && transporters.length > 0) {
-      const { id, bsffId, number, ...rest } = transporters[0];
-      return rest;
-    }
-    return {};
-  })();
+  let transporters:
+    | Prisma.BsffTransporterCreateNestedManyWithoutBsffInput
+    | undefined = undefined;
+
+  if (input.transporter) {
+    transporters = {
+      createMany: {
+        // un seul transporteur dans le tableau normalement
+        data: parsedZodBsff.transporters!.map((t, idx) => {
+          const { id, bsffId, ...data } = t;
+          return { ...data, number: idx + 1 };
+        })
+      }
+    };
+  } else if (input.transporters && input.transporters.length > 0) {
+    transporters = {
+      connect: parsedZodBsff.transporters?.map(t => ({ id: t.id! }))
+    };
+  }
 
   const data: Prisma.BsffCreateInput = {
     ...parsedZodBsff,
@@ -283,12 +295,7 @@ export async function createBsff(
     ficheInterventions: {
       connect: ficheInterventions.map(fi => ({ id: fi.id }))
     },
-    // On crée un premier transporteur par défaut (même si tous les champs sont nuls)
-    // Cela permet dans un premier temps d'être raccord avec le modèle "à plat"
-    // en attendant l'implémentation du multi-modal
-    transporters: {
-      create: { ...firstTransporter, number: 1 }
-    }
+    transporters
   };
 
   const bsffRepository = getBsffRepository(user);

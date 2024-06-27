@@ -72,7 +72,7 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
     const {
       // transport values that should not be duplicated
       id: transporterId,
-      bsffId: transporterBsdaId,
+      bsffId: transporterBffId,
       transporterTransportPlates,
       transporterTransportTakenOverAt,
       transporterTransportSignatureAuthor,

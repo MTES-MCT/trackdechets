@@ -187,6 +187,9 @@ export function expandBsffFromDB(
         }
       : null,
     transporter: transporter ? expandBsffTransporterFromDb(transporter) : null,
+    transporters: (prismaBsff.transporters ?? [])
+      .map(t => expandBsffTransporterFromDb(t))
+      .filter(Boolean),
     destination: nullIfNoValues<GraphQL.BsffDestination>({
       cap: prismaBsff.destinationCap,
       company: nullIfNoValues<GraphQL.FormCompany>({
