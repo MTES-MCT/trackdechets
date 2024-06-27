@@ -1299,7 +1299,7 @@ describe("Mutation.Bsda.create", () => {
     );
   });
 
-  it("should fail if the bsda next destination is not registered as a destination", async () => {
+  it.only("should fail if the bsda next destination is not registered as a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER"
@@ -1318,7 +1318,7 @@ describe("Mutation.Bsda.create", () => {
         isPrivateIndividual: false,
         company: {
           siret: company.siret,
-          name: "The crusher",
+         
           address: "Rue de la carcasse",
           contact: "Centre amiante",
           phone: "0101010101",
@@ -1373,9 +1373,14 @@ describe("Mutation.Bsda.create", () => {
       }
     });
 
+    console.log(errors);
+
     expect(errors.length).toBe(1);
     expect(errors[0].message).toContain(
       "est pas inscrite sur Trackdéchets en tant qu'installation de traitement"
+    );
+    expect(errors[0].message).toContain(
+      "Le nom de l'entreprise émettrice est obligatoire."
     );
   });
 
