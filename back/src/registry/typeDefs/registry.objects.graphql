@@ -507,6 +507,11 @@ type OutgoingWaste {
   "Code d'opération ultérieure prévue"
   nextDestinationProcessingOperation: String
 
+  "N° de notification / déclaration"
+  nextDestinationNotificationNumber: String
+  "Code d'opération ultérieure prévue"
+  nextDestinationProcessingOperation: String
+
   ###########################################################
   # Champs additionnels non mentionnés dans l'arrêté registre
   ###########################################################

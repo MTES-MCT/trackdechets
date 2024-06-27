@@ -508,6 +508,22 @@ export const UPDATE_DASRI_DIRECT_TAKEOVER = gql`
   }
 `;
 
+export const UPDATE_ALLOW_APPENDIX_SIGNATURE_AUTOMATION = gql`
+  mutation UpdateCompany(
+    $id: String!
+    $allowAppendix1SignatureAutomation: Boolean!
+  ) {
+    updateCompany(
+      id: $id
+      allowAppendix1SignatureAutomation: $allowAppendix1SignatureAutomation
+    ) {
+      id
+      siret
+      allowAppendix1SignatureAutomation
+    }
+  }
+`;
+
 export const ADD_SIGNATURE_DELEGATION = gql`
   mutation AddSignatureAutomation($input: SignatureAutomationInput!) {
     addSignatureAutomation(input: $input) {

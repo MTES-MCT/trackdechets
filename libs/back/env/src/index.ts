@@ -133,7 +133,11 @@ export const schema = z.object({
     .optional()
     .default("false")
     .refine(isBoolean),
-  MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z.string().datetime().optional()
+  MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER: z.string().datetime().optional(),
+  GERICO_API_URL: z.string().optional(),
+  GERICO_API_KEY: z.string().optional(),
+  GERICO_WEBHOOK_SLUG: z.string(),
+  GERICO_WEBHOOK_TOKEN: z.string()
 });
 
 export const envVariables = schema.superRefine((val, ctx) => {

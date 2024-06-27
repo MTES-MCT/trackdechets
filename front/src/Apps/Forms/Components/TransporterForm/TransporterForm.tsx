@@ -60,17 +60,12 @@ export function TransporterForm<T extends AnyTransporterInput>({
   const selectedCompanyError = (company?: CompanySearchResult) => {
     if (company) {
       if (!company.isRegistered) {
-        return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
+        return "Cet établissement n'est pas inscrit sur Trackdéchets.";
       } else if (
         !transporter?.recepisse?.isExempted &&
         !company.companyTypes?.includes(CompanyType.Transporter)
       ) {
-        return (
-          "Cet établissement est bien inscrit sur Trackdéchets mais n'a pas le profil Transporteur." +
-          " Il ne peut pas être ajouté sur le bordereau." +
-          " Si vous transportez vos propres déchets, veuillez cocher la case d'exemption après avoir vérifié" +
-          " que vous remplissez bien les conditions."
-        );
+        return "Cet établissement n'a pas le profil Transporteur. Si vous transportez vos propres déchets, veuillez cocher la case d'exemption.";
       }
     }
     return null;

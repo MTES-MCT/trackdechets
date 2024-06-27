@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useMutation, useLazyQuery, gql } from "@apollo/client";
 import {
   CompanyPrivate,
@@ -7,12 +7,14 @@ import {
   Query,
   QuerySearchCompaniesArgs,
   MutationRemoveSignatureAutomationArgs,
-  MutationAddSignatureAutomationArgs
+  MutationAddSignatureAutomationArgs,
+  MutationUpdateCompanyArgs
 } from "@td/codegen-ui";
 import CompanySelector from "../../common/Components/CompanySelector/CompanySelector";
 import {
   REMOVE_SIGNATURE_DELEGATION,
-  ADD_SIGNATURE_DELEGATION
+  ADD_SIGNATURE_DELEGATION,
+  UPDATE_ALLOW_APPENDIX_SIGNATURE_AUTOMATION
 } from "../common/queries";
 import { SEARCH_COMPANIES } from "../../common/queries/company/query";
 import toast from "react-hot-toast";
@@ -20,6 +22,7 @@ import { TOAST_DURATION } from "../../../common/config";
 import { formatDate } from "../../../common/datetime";
 
 import "./companySignature.scss";
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 interface CompanySignatureAutomationProps {
   company: CompanyPrivate;
@@ -28,6 +31,38 @@ const CompanySignatureAutomation = ({
   company
 }: CompanySignatureAutomationProps) => {
   const isAdmin = company.userRole === UserRole.Admin;
+
+  const [allowSignatureAutomation, setAllowSignatureAutomation] = useState(
+    company.allowAppendix1SignatureAutomation
+  );
+
+  const [updateAllowSignatureAutomation] = useMutation<
+    Pick<Mutation, "updateCompany">,
+    MutationUpdateCompanyArgs
+  >(UPDATE_ALLOW_APPENDIX_SIGNATURE_AUTOMATION, {
+    onCompleted: () => {
+      toast.success("Paramètre enregistré", { duration: TOAST_DURATION });
+    },
+    onError: () => {
+      toast.error(
+        "Une erreur s'est produite. Veuillez réessayer dans quelques minutes.",
+        {
+          duration: TOAST_DURATION
+        }
+      );
+      setAllowSignatureAutomation(allowDirectTakeOver => !allowDirectTakeOver);
+    }
+  });
+
+  function onChangeSwitch(checked) {
+    setAllowSignatureAutomation(checked);
+    updateAllowSignatureAutomation({
+      variables: {
+        id: company.id,
+        allowAppendix1SignatureAutomation: checked
+      }
+    });
+  }
 
   const [
     searchCompaniesFromTextSearch,
@@ -153,8 +188,23 @@ const CompanySignatureAutomation = ({
   return (
     <div className="company-signature__automation">
       <h4 className="fr-h4">Signature automatique (annexe 1)</h4>
+      {isAdmin ? (
+        <ToggleSwitch
+          label="J'autorise Trackdéchets à apposer ma signature électronique au moment de la collecte de déchets avec une annexe 1 pour le ou les établissement(s) que je désigne ci-après comme collecteurs autorisés, et avec lesquels j'ai un contrat de collecte."
+          checked={allowSignatureAutomation}
+          onChange={checked => onChangeSwitch(checked)}
+        />
+      ) : (
+        <p className="fr-text">
+          {company.allowAppendix1SignatureAutomation
+            ? "Autorisé"
+            : "Non autorisé"}
+        </p>
+      )}
+
       {isAdmin && (
         <CompanySelector
+          disabled={!allowSignatureAutomation}
           loading={isLoadingSearch}
           onSelect={onSelectCompany}
           onSearch={onSearchCompany}
@@ -183,6 +233,7 @@ const CompanySignatureAutomation = ({
                   {isAdmin && (
                     <td>
                       <button
+                        disabled={!allowSignatureAutomation}
                         className="fr-btn fr-btn--icon-left fr-icon-delete-line"
                         onClick={() => onClickRevokeAutomation(delegation.id)}
                       >

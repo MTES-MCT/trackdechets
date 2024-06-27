@@ -114,6 +114,11 @@ type CompanyPrivate {
   allowBsdasriTakeOverWithoutSignature: Boolean!
 
   """
+  L'entreprise autorise la signature automatique de l'annexe 1 pour les entreprises saisies
+  """
+  allowAppendix1SignatureAutomation: Boolean!
+
+  """
   Liste des automatisations de signature accordées par l'entreprise
   """
   signatureAutomations: [SignatureAutomation!]!
@@ -122,6 +127,11 @@ type CompanyPrivate {
   Liste des automatisations de signature reçues par l'entreprise
   """
   receivedSignatureAutomations: [SignatureAutomation!]!
+
+  """
+  Liste des featureFlags
+  """
+  featureFlags: [String]!
 }
 
 type CompanyPrivateEdge {

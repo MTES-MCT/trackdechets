@@ -1,4 +1,4 @@
-"Configuration wehook"
+"Configuration webHook"
 type WebhookSetting {
   id: ID!
   createdAt: DateTime!

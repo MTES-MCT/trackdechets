@@ -63,7 +63,14 @@ const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
       .receivedSignatureAutomations({
         include: { from: true, to: true }
       });
-    return (automations as any) ?? [];
+
+    if (!automations) {
+      return [];
+    }
+
+    return automations.filter(
+      a => a.from.allowAppendix1SignatureAutomation
+    ) as any;
   },
   workerCertification: parent =>
     prisma.company

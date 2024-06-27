@@ -1,0 +1,14 @@
+"Suivi des fiches établissements"
+type CompanyDigest {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  "Année demandée"
+  year: Int!
+  "Siret de l'établissement"
+  orgId: String!
+  "Id de la fiche sur le service distant"
+  distantId: String
+  "etat de la fiche au cours de son cycle de vie"
+  state: CompanyDigestStatus
+}

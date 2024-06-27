@@ -44,6 +44,7 @@ import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
 import { oauth2Router } from "./routers/oauth2-router";
 import { oidcRouter } from "./routers/oidc-router";
+import { gericoWebhookHandler } from "./routers/gericoWebhookRouter";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
 import { GraphQLContext } from "./types";
@@ -60,7 +61,8 @@ const {
   UI_HOST,
   MAX_REQUESTS_PER_WINDOW = "1000",
   NODE_ENV,
-  TRUST_PROXY_HOPS
+  TRUST_PROXY_HOPS,
+  GERICO_WEBHOOK_SLUG
 } = process.env;
 
 const Sentry = initSentry();
@@ -310,6 +312,8 @@ app.get("/exports", (_, res) =>
 );
 
 app.get(`/${ROAD_CONTROL_SLUG}/:token`, roadControlPdfHandler);
+
+app.post(`/${GERICO_WEBHOOK_SLUG}`, gericoWebhookHandler);
 
 app.use(
   "/graphiql",
