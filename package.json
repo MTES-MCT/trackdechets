@@ -18,7 +18,7 @@
     "nx": "nx",
     "dev": "npx nx run-many -t serve --parallel=6 --projects=front,api,tag:backend:background",
     "bg:integration": "npx nx run-many -t serve --configuration=integration --projects=tag:backend:queues --parallel=5",
-    "afterpull": "npm i ; npx prisma migrate dev ; npx nx run back:codegen ; npx nx run @td/codegen-ui:build"
+    "afterpull": "npm i ; npx prisma migrate dev ; npx nx run back:codegen --skip-nx-cache ; npx nx run @td/codegen-ui:build --skip-nx-cache"
   },
   "engines": {
     "node": "^20"
