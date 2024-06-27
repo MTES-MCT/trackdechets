@@ -14,18 +14,9 @@ export function createBsff(
         input: {
           type: "COLLECTE_PETITES_QUANTITES",
           emitter: fixtures.operateurInput(operateur.siret),
-          packagings: [
-            { type: "BOUTEILLE", volume: 1, numero: "1", weight: 1 }
-          ],
-          waste: {
-            code: "14 06 01*",
-            description: "R404A",
-            adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)"
-          },
-          weight: {
-            value: 1,
-            isEstimate: true
-          },
+          packagings: fixtures.packagingsFixtures(),
+          waste: fixtures.wasteFixture(),
+          weight: fixtures.weightFixture(),
           transporter: fixtures.transporterInput(
             transporteur.siret?.length
               ? transporteur.siret
@@ -43,6 +34,28 @@ export function createBsff(
       ...ctx,
       bsff: data,
       packagings: data.packagings
+    })
+  };
+}
+
+export function createBsffWithTransporters(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
+  return {
+    ...createBsff(company),
+    description:
+      "Crée un BSFF en associant une liste de transporteurs dans un ordre donné",
+    variables: ({ operateur, traiteur, bsffTransporters }) => ({
+      input: {
+        type: "TRACER_FLUIDE",
+        emitter: fixtures.operateurInput(operateur.siret),
+        packagings: fixtures.packagingsFixtures(),
+        waste: fixtures.wasteFixture(),
+        weight: fixtures.weightFixture(),
+        destination: fixtures.traiteurInput(traiteur.siret),
+        transporters: bsffTransporters
+      }
     })
   };
 }

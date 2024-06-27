@@ -1,4 +1,10 @@
-import { User, Bsff, BsffFicheIntervention, BsffStatus } from "@prisma/client";
+import {
+  User,
+  Bsff,
+  BsffFicheIntervention,
+  BsffStatus,
+  BsffTransporter
+} from "@prisma/client";
 import {
   BsffFicheInterventionInput,
   BsffInput,
@@ -8,6 +14,7 @@ import { Permission, checkUserPermissions } from "../permissions";
 import { BsffWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";
 import { flattenBsffTransporterInput } from "./converter";
+import { prisma } from "@td/prisma";
 
 /**
  * Retrieves organisations allowed to read a BSFF
@@ -30,40 +37,72 @@ export function readers(bsff: BsffWithTransporters) {
  * parameter to pre-compute the form contributors after the update, hence verifying
  * a user is not removing his own company from the BSFF
  */
-function contributors(bsff: BsffWithTransporters, input?: BsffInput) {
+async function contributors(bsff: BsffWithTransporters, input?: BsffInput) {
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateTransporterCompanySiret = input?.transporter?.company?.siret;
   const updateTransporterCompanyVatNumber =
     input?.transporter?.company?.vatNumber;
   const updateDestinationCompanySiret = input?.destination?.company?.siret;
 
-  const transporter = getFirstTransporterSync(bsff);
+  let transporters: Pick<
+    BsffTransporter,
+    "transporterCompanySiret" | "transporterCompanyVatNumber"
+  >[] = bsff.transporters;
 
   const emitterCompanySiret =
     updateEmitterCompanySiret !== undefined
       ? updateEmitterCompanySiret
       : bsff.emitterCompanySiret;
 
-  const transporterCompanySiret =
-    updateTransporterCompanySiret !== undefined
-      ? updateTransporterCompanySiret
-      : transporter?.transporterCompanySiret;
-
-  const transporterCompanyVatNumber =
-    updateTransporterCompanyVatNumber !== undefined
-      ? updateTransporterCompanyVatNumber
-      : transporter?.transporterCompanyVatNumber;
-
   const destinationCompanySiret =
     updateDestinationCompanySiret !== undefined
       ? updateDestinationCompanySiret
       : bsff.destinationCompanySiret;
 
+  if (input?.transporters) {
+    // on prend en compte la nouvelle liste de tranporteurs fournit
+    transporters = await prisma.bsffTransporter.findMany({
+      where: { id: { in: input.transporters } }
+    });
+  } else if (input?.transporter) {
+    const firstTransporter = getFirstTransporterSync(bsff);
+    if (!firstTransporter) {
+      transporters = [
+        {
+          transporterCompanySiret: input?.transporter?.company?.siret ?? null,
+          transporterCompanyVatNumber:
+            input?.transporter?.company?.vatNumber ?? null
+        }
+      ];
+    } else {
+      // on met à jour le transporteur 1 s'il existe ou on l'ajoute à la liste s'il n'existe pas
+      const transporterCompanySiret =
+        updateTransporterCompanySiret !== undefined
+          ? updateTransporterCompanySiret
+          : firstTransporter.transporterCompanySiret;
+      const transporterCompanyVatNumber =
+        updateTransporterCompanyVatNumber !== undefined
+          ? updateTransporterCompanyVatNumber
+          : firstTransporter.transporterCompanyVatNumber;
+
+      const updatedFirstTransporter = {
+        ...firstTransporter,
+        transporterCompanySiret,
+        transporterCompanyVatNumber
+      };
+
+      transporters = [updatedFirstTransporter, ...transporters.slice(1)];
+    }
+  }
+
+  const transportersOrgIds = transporters
+    .flatMap(t => [t.transporterCompanySiret, t.transporterCompanyVatNumber])
+    .filter(Boolean);
+
   return [
     emitterCompanySiret,
-    transporterCompanySiret,
-    transporterCompanyVatNumber,
-    destinationCompanySiret
+    destinationCompanySiret,
+    ...transportersOrgIds
   ].filter(Boolean);
 }
 
@@ -105,7 +144,7 @@ export async function checkCanDuplicate(
   user: User,
   bsff: BsffWithTransporters
 ) {
-  const authorizedOrgIds = contributors(bsff);
+  const authorizedOrgIds = await contributors(bsff);
 
   return checkUserPermissions(
     user,
@@ -136,7 +175,7 @@ export async function checkCanUpdate(
   bsff: BsffWithTransporters,
   input?: BsffInput
 ) {
-  const authorizedOrgIds = contributors(bsff);
+  const authorizedOrgIds = await contributors(bsff);
 
   await checkUserPermissions(
     user,
@@ -145,7 +184,7 @@ export async function checkCanUpdate(
     "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
   );
   if (input) {
-    const authorizedOrgIdsAfterUpdate = contributors(bsff, input);
+    const authorizedOrgIdsAfterUpdate = await contributors(bsff, input);
 
     return checkUserPermissions(
       user,
@@ -197,7 +236,7 @@ export async function checkCanUpdateFicheIntervention(
 export async function checkCanDelete(user: User, bsff: BsffWithTransporters) {
   const authorizedOrgIds =
     bsff.status === BsffStatus.INITIAL
-      ? contributors(bsff)
+      ? await contributors(bsff)
       : bsff.status === BsffStatus.SIGNED_BY_EMITTER
       ? [bsff.emitterCompanySiret]
       : [];
@@ -220,7 +259,7 @@ export async function checkCanUpdateBsffTransporter(
   transporterId: string,
   input: BsffTransporterInput
 ) {
-  const authorizedOrgIds = contributors(bsff);
+  const authorizedOrgIds = await contributors(bsff);
 
   await checkUserPermissions(
     user,
@@ -240,7 +279,7 @@ export async function checkCanUpdateBsffTransporter(
       return transporter;
     });
 
-    const futureContributors = contributors({
+    const futureContributors = await contributors({
       ...bsff,
       transporters: futureTransporters
     });

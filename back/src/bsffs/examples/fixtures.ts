@@ -81,11 +81,44 @@ function traiteurInput(siret: string) {
   };
 }
 
+function packagingsFixtures() {
+  return [{ type: "BOUTEILLE", volume: 1, numero: "1", weight: 1 }];
+}
+
+function wasteFixture() {
+  return {
+    code: "14 06 01*",
+    description: "R404A",
+    adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)"
+  };
+}
+
+function weightFixture() {
+  return {
+    value: 1,
+    isEstimate: true
+  };
+}
+
+function transporterNSignatureUpdateInput() {
+  return {
+    transport: {
+      mode: "ROAD",
+      plates: ["abc21cde"],
+      takenOverAt: new Date().toISOString() as any
+    }
+  };
+}
+
 export default {
   detenteurInput,
   operateurInput,
   transporterInput,
   ttrInput,
   traiteurInput,
-  nextDestinationInput
+  nextDestinationInput,
+  packagingsFixtures,
+  wasteFixture,
+  weightFixture,
+  transporterNSignatureUpdateInput
 };
