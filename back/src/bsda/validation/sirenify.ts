@@ -70,6 +70,9 @@ export const sirenifyBsda: (
 ) => ZodBsdaTransformer = context => {
   return async bsda => {
     const sealedFields = await getSealedFields(bsda, context);
+    console.log(sealedFields);
+    console.log(context);
+    console.log(bsda.id);
     return nextBuildSirenify<ParsedZodBsda>(sirenifyBsdaAccessors)(
       bsda,
       sealedFields

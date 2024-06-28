@@ -48,7 +48,7 @@ describe("bsffRepository.update", () => {
 
     expect(await searchByWasteCode("14 06 01*")).toHaveLength(1);
 
-    const { update: updateBsff } = getBsffRepository({
+    const { updateBsff } = getBsffRepository({
       ...user,
       auth: AuthType.Session
     });

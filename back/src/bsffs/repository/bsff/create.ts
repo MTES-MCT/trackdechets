@@ -24,16 +24,6 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
 
     const bsff = await prisma.bsff.create(args);
 
-    await prisma.event.create({
-      data: {
-        streamId: bsff.id,
-        actor: user.id,
-        type: bsffEventTypes.created,
-        data: args.data as Prisma.InputJsonObject,
-        metadata: { ...logMetadata, authType: user.auth }
-      }
-    });
-
     const fullBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id },
       include: { transporters: true, ficheInterventions: true }
@@ -46,6 +36,48 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
     if (args.data.ficheInterventions) {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
+
+    // update transporters ordering when connecting transporters records
+    if (
+      args.data.transporters?.connect &&
+      Array.isArray(args.data.transporters.connect)
+    ) {
+      await Promise.all(
+        args.data.transporters.connect.map(({ id: transporterId }, idx) =>
+          prisma.bsffTransporter.update({
+            where: { id: transporterId },
+            data: {
+              number: idx + 1
+            }
+          })
+        )
+      );
+    }
+
+    if (args.data.transporters) {
+      // compute transporterOrgIds
+      await prisma.bsff.update({
+        where: { id: bsff.id },
+        data: {
+          transportersOrgIds: fullBsff.transporters
+            .flatMap(t => [
+              t.transporterCompanySiret,
+              t.transporterCompanyVatNumber
+            ])
+            .filter(Boolean)
+        }
+      });
+    }
+
+    await prisma.event.create({
+      data: {
+        streamId: bsff.id,
+        actor: user.id,
+        type: bsffEventTypes.created,
+        data: args.data as Prisma.InputJsonObject,
+        metadata: { ...logMetadata, authType: user.auth }
+      }
+    });
 
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsff.id));
 

@@ -1,0 +1,5 @@
+mutation CreateBsffTransporter($input: BsffTransporterInput!) {
+  createBsffTransporter(input: $input) {
+    id
+  }
+}

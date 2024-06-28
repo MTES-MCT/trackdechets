@@ -212,6 +212,69 @@ describe("Mutation.createDraftBsff", () => {
     expect(bsff.detenteurCompanySirets).toEqual([detenteur.company.siret]);
   });
 
+  it("should link several bsff transporters with the `transporters` field", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter1 = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter2 = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsffTransporter1 = await prisma.bsffTransporter.create({
+      data: {
+        transporterCompanySiret: transporter1.company.siret,
+        number: 0
+      }
+    });
+
+    const bsffTransporter2 = await prisma.bsffTransporter.create({
+      data: {
+        transporterCompanySiret: transporter2.company.siret,
+        number: 0
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createDraftBsff">,
+      MutationCreateDraftBsffArgs
+    >(CREATE_DRAFT_BSFF, {
+      variables: {
+        input: {
+          type: BsffType.COLLECTE_PETITES_QUANTITES,
+          emitter: {
+            company: {
+              name: emitter.company.name,
+              siret: emitter.company.siret,
+              address: emitter.company.address,
+              contact: emitter.user.name,
+              mail: emitter.user.email
+            }
+          },
+          transporters: [bsffTransporter1.id, bsffTransporter2.id]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const createdBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: data.createDraftBsff.id },
+      include: { transporters: true }
+    });
+
+    expect(createdBsff.transporters).toHaveLength(2);
+    expect(createdBsff.transporters[0].transporterCompanySiret).toEqual(
+      bsffTransporter1.transporterCompanySiret
+    );
+    expect(createdBsff.transporters[0].number).toEqual(1);
+    expect(createdBsff.transporters[1].transporterCompanySiret).toEqual(
+      bsffTransporter2.transporterCompanySiret
+    );
+    expect(createdBsff.transporters[1].number).toEqual(2);
+    expect(createdBsff.transportersOrgIds).toEqual([
+      bsffTransporter1.transporterCompanySiret,
+      bsffTransporter2.transporterCompanySiret
+    ]);
+  });
+
   describe("when adding previous packagings", () => {
     let emitter: UserWithCompany;
     let transporter: UserWithCompany;
@@ -345,7 +408,7 @@ describe("Mutation.createDraftBsff", () => {
       expect(previousPackagings[0].id).toEqual(forwarded.packagings[0].id);
     });
 
-    it("should ne be possible to add packagings from several BSFFs in case of réexpédition", async () => {
+    it("should not be possible to add packagings from several BSFFs in case of réexpédition", async () => {
       const bsff1 = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {

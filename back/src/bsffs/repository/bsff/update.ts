@@ -27,26 +27,55 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       where: args.where,
       include: { transporters: true }
     });
-    const bsff = await prisma.bsff.update(args);
-
-    const { updatedAt, ...updateDiff } = objectDiff(previousBsff, bsff);
-
-    await prisma.event.create({
-      data: {
-        streamId: bsff.id,
-        actor: user.id,
-        type: args.data?.status
-          ? bsffEventTypes.signed
-          : bsffEventTypes.updated,
-        data: updateDiff,
-        metadata: { ...logMetadata, authType: user.auth }
-      }
-    });
+    const updatedBsff = await prisma.bsff.update(args);
 
     const fullBsff = await prisma.bsff.findUniqueOrThrow({
-      where: { id: bsff.id },
+      where: { id: updatedBsff.id },
       include: { transporters: true, ficheInterventions: true }
     });
+
+    // update transporters ordering when connecting transporters records
+    if (
+      args.data.transporters?.connect &&
+      Array.isArray(args.data.transporters.connect)
+    ) {
+      await Promise.all(
+        args.data.transporters?.connect.map(({ id: transporterId }, idx) =>
+          prisma.bsffTransporter.update({
+            where: { id: transporterId },
+            data: {
+              number: idx + 1
+            }
+          })
+        )
+      );
+    }
+
+    // If a transporter is deleted, make sure to decrement the number of transporters after him.
+    // This code should normally only be called from the `updateForm` mutation when { transporter: null }
+    // is passed in the UpdateBsda input or from the deleteBsdaTransporter mutation.
+    if (args.data.transporters?.delete && fullBsff.transporters?.length) {
+      if (Array.isArray(args.data.transporters.delete)) {
+        // this case should never happen, throw a custom error to debug in Sentry if it ever does
+        throw new Error(
+          "Impossible de supprimer plusieurs transporteurs à la fois sur un bordereau"
+        );
+      } else {
+        const deletedTransporterId = args.data.transporters.delete.id;
+        if (deletedTransporterId) {
+          const deletedTransporter = previousBsff.transporters.find(
+            t => t.id === deletedTransporterId
+          )!;
+          const transporterIdsToDecrement = fullBsff.transporters
+            .filter(t => t.number > deletedTransporter.number)
+            .map(t => t.id);
+          await prisma.bsffTransporter.updateMany({
+            where: { id: { in: transporterIdsToDecrement } },
+            data: { number: { decrement: 1 } }
+          });
+        }
+      }
+    }
 
     if (args.data.transporters) {
       await updateTransporterOrgIds(fullBsff, prisma);
@@ -56,8 +85,24 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
-    prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bsff.id));
+    const { updatedAt, ...updateDiff } = objectDiff(previousBsff, updatedBsff);
 
-    return bsff as Prisma.BsffGetPayload<Args>;
+    await prisma.event.create({
+      data: {
+        streamId: updatedBsff.id,
+        actor: user.id,
+        type: args.data?.status
+          ? bsffEventTypes.signed
+          : bsffEventTypes.updated,
+        data: updateDiff,
+        metadata: { ...logMetadata, authType: user.auth }
+      }
+    });
+
+    prisma.addAfterCommitCallback(() =>
+      enqueueUpdatedBsdToIndex(updatedBsff.id)
+    );
+
+    return updatedBsff as Prisma.BsffGetPayload<Args>;
   };
 }

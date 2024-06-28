@@ -1,8 +1,12 @@
 import { nextBuildSirenify } from "../../../companies/sirenify";
 import { CompanyInput } from "../../../generated/graphql/types";
 import { getSealedFields } from "./rules";
-import { ParsedZodBsff } from "./schema";
-import { BsffValidationContext, ZodBsffTransformer } from "./types";
+import { ParsedZodBsff, ParsedZodBsffTransporter } from "./schema";
+import {
+  BsffValidationContext,
+  ZodBsffTransformer,
+  ZodBsffTransporterTransformer
+} from "./types";
 
 const sirenifyBsffAccessors = (
   bsff: ParsedZodBsff,
@@ -48,3 +52,22 @@ export const sirenifyBsff: (
     );
   };
 };
+
+const sirenifyBsffTransporterAccessors = (
+  bsffTransporter: ParsedZodBsffTransporter
+) => [
+  {
+    siret: bsffTransporter.transporterCompanySiret,
+    setter: (input: ParsedZodBsffTransporter, companyInput: CompanyInput) => {
+      input.transporterCompanyName = companyInput.name;
+      input.transporterCompanyAddress = companyInput.address;
+    },
+    skip: false
+  }
+];
+
+export const sirenifyBsffTransporter: ZodBsffTransporterTransformer =
+  bsffTransporter =>
+    nextBuildSirenify<ParsedZodBsffTransporter>(
+      sirenifyBsffTransporterAccessors
+    )(bsffTransporter, []);

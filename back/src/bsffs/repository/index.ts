@@ -88,7 +88,7 @@ export function getBsffRepository(
   return {
     ...getReadonlyBsffRepository(transaction),
     create: useTransaction(buildCreateBsff) as CreateBsffFn,
-    update: useTransaction(buildUpdateBsff) as UpdateBsffFn,
+    updateBsff: useTransaction(buildUpdateBsff) as UpdateBsffFn,
     delete: useTransaction(buildDeleteBsff) as DeleteBsffFn
   };
 }

@@ -9,26 +9,30 @@ import {
 import { prisma } from "@td/prisma";
 import {
   Mutation,
-  MutationUpdateBsdaTransporterArgs
+  MutationUpdateBsffTransporterArgs
 } from "../../../../generated/graphql/types";
-import { bsdaFactory } from "../../../__tests__/factories";
 import { getFirstTransporter } from "../../../database";
+import {
+  createBsffAfterTransport,
+  createBsffBeforeEmission,
+  createBsffBeforeTransport
+} from "../../../__tests__/factories";
 
-const UPDATE_BSDA_TRANSPORTER = gql`
-  mutation UpdateBsdaTransporter($id: ID!, $input: BsdaTransporterInput!) {
-    updateBsdaTransporter(id: $id, input: $input) {
+const UPDATE_BSFF_TRANSPORTER = gql`
+  mutation UpdateBffTransporter($id: ID!, $input: BsffTransporterInput!) {
+    updateBsffTransporter(id: $id, input: $input) {
       id
     }
   }
 `;
 
-describe("Mutation.updateBsdaTransporter", () => {
+describe("Mutation.updateBsffTransporter", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient(null);
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-    const bsdaTransporter = await prisma.bsdaTransporter.create({
+    const bsffTransporter = await prisma.bsffTransporter.create({
       data: {
         number: 0,
         transporterCompanySiret: transporter.siret,
@@ -37,11 +41,11 @@ describe("Mutation.updateBsdaTransporter", () => {
       }
     });
     const { errors } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter.id,
+        id: bsffTransporter.id,
         input: {
           transport: { mode: "RAIL" }
         }
@@ -52,11 +56,11 @@ describe("Mutation.updateBsdaTransporter", () => {
     ]);
   });
 
-  it("should update a bsda transporter", async () => {
+  it("should update a bsff transporter", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-    const bsdaTransporter = await prisma.bsdaTransporter.create({
+    const bsffTransporter = await prisma.bsffTransporter.create({
       data: {
         number: 0,
         transporterCompanySiret: transporter.siret,
@@ -65,11 +69,11 @@ describe("Mutation.updateBsdaTransporter", () => {
       }
     });
     const { errors, data } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter.id,
+        id: bsffTransporter.id,
         input: {
           transport: {
             mode: "RAIL"
@@ -79,54 +83,61 @@ describe("Mutation.updateBsdaTransporter", () => {
     });
     expect(errors).toBeUndefined();
 
-    const updatedBsdaTransporter =
-      await prisma.bsdaTransporter.findUniqueOrThrow({
-        where: { id: data.updateBsdaTransporter!.id }
+    const updatedBsffTransporter =
+      await prisma.bsffTransporter.findUniqueOrThrow({
+        where: { id: data.updateBsffTransporter!.id }
       });
 
-    expect(updatedBsdaTransporter.transporterTransportMode).toEqual("RAIL");
+    expect(updatedBsffTransporter.transporterTransportMode).toEqual("RAIL");
   });
 
   it("should be possible to update the siret of an existing transporter", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
-    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-    const bsda = await bsdaFactory({
-      opt: {
-        emitterCompanySiret: emitter.company.siret,
-        status: "INITIAL"
-      }
+    const destination = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
     });
-    const bsdaTransporter = await getFirstTransporter(bsda);
+    const anotherTransporter = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
+    });
+    const bsff = await createBsffBeforeEmission({
+      emitter,
+      transporter,
+      destination
+    });
+    const bsffTransporter = await getFirstTransporter(bsff);
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter!.id,
+        id: bsffTransporter!.id,
         input: {
-          company: { siret: transporter.siret }
+          company: { siret: anotherTransporter.company.siret }
         }
       }
     });
     expect(errors).toBeUndefined();
-    const updatedBsdaTransporter = await getFirstTransporter(bsda);
-    expect(updatedBsdaTransporter?.transporterCompanySiret).toEqual(
-      transporter.siret
+    const updatedBsddTransporter = await getFirstTransporter(bsff);
+    expect(updatedBsddTransporter?.transporterCompanySiret).toEqual(
+      anotherTransporter.company.siret
     );
 
     // S'assure que le champ dé-normalisé `transporterOrgIds` soit bien à jour
-    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
-      where: { id: bsda.id }
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id }
     });
-    expect(updatedBsda.transportersOrgIds).toEqual([transporter.siret]);
+    expect(updatedBsff.transportersOrgIds).toEqual([
+      anotherTransporter.company.siret
+    ]);
   });
 
   it("should throw error if data does not pass validation", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-    const bsdaTransporter = await prisma.bsdaTransporter.create({
+    const bsffTransporter = await prisma.bsffTransporter.create({
       data: {
         number: 0,
         transporterCompanySiret: transporter.siret,
@@ -135,11 +146,11 @@ describe("Mutation.updateBsdaTransporter", () => {
       }
     });
     const { errors } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter.id,
+        id: bsffTransporter.id,
         input: {
           company: {
             siret: "123"
@@ -156,26 +167,23 @@ describe("Mutation.updateBsdaTransporter", () => {
 
   it("should not be possible to update a transporter that has already signed", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
-    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-    const bsda = await bsdaFactory({
-      opt: {
-        emitterCompanySiret: emitter.company.siret,
-        status: "SENT"
-      },
-      transporterOpt: {
-        transporterCompanySiret: transporter.siret,
-        number: 1,
-        transporterTransportSignatureDate: new Date()
-      }
+    const destination = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
     });
-    const bsdaTransporter = await getFirstTransporter(bsda);
+    const bsff = await createBsffAfterTransport({
+      emitter,
+      transporter,
+      destination
+    });
+    const bsffTransporter = await getFirstTransporter(bsff);
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter!.id,
+        id: bsffTransporter!.id,
         input: {
           transport: {
             mode: "RAIL"
@@ -191,28 +199,27 @@ describe("Mutation.updateBsdaTransporter", () => {
     ]);
   });
 
-  it("should not allow a user not part of a BSDA to update an associated transporter", async () => {
+  it("should not allow a user not part of a BSFF to update an associated transporter", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
-    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-    const bsda = await bsdaFactory({
-      opt: {
-        emitterCompanySiret: emitter.company.siret,
-        status: "SENT"
-      },
-      transporterOpt: {
-        transporterCompanySiret: transporter.siret,
-        number: 1
-      }
+    const destination = await userWithCompanyFactory("MEMBER");
+
+    const transporter = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
     });
-    const bsdaTransporter = await getFirstTransporter(bsda);
+    const bsff = await createBsffBeforeTransport({
+      emitter,
+      transporter,
+      destination
+    });
+    const bsffTransporter = await getFirstTransporter(bsff);
     const randomUser = await userFactory();
     const { mutate } = makeClient(randomUser);
     const { errors } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter!.id,
+        id: bsffTransporter!.id,
         input: {
           transport: {
             mode: "RAIL"
@@ -222,37 +229,33 @@ describe("Mutation.updateBsdaTransporter", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Vous n'êtes pas autorisé à modifier ce transporteur BSDA"
+        message: "Vous n'êtes pas autorisé à modifier ce transporteur BSFF"
       })
     ]);
   });
 
-  it("should not be possible for a transporter to remove himself from a BSDA", async () => {
+  it("should not be possible for a transporter to remove himself from a BSFF", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER", {
       companyTypes: ["TRANSPORTER"]
     });
     const anotherTransporter = await companyFactory({
       companyTypes: ["TRANSPORTER"]
     });
-    const bsda = await bsdaFactory({
-      opt: {
-        emitterCompanySiret: emitter.company.siret,
-        status: "SENT"
-      },
-      transporterOpt: {
-        transporterCompanySiret: transporter.company.siret,
-        number: 1
-      }
+    const bsff = await createBsffBeforeTransport({
+      emitter,
+      transporter,
+      destination
     });
-    const bsdaTransporter = await getFirstTransporter(bsda);
+    const bsffTransporter = await getFirstTransporter(bsff);
     const { mutate } = makeClient(transporter.user);
     const { errors } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter!.id,
+        id: bsffTransporter!.id,
         input: {
           company: { siret: anotherTransporter.siret }
         }
@@ -266,23 +269,18 @@ describe("Mutation.updateBsdaTransporter", () => {
   });
 
   it("should auto-complete name and address from SIRENE database", async () => {
-    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-
-    const emitter = await userWithCompanyFactory("MEMBER");
-
-    const bsda = await bsdaFactory({
-      opt: {
-        emitterCompanySiret: emitter.company.siret,
-        status: "SENT",
-        transporters: {
-          create: {
-            transporterCompanySiret: transporter.siret,
-            number: 1
-          }
-        }
-      }
+    const transporter = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
     });
-    const bsdaTransporter = await getFirstTransporter(bsda);
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+
+    const bsff = await createBsffBeforeTransport({
+      emitter,
+      transporter,
+      destination
+    });
+    const bsffTransporter = await getFirstTransporter(bsff);
 
     const transporter2 = await companyFactory({
       companyTypes: ["TRANSPORTER"]
@@ -319,11 +317,11 @@ describe("Mutation.updateBsdaTransporter", () => {
     const { mutate } = makeClientLocal(emitter.user);
 
     const { errors, data } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter!.id,
+        id: bsffTransporter!.id,
         input: {
           company: { siret: transporter2.siret }
         }
@@ -334,15 +332,15 @@ describe("Mutation.updateBsdaTransporter", () => {
 
     expect(searchCompanyMock).toHaveBeenCalledWith(transporter2.siret);
 
-    const updatedBsdaTransporter =
-      await prisma.bsdaTransporter.findUniqueOrThrow({
-        where: { id: data.updateBsdaTransporter!.id }
+    const updatedBsffTransporter =
+      await prisma.bsffTransporter.findUniqueOrThrow({
+        where: { id: data.updateBsffTransporter!.id }
       });
 
-    expect(updatedBsdaTransporter.transporterCompanyName).toEqual(
+    expect(updatedBsffTransporter.transporterCompanyName).toEqual(
       searchResult.name
     );
-    expect(updatedBsdaTransporter.transporterCompanyAddress).toEqual(
+    expect(updatedBsffTransporter.transporterCompanyAddress).toEqual(
       searchResult.address
     );
   });
@@ -360,7 +358,7 @@ describe("Mutation.updateBsdaTransporter", () => {
         }
       }
     });
-    const bsdaTransporter = await prisma.bsdaTransporter.create({
+    const bsffTransporter = await prisma.bsffTransporter.create({
       data: {
         number: 0,
         transporterCompanySiret: transporter.siret,
@@ -373,11 +371,11 @@ describe("Mutation.updateBsdaTransporter", () => {
       }
     });
     const { errors, data } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter.id,
+        id: bsffTransporter.id,
         input: {
           recepisse: { isExempted: false }
         }
@@ -385,16 +383,16 @@ describe("Mutation.updateBsdaTransporter", () => {
     });
     expect(errors).toBeUndefined();
 
-    const updatedBsdaTransporter =
-      await prisma.bsdaTransporter.findUniqueOrThrow({
-        where: { id: data.updateBsdaTransporter!.id }
+    const updatedBsffTransporter =
+      await prisma.bsffTransporter.findUniqueOrThrow({
+        where: { id: data.updateBsffTransporter!.id }
       });
 
-    expect(updatedBsdaTransporter.transporterRecepisseNumber).toEqual(
+    expect(updatedBsffTransporter.transporterRecepisseNumber).toEqual(
       "MON-RECEPISSE"
     );
-    expect(updatedBsdaTransporter.transporterRecepisseDepartment).toEqual("13");
-    expect(updatedBsdaTransporter.transporterRecepisseValidityLimit).toEqual(
+    expect(updatedBsffTransporter.transporterRecepisseDepartment).toEqual("13");
+    expect(updatedBsffTransporter.transporterRecepisseValidityLimit).toEqual(
       new Date("2024-01-01")
     );
   });
@@ -422,7 +420,7 @@ describe("Mutation.updateBsdaTransporter", () => {
         }
       }
     });
-    const bsdaTransporter = await prisma.bsdaTransporter.create({
+    const bsffTransporter = await prisma.bsffTransporter.create({
       data: {
         number: 0,
         transporterCompanySiret: transporter1.siret,
@@ -435,11 +433,11 @@ describe("Mutation.updateBsdaTransporter", () => {
       }
     });
     const { errors, data } = await mutate<
-      Pick<Mutation, "updateBsdaTransporter">,
-      MutationUpdateBsdaTransporterArgs
-    >(UPDATE_BSDA_TRANSPORTER, {
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
       variables: {
-        id: bsdaTransporter.id,
+        id: bsffTransporter.id,
         input: {
           company: { siret: transporter2.siret },
           recepisse: {
@@ -451,16 +449,16 @@ describe("Mutation.updateBsdaTransporter", () => {
       }
     });
     expect(errors).toBeUndefined();
-    const updatedBsdaTransporter =
-      await prisma.bsdaTransporter.findUniqueOrThrow({
-        where: { id: data.updateBsdaTransporter!.id }
+    const updatedBsffTransporter =
+      await prisma.bsffTransporter.findUniqueOrThrow({
+        where: { id: data.updateBsffTransporter!.id }
       });
 
-    expect(updatedBsdaTransporter.transporterRecepisseNumber).toEqual(
+    expect(updatedBsffTransporter.transporterRecepisseNumber).toEqual(
       "MON-RECEPISSE-2"
     );
-    expect(updatedBsdaTransporter.transporterRecepisseDepartment).toEqual("07");
-    expect(updatedBsdaTransporter.transporterRecepisseValidityLimit).toEqual(
+    expect(updatedBsffTransporter.transporterRecepisseDepartment).toEqual("07");
+    expect(updatedBsffTransporter.transporterRecepisseValidityLimit).toEqual(
       new Date("2024-01-02")
     );
   });
