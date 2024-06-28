@@ -11,7 +11,10 @@ export function createBsffTransporter(
     description: "Crée un transporteur qui peut ensuite être associé à un BSFF",
     mutation: mutations.createBsffTransporter,
     variables: context => ({
-      input: fixtures.transporterInput(context[transporter].siret)
+      input: fixtures.transporterInput({
+        siret: context[transporter].siret,
+        vatNumber: context[transporter].vatNumber
+      })
     }),
     data: response => response.createBsffTransporter,
     company,

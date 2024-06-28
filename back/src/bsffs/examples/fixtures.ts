@@ -26,10 +26,13 @@ function operateurCompanyInput(siret: string) {
   };
 }
 
-function transporterInput(siret: string) {
+type TransporterInputArgs = { siret?: string; vatNumber?: string };
+
+function transporterInput({ siret, vatNumber }: TransporterInputArgs) {
   return {
     company: {
-      siret,
+      siret: siret ?? null,
+      vatNumber: vatNumber ?? null,
       name: "Transport & Co",
       address: "1 rue des 6 chemins, 07100 ANNONAY",
       contact: "Claire Dupuis",

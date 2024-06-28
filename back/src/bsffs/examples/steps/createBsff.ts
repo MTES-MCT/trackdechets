@@ -17,11 +17,10 @@ export function createBsff(
           packagings: fixtures.packagingsFixtures(),
           waste: fixtures.wasteFixture(),
           weight: fixtures.weightFixture(),
-          transporter: fixtures.transporterInput(
-            transporteur.siret?.length
-              ? transporteur.siret
-              : transporteur.vatNumber
-          ),
+          transporter: fixtures.transporterInput({
+            siret: transporteur.siret,
+            vatNumber: transporteur.vatNumber
+          }),
           destination: fixtures.ttrInput(ttr.siret),
           ficheInterventions: ficheInterventions.map(fi => fi.id)
         }

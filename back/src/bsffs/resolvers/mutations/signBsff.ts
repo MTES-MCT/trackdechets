@@ -14,8 +14,7 @@ import { expandBsffFromDB } from "../../converter";
 import {
   getBsffOrNotFound,
   getNextTransporterSync,
-  getNthTransporterSync,
-  getTransportersSync
+  getNthTransporterSync
 } from "../../database";
 import { isFinalOperation } from "../../constants";
 import { getStatus } from "../../compat";
@@ -79,7 +78,7 @@ export default signBsff;
  */
 export function getAuthorizedOrgIds(
   bsff: BsffWithTransporters,
-  signatureType: BsffSignatureType
+  signatureType: AllBsffSignatureType
 ): string[] {
   const transportNthAuthorizedOrgIds = (
     bsff: BsffWithTransporters,
