@@ -2,6 +2,7 @@ const routes = {
   admin: {
     index: "/admin",
     verification: "/admin/verification",
+    companies: "/admin/companies",
     anonymousCompany: "/admin/anonymous-company",
     reindex: "/admin/reindex",
     user: "/admin/user",

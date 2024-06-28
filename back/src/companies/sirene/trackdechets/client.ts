@@ -31,7 +31,7 @@ const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX;
  * Build a company object from a search response
  * @param data etablissement response object
  */
-const searchResponseToCompany = (
+export const searchResponseToCompany = (
   etablissement: SearchStockEtablissement
 ): SireneSearchResult => {
   const addressVoie = buildAddress([
@@ -72,6 +72,28 @@ const searchResponseToCompany = (
   return company;
 };
 
+export const searchCompanyTD = async (siret: string) => {
+  const response = await client.search<SearchResponse>({
+    index,
+    body: {
+      query: {
+        term: {
+          siret: {
+            value: siret
+          }
+        }
+      }
+    }
+  });
+
+  if (!response.body.hits.hits || !response.body.hits.hits[0]?._source) {
+    throw new SiretNotFoundError();
+  }
+  const company = searchResponseToCompany(response.body.hits.hits[0]._source);
+
+  return company;
+};
+
 /**
  * Search a company by SIRET
  * @param siret
@@ -80,22 +102,7 @@ export const searchCompany = async (
   siret: string
 ): Promise<SireneSearchResult> => {
   try {
-    const response = await client.search<SearchResponse>({
-      index,
-      body: {
-        query: {
-          term: {
-            siret: {
-              value: siret
-            }
-          }
-        }
-      }
-    });
-    if (!response.body.hits.hits || !response.body.hits.hits[0]?._source) {
-      throw new SiretNotFoundError();
-    }
-    const company = searchResponseToCompany(response.body.hits.hits[0]._source);
+    const company = await searchCompanyTD(siret);
 
     if (company.etatAdministratif === ("F" as EtatAdministratif)) {
       throw new ClosedCompanyError();
