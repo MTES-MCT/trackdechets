@@ -71,7 +71,7 @@ export const CompaniesDashboard = () => {
   > = async data => {
     const { siret } = data;
 
-    companiesExhaustive({ variables: { siret: "AAA" } });
+    companiesExhaustive({ variables: { siret } });
   };
 
   const { handleSubmit, reset, formState, register } = useForm<
