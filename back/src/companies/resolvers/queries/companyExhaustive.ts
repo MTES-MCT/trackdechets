@@ -12,8 +12,8 @@ import { UserInputError } from "../../../common/errors";
 
 const formatEtatAdministratif = etat => {
   if (etat === "A") return "A (Active)";
-  if (etat === "F") return "F (Fermé)";
-  if (etat === "C") return "C (Cessée)";
+  if (etat === "F") return "F (Etablissement fermé)";
+  if (etat === "C") return "C (Unité légale cessée)";
   return null;
 };
 
