@@ -56,7 +56,7 @@ const getTransporterData = (transporter: BsffTransporter) => ({
   transporterTakenOverAt: transporter.transporterTransportTakenOverAt,
   transporterCompanyAddress: transporter.transporterCompanyAddress,
   transporterCompanyName: transporter.transporterCompanyName,
-  transporterCompanySiret: transporter.transporterCompanySiret,
+  transporterCompanySiret: getTransporterCompanyOrgId(transporter),
   transporterRecepisseNumber: transporter.transporterRecepisseNumber,
   transporterCompanyMail: transporter.transporterCompanyMail,
   transporterCustomInfo: transporter.transporterCustomInfo,

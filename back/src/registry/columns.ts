@@ -247,7 +247,7 @@ export const columns: Column[] = [
   { field: "transporterCompanyName", label: "Transporteur raison sociale" },
   {
     field: "transporterCompanySiret",
-    label: "Transporteur SIRET ou numéro de TVA le cas échéant"
+    label: "Transporteur SIRET ou n° de TVA intracommunautaire"
   },
   { field: "transporterCompanyAddress", label: "Transporteur adresse" },
   {
@@ -360,7 +360,10 @@ export const columns: Column[] = [
     label: "Transporteur n°2 raison sociale"
   },
   { field: "transporter2CompanyAddress", label: "Transporteur n°2 adresse" },
-  { field: "transporter2CompanySiret", label: "Transporteur n°2 SIRET" },
+  {
+    field: "transporter2CompanySiret",
+    label: "Transporteur n°2 SIRET ou n° de TVA intracommunautaire"
+  },
   {
     field: "transporter2RecepisseIsExempted",
     label: "Transporteur n°2 exemption de récépissé",
@@ -387,7 +390,10 @@ export const columns: Column[] = [
     field: "transporter3CompanyName",
     label: "Transporteur n°3 raison sociale"
   },
-  { field: "transporter3CompanySiret", label: "Transporteur n°3 SIRET" },
+  {
+    field: "transporter3CompanySiret",
+    label: "Transporteur n°3 SIRET ou n° de TVA intracommunautaire"
+  },
   { field: "transporter3CompanyAddress", label: "Transporteur n°3 adresse" },
   {
     field: "transporter3RecepisseIsExempted",
@@ -415,7 +421,10 @@ export const columns: Column[] = [
     field: "transporter4CompanyName",
     label: "Transporteur n°4 raison sociale"
   },
-  { field: "transporter4CompanySiret", label: "Transporteur n°4 SIRET" },
+  {
+    field: "transporter4CompanySiret",
+    label: "Transporteur n°4 SIRET ou n° de TVA intracommunautaire"
+  },
   { field: "transporter4CompanyAddress", label: "Transporteur n°4 adresse" },
   {
     field: "transporter4RecepisseIsExempted",
@@ -423,6 +432,11 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   { field: "transporter4RecepisseNumber", label: "Transporteur n°4 récépissé" },
+  {
+    field: "transporter4NumberPlates",
+    label: "Transporteur n°4 immatriculation",
+    format: formatArray
+  },
   {
     field: "transporter4TransportMode",
     label: "Transporteur n°4 mode de transport",
@@ -433,12 +447,15 @@ export const columns: Column[] = [
     label: "Transporteur n°4 date de dépôt",
     format: formatDate
   },
-  { field: "transporter4CompanyMail", label: "Transporteur n°3 contact" },
+  { field: "transporter4CompanyMail", label: "Transporteur n°4 contact" },
   {
     field: "transporter5CompanyName",
     label: "Transporteur n°5 raison sociale"
   },
-  { field: "transporter5CompanySiret", label: "Transporteur n°5 SIRET" },
+  {
+    field: "transporter5CompanySiret",
+    label: "Transporteur n°5 SIRET ou n° de TVA intracommunautaire"
+  },
   { field: "transporter5CompanyAddress", label: "Transporteur n°5 adresse" },
   {
     field: "transporter5RecepisseIsExempted",
@@ -446,6 +463,11 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   { field: "transporter5RecepisseNumber", label: "Transporteur n°5 récépissé" },
+  {
+    field: "transporter5NumberPlates",
+    label: "Transporteur n°5 immatriculation",
+    format: formatArray
+  },
   {
     field: "transporter5TransportMode",
     label: "Transporteur n°5 mode de transport",
