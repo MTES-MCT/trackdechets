@@ -1,5 +1,5 @@
 import { CompanyExhaustive } from "@td/codegen-ui";
-import React, { useMemo } from "react";
+import React from "react";
 import { useTable } from "react-table";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 
@@ -25,40 +25,35 @@ const rearrangeData = (data: CompanyExhaustive) => {
 };
 
 type Props = {
-  data?: CompanyExhaustive;
+  data: CompanyExhaustive;
 };
 
-export default function CompaniesTable({ data }: Props) {
-  if (!data) return null;
-
+export default function CompanyTable({ data }: Props) {
   // Swap lines & columns for clarity
   const rearrangedData = rearrangeData(data);
 
-  const columns = useMemo(
-    () => [
-      {
-        Header: "",
-        accessor: "field" as const
-      },
-      {
-        Header: "Anonymous",
-        accessor: "anonymous" as const
-      },
-      {
-        Header: "Base de données",
-        accessor: "db" as const
-      },
-      {
-        Header: "Elastic Search",
-        accessor: "es" as const
-      },
-      {
-        Header: "SIRENE",
-        accessor: "sirene" as const
-      }
-    ],
-    []
-  );
+  const columns = [
+    {
+      Header: "",
+      accessor: "field" as const
+    },
+    {
+      Header: "Anonymous",
+      accessor: "anonymous" as const
+    },
+    {
+      Header: "Base de données",
+      accessor: "db" as const
+    },
+    {
+      Header: "Elastic Search",
+      accessor: "es" as const
+    },
+    {
+      Header: "SIRENE",
+      accessor: "sirene" as const
+    }
+  ];
 
   const tableInstance = useTable({
     columns,

@@ -9,7 +9,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { Loader } from "../../Apps/common/Components";
 import { DsfrNotificationError } from "../../Apps/common/Components/Error/Error";
-import CompaniesTable from "./CompanyTable";
+import CompanyTable from "./CompanyTable";
 
 export const companyExhaustiveInfoFragment = gql`
   fragment CompanyExhaustiveInfoFragment on CompanyExhaustiveInfo {
@@ -78,6 +78,12 @@ export const CompaniesDashboard = () => {
     z.infer<typeof validationSchema>
   >({ resolver: zodResolver(validationSchema) });
 
+  const showTable =
+    !loading &&
+    Boolean(data) &&
+    Boolean(data?.companyExhaustive) &&
+    !Boolean(error);
+
   return (
     <div>
       <h3 className="fr-h3 fr-mt-2w">Entreprises</h3>
@@ -105,9 +111,7 @@ export const CompaniesDashboard = () => {
 
       {error && <DsfrNotificationError apolloError={error} />}
 
-      {!loading && Boolean(data?.companyExhaustive) && !Boolean(error) && (
-        <CompaniesTable data={data?.companyExhaustive} />
-      )}
+      {showTable && <CompanyTable data={data?.companyExhaustive!} />}
     </div>
   );
 };
