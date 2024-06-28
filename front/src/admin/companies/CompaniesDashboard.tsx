@@ -74,7 +74,7 @@ export const CompaniesDashboard = () => {
     companiesExhaustive({ variables: { siret } });
   };
 
-  const { handleSubmit, reset, formState, register } = useForm<
+  const { handleSubmit, formState, register } = useForm<
     z.infer<typeof validationSchema>
   >({ resolver: zodResolver(validationSchema) });
 
@@ -106,9 +106,7 @@ export const CompaniesDashboard = () => {
       {error && <DsfrNotificationError apolloError={error} />}
 
       {!loading && Boolean(data?.companyExhaustive) && !Boolean(error) && (
-        <>
-          <CompaniesTable data={data?.companyExhaustive} />
-        </>
+        <CompaniesTable data={data?.companyExhaustive} />
       )}
     </div>
   );
