@@ -64,6 +64,7 @@ export default function plugin(): Plugin<any> {
             bsffWorkflows.collecteFluidesParOperateur
           ),
           groupement: parseWorkflow(bsffWorkflows.groupement),
+          multiModal: parseWorkflow(bsffWorkflows.multiModal)
         },
         bsda: {
           collecteChantier: parseWorkflow(bsdaWorkflows.collecteChantier),

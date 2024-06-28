@@ -47,7 +47,7 @@ export function createBsffWithTransporters(
       "Crée un BSFF en associant une liste de transporteurs dans un ordre donné",
     variables: ({ operateur, traiteur, bsffTransporters }) => ({
       input: {
-        type: "TRACER_FLUIDE",
+        type: "COLLECTE_PETITES_QUANTITES",
         emitter: fixtures.operateurInput(operateur.siret),
         packagings: fixtures.packagingsFixtures(),
         waste: fixtures.wasteFixture(),

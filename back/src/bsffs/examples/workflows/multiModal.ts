@@ -111,20 +111,21 @@ const workflow: Workflow = {
       "ID_BSFF_TRANSPORTER_1",
       "ID_BSFF_TRANSPORTER_2",
       "ID_BSFF_TRANSPORTER_3"
-    ]
+    ],
+    packagings: [{ id: "ID_PACKAGING_1" }]
   },
   chart: `
   graph LR
   AO(NO STATE) -->|createBsff| A
-  A(INITIAL) -->|"signBsff(EMISSION)"| B(SIGNED_BY_PRODUCER)
+  A(INITIAL) -->|"signBsff(EMISSION)"| C(SIGNED_BY_PRODUCER)
   C --> |"signBsff(TRANSPORT)"| D(SENT)
   D -->|"signBsff(TRANSPORT)"| E(SENT)
   E -->|"signBsff(TRANSPORT)"| G(SENT)
   G -->|"signBsff(RECEPTION)"|H(RECEIVED)
   H -->|updateBsffPackaging|H
-  H -->|"signBsff(ACCEPTATION)"|I(ACCEPTED)
-  I -->|updateBsffPackaging|I
-  I -->|"signBsff(OPERATION)"|J(INTERMEDIATELY_PROCESSED)
+  I(RECEIVED) -->|"signBsff(ACCEPTATION)"|J(ACCEPTED)
+  J -->|updateBsffPackaging|K(ACCEPTED)
+  K -->|"signBsff(OPERATION)"|L(INTERMEDIATELY_PROCESSED)
   `
 };
 
