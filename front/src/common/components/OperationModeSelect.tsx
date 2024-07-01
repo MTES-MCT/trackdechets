@@ -6,7 +6,7 @@ import RedErrorMessage from "./RedErrorMessage";
 import {
   getOperationModeLabel,
   getOperationModesFromOperationCode
-} from "../operationModes";
+} from "../../Apps/common/operationModes";
 import Tooltip from "./Tooltip";
 
 const OperationModeSelect = ({ operationCode, name }) => {

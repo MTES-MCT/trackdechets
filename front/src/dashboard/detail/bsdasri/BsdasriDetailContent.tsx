@@ -38,7 +38,7 @@ import {
 } from "../common/Components";
 
 import classNames from "classnames";
-import { getOperationModeLabel } from "../../../common/operationModes";
+import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { DASRI_VERBOSE_STATUSES } from "@td/constants";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
 

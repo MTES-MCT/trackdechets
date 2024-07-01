@@ -22,3 +22,8 @@ export const MODAL_ARIA_LABEL_UPDATE = "Gestion d'une révision";
 export const MODAL_TITLE_UPDATE = "Gérer la révision du";
 export const MODAL_TITLE_CONSULT = "Consulter les révisions du";
 export const MODAL_TITLE_DELETE = "Annuler la révision du";
+
+export const CAN_BE_CANCELLED_LABEL = "Annuler le bordereau";
+export const CANCELATION_MSG = `Si votre demande d'annulation est approuvée, ce bordereau passera au statut Annulé pour tous les acteurs du bordereau.`;
+export const CANCELATION_NOT_POSSIBLE_MSG = `Impossible d'annuler ce bordereau. Il est à un statut trop avancé.`;
+export const CANCELATION_NOT_POSSIBLE_FOR_APPENDIX1_MSG = `Impossible d'annuler un bordereau de tournée dédiée à partir du moment où au moins une Annexe 1 a été signée par le transporteur.`;

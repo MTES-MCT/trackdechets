@@ -8,7 +8,7 @@ import {
   Query,
   WasteRegistryType
 } from "@td/codegen-ui";
-import WasteTreeModal from "../../search/WasteTreeModal";
+import WasteTreeModal from "../../Apps/common/Components/search/WasteTreeModal";
 
 import { ALL_WASTES_TREE } from "@td/constants";
 import { useLazyQuery, gql } from "@apollo/client";
