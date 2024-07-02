@@ -515,58 +515,65 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: "Le champ emitterCompanyName est obligatoire."
+            message: "La raison sociale de l'émetteur est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ emitterCompanySiret est obligatoire."
+            message: "Le N°SIRET de l'émetteur est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ emitterCompanyAddress est obligatoire."
+            message: "L'adresse de l'émetteur est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ emitterCompanyContact est obligatoire."
+            message:
+              "La personne à contacter chez l'émetteur est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ emitterCompanyPhone est obligatoire."
+            message: "Le N° de téléphone de l'émetteur est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ emitterCompanyMail est obligatoire."
+            message: "L'adresse e-mail de l'émetteur est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ wasteCode est obligatoire."
+            message: "Le code déchet est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ wasteDescription est obligatoire."
+            message: "La description du déchet est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ wasteAdr est obligatoire."
+            message: "L'ADR est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ weightValue est obligatoire."
+            message: "La quantité totale est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ destinationCompanyName est obligatoire."
+            message:
+              "La raison sociale de l'installation de destination est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ destinationCompanySiret est obligatoire."
+            message:
+              "Le N°SIRET de l'installation de destination est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ destinationCompanyAddress est obligatoire."
+            message:
+              "L'adresse de l'installation de destination est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ destinationCompanyContact est obligatoire."
+            message:
+              "La personne à contacter de l'installation de destination est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ destinationCompanyPhone est obligatoire."
+            message:
+              "Le N° de téléphone de l'installation de destination est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ destinationPlannedOperationCode est obligatoire."
+            message: "Le code d'opération prévu est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ destinationCompanyMail est obligatoire."
+            message:
+              "L'adresse e-mail de l'installation de destination est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le champ packagings est obligatoire."
+            message: "La liste des contenants est un champ requis."
           })
         ]);
       }
@@ -581,7 +588,7 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: "Le champ packagings est obligatoire."
+            message: "La liste des contenants est un champ requis."
           })
         ]);
       }
@@ -626,7 +633,7 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: "Le champ forwarding est obligatoire."
+            message: "La liste des contenants à réexpedier est un champ requis."
           })
         ]);
       }
@@ -645,7 +652,7 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: "Le champ grouping est obligatoire."
+            message: "La liste des contenants à grouper est un champ requis."
           })
         ]);
       }
@@ -664,7 +671,7 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: "Le champ repackaging est obligatoire."
+            message: "La liste des contenants à regrouper est un champ requis."
           })
         ]);
       }
@@ -679,22 +686,23 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: "Le nom du transporteur n° 1 est obligatoire."
+            message: "La raison sociale du transporteur n° 1 est obligatoire."
           }),
           expect.objectContaining({
-            message: "Le SIRET du transporteur n° 1 est obligatoire."
+            message: "Le N°SIRET du transporteur n° 1 est obligatoire."
           }),
           expect.objectContaining({
             message: "L'adresse du transporteur n° 1 est obligatoire."
           }),
           expect.objectContaining({
-            message: "Le nom de contact du transporteur n° 1 est obligatoire."
+            message:
+              "La personne à contacter du transporteur n° 1 est obligatoire."
           }),
           expect.objectContaining({
-            message: "Le téléphone du transporteur n° 1 est obligatoire."
+            message: "Le N° de téléphone du transporteur n° 1 est obligatoire."
           }),
           expect.objectContaining({
-            message: "L'email du transporteur n° 1 est obligatoire."
+            message: "L'adresse e-mail du transporteur n° 1 est obligatoire."
           }),
           expect.objectContaining({
             message: "Le numéro de TVA du transporteur n° 1 est obligatoire."
@@ -819,7 +827,7 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: "Le champ destinationReceptionDate est obligatoire."
+            message: "La date de la réception est un champ requis."
           })
         ]);
       }

@@ -42,23 +42,23 @@ describe("publishBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le champ emitterCompanyName est obligatoire.\n" +
-          "Le champ emitterCompanyAddress est obligatoire.\n" +
-          "Le champ emitterCompanyContact est obligatoire.\n" +
-          "Le champ emitterCompanyPhone est obligatoire.\n" +
-          "Le champ emitterCompanyMail est obligatoire.\n" +
-          "Le champ wasteCode est obligatoire.\n" +
-          "Le champ wasteDescription est obligatoire.\n" +
-          "Le champ wasteAdr est obligatoire.\n" +
-          "Le champ weightValue est obligatoire.\n" +
-          "Le champ destinationCompanyName est obligatoire.\n" +
-          "Le champ destinationCompanySiret est obligatoire.\n" +
-          "Le champ destinationCompanyAddress est obligatoire.\n" +
-          "Le champ destinationCompanyContact est obligatoire.\n" +
-          "Le champ destinationCompanyPhone est obligatoire.\n" +
-          "Le champ destinationPlannedOperationCode est obligatoire.\n" +
-          "Le champ destinationCompanyMail est obligatoire.\n" +
-          "Le champ packagings est obligatoire."
+          "La raison sociale de l'émetteur est un champ requis.\n" +
+          "L'adresse de l'émetteur est un champ requis.\n" +
+          "La personne à contacter chez l'émetteur est un champ requis.\n" +
+          "Le N° de téléphone de l'émetteur est un champ requis.\n" +
+          "L'adresse e-mail de l'émetteur est un champ requis.\n" +
+          "Le code déchet est un champ requis.\n" +
+          "La description du déchet est un champ requis.\n" +
+          "L'ADR est un champ requis.\n" +
+          "La quantité totale est un champ requis.\n" +
+          "La raison sociale de l'installation de destination est un champ requis.\n" +
+          "Le N°SIRET de l'installation de destination est un champ requis.\n" +
+          "L'adresse de l'installation de destination est un champ requis.\n" +
+          "La personne à contacter de l'installation de destination est un champ requis.\n" +
+          "Le N° de téléphone de l'installation de destination est un champ requis.\n" +
+          "Le code d'opération prévu est un champ requis.\n" +
+          "L'adresse e-mail de l'installation de destination est un champ requis.\n" +
+          "La liste des contenants est un champ requis."
       })
     ]);
   });

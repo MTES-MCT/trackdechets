@@ -413,8 +413,8 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
-          " : Le champ packagings a été vérouillé via signature et ne peut pas être modifié."
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " La liste des contenants a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -667,7 +667,7 @@ describe("Mutation.updateBsff", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
-          " : Le champ ficheInterventions a été vérouillé via signature et ne peut pas être modifié."
+          " : La liste des fiches d'intervention a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -965,19 +965,19 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
-          " : Le champ emitterCompanyName a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ emitterCompanyAddress a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ emitterCompanyContact a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ emitterCompanyPhone a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ emitterCompanyMail a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ wasteAdr a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ wasteDescription a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ destinationCompanyName a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ destinationCompanyAddress a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ weightValue a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ wasteCode a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ packagings a été vérouillé via signature et ne peut pas être modifié."
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
+          "La raison sociale de l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "L'adresse de l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "La personne à contacter chez l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "Le N° de téléphone de l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "L'adresse e-mail de l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "L'ADR a été vérouillé via signature et ne peut pas être modifié., " +
+          "La description du déchet a été vérouillé via signature et ne peut pas être modifié., " +
+          "La raison sociale de l'installation de destination a été vérouillé via signature et ne peut pas être modifié., " +
+          "L'adresse de l'installation de destination a été vérouillé via signature et ne peut pas être modifié., " +
+          "La quantité totale a été vérouillé via signature et ne peut pas être modifié., " +
+          "Le code déchet a été vérouillé via signature et ne peut pas être modifié., " +
+          "La liste des contenants a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
 
@@ -1053,7 +1053,7 @@ describe("Mutation.updateBsff", () => {
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
           " L'immatriculation du transporteur n°1 a été vérouillé via signature et ne peut pas être modifié.," +
-          " La date d'enlèvement du transporteur n°1 a été vérouillé via signature et ne peut pas être modifié."
+          " La date d'enlèvement n°1 a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1162,7 +1162,7 @@ describe("Mutation.updateBsff", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
-          " : Le champ destinationReceptionDate a été vérouillé via signature et ne peut pas être modifié."
+          " : La date de la réception a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1395,7 +1395,7 @@ describe("Mutation.updateBsff", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
-          " : Le champ grouping a été vérouillé via signature et ne peut pas être modifié."
+          " : La liste des contenants à grouper a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1662,7 +1662,7 @@ describe("Mutation.updateBsff", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
-          " : Le champ forwarding a été vérouillé via signature et ne peut pas être modifié."
+          " : La liste des contenants à réexpedier a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1954,7 +1954,7 @@ describe("Mutation.updateBsff", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " Le champ repackaging a été vérouillé via signature et ne peut pas être modifié."
+          " La liste des contenants à regrouper a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });

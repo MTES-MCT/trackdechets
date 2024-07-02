@@ -527,7 +527,7 @@ function checkFieldIsDefined<
       message: [
         errorMsg
           ? errorMsg(fieldDescription)
-          : `${fieldDescription} est obligatoire.`,
+          : `${fieldDescription} est un champ requis.`,
         rule.customErrorMessage
       ]
         .filter(Boolean)
