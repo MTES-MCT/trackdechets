@@ -7,7 +7,7 @@ import {
   isWasteVehicles
 } from "../../../companies/validation";
 import { prisma } from "@td/prisma";
-import { CompanyVerificationStatus } from "@prisma/client";
+import { Company, CompanyVerificationStatus } from "@prisma/client";
 
 const { VERIFY_COMPANY } = process.env;
 
@@ -39,7 +39,7 @@ export async function isTransporterRefinement(
 export async function refineSiretAndGetCompany(
   siret: string | null | undefined,
   ctx
-) {
+): Promise<Company | null> {
   if (!siret) return null;
   const company = await prisma.company.findUnique({
     where: { siret }
@@ -78,7 +78,8 @@ export const isRegisteredVatNumberRefinement = async (vatNumber, ctx) => {
 };
 export async function isDestinationRefinement(
   siret: string | null | undefined,
-  ctx
+  ctx,
+  isExemptedFromVerification?: (destination: Company | null) => boolean
 ) {
   const company = await refineSiretAndGetCompany(siret, ctx);
 
@@ -98,6 +99,11 @@ export async function isDestinationRefinement(
         ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
     });
   }
+
+  if (isExemptedFromVerification && isExemptedFromVerification(company)) {
+    return true;
+  }
+
   if (
     company &&
     VERIFY_COMPANY === "true" &&
