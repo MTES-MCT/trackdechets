@@ -76,7 +76,7 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
     const isCreatedAfterV2024071 =
       bsff.createdAt && bsff.createdAt.getTime() - v2024071.getTime() > 0;
 
-    if (packaging.volume == 0 && isCreatedAfterV2024071) {
+    if (packaging.volume === 0 && isCreatedAfterV2024071) {
       // Changement de règle de validation dans la MAJ 2024.07.1. Il était possible
       // avant de passer un volume égal à 0. On restreint désormais aux valeurs strictement
       // positives mais uniquement pour les nouveaux bordereaux crées afin d'éviter des
@@ -88,7 +88,7 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
       });
     }
 
-    if (packaging.weight == 0 && isCreatedAfterV2024071) {
+    if (packaging.weight === 0 && isCreatedAfterV2024071) {
       // Changement de règle de validation dans la MAJ 2024.07.1. Il était possible
       // avant de passer un poids égal à 0. On restreint désormais aux valeurs strictement
       // positives mais uniquement pour les nouveaux bordereaux crées afin d'éviter des
