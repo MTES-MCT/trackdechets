@@ -218,12 +218,12 @@ describe("validation > parseBsff", () => {
       }
     });
 
-    it("should throw if packaging weight and volume are not positive numbers", () => {
+    it("should throw if packaging weight and volume are negative numbers", () => {
       const zodBsff: ZodBsff = {
         packagings: [
           {
-            weight: 0,
-            volume: 0,
+            weight: -1,
+            volume: -1,
             numero: "1",
             emissionNumero: "1",
             type: "BOUTEILLE"
@@ -245,6 +245,58 @@ describe("validation > parseBsff", () => {
       }
     });
 
+    it(
+      "should parse correctly if packaging weight and volume is 0" +
+        " and bsff is created before MEP 2024.07.1",
+      () => {
+        const zodBsff: ZodBsff = {
+          createdAt: new Date("2024-07-02"),
+          packagings: [
+            {
+              weight: 0,
+              volume: 0,
+              numero: "1",
+              emissionNumero: "1",
+              type: "BOUTEILLE"
+            }
+          ]
+        };
+        expect(parseBsff(zodBsff)).toBeDefined();
+      }
+    );
+
+    it(
+      "should throw if packaging weight and volume are 0 " +
+        "and bsff is created after MEP 2024.07.1",
+      () => {
+        const zodBsff: ZodBsff = {
+          createdAt: new Date("2024-07-03T08:00:00"),
+          packagings: [
+            {
+              weight: 0,
+              volume: 0,
+              numero: "1",
+              emissionNumero: "1",
+              type: "BOUTEILLE"
+            }
+          ]
+        };
+        expect.assertions(1);
+        try {
+          parseBsff(zodBsff);
+        } catch (e) {
+          expect(e.errors).toEqual([
+            expect.objectContaining({
+              message: "Conditionnements : le volume doit être supérieur à 0"
+            }),
+            expect.objectContaining({
+              message: "Conditionnements : le poids doit être supérieur à 0"
+            })
+          ]);
+        }
+      }
+    );
+
     it("should throw when repackaging more than 1 contenants", () => {
       const zodBsff: ZodBsff = {
         repackaging: ["contenant_1", "contenant_2"]
@@ -257,6 +309,47 @@ describe("validation > parseBsff", () => {
           expect.objectContaining({
             message:
               "Vous ne pouvez saisir qu'un seul contenant lors d'une opération de reconditionnement"
+          })
+        ]);
+      }
+    });
+
+    it("should throw if weight value is negative", () => {
+      const zodBsff: ZodBsff = {
+        weightValue: -1
+      };
+      expect.assertions(1);
+      try {
+        parseBsff(zodBsff);
+      } catch (e) {
+        expect(e.errors).toEqual([
+          expect.objectContaining({
+            message: "Le poids doit être supérieur à 0"
+          })
+        ]);
+      }
+    });
+
+    it("should not throw if weight value is 0 and bsff is created before MEP 2024.7.1", () => {
+      const zodBsff: ZodBsff = {
+        createdAt: new Date("2024-07-02"),
+        weightValue: 0
+      };
+      expect(parseBsff(zodBsff)).toBeDefined();
+    });
+
+    it("should  throw if weight value is 0 and bsff is created after MEP 2024.7.1", () => {
+      const zodBsff: ZodBsff = {
+        createdAt: new Date("2024-07-03T08:00:00"),
+        weightValue: 0
+      };
+      expect.assertions(1);
+      try {
+        parseBsff(zodBsff);
+      } catch (e) {
+        expect(e.errors).toEqual([
+          expect.objectContaining({
+            message: "Le poids doit être supérieur à 0"
           })
         ]);
       }
@@ -489,6 +582,24 @@ describe("validation > parseBsff", () => {
         expect(e.errors).toEqual([
           expect.objectContaining({
             message: "Le champ packagings est obligatoire."
+          })
+        ]);
+      }
+    });
+
+    test("empty packaging numero should not be valid at emission signature", async () => {
+      const bsff = await createBsffBeforeEmission(
+        { emitter, destination },
+        { packagingData: { numero: "", emissionNumero: "" } }
+      );
+      const zodBsff = prismaToZodBsff(bsff);
+      expect.assertions(1);
+      try {
+        parseBsff(zodBsff, { currentSignatureType: "EMISSION" });
+      } catch (e) {
+        expect(e.errors).toEqual([
+          expect.objectContaining({
+            message: "Conditionnements : le numéro d'identification est requis"
           })
         ]);
       }

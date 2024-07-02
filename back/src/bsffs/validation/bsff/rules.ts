@@ -259,6 +259,9 @@ const sealedFromEmissionExceptForEmitter: GetBsffSignatureTypeFn<ZodBsff> = (
 };
 
 export const bsffEditionRules: BsffEditionRules = {
+  createdAt: {
+    sealed: { from: "EMISSION" }
+  },
   type: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" }

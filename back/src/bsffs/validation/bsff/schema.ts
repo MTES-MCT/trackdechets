@@ -7,7 +7,7 @@ import { BSFF_OPERATION_CODES } from "../../constants";
 import {
   checkCompanies,
   checkFicheInterventions,
-  checkMaxWeightByRoad,
+  checkWeights,
   checkPackagings,
   checkRequiredFields
 } from "./refinements";
@@ -68,13 +68,17 @@ const rawBsffPackagingSchema = z.object({
   other: z.string().nullish(),
   volume: z
     .number()
-    .positive("Conditionnements : le volume doit être supérieur à 0")
+    .nonnegative("Conditionnements : le volume doit être supérieur à 0")
     .nullish(),
-  weight: weightSchema(WeightUnits.Kilogramme).positive(
+  weight: weightSchema(WeightUnits.Kilogramme).nonnegative(
     "Conditionnements : le poids doit être supérieur à 0"
   ),
   emissionNumero: z.string(),
-  numero: z.string(),
+  numero: z
+    .string({
+      required_error: "Conditionnements : le numéro d'identification est requis"
+    })
+    .min(1, "Conditionnements : le numéro d'identification est requis"),
   previousPackagings: z.string().array().nullish(),
   acceptationSignatureDate: z.coerce.date().nullish(),
   operationSignatureDate: z.coerce.date().nullish()
@@ -82,6 +86,12 @@ const rawBsffPackagingSchema = z.object({
 
 const rawBsffSchema = z.object({
   id: z.string().default(() => getReadableId(ReadableIdPrefix.FF)),
+  // on ajoute `createdAt` au schéma de validation pour appliquer certaines
+  // règles de façon contextuelles en fonction de la date de création du BSFF.
+  // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
+  // en cours de route des bordereaux qui ont déjà été publié sur la base d'une
+  // ancienne version du schéma.
+  createdAt: z.date().nullish(),
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
   type: z
@@ -100,7 +110,7 @@ const rawBsffSchema = z.object({
   wasteCode: ZodWasteCodeEnum,
   wasteAdr: z.string().nullish(),
   weightValue: weightSchema(WeightUnits.Kilogramme)
-    .positive("Le poids doit être supérieur à 0")
+    .nonnegative("Le poids doit être supérieur à 0")
     .nullish(),
   weightIsEstimate: z
     .boolean()
@@ -179,7 +189,7 @@ export type ParsedZodBsff = z.output<typeof rawBsffSchema>;
 
 const refinedBsffSchema = rawBsffSchema
   .superRefine(checkPackagings)
-  .superRefine(checkMaxWeightByRoad);
+  .superRefine(checkWeights);
 
 /**
  * Modification du schéma Zod pour appliquer des tranformations et

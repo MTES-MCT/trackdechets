@@ -37,6 +37,11 @@ import {
 } from "../../../common/validation/zod/refinement";
 import { MAX_WEIGHT_BY_ROAD_TONNES } from "../../../common/validation";
 
+// Date de la MAJ 2024.07.1 introduisant un changement
+// des règles de validations sur les poids et volume qui doivent
+// désormais être strictement > 0
+const v2024071 = new Date("2024-07-03");
+
 /**
  * Ce refinement permet de vérifier que les établissements présents sur le
  * BSFF sont bien inscrits sur Trackdéchets avec le bon profil
@@ -68,6 +73,33 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
   { addIssue }
 ) => {
   for (const packaging of bsff.packagings ?? []) {
+    const isCreatedAfterV2024071 =
+      bsff.createdAt && bsff.createdAt.getTime() - v2024071.getTime() > 0;
+
+    if (packaging.volume == 0 && isCreatedAfterV2024071) {
+      // Changement de règle de validation dans la MAJ 2024.07.1. Il était possible
+      // avant de passer un volume égal à 0. On restreint désormais aux valeurs strictement
+      // positives mais uniquement pour les nouveaux bordereaux crées afin d'éviter des
+      // erreurs de validation sur des BSFFs qui ont déjà été publiés en l'état.
+      // On pourra à terme passer de .nonnegative à .positive directement dans le schéma zod.
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Conditionnements : le volume doit être supérieur à 0"
+      });
+    }
+
+    if (packaging.weight == 0 && isCreatedAfterV2024071) {
+      // Changement de règle de validation dans la MAJ 2024.07.1. Il était possible
+      // avant de passer un poids égal à 0. On restreint désormais aux valeurs strictement
+      // positives mais uniquement pour les nouveaux bordereaux crées afin d'éviter des
+      // erreurs de validation sur des BSFFs qui ont déjà été publiés en l'état.
+      // On pourra à terme passer de .nonnegative à .positive directement dans le schéma zod.
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Conditionnements : le poids doit être supérieur à 0"
+      });
+    }
+
     if (
       packaging.type === BsffPackagingType.AUTRE &&
       (!packaging.other || packaging.other === "")
@@ -122,10 +154,9 @@ export const checkFicheInterventions: Refinement<ParsedZodBsff> = async (
   }
 };
 
-export const checkMaxWeightByRoad: Refinement<ParsedZodBsff> = (
-  bsff,
-  { addIssue }
-) => {
+export const checkWeights: Refinement<ParsedZodBsff> = (bsff, { addIssue }) => {
+  // Lors d'un transport par route, vérifie que le poids est cohérent avec
+  // la charge maximale autorisé
   if (
     (bsff.transporters ?? []).some(
       t => t.transporterTransportMode === TransportMode.ROAD
@@ -143,6 +174,22 @@ export const checkMaxWeightByRoad: Refinement<ParsedZodBsff> = (
           ` tonnes lorsque le transport se fait par la route`
       });
     }
+  }
+
+  if (
+    bsff.weightValue === 0 &&
+    bsff.createdAt &&
+    bsff.createdAt.getTime() - v2024071.getTime() > 0
+  ) {
+    // Changement de règle de validation dans la MAJ 2024.07.1. Il était possible
+    // avant de passer un poids égal à 0. On restreint désormais aux valeurs strictement
+    // positives mais uniquement pour les nouveaux bordereaux crées afin d'éviter des
+    // erreurs de validation sur des BSFFs qui ont déjà été publiés en l'état.
+    // On pourra à terme passer de .nonnegative à .positive directement dans le schéma zod.}
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Le poids doit être supérieur à 0"
+    });
   }
 };
 

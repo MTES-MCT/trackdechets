@@ -46,6 +46,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const { update: updateBsff } = getBsffRepository(user);
 
   const {
+    createdAt,
     transporters,
     packagings,
     ficheInterventions,
