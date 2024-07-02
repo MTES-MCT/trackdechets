@@ -19,7 +19,8 @@ import {
   RevisionRequestStatus,
   UserPermission,
   Transporter,
-  BsdaTransporter
+  BsdaTransporter,
+  BsdasriStatus
 } from "@td/codegen-ui";
 import {
   ACCEPTE,
@@ -1271,6 +1272,11 @@ const canReviewBsda = (bsd, siret) => {
 };
 
 const canReviewBsdasri = (bsd, siret) => {
+  // You can't review a SYNTHESIS dasri with RECEIVED status
+  if (bsd.synthesizing && bsd.status === BsdasriStatus.Received) {
+    return false;
+  }
+
   // these types are not implemented yet
   if ([BsdasriType.Synthesis, BsdasriType.Grouping].includes(bsd.type)) {
     return false;

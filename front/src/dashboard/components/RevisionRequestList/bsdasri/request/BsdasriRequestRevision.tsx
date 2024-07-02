@@ -346,7 +346,7 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
           )}
 
           <RhfReviewableField
-            title="Quantité reçue"
+            title="Quantité traitée"
             suffix="kg"
             path="destination.operation.weight"
             value={bsdasri?.destination?.operation?.weight?.value}
@@ -378,7 +378,7 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             </p>
           </RhfReviewableField>
           <RhfReviewableField
-            title="Code de l’opération D/R"
+            title="Code de l’opération réalisée"
             path="destination.operation.code"
             value={bsdasri?.destination?.operation?.code}
             defaultValue={initialReview?.destination?.operation?.code}
