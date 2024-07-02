@@ -19,15 +19,42 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
+import { extractPostalCode, splitAddress } from "../utils";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { RegistryBsda } from "../registry/elastic";
 import { BsdaForElastic } from "./elastic";
+
+const getPostTempStorageDestination = (bsda: RegistryBsda) => {
+  if (!bsda.forwardedIn) return {};
+
+  const splittedAddress = splitAddress(
+    bsda.forwardedIn.destinationCompanyAddress
+  );
+
+  return {
+    postTempStorageDestinationName: bsda.forwardedIn.destinationCompanyName,
+    postTempStorageDestinationSiret: bsda.forwardedIn.destinationCompanySiret,
+    postTempStorageDestinationAddress: splittedAddress.street,
+    postTempStorageDestinationPostalCode: splittedAddress.postalCode,
+    postTempStorageDestinationCity: splittedAddress.city,
+    // Always FR for now, as destination must be FR
+    postTempStorageDestinationCountry: "FR"
+  };
+};
 
 const getOperationData = (bsda: Bsda) => ({
   destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
   destinationOperationCode: bsda.destinationOperationCode,
   destinationOperationMode: bsda.destinationOperationMode
+});
+
+const getIntermediariesData = (bsda: RegistryBsda) => ({
+  intermediary1CompanyName: bsda.intermediaries?.[0]?.name ?? null,
+  intermediary1CompanySiret: bsda.intermediaries?.[0]?.siret ?? null,
+  intermediary2CompanyName: bsda.intermediaries?.[1]?.name ?? null,
+  intermediary2CompanySiret: bsda.intermediaries?.[1]?.siret ?? null,
+  intermediary3CompanyName: bsda.intermediaries?.[2]?.name ?? null,
+  intermediary3CompanySiret: bsda.intermediaries?.[2]?.siret ?? null
 });
 
 const getFinalOperationsData = (bsda: RegistryBsda) => {
@@ -47,29 +74,55 @@ const getFinalOperationsData = (bsda: RegistryBsda) => {
 const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
   const transporters = getTransportersSync(bsda);
 
-  const [transporter, transporter2, transporter3] = transporters;
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
 
   return {
-    transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
     transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
     transporterCompanyAddress: transporter?.transporterCompanyAddress,
     transporterCompanyName: transporter?.transporterCompanyName,
-    transporterCompanySiret: transporter?.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     transporterNumberPlates: transporter?.transporterTransportPlates,
     transporterCompanyMail: transporter?.transporterCompanyMail,
+    transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
+    transporterTransportMode: transporter?.transporterTransportMode,
     transporter2CompanyAddress: transporter2?.transporterCompanyAddress,
     transporter2CompanyName: transporter2?.transporterCompanyName,
-    transporter2CompanySiret: transporter2?.transporterCompanySiret,
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
     transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
     transporter2NumberPlates: transporter2?.transporterTransportPlates,
     transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
     transporter3CompanyAddress: transporter3?.transporterCompanyAddress,
     transporter3CompanyName: transporter3?.transporterCompanyName,
-    transporter3CompanySiret: transporter3?.transporterCompanySiret,
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
     transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
     transporter3NumberPlates: transporter3?.transporterTransportPlates,
-    transporter3CompanyMail: transporter3?.transporterCompanyMail
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter4CompanyAddress: transporter4?.transporterCompanyAddress,
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4NumberPlates: transporter4?.transporterTransportPlates,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter5CompanyAddress: transporter5?.transporterCompanyAddress,
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5NumberPlates: transporter5?.transporterTransportPlates,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5TransportMode: transporter5?.transporterTransportMode
   };
 };
 
@@ -170,7 +223,9 @@ function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress: bsda.workerCompanyAddress,
-    ...getTransportersData(bsda)
+    ...getTransportersData(bsda),
+    destinationCompanyMail: bsda.destinationCompanyMail,
+    brokerCompanyMail: bsda.brokerCompanyMail
   };
 }
 
@@ -233,7 +288,9 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     brokerRecepisseNumber: null,
     destinationCustomInfo: bsda.destinationCustomInfo,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    ...getOperationData(bsda)
+    ...getOperationData(bsda),
+    nextDestinationProcessingOperation:
+      bsda.destinationOperationNextDestinationPlannedOperationCode
   };
 }
 
@@ -272,6 +329,7 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyOutgoingWaste,
     ...genericWaste,
+    ...getPostTempStorageDestination(bsda),
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
@@ -298,9 +356,10 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
       ? bsda.weightValue.dividedBy(1000).toNumber()
       : null,
     emitterCustomInfo: bsda.emitterCustomInfo,
-    destinationCompanyMail: bsda.destinationCompanyMail,
     ...getOperationData(bsda),
-    ...getFinalOperationsData(bsda)
+    ...getFinalOperationsData(bsda),
+    nextDestinationProcessingOperation:
+      bsda.destinationOperationNextDestinationPlannedOperationCode
   };
 }
 
@@ -366,8 +425,7 @@ export function toTransportedWaste(
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationCompanyAddress: bsda.destinationCompanyAddress,
-    emitterCompanyMail: bsda.emitterCompanyMail,
-    destinationCompanyMail: bsda.destinationCompanyMail
+    emitterCompanyMail: bsda.emitterCompanyMail
   };
 }
 
@@ -429,7 +487,9 @@ export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
     ),
     ...initialEmitter,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    destinationCompanyMail: bsda.destinationCompanyMail
+    destinationCompanyMail: bsda.destinationCompanyMail,
+    nextDestinationProcessingOperation:
+      bsda.destinationOperationNextDestinationPlannedOperationCode
   };
 }
 
@@ -468,6 +528,7 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyAllWaste,
     ...genericWaste,
+    ...getPostTempStorageDestination(bsda),
     createdAt: bsda.createdAt,
     destinationReceptionDate: bsda.destinationReceptionDate,
     brokerCompanyName: bsda.brokerCompanyName,
@@ -498,8 +559,10 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsda.emitterCompanyMail,
-    destinationCompanyMail: bsda.destinationCompanyMail,
     ...getOperationData(bsda),
-    ...getFinalOperationsData(bsda)
+    ...getFinalOperationsData(bsda),
+    nextDestinationProcessingOperation:
+      bsda.destinationOperationNextDestinationPlannedOperationCode,
+    ...getIntermediariesData(bsda)
   };
 }

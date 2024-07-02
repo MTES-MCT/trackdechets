@@ -20,6 +20,11 @@ export async function addSignatureAutomation(
 
   const { from, to } = input;
   const fromCompany = await getCompanyOrCompanyNotFound({ id: from });
+  if (!fromCompany.allowAppendix1SignatureAutomation) {
+    throw new ForbiddenError(
+      "La signature automatique d'annexe 1 est désactivée pour cette entreprise."
+    );
+  }
 
   await checkUserPermissions(
     user,

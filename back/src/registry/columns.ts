@@ -11,6 +11,7 @@ import { GenericWaste } from "./types";
 import { formatStatusLabel } from "@td/constants";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { TransportMode } from "@prisma/client";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)
@@ -45,8 +46,35 @@ const formatBoolean = (b: boolean | null) => {
 };
 const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // return as a number to allow xls cells formulas
 const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
+const formatArrayWithMissingElements = (arr: any[]) => {
+  if (!Array.isArray(arr)) {
+    return "";
+  }
+  return arr.map(elem => elem ?? "").join(",");
+};
 const formatOperationCode = (code?: string) =>
   code ? code.replace(/ /g, "") : ""; // be consistent and remove all white spaces
+
+const formatTransportMode = (mode?: TransportMode): string => {
+  if (!mode) return "";
+
+  switch (mode) {
+    case "ROAD":
+      return "Route";
+    case "RAIL":
+      return "Voie ferrée";
+    case "AIR":
+      return "Voie aérienne";
+    case "RIVER":
+      return "Voie fluviale";
+    case "SEA":
+      return "Voie maritime";
+    case "OTHER":
+      return "Autre";
+    default:
+      return "";
+  }
+};
 /**
  * Clean Final Operation lists
  */
@@ -156,6 +184,26 @@ export const columns: Column[] = [
   { field: "workerCompanyName", label: "Entreprise de travaux raison sociale" },
   { field: "workerCompanySiret", label: "Entreprise de travaux SIRET" },
   { field: "workerCompanyAddress", label: "Entreprise de travaux adresse" },
+  {
+    field: "parcelCities",
+    label: "Parcelle commune",
+    format: formatArray
+  },
+  {
+    field: "parcelPostalCodes",
+    label: "Parcelle code postal",
+    format: formatArray
+  },
+  {
+    field: "parcelNumbers",
+    label: "Parcelle numéro",
+    format: formatArrayWithMissingElements
+  },
+  {
+    field: "parcelCoordinates",
+    label: "Parcelle coordonnées",
+    format: formatArrayWithMissingElements
+  },
   // Gestion du déchets
   { field: "ecoOrganismeName", label: "Éco-organisme raison sociale" },
   { field: "ecoOrganismeSiren", label: "Éco-organisme SIREN" },
@@ -167,11 +215,30 @@ export const columns: Column[] = [
   },
   { field: "traderCompanyName", label: "Négociant raison sociale" },
   { field: "traderCompanySiret", label: "Négociant SIRET" },
+  { field: "traderCompanyMail", label: "Négociant contact" },
   { field: "traderRecepisseNumber", label: "Négociant récépissé " },
   { field: "brokerCompanyName", label: "Courtier raison sociale" },
   { field: "brokerCompanySiret", label: "Courtier SIRET" },
+  { field: "brokerCompanyMail", label: "Courtier contact" },
   { field: "brokerRecepisseNumber", label: "Courtier N°récepissé" },
   // Transport du déchet
+
+  // Intermédiaires
+  {
+    field: "intermediary1CompanyName",
+    label: "Intermédiaire n°1 - Raison sociale"
+  },
+  { field: "intermediary1CompanySiret", label: "Intermédiaire n°1 - SIRET" },
+  {
+    field: "intermediary2CompanyName",
+    label: "Intermédiaire n°2 - Raison sociale"
+  },
+  { field: "intermediary2CompanySiret", label: "Intermédiaire n°2 - SIRET" },
+  {
+    field: "intermediary3CompanyName",
+    label: "Intermédiaire n°3 - Raison sociale"
+  },
+  { field: "intermediary3CompanySiret", label: "Intermédiaire n°3 - SIRET" },
 
   {
     field: "transporterCustomInfo",
@@ -180,7 +247,7 @@ export const columns: Column[] = [
   { field: "transporterCompanyName", label: "Transporteur raison sociale" },
   {
     field: "transporterCompanySiret",
-    label: "Transporteur SIRET ou numéro de TVA le cas échéant"
+    label: "Transporteur SIRET ou n° de TVA intracommunautaire"
   },
   { field: "transporterCompanyAddress", label: "Transporteur adresse" },
   {
@@ -194,6 +261,16 @@ export const columns: Column[] = [
     label: "Transporteur immatriculation",
     format: formatArray
   },
+  {
+    field: "transporterTransportMode",
+    label: "Transporteur mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporterHandedOverSignatureDate",
+    label: "Transporteur date de dépôt",
+    format: formatDate
+  },
   { field: "transporterCompanyMail", label: "Transporteur contact" },
 
   { field: "wasteAdr", label: "ADR" },
@@ -206,6 +283,31 @@ export const columns: Column[] = [
   { field: "destinationCompanyName", label: "Destination raison sociale" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },
   { field: "destinationCompanyAddress", label: "Destination adresse" },
+  { field: "destinationCompanyMail", label: "Destination Contact" },
+  {
+    field: "postTempStorageDestinationName",
+    label: "Destination post entreposage provisoire Raison Sociale"
+  },
+  {
+    field: "postTempStorageDestinationSiret",
+    label: "Destination post entreposage provisoire SIRET"
+  },
+  {
+    field: "postTempStorageDestinationAddress",
+    label: "Destination post entreposage provisoire Adresse"
+  },
+  {
+    field: "postTempStorageDestinationPostalCode",
+    label: "Destination post entreposage provisoire Code Postal"
+  },
+  {
+    field: "postTempStorageDestinationCity",
+    label: "Destination post entreposage provisoire Ville"
+  },
+  {
+    field: "postTempStorageDestinationCountry",
+    label: "Destination post entreposage provisoire Pays"
+  },
   {
     field: "destinationReceptionAcceptationStatus",
     label: "Statut d'acceptation du déchet"
@@ -245,11 +347,23 @@ export const columns: Column[] = [
     format: formatFinalOperationWeights
   },
   {
+    field: "nextDestinationNotificationNumber",
+    label: "N° de notification / déclaration"
+  },
+  {
+    field: "nextDestinationProcessingOperation",
+    label: "Code d'opération ultérieure prévue",
+    format: formatOperationCode
+  },
+  {
     field: "transporter2CompanyName",
     label: "Transporteur n°2 raison sociale"
   },
   { field: "transporter2CompanyAddress", label: "Transporteur n°2 adresse" },
-  { field: "transporter2CompanySiret", label: "Transporteur n°2 SIRET" },
+  {
+    field: "transporter2CompanySiret",
+    label: "Transporteur n°2 SIRET ou n° de TVA intracommunautaire"
+  },
   {
     field: "transporter2RecepisseIsExempted",
     label: "Transporteur n°2 exemption de récépissé",
@@ -261,12 +375,25 @@ export const columns: Column[] = [
     label: "Transporteur n°2 immatriculation",
     format: formatArray
   },
+  {
+    field: "transporter2TransportMode",
+    label: "Transporteur n°2 mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporter2HandedOverSignatureDate",
+    label: "Transporteur n°2 date de dépôt",
+    format: formatDate
+  },
   { field: "transporter2CompanyMail", label: "Transporteur n°2 contact" },
   {
     field: "transporter3CompanyName",
     label: "Transporteur n°3 raison sociale"
   },
-  { field: "transporter3CompanySiret", label: "Transporteur n°3 SIRET" },
+  {
+    field: "transporter3CompanySiret",
+    label: "Transporteur n°3 SIRET ou n° de TVA intracommunautaire"
+  },
   { field: "transporter3CompanyAddress", label: "Transporteur n°3 adresse" },
   {
     field: "transporter3RecepisseIsExempted",
@@ -279,7 +406,79 @@ export const columns: Column[] = [
     label: "Transporteur n°3 immatriculation",
     format: formatArray
   },
-  { field: "transporter3CompanyMail", label: "Transporteur n°3 contact" }
+  {
+    field: "transporter3TransportMode",
+    label: "Transporteur n°3 mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporter3HandedOverSignatureDate",
+    label: "Transporteur n°3 date de dépôt",
+    format: formatDate
+  },
+  { field: "transporter3CompanyMail", label: "Transporteur n°3 contact" },
+  {
+    field: "transporter4CompanyName",
+    label: "Transporteur n°4 raison sociale"
+  },
+  {
+    field: "transporter4CompanySiret",
+    label: "Transporteur n°4 SIRET ou n° de TVA intracommunautaire"
+  },
+  { field: "transporter4CompanyAddress", label: "Transporteur n°4 adresse" },
+  {
+    field: "transporter4RecepisseIsExempted",
+    label: "Transporteur n°4 exemption de récépissé",
+    format: formatBoolean
+  },
+  { field: "transporter4RecepisseNumber", label: "Transporteur n°4 récépissé" },
+  {
+    field: "transporter4NumberPlates",
+    label: "Transporteur n°4 immatriculation",
+    format: formatArray
+  },
+  {
+    field: "transporter4TransportMode",
+    label: "Transporteur n°4 mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporter4HandedOverSignatureDate",
+    label: "Transporteur n°4 date de dépôt",
+    format: formatDate
+  },
+  { field: "transporter4CompanyMail", label: "Transporteur n°4 contact" },
+  {
+    field: "transporter5CompanyName",
+    label: "Transporteur n°5 raison sociale"
+  },
+  {
+    field: "transporter5CompanySiret",
+    label: "Transporteur n°5 SIRET ou n° de TVA intracommunautaire"
+  },
+  { field: "transporter5CompanyAddress", label: "Transporteur n°5 adresse" },
+  {
+    field: "transporter5RecepisseIsExempted",
+    label: "Transporteur n°5 exemption de récépissé",
+    format: formatBoolean
+  },
+  { field: "transporter5RecepisseNumber", label: "Transporteur n°5 récépissé" },
+  {
+    field: "transporter5NumberPlates",
+    label: "Transporteur n°5 immatriculation",
+    format: formatArray
+  },
+  {
+    field: "transporter5TransportMode",
+    label: "Transporteur n°5 mode de transport",
+    format: formatTransportMode
+  },
+  {
+    field: "transporter5HandedOverSignatureDate",
+    label: "Transporteur n°5 date de dépôt",
+    format: formatDate
+  },
+  { field: "transporter5CompanyMail", label: "Transporteur n°5 contact" }
 ];
 
 export function formatRow(waste: GenericWaste, useLabelAsKey = false) {

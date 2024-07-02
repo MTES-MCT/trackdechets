@@ -8,7 +8,10 @@ import {
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getCompanyAssociationOrNotFound } from "../../database";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
-import { checkUserPermissions, Permission } from "../../../permissions";
+import {
+  checkUserIsAdminOrPermissions,
+  Permission
+} from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] =
@@ -16,7 +19,7 @@ const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] 
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
     const company = await getCompanyOrCompanyNotFound({ orgId: siret });
-    await checkUserPermissions(
+    await checkUserIsAdminOrPermissions(
       user,
       company.orgId,
       Permission.CompanyCanManageMembers,

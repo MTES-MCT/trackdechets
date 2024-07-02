@@ -10,16 +10,8 @@ import {
   BsffSignatureType,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import {
-  validateAfterReception,
-  validateBeforeAcceptation,
-  validateBeforeEmission,
-  validateBeforeOperation,
-  validateBeforeReception,
-  validateBeforeTransport
-} from "../../validation";
 import { expandBsffFromDB } from "../../converter";
-import { getBsffOrNotFound, getFirstTransporterSync } from "../../database";
+import { getBsffOrNotFound, getNextTransporterSync } from "../../database";
 import { isFinalOperation } from "../../constants";
 import { getStatus } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -28,7 +20,6 @@ import {
   getBsffRepository
 } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
-import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
 import { operationHook } from "../../operationHook";
 import { prisma } from "@td/prisma";
@@ -37,6 +28,11 @@ import {
   BsffWithTransporters,
   BsffWithTransportersInclude
 } from "../../types";
+import { parseBsffAsync } from "../../validation/bsff";
+import { PrismaBsffForParsing } from "../../validation/bsff/types";
+import { prismaToZodBsff } from "../../validation/bsff/helpers";
+import { prismaToZodBsffPackaging } from "../../validation/bsffPackaging/helpers";
+import { parseBsffPackagingAsync } from "../../validation/bsffPackaging";
 
 const signBsff: MutationResolvers["signBsff"] = async (
   _,
@@ -118,10 +114,17 @@ const signatures: Record<
  */
 async function signEmission(
   user: Express.User,
-  bsff: Bsff & { packagings: BsffPackaging[] },
+  bsff: PrismaBsffForParsing,
   input: BsffSignatureInput
 ) {
-  await validateBeforeEmission(bsff);
+  if (bsff.emitterEmissionSignatureDate) {
+    throw new UserInputError(
+      "L'entreprise émettrice a déjà signé ce bordereau"
+    );
+  }
+
+  const zodBsff = prismaToZodBsff(bsff);
+  await parseBsffAsync(zodBsff, { user, currentSignatureType: "EMISSION" });
 
   const { update: updateBsff } = getBsffRepository(user);
 
@@ -146,25 +149,27 @@ async function signEmission(
  */
 async function signTransport(
   user: Express.User,
-  bsff: Bsff & BsffWithPackagings & BsffWithTransporters,
+  bsff: PrismaBsffForParsing,
   input: BsffSignatureInput
 ) {
   if (bsff.transporters.length === 0) {
     throw new UserInputError("Aucun transporteur n'est renseigné sur ce BSFF.");
   }
 
-  const transporter = getFirstTransporterSync(bsff)!;
+  const transporter = getNextTransporterSync(bsff)!;
 
   if (!transporter) {
     throw new UserInputError("Tous les transporteurs ont déjà signé");
   }
 
-  const transporterReceipt = await getTransporterReceipt(transporter);
-
-  await validateBeforeTransport({
-    ...bsff,
-    transporters: [{ ...transporter, ...transporterReceipt }]
+  const zodBsff = prismaToZodBsff(bsff);
+  const parsedBsff = await parseBsffAsync(zodBsff, {
+    currentSignatureType: "TRANSPORT"
   });
+  const parsedZodTransporter =
+    (parsedBsff.transporters ?? []).find(
+      t => t.number === transporter.number
+    ) ?? null;
 
   const { update: updateBsff } = getBsffRepository(user);
 
@@ -179,7 +184,12 @@ async function signTransport(
           data: {
             transporterTransportSignatureDate: input.date,
             transporterTransportSignatureAuthor: input.author,
-            ...transporterReceipt
+            transporterRecepisseNumber:
+              parsedZodTransporter?.transporterRecepisseNumber ?? null,
+            transporterRecepisseDepartment:
+              parsedZodTransporter?.transporterRecepisseDepartment ?? null,
+            transporterRecepisseValidityLimit:
+              parsedZodTransporter?.transporterRecepisseValidityLimit ?? null
           }
         }
       }
@@ -198,10 +208,17 @@ async function signTransport(
  */
 async function signReception(
   user: Express.User,
-  bsff: Bsff & { packagings: BsffPackaging[] },
+  bsff: PrismaBsffForParsing,
   input: BsffSignatureInput
 ) {
-  await validateBeforeReception(bsff);
+  if (bsff.destinationReceptionSignatureDate) {
+    throw new UserInputError(
+      "L'entreprise émettrice a déjà signé ce bordereau"
+    );
+  }
+
+  const zodBsff = prismaToZodBsff(bsff);
+  await parseBsffAsync(zodBsff, { currentSignatureType: "RECEPTION" });
 
   const { update: updateBsff } = getBsffRepository(user);
 
@@ -230,7 +247,11 @@ async function signAcceptation(
   bsff: Bsff & { packagings: BsffPackaging[] },
   input: BsffSignatureInput
 ) {
-  await validateAfterReception(bsff);
+  if (!bsff.destinationReceptionSignatureDate) {
+    throw new UserInputError(
+      "L'installation de destination n'a pas encore signé la réception"
+    );
+  }
 
   return runInTransaction(async transaction => {
     const {
@@ -249,7 +270,16 @@ async function signAcceptation(
         );
       }
 
-      await validateBeforeAcceptation(packaging);
+      if (packaging.acceptationSignatureDate) {
+        throw new UserInputError(
+          "L'installation de destination a déjà signé l'acceptation de ce contenant"
+        );
+      }
+
+      const zodBsffPackaging = prismaToZodBsffPackaging(packaging);
+      await parseBsffPackagingAsync(zodBsffPackaging, {
+        currentSignatureType: "ACCEPTATION"
+      });
 
       await updateBsffPackaging({
         where: { id: packagingId },
@@ -265,11 +295,18 @@ async function signAcceptation(
         }
       });
     } else {
-      await Promise.all(bsff.packagings.map(p => validateBeforeAcceptation(p)));
+      await Promise.all(
+        bsff.packagings.map(async p => {
+          const zodBsffPackaging = prismaToZodBsffPackaging(p);
+          await parseBsffPackagingAsync(zodBsffPackaging, {
+            currentSignatureType: "ACCEPTATION"
+          });
+        })
+      );
 
       // sign for all packagings
       await updateManyBsffPackaging({
-        where: { bsffId: bsff.id },
+        where: { bsffId: bsff.id, acceptationSignatureDate: null },
         data: {
           acceptationSignatureDate: input.date,
           acceptationSignatureAuthor: input.author
@@ -341,8 +378,6 @@ async function signOperation(
   bsff: Bsff & { packagings: BsffPackaging[] },
   input: BsffSignatureInput
 ) {
-  await validateAfterReception(bsff);
-
   const packagingId = input.packagingId;
 
   return runInTransaction(async transaction => {
@@ -366,7 +401,16 @@ async function signOperation(
         );
       }
 
-      await validateBeforeOperation(packaging);
+      if (packaging.operationSignatureDate) {
+        throw new UserInputError(
+          "L'installation de destination a déjà signé l'acceptation de ce contenant"
+        );
+      }
+
+      const zodBsffPackaging = prismaToZodBsffPackaging(packaging);
+      await parseBsffPackagingAsync(zodBsffPackaging, {
+        currentSignatureType: "OPERATION"
+      });
 
       const updatedBsffPackaging = await updateBsffPackaging({
         where: { id: packagingId },
@@ -380,11 +424,18 @@ async function signOperation(
         await operationHook(updatedBsffPackaging, { runSync: false });
       });
     } else {
-      await Promise.all(bsff.packagings.map(p => validateBeforeOperation(p)));
+      await Promise.all(
+        bsff.packagings.map(async p => {
+          const zodBsffPackaging = prismaToZodBsffPackaging(p);
+          await parseBsffPackagingAsync(zodBsffPackaging, {
+            currentSignatureType: "OPERATION"
+          });
+        })
+      );
 
       // sign for all packagings
       await updateManyBsffPackaging({
-        where: { bsffId: bsff.id },
+        where: { bsffId: bsff.id, operationSignatureDate: null },
         data: {
           operationSignatureDate: input.date,
           operationSignatureAuthor: input.author
@@ -421,6 +472,7 @@ async function signOperation(
 
     const finalOperationPackagings = packagings.filter(
       p =>
+        p.operationSignatureDate &&
         p.operationCode &&
         isFinalOperation(p.operationCode, p.operationNoTraceability)
     );

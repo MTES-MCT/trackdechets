@@ -1,8 +1,10 @@
 import {
   BsffStatus,
   BsffType,
+  OperationMode,
   TransporterReceipt,
-  UserRole
+  UserRole,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -24,12 +26,12 @@ import {
   createBsffBeforeTransport,
   createBsffBeforeReception,
   createBsffBeforeRefusal,
-  createBsffAfterTransport,
   createBsffBeforeOperation,
   createBsffAfterOperation,
-  createBsffBeforeAcceptation
+  createBsffBeforeAcceptation,
+  createBsffAfterReception,
+  createBsffPackaging
 } from "../../../__tests__/factories";
-import { REQUIRED_RECEIPT_NUMBER } from "../../../../common/validation";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 
 const SIGN = gql`
@@ -293,20 +295,21 @@ describe("Mutation.signBsff", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
+            "L'auteur de la signature émetteur est un champ requis. Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau\n" +
+            "La date de signature de l'émetteur est un champ requis. Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
         })
       ]);
     });
 
     it("should throw an error if the transporter tries to sign without receipt", async () => {
+      const transportWithoutReceipt = await userWithCompanyFactory("MEMBER");
       const bsff = await createBsffBeforeTransport({
         emitter,
-        transporter,
+        transporter: transportWithoutReceipt,
         destination
       });
-      // remove the receipt
-      await prisma.transporterReceipt.delete({ where: { id: receipt.id } });
-      const { mutate } = makeClient(transporter.user);
+
+      const { mutate } = makeClient(transportWithoutReceipt.user);
       const { errors } = await mutate<
         Pick<Mutation, "signBsff">,
         MutationSignBsffArgs
@@ -323,13 +326,59 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: expect.stringContaining(REQUIRED_RECEIPT_NUMBER)
+          message:
+            "Le numéro de récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets\n" +
+            "Le département de récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets\n" +
+            "La date de validité du récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
         })
       ]);
-      // restore it
-      receipt = await transporterReceiptFactory({
-        company: transporter.company
+    });
+
+    it("should update transporter receipt if it changes before signature", async () => {
+      const transporterWithReceipt = await userWithCompanyFactory("MEMBER", {
+        transporterReceipt: {
+          create: {
+            receiptNumber: "receipt 1",
+            department: "07",
+            validityLimit: new Date()
+          }
+        }
       });
+      const bsff = await createBsffBeforeTransport({
+        emitter,
+        transporter: transporterWithReceipt,
+        destination
+      });
+
+      await prisma.company.update({
+        where: { orgId: transporterWithReceipt.company.orgId },
+        data: {
+          transporterReceipt: {
+            update: { data: { receiptNumber: "receipt 2" } }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(transporterWithReceipt.user);
+      await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            type: "TRANSPORT",
+            date: new Date().toISOString() as any,
+            author: transporter.user.name
+          }
+        }
+      });
+
+      const signedBsff = await prisma.bsff.findUniqueOrThrow({
+        where: { id: bsff.id },
+        include: { transporters: true }
+      });
+
+      expect(signedBsff.transporters[0].transporterRecepisseNumber).toEqual(
+        "receipt 2"
+      );
     });
 
     it("should be possible for the emitter to sign a BSFF where the transporter is not yet specified", async () => {
@@ -428,9 +477,7 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
+          message: "L'immatriculation du transporteur n° 1 est obligatoire."
         })
       ]);
     });
@@ -492,11 +539,21 @@ describe("Mutation.signBsff", () => {
     });
 
     it("should disallow destination to sign acceptation when required data is missing", async () => {
-      const bsff = await createBsffAfterTransport({
-        emitter,
-        transporter,
-        destination
-      });
+      const bsff = await createBsffAfterReception(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        {
+          packagingData: {
+            acceptationDate: null,
+            acceptationStatus: null,
+            acceptationWeight: null,
+            acceptationWasteDescription: null
+          }
+        }
+      );
 
       const { mutate } = makeClient(destination.user);
       const { errors } = await mutate<
@@ -515,9 +572,11 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
+          message:
+            "Le champ acceptationDate est obligatoire.\n" +
+            "Le champ acceptationStatus est obligatoire.\n" +
+            "Le champ acceptationWeight est obligatoire.\n" +
+            "Le champ acceptationWasteDescription est obligatoire."
         })
       ]);
     });
@@ -571,14 +630,40 @@ describe("Mutation.signBsff", () => {
     it("should disconnect previous packagings when refused and signing for a specific packaging", async () => {
       const ttr = await userWithCompanyFactory(UserRole.ADMIN);
 
-      const bsff = await createBsffAfterOperation(
+      const bsff1 = await createBsffAfterOperation(
         { emitter, transporter, destination: ttr },
         {
           data: { status: BsffStatus.INTERMEDIATELY_PROCESSED },
-          packagingData: { operationCode: OPERATION.R13.code }
+          packagingData: { operationCode: OPERATION.R12.code }
         }
       );
 
+      const bsff2 = await createBsffBeforeOperation(
+        { emitter, transporter, destination: ttr },
+        {
+          data: { status: BsffStatus.INTERMEDIATELY_PROCESSED },
+          packagingData: { operationCode: OPERATION.R12.code }
+        }
+      );
+
+      const beforeRefusalData = {
+        acceptationWeight: 0,
+        acceptationStatus: WasteAcceptationStatus.REFUSED,
+        acceptationRefusalReason: "parce que",
+        acceptationWasteCode: "14 06 01*",
+        acceptationWasteDescription: "fluide",
+        acceptationDate: new Date()
+      };
+
+      const beforeAcceptationData = {
+        acceptationWeight: 1,
+        acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+        acceptationWasteCode: "14 06 01*",
+        acceptationWasteDescription: "fluide",
+        acceptationDate: new Date()
+      };
+
+      // [bsff1, bsff2] => bsff3
       const nextBsff = await createBsffBeforeRefusal(
         {
           emitter: ttr,
@@ -586,16 +671,26 @@ describe("Mutation.signBsff", () => {
           destination
         },
         {
-          previousPackagings: bsff.packagings
+          data: {
+            type: BsffType.GROUPEMENT,
+            packagings: {
+              create: [
+                createBsffPackaging(beforeRefusalData, bsff1.packagings),
+                createBsffPackaging(beforeAcceptationData, bsff2.packagings)
+              ]
+            }
+          }
         }
       );
 
       const { mutate } = makeClient(destination.user);
+
+      // Sign refusal for first packaging
       await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
         variables: {
           id: nextBsff.id,
           input: {
-            packagingId: bsff.packagings[0].id,
+            packagingId: nextBsff.packagings[0].id,
             type: "ACCEPTATION",
             date: new Date().toISOString() as any,
             author: destination.user.name
@@ -603,18 +698,36 @@ describe("Mutation.signBsff", () => {
         }
       });
 
-      const updatedBsff = await prisma.bsff.findUniqueOrThrow({
-        where: { id: bsff.id },
+      // Sign acceptation for second packaging
+      await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
+        variables: {
+          id: nextBsff.id,
+          input: {
+            packagingId: nextBsff.packagings[1].id,
+            type: "ACCEPTATION",
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      const updatedBsff1 = await prisma.bsff.findUniqueOrThrow({
+        where: { id: bsff1.id },
         include: { packagings: true }
       });
-      expect(updatedBsff.status).toEqual(BsffStatus.INTERMEDIATELY_PROCESSED);
+      expect(updatedBsff1.status).toEqual(BsffStatus.INTERMEDIATELY_PROCESSED);
+      // the previous packagings of the refused packaging should be disconnected
+      expect(updatedBsff1.packagings[0].nextPackagingId).toBeNull();
 
-      const refusedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
-        where: { id: bsff.packagings[0].id },
-        include: { previousPackagings: true }
+      const updatedBsff2 = await prisma.bsff.findUniqueOrThrow({
+        where: { id: bsff2.id },
+        include: { packagings: true }
       });
-
-      expect(refusedPackaging.previousPackagings).toEqual([]);
+      expect(updatedBsff2.status).toEqual(BsffStatus.INTERMEDIATELY_PROCESSED);
+      // the previous packagings of the accepted packaging should still be present
+      expect(updatedBsff2.packagings[0].nextPackagingId).toEqual(
+        nextBsff.packagings[1].id
+      );
     });
 
     it(
@@ -680,7 +793,7 @@ describe("Mutation.signBsff", () => {
           data: { acceptationWasteCode: null }
         });
 
-        const { id, ...packagingData } = bsff.packagings[0];
+        const { id, previousPackagings, ...packagingData } = bsff.packagings[0];
         await prisma.bsffPackaging.create({
           data: { ...packagingData, acceptationWasteCode: "14 06 02*" }
         });
@@ -851,7 +964,7 @@ describe("Mutation.signBsff", () => {
       expect(data.signBsff.id).toBeTruthy();
     });
 
-    it("should mark all BSFFs in the history as PROCESSED", async () => {
+    it("should mark all BSFFs in the history as PROCESSED after a reexpedition", async () => {
       const ttr1 = await userWithCompanyFactory(UserRole.ADMIN);
       const ttr2 = await userWithCompanyFactory(UserRole.ADMIN);
 
@@ -924,5 +1037,203 @@ describe("Mutation.signBsff", () => {
       });
       expect(newBsff2.status).toEqual(BsffStatus.PROCESSED);
     });
+
+    it(
+      "should mark all BSFFs in the history as PROCESSED after a groupement " +
+        "when signing all packagings at once",
+      async () => {
+        const ttr1 = await userWithCompanyFactory(UserRole.ADMIN);
+
+        const bsff1 = await createBsffAfterOperation(
+          { emitter, transporter, destination: ttr1 },
+          {
+            data: {
+              status: BsffStatus.INTERMEDIATELY_PROCESSED
+            },
+            packagingData: { operationCode: OPERATION.R12.code }
+          }
+        );
+
+        const bsff2 = await createBsffAfterOperation(
+          { emitter, transporter, destination: ttr1 },
+          {
+            data: {
+              status: BsffStatus.INTERMEDIATELY_PROCESSED
+            },
+            packagingData: { operationCode: OPERATION.R12.code }
+          }
+        );
+
+        const beforeOperationData = {
+          acceptationWeight: 1,
+          acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+          acceptationWasteCode: "14 06 01*",
+          acceptationWasteDescription: "fluide",
+          acceptationDate: new Date(),
+          operationMode: OperationMode.REUTILISATION,
+          operationDate: new Date(),
+          operationDescription: "réutilisation",
+          acceptationSignatureAuthor: "Juste Leblanc",
+          acceptationSignatureDate: new Date().toISOString(),
+          operationCode: OPERATION.R2.code
+        };
+
+        // [bsff1, bsff2] => bsff3
+        const bsff3 = await createBsffBeforeOperation(
+          {
+            emitter: ttr1,
+            transporter,
+            destination
+          },
+          {
+            data: {
+              type: BsffType.GROUPEMENT,
+              packagings: {
+                create: [
+                  createBsffPackaging(beforeOperationData, bsff1.packagings),
+                  createBsffPackaging(beforeOperationData, bsff2.packagings)
+                ]
+              }
+            }
+          }
+        );
+
+        expect(bsff1.status).toEqual(BsffStatus.INTERMEDIATELY_PROCESSED);
+
+        const { mutate } = makeClient(destination.user);
+        const { data, errors } = await mutate<
+          Pick<Mutation, "signBsff">,
+          MutationSignBsffArgs
+        >(SIGN, {
+          variables: {
+            id: bsff3.id,
+            input: {
+              type: "OPERATION",
+              date: new Date().toISOString() as any,
+              author: destination.user.name
+            }
+          }
+        });
+
+        expect(errors).toBeUndefined();
+        expect(data.signBsff.id).toBeTruthy();
+
+        const newBsff1 = await prisma.bsff.findUniqueOrThrow({
+          where: { id: bsff1.id }
+        });
+        expect(newBsff1.status).toEqual(BsffStatus.PROCESSED);
+
+        const newBsff2 = await prisma.bsff.findUniqueOrThrow({
+          where: { id: bsff2.id }
+        });
+        expect(newBsff2.status).toEqual(BsffStatus.PROCESSED);
+      }
+    );
+
+    it(
+      "should mark all BSFFs in the history as PROCESSED after a groupement " +
+        "when signing packagings one by one",
+      async () => {
+        const ttr1 = await userWithCompanyFactory(UserRole.ADMIN);
+
+        const bsff1 = await createBsffAfterOperation(
+          { emitter, transporter, destination: ttr1 },
+          {
+            data: {
+              status: BsffStatus.INTERMEDIATELY_PROCESSED
+            },
+            packagingData: { operationCode: OPERATION.R12.code }
+          }
+        );
+
+        const bsff2 = await createBsffAfterOperation(
+          { emitter, transporter, destination: ttr1 },
+          {
+            data: {
+              status: BsffStatus.INTERMEDIATELY_PROCESSED
+            },
+            packagingData: { operationCode: OPERATION.R12.code }
+          }
+        );
+
+        const beforeOperationData = {
+          acceptationWeight: 1,
+          acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+          acceptationWasteCode: "14 06 01*",
+          acceptationWasteDescription: "fluide",
+          acceptationDate: new Date(),
+          operationMode: OperationMode.REUTILISATION,
+          operationDate: new Date(),
+          operationDescription: "réutilisation",
+          acceptationSignatureAuthor: "Juste Leblanc",
+          acceptationSignatureDate: new Date().toISOString(),
+          operationCode: OPERATION.R2.code
+        };
+
+        // [bsff1, bsff2] => bsff3
+        const bsff3 = await createBsffBeforeOperation(
+          {
+            emitter: ttr1,
+            transporter,
+            destination
+          },
+          {
+            data: {
+              type: BsffType.GROUPEMENT,
+              packagings: {
+                create: [
+                  createBsffPackaging(beforeOperationData, bsff1.packagings),
+                  createBsffPackaging(beforeOperationData, bsff2.packagings)
+                ]
+              }
+            }
+          }
+        );
+
+        expect(bsff1.status).toEqual(BsffStatus.INTERMEDIATELY_PROCESSED);
+
+        const { mutate } = makeClient(destination.user);
+        await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
+          variables: {
+            id: bsff3.id,
+            input: {
+              type: "OPERATION",
+              date: new Date().toISOString() as any,
+              author: destination.user.name,
+              packagingId: bsff3.packagings[0].id
+            }
+          }
+        });
+
+        const newBsff1 = await prisma.bsff.findUniqueOrThrow({
+          where: { id: bsff1.id }
+        });
+        expect(newBsff1.status).toEqual(BsffStatus.PROCESSED);
+
+        let newBsff2 = await prisma.bsff.findUniqueOrThrow({
+          where: { id: bsff2.id }
+        });
+
+        expect(newBsff2.status).toEqual(BsffStatus.INTERMEDIATELY_PROCESSED);
+
+        await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
+          variables: {
+            id: bsff3.id,
+            input: {
+              type: "OPERATION",
+              date: new Date().toISOString() as any,
+              author: destination.user.name,
+              packagingId: bsff3.packagings[1].id
+            }
+          }
+        });
+
+        newBsff2 = await prisma.bsff.findUniqueOrThrow({
+          where: { id: bsff2.id }
+        });
+
+        expect(newBsff2.status).toEqual(BsffStatus.PROCESSED);
+      }
+    );
   });
 });

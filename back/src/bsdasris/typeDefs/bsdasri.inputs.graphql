@@ -240,7 +240,12 @@ input BsdasriDestinationInput {
 }
 
 input BsdasriReceptionInput {
-  volume: Int
+  "Volume total de tous les contenants"
+  volume: Float
+    @deprecated(
+      reason: "Ignoré - Calculé par Trackdéchets en faisant la somme des volumes des contenants"
+    )
+
   packagings: [BsdasriPackagingsInput!]
   date: DateTime
   acceptation: BsdasriAcceptationInput
@@ -344,7 +349,7 @@ input BsdasriRevisionRequestContentInput {
 }
 
 input BsdasriRevisionRequestEmitterInput {
-  "Informations chantier (si différente de l'adresse de l'entreprise)"
+  "Informations chantier (si différente de l'adresse de l'entreprise). Disponible uniquement sur le dasri simple"
   pickupSite: PickupSiteInput
 }
 
@@ -366,12 +371,12 @@ input BsdasriRevisionRequestOperationInput {
 }
 
 input BsdasriRevisionRequestReceptionInput {
-  "Conditionnement"
+  "Conditionnement. Disponible sur bsdasri simple et de groupement."
   packagings: [BsdasriPackagingsInput!]
 }
 
 input BsdasriRevisionRequestWasteInput {
-  "Rubrique Déchet"
+  "Rubrique Déchet. Disponible sur bsdasri simple et de groupement."
   code: String
 }
 

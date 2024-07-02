@@ -4,6 +4,7 @@ import { bsdasriPdfDownloadHandler } from "../bsdasris/resolvers/queries/bsdasri
 import { bsffPdfDownloadHandler } from "../bsffs/resolvers/queries/bsffPdf";
 import { bsvhuPdfDownloadHandler } from "../bsvhu/resolvers/queries/bsvhuPdf";
 import { bspaohPdfDownloadHandler } from "../bspaoh/resolvers/queries/bspaohPdf";
+import { companyDigestPdfDownloadHandler } from "../companydigest/resolvers/queries/companyDigestPdf";
 import { redisClient } from "../common/redis";
 import { formPdfDownloadHandler } from "../forms/resolvers/queries/formPdf";
 import { wastesRegistryCsvDownloadHandler } from "../registry/resolvers/queries/wastesRegistryCsv";
@@ -43,6 +44,7 @@ type DownloadHandlerName = keyof Pick<
   | "wastesRegistryXls"
   | "myCompaniesCsv"
   | "myCompaniesXls"
+  | "companyDigestPdf"
 >;
 
 // List all different params that can be passed to a download handler
@@ -88,6 +90,7 @@ const downloadHandlers: DownloadHandlers = [
   bsffPdfDownloadHandler,
   bsvhuPdfDownloadHandler,
   bspaohPdfDownloadHandler,
+  companyDigestPdfDownloadHandler,
   wastesRegistryCsvDownloadHandler,
   wastesRegistryXlsDownloadHandler,
   myCompaniesCsvDownloadHandler,

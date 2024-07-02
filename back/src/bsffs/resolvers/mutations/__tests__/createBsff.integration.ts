@@ -14,14 +14,9 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
-import { sirenifyBsffInput } from "../../../sirenify";
 import { createFicheIntervention } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-
-jest.mock("../../../sirenify");
-(sirenifyBsffInput as jest.Mock).mockImplementation(input =>
-  Promise.resolve(input)
-);
+import { getFirstTransporterSync } from "../../../database";
 
 const CREATE_BSFF = gql`
   mutation CreateBsff($input: BsffInput!) {
@@ -85,10 +80,7 @@ const createInput = (emitter, transporter, destination) => ({
 });
 
 describe("Mutation.createBsff", () => {
-  afterEach(async () => {
-    await resetDatabase();
-    (sirenifyBsffInput as jest.Mock).mockClear();
-  });
+  afterEach(resetDatabase);
 
   it("should allow user to create a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -106,15 +98,33 @@ describe("Mutation.createBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.createBsff.id).toBeTruthy();
-    expect(data.createBsff.packagings).toEqual([
+
+    const createdBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: data.createBsff.id },
+      include: { packagings: true, transporters: true }
+    });
+
+    expect(createdBsff.type).toEqual(BsffType.COLLECTE_PETITES_QUANTITES);
+    expect(createdBsff.emitterCompanySiret).toEqual(emitter.company.siret);
+    expect(createdBsff.destinationCompanySiret).toEqual(
+      destination.company.siret
+    );
+    expect(createdBsff.transporters).toHaveLength(1);
+    const bsffTransporter = getFirstTransporterSync(createdBsff)!;
+    expect(bsffTransporter.transporterCompanySiret).toEqual(
+      transporter.company.siret
+    );
+    expect(createdBsff.packagings).toHaveLength(1);
+    expect(createdBsff.packagings[0]).toEqual(
       expect.objectContaining({
-        name: "BOUTEILLE",
+        type: BsffPackagingType.BOUTEILLE,
         numero: "123",
         weight: 1
       })
-    ]);
-    // check input is sirenified
-    expect(sirenifyBsffInput as jest.Mock).toHaveBeenCalledTimes(1);
+    );
+    expect(createdBsff.wasteCode).toEqual(BSFF_WASTE_CODES[0]);
+    expect(createdBsff.wasteAdr).toEqual("Mention ADR");
+    expect(createdBsff.wasteDescription).toEqual("R410");
   });
 
   it("should create a bsff with a fiche d'intervention", async () => {
@@ -182,6 +192,7 @@ describe("Mutation.createBsff", () => {
 
   it("should create a bsff and ignore recepisse input", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    // transporter without receipt
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
@@ -195,7 +206,12 @@ describe("Mutation.createBsff", () => {
       }
     });
 
-    expect(data.createBsff.transporter!.recepisse).toEqual(null);
+    expect(data.createBsff.transporter!.recepisse).toEqual({
+      department: null,
+      isExempted: false,
+      number: null,
+      validityLimit: null
+    });
   });
 
   it("should disallow unauthenticated user from creating a bsff", async () => {
@@ -267,27 +283,25 @@ describe("Mutation.createBsff", () => {
         }
       }
     });
+
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          "Destination : le nom de l'établissement est requis\n" +
-          "Destination : le numéro SIRET est requis\n" +
-          "Destination : l'adresse de l'établissement est requise\n" +
-          "Destination : le nom du contact est requis\n" +
-          "Destination : le numéro de téléphone est requis\n" +
-          "Destination : l'adresse email est requise\n" +
-          "Le code de l'opération de traitement prévu est requis\n" +
-          "Le code déchet est requis\n" +
-          "La dénomination usuelle du déchet est obligatoire\n" +
-          "La mention ADR est requise\n" +
-          "Le poids total est requis\n" +
-          "Le type de poids (estimé ou non) est un requis\n" +
-          "Émetteur : le nom de l'établissement est requis\n" +
-          "Émetteur : l'adresse de l'établissement est requise\n" +
-          "Émetteur : le nom du contact est requis\n" +
-          "Émetteur : le numéro de téléphone est requis\n" +
-          "Émetteur : l'adresse email est requise"
+          "La personne à contacter chez l'émetteur est un champ requis.\n" +
+          "Le N° de téléphone de l'émetteur est un champ requis.\n" +
+          "L'adresse e-mail de l'émetteur est un champ requis.\n" +
+          "Le code déchet est un champ requis.\n" +
+          "La description du déchet est un champ requis.\n" +
+          "L'ADR est un champ requis.\n" +
+          "La quantité totale est un champ requis.\n" +
+          "La raison sociale de l'installation de destination est un champ requis.\n" +
+          "Le N°SIRET de l'installation de destination est un champ requis.\n" +
+          "L'adresse de l'installation de destination est un champ requis.\n" +
+          "La personne à contacter de l'installation de destination est un champ requis.\n" +
+          "Le N° de téléphone de l'installation de destination est un champ requis.\n" +
+          "Le code d'opération prévu est un champ requis.\n" +
+          "L'adresse e-mail de l'installation de destination est un champ requis.\n" +
+          "La liste des contenants est un champ requis."
       })
     ]);
   });
@@ -323,9 +337,7 @@ describe("Mutation.createBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          `Transporteur : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
+        message: `L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
       })
     ]);
   });
@@ -360,9 +372,7 @@ describe("Mutation.createBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          `Destination : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
+        message: `L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
       })
     ]);
   });
@@ -386,11 +396,10 @@ describe("Mutation.createBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          `Le transporteur saisi sur le bordereau (SIRET: ${transporter.company.siret}) n'est pas inscrit sur` +
-          " Trackdéchets en tant qu'entreprise de transport. Cette entreprise ne peut donc pas" +
-          " être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette" +
-          " entreprise pour qu'il modifie le profil de l'établissement depuis l'interface" +
+          `Le transporteur saisi sur le bordereau (SIRET: ${transporter.company.siret}) n'est pas inscrit` +
+          " sur Trackdéchets en tant qu'entreprise de transport. Cette entreprise ne peut donc" +
+          " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de" +
+          " cette entreprise pour qu'il modifie le profil de l'établissement depuis l'interface" +
           " Trackdéchets Mon Compte > Établissements"
       })
     ]);
@@ -415,11 +424,11 @@ describe("Mutation.createBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          `L\'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.company.siret}"` +
-          " n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement." +
-          " Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur" +
-          " de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+          `L\'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.company.siret}" ` +
+          "n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement." +
+          " Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de" +
+          " l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis " +
+          "l'interface Trackdéchets Mon Compte > Établissements"
       })
     ]);
   });

@@ -114,6 +114,11 @@ type CompanyPrivate {
   allowBsdasriTakeOverWithoutSignature: Boolean!
 
   """
+  L'entreprise autorise la signature automatique de l'annexe 1 pour les entreprises saisies
+  """
+  allowAppendix1SignatureAutomation: Boolean!
+
+  """
   Liste des automatisations de signature accordées par l'entreprise
   """
   signatureAutomations: [SignatureAutomation!]!
@@ -122,6 +127,11 @@ type CompanyPrivate {
   Liste des automatisations de signature reçues par l'entreprise
   """
   receivedSignatureAutomations: [SignatureAutomation!]!
+
+  """
+  Liste des featureFlags
+  """
+  featureFlags: [String]!
 }
 
 type CompanyPrivateEdge {
@@ -369,6 +379,12 @@ type CompanySearchResult implements CompanySearchPrivateCommon {
   """
   companyTypes: [CompanyType!]
 
+  "Sous-types d'entreprises pour les installation de Tri, Transit Regroupement de déchets"
+  collectorTypes: [CollectorType!]
+
+  "Sous-types d'entreprises pour les installation de traitement de déchets"
+  wasteProcessorTypes: [WasteProcessorType!]
+
   """
   Liste des agréments de l'éco-organisme
   """
@@ -554,6 +570,9 @@ type WorkerCertification {
 type CompanyMember {
   "Identifiant opaque"
   id: ID!
+
+  "Identifiant de la company utile pour la gestion du cache"
+  orgId: ID!
 
   "Email"
   email: String!

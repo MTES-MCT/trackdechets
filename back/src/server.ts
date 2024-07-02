@@ -3,6 +3,8 @@ import { unwrapResolverError } from "@apollo/server/errors";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { makeExecutableSchema } from "@graphql-tools/schema";
+import { ROAD_CONTROL_SLUG } from "@td/constants";
+import { runWithCorrelationId } from "@td/logger";
 import redisStore from "connect-redis";
 import cors from "cors";
 import express, { json, static as serveStatic, urlencoded } from "express";
@@ -17,14 +19,14 @@ import { ValidationError } from "yup";
 import { ZodError } from "zod";
 import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { passportBearerMiddleware } from "./auth";
+import { createBsdaDataLoaders } from "./bsda/dataloader";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
-import { ROAD_CONTROL_SLUG } from "@td/constants";
 import { ErrorCode, UserInputError } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
 import { impersonateMiddleware } from "./common/middlewares/impersonate";
-import loggingMiddleware from "./common/middlewares/loggingMiddleware";
+import { loggingMiddleware } from "./common/middlewares/loggingMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
 import { gqlInfosPlugin } from "./common/plugins/gqlInfosPlugin";
@@ -37,18 +39,19 @@ import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
-import { createBsdaDataLoaders } from "./bsda/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
 import { oauth2Router } from "./routers/oauth2-router";
 import { oidcRouter } from "./routers/oidc-router";
+import { gericoWebhookHandler } from "./routers/gericoWebhookRouter";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
 import { GraphQLContext } from "./types";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
+import configureYup from "./common/yup/configureYup";
 
 const {
   SESSION_SECRET,
@@ -58,10 +61,12 @@ const {
   UI_HOST,
   MAX_REQUESTS_PER_WINDOW = "1000",
   NODE_ENV,
-  TRUST_PROXY_HOPS
+  TRUST_PROXY_HOPS,
+  GERICO_WEBHOOK_SLUG
 } = process.env;
 
 const Sentry = initSentry();
+configureYup();
 
 const UI_BASE_URL = getUIBaseURL();
 const RATE_LIMIT_WINDOW_SECONDS = 60;
@@ -166,6 +171,12 @@ if (Sentry) {
   // The request handler must be the first middleware on the app
   app.use(Sentry.Handlers.requestHandler());
 }
+
+app.use((_req, _res, next) => {
+  runWithCorrelationId(() => {
+    next();
+  });
+});
 
 /**
  * Set the following headers for cross-domain cookie
@@ -301,6 +312,8 @@ app.get("/exports", (_, res) =>
 );
 
 app.get(`/${ROAD_CONTROL_SLUG}/:token`, roadControlPdfHandler);
+
+app.post(`/${GERICO_WEBHOOK_SLUG}`, gericoWebhookHandler);
 
 app.use(
   "/graphiql",

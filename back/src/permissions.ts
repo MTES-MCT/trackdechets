@@ -215,6 +215,28 @@ export function syncCheckUserPermissions(
   throw new ForbiddenError(errorMsg);
 }
 
+/**
+ * Same parameters as checkUserPermissions
+ * @param user
+ * @param orgIds
+ * @param permission
+ * @param errorMsg
+ * @returns true if admin, false if the user has permissions but isn't admin
+ * @throws if the user is not admin and doesn't have permissions
+ */
+export async function checkUserIsAdminOrPermissions(
+  user: Express.User,
+  orgIds: string | string[],
+  permission: Permission,
+  errorMsg: string
+): Promise<boolean> {
+  if (user.isAdmin) {
+    return true;
+  }
+  await checkUserPermissions(user, orgIds, permission, errorMsg);
+  return false;
+}
+
 type AllSignatureType =
   | BsdaSignatureType
   | BsdasriSignatureType

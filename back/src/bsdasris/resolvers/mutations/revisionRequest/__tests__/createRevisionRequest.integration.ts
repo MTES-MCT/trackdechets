@@ -416,7 +416,7 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors, data } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "createBsdasriRevisionRequest">,
       MutationCreateBsdasriRevisionRequestArgs
     >(CREATE_BSDASRI_REVISION_REQUEST, {
@@ -429,8 +429,6 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
         }
       }
     });
-
-    console.log(data);
 
     expect(errors[0].message).toBe(
       `Impossible de créer une révision sur ce bordereau, il a été annulé.`
@@ -623,40 +621,40 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
     expect(errors).toBeUndefined();
   });
 
-  // it("should succeed if operation code has no corresponding mode", async () => {
-  //   const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
-  //   const { user, company } = await userWithCompanyFactory("ADMIN");
-  //   const bsdasri = await bsdasriFactory({
-  //     opt: {
-  //       emitterCompanySiret: company.siret,
-  //       destinationCompanySiret: recipientCompany.siret,
-  //       status: "SENT"
-  //     }
-  //   });
+  it("should succeed if operation code has no corresponding mode", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: recipientCompany.siret,
+        status: "PROCESSED"
+      }
+    });
 
-  //   const { mutate } = makeClient(user);
-  //   const { errors } = await mutate<
-  //     Pick<Mutation, "createBsdasriRevisionRequest">,
-  //     MutationCreateBsdasriRevisionRequestArgs
-  //   >(CREATE_BSDASRI_REVISION_REQUEST, {
-  //     variables: {
-  //       input: {
-  //         bsdasriId: bsdasri.id,
-  //         content: {
-  //           destination: {
-  //             operation: {
-  //               code: "R12"
-  //             }
-  //           }
-  //         },
-  //         comment: "A comment",
-  //         authoringCompanySiret: company.siret!
-  //       }
-  //     }
-  //   });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdasriRevisionRequest">,
+      MutationCreateBsdasriRevisionRequestArgs
+    >(CREATE_BSDASRI_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdasriId: bsdasri.id,
+          content: {
+            destination: {
+              operation: {
+                code: "D9"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
 
-  //   expect(errors).toBeUndefined();
-  // });
+    expect(errors).toBeUndefined();
+  });
 
   it("should fail if all fields are empty", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -716,4 +714,310 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
     );
   });
+});
+
+describe("Mutation.createBsdasriRevisionRequest grouping", () => {
+  afterEach(() => resetDatabase());
+
+  it("should fail on pickup site (grouping)", async () => {
+    // pickup site is not revisable on grouping dasris
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        status: "SENT",
+        emitterCompanySiret: company.siret,
+        type: "GROUPING",
+        destinationCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdasriRevisionRequest">,
+      MutationCreateBsdasriRevisionRequestArgs
+    >(CREATE_BSDASRI_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdasriId: bsdasri.id,
+          content: {
+            emitter: { pickupSite: { address: "rue bidule" } }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Les champs suivants ne sont pas révisables : l'adresse du site d'enlèvement"
+    );
+  });
+
+  it.each(NON_CANCELLABLE_BSDASRI_STATUSES)(
+    "should fail if status is in non-cancellable list (grouping) %p",
+    async (status: BsdasriStatus) => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: recipientCompany.siret,
+          type: "GROUPING",
+          status
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: { isCanceled: true },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors.length).toBeGreaterThan(0);
+    }
+  );
+
+  it.each(CANCELLABLE_BSDASRI_STATUSES)(
+    "should succeed if status is cancellable (grouping) %p",
+    async (status: BsdasriStatus) => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: recipientCompany.siret,
+          type: "GROUPING",
+
+          status
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: { isCanceled: true },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(data.createBsdasriRevisionRequest.bsdasri.id).toBe(bsdasri.id);
+      expect(errors).toBeUndefined();
+    }
+  );
+});
+
+describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
+  afterEach(() => resetDatabase());
+
+  it("should fail on pickup site (synthesis)", async () => {
+    // pickup site is not revisable on synthesis dasris
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        status: "SENT",
+        emitterCompanySiret: company.siret,
+        type: "SYNTHESIS",
+        destinationCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdasriRevisionRequest">,
+      MutationCreateBsdasriRevisionRequestArgs
+    >(CREATE_BSDASRI_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdasriId: bsdasri.id,
+          content: {
+            emitter: { pickupSite: { address: "rue bidule" } }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Les champs suivants ne sont pas révisables : l'adresse du site d'enlèvement"
+    );
+  });
+
+  it("should fail on waste code (synthesis)", async () => {
+    // waste code is not revisable on synthesis dasris
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        status: "PROCESSED",
+        emitterCompanySiret: company.siret,
+        type: "SYNTHESIS",
+        destinationCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdasriRevisionRequest">,
+      MutationCreateBsdasriRevisionRequestArgs
+    >(CREATE_BSDASRI_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdasriId: bsdasri.id,
+          content: {
+            waste: { code: "18 02 02*" }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Les champs suivants ne sont pas révisables : le code déchet"
+    );
+  });
+
+  it("should fail on packagings", async () => {
+    // packagings are not revisable on synthesis dasris
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        status: "PROCESSED",
+        emitterCompanySiret: company.siret,
+        type: "SYNTHESIS",
+        destinationCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdasriRevisionRequest">,
+      MutationCreateBsdasriRevisionRequestArgs
+    >(CREATE_BSDASRI_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdasriId: bsdasri.id,
+          content: {
+            destination: {
+              reception: {
+                packagings: [
+                  { type: "FUT", quantity: 1, other: "", volume: 10 }
+                ]
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Les champs suivants ne sont pas révisables : le conditionnement"
+    );
+  });
+
+  it.each(NON_CANCELLABLE_BSDASRI_STATUSES)(
+    "should fail if status is in non-cancellable list (synthesis) %p",
+    async (status: BsdasriStatus) => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: recipientCompany.siret,
+          type: "SYNTHESIS",
+          status
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: { isCanceled: true },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors.length).toBeGreaterThan(0);
+    }
+  );
+
+  it.each(CANCELLABLE_BSDASRI_STATUSES)(
+    "should succeed if status is cancellable (synthesis) %p",
+    async (status: BsdasriStatus) => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: recipientCompany.siret,
+          type: "SYNTHESIS",
+
+          status
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: { isCanceled: true },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(data.createBsdasriRevisionRequest.bsdasri.id).toBe(bsdasri.id);
+      expect(errors).toBeUndefined();
+    }
+  );
 });

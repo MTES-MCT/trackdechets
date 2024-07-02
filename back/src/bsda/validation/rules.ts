@@ -101,7 +101,7 @@ type BsdaTransporterEditionRules = EditionRules<
  * signature émetteur sauf si l'utilisateur est l'émetteur, auquel cas
  * il peut encore modifier le champ jusqu'à la signature suivante.
  */
-const sealedFromEissionExceptForEmitter: GetBsdaSignatureTypeFn<ZodBsda> = (
+const sealedFromEmissionExceptForEmitter: GetBsdaSignatureTypeFn<ZodBsda> = (
   _,
   context
 ) => {
@@ -304,7 +304,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   emitterCompanyContact: {
     readableFieldName: "le nom de contact de l'entreprise émettrice",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -314,7 +314,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   emitterCompanyPhone: {
     readableFieldName: "le téléphone de l'entreprise émettrice",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -324,7 +324,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   emitterCompanyMail: {
     readableFieldName: "l'email de l'entreprise émettrice",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -335,37 +335,37 @@ export const bsdaEditionRules: BsdaEditionRules = {
     readableFieldName:
       "les champs d'informations complémentaires de l'entreprise émettrice",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     }
   },
   emitterPickupSiteName: {
     readableFieldName: "le nom de l'adresse de chantier ou de collecte",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     }
   },
   emitterPickupSiteAddress: {
     readableFieldName: "l'adresse de collecte ou de chantier",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     }
   },
   emitterPickupSiteCity: {
     readableFieldName: "la ville de l'adresse de collecte ou de chantier",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     }
   },
   emitterPickupSitePostalCode: {
     readableFieldName: "le code postal de l'adresse de collecte ou de chantier",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     }
   },
   emitterPickupSiteInfos: {
     readableFieldName: "les informations de l'adresse de collecte",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     }
   },
   ecoOrganismeName: {
@@ -593,7 +593,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   workerCompanyName: {
     readableFieldName: "le nom de l'entreprise de travaux",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -603,7 +603,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   workerCompanySiret: {
     readableFieldName: "le SIRET de l'entreprise de travaux",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -613,7 +613,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   workerCompanyAddress: {
     readableFieldName: "l'adresse de l'entreprise de travaux",
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     },
     required: {
       from: "EMISSION",
@@ -720,7 +720,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   wasteCode: {
     sealed: {
-      from: sealedFromEissionExceptForEmitter
+      from: sealedFromEmissionExceptForEmitter
     },
     required: { from: "EMISSION" },
     readableFieldName: "le code déchet"

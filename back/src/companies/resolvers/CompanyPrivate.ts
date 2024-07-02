@@ -6,7 +6,12 @@ import { getUserRole, grants, toGraphQLPermission } from "../../permissions";
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
     const userId = context.user!.id;
-    return getCompanyUsers(parent.orgId, context.dataloaders, userId);
+    return getCompanyUsers(
+      parent.orgId,
+      context.dataloaders,
+      userId,
+      context.user!.isAdmin
+    );
   },
   userRole: async (parent, _, context) => {
     if (parent.userRole) {
@@ -60,12 +65,20 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       .findUnique({ where: { id: parent.id } })
       .givenSignatureAutomations({ include: { from: true, to: true } }) as any;
   },
-  receivedSignatureAutomations: parent => {
-    return prisma.company
+  receivedSignatureAutomations: async parent => {
+    const automations = await prisma.company
       .findUnique({ where: { id: parent.id } })
       .receivedSignatureAutomations({
         include: { from: true, to: true }
-      }) as any;
+      });
+
+    if (!automations) {
+      return [];
+    }
+
+    return automations.filter(
+      a => a.from.allowAppendix1SignatureAutomation
+    ) as any;
   }
 };
 

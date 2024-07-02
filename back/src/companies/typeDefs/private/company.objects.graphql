@@ -57,7 +57,7 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   securityCode: Int
 
   "État du processus de vérification de l'établissement"
-  verificationStatus: CompanyVerificationStatus
+  verificationStatus: CompanyVerificationStatus!
 
   "Email de contact (visible sur la fiche entreprise)"
   contactEmail: String
@@ -137,6 +137,11 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
   allowBsdasriTakeOverWithoutSignature: Boolean
 
+  """
+  L'entreprise autorise la signature automatique de l'annexe 1 pour les entreprises saisies
+  """
+  allowAppendix1SignatureAutomation: Boolean
+
   "Code pays de l'établissement"
   codePaysEtrangerEtablissement: String
 
@@ -167,4 +172,22 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   Certification entreprise de travaux
   """
   workerCertification: WorkerCertification
+}
+
+type CompanyExhaustiveInfo {
+  siret: String
+  name: String
+  contact: String
+  address: String
+  createdAt: DateTime
+  etatAdministratif: String
+  statutDiffusion: String
+  codeNaf: String
+}
+
+type CompanyExhaustive {
+  anonymousCompany: CompanyExhaustiveInfo!
+  dbCompany: CompanyExhaustiveInfo!
+  esCompany: CompanyExhaustiveInfo!
+  sireneCompany: CompanyExhaustiveInfo!
 }

@@ -1,10 +1,15 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import { createUserAccountHash } from "../../../database";
 import { AuthType } from "../../../../auth";
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { renderMail, inviteUserToJoin } from "@td/mail";
+import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -49,5 +54,43 @@ describe("mutation resendInvitation", () => {
         }
       })
     );
+  });
+  test("TD admin user can resend a pending invitation", async () => {
+    const company = await companyFactory();
+    const usrToInvite = "john.snow@trackdechets.fr";
+    await createUserAccountHash(usrToInvite, "MEMBER", company.siret!);
+    const tdAdminUser = await userFactory({
+      isAdmin: true
+    });
+    const { mutate } = makeClient({ ...tdAdminUser, auth: AuthType.Session });
+    // Call the mutation to resend the invitation
+    const res = await mutate(RESEND_INVITATION, {
+      variables: { email: usrToInvite, siret: company.siret }
+    });
+
+    expect(res).toEqual({ data: { resendInvitation: true } });
+  });
+
+  test("user who isn't an admin of a company can't resend a pending invitation", async () => {
+    const company = await companyFactory();
+    const usrToInvite = "john.snow@trackdechets.fr";
+    await createUserAccountHash(usrToInvite, "MEMBER", company.siret!);
+    const notAdminUser = await userFactory({
+      isAdmin: false
+    });
+    const { mutate } = makeClient({ ...notAdminUser, auth: AuthType.Session });
+
+    // Call the mutation to resend the invitation
+    const { errors } = await mutate(RESEND_INVITATION, {
+      variables: { email: usrToInvite, siret: company.siret }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: NotCompanyAdminErrorMsg(company.orgId),
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
   });
 });
