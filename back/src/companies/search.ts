@@ -48,6 +48,8 @@ export const mergeCompanyToCompanySearchResult = (
   address: trackdechetsCompanyInfo?.address,
   vatNumber: trackdechetsCompanyInfo?.vatNumber,
   companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
+  wasteProcessorTypes: trackdechetsCompanyInfo?.wasteProcessorTypes ?? [],
+  collectorTypes: trackdechetsCompanyInfo?.collectorTypes ?? [],
   contact: trackdechetsCompanyInfo?.contact,
   contactEmail: trackdechetsCompanyInfo?.contactEmail,
   contactPhone: trackdechetsCompanyInfo?.contactPhone,
@@ -71,6 +73,8 @@ const companySelectedFields = {
   address: true,
   vatNumber: true,
   companyTypes: true,
+  collectorTypes: true,
+  wasteProcessorTypes: true,
   contact: true,
   contactEmail: true,
   contactPhone: true,
@@ -94,6 +98,7 @@ async function findCompanyAndMergeInfos(
     ...where,
     select: companySelectedFields
   });
+
   return mergeCompanyToCompanySearchResult(
     orgId,
     trackdechetsCompanyInfo,

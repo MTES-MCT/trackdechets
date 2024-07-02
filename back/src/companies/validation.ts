@@ -60,6 +60,9 @@ export function isWorker(company: Company) {
 export function isCrematorium(company: Company) {
   return company.companyTypes.includes(CompanyType.CREMATORIUM);
 }
+export function hasCremationProfile(company: Company) {
+  return company.wasteProcessorTypes.includes(WasteProcessorType.CREMATION);
+}
 
 const toSet = (_, value) => [...new Set(value?.filter(Boolean))];
 

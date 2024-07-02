@@ -13,12 +13,6 @@ import {
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { sirenifyBsffPackagingInput } from "../../../sirenify";
-
-jest.mock("../../../sirenify");
-(sirenifyBsffPackagingInput as jest.Mock).mockImplementation(input =>
-  Promise.resolve(input)
-);
 
 const UPDATE_BSFF_PACKAGING = gql`
   mutation UpdateBsffPackaging($id: ID!, $input: UpdateBsffPackagingInput!) {
@@ -29,10 +23,7 @@ const UPDATE_BSFF_PACKAGING = gql`
 `;
 
 describe("Mutation.updateBsffPackaging", () => {
-  afterEach(async () => {
-    await resetDatabase();
-    (sirenifyBsffPackagingInput as jest.Mock).mockClear();
-  });
+  afterEach(resetDatabase);
 
   test("before acceptation > it should be possible to update acceptation fields", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
@@ -57,7 +48,7 @@ describe("Mutation.updateBsffPackaging", () => {
           acceptation: {
             date: new Date().toISOString() as any,
             status: WasteAcceptationStatus.ACCEPTED,
-            weight: 1
+            weight: 3
           }
         }
       }
@@ -69,8 +60,7 @@ describe("Mutation.updateBsffPackaging", () => {
     expect(updatedPackaging.acceptationStatus).toEqual(
       WasteAcceptationStatus.ACCEPTED
     );
-    // check input is sirenified
-    expect(sirenifyBsffPackagingInput as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(updatedPackaging.acceptationWeight).toEqual(3);
   });
 
   it("should throw error if the mutation is not called by the destination", async () => {
@@ -261,11 +251,16 @@ describe("Mutation.updateBsffPackaging", () => {
         }
       }
     });
+
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
-          " : numero, acceptationDate, acceptationWeight, acceptationWasteCode, acceptationWasteDescription"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " Le champ numero a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ acceptationDate a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ acceptationWeight a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ acceptationWasteDescription a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ acceptationWasteCode a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -294,6 +289,7 @@ describe("Mutation.updateBsffPackaging", () => {
           operation: {
             date: "2022-11-05" as any,
             code: "D13",
+            mode: null,
             description: "Regroupement",
             nextDestination: {
               plannedOperationCode: "R2",
@@ -359,14 +355,22 @@ describe("Mutation.updateBsffPackaging", () => {
         }
       }
     });
+
     expect(errors).toEqual([
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " operationDate, operationCode, operationDescription, operationNextDestinationPlannedOperationCode," +
-          " operationNextDestinationCap, operationNextDestinationCompanyName, operationNextDestinationCompanySiret," +
-          " operationNextDestinationCompanyAddress, operationNextDestinationCompanyContact," +
-          " operationNextDestinationCompanyPhone, operationNextDestinationCompanyMail"
+          " Le champ operationDate a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationDescription a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCap a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyName a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanySiret a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyAddress a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyContact a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyPhone a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyMail a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationCode a été vérouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationPlannedOperationCode a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });

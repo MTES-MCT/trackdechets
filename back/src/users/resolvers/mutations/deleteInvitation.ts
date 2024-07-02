@@ -7,7 +7,10 @@ import {
 } from "../../../companies/database";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getUserAccountHashOrNotFound } from "../../database";
-import { checkUserPermissions, Permission } from "../../../permissions";
+import {
+  checkUserIsAdminOrPermissions,
+  Permission
+} from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
@@ -18,12 +21,13 @@ const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ orgId: siret });
-  await checkUserPermissions(
+  await checkUserIsAdminOrPermissions(
     user,
     company.orgId,
     Permission.CompanyCanManageMembers,
     NotCompanyAdminErrorMsg(company.orgId)
   );
+
   const hash = await getUserAccountHashOrNotFound({
     email,
     companySiret: siret

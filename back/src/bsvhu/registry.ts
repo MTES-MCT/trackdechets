@@ -101,7 +101,8 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransporterData(bsvhu)
+    ...getTransporterData(bsvhu),
+    destinationCompanyMail: bsvhu.destinationCompanyMail
   };
 }
 
@@ -183,7 +184,6 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
     traderRecepisseNumber: null,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     emitterCustomInfo: bsvhu.emitterCustomInfo,
-    destinationCompanyMail: bsvhu.destinationCompanyMail,
     ...getOperationData(bsvhu)
   };
 }
@@ -223,8 +223,7 @@ export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
-    emitterCompanyMail: bsvhu.emitterCompanyMail,
-    destinationCompanyMail: bsvhu.destinationCompanyMail
+    emitterCompanyMail: bsvhu.emitterCompanyMail
   };
 }
 
@@ -267,8 +266,7 @@ export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     ...initialEmitter,
-    emitterCompanyMail: bsvhu.emitterCompanyMail,
-    destinationCompanyMail: bsvhu.destinationCompanyMail
+    emitterCompanyMail: bsvhu.emitterCompanyMail
   };
 }
 
@@ -313,7 +311,6 @@ export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    destinationCompanyMail: bsvhu.destinationCompanyMail,
     ...getOperationData(bsvhu)
   };
 }

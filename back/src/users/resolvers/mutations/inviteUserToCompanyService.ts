@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import { prisma } from "@td/prisma";
 
 import { sendMail } from "../../../mailer/mailing";
@@ -16,10 +15,11 @@ import { associateUserToCompany, createUserAccountHash } from "../../database";
 
 import { inviteUserToJoin, notifyUserOfInvite, renderMail } from "@td/mail";
 
-export async function inviteUserToCompanyFn(
-  adminUser: User,
-  { email: unsafeEmail, siret, role }: MutationInviteUserToCompanyArgs
-): Promise<CompanyPrivate> {
+export async function inviteUserToCompanyFn({
+  email: unsafeEmail,
+  siret,
+  role
+}: MutationInviteUserToCompanyArgs): Promise<CompanyPrivate> {
   const email = sanitizeEmail(unsafeEmail);
 
   const existingUser = await prisma.user.findUnique({ where: { email } });

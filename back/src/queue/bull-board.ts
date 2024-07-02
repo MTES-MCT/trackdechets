@@ -14,6 +14,7 @@ import {
 import { updatesQueue } from "./producers/bsdUpdate";
 import { operationHooksQueue } from "./producers/operationHook";
 import { webhooksQueue } from "./producers/webhooks";
+import { gericoQueue } from "./producers/gerico";
 import { syncEventsQueue } from "./producers/events";
 import { mailQueue } from "./producers/mail";
 import { sirenifyQueue } from "./producers/sirenify";
@@ -34,7 +35,8 @@ createBullBoard({
     new BullAdapter(syncEventsQueue),
     new BullAdapter(webhooksQueue),
     new BullAdapter(operationHooksQueue),
-    new BullAdapter(sirenifyQueue)
+    new BullAdapter(sirenifyQueue),
+    new BullAdapter(gericoQueue)
   ],
   serverAdapter: serverAdapter
 });

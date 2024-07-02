@@ -21,7 +21,13 @@ export { formatDate } from "./common/pdf";
 export { sendMail } from "./mailer/mailing";
 export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";
 export { operationHooksQueue } from "./queue/producers/operationHook";
-export { indexBsdJob, operationHookJob, sendMailJob } from "./queue/jobs";
+export {
+  indexBsdJob,
+  operationHookJob,
+  sendMailJob,
+  postGericoJob
+} from "./queue/jobs";
+
 export {
   indexQueue,
   bulkIndexQueue,
@@ -30,6 +36,7 @@ export {
 export { sirenifyQueue } from "./queue/producers/sirenify";
 export { mailQueue } from "./queue/producers/mail";
 export { syncEventsQueue } from "./queue/producers/events";
+
 export {
   geocodeCompanyQueue,
   setCompanyDepartementQueue
@@ -44,12 +51,14 @@ export {
   INDEX_JOB_NAME,
   INDEX_CREATED_JOB_NAME,
   INDEX_UPDATED_JOB_NAME,
-  SIRENIFY_JOB_NAME
+  SIRENIFY_JOB_NAME,
+  SEND_GERICO_API_REQUEST_JOB_NAME
 } from "./queue/producers/jobNames";
 export { deleteBsdJob } from "./queue/jobs/deleteBsd";
 export { indexFavoritesJob } from "./queue/jobs/indexFavorites";
 export { indexChunkBsdJob, indexAllInBulkJob } from "./queue/jobs/indexAllBsds";
 export { sendHookJob } from "./queue/jobs/sendHook";
+
 export {
   webhooksQueue,
   SEND_WEBHOOK_JOB_NAME
@@ -65,3 +74,4 @@ export { generateUniqueTestSiret } from "./companies/resolvers/mutations/createT
 export { createUser } from "./users/database";
 export { default as getReadableId, ReadableIdPrefix } from "./forms/readableId";
 export { reindex } from "./bsds/indexation/reindexBsdHelpers";
+export { gericoQueue } from "./queue/producers/gerico";

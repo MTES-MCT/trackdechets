@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { WasteAcceptationStatus, TransportMode } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
-import {
-  siretSchema,
-  isCrematoriumRefinement,
-  foreignVatNumberSchema,
-  isRegisteredVatNumberRefinement
-} from "../../common/validation/siret";
+import { isCrematoriumRefinement } from "./dynamicRefinements";
 import { BSPAOH_WASTE_CODES, BSPAOH_WASTE_TYPES } from "@td/constants";
+import {
+  foreignVatNumberSchema,
+  siretSchema
+} from "../../common/validation/zod/schema";
+import { isRegisteredVatNumberRefinement } from "../../common/validation/zod/refinement";
 
 export const BSPAOH_OPERATIONS = ["R 1", "D 10"] as const;
 

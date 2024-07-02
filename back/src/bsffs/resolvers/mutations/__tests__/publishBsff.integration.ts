@@ -42,25 +42,23 @@ describe("publishBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          "Destination : le nom de l'établissement est requis\n" +
-          "Destination : le numéro SIRET est requis\n" +
-          "Destination : l'adresse de l'établissement est requise\n" +
-          "Destination : le nom du contact est requis\n" +
-          "Destination : le numéro de téléphone est requis\n" +
-          "Destination : l'adresse email est requise\n" +
-          "Le code de l'opération de traitement prévu est requis\n" +
-          "Le code déchet est requis\n" +
-          "La dénomination usuelle du déchet est obligatoire\n" +
-          "La mention ADR est requise\n" +
-          "Le poids total est requis\n" +
-          "Le type de poids (estimé ou non) est un requis\n" +
-          "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1\n" +
-          "Émetteur : le nom de l'établissement est requis\n" +
-          "Émetteur : l'adresse de l'établissement est requise\n" +
-          "Émetteur : le nom du contact est requis\n" +
-          "Émetteur : le numéro de téléphone est requis\n" +
-          "Émetteur : l'adresse email est requise"
+          "La raison sociale de l'émetteur est un champ requis.\n" +
+          "L'adresse de l'émetteur est un champ requis.\n" +
+          "La personne à contacter chez l'émetteur est un champ requis.\n" +
+          "Le N° de téléphone de l'émetteur est un champ requis.\n" +
+          "L'adresse e-mail de l'émetteur est un champ requis.\n" +
+          "Le code déchet est un champ requis.\n" +
+          "La description du déchet est un champ requis.\n" +
+          "L'ADR est un champ requis.\n" +
+          "La quantité totale est un champ requis.\n" +
+          "La raison sociale de l'installation de destination est un champ requis.\n" +
+          "Le N°SIRET de l'installation de destination est un champ requis.\n" +
+          "L'adresse de l'installation de destination est un champ requis.\n" +
+          "La personne à contacter de l'installation de destination est un champ requis.\n" +
+          "Le N° de téléphone de l'installation de destination est un champ requis.\n" +
+          "Le code d'opération prévu est un champ requis.\n" +
+          "L'adresse e-mail de l'installation de destination est un champ requis.\n" +
+          "La liste des contenants est un champ requis."
       })
     ]);
   });

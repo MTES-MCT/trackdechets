@@ -18,6 +18,7 @@ const CREATE_BSDA = gql`
   mutation CreateBsda($input: BsdaInput!) {
     createBsda(input: $input) {
       id
+      status
       destination {
         company {
           siret
@@ -46,8 +47,15 @@ const CREATE_BSDA = gql`
 `;
 
 describe("Mutation.Bsda.create", () => {
-  afterEach(async () => {
-    await resetDatabase();
+  const OLD_ENV = process.env;
+
+  beforeEach(() => {
+    process.env.VERIFY_COMPANY = "false";
+  });
+
+  afterEach(() => {
+    process.env = OLD_ENV;
+    return resetDatabase();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -1559,5 +1567,89 @@ describe("Mutation.Bsda.create", () => {
     expect(reshipped?.type).toEqual("RESHIPMENT");
     expect(reshipped?.forwardingId).toEqual(bsda.id);
     expect(reshipped?.wasteConsistence).toEqual("PULVERULENT"); // consistence matches input
+  });
+
+  it("should create a bsda if destination is NOT verified, provided it's a WASTE_CENTER and bsda is COLLECTION_2710", async () => {
+    // Given
+    process.env.VERIFY_COMPANY = "true";
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+
+    const { user: destinationUser, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER", {
+        verificationStatus: "TO_BE_VERIFIED",
+        companyTypes: ["PRODUCER", "WASTE_CENTER"]
+      });
+
+    const input: BsdaInput = {
+      destination: {
+        cap: "",
+        company: {
+          address: destinationCompany.address,
+          contact: destinationCompany.contact,
+          mail: destinationCompany.contactEmail,
+          name: destinationCompany.name,
+          phone: destinationCompany.contactPhone,
+          siret: destinationCompany.siret
+        },
+        operation: {
+          description: ""
+        },
+        plannedOperationCode: "R 13"
+      },
+      emitter: {
+        company: {
+          address: emitterCompany.address,
+          contact: emitterCompany.contact,
+          country: "FR",
+          mail: emitterCompany.contactEmail,
+          name: emitterCompany.name,
+          phone: emitterCompany.contactPhone,
+          siret: emitterCompany.siret
+        },
+        isPrivateIndividual: false,
+        pickupSite: {
+          address: "4 Boulevard boues",
+          city: "Marseille",
+          infos: "",
+          name: "4 Boulevard boues",
+          postalCode: "13003"
+        }
+      },
+      packagings: [
+        {
+          other: "",
+          quantity: 1,
+          type: "DEPOT_BAG"
+        }
+      ],
+      type: "COLLECTION_2710",
+      waste: {
+        adr: "ADR",
+        code: "06 07 01*",
+        consistence: "SOLIDE",
+        familyCode: "4",
+        materialName: "test",
+        pop: false,
+        sealNumbers: []
+      },
+      weight: {
+        value: 10
+      }
+    };
+
+    // When
+    const { mutate } = makeClient(destinationUser);
+    const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createBsda.status).toBe("INITIAL");
   });
 });

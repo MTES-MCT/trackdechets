@@ -2,7 +2,7 @@ import express, { json } from "express";
 import supertest from "supertest";
 import Transport from "winston-transport";
 import { logger } from "@td/logger";
-import loggingMiddleware from "../loggingMiddleware";
+import { loggingMiddleware } from "../loggingMiddleware";
 import { gql } from "graphql-tag";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";

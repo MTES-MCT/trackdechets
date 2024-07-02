@@ -3,7 +3,13 @@
  */
 
 import { prisma } from "@td/prisma";
-import { User, Prisma, Company, CompanyAssociation } from "@prisma/client";
+import {
+  User,
+  Prisma,
+  Company,
+  CompanyAssociation,
+  UserAccountHash
+} from "@prisma/client";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,
@@ -125,9 +131,14 @@ export async function isCompanyMember(user: User, company: Company) {
 export async function getCompanyUsers(
   orgId: string,
   dataloaders: AppDataloaders,
-  requestingUserid: string
+  requestingUserid: string,
+  isTDAdmin?: boolean
 ): Promise<CompanyMember[]> {
-  const activeUsers = await getCompanyActiveUsers(orgId, requestingUserid);
+  const activeUsers = await getCompanyActiveUsers(
+    orgId,
+    requestingUserid,
+    isTDAdmin
+  );
   const invitedUsers = await getCompanyInvitedUsers(orgId, dataloaders);
 
   return [...activeUsers, ...invitedUsers];
@@ -140,11 +151,12 @@ const OBFUSCATED_USER_NAME = "Temporairement masqué";
  * @param association
  * @returns
  */
-const userNameDisplay = (
+export const userNameDisplay = (
   association: CompanyAssociation & {
     user: User;
   },
-  requestingUserid?: string
+  requestingUserid?: string,
+  isTDAdmin?: boolean
 ): string => {
   const today = new Date();
   // In the following cases, we return clear user name:
@@ -156,7 +168,8 @@ const userNameDisplay = (
     !association.createdAt ||
     !association.automaticallyAccepted ||
     association.userId === requestingUserid ||
-    !requestingUserid
+    !requestingUserid ||
+    isTDAdmin
   ) {
     return association.user.name;
   }
@@ -171,24 +184,67 @@ const userNameDisplay = (
 };
 
 /**
+ * map a user's company association to a CompanyMember
+ * @param companyAssociations
+ * @param company
+ * @param isTDAdmin
+ */
+export const userAssociationToCompanyMember = (
+  companyAssociations: CompanyAssociation & { user: User },
+  orgId: string,
+  requestingUserId?: string,
+  isTDAdmin = false
+) => {
+  return {
+    ...companyAssociations.user,
+    orgId: orgId,
+    name: userNameDisplay(companyAssociations, requestingUserId, isTDAdmin),
+    role: companyAssociations.role,
+    isPendingInvitation: false
+  };
+};
+
+/**
+ * map a user's company association to a CompanyMember
+ * @param userAccountHash
+ * @param company
+ * @param isTDAdmin
+ */
+export const userAccountHashToCompanyMember = (
+  userAccountHash: UserAccountHash,
+  orgId: string
+) => {
+  return {
+    id: userAccountHash.id,
+    orgId: orgId,
+    name: "Invité",
+    email: userAccountHash.email,
+    role: userAccountHash.role,
+    isActive: false,
+    isPendingInvitation: true
+  };
+};
+
+/**
  * Returns company members that already have an account in TD
  * @param siret
  */
 export async function getCompanyActiveUsers(
   orgId: string,
-  requestingUserid?: string
+  requestingUserId?: string,
+  isTDAdmin?: boolean
 ): Promise<CompanyMember[]> {
   const associations = await prisma.company
     .findUniqueOrThrow({ where: { orgId } })
     .companyAssociations({ include: { user: true } });
 
   return associations.map(a => {
-    return {
-      ...a.user,
-      name: userNameDisplay(a, requestingUserid),
-      role: a.role,
-      isPendingInvitation: false
-    };
+    return userAssociationToCompanyMember(
+      a,
+      orgId,
+      requestingUserId,
+      isTDAdmin
+    );
   });
 }
 
@@ -203,14 +259,7 @@ export async function getCompanyInvitedUsers(
 ): Promise<CompanyMember[]> {
   const hashes = await dataloaders.activeUserAccountHashesBySiret.load(orgId);
   return hashes.map(h => {
-    return {
-      id: h.id,
-      name: "Invité",
-      email: h.email,
-      role: h.role,
-      isActive: false,
-      isPendingInvitation: true
-    };
+    return userAccountHashToCompanyMember(h, orgId);
   });
 }
 
@@ -398,4 +447,27 @@ export async function getUpdatedCompanyNameAndAddress(
   }
   // return existing and unchanged values
   return null;
+}
+
+/**
+ * get a CompanyAssociation by orgId + userId
+ * @param orgId
+ * @param userId
+ */
+export async function getCompanyAssociation({
+  orgId,
+  userId
+}: {
+  orgId: string;
+  userId: string;
+}) {
+  const association = await prisma.companyAssociation.findFirstOrThrow({
+    where: {
+      company: {
+        orgId
+      },
+      userId
+    }
+  });
+  return association;
 }

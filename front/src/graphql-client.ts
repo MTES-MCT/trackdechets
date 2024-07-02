@@ -81,7 +81,7 @@ const apolloClient = new ApolloClient({
         }
       },
       CompanyMember: {
-        keyFields: ["id", "role"]
+        keyFields: ["id", "orgId"]
       }
     }
   }),

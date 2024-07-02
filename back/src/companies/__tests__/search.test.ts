@@ -325,7 +325,10 @@ describe("searchCompanies", () => {
       contactPhone: undefined,
       ecoOrganismeAgreements: [],
       etatAdministratif: "A",
-      isRegistered: true
+      isRegistered: true,
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      website: undefined
     };
     expect(companiesSearched[0]).toEqual(expected);
     expect(mockSearchCompaniesBackend).toHaveBeenCalledTimes(1);

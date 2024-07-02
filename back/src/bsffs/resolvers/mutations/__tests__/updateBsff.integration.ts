@@ -13,7 +13,6 @@ import {
   MutationUpdateBsffArgs
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
-import { associateUserToCompany } from "../../../../users/database";
 import {
   companyFactory,
   siretify,
@@ -34,13 +33,7 @@ import {
   createFicheIntervention,
   createBsffAfterAcceptation
 } from "../../../__tests__/factories";
-import { sirenifyBsffInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
-
-jest.mock("../../../sirenify");
-(sirenifyBsffInput as jest.Mock).mockImplementation(input =>
-  Promise.resolve(input)
-);
 
 const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
@@ -52,10 +45,7 @@ const UPDATE_BSFF = gql`
 `;
 
 describe("Mutation.updateBsff", () => {
-  afterEach(async () => {
-    await resetDatabase();
-    (sirenifyBsffInput as jest.Mock).mockClear();
-  });
+  afterEach(resetDatabase);
 
   it("should allow user to update a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -80,8 +70,6 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.updateBsff.id).toBeTruthy();
-    // check input is sirenified
-    expect(sirenifyBsffInput as jest.Mock).toHaveBeenCalledTimes(1);
   });
 
   it("should update a bsff transporter recepisse with data pulled from db", async () => {
@@ -161,7 +149,12 @@ describe("Mutation.updateBsff", () => {
     });
 
     // recepisse is pulled from db
-    expect(data.updateBsff.transporter!.recepisse).toEqual(null);
+    expect(data.updateBsff.transporter!.recepisse).toEqual({
+      department: null,
+      isExempted: false,
+      number: null,
+      validityLimit: null
+    });
   });
 
   it("should empty a bsff transporter recepisse if transporter siret has changed", async () => {
@@ -199,12 +192,12 @@ describe("Mutation.updateBsff", () => {
     });
 
     // recepisse is empty
-    expect(data.updateBsff.transporter!.recepisse?.isExempted).toBeUndefined();
-    expect(data.updateBsff.transporter!.recepisse?.number).toBeUndefined();
-    expect(
-      data.updateBsff.transporter!.recepisse?.validityLimit
-    ).toBeUndefined();
-    expect(data.updateBsff.transporter!.recepisse?.department).toBeUndefined();
+    expect(data.updateBsff.transporter!.recepisse).toEqual({
+      department: null,
+      isExempted: false,
+      number: null,
+      validityLimit: null
+    });
   });
 
   it("should empty a bsff transporter recepisse if transporter has isExempted", async () => {
@@ -420,7 +413,8 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : packagings"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " La liste des contenants a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -672,7 +666,8 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ficheInterventions"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
+          " : La liste des fiches d'intervention a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -838,7 +833,7 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffBeforeEmission({ emitter });
+    const bsff = await createBsffBeforeEmission({ emitter, destination });
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
@@ -966,14 +961,23 @@ describe("Mutation.updateBsff", () => {
         }
       }
     });
+
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " emitterCompanyName, emitterCompanyAddress, emitterCompanyContact, emitterCompanyPhone," +
-          " emitterCompanyMail, destinationCompanyName," +
-          " destinationCompanyAddress, destinationCompanyContact, destinationCompanyPhone," +
-          " destinationCompanyMail, wasteCode, wasteDescription, wasteAdr, weightValue, packagings"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
+          "La raison sociale de l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "L'adresse de l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "La personne à contacter chez l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "Le N° de téléphone de l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "L'adresse e-mail de l'émetteur a été vérouillé via signature et ne peut pas être modifié., " +
+          "L'ADR a été vérouillé via signature et ne peut pas être modifié., " +
+          "La description du déchet a été vérouillé via signature et ne peut pas être modifié., " +
+          "La raison sociale de l'installation de destination a été vérouillé via signature et ne peut pas être modifié., " +
+          "L'adresse de l'installation de destination a été vérouillé via signature et ne peut pas être modifié., " +
+          "La quantité totale a été vérouillé via signature et ne peut pas être modifié., " +
+          "Le code déchet a été vérouillé via signature et ne peut pas être modifié., " +
+          "La liste des contenants a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
 
@@ -1043,10 +1047,13 @@ describe("Mutation.updateBsff", () => {
         }
       }
     });
+
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporterTransportPlates, transporterTransportTakenOverAt"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " L'immatriculation du transporteur n°1 a été vérouillé via signature et ne peut pas être modifié.," +
+          " La date d'enlèvement n°1 a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1119,13 +1126,22 @@ describe("Mutation.updateBsff", () => {
 
   test("after reception signature > it should not be possible to update sealed fields", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      transporterReceipt: {
+        create: {
+          receiptNumber: "recepisse",
+          validityLimit: new Date(),
+          department: "07"
+        }
+      }
+    });
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsffAfterReception({
       emitter,
       transporter,
       destination
     });
+
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
@@ -1145,7 +1161,8 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationReceptionDate"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
+          " : La date de la réception a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1377,7 +1394,8 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : grouping"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
+          " : La liste des contenants à grouper a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1386,7 +1404,7 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const groupingBsffs = await Promise.all([
+    const groupedBsffs = await Promise.all([
       createBsffAfterOperation(
         {
           emitter: await userWithCompanyFactory(UserRole.ADMIN),
@@ -1412,7 +1430,7 @@ describe("Mutation.updateBsff", () => {
         data: {
           type: BsffType.GROUPEMENT
         },
-        previousPackagings: groupingBsffs.flatMap(bsff => bsff.packagings)
+        previousPackagings: groupedBsffs.flatMap(bsff => bsff.packagings)
       }
     );
 
@@ -1424,7 +1442,7 @@ describe("Mutation.updateBsff", () => {
       variables: {
         id: bsff.id,
         input: {
-          grouping: groupingBsffs.flatMap(({ packagings }) =>
+          grouping: groupedBsffs.flatMap(({ packagings }) =>
             packagings.map(p => p.id)
           )
         }
@@ -1643,7 +1661,8 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : forwarding"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
+          " : La liste des contenants à réexpedier a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1934,7 +1953,8 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : repackaging"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " La liste des contenants à regrouper a été vérouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -2035,6 +2055,8 @@ describe("Mutation.updateBsff", () => {
 
   it("should update a bsff with previous bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
     const groupingBsffs = await Promise.all([
       createBsffAfterOperation(
         {
@@ -2052,7 +2074,8 @@ describe("Mutation.updateBsff", () => {
     ]);
     const bsff = await createBsffBeforeEmission(
       {
-        emitter
+        emitter,
+        destination
       },
       {
         previousPackagings: groupingBsffs.flatMap(bsff => bsff.packagings),
@@ -2086,6 +2109,8 @@ describe("Mutation.updateBsff", () => {
 
   it("should update a bsff with a forwarding BSFF", async () => {
     const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
     const forwardedBsff = await createBsffAfterOperation(
       {
         emitter: await userWithCompanyFactory(UserRole.ADMIN),
@@ -2100,7 +2125,7 @@ describe("Mutation.updateBsff", () => {
       }
     );
     const bsff = await createBsffBeforeEmission(
-      { emitter: ttr },
+      { emitter: ttr, destination },
 
       {
         previousPackagings: forwardedBsff.packagings,
@@ -2134,6 +2159,7 @@ describe("Mutation.updateBsff", () => {
 
   it("should update a BSFF of type RECONDITIONNEMENT", async () => {
     const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const repackagingBsff = await createBsffAfterOperation(
       {
         emitter: await userWithCompanyFactory(UserRole.ADMIN),
@@ -2148,7 +2174,7 @@ describe("Mutation.updateBsff", () => {
       }
     );
     const bsff = await createBsffBeforeEmission(
-      { emitter: ttr },
+      { emitter: ttr, destination },
       {
         data: {
           type: BsffType.RECONDITIONNEMENT,
@@ -2183,6 +2209,7 @@ describe("Mutation.updateBsff", () => {
 
   it("should be possible to update a bsff's fiches d'intervention", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
     const detenteur2 = await userWithCompanyFactory(UserRole.ADMIN);
 
@@ -2193,7 +2220,7 @@ describe("Mutation.updateBsff", () => {
       })
     ]);
     const bsff = await createBsffBeforeEmission(
-      { emitter },
+      { emitter, destination },
       {
         data: {
           isDraft: true,
@@ -2239,8 +2266,10 @@ describe("Mutation.updateBsff", () => {
 
   it("should not be possible to update BSFF type", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
     const bsff = await createBsffBeforeEmission(
-      { emitter },
+      { emitter, destination },
       {
         data: {
           type: BsffType.GROUPEMENT,
@@ -2263,43 +2292,6 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Vous ne pouvez pas modifier le type de BSFF après création"
-      })
-    ]);
-  });
-
-  it("should not be possible to update emitter when grouping, repackaging or forwarding", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const otherCompany = await companyFactory();
-    await associateUserToCompany(
-      emitter.user.id,
-      otherCompany.siret,
-      UserRole.ADMIN
-    );
-    const bsff = await createBsffBeforeEmission(
-      { emitter },
-      {
-        data: {
-          type: BsffType.GROUPEMENT,
-          isDraft: true
-        }
-      }
-    );
-    const { mutate } = makeClient(emitter.user);
-    const { errors } = await mutate<
-      Pick<Mutation, "updateBsff">,
-      MutationUpdateBsffArgs
-    >(UPDATE_BSFF, {
-      variables: {
-        id: bsff.id,
-        input: {
-          emitter: { company: { siret: otherCompany.siret } }
-        }
-      }
-    });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Vous ne pouvez pas modifier l'établissement émetteur après création du BSFF en cas de réexpédition, groupement ou reconditionnement"
       })
     ]);
   });

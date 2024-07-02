@@ -1,7 +1,12 @@
 import { resetDatabase } from "../../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  siretify
+} from "../../../../../__tests__/factories";
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdasriFactory } from "../../../../__tests__/factories";
+import { BsdasriStatus as BsdasriStatusEnum } from "@prisma/client";
+
 import { prisma } from "@td/prisma";
 import {
   Mutation,
@@ -349,90 +354,6 @@ describe("Mutation.submitBsdasriRevisionRequestApproval", () => {
     expect(updatedBsdasri.wasteCode).not.toBe("01 03 08");
   });
 
-  //   it("should change the bsdasri status if the bsdasri is PROCESSED and the new operation code implies a next bsdasri", async () => {
-  //     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
-  //       "ADMIN"
-  //     );
-  //     const { user, company } = await userWithCompanyFactory("ADMIN");
-  //     const { mutate } = makeClient(user);
-
-  //     const bsdasri = await bsdasriFactory({
-  //       opt: {
-  //         emitterCompanySiret: companyOfSomeoneElse.siret,
-  //         status: "PROCESSED",
-  //         destinationOperationCode: "D10"
-  //       }
-  //     });
-
-  //     const revisionRequest = await prisma.bsdasriRevisionRequest.create({
-  //       data: {
-  //         bsdasriId: bsdasri.id,
-  //         authoringCompanyId: companyOfSomeoneElse.id,
-  //         approvals: { create: { approverSiret: company.siret! } },
-  //         destinationOperationCode: "R 13",
-  //         comment: "Operation code error"
-  //       }
-  //     });
-
-  //     await mutate<
-  //       Pick<Mutation, "submitBsdasriRevisionRequestApproval">,
-  //       MutationSubmitBsdasriRevisionRequestApprovalArgs
-  //     >(SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL, {
-  //       variables: {
-  //         id: revisionRequest.id,
-  //         isApproved: true
-  //       }
-  //     });
-
-  //     const updatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
-  //       where: { id: bsdasri.id }
-  //     });
-
-  //     expect(updatedBsdasri.status).toBe("AWAITING_CHILD");
-  //   });
-
-  //   it("should change the bsdasri status if the bsdasri is AWAITING_CHILD and the new operation code does not imply a next bsdasri", async () => {
-  //     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
-  //       "ADMIN"
-  //     );
-  //     const { user, company } = await userWithCompanyFactory("ADMIN");
-  //     const { mutate } = makeClient(user);
-
-  //     const bsdasri = await bsdasriFactory({
-  //       opt: {
-  //         emitterCompanySiret: companyOfSomeoneElse.siret,
-  //         status: "AWAITING_CHILD",
-  //         destinationOperationCode: "R 13"
-  //       }
-  //     });
-
-  //     const revisionRequest = await prisma.bsdasriRevisionRequest.create({
-  //       data: {
-  //         bsdasriId: bsdasri.id,
-  //         authoringCompanyId: companyOfSomeoneElse.id,
-  //         approvals: { create: { approverSiret: company.siret! } },
-  //         destinationOperationCode: "R 5",
-  //         comment: "Operation code error"
-  //       }
-  //     });
-
-  //     await mutate<
-  //       Pick<Mutation, "submitBsdasriRevisionRequestApproval">,
-  //       MutationSubmitBsdasriRevisionRequestApprovalArgs
-  //     >(SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL, {
-  //       variables: {
-  //         id: revisionRequest.id,
-  //         isApproved: true
-  //       }
-  //     });
-
-  //     const updatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
-  //       where: { id: bsdasri.id }
-  //     });
-
-  //     expect(updatedBsdasri.status).toBe("PROCESSED");
-  //   });
-
   it("should change not the bsdasri status if the new operation code implies a next bsdasri but the bsdasri is not PROCESSED", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -475,7 +396,7 @@ describe("Mutation.submitBsdasriRevisionRequestApproval", () => {
     expect(updatedBsdasri.status).toBe("SENT");
   });
 
-  it("should change the bsdasri status to CANCELED if revision asks for cancellation", async () => {
+  it("should change the bsdasri status to CANCELED if revision asks for cancellation (SIMPLE)", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -557,8 +478,6 @@ describe("Mutation.submitBsdasriRevisionRequestApproval", () => {
       );
     }
   );
-
-  // todo: grouped - synthesis
 
   it("should update the operation code & mode", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
@@ -764,4 +683,127 @@ describe("Mutation.submitBsdasriRevisionRequestApproval", () => {
       expect(updatedInitialBsdasri.finalOperations).toHaveLength(1);
     }
   );
+
+  // grouping
+  it("should change the bsdasri status to CANCELED and free grouped dasris if revision asks for cancellation (GROUPING)", async () => {
+    const emitterCompanySiret = siretify(1);
+
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+    const regrouped = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatusEnum.AWAITING_GROUP,
+        emitterCompanySiret,
+        destinationCompanySiret: company.siret,
+        destinationOperationCode: "R12"
+      }
+    });
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        type: "GROUPING",
+        status: "SENT",
+        grouping: { connect: [{ id: regrouped.id }] }
+      }
+    });
+    expect(bsdasri?.groupingEmitterSirets.length).toBe(1);
+
+    const revisionRequest = await prisma.bsdasriRevisionRequest.create({
+      data: {
+        bsdasriId: bsdasri.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "Cancel",
+        isCanceled: true
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitBsdasriRevisionRequestApproval">,
+      MutationSubmitBsdasriRevisionRequestApprovalArgs
+    >(SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id }
+    });
+
+    expect(updatedBsdasri.status).toBe("CANCELED");
+
+    const unRegrouped = await prisma.bsdasri.findUnique({
+      where: { id: regrouped.id }
+    });
+
+    expect(unRegrouped?.groupedInId).toBe(null);
+
+    expect(updatedBsdasri?.groupingEmitterSirets.length).toBe(0);
+  });
+
+  it("should change the bsdasri status to CANCELED and free synthesized dasris if revision asks for cancellation (GROUPING)", async () => {
+    const emitterCompanySiret = siretify(1);
+
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+    const synthesized = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatusEnum.SENT,
+        emitterCompanySiret,
+        destinationCompanySiret: company.siret,
+        destinationOperationCode: "R12"
+      }
+    });
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        type: "SYNTHESIS",
+        status: "SENT",
+        synthesizing: { connect: [{ id: synthesized.id }] }
+      }
+    });
+    expect(bsdasri?.synthesisEmitterSirets.length).toBe(1);
+
+    const revisionRequest = await prisma.bsdasriRevisionRequest.create({
+      data: {
+        bsdasriId: bsdasri.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "Cancel",
+        isCanceled: true
+      }
+    });
+
+    const res = await mutate<
+      Pick<Mutation, "submitBsdasriRevisionRequestApproval">,
+      MutationSubmitBsdasriRevisionRequestApprovalArgs
+    >(SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+    console.log(res);
+    const updatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id }
+    });
+
+    expect(updatedBsdasri.status).toBe("CANCELED");
+
+    const unSynthesized = await prisma.bsdasri.findUnique({
+      where: { id: synthesized.id }
+    });
+
+    expect(unSynthesized?.synthesizedInId).toBe(null);
+
+    expect(updatedBsdasri?.synthesisEmitterSirets.length).toBe(0);
+  });
 });

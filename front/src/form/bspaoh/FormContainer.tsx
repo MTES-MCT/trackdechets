@@ -11,8 +11,7 @@ export default function FormContainer() {
     <DsfrModal
       onClose={() => navigate(-1)}
       closeLabel="Annuler"
-      size="L"
-      padding={false}
+      size="BSD_FORM"
     >
       <ControlledTabs bsdId={id} />
     </DsfrModal>

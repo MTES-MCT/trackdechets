@@ -4,6 +4,9 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import { MutationCreateWorkerCertificationArgs } from "../../../generated/graphql/types";
+import configureYup from "../../../common/yup/configureYup";
+
+configureYup();
 
 export async function createWorkerCertification(
   _,

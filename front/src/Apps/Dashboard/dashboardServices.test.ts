@@ -221,7 +221,7 @@ describe("dashboardServices", () => {
     } as BsdDisplay;
 
     it("should return true if bsd.ecoOrganisme.siret is set", () => {
-      const result = canSkipEmission(bsd, true);
+      const result = canSkipEmission(bsd, true, false);
       expect(result).toBe(true);
     });
 
@@ -230,7 +230,7 @@ describe("dashboardServices", () => {
         ...bsd,
         emitter: { isPrivateIndividual: true }
       };
-      const result = canSkipEmission(bsdPrivateIndividual, false);
+      const result = canSkipEmission(bsdPrivateIndividual, false, false);
       expect(result).toBe(true);
     });
   });
@@ -1231,7 +1231,7 @@ describe("dashboardServices", () => {
 
       const result = getWorkflowLabel(bsdWorkflowType);
 
-      expect(result).toBe(WorkflowDisplayType.GRP);
+      expect(result).toBe(WorkflowDisplayType.REGROUPEMENT);
     });
 
     it("should return correct label for BsffType.Reexpedition", () => {
@@ -1239,7 +1239,7 @@ describe("dashboardServices", () => {
 
       const result = getWorkflowLabel(bsdWorkflowType);
 
-      expect(result).toBe(WorkflowDisplayType.TRANSIT);
+      expect(result).toBe(WorkflowDisplayType.REEXPEDITION);
     });
 
     it("should return correct label for EmitterType.Appendix2", () => {
@@ -1275,7 +1275,7 @@ describe("dashboardServices", () => {
         emitterType: EmitterType.Producer
       };
 
-      const result = canReviewBsdd(bsd);
+      const result = canReviewBsdd(bsd, "1234");
 
       expect(result).toBe(true);
     });
@@ -1287,7 +1287,7 @@ describe("dashboardServices", () => {
         emitterType: EmitterType.Producer
       };
 
-      const result = canReviewBsdd(bsd);
+      const result = canReviewBsdd(bsd, "1234");
 
       expect(result).toBe(false);
     });
@@ -1299,7 +1299,7 @@ describe("dashboardServices", () => {
         emitterType: EmitterType.Producer
       };
 
-      const result = canReviewBsdd(bsd);
+      const result = canReviewBsdd(bsd, "1234");
 
       expect(result).toBe(false);
     });
@@ -1311,7 +1311,7 @@ describe("dashboardServices", () => {
         emitterType: EmitterType.Appendix1Producer
       };
 
-      const result = canReviewBsdd(bsd);
+      const result = canReviewBsdd(bsd, "1234");
 
       expect(result).toBe(true);
     });
@@ -1327,7 +1327,12 @@ describe("dashboardServices", () => {
     } as BsdDisplay;
 
     it("returns true if can Skip Emission and is Same Siret Transporter", () => {
-      const result = isSignTransportCanSkipEmission(currentSiret, bsd, true);
+      const result = isSignTransportCanSkipEmission(
+        currentSiret,
+        bsd,
+        true,
+        false
+      );
 
       expect(result).toBe(true);
     });
@@ -1340,6 +1345,7 @@ describe("dashboardServices", () => {
           ecoOrganisme: null,
           emitter: { isPrivateIndividual: false }
         },
+        false,
         false
       );
 
@@ -1353,6 +1359,7 @@ describe("dashboardServices", () => {
           ...bsd,
           transporter: { company: { siret: "2" } }
         },
+        false,
         false
       );
 

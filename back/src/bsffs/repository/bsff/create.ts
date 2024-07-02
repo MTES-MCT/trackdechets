@@ -5,7 +5,10 @@ import {
 } from "../../../common/repository/types";
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
-import { getTransporters } from "../../database";
+import {
+  updateDetenteurCompanySirets,
+  updateTransporterOrgIds
+} from "../../database";
 
 export type CreateBsffFn = <Args extends Prisma.BsffCreateArgs>(
   args: Args,
@@ -31,20 +34,17 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       }
     });
 
+    const fullBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { transporters: true, ficheInterventions: true }
+    });
+
     if (args.data.transporters) {
-      const transporters = await getTransporters(bsff);
-      // compute transporterOrgIds
-      await prisma.bsff.update({
-        where: { id: bsff.id },
-        data: {
-          transportersOrgIds: transporters
-            .flatMap(t => [
-              t.transporterCompanySiret,
-              t.transporterCompanyVatNumber
-            ])
-            .filter(Boolean)
-        }
-      });
+      await updateTransporterOrgIds(fullBsff, prisma);
+    }
+
+    if (args.data.ficheInterventions) {
+      await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsff.id));

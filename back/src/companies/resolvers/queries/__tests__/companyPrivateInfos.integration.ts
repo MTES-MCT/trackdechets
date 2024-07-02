@@ -389,7 +389,9 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       website: "https://trackdechets.beta.gouv.fr"
     });
 
-    const otherCompany = await companyFactory();
+    const otherCompany = await companyFactory({
+      allowAppendix1SignatureAutomation: true
+    });
 
     const signatureAutomation = await prisma.signatureAutomation.create({
       data: {

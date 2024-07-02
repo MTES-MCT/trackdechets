@@ -13,6 +13,7 @@ import bspaohResolvers from "./bspaoh/resolvers";
 import registerResolvers from "./registry/resolvers";
 import applicationResolvers from "./applications/resolvers";
 import webhookResolvers from "./webhooks/resolvers";
+import companyDigestResolvers from "./companydigest/resolvers";
 
 // Merge GraphQL schema by merging types definitions and resolvers
 // from differents modules
@@ -30,7 +31,8 @@ const repositories = [
   "bspaoh",
   "registry",
   "applications",
-  "webhooks"
+  "webhooks",
+  "companydigest"
 ];
 
 const typeDefsPath = repositories.map(
@@ -54,7 +56,8 @@ const resolvers = [
   bspaohResolvers,
   registerResolvers,
   applicationResolvers,
-  webhookResolvers
+  webhookResolvers,
+  companyDigestResolvers
 ];
 
 export { typeDefs, resolvers };

@@ -68,6 +68,19 @@ export const OPERATION: Record<
   }
 };
 
+export const BSFF_OPERATION_CODES = [
+  OPERATION.R1.code,
+  OPERATION.R2.code,
+  OPERATION.R3.code,
+  OPERATION.R5.code,
+  OPERATION.R12.code,
+  OPERATION.R13.code,
+  OPERATION.D10.code,
+  OPERATION.D13.code,
+  OPERATION.D14.code,
+  OPERATION.D15.code
+] as const;
+
 export function isFinalOperation(
   operationCode: string,
   noTraceability = false

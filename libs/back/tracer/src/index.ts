@@ -44,7 +44,9 @@ if (process.env.NODE_ENV !== "test" && !process.env.OTEL_SDK_DISABLED) {
       new DataloaderInstrumentation(),
       new DnsInstrumentation(),
       new ExpressInstrumentation(),
-      new FsInstrumentation(),
+      new FsInstrumentation({
+        requireParentSpan: true // only instrument fs if it is part of another trace
+      }),
       new GraphQLInstrumentation({
         mergeItems: true,
         ignoreTrivialResolveSpans: true,

@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { BsdasriStatus, OperationMode } from "@prisma/client";
+import {
+  OperationMode,
+  BsdasriStatus,
+  BsdasriType,
+  Bsdasri
+} from "@prisma/client";
 
 import { getOperationModesFromOperationCode } from "../common/operationModes";
 import { capitalize } from "../common/strings";
@@ -17,75 +22,6 @@ const ZodBsdasriPackagingEnum = z.enum([
   "AUTRE"
 ]);
 export type ZodBsdasriPackagingEnum = z.infer<typeof ZodBsdasriPackagingEnum>;
-
-const revisionRules: RevisionRules = {
-  emitterPickupSiteName: {
-    readableFieldName: "le nom du site d'enlèvement",
-    revisable: [
-      BsdasriStatus.SENT,
-      BsdasriStatus.RECEIVED,
-      BsdasriStatus.PROCESSED
-    ]
-  },
-  emitterPickupSiteAddress: {
-    readableFieldName: "l'adresse du site d'enlèvement",
-    revisable: [
-      BsdasriStatus.SENT,
-      BsdasriStatus.RECEIVED,
-      BsdasriStatus.PROCESSED
-    ]
-  },
-  emitterPickupSiteCity: {
-    readableFieldName: "la ville du site d'enlèvement",
-    revisable: [
-      BsdasriStatus.SENT,
-      BsdasriStatus.RECEIVED,
-      BsdasriStatus.PROCESSED
-    ]
-  },
-  emitterPickupSitePostalCode: {
-    readableFieldName: "le doe postal du site d'enlèvement",
-    revisable: [
-      BsdasriStatus.SENT,
-      BsdasriStatus.RECEIVED,
-      BsdasriStatus.PROCESSED
-    ]
-  },
-  emitterPickupSiteInfos: {
-    readableFieldName: "les informations relatives aux site d'enlèvement",
-    revisable: [
-      BsdasriStatus.SENT,
-      BsdasriStatus.RECEIVED,
-      BsdasriStatus.PROCESSED
-    ]
-  },
-
-  wasteCode: {
-    readableFieldName: "le code déchet",
-    revisable: [
-      BsdasriStatus.SENT,
-      BsdasriStatus.RECEIVED,
-      BsdasriStatus.PROCESSED
-    ]
-  },
-
-  destinationWastePackagings: {
-    readableFieldName: "le conditionnement",
-    revisable: [BsdasriStatus.RECEIVED, BsdasriStatus.PROCESSED]
-  },
-  destinationOperationCode: {
-    readableFieldName: "le code de traitement",
-    revisable: [BsdasriStatus.PROCESSED]
-  },
-  destinationOperationMode: {
-    readableFieldName: "le mode de traitement",
-    revisable: [BsdasriStatus.PROCESSED]
-  },
-  destinationReceptionWasteWeightValue: {
-    readableFieldName: "le poids de déchet traité",
-    revisable: [BsdasriStatus.PROCESSED]
-  }
-};
 
 export const bsdasriPackagingSchema = z
   .object({
@@ -175,15 +111,146 @@ export type ZodBsdariRevision = z.infer<typeof revisionSchema>;
 
 type RevisionRules = Record<
   keyof Omit<ZodBsdariRevision, "isCanceled">,
-  { readableFieldName: string; revisable: Array<BsdasriStatus> }
+  {
+    readableFieldName: string;
+
+    revisableFor: (BsdasriType) => Array<BsdasriStatus>;
+  }
 >;
 
-export const checkRevisionRules = (flatContent, status: BsdasriStatus) => {
+// Règles de disponibiltés des champs de révision
+// +-----------------------+-------------------------+-------------------------+-------------------------+
+// |         Champ         |          Simple         |       Groupement        |        Synthèse         |
+// +-----------------------+-------------------------+-------------------------+-------------------------+
+// | Annulation            | sign transporteur uniqt | sign transporteur uniqt | sign transporteur uniqt |
+// | Adresse d'enlèvement  | sign transporteur       | jamais                  | jamais                  |
+// | Code déchet           | sign transporteur       | sign transporteur       | jamais                  |
+// | Conditionnement       | sign réception          | sign réception          | jamais                  |
+// | Quantité reçue (kg)   | sign traitement         | sign traitement         | sign traitement         |
+// | Code opération + mode | sign traitement         | sign traitement         | sign traitement         |
+// +-----------------------+-------------------------+-------------------------+-------------------------+
+//  NB: A partir de, sauf mention contraire
+const revisionRules: RevisionRules = {
+  emitterPickupSiteName: {
+    readableFieldName: "le nom du site d'enlèvement",
+
+    revisableFor: type => {
+      if (type !== BsdasriType.SIMPLE) {
+        return [];
+      }
+      return [
+        BsdasriStatus.SENT,
+        BsdasriStatus.RECEIVED,
+        BsdasriStatus.PROCESSED
+      ];
+    }
+  },
+  emitterPickupSiteAddress: {
+    readableFieldName: "l'adresse du site d'enlèvement",
+
+    revisableFor: type => {
+      if (type !== BsdasriType.SIMPLE) {
+        return [];
+      }
+      return [
+        BsdasriStatus.SENT,
+        BsdasriStatus.RECEIVED,
+        BsdasriStatus.PROCESSED
+      ];
+    }
+  },
+
+  emitterPickupSiteCity: {
+    readableFieldName: "la ville du site d'enlèvement",
+
+    revisableFor: type => {
+      if (type !== BsdasriType.SIMPLE) {
+        return [];
+      }
+      return [
+        BsdasriStatus.SENT,
+        BsdasriStatus.RECEIVED,
+        BsdasriStatus.PROCESSED
+      ];
+    }
+  },
+  emitterPickupSitePostalCode: {
+    readableFieldName: "le doe postal du site d'enlèvement",
+
+    revisableFor: type => {
+      if (type !== BsdasriType.SIMPLE) {
+        return [];
+      }
+      return [
+        BsdasriStatus.SENT,
+        BsdasriStatus.RECEIVED,
+        BsdasriStatus.PROCESSED
+      ];
+    }
+  },
+  emitterPickupSiteInfos: {
+    readableFieldName: "les informations relatives aux site d'enlèvement",
+
+    revisableFor: type => {
+      if (type !== BsdasriType.SIMPLE) {
+        return [];
+      }
+      return [
+        BsdasriStatus.SENT,
+        BsdasriStatus.RECEIVED,
+        BsdasriStatus.PROCESSED
+      ];
+    }
+  },
+
+  wasteCode: {
+    readableFieldName: "le code déchet",
+
+    revisableFor: type => {
+      if (type === BsdasriType.SYNTHESIS) {
+        return [];
+      }
+
+      return [
+        BsdasriStatus.SENT,
+        BsdasriStatus.RECEIVED,
+        BsdasriStatus.PROCESSED
+      ];
+    }
+  },
+
+  destinationWastePackagings: {
+    readableFieldName: "le conditionnement",
+
+    revisableFor: type => {
+      if (type === BsdasriType.SYNTHESIS) {
+        return [];
+      }
+      return [BsdasriStatus.RECEIVED, BsdasriStatus.PROCESSED];
+    }
+  },
+  destinationOperationCode: {
+    readableFieldName: "le code de traitement",
+
+    revisableFor: () => [BsdasriStatus.PROCESSED]
+  },
+  destinationOperationMode: {
+    readableFieldName: "le mode de traitement",
+    revisableFor: () => [BsdasriStatus.PROCESSED]
+  },
+  destinationReceptionWasteWeightValue: {
+    readableFieldName: "le poids de déchet traité",
+    revisableFor: () => [BsdasriStatus.PROCESSED]
+  }
+};
+
+export const checkRevisionRules = (flatContent, bsdasri: Bsdasri) => {
+  const { status, type } = bsdasri;
   // check if fields are editable
   const errors: string[] = [];
   for (const [field, value] of Object.entries(flatContent)) {
     if (value !== null) {
-      if (!revisionRules[field]?.revisable?.includes(status))
+      if (!revisionRules[field]?.revisableFor(type)?.includes(status))
         errors.push(revisionRules[field]?.readableFieldName);
     }
   }

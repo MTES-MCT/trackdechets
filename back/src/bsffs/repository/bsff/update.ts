@@ -6,7 +6,10 @@ import {
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
 import { objectDiff } from "../../../forms/workflow/diff";
-import { getTransporters } from "../../database";
+import {
+  updateDetenteurCompanySirets,
+  updateTransporterOrgIds
+} from "../../database";
 
 export type UpdateBsffFn = <Args extends Prisma.BsffUpdateArgs>(
   args: Args,
@@ -27,6 +30,7 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
     const bsff = await prisma.bsff.update(args);
 
     const { updatedAt, ...updateDiff } = objectDiff(previousBsff, bsff);
+
     await prisma.event.create({
       data: {
         streamId: bsff.id,
@@ -39,20 +43,17 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       }
     });
 
+    const fullBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { transporters: true, ficheInterventions: true }
+    });
+
     if (args.data.transporters) {
-      const transporters = await getTransporters(bsff);
-      // re-compute transporterOrgIds
-      await prisma.bsff.update({
-        where: { id: bsff.id },
-        data: {
-          transportersOrgIds: transporters
-            .flatMap(t => [
-              t.transporterCompanySiret,
-              t.transporterCompanyVatNumber
-            ])
-            .filter(Boolean)
-        }
-      });
+      await updateTransporterOrgIds(fullBsff, prisma);
+    }
+
+    if (args.data.ficheInterventions) {
+      await updateDetenteurCompanySirets(fullBsff, prisma);
     }
 
     prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bsff.id));

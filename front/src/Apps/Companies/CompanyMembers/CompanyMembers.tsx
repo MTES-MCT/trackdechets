@@ -12,12 +12,21 @@ import CompanyMembersList from "./CompanyMembersList";
 
 const { VITE_VERIFY_COMPANY } = import.meta.env;
 
+export type CompanyPrivateMembers = Pick<
+  CompanyPrivate,
+  "userRole" | "companyTypes" | "verificationStatus" | "orgId" | "users"
+>;
+
 interface CompanyMembersProps {
-  company: CompanyPrivate;
+  company: CompanyPrivateMembers;
+  isTDAdmin?: boolean;
 }
 
-const CompanyMembers = ({ company }: CompanyMembersProps) => {
-  const isAdmin = company.userRole === UserRole.Admin;
+const CompanyMembers = ({
+  company,
+  isTDAdmin = false
+}: CompanyMembersProps) => {
+  const isAdmin = company.userRole === UserRole.Admin || isTDAdmin;
   const isProfessional = company.companyTypes.some(ct =>
     COMPANY_CONSTANTS.PROFESSIONALS.includes(ct)
   );
@@ -42,7 +51,7 @@ const CompanyMembers = ({ company }: CompanyMembersProps) => {
             </p>
           </div>
         ))}
-      <CompanyMembersList company={company} />
+      <CompanyMembersList company={company} isTDAdmin={isTDAdmin} />
     </div>
   );
 };

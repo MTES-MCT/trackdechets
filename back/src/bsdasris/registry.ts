@@ -52,7 +52,8 @@ const getTransporterData = (bsdasri: Bsdasri) => ({
   transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
   transporterCompanyMail: bsdasri.transporterCompanyMail,
   transporterCustomInfo: bsdasri.transporterCustomInfo,
-  transporterTakenOverAt: bsdasri.transporterTakenOverAt
+  transporterTakenOverAt: bsdasri.transporterTakenOverAt,
+  transporterTransportMode: bsdasri.transporterTransportMode
 });
 
 export function getRegistryFields(
@@ -135,7 +136,8 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransporterData(bsdasri)
+    ...getTransporterData(bsdasri),
+    destinationCompanyMail: bsdasri.destinationCompanyMail
   };
 }
 
@@ -245,7 +247,6 @@ export function toOutgoingWaste(
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
     emitterCustomInfo: bsdasri.emitterCustomInfo,
-    destinationCompanyMail: bsdasri.destinationCompanyMail,
     ...getOperationData(bsdasri),
     ...getFinalOperationsData(bsdasri)
   };
@@ -302,8 +303,7 @@ export function toTransportedWaste(
     destinationCompanyName: bsdasri.destinationCompanyName,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    emitterCompanyMail: bsdasri.emitterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
 
@@ -359,8 +359,7 @@ export function toManagedWaste(
       bsdasri.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    emitterCompanyMail: bsdasri.emitterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
 
@@ -418,7 +417,6 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    destinationCompanyMail: bsdasri.destinationCompanyMail,
     ...getOperationData(bsdasri),
     ...getFinalOperationsData(bsdasri)
   };

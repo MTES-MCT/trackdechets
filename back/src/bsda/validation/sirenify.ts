@@ -8,11 +8,6 @@ import {
   ZodBsdaTransporterTransformer
 } from "./types";
 
-type SiretInfos = {
-  name: string | null | undefined;
-  address: string | null | undefined;
-};
-
 const sirenifyBsdaAccessors = (
   bsda: ParsedZodBsda,
   sealedFields: string[] // Tranformations should not be run on sealed fields
@@ -20,7 +15,7 @@ const sirenifyBsdaAccessors = (
   {
     siret: bsda?.emitterCompanySiret,
     skip: sealedFields.includes("emitterCompanySiret"),
-    setter: (input, companyInput: SiretInfos) => {
+    setter: (input, companyInput: CompanyInput) => {
       input.emitterCompanyName = companyInput.name;
       input.emitterCompanyAddress = companyInput.address;
     }

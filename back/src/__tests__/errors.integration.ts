@@ -45,6 +45,7 @@ describe("Error handling", () => {
 
     test("Yup validation errors should be displayed as an input error", async () => {
       const yup = require("yup");
+
       mockFoo.mockImplementationOnce(() => {
         yup.string().required().validateSync(null);
       });

@@ -23,12 +23,6 @@
         "command": "prisma generate"
       }
     },
-    "migrate": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "tsx --tsconfig {projectRoot}/tsconfig.lib.json {projectRoot}/src/migrate/index.ts"
-      }
-    },
     "check-migrations": {
       "executor": "nx:run-commands",
       "options": {

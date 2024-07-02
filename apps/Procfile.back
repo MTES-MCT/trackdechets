@@ -5,3 +5,4 @@ indexqueue: node dist/apps/queues-indexation/main.js
 bulkindexqueue: node dist/apps/queues-bulk-indexation/main.js
 bulkindexqueuemaster: node dist/apps/queues-bulk-indexation-master/main.js
 webhooksqueue: node dist/apps/queues-webhooks/main.js
+gericoqueue: node dist/apps/queues-gerico/main.js

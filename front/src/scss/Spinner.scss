@@ -1,0 +1,12 @@
+.spinning {
+  display: inline-block;
+  animation: rotating 1s infinite linear;
+}
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}

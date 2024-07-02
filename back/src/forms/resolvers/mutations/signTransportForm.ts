@@ -195,6 +195,8 @@ const signTransportFn = async (
         include
       );
       const appendix1ContainerId = groupedIn?.[0]?.nextFormId;
+      const appendix1ContainerTakenOverAt =
+        groupedIn?.[0]?.nextForm.takenOverAt;
       if (!appendix1ContainerId) {
         throw new ForbiddenError(
           "Impossible de signer un bordereau d'annexe 1 si cette annexe n'est pas rattachée à un bordereau chapeau."
@@ -227,7 +229,9 @@ const signTransportFn = async (
           }),
           emittedAt: formUpdateInput.sentAt,
           sentAt: formUpdateInput.sentAt,
-          takenOverAt: formUpdateInput.takenOverAt,
+          ...(!appendix1ContainerTakenOverAt // Only the first appendix 1 signature should fill this field
+            ? { takenOverAt: formUpdateInput.takenOverAt }
+            : undefined),
           takenOverBy: formUpdateInput.takenOverBy,
           ...(appendix1ContainerTransporter
             ? {

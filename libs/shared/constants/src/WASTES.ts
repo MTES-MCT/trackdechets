@@ -5528,7 +5528,7 @@ export const ALL_WASTES_TREE: WasteNode[] = [
   }
 ];
 
-const bsffOnlyWasteCodes = ["14 06 01*"];
+const bsffOnlyWasteCodes = ["14 06 01*"] as const;
 const bsdaOnlyWasteCodes = [
   "06 07 01*",
   "06 13 04*",
@@ -5569,7 +5569,7 @@ export const BSFF_WASTE_CODES = [
   "14 06 03*",
   "16 05 04*",
   "13 03 10*"
-];
+] as const;
 
 export const BSPAOH_WASTE_CODES = ["18 01 02"] as const; // let's use an array, because some day we'll have to fill it…
 export const BSPAOH_WASTE_TYPES = ["PAOH", "FOETUS"] as const;
@@ -5592,7 +5592,7 @@ export const BSDA_WASTES = ALL_WASTES.filter(w =>
 );
 
 export const BSFF_WASTES = ALL_WASTES.filter(w =>
-  BSFF_WASTE_CODES.includes(w.code)
+  BSFF_WASTE_CODES.some(code => code === w.code)
 );
 
 export const BSDD_APPENDIX1_WASTE_CODES = [

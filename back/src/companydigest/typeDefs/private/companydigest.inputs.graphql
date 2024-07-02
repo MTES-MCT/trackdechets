@@ -1,0 +1,6 @@
+input CompanyDigestCreateInput {
+  "Id de l'établissement"
+  orgId: String!
+  "Année demandée"
+  year: Int!
+}

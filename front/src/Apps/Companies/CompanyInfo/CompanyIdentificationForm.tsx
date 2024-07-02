@@ -17,6 +17,7 @@ import { useMutation } from "@apollo/client";
 import { NotificationError } from "../../common/Components/Error/Error";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Loader } from "../../common/Components";
+import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotice";
 
 interface CompanyIdentificationFormProps {
   company: CompanyPrivate;
@@ -151,12 +152,15 @@ const CompanyIdentificationForm = ({
           )}
 
           {isEditing ? (
-            <Input
-              label="Nom usuel"
-              nativeInputProps={{
-                ...register("givenName")
-              }}
-            />
+            <>
+              <Input
+                label="Nom usuel"
+                nativeInputProps={{
+                  ...register("givenName")
+                }}
+              />
+              <GivenNameNotice />
+            </>
           ) : (
             <>
               <p className="companyFormWrapper__title-field">Nom usuel</p>

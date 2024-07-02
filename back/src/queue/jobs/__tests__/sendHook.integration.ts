@@ -242,7 +242,7 @@ describe("sendHook", () => {
 
         // Company1 endpoint1 should have failed
         expect(e.message).toContain(
-          `Webhook requets fail for orgId ${company1.orgId} and endpoint ${whs1.endpointUri}`
+          `Webhook request fail for orgId ${company1.orgId} and endpoint ${whs1.endpointUri}`
         );
 
         // Other endpoints should be ok
@@ -312,10 +312,10 @@ describe("sendHook", () => {
 
         // Company1 endpoints should have failed
         expect(e.message).toContain(
-          `Webhook requets fail for orgId ${company1.orgId} and endpoint ${whs1.endpointUri}`
+          `Webhook request fail for orgId ${company1.orgId} and endpoint ${whs1.endpointUri}`
         );
         expect(e.message).toContain(
-          `Webhook requets fail for orgId ${company1.orgId} and endpoint ${whs2.endpointUri}`
+          `Webhook request fail for orgId ${company1.orgId} and endpoint ${whs2.endpointUri}`
         );
 
         // Company2 endpoint should be ok

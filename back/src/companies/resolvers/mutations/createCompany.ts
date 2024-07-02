@@ -67,6 +67,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     vhuAgrementDemolisseurId,
     vhuAgrementBroyeurId,
     allowBsdasriTakeOverWithoutSignature,
+    allowAppendix1SignatureAutomation,
     contact,
     contactEmail,
     contactPhone
@@ -160,6 +161,9 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     },
     allowBsdasriTakeOverWithoutSignature: Boolean(
       allowBsdasriTakeOverWithoutSignature
+    ),
+    allowAppendix1SignatureAutomation: Boolean(
+      allowAppendix1SignatureAutomation
     ),
     contact,
     contactEmail,

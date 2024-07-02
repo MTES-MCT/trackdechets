@@ -1,63 +1,119 @@
-import { Request, Response, NextFunction } from "express";
 import { logger } from "@td/logger";
-import { getUid } from "../../utils";
+import { AsyncResource } from "node:async_hooks";
+import { Request, Response, NextFunction } from "express";
 
 /**
  * Logging middleware
  * For each request we generate a log on start and finish. This enable us to detect requests that never finish.
- * The logs share the same `request_id`. A `request_timing` property indicates the timing of the log (start/end)
+ * A `request_timing` property indicates the timing of the log (start/end)
  */
-export default function (graphQLPath: string) {
-  return function logging(req: Request, res: Response, next: NextFunction) {
-    const message = `${req.method} ${req.path}`;
-    const requestMetadata: { [key: string]: any } = {
-      ip: req.ip,
-      http_params: req.params,
-      http_query: req.query,
-      http_path: req.path,
-      http_method: req.method,
-      request_timing: "start",
-      request_id: getUid(16)
-    };
-    // GraphQL specific fields
-    if (req.path === graphQLPath && req.method === "POST") {
-      requestMetadata.graphql_operation_name = req.body?.operationName;
-      requestMetadata.graphql_variables = req.body?.variables;
-      requestMetadata.graphql_query = req.body?.query;
-    }
+export function loggingMiddleware(graphQLPath: string) {
+  return function logging(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) {
+    logExpressRequest(request, response, {
+      requestTiming: "start",
+      graphQLPath
+    });
 
-    logger.info(message, requestMetadata);
+    const startTime = Date.now();
 
-    // Monkey patch res.send to retrieves response body
-    let responseBody = null;
-    const originalSend = res.send;
-    res.send = body => {
-      responseBody = body;
-      return originalSend.call(res, body);
+    const { send, end } = response;
+
+    response.send = body => {
+      response.send = send;
+      response.locals.body = body;
+      return response.send(body);
     };
 
-    const start = new Date();
+    // To keep the request correlationId we bind the event handler to its parent context
+    const onClose = AsyncResource.bind(() => {
+      request.socket.off("close", onClose);
+      if (response.headersSent) {
+        return;
+      }
 
-    const onFinish = () => {
-      const end = new Date();
+      logExpressRequest(request, response, {
+        requestTiming: "error",
+        graphQLPath
+      });
+    });
 
-      const metadataWithReponse = {
-        ...requestMetadata,
-        user: req.user?.email || "anonyme",
-        auth: req.user?.auth,
-        http_status: res.statusCode,
-        request_timing: "end",
-        execution_time_num: end.getTime() - start.getTime(), // in millis
-        response_body: Buffer.isBuffer(responseBody) ? null : responseBody,
-        graphql_operation: req.gqlInfos?.[0]?.operation,
-        graphql_selection_name: req.gqlInfos?.[0]?.name
-      };
+    // Sometimes the connection is closed without calling res.end (ex: gateway times out the request before app does)
+    request.socket.on("close", onClose);
 
-      logger.info(message, metadataWithReponse);
-      res.removeListener("finish", onFinish);
-    };
-    res.on("finish", onFinish);
+    response.end = ((chunk: any, encoding: BufferEncoding) => {
+      response.end = end;
+
+      const responseTime = Date.now() - startTime;
+      request.socket.off("close", onClose);
+
+      logExpressRequest(request, response, {
+        requestTiming: "end",
+        responseTime,
+        graphQLPath
+      });
+
+      return response.end(chunk, encoding);
+    }) as any;
 
     next();
   };
+}
+
+function logExpressRequest(
+  request: Request,
+  response: Response,
+  {
+    requestTiming,
+    responseTime,
+    graphQLPath
+  }: {
+    requestTiming: "start" | "end" | "error";
+    responseTime?: number;
+    graphQLPath?: string;
+  }
+) {
+  const path = request.originalUrl.split("?")[0];
+  const message = `${request.method} ${path}`;
+
+  let requestMetadata: Record<string, any> = {
+    ip: request.ip,
+    http_params: request.params,
+    http_query: request.query,
+    http_path: path,
+    http_method: request.method,
+    request_timing: requestTiming
+  };
+
+  // GraphQL specific fields
+  if (graphQLPath && path === graphQLPath && request.method === "POST") {
+    requestMetadata.graphql_operation_name = request.body?.operationName;
+    requestMetadata.graphql_variables = request.body?.variables;
+    requestMetadata.graphql_query = request.body?.query;
+  }
+
+  if (["end", "error"].includes(requestTiming)) {
+    requestMetadata = {
+      ...requestMetadata,
+      user: request.user?.email || "anonyme",
+      auth: request.user?.auth,
+      http_status: response.statusCode,
+      request_timing: "end",
+      execution_time_num: responseTime, // in millis
+      response_body: Buffer.isBuffer(response.locals.body)
+        ? null
+        : response.locals.body,
+      graphql_operation: request.gqlInfos?.[0]?.operation,
+      graphql_selection_name: request.gqlInfos?.[0]?.name
+    };
+  }
+
+  if (requestTiming === "error") {
+    return logger.error(message, requestMetadata);
+  }
+
+  logger.info(message, requestMetadata);
 }

@@ -12,17 +12,24 @@ import { getSignatureAncestors } from "./helpers";
 import { capitalize } from "../../common/strings";
 import { isArray } from "../../common/dataTypes";
 import {
-  isDestinationRefinement,
-  isRegisteredVatNumberRefinement,
-  isTransporterRefinement,
-  isWorkerRefinement
-} from "../../common/validation/siret";
-import { Bsda, BsdaStatus, BsdaType } from "@prisma/client";
+  Bsda,
+  BsdaStatus,
+  BsdaType,
+  Company,
+  CompanyType
+} from "@prisma/client";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { getReadonlyBsdaRepository } from "../repository";
 import { getOperationModesFromOperationCode } from "../../common/operationModes";
 import { ParsedZodBsda } from "./schema";
 import { prisma } from "@td/prisma";
+import { isWorker } from "../../companies/validation";
+import {
+  isDestinationRefinement,
+  isRegisteredVatNumberRefinement,
+  isTransporterRefinement,
+  refineSiretAndGetCompany
+} from "../../common/validation/zod/refinement";
 
 export const checkOperationIsAfterReception: Refinement<ParsedZodBsda> = (
   bsda,
@@ -308,10 +315,26 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
   bsda,
   zodContext
 ) => {
-  await isDestinationRefinement(bsda.destinationCompanySiret, zodContext);
+  const isBsdaDestinationExemptFromVerification = (
+    destination: Company | null
+  ) => {
+    if (!destination) return false;
+
+    return (
+      bsda.type === BsdaType.COLLECTION_2710 &&
+      destination.companyTypes.includes(CompanyType.WASTE_CENTER)
+    );
+  };
+
+  await isDestinationRefinement(
+    bsda.destinationCompanySiret,
+    zodContext,
+    isBsdaDestinationExemptFromVerification
+  );
   await isDestinationRefinement(
     bsda.destinationOperationNextDestinationCompanySiret,
-    zodContext
+    zodContext,
+    isBsdaDestinationExemptFromVerification
   );
   for (const transporter of bsda.transporters ?? []) {
     await isTransporterRefinement(
@@ -547,3 +570,20 @@ export const checkTransporters: Refinement<ParsedZodBsda> = (
     }
   }
 };
+export async function isWorkerRefinement(
+  siret: string | null | undefined,
+  ctx
+) {
+  const company = await refineSiretAndGetCompany(siret, ctx);
+
+  if (company && !isWorker(company)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        `L'entreprise de travaux saisie sur le bordereau (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets` +
+        ` en tant qu'entreprise de travaux. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+        ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+        ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+    });
+  }
+}

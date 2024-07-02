@@ -1,0 +1,24 @@
+type Query {
+  """
+  Renvoie les CompanyDigests.
+  Au maximum 2 CompanyDigests (annee en cours et annee precedente) sont renvoyes pour etablissmeent, la requête n'est pas paginee.
+  """
+  companyDigests(orgId: String!): [CompanyDigest]!
+
+  companyDigest(
+    """
+    Identifiant de l'objet CompanyDigest
+    """
+    id: ID!
+  ): CompanyDigest
+
+  """
+  Renvoie un token pour télécharger un pdf de fiche établissement
+  Ce token doit être transmis à la route /xxx pour obtenir le fichier.
+  Il est valable 10 secondes
+  """
+  companyDigestPdf(
+    "Identifiant de l'objet CompanyDigest"
+    id: ID!
+  ): FileDownload!
+}

@@ -105,5 +105,6 @@ env:
     SwIDAQAB
     -----END PUBLIC KEY-----
   WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
-
-
+  GERICO_WEBHOOK_SLUG: secret-slug-lorem
+  GERICO_WEBHOOK_TOKEN: wxcfdzr
+  

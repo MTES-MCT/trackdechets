@@ -305,6 +305,11 @@ input PrivateCompanyInput {
   """
   allowBsdasriTakeOverWithoutSignature: Boolean
 
+  """
+  L'entreprise autorise la signature automatique de l'annexe 1 pour les entreprises saisies
+  """
+  allowAppendix1SignatureAutomation: Boolean
+
   "Prénom et nom du contact dans l'entreprise"
   contact: String
 

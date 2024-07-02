@@ -1,9 +1,11 @@
 import { MockedProvider } from "@apollo/client/testing";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import React from "react";
 import DraftValidation from "./DraftValidation";
 
 describe("DraftBsdsValidation", () => {
+  const route = "/dashboard/12345678901235/bsds/drafts";
   it("renders with expected text when bsd typename is Form", () => {
     const currentSiret = "12345678901234";
     const bsd = {
@@ -14,12 +16,14 @@ describe("DraftBsdsValidation", () => {
 
     render(
       <MockedProvider mocks={[]} addTypename={false}>
-        <DraftValidation
-          bsd={bsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <DraftValidation
+            bsd={bsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
 
@@ -36,12 +40,14 @@ describe("DraftBsdsValidation", () => {
 
     render(
       <MockedProvider mocks={[]} addTypename={false}>
-        <DraftValidation
-          bsd={bsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <DraftValidation
+            bsd={bsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
     const title = screen.getAllByText(/Publier le bordereau/i);
@@ -59,12 +65,14 @@ describe("DraftBsdsValidation", () => {
 
     render(
       <MockedProvider mocks={[]} addTypename={false}>
-        <DraftValidation
-          bsd={bsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <DraftValidation
+            bsd={bsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />
+        </MemoryRouter>
       </MockedProvider>
     );
     const title = screen.getAllByText(/Publier le bordereau/i);
@@ -82,12 +90,14 @@ describe("DraftBsdsValidation", () => {
 
     render(
       <MockedProvider mocks={[]} addTypename={false}>
-        <DraftValidation
-          bsd={bsd}
-          currentSiret={currentSiret}
-          isOpen
-          onClose={onClose}
-        />
+        <MemoryRouter initialEntries={[route]}>
+          <DraftValidation
+            bsd={bsd}
+            currentSiret={currentSiret}
+            isOpen
+            onClose={onClose}
+          />{" "}
+        </MemoryRouter>
       </MockedProvider>
     );
     const title = screen.getAllByText(/Publier le bordereau/i);

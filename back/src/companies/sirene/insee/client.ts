@@ -16,7 +16,7 @@ import {
   StatutDiffusionEtablissement
 } from "../../../generated/graphql/types";
 
-const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3";
+const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3.11";
 export const SEARCH_COMPANIES_MAX_SIZE = 20;
 
 /**
@@ -81,6 +81,12 @@ function searchResponseToCompany({
   return company;
 }
 
+export const searchCompanySirene = async siret => {
+  const searchUrl = `${SIRENE_API_BASE_URL}/siret/${siret}`;
+  const response = await authorizedAxiosGet<SearchResponseInsee>(searchUrl);
+  return searchResponseToCompany(response.data);
+};
+
 /**
  * Search a company by SIRET
  * @param siret
@@ -89,11 +95,8 @@ export async function searchCompany(
   siret: string,
   _source_includes?: string[] // ignored
 ): Promise<SireneSearchResult> {
-  const searchUrl = `${SIRENE_API_BASE_URL}/siret/${siret}`;
-
   try {
-    const response = await authorizedAxiosGet<SearchResponseInsee>(searchUrl);
-    const company = searchResponseToCompany(response.data);
+    const company = await searchCompanySirene(siret);
 
     if (company.etatAdministratif === ("F" as EtatAdministratif)) {
       throw new ClosedCompanyError();

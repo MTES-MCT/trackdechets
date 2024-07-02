@@ -1,6 +1,6 @@
 import { RefinementCtx, z } from "zod";
 import { isFRVat, isVat } from "@td/constants";
-import { siretSchema } from "./siret";
+import { siretSchema } from "./zod/schema";
 
 export const intermediarySchema = z.object({
   siret: siretSchema,

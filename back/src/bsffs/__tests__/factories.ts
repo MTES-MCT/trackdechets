@@ -91,9 +91,11 @@ export async function createBsff(
         where: { id: transporter.company.id }
       })
       .transporterReceipt();
+
     if (transporterReceipt) {
       transporterData = {
         ...transporterData,
+        transporterRecepisseIsExempted: false,
         transporterRecepisseNumber: transporterReceipt.receiptNumber,
         transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
         transporterRecepisseDepartment: transporterReceipt.department
@@ -125,12 +127,16 @@ export async function createBsff(
 
   return prisma.bsff.create({
     data: input,
-    include: { packagings: true, transporters: true }
+    include: {
+      packagings: { include: { previousPackagings: true } },
+      transporters: true,
+      ficheInterventions: true
+    }
   });
 }
 
 export function createBsffBeforeEmission(
-  companies: SetRequired<BsffFactoryCompanies, "emitter">,
+  companies: SetRequired<BsffFactoryCompanies, "emitter" | "destination">,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsff(companies, {
@@ -143,13 +149,14 @@ export function createBsffBeforeEmission(
       weightValue: 1,
       weightIsEstimate: false,
       destinationPlannedOperationCode: OPERATION.D10.code,
+      destinationCap: "CAP",
       ...opts.data
     }
   });
 }
 
 export function createBsffAfterEmission(
-  companies: SetRequired<BsffFactoryCompanies, "emitter">,
+  companies: SetRequired<BsffFactoryCompanies, "emitter" | "destination">,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffBeforeEmission(companies, {
@@ -164,7 +171,7 @@ export function createBsffAfterEmission(
 }
 
 export function createBsffBeforeTransport(
-  companies: SetRequired<BsffFactoryCompanies, "emitter" | "transporter">,
+  companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffAfterEmission(companies, {
@@ -179,7 +186,7 @@ export function createBsffBeforeTransport(
 }
 
 export function createBsffAfterTransport(
-  companies: SetRequired<BsffFactoryCompanies, "emitter" | "transporter">,
+  companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffBeforeTransport(companies, {
@@ -198,10 +205,7 @@ export function createBsffAfterTransport(
 }
 
 export function createBsffBeforeReception(
-  companies: SetRequired<
-    BsffFactoryCompanies,
-    "emitter" | "transporter" | "destination"
-  >,
+  companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffAfterTransport(companies, {
@@ -221,16 +225,14 @@ export function createBsffBeforeReception(
 }
 
 export function createBsffBeforeRefusal(
-  companies: SetRequired<
-    BsffFactoryCompanies,
-    "emitter" | "transporter" | "destination"
-  >,
+  companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffAfterReception(companies, {
     ...opts,
     packagingData: {
       acceptationWeight: 0,
+      acceptationDate: new Date(),
       acceptationStatus: WasteAcceptationStatus.REFUSED,
       acceptationRefusalReason: "non conforme",
       acceptationWasteCode: "14 06 01*",
@@ -241,10 +243,7 @@ export function createBsffBeforeRefusal(
 }
 
 export function createBsffAfterReception(
-  companies: SetRequired<
-    BsffFactoryCompanies,
-    "emitter" | "transporter" | "destination"
-  >,
+  companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffBeforeReception(companies, {
@@ -252,16 +251,15 @@ export function createBsffAfterReception(
     data: {
       status: BsffStatus.RECEIVED,
       destinationReceptionSignatureDate: new Date().toISOString(),
+      destinationReceptionSignatureAuthor:
+        companies.destination.company.contact,
       ...opts.data
     }
   });
 }
 
 export function createBsffBeforeAcceptation(
-  companies: SetRequired<
-    BsffFactoryCompanies,
-    "emitter" | "transporter" | "destination"
-  >,
+  companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffAfterReception(companies, {
@@ -272,16 +270,14 @@ export function createBsffBeforeAcceptation(
       acceptationStatus: WasteAcceptationStatus.ACCEPTED,
       acceptationWasteCode: "14 06 01*",
       acceptationWasteDescription: "fluide",
+      acceptationDate: new Date(),
       ...opts.packagingData
     }
   });
 }
 
 export function createBsffAfterAcceptation(
-  companies: SetRequired<
-    BsffFactoryCompanies,
-    "emitter" | "transporter" | "destination"
-  >,
+  companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffBeforeAcceptation(companies, {
@@ -296,10 +292,7 @@ export function createBsffAfterAcceptation(
 }
 
 export function createBsffBeforeOperation(
-  companies: SetRequired<
-    BsffFactoryCompanies,
-    "emitter" | "transporter" | "destination"
-  >,
+  companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffAfterAcceptation(companies, {
@@ -308,16 +301,14 @@ export function createBsffBeforeOperation(
       operationCode: OPERATION.R2.code,
       operationMode: OperationMode.REUTILISATION,
       operationDate: new Date(),
+      operationDescription: "réutilisation",
       ...opts.packagingData
     }
   });
 }
 
 export function createBsffAfterOperation(
-  companies: SetRequired<
-    BsffFactoryCompanies,
-    "emitter" | "transporter" | "destination"
-  >,
+  companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
 ) {
   return createBsffBeforeOperation(companies, {

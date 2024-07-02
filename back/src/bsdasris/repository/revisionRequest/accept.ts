@@ -16,6 +16,8 @@ import { ForbiddenError } from "../../../common/errors";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { operationHook } from "../../operationHook";
 import { isFinalOperationCode } from "../../../common/operationCodes";
+import { BsdasriPackaging } from "../../../generated/graphql/types";
+import { computeTotalVolume } from "../../converter";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -70,6 +72,15 @@ export function buildAcceptRevisionRequestApproval(
   };
 }
 
+const getTotalVolume = bsdasriUpdate => {
+  if (bsdasriUpdate.destinationWastePackagings) {
+    return computeTotalVolume(
+      bsdasriUpdate.destinationWastePackagings as BsdasriPackaging[]
+    );
+  }
+  return null;
+};
+
 async function getUpdateFromRevisionRequest(
   revisionRequest: BsdasriRevisionRequest,
   prisma: PrismaTransaction
@@ -98,6 +109,8 @@ async function getUpdateFromRevisionRequest(
 
   const result = removeEmpty({
     ...bsdasriUpdate,
+    destinationReceptionWasteVolume: getTotalVolume(bsdasriUpdate),
+
     status: newStatus
   });
 
@@ -197,6 +210,31 @@ export async function approveAndApplyRevisionRequest(
       metadata: { ...logMetadata, authType: user.auth }
     }
   });
+
+  if (updateData.status === BsdasriStatus.CANCELED) {
+    // If the bsdasri was a grouping or synthesis bsdasri, and is cancelled, free the children and update denormalized fields
+
+    await prisma.bsdasri.updateMany({
+      where: {
+        OR: [
+          { groupedInId: updatedBsdasri.id },
+          { synthesizedInId: updatedBsdasri.id }
+        ]
+      },
+      data: {
+        groupedInId: null,
+        synthesizedInId: null
+      }
+    });
+
+    await prisma.bsdasri.update({
+      where: { id: updatedRevisionRequest.bsdasriId },
+      data: {
+        groupingEmitterSirets: [],
+        synthesisEmitterSirets: []
+      }
+    });
+  }
 
   prisma.addAfterCommitCallback?.(() =>
     enqueueUpdatedBsdToIndex(updatedRevisionRequest.bsdasriId)

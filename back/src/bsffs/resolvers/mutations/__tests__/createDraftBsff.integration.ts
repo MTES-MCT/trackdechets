@@ -28,12 +28,6 @@ import {
 import { prisma } from "@td/prisma";
 import { associateUserToCompany } from "../../../../users/database";
 import { getReadonlyBsffPackagingRepository } from "../../../repository";
-import { sirenifyBsffInput } from "../../../sirenify";
-
-jest.mock("../../../sirenify");
-(sirenifyBsffInput as jest.Mock).mockImplementation(input =>
-  Promise.resolve(input)
-);
 
 const CREATE_DRAFT_BSFF = `
   mutation CreateDraftBsff($input: BsffInput!) {
@@ -53,10 +47,7 @@ const CREATE_DRAFT_BSFF = `
 `;
 
 describe("Mutation.createDraftBsff", () => {
-  afterEach(async () => {
-    await resetDatabase();
-    (sirenifyBsffInput as jest.Mock).mockClear();
-  });
+  afterEach(resetDatabase);
 
   it.each(["emitter", "transporter", "destination"])(
     "should allow %p to create a bsff",
@@ -81,8 +72,6 @@ describe("Mutation.createDraftBsff", () => {
 
       expect(errors).toBeUndefined();
       expect(data.createDraftBsff.id).toBeTruthy();
-      // check input is sirenified
-      expect(sirenifyBsffInput as jest.Mock).toHaveBeenCalledTimes(1);
     }
   );
 
@@ -138,7 +127,7 @@ describe("Mutation.createDraftBsff", () => {
 
   it("should link a fiche intervention to several bsffs", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
     const ficheIntervention = await createFicheIntervention({
       operateur: emitter,
@@ -147,7 +136,7 @@ describe("Mutation.createDraftBsff", () => {
 
     // Create a first bsff linked to this fiche intervention
     await createBsffBeforeEmission(
-      { emitter },
+      { emitter, destination },
       {
         data: {
           ficheInterventions: {
@@ -235,17 +224,34 @@ describe("Mutation.createDraftBsff", () => {
     });
 
     it("should add bsffs for groupement", async () => {
-      const previousBsff = await createBsffAfterOperation(
+      const previousBsff1 = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
           data: {
             status: BsffStatus.INTERMEDIATELY_PROCESSED
           },
           packagingData: {
-            operationCode: OPERATION.R12.code
+            operationCode: OPERATION.R12.code,
+            operationSignatureDate: new Date()
           }
         }
       );
+
+      const previousBsff2 = await createBsffAfterOperation(
+        { emitter, transporter, destination },
+        {
+          data: {
+            status: BsffStatus.INTERMEDIATELY_PROCESSED
+          },
+          packagingData: {
+            operationCode: OPERATION.R12.code,
+            operationSignatureDate: new Date()
+          }
+        }
+      );
+
+      const previousPackaging1 = previousBsff1.packagings[0];
+      const previousPackaging2 = previousBsff2.packagings[0];
 
       const { mutate } = makeClient(destination.user);
       const { data, errors } = await mutate<
@@ -264,25 +270,36 @@ describe("Mutation.createDraftBsff", () => {
                 mail: destination.user.email
               }
             },
-            grouping: previousBsff.packagings.map(p => p.id)
+            grouping: [previousPackaging1.id, previousPackaging2.id]
           }
         }
       });
 
       expect(errors).toBeUndefined();
 
-      const previousPackagings =
-        await getReadonlyBsffPackagingRepository().findPreviousPackagings(
-          data.createDraftBsff.packagings.map(p => p.id)
-        );
+      const createdBsff = await prisma.bsff.findUniqueOrThrow({
+        where: { id: data.createDraftBsff.id },
+        include: {
+          packagings: {
+            include: { previousPackagings: { select: { id: true } } }
+          }
+        }
+      });
 
-      expect(previousPackagings).toHaveLength(previousBsff.packagings.length);
+      expect(createdBsff.packagings).toHaveLength(2);
 
-      for (const previousPackaging of previousPackagings) {
-        expect(previousBsff.packagings.map(p => p.id)).toContain(
-          previousPackaging.id
-        );
-      }
+      // packaging infos should be computed from previous packagings
+      const packaging1 = createdBsff.packagings[0];
+      const packaging2 = createdBsff.packagings[1];
+
+      expect(packaging1.numero).toEqual(previousPackaging1.numero);
+      expect(packaging1.previousPackagings).toEqual([
+        { id: previousPackaging1.id }
+      ]);
+      expect(packaging2.numero).toEqual(previousPackaging2.numero);
+      expect(packaging2.previousPackagings).toEqual([
+        { id: previousPackaging2.id }
+      ]);
     });
 
     it("should add a bsff for réexpedition", async () => {
@@ -392,14 +409,18 @@ describe("Mutation.createDraftBsff", () => {
         }
       );
 
-      const { id, ...packagingData } = bsff.packagings[0];
+      const { id, previousPackagings, ...packagingData } = bsff.packagings[0];
       await prisma.bsffPackaging.create({
         data: { ...packagingData, acceptationWasteCode: "14 06 02*" }
       });
 
       bsff = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff.id },
-        include: { packagings: true, transporters: true }
+        include: {
+          packagings: { include: { previousPackagings: true } },
+          transporters: true,
+          ficheInterventions: true
+        }
       });
 
       const { mutate } = makeClient(destination.user);
@@ -620,7 +641,7 @@ describe("Mutation.createDraftBsff", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Vous ne pouvez pas regrouper des contenants ayant des codes déchet différents : 14 06 01*, 14 06 02*"
+            "Vous ne pouvez pas grouper des contenants ayant des codes déchet différents : 14 06 01*, 14 06 02*"
         })
       ]);
     });
@@ -685,39 +706,6 @@ describe("Mutation.createDraftBsff", () => {
         })
       ]);
     });
-
-    it(
-      "should throw an error when creating a BSFF with type" +
-        " REEXPEDITION, GROUPEMENT or RECONDITIONNEMENT and no previous packagings attached",
-      async () => {
-        const { mutate } = makeClient(emitter.user);
-        const { errors } = await mutate<
-          Pick<Mutation, "createDraftBsff">,
-          MutationCreateDraftBsffArgs
-        >(CREATE_DRAFT_BSFF, {
-          variables: {
-            input: {
-              type: BsffType.GROUPEMENT,
-              emitter: {
-                company: {
-                  name: emitter.company.name,
-                  siret: emitter.company.siret,
-                  address: emitter.company.address,
-                  contact: emitter.user.name,
-                  mail: emitter.user.email
-                }
-              }
-            }
-          }
-        });
-        expect(errors).toEqual([
-          expect.objectContaining({
-            message:
-              "Vous devez saisir des contenants en transit en cas de groupement, reconditionnement ou réexpédition"
-          })
-        ]);
-      }
-    );
 
     it("should allow to create a BSFF packaging with deprecated field `name=anything`", async () => {
       const emitter = await userWithCompanyFactory("ADMIN");

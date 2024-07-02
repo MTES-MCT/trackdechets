@@ -11,7 +11,6 @@ import * as GraphQL from "../generated/graphql/types";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsffForElastic } from "./elastic";
-import { Decimal } from "decimal.js";
 import { getFirstTransporterSync } from "./database";
 import { BsffWithTransporters } from "./types";
 
@@ -39,52 +38,52 @@ function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter | null }) {
   };
 }
 
-export function flattenBsffTransporterInput(input: {
-  transporter?: GraphQL.BsffTransporter | null;
-}) {
+export function flattenBsffTransporterInput(
+  transporter?: GraphQL.BsffTransporterInput | null
+) {
   return safeInput({
-    transporterCompanyName: chain(input.transporter, t =>
+    transporterCompanyName: chain(transporter, t =>
       chain(t.company, c => c.name)
     ),
-    transporterCompanySiret: chain(input.transporter, t =>
+    transporterCompanySiret: chain(transporter, t =>
       chain(t.company, c => c.siret)
     ),
-    transporterCompanyVatNumber: chain(input.transporter, t =>
+    transporterCompanyVatNumber: chain(transporter, t =>
       chain(t.company, c => c.vatNumber)
     ),
-    transporterCompanyAddress: chain(input.transporter, t =>
+    transporterCompanyAddress: chain(transporter, t =>
       chain(t.company, c => c.address)
     ),
-    transporterCompanyContact: chain(input.transporter, t =>
+    transporterCompanyContact: chain(transporter, t =>
       chain(t.company, c => c.contact)
     ),
-    transporterCompanyPhone: chain(input.transporter, t =>
+    transporterCompanyPhone: chain(transporter, t =>
       chain(t.company, c => c.phone)
     ),
-    transporterCompanyMail: chain(input.transporter, t =>
+    transporterCompanyMail: chain(transporter, t =>
       chain(t.company, c => c.mail)
     ),
-    transporterCustomInfo: chain(input.transporter, t => t.customInfo),
+    transporterCustomInfo: chain(transporter, t => t.customInfo),
     transporterTransportPlates: undefinedOrDefault(
-      chain(input.transporter, t => chain(t.transport, tr => tr.plates)),
+      chain(transporter, t => chain(t.transport, tr => tr.plates)),
       []
     ),
-    transporterRecepisseNumber: chain(input.transporter, t =>
+    transporterRecepisseNumber: chain(transporter, t =>
       chain(t.recepisse, r => r.number)
     ),
-    transporterRecepisseDepartment: chain(input.transporter, t =>
+    transporterRecepisseDepartment: chain(transporter, t =>
       chain(t.recepisse, r => r.department)
     ),
-    transporterRecepisseValidityLimit: chain(input.transporter, t =>
+    transporterRecepisseValidityLimit: chain(transporter, t =>
       chain(t.recepisse, r => r.validityLimit)
     ),
-    transporterRecepisseIsExempted: chain(input.transporter, t =>
+    transporterRecepisseIsExempted: chain(transporter, t =>
       chain(t.recepisse, r => r.isExempted)
     ),
-    transporterTransportMode: chain(input.transporter, t =>
+    transporterTransportMode: chain(transporter, t =>
       chain(t.transport, tr => tr.mode)
     ),
-    transporterTransportTakenOverAt: chain(input.transporter, t =>
+    transporterTransportTakenOverAt: chain(transporter, t =>
       chain(t.transport, tr => tr.takenOverAt)
     )
   });
@@ -133,35 +132,12 @@ function flattenWasteDetailsInput(input: {
     wasteCode: chain(input.waste, w => w.code),
     wasteDescription: chain(input.waste, w => w.description),
     wasteAdr: chain(input.waste, w => w.adr),
-    weightValue: chain(input.weight, w => new Decimal(w.value)),
+    weightValue: chain(input.weight, w => w.value),
     weightIsEstimate: chain(input.weight, w => w.isEstimate)
   };
 }
 
-export function flattenBsffInput(
-  bsffInput: GraphQL.BsffInput
-): Partial<
-  Omit<
-    Prisma.Bsff,
-    | "id"
-    | "isDraft"
-    | "createdAt"
-    | "updatedAt"
-    | "isDeleted"
-    | "emitterEmissionSignatureAuthor"
-    | "emitterEmissionSignatureDate"
-    | "transporterTransportSignatureAuthor"
-    | "transporterTransportSignatureDate"
-    | "destinationReceptionSignatureAuthor"
-    | "destinationReceptionSignatureDate"
-    | "destinationOperationSignatureAuthor"
-    | "destinationOperationSignatureDate"
-    | "bsffId"
-  >
-> {
-  if (bsffInput.type === null) {
-    throw new Error();
-  }
+export function flattenBsffInput(bsffInput: GraphQL.BsffInput) {
   return safeInput({
     type: bsffInput.type,
     ...flattenEmitterInput(bsffInput),
@@ -204,12 +180,12 @@ export function expandBsffFromDB(
       description: prismaBsff.wasteDescription,
       adr: prismaBsff.wasteAdr
     }),
-    weight: nullIfNoValues<GraphQL.BsffWeight>({
-      value: prismaBsff.weightValue
-        ? processDecimal(prismaBsff.weightValue).toNumber()
-        : null,
-      isEstimate: prismaBsff.weightIsEstimate
-    }),
+    weight: prismaBsff.weightValue
+      ? {
+          value: processDecimal(prismaBsff.weightValue).toNumber(),
+          isEstimate: prismaBsff.weightIsEstimate ?? false
+        }
+      : null,
     transporter: transporter ? expandBsffTransporterFromDb(transporter) : null,
     destination: nullIfNoValues<GraphQL.BsffDestination>({
       cap: prismaBsff.destinationCap,
@@ -277,7 +253,7 @@ export function flattenBsffPackagingInput(
   input: GraphQL.UpdateBsffPackagingInput
 ) {
   return safeInput({
-    numero: input.numero ?? undefined,
+    numero: input.numero,
     acceptationDate: chain(input.acceptation, a => a.date),
     acceptationWeight: chain(input.acceptation, a => a.weight),
     acceptationStatus: chain(input.acceptation, a => a.status),

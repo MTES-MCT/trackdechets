@@ -31,7 +31,8 @@ export async function updateCompanyFn(
     vhuAgrementBroyeurId,
     workerCertificationId,
     ecoOrganismeAgreements,
-    allowBsdasriTakeOverWithoutSignature
+    allowBsdasriTakeOverWithoutSignature,
+    allowAppendix1SignatureAutomation
   } = args;
   const data: Prisma.CompanyUpdateInput = {
     ...(companyTypes != null ? { companyTypes: { set: companyTypes } } : {}),
@@ -49,6 +50,9 @@ export async function updateCompanyFn(
     ...(givenName != null ? { givenName } : {}),
     ...(allowBsdasriTakeOverWithoutSignature !== null
       ? { allowBsdasriTakeOverWithoutSignature }
+      : {}),
+    ...(allowAppendix1SignatureAutomation !== null
+      ? { allowAppendix1SignatureAutomation }
       : {}),
     ...(transporterReceiptId
       ? { transporterReceipt: { connect: { id: transporterReceiptId } } }

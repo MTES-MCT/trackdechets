@@ -79,7 +79,6 @@ export async function mergeInputAndParseBsdaAsync(
  * Fonction permettant de valider et parser un BSDA dans son contexte d'appel.
  * Les données provenant d'un input GraphQL et / ou de la base de données
  * doivent être converties au préalable au format attendu par zod (`ZodBsda`).
- * La fonction `parseBsdaInContext` permet de gérer cette conversion.
  */
 export async function parseBsdaAsync(
   bsda: ZodBsda,

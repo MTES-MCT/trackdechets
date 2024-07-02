@@ -37,7 +37,13 @@ const getTransporterData = (
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     transporterCompanyMail: transporter?.transporterCompanyMail,
     transporterCustomInfo: transporter?.transporterCustomInfo,
-    transporterTakenOverAt: transporter?.transporterTakenOverAt
+    transporterTakenOverAt: transporter?.transporterTakenOverAt,
+    transporterTransportMode: transporter?.transporterTransportMode,
+    // when switching to multi-modal
+    // if this is on the transporter, use it
+    // if it stays on the BSPAOH temporarily, attach it to the last transporter
+    transporterHandedOverSignatureDate:
+      bspaoh.handedOverToDestinationSignatureDate
   };
 };
 
@@ -119,7 +125,8 @@ function toGenericWaste(
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransporterData(bspaoh)
+    ...getTransporterData(bspaoh),
+    destinationCompanyMail: bspaoh.destinationCompanyMail
   };
 }
 
@@ -212,8 +219,7 @@ export function toOutgoingWaste(
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,
     emitterCustomInfo: bspaoh.emitterCustomInfo,
-    transporterCompanyMail: transporter?.transporterCompanyMail,
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    transporterCompanyMail: transporter?.transporterCompanyMail
   };
 }
 
@@ -261,8 +267,7 @@ export function toTransportedWaste(
     destinationCompanySiret: bspaoh.destinationCompanySiret,
     destinationCompanyAddress: bspaoh.destinationCompanyAddress,
     transporterCustomInfo: transporter?.transporterCustomInfo,
-    emitterCompanyMail: bspaoh.emitterCompanyMail,
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    emitterCompanyMail: bspaoh.emitterCompanyMail
   };
 }
 
@@ -310,8 +315,7 @@ export function toManagedWaste(
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     emitterCompanyMail: bspaoh.emitterCompanyMail,
-    transporterCompanyMail: transporter?.transporterCompanyMail,
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    transporterCompanyMail: transporter?.transporterCompanyMail
   };
 }
 
@@ -366,7 +370,6 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bspaoh.emitterCompanyMail,
-    transporterCompanyMail: transporter?.transporterCompanyMail,
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    transporterCompanyMail: transporter?.transporterCompanyMail
   };
 }

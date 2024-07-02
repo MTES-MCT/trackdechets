@@ -1,0 +1,9 @@
+type Mutation {
+  """
+  Crée un nouveau CompanyDigest
+  """
+  createCompanyDigest(
+    "Payload de création d'un CompanyDigest"
+    input: CompanyDigestCreateInput!
+  ): CompanyDigest!
+}

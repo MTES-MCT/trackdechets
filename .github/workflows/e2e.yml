@@ -263,3 +263,8 @@ env:
     -----END PUBLIC KEY-----
   WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
   
+  # Gerico
+  GERICO_API_URL: http://gerico.test/api
+  GERICO_API_KEY: xyz
+  GERICO_WEBHOOK_SLUG: secret-slug
+  GERICO_WEBHOOK_TOKEN: abcdef

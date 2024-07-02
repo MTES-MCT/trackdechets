@@ -1,6 +1,8 @@
 import {
+  companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
@@ -8,7 +10,9 @@ import { formToBsdd } from "../compat";
 import {
   getSubType,
   toAllWaste,
+  toGenericWaste,
   toIncomingWaste,
+  toManagedWaste,
   toOutgoingWaste
 } from "../registry";
 import { prisma } from "@td/prisma";
@@ -119,6 +123,29 @@ describe("toIncomingWaste", () => {
       bdd.emitterCompanySiret
     );
   });
+
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toIncomingWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
 });
 
 describe("toOutgoingWaste", () => {
@@ -176,6 +203,57 @@ describe("toOutgoingWaste", () => {
     }
   );
 
+  it("bsd with bsd-suite should mention post-temp-storage destination", async () => {
+    // Given
+    const user = await userFactory();
+    const emitter = await companyFactory({ name: "Emitter" });
+    const recipient = await companyFactory({ name: "Recipient" });
+    const nextDestination = await companyFactory({ name: "Next destination" });
+    const forwardedInNextDestination = await companyFactory({
+      name: "ForwardedIn next destination",
+      address: "25 rue Voltaire 37100 TOURS"
+    });
+    const form = await formWithTempStorageFactory({
+      opt: {
+        emitterCompanyName: emitter.name,
+        emitterCompanySiret: emitter.siret,
+        recipientCompanyName: recipient.name,
+        recipientCompanySiret: recipient.siret,
+        nextDestinationCompanyName: nextDestination.name,
+        nextDestinationCompanySiret: nextDestination.siret
+      },
+      ownerId: user.id,
+      forwardedInOpts: {
+        recipientCompanyName: forwardedInNextDestination.name,
+        recipientCompanySiret: forwardedInNextDestination.siret,
+        recipientCompanyAddress: forwardedInNextDestination.address
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+
+    const formToBsdd_ = await formToBsdd(formForRegistry);
+    const waste = toOutgoingWaste(formToBsdd_);
+
+    // Then
+    expect(waste.postTempStorageDestinationSiret).toBe(
+      forwardedInNextDestination.siret
+    );
+    expect(waste.postTempStorageDestinationName).toBe(
+      "ForwardedIn next destination"
+    );
+
+    // Address
+    expect(waste.postTempStorageDestinationAddress).toBe("25 rue Voltaire");
+    expect(waste.postTempStorageDestinationCity).toBe("TOURS");
+    expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
+    expect(waste.postTempStorageDestinationCountry).toBe("FR");
+  });
+
   it("initial producer should be filled when forwarded BSD", async () => {
     // Given
     const bdd = await createTmpStorageBsdd();
@@ -197,6 +275,29 @@ describe("toOutgoingWaste", () => {
     expect(wasteRegistry.initialEmitterCompanySiret).toBe(
       bdd.emitterCompanySiret
     );
+  });
+
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toOutgoingWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
   });
 });
 
@@ -253,6 +354,57 @@ describe("toAllWaste", () => {
     }
   );
 
+  it("bsd with bsd-suite should mention post-temp-storage destination", async () => {
+    // Given
+    const user = await userFactory();
+    const emitter = await companyFactory({ name: "Emitter" });
+    const recipient = await companyFactory({ name: "Recipient" });
+    const nextDestination = await companyFactory({ name: "Next destination" });
+    const forwardedInNextDestination = await companyFactory({
+      name: "ForwardedIn next destination",
+      address: "25 rue Voltaire 37100 TOURS"
+    });
+    const form = await formWithTempStorageFactory({
+      opt: {
+        emitterCompanyName: emitter.name,
+        emitterCompanySiret: emitter.siret,
+        recipientCompanyName: recipient.name,
+        recipientCompanySiret: recipient.siret,
+        nextDestinationCompanyName: nextDestination.name,
+        nextDestinationCompanySiret: nextDestination.siret
+      },
+      ownerId: user.id,
+      forwardedInOpts: {
+        recipientCompanyName: forwardedInNextDestination.name,
+        recipientCompanySiret: forwardedInNextDestination.siret,
+        recipientCompanyAddress: forwardedInNextDestination.address
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+
+    const formToBsdd_ = await formToBsdd(formForRegistry);
+    const waste = toAllWaste(formToBsdd_);
+
+    // Then
+    expect(waste.postTempStorageDestinationSiret).toBe(
+      forwardedInNextDestination.siret
+    );
+    expect(waste.postTempStorageDestinationName).toBe(
+      "ForwardedIn next destination"
+    );
+
+    // Address
+    expect(waste.postTempStorageDestinationAddress).toBe("25 rue Voltaire");
+    expect(waste.postTempStorageDestinationCity).toBe("TOURS");
+    expect(waste.postTempStorageDestinationPostalCode).toBe("37100");
+    expect(waste.postTempStorageDestinationCountry).toBe("FR");
+  });
+
   it("initial producer should be filled when forwarded BSD", async () => {
     // Given
     const bdd = await createTmpStorageBsdd();
@@ -274,6 +426,203 @@ describe("toAllWaste", () => {
     expect(wasteRegistry.initialEmitterCompanySiret).toBe(
       bdd.emitterCompanySiret
     );
+  });
+
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+
+  it("should contain all 3 intermediaries", async () => {
+    // Given
+    const user = await userFactory();
+    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary3 = await userWithCompanyFactory(UserRole.MEMBER);
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1.company),
+            toIntermediaryCompany(intermediary2.company),
+            toIntermediaryCompany(intermediary3.company)
+          ]
+        }
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.company.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.company.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.company.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.company.siret);
+    expect(waste.intermediary3CompanyName).toBe(intermediary3.company.name);
+    expect(waste.intermediary3CompanySiret).toBe(intermediary3.company.siret);
+  });
+});
+
+describe("toManagedWaste", () => {
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toManagedWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+
+  it("should work with only 1 intermediary", async () => {
+    // Given
+    const user = await userFactory();
+    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary1.company)]
+        }
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.company.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.company.siret);
+    expect(waste.intermediary2CompanyName).toBe(null);
+    expect(waste.intermediary2CompanySiret).toBe(null);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+
+  it("should work with 2 intermediaries", async () => {
+    // Given
+    const user = await userFactory();
+    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1.company),
+            toIntermediaryCompany(intermediary2.company)
+          ]
+        }
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.company.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.company.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.company.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.company.siret);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+
+  it("should not crash if no intermediaries", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({ ownerId: user.id });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(null);
+    expect(waste.intermediary1CompanySiret).toBe(null);
+    expect(waste.intermediary2CompanyName).toBe(null);
+    expect(waste.intermediary2CompanySiret).toBe(null);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+});
+
+describe("toGenericWaste", () => {
+  it("should contain the destination, trader & broker email addresses", async () => {
+    // Given
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        brokerCompanyMail: "broker@mail.com",
+        recipientCompanyMail: "destination@mail.com",
+        traderCompanyMail: "trader@mail.com"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+    const waste = toGenericWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.destinationCompanyMail).toEqual("destination@mail.com");
+    expect(waste.brokerCompanyMail).toEqual("broker@mail.com");
+    expect(waste.traderCompanyMail).toEqual("trader@mail.com");
   });
 });
 

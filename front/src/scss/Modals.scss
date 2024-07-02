@@ -21,3 +21,10 @@
   margin-bottom: 2rem;
   font-weight: bold;
 }
+
+.td-dsfr-modal-bsd-form {
+  width: 100%;
+  @include lg-desktop {
+    max-width: 1099px;
+  }
+}

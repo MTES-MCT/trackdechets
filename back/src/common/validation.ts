@@ -19,10 +19,10 @@ import { isBase64 } from "../utils";
 import { Decimal } from "decimal.js";
 
 // Poids maximum en tonnes tout mode de transport confondu
-const MAX_WEIGHT_TONNES = 50000;
+export const MAX_WEIGHT_TONNES = 50000;
 
 // Poids maximum en tonnes quand le transport se fait sur route
-const MAX_WEIGHT_BY_ROAD_TONNES = 40;
+export const MAX_WEIGHT_BY_ROAD_TONNES = 40;
 
 // De nombreux bordereaux en transit présentent des valeurs
 // de poids qui dépassent la valeur max autorisée en transport routier

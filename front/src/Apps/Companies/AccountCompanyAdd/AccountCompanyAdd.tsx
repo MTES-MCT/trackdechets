@@ -43,6 +43,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import AccountCompanyAddCollector from "./companyAdd/AccountCompanyAddCollector";
 import AccountCompanyAddWasteProcessor from "./companyAdd/AccountCompanyAddWasteProcessor";
+import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotice";
 
 const GET_ME = gql`
   {
@@ -609,6 +610,7 @@ export default function AccountCompanyAdd() {
                       );
                     }}
                   </Field>
+                  <GivenNameNotice />
 
                   <div className={styles.field}>
                     {companyInfos?.name ? (
