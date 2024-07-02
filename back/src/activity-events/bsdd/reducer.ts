@@ -194,7 +194,8 @@ function decimalConverter(
       update,
       "wasteDetailsQuantity"
     ),
-    quantityReceived: getDecimalField(currentState, update, "quantityReceived")
+    quantityReceived: getDecimalField(currentState, update, "quantityReceived"),
+    quantityRefused: getDecimalField(currentState, update, "quantityRefused")
   };
 }
 

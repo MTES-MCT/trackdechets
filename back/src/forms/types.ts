@@ -280,6 +280,8 @@ export type Bsdd = {
   destinationCustomInfo: string | null;
   destinationReceptionDate: Date | null;
   destinationReceptionWeight: number | null;
+  destinationReceptionAcceptedWeight: number | null;
+  destinationReceptionRefusedWeight: number | null;
   destinationReceptionAcceptationStatus: WasteAcceptationStatus | null;
   destinationReceptionRefusalReason: string | null;
   destinationReceptionSignatureAuthor: string | null;

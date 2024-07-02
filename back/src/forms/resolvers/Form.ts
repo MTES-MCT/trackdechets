@@ -4,6 +4,10 @@ import appendix2Forms from "./forms/appendix2Forms";
 import groupedIn from "./forms/groupedIn";
 import grouping from "./forms/grouping";
 import intermediaries from "./forms/intermediary";
+import {
+  wasteQuantityAcceptedResolver,
+  wasteQuantityRefusedResolver
+} from "./forms/wasteQuantities";
 
 const formResolvers: FormResolvers = {
   appendix2Forms,
@@ -12,6 +16,8 @@ const formResolvers: FormResolvers = {
   groupedIn,
   grouping,
   intermediaries,
+  quantityAccepted: wasteQuantityAcceptedResolver,
+  quantityRefused: wasteQuantityRefusedResolver,
   metadata: bsdd => {
     return {
       ...bsdd.metadata,

@@ -13,7 +13,13 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { CompanyType, EmitterType, Status, UserRole } from "@prisma/client";
+import {
+  CompanyType,
+  EmitterType,
+  Status,
+  UserRole,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../createFormRevisionRequest";
 import { MARK_AS_SEALED, SIGN_EMISSION_FORM } from "./mutations";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
@@ -1375,5 +1381,159 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd?.nextDestinationCompanyVatNumber).toBe("");
     expect(updatedBsdd?.nextDestinationNotificationNumber).toBe("");
     expect(updatedBsdd?.nextDestinationProcessingOperation).toBe("");
+  });
+
+  describe("wasteAcceptationStatus & quantityRefused", () => {
+    it("should update the BSDD wasteAcceptationStatus", async () => {
+      // Given
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          status: Status.ACCEPTED,
+          quantityReceived: 10
+        }
+      });
+
+      const revisionRequest = await prisma.bsddRevisionRequest.create({
+        data: {
+          bsddId: bsdd.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret! } },
+          wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          quantityReceived: 5,
+          wasteRefusalReason: "Reason",
+          comment: ""
+        }
+      });
+
+      // When
+      const { data } = await mutate<
+        Pick<Mutation, "submitFormRevisionRequestApproval">
+      >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      // Then
+      expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+      const updatedBsdd = await prisma.form.findFirstOrThrow({
+        where: { id: bsdd.id }
+      });
+
+      expect(updatedBsdd.wasteAcceptationStatus).toBe(Status.REFUSED);
+      expect(updatedBsdd.wasteRefusalReason).toBe("Reason");
+      expect(updatedBsdd.quantityReceived?.toNumber()).toBe(5);
+    });
+
+    it("should update the BSDD wasteAcceptationStatus and quantityRefused", async () => {
+      // Given
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          status: Status.ACCEPTED,
+          quantityReceived: 10
+        }
+      });
+
+      const revisionRequest = await prisma.bsddRevisionRequest.create({
+        data: {
+          bsddId: bsdd.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret! } },
+          wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+          quantityReceived: 5,
+          quantityRefused: 3,
+          wasteRefusalReason: "Reason",
+          comment: ""
+        }
+      });
+
+      // When
+      const { data } = await mutate<
+        Pick<Mutation, "submitFormRevisionRequestApproval">
+      >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      // Then
+      expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+      const updatedBsdd = await prisma.form.findFirstOrThrow({
+        where: { id: bsdd.id }
+      });
+
+      expect(updatedBsdd.wasteAcceptationStatus).toBe(
+        WasteAcceptationStatus.PARTIALLY_REFUSED
+      );
+      expect(updatedBsdd.wasteRefusalReason).toBe("Reason");
+      expect(updatedBsdd.quantityReceived?.toNumber()).toBe(5);
+      expect(updatedBsdd.quantityRefused?.toNumber()).toBe(3);
+    });
+
+    it("should NOT update the BSDD wasteAcceptationStatus if the BSDD status is no long ACCEPTED or TEMP_STORED_ACCEPTED", async () => {
+      // Given
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          status: Status.PROCESSED,
+          quantityReceived: 10
+        }
+      });
+
+      const revisionRequest = await prisma.bsddRevisionRequest.create({
+        data: {
+          bsddId: bsdd.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret! } },
+          wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          quantityReceived: 5,
+          wasteRefusalReason: "Reason",
+          comment: ""
+        }
+      });
+
+      // When
+      const { errors } = await mutate<
+        Pick<Mutation, "submitFormRevisionRequestApproval">
+      >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le statut d'acceptation des déchets n'est modifiable que si le bordereau est au stade de la réception."
+      );
+    });
   });
 });

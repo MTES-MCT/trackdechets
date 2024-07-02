@@ -107,7 +107,7 @@ export const getSubType = (bsdasri: Bsdasri): BsdSubType => {
   }
 };
 
-function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
+export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
   return {
     wasteDescription: bsdasri.wasteCode
       ? getWasteDescription(bsdasri.wasteCode)
@@ -130,12 +130,21 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
       bsdasri.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdasri.destinationOperationDate,
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue.dividedBy(1000).toNumber()
+      ? bsdasri.destinationReceptionWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
     wasteAdr: bsdasri.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    weight: bsdasri.emitterWasteWeightValue
+      ? bsdasri.emitterWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
     ...getTransporterData(bsdasri),
     destinationCompanyMail: bsdasri.destinationCompanyMail
   };
@@ -243,9 +252,6 @@ export function toOutgoingWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
-      : null,
     emitterCustomInfo: bsdasri.emitterCustomInfo,
     ...getOperationData(bsdasri),
     ...getFinalOperationsData(bsdasri)
@@ -281,9 +287,6 @@ export function toTransportedWaste(
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
-      : null,
     ...initialEmitter,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
@@ -408,9 +411,6 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
       bsdasri.emitterPickupSiteCity
     ]),
     ...initialEmitter,
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
-      : null,
     managedEndDate: null,
     managedStartDate: null,
     traderCompanyName: null,

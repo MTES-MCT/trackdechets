@@ -34,6 +34,8 @@ const APPENDIX2_FORMS = gql`
       }
       signedAt
       quantityReceived
+      quantityAccepted
+      quantityRefused
       quantityGrouped
       processingOperationDone
     }
@@ -79,7 +81,9 @@ export default function Appendix2MultiSelect() {
       })),
       ...appendix2Forms.map(f => ({
         form: f,
-        quantity: new Decimal(f.quantityReceived!).minus(f.quantityGrouped ?? 0)
+        quantity: new Decimal(f.quantityAccepted ?? f.quantityReceived!).minus(
+          f.quantityGrouped ?? 0
+        )
       }))
     ].filter(({ form }) => {
       return wasteCodeFilter?.length
@@ -206,7 +210,7 @@ export default function Appendix2MultiSelect() {
             </th>
             <th>Expéditeur initial</th>
             <th>Date de réception</th>
-            <th>Quantité reçue</th>
+            <th>Quantité acceptée</th>
             <th>Quantité restante</th>
             <th>Quantité à regrouper</th>
             <th>Opération réalisée</th>
@@ -221,7 +225,7 @@ export default function Appendix2MultiSelect() {
                   ({ form, quantity: defaultQuantity }, index) => {
                     const quantitySet = quantitesToGroup[form.id];
                     let quantityLeft = new Decimal(
-                      form.quantityReceived!
+                      form.quantityAccepted ?? form.quantityReceived!
                     ).minus(form.quantityGrouped ?? 0);
 
                     if (values.id) {

@@ -16,6 +16,7 @@ const APPENDIX_FORMS = gql`
   query AppendixForm($siret: String!) {
     appendixForms(siret: $siret) {
       id
+      quantityGrouped
     }
   }
 `;
@@ -208,5 +209,244 @@ describe("Test appendixForms", () => {
 
     expect(appendixForms.length).toBe(1);
     expect(appendixForms[0].id).toBe(form.id);
+  });
+
+  describe("quantityRefused", () => {
+    it("should return candidates", async () => {
+      // Given
+      const { user: emitter, company: emitterCompany } =
+        await userWithCompanyFactory("ADMIN");
+      const { user: ttr, company: ttrCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+
+      const { updateAppendix2Forms } = getFormRepository({
+        ...ttr,
+        auth: AuthType.Session
+      });
+
+      // This form is in AWAITING_GROUP and should be returned
+      const awaitingGroupForm = await formFactory({
+        ownerId: emitter.id,
+        opt: {
+          emitterCompanyName: emitterCompany.name,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: ttrCompany.siret,
+          status: "AWAITING_GROUP",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          quantityReceived: 10,
+          quantityRefused: 7
+        }
+      });
+
+      // Totally grouped, should not be returned
+      const totallyGrouped = await formFactory({
+        ownerId: emitter.id,
+        opt: {
+          emitterCompanyName: emitterCompany.name,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: ttrCompany.siret,
+          status: "AWAITING_GROUP",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          quantityReceived: 12,
+          quantityRefused: 5
+        }
+      });
+
+      const groupingForm1 = await formFactory({
+        ownerId: ttr.id,
+        opt: {
+          emitterCompanyName: ttrCompany.name,
+          emitterCompanySiret: ttrCompany.siret,
+          recipientCompanySiret: destinationCompany.siret,
+          status: "SEALED"
+        }
+      });
+
+      await prisma.formGroupement.create({
+        data: {
+          nextFormId: groupingForm1.id,
+          initialFormId: totallyGrouped.id,
+          quantity: 7 // Totally grouped
+        }
+      });
+
+      // Partially grouped, should be returned
+      const partiallyGrouped = await formFactory({
+        ownerId: emitter.id,
+        opt: {
+          emitterCompanyName: emitterCompany.name,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: ttrCompany.siret,
+          status: "AWAITING_GROUP",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          quantityReceived: 10,
+          quantityRefused: 5
+        }
+      });
+
+      const groupingForm2 = await formFactory({
+        ownerId: ttr.id,
+        opt: {
+          emitterCompanyName: ttrCompany.name,
+          emitterCompanySiret: ttrCompany.siret,
+          recipientCompanySiret: destinationCompany.siret,
+          status: "SEALED"
+        }
+      });
+
+      await prisma.formGroupement.create({
+        data: {
+          nextFormId: groupingForm2.id,
+          initialFormId: partiallyGrouped.id,
+          quantity: 3 // Partially grouped,
+        }
+      });
+
+      await updateAppendix2Forms([totallyGrouped, partiallyGrouped]);
+
+      const { query } = makeClient(ttr);
+      const {
+        data: { appendixForms }
+      } = await query<{
+        appendixForms: { id: string; quantityGrouped: number }[];
+      }>(APPENDIX_FORMS, {
+        variables: { siret: ttrCompany.siret }
+      });
+
+      expect(appendixForms.length).toBe(2);
+      expect(appendixForms[0].id).toBe(awaitingGroupForm.id);
+      expect(appendixForms[0].quantityGrouped).toBe(0);
+      expect(appendixForms[1].id).toBe(partiallyGrouped.id);
+      expect(appendixForms[1].quantityGrouped).toBe(3);
+    });
+
+    it("new + legacy > should return candidates", async () => {
+      // Given
+      const { user: emitter, company: emitterCompany } =
+        await userWithCompanyFactory("ADMIN");
+      const { user: ttr, company: ttrCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+
+      const { updateAppendix2Forms } = getFormRepository({
+        ...ttr,
+        auth: AuthType.Session
+      });
+
+      // This form is in AWAITING_GROUP and should be returned
+      const awaitingGroupForm = await formFactory({
+        ownerId: emitter.id,
+        opt: {
+          emitterCompanyName: emitterCompany.name,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: ttrCompany.siret,
+          status: "AWAITING_GROUP",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          quantityReceived: 10,
+          quantityRefused: 7
+        }
+      });
+
+      const awaitingGroupForm2 = await formFactory({
+        ownerId: emitter.id,
+        opt: {
+          emitterCompanyName: emitterCompany.name,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: ttrCompany.siret,
+          status: "AWAITING_GROUP",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          quantityReceived: 8
+        }
+      });
+
+      // Totally grouped, should not be returned
+      const totallyGrouped = await formFactory({
+        ownerId: emitter.id,
+        opt: {
+          emitterCompanyName: emitterCompany.name,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: ttrCompany.siret,
+          status: "AWAITING_GROUP",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          quantityReceived: 12,
+          quantityRefused: 5
+        }
+      });
+
+      const groupingForm1 = await formFactory({
+        ownerId: ttr.id,
+        opt: {
+          emitterCompanyName: ttrCompany.name,
+          emitterCompanySiret: ttrCompany.siret,
+          recipientCompanySiret: destinationCompany.siret,
+          status: "SEALED"
+        }
+      });
+
+      await prisma.formGroupement.create({
+        data: {
+          nextFormId: groupingForm1.id,
+          initialFormId: totallyGrouped.id,
+          quantity: 7 // Totally grouped
+        }
+      });
+
+      // Partially grouped, should be returned
+      const partiallyGrouped = await formFactory({
+        ownerId: emitter.id,
+        opt: {
+          emitterCompanyName: emitterCompany.name,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: ttrCompany.siret,
+          status: "AWAITING_GROUP",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          quantityReceived: 10
+        }
+      });
+
+      const groupingForm2 = await formFactory({
+        ownerId: ttr.id,
+        opt: {
+          emitterCompanyName: ttrCompany.name,
+          emitterCompanySiret: ttrCompany.siret,
+          recipientCompanySiret: destinationCompany.siret,
+          status: "SEALED"
+        }
+      });
+
+      await prisma.formGroupement.create({
+        data: {
+          nextFormId: groupingForm2.id,
+          initialFormId: partiallyGrouped.id,
+          quantity: 3 // Partially grouped,
+        }
+      });
+
+      await updateAppendix2Forms([totallyGrouped, partiallyGrouped]);
+
+      const { query } = makeClient(ttr);
+      const {
+        data: { appendixForms }
+      } = await query<{
+        appendixForms: { id: string; quantityGrouped: number }[];
+      }>(APPENDIX_FORMS, {
+        variables: { siret: ttrCompany.siret }
+      });
+
+      expect(appendixForms.length).toBe(3);
+      expect(appendixForms[0].id).toBe(awaitingGroupForm.id);
+      expect(appendixForms[0].quantityGrouped).toBe(0);
+      expect(appendixForms[1].id).toBe(awaitingGroupForm2.id);
+      expect(appendixForms[1].quantityGrouped).toBe(0);
+      expect(appendixForms[2].id).toBe(partiallyGrouped.id);
+      expect(appendixForms[2].quantityGrouped).toBe(3);
+    });
   });
 });

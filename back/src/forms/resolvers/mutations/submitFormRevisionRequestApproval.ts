@@ -1,5 +1,6 @@
 import {
   Prisma,
+  Status as FormStatus,
   RevisionRequestApprovalStatus as Status,
   RevisionRequestStatus,
   User
@@ -57,6 +58,27 @@ export default async function submitFormRevisionRequestApproval(
   }
 
   if (isApproved) {
+    const form = await formRepository.findFirst({ id: revisionRequest.bsddId });
+
+    if (!form) {
+      throw new UserInputError("BSDD introuvable.");
+    }
+
+    if (
+      revisionRequest.wasteAcceptationStatus &&
+      revisionRequest.wasteAcceptationStatus !== form?.wasteAcceptationStatus
+    ) {
+      if (
+        ![FormStatus.ACCEPTED, FormStatus.TEMP_STORER_ACCEPTED].includes(
+          form.status
+        )
+      ) {
+        throw new UserInputError(
+          "Le statut d'acceptation des déchets n'est modifiable que si le bordereau est au stade de la réception."
+        );
+      }
+    }
+
     await formRepository.acceptRevisionRequestApproval(approval.id, {
       comment
     });

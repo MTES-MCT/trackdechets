@@ -194,7 +194,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
-          "Refus de prise en charge de votre déchet de l'entreprise WASTE PRODUCER"
+          "Le déchet de l’entreprise WASTE PRODUCER a été totalement refusé à réception"
       })
     );
   });

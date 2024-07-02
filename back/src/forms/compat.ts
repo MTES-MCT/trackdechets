@@ -11,6 +11,7 @@ import {
 } from "../generated/graphql/types";
 import { Bsdd } from "./types";
 import { RegistryForm } from "../registry/elastic";
+import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 
 /**
  * Convert a simple form (without temporary storage) to a BSDD v2
@@ -35,6 +36,8 @@ export function simpleFormToBsdd(
     transporters;
 
   const parcels = form.wasteDetailsParcelNumbers as ParcelNumber[] | null;
+
+  const wasteQuantities = bsddWasteQuantities(form);
 
   return {
     id: form.readableId,
@@ -201,6 +204,12 @@ export function simpleFormToBsdd(
     destinationReceptionDate: form.receivedAt,
     destinationReceptionWeight: form.quantityReceived
       ? form.quantityReceived.toNumber()
+      : null,
+    destinationReceptionAcceptedWeight: wasteQuantities?.quantityAccepted
+      ? wasteQuantities?.quantityAccepted.toNumber()
+      : null,
+    destinationReceptionRefusedWeight: wasteQuantities?.quantityRefused
+      ? wasteQuantities?.quantityRefused.toNumber()
       : null,
     destinationReceptionAcceptationStatus: form.wasteAcceptationStatus,
     destinationReceptionRefusalReason: form.wasteRefusalReason,

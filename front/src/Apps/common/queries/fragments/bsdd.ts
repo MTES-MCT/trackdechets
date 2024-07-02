@@ -315,6 +315,8 @@ export const detailFormFragment = gql`
     receivedAt
     receivedBy
     quantityReceived
+    quantityRefused
+    quantityAccepted
     wasteAcceptationStatus
     wasteRefusalReason
     signedAt
@@ -354,6 +356,8 @@ export const detailFormFragment = gql`
           quantity
         }
         quantityReceived
+        quantityRefused
+        quantityAccepted
         signedAt
         emitterPostalCode
       }

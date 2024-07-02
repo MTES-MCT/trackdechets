@@ -21,6 +21,7 @@ import {
 
 import { getWasteDescription } from "./utils";
 import { getFirstTransporterSync } from "./converter";
+import Decimal from "decimal.js";
 
 const getTransporterData = (
   bspaoh: Bspaoh & {
@@ -93,7 +94,7 @@ export function getRegistryFields(
   return registryFields;
 }
 
-function toGenericWaste(
+export function toGenericWaste(
   bspaoh: Bspaoh & {
     transporters: BspaohTransporter[];
   }
@@ -120,11 +121,22 @@ function toGenericWaste(
       bspaoh.destinationReceptionAcceptationStatus,
     destinationOperationDate: bspaoh.destinationOperationDate,
     destinationReceptionWeight:
-      bspaoh.destinationReceptionWasteReceivedWeightValue,
+      bspaoh.destinationReceptionWasteReceivedWeightValue
+        ? new Decimal(bspaoh.destinationReceptionWasteReceivedWeightValue)
+            .dividedBy(1000)
+            .toDecimalPlaces(6)
+            .toNumber()
+        : bspaoh.destinationReceptionWasteReceivedWeightValue,
     wasteAdr: bspaoh.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    weight: bspaoh.emitterWasteWeightValue
+      ? new Decimal(bspaoh.emitterWasteWeightValue)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : bspaoh.emitterWasteWeightValue,
     ...getTransporterData(bspaoh),
     destinationCompanyMail: bspaoh.destinationCompanyMail
   };
@@ -215,9 +227,6 @@ export function toOutgoingWaste(
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterTakenOverAt: transporter?.transporterTakenOverAt,
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
-    weight: bspaoh.emitterWasteWeightValue
-      ? bspaoh.emitterWasteWeightValue / 1000
-      : bspaoh.emitterWasteWeightValue,
     emitterCustomInfo: bspaoh.emitterCustomInfo,
     transporterCompanyMail: transporter?.transporterCompanyMail
   };
@@ -237,9 +246,6 @@ export function toTransportedWaste(
     ...genericWaste,
     transporterTakenOverAt: bspaoh.transporterTransportTakenOverAt,
     destinationReceptionDate: bspaoh.destinationReceptionDate,
-    weight: bspaoh.emitterWasteWeightValue
-      ? bspaoh.emitterWasteWeightValue / 1000
-      : bspaoh.emitterWasteWeightValue,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterCompanyAddress: transporter?.transporterCompanyAddress,
@@ -361,9 +367,6 @@ export function toAllWaste(
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     transporterNumberPlates: transporter?.transporterTransportPlates,
-    weight: bspaoh.emitterWasteWeightValue
-      ? bspaoh.emitterWasteWeightValue / 1000
-      : bspaoh.emitterWasteWeightValue,
     managedEndDate: null,
     managedStartDate: null,
     traderCompanyName: null,
