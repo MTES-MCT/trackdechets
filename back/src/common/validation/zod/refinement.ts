@@ -100,15 +100,15 @@ export async function isDestinationRefinement(
     });
   }
 
-  if (isExemptedFromVerification && isExemptedFromVerification(company)) {
-    return true;
-  }
-
   if (
     company &&
     VERIFY_COMPANY === "true" &&
     company.verificationStatus !== CompanyVerificationStatus.VERIFIED
   ) {
+    if (isExemptedFromVerification && isExemptedFromVerification(company)) {
+      return true;
+    }
+
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:
