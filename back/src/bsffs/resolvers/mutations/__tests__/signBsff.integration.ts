@@ -295,8 +295,8 @@ describe("Mutation.signBsff", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Le champ emitterEmissionSignatureAuthor est obligatoire. Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau\n" +
-            "Le champ emitterEmissionSignatureDate est obligatoire. Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
+            "L'auteur de la signature émetteur est un champ requis. Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau\n" +
+            "La date de signature de l'émetteur est un champ requis. Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
         })
       ]);
     });

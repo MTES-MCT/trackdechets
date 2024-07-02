@@ -227,13 +227,14 @@ export async function createBsff(
 
   const zodBsff = await graphQlInputToZodBsff(input);
 
-  const { packagings, transporters, ...parsedZodBsff } = await parseBsffAsync(
-    { ...zodBsff, isDraft },
-    {
-      user,
-      currentSignatureType: !isDraft ? "EMISSION" : undefined
-    }
-  );
+  const { packagings, transporters, createdAt, ...parsedZodBsff } =
+    await parseBsffAsync(
+      { ...zodBsff, isDraft },
+      {
+        user,
+        currentSignatureType: !isDraft ? "EMISSION" : undefined
+      }
+    );
 
   const firstTransporter = (() => {
     if (transporters && transporters.length > 0) {
