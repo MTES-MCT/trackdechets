@@ -229,7 +229,7 @@ export async function createBsff(
 
   const { packagings, transporters, createdAt, ...parsedZodBsff } =
     await parseBsffAsync(
-      { ...zodBsff, isDraft },
+      { ...zodBsff, isDraft, createdAt: new Date() },
       {
         user,
         currentSignatureType: !isDraft ? "EMISSION" : undefined
