@@ -22,7 +22,6 @@ import {
   dashboardFormFragment,
   dashboardVhuFragment
 } from "../../Apps/common/queries/fragments";
-import { BsdDisplay } from "../../Apps/common/types/bsdTypes";
 import { Modal } from "../../common/components";
 import { PermissionsContext } from "../../common/contexts/PermissionsContext";
 import { PreviewModal } from "./PreviewModal";

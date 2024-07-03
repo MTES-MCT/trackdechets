@@ -12,7 +12,9 @@ import makeClient from "../../../../__tests__/testClient";
 const FIND_BSD = gql`
   query FindBsd($id: String!) {
     findBsd(id: $id) {
-      id
+      ... on Form {
+        id
+      }
     }
   }
 `;
@@ -23,7 +25,7 @@ describe("query findBsd", () => {
   it("should deny access to regular users", async () => {
     const user = await userFactory({ isAdmin: false });
     const { query } = makeClient(user);
-    const { errors } = await query(FIND_BSD);
+    const { errors } = await query(FIND_BSD, { variables: { id: "id" } });
     expect(errors).toEqual([
       expect.objectContaining({ message: "Vous n'êtes pas administrateur" })
     ]);
@@ -36,7 +38,7 @@ describe("query findBsd", () => {
     const form = await formFactory({ ownerId: user.id });
     const { data } = await query<Pick<Query, "findBsd">, QueryFindBsdArgs>(
       FIND_BSD,
-      { variables: { id: form.id } }
+      { variables: { id: form.readableId } }
     );
 
     expect(data.findBsd.id).toEqual(form.id);

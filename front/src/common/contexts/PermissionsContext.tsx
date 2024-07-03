@@ -17,9 +17,8 @@ type PermissionsContextType = {
   ) => void;
 };
 
-export const PermissionsContext = React.createContext<PermissionsContextType | null>(
-  null
-);
+export const PermissionsContext =
+  React.createContext<PermissionsContextType | null>(null);
 
 export function usePermissions() {
   return useContext(PermissionsContext) as PermissionsContextType;
