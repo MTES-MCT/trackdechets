@@ -173,3 +173,21 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   """
   workerCertification: WorkerCertification
 }
+
+type CompanyExhaustiveInfo {
+  siret: String
+  name: String
+  contact: String
+  address: String
+  createdAt: DateTime
+  etatAdministratif: String
+  statutDiffusion: String
+  codeNaf: String
+}
+
+type CompanyExhaustive {
+  anonymousCompany: CompanyExhaustiveInfo!
+  dbCompany: CompanyExhaustiveInfo!
+  esCompany: CompanyExhaustiveInfo!
+  sireneCompany: CompanyExhaustiveInfo!
+}

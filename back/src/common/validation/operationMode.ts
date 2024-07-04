@@ -2,7 +2,7 @@ import * as yup from "yup";
 import { OperationMode } from "@prisma/client";
 import { getOperationModesFromOperationCode } from "../operationModes";
 
-export const destinationOperationModeValidation = context =>
+export const destinationOperationModeValidation = () =>
   yup
     .mixed<OperationMode | null | undefined>()
     .oneOf([...Object.values(OperationMode), null, undefined])
@@ -11,8 +11,6 @@ export const destinationOperationModeValidation = context =>
       "processing-mode-matches-processing-operation",
       "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie",
       function (item) {
-        if (!context.operationSignature) return true;
-
         const { destinationOperationCode } = this.parent;
         const destinationOperationMode = item;
 

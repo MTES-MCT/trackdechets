@@ -239,7 +239,7 @@ export const PaohPackagings = ({ paohType, disabled = false }) => {
   }, [packagings, setValue]);
 
   return (
-    <div>
+    <div className="fr-mb-2w">
       <h4 className="fr-h4">Conditionnement</h4>
       {fields.map((packaging, index) => (
         <PaohPackaging

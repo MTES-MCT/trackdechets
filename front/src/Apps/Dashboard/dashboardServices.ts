@@ -19,7 +19,8 @@ import {
   RevisionRequestStatus,
   UserPermission,
   Transporter,
-  BsdaTransporter
+  BsdaTransporter,
+  BsdasriStatus
 } from "@td/codegen-ui";
 import {
   ACCEPTE,
@@ -494,7 +495,7 @@ export const isSignEmission = (
 // s'inspire de https://github.com/MTES-MCT/trackdechets/blob/dev/back/src/forms/validation.ts#L1897
 export const canAddAppendix1 = bsd => {
   // Once one of the appendix has been signed by the transporter,
-  // you have 3 days maximum to add new appendix
+  // you have 5 days maximum to add new appendix
   const currentDate = new Date();
   const { grouping } = bsd;
   const firstFormSignatureDate = grouping?.find(({ form }) => {
@@ -507,7 +508,7 @@ export const canAddAppendix1 = bsd => {
     ? new Date(firstFormSignatureDate.form.takenOverAt)
     : currentDate;
   const limitDate = sub(currentDate, {
-    days: 2,
+    days: 4,
     hours: currentDate.getHours(),
     minutes: currentDate.getMinutes()
   });
@@ -1271,6 +1272,11 @@ const canReviewBsda = (bsd, siret) => {
 };
 
 const canReviewBsdasri = (bsd, siret) => {
+  // You can't review a SYNTHESIS dasri with RECEIVED status
+  if (bsd.synthesizing && bsd.status === BsdasriStatus.Received) {
+    return false;
+  }
+
   // these types are not implemented yet
   if ([BsdasriType.Synthesis, BsdasriType.Grouping].includes(bsd.type)) {
     return false;

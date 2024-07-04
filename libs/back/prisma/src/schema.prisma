@@ -1849,7 +1849,7 @@ model CompanyDigest {
   @@index([orgId], map: "_CompanyDigestOrgIdIdx")
   @@index([year], map: "_CompanyDigestYearIdx")
   @@index([state], map: "_CompanyDigestStatedIdx")
-  @@index([distantId], map: "_CompanyDigestdDstantIdIdx")
+  @@index([distantId], map: "_CompanyDigestdDistantIdIdx")
 }
 
 enum CompanyDigestStatus {

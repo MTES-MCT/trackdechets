@@ -1,28 +1,10 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { ObservableGauge, Histogram, metrics } from "@opentelemetry/api";
+import { Gauge, Histogram, metrics } from "@opentelemetry/api";
 
 const meter = metrics.getMeter("prisma");
 
-const observableGauges = new Map<string, ObservableGauge>();
-const observableGaugeValues = new Map<string, number>();
 const histograms = new Map<string, Histogram>();
-
-// Until we have a static gauge in Otel (pretty soon, merged but hidden), we have to use observable gauges
-// cf https://github.com/open-telemetry/opentelemetry-js/pull/4528
-function observeMetric({
-  key,
-  description,
-  value
-}: Omit<Prisma.Metric<number>, "labels">) {
-  observableGaugeValues.set(key, value);
-
-  if (!observableGauges.has(key)) {
-    const gauge = meter.createObservableGauge(key, { description });
-    gauge.addCallback(c => c.observe(observableGaugeValues.get(key) ?? 0));
-
-    observableGauges.set(key, gauge);
-  }
-}
+const gauges = new Map<string, Gauge>();
 
 function createOrGetHistogram(name: string, description: string) {
   if (!histograms.has(name)) {
@@ -33,27 +15,31 @@ function createOrGetHistogram(name: string, description: string) {
   return histograms.get(name)!;
 }
 
+function createOrGetGauge(name: string, description: string) {
+  if (!gauges.has(name)) {
+    const gauge = meter.createGauge(name, { description });
+    gauges.set(name, gauge);
+  }
+
+  return gauges.get(name)!;
+}
+
 export function collectMetrics(prisma: PrismaClient) {
   const flushIntervalSeconds = 15;
   const refreshRate = 1000 * flushIntervalSeconds;
 
   let previousHistograms: Prisma.Metric<Prisma.MetricHistogram>[] | null = null;
-  setInterval(async () => {
+
+  const interval = setInterval(async () => {
     const prismaMetrics = await prisma.$metrics.json();
 
     for (const counter of prismaMetrics.counters) {
-      observeMetric({
-        key: counter.key,
-        description: counter.description,
-        value: counter.value
-      });
+      const recorder = createOrGetGauge(counter.key, counter.description);
+      recorder.record(counter.value);
     }
     for (const gauge of prismaMetrics.gauges) {
-      observeMetric({
-        key: gauge.key,
-        description: gauge.description,
-        value: gauge.value
-      });
+      const recorder = createOrGetGauge(gauge.key, gauge.description);
+      recorder.record(gauge.value);
     }
 
     if (previousHistograms === null) {
@@ -80,6 +66,9 @@ export function collectMetrics(prisma: PrismaClient) {
     }
     previousHistograms = diffHistograms;
   }, refreshRate);
+
+  // Don't let the timer keep the process alive
+  interval.unref();
 }
 
 function diffMetrics(metrics: Prisma.Metric<Prisma.MetricHistogram>[]) {
