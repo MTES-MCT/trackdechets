@@ -319,6 +319,11 @@ function SignReceptionModal({
       setValue("refusedWeight", receivedWeight);
     }
 
+    if (acceptationStatus === "PARTIALLY_REFUSED" && !!receivedWeight) {
+      setValue("refusedWeight", 0);
+      return;
+    }
+
     // manually set values do not trigger re-validation
     trigger("refusedWeight");
   }, [acceptationStatus, receivedWeight, setValue, trigger]);
