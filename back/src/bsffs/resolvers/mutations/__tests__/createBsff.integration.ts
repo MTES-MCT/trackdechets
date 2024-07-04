@@ -306,6 +306,44 @@ describe("Mutation.createBsff", () => {
     ]);
   });
 
+  it("should not be possible to create a bsff where weight or volumes are 0", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporter.company
+    });
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
+    const input = createInput(emitter, transporter, destination);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs
+    >(CREATE_BSFF, {
+      variables: {
+        input: {
+          ...input,
+          weight: { ...input.weight, value: 0 },
+          packagings: input.packagings.map(p => ({
+            ...p,
+            weight: 0,
+            volume: 0
+          }))
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Conditionnements : le volume doit être supérieur à 0\n" +
+          "Conditionnements : le poids doit être supérieur à 0\n" +
+          "Le poids doit être supérieur à 0"
+      })
+    ]);
+  });
+
   it("should not be possible to set a transporter not registered in TD", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);

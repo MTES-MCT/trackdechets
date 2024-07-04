@@ -175,11 +175,13 @@ export function expandBsffFromDB(
       })
     }),
     packagings: [], // will be resolved in Bsff resolver
-    waste: nullIfNoValues<GraphQL.BsffWaste>({
-      code: prismaBsff.wasteCode,
-      description: prismaBsff.wasteDescription,
-      adr: prismaBsff.wasteAdr
-    }),
+    waste: prismaBsff.wasteCode
+      ? nullIfNoValues<GraphQL.BsffWaste>({
+          code: prismaBsff.wasteCode,
+          description: prismaBsff.wasteDescription,
+          adr: prismaBsff.wasteAdr
+        })
+      : null,
     weight: prismaBsff.weightValue
       ? {
           value: processDecimal(prismaBsff.weightValue).toNumber(),
