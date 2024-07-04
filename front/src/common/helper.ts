@@ -198,3 +198,7 @@ export const multiplyByRounded = (
 ): number => {
   return new Decimal(num || 0).times(multBy).toDecimalPlaces(6).toNumber();
 };
+
+export const notNullNorUndefined = (val: any): boolean => {
+  return val !== undefined && val !== null;
+};

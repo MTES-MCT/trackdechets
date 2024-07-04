@@ -81,6 +81,7 @@ import {
   BSD_DETAILS_QTY_TOOLTIP,
   NON_RENSEIGNE
 } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
+import { notNullNorUndefined } from "../../../common/helper";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -388,7 +389,7 @@ const Recipient = ({
         />
         <DetailRow
           value={
-            form?.quantityRefused ? (
+            notNullNorUndefined(form?.quantityRefused) ? (
               `${form?.quantityRefused} tonnes`
             ) : (
               <>
@@ -403,7 +404,7 @@ const Recipient = ({
       <div className={styles.detailGrid}>
         <DetailRow
           value={
-            form?.quantityAccepted ? (
+            notNullNorUndefined(form?.quantityAccepted) ? (
               `${form?.quantityAccepted} tonnes`
             ) : (
               <>
