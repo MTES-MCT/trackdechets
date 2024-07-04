@@ -910,11 +910,6 @@ type ManagedWaste {
   "Le N°SIRET du courtier si le déchet est géré par un courtier"
   brokerCompanySiret: String
 
-  "NON IMPLÉMENTÉ. La date d'acquisition du déchet par le négociant, ou la date de début de gestion du déchet par le courtier"
-  managedStartDate: DateTime
-  "NON IMPLÉMENTÉ. La date de cession du déchet par le négociant, ou la date de fin de gestion du déchet par le courtier"
-  managedEndDate: DateTime
-
   #####################################################
   # b) Concernant la dénomination, nature et quantité :
   #####################################################
@@ -1193,15 +1188,6 @@ type AllWaste {
   transporterTakenOverAt: DateTime
   "La date de déchargement du déchet"
   destinationReceptionDate: DateTime
-
-  ################################################
-  # Concernant les dates de gestion du déchet :
-  ################################################
-
-  "NON IMPLÉMENTÉ. La date d'acquisition du déchet par le négociant, ou la date de début de gestion du déchet par le courtier"
-  managedStartDate: DateTime
-  "NON IMPLÉMENTÉ. La date de cession du déchet par le négociant, ou la date de fin de gestion du déchet par le courtier"
-  managedEndDate: DateTime
 
   #####################################################
   # Concernant la dénomination, nature et quantité :

@@ -206,12 +206,6 @@ export const columns: Column[] = [
   // Gestion du déchets
   { field: "ecoOrganismeName", label: "Éco-organisme raison sociale" },
   { field: "ecoOrganismeSiren", label: "Éco-organisme SIREN" },
-  { field: "managedEndDate", label: "Date de cession", format: formatDate },
-  {
-    field: "managedStartDate",
-    label: "Date d'acquisition",
-    format: formatDate
-  },
   { field: "traderCompanyName", label: "Négociant raison sociale" },
   { field: "traderCompanySiret", label: "Négociant SIRET" },
   { field: "traderCompanyMail", label: "Négociant contact" },

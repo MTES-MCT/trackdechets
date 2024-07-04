@@ -337,8 +337,6 @@ export function toManagedWaste(
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     brokerCompanyName: null,
@@ -409,8 +407,6 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,

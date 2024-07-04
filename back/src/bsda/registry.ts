@@ -462,8 +462,6 @@ export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     brokerCompanyName: bsda.brokerCompanyName,
@@ -551,8 +549,6 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toNumber()
       : null,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,

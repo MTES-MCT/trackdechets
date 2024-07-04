@@ -380,8 +380,6 @@ export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     brokerCompanyName: null,
@@ -453,8 +451,6 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toNumber()
       : null,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,

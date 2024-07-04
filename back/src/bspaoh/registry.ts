@@ -282,8 +282,6 @@ export function toManagedWaste(
   return {
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     brokerCompanyName: null,
@@ -360,8 +358,6 @@ export function toAllWaste(
     weight: bspaoh.emitterWasteWeightValue
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,

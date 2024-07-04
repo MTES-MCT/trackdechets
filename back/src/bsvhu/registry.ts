@@ -249,8 +249,6 @@ export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     brokerCompanyName: null,
@@ -303,8 +301,6 @@ export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
     emitterPickupsiteAddress: null,
     ...initialEmitter,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,

@@ -454,8 +454,6 @@ export function toManagedWaste(
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     brokerCompanyName: null,
@@ -530,8 +528,6 @@ export function toAllWaste(
     ]),
     ...initialEmitter,
     weight: bsdd.weightValue,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
