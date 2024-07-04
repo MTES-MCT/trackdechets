@@ -239,4 +239,27 @@ describe("Query.bsff", () => {
       expect.objectContaining({ id: forwardedBsff.packagings[0].id })
     ]);
   });
+
+  // Sentry error - Cannot return null for non-nullable field BsffWaste.code.
+  // Si wasteDescription est défini mais pas wasteCode, on a une erreur car la définitio GraphQL est la suivante :
+  // BsffWaste { code: String!, description: String, adr: String }
+  it("should not return Bsff.waste when waste code is not present even if a description is present", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter },
+      { data: { wasteCode: null, wasteDescription: "fluide" } }
+    );
+
+    const { query } = makeClient(emitter.user);
+    const { errors, data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(
+      GET_BSFF,
+      {
+        variables: {
+          id: bsff.id
+        }
+      }
+    );
+    expect(errors).toBeUndefined();
+    expect(data.bsff.waste).toBeNull();
+  });
 });
