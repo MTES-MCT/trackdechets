@@ -26,6 +26,7 @@ import {
   MARK_TEMP_STORER_ACCEPTED
 } from "../../../../../form/bsdd/utils/queries";
 import { useParams } from "react-router-dom";
+import { multiplyByRounded } from "../../../../../common/helper";
 
 const getSchema = () =>
   z
@@ -394,7 +395,7 @@ function SignReceptionModal({
               />
               <p className="fr-text fr-text--xs" style={{ color: "#0063CB" }}>
                 <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
-                {(receivedWeight || 0) * 1000} kilos
+                {multiplyByRounded(receivedWeight)} kilos
               </p>
             </div>
           </div>
@@ -458,7 +459,7 @@ function SignReceptionModal({
               />
               <p className="fr-text fr-text--xs" style={{ color: "#0063CB" }}>
                 <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
-                {(refusedWeight || 0) * 1000} kilos
+                {multiplyByRounded(refusedWeight)} kilos
               </p>
             </div>
             <div className="fr-col-12 fr-col-md-4">
@@ -483,7 +484,7 @@ function SignReceptionModal({
               />
               <p className="fr-text fr-text--xs" style={{ color: "#0063CB" }}>
                 <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
-                {(acceptedWeight || 0) * 1000} kilos
+                {multiplyByRounded(acceptedWeight)} kilos
               </p>
             </div>
           </div>

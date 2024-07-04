@@ -1,6 +1,7 @@
 import { DocumentNode } from "graphql";
 import { ApolloError, DataProxy } from "@apollo/client";
 import { getCountries, isValidPhoneNumber } from "libphonenumber-js";
+import Decimal from "decimal.js";
 
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
@@ -190,3 +191,10 @@ export function removeOrgId(obj: any, insideCompany = false): any {
 
   return newObj;
 }
+
+export const multiplyByRounded = (
+  num: number | null = 0,
+  multBy = 1000
+): number => {
+  return new Decimal(num || 0).times(multBy).toDecimalPlaces(6).toNumber();
+};
