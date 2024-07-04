@@ -45,8 +45,6 @@ type IncomingWaste {
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
-  "Lorsque les déchets apportés proviennent de plusieurs producteurs, le ou les codes postaux de la commune de collecte des déchets "
-  initialEmitterPostalCodes: [String!]
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
   "Le numéro SIRET de l'établissement expéditeur des déchets"
@@ -342,8 +340,6 @@ type OutgoingWaste {
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
-  "Lorsque les déchets apportés proviennent de plusieurs producteurs, le ou les codes postaux de la commune de collecte des déchets "
-  initialEmitterPostalCodes: [String!]
 
   #########################################################################
   # d) Concernant la localisation des terres (parcelles) pour la traçabilité des terres et sédiments
@@ -727,14 +723,6 @@ type TransportedWaste {
   # d) Concernant l'origine et la gestion du déchet :
   ###################################################
 
-  "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
-  initialEmitterCompanyName: String
-  "Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
-  initialEmitterCompanySiret: String
-  "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
-  initialEmitterCompanyAddress: String
-  "Lorsque les déchets apportés proviennent de plusieurs producteurs, le ou les codes postaux de la commune de collecte des déchets "
-  initialEmitterPostalCodes: [String!]
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"
@@ -967,14 +955,6 @@ type ManagedWaste {
   """
   ecoOrganismeSiren: String
 
-  "La raison sociale du producteur initial du déchet"
-  initialEmitterCompanyName: String
-  "Le numéro SIRET du producteur initial du déchet"
-  initialEmitterCompanySiret: String
-  "L'adresse du producteur initial du déchet"
-  initialEmitterCompanyAddress: String
-  "Lorsque les déchets apportés proviennent de plusieurs producteurs, le ou les codes postaux de la commune de collecte des déchets "
-  initialEmitterPostalCodes: [String!]
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"
@@ -1250,8 +1230,6 @@ type AllWaste {
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet"
   initialEmitterCompanyAddress: String
-  "L'adresse du producteur initial du déchet"
-  initialEmitterPostalCodes: [String!]
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"

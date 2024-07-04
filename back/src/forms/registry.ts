@@ -19,7 +19,7 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode, splitAddress } from "../utils";
+import { splitAddress } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
@@ -266,25 +266,6 @@ export function toGenericWaste(
 export function toIncomingWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<IncomingWaste> {
-  const initialEmitter: Record<string, string | string[] | null> = {
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    //secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsdd.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
@@ -305,7 +286,6 @@ export function toIncomingWaste(
       bsdd.emitterPickupSitePostalCode,
       bsdd.emitterPickupSiteCity
     ]),
-    ...initialEmitter,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -322,16 +302,6 @@ export function toIncomingWaste(
 export function toOutgoingWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<OutgoingWaste> {
-  const initialEmitter: Record<string, string | string[] | null> = {
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
@@ -355,7 +325,6 @@ export function toOutgoingWaste(
       bsdd.emitterPickupSitePostalCode,
       bsdd.emitterPickupSiteCity
     ]),
-    ...initialEmitter,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -370,28 +339,6 @@ export function toOutgoingWaste(
 export function toTransportedWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<TransportedWaste> {
-  const initialEmitter: Record<string, string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    //secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsdd.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
@@ -400,7 +347,6 @@ export function toTransportedWaste(
     ...genericWaste,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     weight: bsdd.weightValue,
-    ...initialEmitter,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
@@ -426,28 +372,6 @@ export function toTransportedWaste(
 export function toManagedWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<ManagedWaste> {
-  const initialEmitter: Record<string, string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    //secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsdd.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
@@ -471,7 +395,6 @@ export function toManagedWaste(
       bsdd.emitterPickupSitePostalCode,
       bsdd.emitterPickupSiteCity
     ]),
-    ...initialEmitter,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
@@ -482,25 +405,6 @@ export function toManagedWaste(
 export function toAllWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<AllWaste> {
-  const initialEmitter: Record<string, string[] | null> = {
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    //secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsdd.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
@@ -526,7 +430,6 @@ export function toAllWaste(
       bsdd.emitterPickupSitePostalCode,
       bsdd.emitterPickupSiteCity
     ]),
-    ...initialEmitter,
     weight: bsdd.weightValue,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,

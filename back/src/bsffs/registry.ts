@@ -18,7 +18,6 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
 import { toBsffDestination } from "./compat";
 import { RegistryBsff } from "../registry/elastic";
 import { getFirstTransporterSync } from "./database";
@@ -153,36 +152,6 @@ function toGenericWaste(bsff: RegistryBsff): GenericWaste {
 }
 
 export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
-  const initialEmitter: Pick<
-    IncomingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (
-    [
-      BsffType.REEXPEDITION,
-      BsffType.GROUPEMENT,
-      BsffType.RECONDITIONNEMENT
-    ].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial en cas de réexpédition. Cependant,
-    // pour protéger le secret des affaires, et en attendant une clarification officielle, on se
-    // limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
@@ -197,7 +166,9 @@ export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -215,12 +186,10 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     | "initialEmitterCompanyAddress"
     | "initialEmitterCompanyName"
     | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
   > = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
+    initialEmitterCompanySiret: null
   };
 
   if (bsff.type === BsffType.REEXPEDITION) {
@@ -233,18 +202,6 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
       initialEmitter.initialEmitterCompanySiret =
         initialBsff.emitterCompanySiret;
     }
-  }
-
-  if (
-    [BsffType.GROUPEMENT, BsffType.RECONDITIONNEMENT].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    // secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
   }
 
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
@@ -279,36 +236,6 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
 export function toTransportedWaste(
   bsff: RegistryBsff
 ): Required<TransportedWaste> {
-  const initialEmitter: Pick<
-    TransportedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (
-    [
-      BsffType.REEXPEDITION,
-      BsffType.GROUPEMENT,
-      BsffType.RECONDITIONNEMENT
-    ].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial en cas de réexpédition. Cependant,
-    // pour protéger le secret des affaires, et en attendant une clarification officielle, on se
-    // limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
@@ -319,7 +246,6 @@ export function toTransportedWaste(
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toNumber()
       : null,
-    ...initialEmitter,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
@@ -342,38 +268,6 @@ export function toTransportedWaste(
  * be called. We implement it anyway in case it is added later on
  */
 export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
-  const initialEmitter: Pick<
-    ManagedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null
-  };
-
-  if (bsff.type === BsffType.REEXPEDITION) {
-    const initialBsff = bsff.packagings[0]?.previousPackagings[0]?.bsff;
-    initialEmitter.initialEmitterCompanyAddress =
-      initialBsff.emitterCompanyAddress;
-    initialEmitter.initialEmitterCompanyName = initialBsff.emitterCompanyName;
-    initialEmitter.initialEmitterCompanySiret = initialBsff.emitterCompanySiret;
-  }
-
-  if (
-    [BsffType.GROUPEMENT, BsffType.RECONDITIONNEMENT].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    // secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
@@ -392,42 +286,11 @@ export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
     emitterCompanyMail: bsff.emitterCompanyMail
   };
 }
 
 export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
-  const initialEmitter: Pick<
-    IncomingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (
-    [
-      BsffType.REEXPEDITION,
-      BsffType.GROUPEMENT,
-      BsffType.RECONDITIONNEMENT
-    ].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial en cas de réexpédition. Cependant,
-    // pour protéger le secret des affaires, et en attendant une clarification officielle, on se
-    // limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
   return {
@@ -447,7 +310,9 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toNumber()
       : null,

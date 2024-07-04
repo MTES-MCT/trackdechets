@@ -19,7 +19,6 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
 import { getWasteDescription } from "./utils";
 import { RegistryBsdasri } from "../registry/elastic";
 
@@ -144,25 +143,6 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
 export function toIncomingWaste(
   bsdasri: RegistryBsdasri
 ): Required<IncomingWaste> {
-  const initialEmitter: Pick<
-    IncomingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
@@ -182,7 +162,9 @@ export function toIncomingWaste(
       bsdasri.emitterPickupSitePostalCode,
       bsdasri.emitterPickupSiteCity
     ]),
-    ...initialEmitter,
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -197,25 +179,6 @@ export function toIncomingWaste(
 export function toOutgoingWaste(
   bsdasri: RegistryBsdasri
 ): Required<OutgoingWaste> {
-  const initialEmitter: Pick<
-    OutgoingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
@@ -238,7 +201,9 @@ export function toOutgoingWaste(
       bsdasri.emitterPickupSitePostalCode,
       bsdasri.emitterPickupSiteCity
     ]),
-    ...initialEmitter,
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -253,25 +218,6 @@ export function toOutgoingWaste(
 export function toTransportedWaste(
   bsdasri: RegistryBsdasri
 ): Required<TransportedWaste> {
-  const initialEmitter: Pick<
-    TransportedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
@@ -282,7 +228,6 @@ export function toTransportedWaste(
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
-    ...initialEmitter,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
@@ -312,25 +257,6 @@ export function toTransportedWaste(
 export function toManagedWaste(
   bsdasri: RegistryBsdasri
 ): Required<ManagedWaste> {
-  const initialEmitter: Pick<
-    ManagedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
@@ -354,31 +280,11 @@ export function toManagedWaste(
       bsdasri.emitterPickupSitePostalCode,
       bsdasri.emitterPickupSiteCity
     ]),
-    ...initialEmitter,
     emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
 
 export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
-  const initialEmitter: Pick<
-    AllWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
@@ -403,7 +309,9 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
       bsdasri.emitterPickupSitePostalCode,
       bsdasri.emitterPickupSiteCity
     ]),
-    ...initialEmitter,
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
