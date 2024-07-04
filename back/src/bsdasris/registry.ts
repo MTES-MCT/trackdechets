@@ -21,6 +21,7 @@ import {
 } from "../registry/types";
 import { getWasteDescription } from "./utils";
 import { RegistryBsdasri } from "../registry/elastic";
+import { isFinalOperationCode } from "../common/operationCodes";
 
 const getOperationData = (bsdasri: Bsdasri) => ({
   destinationPlannedOperationCode: bsdasri.destinationOperationCode,
@@ -28,18 +29,48 @@ const getOperationData = (bsdasri: Bsdasri) => ({
   destinationOperationMode: bsdasri.destinationOperationMode
 });
 
-const getFinalOperationsData = (bsdasri: RegistryBsdasri) => {
+const getFinalOperationsData = (
+  bsdasri: RegistryBsdasri
+): Pick<
+  OutgoingWaste | AllWaste,
+  | "destinationFinalOperationCodes"
+  | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCompanySirets"
+> => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
+  const destinationFinalOperationCompanySirets: string[] = [];
+
   // Check if finalOperations is defined and has elements
-  if (bsdasri.finalOperations && bsdasri.finalOperations.length > 0) {
+  if (
+    bsdasri.destinationOperationSignatureDate &&
+    bsdasri.destinationOperationCode &&
+    // Cf tra-14603 => si le code de traitement du bordereau initial est final,
+    // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
+    // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
+    !isFinalOperationCode(bsdasri.destinationOperationCode) &&
+    bsdasri.finalOperations?.length
+  ) {
     // Iterate through each operation once and fill both arrays
     bsdasri.finalOperations.forEach(ope => {
       destinationFinalOperationCodes.push(ope.operationCode);
-      destinationFinalOperationWeights.push(ope.quantity.toNumber());
+      destinationFinalOperationWeights.push(
+        // conversion en tonnes
+        ope.quantity.dividedBy(1000).toNumber()
+      );
+      if (ope.finalBsdasri.destinationCompanySiret) {
+        // cela devrait tout le temps être le cas
+        destinationFinalOperationCompanySirets.push(
+          ope.finalBsdasri.destinationCompanySiret
+        );
+      }
     });
   }
-  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+  return {
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    destinationFinalOperationCompanySirets
+  };
 };
 
 const getTransporterData = (bsdasri: Bsdasri, includePlates = false) => {

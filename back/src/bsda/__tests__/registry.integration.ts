@@ -168,23 +168,29 @@ describe("toOutgoingWaste", () => {
     "should compute destinationFinalOperationCodes" +
       " and destinationfinalOperationWeights",
     async () => {
-      const finalBsda1 = await bsdaFactory({});
-      const finalBsda2 = await bsdaFactory({});
+      const finalBsda1 = await bsdaFactory({
+        opt: { destinationOperationCode: "R 5", destinationReceptionWeight: 1 }
+      });
+      const finalBsda2 = await bsdaFactory({
+        opt: { destinationOperationCode: "D 5", destinationReceptionWeight: 2 }
+      });
 
-      const form = await bsdaFactory({
+      const bsda = await bsdaFactory({
         opt: {
+          destinationOperationCode: "D 13",
+          destinationOperationSignatureDate: new Date(),
           finalOperations: {
             createMany: {
               data: [
                 {
                   finalBsdaId: finalBsda1.id,
-                  operationCode: "R 5",
-                  quantity: 1
+                  operationCode: finalBsda1.destinationOperationCode!,
+                  quantity: finalBsda1.destinationReceptionWeight!
                 },
                 {
                   finalBsdaId: finalBsda2.id,
-                  operationCode: "D 5",
-                  quantity: 2
+                  operationCode: finalBsda2.destinationOperationCode!,
+                  quantity: finalBsda2.destinationReceptionWeight!
                 }
               ]
             }
@@ -192,7 +198,7 @@ describe("toOutgoingWaste", () => {
         }
       });
       const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
-        where: { id: form.id },
+        where: { id: bsda.id },
         include: RegistryBsdaInclude
       });
       const waste = toOutgoingWaste(bsdaForRegistry);
@@ -200,7 +206,52 @@ describe("toOutgoingWaste", () => {
         "R 5",
         "D 5"
       ]);
-      expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([
+        0.001, 0.002
+      ]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([
+        finalBsda1.destinationCompanySiret,
+        finalBsda2.destinationCompanySiret
+      ]);
+    }
+  );
+
+  test(
+    "destinationFinalOperationCodes and destinationfinalOperationWeights should be empty" +
+      " when bsda has a final operation",
+    async () => {
+      const bsda = await bsdaFactory({
+        opt: {
+          destinationOperationCode: "R 5",
+          destinationOperationSignatureDate: new Date()
+        }
+      });
+
+      await prisma.bsda.update({
+        where: { id: bsda.id },
+        data: {
+          finalOperations: {
+            createMany: {
+              data: [
+                {
+                  finalBsdaId: bsda.id,
+                  operationCode: bsda.destinationOperationCode!,
+                  quantity: bsda.destinationReceptionWeight!
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id },
+        include: RegistryBsdaInclude
+      });
+      const waste = toOutgoingWaste(bsdaForRegistry);
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([]);
     }
   );
 
@@ -346,23 +397,29 @@ describe("toAllWaste", () => {
     "should compute destinationFinalOperationCodes" +
       " and destinationfinalOperationWeights",
     async () => {
-      const finalBsda1 = await bsdaFactory({});
-      const finalBsda2 = await bsdaFactory({});
+      const finalBsda1 = await bsdaFactory({
+        opt: { destinationOperationCode: "R 5", destinationReceptionWeight: 1 }
+      });
+      const finalBsda2 = await bsdaFactory({
+        opt: { destinationOperationCode: "D 5", destinationReceptionWeight: 2 }
+      });
 
       const form = await bsdaFactory({
         opt: {
+          destinationOperationCode: "D 13",
+          destinationOperationSignatureDate: new Date(),
           finalOperations: {
             createMany: {
               data: [
                 {
                   finalBsdaId: finalBsda1.id,
-                  operationCode: "R 5",
-                  quantity: 1
+                  operationCode: finalBsda1.destinationOperationCode!,
+                  quantity: finalBsda1.destinationReceptionWeight!
                 },
                 {
                   finalBsdaId: finalBsda2.id,
-                  operationCode: "D 5",
-                  quantity: 2
+                  operationCode: finalBsda2.destinationOperationCode!,
+                  quantity: finalBsda2.destinationReceptionWeight!
                 }
               ]
             }
@@ -378,7 +435,52 @@ describe("toAllWaste", () => {
         "R 5",
         "D 5"
       ]);
-      expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([
+        0.001, 0.002
+      ]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([
+        finalBsda1.destinationCompanySiret,
+        finalBsda2.destinationCompanySiret
+      ]);
+    }
+  );
+
+  test(
+    "destinationFinalOperationCodes and destinationfinalOperationWeights should be empty" +
+      " when bsda has a final operation",
+    async () => {
+      const bsda = await bsdaFactory({
+        opt: {
+          destinationOperationCode: "R 5",
+          destinationOperationSignatureDate: new Date()
+        }
+      });
+
+      await prisma.bsda.update({
+        where: { id: bsda.id },
+        data: {
+          finalOperations: {
+            createMany: {
+              data: [
+                {
+                  finalBsdaId: bsda.id,
+                  operationCode: bsda.destinationOperationCode!,
+                  quantity: bsda.destinationReceptionWeight!
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id },
+        include: RegistryBsdaInclude
+      });
+      const waste = toAllWaste(bsdaForRegistry);
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([]);
     }
   );
 
