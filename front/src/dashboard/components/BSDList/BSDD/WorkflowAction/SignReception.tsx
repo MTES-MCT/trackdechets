@@ -27,6 +27,7 @@ import {
 } from "../../../../../form/bsdd/utils/queries";
 import { useParams } from "react-router-dom";
 import { multiplyByRounded } from "../../../../../common/helper";
+import Decimal from "decimal.js";
 
 const getSchema = () =>
   z
@@ -289,7 +290,10 @@ function SignReceptionModal({
     !receivedWeight || ["ACCEPTED", "REFUSED"].includes(acceptationStatus);
 
   const acceptedWeight = receivedWeight
-    ? receivedWeight - (refusedWeight ?? 0)
+    ? new Decimal(receivedWeight)
+        .minus(refusedWeight ?? 0)
+        .toDecimalPlaces(6)
+        .toNumber()
     : 0;
 
   const today = new Date();
@@ -573,10 +577,17 @@ function SignReceptionModal({
       )}
 
       <div className="dsfr-modal-actions fr-mt-3w">
-        <Button disabled={isSubmitting} priority="secondary" onClick={onCancel}>
+        <Button
+          disabled={isSubmitting || loading}
+          priority="secondary"
+          onClick={onCancel}
+        >
           Annuler
         </Button>
-        <Button type="submit" disabled={isSubmitting || !isFormValid}>
+        <Button
+          type="submit"
+          disabled={isSubmitting || loading || !isFormValid}
+        >
           {loading ? "Signature en cours..." : "Valider"}
         </Button>
       </div>
