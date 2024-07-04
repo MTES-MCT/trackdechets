@@ -141,7 +141,6 @@ export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCustomInfo: bsvhu.destinationCustomInfo,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     ...getOperationData(bsvhu)
   };
@@ -183,7 +182,6 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
-    emitterCustomInfo: bsvhu.emitterCustomInfo,
     ...getOperationData(bsvhu)
   };
 }

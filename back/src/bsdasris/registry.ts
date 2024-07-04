@@ -189,7 +189,6 @@ export function toIncomingWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCustomInfo: bsdasri.destinationCustomInfo,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     ...getOperationData(bsdasri)
   };
@@ -246,7 +245,6 @@ export function toOutgoingWaste(
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
-    emitterCustomInfo: bsdasri.emitterCustomInfo,
     ...getOperationData(bsdasri),
     ...getFinalOperationsData(bsdasri)
   };

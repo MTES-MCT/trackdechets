@@ -204,9 +204,6 @@ type IncomingWaste {
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
-  "Extra - Champ libre fourni par le destinataire (tous les bordereaux sauf BSDD)"
-  destinationCustomInfo: String
-
   "Extra - N° de CAP (Certificat d'acceptation préalable)"
   destinationCap: String
 
@@ -518,9 +515,6 @@ type OutgoingWaste {
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
-  "Extra - Champ libre fourni par l'expéditeur (tous les bordereaux sauf BSDD)"
-  emitterCustomInfo: String
-
   "Extra - N° de CAP (Certificat d'acceptation préalable)"
   destinationCap: String
 
@@ -812,9 +806,6 @@ type TransportedWaste {
 
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
-
-  "Extra - Champ libre fourni par le transporteur (tous les bordereaux sauf BSDD)"
-  transporterCustomInfo: String
 
   "Extra - Adresse email de contact du transporteur"
   transporterCompanyMail: String

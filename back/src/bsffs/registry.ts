@@ -204,7 +204,6 @@ export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCustomInfo: bsff.destinationCustomInfo,
     emitterCompanyMail: bsff.emitterCompanyMail,
     ...getOperationData(bsff)
   };
@@ -272,7 +271,6 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toNumber()
       : null,
-    emitterCustomInfo: bsff.emitterCustomInfo,
     ...getOperationData(bsff),
     ...getFinalOperationsData(bsff)
   };

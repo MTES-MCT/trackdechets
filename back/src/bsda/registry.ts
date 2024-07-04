@@ -286,7 +286,6 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: null,
-    destinationCustomInfo: bsda.destinationCustomInfo,
     emitterCompanyMail: bsda.emitterCompanyMail,
     ...getOperationData(bsda),
     nextDestinationProcessingOperation:
@@ -355,7 +354,6 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toNumber()
       : null,
-    emitterCustomInfo: bsda.emitterCustomInfo,
     ...getOperationData(bsda),
     ...getFinalOperationsData(bsda),
     nextDestinationProcessingOperation:

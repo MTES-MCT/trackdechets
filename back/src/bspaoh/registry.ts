@@ -169,8 +169,6 @@ export function toIncomingWaste(
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationOperationCode: bspaoh.destinationOperationCode,
     destinationOperationMode: "ELIMINATION",
-
-    destinationCustomInfo: bspaoh.destinationCustomInfo,
     emitterCompanyMail: bspaoh.emitterCompanyMail,
     transporterCompanyMail: transporter?.transporterCompanyMail
   };
@@ -218,7 +216,6 @@ export function toOutgoingWaste(
     weight: bspaoh.emitterWasteWeightValue
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,
-    emitterCustomInfo: bspaoh.emitterCustomInfo,
     transporterCompanyMail: transporter?.transporterCompanyMail
   };
 }
@@ -266,7 +263,6 @@ export function toTransportedWaste(
     destinationCompanyName: bspaoh.destinationCompanyName,
     destinationCompanySiret: bspaoh.destinationCompanySiret,
     destinationCompanyAddress: bspaoh.destinationCompanyAddress,
-    transporterCustomInfo: transporter?.transporterCustomInfo,
     emitterCompanyMail: bspaoh.emitterCompanyMail
   };
 }

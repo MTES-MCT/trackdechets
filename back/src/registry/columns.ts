@@ -174,7 +174,6 @@ export const columns: Column[] = [
     field: "initialEmitterCompanyAddress",
     label: "Producteur initial adresse"
   },
-  { field: "emitterCustomInfo", label: "Champ libre expéditeur" },
   { field: "emitterCompanyName", label: "Expéditeur raison sociale" },
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },
   { field: "emitterCompanyAddress", label: "Expéditeur adresse" },
@@ -239,11 +238,6 @@ export const columns: Column[] = [
     label: "Intermédiaire n°3 - Raison sociale"
   },
   { field: "intermediary3CompanySiret", label: "Intermédiaire n°3 - SIRET" },
-
-  {
-    field: "transporterCustomInfo",
-    label: "Champ libre transporteur"
-  },
   { field: "transporterCompanyName", label: "Transporteur raison sociale" },
   {
     field: "transporterCompanySiret",
@@ -275,10 +269,6 @@ export const columns: Column[] = [
 
   { field: "wasteAdr", label: "ADR" },
   // Destination du déchet
-  {
-    field: "destinationCustomInfo",
-    label: "Champ libre destination"
-  },
   { field: "destinationCap", label: "CAP" },
   { field: "destinationCompanyName", label: "Destination raison sociale" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },
