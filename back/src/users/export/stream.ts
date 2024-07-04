@@ -16,7 +16,7 @@ export class MyCompaniesReader extends Readable {
   }
 }
 export interface MyCompaniesReaderArgs {
-  userId: string;
+  companyIds: string[];
   chunk?: number;
 }
 
@@ -36,22 +36,13 @@ export type CompanyWithUsers = Prisma.CompanyGetPayload<{
  * qui leurs sont associés en paginant
  */
 export function myCompaniesReader({
-  userId,
+  companyIds,
   chunk = 100
 }: MyCompaniesReaderArgs): Readable {
   const stream = new MyCompaniesReader({
     objectMode: true,
     async read(this) {
-      // Liste tous les établissements auxquels appartient l'utilisateur
-      const associations = await prisma.companyAssociation.findMany({
-        where: { userId },
-        select: { companyId: true }
-      });
-
-      const companyIds = associations.map(a => a.companyId);
-
       const totalCount = companyIds.length;
-
       const { edges, pageInfo } = await getConnection({
         totalCount,
         findMany: prismaPaginationArgs =>
@@ -75,6 +66,7 @@ export function myCompaniesReader({
             ]
           }),
         first: chunk,
+        ...(this.after ? { after: this.after } : {}),
         formatNode: (company: CompanyWithUsers) => company
       });
 
