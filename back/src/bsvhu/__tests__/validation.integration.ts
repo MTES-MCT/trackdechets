@@ -390,11 +390,11 @@ describe("BSVHU validation", () => {
       expect(res).not.toBeUndefined();
     });
 
-    test("should work if operation mode is missing but step is not operation", async () => {
+    test("should work if operation code & mode are missing", async () => {
       const data = {
         ...bsvhu,
-        destinationOperationCode: "R 4",
-        destinationOperationMode: undefined, // Correct mode is REUTILISATION | RECYCLAGE
+        destinationOperationCode: undefined,
+        destinationOperationMode: undefined,
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED"
       };

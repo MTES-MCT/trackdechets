@@ -51,7 +51,7 @@ export function graphiqlLandingPagePlugin(): ApolloServerPlugin {
     ></script>
     <link
       rel="stylesheet"
-      href="https://unpkg.com/graphiql/graphiql.min.css"
+      href="https://unpkg.com/graphiql@3.2.0/graphiql.min.css"
       crossorigin
       integrity="sha256-wTzfn13a+pLMB5rMeysPPR1hO7x0SwSeQI+cnw7VdbE="
     />
@@ -59,7 +59,7 @@ export function graphiqlLandingPagePlugin(): ApolloServerPlugin {
       These are imports for the GraphIQL Explorer plugin.
      -->
     <script
-      src="https://unpkg.com/@graphiql/plugin-explorer/dist/index.umd.js"
+      src="https://unpkg.com/@graphiql/plugin-explorer@2.0.0/dist/index.umd.js"
       crossorigin
       integrity="sha256-/KjN0AtQm74p7exR84hK/woqhc2pYBdNQamcxHOkiDA="
     ></script>

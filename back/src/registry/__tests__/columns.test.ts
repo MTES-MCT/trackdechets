@@ -108,7 +108,7 @@ describe("formatRow", () => {
       "Courtier N°récepissé": "broker_recepisse",
       "Transporteur adresse": "transporter address",
       "Transporteur raison sociale": "transporter name",
-      "Transporteur SIRET ou numéro de TVA le cas échéant": "transporter siret",
+      "Transporteur SIRET ou n° de TVA intracommunautaire": "transporter siret",
       "Transporteur récépissé": "transporter recepisse",
       "Transporteur exemption de récépissé": "O",
       "Transporteur mode de transport": "Route",

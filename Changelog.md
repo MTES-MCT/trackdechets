@@ -16,6 +16,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correctif de la mise à jour d'un paoh depuis la modale de publication [PR 3390](https://github.com/MTES-MCT/trackdechets/pull/3390)
 - Appliquer le traitement d'Annexes 2 récursivement [PR 3402](https://github.com/MTES-MCT/trackdechets/pull/3402)
+- Le champ allowBsdasriTakeOverWithoutSignature est désormais retourné par la requête companyInfos même pour des entreprises non-diffusibles [PR 3399](https://github.com/MTES-MCT/trackdechets/pull/3399)
+- Le volume total d'un DASRI est désormais un Float, et déprécié [PR 3398](https://github.com/MTES-MCT/trackdechets/pull/3398)
+- Une déchetterie (WASTE_CENTER) non vérifiée peut désormais créer un BSDA COLLECTION_2710 [PR 3436](https://github.com/MTES-MCT/trackdechets/pull/3436)
 
 #### :boom: Breaking changes
 
@@ -25,6 +28,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout d'informations relatives au transport sur l'ensemble des registres [PR 3409](https://github.com/MTES-MCT/trackdechets/pull/3409)
 - Ajout d'informations relatives à la localisation des terres (parcelles) sur les registres Entrant, Sortant, Exhaustif et Gestion [PR 3410](https://github.com/MTES-MCT/trackdechets/pull/3410)
 - Permettre la révision des DASRI de synthèse et de groupement [PR 3407](https://github.com/MTES-MCT/trackdechets/pull/3407)
+- Ajout des informations relatives à l'installation de destination post-entreposage provisoire dans le registre sortant et exhaustif [PR 3349](https://github.com/MTES-MCT/trackdechets/pull/3349)
+- Ajout des informations relatives à l'envoi à l'étranger sur les registres Entrant, Sortant, Exhaustif & Gestion, pour les BSDD & BSDA [PR 3372](https://github.com/MTES-MCT/trackdechets/pull/3372)
+- Ajout du SIRET et de la Raison sociale des 3 intermédiaires sur le registre exhaustif [PR 3367](https://github.com/MTES-MCT/trackdechets/pull/3367)
+- Ajout d'une colonne avec l'adresse email du destinataire, négociant & courtier dans tous les registres [PR 3392](https://github.com/MTES-MCT/trackdechets/pull/3392)
 
 #### :house: Interne
 

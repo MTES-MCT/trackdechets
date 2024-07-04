@@ -11,7 +11,13 @@ import {
 import { getSignatureAncestors } from "./helpers";
 import { capitalize } from "../../common/strings";
 import { isArray } from "../../common/dataTypes";
-import { Bsda, BsdaStatus, BsdaType } from "@prisma/client";
+import {
+  Bsda,
+  BsdaStatus,
+  BsdaType,
+  Company,
+  CompanyType
+} from "@prisma/client";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { getReadonlyBsdaRepository } from "../repository";
 import { getOperationModesFromOperationCode } from "../../common/operationModes";
@@ -309,10 +315,26 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
   bsda,
   zodContext
 ) => {
-  await isDestinationRefinement(bsda.destinationCompanySiret, zodContext);
+  const isBsdaDestinationExemptFromVerification = (
+    destination: Company | null
+  ) => {
+    if (!destination) return false;
+
+    return (
+      bsda.type === BsdaType.COLLECTION_2710 &&
+      destination.companyTypes.includes(CompanyType.WASTE_CENTER)
+    );
+  };
+
+  await isDestinationRefinement(
+    bsda.destinationCompanySiret,
+    zodContext,
+    isBsdaDestinationExemptFromVerification
+  );
   await isDestinationRefinement(
     bsda.destinationOperationNextDestinationCompanySiret,
-    zodContext
+    zodContext,
+    isBsdaDestinationExemptFromVerification
   );
   for (const transporter of bsda.transporters ?? []) {
     await isTransporterRefinement(

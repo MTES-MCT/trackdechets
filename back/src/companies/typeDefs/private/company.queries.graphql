@@ -37,4 +37,6 @@ type Query {
     """
     clue: String!
   ): CompanySearchPrivate!
+
+  companyExhaustive(siret: String!): CompanyExhaustive!
 }
