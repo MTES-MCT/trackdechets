@@ -1,85 +1,41 @@
 import { useMutation } from "@apollo/client";
-import { Field, Form, Formik } from "formik";
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import * as yup from "yup";
-import classNames from "classnames";
-import {
-  FieldSwitch,
-  RedErrorMessage
-} from "../../../../../../common/components";
-import Packagings, {
-  PACKAGINGS_NAMES
-} from "../../../../../../form/bsda/components/packagings/Packagings";
-import { getInitialCompany } from "../../../../../../form/bsdd/utils/initial-state";
-import CompanySelector from "../../../../../../form/common/components/company/CompanySelector";
-import DateInput from "../../../../../../form/common/components/custom-inputs/DateInput";
-import NumberInput from "../../../../../../form/common/components/custom-inputs/NumberInput";
-import WorkSiteAddress from "../../../../../../form/common/components/work-site/WorkSiteAddress";
+import Button from "@codegouvfr/react-dsfr/Button";
+import Input from "@codegouvfr/react-dsfr/Input";
+import Select from "@codegouvfr/react-dsfr/Select";
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Bsda,
+  FavoriteType,
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-ui";
-import { removeEmptyKeys } from "../../../../../../common/helper";
-import { ReviewableField } from "../../bsdd/request/ReviewableField";
-import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
-import styles from "./BsdaRequestRevision.module.scss";
 import { BSDA_WASTES } from "@td/constants";
+import React, { useMemo, useState } from "react";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
+import { z } from "zod";
+import { removeEmptyKeys } from "../../../../../../common/helper";
+import WorkSiteAddress from "../../../../../../form/common/components/work-site/WorkSiteAddress";
+import RhfCompanyContactInfo from "../../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
+import { Loader } from "../../../../../common/Components";
+import RhfCompanySelectorWrapper from "../../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
+import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
+import { BsdTypename } from "../../../../../common/types/bsdTypes";
+import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
+import { PACKAGINGS_BSD_NAMES } from "../../common/Components/Packagings/packagings";
+import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
+import {
+  initialBsdaReview,
+  validationBsdaSchema
+} from "../../common/utils/schema";
 import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCancelationInput";
-import OperationModeSelect from "../../../../../../common/components/OperationModeSelect";
-import TagsInput from "../../../../../../common/components/tags-input/TagsInput";
-
+import TagsInput from "../../../../../Forms/Components/TagsInput/TagsInput";
+import styles from "./BsdaRequestRevision.module.scss";
 type Props = {
   bsda: Bsda;
 };
-
-const initialReview = {
-  emitter: {
-    pickupSite: {
-      name: "",
-      address: "",
-      city: "",
-      postalCode: "",
-      infos: ""
-    }
-  },
-  waste: {
-    code: "",
-    pop: "",
-    sealNumbers: [],
-    materialName: ""
-  },
-  packagings: [],
-  broker: {
-    company: getInitialCompany(),
-    recepisse: {
-      number: "",
-      department: "",
-      validityLimit: null
-    }
-  },
-  destination: {
-    cap: "",
-    reception: {
-      weight: null
-    },
-    operation: {
-      code: "",
-      mode: null,
-      description: ""
-    }
-  },
-  isCanceled: false
-};
-
-const validationSchema = yup.object({
-  comment: yup
-    .string()
-    .required(
-      "Vous devez ajouter un commentaire expliquant la demande de révision"
-    )
-});
 
 export function BsdaRequestRevision({ bsda }: Props) {
   const { siret } = useParams<{ siret: string }>();
@@ -88,6 +44,109 @@ export function BsdaRequestRevision({ bsda }: Props) {
     Pick<Mutation, "createBsdaRevisionRequest">,
     MutationCreateBsdaRevisionRequestArgs
   >(CREATE_BSDA_REVISION_REQUEST);
+  const [sealNumbersTags, setSealNumbersTags] = useState<string[]>([]);
+
+  type ValidationSchema = z.infer<typeof validationBsdaSchema>;
+
+  const methods = useForm<ValidationSchema>({
+    mode: "onTouched",
+    defaultValues: initialBsdaReview,
+    resolver: zodResolver(validationBsdaSchema)
+  });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting, isDirty }
+  } = methods;
+
+  const resetAndClose = () => {
+    reset();
+    navigate(-1);
+  };
+
+  const onSubmitForm = async data => {
+    const { comment, ...content } = data;
+    const cleanedContent = removeEmptyKeys(content);
+
+    await createBsdaRevisionRequest({
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: cleanedContent ?? {},
+          comment,
+          authoringCompanySiret: siret!
+        }
+      }
+    });
+    navigate(-1);
+  };
+
+  const onSubmit: SubmitHandler<ValidationSchema> = async data => {
+    await onSubmitForm(data);
+    resetAndClose();
+  };
+
+  // live form values
+  const formValues = watch();
+
+  const areModificationsDisabled = formValues.isCanceled;
+
+  const orgId = useMemo(
+    () => bsda?.broker?.company?.orgId ?? bsda?.broker?.company?.siret ?? null,
+    [bsda?.broker?.company?.orgId, bsda?.broker?.company?.siret]
+  );
+
+  const onCompanyBrokerSeleted = company => {
+    const field = "broker";
+    if (company) {
+      setValue(`${field}.company.orgId`, company.orgId);
+      setValue(`${field}.company.siret`, company.siret);
+      setValue(`${field}.company.name`, company.name);
+      setValue(`${field}.company.vatNumber`, company.vatNumber);
+      setValue(`${field}.company.address`, company.address);
+      setValue(
+        `${field}.company.contact`,
+        company.contact || bsda.broker?.company?.contact
+      );
+      setValue(
+        `${field}.company.phone`,
+        company.contactPhone || bsda.broker?.company?.phone
+      );
+
+      setValue(
+        `${field}.company.mail`,
+        company.contactEmail || bsda.broker?.company?.mail
+      );
+    }
+    const receipt = company?.brokerReceipt;
+    if (receipt) {
+      setValue(`${field}.receipt`, receipt.receiptNumber);
+      setValue(`${field}.validityLimit`, receipt.validityLimit);
+      setValue(`${field}.department`, receipt.department);
+    } else {
+      setValue(`${field}.receipt`, "");
+      setValue(`${field}.validityLimit`, null);
+      setValue(`${field}.department`, "");
+    }
+  };
+
+  const handleAddSealNumbers = value => {
+    if (value && !bsda.waste?.sealNumbers?.includes(value)) {
+      setSealNumbersTags([...sealNumbersTags, value]);
+      setValue("waste.sealNumbers", [...sealNumbersTags, value]);
+    }
+  };
+
+  const dismissTag = plateTagIdx => {
+    const newPlates = sealNumbersTags.filter(
+      p => p !== sealNumbersTags[plateTagIdx]
+    );
+    setSealNumbersTags(newPlates);
+    setValue("waste.sealNumbers", newPlates);
+  };
 
   return (
     <div className={styles.container}>
@@ -95,373 +154,328 @@ export function BsdaRequestRevision({ bsda }: Props) {
         Demander une révision du bordereau {bsda.id}
       </h2>
 
-      <Formik
-        initialValues={{ comment: "", content: initialReview }}
-        validationSchema={validationSchema}
-        onSubmit={async ({ content, comment }) => {
-          let cleanedContent;
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className={styles.fields}>
+            <BsdaRequestRevisionCancelationInput
+              bsda={bsda}
+              onChange={value => setValue("isCanceled", value)}
+            />
 
-          if (content.isCanceled) cleanedContent = { isCanceled: true };
-          else cleanedContent = removeEmptyKeys(content);
+            <div
+              style={{
+                display: areModificationsDisabled ? "none" : "inline"
+              }}
+            >
+              <hr />
+              <RhfReviewableField
+                title="Code déchet"
+                path="waste.code"
+                value={bsda.waste?.code}
+                defaultValue={initialBsdaReview.waste.code}
+              >
+                <Select
+                  label="Code déchet"
+                  className="fr-col-8"
+                  nativeSelectProps={{
+                    ...register("waste.code")
+                  }}
+                >
+                  <option />
+                  {BSDA_WASTES.map(item => (
+                    <option value={item.code} key={item.code}>
+                      {item.code} - {item.description}
+                    </option>
+                  ))}
+                </Select>
+              </RhfReviewableField>
 
-          await createBsdaRevisionRequest({
-            variables: {
-              input: {
-                bsdaId: bsda.id,
-                content: cleanedContent ?? {},
-                comment,
-                authoringCompanySiret: siret!
-              }
-            }
-          });
-          navigate(-1);
-        }}
-      >
-        {({ setFieldValue, values }) => {
-          // One cannot ask for cancelation AND modifications, they are exclusive
-          const areModificationsDisabled = values.content.isCanceled;
-
-          return (
-            <Form>
-              <div className={styles.fields}>
-                <BsdaRequestRevisionCancelationInput
-                  bsda={bsda}
-                  defaultValue={initialReview.isCanceled}
-                  onChange={value => setFieldValue("content.isCanceled", value)}
+              <RhfReviewableField
+                title="Nom usuel du déchet"
+                path="waste.sealNumbers"
+                value={bsda.waste?.sealNumbers}
+                defaultValue={initialBsdaReview.waste.sealNumbers}
+              >
+                <Input
+                  label="Nom usuel du déchet"
+                  className="fr-col-8"
+                  nativeInputProps={{
+                    ...register("waste.materialName")
+                  }}
                 />
+              </RhfReviewableField>
 
-                <div
-                  style={{
-                    display: areModificationsDisabled ? "none" : "inline"
+              <RhfReviewableField
+                title="Numéros de scellés"
+                path="waste.sealNumbers"
+                value={bsda.waste?.sealNumbers?.join(", ")}
+                defaultValue={initialBsdaReview.waste.sealNumbers}
+              >
+                <div className="fr-col-8">
+                  <TagsInput
+                    label="Numéros de scellés"
+                    onAddTag={handleAddSealNumbers}
+                    onDeleteTag={dismissTag}
+                    tags={sealNumbersTags}
+                  />
+                </div>
+              </RhfReviewableField>
+
+              <RhfReviewableField
+                title="Contient des polluants organique persistant"
+                path="waste.pop"
+                value={Boolean(bsda.waste?.pop) ? "Oui" : "Non"}
+                defaultValue={initialBsdaReview.waste.pop}
+              >
+                <ToggleSwitch
+                  label="Le déchet contient des polluants organiques persistants"
+                  checked={Boolean(formValues.waste?.pop)}
+                  showCheckedHint={false}
+                  onChange={checked => {
+                    return setValue("waste.pop", checked, {
+                      shouldDirty: true
+                    });
+                  }}
+                />
+              </RhfReviewableField>
+
+              <RhfReviewableField
+                title="CAP"
+                value={bsda.destination?.cap}
+                path="destination.cap"
+                defaultValue={initialBsdaReview.destination.cap}
+              >
+                <Input
+                  label="Numéro de CAP"
+                  className="fr-col-6"
+                  nativeInputProps={{
+                    ...register("destination.cap")
+                  }}
+                />
+              </RhfReviewableField>
+
+              <RhfReviewableField
+                title="Conditionnement"
+                path="packagings"
+                value={bsda.packagings
+                  ?.map(
+                    p =>
+                      `${p.quantity} ${
+                        PACKAGINGS_BSD_NAMES[BsdTypename.Bsda][p.type]
+                      }`
+                  )
+                  .join(", ")}
+                defaultValue={initialBsdaReview.packagings}
+                initialValue={bsda.packagings}
+              >
+                <BsdPackagings path="packagings" bsdType={BsdTypename.Bsda} />
+              </RhfReviewableField>
+
+              <RhfReviewableField
+                title="Quantité traitée (en tonnes)"
+                path="destination.reception.weight"
+                value={bsda.destination?.reception?.weight}
+                defaultValue={initialBsdaReview.destination?.reception?.weight}
+              >
+                <Input
+                  label="Poids en tonnes"
+                  className="fr-col-2"
+                  state={errors.destination?.reception?.weight && "error"}
+                  stateRelatedMessage={
+                    errors.destination?.reception?.weight?.message ?? ""
+                  }
+                  nativeInputProps={{
+                    ...register("destination.reception.weight", {
+                      valueAsNumber: true
+                    }),
+                    type: "number"
+                  }}
+                />
+                {formValues.destination?.reception?.weight && (
+                  <p className="fr-info-text">
+                    Soit{" "}
+                    {Number(formValues.destination?.reception?.weight) * 1000}
+                    kg
+                  </p>
+                )}
+              </RhfReviewableField>
+
+              <RhfReviewableField
+                title="Code de l'opération D/R"
+                path="destination.operation.code"
+                value={bsda.destination?.operation?.code}
+                defaultValue={initialBsdaReview.destination?.operation?.code}
+              >
+                <Select
+                  label="Code de l'opération"
+                  className="fr-col-8"
+                  nativeSelectProps={{
+                    ...register("destination.operation.code")
                   }}
                 >
-                  <hr />
+                  <option value="...">Sélectionnez une valeur...</option>
+                  <option value="R 5">
+                    R 5 - Recyclage ou récupération d'autres matières
+                    inorganiques (dont vitrification)
+                  </option>
+                  <option value="D 5">
+                    D 5 - Mise en décharge aménagée et autorisée en ISDD ou
+                    ISDND
+                  </option>
+                  <option value="D 9">
+                    D 9 - Traitement chimique ou prétraitement (dont
+                    vitrification)
+                  </option>
+                  <option value="R 13">
+                    R 13 - Opérations de transit incluant le groupement sans
+                    transvasement préalable à R 5
+                  </option>
+                  <option value="D 15">
+                    D 15 - Transit incluant le groupement sans transvasement
+                  </option>
+                </Select>
+                <RhfOperationModeSelect
+                  operationCode={formValues?.destination?.operation?.code}
+                  path={"destination.operation.code"}
+                />
+              </RhfReviewableField>
 
-                  <ReviewableField
-                    title="Code déchet"
-                    value={bsda.waste?.code}
-                    name="content.waste.code"
-                    defaultValue={initialReview.waste.code}
-                  >
-                    <Field
-                      as="select"
-                      name="content.waste.code"
-                      className="td-select"
-                    >
-                      <option />
-                      {BSDA_WASTES.map(item => (
-                        <option value={item.code} key={item.code}>
-                          {item.code} - {item.description}
-                        </option>
-                      ))}
-                    </Field>
-                  </ReviewableField>
+              <RhfReviewableField
+                title="Description de l'opération D/R"
+                path="destination.operation.description"
+                value={bsda.destination?.operation?.description}
+                defaultValue={
+                  initialBsdaReview.destination?.operation?.description
+                }
+              >
+                <Input
+                  label="Description de l'opération D/R"
+                  nativeInputProps={{
+                    ...register("destination.operation.description")
+                  }}
+                  className="fr-col-8"
+                />
+              </RhfReviewableField>
 
-                  <ReviewableField
-                    title="Description du déchet"
-                    value={bsda.waste?.materialName}
-                    name="content.waste.materialName"
-                    defaultValue={initialReview.waste.materialName}
-                  >
-                    <Field
-                      name="content.waste.materialName"
-                      className="td-input td-input--medium"
-                    />
-                  </ReviewableField>
+              <RhfReviewableField
+                title="Courtier"
+                path="broker"
+                value={
+                  bsda.broker?.company?.name ? (
+                    <div>{bsda.broker.company.name}</div>
+                  ) : (
+                    "Aucun"
+                  )
+                }
+                defaultValue={initialBsdaReview.broker}
+              >
+                <RhfCompanySelectorWrapper
+                  orgId={siret}
+                  favoriteType={FavoriteType.Broker}
+                  onCompanySelected={onCompanyBrokerSeleted}
+                />
+                <RhfCompanyContactInfo
+                  fieldName={"broker.company"}
+                  key={orgId}
+                />
+                <Input
+                  label="Numéro de récépissé"
+                  nativeInputProps={{
+                    ...register("broker.receipt")
+                  }}
+                  className="fr-col-6"
+                />
+                <Input
+                  label="Département"
+                  nativeInputProps={{
+                    ...register("broker.department")
+                  }}
+                  className="fr-col-6"
+                />
+                <Input
+                  label="Limite de validité"
+                  nativeInputProps={{
+                    type: "date",
+                    ...register("broker.validityLimit")
+                  }}
+                />
+              </RhfReviewableField>
 
-                  <ReviewableField
-                    title="Numéros de scellés"
-                    value={bsda.waste?.sealNumbers?.join(", ")}
-                    name="content.waste.sealNumbers"
-                    defaultValue={initialReview.waste.sealNumbers}
-                  >
-                    <TagsInput name="content.waste.sealNumbers" />
-                  </ReviewableField>
-
-                  <ReviewableField
-                    title="Présence de polluants organiques persistants"
-                    value={Boolean(bsda.waste?.pop) ? "Oui" : "Non"}
-                    name="content.waste.pop"
-                    defaultValue={initialReview.waste.pop}
-                  >
-                    <Field
-                      type="checkbox"
-                      component={FieldSwitch}
-                      name="content.waste.pop"
-                      label=""
-                    />{" "}
-                    {Boolean(values.content.waste.pop) ? "Oui" : "Non"}
-                  </ReviewableField>
-
-                  <ReviewableField
-                    title="CAP"
-                    value={bsda.destination?.cap}
-                    name="content.destination.cap"
-                    defaultValue={initialReview.destination.cap}
-                  >
-                    <Field
-                      name="content.destination.cap"
-                      className="td-input td-input--medium"
-                    />
-                  </ReviewableField>
-
-                  <ReviewableField
-                    title="Conditionnement"
-                    value={bsda.packagings
-                      ?.map(p => `${p.quantity} ${PACKAGINGS_NAMES[p.type]}`)
-                      .join(", ")}
-                    name="content.packagings"
-                    defaultValue={initialReview.packagings}
-                  >
-                    <Field name="content.packagings" component={Packagings} />
-                  </ReviewableField>
-
-                  <ReviewableField
-                    title="Quantité traitée (en tonnes)"
-                    value={bsda.destination?.reception?.weight}
-                    name="content.destination.reception.weight"
-                    defaultValue={initialReview.destination?.reception?.weight}
-                  >
-                    <Field
-                      name="content.destination.reception.weight"
-                      className="td-input td-input--small"
-                      component={NumberInput}
-                    />
-                  </ReviewableField>
-
-                  <ReviewableField
-                    title="Code de l'opération D/R"
-                    value={bsda.destination?.operation?.code}
-                    name="content.destination.operation.code"
-                    defaultValue={initialReview.destination?.operation?.code}
-                  >
-                    <Field
-                      as="select"
-                      name="content.destination.operation.code"
-                      className="td-select"
-                    >
-                      <option value="...">Sélectionnez une valeur...</option>
-                      <option value="R 5">
-                        R 5 - Recyclage ou récupération d'autres matières
-                        inorganiques (dont vitrification)
-                      </option>
-                      <option value="D 5">
-                        D 5 - Mise en décharge aménagée et autorisée en ISDD ou
-                        ISDND
-                      </option>
-                      <option value="D 9">
-                        D 9 - Traitement chimique ou prétraitement (dont
-                        vitrification)
-                      </option>
-                      <option value="R 13">
-                        R 13 - Opérations de transit incluant le groupement sans
-                        transvasement préalable à R 5
-                      </option>
-                      <option value="D 15">
-                        D 15 - Transit incluant le groupement sans transvasement
-                      </option>
-                    </Field>
-
-                    <OperationModeSelect
-                      operationCode={
-                        values?.content?.destination?.operation?.code
-                      }
-                      name="content.destination.operation.mode"
-                    />
-                  </ReviewableField>
-
-                  <ReviewableField
-                    title="Description de l'opération D/R"
-                    value={bsda.destination?.operation?.description}
-                    name="content.destination.operation.description"
-                    defaultValue={
-                      initialReview.destination?.operation?.description
-                    }
-                  >
-                    <Field
-                      name="content.destination.operation.description"
-                      className="td-input"
-                    />
-                  </ReviewableField>
-
-                  <ReviewableField
-                    title="Courtier"
-                    value={
-                      bsda.broker?.company?.name ? (
-                        <div>{bsda.broker.company.name}</div>
-                      ) : (
-                        "Aucun"
-                      )
-                    }
-                    name="content.broker"
-                    defaultValue={initialReview.broker}
-                  >
-                    <>
-                      <CompanySelector
-                        name="content.broker.company"
-                        onCompanySelected={broker => {
-                          if (broker?.brokerReceipt) {
-                            setFieldValue(
-                              "content.broker.recepisse.number",
-                              broker.brokerReceipt.receiptNumber
-                            );
-                            setFieldValue(
-                              "content.broker.recepisse.validityLimit",
-                              broker.brokerReceipt.validityLimit
-                            );
-                            setFieldValue(
-                              "content.broker.recepisse.department",
-                              broker.brokerReceipt.department
-                            );
-                          } else {
-                            setFieldValue(
-                              "content.broker.recepisse.number",
-                              ""
-                            );
-                            setFieldValue(
-                              "content.broker.recepisse.validityLimit",
-                              null
-                            );
-                            setFieldValue(
-                              "content.broker.recepisse.department",
-                              ""
-                            );
-                          }
-                        }}
-                      />
-                      <div className="form__row">
-                        <label>
-                          Numéro de récépissé
-                          <Field
-                            type="text"
-                            name="content.broker.recepisse.number"
-                            className="td-input"
-                          />
-                        </label>
-
-                        <RedErrorMessage name="content.broker.recepisse.number" />
-                      </div>
-                      <div className="form__row">
-                        <label>
-                          Département
-                          <Field
-                            type="text"
-                            name="content.broker.recepisse.department"
-                            placeholder="Ex: 83"
-                            className={classNames(
-                              "td-input",
-                              styles.recipientDepartment
-                            )}
-                          />
-                        </label>
-
-                        <RedErrorMessage name="content.broker.recepisse.department" />
-                      </div>
-                      <div className="form__row">
-                        <label>
-                          Limite de validité
-                          <Field
-                            component={DateInput}
-                            name="content.broker.recepisse.validityLimit"
-                            className={classNames(
-                              "td-input",
-                              styles.recipientValidityLimit
-                            )}
-                          />
-                        </label>
-
-                        <RedErrorMessage name="content.broker.recepisse.validityLimit" />
-                      </div>
-                    </>
-                  </ReviewableField>
-
-                  <ReviewableField
-                    title="Adresse de chantier ou de collecte"
-                    value={[
-                      bsda.emitter?.pickupSite?.address,
-                      bsda.emitter?.pickupSite?.postalCode,
-                      bsda.emitter?.pickupSite?.city
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                    name="content.emitter.pickupSite"
-                    defaultValue={initialReview.emitter?.pickupSite}
-                  >
-                    <div className="form__row">
-                      <WorkSiteAddress
-                        address={values.content?.emitter?.pickupSite?.address}
-                        city={values.content?.emitter?.pickupSite?.city}
-                        postalCode={
-                          values.content?.emitter?.pickupSite?.postalCode
-                        }
-                        onAddressSelection={details => {
-                          // `address` is passed as `name` because of adresse api return fields
-                          setFieldValue(
-                            `content.emitter.pickupSite.address`,
-                            details.name
-                          );
-                          setFieldValue(
-                            `content.emitter.pickupSite.city`,
-                            details.city
-                          );
-                          setFieldValue(
-                            `content.emitter.pickupSite.postalCode`,
-                            details.postcode
-                          );
-                        }}
-                        designation="du chantier ou lieu de collecte"
-                      />
-                    </div>
-
-                    <div className="form__row">
-                      <label>
-                        Informations complémentaires (optionnel)
-                        <Field
-                          component="textarea"
-                          className="textarea-pickup-site td-textarea"
-                          placeholder="Champ libre pour préciser..."
-                          name="content.emitter.pickupSite.infos"
-                        />
-                      </label>
-                    </div>
-                  </ReviewableField>
-                </div>
-
+              <RhfReviewableField
+                title="Adresse de chantier ou de collecte"
+                value={[
+                  bsda.emitter?.pickupSite?.address,
+                  bsda.emitter?.pickupSite?.postalCode,
+                  bsda.emitter?.pickupSite?.city
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                path="emitter.pickupSite"
+                defaultValue={initialBsdaReview.emitter?.pickupSite}
+              >
                 <div className="form__row">
-                  <label>Commentaire à propos de la révision</label>
-                  <Field name="comment" as="textarea" className="td-textarea" />
-                  <RedErrorMessage name="comment" />
+                  <WorkSiteAddress
+                    address={formValues?.emitter?.pickupSite?.address}
+                    city={formValues?.emitter?.pickupSite?.city}
+                    postalCode={formValues?.emitter?.pickupSite?.postalCode}
+                    onAddressSelection={details => {
+                      // `address` is passed as `name` because of adresse api return fields
+                      setValue("emitter.pickupSite.address", details.name);
+                      setValue("emitter.pickupSite.city", details.city);
+                      setValue(
+                        "emitter.pickupSite.postalCode",
+                        details.postcode
+                      );
+                    }}
+                    designation="du chantier ou lieu de collecte"
+                  />
                 </div>
-              </div>
 
-              {error && (
-                <div className="notification notification--warning">
-                  {error.message}
-                </div>
-              )}
-
-              <div className={styles.actions}>
-                <button
-                  className="btn btn--outline-primary"
-                  onClick={() => {
-                    navigate(-1);
+                <Input
+                  textArea
+                  label="Informations complémentaires (optionnel)"
+                  nativeTextAreaProps={{
+                    placeholder: "Champ libre pour préciser...",
+                    ...register("emitter.pickupSite.infos")
                   }}
-                  type="button"
-                >
-                  Annuler
-                </button>
-                <button
-                  className="btn btn--primary"
-                  type="submit"
-                  disabled={loading}
-                >
-                  Envoyer
-                </button>
-              </div>
-            </Form>
-          );
-        }}
-      </Formik>
+                />
+              </RhfReviewableField>
+            </div>
+          </div>
+          {areModificationsDisabled && <hr />}
+          <Input
+            textArea
+            label="Commentaire à propos de la révision"
+            state={errors?.comment && "error"}
+            stateRelatedMessage={(errors?.comment?.message as string) ?? ""}
+            nativeTextAreaProps={{
+              ...register("comment")
+            }}
+          />
+
+          {error && (
+            <div className="notification notification--warning">
+              {error.message}
+            </div>
+          )}
+          <div className={styles.cta}>
+            <Button
+              priority="secondary"
+              nativeButtonProps={{ type: "button" }}
+              onClick={resetAndClose}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="submit"
+              disabled={!isDirty || loading || isSubmitting}
+            >
+              Demander
+            </Button>
+            {(loading || isSubmitting) && <Loader />}
+          </div>
+        </form>
+      </FormProvider>
     </div>
   );
 }

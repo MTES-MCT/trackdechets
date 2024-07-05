@@ -4,6 +4,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import {
+  BsdaPackagingType,
   BsdasriPackagingType,
   Packagings as BsddPackagingsType
 } from "@td/codegen-ui";
@@ -26,9 +27,11 @@ const BsdPackaging = ({ bsdType, path, idx, remove, disabled }) => {
   useEffect(() => {
     // reset `other` detail field when packaging type is not `Autre`
     if (
-      ![BsdasriPackagingType.Autre, BsddPackagingsType.Autre].includes(
-        packagingType
-      )
+      ![
+        BsdasriPackagingType.Autre,
+        BsddPackagingsType.Autre,
+        BsdaPackagingType.Other
+      ].includes(packagingType)
     ) {
       setValue(`${name}.other`, "");
     }
@@ -99,9 +102,11 @@ const BsdPackaging = ({ bsdType, path, idx, remove, disabled }) => {
             label="Précisez"
             disabled={
               disabled ||
-              ![BsdasriPackagingType.Autre, BsddPackagingsType.Autre].includes(
-                getValues(`${name}.type`)
-              )
+              ![
+                BsdasriPackagingType.Autre,
+                BsddPackagingsType.Autre,
+                BsdaPackagingType.Other
+              ].includes(getValues(`${name}.type`))
             }
             state={otherError && "error"}
             stateRelatedMessage={(otherError?.message as string) ?? ""}
@@ -145,7 +150,7 @@ const BsdPackaging = ({ bsdType, path, idx, remove, disabled }) => {
 export const BsdPackagings = ({
   path,
   bsdType,
-  disabledAddCta,
+  disabledAddCta = false,
   disabled = false
 }) => {
   const { control } = useFormContext(); // retrieve  control for initial values

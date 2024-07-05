@@ -3,7 +3,8 @@ import {
   BsdasriPackagingType,
   Packagings,
   PackagingInfo,
-  FormInput
+  FormInput,
+  BsdaPackagingType
 } from "@td/codegen-ui";
 import { Decimal } from "decimal.js";
 import { BsdTypename } from "../../../../../../common/types/bsdTypes";
@@ -27,6 +28,14 @@ export const PACKAGINGS_BSD_NAMES = {
     [Packagings.Grv]: "GRV(s)",
     [Packagings.Pipeline]: "Conditionné pour Pipeline",
     [Packagings.Autre]: "Autre(s)"
+  },
+  [BsdTypename.Bsda]: {
+    [BsdaPackagingType.BigBag]: "Big-bag / GRV",
+    [BsdaPackagingType.DepotBag]: "Dépôt-bag",
+    [BsdaPackagingType.PaletteFilme]: "Palette filmée",
+    [BsdaPackagingType.SacRenforce]: "Sac renforcé",
+    [BsdaPackagingType.ConteneurBag]: "Conteneur-bag",
+    [BsdaPackagingType.Other]: "Autre(s)"
   }
 };
 
