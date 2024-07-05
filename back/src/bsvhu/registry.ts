@@ -24,17 +24,27 @@ const getOperationData = (bsvhu: Bsvhu) => ({
   destinationOperationMode: bsvhu.destinationOperationMode
 });
 
-const getTransporterData = (bsvhu: Bsvhu) => ({
-  transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
-  transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
-  transporterNumberPlates: bsvhu.transporterTransportPlates,
-  transporterCompanyName: bsvhu.transporterCompanyName,
-  transporterCompanySiret: bsvhu.transporterCompanySiret,
-  transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
-  transporterCompanyMail: bsvhu.transporterCompanyMail,
-  transporterCustomInfo: bsvhu.transporterCustomInfo,
-  transporterCompanyAddress: bsvhu.transporterCompanyAddress
-});
+const getTransporterData = (bsvhu: Bsvhu, includePlates = false) => {
+  const data = {
+    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
+    transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
+    transporterCompanyName: bsvhu.transporterCompanyName,
+    transporterCompanySiret: bsvhu.transporterCompanySiret,
+    transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
+    transporterCompanyMail: bsvhu.transporterCompanyMail,
+    transporterCustomInfo: bsvhu.transporterCustomInfo,
+    transporterCompanyAddress: bsvhu.transporterCompanyAddress
+  };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: bsvhu.transporterTransportPlates
+    };
+  }
+
+  return data;
+};
 
 export function getRegistryFields(
   bsvhu: Bsvhu
@@ -74,7 +84,7 @@ export function getRegistryFields(
   return registryFields;
 }
 
-function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
+export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
   return {
     wasteDescription: getWasteDescription(bsvhu.wasteCode),
     wasteCode: bsvhu.wasteCode,
@@ -101,7 +111,6 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransporterData(bsvhu),
     destinationCompanyMail: bsvhu.destinationCompanyMail
   };
 }
@@ -131,7 +140,8 @@ export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    ...getOperationData(bsvhu)
+    ...getOperationData(bsvhu),
+    ...getTransporterData(bsvhu)
   };
 }
 
@@ -160,7 +170,8 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
-    ...getOperationData(bsvhu)
+    ...getOperationData(bsvhu),
+    ...getTransporterData(bsvhu)
   };
 }
 
@@ -186,7 +197,8 @@ export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
-    emitterCompanyMail: bsvhu.emitterCompanyMail
+    emitterCompanyMail: bsvhu.emitterCompanyMail,
+    ...getTransporterData(bsvhu, true)
   };
 }
 
@@ -213,7 +225,8 @@ export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    emitterCompanyMail: bsvhu.emitterCompanyMail
+    emitterCompanyMail: bsvhu.emitterCompanyMail,
+    ...getTransporterData(bsvhu)
   };
 }
 
@@ -245,6 +258,7 @@ export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    ...getOperationData(bsvhu)
+    ...getOperationData(bsvhu),
+    ...getTransporterData(bsvhu, true)
   };
 }

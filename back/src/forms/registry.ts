@@ -48,55 +48,69 @@ const getOperationData = (bsdd: Bsdd) => ({
   destinationOperationMode: bsdd.destinationOperationMode
 });
 
-const getTransportersData = (bsdd: Bsdd) => ({
-  transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
-  transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
-  transporterCompanyAddress: bsdd.transporterCompanyAddress,
-  transporterCompanyName: bsdd.transporterCompanyName,
-  transporterCompanySiret: bsdd.transporterCompanySiret?.length
-    ? bsdd.transporterCompanySiret
-    : bsdd.transporterCompanyVatNumber,
-  transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
-  transporterNumberPlates: bsdd.transporterNumberPlates,
-  transporterTransportMode: bsdd.transporterTransportMode,
-  transporterCompanyMail: bsdd.transporterCompanyMail,
-  transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
-  transporter2CompanyName: bsdd.transporter2CompanyName,
-  transporter2CompanySiret: bsdd.transporter2CompanySiret?.length
-    ? bsdd.transporter2CompanySiret
-    : bsdd.transporter2CompanyVatNumber,
-  transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
-  transporter2NumberPlates: bsdd.transporter2NumberPlates,
-  transporter2CompanyMail: bsdd.transporter2CompanyMail,
-  transporter2TransportMode: bsdd.transporter2TransportMode,
-  transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
-  transporter3CompanyName: bsdd.transporter3CompanyName,
-  transporter3CompanySiret: bsdd.transporter3CompanySiret?.length
-    ? bsdd.transporter3CompanySiret
-    : bsdd.transporter3CompanyVatNumber,
-  transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
-  transporter3NumberPlates: bsdd.transporter3NumberPlates,
-  transporter3CompanyMail: bsdd.transporter3CompanyMail,
-  transporter3TransportMode: bsdd.transporter3TransportMode,
-  transporter4CompanyAddress: bsdd.transporter4CompanyAddress,
-  transporter4CompanyName: bsdd.transporter4CompanyName,
-  transporter4CompanySiret: bsdd.transporter4CompanySiret?.length
-    ? bsdd.transporter4CompanySiret
-    : bsdd.transporter4CompanyVatNumber,
-  transporter4RecepisseNumber: bsdd.transporter4RecepisseNumber,
-  transporter4NumberPlates: bsdd.transporter4NumberPlates,
-  transporter4CompanyMail: bsdd.transporter4CompanyMail,
-  transporter4TransportMode: bsdd.transporter4TransportMode,
-  transporter5CompanyAddress: bsdd.transporter5CompanyAddress,
-  transporter5CompanyName: bsdd.transporter5CompanyName,
-  transporter5CompanySiret: bsdd.transporter5CompanySiret?.length
-    ? bsdd.transporter5CompanySiret
-    : bsdd.transporter5CompanyVatNumber,
-  transporter5RecepisseNumber: bsdd.transporter5RecepisseNumber,
-  transporter5NumberPlates: bsdd.transporter5NumberPlates,
-  transporter5CompanyMail: bsdd.transporter5CompanyMail,
-  transporter5TransportMode: bsdd.transporter5TransportMode
-});
+const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
+  const data = {
+    transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
+    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
+    transporterCompanyAddress: bsdd.transporterCompanyAddress,
+    transporterCompanyName: bsdd.transporterCompanyName,
+    transporterCompanySiret: bsdd.transporterCompanySiret?.length
+      ? bsdd.transporterCompanySiret
+      : bsdd.transporterCompanyVatNumber,
+    transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
+    transporterTransportMode: bsdd.transporterTransportMode,
+    transporterCompanyMail: bsdd.transporterCompanyMail,
+    transporter2CompanyAddress: bsdd.transporter2CompanyAddress ?? null,
+    transporter2CompanyName: bsdd.transporter2CompanyName ?? null,
+    transporter2CompanySiret:
+      (bsdd.transporter2CompanySiret?.length
+        ? bsdd.transporter2CompanySiret
+        : bsdd.transporter2CompanyVatNumber) ?? null,
+    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber ?? null,
+    transporter2CompanyMail: bsdd.transporter2CompanyMail ?? null,
+    transporter2TransportMode: bsdd.transporter2TransportMode ?? null,
+    transporter3CompanyAddress: bsdd.transporter3CompanyAddress ?? null,
+    transporter3CompanyName: bsdd.transporter3CompanyName ?? null,
+    transporter3CompanySiret:
+      (bsdd.transporter3CompanySiret?.length
+        ? bsdd.transporter3CompanySiret
+        : bsdd.transporter3CompanyVatNumber) ?? null,
+    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber ?? null,
+    transporter3CompanyMail: bsdd.transporter3CompanyMail ?? null,
+    transporter3TransportMode: bsdd.transporter3TransportMode ?? null,
+    transporter4CompanyAddress: bsdd.transporter4CompanyAddress ?? null,
+    transporter4CompanyName: bsdd.transporter4CompanyName ?? null,
+    transporter4CompanySiret:
+      (bsdd.transporter4CompanySiret?.length
+        ? bsdd.transporter4CompanySiret
+        : bsdd.transporter4CompanyVatNumber) ?? null,
+    transporter4RecepisseNumber: bsdd.transporter4RecepisseNumber ?? null,
+    transporter4CompanyMail: bsdd.transporter4CompanyMail ?? null,
+    transporter4TransportMode: bsdd.transporter4TransportMode ?? null,
+    transporter5CompanyAddress: bsdd.transporter5CompanyAddress ?? null,
+    transporter5CompanyName: bsdd.transporter5CompanyName ?? null,
+    transporter5CompanySiret:
+      (bsdd.transporter5CompanySiret?.length
+        ? bsdd.transporter5CompanySiret
+        : bsdd.transporter5CompanyVatNumber) ?? null,
+    transporter5RecepisseNumber: bsdd.transporter5RecepisseNumber ?? null,
+    transporter5CompanyMail: bsdd.transporter5CompanyMail ?? null,
+    transporter5TransportMode: bsdd.transporter5TransportMode ?? null
+  };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: bsdd.transporterNumberPlates ?? null,
+      transporter2NumberPlates: bsdd.transporter2NumberPlates ?? null,
+      transporter3NumberPlates: bsdd.transporter3NumberPlates ?? null,
+      transporter4NumberPlates: bsdd.transporter4NumberPlates ?? null,
+      transporter5NumberPlates: bsdd.transporter5NumberPlates ?? null
+    };
+  }
+
+  return data;
+};
 
 const getIntermediariesData = (bsdd: ReturnType<typeof formToBsdd>) => ({
   intermediary1CompanyName: bsdd.intermediaries?.[0]?.name ?? null,
@@ -258,7 +272,6 @@ export function toGenericWaste(
     parcelPostalCodes: bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
     parcelCoordinates: bsdd.parcelCoordinates,
-    ...getTransportersData(bsdd),
     ...initialEmitter
   };
 }
@@ -295,7 +308,8 @@ export function toIncomingWaste(
     emitterCompanyMail: bsdd.emitterCompanyMail,
     ...getOperationData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
-    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
+    ...getTransportersData(bsdd)
   };
 }
 
@@ -332,7 +346,8 @@ export function toOutgoingWaste(
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
-    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
+    ...getTransportersData(bsdd)
   };
 }
 
@@ -365,7 +380,8 @@ export function toTransportedWaste(
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    emitterCompanyMail: bsdd.emitterCompanyMail
+    emitterCompanyMail: bsdd.emitterCompanyMail,
+    ...getTransportersData(bsdd, true)
   };
 }
 
@@ -398,7 +414,8 @@ export function toManagedWaste(
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
-    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
+    ...getTransportersData(bsdd)
   };
 }
 
@@ -439,6 +456,7 @@ export function toAllWaste(
     ...getFinalOperationsData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
-    ...getIntermediariesData(bsdd)
+    ...getIntermediariesData(bsdd),
+    ...getTransportersData(bsdd, true)
   };
 }

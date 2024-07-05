@@ -25,12 +25,12 @@ import { getFirstTransporterSync } from "./converter";
 const getTransporterData = (
   bspaoh: Bspaoh & {
     transporters: BspaohTransporter[];
-  }
+  },
+  includePlates = false
 ) => {
   const transporter = getFirstTransporterSync(bspaoh);
-  return {
+  const data = {
     transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
-    transporterNumberPlates: transporter?.transporterTransportPlates,
     transporterCompanyAddress: transporter?.transporterCompanyAddress,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
@@ -43,8 +43,17 @@ const getTransporterData = (
     // if this is on the transporter, use it
     // if it stays on the BSPAOH temporarily, attach it to the last transporter
     transporterHandedOverSignatureDate:
-      bspaoh.handedOverToDestinationSignatureDate
+      bspaoh.handedOverToDestinationSignatureDate ?? null
   };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: transporter?.transporterTransportPlates
+    };
+  }
+
+  return data;
 };
 
 export function getRegistryFields(
@@ -93,7 +102,7 @@ export function getRegistryFields(
   return registryFields;
 }
 
-function toGenericWaste(
+export function toGenericWaste(
   bspaoh: Bspaoh & {
     transporters: BspaohTransporter[];
   }
@@ -125,7 +134,6 @@ function toGenericWaste(
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransporterData(bspaoh),
     destinationCompanyMail: bspaoh.destinationCompanyMail
   };
 }
@@ -162,6 +170,7 @@ export function toIncomingWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
+    ...getTransporterData(bspaoh),
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
@@ -206,6 +215,7 @@ export function toOutgoingWaste(
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
+    ...getTransporterData(bspaoh),
     transporterCompanyAddress: transporter?.transporterCompanyAddress,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
@@ -230,6 +240,7 @@ export function toTransportedWaste(
   return {
     ...emptyTransportedWaste,
     ...genericWaste,
+    ...getTransporterData(bspaoh, true),
     transporterTakenOverAt: bspaoh.transporterTransportTakenOverAt,
     destinationReceptionDate: bspaoh.destinationReceptionDate,
     weight: bspaoh.emitterWasteWeightValue
@@ -294,6 +305,7 @@ export function toManagedWaste(
       bspaoh.emitterPickupSitePostalCode,
       bspaoh.emitterPickupSiteCity
     ]),
+    ...getTransporterData(bspaoh),
     transporterCompanyAddress: transporter?.transporterCompanyAddress,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
@@ -314,6 +326,7 @@ export function toAllWaste(
   return {
     ...emptyAllWaste,
     ...genericWaste,
+    ...getTransporterData(bspaoh, true),
     createdAt: bspaoh.createdAt,
     transporterTakenOverAt: transporter?.transporterTakenOverAt,
     destinationReceptionDate: bspaoh.destinationReceptionDate,

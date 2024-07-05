@@ -71,19 +71,18 @@ const getFinalOperationsData = (bsda: RegistryBsda) => {
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
-const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
+const getTransportersData = (bsda: RegistryBsda, includePlates = false) => {
   const transporters = getTransportersSync(bsda);
 
   const [transporter, transporter2, transporter3, transporter4, transporter5] =
     transporters;
 
-  return {
+  const data = {
     transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
     transporterCompanyAddress: transporter?.transporterCompanyAddress,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
-    transporterNumberPlates: transporter?.transporterTransportPlates,
     transporterCompanyMail: transporter?.transporterCompanyMail,
     transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
     transporterTransportMode: transporter?.transporterTransportMode,
@@ -91,7 +90,6 @@ const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
     transporter2CompanyName: transporter2?.transporterCompanyName,
     transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
     transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
-    transporter2NumberPlates: transporter2?.transporterTransportPlates,
     transporter2CompanyMail: transporter2?.transporterCompanyMail,
     transporter2RecepisseIsExempted:
       transporter2?.transporterRecepisseIsExempted,
@@ -100,7 +98,6 @@ const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
     transporter3CompanyName: transporter3?.transporterCompanyName,
     transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
     transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
-    transporter3NumberPlates: transporter3?.transporterTransportPlates,
     transporter3CompanyMail: transporter3?.transporterCompanyMail,
     transporter3RecepisseIsExempted:
       transporter3?.transporterRecepisseIsExempted,
@@ -109,7 +106,6 @@ const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
     transporter4CompanyName: transporter4?.transporterCompanyName,
     transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
     transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
-    transporter4NumberPlates: transporter4?.transporterTransportPlates,
     transporter4CompanyMail: transporter4?.transporterCompanyMail,
     transporter4RecepisseIsExempted:
       transporter4?.transporterRecepisseIsExempted,
@@ -118,12 +114,27 @@ const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
     transporter5CompanyName: transporter5?.transporterCompanyName,
     transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
     transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
-    transporter5NumberPlates: transporter5?.transporterTransportPlates,
     transporter5CompanyMail: transporter5?.transporterCompanyMail,
     transporter5RecepisseIsExempted:
       transporter5?.transporterRecepisseIsExempted,
     transporter5TransportMode: transporter5?.transporterTransportMode
   };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: transporter?.transporterTransportPlates ?? null,
+      transporter2NumberPlates:
+        transporter2?.transporterTransportPlates ?? null,
+      transporter3NumberPlates:
+        transporter3?.transporterTransportPlates ?? null,
+      transporter4NumberPlates:
+        transporter4?.transporterTransportPlates ?? null,
+      transporter5NumberPlates: transporter5?.transporterTransportPlates ?? null
+    };
+  }
+
+  return data;
 };
 
 export function getRegistryFields(
@@ -223,7 +234,6 @@ function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress: bsda.workerCompanyAddress,
-    ...getTransportersData(bsda),
     destinationCompanyMail: bsda.destinationCompanyMail,
     brokerCompanyMail: bsda.brokerCompanyMail
   };
@@ -263,7 +273,8 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     emitterCompanyMail: bsda.emitterCompanyMail,
     ...getOperationData(bsda),
     nextDestinationProcessingOperation:
-      bsda.destinationOperationNextDestinationPlannedOperationCode
+      bsda.destinationOperationNextDestinationPlannedOperationCode,
+    ...getTransportersData(bsda)
   };
 }
 
@@ -323,7 +334,8 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     ...getOperationData(bsda),
     ...getFinalOperationsData(bsda),
     nextDestinationProcessingOperation:
-      bsda.destinationOperationNextDestinationPlannedOperationCode
+      bsda.destinationOperationNextDestinationPlannedOperationCode,
+    ...getTransportersData(bsda)
   };
 }
 
@@ -360,7 +372,8 @@ export function toTransportedWaste(
     destinationCompanyName: bsda.destinationCompanyName,
     destinationCompanySiret: bsda.destinationCompanySiret,
     destinationCompanyAddress: bsda.destinationCompanyAddress,
-    emitterCompanyMail: bsda.emitterCompanyMail
+    emitterCompanyMail: bsda.emitterCompanyMail,
+    ...getTransportersData(bsda, true)
   };
 }
 
@@ -393,7 +406,8 @@ export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
     emitterCompanyMail: bsda.emitterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail,
     nextDestinationProcessingOperation:
-      bsda.destinationOperationNextDestinationPlannedOperationCode
+      bsda.destinationOperationNextDestinationPlannedOperationCode,
+    ...getTransportersData(bsda)
   };
 }
 
@@ -439,6 +453,7 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     ...getFinalOperationsData(bsda),
     nextDestinationProcessingOperation:
       bsda.destinationOperationNextDestinationPlannedOperationCode,
-    ...getIntermediariesData(bsda)
+    ...getIntermediariesData(bsda),
+    ...getTransportersData(bsda, true)
   };
 }

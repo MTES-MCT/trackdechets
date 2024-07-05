@@ -649,7 +649,7 @@ type TransportedWaste {
   "Le mode de transport utilisé par le transporteur"
   transporterTransportMode: TransportMode
   "La date de signature de dépôt à la destination du transporteur"
-  transporterHandedOverSignatureDate: String
+  transporterHandedOverSignatureDate: DateTime
 
   "La raison sociale du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyName: String
@@ -1256,7 +1256,7 @@ type AllWaste {
   "Le mode de transport utilisé par le transporteur"
   transporterTransportMode: TransportMode
   "La date de signature de dépôt à la destination du transporteur"
-  transporterHandedOverSignatureDate: String
+  transporterHandedOverSignatureDate: DateTime
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String

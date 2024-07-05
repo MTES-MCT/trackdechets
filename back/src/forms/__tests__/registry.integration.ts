@@ -13,7 +13,8 @@ import {
   toGenericWaste,
   toIncomingWaste,
   toManagedWaste,
-  toOutgoingWaste
+  toOutgoingWaste,
+  toTransportedWaste
 } from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryFormInclude } from "../../registry/elastic";
@@ -98,6 +99,113 @@ const createTmpStorageBsdd = async () => {
   return bsdd;
 };
 
+const createBsddWith5Transporters = async () => {
+  const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["PRODUCER"]
+    }
+  });
+
+  const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    }
+  });
+
+  const transporter2 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    }
+  });
+
+  const transporter3 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    }
+  });
+
+  const transporter4 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    }
+  });
+
+  const transporter5 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    }
+  });
+
+  const destination = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["WASTEPROCESSOR"]
+    }
+  });
+
+  const bsdd = await formFactory({
+    ownerId: emitter.user.id,
+    opt: {
+      status: "PROCESSED",
+      emittedAt: new Date(),
+      sentAt: new Date(),
+      takenOverAt: new Date(),
+      receivedAt: new Date(),
+      processedAt: new Date(),
+      emitterCompanySiret: emitter.company.siret,
+      transporters: {
+        createMany: {
+          data: [
+            {
+              transporterCompanySiret: transporter.company.siret,
+              transporterNumberPlate: "TRANSPORTER1-NBR-PLATES",
+              takenOverAt: new Date(),
+              number: 1
+            },
+            {
+              transporterCompanySiret: transporter2.company.siret,
+              transporterNumberPlate: "TRANSPORTER2-NBR-PLATES",
+              takenOverAt: new Date(),
+              number: 2
+            },
+            {
+              transporterCompanySiret: transporter3.company.siret,
+              transporterNumberPlate: "TRANSPORTER3-NBR-PLATES",
+              takenOverAt: new Date(),
+              number: 3
+            },
+            {
+              transporterCompanySiret: transporter4.company.siret,
+              transporterNumberPlate: "TRANSPORTER4-NBR-PLATES",
+              takenOverAt: new Date(),
+              number: 4
+            },
+            {
+              transporterCompanySiret: transporter5.company.siret,
+              transporterNumberPlate: "TRANSPORTER5-NBR-PLATES",
+              takenOverAt: new Date(),
+              number: 5
+            }
+          ]
+        }
+      },
+      recipientCompanySiret: destination.company.siret
+    }
+  });
+
+  const formForElastic = await getFormForElastic(bsdd);
+  await indexForm(formForElastic);
+  await refreshElasticSearch();
+
+  return {
+    bsdd,
+    transporter1: transporter.company,
+    transporter2: transporter2.company,
+    transporter3: transporter3.company,
+    transporter4: transporter4.company,
+    transporter5: transporter5.company
+  };
+};
+
 describe("toIncomingWaste", () => {
   afterAll(resetDatabase);
 
@@ -145,6 +253,34 @@ describe("toIncomingWaste", () => {
     // Then
     expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
     expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+
+  it("should contain transporters info except plates", async () => {
+    // Given
+    const data = await createBsddWith5Transporters();
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: data.bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toIncomingWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.transporterCompanySiret).toBe(data.transporter1.siret);
+    expect(waste["transporterNumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter2CompanySiret).toBe(data.transporter2.siret);
+    expect(waste["transporter2NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter3CompanySiret).toBe(data.transporter3.siret);
+    expect(waste["transporter3NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
+    expect(waste["transporter4NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
 });
 
@@ -299,6 +435,34 @@ describe("toOutgoingWaste", () => {
     expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
     expect(waste.nextDestinationProcessingOperation).toBe("D9");
   });
+
+  it("should contain transporters info except plates", async () => {
+    // Given
+    const data = await createBsddWith5Transporters();
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: data.bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toOutgoingWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.transporterCompanySiret).toBe(data.transporter1.siret);
+    expect(waste["transporterNumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter2CompanySiret).toBe(data.transporter2.siret);
+    expect(waste["transporter2NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter3CompanySiret).toBe(data.transporter3.siret);
+    expect(waste["transporter3NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
+    expect(waste["transporter4NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
 });
 
 describe("toAllWaste", () => {
@@ -451,67 +615,6 @@ describe("toAllWaste", () => {
     expect(waste.nextDestinationProcessingOperation).toBe("D9");
   });
 
-  it("should contain all 3 intermediaries", async () => {
-    // Given
-    const user = await userFactory();
-    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
-    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
-    const intermediary3 = await userWithCompanyFactory(UserRole.MEMBER);
-    const bsdd = await formFactory({
-      ownerId: user.id,
-      opt: {
-        intermediaries: {
-          create: [
-            toIntermediaryCompany(intermediary1.company),
-            toIntermediaryCompany(intermediary2.company),
-            toIntermediaryCompany(intermediary3.company)
-          ]
-        }
-      }
-    });
-
-    // When
-    const formForRegistry = await prisma.form.findUniqueOrThrow({
-      where: { id: bsdd.id },
-      include: RegistryFormInclude
-    });
-    const waste = toAllWaste(formToBsdd(formForRegistry));
-
-    // Then
-    expect(waste).not.toBeUndefined();
-    expect(waste.intermediary1CompanyName).toBe(intermediary1.company.name);
-    expect(waste.intermediary1CompanySiret).toBe(intermediary1.company.siret);
-    expect(waste.intermediary2CompanyName).toBe(intermediary2.company.name);
-    expect(waste.intermediary2CompanySiret).toBe(intermediary2.company.siret);
-    expect(waste.intermediary3CompanyName).toBe(intermediary3.company.name);
-    expect(waste.intermediary3CompanySiret).toBe(intermediary3.company.siret);
-  });
-});
-
-describe("toManagedWaste", () => {
-  it("should contain nextDestination operation code & notification number", async () => {
-    // Given
-    const user = await userFactory();
-    const bdd = await formFactory({
-      ownerId: user.id,
-      opt: {
-        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
-        nextDestinationProcessingOperation: "D9"
-      }
-    });
-
-    // When
-    const formForRegistry = await prisma.form.findUniqueOrThrow({
-      where: { id: bdd.id },
-      include: RegistryFormInclude
-    });
-    const waste = toManagedWaste(formToBsdd(formForRegistry));
-
-    // Then
-    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
-    expect(waste.nextDestinationProcessingOperation).toBe("D9");
-  });
-
   it("should work with only 1 intermediary", async () => {
     // Given
     const user = await userFactory();
@@ -597,9 +700,182 @@ describe("toManagedWaste", () => {
     expect(waste.intermediary3CompanyName).toBe(null);
     expect(waste.intermediary3CompanySiret).toBe(null);
   });
+
+  it("should contain all 3 intermediaries", async () => {
+    // Given
+    const user = await userFactory();
+    const intermediary1 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary3 = await userWithCompanyFactory(UserRole.MEMBER);
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: [
+            toIntermediaryCompany(intermediary1.company),
+            toIntermediaryCompany(intermediary2.company),
+            toIntermediaryCompany(intermediary3.company)
+          ]
+        }
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.company.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.company.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.company.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.company.siret);
+    expect(waste.intermediary3CompanyName).toBe(intermediary3.company.name);
+    expect(waste.intermediary3CompanySiret).toBe(intermediary3.company.siret);
+  });
+
+  it("should contain transporters info including plates", async () => {
+    // Given
+    const data = await createBsddWith5Transporters();
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: data.bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toAllWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.transporterCompanySiret).toBe(data.transporter1.siret);
+    expect(waste.transporterNumberPlates).toStrictEqual([
+      "TRANSPORTER1-NBR-PLATES"
+    ]);
+
+    expect(waste.transporter2CompanySiret).toBe(data.transporter2.siret);
+    expect(waste.transporter2NumberPlates).toStrictEqual([
+      "TRANSPORTER2-NBR-PLATES"
+    ]);
+
+    expect(waste.transporter3CompanySiret).toBe(data.transporter3.siret);
+    expect(waste.transporter3NumberPlates).toStrictEqual([
+      "TRANSPORTER3-NBR-PLATES"
+    ]);
+
+    expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
+    expect(waste.transporter4NumberPlates).toStrictEqual([
+      "TRANSPORTER4-NBR-PLATES"
+    ]);
+
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    expect(waste.transporter5NumberPlates).toStrictEqual([
+      "TRANSPORTER5-NBR-PLATES"
+    ]);
+  });
+});
+
+describe("toManagedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain nextDestination operation code & notification number", async () => {
+    // Given
+    const user = await userFactory();
+    const bdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        nextDestinationNotificationNumber: "A7E AAAA DDDRRR",
+        nextDestinationProcessingOperation: "D9"
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toManagedWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.nextDestinationNotificationNumber).toBe("A7E AAAA DDDRRR");
+    expect(waste.nextDestinationProcessingOperation).toBe("D9");
+  });
+
+  it("should contain transporters info except plates", async () => {
+    // Given
+    const data = await createBsddWith5Transporters();
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: data.bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toManagedWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.transporterCompanySiret).toBe(data.transporter1.siret);
+    expect(waste["transporterNumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter2CompanySiret).toBe(data.transporter2.siret);
+    expect(waste["transporter2NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter3CompanySiret).toBe(data.transporter3.siret);
+    expect(waste["transporter3NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
+    expect(waste["transporter4NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
+});
+
+describe("toTransportedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain transporters info including plates", async () => {
+    // Given
+    const data = await createBsddWith5Transporters();
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: data.bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = toTransportedWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.transporterCompanySiret).toBe(data.transporter1.siret);
+    expect(waste.transporterNumberPlates).toStrictEqual([
+      "TRANSPORTER1-NBR-PLATES"
+    ]);
+
+    expect(waste.transporter2CompanySiret).toBe(data.transporter2.siret);
+    expect(waste.transporter2NumberPlates).toStrictEqual([
+      "TRANSPORTER2-NBR-PLATES"
+    ]);
+
+    expect(waste.transporter3CompanySiret).toBe(data.transporter3.siret);
+    expect(waste.transporter3NumberPlates).toStrictEqual([
+      "TRANSPORTER3-NBR-PLATES"
+    ]);
+
+    expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
+    expect(waste.transporter4NumberPlates).toStrictEqual([
+      "TRANSPORTER4-NBR-PLATES"
+    ]);
+
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    expect(waste.transporter5NumberPlates).toStrictEqual([
+      "TRANSPORTER5-NBR-PLATES"
+    ]);
+  });
 });
 
 describe("toGenericWaste", () => {
+  afterAll(resetDatabase);
+
   it("should contain the destination, trader & broker email addresses", async () => {
     // Given
     const user = await userFactory();

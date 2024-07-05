@@ -50,18 +50,31 @@ const getFinalOperationsData = (bsff: RegistryBsff) => {
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
-const getTransporterData = (transporter: BsffTransporter) => ({
-  transporterRecepisseIsExempted: transporter.transporterRecepisseIsExempted,
-  transporterTakenOverAt: transporter.transporterTransportTakenOverAt,
-  transporterCompanyAddress: transporter.transporterCompanyAddress,
-  transporterCompanyName: transporter.transporterCompanyName,
-  transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-  transporterRecepisseNumber: transporter.transporterRecepisseNumber,
-  transporterCompanyMail: transporter.transporterCompanyMail,
-  transporterCustomInfo: transporter.transporterCustomInfo,
-  transporterNumberPlates: transporter.transporterTransportPlates,
-  transporterTransportMode: transporter.transporterTransportMode
-});
+const getTransporterData = (
+  transporter: BsffTransporter,
+  includePlates = false
+) => {
+  const data = {
+    transporterRecepisseIsExempted: transporter.transporterRecepisseIsExempted,
+    transporterTakenOverAt: transporter.transporterTransportTakenOverAt,
+    transporterCompanyAddress: transporter.transporterCompanyAddress,
+    transporterCompanyName: transporter.transporterCompanyName,
+    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
+    transporterRecepisseNumber: transporter.transporterRecepisseNumber,
+    transporterCompanyMail: transporter.transporterCompanyMail,
+    transporterCustomInfo: transporter.transporterCustomInfo,
+    transporterTransportMode: transporter.transporterTransportMode
+  };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: transporter.transporterTransportPlates ?? null
+    };
+  }
+
+  return data;
+};
 
 export function getRegistryFields(
   bsff: BsffWithTransporters
@@ -116,9 +129,8 @@ export const getSubType = (bsff: RegistryBsff): BsdSubType => {
   return "INITIAL";
 };
 
-function toGenericWaste(bsff: RegistryBsff): GenericWaste {
+export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
   const bsffDestination = toBsffDestination(bsff.packagings);
-  const transporter = getFirstTransporterSync(bsff);
 
   return {
     wasteDescription: bsff.wasteDescription,
@@ -141,18 +153,17 @@ function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     destinationReceptionWeight: bsffDestination.receptionWeight
       ? bsffDestination.receptionWeight / 1000
       : bsffDestination.receptionWeight,
-
     wasteAdr: bsff.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...(transporter ? getTransporterData(transporter) : {}),
     destinationCompanyMail: bsff.destinationCompanyMail
   };
 }
 
 export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
+  const transporter = getFirstTransporterSync(bsff);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
@@ -176,11 +187,14 @@ export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
-    ...getOperationData(bsff)
+    ...getOperationData(bsff),
+    ...(transporter ? getTransporterData(transporter) : {})
   };
 }
 
 export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
+  const transporter = getFirstTransporterSync(bsff);
+
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyAddress"
@@ -229,7 +243,8 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
       ? bsff.weightValue.dividedBy(1000).toNumber()
       : null,
     ...getOperationData(bsff),
-    ...getFinalOperationsData(bsff)
+    ...getFinalOperationsData(bsff),
+    ...(transporter ? getTransporterData(transporter) : {})
   };
 }
 
@@ -237,6 +252,7 @@ export function toTransportedWaste(
   bsff: RegistryBsff
 ): Required<TransportedWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
+  const transporter = getFirstTransporterSync(bsff);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
@@ -259,7 +275,8 @@ export function toTransportedWaste(
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,
     destinationCompanyAddress: bsff.destinationCompanyAddress,
-    emitterCompanyMail: bsff.emitterCompanyMail
+    emitterCompanyMail: bsff.emitterCompanyMail,
+    ...(transporter ? getTransporterData(transporter, true) : {})
   };
 }
 
@@ -269,6 +286,7 @@ export function toTransportedWaste(
  */
 export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
+  const transporter = getFirstTransporterSync(bsff);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
@@ -286,12 +304,14 @@ export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    emitterCompanyMail: bsff.emitterCompanyMail
+    emitterCompanyMail: bsff.emitterCompanyMail,
+    ...(transporter ? getTransporterData(transporter) : {})
   };
 }
 
 export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
+  const transporter = getFirstTransporterSync(bsff);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
@@ -321,6 +341,7 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     traderRecepisseNumber: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
     ...getOperationData(bsff),
-    ...getFinalOperationsData(bsff)
+    ...getFinalOperationsData(bsff),
+    ...(transporter ? getTransporterData(transporter, true) : {})
   };
 }
