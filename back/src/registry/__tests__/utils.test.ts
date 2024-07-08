@@ -5,8 +5,8 @@ describe("displayWasteQuantity", () => {
     [10, "10 tonne(s)"],
     [0, "0 tonne(s)"],
     [0.654654, "0.654654 tonne(s)"],
-    [null, "Non renseigné"],
-    [undefined, "Non renseigné"]
+    [null, "Non renseignée"],
+    [undefined, "Non renseignée"]
   ])("%p should be displayed as %p", (input, expected) => {
     // When
     const res = displayWasteQuantity(input);
