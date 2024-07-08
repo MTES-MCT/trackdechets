@@ -60,8 +60,8 @@ describe("renderFormRefusedEmail", () => {
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
     <li>Quantité réelle présentée nette: ${form.quantityReceived} tonnes</li>
-    <li>Quantité refusée: Non renseigné</li>
-    <li>Quantité acceptée: Non renseigné</li>
+    <li>Quantité refusée: Non renseignée</li>
+    <li>Quantité acceptée: Non renseignée</li>
     <li>
       Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
@@ -144,8 +144,8 @@ describe("renderFormRefusedEmail", () => {
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
     <li>Quantité réelle présentée nette: ${form.quantityReceived} tonnes</li>
-    <li>Quantité refusée: Non renseigné</li>
-    <li>Quantité acceptée: Non renseigné</li>
+    <li>Quantité refusée: Non renseignée</li>
+    <li>Quantité acceptée: Non renseignée</li>
     <li>
       Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
@@ -257,8 +257,8 @@ describe("renderFormRefusedEmail", () => {
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
     <li>Quantité réelle présentée nette: ${form.quantityReceived} tonnes</li>
-    <li>Quantité refusée: Non renseigné</li>
-    <li>Quantité acceptée: Non renseigné</li>
+    <li>Quantité refusée: Non renseignée</li>
+    <li>Quantité acceptée: Non renseignée</li>
     <li>
       Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
@@ -328,8 +328,8 @@ describe("renderFormRefusedEmail", () => {
     <li>Quantité réelle présentée nette: ${
       forwardedIn?.quantityReceived
     } tonnes</li>
-    <li>Quantité refusée: Non renseigné</li>
-    <li>Quantité acceptée: Non renseigné</li>
+    <li>Quantité refusée: Non renseignée</li>
+    <li>Quantité acceptée: Non renseignée</li>
     <li>
       Motif de refus :
       <span>${forwardedIn!.wasteRefusalReason}</span>`);

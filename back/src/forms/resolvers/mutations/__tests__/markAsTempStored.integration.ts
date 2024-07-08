@@ -922,8 +922,8 @@ describe("{ mutation { markAsTempStored } }", () => {
       expect.objectContaining({
         subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
         body: expect.stringContaining(`<li>Quantité réelle présentée nette: 10 tonnes</li>
-    <li>Quantité refusée: Non renseigné</li>
-    <li>Quantité acceptée: Non renseigné</li>`)
+    <li>Quantité refusée: Non renseignée</li>
+    <li>Quantité acceptée: Non renseignée</li>`)
       })
     );
   });
