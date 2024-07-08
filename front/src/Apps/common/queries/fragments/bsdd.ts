@@ -257,6 +257,7 @@ const mutableFieldsFragment = gql`
       }
     }
     quantityGrouped
+    quantityReceived
     ecoOrganisme {
       name
       siret

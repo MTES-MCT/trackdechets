@@ -10,6 +10,7 @@ import {
   DsfrDataListTerm,
   DsfrDataListDescription
 } from "../../../../../common/components";
+import { notNullNorUndefined } from "../../../../../common/helper";
 
 interface FormWasteSummaryProps {
   form: Form;
@@ -73,7 +74,22 @@ const getConsistenceLabel = (consistence: Maybe<Consistence> | undefined) => {
   }
 };
 
+const getWasteQuantityAndIsEstimated = (
+  form
+): { quantity: number; isEstimated: boolean } => {
+  if (notNullNorUndefined(form.quantityReceived)) {
+    return { quantity: form.quantityReceived, isEstimated: false };
+  }
+
+  return {
+    quantity: form.wasteDetails?.quantity,
+    isEstimated: form.wasteDetails?.quantityType === QuantityType.Estimated
+  };
+};
+
 export function DsfrFormWasteSummary({ form }: FormWasteSummaryProps) {
+  const { quantity, isEstimated } = getWasteQuantityAndIsEstimated(form);
+
   return (
     <DsfrDataList>
       <DsfrDataListItem>
@@ -109,13 +125,7 @@ export function DsfrFormWasteSummary({ form }: FormWasteSummaryProps) {
       <DsfrDataListItem>
         <DsfrDataListTerm>Poids estimé / réel</DsfrDataListTerm>
         <DsfrDataListDescription>
-          {form.quantityReceived
-            ? `${form.quantityReceived}t`
-            : `${form.wasteDetails?.quantity}t${
-                form.wasteDetails?.quantityType === QuantityType.Estimated
-                  ? " (estimé)"
-                  : ""
-              }`}
+          {`${quantity}t${isEstimated ? " (estimé)" : ""}`}
         </DsfrDataListDescription>
       </DsfrDataListItem>
     </DsfrDataList>
