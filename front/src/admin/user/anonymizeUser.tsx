@@ -2,24 +2,46 @@ import * as React from "react";
 import { Formik, Form, Field } from "formik";
 import toast from "react-hot-toast";
 import { gql, useMutation } from "@apollo/client";
-import { Mutation, MutationAnonymizeUserArgs } from "@td/codegen-ui";
+import {
+  Mutation,
+  MutationAddUserToCompanyArgs,
+  MutationAnonymizeUserArgs,
+  UserRole
+} from "@td/codegen-ui";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
 import { TOAST_DURATION } from "../../common/config";
+import Button from "@codegouvfr/react-dsfr/Button";
+import Input from "@codegouvfr/react-dsfr/Input";
+import Select from "@codegouvfr/react-dsfr/Select";
 
 const ANONYMIZE_USER = gql`
   mutation anonymizeUser($id: ID!) {
     anonymizeUser(id: $id)
   }
 `;
+
+const ADD_USER_TO_COMPANY = gql`
+  mutation AddUserToCompany($input: AddUserToCompanyInput!) {
+    addUserToCompany(input: $input)
+  }
+`;
+
 function AnonymizeUser() {
   const [anonymizeUser, { loading, error }] = useMutation<
     Pick<Mutation, "anonymizeUser">,
     MutationAnonymizeUserArgs
   >(ANONYMIZE_USER);
 
+  const [addUserToCompany, { loading: loadingAddUser, error: errorAddUser }] =
+    useMutation<
+      Pick<Mutation, "addUserToCompany">,
+      MutationAddUserToCompanyArgs
+    >(ADD_USER_TO_COMPANY);
+
   return (
     <div>
+      <h3 className="fr-h3 fr-mt-4w">Anonymisation d'un compte</h3>
       <Formik
         initialValues={{
           id: ""
@@ -73,6 +95,69 @@ function AnonymizeUser() {
           </Form>
         )}
       </Formik>
+
+      <h3 className="fr-h3 fr-mt-4w">
+        Ajout d'un utilisateur à une entreprise
+      </h3>
+      <form
+        onSubmit={async e => {
+          e.preventDefault();
+          const formData = new FormData(e.target as HTMLFormElement);
+
+          try {
+            await addUserToCompany({
+              variables: {
+                input: {
+                  email: (formData.get("email") as string) ?? "",
+                  role: (formData.get("role") as UserRole) ?? UserRole.Admin,
+                  orgId: (formData.get("orgId") as string) ?? ""
+                }
+              }
+            });
+            toast.success(`Utilisateur ajouté à l'entreprise`);
+          } catch (err) {
+            console.log(err);
+            toast.error(`Une erreur s'est produite: ${errorAddUser?.message}`);
+          }
+        }}
+      >
+        <Input
+          label="Email"
+          className="fr-col-4"
+          nativeInputProps={{
+            required: true,
+            name: "email",
+            placeholder: "my@email.com"
+          }}
+        />
+
+        <Select
+          label="Rôle"
+          className="fr-col-3 fr-mb-5v"
+          nativeSelectProps={{
+            name: "role",
+            defaultValue: UserRole.Admin
+          }}
+        >
+          <option value={UserRole.Admin}>Administrateur</option>
+          <option value={UserRole.Member}>Collaborateur</option>
+          <option value={UserRole.Reader}>Lecteur</option>
+          <option value={UserRole.Driver}>Chauffeur</option>
+        </Select>
+
+        <Input
+          label="SIRET de l'entreprise"
+          className="fr-col-4"
+          hintText="Ou Vat number"
+          nativeInputProps={{
+            required: true,
+            name: "orgId",
+            placeholder: "XXXXXXXXXXXXXX"
+          }}
+        />
+
+        <Button disabled={loadingAddUser}>Ajouter</Button>
+      </form>
     </div>
   );
 }

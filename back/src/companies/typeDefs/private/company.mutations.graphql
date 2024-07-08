@@ -127,6 +127,12 @@ type Mutation {
 
   deleteCompany(id: ID!): CompanyPrivate!
 
+  """
+  USAGE INTERNE
+  Permet de rattacher un utilisateur à une entreprise
+  """
+  addUserToCompany(input: AddUserToCompanyInput!): Boolean!
+
   createAnonymousCompany(input: AnonymousCompanyInput!): AnonymousCompany!
 
   addSignatureAutomation(input: SignatureAutomationInput!): SignatureAutomation!

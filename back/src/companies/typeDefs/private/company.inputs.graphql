@@ -357,3 +357,12 @@ input SignatureAutomationInput {
   "ID de l'entreprise qui a délégation"
   to: ID!
 }
+
+input AddUserToCompanyInput {
+  "Email de l'utilisateur à rattacher"
+  email: ID!
+  "identifiant (siret ou vat number) de l'entreprise à laquelle rattacher l'utilisateur"
+  orgId: ID!
+  "Rôle de l'utilisateur dans l'entreprise"
+  role: UserRole!
+}
