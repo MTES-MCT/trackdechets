@@ -268,7 +268,9 @@ export default function Appendix2MultiSelect() {
                         </td>
                         <td>{form.emitter?.company?.name}</td>
                         <td>{formatDate(form.signedAt!)}</td>
-                        <td>{form.quantityReceived} T</td>
+                        <td>
+                          {form.quantityAccepted ?? form.quantityReceived} T
+                        </td>
                         <td>{quantityLeft.toNumber()} T</td>
                         <td>
                           <input
