@@ -79,7 +79,7 @@ import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import TdTooltip from "../../../common/components/Tooltip";
 import {
   BSD_DETAILS_QTY_TOOLTIP,
-  NON_RENSEIGNE
+  QUANTITY_NON_RENSEIGNE
 } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
 import { notNullNorUndefined } from "../../../common/helper";
 
@@ -393,7 +393,8 @@ const Recipient = ({
               `${form?.quantityRefused} tonnes`
             ) : (
               <>
-                {NON_RENSEIGNE} <TdTooltip msg={BSD_DETAILS_QTY_TOOLTIP} />
+                {QUANTITY_NON_RENSEIGNE}{" "}
+                <TdTooltip msg={BSD_DETAILS_QTY_TOOLTIP} />
               </>
             )
           }
@@ -408,7 +409,8 @@ const Recipient = ({
               `${form?.quantityAccepted} tonnes`
             ) : (
               <>
-                {NON_RENSEIGNE} <TdTooltip msg={BSD_DETAILS_QTY_TOOLTIP} />
+                {QUANTITY_NON_RENSEIGNE}{" "}
+                <TdTooltip msg={BSD_DETAILS_QTY_TOOLTIP} />
               </>
             )
           }

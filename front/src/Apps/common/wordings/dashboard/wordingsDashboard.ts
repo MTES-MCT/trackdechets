@@ -191,5 +191,6 @@ export const VALIDER_SYNTHESE_LABEL = "Valider la synthèse";
 export const ROAD_CONTROL = "Contrôle routier";
 
 export const NON_RENSEIGNE = "Non renseigné";
+export const QUANTITY_NON_RENSEIGNE = "Non renseignée";
 export const BSD_DETAILS_QTY_TOOLTIP =
   "Les valeurs quantité refusée et traitée font suite à une mise à jour permettant à l'installation de destination d'un bordereau de les compléter. Si la valeur affichée est 'Non renseignée', cela signifie que le traitement est antérieur à la mise à disposition de cette fonctionnalité et que ces champs n'ont pas été complétés ultérieurement, par la révision par exemple. Pour plus d'informations sur ces nouveaux champs, consultez la FAQ.";
