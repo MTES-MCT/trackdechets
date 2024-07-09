@@ -55,15 +55,17 @@ export const selectPackagingRules = (
       ([BsddPackagingsType.Citerne, BsddPackagingsType.Benne].includes(
         selectedOptionValue
       ) ||
-        values.some(p =>
-          [
+        values.some(p => {
+          const optionValues =
+            selectedOptionValue !== BsddPackagingsType.Autre
+              ? [selectedOptionValue]
+              : [];
+          return [
             BsddPackagingsType.Citerne,
             BsddPackagingsType.Benne,
-            ...(selectedOptionValue !== BsddPackagingsType.Autre
-              ? [selectedOptionValue]
-              : [])
-          ].includes(p.type)
-        ))
+            [...optionValues]
+          ].includes(p.type);
+        }))
     );
   }
   return false;
