@@ -108,7 +108,7 @@ const getTransportersData = (bsff: RegistryBsff, includePlates = false) => {
       transporter3NumberPlates:
         transporter3?.transporterTransportPlates ?? null,
       transporter4NumberPlates:
-        transporter5?.transporterTransportPlates ?? null,
+        transporter4?.transporterTransportPlates ?? null,
       transporter5NumberPlates: transporter5?.transporterTransportPlates ?? null
     };
   }

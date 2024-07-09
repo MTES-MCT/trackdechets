@@ -9,10 +9,71 @@ import {
 } from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryBsffInclude } from "../../registry/elastic";
-import { createBsff, createBsffAfterOperation } from "./factories";
+import {
+  addBsffTransporter,
+  createBsff,
+  createBsffAfterOperation
+} from "./factories";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { BsffType } from "@prisma/client";
+
+const createBsffWith5Transporters = async () => {
+  const transporter1 = await userWithCompanyFactory("MEMBER", {
+    companyTypes: ["TRANSPORTER"]
+  });
+  const transporter2 = await userWithCompanyFactory("MEMBER", {
+    companyTypes: ["TRANSPORTER"]
+  });
+  const transporter3 = await userWithCompanyFactory("MEMBER", {
+    companyTypes: ["TRANSPORTER"]
+  });
+  const transporter4 = await userWithCompanyFactory("MEMBER", {
+    companyTypes: ["TRANSPORTER"]
+  });
+  const transporter5 = await userWithCompanyFactory("MEMBER", {
+    companyTypes: ["TRANSPORTER"]
+  });
+  const bsff = await createBsff(
+    { transporter: transporter1 },
+    {
+      data: { destinationCompanyMail: "destination@mail.com" },
+      transporterData: {
+        transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"]
+      }
+    }
+  );
+
+  await addBsffTransporter({
+    bsffId: bsff.id,
+    transporter: transporter2,
+    opt: { transporterTransportPlates: ["TRANSPORTER2-NBR-PLATES"] }
+  });
+  await addBsffTransporter({
+    bsffId: bsff.id,
+    transporter: transporter3,
+    opt: { transporterTransportPlates: ["TRANSPORTER3-NBR-PLATES"] }
+  });
+  await addBsffTransporter({
+    bsffId: bsff.id,
+    transporter: transporter4,
+    opt: { transporterTransportPlates: ["TRANSPORTER4-NBR-PLATES"] }
+  });
+  await addBsffTransporter({
+    bsffId: bsff.id,
+    transporter: transporter5,
+    opt: { transporterTransportPlates: ["TRANSPORTER5-NBR-PLATES"] }
+  });
+
+  return {
+    bsff,
+    transporter1,
+    transporter2,
+    transporter3,
+    transporter4,
+    transporter5
+  };
+};
 
 describe("toOutgoingWaste", () => {
   afterAll(resetDatabase);
@@ -65,10 +126,7 @@ describe("toOutgoingWaste", () => {
 
   it("should contain transporters info except plates", async () => {
     // Given
-    const bsff = await createBsff(
-      {},
-      { data: { destinationCompanyMail: "destination@mail.com" } }
-    );
+    const { bsff } = await createBsffWith5Transporters();
 
     // When
     const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
@@ -83,16 +141,24 @@ describe("toOutgoingWaste", () => {
     );
     expect(waste["transporterNumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter2CompanySiret).toBeNull();
+    expect(waste.transporter2CompanySiret).toBe(
+      bsffForRegistry.transporters[1].transporterCompanySiret
+    );
     expect(waste["transporter2NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter3CompanySiret).toBeNull();
+    expect(waste.transporter3CompanySiret).toBe(
+      bsffForRegistry.transporters[2].transporterCompanySiret
+    );
     expect(waste["transporter3NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter4CompanySiret).toBeNull();
+    expect(waste.transporter4CompanySiret).toBe(
+      bsffForRegistry.transporters[3].transporterCompanySiret
+    );
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter5CompanySiret).toBeNull();
+    expect(waste.transporter5CompanySiret).toBe(
+      bsffForRegistry.transporters[4].transporterCompanySiret
+    );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
 });
@@ -102,10 +168,7 @@ describe("toIncomingWaste", () => {
 
   it("should contain transporters info except plates", async () => {
     // Given
-    const bsff = await createBsff(
-      {},
-      { data: { destinationCompanyMail: "destination@mail.com" } }
-    );
+    const { bsff } = await createBsffWith5Transporters();
 
     // When
     const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
@@ -120,16 +183,24 @@ describe("toIncomingWaste", () => {
     );
     expect(waste["transporterNumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter2CompanySiret).toBeNull();
+    expect(waste.transporter2CompanySiret).toBe(
+      bsffForRegistry.transporters[1].transporterCompanySiret
+    );
     expect(waste["transporter2NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter3CompanySiret).toBeNull();
+    expect(waste.transporter3CompanySiret).toBe(
+      bsffForRegistry.transporters[2].transporterCompanySiret
+    );
     expect(waste["transporter3NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter4CompanySiret).toBeNull();
+    expect(waste.transporter4CompanySiret).toBe(
+      bsffForRegistry.transporters[3].transporterCompanySiret
+    );
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter5CompanySiret).toBeNull();
+    expect(waste.transporter5CompanySiret).toBe(
+      bsffForRegistry.transporters[4].transporterCompanySiret
+    );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
 });
@@ -139,10 +210,7 @@ describe("toManagedWaste", () => {
 
   it("should contain transporters info except plates", async () => {
     // Given
-    const bsff = await createBsff(
-      {},
-      { data: { destinationCompanyMail: "destination@mail.com" } }
-    );
+    const { bsff } = await createBsffWith5Transporters();
 
     // When
     const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
@@ -157,16 +225,24 @@ describe("toManagedWaste", () => {
     );
     expect(waste["transporterNumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter2CompanySiret).toBeNull();
+    expect(waste.transporter2CompanySiret).toBe(
+      bsffForRegistry.transporters[1].transporterCompanySiret
+    );
     expect(waste["transporter2NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter3CompanySiret).toBeNull();
+    expect(waste.transporter3CompanySiret).toBe(
+      bsffForRegistry.transporters[2].transporterCompanySiret
+    );
     expect(waste["transporter3NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter4CompanySiret).toBeNull();
+    expect(waste.transporter4CompanySiret).toBe(
+      bsffForRegistry.transporters[3].transporterCompanySiret
+    );
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter5CompanySiret).toBeNull();
+    expect(waste.transporter5CompanySiret).toBe(
+      bsffForRegistry.transporters[4].transporterCompanySiret
+    );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
 });
@@ -176,15 +252,7 @@ describe("toTransportedWaste", () => {
 
   it("should contain transporters info including plates", async () => {
     // Given
-    const bsff = await createBsff(
-      {},
-      {
-        data: { destinationCompanyMail: "destination@mail.com" },
-        transporterData: {
-          transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"]
-        }
-      }
-    );
+    const { bsff } = await createBsffWith5Transporters();
 
     // When
     const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
@@ -201,17 +269,33 @@ describe("toTransportedWaste", () => {
       "TRANSPORTER1-NBR-PLATES"
     ]);
 
-    expect(waste.transporter2CompanySiret).toBeNull();
-    expect(waste.transporter2NumberPlates).toBeNull();
+    expect(waste.transporter2CompanySiret).toBe(
+      bsffForRegistry.transporters[1].transporterCompanySiret
+    );
+    expect(waste.transporter2NumberPlates).toStrictEqual([
+      "TRANSPORTER2-NBR-PLATES"
+    ]);
 
-    expect(waste.transporter3CompanySiret).toBeNull();
-    expect(waste.transporter3NumberPlates).toBeNull();
+    expect(waste.transporter3CompanySiret).toBe(
+      bsffForRegistry.transporters[2].transporterCompanySiret
+    );
+    expect(waste.transporter3NumberPlates).toStrictEqual([
+      "TRANSPORTER3-NBR-PLATES"
+    ]);
 
-    expect(waste.transporter4CompanySiret).toBeNull();
-    expect(waste.transporter4NumberPlates).toBeNull();
+    expect(waste.transporter4CompanySiret).toBe(
+      bsffForRegistry.transporters[3].transporterCompanySiret
+    );
+    expect(waste.transporter4NumberPlates).toStrictEqual([
+      "TRANSPORTER4-NBR-PLATES"
+    ]);
 
-    expect(waste.transporter5CompanySiret).toBeNull();
-    expect(waste.transporter5NumberPlates).toBeNull();
+    expect(waste.transporter5CompanySiret).toBe(
+      bsffForRegistry.transporters[4].transporterCompanySiret
+    );
+    expect(waste.transporter5NumberPlates).toStrictEqual([
+      "TRANSPORTER5-NBR-PLATES"
+    ]);
   });
 });
 
@@ -264,22 +348,14 @@ describe("toAllWaste", () => {
 
   it("should contain transporters info including plates", async () => {
     // Given
-    const bsff = await createBsff(
-      {},
-      {
-        data: { destinationCompanyMail: "destination@mail.com" },
-        transporterData: {
-          transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"]
-        }
-      }
-    );
+    const { bsff } = await createBsffWith5Transporters();
 
     // When
     const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id },
       include: RegistryBsffInclude
     });
-    const waste = toAllWaste(bsffForRegistry);
+    const waste = toTransportedWaste(bsffForRegistry);
 
     // Then
     expect(waste.transporterCompanySiret).toBe(
@@ -289,17 +365,33 @@ describe("toAllWaste", () => {
       "TRANSPORTER1-NBR-PLATES"
     ]);
 
-    expect(waste.transporter2CompanySiret).toBeNull();
-    expect(waste.transporter2NumberPlates).toBeNull();
+    expect(waste.transporter2CompanySiret).toBe(
+      bsffForRegistry.transporters[1].transporterCompanySiret
+    );
+    expect(waste.transporter2NumberPlates).toStrictEqual([
+      "TRANSPORTER2-NBR-PLATES"
+    ]);
 
-    expect(waste.transporter3CompanySiret).toBeNull();
-    expect(waste.transporter3NumberPlates).toBeNull();
+    expect(waste.transporter3CompanySiret).toBe(
+      bsffForRegistry.transporters[2].transporterCompanySiret
+    );
+    expect(waste.transporter3NumberPlates).toStrictEqual([
+      "TRANSPORTER3-NBR-PLATES"
+    ]);
 
-    expect(waste.transporter4CompanySiret).toBeNull();
-    expect(waste.transporter4NumberPlates).toBeNull();
+    expect(waste.transporter4CompanySiret).toBe(
+      bsffForRegistry.transporters[3].transporterCompanySiret
+    );
+    expect(waste.transporter4NumberPlates).toStrictEqual([
+      "TRANSPORTER4-NBR-PLATES"
+    ]);
 
-    expect(waste.transporter5CompanySiret).toBeNull();
-    expect(waste.transporter5NumberPlates).toBeNull();
+    expect(waste.transporter5CompanySiret).toBe(
+      bsffForRegistry.transporters[4].transporterCompanySiret
+    );
+    expect(waste.transporter5NumberPlates).toStrictEqual([
+      "TRANSPORTER5-NBR-PLATES"
+    ]);
   });
 });
 
