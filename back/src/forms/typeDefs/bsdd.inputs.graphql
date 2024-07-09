@@ -728,6 +728,16 @@ input TempStorerAcceptedFormInput {
   """
   quantityReceived: Float!
 
+  """
+  Quantité refusée (optionnelle)
+
+  Si définie:
+  - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
+  - doit être égale à 0 si le déchet est totalement accepté.
+  - doit être égale à quantityReceived si le déchet est totalement refusé.
+  """
+  quantityRefused: Float
+
   "Réelle ou estimée"
   quantityType: QuantityType!
 }

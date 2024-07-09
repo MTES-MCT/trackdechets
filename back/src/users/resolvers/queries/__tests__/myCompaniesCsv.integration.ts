@@ -110,4 +110,36 @@ describe("query { myCompaniesCsv }", () => {
         });
       });
   });
+
+  it("should paginate correctly if user has more than chunk size (100) companies", async () => {
+    const user = await userFactory();
+    const companyCount = 150;
+    for (let i = 0; i < companyCount; i++) {
+      const company = await companyFactory();
+      await associateUserToCompany(user.id, company.orgId, "ADMIN");
+    }
+    const { query } = makeClient(user);
+    const { data, errors } = await query<Pick<Query, "myCompaniesCsv">>(
+      MY_COMPANIES_CSV
+    );
+    expect(errors).toBeUndefined();
+    expect(data.myCompaniesCsv?.token?.length).toBeGreaterThan(0);
+    expect(data.myCompaniesCsv?.downloadLink?.length).toBeGreaterThan(0);
+
+    const request = supertest(app);
+
+    const res = await request
+      .get("/download")
+      .query({ token: data.myCompaniesCsv!.token });
+
+    expect(res.status).toBe(200);
+
+    const rows: any[] = [];
+
+    parseString(res.text, { headers: true, delimiter: ";" })
+      .on("data", row => rows.push(row))
+      .on("end", (rowCount: number) => {
+        expect(rowCount).toEqual(companyCount);
+      });
+  });
 });

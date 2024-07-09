@@ -132,4 +132,44 @@ describe("query { myCompaniesXls }", () => {
       Rôle: formatRole(association4.role)
     });
   });
+
+  it("should paginate correctly if user has more than chunk size (100) companies", async () => {
+    const user = await userFactory();
+    const companyCount = 150;
+    for (let i = 0; i < companyCount; i++) {
+      const company = await companyFactory();
+      await associateUserToCompany(user.id, company.orgId, "ADMIN");
+    }
+
+    const { query } = makeClient(user);
+    const { data, errors } = await query<Pick<Query, "myCompaniesXls">>(
+      MY_COMPANIES_XLS
+    );
+    expect(errors).toBeUndefined();
+
+    expect(data.myCompaniesXls?.token?.length).toBeGreaterThan(0);
+    expect(data.myCompaniesXls?.downloadLink?.length).toBeGreaterThan(0);
+
+    const request = supertest(app);
+    const req = request
+      .get("/download")
+      .query({ token: data.myCompaniesXls!.token });
+
+    const tmpFolder = fs.mkdtempSync(join(tmpdir(), sep));
+    const filename = `${tmpFolder}/registre.xlsx`;
+    const writeStream = createWriteStream(filename);
+
+    req.pipe(writeStream);
+
+    await new Promise<void>(resolve => {
+      req.on("end", async () => {
+        writeStream.on("finish", () => resolve());
+      });
+    });
+
+    const workbook = new Excel.Workbook();
+    await workbook.xlsx.readFile(filename);
+    const worksheet = workbook.getWorksheet("etablissements")!;
+    expect(worksheet.rowCount).toBe(companyCount + 1); //+1 for header
+  });
 });
