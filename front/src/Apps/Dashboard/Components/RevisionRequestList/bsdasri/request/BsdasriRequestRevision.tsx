@@ -190,7 +190,6 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
               <BsdPackagings
                 bsdType={BsdTypename.Bsdasri}
                 path="destination.reception.packagings"
-                disabledAddCta={false}
               />
             </RhfReviewableField>
           )}

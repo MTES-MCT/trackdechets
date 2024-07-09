@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   getInitialBroker,
+  getInitialCompany,
   getInitialTrader
 } from "../../../../../../form/bsdd/utils/initial-state";
 import { ALL_WASTES } from "@td/constants";
@@ -96,6 +97,24 @@ export const getDasriSchema = () =>
       .string()
       .min(3, "Le commentaire doit faire au moins 3 caractères")
   });
+
+const broker_trader_Schema = z.object({
+  receipt: z.string().nullish(),
+  department: z.string().nullish(),
+  validityLimit: z.string().nullish(),
+  company: z.object({
+    orgId: z.string().nullish(),
+    siret: z.string().nullish(),
+    name: z.string().nullish(),
+    address: z.string().nullish(),
+    contact: z.string().nullish(),
+    mail: z.string().nullish(),
+    phone: z.string().nullish(),
+    vatNumber: z.string().nullish(),
+    country: z.string().nullish(),
+    omiNumber: z.string().nullish()
+  })
+});
 
 export const initialBsddReview = {
   wasteDetails: {
@@ -198,40 +217,8 @@ export const validationBsddSchema = z.object({
     sampleNumber: z.string().nullish(),
     quantity: z.number().nullish()
   }),
-  trader: z.object({
-    receipt: z.string().nullish(),
-    department: z.string().nullish(),
-    validityLimit: z.string().nullish(),
-    company: z.object({
-      orgId: z.string().nullish(),
-      siret: z.string().nullish(),
-      name: z.string().nullish(),
-      address: z.string().nullish(),
-      contact: z.string().nullish(),
-      mail: z.string().nullish(),
-      phone: z.string().nullish(),
-      vatNumber: z.string().nullish(),
-      country: z.string().nullish(),
-      omiNumber: z.string().nullish()
-    })
-  }),
-  broker: z.object({
-    receipt: z.string().nullish(),
-    department: z.string().nullish(),
-    validityLimit: z.string().nullish(),
-    company: z.object({
-      orgId: z.string().nullish(),
-      siret: z.string().nullish(),
-      name: z.string().nullish(),
-      address: z.string().nullish(),
-      contact: z.string().nullish(),
-      mail: z.string().nullish(),
-      phone: z.string().nullish(),
-      vatNumber: z.string().nullish(),
-      country: z.string().nullish(),
-      omiNumber: z.string().nullish()
-    })
-  }),
+  trader: broker_trader_Schema,
+  broker: broker_trader_Schema,
   recipient: z.object({
     cap: z.string().nullish()
   }),
@@ -248,4 +235,114 @@ export const validationBsddSchema = z.object({
       processingOperation: z.string().nullish()
     })
   })
+});
+
+export const initialBsdaReview = {
+  emitter: {
+    pickupSite: {
+      name: "",
+      address: "",
+      city: "",
+      postalCode: "",
+      infos: ""
+    }
+  },
+  waste: {
+    code: "",
+    pop: null,
+    sealNumbers: [],
+    materialName: ""
+  },
+  packagings: [],
+  broker: {
+    company: getInitialCompany(),
+    recepisse: {
+      number: "",
+      department: "",
+      validityLimit: null
+    }
+  },
+  destination: {
+    cap: "",
+    reception: {
+      weight: null
+    },
+    operation: {
+      code: "",
+      mode: null,
+      description: ""
+    }
+  },
+  isCanceled: false
+};
+
+export const validationBsdaSchema = z.object({
+  comment: z.string().min(3, "Le commentaire doit faire au moins 3 caractères"),
+  isCanceled: z.boolean().nullish(),
+  waste: z.object({
+    code: z.string().nullish(),
+    cap: z.string().nullish(),
+    sealNumbers: z.array(z.string()).nullish(),
+    materialName: z.string().nullish(),
+    pop: z.boolean().nullish()
+  }),
+  emitter: z.object({
+    pickupSite: z.object({
+      name: z.string().nullish(),
+      address: z.string().nullish(),
+      city: z.string().nullish(),
+      postalCode: z.string().nullish(),
+      infos: z.string().nullish()
+    })
+  }),
+  packagings: z
+    .array(
+      z
+        .object({
+          type: z.enum(
+            [
+              "BIG_BAG",
+              "CONTENEUR_BAG",
+              "DEPOT_BAG",
+              "OTHER",
+              "PALETTE_FILME",
+              "SAC_RENFORCE"
+            ],
+            {
+              required_error: "Ce champ est requis",
+              invalid_type_error: "Ce champ est requis"
+            }
+          ),
+          other: z.string(),
+          quantity: z.coerce
+            .number()
+            .positive("Ce champ est requis est doit être supérieur à 0")
+        })
+        .superRefine((values, context) => {
+          if (values.type === "OTHER" && !values.other) {
+            context.addIssue({
+              code: z.ZodIssueCode.custom,
+
+              message: "Veuillez préciser le conditionnement",
+
+              path: ["other"]
+            });
+          }
+        })
+    )
+    .nullish(),
+  broker: broker_trader_Schema,
+  destination: z
+    .object({
+      cap: z.string().nullish(),
+      reception: z.object({
+        weight: z.coerce.number().nonnegative().nullish()
+      }),
+      operation: z.object({
+        code: z.string().nullish(),
+        mode: z.string().nullish(),
+        description: z.string().nullish()
+      })
+    })
+    .nullish()
 });

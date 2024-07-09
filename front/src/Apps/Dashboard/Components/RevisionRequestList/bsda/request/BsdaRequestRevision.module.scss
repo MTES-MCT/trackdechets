@@ -41,3 +41,12 @@
     justify-content: flex-end;
   }
 }
+
+.cta {
+  display: flex;
+  margin-top: 40px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  align-self: stretch;
+}
