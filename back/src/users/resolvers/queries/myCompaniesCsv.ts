@@ -1,3 +1,4 @@
+import { prisma } from "@td/prisma";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
@@ -11,9 +12,15 @@ export type MyCompaniesCsvArgs = { userId: string };
 export const myCompaniesCsvDownloadHandler: DownloadHandler<MyCompaniesCsvArgs> =
   {
     name: "myCompaniesCsv",
-    handler: (_, res, args) => {
+    handler: async (_, res, { userId }) => {
+      // Liste tous les établissements auxquels appartient l'utilisateur
+      const associations = await prisma.companyAssociation.findMany({
+        where: { userId },
+        select: { companyId: true }
+      });
+      const companyIds = associations.map(a => a.companyId);
       const reader = myCompaniesReader({
-        userId: args.userId,
+        companyIds,
         chunk: 100
       });
       const filename = getCompaniesExportFileName();
