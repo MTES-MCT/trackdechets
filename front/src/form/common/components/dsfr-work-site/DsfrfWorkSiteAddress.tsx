@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useState } from "react";
 import * as Sentry from "@sentry/browser";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
-import SearchInput from "../../../../common/components/DsfrSearchInput";
+import SearchInput from "../../../../Apps/common/Components/search/DsfrSearchInput";
 import styles from "./WorkSiteAddress.module.scss";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 

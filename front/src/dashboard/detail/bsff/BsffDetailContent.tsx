@@ -41,7 +41,7 @@ import {
 } from "../../../common/components";
 import { formatDate } from "../../../common/datetime";
 import { PACKAGINGS_NAMES } from "../../../form/bsff/components/packagings/Packagings";
-import { getOperationModeLabel } from "../../../common/operationModes";
+import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { BSFF_VERBOSE_STATUSES, isForeignVat } from "@td/constants";
 
 type CompanyProps = {
