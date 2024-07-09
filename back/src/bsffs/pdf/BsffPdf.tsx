@@ -23,6 +23,7 @@ import { extractPostalCode } from "../../utils";
 import { Decimal } from "decimal.js";
 import { Recepisse } from "./Recepisse";
 import { getOperationModeLabel } from "../../common/operationModes";
+import { dateToXMonthAtHHMM } from "../../common/helpers";
 
 type Props = {
   bsff: Bsff & { packagings: BsffPackaging[] } & {
@@ -109,6 +110,9 @@ function Header({ qrCode }: Pick<Props, "qrCode">) {
       </div>
       <div className="BoxCol TextAlignCenter">
         <div className="QrCode" dangerouslySetInnerHTML={{ __html: qrCode }} />
+        <div>
+          <b>Document édité le {dateToXMonthAtHHMM()}</b>
+        </div>
       </div>
       {/* End 3-parts header */}
     </div>

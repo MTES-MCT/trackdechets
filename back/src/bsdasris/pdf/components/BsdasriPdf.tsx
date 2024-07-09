@@ -18,6 +18,7 @@ import { FormCompanyFields } from "./FormCompanyFields";
 import { BsdasriType, OperationMode } from "@prisma/client";
 import { Recepisse } from "../../../bsda/pdf/components/Recepisse";
 import { getOperationModeLabel } from "../../../common/operationModes";
+import { dateToXMonthAtHHMM } from "../../../common/helpers";
 
 type Props = {
   bsdasri: Bsdasri;
@@ -56,6 +57,9 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               className="QrCode"
               dangerouslySetInnerHTML={{ __html: qrCode }}
             />
+            <div>
+              <b>Document édité le {dateToXMonthAtHHMM()}</b>
+            </div>
           </div>
         </div>
         {/* end 3-parts header */}
