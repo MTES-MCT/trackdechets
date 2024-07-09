@@ -26,7 +26,10 @@ import {
   MARK_TEMP_STORER_ACCEPTED
 } from "../../../../../form/bsdd/utils/queries";
 import { useParams } from "react-router-dom";
-import { multiplyByRounded } from "../../../../../common/helper";
+import {
+  isDefinedStrict,
+  multiplyByRounded
+} from "../../../../../common/helper";
 import Decimal from "decimal.js";
 
 const getSchema = () =>
@@ -169,11 +172,9 @@ function SignReceptionModal({
     MutationMarkAsTempStorerAcceptedArgs
   >(MARK_TEMP_STORER_ACCEPTED);
 
-  const isReception = [
-    FormStatus.Sent,
-    FormStatus.Resent,
-    FormStatus.TempStored
-  ].includes(form.status);
+  const isReception = [FormStatus.Sent, FormStatus.Resent].includes(
+    form.status
+  );
   const isTempStorage = form.recipient?.isTempStorage;
   const isFinalDestination =
     (isTempStorage &&
@@ -227,6 +228,7 @@ function SignReceptionModal({
               id: form.id,
               tempStorerAcceptedInfo: {
                 quantityReceived: receivedWeight,
+                quantityRefused: refusedWeight,
                 quantityType: quantityType,
                 signedAt: signedAt,
                 signedBy: signedBy,
@@ -290,8 +292,8 @@ function SignReceptionModal({
     !receivedWeight || ["ACCEPTED", "REFUSED"].includes(acceptationStatus);
 
   const acceptedWeight = receivedWeight
-    ? new Decimal(receivedWeight)
-        .minus(refusedWeight ?? 0)
+    ? new Decimal(receivedWeight ?? 0)
+        .minus(isDefinedStrict(refusedWeight) ? refusedWeight! : 0)
         .toDecimalPlaces(6)
         .toNumber()
     : 0;

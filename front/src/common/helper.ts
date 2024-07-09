@@ -196,9 +196,27 @@ export const multiplyByRounded = (
   num: number | null = 0,
   multBy = 1000
 ): number => {
-  return new Decimal(num || 0).times(multBy).toDecimalPlaces(6).toNumber();
+  if (!isDefinedStrict(num)) {
+    return 0;
+  }
+
+  return new Decimal(num ?? 0).times(multBy).toDecimalPlaces(6).toNumber();
 };
 
-export const notNullNorUndefined = (val: any): boolean => {
+export const isDefined = (
+  val: any,
+  accept = { acceptEmptyString: true }
+): boolean => {
+  if (val === "") return accept.acceptEmptyString;
+
   return val !== undefined && val !== null;
+};
+
+/**
+ * This one does not consider empty strings "" as 'defined'
+ */
+export const isDefinedStrict = (val: any): boolean => {
+  if (val === "") return false;
+
+  return isDefined(val);
 };

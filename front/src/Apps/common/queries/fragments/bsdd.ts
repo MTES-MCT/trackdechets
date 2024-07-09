@@ -119,6 +119,8 @@ export const temporaryStorageDetailFragment = gql`
     temporaryStorer {
       quantityType
       quantityReceived
+      quantityRefused
+      quantityAccepted
       wasteAcceptationStatus
       wasteRefusalReason
       receivedAt

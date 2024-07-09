@@ -10,7 +10,7 @@ import {
   DsfrDataListTerm,
   DsfrDataListDescription
 } from "../../../../../common/components";
-import { notNullNorUndefined } from "../../../../../common/helper";
+import { isDefined } from "../../../../../common/helper";
 
 interface FormWasteSummaryProps {
   form: Form;
@@ -77,7 +77,7 @@ const getConsistenceLabel = (consistence: Maybe<Consistence> | undefined) => {
 const getWasteQuantityAndIsEstimated = (
   form
 ): { quantity: number; isEstimated: boolean } => {
-  if (notNullNorUndefined(form.quantityReceived)) {
+  if (isDefined(form.quantityReceived)) {
     return { quantity: form.quantityReceived, isEstimated: false };
   }
 
