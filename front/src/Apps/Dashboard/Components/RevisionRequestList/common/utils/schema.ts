@@ -1,10 +1,10 @@
 import { z } from "zod";
 import {
   getInitialBroker,
-  getInitialCompany,
   getInitialTrader
 } from "../../../../../../form/bsdd/utils/initial-state";
 import { ALL_WASTES } from "@td/constants";
+import { getInitialCompany } from "../../../../../common/data/initialState";
 
 export const initialDasriReview = {
   emitter: {

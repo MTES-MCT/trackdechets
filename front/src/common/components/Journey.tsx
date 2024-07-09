@@ -10,8 +10,10 @@ export function Journey({ children }: JourneyProps) {
   return <ul className={styles.Journey}>{children}</ul>;
 }
 
+export type JourneyStopVariant = "complete" | "active" | "incomplete";
+
 interface JourneyStopProps {
-  variant?: "complete" | "active" | "incomplete";
+  variant?: JourneyStopVariant;
   children: React.ReactNode;
 }
 

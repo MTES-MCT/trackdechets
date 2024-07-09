@@ -2,7 +2,6 @@ import { useMutation, useQuery } from "@apollo/client";
 import React, { ReactElement, useMemo, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "../../Apps/common/Components";
-import { getComputedState } from "../common/getComputedState";
 import { IStepContainerProps } from "../common/stepper/Step";
 import { toastApolloError } from "../common/stepper/toaster";
 import {
@@ -13,15 +12,28 @@ import {
   Query,
   Bsff,
   BsffInput,
-  BsffType
+  BsffType,
+  MutationCreateBsffTransporterArgs,
+  BsffTransporterInput,
+  TransportMode,
+  MutationUpdateBsffTransporterArgs
 } from "@td/codegen-ui";
-import initialState from "./utils/initial-state";
+import {
+  BsffFormikValues,
+  CreateOrUpdateBsffTransporterInput,
+  getInitialState
+} from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSFF,
   UPDATE_BSFF_FORM,
   GET_BSFF_FORM
 } from "../../Apps/common/queries/bsff/queries";
 import { validationSchema } from "./utils/schema";
+import {
+  CREATE_BSFF_TRANSPORTER,
+  UPDATE_BSFF_TRANSPORTER
+} from "../../Apps/Forms/Components/query";
+import { isForeignVat } from "@td/constants";
 
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
@@ -32,7 +44,7 @@ interface Props {
 export default function BsffStepsList(props: Props) {
   const navigate = useNavigate();
 
-  const formQuery = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(
+  const bsffQuery = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(
     GET_BSFF_FORM,
     {
       variables: {
@@ -43,20 +55,10 @@ export default function BsffStepsList(props: Props) {
     }
   );
 
-  const formState = useMemo(() => {
-    function getCurrentState(bsff: Bsff) {
-      const { forwarding, repackaging, grouping, transporter } = bsff;
-      const previousPackagings = [...forwarding, ...repackaging, ...grouping];
-      return {
-        ...formQuery.data?.bsff,
-        previousPackagings,
-        transporter
-      };
-    }
-    const bsff = formQuery.data?.bsff;
-
-    return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
-  }, [formQuery.data]);
+  const bsffState = useMemo(() => {
+    const existingBsff = bsffQuery.data?.bsff;
+    return getInitialState(existingBsff);
+  }, [bsffQuery.data]);
 
   const [createDraftBsff, { loading: creating }] = useMutation<
     Pick<Mutation, "createDraftBsff">,
@@ -68,46 +70,143 @@ export default function BsffStepsList(props: Props) {
     MutationUpdateBsffArgs
   >(UPDATE_BSFF_FORM);
 
-  function saveForm(input: BsffInput): Promise<any> {
-    return formState.id
+  const [createBsffTransporter, { loading: creatingBsffTransporter }] =
+    useMutation<
+      Pick<Mutation, "createBsffTransporter">,
+      MutationCreateBsffTransporterArgs
+    >(CREATE_BSFF_TRANSPORTER);
+
+  const [updateBsffTransporter, { loading: updatingBsffTransporter }] =
+    useMutation<
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER);
+
+  const loading =
+    creating || updating || creatingBsffTransporter || updatingBsffTransporter;
+
+  function saveBsff(input: BsffInput): Promise<any> {
+    return bsffState.id
       ? updateBsffForm({
-          variables: { id: formState.id, input }
+          variables: { id: bsffState.id, input }
         })
       : createDraftBsff({ variables: { input } });
   }
 
-  function onSubmit(values) {
+  async function saveBsffTransporter(
+    transporterInput: CreateOrUpdateBsffTransporterInput
+  ): Promise<string> {
+    const { id, takenOverAt, transport, ...input } = transporterInput;
+
+    // S'assure que les données de récépissé transport sont nulles dans les
+    // cas suivants :
+    // - l'exemption est cochée
+    // - le transporteur est étranger
+    // - le transport ne se fait pas par la route
+    const cleanInput: BsffTransporterInput = {
+      ...input,
+      transport: {
+        mode: transport?.mode,
+        plates: transport?.plates
+      },
+      recepisse: {
+        ...input.recepisse,
+        ...(input.recepisse?.isExempted ||
+        isForeignVat(input?.company?.vatNumber) ||
+        transport?.mode !== TransportMode.Road
+          ? {
+              number: null,
+              validityLimit: null,
+              department: null
+            }
+          : {})
+      }
+    };
+
+    if (id) {
+      // Le transporteur existe déjà en base de données, on met
+      // à jour les infos (uniquement si le transporteur n'a pas encore
+      // pris en charge le déchet) et on renvoie l'identifiant
+      if (!takenOverAt) {
+        const { errors } = await updateBsffTransporter({
+          variables: { id, input: cleanInput },
+          onError: err => {
+            toastApolloError(err);
+          }
+        });
+        if (errors) {
+          throw new Error(errors.map(e => e.message).join("\n"));
+        }
+      }
+      return id;
+    } else {
+      // Le transporteur n'existe pas encore en base, on le crée
+      // et on renvoie l'identifiant retourné
+      const { data, errors } = await createBsffTransporter({
+        variables: { input: cleanInput },
+        onError: err => {
+          toastApolloError(err);
+        }
+      });
+      if (errors) {
+        throw new Error(errors.map(e => e.message).join("\n"));
+      }
+      // if `errors` is not defined then data?.createBsffTransporter?.id
+      // should be defined. For type safety we return "" if it is not, but
+      // it should not hapen
+      return data?.createBsffTransporter?.id ?? "";
+    }
+  }
+
+  async function onSubmit(values: BsffFormikValues) {
     const {
       id,
       ficheInterventions,
       previousPackagings,
       packagings,
       type,
-      transporter,
-      destination: { plannedOperationCode, ...destination },
+      transporters,
+      destination,
       ...input
     } = values;
-    saveForm({
-      type,
+
+    let transporterIds: string[] = [];
+
+    try {
+      transporterIds = await Promise.all(
+        transporters.map(t => saveBsffTransporter(t))
+      );
+    } catch (_) {
+      // Si une erreur survient pendant la sauvegarde des données
+      // transporteur, on n'essaye même pas de sauvgarder le bordereau
+      return;
+    }
+
+    const bsffInput: BsffInput = {
       ...input,
-      transporter,
-      destination: {
-        ...destination,
-        plannedOperationCode:
-          plannedOperationCode?.length > 0 ? plannedOperationCode : null
-      },
-      // packagings is computed by the backend in case of groupement or reexpedition
-      ...([BsffType.Groupement, BsffType.Reexpedition].includes(type)
-        ? {}
-        : {
-            packagings: packagings.map(p => ({
-              type: p.type,
-              other: p.other,
-              numero: p.numero,
-              volume: p.volume,
-              weight: p.weight
-            }))
-          }),
+      transporters: transporterIds
+    };
+
+    const cleanDestination = {
+      ...destination,
+      plannedOperationCode:
+        destination?.plannedOperationCode &&
+        destination?.plannedOperationCode?.length > 0
+          ? destination.plannedOperationCode
+          : null
+    };
+
+    // packagings is computed by the backend in case of groupement or reexpedition
+    const cleanPackagings =
+      type && [BsffType.Groupement, BsffType.Reexpedition].includes(type)
+        ? undefined
+        : packagings;
+
+    saveBsff({
+      type,
+      ...bsffInput,
+      destination: cleanDestination,
+      packagings: cleanPackagings,
       ficheInterventions: ficheInterventions.map(
         ficheIntervention => ficheIntervention.id
       ),
@@ -128,7 +227,7 @@ export default function BsffStepsList(props: Props) {
 
   // As it's a render function, the steps are nested into a `<></>` block
   // So we render then unwrap to get the steps
-  const parentOfSteps = props.children(formQuery.data?.bsff);
+  const parentOfSteps = props.children(bsffQuery.data?.bsff);
   const steps = parentOfSteps.props
     .children as ReactElement<IStepContainerProps>[];
 
@@ -137,12 +236,12 @@ export default function BsffStepsList(props: Props) {
       <GenericStepList
         children={steps}
         formId={props.formId}
-        formQuery={formQuery}
+        formQuery={bsffQuery}
         onSubmit={onSubmit}
-        initialValues={formState}
+        initialValues={bsffState}
         validationSchema={validationSchema}
       />
-      {(creating || updating) && <Loader />}
+      {loading && <Loader />}
     </>
   );
 }

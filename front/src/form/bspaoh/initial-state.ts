@@ -1,5 +1,5 @@
-import { getInitialCompany } from "../bsdd/utils/initial-state";
 import { TransportMode, BspaohType } from "@td/codegen-ui";
+import { getInitialCompany } from "../../Apps/common/data/initialState";
 
 export function getInitialEmitterPickupSite(pickupSite) {
   return {

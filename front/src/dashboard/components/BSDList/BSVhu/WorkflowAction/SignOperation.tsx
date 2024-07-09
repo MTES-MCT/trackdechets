@@ -1,6 +1,5 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
-import { getInitialCompany } from "../../../../../form/bsdd/utils/initial-state";
 import Operation from "../../../../../form/bsvhu/Operation";
 import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
 import { getComputedState } from "../../../../../form/common/getComputedState";
@@ -16,6 +15,7 @@ import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
+import { getInitialCompany } from "../../../../../Apps/common/data/initialState";
 
 const validationSchema = yup.object({
   date: yup.date().required("La date est requise"),

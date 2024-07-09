@@ -71,9 +71,5 @@ export default function CompanyTable({ data }: Props) {
     return [...row.cells.map(cell => cell.render("Cell"))];
   });
 
-  return (
-    <>
-      <Table headers={tableHeaders} data={tableData} fixed />
-    </>
-  );
+  return <Table headers={tableHeaders} data={tableData} fixed />;
 }

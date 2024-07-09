@@ -5,7 +5,7 @@ import { Signature as SignatureType } from "../../../generated/graphql/types";
 type Props = {
   signature: SignatureType | null | undefined;
 };
-export function Signature({ signature }: Props) {
+export function Signature({ signature }: Readonly<Props>) {
   return (
     <>
       <p>

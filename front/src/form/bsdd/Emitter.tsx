@@ -6,7 +6,6 @@ import React, { useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "../common/components/work-site/WorkSite";
 import {
-  getInitialCompany,
   getInitialEmitterWorkSite,
   initialFormTransporter
 } from "./utils/initial-state";
@@ -16,6 +15,7 @@ import { emitterTypeLabels } from "../../dashboard/constants";
 import { isForeignVat, isOmi } from "@td/constants";
 import { RedErrorMessage } from "../../common/components";
 import Tooltip from "../../common/components/Tooltip";
+import { getInitialCompany } from "../../Apps/common/data/initialState";
 
 export default function Emitter({ disabled }) {
   const ctx = useFormikContext<Form>();

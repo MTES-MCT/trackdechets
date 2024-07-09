@@ -5,7 +5,7 @@ type Props = {
   company?: FormCompany | null;
 };
 
-export function CompanyDescription({ company }: Props) {
+export function CompanyDescription({ company }: Readonly<Props>) {
   return (
     <p>
       N° SIRET : {company?.siret}
@@ -23,7 +23,7 @@ export function CompanyDescription({ company }: Props) {
   );
 }
 
-export function CompanyContact({ company }: Props) {
+export function CompanyContact({ company }: Readonly<Props>) {
   return (
     <p>
       Tel : {company?.phone}

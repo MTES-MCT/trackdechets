@@ -54,7 +54,7 @@ describe("Bsd Badge status", () => {
     expect(screen.getByText(/Signé par le transporteur/i));
   });
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "SENT multi-modal when bsdType is %p",
     bsdType => {
       const transporter1 = {
