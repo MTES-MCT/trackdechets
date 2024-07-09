@@ -1499,7 +1499,7 @@ describe("Mutation.createFormRevisionRequest", () => {
       expect(errors).toBeUndefined();
     });
 
-    it.only("cannot specify quantityReceived < quantityRefused", async () => {
+    it("cannot specify quantityReceived < quantityRefused", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
         "ADMIN"
