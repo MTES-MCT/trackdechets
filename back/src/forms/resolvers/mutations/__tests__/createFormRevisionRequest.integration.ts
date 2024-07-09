@@ -1498,6 +1498,52 @@ describe("Mutation.createFormRevisionRequest", () => {
       // Then
       expect(errors).toBeUndefined();
     });
+
+    it("cannot specify quantityReceived < quantityRefused", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+          wasteRefusalReason: "Reason",
+          quantityReceived: 15,
+          quantityRefused: 13,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              quantityReceived: 10
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+      );
+    });
+
     it("should work for APPENDIX1_PRODUCER", async () => {
       const { company: recipientCompany } = await userWithCompanyFactory(
         "ADMIN"
