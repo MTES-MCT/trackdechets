@@ -1,14 +1,16 @@
-import { getInitialCompany } from "../../bsdd/utils/initial-state";
 import {
   Bsda,
   BsdaConsistence,
   BsdaInput,
   BsdaTransporterInput,
   BsdaType,
-  FormCompany,
-  TransportMode
+  FormCompany
 } from "@td/codegen-ui";
 import { getInitialEmitterPickupSite } from "./steps/Emitter";
+import {
+  getInitialCompany,
+  initialTransporter
+} from "../../../Apps/common/data/initialState";
 
 // Les données transporteurs du formulaire représente soit un transporteur BSDA
 // déjà crée en base de données qui dispose d'un identifiant, soit un transporteur
@@ -42,15 +44,6 @@ function getInitialDestinationCompany(company?: FormCompany | null) {
   return initialDestinationCompany;
 }
 
-export const initialBsdaTransporter: BsdaTransporterInput = {
-  transport: {
-    mode: TransportMode.Road,
-    plates: []
-  },
-  recepisse: { isExempted: false },
-  company: getInitialCompany()
-};
-
 export function getInitialState(bsda?: Bsda | null): BsdaFormikValues {
   const initialTransporters: CreateOrUpdateBsdaTransporterInput[] =
     bsda?.transporters && bsda?.transporters.length > 0
@@ -58,7 +51,7 @@ export function getInitialState(bsda?: Bsda | null): BsdaFormikValues {
           ...t,
           takenOverAt: t.transport?.signature?.date
         }))
-      : [initialBsdaTransporter];
+      : [initialTransporter];
 
   return {
     id: bsda?.id ?? null,

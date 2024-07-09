@@ -10,13 +10,11 @@ import {
   MutationUpdateFormArgs
 } from "@td/codegen-ui";
 import React from "react";
-import {
-  getInitialCompany,
-  getInitialEmitterWorkSite
-} from "../utils/initial-state";
+import { getInitialEmitterWorkSite } from "../utils/initial-state";
 import { CREATE_FORM, UPDATE_FORM } from "../utils/queries";
 import WorkSite from "../../common/components/work-site/WorkSite";
 import { TOAST_DURATION } from "../../../common/config";
+import { getInitialCompany } from "../../../Apps/common/data/initialState";
 
 export function Appendix1ProducerForm({
   container,

@@ -109,16 +109,20 @@ export function SignTransport({
 
         const signingTransporter = bsda.transporters?.find(
           t => !t.transport?.signature?.date
-        )!;
+        );
+
+        if (!signingTransporter) {
+          return <div>Tous les transporteurs ont déjà signé</div>;
+        }
 
         return (
           <Formik<FormikValues>
             initialValues={{
               transport: {
-                mode: signingTransporter.transport?.mode ?? TransportMode.Road,
-                plates: signingTransporter.transport?.plates ?? [],
+                mode: signingTransporter?.transport?.mode ?? TransportMode.Road,
+                plates: signingTransporter?.transport?.plates ?? [],
                 takenOverAt:
-                  signingTransporter.transport?.takenOverAt ??
+                  signingTransporter?.transport?.takenOverAt ??
                   new Date().toISOString()
               },
               signature: {

@@ -452,6 +452,7 @@ function BsdCardList({
       {validationWorkflowType === "ACT_BSFF" && (
         <ActBsffValidation
           bsd={bsdClicked as Bsff}
+          currentSiret={siret}
           isOpen={isModalOpen}
           onClose={onClose}
         />

@@ -6,7 +6,7 @@ import { BsdasriPackaging, BsdasriPackagingType } from "@td/codegen-ui";
 import {
   PACKAGINGS_NAMES,
   getDasriPackagingInfosSummary
-} from "../../utils/packagings";
+} from "../../../../Apps/common/utils/packagingsDasriSummary";
 import React, { InputHTMLAttributes } from "react";
 import "./Packagings.scss";
 

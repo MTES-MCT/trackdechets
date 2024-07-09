@@ -9,7 +9,6 @@ import {
 } from "../../../../common/components";
 import { Loader } from "../../../../Apps/common/Components";
 import { GET_BSDAS } from "../../../../Apps/common/queries/bsda/queries";
-import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 import { FieldArray, useFormikContext } from "formik";
 import {
   Bsda,
@@ -23,6 +22,7 @@ import {
 import React from "react";
 import { useParams } from "react-router-dom";
 import { getInitialState } from "../../stepper/initial-state";
+import { getInitialCompany } from "../../../../Apps/common/data/initialState";
 
 type Props = { name: string; bsdaId: string };
 

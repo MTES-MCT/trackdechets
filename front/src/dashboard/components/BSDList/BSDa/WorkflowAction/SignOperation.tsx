@@ -4,7 +4,6 @@ import routes from "../../../../../Apps/routes";
 import { format, subMonths } from "date-fns";
 import { UPDATE_BSDA } from "../../../../../Apps/common/queries/bsda/queries";
 import Operation from "../../../../../form/bsda/stepper/steps/Operation";
-import { getInitialCompany } from "../../../../../form/bsdd/utils/initial-state";
 import { getComputedState } from "../../../../../form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
@@ -18,6 +17,7 @@ import { generatePath, Link } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
+import { getInitialCompany } from "../../../../../Apps/common/data/initialState";
 
 const validationSchema = yup.object({
   date: yup.date().required("La date est requise"),

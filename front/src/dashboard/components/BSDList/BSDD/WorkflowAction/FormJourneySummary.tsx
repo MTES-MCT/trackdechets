@@ -6,7 +6,7 @@ import {
   JourneyStopDescription,
   JourneyStopName
 } from "../../../../../common/components";
-import { formTransportIsPipeline } from "../../../../../form/bsdd/utils/packagings";
+import { formTransportIsPipeline } from "../../../../../Apps/common/utils/packagingsBsddSummary";
 
 interface FormJourneySummaryProps {
   form: Form;

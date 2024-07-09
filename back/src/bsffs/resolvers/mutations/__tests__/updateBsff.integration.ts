@@ -8,6 +8,7 @@ import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "@td/constants";
 import {
+  BsffInput,
   BsffOperationCode,
   Mutation,
   MutationUpdateBsffArgs
@@ -31,9 +32,14 @@ import {
   createBsffBeforeEmission,
   createBsffAfterReception,
   createFicheIntervention,
-  createBsffAfterAcceptation
+  createBsffAfterAcceptation,
+  addBsffTransporter
 } from "../../../__tests__/factories";
-import { getFirstTransporterSync } from "../../../database";
+import {
+  getFirstTransporter,
+  getFirstTransporterSync,
+  getTransportersSync
+} from "../../../database";
 
 const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
@@ -2292,6 +2298,712 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Vous ne pouvez pas modifier le type de BSFF après création"
+      })
+    ]);
+  });
+
+  it("should be possible to update transporters with the `transporters` field", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+    const transporter3 = await userWithCompanyFactory("MEMBER");
+    const transporter4 = await userWithCompanyFactory("MEMBER");
+    const transporter5 = await userWithCompanyFactory("MEMBER");
+
+    const bsff = await createBsffBeforeEmission(
+      {
+        emitter,
+        destination
+      },
+      { data: { transporters: undefined } }
+    );
+
+    const [
+      bsffTransporter1,
+      bsffTransporter2,
+      bsffTransporter3,
+      bsffTransporter4,
+      bsffTransporter5
+    ] = await Promise.all(
+      [
+        transporter1,
+        transporter2,
+        transporter3,
+        transporter4,
+        transporter5
+      ].map((transporter, idx) => {
+        return prisma.bsffTransporter.create({
+          data: {
+            number: idx + 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        });
+      })
+    );
+
+    // Initiate the bsff with two transporters
+    await prisma.bsff.update({
+      where: { id: bsff.id },
+      data: {
+        transporters: {
+          deleteMany: {},
+          connect: [{ id: bsffTransporter1.id }, { id: bsffTransporter2.id }]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Update the bsff by removing the initial two transporters
+    // and adding three others
+    const input: BsffInput = {
+      transporters: [
+        bsffTransporter3.id,
+        bsffTransporter4.id,
+        bsffTransporter5.id
+      ]
+    };
+    const { errors: errors1 } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors1).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedBsff);
+
+    expect(transporters).toHaveLength(3);
+    expect(transporters[0]).toMatchObject({
+      id: bsffTransporter3.id,
+      number: 1 // number should have been set correctly
+    });
+    expect(transporters[1]).toMatchObject({
+      id: bsffTransporter4.id,
+      number: 2 // number should have been set correctly
+    });
+    expect(transporters[2]).toMatchObject({
+      id: bsffTransporter5.id,
+      number: 3 // number should have been set correctly
+    });
+
+    const transporter6 = await userWithCompanyFactory("MEMBER");
+    const bsffTransporter6 = await prisma.bsffTransporter.create({
+      data: {
+        number: 6,
+        transporterCompanySiret: transporter6.company.siret
+      }
+    });
+
+    // it should not be possible though to set more than 5 transporters
+    const { errors: errors2 } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          transporters: [
+            bsffTransporter1.id,
+            bsffTransporter2.id,
+            bsffTransporter3.id,
+            bsffTransporter4.id,
+            bsffTransporter5.id,
+            bsffTransporter6.id
+          ]
+        }
+      }
+    });
+
+    expect(errors2).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas ajouter plus de 5 transporteurs"
+      })
+    ]);
+  });
+
+  it("should be possible to swap the order of the different transporters", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    const bsff = await createBsffBeforeEmission(
+      { emitter, destination },
+      { data: { transporters: undefined } }
+    );
+
+    const [bsffTransporter1, bsffTransporter2] = await Promise.all(
+      [transporter1, transporter2].map((transporter, idx) => {
+        return prisma.bsffTransporter.create({
+          data: {
+            number: idx + 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        });
+      })
+    );
+
+    // Initiate the bsff with two transporters in a given order
+    await prisma.bsff.update({
+      where: { id: bsff.id },
+      data: {
+        transporters: {
+          deleteMany: {},
+          connect: [{ id: bsffTransporter1.id }, { id: bsffTransporter2.id }]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // swap the order
+    const input: BsffInput = {
+      transporters: [bsffTransporter2.id, bsffTransporter1.id]
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedBsff);
+
+    expect(transporters).toHaveLength(2);
+    expect(transporters[0]).toMatchObject({
+      id: bsffTransporter2.id,
+      number: 1 // number should have been set correctly
+    });
+    expect(transporters[1]).toMatchObject({
+      id: bsffTransporter1.id,
+      number: 2 // number should have been set correctly
+    });
+  });
+
+  it("should be possible to empty transporters list", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    const bsff = await createBsffBeforeEmission(
+      { emitter, destination },
+      { data: { transporters: undefined } }
+    );
+
+    const [bsffTransporter1, bsffTransporter2] = await Promise.all(
+      [transporter1, transporter2].map((transporter, idx) => {
+        return prisma.bsffTransporter.create({
+          data: {
+            number: idx + 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        });
+      })
+    );
+
+    // Initiate the bsff with two transporters
+    await prisma.bsff.update({
+      where: { id: bsff.id },
+      data: {
+        transporters: {
+          deleteMany: {},
+          connect: [{ id: bsffTransporter1.id }, { id: bsffTransporter2.id }]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    const input: BsffInput = {
+      transporters: []
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedBsff);
+    expect(transporters).toHaveLength(0);
+  });
+
+  it("should throw exception if transporters ID's don't exist", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+
+    const bsff = await createBsffBeforeEmission(
+      { emitter, destination },
+      { data: { transporters: undefined } }
+    );
+    const { mutate } = makeClient(emitter.user);
+
+    const input: BsffInput = {
+      transporters: ["ID1", "ID2"]
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Aucun transporteur ne possède le ou les identifiants suivants : ID1, ID2"
+      })
+    ]);
+  });
+
+  it("should update the first transporter and do not updates next transporters", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    const bsff = await createBsffBeforeEmission(
+      { emitter, destination },
+      { data: { transporters: undefined } }
+    );
+
+    const [bsffTransporter1, bsffTransporter2] = await Promise.all(
+      [transporter1, transporter2].map((transporter, idx) => {
+        return prisma.bsffTransporter.create({
+          data: {
+            number: idx + 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        });
+      })
+    );
+
+    // Initiate the bsff with two transporters
+    await prisma.bsff.update({
+      where: { id: bsff.id },
+      data: {
+        transporters: {
+          deleteMany: {},
+          connect: [{ id: bsffTransporter1.id }, { id: bsffTransporter2.id }]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // update first transporter with deprecated field `transporter`
+    const input: BsffInput = {
+      transporter: { company: { contact: "Obiwan" } }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedBsff);
+    expect(transporters).toHaveLength(2);
+    expect(transporters[0].id).toEqual(bsffTransporter1.id);
+    expect(transporters[0].number).toEqual(1);
+    expect(transporters[1].id).toEqual(bsffTransporter2.id);
+    expect(transporters[1].number).toEqual(bsffTransporter2.number);
+    expect(transporters[0].transporterCompanyContact).toEqual("Obiwan");
+  });
+
+  it("should delete first transporter and do not updates next transporters", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+    const transporter3 = await userWithCompanyFactory("MEMBER");
+
+    const bsff = await createBsffBeforeEmission(
+      { emitter, destination },
+      { data: { transporters: undefined } }
+    );
+
+    const [bsffTransporter1, bsffTransporter2, bsffTransporter3] =
+      await Promise.all(
+        [transporter1, transporter2, transporter3].map((transporter, idx) => {
+          return prisma.bsffTransporter.create({
+            data: {
+              number: idx + 1,
+              transporterCompanySiret: transporter.company.siret
+            }
+          });
+        })
+      );
+
+    // Initiate the bsff with two transporters
+    await prisma.bsff.update({
+      where: { id: bsff.id },
+      data: {
+        transporters: {
+          deleteMany: {},
+          connect: [
+            { id: bsffTransporter1.id },
+            { id: bsffTransporter2.id },
+            { id: bsffTransporter3.id }
+          ]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // set first transporter to `null` with deprecated field `transporter`
+    const input: BsffInput = {
+      transporter: null
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedBsff);
+    expect(transporters).toHaveLength(2);
+
+    // transporters ordering should have been decremented
+    expect(transporters[0].id).toEqual(bsffTransporter2.id);
+    expect(transporters[0].number).toEqual(1);
+    expect(transporters[1].id).toEqual(bsffTransporter3.id);
+    expect(transporters[1].number).toEqual(bsffTransporter2.number);
+  });
+
+  it("should not be possible to update `transporters` when the bsff has been received", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    // Create a bsff that has already been processed
+    const bsff = await createBsffAfterReception({
+      emitter,
+      destination,
+      transporter
+    });
+
+    const bsffTransporter1 = await getFirstTransporter(bsff);
+
+    const bsffTransporter2 = await prisma.bsffTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter2.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Trying adding a new transporter
+    const input: BsffInput = {
+      transporters: [bsffTransporter1!.id, bsffTransporter2.id]
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " La liste des transporteurs a été vérouillé via signature et ne peut pas être modifié."
+      })
+    ]);
+  });
+
+  it("should not be possible to remove or permutate a transporter that has already signed when status is SENT", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    // Create a bsff that has already been sent
+    const bsff = await createBsffAfterTransport({
+      emitter,
+      destination,
+      transporter: transporter1
+    });
+
+    const bsffTransporter1 = await getFirstTransporter(bsff);
+
+    const bsffTransporter2 = await prisma.bsffTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter2.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Trying permuting two transporters
+    const input: BsffInput = {
+      transporters: [bsffTransporter2.id, bsffTransporter1!.id]
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " Le transporteur n°1 a déjà signé le BSFF, il ne peut pas être supprimé ou modifié"
+      })
+    ]);
+  });
+
+  it("should be possible to remove or permute transporters that has not signed yet when status is SENT", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const recepisse = {
+      create: {
+        receiptNumber: "recepisse",
+        validityLimit: new Date(),
+        department: "07"
+      }
+    };
+    const transporter1 = await userWithCompanyFactory("MEMBER", {
+      transporterReceipt: recepisse
+    });
+    const transporter2 = await userWithCompanyFactory("MEMBER", {
+      transporterReceipt: recepisse
+    });
+    const transporter3 = await userWithCompanyFactory("MEMBER", {
+      transporterReceipt: recepisse
+    });
+
+    // Create a bsff that has already been signed by the first transporter
+    const bsff = await createBsffAfterTransport({
+      emitter,
+      destination,
+      transporter: transporter1
+    });
+    const bsffTransporter1 = await getFirstTransporter(bsff);
+
+    // Transporter n°2 (not signed yet)
+    const bsffTransporter2 = await addBsffTransporter({
+      bsffId: bsff.id,
+      transporter: transporter2
+    });
+
+    // Transporter n°3 (not signed yet)
+    const bsffTransporter3 = await addBsffTransporter({
+      bsffId: bsff.id,
+      transporter: transporter3
+    });
+
+    // Permute transporter 2 and transporter 3
+    const input: BsffInput = {
+      transporters: [
+        bsffTransporter1!.id,
+        bsffTransporter3.id,
+        bsffTransporter2.id
+      ]
+    };
+    const { mutate } = makeClient(emitter.user);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { transporters: true }
+    });
+
+    const updatedTransporters = getTransportersSync(updatedBsff);
+
+    expect(updatedTransporters).toHaveLength(3);
+    expect(updatedTransporters[0].id).toEqual(bsffTransporter1!.id);
+    expect(updatedTransporters[1].id).toEqual(bsffTransporter3.id);
+    expect(updatedTransporters[2].id).toEqual(bsffTransporter2.id);
+  });
+
+  it("should not be possible to update `transporter` (first transporter) when the bsff has been sent", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("MEMBER");
+
+    // Create a bsff that has already been sent
+    const bsff = await createBsffAfterTransport({
+      emitter,
+      destination,
+      transporter
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Try update first transporter
+    const input: BsffInput = {
+      transporter: { transport: { mode: "RAIL" } }
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " Le mode de transport n°1 a été vérouillé via signature et ne peut pas être modifié."
+      })
+    ]);
+  });
+
+  it("should be possible to add a new transporter while the bsff has not been received", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const recepisse = {
+      create: {
+        receiptNumber: "recepisse",
+        validityLimit: new Date(),
+        department: "07"
+      }
+    };
+    const transporter1 = await userWithCompanyFactory("MEMBER", {
+      transporterReceipt: recepisse
+    });
+    const transporter2 = await userWithCompanyFactory("MEMBER", {
+      transporterReceipt: recepisse
+    });
+
+    // Create a bsff that has already been received
+    const bsff = await createBsffAfterTransport({
+      emitter,
+      transporter: transporter1,
+      destination
+    });
+
+    const bsffTransporter1 = await getFirstTransporter(bsff);
+
+    const bsffTransporter2 = await prisma.bsffTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter2.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Trying adding a new transporter after the first one
+    const input: BsffInput = {
+      transporters: [bsffTransporter1!.id, bsffTransporter2.id]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsff">>(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: { transporters: true }
+    });
+
+    const updatedTransporters = getTransportersSync(updatedBsff);
+
+    expect(updatedTransporters).toHaveLength(2);
+    expect(updatedTransporters[0].id).toEqual(bsffTransporter1!.id);
+    expect(updatedTransporters[1].id).toEqual(bsffTransporter2.id);
+  });
+
+  it("should not be possible to remove a transporter that has already signed", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    // Create a bsff that has already been signed by first transporter
+    const bsff = await createBsffAfterTransport({
+      emitter,
+      transporter: transporter1,
+      destination
+    });
+
+    const bsffTransporter2 = await prisma.bsffTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter2.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Trying removing first transporter and set a different one
+    const input: BsffInput = {
+      transporters: [bsffTransporter2.id]
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: { id: bsff.id, input }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " Le transporteur n°1 a déjà signé le BSFF, il ne peut pas être supprimé ou modifié"
       })
     ]);
   });

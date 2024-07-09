@@ -1,4 +1,4 @@
-import { BsffTransporter, BsffType, OperationMode } from "@prisma/client";
+import { BsffType, OperationMode } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
@@ -20,7 +20,7 @@ import {
 } from "../registry/types";
 import { toBsffDestination } from "./compat";
 import { RegistryBsff } from "../registry/elastic";
-import { getFirstTransporterSync } from "./database";
+import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { BsffWithTransporters } from "./types";
 
 const getOperationData = (bsff: RegistryBsff) => {
@@ -50,26 +50,66 @@ const getFinalOperationsData = (bsff: RegistryBsff) => {
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
-const getTransporterData = (
-  transporter: BsffTransporter,
-  includePlates = false
-) => {
+const getTransportersData = (bsff: RegistryBsff, includePlates = false) => {
+  const transporters = getTransportersSync(bsff);
+
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
+
   const data = {
-    transporterRecepisseIsExempted: transporter.transporterRecepisseIsExempted,
-    transporterTakenOverAt: transporter.transporterTransportTakenOverAt,
-    transporterCompanyAddress: transporter.transporterCompanyAddress,
-    transporterCompanyName: transporter.transporterCompanyName,
+    transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
+    transporterCompanyAddress: transporter?.transporterCompanyAddress,
+    transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-    transporterRecepisseNumber: transporter.transporterRecepisseNumber,
-    transporterCompanyMail: transporter.transporterCompanyMail,
-    transporterCustomInfo: transporter.transporterCustomInfo,
-    transporterTransportMode: transporter.transporterTransportMode
+    transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporterCompanyMail: transporter?.transporterCompanyMail,
+    transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
+    transporterTransportMode: transporter?.transporterTransportMode,
+    transporter2CompanyAddress: transporter2?.transporterCompanyAddress,
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
+    transporter3CompanyAddress: transporter3?.transporterCompanyAddress,
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter4CompanyAddress: transporter4?.transporterCompanyAddress,
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter5CompanyAddress: transporter5?.transporterCompanyAddress,
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5TransportMode: transporter5?.transporterTransportMode
   };
 
   if (includePlates) {
     return {
       ...data,
-      transporterNumberPlates: transporter.transporterTransportPlates ?? null
+      transporterNumberPlates: transporter.transporterTransportPlates ?? null,
+      transporter2NumberPlates:
+        transporter2?.transporterTransportPlates ?? null,
+      transporter3NumberPlates:
+        transporter3?.transporterTransportPlates ?? null,
+      transporter4NumberPlates:
+        transporter5?.transporterTransportPlates ?? null,
+      transporter5NumberPlates: transporter5?.transporterTransportPlates ?? null
     };
   }
 
@@ -102,11 +142,15 @@ export function getRegistryFields(
     }
     registryFields.isOutgoingWasteFor.push(...bsff.detenteurCompanySirets);
     registryFields.isAllWasteFor.push(...bsff.detenteurCompanySirets);
+  }
 
-    const transporterOrgId = getTransporterCompanyOrgId(transporter);
-    if (transporterOrgId) {
-      registryFields.isTransportedWasteFor.push(transporterOrgId);
-      registryFields.isAllWasteFor.push(transporterOrgId);
+  for (const transporter of bsff.transporters ?? []) {
+    if (transporter.transporterTransportSignatureDate) {
+      const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+      if (transporterCompanyOrgId) {
+        registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+        registryFields.isAllWasteFor.push(transporterCompanyOrgId);
+      }
     }
   }
 
@@ -188,7 +232,7 @@ export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
     brokerRecepisseNumber: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
     ...getOperationData(bsff),
-    ...(transporter ? getTransporterData(transporter) : {})
+    ...(transporter ? getTransportersData(bsff) : {})
   };
 }
 
@@ -244,7 +288,7 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
       : null,
     ...getOperationData(bsff),
     ...getFinalOperationsData(bsff),
-    ...(transporter ? getTransporterData(transporter) : {})
+    ...(transporter ? getTransportersData(bsff) : {})
   };
 }
 
@@ -276,7 +320,7 @@ export function toTransportedWaste(
     destinationCompanySiret: bsff.destinationCompanySiret,
     destinationCompanyAddress: bsff.destinationCompanyAddress,
     emitterCompanyMail: bsff.emitterCompanyMail,
-    ...(transporter ? getTransporterData(transporter, true) : {})
+    ...(transporter ? getTransportersData(bsff, true) : {})
   };
 }
 
@@ -305,7 +349,7 @@ export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
-    ...(transporter ? getTransporterData(transporter) : {})
+    ...(transporter ? getTransportersData(bsff) : {})
   };
 }
 
@@ -342,6 +386,6 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     emitterCompanyMail: bsff.emitterCompanyMail,
     ...getOperationData(bsff),
     ...getFinalOperationsData(bsff),
-    ...(transporter ? getTransporterData(transporter, true) : {})
+    ...(transporter ? getTransportersData(bsff, true) : {})
   };
 }

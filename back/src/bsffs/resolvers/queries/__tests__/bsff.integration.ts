@@ -7,6 +7,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
+  addBsffTransporter,
   createBsff,
   createBsffAfterOperation
 } from "../../../__tests__/factories";
@@ -261,5 +262,41 @@ describe("Query.bsff", () => {
     );
     expect(errors).toBeUndefined();
     expect(data.bsff.waste).toBeNull();
+  });
+
+  it("should allow a foreign multi-modal transporter N>1 to read their BSFF", async () => {
+    const transporter = await userWithCompanyFactory();
+    const foreignTransporter = await userWithCompanyFactory("ADMIN", {
+      siret: null,
+      vatNumber: "IT13029381004"
+    });
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const bsff = await createBsff({ emitter, transporter });
+
+    await addBsffTransporter({
+      bsffId: bsff.id,
+      transporter: foreignTransporter
+    });
+
+    const getBsffQuery = gql`
+      query GetBsff($id: ID!) {
+        bsff(id: $id) {
+          id
+        }
+      }
+    `;
+
+    const { query } = makeClient(foreignTransporter.user);
+    const { data, errors } = await query<Pick<Query, "bsff">, QueryBsffArgs>(
+      getBsffQuery,
+      {
+        variables: {
+          id: bsff.id
+        }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+    expect(data.bsff.id).toBe(bsff.id);
   });
 });
