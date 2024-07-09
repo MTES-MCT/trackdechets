@@ -304,7 +304,4 @@ const run = async () => {
   );
 };
 
-run().then(
-  () => rl.close(),
-  () => rl.close()
-);
+run().finally(() => rl.close());
