@@ -40,7 +40,7 @@ export async function getZodTransporters(
     );
   }
   if (input.transporter) {
-    // Couche de compatibilité avec l'API BSDA "pré multi-modal"
+    // Couche de compatibilité avec l'API BSFF "pré multi-modal"
     // Les données de `input.transporter` correspondent au premier
     // transporteur.
     return [graphqlInputToZodBsffTransporter(input.transporter)];

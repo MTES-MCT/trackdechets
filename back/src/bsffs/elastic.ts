@@ -31,10 +31,10 @@ export const BsffForElasticInclude = {
 };
 
 export async function getBsffForElastic(
-  bsda: Pick<Bsff, "id">
+  bsff: Pick<Bsff, "id">
 ): Promise<BsffForElastic> {
   return prisma.bsff.findUniqueOrThrow({
-    where: { id: bsda.id },
+    where: { id: bsff.id },
     include: BsffForElasticInclude
   });
 }

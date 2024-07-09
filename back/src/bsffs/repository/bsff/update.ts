@@ -52,8 +52,8 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
     }
 
     // If a transporter is deleted, make sure to decrement the number of transporters after him.
-    // This code should normally only be called from the `updateForm` mutation when { transporter: null }
-    // is passed in the UpdateBsda input or from the deleteBsdaTransporter mutation.
+    // This code should normally only be called from the `updateBsff` mutation when { transporter: null }
+    // is passed in the UpdateBsff input or from the deleteBffTransporter mutation.
     if (args.data.transporters?.delete && fullBsff.transporters?.length) {
       if (Array.isArray(args.data.transporters.delete)) {
         // this case should never happen, throw a custom error to debug in Sentry if it ever does
