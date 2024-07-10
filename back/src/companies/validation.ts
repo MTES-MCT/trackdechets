@@ -3,7 +3,8 @@ import {
   CollectorType,
   Company,
   CompanyType,
-  WasteProcessorType
+  WasteProcessorType,
+  WasteVehiclesType
 } from "@prisma/client";
 import {
   cleanClue,
@@ -110,6 +111,28 @@ export const companyTypesValidationSchema = yup.object({
         if (
           wasteProcessorTypes?.length &&
           !companyTypes.includes(CompanyType.WASTEPROCESSOR)
+        ) {
+          return false;
+        }
+
+        return true;
+      }
+    ),
+  wasteVehiclesTypes: yup
+    .array()
+    .of(yup.string().oneOf(Object.values(WasteVehiclesType)))
+    // .ensure()
+    .compact()
+    .transform(toSet)
+    .test(
+      "wasteVehiclesTypes",
+      "Your company needs to be a WasteVehicles to have wasteVehiclesTypes",
+      async (wasteVehiclesTypes, ctx) => {
+        const { companyTypes } = ctx.parent;
+
+        if (
+          wasteVehiclesTypes?.length &&
+          !companyTypes.includes(CompanyType.WASTE_VEHICLES)
         ) {
           return false;
         }

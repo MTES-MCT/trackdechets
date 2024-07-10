@@ -1,7 +1,7 @@
 import React from "react";
 import { CompanySearchResult } from "@td/codegen-ui";
 import routes from "../Apps/routes";
-import { COMPANY_CONSTANTS } from "../Apps/Companies/common/utils";
+import { COMPANY_TYPE_OPTIONS } from "../Apps/Companies/common/utils";
 
 type Props = Pick<
   CompanySearchResult,
@@ -25,7 +25,10 @@ export default function CompanyRegistration(props: Props) {
             <ul className="tw-list-disc tw-list-inside">
               {props.companyTypes?.map((companyType, idx) => (
                 <li key={idx}>
-                  {COMPANY_CONSTANTS.find(t => t.value === companyType)?.label}
+                  {
+                    COMPANY_TYPE_OPTIONS.find(t => t.value === companyType)
+                      ?.label
+                  }
                 </li>
               ))}
             </ul>
