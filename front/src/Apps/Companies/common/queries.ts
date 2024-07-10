@@ -214,11 +214,20 @@ export const UPDATE_GIVEN_NAME_OR_GEREP_ID = gql`
   }
 `;
 
-export const UPDATE_COMPANY_TYPES = gql`
-  mutation UpdateCompany($id: String!, $companyTypes: [CompanyType!]) {
-    updateCompany(id: $id, companyTypes: $companyTypes) {
+export const UPDATE_COMPANY = gql`
+  mutation UpdateCompany(
+    $id: String!
+    $companyTypes: [CompanyType!]
+    $ecoOrganismeAgreements: [URL!]
+  ) {
+    updateCompany(
+      id: $id
+      companyTypes: $companyTypes
+      ecoOrganismeAgreements: $ecoOrganismeAgreements
+    ) {
       id
       companyTypes
+      ecoOrganismeAgreements
     }
   }
 `;
@@ -240,6 +249,18 @@ export const UPDATE_COMPANY_WASTE_PROCESSOR_TYPES = gql`
     updateCompany(id: $id, wasteProcessorTypes: $wasteProcessorTypes) {
       id
       wasteProcessorTypes
+    }
+  }
+`;
+
+export const UPDATE_COMPANY_WASTE_VEHICLES_TYPES = gql`
+  mutation UpdateCompany(
+    $id: String!
+    $wasteVehiclesTypes: [WasteVehiclesType!]
+  ) {
+    updateCompany(id: $id, wasteVehiclesTypes: $wasteVehiclesTypes) {
+      id
+      wasteVehiclesTypes
     }
   }
 `;

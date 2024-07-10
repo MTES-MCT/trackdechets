@@ -18,6 +18,7 @@ export async function updateCompanyFn(
     companyTypes,
     collectorTypes,
     wasteProcessorTypes,
+    wasteVehiclesTypes,
     gerepId,
     contact,
     contactEmail,
@@ -41,6 +42,9 @@ export async function updateCompanyFn(
       : {}),
     ...(wasteProcessorTypes != null
       ? { wasteProcessorTypes: { set: wasteProcessorTypes } }
+      : {}),
+    ...(wasteVehiclesTypes != null
+      ? { wasteVehiclesTypes: { set: wasteVehiclesTypes } }
       : {}),
     ...(gerepId != null ? { gerepId } : {}),
     ...(contact != null ? { contact } : {}),

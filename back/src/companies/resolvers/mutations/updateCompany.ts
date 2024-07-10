@@ -1,7 +1,8 @@
 import {
   MutationResolvers,
   MutationUpdateCompanyArgs,
-  RequireFields
+  RequireFields,
+  WasteVehiclesType
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -32,7 +33,8 @@ const validateCompanyTypes = (
   };
 
   const { companyTypes } = mergedCompanyData;
-  let { collectorTypes, wasteProcessorTypes } = mergedCompanyData;
+  let { collectorTypes, wasteProcessorTypes, wasteVehiclesTypes } =
+    mergedCompanyData;
 
   // Nullify sub-types automatically
   if (args?.companyTypes?.length) {
@@ -48,12 +50,19 @@ const validateCompanyTypes = (
     ) {
       wasteProcessorTypes = [];
     }
+    if (
+      company.companyTypes?.includes(CompanyType.WASTE_VEHICLES) &&
+      !args?.companyTypes?.includes(CompanyType.WASTE_VEHICLES)
+    ) {
+      wasteVehiclesTypes = [];
+    }
   }
 
   return companyTypesValidationSchema.validate({
     companyTypes,
     collectorTypes,
-    wasteProcessorTypes
+    wasteProcessorTypes,
+    wasteVehiclesTypes
   });
 };
 
@@ -79,8 +88,12 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   );
 
   // Validate & transform company types & sub-types
-  const { companyTypes, collectorTypes, wasteProcessorTypes } =
-    await validateCompanyTypes(company, args);
+  const {
+    companyTypes,
+    collectorTypes,
+    wasteProcessorTypes,
+    wasteVehiclesTypes
+  } = await validateCompanyTypes(company, args);
 
   if (companyTypes.includes("CREMATORIUM")) {
     throw new UserInputError(
@@ -121,7 +134,8 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
       ...args,
       companyTypes: companyTypes as CompanyType[],
       collectorTypes: collectorTypes as CollectorType[],
-      wasteProcessorTypes: wasteProcessorTypes as WasteProcessorType[]
+      wasteProcessorTypes: wasteProcessorTypes as WasteProcessorType[],
+      wasteVehiclesTypes: wasteVehiclesTypes as WasteVehiclesType[]
     },
     company
   );

@@ -2,25 +2,44 @@ import { Highlight } from "@codegouvfr/react-dsfr/Highlight";
 import { CompanyPrivate, CompanyType } from "@td/codegen-ui";
 import React from "react";
 import {
-  COLLECTOR_OPTIONS,
-  WASTE_PROCESSOR_OPTIONS,
+  COLLECTOR_TYPE_OPTIONS,
+  COMPANY_TYPE_OPTIONS,
+  WASTE_PROCESSOR_TYPE_OPTIONS,
   formatDateViewDisplay
 } from "../common/utils";
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
-  companyTypesFormatted: {
-    label: string | undefined;
-    value: CompanyType | undefined;
-    helpText?: string;
-    isChecked: boolean;
-  }[];
 }
 
-const CompanyProfileInformation = ({
-  company,
-  companyTypesFormatted
-}: CompanyProfileFormProps) => {
+function getFormattedCompanyTypes(companyTypes: CompanyType[]) {
+  const companyTypesFormatted = companyTypes.map(companyType => {
+    const companyTypeObj = COMPANY_TYPE_OPTIONS.find(
+      constant => constant.value === companyType
+    );
+    return {
+      label: companyTypeObj?.label,
+      isChecked: true,
+      value: companyTypeObj?.value,
+      helpText: companyTypeObj?.helpText
+    };
+  });
+
+  const companyTypesAllValues = COMPANY_TYPE_OPTIONS.map(companyType => {
+    const companyTypeInitial = companyTypesFormatted?.find(
+      c => c.value === companyType.value
+    );
+    if (companyTypeInitial) {
+      return companyTypeInitial;
+    }
+    return { ...companyType, isChecked: false };
+  });
+
+  return companyTypesAllValues;
+}
+
+const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
+  const companyTypesFormatted = getFormattedCompanyTypes(company.companyTypes);
   return (
     <ul data-testid="company-types">
       {companyTypesFormatted.map(companyType => {
@@ -228,9 +247,10 @@ const CompanyProfileInformation = ({
               {companyType.value === CompanyType.Wasteprocessor && (
                 <Highlight>
                   {company.wasteProcessorTypes?.map(wasteProcessorType => {
-                    const wasteProcessorFound = WASTE_PROCESSOR_OPTIONS.find(
-                      option => option.value === wasteProcessorType
-                    );
+                    const wasteProcessorFound =
+                      WASTE_PROCESSOR_TYPE_OPTIONS.find(
+                        option => option.value === wasteProcessorType
+                      );
                     if (wasteProcessorFound) {
                       return (
                         <p key={wasteProcessorFound.value}>
@@ -245,7 +265,7 @@ const CompanyProfileInformation = ({
               {companyType.value === CompanyType.Collector && (
                 <Highlight>
                   {company.collectorTypes?.map(collector => {
-                    const collectorFound = COLLECTOR_OPTIONS.find(
+                    const collectorFound = COLLECTOR_TYPE_OPTIONS.find(
                       option => option.value === collector
                     );
                     if (collectorFound) {

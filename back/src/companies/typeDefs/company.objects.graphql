@@ -12,6 +12,9 @@ type CompanyPrivate {
   "Sous-types d'entreprises pour les installation de traitement de déchets"
   wasteProcessorTypes: [WasteProcessorType!]!
 
+  "Sous-types d'entreprises pour les installation de traitement VHU"
+  wasteVehiclesTypes: [WasteVehiclesType!]!
+
   "Identifiant GEREP"
   gerepId: String
 

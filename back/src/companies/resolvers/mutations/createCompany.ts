@@ -66,6 +66,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     brokerReceiptId,
     vhuAgrementDemolisseurId,
     vhuAgrementBroyeurId,
+    workerCertificationId,
     allowBsdasriTakeOverWithoutSignature,
     allowAppendix1SignatureAutomation,
     contact,
@@ -203,6 +204,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   if (!!vhuAgrementBroyeurId) {
     companyCreateInput.vhuAgrementBroyeur = {
       connect: { id: vhuAgrementBroyeurId }
+    };
+  }
+
+  if (!!workerCertificationId) {
+    companyCreateInput.workerCertification = {
+      connect: { id: workerCertificationId }
     };
   }
 

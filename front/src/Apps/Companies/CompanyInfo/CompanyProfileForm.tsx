@@ -1,21 +1,20 @@
 import React from "react";
 import CompanyFormWrapper from "../common/Components/CompanyFormWrapper";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
-  BrokerReceipt,
-  CollectorType,
   CompanyPrivate,
   CompanyType,
-  TraderReceipt,
-  TransporterReceipt,
+  Mutation,
+  MutationDeleteBrokerReceiptArgs,
+  MutationDeleteTraderReceiptArgs,
+  MutationDeleteTransporterReceiptArgs,
+  MutationDeleteVhuAgrementArgs,
+  MutationDeleteWorkerCertificationArgs,
+  MutationUpdateCompanyArgs,
   UserRole,
-  VhuAgrement,
-  WasteProcessorType,
   WorkerCertification
 } from "@td/codegen-ui";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-import { COMPANY_CONSTANTS, formatDate } from "../common/utils";
-import TdTooltip from "../../../common/components/Tooltip";
+import { formatDate } from "../common/utils";
 import {
   CREATE_BROKER_RECEIPT_,
   CREATE_TRADER_RECEIPT_,
@@ -32,10 +31,11 @@ import {
   UPDATE_COMPANY_COLLECTOR_TYPES,
   UPDATE_COMPANY_TRADER_RECEIPT,
   UPDATE_COMPANY_TRANSPORTER_RECEIPT,
-  UPDATE_COMPANY_TYPES,
+  UPDATE_COMPANY,
   UPDATE_COMPANY_VHU_AGREMENT,
   UPDATE_COMPANY_VHU_AGREMENT_DEMOLISSEUR,
   UPDATE_COMPANY_WASTE_PROCESSOR_TYPES,
+  UPDATE_COMPANY_WASTE_VEHICLES_TYPES,
   UPDATE_COMPANY_WORKER_CERTIFICATION,
   UPDATE_TRADER_RECEIPT,
   UPDATE_TRANSPORTER_RECEIPT,
@@ -44,107 +44,62 @@ import {
 } from "../common/queries";
 import { gql, useMutation } from "@apollo/client";
 import { Loader } from "../../common/Components";
-import CompanyProfileSubForm from "./CompanyProfileSubForm";
 import { NotificationError } from "../../common/Components/Error/Error";
 import CompanyProfileInformation from "./CompanyProfileInformation";
+import RhfCompanyTypeForm, {
+  RhfCompanyTypeFormField
+} from "../common/Components/CompanyTypeForm/RhfCompanyTypeForm";
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
 }
-interface CompanyProfileFormFields {
-  companyTypes: {
-    label: string | undefined;
-    value: CompanyType | undefined;
-    helpText?: string;
-    isChecked: boolean;
-  }[];
-  workerCertification?: WorkerCertification;
-  transporterReceipt?: TransporterReceipt;
-  brokerReceipt?: BrokerReceipt;
-  traderReceipt?: TraderReceipt;
-  vhuAgrementBroyeur?: VhuAgrement;
-  vhuAgrementDemolisseur?: VhuAgrement;
-  collectorTypes: CollectorType[];
-  wasteProcessorTypes: WasteProcessorType[];
-}
 
 const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
   const [
-    updateCompanyTypes,
+    updateCompany,
     {
       data: dataUpdateCompanyType,
       loading: LoadingCompanyTypes,
       error: errorCompanyTypes
     }
-  ] = useMutation(UPDATE_COMPANY_TYPES);
+  ] = useMutation<Pick<Mutation, "updateCompany">, MutationUpdateCompanyArgs>(
+    UPDATE_COMPANY
+  );
 
-  const getFormattedComapnyTypes = companyTypes => {
-    const companyTypesFormatted = companyTypes?.map(companyType => {
-      const companyTypeObj = COMPANY_CONSTANTS.find(
-        constant => constant.value === companyType
-      );
-      return {
-        label: companyTypeObj?.label,
-        isChecked: true,
-        value: companyTypeObj?.value,
-        helpText: companyTypeObj?.helpText
-      };
-    });
-
-    const companyTypesAllValues = COMPANY_CONSTANTS.map(companyType => {
-      const companyTypeInitial = companyTypesFormatted?.find(
-        c => c.value === companyType.value
-      );
-      if (companyTypeInitial) {
-        return companyTypeInitial;
-      }
-      return { ...companyType, isChecked: false };
-    });
-
-    return companyTypesAllValues;
-  };
-  const companyTypesFormatted = getFormattedComapnyTypes(company.companyTypes);
-
-  const defaultValues: CompanyProfileFormFields = {
-    companyTypes: companyTypesFormatted || [],
-    vhuAgrementBroyeur: company.vhuAgrementBroyeur as VhuAgrement,
-    vhuAgrementDemolisseur: company.vhuAgrementDemolisseur as VhuAgrement,
-    transporterReceipt: {
+  const defaultValues: RhfCompanyTypeFormField = {
+    companyTypes: company.companyTypes,
+    vhuAgrementBroyeur: company.vhuAgrementBroyeur,
+    vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
+    transporterReceipt: company.transporterReceipt && {
       ...company.transporterReceipt,
       validityLimit: formatDate(company.transporterReceipt?.validityLimit)
-    } as TransporterReceipt,
-    brokerReceipt: {
+    },
+    brokerReceipt: company.brokerReceipt && {
       ...company.brokerReceipt,
       validityLimit: formatDate(company.brokerReceipt?.validityLimit)
-    } as BrokerReceipt,
-    traderReceipt: {
+    },
+    traderReceipt: company.traderReceipt && {
       ...company.traderReceipt,
       validityLimit: formatDate(company.traderReceipt?.validityLimit)
-    } as TraderReceipt,
-    workerCertification: {
+    },
+    workerCertification: company.workerCertification && {
       ...company.workerCertification,
       validityLimit: formatDate(company.workerCertification?.validityLimit)
-    } as WorkerCertification,
+    },
     collectorTypes: company.collectorTypes,
-    wasteProcessorTypes: company.wasteProcessorTypes
+    wasteProcessorTypes: company.wasteProcessorTypes,
+    wasteVehiclesTypes: company.wasteVehiclesTypes,
+    ecoOrganismeAgreements: company.ecoOrganismeAgreements
   };
 
-  const { handleSubmit, reset, formState, register, control, watch } =
-    useForm<CompanyProfileFormFields>({
+  const { handleSubmit, reset, formState, register, watch, setValue } =
+    useForm<RhfCompanyTypeFormField>({
       defaultValues,
       values: dataUpdateCompanyType?.updateCompany && {
         ...defaultValues,
-        ...dataUpdateCompanyType?.updateCompany,
-        companyTypes: getFormattedComapnyTypes(
-          dataUpdateCompanyType?.updateCompany?.companyTypes
-        )
+        companyTypes: dataUpdateCompanyType?.updateCompany?.companyTypes
       }
     });
-
-  const { fields } = useFieldArray<CompanyProfileFormFields>({
-    control, // control props comes from useForm (optional: if you are using FormProvider)
-    name: "companyTypes"
-  });
 
   const [
     createOrUpdateTransporterReceipt,
@@ -161,9 +116,14 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       loading: LoadingUpdateCompanyTransportReceipt,
       error: errorUpdateCompanyTransportReceipt
     }
-  ] = useMutation(UPDATE_COMPANY_TRANSPORTER_RECEIPT);
+  ] = useMutation<Pick<Mutation, "updateCompany">, MutationUpdateCompanyArgs>(
+    UPDATE_COMPANY_TRANSPORTER_RECEIPT
+  );
 
-  const [deleteTransporterReceipt] = useMutation(DELETE_TRANSPORTER_RECEIPT, {
+  const [deleteTransporterReceipt] = useMutation<
+    Pick<Mutation, "deleteTransporterReceipt">,
+    MutationDeleteTransporterReceiptArgs
+  >(DELETE_TRANSPORTER_RECEIPT, {
     update(cache) {
       cache.writeFragment({
         id: `CompanyPrivate:${company.id}`,
@@ -200,7 +160,9 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       loading: loadingUpdateCompanyVhuBroyeur,
       error: errorUpdateCompanyVhuBroyeur
     }
-  ] = useMutation(UPDATE_COMPANY_VHU_AGREMENT);
+  ] = useMutation<Pick<Mutation, "updateCompany">, MutationUpdateCompanyArgs>(
+    UPDATE_COMPANY_VHU_AGREMENT
+  );
 
   const [
     deleteVhuAgrementBroyeur,
@@ -233,7 +195,10 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
   const [
     deleteVhuAgrementDemolisseur,
     { loading: loadingDeleteVhuDemolisseur, error: errorDeleteVhuDemolisseur }
-  ] = useMutation(DELETE_VHU_AGREMENT, {
+  ] = useMutation<
+    Pick<Mutation, "deleteVhuAgrement">,
+    MutationDeleteVhuAgrementArgs
+  >(DELETE_VHU_AGREMENT, {
     update(cache) {
       cache.writeFragment({
         id: `CompanyPrivate:${company.id}`,
@@ -266,12 +231,17 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       loading: updateCompanyLoadingTraderReceipt,
       error: updateCompanyErrorTraderReceipt
     }
-  ] = useMutation(UPDATE_COMPANY_TRADER_RECEIPT);
+  ] = useMutation<Pick<Mutation, "updateCompany">, MutationUpdateCompanyArgs>(
+    UPDATE_COMPANY_TRADER_RECEIPT
+  );
 
   const [
     deleteTraderReceipt,
     { loading: deleteLoadingTraderReceipt, error: deleteErrorTraderReceipt }
-  ] = useMutation(DELETE_TRADER_RECEIPT, {
+  ] = useMutation<
+    Pick<Mutation, "deleteTraderReceipt">,
+    MutationDeleteTraderReceiptArgs
+  >(DELETE_TRADER_RECEIPT, {
     update(cache) {
       cache.writeFragment({
         id: `CompanyPrivate:${company.id}`,
@@ -309,7 +279,10 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
   const [
     deleteBrokerReceipt,
     { loading: deleteLoadingBrokerReceipt, error: deleteErrorBrokerReceipt }
-  ] = useMutation(DELETE_BROKER_RECEIPT, {
+  ] = useMutation<
+    Pick<Mutation, "deleteBrokerReceipt">,
+    MutationDeleteBrokerReceiptArgs
+  >(DELETE_BROKER_RECEIPT, {
     update(cache) {
       cache.writeFragment({
         id: `CompanyPrivate:${company.id}`,
@@ -348,7 +321,10 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
   const [
     deleteWorkerCertification,
     { loading: deleteLoadingWorkerCertif, error: deleteErrorWorkerCertif }
-  ] = useMutation(DELETE_WORKER_CERTIFICATION, {
+  ] = useMutation<
+    Pick<Mutation, "deleteWorkerCertification">,
+    MutationDeleteWorkerCertificationArgs
+  >(DELETE_WORKER_CERTIFICATION, {
     update(cache) {
       cache.writeFragment({
         id: `CompanyPrivate:${company.id}`,
@@ -371,7 +347,9 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       loading: updateCompanyCollectorTypesLoading,
       error: updateCompanyCollectorTypesError
     }
-  ] = useMutation(UPDATE_COMPANY_COLLECTOR_TYPES);
+  ] = useMutation<Pick<Mutation, "updateCompany">, MutationUpdateCompanyArgs>(
+    UPDATE_COMPANY_COLLECTOR_TYPES
+  );
 
   const [
     updateCompanyWasteProcessorTypes,
@@ -379,7 +357,19 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       loading: updateCompanyWasteProcessorTypesLoading,
       error: updateCompanyWasteProcessorTypesError
     }
-  ] = useMutation(UPDATE_COMPANY_WASTE_PROCESSOR_TYPES);
+  ] = useMutation<Pick<Mutation, "updateCompany">, MutationUpdateCompanyArgs>(
+    UPDATE_COMPANY_WASTE_PROCESSOR_TYPES
+  );
+
+  const [
+    updateCompanyWasteVehiclesTypes,
+    {
+      loading: updateCompanyWasteVehiclesTypesLoading,
+      error: updateCompanyWasteVehiclesTypesError
+    }
+  ] = useMutation<Pick<Mutation, "updateCompany">, MutationUpdateCompanyArgs>(
+    UPDATE_COMPANY_WASTE_VEHICLES_TYPES
+  );
 
   const handleCreateOrUpdateBrokerReceipt = async dataToUpdate => {
     const input = {
@@ -405,8 +395,10 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       ...(company.workerCertification?.id
         ? { id: company.workerCertification.id }
         : {}),
-      hasSubSectionFour: dataToUpdate.workerCertification.hasSubSectionFour,
-      hasSubSectionThree: dataToUpdate.workerCertification.hasSubSectionThree
+      hasSubSectionFour:
+        dataToUpdate.workerCertification.hasSubSectionFour ?? false,
+      hasSubSectionThree:
+        dataToUpdate.workerCertification.hasSubSectionThree ?? false
     };
 
     if (dataToUpdate.workerCertification.hasSubSectionThree) {
@@ -518,7 +510,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     }
   };
 
-  const handleSubTypesDeletes = async companyTypesToUpdate => {
+  const handleSubTypesDeletes = async (companyTypesToUpdate: CompanyType[]) => {
     const shouldDeleteWorkerCertification =
       !companyTypesToUpdate.includes(CompanyType.Worker) &&
       company.workerCertification;
@@ -538,79 +530,91 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       !companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
       company.vhuAgrementDemolisseur;
 
-    if (shouldDeleteWorkerCertification) {
+    if (shouldDeleteWorkerCertification && company.workerCertification?.id) {
       await deleteWorkerCertification({
         variables: {
-          input: { id: company.workerCertification?.id }
+          input: { id: company.workerCertification.id }
         }
       });
     }
-    if (shouldDeleteBrokerReceipt) {
+    if (shouldDeleteBrokerReceipt && company.brokerReceipt?.id) {
       await deleteBrokerReceipt({
         variables: {
-          input: { id: company.brokerReceipt?.id }
+          input: { id: company.brokerReceipt.id }
         }
       });
     }
-    if (shouldDeleteTraderReceipt) {
+    if (shouldDeleteTraderReceipt && company.traderReceipt?.id) {
       await deleteTraderReceipt({
         variables: {
-          input: { id: company.traderReceipt?.id }
+          input: { id: company.traderReceipt.id }
         }
       });
     }
-    if (shouldDeleteTransporterReceipt) {
+    if (shouldDeleteTransporterReceipt && company.transporterReceipt?.id) {
       await deleteTransporterReceipt({
         variables: {
-          input: { id: company.transporterReceipt?.id }
+          input: { id: company.transporterReceipt.id }
         }
       });
     }
-    if (shouldDeleteVhuAgrementBroyeur) {
+    if (shouldDeleteVhuAgrementBroyeur && company.vhuAgrementBroyeur?.id) {
       await deleteVhuAgrementBroyeur({
         variables: {
-          input: { id: company.vhuAgrementBroyeur?.id }
+          input: { id: company.vhuAgrementBroyeur.id }
         }
       });
     }
-    if (shouldDeleteVhuAgrementDemolisseur) {
+    if (
+      shouldDeleteVhuAgrementDemolisseur &&
+      company.vhuAgrementDemolisseur?.id
+    ) {
       await deleteVhuAgrementDemolisseur({
         variables: {
-          input: { id: company.vhuAgrementDemolisseur?.id }
+          input: { id: company.vhuAgrementDemolisseur.id }
         }
       });
     }
   };
 
-  const handleSubTypesUpdates = async (data, companyTypesToUpdate) => {
+  const handleSubTypesUpdates = async (
+    data: RhfCompanyTypeFormField,
+    companyTypesToUpdate: CompanyType[]
+  ) => {
     const shouldCreateOrUpdateWorkerCertification =
       companyTypesToUpdate.includes(CompanyType.Worker);
     const shouldCreateOrUpdateTransporterReceipt =
       companyTypesToUpdate.includes(CompanyType.Transporter) &&
-      data.transporterReceipt.receiptNumber;
+      data.transporterReceipt?.receiptNumber;
     const shouldCreateOrUpdateBrokerReceipt =
       companyTypesToUpdate.includes(CompanyType.Broker) &&
-      data.brokerReceipt.receiptNumber;
+      data.brokerReceipt?.receiptNumber;
     const shouldCreateOrUpdateTraderReceipt =
       companyTypesToUpdate.includes(CompanyType.Trader) &&
-      data.traderReceipt.receiptNumber;
+      data.traderReceipt?.receiptNumber;
     const shouldCreateOrUpdateVhuAgrementBroyeur =
       companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
-      data.vhuAgrementBroyeur.agrementNumber;
+      data.vhuAgrementBroyeur?.agrementNumber;
     const shouldCreateOrUpdateVhuAgrementDemolisseur =
       companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
-      data.vhuAgrementDemolisseur.agrementNumber;
+      data.vhuAgrementDemolisseur?.agrementNumber;
     const hasCollectorType = companyTypesToUpdate.includes(
       CompanyType.Collector
     );
     const hasWasteProcessorType = companyTypesToUpdate.includes(
       CompanyType.Wasteprocessor
     );
+    const hasWasteVehiclesType = companyTypesToUpdate.includes(
+      CompanyType.WasteVehicles
+    );
     const shouldUpdateCollectorTypes =
       hasCollectorType || (!hasCollectorType && data.collectorTypes);
     const shouldUpdateWasteProcessorTypes =
       hasWasteProcessorType ||
       (!hasWasteProcessorType && data.wasteProcessorTypes);
+    const shouldUpdateWasteVehiclesTypes =
+      hasWasteVehiclesType ||
+      (!hasWasteVehiclesType && data.wasteVehiclesTypes);
 
     if (shouldUpdateCollectorTypes) {
       await updateCompanyCollectorTypes({
@@ -626,6 +630,17 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
           id: company.id,
           wasteProcessorTypes: hasWasteProcessorType
             ? data.wasteProcessorTypes
+            : []
+        }
+      });
+    }
+
+    if (shouldUpdateWasteVehiclesTypes) {
+      await updateCompanyWasteVehiclesTypes({
+        variables: {
+          id: company.id,
+          wasteVehiclesTypes: hasWasteVehiclesType
+            ? data.wasteVehiclesTypes
             : []
         }
       });
@@ -651,20 +666,14 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     }
   };
 
-  const handleUpdateCompanyTypes = async data => {
-    const companyTypesToUpdate = data.companyTypes
-      .map(type => {
-        if (type.isChecked) {
-          return type.value;
-        }
-        return null;
-      })
-      .filter(f => f !== null);
+  const handleUpdateCompanyTypes = async (data: RhfCompanyTypeFormField) => {
+    const companyTypesToUpdate = data.companyTypes;
 
-    await updateCompanyTypes({
+    await updateCompany({
       variables: {
         id: company.id,
-        companyTypes: companyTypesToUpdate
+        companyTypes: companyTypesToUpdate,
+        ecoOrganismeAgreements: data.ecoOrganismeAgreements
       }
     });
 
@@ -695,7 +704,8 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     updateCompanyWorkerCertifLoading ||
     deleteLoadingWorkerCertif ||
     updateCompanyCollectorTypesLoading ||
-    updateCompanyWasteProcessorTypesLoading;
+    updateCompanyWasteProcessorTypesLoading ||
+    updateCompanyWasteVehiclesTypesLoading;
   const error =
     errorCompanyTypes ||
     errorTransportReceipt ||
@@ -716,7 +726,8 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     updateCompanyWorkerCertifError ||
     deleteErrorWorkerCertif ||
     updateCompanyCollectorTypesError ||
-    updateCompanyWasteProcessorTypesError;
+    updateCompanyWasteProcessorTypesError ||
+    updateCompanyWasteVehiclesTypesError;
 
   return (
     <CompanyFormWrapper
@@ -738,43 +749,17 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
               }
             })}
           >
-            {fields.map((field, index) => {
-              return (
-                <div key={field.id}>
-                  <div className="fr-grid-row fr-grid-row--gutters">
-                    <div className="fr-col-11">
-                      <Checkbox
-                        options={[
-                          {
-                            label: field.label,
-                            nativeInputProps: {
-                              ...register(`companyTypes.${index}.isChecked`)
-                            }
-                          }
-                        ]}
-                      />
-                    </div>
-                    <div className="fr-col-1">
-                      <TdTooltip msg={field.helpText} />
-                    </div>
-                  </div>
-                  <CompanyProfileSubForm
-                    register={register}
-                    field={field}
-                    watch={watch}
-                    formState={formState}
-                  />
-                </div>
-              );
-            })}
+            <RhfCompanyTypeForm
+              watch={watch}
+              register={register}
+              setValue={setValue}
+              formState={formState}
+            />
             {loading && <Loader />}
             {error && <NotificationError apolloError={error} />}
           </form>
         ) : (
-          <CompanyProfileInformation
-            company={company}
-            companyTypesFormatted={companyTypesFormatted}
-          />
+          <CompanyProfileInformation company={company} />
         )
       }
     </CompanyFormWrapper>
