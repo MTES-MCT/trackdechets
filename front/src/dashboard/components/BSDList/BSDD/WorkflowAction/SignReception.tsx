@@ -588,6 +588,7 @@ function SignReceptionModal({
           disabled={isSubmitting || loading}
           priority="secondary"
           onClick={onCancel}
+          type="button"
         >
           Annuler
         </Button>
