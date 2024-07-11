@@ -188,7 +188,7 @@ export function extractPostalCode(
     let match: RegExpExecArray | null = null;
     do {
       match = regex.exec(addressUp);
-      
+
       if (match?.length) {
         const cleanedMatch = match[0].replace(/,/g, " ").trim();
         matches.push(cleanedMatch);
@@ -242,7 +242,10 @@ export const splitAddress = (
 
   if (!postalCode) {
     return {
-      street: "",
+      // Fallback: return the full address in 'street' field
+      street: address
+        .replace(/\r?\n|\r/g, " ") // remove line breaks
+        .replace(/\s+/g, " "), // double spaces to single spaces
       postalCode: "",
       city: "",
       country

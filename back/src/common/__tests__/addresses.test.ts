@@ -168,14 +168,14 @@ describe("splitAddress", () => {
         country: "BE"
       }
     ],
-    // Invalid postalCode. Return at least the country
+    // Invalid postalCode. Fallback to full address in 'street' field + country
     [
       {
-        address: "Avenue Léopold III(PER) 337134 Binche",
+        address: "Avenue Léopold III(PER)   337134 Binche",
         vatNumber: "BE0401203084"
       },
       {
-        street: "",
+        street: "Avenue Léopold III(PER) 337134 Binche",
         postalCode: "",
         city: "",
         country: "BE"
