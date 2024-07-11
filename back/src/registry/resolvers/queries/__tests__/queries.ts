@@ -31,7 +31,6 @@ export const INCOMING_WASTES = gql`
           initialEmitterCompanySiret
           initialEmitterCompanyName
           initialEmitterCompanyAddress
-          initialEmitterPostalCodes
           emitterCompanySiret
         }
       }

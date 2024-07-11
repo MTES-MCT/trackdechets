@@ -166,15 +166,9 @@ export const columns: Column[] = [
   },
   { field: "initialEmitterCompanySiret", label: "Producteur initial SIRET" },
   {
-    field: "initialEmitterPostalCodes",
-    label: "Producteurs initiaux code postaux",
-    format: formatArray
-  },
-  {
     field: "initialEmitterCompanyAddress",
     label: "Producteur initial adresse"
   },
-  { field: "emitterCustomInfo", label: "Champ libre expéditeur" },
   { field: "emitterCompanyName", label: "Expéditeur raison sociale" },
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },
   { field: "emitterCompanyAddress", label: "Expéditeur adresse" },
@@ -207,12 +201,6 @@ export const columns: Column[] = [
   // Gestion du déchets
   { field: "ecoOrganismeName", label: "Éco-organisme raison sociale" },
   { field: "ecoOrganismeSiren", label: "Éco-organisme SIREN" },
-  { field: "managedEndDate", label: "Date de cession", format: formatDate },
-  {
-    field: "managedStartDate",
-    label: "Date d'acquisition",
-    format: formatDate
-  },
   { field: "traderCompanyName", label: "Négociant raison sociale" },
   { field: "traderCompanySiret", label: "Négociant SIRET" },
   { field: "traderCompanyMail", label: "Négociant contact" },
@@ -239,11 +227,6 @@ export const columns: Column[] = [
     label: "Intermédiaire n°3 - Raison sociale"
   },
   { field: "intermediary3CompanySiret", label: "Intermédiaire n°3 - SIRET" },
-
-  {
-    field: "transporterCustomInfo",
-    label: "Champ libre transporteur"
-  },
   { field: "transporterCompanyName", label: "Transporteur raison sociale" },
   {
     field: "transporterCompanySiret",
@@ -275,10 +258,6 @@ export const columns: Column[] = [
 
   { field: "wasteAdr", label: "ADR" },
   // Destination du déchet
-  {
-    field: "destinationCustomInfo",
-    label: "Champ libre destination"
-  },
   { field: "destinationCap", label: "CAP" },
   { field: "destinationCompanyName", label: "Destination raison sociale" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },

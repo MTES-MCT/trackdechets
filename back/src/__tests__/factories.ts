@@ -409,13 +409,20 @@ export const formFactory = async ({
     canAccessDraftSirets: ownerOrgIds,
     ...opt,
     transporters: {
-      create: {
-        ...formdata.transporters!.create,
-        ...opt.transporters?.create,
-        number: 1
-      }
+      ...(opt.transporters?.createMany
+        ? {
+            createMany: opt.transporters!.createMany
+          }
+        : {
+            create: {
+              ...formdata.transporters!.create,
+              ...opt.transporters?.create,
+              number: 1
+            }
+          })
     }
   };
+
   return prisma.form.create({
     data: {
       readableId: getReadableId(),
