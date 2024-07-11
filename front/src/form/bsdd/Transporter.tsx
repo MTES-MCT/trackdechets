@@ -1,6 +1,6 @@
 import { useFormikContext } from "formik";
 import React from "react";
-import { formTransportIsPipeline } from "./utils/packagings";
+import { formTransportIsPipeline } from "../../Apps/common/utils/packagingsBsddSummary";
 import { TransporterList } from "../../Apps/Forms/Components/TransporterList/TransporterList";
 import { useParams } from "react-router-dom";
 import { FormFormikValues } from "./utils/initial-state";

@@ -71,8 +71,8 @@ import {
   COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS,
   SEARCH_COMPANIES
 } from "../../../Apps/common/queries/company/query";
-import { formTransportIsPipeline } from "../../../form/bsdd/utils/packagings";
-import { getOperationModeLabel } from "../../../common/operationModes";
+import { formTransportIsPipeline } from "../../../Apps/common/utils/packagingsBsddSummary";
+import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";

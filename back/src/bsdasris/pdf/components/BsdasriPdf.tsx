@@ -16,9 +16,9 @@ import { TraceabilityTable } from "./TraceabilityTable";
 import { PackagingInfosTable } from "./PackagingInfosTable";
 import { FormCompanyFields } from "./FormCompanyFields";
 import { BsdasriType, OperationMode } from "@prisma/client";
-import { Recepisse } from "../../../bsda/pdf/components/Recepisse";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { dateToXMonthAtHHMM } from "../../../common/helpers";
+import { Recepisse } from "../../../common/pdf/components/Recepisse";
 
 type Props = {
   bsdasri: Bsdasri;

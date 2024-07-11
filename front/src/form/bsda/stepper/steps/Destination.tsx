@@ -2,11 +2,11 @@ import React from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "../../../common/components/company/CompanySelector";
 import { Bsda, BsdaType } from "@td/codegen-ui";
-import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import DateInput from "../../../common/components/custom-inputs/DateInput";
 import Select from "react-select";
 import { IntermediariesSelector } from "../../components/intermediaries/IntermediariesSelector";
+import { getInitialCompany } from "../../../../Apps/common/data/initialState";
 
 export function Destination({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();

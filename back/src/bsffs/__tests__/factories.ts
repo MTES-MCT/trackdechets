@@ -372,3 +372,47 @@ export function createFicheIntervention({
 
   return prisma.bsffFicheIntervention.create({ data });
 }
+
+type AddBsffTransporterOpt = {
+  bsffId: string;
+  transporter: UserWithCompany;
+};
+
+export const addBsffTransporter = async ({
+  bsffId,
+  transporter
+}: AddBsffTransporterOpt) => {
+  const count = await prisma.bsffTransporter.count({ where: { bsffId } });
+
+  let transporterData: Omit<Prisma.BsffTransporterCreateInput, "number"> = {
+    transporterCompanyName: transporter.company.name,
+    transporterCompanySiret: transporter.company.siret,
+    transporterCompanyAddress: transporter.company.address,
+    transporterCompanyContact: transporter.user.name,
+    transporterCompanyPhone: transporter.company.contactPhone,
+    transporterCompanyMail: transporter.company.contactEmail,
+    transporterCompanyVatNumber: transporter.company.vatNumber
+  };
+  const transporterReceipt = await prisma.company
+    .findUnique({
+      where: { id: transporter.company.id }
+    })
+    .transporterReceipt();
+
+  if (transporterReceipt) {
+    transporterData = {
+      ...transporterData,
+      transporterRecepisseIsExempted: false,
+      transporterRecepisseNumber: transporterReceipt.receiptNumber,
+      transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+      transporterRecepisseDepartment: transporterReceipt.department
+    };
+  }
+  return prisma.bsffTransporter.create({
+    data: {
+      ...transporterData,
+      number: count + 1,
+      bsff: { connect: { id: bsffId } }
+    }
+  });
+};

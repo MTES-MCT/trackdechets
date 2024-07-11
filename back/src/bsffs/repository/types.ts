@@ -47,7 +47,7 @@ export type BsffActions = {
   findUniqueGetFicheInterventions: FindUniqueBsffGetFicheInterventionsFn;
   findMany: FindManyBsffFn;
   create: CreateBsffFn;
-  update: UpdateBsffFn;
+  updateBsff: UpdateBsffFn;
   delete: DeleteBsffFn;
 };
 

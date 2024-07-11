@@ -23,7 +23,10 @@ export function createGroupementBsff(company: string): WorkflowStep {
             value: 1,
             isEstimate: true
           },
-          transporter: fixtures.transporterInput(transporteur.siret),
+          transporter: fixtures.transporterInput({
+            siret: transporteur.siret,
+            vatNumber: transporteur.vatNumber
+          }),
           destination: fixtures.traiteurInput(traiteur.siret),
           grouping: initialBsffs.flatMap(bsff => bsff.packagings.map(p => p.id))
         }

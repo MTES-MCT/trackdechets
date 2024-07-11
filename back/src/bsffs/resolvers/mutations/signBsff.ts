@@ -11,7 +11,11 @@ import {
   MutationResolvers
 } from "../../../generated/graphql/types";
 import { expandBsffFromDB } from "../../converter";
-import { getBsffOrNotFound, getNextTransporterSync } from "../../database";
+import {
+  getBsffOrNotFound,
+  getNextTransporterSync,
+  getNthTransporterSync
+} from "../../database";
 import { isFinalOperation } from "../../constants";
 import { getStatus } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -29,7 +33,10 @@ import {
   BsffWithTransportersInclude
 } from "../../types";
 import { parseBsffAsync } from "../../validation/bsff";
-import { PrismaBsffForParsing } from "../../validation/bsff/types";
+import {
+  AllBsffSignatureType,
+  PrismaBsffForParsing
+} from "../../validation/bsff/types";
 import { prismaToZodBsff } from "../../validation/bsff/helpers";
 import { prismaToZodBsffPackaging } from "../../validation/bsffPackaging/helpers";
 import { parseBsffPackagingAsync } from "../../validation/bsffPackaging";
@@ -41,8 +48,16 @@ const signBsff: MutationResolvers["signBsff"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
-  const authorizedOrgIds = getAuthorizedOrgIds(existingBsff, input.type);
-  await checkCanSignFor(user, input.type, authorizedOrgIds, input.securityCode);
+
+  const signatureType = getBsffSignatureType(input.type, existingBsff);
+
+  const authorizedOrgIds = getAuthorizedOrgIds(existingBsff, signatureType);
+  await checkCanSignFor(
+    user,
+    signatureType,
+    authorizedOrgIds,
+    input.securityCode
+  );
 
   const sign = signatures[input.type];
   const updatedBsff = await sign(user, existingBsff, {
@@ -57,27 +72,41 @@ export default signBsff;
 
 /**
  * Returns the different companies allowed to perform the signature
- * @param bsff the BSFF we wante to sign
+ * @param bsff the BSFF we want to sign
  * @param signatureType the type of signature (ex: EMISSION, TRANSPORT, etc)
  * @returns a list of organisation identifiers
  */
 export function getAuthorizedOrgIds(
   bsff: BsffWithTransporters,
-  signatureType: BsffSignatureType
+  signatureType: AllBsffSignatureType
 ): string[] {
+  const transportNthAuthorizedOrgIds = (
+    bsff: BsffWithTransporters,
+    n: number
+  ) => {
+    const transporterN = getNthTransporterSync(bsff, n);
+    return [
+      transporterN?.transporterCompanySiret,
+      transporterN?.transporterCompanyVatNumber
+    ].filter(Boolean);
+  };
+
   const signatureTypeToFn: {
-    [Key in BsffSignatureType]: (
+    [Key in AllBsffSignatureType]: (
       bsff: BsffWithTransporters
     ) => (string | null)[];
   } = {
     EMISSION: (bsff: Bsff) => [bsff.emitterCompanySiret],
     TRANSPORT: (bsff: BsffWithTransporters) =>
-      bsff.transporters
-        .flatMap(t => [
-          t.transporterCompanySiret,
-          t.transporterCompanyVatNumber
-        ])
-        .filter(Boolean),
+      transportNthAuthorizedOrgIds(bsff, 1),
+    TRANSPORT_2: (bsff: BsffWithTransporters) =>
+      transportNthAuthorizedOrgIds(bsff, 2),
+    TRANSPORT_3: (bsff: BsffWithTransporters) =>
+      transportNthAuthorizedOrgIds(bsff, 3),
+    TRANSPORT_4: (bsff: BsffWithTransporters) =>
+      transportNthAuthorizedOrgIds(bsff, 4),
+    TRANSPORT_5: (bsff: BsffWithTransporters) =>
+      transportNthAuthorizedOrgIds(bsff, 5),
     ACCEPTATION: (bsff: Bsff) => [bsff.destinationCompanySiret],
     RECEPTION: (bsff: Bsff) => [bsff.destinationCompanySiret],
     OPERATION: (bsff: Bsff) => [bsff.destinationCompanySiret]
@@ -126,7 +155,7 @@ async function signEmission(
   const zodBsff = prismaToZodBsff(bsff);
   await parseBsffAsync(zodBsff, { user, currentSignatureType: "EMISSION" });
 
-  const { update: updateBsff } = getBsffRepository(user);
+  const { updateBsff } = getBsffRepository(user);
 
   return updateBsff({
     where: { id: bsff.id },
@@ -171,13 +200,17 @@ async function signTransport(
       t => t.number === transporter.number
     ) ?? null;
 
-  const { update: updateBsff } = getBsffRepository(user);
+  const { updateBsff } = getBsffRepository(user);
 
   return updateBsff({
     where: { id: bsff.id },
     data: {
       status: BsffStatus.SENT,
-      transporterTransportSignatureDate: input.date,
+      ...(transporter.number === 1
+        ? // champ dénormalisé permettant de stocker la date de la première signature
+          // transporteur sur le BSFF
+          { transporterTransportSignatureDate: input.date }
+        : {}),
       transporters: {
         update: {
           where: { id: transporter.id },
@@ -220,14 +253,19 @@ async function signReception(
   const zodBsff = prismaToZodBsff(bsff);
   await parseBsffAsync(zodBsff, { currentSignatureType: "RECEPTION" });
 
-  const { update: updateBsff } = getBsffRepository(user);
+  const { updateBsff } = getBsffRepository(user);
 
   return updateBsff({
     where: { id: bsff.id },
     data: {
       status: BsffStatus.RECEIVED,
       destinationReceptionSignatureDate: input.date,
-      destinationReceptionSignatureAuthor: input.author
+      destinationReceptionSignatureAuthor: input.author,
+      // on autorise l'installation de destination à signer même si le ou les
+      // derniers transporteurs multi-modaux n'ont pas signé dans le cas où le
+      // premier transporteur ait finalement décidé d'aller directement à destination.
+      // Dans ce cas on supprime les transporteurs multi-modaux qui n'ont pas signé.
+      transporters: { deleteMany: { transporterTransportSignatureDate: null } }
     },
     include: BsffWithTransportersInclude
   });
@@ -336,7 +374,7 @@ async function signAcceptation(
       }
     }
 
-    const { update: updateBsff, findUniqueGetPackagings } = getBsffRepository(
+    const { updateBsff, findUniqueGetPackagings } = getBsffRepository(
       user,
       transaction
     );
@@ -388,7 +426,7 @@ async function signOperation(
     } = getBsffPackagingRepository(user, transaction);
 
     const {
-      update: updateBsff,
+      updateBsff,
       findMany: findManyBsffs,
       findUniqueGetPackagings
     } = getBsffRepository(user, transaction);
@@ -504,4 +542,35 @@ async function signOperation(
 
     return updatedBsff;
   });
+}
+
+/**
+ * Renvoie le numéro de la signature de transport en cas de signature d'un transporteur
+ * mulit-modal. Renvoie la signature GraphQL dans les autres cas
+ * @param signatureType
+ * @param bsff
+ * @returns
+ */
+function getBsffSignatureType(
+  signatureType: BsffSignatureType,
+  bsff: BsffWithTransporters
+): AllBsffSignatureType {
+  if (signatureType === "TRANSPORT") {
+    if (bsff.transporters && bsff.transporters.length > 1) {
+      const nextTransporter = getNextTransporterSync(bsff);
+      if (!nextTransporter) {
+        throw new UserInputError(
+          "Impossible d'appliquer une signature TRANSPORT. Tous les transporteurs ont déjà signé"
+        );
+      }
+      const number = nextTransporter.number;
+      if (!number || number === 1) {
+        return "TRANSPORT";
+      }
+      return `TRANSPORT_${number}` as AllBsffSignatureType;
+    }
+    return "TRANSPORT";
+  }
+
+  return signatureType;
 }

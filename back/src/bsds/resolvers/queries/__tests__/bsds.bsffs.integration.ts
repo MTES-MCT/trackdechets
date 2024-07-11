@@ -31,7 +31,9 @@ describe("Bsff subresolver in query bsds", () => {
 
   test("Bsff.packagings should resolve correctly", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
-    const bsff = await createBsffAfterEmission({ emitter });
+    const destination = await userWithCompanyFactory("ADMIN");
+
+    const bsff = await createBsffAfterEmission({ emitter, destination });
     const packagings = await prisma.bsff
       .findUniqueOrThrow({ where: { id: bsff.id } })
       .packagings();

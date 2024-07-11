@@ -10,8 +10,7 @@ import {
   formatDate,
   FormCompanyFields,
   SignatureStamp,
-  SignatureStampSmall,
-  TRANSPORT_MODE_LABELS
+  SignatureStampSmall
 } from "../../common/pdf";
 import {
   Bsff,
@@ -21,9 +20,9 @@ import {
 import { BSFF_WASTES } from "@td/constants";
 import { extractPostalCode } from "../../utils";
 import { Decimal } from "decimal.js";
-import { Recepisse } from "./Recepisse";
 import { getOperationModeLabel } from "../../common/operationModes";
 import { dateToXMonthAtHHMM } from "../../common/helpers";
+import Transporter from "../../common/pdf/components/Transporter";
 
 type Props = {
   bsff: Bsff & { packagings: BsffPackaging[] } & {
@@ -52,7 +51,9 @@ export function BsffPdf({ bsff, qrCode }: Props) {
           <BsffQuantity bsff={bsff} />
         </div>
         <BsffEmission bsff={bsff} />
-        <BsffTransporter bsff={bsff} />
+        {bsff?.transporter && (
+          <Transporter transporter={bsff.transporter} frameNumber={7} />
+        )}
         {bsff.packagings?.length > 1 ? (
           <BsffPackagingAcceptationOperation bsff={bsff} />
         ) : (
@@ -70,6 +71,22 @@ export function BsffPdf({ bsff, qrCode }: Props) {
           </>
         )}
       </div>
+      {bsff?.transporters?.length > 1 && (
+        <div className="Page">
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>A REMPLIR EN CAS DE TRANSPORT MULTIMODAL</strong>
+              </p>
+            </div>
+          </div>
+          {bsff.transporters
+            .filter((_, idx) => idx > 0)
+            .map((t, idx) => (
+              <Transporter transporter={t} key={t.id} frameNumber={11 + idx} />
+            ))}
+        </div>
+      )}
       {(hasFicheInterventions || hasPreviousBsffs) && (
         <div className="Page">
           {" "}
@@ -343,51 +360,6 @@ function BsffEmission({ bsff }: Pick<Props, "bsff">) {
         <div>Date : {formatDate(bsff.emitter?.emission?.signature?.date)}</div>
         <div>Signature :</div>
         {bsff.emitter?.emission?.signature?.date && <SignatureStamp />}
-      </div>
-    </div>
-  );
-}
-
-function BsffTransporter({ bsff }: Pick<Props, "bsff">) {
-  return (
-    <div className="BoxRow">
-      <div className="BoxCol">
-        <p>
-          <strong>7. Transporteur</strong>
-        </p>
-        <div className="Row">
-          <div className="Col">
-            <FormCompanyFields company={bsff.transporter?.company} />
-          </div>
-          <div className="Col">
-            {bsff?.transporter?.recepisse?.isExempted ? (
-              <p>
-                Le transporteur déclare être exempté de récépissé conformément
-                aux dispositions de l'article R.541-50 du code de
-                l'environnement.
-              </p>
-            ) : (
-              <Recepisse recepisse={bsff?.transporter?.recepisse} />
-            )}
-            <p>
-              Mode de transport :{" "}
-              {bsff?.transporter?.transport?.mode
-                ? TRANSPORT_MODE_LABELS[bsff?.transporter?.transport?.mode]
-                : null}
-              <br />
-              Immatriculation(s) : {bsff.transporter?.transport?.plates}
-              <br />
-              Date de prise en charge :{" "}
-              {formatDate(bsff.transporter?.transport?.takenOverAt)}
-              <br />
-              Nom et signature :{" "}
-              {bsff?.transporter?.transport?.signature?.author}
-            </p>
-            {bsff?.transporter?.transport?.signature?.date && (
-              <SignatureStamp />
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );

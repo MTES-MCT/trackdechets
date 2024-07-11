@@ -43,11 +43,11 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     return expandBsffFromDB(existingBsff);
   }
 
-  const { update: updateBsff } = getBsffRepository(user);
+  const { updateBsff } = getBsffRepository(user);
 
   const {
     createdAt,
-    transporters,
+    transporters: parsedTransporters,
     packagings,
     ficheInterventions,
     forwarding,
@@ -80,20 +80,33 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     };
   }
 
+  let transporters:
+    | Prisma.BsffTransporterUpdateManyWithoutBsffNestedInput
+    | undefined = undefined;
+
   if (updatedFields.includes("transporters")) {
     if (input.transporter) {
       if (existingFirstTransporter) {
         // on met à jour le premier transporteur existant
-        const { id, number, bsffId, ...transporterData } = transporters![0];
-        data.transporters = {
-          update: { where: { id: id! }, data: transporterData }
-        };
+        const { id, number, bsffId, ...data } = parsedTransporters![0];
+        transporters = { update: { where: { id: id! }, data } };
       } else {
         // on crée le premier transporteur
-        const { id, bsffId, ...transporterData } = transporters![0];
-        data.transporters = { create: { ...transporterData, number: 1 } };
+        const { id, bsffId, ...data } = parsedTransporters![0];
+        transporters = { create: { ...data, number: 1 } };
       }
+    } else {
+      // Cas où l'update est fait via `BsffInput.transporters`. On déconnecte tous les transporteurs qui étaient
+      // précédement associés et on connecte les nouveaux transporteurs de la table `BsffTransporter`
+      // avec ce bordereau. La fonction `update` du repository s'assure que la numérotation des
+      // transporteurs correspond à l'ordre du tableau d'identifiants.
+      transporters = {
+        set: [],
+        connect: parsedTransporters!.map(t => ({ id: t.id! }))
+      };
     }
+
+    data.transporters = transporters;
   }
 
   if (updatedFields.includes("ficheInterventions")) {

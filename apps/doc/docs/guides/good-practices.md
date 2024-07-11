@@ -2,7 +2,7 @@
 title : "Consommer l'api - Bonnes pratiques"
 ---
 
-L'api de Trackdéchets étant ouverte à tous les acteurs du déchet, le volume de requêtes absorbées est devenu très conséquent. 
+L'API de Trackdéchets étant ouverte à tous les acteurs du déchet, le volume de requêtes absorbées est devenu très conséquent. 
 Afin de garantir et faciliter un accès équitable à tous les systèmes d'information (SI) connectés, il vous est demandé d'appliquer au mieux certaines règles pour limiter la charge sur l'api sans pour autant restreindre les requêtes nécessaires.
 Pour limiter les abus nous pourrions être amenés à mettre en place des rate limits spécifiques dans les semaines à venir.
 

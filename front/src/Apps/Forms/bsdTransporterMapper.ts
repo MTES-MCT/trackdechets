@@ -1,4 +1,3 @@
-import { CreateOrUpdateBsdaTransporterInput } from "../../form/bsda/stepper/initial-state";
 import { CreateOrUpdateTransporterInput } from "../../form/bsdd/utils/initial-state";
 import { AnyTransporterInput, BsdTransporterInput } from "./types";
 import { BsdType } from "@td/codegen-ui";
@@ -23,12 +22,6 @@ export const mapBsddTransporter = (
   };
 };
 
-export const mapBsdaTransporter = (
-  transporter: CreateOrUpdateBsdaTransporterInput
-): BsdTransporterInput => {
-  return transporter;
-};
-
 export const mapBsdTransporter = (
   transporter: AnyTransporterInput,
   bsdType: BsdType
@@ -36,8 +29,8 @@ export const mapBsdTransporter = (
   switch (bsdType) {
     case BsdType.Bsdd:
       return mapBsddTransporter(transporter);
-    case BsdType.Bsda:
-      return mapBsdaTransporter(transporter);
+    default:
+      return transporter;
   }
   return null;
 };
