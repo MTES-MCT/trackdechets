@@ -97,7 +97,7 @@ export const checkDasrisAreGroupable = async (
   // retrieve dasris:
   // whose id is in regroupedBsdasrisIds array
   // which are in PROCESSED status
-  // whose destinationOperationCode is either D12 or  R12
+  // whose destinationOperationCode is either D13 or  R12
   // wich are of SIMPLE type
   // which are not already grouped, grouping, synthesized or synthesizing
   // whose recipient in current emitter

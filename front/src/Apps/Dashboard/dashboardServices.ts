@@ -160,7 +160,7 @@ export const getBsdStatusLabel = (
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
     case BsdStatusCode.AwaitingGroup:
       if (bsdType === BsdType.Bsdasri) {
-        if (operationCode === "R12" || operationCode === "D12") {
+        if (operationCode === "R12" || operationCode === "D13") {
           return EN_ATTENTE_BSD_SUITE;
         }
         return ANNEXE_BORDEREAU_SUITE;

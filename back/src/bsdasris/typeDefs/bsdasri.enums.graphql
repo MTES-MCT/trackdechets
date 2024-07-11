@@ -57,7 +57,7 @@ enum BsdasriPackagingType {
 enum destinationOperationCodeTypes {
   D9
   D10
-  D12
+  D13
   R1
   R12
 }

@@ -182,7 +182,8 @@ describe("Mutation.signBsdasri operation", () => {
         ...readyToTakeOverData(transporterCompany),
         ...readyToReceiveData(),
         ...readyToProcessData,
-        destinationOperationCode: "D12",
+        destinationOperationCode: "D13",
+        destinationOperationMode: null,
         status: BsdasriStatus.RECEIVED
       }
     });
@@ -272,7 +273,8 @@ describe("Mutation.signBsdasri operation", () => {
         ...readyToTakeOverData(transporterCompany),
         ...readyToReceiveData(),
         ...readyToProcessData,
-        destinationOperationCode: "D12",
+        destinationOperationCode: "D13",
+        destinationOperationMode: null,
         status: BsdasriStatus.RECEIVED
       }
     });

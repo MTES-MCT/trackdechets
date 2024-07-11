@@ -43,6 +43,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking changes
 
 - Le profil crématorium est déprécié au profit du sous-type crémation [PR 3468](https://github.com/MTES-MCT/trackdechets/pull/3468)
+- Correction de la dénomination du code de traitement non final D12 par D13 [PR 3457](https://github.com/MTES-MCT/trackdechets/pull/3457)
 
 #### :nail_care: Améliorations
 
