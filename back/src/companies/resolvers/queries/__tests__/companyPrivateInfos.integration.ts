@@ -1,4 +1,4 @@
-import { CompanyType } from "@prisma/client";
+import { CompanyType, WasteProcessorType, CollectorType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth";
 import { TEST_COMPANY_PREFIX } from "@td/constants";
@@ -66,6 +66,8 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           libelleNaf
           isRegistered
           companyTypes
+          wasteProcessorTypes
+          collectorTypes
           contactEmail
           contactPhone
           website
@@ -85,6 +87,8 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       libelleNaf: "Programmation informatique",
       isRegistered: false,
       companyTypes: [],
+      wasteProcessorTypes: [],
+      collectorTypes: [],
       contactEmail: null,
       contactPhone: null,
       website: null,
@@ -117,6 +121,12 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       website: "https://trackdechets.beta.gouv.fr",
       companyTypes: {
         set: [CompanyType.WASTEPROCESSOR]
+      },
+      wasteProcessorTypes: {
+        set: [WasteProcessorType.CREMATION]
+      },
+      collectorTypes: {
+        set: [CollectorType.DANGEROUS_WASTES]
       }
     });
 
@@ -137,6 +147,8 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           libelleNaf
           isRegistered
           companyTypes
+                wasteProcessorTypes
+          collectorTypes
           contactEmail
           contactPhone
           website
@@ -157,6 +169,8 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       libelleNaf: "Programmation informatique",
       isRegistered: true,
       companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.CREMATION],
+      collectorTypes: [CollectorType.DANGEROUS_WASTES],
       contactEmail: "john.snow@trackdechets.fr",
       contactPhone: "0600000000",
       website: "https://trackdechets.beta.gouv.fr",
