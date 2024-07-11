@@ -21,6 +21,7 @@ import { BSFF_WASTES } from "@td/constants";
 import { extractPostalCode } from "../../utils";
 import { Decimal } from "decimal.js";
 import { getOperationModeLabel } from "../../common/operationModes";
+import { dateToXMonthAtHHMM } from "../../common/helpers";
 import Transporter from "../../common/pdf/components/Transporter";
 
 type Props = {
@@ -126,6 +127,9 @@ function Header({ qrCode }: Pick<Props, "qrCode">) {
       </div>
       <div className="BoxCol TextAlignCenter">
         <div className="QrCode" dangerouslySetInnerHTML={{ __html: qrCode }} />
+        <div>
+          <b>Document édité le {dateToXMonthAtHHMM()}</b>
+        </div>
       </div>
       {/* End 3-parts header */}
     </div>

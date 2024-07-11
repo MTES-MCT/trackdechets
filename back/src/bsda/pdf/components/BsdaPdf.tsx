@@ -8,6 +8,7 @@ import { WasteDetails } from "./WasteDetails";
 import { BsdaStatus, OperationMode } from "@prisma/client";
 import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../../common/operationModes";
+import { dateToXMonthAtHHMM } from "../../../common/helpers";
 import { Signature } from "../../../bspaoh/pdf/components/Signature";
 import {
   CompanyContact,
@@ -47,6 +48,9 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
               className="QrCode"
               dangerouslySetInnerHTML={{ __html: qrCode }}
             />
+            <div>
+              <b>Document édité le {dateToXMonthAtHHMM()}</b>
+            </div>
           </div>
         </div>
 

@@ -35,6 +35,7 @@ import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../common/operationModes";
 import { FormCompanyDetails } from "../../common/pdf/components/FormCompanyDetails";
 import { isFrenchCompany } from "../../companies/validation";
+import { dateToXMonthAtHHMM } from "../../common/helpers";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -342,6 +343,9 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
               className="QrCode"
               dangerouslySetInnerHTML={{ __html: qrCode }}
             />
+            <div>
+              <b>Document édité le {dateToXMonthAtHHMM()}</b>
+            </div>
           </div>
         </div>
 

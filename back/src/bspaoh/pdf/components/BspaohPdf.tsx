@@ -11,6 +11,7 @@ import { PackagingInfosTable } from "./PackagingInfosTable";
 import { Recepisse } from "./Recepisse";
 import { Signature } from "./Signature";
 import { Quantity } from "./WasteDetails";
+import { dateToXMonthAtHHMM } from "../../../common/helpers";
 
 type Props = { readonly bspaoh: Bspaoh; readonly qrCode: string };
 
@@ -43,6 +44,9 @@ export function BspaohPdf({ bspaoh, qrCode }: Props) {
               className="QrCode"
               dangerouslySetInnerHTML={{ __html: qrCode }}
             />
+            <div>
+              <b>Document édité le {dateToXMonthAtHHMM()}</b>
+            </div>
           </div>
         </div>
         <div className="BoxRow">
