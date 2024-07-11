@@ -24,17 +24,27 @@ const getOperationData = (bsvhu: Bsvhu) => ({
   destinationOperationMode: bsvhu.destinationOperationMode
 });
 
-const getTransporterData = (bsvhu: Bsvhu) => ({
-  transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
-  transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
-  transporterNumberPlates: bsvhu.transporterTransportPlates,
-  transporterCompanyName: bsvhu.transporterCompanyName,
-  transporterCompanySiret: bsvhu.transporterCompanySiret,
-  transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
-  transporterCompanyMail: bsvhu.transporterCompanyMail,
-  transporterCustomInfo: bsvhu.transporterCustomInfo,
-  transporterCompanyAddress: bsvhu.transporterCompanyAddress
-});
+const getTransporterData = (bsvhu: Bsvhu, includePlates = false) => {
+  const data = {
+    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
+    transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
+    transporterCompanyName: bsvhu.transporterCompanyName,
+    transporterCompanySiret: bsvhu.transporterCompanySiret,
+    transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
+    transporterCompanyMail: bsvhu.transporterCompanyMail,
+    transporterCustomInfo: bsvhu.transporterCustomInfo,
+    transporterCompanyAddress: bsvhu.transporterCompanyAddress
+  };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: bsvhu.transporterTransportPlates
+    };
+  }
+
+  return data;
+};
 
 export function getRegistryFields(
   bsvhu: Bsvhu
@@ -74,7 +84,7 @@ export function getRegistryFields(
   return registryFields;
 }
 
-function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
+export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
   return {
     wasteDescription: getWasteDescription(bsvhu.wasteCode),
     wasteCode: bsvhu.wasteCode,
@@ -101,25 +111,11 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransporterData(bsvhu),
     destinationCompanyMail: bsvhu.destinationCompanyMail
   };
 }
 
 export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
-  const initialEmitter: Pick<
-    IncomingWaste,
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterCompanyAddress: null,
-    initialEmitterPostalCodes: null
-  };
-
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
@@ -134,33 +130,22 @@ export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
+    initialEmitterCompanyAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCustomInfo: bsvhu.destinationCustomInfo,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    ...getOperationData(bsvhu)
+    ...getOperationData(bsvhu),
+    ...getTransporterData(bsvhu)
   };
 }
 
 export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
-  const initialEmitter: Pick<
-    OutgoingWaste,
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterCompanyAddress: null,
-    initialEmitterPostalCodes: null
-  };
-
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
@@ -178,29 +163,19 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
+    initialEmitterCompanyAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
-    emitterCustomInfo: bsvhu.emitterCustomInfo,
-    ...getOperationData(bsvhu)
+    ...getOperationData(bsvhu),
+    ...getTransporterData(bsvhu)
   };
 }
 
 export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
-  const initialEmitter: Pick<
-    TransportedWaste,
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterCompanyAddress: null,
-    initialEmitterPostalCodes: null
-  };
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
@@ -209,7 +184,6 @@ export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
     ...genericWaste,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
-    ...initialEmitter,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
@@ -223,7 +197,8 @@ export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
     destinationCompanyName: bsvhu.destinationCompanyName,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
-    emitterCompanyMail: bsvhu.emitterCompanyMail
+    emitterCompanyMail: bsvhu.emitterCompanyMail,
+    ...getTransporterData(bsvhu, true)
   };
 }
 
@@ -232,27 +207,12 @@ export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
  * be called. We implement it anyway in case it is added later on
  */
 export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
-  const initialEmitter: Pick<
-    ManagedWaste,
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterCompanyAddress: null,
-    initialEmitterPostalCodes: null
-  };
-
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     brokerCompanyName: null,
@@ -265,25 +225,12 @@ export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
-    emitterCompanyMail: bsvhu.emitterCompanyMail
+    emitterCompanyMail: bsvhu.emitterCompanyMail,
+    ...getTransporterData(bsvhu)
   };
 }
 
 export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
-  const initialEmitter: Pick<
-    AllWaste,
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterCompanyAddress: null,
-    initialEmitterPostalCodes: null
-  };
-
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
@@ -303,14 +250,15 @@ export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
+    initialEmitterCompanyAddress: null,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
-    ...getOperationData(bsvhu)
+    ...getOperationData(bsvhu),
+    ...getTransporterData(bsvhu, true)
   };
 }

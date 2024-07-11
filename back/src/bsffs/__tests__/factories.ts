@@ -376,11 +376,13 @@ export function createFicheIntervention({
 type AddBsffTransporterOpt = {
   bsffId: string;
   transporter: UserWithCompany;
+  opt: { transporterTransportPlates: string[] };
 };
 
 export const addBsffTransporter = async ({
   bsffId,
-  transporter
+  transporter,
+  opt
 }: AddBsffTransporterOpt) => {
   const count = await prisma.bsffTransporter.count({ where: { bsffId } });
 
@@ -391,7 +393,8 @@ export const addBsffTransporter = async ({
     transporterCompanyContact: transporter.user.name,
     transporterCompanyPhone: transporter.company.contactPhone,
     transporterCompanyMail: transporter.company.contactEmail,
-    transporterCompanyVatNumber: transporter.company.vatNumber
+    transporterCompanyVatNumber: transporter.company.vatNumber,
+    transporterTransportPlates: opt?.transporterTransportPlates
   };
   const transporterReceipt = await prisma.company
     .findUnique({
