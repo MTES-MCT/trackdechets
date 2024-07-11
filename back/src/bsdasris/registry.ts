@@ -19,9 +19,9 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
 import { getWasteDescription } from "./utils";
 import { RegistryBsdasri } from "../registry/elastic";
+import { extractPostalCode } from "../common/addresses";
 
 const getOperationData = (bsdasri: Bsdasri) => ({
   destinationPlannedOperationCode: bsdasri.destinationOperationCode,

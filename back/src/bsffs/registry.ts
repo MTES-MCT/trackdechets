@@ -18,11 +18,11 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
 import { toBsffDestination } from "./compat";
 import { RegistryBsff } from "../registry/elastic";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { BsffWithTransporters } from "./types";
+import { extractPostalCode } from "../common/addresses";
 
 const getOperationData = (bsff: RegistryBsff) => {
   const bsffDestination = toBsffDestination(bsff.packagings);

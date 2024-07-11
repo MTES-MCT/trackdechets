@@ -19,10 +19,10 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode, splitAddress } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
+import { extractPostalCode, splitAddress } from "../common/addresses";
 
 const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
   if (!bsdd.forwardedIn) return {};

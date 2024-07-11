@@ -59,9 +59,9 @@ import {
   WorkSite
 } from "../generated/graphql/types";
 import { prisma } from "@td/prisma";
-import { extractPostalCode } from "../utils";
 import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";
+import { extractPostalCode } from "../common/addresses";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;

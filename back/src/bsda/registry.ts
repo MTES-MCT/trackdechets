@@ -19,10 +19,10 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode, splitAddress } from "../utils";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { RegistryBsda } from "../registry/elastic";
 import { BsdaForElastic } from "./elastic";
+import { extractPostalCode, splitAddress } from "../common/addresses";
 
 const getPostTempStorageDestination = (bsda: RegistryBsda) => {
   if (!bsda.forwardedIn) return {};
