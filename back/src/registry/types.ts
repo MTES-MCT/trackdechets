@@ -139,7 +139,25 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   parcelCities: null,
   parcelPostalCodes: null,
   parcelNumbers: null,
-  parcelCoordinates: null
+  parcelCoordinates: null,
+  initialEmitterCompanyCity: null,
+  initialEmitterCompanyCountry: null,
+  initialEmitterCompanyPostalCode: null,
+  transporter2CompanyCity: null,
+  transporter2CompanyCountry: null,
+  transporter2CompanyPostalCode: null,
+  transporter3CompanyCity: null,
+  transporter3CompanyCountry: null,
+  transporter3CompanyPostalCode: null,
+  transporter4CompanyCity: null,
+  transporter4CompanyCountry: null,
+  transporter4CompanyPostalCode: null,
+  transporter5CompanyCity: null,
+  transporter5CompanyCountry: null,
+  transporter5CompanyPostalCode: null,
+  transporterCompanyCity: null,
+  transporterCompanyCountry: null,
+  transporterCompanyPostalCode: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -240,7 +258,25 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   parcelCities: null,
   parcelPostalCodes: null,
   parcelNumbers: null,
-  parcelCoordinates: null
+  parcelCoordinates: null,
+  initialEmitterCompanyCity: null,
+  initialEmitterCompanyCountry: null,
+  initialEmitterCompanyPostalCode: null,
+  transporter2CompanyCity: null,
+  transporter2CompanyCountry: null,
+  transporter2CompanyPostalCode: null,
+  transporter3CompanyCity: null,
+  transporter3CompanyCountry: null,
+  transporter3CompanyPostalCode: null,
+  transporter4CompanyCity: null,
+  transporter4CompanyCountry: null,
+  transporter4CompanyPostalCode: null,
+  transporter5CompanyCity: null,
+  transporter5CompanyCountry: null,
+  transporter5CompanyPostalCode: null,
+  transporterCompanyCity: null,
+  transporterCompanyCountry: null,
+  transporterCompanyPostalCode: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -332,7 +368,22 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   workerCompanyAddress: null,
   wasteIsDangerous: null,
   brokerCompanyMail: null,
-  traderCompanyMail: null
+  traderCompanyMail: null,
+  transporter2CompanyCity: null,
+  transporter2CompanyCountry: null,
+  transporter2CompanyPostalCode: null,
+  transporter3CompanyCity: null,
+  transporter3CompanyCountry: null,
+  transporter3CompanyPostalCode: null,
+  transporter4CompanyCity: null,
+  transporter4CompanyCountry: null,
+  transporter4CompanyPostalCode: null,
+  transporter5CompanyCity: null,
+  transporter5CompanyCountry: null,
+  transporter5CompanyPostalCode: null,
+  transporterCompanyCity: null,
+  transporterCompanyCountry: null,
+  transporterCompanyPostalCode: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -420,7 +471,22 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   // finalOperationCodes: null,
   // finalReceptionWeights: null
   brokerCompanyMail: null,
-  traderCompanyMail: null
+  traderCompanyMail: null,
+  transporter2CompanyCity: null,
+  transporter2CompanyCountry: null,
+  transporter2CompanyPostalCode: null,
+  transporter3CompanyCity: null,
+  transporter3CompanyCountry: null,
+  transporter3CompanyPostalCode: null,
+  transporter4CompanyCity: null,
+  transporter4CompanyCountry: null,
+  transporter4CompanyPostalCode: null,
+  transporter5CompanyCity: null,
+  transporter5CompanyCountry: null,
+  transporter5CompanyPostalCode: null,
+  transporterCompanyCity: null,
+  transporterCompanyCountry: null,
+  transporterCompanyPostalCode: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -539,5 +605,23 @@ export const emptyAllWaste: Required<AllWaste> = {
   parcelCities: null,
   parcelPostalCodes: null,
   parcelNumbers: null,
-  parcelCoordinates: null
+  parcelCoordinates: null,
+  initialEmitterCompanyCity: null,
+  initialEmitterCompanyCountry: null,
+  initialEmitterCompanyPostalCode: null,
+  transporter2CompanyCity: null,
+  transporter2CompanyCountry: null,
+  transporter2CompanyPostalCode: null,
+  transporter3CompanyCity: null,
+  transporter3CompanyCountry: null,
+  transporter3CompanyPostalCode: null,
+  transporter4CompanyCity: null,
+  transporter4CompanyCountry: null,
+  transporter4CompanyPostalCode: null,
+  transporter5CompanyCity: null,
+  transporter5CompanyCountry: null,
+  transporter5CompanyPostalCode: null,
+  transporterCompanyCity: null,
+  transporterCompanyCountry: null,
+  transporterCompanyPostalCode: null
 };
