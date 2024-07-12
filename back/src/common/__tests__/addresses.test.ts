@@ -240,6 +240,15 @@ describe("splitAddress", () => {
         country: "FR"
       }
     ],
+    [
+      { address: "15 Rue Jacques Prévert, Le Port 97420, Réunion" },
+      {
+        street: "15 Rue Jacques Prévert, Le Port",
+        postalCode: "97420",
+        city: "Réunion",
+        country: "FR"
+      }
+    ],
     // Weirdly formatted frech address
     [
       {

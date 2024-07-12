@@ -5,7 +5,8 @@ import {
   toManagedWaste,
   toOutgoingWaste,
   toTransportedWaste,
-  toGenericWaste
+  toGenericWaste,
+  getTransportersData
 } from "../registry";
 import { prisma } from "@td/prisma";
 import { RegistryBsffInclude } from "../../registry/elastic";
@@ -16,30 +17,53 @@ import {
 } from "./factories";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { BsffType } from "@prisma/client";
+import { BsffType, UserRole } from "@prisma/client";
 
 const createBsffWith5Transporters = async () => {
-  const transporter1 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+  const transporter1 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "4 Boulevard Pasteur 44100 Nantes"
   });
-  const transporter2 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+
+  const transporter2 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "2 RUE PIERRE BROSSOLETTE 64000 PAU"
   });
-  const transporter3 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+
+  const transporter3 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "34 ROUTE DE BRESSUIRE 79200 CHATILLON-SUR-THOUET"
   });
-  const transporter4 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+
+  const transporter4 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "15 Rue Jacques Prévert, Le Port 97420, Réunion"
   });
-  const transporter5 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+
+  const transporter5 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "VIA TRATTATO DI SCHENGEN 5 15067 NOVI LIGURE AL",
+    vatNumber: "IT01144600069"
   });
+
   const bsff = await createBsff(
     { transporter: transporter1 },
     {
       data: { destinationCompanyMail: "destination@mail.com" },
       transporterData: {
-        transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"]
+        transporterCompanySiret: transporter1.company.siret,
+        transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"],
+        transporterCompanyAddress: transporter1.company.address
       }
     }
   );
@@ -157,7 +181,7 @@ describe("toOutgoingWaste", () => {
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
@@ -199,7 +223,7 @@ describe("toIncomingWaste", () => {
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
@@ -241,7 +265,7 @@ describe("toManagedWaste", () => {
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
@@ -291,7 +315,7 @@ describe("toTransportedWaste", () => {
     ]);
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste.transporter5NumberPlates).toStrictEqual([
       "TRANSPORTER5-NBR-PLATES"
@@ -387,7 +411,7 @@ describe("toAllWaste", () => {
     ]);
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste.transporter5NumberPlates).toStrictEqual([
       "TRANSPORTER5-NBR-PLATES"
@@ -437,5 +461,50 @@ describe("getSubType", () => {
 
     // Then
     expect(subType).toBe(expectedSubType);
+  });
+});
+
+describe("getTransportersData", () => {
+  afterAll(resetDatabase);
+
+  it("should contain the splitted addresses of all transporters", async () => {
+    // Given
+    const { bsff } = await createBsffWith5Transporters();
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const waste = getTransportersData(bsffForRegistry);
+
+    // Then
+    expect(waste.transporterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.transporterCompanyPostalCode).toBe("44100");
+    expect(waste.transporterCompanyCity).toBe("Nantes");
+    expect(waste.transporterCompanyCountry).toBe("FR");
+
+    expect(waste.transporter2CompanyAddress).toBe("2 RUE PIERRE BROSSOLETTE");
+    expect(waste.transporter2CompanyPostalCode).toBe("64000");
+    expect(waste.transporter2CompanyCity).toBe("PAU");
+    expect(waste.transporter2CompanyCountry).toBe("FR");
+
+    expect(waste.transporter3CompanyAddress).toBe("34 ROUTE DE BRESSUIRE");
+    expect(waste.transporter3CompanyPostalCode).toBe("79200");
+    expect(waste.transporter3CompanyCity).toBe("CHATILLON-SUR-THOUET");
+    expect(waste.transporter3CompanyCountry).toBe("FR");
+
+    expect(waste.transporter4CompanyAddress).toBe(
+      "15 Rue Jacques Prévert, Le Port"
+    );
+    expect(waste.transporter4CompanyPostalCode).toBe("97420");
+    expect(waste.transporter4CompanyCity).toBe("Réunion");
+    expect(waste.transporter4CompanyCountry).toBe("FR");
+
+    // Foreign transporter
+    expect(waste.transporter5CompanyAddress).toBe("VIA TRATTATO DI SCHENGEN 5");
+    expect(waste.transporter5CompanyPostalCode).toBe("15067");
+    expect(waste.transporter5CompanyCity).toBe("NOVI LIGURE AL");
+    expect(waste.transporter5CompanyCountry).toBe("IT");
   });
 });

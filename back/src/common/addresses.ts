@@ -259,7 +259,13 @@ export const splitAddress = (
     .replace(/\r?\n|\r/g, " ") // remove line breaks
     .replace(/\s+/g, " ") // double spaces to single spaces
     .split(postalCode)
-    .map(s => s.trim().replace(/,\s*$/, "")); // Remove trailing commas or spaces
+    .map(
+      s =>
+        s
+          .replace(/^,/, "") // Remove leading comma
+          .trim()
+          .replace(/,\s*$/, "") // Remove trailing commas or spaces
+    );
 
   return {
     street: splitted[0],

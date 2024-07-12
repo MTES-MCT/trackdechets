@@ -70,7 +70,7 @@ export const companyFactory = async (
   return prisma.company.create({
     data: {
       orgId: opts.vatNumber ?? siret,
-      siret,
+      siret: opts.vatNumber ? null : siret,
       companyTypes: {
         set: [
           "PRODUCER",

@@ -21,6 +21,7 @@ import {
 } from "../registry/types";
 import { getWasteDescription } from "./utils";
 import { RegistryBsdasri } from "../registry/elastic";
+import { splitAddress } from "../common/addresses";
 
 const getOperationData = (bsdasri: Bsdasri) => ({
   destinationPlannedOperationCode: bsdasri.destinationOperationCode,
@@ -55,10 +56,23 @@ const getInitialEmitterData = () => {
   return initialEmitter;
 };
 
-const getTransporterData = (bsdasri: Bsdasri, includePlates = false) => {
+export const getTransporterData = (bsdasri: Bsdasri, includePlates = false) => {
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    bsdasri.transporterCompanyAddress,
+    bsdasri.transporterCompanyVatNumber
+  );
+
   const data = {
     transporterRecepisseIsExempted: bsdasri.transporterRecepisseIsExempted,
-    transporterCompanyAddress: bsdasri.transporterCompanyAddress,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
     transporterCompanyName: bsdasri.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,

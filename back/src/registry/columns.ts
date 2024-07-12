@@ -245,6 +245,9 @@ export const columns: Column[] = [
     label: "Transporteur SIRET ou n° de TVA intracommunautaire"
   },
   { field: "transporterCompanyAddress", label: "Transporteur adresse" },
+  { field: "transporterCompanyPostalCode", label: "Transporteur Code postal" },
+  { field: "transporterCompanyCity", label: "Transporteur Commune" },
+  { field: "transporterCompanyCountry", label: "Transporteur Pays" },
   {
     field: "transporterRecepisseIsExempted",
     label: "Transporteur exemption de récépissé",
@@ -352,6 +355,13 @@ export const columns: Column[] = [
   },
   { field: "transporter2CompanyAddress", label: "Transporteur n°2 adresse" },
   {
+    field: "transporter2CompanyPostalCode",
+    label: "Transporteur n°2 Code postal"
+  },
+  { field: "transporter2CompanyCity", label: "Transporteur n°2 Commune" },
+  { field: "transporter2CompanyCountry", label: "Transporteur n°2 Pays" },
+
+  {
     field: "transporter2CompanySiret",
     label: "Transporteur n°2 SIRET ou n° de TVA intracommunautaire"
   },
@@ -387,6 +397,12 @@ export const columns: Column[] = [
   },
   { field: "transporter3CompanyAddress", label: "Transporteur n°3 adresse" },
   {
+    field: "transporter3CompanyPostalCode",
+    label: "Transporteur n°3 Code postal"
+  },
+  { field: "transporter3CompanyCity", label: "Transporteur n°3 Commune" },
+  { field: "transporter3CompanyCountry", label: "Transporteur n°3 Pays" },
+  {
     field: "transporter3RecepisseIsExempted",
     label: "Transporteur n°3 exemption de récépissé",
     format: formatBoolean
@@ -418,6 +434,12 @@ export const columns: Column[] = [
   },
   { field: "transporter4CompanyAddress", label: "Transporteur n°4 adresse" },
   {
+    field: "transporter4CompanyPostalCode",
+    label: "Transporteur n°4 Code postal"
+  },
+  { field: "transporter4CompanyCity", label: "Transporteur n°4 Commune" },
+  { field: "transporter4CompanyCountry", label: "Transporteur n°4 Pays" },
+  {
     field: "transporter4RecepisseIsExempted",
     label: "Transporteur n°4 exemption de récépissé",
     format: formatBoolean
@@ -448,6 +470,12 @@ export const columns: Column[] = [
     label: "Transporteur n°5 SIRET ou n° de TVA intracommunautaire"
   },
   { field: "transporter5CompanyAddress", label: "Transporteur n°5 adresse" },
+  {
+    field: "transporter5CompanyPostalCode",
+    label: "Transporteur n°5 Code postal"
+  },
+  { field: "transporter5CompanyCity", label: "Transporteur n°5 Commune" },
+  { field: "transporter5CompanyCountry", label: "Transporteur n°5 Pays" },
   {
     field: "transporter5RecepisseIsExempted",
     label: "Transporteur n°5 exemption de récépissé",

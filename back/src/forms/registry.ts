@@ -77,11 +77,64 @@ const getInitialEmitterData = (bsdd: ReturnType<typeof formToBsdd>) => {
   return initialEmitter;
 };
 
-const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
+export const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    bsdd.transporterCompanyAddress,
+    bsdd.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    bsdd.transporter2CompanyAddress,
+    bsdd.transporter2CompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    bsdd.transporter3CompanyAddress,
+    bsdd.transporter3CompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    bsdd.transporter4CompanyAddress,
+    bsdd.transporter4CompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    bsdd.transporter5CompanyAddress,
+    bsdd.transporter5CompanyVatNumber
+  );
+
   const data = {
     transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
     transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
-    transporterCompanyAddress: bsdd.transporterCompanyAddress,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
     transporterCompanyName: bsdd.transporterCompanyName,
     transporterCompanySiret: bsdd.transporterCompanySiret?.length
       ? bsdd.transporterCompanySiret
@@ -89,7 +142,10 @@ const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
     transporterTransportMode: bsdd.transporterTransportMode,
     transporterCompanyMail: bsdd.transporterCompanyMail,
-    transporter2CompanyAddress: bsdd.transporter2CompanyAddress ?? null,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
     transporter2CompanyName: bsdd.transporter2CompanyName ?? null,
     transporter2CompanySiret:
       (bsdd.transporter2CompanySiret?.length
@@ -98,7 +154,10 @@ const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
     transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber ?? null,
     transporter2CompanyMail: bsdd.transporter2CompanyMail ?? null,
     transporter2TransportMode: bsdd.transporter2TransportMode ?? null,
-    transporter3CompanyAddress: bsdd.transporter3CompanyAddress ?? null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
     transporter3CompanyName: bsdd.transporter3CompanyName ?? null,
     transporter3CompanySiret:
       (bsdd.transporter3CompanySiret?.length
@@ -107,7 +166,10 @@ const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
     transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber ?? null,
     transporter3CompanyMail: bsdd.transporter3CompanyMail ?? null,
     transporter3TransportMode: bsdd.transporter3TransportMode ?? null,
-    transporter4CompanyAddress: bsdd.transporter4CompanyAddress ?? null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
     transporter4CompanyName: bsdd.transporter4CompanyName ?? null,
     transporter4CompanySiret:
       (bsdd.transporter4CompanySiret?.length
@@ -116,7 +178,10 @@ const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
     transporter4RecepisseNumber: bsdd.transporter4RecepisseNumber ?? null,
     transporter4CompanyMail: bsdd.transporter4CompanyMail ?? null,
     transporter4TransportMode: bsdd.transporter4TransportMode ?? null,
-    transporter5CompanyAddress: bsdd.transporter5CompanyAddress ?? null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
     transporter5CompanyName: bsdd.transporter5CompanyName ?? null,
     transporter5CompanySiret:
       (bsdd.transporter5CompanySiret?.length

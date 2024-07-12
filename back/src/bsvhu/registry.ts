@@ -17,6 +17,7 @@ import {
   emptyTransportedWaste
 } from "../registry/types";
 import { getWasteDescription } from "./utils";
+import { splitAddress } from "../common/addresses";
 
 const getOperationData = (bsvhu: Bsvhu) => ({
   destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
@@ -37,7 +38,17 @@ const getInitialEmitterData = () => {
   return initialEmitter;
 };
 
-const getTransporterData = (bsvhu: Bsvhu, includePlates = false) => {
+export const getTransporterData = (bsvhu: Bsvhu, includePlates = false) => {
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    bsvhu.transporterCompanyAddress,
+    bsvhu.transporterCompanyVatNumber
+  );
+
   const data = {
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
     transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
@@ -46,7 +57,10 @@ const getTransporterData = (bsvhu: Bsvhu, includePlates = false) => {
     transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
     transporterCompanyMail: bsvhu.transporterCompanyMail,
     transporterCustomInfo: bsvhu.transporterCustomInfo,
-    transporterCompanyAddress: bsvhu.transporterCompanyAddress
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry
   };
 
   if (includePlates) {

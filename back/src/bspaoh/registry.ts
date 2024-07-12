@@ -21,6 +21,7 @@ import {
 
 import { getWasteDescription } from "./utils";
 import { getFirstTransporterSync } from "./converter";
+import { splitAddress } from "../common/addresses";
 
 const getInitialEmitterData = () => {
   const initialEmitter: Record<string, string | null> = {
@@ -35,16 +36,30 @@ const getInitialEmitterData = () => {
   return initialEmitter;
 };
 
-const getTransporterData = (
+export const getTransporterData = (
   bspaoh: Bspaoh & {
     transporters: BspaohTransporter[];
   },
   includePlates = false
 ) => {
   const transporter = getFirstTransporterSync(bspaoh);
+
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    transporter?.transporterCompanyAddress,
+    transporter?.transporterCompanyVatNumber
+  );
+
   const data = {
     transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
@@ -224,11 +239,6 @@ export function toOutgoingWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     ...getTransporterData(bspaoh),
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
-    transporterCompanyName: transporter?.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-    transporterTakenOverAt: transporter?.transporterTakenOverAt,
-    transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     weight: bspaoh.emitterWasteWeightValue
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,
@@ -242,8 +252,6 @@ export function toTransportedWaste(
     transporters: BspaohTransporter[];
   }
 ): TransportedWaste {
-  const transporter = getFirstTransporterSync(bspaoh);
-
   const { __typename, ...genericWaste } = toGenericWaste(bspaoh);
 
   return {
@@ -255,10 +263,6 @@ export function toTransportedWaste(
     weight: bspaoh.emitterWasteWeightValue
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,
-    transporterCompanyName: transporter?.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
-    transporterNumberPlates: transporter?.transporterTransportPlates,
     emitterCompanyAddress: bspaoh.emitterCompanyAddress,
     emitterCompanyName: bspaoh.emitterCompanyName,
     emitterCompanySiret: bspaoh.emitterCompanySiret,
@@ -315,10 +319,6 @@ export function toManagedWaste(
       bspaoh.emitterPickupSiteCity
     ]),
     ...getTransporterData(bspaoh),
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
-    transporterCompanyName: transporter?.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-    transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     emitterCompanyMail: bspaoh.emitterCompanyMail,
     transporterCompanyMail: transporter?.transporterCompanyMail
   };
@@ -358,11 +358,6 @@ export function toAllWaste(
       bspaoh.emitterPickupSitePostalCode,
       bspaoh.emitterPickupSiteCity
     ]),
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
-    transporterCompanyName: transporter?.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-    transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
-    transporterNumberPlates: transporter?.transporterTransportPlates,
     weight: bspaoh.emitterWasteWeightValue
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,

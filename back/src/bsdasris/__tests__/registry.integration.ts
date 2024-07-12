@@ -406,3 +406,31 @@ describe("getSubType", () => {
     expect(subType).toBe(expectedSubType);
   });
 });
+
+describe("getTransporterData", () => {
+  afterAll(resetDatabase);
+
+  it("should contain the splitted addresses of all transporters", async () => {
+    // Given
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    const dasri = await bsdasriFactory({
+      opt: {
+        transporterCompanySiret: transporter.siret,
+        transporterCompanyAddress: "4 Boulevard Pasteur 44100 Nantes"
+      }
+    });
+
+    // When
+    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toAllWaste(dasriForRegistry);
+
+    // Then
+    expect(waste.transporterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.transporterCompanyPostalCode).toBe("44100");
+    expect(waste.transporterCompanyCity).toBe("Nantes");
+    expect(waste.transporterCompanyCountry).toBe("FR");
+  });
+});

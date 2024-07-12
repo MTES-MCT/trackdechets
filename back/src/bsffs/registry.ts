@@ -83,22 +83,81 @@ const getInitialEmitterData = (bsff: RegistryBsff) => {
   return initialEmitter;
 };
 
-const getTransportersData = (bsff: RegistryBsff, includePlates = false) => {
+export const getTransportersData = (
+  bsff: RegistryBsff,
+  includePlates = false
+) => {
   const transporters = getTransportersSync(bsff);
 
   const [transporter, transporter2, transporter3, transporter4, transporter5] =
     transporters;
 
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    transporter.transporterCompanyAddress,
+    transporter.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    transporter2?.transporterCompanyAddress,
+    transporter2?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    transporter3?.transporterCompanyAddress,
+    transporter3?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    transporter4?.transporterCompanyAddress,
+    transporter4?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    transporter5?.transporterCompanyAddress,
+    transporter5?.transporterCompanyVatNumber
+  );
+
   const data = {
     transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     transporterCompanyMail: transporter?.transporterCompanyMail,
     transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
     transporterTransportMode: transporter?.transporterTransportMode,
-    transporter2CompanyAddress: transporter2?.transporterCompanyAddress,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
     transporter2CompanyName: transporter2?.transporterCompanyName,
     transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
     transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
@@ -106,7 +165,10 @@ const getTransportersData = (bsff: RegistryBsff, includePlates = false) => {
     transporter2RecepisseIsExempted:
       transporter2?.transporterRecepisseIsExempted,
     transporter2TransportMode: transporter2?.transporterTransportMode,
-    transporter3CompanyAddress: transporter3?.transporterCompanyAddress,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
     transporter3CompanyName: transporter3?.transporterCompanyName,
     transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
     transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
@@ -114,7 +176,10 @@ const getTransportersData = (bsff: RegistryBsff, includePlates = false) => {
     transporter3RecepisseIsExempted:
       transporter3?.transporterRecepisseIsExempted,
     transporter3TransportMode: transporter3?.transporterTransportMode,
-    transporter4CompanyAddress: transporter4?.transporterCompanyAddress,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
     transporter4CompanyName: transporter4?.transporterCompanyName,
     transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
     transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
@@ -122,7 +187,10 @@ const getTransportersData = (bsff: RegistryBsff, includePlates = false) => {
     transporter4RecepisseIsExempted:
       transporter4?.transporterRecepisseIsExempted,
     transporter4TransportMode: transporter4?.transporterTransportMode,
-    transporter5CompanyAddress: transporter5?.transporterCompanyAddress,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
     transporter5CompanyName: transporter5?.transporterCompanyName,
     transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
     transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,

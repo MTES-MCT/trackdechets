@@ -271,3 +271,29 @@ describe("toGenericWaste", () => {
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
   });
 });
+
+describe("getTransportersData", () => {
+  afterAll(resetDatabase);
+
+  it("should contain the splitted addresses of all transporters", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        destinationCompanyMail: "destination@mail.com",
+        transporterCompanyAddress: "4 Boulevard Pasteur 44100 Nantes"
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id }
+    });
+    const waste = toTransportedWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.transporterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.transporterCompanyPostalCode).toBe("44100");
+    expect(waste.transporterCompanyCity).toBe("Nantes");
+    expect(waste.transporterCompanyCountry).toBe("FR");
+  });
+});

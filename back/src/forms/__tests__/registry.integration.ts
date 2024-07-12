@@ -9,6 +9,7 @@ import {
 import { formToBsdd } from "../compat";
 import {
   getSubType,
+  getTransportersData,
   toAllWaste,
   toGenericWaste,
   toIncomingWaste,
@@ -35,31 +36,37 @@ const createBsddWith5Transporters = async () => {
   const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
     companyTypes: {
       set: ["TRANSPORTER"]
-    }
+    },
+    address: "4 Boulevard Pasteur 44100 Nantes"
   });
 
   const transporter2 = await userWithCompanyFactory(UserRole.ADMIN, {
     companyTypes: {
       set: ["TRANSPORTER"]
-    }
+    },
+    address: "2 RUE PIERRE BROSSOLETTE 64000 PAU"
   });
 
   const transporter3 = await userWithCompanyFactory(UserRole.ADMIN, {
     companyTypes: {
       set: ["TRANSPORTER"]
-    }
+    },
+    address: "34 ROUTE DE BRESSUIRE 79200 CHATILLON-SUR-THOUET"
   });
 
   const transporter4 = await userWithCompanyFactory(UserRole.ADMIN, {
     companyTypes: {
       set: ["TRANSPORTER"]
-    }
+    },
+    address: "15 Rue Jacques Prévert, Le Port 97420, Réunion"
   });
 
   const transporter5 = await userWithCompanyFactory(UserRole.ADMIN, {
     companyTypes: {
       set: ["TRANSPORTER"]
-    }
+    },
+    address: "VIA TRATTATO DI SCHENGEN 5 15067 NOVI LIGURE AL",
+    vatNumber: "IT01144600069"
   });
 
   const destination = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -84,30 +91,35 @@ const createBsddWith5Transporters = async () => {
             {
               transporterCompanySiret: transporter.company.siret,
               transporterNumberPlate: "TRANSPORTER1-NBR-PLATES",
+              transporterCompanyAddress: transporter.company.address,
               takenOverAt: new Date(),
               number: 1
             },
             {
               transporterCompanySiret: transporter2.company.siret,
               transporterNumberPlate: "TRANSPORTER2-NBR-PLATES",
+              transporterCompanyAddress: transporter2.company.address,
               takenOverAt: new Date(),
               number: 2
             },
             {
               transporterCompanySiret: transporter3.company.siret,
               transporterNumberPlate: "TRANSPORTER3-NBR-PLATES",
+              transporterCompanyAddress: transporter3.company.address,
               takenOverAt: new Date(),
               number: 3
             },
             {
               transporterCompanySiret: transporter4.company.siret,
               transporterNumberPlate: "TRANSPORTER4-NBR-PLATES",
+              transporterCompanyAddress: transporter4.company.address,
               takenOverAt: new Date(),
               number: 4
             },
             {
-              transporterCompanySiret: transporter5.company.siret,
+              transporterCompanyVatNumber: transporter5.company.vatNumber,
               transporterNumberPlate: "TRANSPORTER5-NBR-PLATES",
+              transporterCompanyAddress: transporter5.company.address,
               takenOverAt: new Date(),
               number: 5
             }
@@ -182,7 +194,8 @@ describe("toIncomingWaste", () => {
     expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    // Foreign transporter
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.vatNumber);
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
 
@@ -367,7 +380,8 @@ describe("toOutgoingWaste", () => {
     expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    // Foreign transporter
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.vatNumber);
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
 
@@ -400,6 +414,8 @@ describe("toOutgoingWaste", () => {
 });
 
 describe("toAllWaste", () => {
+  afterAll(resetDatabase);
+
   it(
     "should compute destinationFinalOperationCodes" +
       " and destinationfinalOperationWeights",
@@ -680,7 +696,8 @@ describe("toAllWaste", () => {
       "TRANSPORTER4-NBR-PLATES"
     ]);
 
-    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    // Foreign transporter
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.vatNumber);
     expect(waste.transporter5NumberPlates).toStrictEqual([
       "TRANSPORTER5-NBR-PLATES"
     ]);
@@ -764,7 +781,8 @@ describe("toManagedWaste", () => {
     expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
-    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    // Foreign transporter
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.vatNumber);
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
 });
@@ -804,7 +822,8 @@ describe("toTransportedWaste", () => {
       "TRANSPORTER4-NBR-PLATES"
     ]);
 
-    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    // Foreign transporter
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.vatNumber);
     expect(waste.transporter5NumberPlates).toStrictEqual([
       "TRANSPORTER5-NBR-PLATES"
     ]);
@@ -941,5 +960,50 @@ describe("getSubType", () => {
 
     // Then
     expect(subType).toBe("INITIAL");
+  });
+});
+
+describe("getTransportersData", () => {
+  afterAll(resetDatabase);
+
+  it("should contain the splitted addresses of all transporters", async () => {
+    // Given
+    const data = await createBsddWith5Transporters();
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: data.bsdd.id },
+      include: RegistryFormInclude
+    });
+    const waste = getTransportersData(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.transporterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.transporterCompanyPostalCode).toBe("44100");
+    expect(waste.transporterCompanyCity).toBe("Nantes");
+    expect(waste.transporterCompanyCountry).toBe("FR");
+
+    expect(waste.transporter2CompanyAddress).toBe("2 RUE PIERRE BROSSOLETTE");
+    expect(waste.transporter2CompanyPostalCode).toBe("64000");
+    expect(waste.transporter2CompanyCity).toBe("PAU");
+    expect(waste.transporter2CompanyCountry).toBe("FR");
+
+    expect(waste.transporter3CompanyAddress).toBe("34 ROUTE DE BRESSUIRE");
+    expect(waste.transporter3CompanyPostalCode).toBe("79200");
+    expect(waste.transporter3CompanyCity).toBe("CHATILLON-SUR-THOUET");
+    expect(waste.transporter3CompanyCountry).toBe("FR");
+
+    expect(waste.transporter4CompanyAddress).toBe(
+      "15 Rue Jacques Prévert, Le Port"
+    );
+    expect(waste.transporter4CompanyPostalCode).toBe("97420");
+    expect(waste.transporter4CompanyCity).toBe("Réunion");
+    expect(waste.transporter4CompanyCountry).toBe("FR");
+
+    // Foreign transporter
+    expect(waste.transporter5CompanyAddress).toBe("VIA TRATTATO DI SCHENGEN 5");
+    expect(waste.transporter5CompanyPostalCode).toBe("15067");
+    expect(waste.transporter5CompanyCity).toBe("NOVI LIGURE AL");
+    expect(waste.transporter5CompanyCountry).toBe("IT");
   });
 });

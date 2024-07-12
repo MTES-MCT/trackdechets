@@ -6,7 +6,8 @@ import {
   toManagedWaste,
   toOutgoingWaste,
   toTransportedWaste,
-  toGenericWaste
+  toGenericWaste,
+  getTransporterData
 } from "../registry";
 import { bspaohFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
@@ -324,5 +325,39 @@ describe("toGenericWaste", () => {
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
+  });
+});
+
+describe("getTransporterData", () => {
+  afterAll(resetDatabase);
+
+  it("should contain the splitted addresses of all transporters", async () => {
+    // Given
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    const paoh = await bspaohFactory({
+      opt: {
+        destinationCompanyMail: "destination@mail.com",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyAddress: "4 Boulevard Pasteur 44100 Nantes",
+            number: 1
+          }
+        }
+      }
+    });
+
+    // When
+    const paohForRegistry = await prisma.bspaoh.findUniqueOrThrow({
+      where: { id: paoh.id },
+      include: RegistryBspaohInclude
+    });
+    const waste = getTransporterData(paohForRegistry);
+
+    // Then
+    expect(waste.transporterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.transporterCompanyPostalCode).toBe("44100");
+    expect(waste.transporterCompanyCity).toBe("Nantes");
+    expect(waste.transporterCompanyCountry).toBe("FR");
   });
 });
