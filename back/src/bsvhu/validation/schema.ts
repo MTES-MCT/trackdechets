@@ -6,7 +6,9 @@ import {
   checkFicheInterventions,
   checkWeights,
   checkPackagings,
-  checkRequiredFields
+  checkRequiredFields,
+  checkOperationMode,
+  checkReceptionWeight
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
@@ -171,7 +173,10 @@ export type ZodBsvhu = z.input<typeof rawBsvhuSchema>;
 // Voir https://zod.dev/?id=type-inference
 export type ParsedZodBsvhu = z.output<typeof rawBsvhuSchema>;
 
-const refinedBsvhuSchema = rawBsvhuSchema.superRefine(checkWeights);
+const refinedBsvhuSchema = rawBsvhuSchema
+  .superRefine(checkWeights)
+  .superRefine(checkReceptionWeight)
+  .superRefine(checkOperationMode);
 
 /**
  * Modification du schéma Zod pour appliquer des tranformations et

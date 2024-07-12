@@ -771,7 +771,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
     readableFieldName: "le conditionnement"
   },
   weightIsEstimate: {
-    readableFieldName: "le champ pour indiquer sile poids est estimé",
+    readableFieldName: "le champ pour indiquer si le poids est estimé",
     sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
     required: { from: "WORK" }
   },
