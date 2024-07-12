@@ -282,8 +282,6 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
       return (
         <>
           <Highlight>
-            <h4>Déchets traités</h4>
-            <br />
             {WASTE_PROCESSOR_OPTIONS.map(option => (
               <Checkbox
                 key={option.value}
@@ -307,8 +305,6 @@ const CompanyProfileSubForm = ({ watch, register, field, formState }) => {
       return (
         <>
           <Highlight>
-            <h4>Déchets concernés</h4>
-            <br />
             {COLLECTOR_OPTIONS.map(option => (
               <Checkbox
                 key={option.value}
