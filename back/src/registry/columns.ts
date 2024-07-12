@@ -169,6 +169,18 @@ export const columns: Column[] = [
     field: "initialEmitterCompanyAddress",
     label: "Producteur initial adresse"
   },
+  {
+    field: "initialEmitterCompanyPostalCode",
+    label: "Producteur initial Code postal"
+  },
+  {
+    field: "initialEmitterCompanyCity",
+    label: "Producteur initial Commune"
+  },
+  {
+    field: "initialEmitterCompanyCountry",
+    label: "Producteur initial Pays"
+  },
   { field: "emitterCompanyName", label: "Expéditeur raison sociale" },
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },
   { field: "emitterCompanyAddress", label: "Expéditeur adresse" },

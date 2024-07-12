@@ -53,6 +53,26 @@ describe("toIncomingWaste", () => {
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const dasri = await bsdasriFactory({});
+
+    // When
+    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toIncomingWaste(dasriForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
+  });
 });
 
 describe("toOutgoingWaste", () => {
@@ -133,6 +153,26 @@ describe("toOutgoingWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const dasri = await bsdasriFactory({});
+
+    // When
+    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toOutgoingWaste(dasriForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
   });
 });
 
@@ -300,6 +340,26 @@ describe("toAllWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste.transporter5NumberPlates).toBeNull();
+  });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const dasri = await bsdasriFactory({});
+
+    // When
+    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toAllWaste(dasriForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
   });
 });
 

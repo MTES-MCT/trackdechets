@@ -159,6 +159,44 @@ describe("toIncomingWaste", () => {
     expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
+
+  it("if forwarding BSD, should contain the info of the initial emitter", async () => {
+    // Given
+    const emitter = await companyFactory({
+      name: "Acme Inc.",
+      address: "4 boulevard Pasteur 44100 Nantes"
+    });
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        emitterCompanyName: emitter.name,
+        emitterCompanyAddress: emitter.address
+      }
+    });
+    const forwardingBsda = await bsdaFactory({
+      opt: {
+        forwarding: { connect: { id: forwardedBsda.id } },
+        emitterCompanyName: emitter.name,
+        emitterCompanyAddress: emitter.address,
+        emitterCompanySiret: emitter.siret
+      }
+    });
+
+    // When
+    const forwardingBsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: forwardingBsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toIncomingWaste(forwardingBsdaForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBe("4 boulevard Pasteur");
+    expect(waste.initialEmitterCompanyPostalCode).toBe("44100");
+    expect(waste.initialEmitterCompanyCity).toBe("Nantes");
+    expect(waste.initialEmitterCompanyCountry).toBe("FR");
+    expect(waste.initialEmitterCompanyName).toBe("Acme Inc.");
+    expect(waste.initialEmitterCompanySiret).toBe(emitter.siret);
+  });
 });
 
 describe("toOutgoingWaste", () => {
@@ -291,6 +329,44 @@ describe("toOutgoingWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
+
+  it("if forwarding BSD, should contain the info of the initial emitter", async () => {
+    // Given
+    const emitter = await companyFactory({
+      name: "Acme Inc.",
+      address: "4 boulevard Pasteur 44100 Nantes"
+    });
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        emitterCompanyName: emitter.name,
+        emitterCompanyAddress: emitter.address
+      }
+    });
+    const forwardingBsda = await bsdaFactory({
+      opt: {
+        forwarding: { connect: { id: forwardedBsda.id } },
+        emitterCompanyName: emitter.name,
+        emitterCompanyAddress: emitter.address,
+        emitterCompanySiret: emitter.siret
+      }
+    });
+
+    // When
+    const forwardingBsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: forwardingBsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toOutgoingWaste(forwardingBsdaForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBe("4 boulevard Pasteur");
+    expect(waste.initialEmitterCompanyPostalCode).toBe("44100");
+    expect(waste.initialEmitterCompanyCity).toBe("Nantes");
+    expect(waste.initialEmitterCompanyCountry).toBe("FR");
+    expect(waste.initialEmitterCompanyName).toBe("Acme Inc.");
+    expect(waste.initialEmitterCompanySiret).toBe(emitter.siret);
   });
 });
 
@@ -596,6 +672,44 @@ describe("toAllWaste", () => {
     expect(waste.transporter5NumberPlates).toStrictEqual([
       "TRANSPORTER5-NBR-PLATES"
     ]);
+  });
+
+  it("if forwarding BSD, should contain the info of the initial emitter", async () => {
+    // Given
+    const emitter = await companyFactory({
+      name: "Acme Inc.",
+      address: "4 boulevard Pasteur 44100 Nantes"
+    });
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        emitterCompanyName: emitter.name,
+        emitterCompanyAddress: emitter.address
+      }
+    });
+    const forwardingBsda = await bsdaFactory({
+      opt: {
+        forwarding: { connect: { id: forwardedBsda.id } },
+        emitterCompanyName: emitter.name,
+        emitterCompanyAddress: emitter.address,
+        emitterCompanySiret: emitter.siret
+      }
+    });
+
+    // When
+    const forwardingBsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: forwardingBsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toAllWaste(forwardingBsdaForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBe("4 boulevard Pasteur");
+    expect(waste.initialEmitterCompanyPostalCode).toBe("44100");
+    expect(waste.initialEmitterCompanyCity).toBe("Nantes");
+    expect(waste.initialEmitterCompanyCountry).toBe("FR");
+    expect(waste.initialEmitterCompanyName).toBe("Acme Inc.");
+    expect(waste.initialEmitterCompanySiret).toBe(emitter.siret);
   });
 });
 

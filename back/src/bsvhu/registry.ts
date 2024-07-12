@@ -24,6 +24,19 @@ const getOperationData = (bsvhu: Bsvhu) => ({
   destinationOperationMode: bsvhu.destinationOperationMode
 });
 
+const getInitialEmitterData = () => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  return initialEmitter;
+};
+
 const getTransporterData = (bsvhu: Bsvhu, includePlates = false) => {
   const data = {
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
@@ -130,9 +143,6 @@ export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterCompanyAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -141,7 +151,8 @@ export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
     brokerRecepisseNumber: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     ...getOperationData(bsvhu),
-    ...getTransporterData(bsvhu)
+    ...getTransporterData(bsvhu),
+    ...getInitialEmitterData()
   };
 }
 
@@ -163,15 +174,13 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterCompanyAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     ...getOperationData(bsvhu),
-    ...getTransporterData(bsvhu)
+    ...getTransporterData(bsvhu),
+    ...getInitialEmitterData()
   };
 }
 
@@ -250,15 +259,13 @@ export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterCompanyAddress: null,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     ...getOperationData(bsvhu),
-    ...getTransporterData(bsvhu, true)
+    ...getTransporterData(bsvhu, true),
+    ...getInitialEmitterData()
   };
 }

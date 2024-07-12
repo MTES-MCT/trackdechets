@@ -71,6 +71,35 @@ const getFinalOperationsData = (bsda: RegistryBsda) => {
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
+const getInitialEmitterData = (bsda: RegistryBsda) => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  if (bsda.forwarding) {
+    const { street, postalCode, city, country } = splitAddress(
+      bsda.forwarding.emitterCompanyAddress
+    );
+
+    initialEmitter.initialEmitterCompanyAddress = street;
+    initialEmitter.initialEmitterCompanyPostalCode = postalCode;
+    initialEmitter.initialEmitterCompanyCity = city;
+    initialEmitter.initialEmitterCompanyCountry = country;
+
+    initialEmitter.initialEmitterCompanyName =
+      bsda.forwarding.emitterCompanyName;
+    initialEmitter.initialEmitterCompanySiret =
+      bsda.forwarding.emitterCompanySiret;
+  }
+
+  return initialEmitter;
+};
+
 const getTransportersData = (bsda: RegistryBsda, includePlates = false) => {
   const transporters = getTransportersSync(bsda);
 
@@ -253,7 +282,6 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
-    initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
     emitterPickupsiteName: bsda.emitterPickupSiteName,
@@ -274,31 +302,12 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     ...getOperationData(bsda),
     nextDestinationProcessingOperation:
       bsda.destinationOperationNextDestinationPlannedOperationCode,
-    ...getTransportersData(bsda)
+    ...getTransportersData(bsda),
+    ...getInitialEmitterData(bsda)
   };
 }
 
 export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
-  const initialEmitter: Pick<
-    OutgoingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null
-  };
-
-  if (bsda.forwarding) {
-    initialEmitter.initialEmitterCompanyAddress =
-      bsda.forwarding.emitterCompanyAddress;
-    initialEmitter.initialEmitterCompanyName =
-      bsda.forwarding.emitterCompanyName;
-    initialEmitter.initialEmitterCompanySiret =
-      bsda.forwarding.emitterCompanySiret;
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
@@ -324,7 +333,6 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
         bsda.emitterPickupSiteCity
       ].filter(Boolean)
     ),
-    ...initialEmitter,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -335,7 +343,8 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     ...getFinalOperationsData(bsda),
     nextDestinationProcessingOperation:
       bsda.destinationOperationNextDestinationPlannedOperationCode,
-    ...getTransportersData(bsda)
+    ...getTransportersData(bsda),
+    ...getInitialEmitterData(bsda)
   };
 }
 
@@ -439,7 +448,6 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
         bsda.emitterPickupSiteCity
       ].filter(Boolean)
     ),
-    initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
     weight: bsda.weightValue
@@ -454,6 +462,7 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     nextDestinationProcessingOperation:
       bsda.destinationOperationNextDestinationPlannedOperationCode,
     ...getIntermediariesData(bsda),
-    ...getTransportersData(bsda, true)
+    ...getTransportersData(bsda, true),
+    ...getInitialEmitterData(bsda)
   };
 }

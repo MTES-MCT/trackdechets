@@ -43,6 +43,25 @@ describe("toIncomingWaste", () => {
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({});
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id }
+    });
+    const waste = toIncomingWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
+  });
 });
 
 describe("toOutgoingWaste", () => {
@@ -77,6 +96,25 @@ describe("toOutgoingWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({});
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id }
+    });
+    const waste = toOutgoingWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
   });
 });
 
@@ -152,6 +190,25 @@ describe("toAllWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste.transporter5NumberPlates).toBeNull();
+  });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({});
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id }
+    });
+    const waste = toAllWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
   });
 });
 

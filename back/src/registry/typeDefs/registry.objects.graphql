@@ -45,6 +45,13 @@ type IncomingWaste {
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
+  "Le code postal du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyPostalCode: String
+  "La ville du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCity: String
+  "Le pays (isoCode) du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCountry: String
+
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
   "Le numéro SIRET de l'établissement expéditeur des déchets"
@@ -340,6 +347,12 @@ type OutgoingWaste {
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
+  "Le code postal du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyPostalCode: String
+  "La ville du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCity: String
+  "Le pays (isoCode) du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCountry: String
 
   #########################################################################
   # d) Concernant la localisation des terres (parcelles) pour la traçabilité des terres et sédiments
@@ -1228,8 +1241,14 @@ type AllWaste {
   initialEmitterCompanyName: String
   "Le numéro SIRET du producteur initial du déchet"
   initialEmitterCompanySiret: String
-  "L'adresse du producteur initial du déchet"
+  "L'adresse du producteur initial du déchet "
   initialEmitterCompanyAddress: String
+  "Le code postal du producteur initial du déchet"
+  initialEmitterCompanyPostalCode: String
+  "La ville du producteur initial du déchet"
+  initialEmitterCompanyCity: String
+  "Le pays (isoCode) du producteur initial du déchet"
+  initialEmitterCompanyCountry: String
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"

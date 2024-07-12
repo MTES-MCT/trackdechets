@@ -181,8 +181,8 @@ export function extractPostalCode(
   if (address) {
     let addressUp = address.toUpperCase();
     // Kind of a complex machine here because matches might overlap and not be
-    // detected by .matches()
-    // ie: 134 AV DU GENERAL EISENHOWER CS 42326 31100 TOULOUSE
+    // detected by RegExp.matches()
+    // ex: 134 AV DU GENERAL EISENHOWER CS 42326 31100 TOULOUSE
     // if " 42326 " is detected then " 31100 " won't
     const matches: string[] = [];
     let match: RegExpExecArray | null = null;
@@ -216,8 +216,11 @@ export function extractPostalCode(
  * Kind of rudimentary though. Everything is "guessed" with raw code
  * instead of making API calls to external mapping services (for performance)
  *
+ * If we can't find the postalCode, the fallback is to return the full
+ * address in the "street" field
+ *
  * If no vatNumber, we assume the address is in France. Else, we use
- * jsvat to guess the country.
+ * jsvat to find the country.
  */
 export const splitAddress = (
   address: string | null | undefined,

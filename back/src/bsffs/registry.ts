@@ -22,6 +22,7 @@ import { toBsffDestination } from "./compat";
 import { RegistryBsff } from "../registry/elastic";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { BsffWithTransporters } from "./types";
+import { splitAddress } from "../common/addresses";
 
 const getOperationData = (bsff: RegistryBsff) => {
   const bsffDestination = toBsffDestination(bsff.packagings);
@@ -48,6 +49,38 @@ const getFinalOperationsData = (bsff: RegistryBsff) => {
   }
 
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+};
+
+const getInitialEmitterData = (bsff: RegistryBsff) => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  if (bsff.type === BsffType.REEXPEDITION) {
+    const initialBsff = bsff.packagings[0]?.previousPackagings[0]?.bsff;
+    if (initialBsff) {
+      const { street, postalCode, city, country } = splitAddress(
+        initialBsff.emitterCompanyAddress
+      );
+
+      // Legagcy reexpedition BSFFs may have been created without linking to previous packagings
+      initialEmitter.initialEmitterCompanyAddress = street;
+      initialEmitter.initialEmitterCompanyPostalCode = postalCode;
+      initialEmitter.initialEmitterCompanyCity = city;
+      initialEmitter.initialEmitterCompanyCountry = country;
+
+      initialEmitter.initialEmitterCompanyName = initialBsff.emitterCompanyName;
+      initialEmitter.initialEmitterCompanySiret =
+        initialBsff.emitterCompanySiret;
+    }
+  }
+
+  return initialEmitter;
 };
 
 const getTransportersData = (bsff: RegistryBsff, includePlates = false) => {
@@ -221,9 +254,6 @@ export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -232,35 +262,13 @@ export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
     brokerRecepisseNumber: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
     ...getOperationData(bsff),
-    ...(transporter ? getTransportersData(bsff) : {})
+    ...(transporter ? getTransportersData(bsff) : {}),
+    ...getInitialEmitterData(bsff)
   };
 }
 
 export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
   const transporter = getFirstTransporterSync(bsff);
-
-  const initialEmitter: Pick<
-    OutgoingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null
-  };
-
-  if (bsff.type === BsffType.REEXPEDITION) {
-    const initialBsff = bsff.packagings[0]?.previousPackagings[0]?.bsff;
-    if (initialBsff) {
-      // Legagcy reexpedition BSFFs may have been created without linking to previous packagings
-      initialEmitter.initialEmitterCompanyAddress =
-        initialBsff.emitterCompanyAddress;
-      initialEmitter.initialEmitterCompanyName = initialBsff.emitterCompanyName;
-      initialEmitter.initialEmitterCompanySiret =
-        initialBsff.emitterCompanySiret;
-    }
-  }
 
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
 
@@ -279,7 +287,6 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -288,7 +295,8 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
       : null,
     ...getOperationData(bsff),
     ...getFinalOperationsData(bsff),
-    ...(transporter ? getTransportersData(bsff) : {})
+    ...(transporter ? getTransportersData(bsff) : {}),
+    ...getInitialEmitterData(bsff)
   };
 }
 
@@ -374,9 +382,6 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toNumber()
       : null,
@@ -386,6 +391,7 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     emitterCompanyMail: bsff.emitterCompanyMail,
     ...getOperationData(bsff),
     ...getFinalOperationsData(bsff),
-    ...(transporter ? getTransportersData(bsff, true) : {})
+    ...(transporter ? getTransportersData(bsff, true) : {}),
+    ...getInitialEmitterData(bsff)
   };
 }

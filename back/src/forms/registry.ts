@@ -48,6 +48,35 @@ const getOperationData = (bsdd: Bsdd) => ({
   destinationOperationMode: bsdd.destinationOperationMode
 });
 
+const getInitialEmitterData = (bsdd: ReturnType<typeof formToBsdd>) => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  // Bsd suite. Fill initial emitter data.
+  if (bsdd.forwarding) {
+    const { street, city, postalCode, country } = splitAddress(
+      bsdd.forwarding.emitterCompanyAddress
+    );
+    initialEmitter.initialEmitterCompanyAddress = street;
+    initialEmitter.initialEmitterCompanyCity = city;
+    initialEmitter.initialEmitterCompanyPostalCode = postalCode;
+    initialEmitter.initialEmitterCompanyCountry = country;
+
+    initialEmitter.initialEmitterCompanyName =
+      bsdd.forwarding.emitterCompanyName;
+    initialEmitter.initialEmitterCompanySiret =
+      bsdd.forwarding.emitterCompanySiret;
+  }
+
+  return initialEmitter;
+};
+
 const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
   const data = {
     transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
@@ -225,22 +254,6 @@ export const getSubType = (bsdd: Bsdd): BsdSubType => {
 export function toGenericWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): GenericWaste {
-  const initialEmitter: Record<string, string | string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null
-  };
-
-  // Bsd suite. Fill initial emitter data.
-  if (bsdd.forwarding) {
-    initialEmitter.initialEmitterCompanyAddress =
-      bsdd.forwarding.emitterCompanyAddress;
-    initialEmitter.initialEmitterCompanyName =
-      bsdd.forwarding.emitterCompanyName;
-    initialEmitter.initialEmitterCompanySiret =
-      bsdd.forwarding.emitterCompanySiret;
-  }
-
   return {
     wasteDescription: bsdd.wasteDescription,
     wasteCode: bsdd.wasteCode,
@@ -271,8 +284,7 @@ export function toGenericWaste(
     parcelCities: bsdd.parcelCities,
     parcelPostalCodes: bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
-    parcelCoordinates: bsdd.parcelCoordinates,
-    ...initialEmitter
+    parcelCoordinates: bsdd.parcelCoordinates
   };
 }
 
@@ -309,7 +321,8 @@ export function toIncomingWaste(
     ...getOperationData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
-    ...getTransportersData(bsdd)
+    ...getTransportersData(bsdd),
+    ...getInitialEmitterData(bsdd)
   };
 }
 
@@ -347,7 +360,8 @@ export function toOutgoingWaste(
     ...getFinalOperationsData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
-    ...getTransportersData(bsdd)
+    ...getTransportersData(bsdd),
+    ...getInitialEmitterData(bsdd)
   };
 }
 
@@ -457,6 +471,7 @@ export function toAllWaste(
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
     ...getIntermediariesData(bsdd),
-    ...getTransportersData(bsdd, true)
+    ...getTransportersData(bsdd, true),
+    ...getInitialEmitterData(bsdd)
   };
 }
