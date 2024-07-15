@@ -42,6 +42,12 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   "Profil de l'établissement"
   companyTypes: [CompanyType!]!
 
+  "Sous-types d'entreprises pour les installation de Tri, Transit Regroupement de déchets"
+  collectorTypes: [CollectorType!]
+
+  "Sous-types d'entreprises pour les installation de traitement de déchets"
+  wasteProcessorTypes: [WasteProcessorType!]
+
   "SIRET ou TVA de l'établissement"
   orgId: String!
 
