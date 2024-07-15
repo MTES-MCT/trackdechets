@@ -325,6 +325,13 @@ export function toGenericWaste(
     country: destinationCompanyCountry
   } = splitAddress(bsdd.destinationCompanyAddress);
 
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsdd.emitterCompanyAddress);
+
   return {
     wasteDescription: bsdd.wasteDescription,
     wasteCode: bsdd.wasteCode,
@@ -369,7 +376,13 @@ export function toGenericWaste(
     emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
     emitterPickupsitePostalCode: bsdd.emitterPickupSitePostalCode,
     emitterPickupsiteCity: bsdd.emitterPickupSiteCity,
-    emitterPickupsiteCountry: bsdd.emitterPickupSiteAddress ? "FR" : null
+    emitterPickupsiteCountry: bsdd.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bsdd.emitterCompanyName,
+    emitterCompanySiret: bsdd.emitterCompanySiret
   };
 }
 
@@ -387,9 +400,6 @@ export function toIncomingWaste(
     destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -422,9 +432,6 @@ export function toOutgoingWaste(
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -449,9 +456,6 @@ export function toTransportedWaste(
     ...genericWaste,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     weight: bsdd.weightValue,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -483,9 +487,6 @@ export function toManagedWaste(
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
@@ -513,9 +514,6 @@ export function toAllWaste(
     destinationCompanyName: bsdd.destinationCompanyName,
     destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
     weight: bsdd.weightValue,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,

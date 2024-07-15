@@ -318,6 +318,13 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     country: workerCompanyCountry
   } = splitAddress(bsda.workerCompanyAddress);
 
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsda.emitterCompanyAddress);
+
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
@@ -340,7 +347,6 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     destinationReceptionWeight: bsda.destinationReceptionWeight
       ? bsda.destinationReceptionWeight.dividedBy(1000).toNumber()
       : null,
-
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
@@ -360,7 +366,13 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     emitterPickupsiteAddress: bsda.emitterPickupSiteAddress,
     emitterPickupsitePostalCode: bsda.emitterPickupSitePostalCode,
     emitterPickupsiteCity: bsda.emitterPickupSiteCity,
-    emitterPickupsiteCountry: bsda.emitterPickupSiteAddress ? "FR" : null
+    emitterPickupsiteCountry: bsda.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bsda.emitterCompanyName,
+    emitterCompanySiret: bsda.emitterCompanySiret
   };
 }
 
@@ -372,9 +384,6 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     ...emptyIncomingWaste,
     ...genericWaste,
     destinationReceptionDate: bsda.destinationReceptionDate,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
     traderCompanyName: null,
@@ -404,9 +413,6 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -435,9 +441,6 @@ export function toTransportedWaste(
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toNumber()
       : null,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -461,9 +464,6 @@ export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyMail: bsda.emitterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail,
     nextDestinationProcessingOperation:
@@ -486,9 +486,6 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
     emitterPickupsiteName: bsda.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress(
       [

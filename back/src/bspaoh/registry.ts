@@ -141,6 +141,13 @@ export function toGenericWaste(
     country: destinationCompanyCountry
   } = splitAddress(bspaoh.destinationCompanyAddress);
 
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bspaoh.emitterCompanyAddress);
+
   return {
     wasteDescription: bspaoh.wasteCode
       ? getWasteDescription(bspaoh.wasteType)
@@ -182,7 +189,13 @@ export function toGenericWaste(
     emitterPickupsiteAddress: bspaoh.emitterPickupSiteAddress,
     emitterPickupsitePostalCode: bspaoh.emitterPickupSitePostalCode,
     emitterPickupsiteCity: bspaoh.emitterPickupSiteCity,
-    emitterPickupsiteCountry: bspaoh.emitterPickupSiteAddress ? "FR" : null
+    emitterPickupsiteCountry: bspaoh.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bspaoh.emitterCompanyName,
+    emitterCompanySiret: bspaoh.emitterCompanySiret
   };
 }
 
@@ -197,9 +210,6 @@ export function toIncomingWaste(
     ...emptyIncomingWaste,
     ...genericWaste,
     destinationReceptionDate: bspaoh.destinationReceptionDate,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -234,9 +244,6 @@ export function toOutgoingWaste(
     brokerRecepisseNumber: null,
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -265,9 +272,6 @@ export function toTransportedWaste(
     weight: bspaoh.emitterWasteWeightValue
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -299,9 +303,6 @@ export function toManagedWaste(
     brokerCompanySiret: null,
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
     ...getTransporterData(bspaoh),
     emitterCompanyMail: bspaoh.emitterCompanyMail,
     transporterCompanyMail: transporter?.transporterCompanyMail
@@ -330,9 +331,6 @@ export function toAllWaste(
     destinationOperationMode: "ELIMINATION",
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
     weight: bspaoh.emitterWasteWeightValue
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,

@@ -301,6 +301,35 @@ describe("toGenericWaste", () => {
     expect(waste.destinationCompanySiret).toBe(destination.siret);
     expect(waste.destinationCompanyName).toBe(destination.name);
   });
+
+  it("should contain emitter's splitted address, name & siret", async () => {
+    // Given
+    const emitter = await companyFactory({
+      name: "Emitter company name",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        emitterCompanyName: emitter.name,
+        emitterCompanyAddress: emitter.address
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id }
+    });
+    const waste = toGenericWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.emitterCompanyName).toBe(emitter.name);
+    expect(waste.emitterCompanySiret).toBe(emitter.siret);
+    expect(waste.emitterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.emitterCompanyPostalCode).toBe("44100");
+    expect(waste.emitterCompanyCity).toBe("Nantes");
+    expect(waste.emitterCompanyCountry).toBe("FR");
+  });
 });
 
 describe("getTransportersData", () => {

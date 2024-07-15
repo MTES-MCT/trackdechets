@@ -166,7 +166,10 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   workerCompanyPostalCode: null,
   emitterPickupsiteCity: null,
   emitterPickupsiteCountry: null,
-  emitterPickupsitePostalCode: null
+  emitterPickupsitePostalCode: null,
+  emitterCompanyCity: null,
+  emitterCompanyCountry: null,
+  emitterCompanyPostalCode: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -294,7 +297,10 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   workerCompanyPostalCode: null,
   emitterPickupsiteCity: null,
   emitterPickupsiteCountry: null,
-  emitterPickupsitePostalCode: null
+  emitterPickupsitePostalCode: null,
+  emitterCompanyCity: null,
+  emitterCompanyCountry: null,
+  emitterCompanyPostalCode: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -410,7 +416,10 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   workerCompanyPostalCode: null,
   emitterPickupsiteCity: null,
   emitterPickupsiteCountry: null,
-  emitterPickupsitePostalCode: null
+  emitterPickupsitePostalCode: null,
+  emitterCompanyCity: null,
+  emitterCompanyCountry: null,
+  emitterCompanyPostalCode: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -522,7 +531,10 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   workerCompanyPostalCode: null,
   emitterPickupsiteCity: null,
   emitterPickupsiteCountry: null,
-  emitterPickupsitePostalCode: null
+  emitterPickupsitePostalCode: null,
+  emitterCompanyCity: null,
+  emitterCompanyCountry: null,
+  emitterCompanyPostalCode: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -668,5 +680,8 @@ export const emptyAllWaste: Required<AllWaste> = {
   workerCompanyPostalCode: null,
   emitterPickupsiteCity: null,
   emitterPickupsiteCountry: null,
-  emitterPickupsitePostalCode: null
+  emitterPickupsitePostalCode: null,
+  emitterCompanyCity: null,
+  emitterCompanyCountry: null,
+  emitterCompanyPostalCode: null
 };

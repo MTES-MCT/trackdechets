@@ -58,6 +58,13 @@ type IncomingWaste {
   emitterCompanySiret: String
   "L'adresse de l'établissement expéditeur des déchets"
   emitterCompanyAddress: String
+  "Le code postal de l'établissement expéditeur des déchets"
+  emitterCompanyPostalCode: String
+  "La ville de l'établissement expéditeur des déchets"
+  emitterCompanyCity: String
+  "Le pays de l'établissement expéditeur des déchets"
+  emitterCompanyCountry: String
+
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement expéditeur des déchets"
@@ -385,6 +392,12 @@ type OutgoingWaste {
 
   "L'adresse de l'établissement"
   emitterCompanyAddress: String
+  "Le code postal de l'établissement"
+  emitterCompanyPostalCode: String
+  "La ville de l'établissement"
+  emitterCompanyCity: String
+  "Le pays de l'établissement"
+  emitterCompanyCountry: String
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
@@ -869,6 +882,12 @@ type TransportedWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le code postal de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyPostalCode: String
+  "La ville de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCity: String
+  "Le pays de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCountry: String
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
@@ -1119,6 +1138,12 @@ type ManagedWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le code postal de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyPostalCode: String
+  "La ville de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCity: String
+  "Le pays de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCountry: String
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
@@ -1448,6 +1473,12 @@ type AllWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le code postal de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyPostalCode: String
+  "La ville de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCity: String
+  "Le pays de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCountry: String
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"

@@ -150,6 +150,13 @@ export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     country: destinationCompanyCountry
   } = splitAddress(bsdasri.destinationCompanyAddress);
 
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsdasri.emitterCompanyAddress);
+
   return {
     wasteDescription: bsdasri.wasteCode
       ? getWasteDescription(bsdasri.wasteCode)
@@ -192,7 +199,13 @@ export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
     emitterPickupsitePostalCode: bsdasri.emitterPickupSitePostalCode,
     emitterPickupsiteCity: bsdasri.emitterPickupSiteCity,
-    emitterPickupsiteCountry: bsdasri.emitterPickupSiteAddress ? "FR" : null
+    emitterPickupsiteCountry: bsdasri.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bsdasri.emitterCompanyName,
+    emitterCompanySiret: bsdasri.emitterCompanySiret
   };
 }
 
@@ -207,9 +220,6 @@ export function toIncomingWaste(
     ...genericWaste,
     ...getTransporterData(bsdasri),
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -236,9 +246,6 @@ export function toOutgoingWaste(
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -265,9 +272,6 @@ export function toTransportedWaste(
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -297,9 +301,6 @@ export function toManagedWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
@@ -318,9 +319,6 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
