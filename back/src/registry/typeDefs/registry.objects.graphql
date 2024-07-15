@@ -62,6 +62,12 @@ type IncomingWaste {
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement expéditeur des déchets"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
   """
   la raison sociale de l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
   le cadre d'une filière à responsabilité élargie du producteur définie à l'article L. 541-10-1 du code de l'environnement
@@ -383,6 +389,12 @@ type OutgoingWaste {
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyName: String
   "Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
@@ -861,6 +873,12 @@ type TransportedWaste {
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
 
   """
   la raison sociale de l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
@@ -1105,6 +1123,12 @@ type ManagedWaste {
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
 
   "La raison sociale du transporteur"
   transporterCompanyName: String
@@ -1428,6 +1452,12 @@ type AllWaste {
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
   "La quantité de déchet sortant en tonne"
   weight: Float
 

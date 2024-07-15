@@ -1,7 +1,6 @@
 import { BsddFinalOperation } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   BsdSubType,
@@ -365,7 +364,12 @@ export function toGenericWaste(
     destinationCompanyCity,
     destinationCompanyCountry,
     destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret
+    destinationCompanySiret: bsdd.destinationCompanySiret,
+    emitterPickupsiteName: bsdd.emitterPickupSiteName,
+    emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bsdd.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bsdd.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bsdd.emitterPickupSiteAddress ? "FR" : null
   };
 }
 
@@ -386,12 +390,6 @@ export function toIncomingWaste(
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -427,12 +425,6 @@ export function toOutgoingWaste(
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -460,12 +452,6 @@ export function toTransportedWaste(
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -500,12 +486,6 @@ export function toManagedWaste(
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
@@ -536,12 +516,6 @@ export function toAllWaste(
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     weight: bsdd.weightValue,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,

@@ -185,7 +185,13 @@ export const columns: Column[] = [
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },
   { field: "emitterCompanyAddress", label: "Expéditeur adresse" },
   { field: "emitterPickupsiteName", label: "Nom du point de prise en charge" },
-  { field: "emitterPickupsiteAddress", label: "Adresse de prise en charge" },
+  { field: "emitterPickupsiteAddress", label: "Prise en charge adresse" },
+  {
+    field: "emitterPickupsitePostalCode",
+    label: "Prise en charge Code postal"
+  },
+  { field: "emitterPickupsiteCity", label: "Prise en charge Commune" },
+  { field: "emitterPickupsiteCountry", label: "Prise en charge Pays" },
   { field: "emitterCompanyMail", label: "Expéditeur contact" },
   { field: "workerCompanyName", label: "Entreprise de travaux raison sociale" },
   { field: "workerCompanySiret", label: "Entreprise de travaux SIRET" },

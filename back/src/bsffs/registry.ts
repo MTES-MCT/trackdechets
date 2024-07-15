@@ -318,7 +318,12 @@ export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     destinationCompanyCity,
     destinationCompanyCountry,
     destinationCompanyName: bsff.destinationCompanyName,
-    destinationCompanySiret: bsff.destinationCompanySiret
+    destinationCompanySiret: bsff.destinationCompanySiret,
+    emitterPickupsiteAddress: null,
+    emitterPickupsitePostalCode: null,
+    emitterPickupsiteCity: null,
+    emitterPickupsiteCountry: null,
+    emitterPickupsiteName: null
   };
 }
 
@@ -334,7 +339,6 @@ export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
-    emitterPickupsiteAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -364,7 +368,6 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
-    emitterPickupsiteAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -395,7 +398,6 @@ export function toTransportedWaste(
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
-    emitterPickupsiteAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -427,7 +429,6 @@ export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
-    emitterPickupsiteAddress: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
     ...(transporter ? getTransportersData(bsff) : {})
   };
@@ -450,7 +451,6 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
-    emitterPickupsiteAddress: null,
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toNumber()
       : null,

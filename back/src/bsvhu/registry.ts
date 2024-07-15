@@ -154,7 +154,12 @@ export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     destinationCompanyCity,
     destinationCompanyCountry,
     destinationCompanyName: bsvhu.destinationCompanyName,
-    destinationCompanySiret: bsvhu.destinationCompanySiret
+    destinationCompanySiret: bsvhu.destinationCompanySiret,
+    emitterPickupsiteAddress: null,
+    emitterPickupsitePostalCode: null,
+    emitterPickupsiteCity: null,
+    emitterPickupsiteCountry: null,
+    emitterPickupsiteName: null
   };
 }
 
@@ -169,7 +174,6 @@ export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
-    emitterPickupsiteAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -197,7 +201,6 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
-    emitterPickupsiteAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -220,7 +223,6 @@ export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
-    emitterPickupsiteAddress: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -251,7 +253,6 @@ export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
-    emitterPickupsiteAddress: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     ...getTransporterData(bsvhu)
   };
@@ -273,7 +274,6 @@ export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
     emitterCompanyAddress: bsvhu.emitterCompanyAddress,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
-    emitterPickupsiteAddress: null,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     traderCompanyName: null,
     traderCompanySiret: null,

@@ -355,7 +355,12 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     destinationCompanyCity,
     destinationCompanyCountry,
     destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret
+    destinationCompanySiret: bsda.destinationCompanySiret,
+    emitterPickupsiteName: bsda.emitterPickupSiteName,
+    emitterPickupsiteAddress: bsda.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bsda.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bsda.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bsda.emitterPickupSiteAddress ? "FR" : null
   };
 }
 
@@ -372,14 +377,6 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -410,14 +407,6 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -449,14 +438,6 @@ export function toTransportedWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -483,14 +464,6 @@ export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
     emitterCompanyMail: bsda.emitterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail,
     nextDestinationProcessingOperation:
