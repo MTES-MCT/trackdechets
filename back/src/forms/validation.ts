@@ -1414,7 +1414,7 @@ const withNextDestination = (required: boolean) =>
               schema
                 .max(
                   15,
-                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                  "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
                 )
                 .nullable()
                 .required(
@@ -1424,7 +1424,7 @@ const withNextDestination = (required: boolean) =>
               schema
                 .max(
                   15,
-                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                  "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
                 )
                 .notRequired()
                 .nullable()
