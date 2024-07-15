@@ -319,6 +319,13 @@ export const getSubType = (bsdd: Bsdd): BsdSubType => {
 export function toGenericWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): GenericWaste {
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsdd.destinationCompanyAddress);
+
   return {
     wasteDescription: bsdd.wasteDescription,
     wasteCode: bsdd.wasteCode,
@@ -349,7 +356,13 @@ export function toGenericWaste(
     parcelCities: bsdd.parcelCities,
     parcelPostalCodes: bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
-    parcelCoordinates: bsdd.parcelCoordinates
+    parcelCoordinates: bsdd.parcelCoordinates,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bsdd.destinationCompanyName,
+    destinationCompanySiret: bsdd.destinationCompanySiret
   };
 }
 

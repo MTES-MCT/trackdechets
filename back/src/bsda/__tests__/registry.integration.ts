@@ -2,6 +2,7 @@ import {
   getSubType,
   getTransportersData,
   toAllWaste,
+  toGenericWaste,
   toIncomingWaste,
   toManagedWaste,
   toOutgoingWaste,
@@ -782,11 +783,42 @@ describe("toGenericWaste", () => {
       where: { id: form.id },
       include: RegistryBsdaInclude
     });
-    const waste = toAllWaste(bsdaForRegistry);
+    const waste = toGenericWaste(bsdaForRegistry);
 
     // Then
     expect(waste.destinationCompanyMail).toStrictEqual("destination@mail.com");
     expect(waste.brokerCompanyMail).toStrictEqual("broker@mail.com");
+  });
+
+  it("should contain destination's splitted address, name & siret", async () => {
+    // Given
+    const destination = await companyFactory({
+      name: "Acme Inc",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationCompanyName: destination.name,
+        destinationCompanyAddress: destination.address,
+        destinationCompanySiret: destination.siret
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toGenericWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.destinationCompanyPostalCode).toBe("44100");
+    expect(waste.destinationCompanyCity).toBe("Nantes");
+    expect(waste.destinationCompanyCountry).toBe("FR");
+
+    expect(waste.destinationCompanySiret).toBe(destination.siret);
+    expect(waste.destinationCompanyName).toBe(destination.name);
   });
 });
 

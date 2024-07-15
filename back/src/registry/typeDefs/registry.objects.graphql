@@ -183,6 +183,12 @@ type IncomingWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
 
   "Le code du traitement qui va être opéré dans l'installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;"
   destinationPlannedOperationCode: String
@@ -530,6 +536,12 @@ type OutgoingWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
   destinationOperationCode: String
 
@@ -874,6 +886,12 @@ type TransportedWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
   "Extra - La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
   destinationReceptionWeight: Float
 
@@ -1165,6 +1183,12 @@ type ManagedWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
   "Le code du traitement qui va être opéré dans l'installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;"
   destinationPlannedOperationCode: String
   "NON IMPLÉMENTÉ - La qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
@@ -1526,6 +1550,12 @@ type AllWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
   destinationOperationCode: String
   "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"

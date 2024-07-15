@@ -303,7 +303,14 @@ export const getSubType = (bsda: RegistryBsda): BsdSubType => {
   return bsda.type;
 };
 
-function toGenericWaste(bsda: RegistryBsda): GenericWaste {
+export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsda.destinationCompanyAddress);
+
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
@@ -332,7 +339,13 @@ function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress: bsda.workerCompanyAddress,
     destinationCompanyMail: bsda.destinationCompanyMail,
-    brokerCompanyMail: bsda.brokerCompanyMail
+    brokerCompanyMail: bsda.brokerCompanyMail,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bsda.destinationCompanyName,
+    destinationCompanySiret: bsda.destinationCompanySiret
   };
 }
 
@@ -343,9 +356,6 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyIncomingWaste,
     ...genericWaste,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationReceptionDate: bsda.destinationReceptionDate,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
@@ -386,9 +396,6 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
     destinationPlannedOperationMode: null,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
@@ -446,9 +453,6 @@ export function toTransportedWaste(
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
     emitterCompanyMail: bsda.emitterCompanyMail,
     ...getTransportersData(bsda, true)
   };
@@ -465,9 +469,6 @@ export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
     traderCompanySiret: null,
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
@@ -501,9 +502,6 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,

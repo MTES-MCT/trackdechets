@@ -157,7 +157,10 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   transporter5CompanyPostalCode: null,
   transporterCompanyCity: null,
   transporterCompanyCountry: null,
-  transporterCompanyPostalCode: null
+  transporterCompanyPostalCode: null,
+  destinationCompanyCity: null,
+  destinationCompanyCountry: null,
+  destinationCompanyPostalCode: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -276,7 +279,10 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   transporter5CompanyPostalCode: null,
   transporterCompanyCity: null,
   transporterCompanyCountry: null,
-  transporterCompanyPostalCode: null
+  transporterCompanyPostalCode: null,
+  destinationCompanyCity: null,
+  destinationCompanyCountry: null,
+  destinationCompanyPostalCode: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -383,7 +389,10 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   transporter5CompanyPostalCode: null,
   transporterCompanyCity: null,
   transporterCompanyCountry: null,
-  transporterCompanyPostalCode: null
+  transporterCompanyPostalCode: null,
+  destinationCompanyCity: null,
+  destinationCompanyCountry: null,
+  destinationCompanyPostalCode: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -486,7 +495,10 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   transporter5CompanyPostalCode: null,
   transporterCompanyCity: null,
   transporterCompanyCountry: null,
-  transporterCompanyPostalCode: null
+  transporterCompanyPostalCode: null,
+  destinationCompanyCity: null,
+  destinationCompanyCountry: null,
+  destinationCompanyPostalCode: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -623,5 +635,8 @@ export const emptyAllWaste: Required<AllWaste> = {
   transporter5CompanyPostalCode: null,
   transporterCompanyCity: null,
   transporterCompanyCountry: null,
-  transporterCompanyPostalCode: null
+  transporterCompanyPostalCode: null,
+  destinationCompanyCity: null,
+  destinationCompanyCountry: null,
+  destinationCompanyPostalCode: null
 };

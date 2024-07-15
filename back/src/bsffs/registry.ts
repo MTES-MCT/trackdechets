@@ -277,6 +277,13 @@ export const getSubType = (bsff: RegistryBsff): BsdSubType => {
 export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
   const bsffDestination = toBsffDestination(bsff.packagings);
 
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsff.destinationCompanyAddress);
+
   return {
     wasteDescription: bsff.wasteDescription,
     wasteCode: bsff.wasteCode,
@@ -302,7 +309,13 @@ export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    destinationCompanyMail: bsff.destinationCompanyMail
+    destinationCompanyMail: bsff.destinationCompanyMail,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bsff.destinationCompanyName,
+    destinationCompanySiret: bsff.destinationCompanySiret
   };
 }
 
@@ -314,9 +327,6 @@ export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyIncomingWaste,
     ...genericWaste,
-    destinationCompanyName: bsff.destinationCompanyName,
-    destinationCompanySiret: bsff.destinationCompanySiret,
-    destinationCompanyAddress: bsff.destinationCompanyAddress,
     destinationReceptionDate: bsff.destinationReceptionDate,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
@@ -347,9 +357,6 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bsff.destinationCompanyAddress,
-    destinationCompanyName: bsff.destinationCompanyName,
-    destinationCompanySiret: bsff.destinationCompanySiret,
     destinationPlannedOperationMode: null,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
@@ -392,9 +399,6 @@ export function toTransportedWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyName: bsff.destinationCompanyName,
-    destinationCompanySiret: bsff.destinationCompanySiret,
-    destinationCompanyAddress: bsff.destinationCompanyAddress,
     emitterCompanyMail: bsff.emitterCompanyMail,
     ...(transporter ? getTransportersData(bsff, true) : {})
   };
@@ -416,9 +420,6 @@ export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
     traderCompanySiret: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
-    destinationCompanyAddress: bsff.destinationCompanyAddress,
-    destinationCompanyName: bsff.destinationCompanyName,
-    destinationCompanySiret: bsff.destinationCompanySiret,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
@@ -442,9 +443,6 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bsff.destinationCompanyAddress,
-    destinationCompanyName: bsff.destinationCompanyName,
-    destinationCompanySiret: bsff.destinationCompanySiret,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,

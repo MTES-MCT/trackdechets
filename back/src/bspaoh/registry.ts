@@ -135,6 +135,13 @@ export function toGenericWaste(
     transporters: BspaohTransporter[];
   }
 ): GenericWaste {
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bspaoh.destinationCompanyAddress);
+
   return {
     wasteDescription: bspaoh.wasteCode
       ? getWasteDescription(bspaoh.wasteType)
@@ -162,7 +169,13 @@ export function toGenericWaste(
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    destinationCompanyMail: bspaoh.destinationCompanyMail,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bspaoh.destinationCompanyName,
+    destinationCompanySiret: bspaoh.destinationCompanySiret
   };
 }
 
@@ -176,9 +189,6 @@ export function toIncomingWaste(
   return {
     ...emptyIncomingWaste,
     ...genericWaste,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
     destinationReceptionDate: bspaoh.destinationReceptionDate,
     emitterCompanyName: bspaoh.emitterCompanyName,
     emitterCompanySiret: bspaoh.emitterCompanySiret,
@@ -221,9 +231,6 @@ export function toOutgoingWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyName: bspaoh.emitterCompanyName,
@@ -278,9 +285,6 @@ export function toTransportedWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
     emitterCompanyMail: bspaoh.emitterCompanyMail
   };
 }
@@ -304,9 +308,6 @@ export function toManagedWaste(
     traderCompanySiret: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationPlannedOperationMode: null,
     emitterCompanyAddress: bspaoh.emitterCompanyAddress,
@@ -342,9 +343,6 @@ export function toAllWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
     destinationOperationCode: bspaoh.destinationOperationCode,
     destinationOperationMode: "ELIMINATION",
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,

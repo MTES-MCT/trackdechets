@@ -9,6 +9,7 @@ import {
 } from "../registry";
 import { bsvhuFactory } from "./factories.vhu";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { companyFactory } from "../../__tests__/factories";
 
 describe("toIncomingWaste", () => {
   afterAll(resetDatabase);
@@ -269,6 +270,36 @@ describe("toGenericWaste", () => {
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
+  });
+
+  it("should contain destination's splitted address, name & siret", async () => {
+    // Given
+    const destination = await companyFactory({
+      name: "Acme Inc",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        destinationCompanyName: destination.name,
+        destinationCompanyAddress: destination.address,
+        destinationCompanySiret: destination.siret
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id }
+    });
+    const waste = toGenericWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.destinationCompanyPostalCode).toBe("44100");
+    expect(waste.destinationCompanyCity).toBe("Nantes");
+    expect(waste.destinationCompanyCountry).toBe("FR");
+
+    expect(waste.destinationCompanySiret).toBe(destination.siret);
+    expect(waste.destinationCompanyName).toBe(destination.name);
   });
 });
 

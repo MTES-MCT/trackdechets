@@ -15,7 +15,10 @@ import {
   createBsff,
   createBsffAfterOperation
 } from "./factories";
-import { userWithCompanyFactory } from "../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { BsffType, UserRole } from "@prisma/client";
 
@@ -436,6 +439,40 @@ describe("toGenericWaste", () => {
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
+  });
+
+  it("should contain destination's splitted address, name & siret", async () => {
+    // Given
+    const destination = await companyFactory({
+      name: "Acme Inc",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const bsff = await createBsff(
+      {},
+      {
+        data: {
+          destinationCompanyName: destination.name,
+          destinationCompanyAddress: destination.address,
+          destinationCompanySiret: destination.siret
+        }
+      }
+    );
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const waste = toGenericWaste(bsffForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.destinationCompanyPostalCode).toBe("44100");
+    expect(waste.destinationCompanyCity).toBe("Nantes");
+    expect(waste.destinationCompanyCountry).toBe("FR");
+
+    expect(waste.destinationCompanySiret).toBe(destination.siret);
+    expect(waste.destinationCompanyName).toBe(destination.name);
   });
 });
 

@@ -857,6 +857,39 @@ describe("toGenericWaste", () => {
     expect(waste.brokerCompanyMail).toEqual("broker@mail.com");
     expect(waste.traderCompanyMail).toEqual("trader@mail.com");
   });
+
+  it("should contain destination's splitted address, name & siret", async () => {
+    // Given
+    const user = await userFactory();
+    const destination = await companyFactory({
+      name: "Acme Inc",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        recipientCompanyName: destination.name,
+        recipientCompanyAddress: destination.address,
+        recipientCompanySiret: destination.siret
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+    const waste = toGenericWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(waste.destinationCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.destinationCompanyPostalCode).toBe("44100");
+    expect(waste.destinationCompanyCity).toBe("Nantes");
+    expect(waste.destinationCompanyCountry).toBe("FR");
+
+    expect(waste.destinationCompanySiret).toBe(destination.siret);
+    expect(waste.destinationCompanyName).toBe(destination.name);
+  });
 });
 
 describe("getSubType", () => {

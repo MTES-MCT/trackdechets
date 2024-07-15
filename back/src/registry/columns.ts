@@ -277,6 +277,9 @@ export const columns: Column[] = [
   { field: "destinationCompanyName", label: "Destination raison sociale" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },
   { field: "destinationCompanyAddress", label: "Destination adresse" },
+  { field: "destinationCompanyPostalCode", label: "Destination Code postal" },
+  { field: "destinationCompanyCity", label: "Destination Commune" },
+  { field: "destinationCompanyCountry", label: "Destination Pays" },
   { field: "destinationCompanyMail", label: "Destination Contact" },
   {
     field: "postTempStorageDestinationName",
