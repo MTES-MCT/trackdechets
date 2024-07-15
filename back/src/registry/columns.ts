@@ -191,6 +191,12 @@ export const columns: Column[] = [
   { field: "workerCompanySiret", label: "Entreprise de travaux SIRET" },
   { field: "workerCompanyAddress", label: "Entreprise de travaux adresse" },
   {
+    field: "workerCompanyPostalCode",
+    label: "Entreprise de travaux Code postal"
+  },
+  { field: "workerCompanyCity", label: "Entreprise de travaux Commune" },
+  { field: "workerCompanyCountry", label: "Entreprise de travaux Pays" },
+  {
     field: "parcelCities",
     label: "Parcelle commune",
     format: formatArray

@@ -820,6 +820,37 @@ describe("toGenericWaste", () => {
     expect(waste.destinationCompanySiret).toBe(destination.siret);
     expect(waste.destinationCompanyName).toBe(destination.name);
   });
+
+  it("should contain worker's splitted address, name & siret", async () => {
+    // Given
+    const worker = await companyFactory({
+      name: "Acme Inc",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const bsda = await bsdaFactory({
+      opt: {
+        workerCompanyName: worker.name,
+        workerCompanyAddress: worker.address,
+        workerCompanySiret: worker.siret
+      }
+    });
+
+    // When
+    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id },
+      include: RegistryBsdaInclude
+    });
+    const waste = toGenericWaste(bsdaForRegistry);
+
+    // Then
+    expect(waste.workerCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.workerCompanyPostalCode).toBe("44100");
+    expect(waste.workerCompanyCity).toBe("Nantes");
+    expect(waste.workerCompanyCountry).toBe("FR");
+
+    expect(waste.workerCompanySiret).toBe(worker.siret);
+    expect(waste.workerCompanyName).toBe(worker.name);
+  });
 });
 
 describe("getSubType", () => {

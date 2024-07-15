@@ -318,6 +318,12 @@ type IncomingWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 }
 
 type IncomingWasteEdge {
@@ -672,6 +678,12 @@ type OutgoingWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 }
 
 type OutgoingWasteEdge {
@@ -977,6 +989,12 @@ type TransportedWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 
   """
   Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
@@ -1294,6 +1312,12 @@ type ManagedWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 }
 
 type ManagedWasteEdge {
@@ -1670,6 +1694,12 @@ type AllWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 
   "Intermédiaire n°1 - Raison sociale"
   intermediary1CompanyName: String

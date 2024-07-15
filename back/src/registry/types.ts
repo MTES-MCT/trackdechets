@@ -160,7 +160,10 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   transporterCompanyPostalCode: null,
   destinationCompanyCity: null,
   destinationCompanyCountry: null,
-  destinationCompanyPostalCode: null
+  destinationCompanyPostalCode: null,
+  workerCompanyCity: null,
+  workerCompanyCountry: null,
+  workerCompanyPostalCode: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -282,7 +285,10 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   transporterCompanyPostalCode: null,
   destinationCompanyCity: null,
   destinationCompanyCountry: null,
-  destinationCompanyPostalCode: null
+  destinationCompanyPostalCode: null,
+  workerCompanyCity: null,
+  workerCompanyCountry: null,
+  workerCompanyPostalCode: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -392,7 +398,10 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   transporterCompanyPostalCode: null,
   destinationCompanyCity: null,
   destinationCompanyCountry: null,
-  destinationCompanyPostalCode: null
+  destinationCompanyPostalCode: null,
+  workerCompanyCity: null,
+  workerCompanyCountry: null,
+  workerCompanyPostalCode: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -498,7 +507,10 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   transporterCompanyPostalCode: null,
   destinationCompanyCity: null,
   destinationCompanyCountry: null,
-  destinationCompanyPostalCode: null
+  destinationCompanyPostalCode: null,
+  workerCompanyCity: null,
+  workerCompanyCountry: null,
+  workerCompanyPostalCode: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -638,5 +650,8 @@ export const emptyAllWaste: Required<AllWaste> = {
   transporterCompanyPostalCode: null,
   destinationCompanyCity: null,
   destinationCompanyCountry: null,
-  destinationCompanyPostalCode: null
+  destinationCompanyPostalCode: null,
+  workerCompanyCity: null,
+  workerCompanyCountry: null,
+  workerCompanyPostalCode: null
 };

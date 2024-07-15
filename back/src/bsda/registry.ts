@@ -311,6 +311,13 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     country: destinationCompanyCountry
   } = splitAddress(bsda.destinationCompanyAddress);
 
+  const {
+    street: workerCompanyAddress,
+    postalCode: workerCompanyPostalCode,
+    city: workerCompanyCity,
+    country: workerCompanyCountry
+  } = splitAddress(bsda.workerCompanyAddress);
+
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
@@ -337,7 +344,10 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
-    workerCompanyAddress: bsda.workerCompanyAddress,
+    workerCompanyAddress,
+    workerCompanyPostalCode,
+    workerCompanyCity,
+    workerCompanyCountry,
     destinationCompanyMail: bsda.destinationCompanyMail,
     brokerCompanyMail: bsda.brokerCompanyMail,
     destinationCompanyAddress,
