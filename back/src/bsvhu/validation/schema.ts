@@ -3,9 +3,7 @@ import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 
 import {
   checkCompanies,
-  checkFicheInterventions,
   checkWeights,
-  checkPackagings,
   checkRequiredFields,
   checkOperationMode,
   checkReceptionWeight
@@ -14,10 +12,7 @@ import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
 import { sirenifyBsvhu } from "./sirenify";
-// import {
-//   updateTransporterRecepisse
-// } from "./transformers";
-import { updateTransportersRecepisse } from "../../common/validation/zod/transformers";
+import { recipifyBsdTransporter } from "../../common/validation/zod/transformers";
 import { siretSchema } from "../../common/validation/zod/schema";
 import { BSVHU_WASTE_CODES, PROCESSING_OPERATIONS_CODES } from "@td/constants";
 import {
@@ -197,7 +192,7 @@ export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
   return refinedBsvhuSchema
     .superRefine(checkCompanies)
     .transform(sirenifyBsvhu(context))
-    .transform(updateTransportersRecepisse)
+    .transform(recipifyBsdTransporter)
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où des transformations auto-complète certains champs

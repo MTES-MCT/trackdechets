@@ -1,8 +1,16 @@
 import { ZodBsvhu } from "./schema";
-import { BsvhuUserFunctions } from "./types";
+import { BsvhuUserFunctions, BsvhuValidationContext } from "./types";
 import { SignatureTypeInput } from "../../generated/graphql/types";
 import { WasteAcceptationStatus } from "@prisma/client";
 import { isForeignVat } from "@td/constants";
+import {
+  getBsvhuUserFunctions,
+  getCurrentSignatureType,
+  getSignatureAncestors,
+  getUpdatedFields
+} from "./helpers";
+import { capitalize } from "../../common/strings";
+import { SealedFieldError } from "../../common/errors";
 
 // Liste des champs éditables sur l'objet Bsvhu
 export type BsvhuEditableFields = Required<
@@ -440,4 +448,128 @@ function isNotRefused(bsvhu: ZodBsvhu) {
     bsvhu.destinationReceptionAcceptationStatus !==
     WasteAcceptationStatus.REFUSED
   );
+}
+
+/**
+ * Cette fonction permet de vérifier qu'un utilisateur n'est pas
+ * en train d'essayer de modifier des données qui ont été verrouillée
+ * par une signature
+ * @param persisted BSVHU persisté en base
+ * @param bsvhu BSVHU avec les modifications apportées par l'input
+ * @param user Utilisateur qui effectue la modification
+ */
+export async function checkBsvhuSealedFields(
+  persisted: ZodBsvhu,
+  bsvhu: ZodBsvhu,
+  context: BsvhuValidationContext
+) {
+  const sealedFieldErrors: string[] = [];
+
+  const updatedFields = getUpdatedFields(persisted, bsvhu);
+
+  const currentSignatureType =
+    context.currentSignatureType ?? getCurrentSignatureType(persisted);
+
+  // Some signatures may be skipped, so always check all the hierarchy
+  const signaturesToCheck = getSignatureAncestors(currentSignatureType);
+
+  const userFunctions = await getBsvhuUserFunctions(context.user, persisted);
+
+  for (const field of updatedFields) {
+    const { readableFieldName, sealed: sealedRule } =
+      bsvhuEditionRules[field as keyof BsvhuEditableFields];
+
+    const fieldDescription = readableFieldName
+      ? capitalize(readableFieldName)
+      : `Le champ ${field}`;
+
+    const isSealed = isBsvhuFieldSealed(sealedRule, bsvhu, signaturesToCheck, {
+      persisted,
+      userFunctions
+    });
+
+    if (isSealed) {
+      sealedFieldErrors.push(
+        [
+          `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
+          sealedRule.customErrorMessage
+        ]
+          .filter(Boolean)
+          .join(" ")
+      );
+    }
+  }
+
+  if (sealedFieldErrors?.length > 0) {
+    throw new SealedFieldError([...new Set(sealedFieldErrors)]);
+  }
+
+  return Promise.resolve(updatedFields);
+}
+
+export async function getSealedFields(
+  bsvhu: ZodBsvhu,
+  context: BsvhuValidationContext
+): Promise<(keyof BsvhuEditionRules)[]> {
+  const currentSignatureType =
+    context.currentSignatureType ?? getCurrentSignatureType(bsvhu);
+  // Some signatures may be skipped, so always check all the hierarchy
+  const signaturesToCheck = getSignatureAncestors(currentSignatureType);
+
+  const userFunctions = await getBsvhuUserFunctions(context.user, bsvhu);
+
+  const sealedFields = Object.entries(bsvhuEditionRules)
+    .filter(([_, { sealed: sealedRule }]) => {
+      const isSealed = isBsvhuFieldSealed(
+        sealedRule,
+        bsvhu,
+        signaturesToCheck,
+        {
+          persisted: bsvhu,
+          userFunctions
+        }
+      );
+
+      return isSealed;
+    })
+    .map(([field]) => field as keyof BsvhuEditionRules);
+
+  return sealedFields;
+}
+
+// Fonction utilitaire générique permettant d'appliquer une règle
+// de verrouillage de champ ou de champ requis
+// définie soit à partir d'une fonction soit à partir d'une config
+function isRuleApplied<T extends ZodBsvhu>(
+  rule: EditionRule<T>,
+  resource: T,
+  signatures: SignatureTypeInput[],
+  context?: RuleContext<T>
+) {
+  const from =
+    typeof rule.from === "function" ? rule.from(resource, context) : rule.from;
+
+  const isApplied =
+    from &&
+    signatures.includes(from) &&
+    (rule.when === undefined || rule.when(resource));
+
+  return isApplied;
+}
+
+function isBsvhuFieldSealed(
+  rule: EditionRule<ZodBsvhu>,
+  bsvhu: ZodBsvhu,
+  signatures: SignatureTypeInput[],
+  context?: RuleContext<ZodBsvhu>
+) {
+  return isRuleApplied(rule, bsvhu, signatures, context);
+}
+
+export function isBsvhuFieldRequired(
+  rule: EditionRule<ZodBsvhu>,
+  bsvhu: ZodBsvhu,
+  signatures: SignatureTypeInput[]
+) {
+  return isRuleApplied(rule, bsvhu, signatures);
 }

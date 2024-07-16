@@ -1,35 +1,22 @@
 import { Refinement, RefinementCtx, z } from "zod";
-import { BsffValidationContext } from "./types";
+import { BsvhuValidationContext } from "./types";
 import { ParsedZodBsvhu, ZodBsvhu } from "./schema";
 import {
-  BsffEditableFields,
-  BsffPackagingEditableFields,
-  BsffTransporterEditableFields,
-  EditionRule,
-  bsffEditionRules,
-  bsffPackagingEditionRules,
-  bsffTransporterEditionRules,
-  isBsffFieldRequired,
-  isBsffPackagingFieldRequired,
-  isBsffTransporterFieldRequired
+  bsvhuEditionRules,
+  BsvhuEditableFields,
+  isBsvhuFieldRequired
 } from "./rules";
 import { getSignatureAncestors } from "./helpers";
 import { isArray } from "../../common/dataTypes";
 import { capitalize } from "../../common/strings";
-import { Prisma, TransportMode, WasteAcceptationStatus } from "@prisma/client";
-import { prisma } from "@td/prisma";
-import { OPERATION } from "../constants";
-import { BsvhuOperationCode } from "../../generated/graphql/types";
+import { WasteAcceptationStatus } from "@prisma/client";
 import {
   destinationOperationModeRefinement,
   isDestinationRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
 } from "../../common/validation/zod/refinement";
-import { MAX_WEIGHT_BY_ROAD_TONNES } from "../../common/validation";
-import { BsvhuValidationContext } from "./types";
-import { bsvhuEditionRules } from "./rules";
-import { BsvhuEditableFields } from "./rules";
+import { EditionRule } from "./rules";
 
 // Date de la MAJ 2024.07.2 introduisant un changement
 // des règles de validations sur les poids et volume qui doivent
@@ -126,6 +113,40 @@ export const checkReceptionWeight: Refinement<ParsedZodBsvhu> = (
     }
   }
 };
+
+type CheckFieldIsDefinedArgs<T extends ZodBsvhu> = {
+  resource: T;
+  field: string;
+  rule: EditionRule<T>;
+  readableFieldName?: string;
+  ctx: RefinementCtx;
+  errorMsg?: (fieldDescription: string) => string;
+};
+
+function checkFieldIsDefined<T extends ZodBsvhu>(
+  args: CheckFieldIsDefinedArgs<T>
+) {
+  const { resource, field, rule, ctx, readableFieldName, errorMsg } = args;
+  const value = resource[field];
+  if (value == null || (isArray(value) && (value as any[]).length === 0)) {
+    const fieldDescription = readableFieldName
+      ? capitalize(readableFieldName)
+      : `Le champ ${field}`;
+
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [field],
+      message: [
+        errorMsg
+          ? errorMsg(fieldDescription)
+          : `${fieldDescription} est un champ requis.`,
+        rule.customErrorMessage
+      ]
+        .filter(Boolean)
+        .join(" ")
+    });
+  }
+}
 
 export const checkRequiredFields: (
   validationContext: BsvhuValidationContext
