@@ -44,7 +44,7 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
       ].filter(Boolean);
 
       await prisma.bsdasri.update({
-        where,
+        where: { id: bsdasri.id },
         data: { synthesisEmitterSirets }
       });
     }
@@ -55,7 +55,7 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
         ...new Set(bsdasri.grouping.map(grouped => grouped.emitterCompanySiret))
       ].filter(Boolean);
       await prisma.bsdasri.update({
-        where,
+        where: { id: bsdasri.id },
         data: { groupingEmitterSirets }
       });
     }

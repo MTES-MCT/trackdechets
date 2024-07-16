@@ -98,7 +98,7 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
     if (data.transporters) {
       // recompute transporterOrgIds
       await prisma.bsda.update({
-        where,
+        where: { id: updatedBsda.id },
         data: {
           transportersOrgIds: getTransportersSync(updatedBsda)
             .flatMap(t => [
