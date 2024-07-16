@@ -17,7 +17,8 @@ export const COMPANY_CONSTANTS = [
   },
   {
     value: CompanyType.Collector,
-    label: "Installation de Tri, transit regroupement de déchets",
+    label:
+      "Installation de Tri, transit regroupement de déchets y compris non classée",
     helpText:
       "Installations sur lesquelles sont regroupés, triés ou en transit les déchets dangereux et/ou non dangereux - installations relevant des rubriques suivantes de la nomenclature ICPE:  2711, 2713, 2714, 2715, 2716, 2718, 2719, 2731, 2792-1, 2793-1, 2793-2, 2797-1, 2798."
   },

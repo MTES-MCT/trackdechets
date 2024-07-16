@@ -20,9 +20,7 @@ import {
 import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-
-import { DateRow, DetailRow, YesNoRow } from "../common/Components";
-
+import { DateRow, DetailRow, Transporter } from "../common/Components";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import styles from "../common/BSDDetailContent.module.scss";
 import { generatePath, Link, useParams } from "react-router-dom";
@@ -30,7 +28,6 @@ import routes from "../../../Apps/routes";
 import { WorkflowAction } from "../../components/BSDList/BSFF/WorkflowAction";
 import { DeleteBsffModal } from "../../components/BSDList/BSFF/BsffActions/DeleteModal";
 import { useDownloadPdf } from "../../components/BSDList/BSFF/BsffActions/useDownloadPdf";
-import { transportModeLabels } from "../../constants";
 import {
   Table,
   TableBody,
@@ -41,8 +38,8 @@ import {
 } from "../../../common/components";
 import { formatDate } from "../../../common/datetime";
 import { PACKAGINGS_NAMES } from "../../../form/bsff/components/packagings/Packagings";
-import { getOperationModeLabel } from "../../../common/operationModes";
-import { BSFF_VERBOSE_STATUSES, isForeignVat } from "@td/constants";
+import { getOperationModeLabel } from "../../../Apps/common/operationModes";
+import { BSFF_VERBOSE_STATUSES } from "@td/constants";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -64,13 +61,15 @@ export function BsffDetailContent({ form: bsff }: Props) {
       ? "Autre détenteur"
       : "Installation de tri, transit, regroupement";
 
-  const isBsffContributor = [
+  const contributors = [
     bsff.emitter?.company?.siret,
-    bsff.transporter?.company?.orgId,
-    bsff?.destination?.company?.siret
-  ]
-    .filter(Boolean)
-    .includes(siret);
+    bsff?.destination?.company?.siret,
+    ...(bsff.transporters ?? []).map(t => t.company?.orgId)
+  ];
+
+  const isBsffContributor = siret
+    ? contributors.filter(Boolean).includes(siret)
+    : false;
 
   const totalWeight = bsff.packagings.reduce((w, p) => {
     if (p.acceptation?.weight) {
@@ -78,6 +77,8 @@ export function BsffDetailContent({ form: bsff }: Props) {
     }
     return w + p.weight;
   }, 0);
+
+  const isMultiModal = bsff?.transporters.length > 1;
 
   return (
     <>
@@ -141,12 +142,14 @@ export function BsffDetailContent({ form: bsff }: Props) {
               <span className={styles.detailTabCaption}>{emitterLabel}</span>
             </Tab>
 
-            <Tab className={styles.detailTab}>
-              <IconWarehouseDelivery size="25px" />
-              <span className={styles.detailTabCaption}>
-                <span> Transporteur</span>
-              </span>
-            </Tab>
+            {bsff.transporters?.map((t, idx) => (
+              <Tab className={styles.detailTab} key={t.id}>
+                <IconWarehouseDelivery size="25px" />
+                <span className={styles.detailTabCaption}>
+                  {isMultiModal ? `Transp. n° ${idx + 1}` : "Transporteur"}
+                </span>
+              </Tab>
+            ))}
 
             <Tab className={styles.detailTab}>
               <IconRenewableEnergyEarth size="25px" />
@@ -172,10 +175,17 @@ export function BsffDetailContent({ form: bsff }: Props) {
               <Emitter form={bsff} />
             </TabPanel>
 
-            {/* Transporter tab panel */}
-            <TabPanel className={styles.detailTabPanel}>
-              <Transporter form={bsff} />
-            </TabPanel>
+            {/* Transporters tab panels */}
+
+            {bsff.transporters?.map((transporter, idx) => (
+              <TabPanel className={styles.detailTabPanel} key={transporter.id}>
+                <Transporter
+                  transporter={transporter}
+                  numero={idx + 1}
+                  isMultiModal={isMultiModal}
+                />
+              </TabPanel>
+            ))}
 
             {/* Recipient  tab panel */}
             <TabPanel className={styles.detailTabPanel}>
@@ -316,66 +326,6 @@ function Emitter({ form }: { form: Bsff }) {
         />
       </div>
     </div>
-  );
-}
-
-function Transporter({ form }: { form: Bsff }) {
-  return (
-    <>
-      <div className={styles.detailGrid}>
-        <Company label="Raison sociale" company={form.transporter?.company} />
-      </div>
-      <div className={styles.detailGrid}>
-        {!isForeignVat(form?.transporter?.company?.vatNumber!) && (
-          <>
-            <YesNoRow
-              value={form?.transporter?.recepisse?.isExempted}
-              label="Exemption de récépissé"
-            />
-            {form?.transporter?.recepisse?.isExempted !== true && (
-              <>
-                <DetailRow
-                  value={form.transporter?.recepisse?.number}
-                  label="Numéro de récépissé"
-                  showEmpty={true}
-                />
-                <DetailRow
-                  value={form.transporter?.recepisse?.department}
-                  label="Département"
-                  showEmpty={true}
-                />
-                <DateRow
-                  value={form.transporter?.recepisse?.validityLimit}
-                  label="Date de validité"
-                />
-              </>
-            )}
-          </>
-        )}
-        <DetailRow
-          value={
-            form.transporter?.transport?.mode
-              ? transportModeLabels[form.transporter.transport.mode]
-              : ""
-          }
-          label="Mode de transport"
-        />
-        <DetailRow
-          value={form.transporter?.transport?.plates?.join(", ")}
-          label="Plaques d'immatriculation"
-        />
-      </div>
-      <div className={`${styles.detailGrid} `}>
-        <DateRow
-          value={form.transporter?.transport?.signature?.date}
-          label="Signé le"
-        />
-        <DetailRow
-          value={form.transporter?.transport?.signature?.author}
-          label="Signé par"
-        />
-      </div>
-    </>
   );
 }
 

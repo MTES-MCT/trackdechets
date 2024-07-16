@@ -1,0 +1,5 @@
+mutation UpdateBsffTransporter($id: ID!, $input: BsffTransporterInput!) {
+  updateBsffTransporter(id: $id, input: $input) {
+    id
+  }
+}

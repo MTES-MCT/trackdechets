@@ -10,5 +10,7 @@ export default {
   createBsff: loadMutation("createBsff"),
   signBsff: loadMutation("signBsff"),
   updateBsff: loadMutation("updateBsff"),
-  updateBsffPackaging: loadMutation("updateBsffPackaging")
+  updateBsffPackaging: loadMutation("updateBsffPackaging"),
+  createBsffTransporter: loadMutation("createBsffTransporter"),
+  updateBsffTransporter: loadMutation("updateBsffTransporter")
 };

@@ -1,4 +1,4 @@
-import { BsffTransporter, BsffType, OperationMode } from "@prisma/client";
+import { BsffType, OperationMode } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
@@ -18,10 +18,9 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
 import { toBsffDestination } from "./compat";
 import { RegistryBsff } from "../registry/elastic";
-import { getFirstTransporterSync } from "./database";
+import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { BsffWithTransporters } from "./types";
 import Decimal from "decimal.js";
 
@@ -52,18 +51,71 @@ const getFinalOperationsData = (bsff: RegistryBsff) => {
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
-const getTransporterData = (transporter: BsffTransporter) => ({
-  transporterRecepisseIsExempted: transporter.transporterRecepisseIsExempted,
-  transporterTakenOverAt: transporter.transporterTransportTakenOverAt,
-  transporterCompanyAddress: transporter.transporterCompanyAddress,
-  transporterCompanyName: transporter.transporterCompanyName,
-  transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-  transporterRecepisseNumber: transporter.transporterRecepisseNumber,
-  transporterCompanyMail: transporter.transporterCompanyMail,
-  transporterCustomInfo: transporter.transporterCustomInfo,
-  transporterNumberPlates: transporter.transporterTransportPlates,
-  transporterTransportMode: transporter.transporterTransportMode
-});
+const getTransportersData = (bsff: RegistryBsff, includePlates = false) => {
+  const transporters = getTransportersSync(bsff);
+
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
+
+  const data = {
+    transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
+    transporterCompanyAddress: transporter?.transporterCompanyAddress,
+    transporterCompanyName: transporter?.transporterCompanyName,
+    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
+    transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporterCompanyMail: transporter?.transporterCompanyMail,
+    transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
+    transporterTransportMode: transporter?.transporterTransportMode,
+    transporter2CompanyAddress: transporter2?.transporterCompanyAddress,
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
+    transporter3CompanyAddress: transporter3?.transporterCompanyAddress,
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter4CompanyAddress: transporter4?.transporterCompanyAddress,
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter5CompanyAddress: transporter5?.transporterCompanyAddress,
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5TransportMode: transporter5?.transporterTransportMode
+  };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: transporter.transporterTransportPlates ?? null,
+      transporter2NumberPlates:
+        transporter2?.transporterTransportPlates ?? null,
+      transporter3NumberPlates:
+        transporter3?.transporterTransportPlates ?? null,
+      transporter4NumberPlates:
+        transporter4?.transporterTransportPlates ?? null,
+      transporter5NumberPlates: transporter5?.transporterTransportPlates ?? null
+    };
+  }
+
+  return data;
+};
 
 export function getRegistryFields(
   bsff: BsffWithTransporters
@@ -91,11 +143,15 @@ export function getRegistryFields(
     }
     registryFields.isOutgoingWasteFor.push(...bsff.detenteurCompanySirets);
     registryFields.isAllWasteFor.push(...bsff.detenteurCompanySirets);
+  }
 
-    const transporterOrgId = getTransporterCompanyOrgId(transporter);
-    if (transporterOrgId) {
-      registryFields.isTransportedWasteFor.push(transporterOrgId);
-      registryFields.isAllWasteFor.push(transporterOrgId);
+  for (const transporter of bsff.transporters ?? []) {
+    if (transporter.transporterTransportSignatureDate) {
+      const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+      if (transporterCompanyOrgId) {
+        registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+        registryFields.isAllWasteFor.push(transporterCompanyOrgId);
+      }
     }
   }
 
@@ -120,7 +176,6 @@ export const getSubType = (bsff: RegistryBsff): BsdSubType => {
 
 export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
   const bsffDestination = toBsffDestination(bsff.packagings);
-  const transporter = getFirstTransporterSync(bsff);
 
   return {
     wasteDescription: bsff.wasteDescription,
@@ -153,43 +208,13 @@ export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...(transporter ? getTransporterData(transporter) : {}),
     destinationCompanyMail: bsff.destinationCompanyMail
   };
 }
 
 export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
-  const initialEmitter: Pick<
-    IncomingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (
-    [
-      BsffType.REEXPEDITION,
-      BsffType.GROUPEMENT,
-      BsffType.RECONDITIONNEMENT
-    ].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial en cas de réexpédition. Cependant,
-    // pour protéger le secret des affaires, et en attendant une clarification officielle, on se
-    // limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
+  const transporter = getFirstTransporterSync(bsff);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
@@ -203,31 +228,33 @@ export function toIncomingWaste(bsff: RegistryBsff): Required<IncomingWaste> {
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCustomInfo: bsff.destinationCustomInfo,
     emitterCompanyMail: bsff.emitterCompanyMail,
-    ...getOperationData(bsff)
+    ...getOperationData(bsff),
+    ...(transporter ? getTransportersData(bsff) : {})
   };
 }
 
 export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
+  const transporter = getFirstTransporterSync(bsff);
+
   const initialEmitter: Pick<
     OutgoingWaste,
     | "initialEmitterCompanyAddress"
     | "initialEmitterCompanyName"
     | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
   > = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
+    initialEmitterCompanySiret: null
   };
 
   if (bsff.type === BsffType.REEXPEDITION) {
@@ -240,18 +267,6 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
       initialEmitter.initialEmitterCompanySiret =
         initialBsff.emitterCompanySiret;
     }
-  }
-
-  if (
-    [BsffType.GROUPEMENT, BsffType.RECONDITIONNEMENT].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    // secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
   }
 
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
@@ -275,53 +290,29 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
-    emitterCustomInfo: bsff.emitterCustomInfo,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     ...getOperationData(bsff),
-    ...getFinalOperationsData(bsff)
+    ...getFinalOperationsData(bsff),
+    ...(transporter ? getTransportersData(bsff) : {})
   };
 }
 
 export function toTransportedWaste(
   bsff: RegistryBsff
 ): Required<TransportedWaste> {
-  const initialEmitter: Pick<
-    TransportedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (
-    [
-      BsffType.REEXPEDITION,
-      BsffType.GROUPEMENT,
-      BsffType.RECONDITIONNEMENT
-    ].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial en cas de réexpédition. Cependant,
-    // pour protéger le secret des affaires, et en attendant une clarification officielle, on se
-    // limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
+  const transporter = getFirstTransporterSync(bsff);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyTransportedWaste,
     ...genericWaste,
     destinationReceptionDate: bsff.destinationReceptionDate,
-    ...initialEmitter,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
@@ -335,7 +326,8 @@ export function toTransportedWaste(
     destinationCompanyName: bsff.destinationCompanyName,
     destinationCompanySiret: bsff.destinationCompanySiret,
     destinationCompanyAddress: bsff.destinationCompanyAddress,
-    emitterCompanyMail: bsff.emitterCompanyMail
+    emitterCompanyMail: bsff.emitterCompanyMail,
+    ...(transporter ? getTransportersData(bsff, true) : {})
   };
 }
 
@@ -344,46 +336,13 @@ export function toTransportedWaste(
  * be called. We implement it anyway in case it is added later on
  */
 export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
-  const initialEmitter: Pick<
-    ManagedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null
-  };
-
-  if (bsff.type === BsffType.REEXPEDITION) {
-    const initialBsff = bsff.packagings[0]?.previousPackagings[0]?.bsff;
-    initialEmitter.initialEmitterCompanyAddress =
-      initialBsff.emitterCompanyAddress;
-    initialEmitter.initialEmitterCompanyName = initialBsff.emitterCompanyName;
-    initialEmitter.initialEmitterCompanySiret = initialBsff.emitterCompanySiret;
-  }
-
-  if (
-    [BsffType.GROUPEMENT, BsffType.RECONDITIONNEMENT].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    // secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
+  const transporter = getFirstTransporterSync(bsff);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     brokerCompanyName: null,
@@ -396,43 +355,14 @@ export function toManagedWaste(bsff: RegistryBsff): Required<ManagedWaste> {
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
-    emitterCompanyMail: bsff.emitterCompanyMail
+    emitterCompanyMail: bsff.emitterCompanyMail,
+    ...(transporter ? getTransportersData(bsff) : {})
   };
 }
 
 export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
-  const initialEmitter: Pick<
-    IncomingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (
-    [
-      BsffType.REEXPEDITION,
-      BsffType.GROUPEMENT,
-      BsffType.RECONDITIONNEMENT
-    ].includes(bsff.type as any)
-  ) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial en cas de réexpédition. Cependant,
-    // pour protéger le secret des affaires, et en attendant une clarification officielle, on se
-    // limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = bsff.packagings
-      .flatMap(p => p.previousPackagings)
-      .map(p => extractPostalCode(p.bsff.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsff);
+  const transporter = getFirstTransporterSync(bsff);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
@@ -451,14 +381,18 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterPickupsiteAddress: null,
-    ...initialEmitter,
-    managedEndDate: null,
-    managedStartDate: null,
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsff.emitterCompanyMail,
     ...getOperationData(bsff),
-    ...getFinalOperationsData(bsff)
+    ...getFinalOperationsData(bsff),
+    ...(transporter ? getTransportersData(bsff, true) : {})
   };
 }

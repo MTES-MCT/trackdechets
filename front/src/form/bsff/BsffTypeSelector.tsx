@@ -8,7 +8,7 @@ import {
   BsffType
 } from "@td/codegen-ui";
 import Tooltip from "../../common/components/Tooltip";
-import initialState from "./utils/initial-state";
+import { getInitialState } from "./utils/initial-state";
 
 const options = [
   {
@@ -36,6 +36,8 @@ const options = [
     label: "Une installation dans le cadre d'une réexpédition"
   }
 ];
+
+const initialState = getInitialState();
 
 export function BsffTypeSelector() {
   const [{ value: id }] = useField<BsffType>("id");

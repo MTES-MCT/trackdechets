@@ -7,8 +7,10 @@ import {
 import { checkBsffSealedFields } from "./rules";
 import {
   ZodBsff,
+  ZodBsffTransporter,
   contextualBsffSchema,
-  contextualBsffSchemaAsync
+  contextualBsffSchemaAsync,
+  transformedBsffTransporterSchema
 } from "./schema";
 import { BsffValidationContext, PrismaBsffForParsing } from "./types";
 
@@ -109,4 +111,12 @@ export async function parseBsffAsync(
 export function parseBsff(bsff: ZodBsff, context: BsffValidationContext = {}) {
   const schema = contextualBsffSchema(context);
   return schema.parse(bsff);
+}
+
+/**
+ * Fonction permettant de valider et parser un BsffTransporter dans les
+ * mutations `createBsffTransporter` et `updateBsffTransporter`
+ */
+export function parseBsffTransporterAsync(transporter: ZodBsffTransporter) {
+  return transformedBsffTransporterSchema.parseAsync(transporter);
 }

@@ -15,8 +15,8 @@ import {
   RevisionRequestStatus,
   Trader
 } from "@td/codegen-ui";
-import { getOperationModeLabel } from "../../../../common/operationModes";
-import { getPackagingInfosSummary } from "../../../../form/bsdd/utils/packagings";
+import { getOperationModeLabel } from "../../../common/operationModes";
+import { getPackagingInfosSummary } from "../../../common/utils/packagingsBsddSummary";
 import {
   BIGBAG,
   BOOLEAN_FALSE_LABEL,

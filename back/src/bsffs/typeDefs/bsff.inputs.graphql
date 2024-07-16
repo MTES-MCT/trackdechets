@@ -174,8 +174,17 @@ input BsffInput {
   waste: BsffWasteInput
   "Quantité"
   weight: BsffWeightInput
-  "Informations sur le trasnporteur du déchet. L'entreprise visée doit être inscrite sur Trackdéchets avec le profil transporteur"
+  "Entreprise de transport (premier transporteur en cas de transport multi-modal). L'entreprise visée doit être inscrite sur Trackdéchets avec le profil transporteur"
   transporter: BsffTransporterInput
+
+  """
+  Liste des différents transporteurs, dans l'ordre de prise en charge du déchet.
+  Contient un seul identifiant en cas d'acheminement direct. Peut contenir au maximum
+  5 identifiants en cas de transport multi-modal. Les transporteurs peuvent être crées, modifiés,
+  supprimés à l'aide des mutations createBsffTransporter, updateBsffTransporter, deleteBsffTransporter.
+  """
+  transporters: [ID!]
+
   "Installation de traitement ou de tri transit regroupement. L'installation visée doit être insscrite sur Trackdéchets avec un profil idoine"
   destination: BsffDestinationInput
   """

@@ -9,11 +9,13 @@ import { SignBsffOperationOnePackaging } from "../../../../../dashboard/componen
 
 interface ActBsffValidationProps {
   bsd: Bsff;
+  currentSiret: string;
   isOpen: boolean;
   onClose: () => void;
 }
 const ActBsffValidation = ({
   bsd,
+  currentSiret,
   isOpen,
   onClose
 }: ActBsffValidationProps) => {
@@ -32,6 +34,14 @@ const ActBsffValidation = ({
   };
 
   const renderSentModal = () => {
+    const nextTransporter = (bsd.transporters ?? []).find(
+      t => !t.transport?.signature?.date
+    );
+
+    if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
+      return <SignTransport bsffId={bsd.id} {...actionButtonAdapterProps} />;
+    }
+
     return <SignReception bsffId={bsd.id} {...actionButtonAdapterProps} />;
   };
 

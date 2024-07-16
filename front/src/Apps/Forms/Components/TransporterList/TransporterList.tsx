@@ -9,7 +9,7 @@ import TransporterDisplay from "../TransporterDisplay/TransporterDisplay";
 import { AnyTransporterInput } from "../../types";
 import { useTransporters } from "../../hooks/useTransporters";
 import { useDeleteTransporter } from "../../hooks/useDeleteTransporter";
-import { initialBsdaTransporter } from "../../../../form/bsda/stepper/initial-state";
+import { initialTransporter } from "../../../common/data/initialState";
 
 type TransporterListProps = {
   // SIRET ou VAT de l'établissement courant
@@ -44,9 +44,7 @@ export function TransporterList<TransporterInput extends AnyTransporterInput>({
 
   const initialTransporterData = React.useMemo(
     () =>
-      bsdType === BsdType.Bsdd
-        ? initialFormTransporter
-        : initialBsdaTransporter,
+      bsdType === BsdType.Bsdd ? initialFormTransporter : initialTransporter,
     [bsdType]
   );
 

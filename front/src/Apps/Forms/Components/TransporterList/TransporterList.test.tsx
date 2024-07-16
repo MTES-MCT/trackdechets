@@ -13,10 +13,8 @@ import {
   TransportMode,
   Transporter
 } from "@td/codegen-ui";
-import {
-  CreateOrUpdateBsdaTransporterInput,
-  initialBsdaTransporter
-} from "../../../../form/bsda/stepper/initial-state";
+import { CreateOrUpdateBsdaTransporterInput } from "../../../../form/bsda/stepper/initial-state";
+import { initialTransporter } from "../../../common/data/initialState";
 
 function getBsddTransporter(
   data?: Partial<CreateOrUpdateTransporterInput>
@@ -68,9 +66,7 @@ function getBsdaTransporter(
 }
 
 function getInitialTransporter(bsdType: BsdType) {
-  return bsdType === BsdType.Bsdd
-    ? initialFormTransporter
-    : initialBsdaTransporter;
+  return bsdType === BsdType.Bsdd ? initialFormTransporter : initialTransporter;
 }
 
 describe("<TransporterList />", () => {
@@ -87,7 +83,7 @@ describe("<TransporterList />", () => {
     </MockedProvider>
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "component renders without errors when bsdType is %p",
     bsdType => {
       const { container } = render(
@@ -97,7 +93,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "delete button is disabled when there is only one transporter and bsdType is %p",
     bsdType => {
       render(component([getInitialTransporter(bsdType)], bsdType));
@@ -106,7 +102,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "up button is disabled when there is only one transporter and bsdType is %p",
     bsdType => {
       render(component([getInitialTransporter(bsdType)], bsdType));
@@ -124,7 +120,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "new transporters can be added until 5 when bsdType is %p",
     async bsdType => {
       render(component([getInitialTransporter(bsdType)], bsdType));
@@ -152,7 +148,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "transporters can be deleted with the delete button when bsdType is %p",
     async bsdType => {
       render(
@@ -172,7 +168,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "up button is disabled for the first transporter when bsdType is %p",
     async bsdType => {
       render(
@@ -187,7 +183,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "down button is disabled for the last transporter when bsdType is %p",
     async bsdType => {
       render(
@@ -202,7 +198,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "accordions are folded by default when there is several transporters and bsdType is %p",
     bsdType => {
       render(
@@ -225,7 +221,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "only one accordion can be expanded at once when bsdType is %p",
     async bsdType => {
       render(
@@ -243,7 +239,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "transporter detail is displayed when the transporter has already signed and bsdType is %p",
     bsdType => {
       const transporter1 =
@@ -329,7 +325,7 @@ describe("<TransporterList />", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
     "Add button is disabled when next transporter has already signed and bsdType is %p",
     async bsdType => {
       const transporter1 =
