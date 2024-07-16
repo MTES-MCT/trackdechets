@@ -1,6 +1,6 @@
 import { TotalHits } from "@elastic/elasticsearch/api/types";
 import { WasteRegistryType } from "../generated/graphql/types";
-import { toWastes } from "./converters";
+import { toWastes, WasteMap } from "./converters";
 import { searchBsds, toPrismaBsds } from "./elastic";
 import { getElasticPaginationArgs } from "./pagination";
 import {
@@ -9,6 +9,69 @@ import {
   WasteConnection,
   WasteEdge
 } from "./types";
+import { prisma } from "../../../libs/back/prisma/src";
+
+// The list of company fields that need fixing. First is the field
+// to complete with the appropriate value, second field if where to find
+// the company siret
+const FIELDS_TO_FIX = [
+  ["emitterCompanyGivenName", "emitterCompanySiret"],
+  ["destinationCompanyGivenName", "destinationCompanySiret"],
+  ["transporterCompanyGivenName", "transporterCompanySiret"],
+  ["transporter2CompanyGivenName", "transporter2CompanySiret"],
+  ["transporter3CompanyGivenName", "transporter3CompanySiret"],
+  ["transporter4CompanyGivenName", "transporter4CompanySiret"],
+  ["transporter5CompanyGivenName", "transporter5CompanySiret"]
+];
+async function addCompaniesGivenNames<WasteType extends GenericWaste>(
+  wastes: WasteMap<WasteType>
+) {
+  // wastes = { BSDD: [...], BSDA: [...], ...}
+  let allWastes: any[] = [];
+  Object.keys(wastes).forEach(key => {
+    allWastes = [...allWastes, ...wastes[key]];
+  });
+
+  // Retrieve companies sirets
+  let sirets: any[] = [];
+  allWastes.forEach(waste => {
+    FIELDS_TO_FIX.forEach(tuple => {
+      sirets.push(waste[tuple[1]]);
+    });
+  });
+
+  // Fetch companies once
+  const companies = await prisma.company.findMany({
+    where: {
+      siret: {
+        in: [...new Set(sirets)].filter(Boolean) as string[]
+      }
+    },
+    select: {
+      siret: true,
+      givenName: true
+    }
+  });
+
+  const fix = (waste, givenNameField, siretField) => {
+    if (waste[siretField]) {
+      waste[givenNameField] = companies.find(
+        company => company.siret === waste[siretField]
+      )?.givenName;
+    }
+  };
+
+  // Fix wastes, filling given names with value from company
+  Object.keys(wastes).forEach(bsdType => {
+    wastes[bsdType].forEach(waste => {
+      FIELDS_TO_FIX.forEach(tuple => {
+        fix(waste, tuple[0], tuple[1]);
+      });
+    });
+  });
+
+  return wastes;
+}
 
 /**
  * Perform the actual data fetching and return a waste connection
@@ -54,13 +117,17 @@ async function getWasteConnection<WasteType extends GenericWaste>(
 
   const wastes = toWastes<WasteType>(registryType, bsds);
 
+  // For performance reasons, we fetch all companies at once
+  // and fill the given names after all the rest has been done
+  const wastesWithGivenNames = await addCompaniesGivenNames(wastes);
+
   const edges = hits.reduce<Array<WasteEdge<WasteType>>>(
     (acc, { _source: bsd }) => {
       if (!bsd) {
         return acc;
       }
       const { type, id, readableId } = bsd;
-      const waste = wastes[type].find(waste =>
+      const waste = wastesWithGivenNames[type].find(waste =>
         type === "BSDD" ? waste.id === readableId : waste.id === id
       );
 
