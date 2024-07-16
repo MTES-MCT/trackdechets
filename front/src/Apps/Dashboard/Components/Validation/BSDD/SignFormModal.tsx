@@ -5,10 +5,10 @@ import {
   DsfrModal,
   ModalSizes
 } from "../../../../../Apps/common/Components/Modal/DsfrModal";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import { Query, QueryFormArgs } from "@td/codegen-ui";
 import React from "react";
 import { FormSummary } from "./FormSummary";
+import { GET_FORM } from "../../../../common/queries/bsdd/queries";
 
 type Props = {
   title: string;

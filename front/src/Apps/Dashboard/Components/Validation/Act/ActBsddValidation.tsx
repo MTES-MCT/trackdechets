@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import TdModal from "../../../../common/Components/Modal/Modal";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import {
   CompanyType,
   EmitterType,
@@ -19,9 +18,10 @@ import { Appendix1ProducerForm } from "../../../../../form/bsdd/appendix1Produce
 import MarkAsProcessedModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsProcessedModalContent";
 import SignEmissionFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignEmissionFormModalContent";
 import SignTransportFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportFormModalContent";
-import { SignReception } from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignReception";
 import { mapBsdd } from "../../../bsdMapper";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../../common/queries/company/query";
+import { GET_FORM } from "../../../../common/queries/bsdd/queries";
+import { SignReception } from "../BSDD/SignReception";
 
 interface ActBsddValidationProps {
   bsd: Form;

@@ -11,7 +11,6 @@ import {
   Query,
   QueryFormArgs
 } from "@td/codegen-ui";
-import { GET_FORM, UPDATE_FORM } from "../../../../../form/bsdd/utils/queries";
 import { RedErrorMessage } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
 import {
@@ -25,6 +24,10 @@ import SignatureCodeInput from "../../../../../form/common/components/custom-inp
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
+import {
+  GET_FORM,
+  UPDATE_FORM
+} from "../../../../../Apps/common/queries/bsdd/queries";
 
 const validationSchema = yup.object({
   takenOverAt: yup.date().required("La date de prise en charge est requise"),

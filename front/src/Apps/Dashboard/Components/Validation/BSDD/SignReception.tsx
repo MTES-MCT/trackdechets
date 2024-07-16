@@ -16,21 +16,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SignForm } from "./SignForm";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { datetimeToYYYYMMDD } from "../../BSPaoh/paohUtils";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import {
-  MARK_AS_RECEIVED,
-  MARK_AS_ACCEPTED,
-  MARK_AS_TEMP_STORED,
-  MARK_TEMP_STORER_ACCEPTED
-} from "../../../../../form/bsdd/utils/queries";
 import { useParams } from "react-router-dom";
 import {
   isDefinedStrict,
   multiplyByRounded
 } from "../../../../../common/helper";
 import Decimal from "decimal.js";
+import { datetimeToYYYYMMDD } from "../../../../../dashboard/components/BSDList/BSPaoh/paohUtils";
+import {
+  MARK_AS_RECEIVED,
+  MARK_AS_ACCEPTED,
+  MARK_AS_TEMP_STORED,
+  MARK_TEMP_STORER_ACCEPTED
+} from "../../../../common/queries/bsdd/queries";
 
 const getSchema = () =>
   z
