@@ -6,7 +6,7 @@ import {
   BSDD_WASTES_TREE
 } from "@td/constants";
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
-import WasteTreeModal from "../../../../search/WasteTreeModal";
+import WasteTreeModal from "../../../../Apps/common/Components/search/WasteTreeModal";
 import styles from "./WasteCode.module.scss";
 
 function formatWasteCode(wasteCode: string) {

@@ -134,8 +134,10 @@ test.describe
     await test.step("#005 - Installation de Transit, Regroupement ou Tri des déchets", async () => {
       await createWasteManagingCompany(page, {
         company: {
-          name: "005 - Installation de Tri, transit regroupement de déchets",
-          roles: ["Installation de Tri, transit regroupement de déchets"]
+          name: "005 - Installation de Tri, transit regroupement de déchets y compris non classée",
+          roles: [
+            "Installation de Tri, transit regroupement de déchets y compris non classée"
+          ]
         },
         contact: {
           name: "Installation TTR 005",

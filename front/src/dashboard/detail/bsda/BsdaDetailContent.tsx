@@ -10,20 +10,18 @@ import {
 import routes from "../../../Apps/routes";
 import { useDownloadPdf } from "../../components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 import { useDuplicate } from "../../components/BSDList/BSDa/BSDaActions/useDuplicate";
-import { transportModeLabels } from "../../constants";
 import styles from "../common/BSDDetailContent.module.scss";
 import {
   DateRow,
   DetailRow,
-  TransporterReceiptDetails,
-  YesNoRow
+  YesNoRow,
+  Transporter
 } from "../common/Components";
 import { getVerboseAcceptationStatus } from "../common/utils";
 import { PACKAGINGS_NAMES } from "../../../form/bsda/components/packagings/Packagings";
 import {
   Bsda,
   BsdaNextDestination,
-  BsdaTransporter,
   BsdaType,
   FormCompany,
   OperationMode,
@@ -34,7 +32,7 @@ import QRCodeIcon from "react-qr-code";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
-import { getOperationModeLabel } from "../../../common/operationModes";
+import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
 import { BSDA_VERBOSE_STATUSES } from "@td/constants";
 import ExpandableList from "./ExpandableList";
@@ -44,7 +42,7 @@ type CompanyProps = {
   company?: FormCompany | null;
   label: string;
 };
-const Company = ({ company, label }: CompanyProps) => (
+export const Company = ({ company, label }: CompanyProps) => (
   <>
     <dt>{label}</dt> <dd>{company?.name}</dd>
     <dt>Siret</dt> <dd>{company?.siret}</dd>
@@ -165,54 +163,6 @@ const Worker = ({ form }: { form: Bsda }) => {
         <DetailRow value={worker?.work?.signature?.author} label="Signé par" />
       </div>
     </div>
-  );
-};
-
-const Transporter: React.FC<{
-  transporter: BsdaTransporter;
-  isMultiModal: boolean;
-  numero: number;
-}> = ({ transporter, isMultiModal, numero }) => {
-  return (
-    <>
-      <div className={styles.detailGrid}>
-        <Company
-          label={isMultiModal ? `Transporteur n°${numero}` : "Transporteur"}
-          company={transporter?.company}
-        />
-      </div>
-      <TransporterReceiptDetails transporter={transporter} />
-      <div className={`${styles.detailGrid} `}>
-        <DateRow
-          value={transporter?.transport?.takenOverAt}
-          label="Emporté le"
-        />
-        <DateRow
-          value={transporter?.transport?.signature?.date}
-          label="Signé le"
-        />
-        <DetailRow
-          value={transporter?.transport?.signature?.author}
-          label="Signé par"
-        />
-        <DetailRow
-          value={transporter?.customInfo}
-          label="Informations tranporteur"
-        />
-        <DetailRow
-          value={
-            transporter?.transport?.mode
-              ? transportModeLabels[transporter.transport.mode]
-              : ""
-          }
-          label="Mode de transport"
-        />
-        <DetailRow
-          value={transporter?.transport?.plates?.join(", ")}
-          label="Immatriculations"
-        />
-      </div>
-    </>
   );
 };
 

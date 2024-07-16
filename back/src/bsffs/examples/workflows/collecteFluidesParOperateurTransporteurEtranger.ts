@@ -1,4 +1,3 @@
-import fixtures from "../fixturesForeignTransporter";
 import { Workflow } from "../../../common/workflow";
 import { createFicheIntervention } from "../steps/createFicheIntervention";
 import { createBsff } from "../steps/createBsff";
@@ -59,7 +58,7 @@ const workflow: Workflow = {
         "Cette étape peut être répétée autant de fois que l'on veut pour renseigner N fiches d'intervention"
     },
     {
-      ...createBsff("operateur", fixtures as any),
+      ...createBsff("operateur"),
       description: `L'opérateur crée un BSFF en liant les fiches d'intervention par leur identifiant Trackdéchets`
     },
     signEmission("operateur"),

@@ -35,7 +35,11 @@ export const bsdaFactory = async ({
   const data: Prisma.BsdaCreateInput = {
     ...bsdaObject,
     transporters: {
-      create: { ...bsdaObject.transporters!.create!, ...transporterOpt }
+      ...(opt.transporters?.createMany
+        ? { createMany: opt.transporters?.createMany }
+        : {
+            create: { ...bsdaObject.transporters!.create!, ...transporterOpt }
+          })
     },
     ...opt
   };

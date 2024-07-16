@@ -37,6 +37,7 @@ import { FormCompanyDetails } from "../../common/pdf/components/FormCompanyDetai
 import { isFrenchCompany } from "../../companies/validation";
 import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
 import { displayWasteQuantity } from "../../registry/utils";
+import { dateToXMonthAtHHMM } from "../../common/helpers";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -360,6 +361,9 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
               className="QrCode"
               dangerouslySetInnerHTML={{ __html: qrCode }}
             />
+            <div>
+              <b>Document édité le {dateToXMonthAtHHMM()}</b>
+            </div>
           </div>
         </div>
 

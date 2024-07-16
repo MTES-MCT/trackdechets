@@ -79,3 +79,58 @@ export const DELETE_BSDA_TRANSPORTER = gql`
     deleteBsdaTransporter(id: $id)
   }
 `;
+
+export const BsffTransporterFragment = gql`
+  fragment BsffTransporterFragment on BsffTransporter {
+    id
+    company {
+      name
+      orgId
+      siret
+      address
+      country
+      contact
+      phone
+      mail
+      vatNumber
+      omiNumber
+    }
+    recepisse {
+      isExempted
+      number
+      validityLimit
+      department
+    }
+    transport {
+      mode
+      plates
+      signature {
+        date
+      }
+    }
+  }
+`;
+
+export const CREATE_BSFF_TRANSPORTER = gql`
+  mutation CreateBsffTransporter($input: BsffTransporterInput!) {
+    createBsffTransporter(input: $input) {
+      ...BsffTransporterFragment
+    }
+  }
+  ${BsffTransporterFragment}
+`;
+
+export const UPDATE_BSFF_TRANSPORTER = gql`
+  mutation UpdateBsffTransporter($id: ID!, $input: BsffTransporterInput!) {
+    updateBsffTransporter(id: $id, input: $input) {
+      ...BsffTransporterFragment
+    }
+  }
+  ${BsffTransporterFragment}
+`;
+
+export const DELETE_BSFF_TRANSPORTER = gql`
+  mutation DeleteBsffTransporter($id: ID!) {
+    deleteBsffTransporter(id: $id)
+  }
+`;

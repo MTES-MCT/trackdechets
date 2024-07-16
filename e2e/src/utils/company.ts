@@ -7,7 +7,7 @@ type CompanyRole =
   | "Transporteur"
   | "Installation de collecte de déchets apportés par le producteur initial"
   | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
-  | "Installation de Tri, transit regroupement de déchets"
+  | "Installation de Tri, transit regroupement de déchets y compris non classée"
   | "Installation de traitement"
   | "Négociant"
   | "Courtier"
@@ -66,7 +66,7 @@ export const getCreateButtonName = (roles: CompanyRole[]) => {
       [
         "Installation de collecte de déchets apportés par le producteur initial",
         "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
-        "Installation de Tri, transit regroupement de déchets",
+        "Installation de Tri, transit regroupement de déchets y compris non classée",
         "Transporteur",
         "Installation de traitement",
         "Négociant",

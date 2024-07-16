@@ -78,6 +78,7 @@ module.exports = {
               BSFF: [
                 "tutoriels/examples/bsff/collecte-fluides-par-operateur",
                 "tutoriels/examples/bsff/groupement",
+                "tutoriels/examples/bsff/multi-modal"
               ],
               BSDA: [
                 "tutoriels/examples/bsda/collecte-chantier",

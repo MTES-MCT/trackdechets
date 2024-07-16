@@ -43,8 +43,6 @@ type IncomingWaste {
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
-  "Lorsque les déchets apportés proviennent de plusieurs producteurs, le ou les codes postaux de la commune de collecte des déchets "
-  initialEmitterPostalCodes: [String!]
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
   "Le numéro SIRET de l'établissement expéditeur des déchets"
@@ -211,9 +209,6 @@ type IncomingWaste {
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
-  "Extra - Champ libre fourni par le destinataire (tous les bordereaux sauf BSDD)"
-  destinationCustomInfo: String
-
   "Extra - N° de CAP (Certificat d'acceptation préalable)"
   destinationCap: String
 
@@ -352,8 +347,6 @@ type OutgoingWaste {
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
-  "Lorsque les déchets apportés proviennent de plusieurs producteurs, le ou les codes postaux de la commune de collecte des déchets "
-  initialEmitterPostalCodes: [String!]
 
   #########################################################################
   # d) Concernant la localisation des terres (parcelles) pour la traçabilité des terres et sédiments
@@ -529,9 +522,6 @@ type OutgoingWaste {
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
-  "Extra - Champ libre fourni par l'expéditeur (tous les bordereaux sauf BSDD)"
-  emitterCustomInfo: String
-
   "Extra - N° de CAP (Certificat d'acceptation préalable)"
   destinationCap: String
 
@@ -670,7 +660,7 @@ type TransportedWaste {
   "Le mode de transport utilisé par le transporteur"
   transporterTransportMode: TransportMode
   "La date de signature de dépôt à la destination du transporteur"
-  transporterHandedOverSignatureDate: String
+  transporterHandedOverSignatureDate: DateTime
 
   "La raison sociale du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyName: String
@@ -744,14 +734,6 @@ type TransportedWaste {
   # d) Concernant l'origine et la gestion du déchet :
   ###################################################
 
-  "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
-  initialEmitterCompanyName: String
-  "Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
-  initialEmitterCompanySiret: String
-  "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
-  initialEmitterCompanyAddress: String
-  "Lorsque les déchets apportés proviennent de plusieurs producteurs, le ou les codes postaux de la commune de collecte des déchets "
-  initialEmitterPostalCodes: [String!]
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"
@@ -823,9 +805,6 @@ type TransportedWaste {
 
   "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
-
-  "Extra - Champ libre fourni par le transporteur (tous les bordereaux sauf BSDD)"
-  transporterCustomInfo: String
 
   "Extra - Adresse email de contact du transporteur"
   transporterCompanyMail: String
@@ -930,11 +909,6 @@ type ManagedWaste {
   "Le N°SIRET du courtier si le déchet est géré par un courtier"
   brokerCompanySiret: String
 
-  "NON IMPLÉMENTÉ. La date d'acquisition du déchet par le négociant, ou la date de début de gestion du déchet par le courtier"
-  managedStartDate: DateTime
-  "NON IMPLÉMENTÉ. La date de cession du déchet par le négociant, ou la date de fin de gestion du déchet par le courtier"
-  managedEndDate: DateTime
-
   #####################################################
   # b) Concernant la dénomination, nature et quantité :
   #####################################################
@@ -992,14 +966,6 @@ type ManagedWaste {
   """
   ecoOrganismeSiren: String
 
-  "La raison sociale du producteur initial du déchet"
-  initialEmitterCompanyName: String
-  "Le numéro SIRET du producteur initial du déchet"
-  initialEmitterCompanySiret: String
-  "L'adresse du producteur initial du déchet"
-  initialEmitterCompanyAddress: String
-  "Lorsque les déchets apportés proviennent de plusieurs producteurs, le ou les codes postaux de la commune de collecte des déchets "
-  initialEmitterPostalCodes: [String!]
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"
@@ -1221,15 +1187,6 @@ type AllWaste {
   "La date de déchargement du déchet"
   destinationReceptionDate: DateTime
 
-  ################################################
-  # Concernant les dates de gestion du déchet :
-  ################################################
-
-  "NON IMPLÉMENTÉ. La date d'acquisition du déchet par le négociant, ou la date de début de gestion du déchet par le courtier"
-  managedStartDate: DateTime
-  "NON IMPLÉMENTÉ. La date de cession du déchet par le négociant, ou la date de fin de gestion du déchet par le courtier"
-  managedEndDate: DateTime
-
   #####################################################
   # Concernant la dénomination, nature et quantité :
   #####################################################
@@ -1291,8 +1248,6 @@ type AllWaste {
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet"
   initialEmitterCompanyAddress: String
-  "L'adresse du producteur initial du déchet"
-  initialEmitterPostalCodes: [String!]
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"
@@ -1319,7 +1274,7 @@ type AllWaste {
   "Le mode de transport utilisé par le transporteur"
   transporterTransportMode: TransportMode
   "La date de signature de dépôt à la destination du transporteur"
-  transporterHandedOverSignatureDate: String
+  transporterHandedOverSignatureDate: DateTime
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String

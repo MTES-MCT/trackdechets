@@ -16,7 +16,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
 
-  const { update: updateBsff } = getBsffRepository(user);
+  const { updateBsff } = getBsffRepository(user);
 
   await checkCanUpdate(user, existingBsff);
 
