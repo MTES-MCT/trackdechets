@@ -3,10 +3,10 @@ import { MockedProvider } from "@apollo/client/testing";
 
 import { render, screen, waitFor } from "@testing-library/react";
 import ActBsddValidation from "./ActBsddValidation";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import ActBsdSuiteValidation from "./ActBsdSuiteValidation";
 import { MemoryRouter } from "react-router-dom";
 import { Form } from "@td/codegen-ui";
+import { GET_FORM } from "../../../../common/queries/bsdd/queries";
 
 describe("ActBsddValidation", () => {
   const onClose = jest.fn();
