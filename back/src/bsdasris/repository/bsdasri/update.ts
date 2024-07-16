@@ -19,7 +19,7 @@ export type UpdateBsdasriFn = (
 export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
   return async (where, data, logMetadata?) => {
     const { prisma, user } = deps;
-    const previousBsdasri = await prisma.bsdasri.findUnique({
+    const previousBsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where,
       include: {
         synthesizing: true,

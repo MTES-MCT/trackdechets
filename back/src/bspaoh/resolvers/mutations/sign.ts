@@ -315,5 +315,8 @@ async function updateBspaoh(
   updateInput: Prisma.BspaohUpdateInput
 ) {
   const bspaohRepository = getBspaohRepository(user);
-  return bspaohRepository.update({ id: bspaoh.id }, { ...updateInput });
+  return bspaohRepository.update(
+    { id: bspaoh.id, status: bspaoh.status },
+    { ...updateInput }
+  );
 }
