@@ -1220,7 +1220,9 @@ const canDeleteBsdasri = (bsd, siret) =>
       bsd.status === BsdStatusCode.SignedByProducer));
 
 const canDeleteBsvhu = bsd =>
-  bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.Initial;
+  bsd.type === BsdType.Bsvhu &&
+  (bsd.status === BsdStatusCode.Initial ||
+    bsd.status === BsdStatusCode.SignedByProducer);
 
 const canDeleteBspaoh = bsd =>
   bsd.type === BsdType.Bspaoh && bsd.status === BsdStatusCode.Initial;
