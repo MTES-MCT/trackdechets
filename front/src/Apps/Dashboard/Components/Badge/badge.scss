@@ -23,8 +23,7 @@
 
   &--DRAFT,
   &--INITIAL,
-  &--SEALED,
-  &--SIGNED_BY_PRODUCER {
+  &--SEALED {
     background-color: #fbf6ed;
     color: #716043;
   }
@@ -33,7 +32,8 @@
   &--SENT,
   &--RESENT,
   &--SIGNED_BY_TEMP_STORER,
-  &--SIGNED_BY_EMITTER {
+  &--SIGNED_BY_EMITTER,
+  &--SIGNED_BY_PRODUCER {
     background-color: #e6eefe;
     color: #3558a2;
   }
@@ -43,12 +43,12 @@
       width: 200px;
     }
   }
-  &--RECEIVED,
   &--AWAITING_GROUP {
     background-color: #e5fbfd;
     color: #006a6f;
   }
   &--ACCEPTED,
+  &--RECEIVED,
   &--TEMP_STORER_ACCEPTED {
     background-color: #e3fdeb;
     color: #37635f;
