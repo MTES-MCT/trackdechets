@@ -33,7 +33,8 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
         address: "",
         contact: "",
         mail: "",
-        phone: ""
+        phone: "",
+        vatNumber: ""
       }
     }),
     []
@@ -44,6 +45,9 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   );
   const [extraEuropeanCompany, setExtraEuropeanCompany] = useState(
     nextDestination?.company?.extraEuropeanId
+  );
+  const [vatNumber, setVatNumber] = useState(
+    nextDestination?.company?.vatNumber
   );
 
   /**
@@ -57,6 +61,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
         "nextDestination.company.extraEuropeanId",
         !extraEuropeanCompany ? "" : extraEuropeanCompany
       );
+      setFieldValue("nextDestination.company.vatNumber", vatNumber);
     } else {
       setIsExtraEuropeanCompany(false);
       setFieldValue("nextDestination.company.extraEuropeanId", "");
@@ -66,7 +71,8 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
     isExtraEuropeanCompany,
     setFieldValue,
     extraEuropeanCompany,
-    initNextDestination.company
+    initNextDestination.company,
+    vatNumber
   ]);
 
   const isGroupement =
@@ -287,6 +293,8 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
                 optional={noTraceability === true}
                 extraEuropeanCompanyId={extraEuropeanCompany}
                 onExtraEuropeanCompanyId={setExtraEuropeanCompany}
+                vatNumber={vatNumber}
+                onVatNumberChange={setVatNumber}
               />
             )}
             {showNotificationNumber && (
