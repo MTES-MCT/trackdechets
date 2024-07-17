@@ -96,8 +96,7 @@ describe("Mutation.createCompany", () => {
     CompanyType.WASTE_VEHICLES,
     CompanyType.WASTE_CENTER,
     CompanyType.BROKER,
-    CompanyType.WORKER,
-    CompanyType.CREMATORIUM
+    CompanyType.WORKER
   ])("should create company and userAssociation", async companyType => {
     const user = await userFactory();
     const orgId = siretify(7);
@@ -216,7 +215,40 @@ describe("Mutation.createCompany", () => {
     // association date is filled
     expect(refreshedUser.firstAssociationDate).toBeTruthy();
   });
+  it("should fail to a create a company with companyTypes.CREMATORIUM", async () => {
+    const user = await userFactory();
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      gerepId: "1234",
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["CREMATORIUM"]
+    };
 
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le type CREMATORIUM est déprécié, utiliser WasteProcessorTypes.CREMATION."
+      })
+    ]);
+  });
   it("should link to a transporterReceipt", async () => {
     const user = await userFactory();
 

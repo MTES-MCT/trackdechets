@@ -34,7 +34,10 @@ describe("Mutation.Bspaoh.sign", () => {
 
   describe("RECEPTION", () => {
     it("should allow destination to sign reception (RECEIVED)", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -103,7 +106,10 @@ describe("Mutation.Bspaoh.sign", () => {
     });
 
     it("should allow destination to sign reception (RECEIVED) if no weight, but quantity is provided", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -172,7 +178,10 @@ describe("Mutation.Bspaoh.sign", () => {
     });
 
     it("should allow destination to sign reception (REFUSED)", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -309,7 +318,10 @@ describe("Mutation.Bspaoh.sign", () => {
     });
 
     it("should disallow destination to sign reception if transporter did not sign", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -379,7 +391,10 @@ describe("Mutation.Bspaoh.sign", () => {
     });
 
     it("should disallow destination to sign reception (REFUSED) if refusal reason is missing", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -447,7 +462,10 @@ describe("Mutation.Bspaoh.sign", () => {
     });
 
     it("should deny destination to sign reception if all packagins are accepted (PARTIALLY_REFUSED)", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -514,8 +532,12 @@ describe("Mutation.Bspaoh.sign", () => {
         })
       ]);
     });
+
     it("should allow destination to sign reception (PARTIALLY_REFUSED)", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -585,7 +607,10 @@ describe("Mutation.Bspaoh.sign", () => {
     });
 
     it("should disallow destination to sign reception if received waste fields are incomplete", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -658,7 +683,10 @@ describe("Mutation.Bspaoh.sign", () => {
     });
 
     it("should deny reception signature if all packagings reception info is missing", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -729,7 +757,10 @@ describe("Mutation.Bspaoh.sign", () => {
       expect(persisted?.status).toEqual(BspaohStatus.SENT);
     });
     it("should deny reception signature if some packagings reception info is missing", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -803,7 +834,10 @@ describe("Mutation.Bspaoh.sign", () => {
       expect(persisted?.status).toEqual(BspaohStatus.SENT);
     });
     it("should deny reception signature if all packagings are not accepted", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
