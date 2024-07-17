@@ -12,7 +12,6 @@ export type BsvhuUserFunctions = {
 export type BsvhuValidationContext = {
   user?: User;
   currentSignatureType?: SignatureTypeInput;
-  userFunctions?: BsvhuUserFunctions;
 };
 
 export type ZodBsvhuTransformer = (

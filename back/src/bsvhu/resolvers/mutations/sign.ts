@@ -10,7 +10,7 @@ import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
 import { AlreadySignedError, InvalidSignatureError } from "../../errors";
 import { machine } from "../../machine";
-import { validateBsvhu } from "../../validation";
+import { parseBsvhuAsync } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -19,6 +19,7 @@ import {
   BsdTransporterReceiptPart,
   getTransporterReceipt
 } from "../../../companies/recipify";
+import { prismaToZodBsvhu } from "../../validation/helpers";
 
 export default async function sign(
   _,
@@ -40,21 +41,14 @@ export default async function sign(
     transporterReceipt = await getTransporterReceipt(bsvhu);
   }
 
+  const zodBsvhu = prismaToZodBsvhu(bsvhu);
+
   // Check that all necessary fields are filled
-  await validateBsvhu(
+  await parseBsvhuAsync(
+    { ...zodBsvhu, ...transporterReceipt },
     {
-      ...bsvhu,
-      ...transporterReceipt
-    },
-    {
-      emissionSignature:
-        bsvhu.emitterEmissionSignatureDate != null || input.type === "EMISSION",
-      transportSignature:
-        bsvhu.transporterTransportSignatureDate != null ||
-        input.type === "TRANSPORT",
-      operationSignature:
-        bsvhu.destinationOperationSignatureDate != null ||
-        input.type === "OPERATION"
+      user,
+      currentSignatureType: input.type
     }
   );
 
