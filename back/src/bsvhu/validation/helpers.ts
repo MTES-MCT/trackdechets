@@ -44,7 +44,6 @@ export async function graphQlInputToZodBsvhu(
 export function prismaToZodBsvhu(bsvhu: Bsvhu): ZodBsvhu {
   const {
     wasteCode,
-    weightValue,
     destinationPlannedOperationCode,
     destinationOperationCode,
     ...data
