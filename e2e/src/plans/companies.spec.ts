@@ -269,20 +269,6 @@ test.describe
       });
     });
 
-    await test.step("#013 - Crématorium", async () => {
-      await createWasteManagingCompany(page, {
-        company: {
-          name: "013 - Crématorium",
-          roles: ["Crématorium"]
-        },
-        contact: {
-          name: "Crématorium 013",
-          phone: "+33 4 75 84 85 78",
-          email: "crematorium@installation.com"
-        }
-      });
-    });
-
     await test.step("Établissement à supprimer", async () => {
       let producerSiret;
 
@@ -304,7 +290,7 @@ test.describe
       });
     });
 
-    await test.step("#014 - Producteur + Transporteur avec signature DASRI", async () => {
+    await test.step("#013 - Producteur + Transporteur avec signature DASRI", async () => {
       await createWasteManagingCompany(page, {
         company: {
           name: "014 - Producteur + Transporteur",
@@ -323,7 +309,7 @@ test.describe
       });
     });
 
-    await test.step("#015 - Entreprise de travaux amiante + Transporteur", async () => {
+    await test.step("#014 - Entreprise de travaux amiante + Transporteur", async () => {
       await createWasteManagingCompany(page, {
         company: {
           name: "015 - Entreprise de travaux amiante + transporteur",

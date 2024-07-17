@@ -11,7 +11,6 @@ type CompanyRole =
   | "Installation de traitement"
   | "Négociant"
   | "Courtier"
-  | "Crématorium"
   | "Entreprise de travaux amiante"
   | "Intermédiaire : établissement qui peut être ajouté à une traçabilité, sans responsabilité réglementaire (y compris entreprises de travaux hors amiante)"
   | "Installation de valorisation de T&S"
@@ -71,7 +70,6 @@ export const getCreateButtonName = (roles: CompanyRole[]) => {
         "Installation de traitement",
         "Négociant",
         "Courtier",
-        "Crématorium",
         "Entreprise de travaux amiante"
       ].includes(role)
     ) {

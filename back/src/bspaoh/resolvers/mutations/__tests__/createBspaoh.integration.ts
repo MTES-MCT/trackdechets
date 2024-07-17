@@ -12,6 +12,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { sirenify as sirenifyBspaohInput } from "../../../validation/sirenify";
+import { crematoriumFactory } from "../../../__tests__/factories";
 
 jest.mock("../../../validation/sirenify");
 (sirenifyBspaohInput as jest.Mock).mockImplementation(input =>
@@ -86,7 +87,7 @@ describe("Mutation.Bspaoh.create", () => {
     "should allow bspaoh creation",
     async bspaohType => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
-      const destinationCompany = await companyFactory();
+      const destinationCompany = await crematoriumFactory();
 
       const input: BspaohInput = {
         waste: {
@@ -171,10 +172,7 @@ describe("Mutation.Bspaoh.create", () => {
   it("should allow bspaoh creation for CREMATION companies", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
-    const destinationCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"],
-      wasteProcessorTypes: ["CREMATION"]
-    });
+    const destinationCompany = await crematoriumFactory();
 
     const input: BspaohInput = {
       waste: {
@@ -257,7 +255,7 @@ describe("Mutation.Bspaoh.create", () => {
 
   it("should allow bspaoh creation for transporters", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const destinationCompany = await companyFactory();
+    const destinationCompany = await crematoriumFactory();
     const emitterCompany = await companyFactory();
 
     const input: BspaohInput = {
@@ -338,7 +336,8 @@ describe("Mutation.Bspaoh.create", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { company: destinationCompany } = await userWithCompanyFactory(
-      "MEMBER"
+      "MEMBER",
+      { wasteProcessorTypes: { set: ["CREMATION"] } }
     );
 
     const transporterCompany = await companyFactory({
@@ -418,7 +417,7 @@ describe("Mutation.Bspaoh.create", () => {
 
   it("should forbid waste codes other than 18 01 02", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const destinationCompany = await companyFactory();
+    const destinationCompany = await crematoriumFactory();
 
     const input: BspaohInput = {
       waste: {
@@ -495,7 +494,7 @@ describe("Mutation.Bspaoh.create", () => {
 
   it("should forbid liquid consitence for FOETUS bspaoh", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const destinationCompany = await companyFactory();
+    const destinationCompany = await crematoriumFactory();
 
     const input: BspaohInput = {
       waste: {
@@ -571,7 +570,7 @@ describe("Mutation.Bspaoh.create", () => {
 
   it("should require transporter siret for creation", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const destinationCompany = await companyFactory();
+    const destinationCompany = await crematoriumFactory();
 
     const input: BspaohInput = {
       waste: {
@@ -636,10 +635,11 @@ describe("Mutation.Bspaoh.create", () => {
     ]);
   });
 
-  it("should forbid companies which are neither CREMATORIUM nor CREMATION for destination company", async () => {
+  it("should forbid companies which don't have wasteprocessorType.CREMATION for destination company", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: []
     });
 
     const input: BspaohInput = {
@@ -795,7 +795,9 @@ describe("Mutation.Bspaoh.create", () => {
 
   it("should forbid incomplete packagings", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const destinationCompany = await companyFactory();
+    const destinationCompany = await companyFactory({
+      wasteProcessorTypes: { set: ["CREMATION"] }
+    });
 
     const input: BspaohInput = {
       waste: {

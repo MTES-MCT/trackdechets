@@ -2,7 +2,6 @@ import React, { useMemo, useEffect, useContext } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import {
   FavoriteType,
-  CompanyType,
   CompanySearchResult,
   WasteProcessorType
 } from "@td/codegen-ui";
@@ -45,7 +44,6 @@ export function Destination() {
       if (!company.isRegistered) {
         return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
       } else if (
-        !company.companyTypes?.includes(CompanyType.Crematorium) &&
         !company.wasteProcessorTypes?.includes(WasteProcessorType.Cremation)
       ) {
         return "Cet établissement n'a pas le profil Crématorium (et cimetières pour la Guyane).";
