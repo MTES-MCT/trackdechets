@@ -8,16 +8,11 @@
     }
   }
 
-  &--error {
+  &--error,
+  &--canceled {
     &:before {
       display: inline-block !important;
       -webkit-mask-image: url("/icons/system/fr--error-fill.svg") !important;
-    }
-  }
-
-  &--canceled {
-    &:before {
-      -webkit-mask-image: url("/icons/system/fr--info-fill.svg") !important;
     }
   }
 
@@ -48,7 +43,6 @@
     color: #006a6f;
   }
   &--ACCEPTED,
-  &--RECEIVED,
   &--TEMP_STORER_ACCEPTED {
     background-color: #e3fdeb;
     color: #37635f;
@@ -89,7 +83,8 @@
   &--RESEALED,
   &--AWAITING_CHILD,
   &--GROUPED,
-  &--INTERMEDIATELY_PROCESSED {
+  &--INTERMEDIATELY_PROCESSED,
+  &--RECEIVED {
     background-color: #e5fbfd;
     color: #006a6f;
   }
