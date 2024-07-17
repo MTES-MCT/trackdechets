@@ -95,8 +95,8 @@ function SignPackagingsModal({ bsffId, onClose }: SignPackagingsModalProps) {
     <Modal
       onClose={onClose}
       ariaLabel="Signer l'opération des contentants"
-      wide={true}
       isOpen
+      size="L"
     >
       <h2 className="td-modal-title">
         Signature acceptation et traitement par contenant

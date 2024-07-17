@@ -24,7 +24,7 @@ function WasteTreeModal({
       isOpen={open}
       ariaLabel="Liste des déchets"
       onClose={onClose}
-      wide={true}
+      size="XL"
     >
       <div className={styles.tree}>
         <WasteTree

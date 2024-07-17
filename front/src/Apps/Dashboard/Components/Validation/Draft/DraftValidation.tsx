@@ -15,7 +15,6 @@ import toast from "react-hot-toast";
 import { NotificationError } from "../../../../common/Components/Error/Error";
 import { Loader } from "../../../../common/Components";
 import TdModal from "../../../../common/Components/Modal/Modal";
-import { DsfrModal } from "../../../../common/Components/Modal/DsfrModal";
 import {
   bsdaPublishDraft,
   bsddValidationDraftText,
@@ -384,14 +383,14 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       );
     }
   };
-  return bsd.__typename === "Bspaoh" ? (
-    <DsfrModal title={renderTitle()} onClose={onClose}>
-      {renderContent()}
-    </DsfrModal>
-  ) : (
-    <TdModal isOpen={isOpen} onClose={onClose} ariaLabel={renderTitle()}>
+  return (
+    <TdModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={renderTitle()}
+      size="M"
+    >
       <h2 className="td-modal-title">{renderTitle()}</h2>
-
       {renderContent()}
     </TdModal>
   );

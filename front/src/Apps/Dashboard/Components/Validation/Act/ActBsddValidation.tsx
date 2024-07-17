@@ -167,8 +167,15 @@ const ActBsddValidation = ({
     return "";
   };
 
+  const modalSize = "L";
+
   const renderSignTransportFormModal = () => (
-    <TdModal isOpen={isOpen} onClose={onClose} ariaLabel={renderTitle()}>
+    <TdModal
+      isOpen={isOpen}
+      onClose={onClose}
+      ariaLabel={renderTitle()}
+      size={modalSize}
+    >
       <h2 className="td-modal-title">{renderTitle()}</h2>
       <SignTransportFormModalContent
         title={renderTitle()}
@@ -181,7 +188,12 @@ const ActBsddValidation = ({
 
   const renderSignEmissionFormModal = () => {
     return (
-      <TdModal isOpen={isOpen} onClose={onClose} ariaLabel={renderTitle()}>
+      <TdModal
+        isOpen={isOpen}
+        onClose={onClose}
+        ariaLabel={renderTitle()}
+        size={modalSize}
+      >
         <h2 className="td-modal-title">{renderTitle()}</h2>
         <SignEmissionFormModalContent
           title={renderTitle()}
@@ -195,7 +207,12 @@ const ActBsddValidation = ({
 
   const renderMarkAsProcessedModal = () => {
     return (
-      <TdModal isOpen={isOpen} onClose={onClose} ariaLabel={renderTitle()}>
+      <TdModal
+        isOpen={isOpen}
+        onClose={onClose}
+        ariaLabel={renderTitle()}
+        size={modalSize}
+      >
         <h2 className="td-modal-title">{renderTitle()}</h2>
         <MarkAsProcessedModalContent data={data} onClose={onClose} />
       </TdModal>
@@ -327,7 +344,7 @@ const ActBsddValidation = ({
         isOpen={isOpen}
         onClose={onClose}
         ariaLabel="Ajout d'une annexe 1 au chapeau"
-        wide
+        size={modalSize}
       >
         <Appendix1ProducerForm container={bsd} close={onClose} />
       </TdModal>

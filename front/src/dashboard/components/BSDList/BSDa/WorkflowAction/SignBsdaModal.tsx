@@ -28,7 +28,7 @@ export function SignBsdaModal({ title, bsdaId, children, onClose }: Props) {
   const { bsda } = data;
 
   return (
-    <Modal onClose={onClose} ariaLabel={title} isOpen>
+    <Modal onClose={onClose} ariaLabel={title} isOpen size="L">
       <h2 className="td-modal-title">{title}</h2>
       <BsdaSummary bsda={bsda} />
       {children({ bsda, onClose })}

@@ -1,10 +1,9 @@
 import { useQuery } from "@apollo/client";
 
 import { Loader } from "../../../../../Apps/common/Components";
-import {
-  DsfrModal,
+import TdModal, {
   ModalSizes
-} from "../../../../../Apps/common/Components/Modal/DsfrModal";
+} from "../../../../../Apps/common/Components/Modal/Modal";
 import { Query, QueryFormArgs } from "@td/codegen-ui";
 import React from "react";
 import { FormSummary } from "./FormSummary";
@@ -38,14 +37,15 @@ export function SignFormModal({
   const { form } = data;
 
   return (
-    <DsfrModal
-      title={title}
+    <TdModal
       onClose={onClose}
+      title={title}
+      ariaLabel={title}
+      isOpen
       size={size as ModalSizes}
-      padding={true}
     >
       <FormSummary form={form} />
       {children({ form, onClose })}
-    </DsfrModal>
+    </TdModal>
   );
 }

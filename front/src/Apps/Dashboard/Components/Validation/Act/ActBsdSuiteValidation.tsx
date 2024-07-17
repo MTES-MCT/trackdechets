@@ -8,6 +8,7 @@ const ActBsdSuiteValidation = ({ bsd, isOpen, onClose }) => {
       isOpen={isOpen}
       onClose={onClose}
       ariaLabel="Compléter le BSD suite"
+      size="L"
     >
       <h2 className="td-modal-title">Compléter le BSD suite</h2>
       <MarkAsResealedModalContent bsd={bsd} onClose={onClose} />

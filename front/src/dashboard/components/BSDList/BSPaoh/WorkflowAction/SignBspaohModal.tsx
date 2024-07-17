@@ -1,14 +1,13 @@
 import { useQuery } from "@apollo/client";
 
 import { Loader } from "../../../../../Apps/common/Components";
-import {
-  DsfrModal,
-  ModalSizes
-} from "../../../../../Apps/common/Components/Modal/DsfrModal";
 import { GET_BSPAOH } from "../../../../../form/bspaoh/utils/queries";
 import { Query, QueryBspaohArgs } from "@td/codegen-ui";
 import React from "react";
 import { BspaohSummary } from "./BspaohSummary";
+import TdModal, {
+  ModalSizes
+} from "../../../../../Apps/common/Components/Modal/Modal";
 
 type Props = {
   title: string;
@@ -41,9 +40,15 @@ export function SignBspaohModal({
   const { bspaoh } = data;
 
   return (
-    <DsfrModal title={title} onClose={onClose} size={size as ModalSizes}>
+    <TdModal
+      onClose={onClose}
+      title={title}
+      ariaLabel="fermer la modale"
+      isOpen
+      size={size as ModalSizes}
+    >
       <BspaohSummary bspaoh={bspaoh} />
       {children({ bspaoh, onClose })}
-    </DsfrModal>
+    </TdModal>
   );
 }
