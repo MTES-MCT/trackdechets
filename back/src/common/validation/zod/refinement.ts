@@ -9,6 +9,7 @@ import {
 import { prisma } from "@td/prisma";
 import { Company, CompanyVerificationStatus } from "@prisma/client";
 import { getOperationModesFromOperationCode } from "../../operationModes";
+import { CompanyRole } from "./schema";
 
 const { VERIFY_COMPANY } = process.env;
 
@@ -20,11 +21,15 @@ export async function isTransporterRefinement(
     siret: string | null | undefined;
     transporterRecepisseIsExempted: boolean;
   },
-  ctx
+  ctx: RefinementCtx
 ) {
   if (transporterRecepisseIsExempted) return;
 
-  const company = await refineSiretAndGetCompany(siret, ctx);
+  const company = await refineSiretAndGetCompany(
+    siret,
+    ctx,
+    CompanyRole.Transporter
+  );
 
   if (company && !isTransporter(company)) {
     ctx.addIssue({
@@ -39,7 +44,8 @@ export async function isTransporterRefinement(
 }
 export async function refineSiretAndGetCompany(
   siret: string | null | undefined,
-  ctx
+  ctx: RefinementCtx,
+  companyRole?: CompanyRole
 ): Promise<Company | null> {
   if (!siret) return null;
   const company = await prisma.company.findUnique({
@@ -49,13 +55,18 @@ export async function refineSiretAndGetCompany(
   if (company === null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
+      message: `${
+        companyRole ? `${companyRole} : ` : ""
+      }L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
     });
   }
 
   return company;
 }
-export const isRegisteredVatNumberRefinement = async (vatNumber, ctx) => {
+export const isRegisteredVatNumberRefinement = async (
+  vatNumber: string | null | undefined,
+  ctx: RefinementCtx
+) => {
   if (!vatNumber) return;
   const company = await prisma.company.findUnique({
     where: { vatNumber }
@@ -83,9 +94,22 @@ export async function isDestinationRefinement(
   role: "DESTINATION" | "WASTE_VEHICLES" = "DESTINATION",
   isExemptedFromVerification?: (destination: Company | null) => boolean
 ) {
-  const company = await refineSiretAndGetCompany(siret, ctx);
+  const company = await refineSiretAndGetCompany(
+    siret,
+    ctx,
+    CompanyRole.Destination
+  );
 
-  if (
+  if (company && role === "WASTE_VEHICLES" && !isWasteVehicles(company)) {
+    return ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        `L'installation de destination avec le SIRET "${siret}" n'est pas inscrite` +
+        ` sur Trackdéchets en tant qu'installation de traitement de VHU. Cette installation ne peut` +
+        ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
+        ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+    });
+  } else if (
     company &&
     !isCollector(company) &&
     !isWasteProcessor(company) &&
@@ -97,17 +121,6 @@ export async function isDestinationRefinement(
       message:
         `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
         ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
-        ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
-        ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
-    });
-  }
-
-  if (company && role === "WASTE_VEHICLES" && !isWasteVehicles(company)) {
-    return ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message:
-        `L'installation de destination avec le SIRET "${siret}" n'est pas inscrite` +
-        ` sur Trackdéchets en tant qu'installation de traitement de VHU. Cette installation ne peut` +
         ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
         ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
     });

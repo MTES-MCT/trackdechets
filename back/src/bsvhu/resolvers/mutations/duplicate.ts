@@ -7,7 +7,6 @@ import { getBsvhuOrNotFound } from "../../database";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
 import { prisma } from "@td/prisma";
-import { sirenifyBsvhuCreateInput } from "../../sirenify";
 
 export default async function duplicate(
   _,
@@ -23,9 +22,7 @@ export default async function duplicate(
 
   const duplicateData = await getDuplicateData(prismaBsvhu);
 
-  const sirenified = await sirenifyBsvhuCreateInput(duplicateData, []);
-
-  const newBsvhu = await bsvhuRepository.create(sirenified);
+  const newBsvhu = await bsvhuRepository.create(duplicateData);
 
   return expandVhuFormFromDb(newBsvhu);
 }

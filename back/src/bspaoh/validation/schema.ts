@@ -44,7 +44,7 @@ const rawBspaohSchema = z.object({
 
   // emitter
   emitterCompanyName: z.string().nullish(),
-  emitterCompanySiret: siretSchema.nullish(),
+  emitterCompanySiret: siretSchema().nullish(),
   emitterCompanyAddress: z.string().nullish(),
   emitterCompanyContact: z.string().nullish(),
   emitterCompanyPhone: z.string().nullish(),
@@ -67,7 +67,7 @@ const rawBspaohSchema = z.object({
 
   // destination
   destinationCompanyName: z.string().nullish(),
-  destinationCompanySiret: siretSchema
+  destinationCompanySiret: siretSchema()
     .nullish()
     .superRefine(isCrematoriumRefinement),
   destinationCompanyAddress: z.string().nullish(),
@@ -126,12 +126,12 @@ export type ZodBspaoh = z.infer<typeof rawBspaohSchema>;
 
 const rawBspaohTransporterSchema = z.object({
   transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema.nullish(), // Further verifications done here under in superRefine
+  transporterCompanySiret: siretSchema().nullish(), // Further verifications done here under in superRefine
   transporterCompanyAddress: z.string().nullish(),
   transporterCompanyContact: z.string().nullish(),
   transporterCompanyPhone: z.string().nullish(),
   transporterCompanyMail: z.string().nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema
+  transporterCompanyVatNumber: foreignVatNumberSchema()
     .nullish()
     .superRefine(isRegisteredVatNumberRefinement),
   transporterCustomInfo: z.string().nullish(),

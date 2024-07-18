@@ -102,7 +102,7 @@ const rawBsffSchema = z.object({
     .nullish()
     .transform(t => t ?? BsffType.COLLECTE_PETITES_QUANTITES),
   emitterCompanyName: z.string().nullish(),
-  emitterCompanySiret: siretSchema.nullish(),
+  emitterCompanySiret: siretSchema().nullish(),
   emitterCompanyAddress: z.string().nullish(),
   emitterCompanyContact: z.string().nullish(),
   emitterCompanyPhone: z.string().nullish(),
@@ -122,7 +122,7 @@ const rawBsffSchema = z.object({
   wasteDescription: z.string().nullish(),
   transporterTransportSignatureDate: z.coerce.date().nullish(),
   destinationCompanyName: z.string().nullish(),
-  destinationCompanySiret: siretSchema.nullish(),
+  destinationCompanySiret: siretSchema().nullish(),
   destinationCompanyAddress: z.string().nullish(),
   destinationCompanyContact: z.string().nullish(),
   destinationCompanyPhone: z.string().nullish(),

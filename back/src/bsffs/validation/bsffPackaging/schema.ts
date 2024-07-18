@@ -55,7 +55,7 @@ const rawBsffPackagingSchema = z.object({
   operationNextDestinationPlannedOperationCode: ZodOperationEnum,
   operationNextDestinationCap: z.string().nullish(),
   operationNextDestinationCompanyName: z.string().nullish(),
-  operationNextDestinationCompanySiret: siretSchema.nullish(),
+  operationNextDestinationCompanySiret: siretSchema().nullish(),
   operationNextDestinationCompanyVatNumber: vatNumberSchema.nullish(),
   operationNextDestinationCompanyAddress: z.string().nullish(),
   operationNextDestinationCompanyContact: z.string().nullish(),

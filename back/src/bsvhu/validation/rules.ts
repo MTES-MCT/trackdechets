@@ -217,10 +217,10 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   destinationOperationMode: {
     sealed: { from: "OPERATION" },
-    required: {
-      from: "OPERATION",
-      when: isNotRefused // more precise check in checkOperationMode refinement
-    },
+    // required: {
+    //   from: "OPERATION",
+    //   when: isNotRefused // more precise check in checkOperationMode refinement
+    // },
     readableFieldName: "Le mode de traitement"
   },
   destinationOperationDate: {

@@ -2,17 +2,32 @@ import { z } from "zod";
 import { TransportMode } from "@prisma/client";
 import { isForeignVat, isSiret, isVat } from "@td/constants";
 
-export const siretSchema = z
-  .string({ required_error: "le N° SIRET est obligatoire" })
-  .refine(
-    value => {
-      if (!value) {
-        return true;
-      }
-      return isSiret(value);
-    },
-    val => ({ message: `${val} n'est pas un numéro de SIRET valide` })
-  );
+export enum CompanyRole {
+  Emitter = "Émetteur",
+  Transporter = "Transporteur",
+  Destination = "Destination"
+}
+
+export const siretSchema = (expectedCompanyRole?: CompanyRole) =>
+  z
+    .string({
+      required_error: `${
+        expectedCompanyRole ? `${expectedCompanyRole} : ` : ""
+      }le N° SIRET est obligatoire`
+    })
+    .refine(
+      value => {
+        if (!value) {
+          return true;
+        }
+        return isSiret(value);
+      },
+      val => ({
+        message: `${
+          expectedCompanyRole ? `${expectedCompanyRole} : ` : ""
+        }${val} n'est pas un numéro de SIRET valide`
+      })
+    );
 export const vatNumberSchema = z.string().refine(
   value => {
     if (!value) {
@@ -22,16 +37,17 @@ export const vatNumberSchema = z.string().refine(
   },
   val => ({ message: `${val} n'est pas un numéro de TVA valide` })
 );
-export const foreignVatNumberSchema = vatNumberSchema.refine(value => {
-  if (!value) return true;
-  return isForeignVat(value);
-}, "Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement");
+export const foreignVatNumberSchema = (expectedCompanyRole?: CompanyRole) =>
+  vatNumberSchema.refine(value => {
+    if (!value) return true;
+    return isForeignVat(value);
+  }, `${expectedCompanyRole ? `${expectedCompanyRole} : ` : ""}Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement`);
 
 export const rawTransporterSchema = z.object({
   id: z.string().nullish(),
   number: z.number().nullish(),
   transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema.nullish(),
+  transporterCompanySiret: siretSchema().nullish(),
   transporterCompanyAddress: z.string().nullish(),
   transporterCompanyContact: z.string().nullish(),
   transporterCompanyPhone: z.string().nullish(),
@@ -39,7 +55,7 @@ export const rawTransporterSchema = z.object({
     .string()
     .email("E-mail transporteur invalide")
     .nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema.nullish(),
+  transporterCompanyVatNumber: foreignVatNumberSchema().nullish(),
   transporterCustomInfo: z.string().nullish(),
   transporterRecepisseIsExempted: z
     .boolean()

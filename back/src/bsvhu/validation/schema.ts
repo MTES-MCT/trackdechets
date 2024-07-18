@@ -13,7 +13,11 @@ import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
 import { sirenifyBsvhu } from "./sirenify";
 import { recipifyBsdTransporter } from "../../common/validation/zod/transformers";
-import { siretSchema } from "../../common/validation/zod/schema";
+import {
+  CompanyRole,
+  foreignVatNumberSchema,
+  siretSchema
+} from "../../common/validation/zod/schema";
 import { BSVHU_WASTE_CODES, PROCESSING_OPERATIONS_CODES } from "@td/constants";
 import {
   BsvhuDestinationType,
@@ -72,7 +76,7 @@ const rawBsvhuSchema = z.object({
 
   emitterAgrementNumber: z.string().max(100).nullish(),
   emitterCompanyName: z.string().nullish(),
-  emitterCompanySiret: siretSchema.nullish(),
+  emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),
   emitterCompanyContact: z.string().nullish(),
   emitterCompanyPhone: z.string().nullish(),
@@ -84,7 +88,7 @@ const rawBsvhuSchema = z.object({
   destinationPlannedOperationCode: ZodOperationEnum,
   destinationAgrementNumber: z.string().max(100).nullish(),
   destinationCompanyName: z.string().nullish(),
-  destinationCompanySiret: siretSchema.nullish(),
+  destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
   destinationCompanyAddress: z.string().nullish(),
   destinationCompanyContact: z.string().nullish(),
   destinationCompanyPhone: z.string().nullish(),
@@ -102,7 +106,9 @@ const rawBsvhuSchema = z.object({
     .nullish(),
   destinationOperationCode: ZodOperationEnum,
   destinationOperationNextDestinationCompanyName: z.string().nullish(),
-  destinationOperationNextDestinationCompanySiret: siretSchema.nullish(),
+  destinationOperationNextDestinationCompanySiret: siretSchema(
+    CompanyRole.Destination
+  ).nullish(),
   destinationOperationNextDestinationCompanyAddress: z.string().nullish(),
   destinationOperationNextDestinationCompanyContact: z.string().nullish(),
   destinationOperationNextDestinationCompanyPhone: z.string().nullish(),
@@ -110,7 +116,9 @@ const rawBsvhuSchema = z.object({
     .string()
     .email("E-mail destinataire suivant invalide")
     .nullish(),
-  destinationOperationNextDestinationCompanyVatNumber: z.string().nullish(),
+  destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
+    CompanyRole.Destination
+  ).nullish(),
   destinationOperationSignatureAuthor: z.string().nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
   destinationOperationDate: z.coerce.date().nullish(),
@@ -134,7 +142,7 @@ const rawBsvhuSchema = z.object({
     .nullish()
     .transform(v => Boolean(v)),
   transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema.nullish(),
+  transporterCompanySiret: siretSchema(CompanyRole.Transporter).nullish(),
   transporterCompanyAddress: z.string().nullish(),
   transporterCompanyContact: z.string().nullish(),
   transporterCompanyPhone: z.string().nullish(),
@@ -145,7 +153,9 @@ const rawBsvhuSchema = z.object({
   transporterRecepisseNumber: z.string().nullish(),
   transporterRecepisseDepartment: z.string().nullish(),
   transporterRecepisseValidityLimit: z.coerce.date().nullish(),
-  transporterCompanyVatNumber: z.string().max(50).nullish(),
+  transporterCompanyVatNumber: foreignVatNumberSchema(
+    CompanyRole.Transporter
+  ).nullish(),
   transporterTransportSignatureAuthor: z.string().nullish(),
   transporterTransportSignatureDate: z.coerce.date().nullish(),
   transporterTransportTakenOverAt: z.coerce.date().nullish(),
