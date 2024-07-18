@@ -1,11 +1,15 @@
 import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { ControlledTabs } from "./FormSteps";
 import TdModal from "../../Apps/common/Components/Modal/Modal";
 
 export default function FormContainer() {
-  const { id } = useParams<{ id?: string; siret: string }>();
+  const { id } = useParams<{
+    id?: string;
+    siret: string;
+  }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <TdModal
@@ -15,7 +19,7 @@ export default function FormContainer() {
       isOpen
       size="TD_SIZE"
     >
-      <ControlledTabs bsdId={id} />
+      <ControlledTabs bsdId={id} publishErrors={location.state.publishErrors} />
     </TdModal>
   );
 }

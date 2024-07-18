@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { gql, useMutation } from "@apollo/client";
 import {
@@ -72,6 +72,18 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       }
     }
   `;
+
+  const UPDATE_AND_PUBLISH_LBL = "Mettre le bordereau à jour pour le publier";
+  const PUBLISH_LBL = "Publier le bordereau";
+
+  const [publishErrors, setPublishErrors] = useState<
+    | {
+        code: string;
+        path: string[];
+        message: string;
+      }[]
+    | undefined
+  >();
 
   const [
     markAsSealed,
@@ -149,10 +161,28 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             duration: TOAST_DURATION
           });
         },
-        onError: () =>
+        onError: err => {
           toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
             duration: TOAST_DURATION
-          })
+          });
+          if (err.graphQLErrors?.length) {
+            const issues = err.graphQLErrors[0]?.extensions?.issues as {
+              code: string;
+              path: string[];
+              message: string;
+            }[];
+            const errorDetailList = issues?.map(error => {
+              return error;
+            });
+            setPublishErrors(
+              errorDetailList as {
+                code: string;
+                path: string[];
+                message: string;
+              }[]
+            );
+          }
+        }
       }
     );
 
@@ -167,10 +197,11 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
       bsd.__typename === "Bsvhu" ||
       bsd.__typename === "Bspaoh"
     ) {
-      return "Publier le bordereau";
+      return PUBLISH_LBL;
     }
     return "";
   };
+
   const renderContent = () => {
     if (bsd.__typename === "Form") {
       return (
@@ -232,7 +263,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 }
               }}
             >
-              <span>Publier le bordereau</span>
+              <span>{PUBLISH_LBL}</span>
             </button>
           </div>
           {loadingPublishBsda && <Loader />}
@@ -249,7 +280,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 })}
                 className="btn btn--primary"
               >
-                Mettre le bordereau à jour pour le publier
+                {UPDATE_AND_PUBLISH_LBL}
               </Link>
             </>
           )}
@@ -275,7 +306,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 }
               }}
             >
-              <span>Publier le bordereau</span>
+              <span>{PUBLISH_LBL}</span>
             </button>
           </div>
           {loadingBsff && <Loader />}
@@ -306,7 +337,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 }
               }}
             >
-              <span>Publier le bordereau</span>
+              <span>{PUBLISH_LBL}</span>
             </button>
           </div>
 
@@ -323,7 +354,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 })}
                 className="btn btn--primary"
               >
-                Mettre le bordereau à jour pour le publier
+                {UPDATE_AND_PUBLISH_LBL}
               </Link>
             </>
           )}
@@ -354,7 +385,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 }
               }}
             >
-              <span>Publier le bordereau</span>
+              <span>{PUBLISH_LBL}</span>
             </Button>
           </div>
 
@@ -370,11 +401,12 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                   id: bsd.id
                 })}
                 onClick={onClose}
-                state={{ background: location }}
+                state={{
+                  background: location,
+                  publishErrors: publishErrors
+                }}
               >
-                <Button priority="primary">
-                  Mettre le bordereau à jour pour le publier
-                </Button>
+                <Button priority="primary">{UPDATE_AND_PUBLISH_LBL}</Button>
               </Link>
             </>
           )}
