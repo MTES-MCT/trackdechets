@@ -139,7 +139,14 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   parcelCities: null,
   parcelPostalCodes: null,
   parcelNumbers: null,
-  parcelCoordinates: null
+  parcelCoordinates: null,
+  destinationCompanyGivenName: null,
+  emitterCompanyGivenName: null,
+  transporter2CompanyGivenName: null,
+  transporter3CompanyGivenName: null,
+  transporter4CompanyGivenName: null,
+  transporter5CompanyGivenName: null,
+  transporterCompanyGivenName: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -240,7 +247,14 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   parcelCities: null,
   parcelPostalCodes: null,
   parcelNumbers: null,
-  parcelCoordinates: null
+  parcelCoordinates: null,
+  destinationCompanyGivenName: null,
+  emitterCompanyGivenName: null,
+  transporter2CompanyGivenName: null,
+  transporter3CompanyGivenName: null,
+  transporter4CompanyGivenName: null,
+  transporter5CompanyGivenName: null,
+  transporterCompanyGivenName: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -332,7 +346,14 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   workerCompanyAddress: null,
   wasteIsDangerous: null,
   brokerCompanyMail: null,
-  traderCompanyMail: null
+  traderCompanyMail: null,
+  destinationCompanyGivenName: null,
+  emitterCompanyGivenName: null,
+  transporter2CompanyGivenName: null,
+  transporter3CompanyGivenName: null,
+  transporter4CompanyGivenName: null,
+  transporter5CompanyGivenName: null,
+  transporterCompanyGivenName: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -420,7 +441,14 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   // finalOperationCodes: null,
   // finalReceptionWeights: null
   brokerCompanyMail: null,
-  traderCompanyMail: null
+  traderCompanyMail: null,
+  destinationCompanyGivenName: null,
+  emitterCompanyGivenName: null,
+  transporter2CompanyGivenName: null,
+  transporter3CompanyGivenName: null,
+  transporter4CompanyGivenName: null,
+  transporter5CompanyGivenName: null,
+  transporterCompanyGivenName: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -539,5 +567,12 @@ export const emptyAllWaste: Required<AllWaste> = {
   parcelCities: null,
   parcelPostalCodes: null,
   parcelNumbers: null,
-  parcelCoordinates: null
+  parcelCoordinates: null,
+  destinationCompanyGivenName: null,
+  emitterCompanyGivenName: null,
+  transporter2CompanyGivenName: null,
+  transporter3CompanyGivenName: null,
+  transporter4CompanyGivenName: null,
+  transporter5CompanyGivenName: null,
+  transporterCompanyGivenName: null
 };

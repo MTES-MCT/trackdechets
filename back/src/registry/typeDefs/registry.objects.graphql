@@ -47,6 +47,8 @@ type IncomingWaste {
   initialEmitterCompanyAddress: String
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
+  "Le nom usuel de l'établissement expéditeur des déchets"
+  emitterCompanyGivenName: String
   "Le numéro SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
   "L'adresse de l'établissement expéditeur des déchets"
@@ -83,6 +85,8 @@ type IncomingWaste {
 
   "La raison sociale du transporteur"
   transporterCompanyName: String
+  "Le nom usuel du transporteur"
+  transporterCompanyGivenName: String
   "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
   transporterCompanySiret: String
   "L'adresse du transporteur"
@@ -94,6 +98,8 @@ type IncomingWaste {
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String
+  "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
+  transporter2CompanyGivenName: String
   "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multimodal)"
@@ -105,6 +111,8 @@ type IncomingWaste {
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyName: String
+  "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
+  transporter3CompanyGivenName: String
   "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multimodal)"
@@ -116,6 +124,8 @@ type IncomingWaste {
 
   "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyName: String
+  "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyGivenName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multimodal)"
@@ -127,6 +137,8 @@ type IncomingWaste {
 
   "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyName: String
+  "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyGivenName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multimodal)"
@@ -142,6 +154,8 @@ type IncomingWaste {
 
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
+  "Le nom usuel de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyGivenName: String
   "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
@@ -325,6 +339,8 @@ type OutgoingWaste {
 
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
+  "Le nom usuel de l'établissement expéditeur des déchets"
+  emitterCompanyGivenName: String
   "Le numéro SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
 
@@ -394,6 +410,8 @@ type OutgoingWaste {
 
   "La raison sociale du transporteur"
   transporterCompanyName: String
+  "Le nom usuel du transporteur"
+  transporterCompanyGivenName: String
   "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
   transporterCompanySiret: String
   "Le numéro de récépissé du trasnporteur mentionné à l'article R. 541-53 du code de l'environnement"
@@ -405,6 +423,8 @@ type OutgoingWaste {
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String
+  "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
+  transporter2CompanyGivenName: String
   "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multimodal)"
@@ -416,6 +436,8 @@ type OutgoingWaste {
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyName: String
+  "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
+  transporter3CompanyGivenName: String
   "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multimodal)"
@@ -427,6 +449,8 @@ type OutgoingWaste {
 
   "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyName: String
+  "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyGivenName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multimodal)"
@@ -438,6 +462,8 @@ type OutgoingWaste {
 
   "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyName: String
+  "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyGivenName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multimodal)"
@@ -453,6 +479,8 @@ type OutgoingWaste {
 
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
+  "Le nom usuel de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyGivenName: String
   "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
@@ -638,6 +666,8 @@ type TransportedWaste {
 
   "La raison sociale du transporteur"
   transporterCompanyName: String
+  "Le nom usuel du transporteur"
+  transporterCompanyGivenName: String
   "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
   transporterCompanySiret: String
   "L'adresse du transporteur"
@@ -653,6 +683,8 @@ type TransportedWaste {
 
   "La raison sociale du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyName: String
+  "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
+  transporter2CompanyGivenName: String
   "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multi-modal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
@@ -668,6 +700,8 @@ type TransportedWaste {
 
   "La raison sociale du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyName: String
+  "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
+  transporter3CompanyGivenName: String
   "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multi-modal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
@@ -683,6 +717,8 @@ type TransportedWaste {
 
   "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyName: String
+  "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyGivenName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multimodal)"
@@ -698,6 +734,8 @@ type TransportedWaste {
 
   "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyName: String
+  "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyGivenName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multimodal)"
@@ -725,6 +763,8 @@ type TransportedWaste {
 
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
+  "Le nom usuel de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyGivenName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
@@ -766,6 +806,8 @@ type TransportedWaste {
 
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
+  "Le nom usuel de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyGivenName: String
   "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
@@ -957,6 +999,8 @@ type ManagedWaste {
 
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
+  "Le nom usuel de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyGivenName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
@@ -968,6 +1012,8 @@ type ManagedWaste {
 
   "La raison sociale du transporteur"
   transporterCompanyName: String
+  "Le nom usuel du transporteur"
+  transporterCompanyGivenName: String
   "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
   transporterCompanySiret: String
   "L'adresse du transporteur"
@@ -979,6 +1025,8 @@ type ManagedWaste {
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String
+  "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
+  transporter2CompanyGivenName: String
   "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multimodal)"
@@ -990,6 +1038,8 @@ type ManagedWaste {
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyName: String
+  "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
+  transporter3CompanyGivenName: String
   "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multimodal)"
@@ -1001,6 +1051,8 @@ type ManagedWaste {
 
   "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyName: String
+  "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyGivenName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multimodal)"
@@ -1012,6 +1064,8 @@ type ManagedWaste {
 
   "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyName: String
+  "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyGivenName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multimodal)"
@@ -1027,6 +1081,8 @@ type ManagedWaste {
 
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
+  "Le nom usuel de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyGivenName: String
   "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
@@ -1232,6 +1288,8 @@ type AllWaste {
   initialEmitterCompanyAddress: String
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
+  "Le nom usuel de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyGivenName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
@@ -1245,6 +1303,8 @@ type AllWaste {
 
   "La raison sociale du transporteur"
   transporterCompanyName: String
+  "Le nom usuel du transporteur"
+  transporterCompanyGivenName: String
   "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
   transporterCompanySiret: String
   "L'adresse du transporteur"
@@ -1260,6 +1320,8 @@ type AllWaste {
 
   "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyName: String
+  "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
+  transporter2CompanyGivenName: String
   "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multimodal)"
@@ -1275,6 +1337,8 @@ type AllWaste {
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyName: String
+  "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
+  transporter3CompanyGivenName: String
   "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multimodal)"
@@ -1290,6 +1354,8 @@ type AllWaste {
 
   "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyName: String
+  "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyGivenName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multimodal)"
@@ -1305,6 +1371,8 @@ type AllWaste {
 
   "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyName: String
+  "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyGivenName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multimodal)"
@@ -1352,6 +1420,8 @@ type AllWaste {
   destinationReceptionWeight: Float
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
+  "Le nom usuel de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyGivenName: String
   "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"

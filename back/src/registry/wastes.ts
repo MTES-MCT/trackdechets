@@ -9,12 +9,9 @@ import {
   WasteConnection,
   WasteEdge
 } from "./types";
-import { prisma } from "../../../libs/back/prisma/src";
+import { prisma } from "@td/prisma";
 
-// The list of company fields that need fixing. First is the field
-// to complete with the appropriate value, second field if where to find
-// the company siret
-const FIELDS_TO_FIX = [
+const GIVEN_NAMES_AND_SIRET_FIELDS = [
   ["emitterCompanyGivenName", "emitterCompanySiret"],
   ["destinationCompanyGivenName", "destinationCompanySiret"],
   ["transporterCompanyGivenName", "transporterCompanySiret"],
@@ -23,9 +20,9 @@ const FIELDS_TO_FIX = [
   ["transporter4CompanyGivenName", "transporter4CompanySiret"],
   ["transporter5CompanyGivenName", "transporter5CompanySiret"]
 ];
-async function addCompaniesGivenNames<WasteType extends GenericWaste>(
+export async function addCompaniesGivenNames<WasteType extends GenericWaste>(
   wastes: WasteMap<WasteType>
-) {
+): Promise<WasteMap<WasteType>> {
   // wastes = { BSDD: [...], BSDA: [...], ...}
   let allWastes: any[] = [];
   Object.keys(wastes).forEach(key => {
@@ -33,9 +30,9 @@ async function addCompaniesGivenNames<WasteType extends GenericWaste>(
   });
 
   // Retrieve companies sirets
-  let sirets: any[] = [];
+  const sirets: any[] = [];
   allWastes.forEach(waste => {
-    FIELDS_TO_FIX.forEach(tuple => {
+    GIVEN_NAMES_AND_SIRET_FIELDS.forEach(tuple => {
       sirets.push(waste[tuple[1]]);
     });
   });
@@ -43,12 +40,12 @@ async function addCompaniesGivenNames<WasteType extends GenericWaste>(
   // Fetch companies once
   const companies = await prisma.company.findMany({
     where: {
-      siret: {
+      orgId: {
         in: [...new Set(sirets)].filter(Boolean) as string[]
       }
     },
     select: {
-      siret: true,
+      orgId: true,
       givenName: true
     }
   });
@@ -56,7 +53,7 @@ async function addCompaniesGivenNames<WasteType extends GenericWaste>(
   const fix = (waste, givenNameField, siretField) => {
     if (waste[siretField]) {
       waste[givenNameField] = companies.find(
-        company => company.siret === waste[siretField]
+        company => company.orgId === waste[siretField]
       )?.givenName;
     }
   };
@@ -64,7 +61,7 @@ async function addCompaniesGivenNames<WasteType extends GenericWaste>(
   // Fix wastes, filling given names with value from company
   Object.keys(wastes).forEach(bsdType => {
     wastes[bsdType].forEach(waste => {
-      FIELDS_TO_FIX.forEach(tuple => {
+      GIVEN_NAMES_AND_SIRET_FIELDS.forEach(tuple => {
         fix(waste, tuple[0], tuple[1]);
       });
     });
