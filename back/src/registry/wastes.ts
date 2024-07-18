@@ -24,7 +24,7 @@ const GIVEN_NAMES_AND_SIRET_FIELDS: [WasteField, WasteField][] = [
 export async function addCompaniesGivenNames<WasteType extends GenericWaste>(
   wastes: WasteMap<WasteType>
 ): Promise<WasteMap<WasteType>> {
-  // wastes = { BSDD: [...], BSDA: [...], ...}
+  // Extract all targeted sirets from wastes
   const sirets: any[] = [];
   Object.keys(wastes).forEach(key => {
     wastes[key].forEach(waste => {
