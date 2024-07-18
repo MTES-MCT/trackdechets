@@ -10,8 +10,9 @@ import {
   WasteEdge
 } from "./types";
 import { prisma } from "@td/prisma";
+import { WasteField } from "./columns";
 
-const GIVEN_NAMES_AND_SIRET_FIELDS = [
+const GIVEN_NAMES_AND_SIRET_FIELDS: [WasteField, WasteField][] = [
   ["emitterCompanyGivenName", "emitterCompanySiret"],
   ["destinationCompanyGivenName", "destinationCompanySiret"],
   ["transporterCompanyGivenName", "transporterCompanySiret"],
@@ -24,16 +25,12 @@ export async function addCompaniesGivenNames<WasteType extends GenericWaste>(
   wastes: WasteMap<WasteType>
 ): Promise<WasteMap<WasteType>> {
   // wastes = { BSDD: [...], BSDA: [...], ...}
-  let allWastes: any[] = [];
-  Object.keys(wastes).forEach(key => {
-    allWastes = [...allWastes, ...wastes[key]];
-  });
-
-  // Retrieve companies sirets
   const sirets: any[] = [];
-  allWastes.forEach(waste => {
-    GIVEN_NAMES_AND_SIRET_FIELDS.forEach(tuple => {
-      sirets.push(waste[tuple[1]]);
+  Object.keys(wastes).forEach(key => {
+    wastes[key].forEach(waste => {
+      GIVEN_NAMES_AND_SIRET_FIELDS.forEach(tuple => {
+        sirets.push(waste[tuple[1]]);
+      });
     });
   });
 

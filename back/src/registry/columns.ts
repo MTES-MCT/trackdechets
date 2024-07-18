@@ -20,13 +20,15 @@ export type CustomWasteColumns = {
   statusLabel: string;
 };
 
+export type WasteField = keyof (IncomingWaste &
+  OutgoingWaste &
+  TransportedWaste &
+  ManagedWaste &
+  AllWaste &
+  CustomWasteColumns);
+
 type Column = {
-  field: keyof (IncomingWaste &
-    OutgoingWaste &
-    TransportedWaste &
-    ManagedWaste &
-    AllWaste &
-    CustomWasteColumns);
+  field: WasteField;
   label: string;
   format?: (v: unknown, full: unknown) => string | number | null;
 };
