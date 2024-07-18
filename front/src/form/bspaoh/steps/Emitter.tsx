@@ -12,7 +12,7 @@ import { SealedFieldsContext } from "../context";
 const actor = "emitter";
 
 export function Emitter() {
-  const { register, setValue, watch } = useFormContext();
+  const { register, setValue, watch, formState } = useFormContext();
   const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
@@ -64,6 +64,13 @@ export function Emitter() {
           }
         }}
       />
+
+      {formState.errors?.emitter?.["company"]?.orgId?.message && (
+        <p id="text-input-error-desc-error" className="fr-mb-4v fr-error-text">
+          {formState.errors?.emitter?.["company"]?.orgId?.message}
+        </p>
+      )}
+
       <CompanyContactInfo
         fieldName={`${actor}.company`}
         disabled={sealedFields.includes(`emitter.company.siret`)}
