@@ -11,6 +11,7 @@ export type TagsInputProps = {
   readonly maxTags?: number;
   readonly disabled?: boolean;
   readonly errorMessage?: string;
+  readonly hintText?: string;
 };
 
 /**
@@ -24,7 +25,8 @@ const TagsInput: React.FC<TagsInputProps> = ({
   onDeleteTag,
   maxTags,
   disabled = false,
-  errorMessage
+  errorMessage,
+  hintText = ""
 }) => {
   const [tag, setTag] = useState("");
 
@@ -40,6 +42,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
     <>
       <Input
         label={label}
+        hintText={hintText}
         disabled={disabled}
         style={{ marginBottom: "10px" }}
         nativeInputProps={{

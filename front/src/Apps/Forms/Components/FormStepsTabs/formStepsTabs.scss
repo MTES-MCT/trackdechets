@@ -1,0 +1,26 @@
+@import "../../../../scss/Breakpoints.scss";
+
+.formSteps {
+  &__tabs {
+    overflow: hidden;
+    overflow-y: scroll;
+    max-height: 530px;
+  }
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    &__cta-group {
+      display: flex;
+      flex-direction: column;
+      @include tablet {
+        flex-direction: row;
+      }
+      gap: 1rem;
+    }
+  }
+  .tabError {
+    background-color: #fb8f8f;
+    color: #ce0500;
+  }
+}

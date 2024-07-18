@@ -143,6 +143,7 @@ export function Transporter() {
             maxTags={2}
             label="Immatriculations"
             fieldName={`${actor}.transport.plates`}
+            hintText="2 max : Véhicule, remorque"
           />
         </div>
       </div>

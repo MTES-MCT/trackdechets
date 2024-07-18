@@ -1,7 +1,4 @@
 import React, { useState, useMemo } from "react";
-import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
-
 import omitDeep from "omit-deep-lodash";
 import { useMutation, useQuery } from "@apollo/client";
 import { cleanPayload } from "./utils/payload";
@@ -19,7 +16,6 @@ import { useNavigate } from "react-router-dom";
 import { getComputedState } from "../common/getComputedState";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toastApolloError } from "../common/stepper/toaster";
-import styles from "./PaohForm.module.scss";
 import {
   CREATE_DRAFT_BSPAOH,
   CREATE_BSPAOH,
@@ -27,7 +23,6 @@ import {
   UPDATE_BSPAOH
 } from "./utils/queries";
 import { SealedFieldsContext } from "./context";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Emitter } from "./steps/Emitter";
 import { Transporter } from "./steps/Transporter";
 import { Destination } from "./steps/Destination";
@@ -35,9 +30,10 @@ import { Waste } from "./steps/Waste";
 import initialState from "./initial-state";
 import { rawBspaohSchema, ZodBspaoh } from "./schema";
 import { Loader } from "../../Apps/common/Components";
+import FormStepsTabs from "../../Apps/Forms/Components/FormStepsTabs/FormStepsTabs";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 const tabIds = ["tab1", "tab2", "tab3", "tab4"];
-
 const getNextTab = currentTabId => {
   const idx = tabIds.indexOf(currentTabId);
   if (idx === -1 || idx === tabIds.length) {
@@ -108,6 +104,7 @@ export function ControlledTabs(props: Readonly<Props>) {
       return zodResolver(rawBspaohSchema)(data, context, options);
     }
   });
+
   const errors = methods?.formState?.errors;
   const formHasErrors = Object.keys(errors)?.length > 0;
 
@@ -168,38 +165,52 @@ export function ControlledTabs(props: Readonly<Props>) {
   const lastTabId = tabIds[tabIds.length - 1];
 
   const firstTabId = tabIds[0];
+
+  const onTabChange = tabId => {
+    setSelectedTabId(tabId);
+  };
+
   return (
     <>
-      <Tabs
-        selectedTabId={selectedTabId}
-        tabs={[
-          {
-            tabId: "tab1",
-            label: "Déchet",
-            iconId: "fr-icon-arrow-right-line"
-          },
-          {
-            tabId: "tab2",
-            label: "Producteur",
-            iconId: "fr-icon-arrow-right-line"
-          },
-          {
-            tabId: "tab3",
-            label: "Transporteur",
-            iconId: "fr-icon-arrow-right-line"
-          },
-          {
-            tabId: "tab4",
-            label: "Crématorium",
-            iconId: "fr-icon-arrow-right-line"
-          }
-        ]}
-        onTabChange={setSelectedTabId}
-      >
-        <SealedFieldsContext.Provider value={sealedFields}>
-          <FormProvider {...methods}>
-            <form
+      <SealedFieldsContext.Provider value={sealedFields}>
+        <FormProvider {...methods}>
+          {!loading && (
+            <FormStepsTabs
+              tabList={[
+                {
+                  tabId: "tab1",
+                  label: "Déchet",
+                  iconId: "fr-icon-arrow-right-line"
+                },
+                {
+                  tabId: "tab2",
+                  label: "Producteur",
+                  iconId: "fr-icon-arrow-right-line"
+                },
+                {
+                  tabId: "tab3",
+                  label: "Transporteur",
+                  iconId: "fr-icon-arrow-right-line"
+                },
+                {
+                  tabId: "tab4",
+                  label: "Crématorium",
+                  iconId: "fr-icon-arrow-right-line"
+                }
+              ]}
+              draftCtaLabel={draftCtaLabel}
+              mainCtaLabel={mainCtaLabel}
+              selectedTabId={selectedTabId}
+              isPrevStepDisabled={selectedTabId === firstTabId}
+              isNextStepDisabled={selectedTabId === lastTabId}
+              isSaveDisabled={
+                mainCtaLabel !== "Publier" && selectedTabId !== lastTabId
+              }
               onSubmit={methods.handleSubmit((data, e) => onSubmit(data, e))}
+              onCancel={() => navigate(-1)}
+              onPrevTab={() => setSelectedTabId(getPrevTab(selectedTabId))}
+              onNextTab={() => setSelectedTabId(getNextTab(selectedTabId))}
+              onTabChange={onTabChange}
             >
               {tabsContent[selectedTabId] ?? <p></p>}
               {formHasErrors && (
@@ -210,56 +221,10 @@ export function ControlledTabs(props: Readonly<Props>) {
                   description="Le formulaire comporte des erreurs"
                 />
               )}
-              <div className={styles.form__actions}>
-                <Button
-                  onClick={() => setSelectedTabId(getPrevTab(selectedTabId))}
-                  priority="tertiary"
-                  disabled={selectedTabId === firstTabId}
-                  type="button"
-                >
-                  Précédent
-                </Button>
-
-                <Button
-                  onClick={() => setSelectedTabId(getNextTab(selectedTabId))}
-                  priority="tertiary"
-                  disabled={selectedTabId === lastTabId}
-                  type="button"
-                >
-                  Suivant
-                </Button>
-
-                <div className={styles.form__actions__right}>
-                  <Button
-                    priority="secondary"
-                    type="button"
-                    onClick={() => navigate(-1)}
-                  >
-                    Annuler
-                  </Button>
-
-                  {!!draftCtaLabel && (
-                    <Button
-                      priority="secondary"
-                      id="id_save_draft"
-                      disabled={selectedTabId !== lastTabId}
-                    >
-                      {draftCtaLabel}
-                    </Button>
-                  )}
-                  <Button
-                    id="id_save"
-                    priority="primary"
-                    disabled={selectedTabId !== lastTabId}
-                  >
-                    {mainCtaLabel}
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </FormProvider>
-        </SealedFieldsContext.Provider>
-      </Tabs>
+            </FormStepsTabs>
+          )}
+        </FormProvider>
+      </SealedFieldsContext.Provider>
       {loading && <Loader />}
     </>
   );
