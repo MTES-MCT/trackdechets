@@ -28,8 +28,8 @@ export async function addCompaniesGivenNames<WasteType extends GenericWaste>(
   const sirets: any[] = [];
   Object.keys(wastes).forEach(key => {
     wastes[key].forEach(waste => {
-      GIVEN_NAMES_AND_SIRET_FIELDS.forEach(tuple => {
-        sirets.push(waste[tuple[1]]);
+      GIVEN_NAMES_AND_SIRET_FIELDS.forEach(([_, siretField]) => {
+        sirets.push(waste[siretField]);
       });
     });
   });
@@ -47,7 +47,7 @@ export async function addCompaniesGivenNames<WasteType extends GenericWaste>(
     }
   });
 
-  const fix = (waste, givenNameField, siretField) => {
+  const fixGivenName = (waste, givenNameField, siretField) => {
     if (waste[siretField]) {
       waste[givenNameField] = companies.find(
         company => company.orgId === waste[siretField]
@@ -58,8 +58,8 @@ export async function addCompaniesGivenNames<WasteType extends GenericWaste>(
   // Fix wastes, filling given names with value from company
   Object.keys(wastes).forEach(bsdType => {
     wastes[bsdType].forEach(waste => {
-      GIVEN_NAMES_AND_SIRET_FIELDS.forEach(tuple => {
-        fix(waste, tuple[0], tuple[1]);
+      GIVEN_NAMES_AND_SIRET_FIELDS.forEach(([givenNameField, siretField]) => {
+        fixGivenName(waste, givenNameField, siretField);
       });
     });
   });
