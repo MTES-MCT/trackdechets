@@ -1,0 +1,40 @@
+.select {
+  border: 2px dotted brown;
+  max-width: 400px;
+}
+
+.select:focus {
+  outline: 0;
+}
+
+.selectOption {
+  border: 4px dotted red;
+  height: 0;
+  color: red !important;
+  background-color: red !important;
+  // display: none;
+}
+
+.downDownWrapper {
+  padding: 16px;
+  background: #ffffff;
+  box-shadow: 0px 2px 6px 0px #00001229;
+  position: absolute;
+  z-index: 999;
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
+.optionAndSubOptionWrapper {
+  // border: 2px dotted blue;
+}
+
+.optionWrapper {
+  // border: 2px dotted red;
+}
+
+.optionCheckbox {
+  // border: 2px dotted yellow;
+  height: 24px;
+  margin-bottom: 16px;
+}

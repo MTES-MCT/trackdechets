@@ -1,11 +1,18 @@
 import React from "react";
 import { filter_type_select_option_placeholder } from "../../wordings/dashboard/wordingsDashboard";
 import MultiSelectWrapper from "../MultiSelect/MultiSelect";
+import { SelectWithSubOptions } from "../SelectWithSubOptions/SelectWithSubOptions";
+
+interface Option {
+  value: string;
+  label: string;
+  options: Option[];
+}
 
 interface SelectProps {
   label?: string;
   id?: string;
-  options: { value: string; label: string }[];
+  options: Option[];
   selected?: any;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   placeholder?: string;
@@ -31,6 +38,42 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     },
     ref
   ) => {
+    const hasSubOptions = options.find(o => o.options?.length);
+
+    const selectWithSubOptions = <SelectWithSubOptions options={options} />;
+    const regularSelect = (
+      <select
+        ref={ref}
+        id={id}
+        className="fr-select"
+        onChange={onChange}
+        defaultValue={defaultValue}
+      >
+        <option value="" disabled hidden>
+          {placeholder}
+        </option>
+        {options?.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    );
+    const multipleSelect = (
+      <MultiSelectWrapper
+        options={options}
+        selected={selected}
+        onChange={onChange}
+        placeholder={placeholder}
+        disableSearch={disableSearch}
+        showRendererText={showRendererText}
+      />
+    );
+
+    let select = regularSelect;
+    if (hasSubOptions) select = selectWithSubOptions;
+    else if (isMultiple) select = multipleSelect;
+
     return (
       <div className="fr-select-group">
         {label && (
@@ -38,33 +81,8 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             {label}
           </label>
         )}
-        {!isMultiple ? (
-          <select
-            ref={ref}
-            id={id}
-            className="fr-select"
-            onChange={onChange}
-            defaultValue={defaultValue}
-          >
-            <option value="" disabled hidden>
-              {placeholder}
-            </option>
-            {options?.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <MultiSelectWrapper
-            options={options}
-            selected={selected}
-            onChange={onChange}
-            placeholder={placeholder}
-            disableSearch={disableSearch}
-            showRendererText={showRendererText}
-          />
-        )}
+
+        {select}
       </div>
     );
   }

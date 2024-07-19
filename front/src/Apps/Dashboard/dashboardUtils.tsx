@@ -34,7 +34,18 @@ import {
   filter_tva_intra,
   filter_waste_code,
   filter_worker_operation_code,
-  filter_worker_sign_date
+  filter_worker_sign_date,
+  bsd_sub_type_option_appendix1,
+  bsd_sub_type_option_appendix2,
+  bsd_sub_type_option_collection_2710,
+  bsd_sub_type_option_gathering,
+  bsd_sub_type_option_groupement,
+  bsd_sub_type_option_initial,
+  bsd_sub_type_option_reconditionnement,
+  bsd_sub_type_option_reshipment,
+  bsd_sub_type_option_synthesis,
+  bsd_sub_type_option_temp_stored,
+  bsd_sub_type_option_tournee
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
 import {
@@ -47,34 +58,118 @@ import {
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
-import { BsdType, BsdWhere, OrderBy } from "@td/codegen-ui";
+import { BsdSubType, BsdType, BsdWhere, OrderBy } from "@td/codegen-ui";
 
 export const MAX_FILTER = 5;
 
 const bsdTypeFilterSelectOptions = [
   {
     value: BsdType.Bsdd,
-    label: bsd_type_option_bsdd
+    label: bsd_type_option_bsdd,
+    options: [
+      {
+        value: BsdSubType.Initial,
+        label: bsd_sub_type_option_initial
+      },
+      {
+        value: BsdSubType.Tournee,
+        label: bsd_sub_type_option_tournee
+      },
+      {
+        value: BsdSubType.Appendix1,
+        label: bsd_sub_type_option_appendix1
+      },
+      {
+        value: BsdSubType.Appendix2,
+        label: bsd_sub_type_option_appendix2
+      },
+      {
+        value: BsdSubType.TempStored,
+        label: bsd_sub_type_option_temp_stored
+      }
+    ]
   },
   {
     value: BsdType.Bsdasri,
-    label: bsd_type_option_bsdasri
+    label: bsd_type_option_bsdasri,
+    options: [
+      {
+        value: BsdSubType.Initial,
+        label: bsd_sub_type_option_initial
+      },
+      {
+        value: BsdSubType.Synthesis,
+        label: bsd_sub_type_option_synthesis
+      },
+      {
+        value: BsdSubType.Gathering,
+        label: bsd_sub_type_option_gathering
+      }
+    ]
   },
   {
     value: BsdType.Bsvhu,
-    label: bsd_type_option_bsvhu
+    label: bsd_type_option_bsvhu,
+    options: [
+      {
+        value: BsdSubType.Initial,
+        label: bsd_sub_type_option_initial
+      }
+    ]
   },
   {
     value: BsdType.Bsff,
-    label: bsd_type_option_bsff
+    label: bsd_type_option_bsff,
+    options: [
+      {
+        value: BsdSubType.Initial,
+        label: bsd_sub_type_option_initial
+      },
+      {
+        value: BsdSubType.Groupement,
+        label: bsd_sub_type_option_groupement
+      },
+      {
+        value: BsdSubType.Reconditionnement,
+        label: bsd_sub_type_option_reconditionnement
+      },
+      {
+        value: BsdSubType.Reshipment,
+        label: bsd_sub_type_option_reshipment
+      }
+    ]
   },
   {
     value: BsdType.Bsda,
-    label: bsd_type_option_bsda
+    label: bsd_type_option_bsda,
+    options: [
+      {
+        value: BsdSubType.Initial,
+        label: bsd_sub_type_option_initial
+      },
+      {
+        value: BsdSubType.Gathering,
+        label: bsd_sub_type_option_gathering
+      },
+      {
+        value: BsdSubType.Reshipment,
+        label: bsd_sub_type_option_reshipment
+      },
+      {
+        value: BsdSubType.Collection_2710,
+        label: bsd_sub_type_option_collection_2710
+      }
+    ]
   },
   {
     value: BsdType.Bspaoh,
-    label: bsd_type_option_bspaoh
+    label: bsd_type_option_bspaoh,
+    options: [
+      {
+        value: BsdSubType.Initial,
+        label: bsd_sub_type_option_initial
+      }
+    ]
   }
 ];
 
