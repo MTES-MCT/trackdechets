@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 /**
  * To get format YYYY-MM-DD
  */
@@ -9,5 +11,5 @@ export const toYYYYMMDD = (date: Date) => {
  * To get format DD/MM/YYYY
  */
 export const toDDMMYYYY = (date: Date) => {
-  return date.toLocaleDateString("fr-FR");
+  return format(date, "dd/MM/yyyy");
 };
