@@ -1,7 +1,7 @@
 import React from "react";
 import { filter_type_select_option_placeholder } from "../../wordings/dashboard/wordingsDashboard";
 import MultiSelectWrapper from "../MultiSelect/MultiSelect";
-import { SelectWithSubOptions } from "../SelectWithSubOptions/SelectWithSubOptions";
+import SelectWithSubOptions from "../SelectWithSubOptions/SelectWithSubOptions";
 
 interface Option {
   value: string;
@@ -40,7 +40,9 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ) => {
     const hasSubOptions = options.find(o => o.options?.length);
 
-    const selectWithSubOptions = <SelectWithSubOptions options={options} />;
+    const selectWithSubOptions = (
+      <SelectWithSubOptions options={options} onChange={() => {}} />
+    );
     const regularSelect = (
       <select
         ref={ref}

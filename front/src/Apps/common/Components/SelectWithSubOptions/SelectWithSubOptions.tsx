@@ -1,56 +1,54 @@
 import React, { useState } from "react";
-import { filter_type_select_option_placeholder } from "../../wordings/dashboard/wordingsDashboard";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import { FieldArray } from "formik";
 import "./selectWithSubOptions.scss";
+import { getLabel, onSelectChange } from "./SelectWithSubOptions.utils";
 
-export const SelectWithSubOptions = ({
-  label,
-  options,
-  id,
-  onChange,
-  isMultiple,
-  selected,
-  disableSearch,
-  defaultValue,
-  placeholder = filter_type_select_option_placeholder,
-  showRendererText = true
-}) => {
-  const [value, setValue] = useState({});
+const SelectWithSubOptions = ({ options, onChange }) => {
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  console.log("value", value);
-
-  const mapOptions = (options, parentPath = null, ml = 0) => (
+  const mapOptions = (options, parentPaths: string[] = [], ml = 0) => (
     <>
       {options.map((option, idx) => {
-        const optionPath = parentPath
-          ? `${parentPath}.${option.value}`
+        const optionPath = parentPaths.length
+          ? [...parentPaths, option.value].join(".")
           : option.value;
+
+        const optionIsAlreadySelected = selectedOptions.some(
+          o => o === optionPath
+        );
 
         return (
           <div key={idx} className="optionAndSubOptionWrapper">
             <div className="optionWrapper" key={optionPath}>
               <Checkbox
-                className={`optionCheckbox fr-ml-${ml}v`}
+                className={`optionCheckbox fr-ml-${ml * 4}v`}
                 options={[
                   {
                     label: option.label,
                     nativeInputProps: {
                       name: optionPath,
-                      checked: Boolean(value[optionPath]),
-                      onClick: () => {
-                        if (value[optionPath])
-                          setValue({ ...value, [optionPath]: undefined });
-                        else setValue({ ...value, [optionPath]: true });
-                      }
+                      checked: optionIsAlreadySelected,
+                      onChange: () =>
+                        onSelectChange(
+                          option,
+                          parentPaths,
+                          optionPath,
+                          selectedOptions,
+                          setSelectedOptions
+                        )
                     }
                   }
                 ]}
               />
             </div>
 
-            {option.options && mapOptions(option.options, optionPath, ml + 1)}
+            {option.options &&
+              mapOptions(
+                option.options,
+                [...parentPaths, option.value],
+                ml + 1
+              )}
           </div>
         );
       })}
@@ -60,27 +58,23 @@ export const SelectWithSubOptions = ({
   return (
     <>
       <select
-        id={id}
         className="fr-select select"
         onChange={onChange}
-        defaultValue={defaultValue}
+        defaultValue={""}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <option value="" disabled hidden>
-          Sélectionner une option
+        <option value="" hidden>
+          {getLabel(options, selectedOptions)}
         </option>
       </select>
 
       {isOpen && (
-        <div className="downDownWrapper">
-          {/* <FieldArray
-            name={"test"}
-            render={arrayHelpers => ( */}
+        <div className="dropDownWrapper">
           <div className="fr-container-fluid">{mapOptions(options)}</div>
-          {/* )}
-          /> */}
         </div>
       )}
     </>
   );
 };
+
+export default SelectWithSubOptions;
