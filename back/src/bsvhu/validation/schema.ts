@@ -107,7 +107,7 @@ const rawBsvhuSchema = z.object({
   destinationOperationCode: ZodOperationEnum,
   destinationOperationNextDestinationCompanyName: z.string().nullish(),
   destinationOperationNextDestinationCompanySiret: siretSchema(
-    CompanyRole.Destination
+    CompanyRole.NextDestination
   ).nullish(),
   destinationOperationNextDestinationCompanyAddress: z.string().nullish(),
   destinationOperationNextDestinationCompanyContact: z.string().nullish(),
@@ -117,7 +117,7 @@ const rawBsvhuSchema = z.object({
     .email("E-mail destinataire suivant invalide")
     .nullish(),
   destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
-    CompanyRole.Destination
+    CompanyRole.NextDestination
   ).nullish(),
   destinationOperationSignatureAuthor: z.string().nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),

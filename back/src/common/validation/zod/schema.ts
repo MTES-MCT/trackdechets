@@ -5,7 +5,12 @@ import { isForeignVat, isSiret, isVat } from "@td/constants";
 export enum CompanyRole {
   Emitter = "Émetteur",
   Transporter = "Transporteur",
-  Destination = "Destination"
+  Destination = "Destination",
+  EcoOrganisme = "Éco-organisme",
+  Broker = "Courtier",
+  Worker = "Entreprise de travaux",
+  Intermediary = "Intermédiaire",
+  NextDestination = "Éxutoire"
 }
 
 export const siretSchema = (expectedCompanyRole?: CompanyRole) =>
@@ -47,7 +52,7 @@ export const rawTransporterSchema = z.object({
   id: z.string().nullish(),
   number: z.number().nullish(),
   transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema().nullish(),
+  transporterCompanySiret: siretSchema(CompanyRole.Transporter).nullish(),
   transporterCompanyAddress: z.string().nullish(),
   transporterCompanyContact: z.string().nullish(),
   transporterCompanyPhone: z.string().nullish(),
@@ -55,7 +60,9 @@ export const rawTransporterSchema = z.object({
     .string()
     .email("E-mail transporteur invalide")
     .nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema().nullish(),
+  transporterCompanyVatNumber: foreignVatNumberSchema(
+    CompanyRole.Transporter
+  ).nullish(),
   transporterCustomInfo: z.string().nullish(),
   transporterRecepisseIsExempted: z
     .boolean()

@@ -177,7 +177,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "1 n'est pas un numéro de SIRET valide"
+        "Émetteur : 1 n'est pas un numéro de SIRET valide"
       );
     });
 
@@ -194,7 +194,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "1 n'est pas un numéro de SIRET valide"
+        "Transporteur : 1 n'est pas un numéro de SIRET valide"
       );
     });
 
@@ -211,7 +211,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+        "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
       );
     });
 
@@ -236,7 +236,7 @@ describe("BSPAOH validation", () => {
         expect(error.issues).toEqual([
           expect.objectContaining({
             message:
-              "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+              "Transporteur : L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
           })
         ]);
       }
@@ -326,7 +326,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "1 n'est pas un numéro de SIRET valide"
+        "Destination : 1 n'est pas un numéro de SIRET valide"
       );
     });
 

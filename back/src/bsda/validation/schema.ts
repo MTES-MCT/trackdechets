@@ -37,6 +37,7 @@ import {
 import { sirenifyBsda, sirenifyBsdaTransporter } from "./sirenify";
 import { updateTransportersRecepisse } from "../../common/validation/zod/transformers";
 import {
+  CompanyRole,
   foreignVatNumberSchema,
   rawTransporterSchema,
   siretSchema
@@ -104,7 +105,7 @@ export const rawBsdaSchema = z.object({
     .nullish()
     .transform(v => Boolean(v)),
   emitterCompanyName: z.string().nullish(),
-  emitterCompanySiret: siretSchema().nullish(),
+  emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),
   emitterCompanyContact: z.string().nullish(),
   emitterCompanyPhone: z.string().nullish(),
@@ -118,7 +119,7 @@ export const rawBsdaSchema = z.object({
   emitterEmissionSignatureAuthor: z.string().nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
   ecoOrganismeName: z.string().nullish(),
-  ecoOrganismeSiret: siretSchema().nullish(),
+  ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   wasteCode: ZodWasteCodeEnum,
   wasteFamilyCode: z.string().nullish(),
   wasteMaterialName: z.string().nullish(),
@@ -140,7 +141,7 @@ export const rawBsdaSchema = z.object({
     .transform(v => Boolean(v)),
   weightValue: z.number().nullish(),
   brokerCompanyName: z.string().nullish(),
-  brokerCompanySiret: siretSchema().nullish(),
+  brokerCompanySiret: siretSchema(CompanyRole.Broker).nullish(),
   brokerCompanyAddress: z.string().nullish(),
   brokerCompanyContact: z.string().nullish(),
   brokerCompanyPhone: z.string().nullish(),
@@ -149,7 +150,7 @@ export const rawBsdaSchema = z.object({
   brokerRecepisseDepartment: z.string().nullish(),
   brokerRecepisseValidityLimit: z.coerce.date().nullish(),
   destinationCompanyName: z.string().nullish(),
-  destinationCompanySiret: siretSchema().nullish(),
+  destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
   destinationCompanyAddress: z.string().nullish(),
   destinationCompanyContact: z.string().nullish(),
   destinationCompanyPhone: z.string().nullish(),
@@ -174,9 +175,12 @@ export const rawBsdaSchema = z.object({
     }),
   destinationOperationSignatureAuthor: z.string().nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
-  destinationOperationNextDestinationCompanySiret: siretSchema().nullish(),
-  destinationOperationNextDestinationCompanyVatNumber:
-    foreignVatNumberSchema().nullish(),
+  destinationOperationNextDestinationCompanySiret: siretSchema(
+    CompanyRole.NextDestination
+  ).nullish(),
+  destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
+    CompanyRole.NextDestination
+  ).nullish(),
   destinationOperationNextDestinationCompanyName: z.string().nullish(),
   destinationOperationNextDestinationCompanyAddress: z.string().nullish(),
   destinationOperationNextDestinationCompanyContact: z.string().nullish(),
@@ -190,7 +194,7 @@ export const rawBsdaSchema = z.object({
     .nullish()
     .transform(v => Boolean(v)),
   workerCompanyName: z.string().nullish(),
-  workerCompanySiret: siretSchema().nullish(),
+  workerCompanySiret: siretSchema(CompanyRole.Worker).nullish(),
   workerCompanyAddress: z.string().nullish(),
   workerCompanyContact: z.string().nullish(),
   workerCompanyPhone: z.string().nullish(),

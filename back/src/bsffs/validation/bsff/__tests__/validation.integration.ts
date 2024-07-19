@@ -115,13 +115,13 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: "foo1 n'est pas un numéro de SIRET valide"
+            message: "Émetteur : foo1 n'est pas un numéro de SIRET valide"
           }),
           expect.objectContaining({
-            message: "foo2 n'est pas un numéro de SIRET valide"
+            message: "Destination : foo2 n'est pas un numéro de SIRET valide"
           }),
           expect.objectContaining({
-            message: "foo3 n'est pas un numéro de SIRET valide"
+            message: "Transporteur : foo3 n'est pas un numéro de SIRET valide"
           })
         ]);
       }
@@ -860,7 +860,7 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: `L'établissement avec le SIRET ${randomSiret} n'est pas inscrit sur Trackdéchets`
+            message: `Destination : L'établissement avec le SIRET ${randomSiret} n'est pas inscrit sur Trackdéchets`
           })
         ]);
       }
@@ -898,7 +898,7 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: `L'établissement avec le SIRET ${randomSiret} n'est pas inscrit sur Trackdéchets`
+            message: `Transporteur : L'établissement avec le SIRET ${randomSiret} n'est pas inscrit sur Trackdéchets`
           })
         ]);
       }
