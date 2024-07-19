@@ -9,10 +9,6 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
-import { sirenify } from "../../../sirenify";
-
-jest.mock("../../../sirenify");
-(sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_VHU_FORM = `
 mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
@@ -44,6 +40,7 @@ mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
         number
         department
         validityLimit
+        isExempted
       }
     }
     weight {
@@ -56,7 +53,6 @@ mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
 describe("Mutation.Vhu.update", () => {
   afterEach(async () => {
     await resetDatabase();
-    (sirenify as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -133,8 +129,6 @@ describe("Mutation.Vhu.update", () => {
     );
 
     expect(data.updateBsvhu.weight!.value).toBe(4);
-    // check input is sirenified
-    expect(sirenify).toHaveBeenCalledTimes(1);
   });
 
   it("should allow emitter fields update before emitter signature", async () => {
@@ -190,7 +184,7 @@ describe("Mutation.Vhu.update", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterAgrementNumber",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le N° d'agrément de l'émetteur a été vérouillé via signature et ne peut pas être modifié.",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -305,6 +299,11 @@ describe("Mutation.Vhu.update", () => {
     );
 
     // recepisse is pulled from db
-    expect(data.updateBsvhu.transporter!.recepisse).toEqual(null);
+    expect(data.updateBsvhu.transporter!.recepisse).toEqual({
+      department: null,
+      number: null,
+      validityLimit: null,
+      isExempted: false
+    });
   });
 });

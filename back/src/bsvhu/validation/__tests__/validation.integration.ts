@@ -1,6 +1,11 @@
 import { Company, OperationMode } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { companyFactory } from "../../../__tests__/factories";
+import {
+  companyFactory,
+  transporterReceiptFactory
+} from "../../../__tests__/factories";
+import { CompanySearchResult } from "../../../companies/types";
+import { searchCompany } from "../../../companies/search";
 
 import { bsvhuFactory } from "../../__tests__/factories.vhu";
 import { ZodBsvhu } from "../schema";
@@ -9,16 +14,26 @@ import { prismaToZodBsvhu } from "../helpers";
 import { parseBsvhu, parseBsvhuAsync } from "..";
 import { ZodError } from "zod";
 
+const searchResult = (companyName: string) => {
+  return {
+    name: companyName,
+    address: `Adresse ${companyName}`,
+    statutDiffusionEtablissement: "O"
+  } as CompanySearchResult;
+};
+
+jest.mock("../../../companies/search");
+
 describe("BSVHU validation", () => {
   afterAll(resetDatabase);
 
   let bsvhu: ZodBsvhu;
   let context: BsvhuValidationContext;
   let foreignTransporter: Company;
-
+  let transporterCompany: Company;
   beforeAll(async () => {
     const emitterCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
-    const transporterCompany = await companyFactory({
+    transporterCompany = await companyFactory({
       companyTypes: ["TRANSPORTER"]
     });
     const destinationCompany = await companyFactory({
@@ -543,6 +558,79 @@ describe("BSVHU validation", () => {
           })
         ]);
       }
+    });
+  });
+
+  describe("sirenify", () => {
+    it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
+      const searchResults = {
+        [bsvhu.emitterCompanySiret!]: searchResult("émetteur"),
+        [bsvhu.transporterCompanySiret!]: searchResult("transporteur"),
+        [bsvhu.destinationCompanySiret!]: searchResult("destinataire")
+      };
+      (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+        return Promise.resolve(searchResults[clue]);
+      });
+
+      const sirenified = await parseBsvhuAsync(bsvhu, {
+        ...context
+      });
+
+      expect(sirenified.emitterCompanyName).toEqual(
+        searchResults[bsvhu.emitterCompanySiret!].name
+      );
+      expect(sirenified.emitterCompanyAddress).toEqual(
+        searchResults[bsvhu.emitterCompanySiret!].address
+      );
+      expect(sirenified.transporterCompanyName).toEqual(
+        searchResults[bsvhu.transporterCompanySiret!].name
+      );
+      expect(sirenified.transporterCompanyAddress).toEqual(
+        searchResults[bsvhu.transporterCompanySiret!].address
+      );
+      expect(sirenified.destinationCompanyName).toEqual(
+        searchResults[bsvhu.destinationCompanySiret!].name
+      );
+      expect(sirenified.destinationCompanyAddress).toEqual(
+        searchResults[bsvhu.destinationCompanySiret!].address
+      );
+    });
+  });
+
+  describe("BSVHU Recipify Module", () => {
+    it("recipify should correctly process input and return completedInput with transporter receipt", async () => {
+      const receipt = await transporterReceiptFactory({
+        company: transporterCompany
+      });
+      const recipified = await parseBsvhuAsync(bsvhu, {
+        ...context
+      });
+      expect(recipified).toEqual(
+        expect.objectContaining({
+          transporterRecepisseNumber: receipt.receiptNumber,
+          transporterRecepisseDepartment: receipt.department,
+          transporterRecepisseValidityLimit: receipt.validityLimit
+        })
+      );
+    });
+
+    it("recipify should correctly process input with isExempted true and return completedInput without transporter recepisse", async () => {
+      const recipified = await parseBsvhuAsync(
+        {
+          ...bsvhu,
+          transporterRecepisseIsExempted: true
+        },
+        {
+          ...context
+        }
+      );
+      expect(recipified).toEqual(
+        expect.objectContaining({
+          transporterRecepisseNumber: null,
+          transporterRecepisseDepartment: null,
+          transporterRecepisseValidityLimit: null
+        })
+      );
     });
   });
 });

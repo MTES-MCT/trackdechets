@@ -31,7 +31,10 @@ const DUPLICATE_BVHU = gql`
 `;
 
 describe("mutaion.duplicateBsvhu", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    jest.resetModules();
+  });
 
   it("should disallow unauthenticated user", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
@@ -224,6 +227,25 @@ describe("mutaion.duplicateBsvhu", () => {
       }
     });
 
+    // SIRENE info should take over internal data so we test that too
+    function searchResult(companyName: string) {
+      return {
+        name: `updated ${companyName} name`,
+        address: `updated ${companyName} address`,
+        statutDiffusionEtablissement: "O"
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [emitter.company.siret!]: searchResult("emitter"),
+      [transporterCompany.siret!]: searchResult("transporter"),
+      [destinationCompany.siret!]: searchResult("destination")
+    };
+
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
     const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
       DUPLICATE_BVHU,
       {
@@ -236,11 +258,12 @@ describe("mutaion.duplicateBsvhu", () => {
     const duplicatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: data.duplicateBsvhu.id }
     });
-
-    expect(duplicatedBsvhu.emitterCompanyName).toEqual("UPDATED-EMITTER-NAME");
+    // SIRENE info takes over
+    expect(duplicatedBsvhu.emitterCompanyName).toEqual("updated emitter name");
     expect(duplicatedBsvhu.emitterCompanyAddress).toEqual(
-      "UPDATED-EMITTER-ADDRESS"
+      "updated emitter address"
     );
+    // internal info
     expect(duplicatedBsvhu.emitterCompanyContact).toEqual(
       "UPDATED-EMITTER-CONTACT"
     );
@@ -249,12 +272,14 @@ describe("mutaion.duplicateBsvhu", () => {
       "UPDATED-EMITTER-PHONE"
     );
 
+    // SIRENE info takes over
     expect(duplicatedBsvhu.transporterCompanyName).toEqual(
-      "UPDATED-TRANSPORTER-NAME"
+      "updated transporter name"
     );
     expect(duplicatedBsvhu.transporterCompanyAddress).toEqual(
-      "UPDATED-TRANSPORTER-ADDRESS"
+      "updated transporter address"
     );
+    // internal info
     expect(duplicatedBsvhu.transporterCompanyContact).toEqual(
       "UPDATED-TRANSPORTER-CONTACT"
     );
@@ -274,13 +299,14 @@ describe("mutaion.duplicateBsvhu", () => {
     expect(duplicatedBsvhu.transporterRecepisseDepartment).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
     );
-
+    // SIRENE info takes over
     expect(duplicatedBsvhu.destinationCompanyName).toEqual(
-      "UPDATED-DESTINATION-NAME"
+      "updated destination name"
     );
     expect(duplicatedBsvhu.destinationCompanyAddress).toEqual(
-      "UPDATED-DESTINATION-ADDRESS"
+      "updated destination address"
     );
+    // internal info
     expect(duplicatedBsvhu.destinationCompanyContact).toEqual(
       "UPDATED-DESTINATION-CONTACT"
     );
