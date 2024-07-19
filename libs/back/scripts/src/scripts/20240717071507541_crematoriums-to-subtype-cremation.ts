@@ -21,10 +21,12 @@ export async function run(tx: Prisma.TransactionClient) {
       data: {
         wasteProcessorTypes: { push: WasteProcessorType.CREMATION },
         companyTypes: [
-          ...crematorium.companyTypes.filter(
-            type => type !== CompanyType.CREMATORIUM
-          ),
-          CompanyType.WASTEPROCESSOR
+          ...new Set([
+            ...crematorium.companyTypes.filter(
+              type => type !== CompanyType.CREMATORIUM
+            ),
+            CompanyType.WASTEPROCESSOR
+          ])
         ]
       }
     });
