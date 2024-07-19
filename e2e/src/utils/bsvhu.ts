@@ -474,7 +474,7 @@ export const fixAndPublishBsvhu = async (page: Page, { id }) => {
   await page.getByRole("button", { name: "Publier le bordereau" }).click();
 
   // Weight is missing
-  await expect(page.getByText("Le poids est un champs requis.")).toBeVisible();
+  await expect(page.getByText("Le poids est un champ requis.")).toBeVisible();
 
   // Edit VHU and add weight
   await page.getByRole("link", { name: "Mettre le bordereau à jour" }).click();
