@@ -60,5 +60,6 @@ const Template: ComponentStory<typeof SelectWithSubOptions> = args => (
 export const Primary = Template.bind({});
 
 Primary.args = {
-  options: OPTIONS
+  options: OPTIONS,
+  onChange: () => {}
 };

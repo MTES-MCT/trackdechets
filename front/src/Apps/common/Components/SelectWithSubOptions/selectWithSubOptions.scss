@@ -1,13 +1,21 @@
-.select {
-  border: 2px dotted brown;
+.select-wrapper {
   max-width: 400px;
+}
+
+.select {
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.select-open {
+  --data-uri-svg: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' viewBox='0 0 24 24' ><path fill='%23161616' d='m 12,10.9 5,4.9 1.4,-1.4 L 12,8.1 5.6,14.5 7,15.9 Z'/></svg>");
+  background-image: var(--data-uri-svg);
 }
 
 .select:focus {
   outline: 0;
-}
-
-.selectOption {
 }
 
 .dropDownWrapper {
@@ -18,12 +26,6 @@
   z-index: 999;
   max-height: 500px;
   overflow-y: scroll;
-}
-
-.optionAndSubOptionWrapper {
-}
-
-.optionWrapper {
 }
 
 .optionCheckbox {
