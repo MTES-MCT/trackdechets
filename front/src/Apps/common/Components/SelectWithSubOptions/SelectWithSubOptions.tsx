@@ -85,11 +85,20 @@ const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
     </>
   );
 
+  const handleKeyDown = e => {
+    if (e.keyCode === 13) {
+      setIsOpen(!isOpen);
+    }
+  };
+
   return (
     <div ref={ref} className="fr-mt-2v select-wrapper">
       <div
+        role={"button"}
+        tabIndex={0}
         className={`fr-select select ${isOpen ? "select-open" : ""}`}
-        onClick={() => setIsOpen(isOpen => !isOpen)}
+        onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={handleKeyDown}
       >
         {getLabel(options, selectedOptionsValues)}
       </div>
