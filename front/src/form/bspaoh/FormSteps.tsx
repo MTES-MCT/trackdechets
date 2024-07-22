@@ -31,9 +31,10 @@ import initialState from "./initial-state";
 import { rawBspaohSchema, ZodBspaoh } from "./schema";
 import { Loader } from "../../Apps/common/Components";
 import FormStepsTabs from "../../Apps/Forms/Components/FormStepsTabs/FormStepsTabs";
-import Alert from "@codegouvfr/react-dsfr/Alert";
+import { getTabClassName } from "../../Apps/Forms/Components/FormStepsTabs/utils";
 
-const tabIds = ["tab1", "tab2", "tab3", "tab4"];
+const tabIds = ["waste", "emitter", "transporter", "destination"];
+
 const getNextTab = currentTabId => {
   const idx = tabIds.indexOf(currentTabId);
   if (idx === -1 || idx === tabIds.length) {
@@ -51,10 +52,10 @@ const getPrevTab = currentTabId => {
 };
 
 const tabsContent = {
-  tab1: <Waste />,
-  tab2: <Emitter />,
-  tab3: <Transporter />,
-  tab4: <Destination />
+  waste: <Waste />,
+  emitter: <Emitter />,
+  transporter: <Transporter />,
+  destination: <Destination />
 };
 
 const paohToInput = (paoh: BspaohInput): BspaohInput => {
@@ -69,9 +70,10 @@ const paohToInput = (paoh: BspaohInput): BspaohInput => {
 };
 interface Props {
   bsdId?: string;
+  publishErrors?: any;
 }
 export function ControlledTabs(props: Readonly<Props>) {
-  const [selectedTabId, setSelectedTabId] = useState("tab1");
+  const [selectedTabId, setSelectedTabId] = useState("waste");
 
   const formQuery = useQuery<Pick<Query, "bspaoh">, QueryBspaohArgs>(
     GET_BSPAOH,
@@ -105,8 +107,21 @@ export function ControlledTabs(props: Readonly<Props>) {
     }
   });
 
-  const errors = methods?.formState?.errors;
-  const formHasErrors = Object.keys(errors)?.length > 0;
+  const publishErrorTab = [
+    ...new Set(
+      props?.publishErrors?.[0]?.map(publishError => {
+        return tabIds.find(key => publishError.path[0].includes(key));
+      })
+    )
+  ];
+  const errors = publishErrorTab.length
+    ? publishErrorTab
+    : Object.keys(methods?.formState?.errors)?.length > 0
+    ? Object.keys(methods?.formState?.errors)
+    : [];
+
+  const formHasErrors = errors?.length > 0;
+  const errorTabIds = formHasErrors ? errors : [];
 
   const [createDraftBspaoh, { loading: creatingDraft }] = useMutation<
     Pick<Mutation, "createDraftBspaoh">,
@@ -178,24 +193,24 @@ export function ControlledTabs(props: Readonly<Props>) {
             <FormStepsTabs
               tabList={[
                 {
-                  tabId: "tab1",
+                  tabId: "waste",
                   label: "Déchet",
-                  iconId: "fr-icon-arrow-right-line"
+                  iconId: getTabClassName(errorTabIds, "waste")
                 },
                 {
-                  tabId: "tab2",
+                  tabId: "emitter",
                   label: "Producteur",
-                  iconId: "fr-icon-arrow-right-line"
+                  iconId: getTabClassName(errorTabIds, "emitter")
                 },
                 {
-                  tabId: "tab3",
+                  tabId: "transporter",
                   label: "Transporteur",
-                  iconId: "fr-icon-arrow-right-line"
+                  iconId: getTabClassName(errorTabIds, "transporter")
                 },
                 {
-                  tabId: "tab4",
+                  tabId: "destination",
                   label: "Crématorium",
-                  iconId: "fr-icon-arrow-right-line"
+                  iconId: getTabClassName(errorTabIds, "destination")
                 }
               ]}
               draftCtaLabel={draftCtaLabel}
@@ -213,14 +228,6 @@ export function ControlledTabs(props: Readonly<Props>) {
               onTabChange={onTabChange}
             >
               {tabsContent[selectedTabId] ?? <p></p>}
-              {formHasErrors && (
-                <Alert
-                  severity="error"
-                  title="Erreur"
-                  className="fr-mt-5v"
-                  description="Le formulaire comporte des erreurs"
-                />
-              )}
             </FormStepsTabs>
           )}
         </FormProvider>
