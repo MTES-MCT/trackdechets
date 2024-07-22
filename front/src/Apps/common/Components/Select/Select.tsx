@@ -3,10 +3,10 @@ import { filter_type_select_option_placeholder } from "../../wordings/dashboard/
 import MultiSelectWrapper from "../MultiSelect/MultiSelect";
 import SelectWithSubOptions from "../SelectWithSubOptions/SelectWithSubOptions";
 
-interface Option {
+export interface Option {
   value: string;
   label: string;
-  options: Option[];
+  options?: Option[];
 }
 
 interface SelectProps {

@@ -2,8 +2,14 @@ import React, { useState } from "react";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import "./selectWithSubOptions.scss";
 import { getLabel, onSelectChange } from "./SelectWithSubOptions.utils";
+import { Option } from "../Select/Select";
 
-const SelectWithSubOptions = ({ options, onChange }) => {
+interface SelectWithSubOptions {
+  options: Option[];
+  onChange: () => void;
+}
+
+const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 

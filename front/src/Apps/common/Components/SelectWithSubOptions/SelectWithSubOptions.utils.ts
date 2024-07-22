@@ -1,3 +1,5 @@
+import { Option } from "../Select/Select";
+
 /**
  * Builds the label of the select (that is, a string with the labels of the corresponding
  * selected value) based on the original options map, and the actually selected values.
@@ -10,7 +12,11 @@
  * @selectedOptions the actually selected options (array of values, flat)
  * @parentValue (in recursive iterations) the value of parent option
  */
-export const getLabel = (options, selectedOptions, parentValue = null) => {
+export const getLabel = (
+  options: Option[],
+  selectedOptions: string[],
+  parentValue: string | null = null
+) => {
   // Nothing has been selected yet
   if (!selectedOptions.length) {
     return "Sélectionner une option";
@@ -60,18 +66,19 @@ export const getLabel = (options, selectedOptions, parentValue = null) => {
  * @param selectedOptions the values of currently selected options, like ["OPTION1", "OPTION2", ...]
  * @param setSelectedOptions the method to change the state with newly selected options
  */
+type SetOptionsFn = (options: string[]) => string[];
 export const onSelectChange = (
-  option,
-  parentPaths,
-  optionPath,
-  selectedOptions,
-  setSelectedOptions
+  option: Option,
+  parentPaths: string[],
+  optionPath: string,
+  selectedOptions: string[],
+  setSelectedOptions: (SetOptionsFn) => void
 ) => {
   const optionIsAlreadySelected = selectedOptions.some(o => o === optionPath);
 
   // Deselect. If we de-select an option, we must de-select all its children
   if (optionIsAlreadySelected) {
-    setSelectedOptions(selectedOptions => {
+    setSelectedOptions((selectedOptions: string[]) => {
       // Remove option
       let newSelectedOptions = [
         ...selectedOptions.filter(o => o !== optionPath)
@@ -115,7 +122,7 @@ export const onSelectChange = (
     });
 
     // Now that we have all possible parent options' paths, select them
-    setSelectedOptions(
+    setSelectedOptions((selectedOptions: string[]) =>
       Array.from(
         new Set([
           ...selectedOptions, // Already selected options
