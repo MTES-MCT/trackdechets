@@ -41,7 +41,12 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     const hasSubOptions = options.find(o => o.options?.length);
 
     const selectWithSubOptions = (
-      <SelectWithSubOptions options={options} onChange={values => {}} />
+      <SelectWithSubOptions
+        options={options}
+        onChange={values => {
+          console.log(">> values", values);
+        }}
+      />
     );
     const regularSelect = (
       <select

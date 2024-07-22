@@ -50,6 +50,8 @@ export const getLabel = (
         return option.label;
       }
     }
+
+    return null;
   });
 
   return optionsLabels.filter(Boolean).join(", ");
@@ -72,7 +74,7 @@ export const onSelectChange = (
   parentPaths: string[],
   optionPath: string,
   selectedOptionsValues: string[],
-  setSelectedOptionsValues: (SetOptionsFn) => void
+  setSelectedOptionsValues: (fn: SetOptionsFn) => void
 ) => {
   const optionIsAlreadySelected = selectedOptionsValues.some(
     optionValue => optionValue === optionPath
