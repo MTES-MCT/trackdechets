@@ -14,7 +14,8 @@ import {
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult,
-  Maybe
+  Maybe,
+  WasteVehiclesType
 } from "@td/codegen-ui";
 import classNames from "classnames";
 import {
@@ -137,12 +138,28 @@ export default function AccountCompanyAdd() {
     return companyTypes.includes(_CompanyType.WasteVehicles);
   }
 
+  function isVhuDemolisseur(wasteVechiclesTypes: WasteVehiclesType[]) {
+    return wasteVechiclesTypes.includes(WasteVehiclesType.Demolisseur);
+  }
+
+  function isVhuBroyeur(wasteVechiclesTypes: WasteVehiclesType[]) {
+    return wasteVechiclesTypes.includes(WasteVehiclesType.Broyeur);
+  }
+
   function isForcedTransporter(companyInfos: CompanySearchResult) {
     return !!companyInfos.vatNumber && !companyInfos.siret;
   }
 
   function isWorker(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Worker);
+  }
+
+  function isWasteProcessor(companyTypes: _CompanyType[]) {
+    return companyTypes.includes(_CompanyType.Wasteprocessor);
+  }
+
+  function isWasteCollector(companyTypes: _CompanyType[]) {
+    return companyTypes.includes(_CompanyType.Collector);
   }
 
   /**
@@ -161,6 +178,9 @@ export default function AccountCompanyAdd() {
       workerCertification,
       ecoOrganismeAgreements,
       allowBsdasriTakeOverWithoutSignature,
+      wasteProcessorTypes,
+      collectorTypes,
+      wasteVehiclesTypes,
       ...companyValues
     } = values;
 
@@ -205,9 +225,12 @@ export default function AccountCompanyAdd() {
     let vhuAgrementDemolisseurId: string | null = null;
     let vhuAgrementBroyeurId: string | null = null;
 
-    // create vhu agrement if any
+    // create vhu agrements if any
     if (isVhu(values.companyTypes)) {
-      if (vhuAgrementDemolisseur) {
+      if (
+        isVhuDemolisseur(values.wasteVehiclesTypes) &&
+        vhuAgrementDemolisseur
+      ) {
         const { data } = await createVhuAgrement({
           variables: { input: vhuAgrementDemolisseur }
         });
@@ -217,7 +240,7 @@ export default function AccountCompanyAdd() {
         }
       }
 
-      if (vhuAgrementBroyeur) {
+      if (isVhuBroyeur(values.wasteVehiclesTypes) && vhuAgrementBroyeur) {
         const { data } = await createVhuAgrement({
           variables: { input: vhuAgrementBroyeur }
         });
@@ -244,6 +267,15 @@ export default function AccountCompanyAdd() {
       variables: {
         companyInput: {
           ...companyValues,
+          wasteProcessorTypes: isWasteProcessor(values.companyTypes)
+            ? wasteProcessorTypes
+            : [],
+          collectorTypes: isWasteCollector(values.companyTypes)
+            ? collectorTypes
+            : [],
+          wasteVehiclesTypes: isVhu(values.companyTypes)
+            ? wasteVehiclesTypes
+            : [],
           transporterReceiptId,
           traderReceiptId,
           brokerReceiptId,
