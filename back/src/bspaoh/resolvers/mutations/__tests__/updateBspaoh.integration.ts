@@ -17,6 +17,7 @@ import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { prisma } from "@td/prisma";
 import { sirenify as sirenifyBspaohInput } from "../../../validation/sirenify";
+import { crematoriumFactory } from "../../../__tests__/factories";
 
 jest.mock("../../../validation/sirenify");
 (sirenifyBspaohInput as jest.Mock).mockImplementation(input =>
@@ -175,7 +176,11 @@ describe("Mutation.updateBspaoh", () => {
     const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await companyAssociatedToExistingUserFactory(
       user,
-      UserRole.MEMBER
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      }
     );
     const bspaoh = await bspaohFactory({
       opt: {
@@ -360,7 +365,10 @@ describe("Mutation.updateBspaoh", () => {
   });
 
   it("should not update emitter if they signed already", async () => {
-    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: { set: ["WASTEPROCESSOR"] },
+      wasteProcessorTypes: { set: ["CREMATION"] }
+    });
     const bspaoh = await bspaohFactory({
       opt: {
         status: "SIGNED_BY_PRODUCER",
@@ -397,9 +405,12 @@ describe("Mutation.updateBspaoh", () => {
   });
 
   it("should allow emitter to update destination when he is the only one to have signed", async () => {
-    const { company: emitter, user } = await userWithCompanyFactory("ADMIN");
-    const destination = await companyFactory();
-    const destination2 = await companyFactory();
+    const { company: emitter, user } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["WASTEPROCESSOR"] },
+      wasteProcessorTypes: { set: ["CREMATION"] }
+    });
+    const destination = await crematoriumFactory();
+    const destination2 = await crematoriumFactory();
 
     const bspaoh = await bspaohFactory({
       opt: {
@@ -433,9 +444,12 @@ describe("Mutation.updateBspaoh", () => {
   });
 
   it("should not allow emitter to update destination if the transporter has signed", async () => {
-    const { company: emitter, user } = await userWithCompanyFactory("ADMIN");
-    const destination = await companyFactory();
-    const destination2 = await companyFactory();
+    const { company: emitter, user } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["WASTEPROCESSOR"] },
+      wasteProcessorTypes: { set: ["CREMATION"] }
+    });
+    const destination = await crematoriumFactory();
+    const destination2 = await crematoriumFactory();
     const transporter = await companyFactory();
 
     const bspaoh = await bspaohFactory({

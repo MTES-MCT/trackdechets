@@ -45,7 +45,8 @@ const formatBoolean = (b: boolean | null) => {
   return b ? "O" : "N";
 };
 const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // return as a number to allow xls cells formulas
-const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
+const formatArray = (arr: any[], sep = ",") =>
+  Array.isArray(arr) ? arr.join(sep) : "";
 const formatArrayWithMissingElements = (arr: any[]) => {
   if (!Array.isArray(arr)) {
     return "";
@@ -75,13 +76,7 @@ const formatTransportMode = (mode?: TransportMode): string => {
       return "";
   }
 };
-/**
- * Clean Final Operation lists
- */
-const formatFinalOperations = (val?: string[]) =>
-  val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
-const formatFinalOperationWeights = (val?: number[]) =>
-  val ? val.map(quant => quant.toFixed(2)).join("; ") : "";
+
 export const formatSubType = (subType?: BsdSubType) => {
   if (!subType) return "";
 
@@ -185,12 +180,12 @@ export const columns: Column[] = [
   {
     field: "parcelCities",
     label: "Parcelle commune",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "parcelPostalCodes",
     label: "Parcelle code postal",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "parcelNumbers",
@@ -246,7 +241,7 @@ export const columns: Column[] = [
   {
     field: "transporterNumberPlates",
     label: "Transporteur immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporterTransportMode",
@@ -297,17 +292,17 @@ export const columns: Column[] = [
   },
   {
     field: "destinationReceptionWeight",
-    label: "Quantité réceptionnée nette",
+    label: "Quantité réceptionnée nette (tonnes)",
     format: formatNumber
   },
   {
     field: "destinationReceptionRefusedWeight",
-    label: "Quantité refusée",
+    label: "Quantité refusée (tonnes)",
     format: formatNumber
   },
   {
     field: "destinationReceptionAcceptedWeight",
-    label: "Quantité acceptée / traitée",
+    label: "Quantité acceptée / traitée (tonnes)",
     format: formatNumber
   },
   {
@@ -330,14 +325,24 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   {
+    field: "destinationFinalOperationCompanySirets",
+    label: "SIRET de la destination finale",
+    format: (v: string[]) => formatArray(v)
+  },
+  {
     field: "destinationFinalOperationCodes",
-    label: "Opération(s) finale(s) réalisée(s) par la traçabilité suite",
-    format: formatFinalOperations
+    label: "Code opération finale réalisée",
+    format: (codes: string[]) =>
+      formatArray(codes.map(c => formatOperationCode(c)))
   },
   {
     field: "destinationFinalOperationWeights",
-    label: "Quantité(s) liée(s)",
-    format: formatFinalOperationWeights
+    label: "Quantité finale (tonnes)",
+    format: (quantities: number[]) =>
+      formatArray(
+        quantities.map(q => q.toLocaleString("fr")),
+        " - "
+      )
   },
   {
     field: "nextDestinationNotificationNumber",
@@ -366,7 +371,7 @@ export const columns: Column[] = [
   {
     field: "transporter2NumberPlates",
     label: "Transporteur n°2 immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporter2TransportMode",
@@ -397,7 +402,7 @@ export const columns: Column[] = [
   {
     field: "transporter3NumberPlates",
     label: "Transporteur n°3 immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporter3TransportMode",
@@ -428,7 +433,7 @@ export const columns: Column[] = [
   {
     field: "transporter4NumberPlates",
     label: "Transporteur n°4 immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporter4TransportMode",
@@ -459,7 +464,7 @@ export const columns: Column[] = [
   {
     field: "transporter5NumberPlates",
     label: "Transporteur n°5 immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporter5TransportMode",

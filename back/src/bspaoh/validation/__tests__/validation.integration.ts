@@ -347,7 +347,10 @@ describe("BSPAOH validation", () => {
     });
 
     test("when destination is registered with wrong profile", async () => {
-      const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+      const company = await companyFactory({
+        companyTypes: ["PRODUCER"],
+        wasteProcessorTypes: []
+      });
       const bspaoh = await bspaohFactory({});
       const data = {
         ...bspaoh,
@@ -467,7 +470,13 @@ describe("BSPAOH validation", () => {
   it("should be possible to update any fields when bspaoh status is SIGNED_BY_PRODUCER", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const { company: destinationCompany } = await userWithCompanyFactory();
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      }
+    );
     const bspaoh = await bspaohFactory({
       opt: {
         transporters: {

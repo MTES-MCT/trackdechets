@@ -13,6 +13,7 @@ import { bsdasriFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { BsdasriType } from "@prisma/client";
 import { companyFactory } from "../../__tests__/factories";
+import { siretify } from "../../__tests__/factories";
 
 describe("toGenericWaste", () => {
   afterAll(resetDatabase);
@@ -107,23 +108,39 @@ describe("toOutgoingWaste", () => {
     "should compute destinationFinalOperationCodes" +
       " and destinationfinalOperationWeights",
     async () => {
-      const finalBsdasri1 = await bsdasriFactory({});
-      const finalBsdasri2 = await bsdasriFactory({});
-
-      const form = await bsdasriFactory({
+      const finalBsdasri1 = await bsdasriFactory({
         opt: {
+          destinationOperationCode: "R 5",
+          destinationOperationSignatureDate: new Date(),
+          destinationReceptionWasteWeightValue: 1,
+          destinationCompanySiret: siretify()
+        }
+      });
+      const finalBsdasri2 = await bsdasriFactory({
+        opt: {
+          destinationOperationCode: "D 5",
+          destinationOperationSignatureDate: new Date(),
+          destinationReceptionWasteWeightValue: 2,
+          destinationCompanySiret: siretify()
+        }
+      });
+
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          destinationOperationCode: "D 13",
+          destinationOperationSignatureDate: new Date(),
           finalOperations: {
             createMany: {
               data: [
                 {
                   finalBsdasriId: finalBsdasri1.id,
-                  operationCode: "R 5",
-                  quantity: 1
+                  operationCode: finalBsdasri1.destinationOperationCode!,
+                  quantity: finalBsdasri1.destinationReceptionWasteWeightValue!
                 },
                 {
                   finalBsdasriId: finalBsdasri2.id,
-                  operationCode: "D 5",
-                  quantity: 2
+                  operationCode: finalBsdasri2.destinationOperationCode!,
+                  quantity: finalBsdasri2.destinationReceptionWasteWeightValue!
                 }
               ]
             }
@@ -131,15 +148,66 @@ describe("toOutgoingWaste", () => {
         }
       });
       const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
-        where: { id: form.id },
+        where: { id: bsdasri.id },
         include: RegistryBsdasriInclude
       });
       const waste = toOutgoingWaste(bsdasriForRegistry);
       expect(waste.destinationFinalOperationCodes).toStrictEqual([
-        "R 5",
-        "D 5"
+        finalBsdasri1.destinationOperationCode,
+        finalBsdasri2.destinationOperationCode
       ]);
-      expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([
+        finalBsdasri1.destinationReceptionWasteWeightValue
+          ?.dividedBy(1000)
+          .toNumber(),
+        finalBsdasri2.destinationReceptionWasteWeightValue
+          ?.dividedBy(1000)
+          .toNumber()
+      ]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([
+        finalBsdasri1.destinationCompanySiret,
+        finalBsdasri2.destinationCompanySiret
+      ]);
+    }
+  );
+
+  test(
+    "destinationFinalOperationCodes and destinationfinalOperationWeights should be empty" +
+      " when bsdasri has a final operation",
+    async () => {
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          destinationOperationCode: "R 1",
+          destinationOperationSignatureDate: new Date(),
+          destinationReceptionWasteWeightValue: 1
+        }
+      });
+
+      await prisma.bsdasri.update({
+        where: { id: bsdasri.id },
+        data: {
+          finalOperations: {
+            createMany: {
+              data: [
+                {
+                  finalBsdasriId: bsdasri.id,
+                  operationCode: bsdasri.destinationOperationCode!,
+                  quantity: bsdasri.destinationReceptionWasteWeightValue!
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+        where: { id: bsdasri.id },
+        include: RegistryBsdasriInclude
+      });
+      const waste = toOutgoingWaste(bsdasriForRegistry);
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([]);
     }
   );
 
@@ -342,23 +410,39 @@ describe("toAllWaste", () => {
     "should compute destinationFinalOperationCodes" +
       " and destinationfinalOperationWeights",
     async () => {
-      const finalBsdasri1 = await bsdasriFactory({});
-      const finalBsdasri2 = await bsdasriFactory({});
+      const finalBsdasri1 = await bsdasriFactory({
+        opt: {
+          destinationOperationCode: "R 5",
+          destinationOperationSignatureDate: new Date(),
+          destinationReceptionWasteWeightValue: 1,
+          destinationCompanySiret: siretify()
+        }
+      });
+      const finalBsdasri2 = await bsdasriFactory({
+        opt: {
+          destinationOperationCode: "D 5",
+          destinationOperationSignatureDate: new Date(),
+          destinationReceptionWasteWeightValue: 2,
+          destinationCompanySiret: siretify()
+        }
+      });
 
       const form = await bsdasriFactory({
         opt: {
+          destinationOperationCode: "D 13",
+          destinationOperationSignatureDate: new Date(),
           finalOperations: {
             createMany: {
               data: [
                 {
                   finalBsdasriId: finalBsdasri1.id,
-                  operationCode: "R 5",
-                  quantity: 1
+                  operationCode: finalBsdasri1.destinationOperationCode!,
+                  quantity: finalBsdasri1.destinationReceptionWasteWeightValue!
                 },
                 {
                   finalBsdasriId: finalBsdasri2.id,
-                  operationCode: "D 5",
-                  quantity: 2
+                  operationCode: finalBsdasri2.destinationOperationCode!,
+                  quantity: finalBsdasri2.destinationReceptionWasteWeightValue!
                 }
               ]
             }
@@ -371,10 +455,61 @@ describe("toAllWaste", () => {
       });
       const waste = toAllWaste(bsdasriForRegistry);
       expect(waste.destinationFinalOperationCodes).toStrictEqual([
-        "R 5",
-        "D 5"
+        finalBsdasri1.destinationOperationCode,
+        finalBsdasri2.destinationOperationCode
       ]);
-      expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([
+        finalBsdasri1.destinationReceptionWasteWeightValue
+          ?.dividedBy(1000)
+          .toNumber(),
+        finalBsdasri2.destinationReceptionWasteWeightValue
+          ?.dividedBy(1000)
+          .toNumber()
+      ]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([
+        finalBsdasri1.destinationCompanySiret,
+        finalBsdasri2.destinationCompanySiret
+      ]);
+    }
+  );
+
+  test(
+    "destinationFinalOperationCodes and destinationfinalOperationWeights should be empty" +
+      " when bsdasri has a final operation",
+    async () => {
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          destinationOperationCode: "R 1",
+          destinationOperationSignatureDate: new Date(),
+          destinationReceptionWasteWeightValue: 1
+        }
+      });
+
+      await prisma.bsdasri.update({
+        where: { id: bsdasri.id },
+        data: {
+          finalOperations: {
+            createMany: {
+              data: [
+                {
+                  finalBsdasriId: bsdasri.id,
+                  operationCode: bsdasri.destinationOperationCode!,
+                  quantity: bsdasri.destinationReceptionWasteWeightValue!
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+        where: { id: bsdasri.id },
+        include: RegistryBsdasriInclude
+      });
+      const waste = toAllWaste(bsdasriForRegistry);
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([]);
     }
   );
 

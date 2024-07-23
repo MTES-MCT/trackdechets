@@ -50,6 +50,7 @@ const CompanySelector = ({
   const handleOnSelect = (company: CompanySearchResult) => {
     setShouldDisplayResults(false);
     onSelect(company);
+    setSearchString("");
   };
 
   const displayResults = () => {

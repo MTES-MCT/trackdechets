@@ -6,6 +6,8 @@
   max-height: 700px;
   padding: 0 8px;
   border-right: solid 1px $grey-light;
+  position: sticky;
+  top: 56px;
 
   &__item {
     display: block;

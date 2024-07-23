@@ -1,5 +1,4 @@
 import {
-  BsddFinalOperation,
   IntermediaryFormAssociation,
   QuantityType,
   Status
@@ -267,11 +266,9 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
   forwardedIn: (Bsdd & { grouping: Bsdd[] }) | null;
 } & {
   forwarding: (Bsdd & { grouping: Bsdd[] }) | null;
-} & {
-  finalOperations: BsddFinalOperation[];
-} & {
-  intermediaries: IntermediaryFormAssociation[] | null;
-} {
+} & Pick<RegistryForm, "finalOperations"> & {
+    intermediaries: IntermediaryFormAssociation[] | null;
+  } {
   let grouping: Bsdd[] = [];
 
   if (form.grouping) {

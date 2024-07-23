@@ -15,6 +15,7 @@ import {
 import { searchCompany } from "../../../../companies/search";
 import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";
+import { crematoriumFactory } from "../../../__tests__/factories";
 
 jest.mock("../../../../companies/search");
 
@@ -142,7 +143,7 @@ describe("Mutation.duplicateBspaoh", () => {
       await prisma.transporterReceipt.findUniqueOrThrow({
         where: { id: transporterCompany.transporterReceiptId! }
       });
-    const destinationCompany = await companyFactory();
+    const destinationCompany = await crematoriumFactory();
     const bspaoh = await bspaohFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
@@ -343,7 +344,7 @@ describe("Mutation.duplicateBspaoh", () => {
       await prisma.transporterReceipt.findUniqueOrThrow({
         where: { id: transporterCompany.transporterReceiptId! }
       });
-    const destinationCompany = await companyFactory();
+    const destinationCompany = await crematoriumFactory();
 
     const bspaoh = await bspaohFactory({
       opt: {

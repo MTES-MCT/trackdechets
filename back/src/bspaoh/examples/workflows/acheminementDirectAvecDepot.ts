@@ -15,7 +15,11 @@ export default {
   companies: [
     { name: "emetteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur", companyTypes: ["TRANSPORTER"] },
-    { name: "crematorium", companyTypes: ["CREMATORIUM"] }
+    {
+      name: "crematorium",
+      companyTypes: ["WASTEPROCESSOR"],
+      opt: { wasteProcessorTypes: ["CREMATION"] }
+    }
   ],
   steps: [
     createBspaoh("emetteur"),

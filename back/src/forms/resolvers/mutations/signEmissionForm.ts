@@ -103,7 +103,7 @@ const signatures: Partial<
     await validateBeforeEmission(futureForm as Form);
 
     const updatedForm = await getFormRepository(user).update(
-      { id: existingForm.id },
+      { id: existingForm.id, status: existingForm.status },
       {
         status: transitionForm(existingForm, {
           type: EventType.SignedByProducer,
@@ -179,7 +179,7 @@ const signatures: Partial<
     await validateBeforeEmission(futureFullForm.forwardedIn as Form);
 
     const updatedForm = await getFormRepository(user).update(
-      { id: existingForm.id },
+      { id: existingForm.id, status: existingForm.status },
       {
         status: transitionForm(existingForm, {
           type: EventType.SignedByTempStorer,

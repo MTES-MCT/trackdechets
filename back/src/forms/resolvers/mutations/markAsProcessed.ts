@@ -111,7 +111,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
       getFormRepository(user, transaction);
 
     const processedForm = await update(
-      { id: form.id },
+      { id: form.id, status: form.status },
       {
         status: transitionForm(form, {
           type: EventType.MarkAsProcessed,

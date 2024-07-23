@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../integration-tests/helper";
-import { bspaohFactory } from "./factories";
+import { bspaohFactory, crematoriumFactory } from "./factories";
 
 describe("Test Factories", () => {
   afterEach(resetDatabase);
@@ -16,5 +16,12 @@ describe("Test Factories", () => {
     expect(paoh.transportersSirets).toEqual([
       paoh.transporters[0].transporterCompanySiret
     ]);
+  });
+
+  test("should create a crematorium", async () => {
+    const crematorium = await crematoriumFactory();
+    expect(crematorium.id).toBeTruthy();
+    expect(crematorium.companyTypes).toEqual(["WASTEPROCESSOR"]);
+    expect(crematorium.wasteProcessorTypes).toEqual(["CREMATION"]);
   });
 });

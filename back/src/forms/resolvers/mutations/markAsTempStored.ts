@@ -75,7 +75,7 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   const tempStoredForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
     const tempStoredForm = await formRepository.update(
-      { id: form.id },
+      { id: form.id, status: form.status },
       {
         status: transitionForm(form, {
           type: EventType.MarkAsTempStored,
