@@ -1,7 +1,6 @@
 import { Bsda } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   BsdSubType,
@@ -384,8 +383,6 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     ...emptyIncomingWaste,
     ...genericWaste,
     destinationReceptionDate: bsda.destinationReceptionDate,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -486,16 +483,6 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
     destinationPlannedOperationMode: null,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toNumber()
       : null,
