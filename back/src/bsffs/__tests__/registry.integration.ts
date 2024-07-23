@@ -17,6 +17,7 @@ import {
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { BsffType } from "@prisma/client";
+import { OPERATION } from "../constants";
 
 const createBsffWith5Transporters = async () => {
   const transporter1 = await userWithCompanyFactory("MEMBER", {
@@ -87,11 +88,14 @@ describe("toOutgoingWaste", () => {
       const ttr = await userWithCompanyFactory("MEMBER");
       const destination = await userWithCompanyFactory("MEMBER");
 
-      const finalBsff = await createBsffAfterOperation({
-        emitter: ttr,
-        transporter,
-        destination
-      });
+      const finalBsff = await createBsffAfterOperation(
+        {
+          emitter: ttr,
+          transporter,
+          destination
+        },
+        { packagingData: { operationCode: "R 1", acceptationWeight: 1 } }
+      );
 
       const finalPackaging = finalBsff.packagings[0];
 
@@ -103,11 +107,13 @@ describe("toOutgoingWaste", () => {
         },
         {
           packagingData: {
+            operationCode: "D 13",
+            operationSignatureDate: new Date(),
             finalOperations: {
               create: {
                 finalBsffPackagingId: finalPackaging.id,
-                quantity: 1,
-                operationCode: "R 1",
+                quantity: finalPackaging.acceptationWeight!,
+                operationCode: finalPackaging.operationCode!,
                 noTraceability: false
               }
             }
@@ -120,7 +126,66 @@ describe("toOutgoingWaste", () => {
       });
       const waste = toOutgoingWaste(bsffForRegistry);
       expect(waste.destinationFinalOperationCodes).toStrictEqual(["R 1"]);
-      expect(waste.destinationFinalOperationWeights).toStrictEqual([1]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([0.001]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([
+        destination.company.siret
+      ]);
+    }
+  );
+
+  test(
+    "destinationFinalOperationCodes and destinationfinalOperationWeights should be empty" +
+      " when BSFF has a final operation",
+    async () => {
+      const emitter = await userWithCompanyFactory("MEMBER");
+      const transporter = await userWithCompanyFactory("MEMBER");
+      const destination = await userWithCompanyFactory("MEMBER");
+
+      const bsff = await createBsffAfterOperation(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        {
+          packagingData: {
+            operationCode: OPERATION.R1.code,
+            operationSignatureDate: new Date()
+          }
+        }
+      );
+
+      const packaging = bsff.packagings[0];
+
+      await prisma.bsff.update({
+        where: { id: bsff.id },
+        data: {
+          packagings: {
+            update: {
+              where: { id: bsff.packagings[0].id },
+              data: {
+                finalOperations: {
+                  create: {
+                    finalBsffPackagingId: packaging.id,
+                    quantity: packaging.acceptationWeight!,
+                    operationCode: packaging.operationCode!,
+                    noTraceability: false
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+        where: { id: bsff.id },
+        include: RegistryBsffInclude
+      });
+      const waste = toOutgoingWaste(bsffForRegistry);
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([]);
     }
   );
 
@@ -309,11 +374,14 @@ describe("toAllWaste", () => {
       const ttr = await userWithCompanyFactory("MEMBER");
       const destination = await userWithCompanyFactory("MEMBER");
 
-      const finalBsff = await createBsffAfterOperation({
-        emitter: ttr,
-        transporter,
-        destination
-      });
+      const finalBsff = await createBsffAfterOperation(
+        {
+          emitter: ttr,
+          transporter,
+          destination
+        },
+        { packagingData: { operationCode: "R 1", acceptationWeight: 1 } }
+      );
 
       const finalPackaging = finalBsff.packagings[0];
 
@@ -325,24 +393,95 @@ describe("toAllWaste", () => {
         },
         {
           packagingData: {
+            operationCode: "D 13",
+            operationSignatureDate: new Date(),
             finalOperations: {
               create: {
                 finalBsffPackagingId: finalPackaging.id,
-                quantity: 1,
-                operationCode: "R 1",
+                quantity: finalPackaging.acceptationWeight!,
+                operationCode: finalPackaging.operationCode!,
                 noTraceability: false
               }
             }
           }
         }
       );
+
+      await prisma.bsffPackaging.update({
+        where: { id: finalPackaging.id },
+        data: {
+          previousPackagings: {
+            connect: bsff.packagings.map(p => ({ id: p.id }))
+          }
+        }
+      });
+
       const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff.id },
         include: RegistryBsffInclude
       });
       const waste = toAllWaste(bsffForRegistry);
       expect(waste.destinationFinalOperationCodes).toStrictEqual(["R 1"]);
-      expect(waste.destinationFinalOperationWeights).toStrictEqual([1]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([0.001]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([
+        destination.company.siret
+      ]);
+    }
+  );
+
+  test(
+    "destinationFinalOperationCodes and destinationfinalOperationWeights should be empty" +
+      " when BSFF has a final operation",
+    async () => {
+      const emitter = await userWithCompanyFactory("MEMBER");
+      const transporter = await userWithCompanyFactory("MEMBER");
+      const destination = await userWithCompanyFactory("MEMBER");
+
+      const bsff = await createBsffAfterOperation(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        {
+          packagingData: {
+            operationCode: OPERATION.R1.code,
+            operationSignatureDate: new Date()
+          }
+        }
+      );
+
+      const packaging = bsff.packagings[0];
+
+      await prisma.bsff.update({
+        where: { id: bsff.id },
+        data: {
+          packagings: {
+            update: {
+              where: { id: bsff.packagings[0].id },
+              data: {
+                finalOperations: {
+                  create: {
+                    finalBsffPackagingId: packaging.id,
+                    quantity: packaging.acceptationWeight!,
+                    operationCode: packaging.operationCode!,
+                    noTraceability: false
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+        where: { id: bsff.id },
+        include: RegistryBsffInclude
+      });
+      const waste = toAllWaste(bsffForRegistry);
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([]);
     }
   );
 

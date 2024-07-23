@@ -17,6 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout de la possibilité de gérer les rôles des membres d'une entreprise depuis la liste des membres [PR 3384](https://github.com/MTES-MCT/trackdechets/pull/3384)
 - Ajout d'une gestion des membres d'entreprises pour les admin Trackdéchets [PR 3384](https://github.com/MTES-MCT/trackdechets/pull/3384)
+- Ajout du N°SIRET de la destination finale sur les registres sortants et exhaustifs [PR 3447](https://github.com/MTES-MCT/trackdechets/pull/3447)
 
 #### :bug: Corrections de bugs
 
@@ -25,6 +26,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Le champ allowBsdasriTakeOverWithoutSignature est désormais retourné par la requête companyInfos même pour des entreprises non-diffusibles [PR 3399](https://github.com/MTES-MCT/trackdechets/pull/3399)
 - Le volume total d'un DASRI est désormais un Float, et déprécié [PR 3398](https://github.com/MTES-MCT/trackdechets/pull/3398)
 - Une déchetterie (WASTE_CENTER) non vérifiée peut désormais créer un BSDA COLLECTION_2710 [PR 3436](https://github.com/MTES-MCT/trackdechets/pull/3436)
+- Corriger les données remontées dans la colonne Quantité(s) liée(s) [PR 3447](https://github.com/MTES-MCT/trackdechets/pull/3447)
 
 #### :boom: Breaking changes
 

@@ -1,9 +1,9 @@
-import { BsdSubType, IncomingWaste } from "../../generated/graphql/types";
+import { BsdSubType, AllWaste } from "../../generated/graphql/types";
 import { CUSTOM_WASTE_COLUMNS, formatRow, formatSubType } from "../columns";
 
 describe("formatRow", () => {
   it("should format waste", () => {
-    const waste: IncomingWaste = {
+    const waste: AllWaste = {
       bsdType: "BSDA",
       brokerCompanyName: "broker",
       brokerCompanySiret: "broker_siret",
@@ -35,7 +35,13 @@ describe("formatRow", () => {
       transporterTransportMode: "ROAD",
       wasteCode: "01 01 01*",
       wasteDescription: "déchets dangereux",
-      destinationPlannedOperationCode: "R10"
+      destinationPlannedOperationCode: "R10",
+      destinationFinalOperationCodes: ["R1", "R2"],
+      destinationFinalOperationWeights: [1.24, 2.78],
+      destinationFinalOperationCompanySirets: [
+        "85001946400021",
+        "88792840600024"
+      ]
     };
     const formatted = formatRow(waste);
     // Fields in the waste object + custom fields added for user convenience
@@ -75,7 +81,10 @@ describe("formatRow", () => {
       destinationOperationMode: "RECYCLAGE",
       destinationReceptionDate: "2021-01-01",
       destinationReceptionWeight: 1.2,
-      destinationPlannedOperationCode: "R10"
+      destinationPlannedOperationCode: "R10",
+      destinationFinalOperationCodes: "R1,R2",
+      destinationFinalOperationWeights: "1,24 - 2,78",
+      destinationFinalOperationCompanySirets: "85001946400021,88792840600024"
     });
     const formattedWithLabels = formatRow(waste, true);
     expect(formattedWithLabels).toEqual({
@@ -111,7 +120,10 @@ describe("formatRow", () => {
       "Code opération prévu": "R10",
       "Mode de traitement réalisé": "RECYCLAGE",
       "Date de réception": "2021-01-01",
-      "Quantité de déchet entrant (t)": 1.2
+      "Quantité de déchet entrant (tonnes)": 1.2,
+      "Code opération finale réalisée": "R1,R2",
+      "Quantité finale (tonnes)": "1,24 - 2,78",
+      "SIRET de la destination finale": "85001946400021,88792840600024"
     });
     expect(Object.keys(formattedWithLabels).length).toEqual(
       Object.keys(waste).length + CUSTOM_WASTE_COLUMNS.length
