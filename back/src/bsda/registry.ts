@@ -237,7 +237,7 @@ export const getSubType = (bsda: RegistryBsda): BsdSubType => {
   return bsda.type;
 };
 
-function toGenericWaste(bsda: RegistryBsda): GenericWaste {
+export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
@@ -258,9 +258,14 @@ function toGenericWaste(bsda: RegistryBsda): GenericWaste {
       bsda.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsda.destinationOperationDate,
     destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight.dividedBy(1000).toNumber()
+      ? bsda.destinationReceptionWeight
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
-
+    weight: bsda.weightValue
+      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,

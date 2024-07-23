@@ -22,6 +22,7 @@ import { toBsffDestination } from "./compat";
 import { RegistryBsff } from "../registry/elastic";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { BsffWithTransporters } from "./types";
+import Decimal from "decimal.js";
 import { isFinalOperation } from "./constants";
 
 const getOperationData = (bsff: RegistryBsff) => {
@@ -227,8 +228,14 @@ export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     destinationReceptionAcceptationStatus:
       bsffDestination.receptionAcceptationStatus,
     destinationOperationDate: bsffDestination.operationDate,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     destinationReceptionWeight: bsffDestination.receptionWeight
-      ? bsffDestination.receptionWeight / 1000
+      ? new Decimal(bsffDestination.receptionWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : bsffDestination.receptionWeight,
     wasteAdr: bsff.wasteAdr,
     workerCompanyName: null,

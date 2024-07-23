@@ -17,6 +17,7 @@ import {
   emptyTransportedWaste
 } from "../registry/types";
 import { getWasteDescription } from "./utils";
+import Decimal from "decimal.js";
 
 const getOperationData = (bsvhu: Bsvhu) => ({
   destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
@@ -105,12 +106,22 @@ export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
       bsvhu.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsvhu.destinationOperationDate,
     destinationReceptionWeight: bsvhu.destinationReceptionWeight
-      ? bsvhu.destinationReceptionWeight / 1000
+      ? new Decimal(bsvhu.destinationReceptionWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : bsvhu.destinationReceptionWeight,
     wasteAdr: null,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    weight: bsvhu.weightValue
+      ? new Decimal(bsvhu.weightValue)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : bsvhu.weightValue,
+    ...getTransporterData(bsvhu),
     destinationCompanyMail: bsvhu.destinationCompanyMail
   };
 }
@@ -169,6 +180,7 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
+    ...getOperationData(bsvhu),
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     ...getOperationData(bsvhu),
     ...getTransporterData(bsvhu)

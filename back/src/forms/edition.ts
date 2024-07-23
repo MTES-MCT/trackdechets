@@ -32,6 +32,7 @@ type EditableBsddFields = Required<
     | "isAccepted"
     | "receivedAt"
     | "quantityReceived"
+    | "quantityRefused"
     | "quantityReceivedType"
     | "processingOperationDone"
     | "destinationOperationMode"

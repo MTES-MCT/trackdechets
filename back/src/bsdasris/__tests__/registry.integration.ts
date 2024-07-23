@@ -15,6 +15,27 @@ import { BsdasriType } from "@prisma/client";
 import { companyFactory } from "../../__tests__/factories";
 import { siretify } from "../../__tests__/factories";
 
+describe("toGenericWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain destinationCompanyMail", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: { destinationCompanyMail: "destination@mail.com" }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toGenericWaste(bsdasriForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyMail).toBe("destination@mail.com");
+  });
+});
+
 describe("toIncomingWaste", () => {
   afterAll(resetDatabase);
 
@@ -53,6 +74,30 @@ describe("toIncomingWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const wasteRegistry = toIncomingWaste(bsdasriForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
   });
 });
 
@@ -166,6 +211,30 @@ describe("toOutgoingWaste", () => {
     }
   );
 
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const wasteRegistry = toOutgoingWaste(bsdasriForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+
   it("should contain transporters info except plates", async () => {
     // Given
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
@@ -204,49 +273,30 @@ describe("toOutgoingWaste", () => {
   });
 });
 
-describe("toManagedWaste", () => {
+describe("toTransportedWaste", () => {
   afterAll(resetDatabase);
 
-  it("should contain transporters info except plates", async () => {
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
     // Given
-    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-    const dasri = await bsdasriFactory({
+    const bsdasri = await bsdasriFactory({
       opt: {
-        destinationCompanyMail: "destination@mail.com",
-        transporterCompanySiret: transporter.siret,
-        transporterTransportPlates: ["TRANSPORTER-NBR-PLATES"]
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
       }
     });
 
     // When
-    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
-      where: { id: dasri.id },
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
       include: RegistryBsdasriInclude
     });
-    const waste = toManagedWaste(dasriForRegistry);
+    const wasteRegistry = toTransportedWaste(bsdasriForRegistry);
 
     // Then
-    expect(waste.transporterCompanySiret).toBe(
-      dasriForRegistry.transporterCompanySiret
-    );
-    expect(waste["transporterNumberPlates"]).toBeUndefined();
-
-    expect(waste.transporter2CompanySiret).toBeNull();
-    expect(waste["transporter2NumberPlates"]).toBeUndefined();
-
-    expect(waste.transporter3CompanySiret).toBeNull();
-    expect(waste["transporter3NumberPlates"]).toBeUndefined();
-
-    expect(waste.transporter4CompanySiret).toBeNull();
-    expect(waste["transporter4NumberPlates"]).toBeUndefined();
-
-    expect(waste.transporter5CompanySiret).toBeNull();
-    expect(waste["transporter5NumberPlates"]).toBeUndefined();
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
   });
-});
-
-describe("toTransportedWaste", () => {
-  afterAll(resetDatabase);
 
   it("should contain transporters info including plates", async () => {
     // Given
@@ -285,6 +335,71 @@ describe("toTransportedWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste.transporter5NumberPlates).toBeNull();
+  });
+});
+
+describe("toManagedWaste", () => {
+  afterAll(resetDatabase);
+
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const wasteRegistry = toManagedWaste(bsdasriForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+
+  it("should contain transporters info except plates", async () => {
+    // Given
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    const dasri = await bsdasriFactory({
+      opt: {
+        destinationCompanyMail: "destination@mail.com",
+        transporterCompanySiret: transporter.siret,
+        transporterTransportPlates: ["TRANSPORTER-NBR-PLATES"]
+      }
+    });
+
+    // When
+    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toManagedWaste(dasriForRegistry);
+
+    // Then
+    expect(waste.transporterCompanySiret).toBe(
+      dasriForRegistry.transporterCompanySiret
+    );
+    expect(waste["transporterNumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter2CompanySiret).toBeNull();
+    expect(waste["transporter2NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter3CompanySiret).toBeNull();
+    expect(waste["transporter3NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter4CompanySiret).toBeNull();
+    expect(waste["transporter4NumberPlates"]).toBeUndefined();
+
+    expect(waste.transporter5CompanySiret).toBeNull();
+    expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
 });
 
@@ -398,6 +513,30 @@ describe("toAllWaste", () => {
     }
   );
 
+  it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterWasteWeightValue: 56.5,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWasteWeightValue: 78.9
+      }
+    });
+
+    // Given
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const wasteRegistry = toAllWaste(bsdasriForRegistry);
+
+    // Then
+    expect(wasteRegistry.weight).toBe(0.0565);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+
   it("should contain transporters info including plates", async () => {
     // Given
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
@@ -435,27 +574,6 @@ describe("toAllWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste.transporter5NumberPlates).toBeNull();
-  });
-});
-
-describe("toGenericWaste", () => {
-  afterAll(resetDatabase);
-
-  it("should contain destinationCompanyMail", async () => {
-    // Given
-    const bsdasri = await bsdasriFactory({
-      opt: { destinationCompanyMail: "destination@mail.com" }
-    });
-
-    // When
-    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
-      where: { id: bsdasri.id },
-      include: RegistryBsdasriInclude
-    });
-    const waste = toGenericWaste(bsdasriForRegistry);
-
-    // Then
-    expect(waste.destinationCompanyMail).toBe("destination@mail.com");
   });
 });
 

@@ -170,12 +170,22 @@ export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
       bsdasri.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdasri.destinationOperationDate,
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue.dividedBy(1000).toNumber()
+      ? bsdasri.destinationReceptionWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
     wasteAdr: bsdasri.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    weight: bsdasri.emitterWasteWeightValue
+      ? bsdasri.emitterWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
+    ...getTransporterData(bsdasri),
     destinationCompanyMail: bsdasri.destinationCompanyMail
   };
 }
