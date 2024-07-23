@@ -1242,11 +1242,13 @@ const canDuplicateBsdd = bsd =>
 
 export const canDuplicateBsff = (bsd, siret) => {
   const emitterSiret = bsd.emitter?.company?.siret;
-  const transporterSiret = bsd.transporter?.company?.siret;
+  const transporterOrgsIds = bsd.transporters?.map(t => t.company?.orgId);
   const destinationSiret = bsd.destination?.company?.siret;
   return (
     bsd.type === BsdType.Bsff &&
-    [emitterSiret, transporterSiret, destinationSiret].includes(siret)
+    [emitterSiret, destinationSiret, ...transporterOrgsIds]
+      .filter(Boolean)
+      .includes(siret)
   );
 };
 
