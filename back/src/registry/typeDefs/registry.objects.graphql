@@ -43,18 +43,40 @@ type IncomingWaste {
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
+  "Le code postal du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyPostalCode: String
+  "La ville du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCity: String
+  "Le pays (isoCode) du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCountry: String
+
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
   "Le numéro SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
   "L'adresse de l'établissement expéditeur des déchets"
   emitterCompanyAddress: String
+  "Le code postal de l'établissement expéditeur des déchets"
+  emitterCompanyPostalCode: String
+  "La ville de l'établissement expéditeur des déchets"
+  emitterCompanyCity: String
+  "Le pays de l'établissement expéditeur des déchets"
+  emitterCompanyCountry: String
+
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement expéditeur des déchets"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
+
   "La quantité de déchet sortant en tonne"
   weight: Float
+
   """
   la raison sociale de l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
   le cadre d'une filière à responsabilité élargie du producteur définie à l'article L. 541-10-1 du code de l'environnement
@@ -87,6 +109,12 @@ type IncomingWaste {
   transporterCompanySiret: String
   "L'adresse du transporteur"
   transporterCompanyAddress: String
+  "Le code postal du transporteur"
+  transporterCompanyPostalCode: String
+  "La ville du transporteur"
+  transporterCompanyCity: String
+  "Le pays du transporteur"
+  transporterCompanyCountry: String
   "Le numéro de récépissé du trasnporteur mentionné à l'article R. 541-53 du code de l'environnement"
   transporterRecepisseNumber: String
   "Le mode de transport utilisé par le transporteur"
@@ -96,8 +124,14 @@ type IncomingWaste {
   transporter2CompanyName: String
   "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
-  "L'adresse du transporteur n°2 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
+  "Le code postal du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyPostalCode: String
+  "La ville du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCity: String
+  "Le pays du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCountry: String
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
   transporter2RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
@@ -107,8 +141,14 @@ type IncomingWaste {
   transporter3CompanyName: String
   "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
-  "L'adresse du transporteur n°3 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
+  "Le code postal du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyPostalCode: String
+  "La ville du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCity: String
+  "Le pays du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCountry: String
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
   transporter3RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
@@ -118,8 +158,14 @@ type IncomingWaste {
   transporter4CompanyName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
-  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
+  "Le code postal du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyPostalCode: String
+  "La ville du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCity: String
+  "Le pays du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCountry: String
   "Le récepissé transporteur n°4 (en cas de transport multimodal)"
   transporter4RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
@@ -129,8 +175,14 @@ type IncomingWaste {
   transporter5CompanyName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
-  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
+  "Le code postal du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyPostalCode: String
+  "La ville du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCity: String
+  "Le pays du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCountry: String
   "Le récepissé transporteur n°5 (en cas de transport multimodal)"
   transporter5RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
@@ -146,6 +198,12 @@ type IncomingWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
 
   "Le code du traitement qui va être opéré dans l'installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;"
   destinationPlannedOperationCode: String
@@ -282,6 +340,12 @@ type IncomingWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 }
 
 type IncomingWasteEdge {
@@ -337,16 +401,34 @@ type OutgoingWaste {
 
   "L'adresse de l'établissement"
   emitterCompanyAddress: String
+  "Le code postal de l'établissement"
+  emitterCompanyPostalCode: String
+  "La ville de l'établissement"
+  emitterCompanyCity: String
+  "Le pays de l'établissement"
+  emitterCompanyCountry: String
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyName: String
   "Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
+  "Le code postal du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyPostalCode: String
+  "La ville du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCity: String
+  "Le pays (isoCode) du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCountry: String
 
   #########################################################################
   # d) Concernant la localisation des terres (parcelles) pour la traçabilité des terres et sédiments
@@ -407,6 +489,12 @@ type OutgoingWaste {
   transporterRecepisseNumber: String
   "L'adresse du transporteur"
   transporterCompanyAddress: String
+  "Le code postal du transporteur"
+  transporterCompanyPostalCode: String
+  "La ville du transporteur"
+  transporterCompanyCity: String
+  "Le pays du transporteur"
+  transporterCompanyCountry: String
   "Le mode de transport utilisé par le transporteur"
   transporterTransportMode: TransportMode
 
@@ -414,8 +502,14 @@ type OutgoingWaste {
   transporter2CompanyName: String
   "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
-  "L'adresse du transporteur n°2 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
+  "Le code postal du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyPostalCode: String
+  "La ville du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCity: String
+  "Le pays du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCountry: String
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
   transporter2RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
@@ -425,8 +519,14 @@ type OutgoingWaste {
   transporter3CompanyName: String
   "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
-  "L'adresse du transporteur n°3 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
+  "Le code postal du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyPostalCode: String
+  "La ville du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCity: String
+  "Le pays du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCountry: String
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
   transporter3RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
@@ -436,8 +536,14 @@ type OutgoingWaste {
   transporter4CompanyName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
-  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
+  "Le code postal du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyPostalCode: String
+  "La ville du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCity: String
+  "Le pays du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCountry: String
   "Le récepissé transporteur n°4 (en cas de transport multimodal)"
   transporter4RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
@@ -447,8 +553,14 @@ type OutgoingWaste {
   transporter5CompanyName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
-  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
+  "Le code postal du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyPostalCode: String
+  "La ville du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCity: String
+  "Le pays du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCountry: String
   "Le récepissé transporteur n°5 (en cas de transport multimodal)"
   transporter5RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
@@ -464,6 +576,12 @@ type OutgoingWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
   destinationOperationCode: String
 
@@ -601,6 +719,12 @@ type OutgoingWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 }
 
 type OutgoingWasteEdge {
@@ -656,6 +780,12 @@ type TransportedWaste {
   transporterCompanySiret: String
   "L'adresse du transporteur"
   transporterCompanyAddress: String
+  "Le code postal du transporteur"
+  transporterCompanyPostalCode: String
+  "La ville du transporteur"
+  transporterCompanyCity: String
+  "Le pays du transporteur"
+  transporterCompanyCountry: String
   "Le numéro d'immatriculation du ou des véhicules transportant le déchet"
   transporterNumberPlates: [String!]
   "Le récepissé transporteur"
@@ -671,6 +801,13 @@ type TransportedWaste {
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
+  "Le code postal du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyPostalCode: String
+  "La ville du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCity: String
+  "Le pays du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCountry: String
+
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°2 (en cas de transport multi-modal)"
   transporter2NumberPlates: [String!]
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
@@ -686,6 +823,12 @@ type TransportedWaste {
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
+  "Le code postal du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyPostalCode: String
+  "La ville du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCity: String
+  "Le pays du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCountry: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°3 (en cas de transport multi-modal)"
   transporter3NumberPlates: [String!]
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
@@ -699,8 +842,14 @@ type TransportedWaste {
   transporter4CompanyName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
-  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
+  "Le code postal du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyPostalCode: String
+  "La ville du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCity: String
+  "Le pays du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCountry: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°4 (en cas de transport multi-modal)"
   transporter4NumberPlates: [String!]
   "Le récepissé transporteur n°4 (en cas de transport multimodal)"
@@ -714,8 +863,14 @@ type TransportedWaste {
   transporter5CompanyName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
-  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
+  "Le code postal du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyPostalCode: String
+  "La ville du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCity: String
+  "Le pays du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCountry: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°5 (en cas de transport multi-modal)"
   transporter5NumberPlates: [String!]
   "Le récepissé transporteur n°5 (en cas de transport multimodal)"
@@ -743,10 +898,22 @@ type TransportedWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le code postal de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyPostalCode: String
+  "La ville de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCity: String
+  "Le pays de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCountry: String
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
 
   """
   la raison sociale de l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
@@ -784,6 +951,12 @@ type TransportedWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
   "Extra - La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
   destinationReceptionWeight: Float
 
@@ -869,6 +1042,12 @@ type TransportedWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 
   """
   Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
@@ -975,10 +1154,22 @@ type ManagedWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le code postal de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyPostalCode: String
+  "La ville de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCity: String
+  "Le pays de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCountry: String
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
 
   "La raison sociale du transporteur"
   transporterCompanyName: String
@@ -986,6 +1177,12 @@ type ManagedWaste {
   transporterCompanySiret: String
   "L'adresse du transporteur"
   transporterCompanyAddress: String
+  "Le code postal du transporteur"
+  transporterCompanyPostalCode: String
+  "La ville du transporteur"
+  transporterCompanyCity: String
+  "Le pays du transporteur"
+  transporterCompanyCountry: String
   "Le récepissé transporteur"
   transporterRecepisseNumber: String
   "Le mode de transport utilisé par le transporteur"
@@ -995,8 +1192,14 @@ type ManagedWaste {
   transporter2CompanyName: String
   "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
-  "L'adresse du transporteur n°2 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
+  "Le code postal du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyPostalCode: String
+  "La ville du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCity: String
+  "Le pays du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCountry: String
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
   transporter2RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
@@ -1006,8 +1209,14 @@ type ManagedWaste {
   transporter3CompanyName: String
   "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
-  "L'adresse du transporteur n°3 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
+  "Le code postal du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyPostalCode: String
+  "La ville du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCity: String
+  "Le pays du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCountry: String
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
   transporter3RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
@@ -1017,8 +1226,14 @@ type ManagedWaste {
   transporter4CompanyName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
-  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
+  "Le code postal du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyPostalCode: String
+  "La ville du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCity: String
+  "Le pays du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCountry: String
   "Le récepissé transporteur n°4 (en cas de transport multimodal)"
   transporter4RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
@@ -1028,8 +1243,14 @@ type ManagedWaste {
   transporter5CompanyName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
-  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
+  "Le code postal du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyPostalCode: String
+  "La ville du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCity: String
+  "Le pays du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCountry: String
   "Le récepissé transporteur n°5 (en cas de transport multimodal)"
   transporter5RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
@@ -1045,6 +1266,12 @@ type ManagedWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
   "Le code du traitement qui va être opéré dans l'installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;"
   destinationPlannedOperationCode: String
   "NON IMPLÉMENTÉ - La qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
@@ -1157,6 +1384,12 @@ type ManagedWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 }
 
 type ManagedWasteEdge {
@@ -1249,18 +1482,36 @@ type AllWaste {
   initialEmitterCompanyName: String
   "Le numéro SIRET du producteur initial du déchet"
   initialEmitterCompanySiret: String
-  "L'adresse du producteur initial du déchet"
+  "L'adresse du producteur initial du déchet "
   initialEmitterCompanyAddress: String
+  "Le code postal du producteur initial du déchet"
+  initialEmitterCompanyPostalCode: String
+  "La ville du producteur initial du déchet"
+  initialEmitterCompanyCity: String
+  "Le pays (isoCode) du producteur initial du déchet"
+  initialEmitterCompanyCountry: String
   "La raison sociale de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyName: String
   "Le numéro SIRET de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le code postal de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyPostalCode: String
+  "La ville de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCity: String
+  "Le pays de la personne remettant les déchets au transporteur ou au collecteur"
+  emitterCompanyCountry: String
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
   "La quantité de déchet sortant en tonne"
   weight: Float
 
@@ -1270,6 +1521,12 @@ type AllWaste {
   transporterCompanySiret: String
   "L'adresse du transporteur"
   transporterCompanyAddress: String
+  "Le code postal du transporteur"
+  transporterCompanyPostalCode: String
+  "La ville du transporteur"
+  transporterCompanyCity: String
+  "Le pays du transporteur"
+  transporterCompanyCountry: String
   "Le récepissé transporteur"
   transporterRecepisseNumber: String
   "Le numéro d'immatriculation du ou des véhicules transportant le déchet"
@@ -1283,8 +1540,14 @@ type AllWaste {
   transporter2CompanyName: String
   "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
-  "L'adresse du transporteur n°2 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
+  "Le code postal du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyPostalCode: String
+  "La ville du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCity: String
+  "Le pays du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCountry: String
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
   transporter2RecepisseNumber: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°2 (en cas de transport multimodal)"
@@ -1298,8 +1561,14 @@ type AllWaste {
   transporter3CompanyName: String
   "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
-  "L'adresse du transporteur n°3 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
+  "Le code postal du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyPostalCode: String
+  "La ville du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCity: String
+  "Le pays du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCountry: String
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
   transporter3RecepisseNumber: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°3 (en cas de transport multimodal)"
@@ -1313,8 +1582,14 @@ type AllWaste {
   transporter4CompanyName: String
   "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
-  "L'adresse du transporteur n°4 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
+  "Le code postal du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyPostalCode: String
+  "La ville du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCity: String
+  "Le pays du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCountry: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°4 (en cas de transport multi-modal)"
   transporter4NumberPlates: [String!]
   "Le récepissé transporteur n°4 (en cas de transport multimodal)"
@@ -1328,8 +1603,14 @@ type AllWaste {
   transporter5CompanyName: String
   "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
-  "L'adresse du transporteur n°5 (en cas de transport multimodal)"
+  "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
+  "Le code postal du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyPostalCode: String
+  "La ville du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCity: String
+  "Le pays du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCountry: String
   "Le numéro d'immatriculation du ou des véhicules du transporteur n°5 (en cas de transport multi-modal)"
   transporter5NumberPlates: [String!]
   "Le récepissé transporteur n°5 (en cas de transport multimodal)"
@@ -1381,6 +1662,12 @@ type AllWaste {
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
   destinationOperationCode: String
   "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
@@ -1498,6 +1785,12 @@ type AllWaste {
   workerCompanySiret: String
   "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
 
   "Intermédiaire n°1 - Raison sociale"
   intermediary1CompanyName: String

@@ -1,7 +1,6 @@
 import { Bspaoh, BspaohTransporter } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   IncomingWaste,
@@ -21,18 +20,46 @@ import {
 
 import { getWasteDescription } from "./utils";
 import { getFirstTransporterSync } from "./converter";
+import { splitAddress } from "../common/addresses";
 import Decimal from "decimal.js";
 
-const getTransporterData = (
+const getInitialEmitterData = () => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  return initialEmitter;
+};
+
+export const getTransporterData = (
   bspaoh: Bspaoh & {
     transporters: BspaohTransporter[];
   },
   includePlates = false
 ) => {
   const transporter = getFirstTransporterSync(bspaoh);
+
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    transporter?.transporterCompanyAddress,
+    transporter?.transporterCompanyVatNumber
+  );
+
   const data = {
     transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
@@ -108,6 +135,20 @@ export function toGenericWaste(
     transporters: BspaohTransporter[];
   }
 ): GenericWaste {
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bspaoh.destinationCompanyAddress);
+
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bspaoh.emitterCompanyAddress);
+
   return {
     wasteDescription: bspaoh.wasteCode
       ? getWasteDescription(bspaoh.wasteType)
@@ -140,14 +181,34 @@ export function toGenericWaste(
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+    destinationCompanyMail: bspaoh.destinationCompanyMail,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bspaoh.destinationCompanyName,
+    destinationCompanySiret: bspaoh.destinationCompanySiret,
+    emitterPickupsiteName: bspaoh.emitterPickupSiteName,
+    emitterPickupsiteAddress: bspaoh.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bspaoh.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bspaoh.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bspaoh.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bspaoh.emitterCompanyName,
+    emitterCompanySiret: bspaoh.emitterCompanySiret,
     weight: bspaoh.emitterWasteWeightValue
       ? new Decimal(bspaoh.emitterWasteWeightValue)
           .dividedBy(1000)
           .toDecimalPlaces(6)
           .toNumber()
       : bspaoh.emitterWasteWeightValue,
-    ...getTransporterData(bspaoh),
-    destinationCompanyMail: bspaoh.destinationCompanyMail
+    ...getTransporterData(bspaoh)
   };
 }
 
@@ -161,22 +222,7 @@ export function toIncomingWaste(
   return {
     ...emptyIncomingWaste,
     ...genericWaste,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
     destinationReceptionDate: bspaoh.destinationReceptionDate,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
-    emitterPickupsiteName: bspaoh.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bspaoh.emitterPickupSiteAddress,
-      bspaoh.emitterPickupSitePostalCode,
-      bspaoh.emitterPickupSiteCity
-    ]),
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -191,7 +237,8 @@ export function toIncomingWaste(
     destinationOperationCode: bspaoh.destinationOperationCode,
     destinationOperationMode: "ELIMINATION",
     emitterCompanyMail: bspaoh.emitterCompanyMail,
-    transporterCompanyMail: transporter?.transporterCompanyMail
+    transporterCompanyMail: transporter?.transporterCompanyMail,
+    ...getInitialEmitterData()
   };
 }
 
@@ -208,36 +255,17 @@ export function toOutgoingWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
-    emitterPickupsiteName: bspaoh.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bspaoh.emitterPickupSiteAddress,
-      bspaoh.emitterPickupSitePostalCode,
-      bspaoh.emitterPickupSiteCity
-    ]),
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     ...getTransporterData(bspaoh),
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
-    transporterCompanyName: transporter?.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-    transporterTakenOverAt: transporter?.transporterTakenOverAt,
-    transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     weight: bspaoh.emitterWasteWeightValue
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,
-    transporterCompanyMail: transporter?.transporterCompanyMail
+    transporterCompanyMail: transporter?.transporterCompanyMail,
+    ...getInitialEmitterData()
   };
 }
 
@@ -246,8 +274,6 @@ export function toTransportedWaste(
     transporters: BspaohTransporter[];
   }
 ): TransportedWaste {
-  const transporter = getFirstTransporterSync(bspaoh);
-
   const { __typename, ...genericWaste } = toGenericWaste(bspaoh);
 
   return {
@@ -256,28 +282,15 @@ export function toTransportedWaste(
     ...getTransporterData(bspaoh, true),
     transporterTakenOverAt: bspaoh.transporterTransportTakenOverAt,
     destinationReceptionDate: bspaoh.destinationReceptionDate,
-    transporterCompanyName: transporter?.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
-    transporterNumberPlates: transporter?.transporterTransportPlates,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
-    emitterPickupsiteName: bspaoh.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bspaoh.emitterPickupSiteAddress,
-      bspaoh.emitterPickupSitePostalCode,
-      bspaoh.emitterPickupSiteCity
-    ]),
+    weight: bspaoh.emitterWasteWeightValue
+      ? bspaoh.emitterWasteWeightValue / 1000
+      : bspaoh.emitterWasteWeightValue,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
     emitterCompanyMail: bspaoh.emitterCompanyMail
   };
 }
@@ -301,25 +314,9 @@ export function toManagedWaste(
     traderCompanySiret: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
-    emitterPickupsiteName: bspaoh.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bspaoh.emitterPickupSiteAddress,
-      bspaoh.emitterPickupSitePostalCode,
-      bspaoh.emitterPickupSiteCity
-    ]),
     ...getTransporterData(bspaoh),
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
-    transporterCompanyName: transporter?.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-    transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
     emitterCompanyMail: bspaoh.emitterCompanyMail,
     transporterCompanyMail: transporter?.transporterCompanyMail
   };
@@ -343,30 +340,10 @@ export function toAllWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bspaoh.destinationCompanyAddress,
-    destinationCompanyName: bspaoh.destinationCompanyName,
-    destinationCompanySiret: bspaoh.destinationCompanySiret,
     destinationOperationCode: bspaoh.destinationOperationCode,
     destinationOperationMode: "ELIMINATION",
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bspaoh.emitterCompanyAddress,
-    emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret,
-    emitterPickupsiteName: bspaoh.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bspaoh.emitterPickupSiteAddress,
-      bspaoh.emitterPickupSitePostalCode,
-      bspaoh.emitterPickupSiteCity
-    ]),
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
-    transporterCompanyName: transporter?.transporterCompanyName,
-    transporterCompanySiret: getTransporterCompanyOrgId(transporter),
-    transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
-    transporterNumberPlates: transporter?.transporterTransportPlates,
     weight: bspaoh.emitterWasteWeightValue
       ? bspaoh.emitterWasteWeightValue / 1000
       : bspaoh.emitterWasteWeightValue,
@@ -374,6 +351,7 @@ export function toAllWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bspaoh.emitterCompanyMail,
-    transporterCompanyMail: transporter?.transporterCompanyMail
+    transporterCompanyMail: transporter?.transporterCompanyMail,
+    ...getInitialEmitterData()
   };
 }

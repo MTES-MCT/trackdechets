@@ -6,6 +6,7 @@ import {
   toIncomingWaste,
   toManagedWaste,
   toOutgoingWaste,
+  getTransporterData,
   toTransportedWaste
 } from "../registry";
 import { bspaohFactory } from "./factories";
@@ -30,6 +31,93 @@ describe("toGenericWaste", () => {
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
+  });
+
+  it("should contain destination's splitted address, name & siret", async () => {
+    // Given
+    const destination = await companyFactory({
+      name: "Acme Inc",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const paoh = await bspaohFactory({
+      opt: {
+        destinationCompanyName: destination.name,
+        destinationCompanyAddress: destination.address,
+        destinationCompanySiret: destination.siret
+      }
+    });
+
+    // When
+    const paohForRegistry = await prisma.bspaoh.findUniqueOrThrow({
+      where: { id: paoh.id },
+      include: RegistryBspaohInclude
+    });
+    const waste = toGenericWaste(paohForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.destinationCompanyPostalCode).toBe("44100");
+    expect(waste.destinationCompanyCity).toBe("Nantes");
+    expect(waste.destinationCompanyCountry).toBe("FR");
+
+    expect(waste.destinationCompanySiret).toBe(destination.siret);
+    expect(waste.destinationCompanyName).toBe(destination.name);
+  });
+
+  it("should contain emitterPickupSite's splitted address & name", async () => {
+    // Given
+    const paoh = await bspaohFactory({
+      opt: {
+        emitterPickupSiteName: "Site name",
+        emitterPickupSiteAddress: "4 Boulevard Pasteur",
+        emitterPickupSitePostalCode: "44100",
+        emitterPickupSiteCity: "Nantes"
+      }
+    });
+
+    // When
+    const paohForRegistry = await prisma.bspaoh.findUniqueOrThrow({
+      where: { id: paoh.id },
+      include: RegistryBspaohInclude
+    });
+    const waste = toGenericWaste(paohForRegistry);
+
+    // Then
+    expect(waste.emitterPickupsiteName).toBe("Site name");
+    expect(waste.emitterPickupsiteAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.emitterPickupsitePostalCode).toBe("44100");
+    expect(waste.emitterPickupsiteCity).toBe("Nantes");
+    expect(waste.emitterPickupsiteCountry).toBe("FR");
+  });
+
+  it("should contain emitter's splitted address, name & siret", async () => {
+    // Given
+    const emitter = await companyFactory({
+      name: "Emitter company name",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const paoh = await bspaohFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        emitterCompanyName: emitter.name,
+        emitterCompanyAddress: emitter.address
+      }
+    });
+
+    // When
+    const paohForRegistry = await prisma.bspaoh.findUniqueOrThrow({
+      where: { id: paoh.id },
+      include: RegistryBspaohInclude
+    });
+    const waste = toGenericWaste(paohForRegistry);
+
+    // Then
+    expect(waste.emitterCompanyName).toBe(emitter.name);
+    expect(waste.emitterCompanySiret).toBe(emitter.siret);
+    expect(waste.emitterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.emitterCompanyPostalCode).toBe("44100");
+    expect(waste.emitterCompanyCity).toBe("Nantes");
+    expect(waste.emitterCompanyCountry).toBe("FR");
   });
 });
 
@@ -101,6 +189,26 @@ describe("toIncomingWaste", () => {
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const bspaoh = await bspaohFactory({});
+
+    // When
+    const paohForRegistry = await prisma.bspaoh.findUniqueOrThrow({
+      where: { id: bspaoh.id },
+      include: RegistryBspaohInclude
+    });
+    const waste = toIncomingWaste(paohForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
+  });
 });
 
 describe("toOutgoingWaste", () => {
@@ -170,6 +278,26 @@ describe("toOutgoingWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const bspaoh = await bspaohFactory({});
+
+    // When
+    const paohForRegistry = await prisma.bspaoh.findUniqueOrThrow({
+      where: { id: bspaoh.id },
+      include: RegistryBspaohInclude
+    });
+    const waste = toOutgoingWaste(paohForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
   });
 });
 
@@ -360,6 +488,26 @@ describe("toAllWaste", () => {
     expect(waste.transporter5NumberPlates).toBeNull();
   });
 
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const bspaoh = await bspaohFactory({});
+
+    // When
+    const paohForRegistry = await prisma.bspaoh.findUniqueOrThrow({
+      where: { id: bspaoh.id },
+      include: RegistryBspaohInclude
+    });
+    const waste = toAllWaste(paohForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
+  });
+
   it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
     // Given
     const bspaoh = await bspaohFactory({
@@ -382,5 +530,39 @@ describe("toAllWaste", () => {
     expect(wasteRegistry.destinationReceptionWeight).toBe(0.0789);
     expect(wasteRegistry.destinationReceptionAcceptedWeight).toBeNull();
     expect(wasteRegistry.destinationReceptionRefusedWeight).toBeNull();
+  });
+});
+
+describe("getTransporterData", () => {
+  afterAll(resetDatabase);
+
+  it("should contain the splitted addresses of all transporters", async () => {
+    // Given
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    const paoh = await bspaohFactory({
+      opt: {
+        destinationCompanyMail: "destination@mail.com",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyAddress: "4 Boulevard Pasteur 44100 Nantes",
+            number: 1
+          }
+        }
+      }
+    });
+
+    // When
+    const paohForRegistry = await prisma.bspaoh.findUniqueOrThrow({
+      where: { id: paoh.id },
+      include: RegistryBspaohInclude
+    });
+    const waste = getTransporterData(paohForRegistry);
+
+    // Then
+    expect(waste.transporterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.transporterCompanyPostalCode).toBe("44100");
+    expect(waste.transporterCompanyCity).toBe("Nantes");
+    expect(waste.transporterCompanyCountry).toBe("FR");
   });
 });

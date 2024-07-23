@@ -1,7 +1,6 @@
 import { Bsdasri } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   BsdSubType,
@@ -21,6 +20,7 @@ import {
 } from "../registry/types";
 import { getWasteDescription } from "./utils";
 import { RegistryBsdasri } from "../registry/elastic";
+import { splitAddress } from "../common/addresses";
 import { isFinalOperationCode } from "../common/operationCodes";
 
 const getOperationData = (bsdasri: Bsdasri) => ({
@@ -73,10 +73,36 @@ const getFinalOperationsData = (
   };
 };
 
-const getTransporterData = (bsdasri: Bsdasri, includePlates = false) => {
+const getInitialEmitterData = () => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  return initialEmitter;
+};
+
+export const getTransporterData = (bsdasri: Bsdasri, includePlates = false) => {
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    bsdasri.transporterCompanyAddress,
+    bsdasri.transporterCompanyVatNumber
+  );
+
   const data = {
     transporterRecepisseIsExempted: bsdasri.transporterRecepisseIsExempted,
-    transporterCompanyAddress: bsdasri.transporterCompanyAddress,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
     transporterCompanyName: bsdasri.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
@@ -148,6 +174,20 @@ export const getSubType = (bsdasri: Bsdasri): BsdSubType => {
 };
 
 export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsdasri.destinationCompanyAddress);
+
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsdasri.emitterCompanyAddress);
+
   return {
     wasteDescription: bsdasri.wasteCode
       ? getWasteDescription(bsdasri.wasteCode)
@@ -179,14 +219,34 @@ export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+    destinationCompanyMail: bsdasri.destinationCompanyMail,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bsdasri.destinationCompanyName,
+    destinationCompanySiret: bsdasri.destinationCompanySiret,
+    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
+    emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bsdasri.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bsdasri.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bsdasri.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bsdasri.emitterCompanyName,
+    emitterCompanySiret: bsdasri.emitterCompanySiret,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue
           .dividedBy(1000)
           .toDecimalPlaces(6)
           .toNumber()
       : null,
-    ...getTransporterData(bsdasri),
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    ...getTransporterData(bsdasri)
   };
 }
 
@@ -200,22 +260,7 @@ export function toIncomingWaste(
     ...emptyIncomingWaste,
     ...genericWaste,
     ...getTransporterData(bsdasri),
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -223,7 +268,8 @@ export function toIncomingWaste(
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    ...getOperationData(bsdasri)
+    ...getOperationData(bsdasri),
+    ...getInitialEmitterData()
   };
 }
 
@@ -240,22 +286,7 @@ export function toOutgoingWaste(
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -266,7 +297,8 @@ export function toOutgoingWaste(
           .toNumber()
       : null,
     ...getOperationData(bsdasri),
-    ...getFinalOperationsData(bsdasri)
+    ...getFinalOperationsData(bsdasri),
+    ...getInitialEmitterData()
   };
 }
 
@@ -287,24 +319,12 @@ export function toTransportedWaste(
           .toDecimalPlaces(6)
           .toNumber()
       : null,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
@@ -327,19 +347,7 @@ export function toManagedWaste(
     traderCompanySiret: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
     emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
@@ -357,22 +365,7 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
@@ -381,6 +374,7 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
     traderRecepisseNumber: null,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     ...getOperationData(bsdasri),
-    ...getFinalOperationsData(bsdasri)
+    ...getFinalOperationsData(bsdasri),
+    ...getInitialEmitterData()
   };
 }

@@ -1,6 +1,5 @@
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   BsdSubType,
@@ -18,10 +17,10 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { splitAddress } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
+import { splitAddress } from "../common/addresses";
 import { isFinalOperationCode } from "../common/operationCodes";
 
 const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
@@ -48,11 +47,93 @@ const getOperationData = (bsdd: Bsdd) => ({
   destinationOperationMode: bsdd.destinationOperationMode
 });
 
-const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
+const getInitialEmitterData = (bsdd: ReturnType<typeof formToBsdd>) => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  // Bsd suite. Fill initial emitter data.
+  if (bsdd.forwarding) {
+    const { street, city, postalCode, country } = splitAddress(
+      bsdd.forwarding.emitterCompanyAddress
+    );
+    initialEmitter.initialEmitterCompanyAddress = street;
+    initialEmitter.initialEmitterCompanyCity = city;
+    initialEmitter.initialEmitterCompanyPostalCode = postalCode;
+    initialEmitter.initialEmitterCompanyCountry = country;
+
+    initialEmitter.initialEmitterCompanyName =
+      bsdd.forwarding.emitterCompanyName;
+    initialEmitter.initialEmitterCompanySiret =
+      bsdd.forwarding.emitterCompanySiret;
+  }
+
+  return initialEmitter;
+};
+
+export const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    bsdd.transporterCompanyAddress,
+    bsdd.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    bsdd.transporter2CompanyAddress,
+    bsdd.transporter2CompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    bsdd.transporter3CompanyAddress,
+    bsdd.transporter3CompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    bsdd.transporter4CompanyAddress,
+    bsdd.transporter4CompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    bsdd.transporter5CompanyAddress,
+    bsdd.transporter5CompanyVatNumber
+  );
+
   const data = {
     transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
     transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
-    transporterCompanyAddress: bsdd.transporterCompanyAddress,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
     transporterCompanyName: bsdd.transporterCompanyName,
     transporterCompanySiret: bsdd.transporterCompanySiret?.length
       ? bsdd.transporterCompanySiret
@@ -60,7 +141,10 @@ const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
     transporterTransportMode: bsdd.transporterTransportMode,
     transporterCompanyMail: bsdd.transporterCompanyMail,
-    transporter2CompanyAddress: bsdd.transporter2CompanyAddress ?? null,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
     transporter2CompanyName: bsdd.transporter2CompanyName ?? null,
     transporter2CompanySiret:
       (bsdd.transporter2CompanySiret?.length
@@ -69,7 +153,10 @@ const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
     transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber ?? null,
     transporter2CompanyMail: bsdd.transporter2CompanyMail ?? null,
     transporter2TransportMode: bsdd.transporter2TransportMode ?? null,
-    transporter3CompanyAddress: bsdd.transporter3CompanyAddress ?? null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
     transporter3CompanyName: bsdd.transporter3CompanyName ?? null,
     transporter3CompanySiret:
       (bsdd.transporter3CompanySiret?.length
@@ -78,7 +165,10 @@ const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
     transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber ?? null,
     transporter3CompanyMail: bsdd.transporter3CompanyMail ?? null,
     transporter3TransportMode: bsdd.transporter3TransportMode ?? null,
-    transporter4CompanyAddress: bsdd.transporter4CompanyAddress ?? null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
     transporter4CompanyName: bsdd.transporter4CompanyName ?? null,
     transporter4CompanySiret:
       (bsdd.transporter4CompanySiret?.length
@@ -87,7 +177,10 @@ const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
     transporter4RecepisseNumber: bsdd.transporter4RecepisseNumber ?? null,
     transporter4CompanyMail: bsdd.transporter4CompanyMail ?? null,
     transporter4TransportMode: bsdd.transporter4TransportMode ?? null,
-    transporter5CompanyAddress: bsdd.transporter5CompanyAddress ?? null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
     transporter5CompanyName: bsdd.transporter5CompanyName ?? null,
     transporter5CompanySiret:
       (bsdd.transporter5CompanySiret?.length
@@ -246,21 +339,19 @@ export const getSubType = (bsdd: Bsdd): BsdSubType => {
 export function toGenericWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): GenericWaste {
-  const initialEmitter: Record<string, string | string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null
-  };
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsdd.destinationCompanyAddress);
 
-  // Bsd suite. Fill initial emitter data.
-  if (bsdd.forwarding) {
-    initialEmitter.initialEmitterCompanyAddress =
-      bsdd.forwarding.emitterCompanyAddress;
-    initialEmitter.initialEmitterCompanyName =
-      bsdd.forwarding.emitterCompanyName;
-    initialEmitter.initialEmitterCompanySiret =
-      bsdd.forwarding.emitterCompanySiret;
-  }
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsdd.emitterCompanyAddress);
 
   return {
     wasteDescription: bsdd.wasteDescription,
@@ -289,6 +380,9 @@ export function toGenericWaste(
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
     weight: bsdd.weightValue,
     brokerCompanyMail: bsdd.brokerCompanyMail,
     traderCompanyMail: bsdd.traderCompanyMail,
@@ -296,7 +390,23 @@ export function toGenericWaste(
     parcelPostalCodes: bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
     parcelCoordinates: bsdd.parcelCoordinates,
-    ...initialEmitter
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bsdd.destinationCompanyName,
+    destinationCompanySiret: bsdd.destinationCompanySiret,
+    emitterPickupsiteName: bsdd.emitterPickupSiteName,
+    emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bsdd.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bsdd.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bsdd.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bsdd.emitterCompanyName,
+    emitterCompanySiret: bsdd.emitterCompanySiret
   };
 }
 
@@ -309,19 +419,7 @@ export function toIncomingWaste(
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyIncomingWaste,
     ...genericWaste,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationReceptionDate: bsdd.destinationReceptionDate,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -335,7 +433,8 @@ export function toIncomingWaste(
     ...getOperationData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
-    ...getTransportersData(bsdd)
+    ...getTransportersData(bsdd),
+    ...getInitialEmitterData(bsdd)
   };
 }
 
@@ -352,19 +451,7 @@ export function toOutgoingWaste(
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
@@ -377,7 +464,8 @@ export function toOutgoingWaste(
     ...getFinalOperationsData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
-    ...getTransportersData(bsdd)
+    ...getTransportersData(bsdd),
+    ...getInitialEmitterData(bsdd)
   };
 }
 
@@ -392,24 +480,12 @@ export function toTransportedWaste(
     ...genericWaste,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     weight: bsdd.weightValue,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     ...getTransportersData(bsdd, true)
   };
@@ -428,19 +504,7 @@ export function toManagedWaste(
     traderCompanySiret: bsdd.traderCompanySiret,
     brokerCompanyName: null,
     brokerCompanySiret: null,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
@@ -467,19 +531,7 @@ export function toAllWaste(
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     weight: bsdd.weightValue,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
@@ -494,6 +546,7 @@ export function toAllWaste(
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
     ...getIntermediariesData(bsdd),
-    ...getTransportersData(bsdd, true)
+    ...getTransportersData(bsdd, true),
+    ...getInitialEmitterData(bsdd)
   };
 }

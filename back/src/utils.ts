@@ -133,21 +133,6 @@ export const hashToken = (token: string) =>
     .update(token)
     .digest("hex");
 
-/**
- *Try extracting a valid postal code
- */
-export function extractPostalCode(address: string | null | undefined) {
-  if (address) {
-    const matches = address.match(/([0-9]{5})/g);
-    if (matches && matches.length > 0) {
-      // Some addresses might have misleading numbers that look like postal codes
-      // ex: 134 AV DU GENERAL EISENHOWER CS 42326 31100 TOULOUSE
-      return matches[matches.length - 1];
-    }
-  }
-  return "";
-}
-
 const reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
 const reHasRegExpChar = RegExp(reRegExpChar.source);
 
@@ -253,41 +238,4 @@ export const isBase64 = (str: string): boolean => {
   return new RegExp(
     /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/
   ).test(str);
-};
-
-/**
- * Splits an address into:
- * - street
- * - postal code
- * - city
- */
-export const splitAddress = (address: string | null | undefined) => {
-  if (!address) {
-    return {
-      street: "",
-      postalCode: "",
-      city: ""
-    };
-  }
-
-  const postalCode = extractPostalCode(address);
-
-  if (!postalCode) {
-    return {
-      street: "",
-      postalCode: "",
-      city: ""
-    };
-  }
-
-  const splitted = address
-    .replace(/\r?\n|\r/g, " ") // remove line breaks
-    .replace(/\s+/g, " ") // double spaces to single spaces
-    .split(postalCode);
-
-  return {
-    street: splitted[0]?.trim(),
-    postalCode: postalCode?.trim(),
-    city: splitted[1]?.trim()
-  };
 };

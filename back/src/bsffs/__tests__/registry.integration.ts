@@ -1,10 +1,11 @@
 import {
   getSubType,
   toAllWaste,
-  toGenericWaste,
   toIncomingWaste,
   toManagedWaste,
   toOutgoingWaste,
+  toGenericWaste,
+  getTransportersData,
   toTransportedWaste
 } from "../registry";
 import { prisma } from "@td/prisma";
@@ -15,33 +16,59 @@ import {
   createBsff,
   createBsffAfterOperation
 } from "./factories";
-import { userWithCompanyFactory } from "../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { BsffType } from "@prisma/client";
+import { BsffType, UserRole } from "@prisma/client";
 import { OPERATION } from "../constants";
 
 const createBsffWith5Transporters = async () => {
-  const transporter1 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+  const transporter1 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "4 Boulevard Pasteur 44100 Nantes"
   });
-  const transporter2 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+
+  const transporter2 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "2 RUE PIERRE BROSSOLETTE 64000 PAU"
   });
-  const transporter3 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+
+  const transporter3 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "34 ROUTE DE BRESSUIRE 79200 CHATILLON-SUR-THOUET"
   });
-  const transporter4 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+
+  const transporter4 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "15 Rue Jacques Prévert, Le Port 97420, Réunion"
   });
-  const transporter5 = await userWithCompanyFactory("MEMBER", {
-    companyTypes: ["TRANSPORTER"]
+
+  const transporter5 = await userWithCompanyFactory(UserRole.ADMIN, {
+    companyTypes: {
+      set: ["TRANSPORTER"]
+    },
+    address: "VIA TRATTATO DI SCHENGEN 5 15067 NOVI LIGURE AL",
+    vatNumber: "IT01144600069"
   });
+
   const bsff = await createBsff(
     { transporter: transporter1 },
     {
       data: { destinationCompanyMail: "destination@mail.com" },
       transporterData: {
-        transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"]
+        transporterCompanySiret: transporter1.company.siret,
+        transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"],
+        transporterCompanyAddress: transporter1.company.address
       }
     }
   );
@@ -78,6 +105,8 @@ const createBsffWith5Transporters = async () => {
 };
 
 describe("toGenericWaste", () => {
+  afterAll(resetDatabase);
+
   it("should contain destinationCompanyMail", async () => {
     // Given
     const bsff = await createBsff(
@@ -94,6 +123,91 @@ describe("toGenericWaste", () => {
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
+  });
+
+  it("should contain destinationCompanyMail", async () => {
+    // Given
+    const bsff = await createBsff(
+      {},
+      { data: { destinationCompanyMail: "destination@mail.com" } }
+    );
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const waste = toGenericWaste(bsffForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyMail).toBe("destination@mail.com");
+  });
+
+  it("should contain destination's splitted address, name & siret", async () => {
+    // Given
+    const destination = await companyFactory({
+      name: "Acme Inc",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const bsff = await createBsff(
+      {},
+      {
+        data: {
+          destinationCompanyName: destination.name,
+          destinationCompanyAddress: destination.address,
+          destinationCompanySiret: destination.siret
+        }
+      }
+    );
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const waste = toGenericWaste(bsffForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.destinationCompanyPostalCode).toBe("44100");
+    expect(waste.destinationCompanyCity).toBe("Nantes");
+    expect(waste.destinationCompanyCountry).toBe("FR");
+
+    expect(waste.destinationCompanySiret).toBe(destination.siret);
+    expect(waste.destinationCompanyName).toBe(destination.name);
+  });
+
+  it("should contain emitter's splitted address, name & siret", async () => {
+    // Given
+    const emitter = await companyFactory({
+      name: "Emitter company name",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const bsff = await createBsff(
+      {},
+      {
+        data: {
+          emitterCompanySiret: emitter.siret,
+          emitterCompanyName: emitter.name,
+          emitterCompanyAddress: emitter.address
+        }
+      }
+    );
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const waste = toGenericWaste(bsffForRegistry);
+
+    // Then
+    expect(waste.emitterCompanyName).toBe(emitter.name);
+    expect(waste.emitterCompanySiret).toBe(emitter.siret);
+    expect(waste.emitterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.emitterCompanyPostalCode).toBe("44100");
+    expect(waste.emitterCompanyCity).toBe("Nantes");
+    expect(waste.emitterCompanyCountry).toBe("FR");
   });
 });
 
@@ -133,7 +247,7 @@ describe("toIncomingWaste", () => {
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
@@ -355,7 +469,7 @@ describe("toOutgoingWaste", () => {
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
@@ -439,7 +553,7 @@ describe("toTransportedWaste", () => {
     ]);
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste.transporter5NumberPlates).toStrictEqual([
       "TRANSPORTER5-NBR-PLATES"
@@ -518,13 +632,15 @@ describe("toManagedWaste", () => {
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
 });
 
 describe("toAllWaste", () => {
+  afterAll(resetDatabase);
+
   it(
     "should compute destinationFinalOperationCodes" +
       " and destinationfinalOperationWeights",
@@ -721,7 +837,7 @@ describe("toAllWaste", () => {
     ]);
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste.transporter5NumberPlates).toStrictEqual([
       "TRANSPORTER5-NBR-PLATES"
@@ -751,5 +867,50 @@ describe("getSubType", () => {
 
     // Then
     expect(subType).toBe(expectedSubType);
+  });
+});
+
+describe("getTransportersData", () => {
+  afterAll(resetDatabase);
+
+  it("should contain the splitted addresses of all transporters", async () => {
+    // Given
+    const { bsff } = await createBsffWith5Transporters();
+
+    // When
+    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id },
+      include: RegistryBsffInclude
+    });
+    const waste = getTransportersData(bsffForRegistry);
+
+    // Then
+    expect(waste.transporterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.transporterCompanyPostalCode).toBe("44100");
+    expect(waste.transporterCompanyCity).toBe("Nantes");
+    expect(waste.transporterCompanyCountry).toBe("FR");
+
+    expect(waste.transporter2CompanyAddress).toBe("2 RUE PIERRE BROSSOLETTE");
+    expect(waste.transporter2CompanyPostalCode).toBe("64000");
+    expect(waste.transporter2CompanyCity).toBe("PAU");
+    expect(waste.transporter2CompanyCountry).toBe("FR");
+
+    expect(waste.transporter3CompanyAddress).toBe("34 ROUTE DE BRESSUIRE");
+    expect(waste.transporter3CompanyPostalCode).toBe("79200");
+    expect(waste.transporter3CompanyCity).toBe("CHATILLON-SUR-THOUET");
+    expect(waste.transporter3CompanyCountry).toBe("FR");
+
+    expect(waste.transporter4CompanyAddress).toBe(
+      "15 Rue Jacques Prévert, Le Port"
+    );
+    expect(waste.transporter4CompanyPostalCode).toBe("97420");
+    expect(waste.transporter4CompanyCity).toBe("Réunion");
+    expect(waste.transporter4CompanyCountry).toBe("FR");
+
+    // Foreign transporter
+    expect(waste.transporter5CompanyAddress).toBe("VIA TRATTATO DI SCHENGEN 5");
+    expect(waste.transporter5CompanyPostalCode).toBe("15067");
+    expect(waste.transporter5CompanyCity).toBe("NOVI LIGURE AL");
+    expect(waste.transporter5CompanyCountry).toBe("IT");
   });
 });

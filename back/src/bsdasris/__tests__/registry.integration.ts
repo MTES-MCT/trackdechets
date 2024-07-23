@@ -34,6 +34,110 @@ describe("toGenericWaste", () => {
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
   });
+
+  it("should contain destinationCompanyMail", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: { destinationCompanyMail: "destination@mail.com" }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toGenericWaste(bsdasriForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyMail).toBe("destination@mail.com");
+  });
+
+  it("should contain destination's splitted address, name & siret", async () => {
+    // Given
+    const destination = await companyFactory({
+      name: "Acme Inc",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        destinationCompanyName: destination.name,
+        destinationCompanyAddress: destination.address,
+        destinationCompanySiret: destination.siret
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toGenericWaste(bsdasriForRegistry);
+
+    // Then
+    expect(waste.destinationCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.destinationCompanyPostalCode).toBe("44100");
+    expect(waste.destinationCompanyCity).toBe("Nantes");
+    expect(waste.destinationCompanyCountry).toBe("FR");
+
+    expect(waste.destinationCompanySiret).toBe(destination.siret);
+    expect(waste.destinationCompanyName).toBe(destination.name);
+  });
+
+  it("should contain emitterPickupSite's splitted address & name", async () => {
+    // Given
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterPickupSiteName: "Site name",
+        emitterPickupSiteAddress: "4 Boulevard Pasteur",
+        emitterPickupSitePostalCode: "44100",
+        emitterPickupSiteCity: "Nantes"
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toGenericWaste(bsdasriForRegistry);
+
+    // Then
+    expect(waste.emitterPickupsiteName).toBe("Site name");
+    expect(waste.emitterPickupsiteAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.emitterPickupsitePostalCode).toBe("44100");
+    expect(waste.emitterPickupsiteCity).toBe("Nantes");
+    expect(waste.emitterPickupsiteCountry).toBe("FR");
+  });
+
+  it("should contain emitter's splitted address, name & siret", async () => {
+    // Given
+    const emitter = await companyFactory({
+      name: "Emitter company name",
+      address: "4 Boulevard Pasteur 44100 Nantes"
+    });
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        emitterCompanyName: emitter.name,
+        emitterCompanyAddress: emitter.address
+      }
+    });
+
+    // When
+    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toGenericWaste(bsdasriForRegistry);
+
+    // Then
+    expect(waste.emitterCompanyName).toBe(emitter.name);
+    expect(waste.emitterCompanySiret).toBe(emitter.siret);
+    expect(waste.emitterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.emitterCompanyPostalCode).toBe("44100");
+    expect(waste.emitterCompanyCity).toBe("Nantes");
+    expect(waste.emitterCompanyCountry).toBe("FR");
+  });
 });
 
 describe("toIncomingWaste", () => {
@@ -74,6 +178,26 @@ describe("toIncomingWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const dasri = await bsdasriFactory({});
+
+    // When
+    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toIncomingWaste(dasriForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
   });
 
   it("should contain emitted weight and destinationReception weight, acceptedWeight, & refusedWeight", async () => {
@@ -270,6 +394,26 @@ describe("toOutgoingWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const dasri = await bsdasriFactory({});
+
+    // When
+    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toOutgoingWaste(dasriForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
   });
 });
 
@@ -575,6 +719,26 @@ describe("toAllWaste", () => {
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste.transporter5NumberPlates).toBeNull();
   });
+
+  it("should contain null initialEmitter data", async () => {
+    // Given
+    const dasri = await bsdasriFactory({});
+
+    // When
+    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toAllWaste(dasriForRegistry);
+
+    // Then
+    expect(waste.initialEmitterCompanyAddress).toBeNull();
+    expect(waste.initialEmitterCompanyPostalCode).toBeNull();
+    expect(waste.initialEmitterCompanyCity).toBeNull();
+    expect(waste.initialEmitterCompanyCountry).toBeNull();
+    expect(waste.initialEmitterCompanyName).toBeNull();
+    expect(waste.initialEmitterCompanySiret).toBeNull();
+  });
 });
 
 describe("getSubType", () => {
@@ -597,5 +761,33 @@ describe("getSubType", () => {
 
     // Then
     expect(subType).toBe(expectedSubType);
+  });
+});
+
+describe("getTransporterData", () => {
+  afterAll(resetDatabase);
+
+  it("should contain the splitted addresses of all transporters", async () => {
+    // Given
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    const dasri = await bsdasriFactory({
+      opt: {
+        transporterCompanySiret: transporter.siret,
+        transporterCompanyAddress: "4 Boulevard Pasteur 44100 Nantes"
+      }
+    });
+
+    // When
+    const dasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: RegistryBsdasriInclude
+    });
+    const waste = toAllWaste(dasriForRegistry);
+
+    // Then
+    expect(waste.transporterCompanyAddress).toBe("4 Boulevard Pasteur");
+    expect(waste.transporterCompanyPostalCode).toBe("44100");
+    expect(waste.transporterCompanyCity).toBe("Nantes");
+    expect(waste.transporterCompanyCountry).toBe("FR");
   });
 });

@@ -168,15 +168,42 @@ export const columns: Column[] = [
     field: "initialEmitterCompanyAddress",
     label: "Producteur initial adresse"
   },
+  {
+    field: "initialEmitterCompanyPostalCode",
+    label: "Producteur initial Code postal"
+  },
+  {
+    field: "initialEmitterCompanyCity",
+    label: "Producteur initial Commune"
+  },
+  {
+    field: "initialEmitterCompanyCountry",
+    label: "Producteur initial Pays"
+  },
   { field: "emitterCompanyName", label: "Expéditeur raison sociale" },
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },
-  { field: "emitterCompanyAddress", label: "Expéditeur adresse" },
+  { field: "emitterCompanyAddress", label: "Expéditeur Adresse" },
+  { field: "emitterCompanyPostalCode", label: "Expéditeur Code postal" },
+  { field: "emitterCompanyCity", label: "Expéditeur Commune" },
+  { field: "emitterCompanyCountry", label: "Expéditeur Pays" },
   { field: "emitterPickupsiteName", label: "Nom du point de prise en charge" },
-  { field: "emitterPickupsiteAddress", label: "Adresse de prise en charge" },
+  { field: "emitterPickupsiteAddress", label: "Prise en charge adresse" },
+  {
+    field: "emitterPickupsitePostalCode",
+    label: "Prise en charge Code postal"
+  },
+  { field: "emitterPickupsiteCity", label: "Prise en charge Commune" },
+  { field: "emitterPickupsiteCountry", label: "Prise en charge Pays" },
   { field: "emitterCompanyMail", label: "Expéditeur contact" },
   { field: "workerCompanyName", label: "Entreprise de travaux raison sociale" },
   { field: "workerCompanySiret", label: "Entreprise de travaux SIRET" },
   { field: "workerCompanyAddress", label: "Entreprise de travaux adresse" },
+  {
+    field: "workerCompanyPostalCode",
+    label: "Entreprise de travaux Code postal"
+  },
+  { field: "workerCompanyCity", label: "Entreprise de travaux Commune" },
+  { field: "workerCompanyCountry", label: "Entreprise de travaux Pays" },
   {
     field: "parcelCities",
     label: "Parcelle commune",
@@ -232,6 +259,9 @@ export const columns: Column[] = [
     label: "Transporteur SIRET ou n° de TVA intracommunautaire"
   },
   { field: "transporterCompanyAddress", label: "Transporteur adresse" },
+  { field: "transporterCompanyPostalCode", label: "Transporteur Code postal" },
+  { field: "transporterCompanyCity", label: "Transporteur Commune" },
+  { field: "transporterCompanyCountry", label: "Transporteur Pays" },
   {
     field: "transporterRecepisseIsExempted",
     label: "Transporteur exemption de récépissé",
@@ -261,6 +291,9 @@ export const columns: Column[] = [
   { field: "destinationCompanyName", label: "Destination raison sociale" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },
   { field: "destinationCompanyAddress", label: "Destination adresse" },
+  { field: "destinationCompanyPostalCode", label: "Destination Code postal" },
+  { field: "destinationCompanyCity", label: "Destination Commune" },
+  { field: "destinationCompanyCountry", label: "Destination Pays" },
   { field: "destinationCompanyMail", label: "Destination Contact" },
   {
     field: "postTempStorageDestinationName",
@@ -359,6 +392,13 @@ export const columns: Column[] = [
   },
   { field: "transporter2CompanyAddress", label: "Transporteur n°2 adresse" },
   {
+    field: "transporter2CompanyPostalCode",
+    label: "Transporteur n°2 Code postal"
+  },
+  { field: "transporter2CompanyCity", label: "Transporteur n°2 Commune" },
+  { field: "transporter2CompanyCountry", label: "Transporteur n°2 Pays" },
+
+  {
     field: "transporter2CompanySiret",
     label: "Transporteur n°2 SIRET ou n° de TVA intracommunautaire"
   },
@@ -394,6 +434,12 @@ export const columns: Column[] = [
   },
   { field: "transporter3CompanyAddress", label: "Transporteur n°3 adresse" },
   {
+    field: "transporter3CompanyPostalCode",
+    label: "Transporteur n°3 Code postal"
+  },
+  { field: "transporter3CompanyCity", label: "Transporteur n°3 Commune" },
+  { field: "transporter3CompanyCountry", label: "Transporteur n°3 Pays" },
+  {
     field: "transporter3RecepisseIsExempted",
     label: "Transporteur n°3 exemption de récépissé",
     format: formatBoolean
@@ -425,6 +471,12 @@ export const columns: Column[] = [
   },
   { field: "transporter4CompanyAddress", label: "Transporteur n°4 adresse" },
   {
+    field: "transporter4CompanyPostalCode",
+    label: "Transporteur n°4 Code postal"
+  },
+  { field: "transporter4CompanyCity", label: "Transporteur n°4 Commune" },
+  { field: "transporter4CompanyCountry", label: "Transporteur n°4 Pays" },
+  {
     field: "transporter4RecepisseIsExempted",
     label: "Transporteur n°4 exemption de récépissé",
     format: formatBoolean
@@ -455,6 +507,12 @@ export const columns: Column[] = [
     label: "Transporteur n°5 SIRET ou n° de TVA intracommunautaire"
   },
   { field: "transporter5CompanyAddress", label: "Transporteur n°5 adresse" },
+  {
+    field: "transporter5CompanyPostalCode",
+    label: "Transporteur n°5 Code postal"
+  },
+  { field: "transporter5CompanyCity", label: "Transporteur n°5 Commune" },
+  { field: "transporter5CompanyCountry", label: "Transporteur n°5 Pays" },
   {
     field: "transporter5RecepisseIsExempted",
     label: "Transporteur n°5 exemption de récépissé",
