@@ -1,12 +1,11 @@
-import React from "react";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import React, { useEffect } from "react";
 
+import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationCreatePdfAccessTokenArgs } from "@td/codegen-ui";
 import QRCodeIcon from "react-qr-code";
-import { useMutation, gql } from "@apollo/client";
 import { Loader } from "../../../../../Apps/common/Components";
 
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { InlineError } from "../../../../../Apps/common/Components/Error/Error";
 import { TOAST_DURATION } from "../../../../../common/config";
 
@@ -23,7 +22,6 @@ export function RouteControlPdf() {
     id: string;
     siret: string;
   }>();
-  const navigate = useNavigate();
 
   const [createPdfAccessToken, { data, loading, error }] = useMutation<
     Pick<Mutation, "createPdfAccessToken">,
@@ -34,6 +32,14 @@ export function RouteControlPdf() {
         duration: TOAST_DURATION
       })
   });
+
+  useEffect(() => {
+    createPdfAccessToken({
+      variables: {
+        input: { bsdId: id! }
+      }
+    });
+  }, [createPdfAccessToken, id]);
 
   return (
     <div>
@@ -53,30 +59,6 @@ export function RouteControlPdf() {
           <span className="tw-mt-3">À scanner par les forces de l'ordre</span>
         </div>
       )}
-
-      <div className="td-modal-actions">
-        <Button
-          priority="secondary"
-          onClick={() => {
-            navigate(-1);
-          }}
-        >
-          Annuler
-        </Button>
-
-        <Button
-          disabled={loading || !!data}
-          onClick={() =>
-            createPdfAccessToken({
-              variables: {
-                input: { bsdId: id! }
-              }
-            })
-          }
-        >
-          Afficher le QR code
-        </Button>
-      </div>
     </div>
   );
 }

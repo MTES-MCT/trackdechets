@@ -22,6 +22,7 @@ import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { RegistryBsda } from "../registry/elastic";
 import { BsdaForElastic } from "./elastic";
 import { splitAddress } from "../common/addresses";
+import { isFinalOperationCode } from "../common/operationCodes";
 
 const getPostTempStorageDestination = (bsda: RegistryBsda) => {
   if (!bsda.forwardedIn) return {};
@@ -56,18 +57,48 @@ const getIntermediariesData = (bsda: RegistryBsda) => ({
   intermediary3CompanySiret: bsda.intermediaries?.[2]?.siret ?? null
 });
 
-const getFinalOperationsData = (bsda: RegistryBsda) => {
+const getFinalOperationsData = (
+  bsda: RegistryBsda
+): Pick<
+  OutgoingWaste | AllWaste,
+  | "destinationFinalOperationCodes"
+  | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCompanySirets"
+> => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
+  const destinationFinalOperationCompanySirets: string[] = [];
+
   // Check if finalOperations is defined and has elements
-  if (bsda.finalOperations && bsda.finalOperations.length > 0) {
+  if (
+    bsda.destinationOperationSignatureDate &&
+    bsda.destinationOperationCode &&
+    // Cf tra-14603 => si le code de traitement du bordereau initial est final,
+    // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
+    // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
+    !isFinalOperationCode(bsda.destinationOperationCode) &&
+    bsda.finalOperations?.length
+  ) {
     // Iterate through each operation once and fill both arrays
     bsda.finalOperations.forEach(ope => {
       destinationFinalOperationCodes.push(ope.operationCode);
-      destinationFinalOperationWeights.push(ope.quantity.toNumber());
+      destinationFinalOperationWeights.push(
+        // conversion en tonnes
+        ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      );
+      if (ope.finalBsda.destinationCompanySiret) {
+        // cela devrait tout le temps être le cas
+        destinationFinalOperationCompanySirets.push(
+          ope.finalBsda.destinationCompanySiret
+        );
+      }
     });
   }
-  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+  return {
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    destinationFinalOperationCompanySirets
+  };
 };
 
 const getInitialEmitterData = (bsda: RegistryBsda) => {
@@ -344,7 +375,13 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
       bsda.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsda.destinationOperationDate,
     destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight.dividedBy(1000).toNumber()
+      ? bsda.destinationReceptionWeight
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
+    weight: bsda.weightValue
+      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
@@ -414,7 +451,7 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toNumber()
+      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     ...getOperationData(bsda),
     ...getFinalOperationsData(bsda),

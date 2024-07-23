@@ -32,6 +32,7 @@ enum CompanyType {
 
   "Crématorium"
   CREMATORIUM
+    @deprecated(reason: "Déprécié - Utiliser WasteprocessorType.CREMATION")
 
   "Intermédiaire : établissement qui peut être ajouté à une traçabilité, sans responsabilité réglementaire (y compris entreprises de travaux hors amiante)"
   INTERMEDIARY

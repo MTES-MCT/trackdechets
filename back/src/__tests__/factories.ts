@@ -77,8 +77,7 @@ export const companyFactory = async (
           "TRANSPORTER",
           "WASTEPROCESSOR",
           "WORKER",
-          "WASTE_VEHICLES",
-          "CREMATORIUM"
+          "WASTE_VEHICLES"
         ]
       },
       name: `company_${companyIndex}`,
@@ -372,7 +371,7 @@ export const upsertBaseSiret = async siret => {
           orgId: siret,
           siret,
           companyTypes: {
-            set: ["TRANSPORTER", "WASTEPROCESSOR", "WORKER", "CREMATORIUM"]
+            set: ["TRANSPORTER", "WASTEPROCESSOR", "WORKER"]
           },
           name: `company_${siret}`,
           securityCode: 1234,

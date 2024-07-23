@@ -171,7 +171,7 @@ const signTransportFn = async (
       getFormRepository(user, transaction);
 
     const updatedForm = await update(
-      { id: existingForm.id },
+      { id: existingForm.id, status: existingForm.status },
       {
         status: transitionForm(existingForm, {
           type: EventType.SignedByTransporter,
@@ -359,7 +359,7 @@ const signatures: Partial<
     };
 
     const updatedForm = await getFormRepository(user).update(
-      { id: existingFullForm.id },
+      { id: existingFullForm.id, status: existingFullForm.status },
       {
         status: transitionForm(existingFullForm, {
           type: EventType.MarkAsResent,

@@ -4,7 +4,6 @@ import {
   userFactory,
   userWithCompanyFactory,
   companyAssociatedToExistingUserFactory,
-  companyFactory,
   siretify
 } from "../../../../__tests__/factories";
 import { UserRole } from "@prisma/client";
@@ -14,6 +13,7 @@ import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { prisma } from "@td/prisma";
 import { sirenify as sirenifyBspaohInput } from "../../../validation/sirenify";
+import { crematoriumFactory } from "../../../__tests__/factories";
 
 jest.mock("../../../validation/sirenify");
 (sirenifyBspaohInput as jest.Mock).mockImplementation(input =>
@@ -86,7 +86,7 @@ describe("Mutation.createDraftBspaoh", () => {
 
   it("create a draft bspaoh with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const destination = await companyFactory();
+    const destination = await crematoriumFactory();
 
     const input = {
       emitter: {
@@ -124,7 +124,7 @@ describe("Mutation.createDraftBspaoh", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     // user has a second company, not on the paoh, not expected in `canAccessDraftSirets`
     await companyAssociatedToExistingUserFactory(user, UserRole.MEMBER);
-    const destination = await companyFactory();
+    const destination = await crematoriumFactory();
 
     const input = {
       emitter: {
@@ -170,7 +170,11 @@ describe("Mutation.createDraftBspaoh", () => {
 
     const destination = await companyAssociatedToExistingUserFactory(
       user,
-      UserRole.MEMBER
+      UserRole.MEMBER,
+      {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      }
     );
 
     const input = {

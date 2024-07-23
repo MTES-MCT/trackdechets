@@ -121,7 +121,7 @@ function SignTransportForm({
             les informations ci-dessus sont correctes. En signant ce document,
             je déclare prendre en charge le déchet.
           </p>
-          <TransporterRecepisseWrapper transporter={bsff.transporter!} />
+          <TransporterRecepisseWrapper transporter={signingTransporter} />
 
           {!signingTransporter.transport?.mode ||
             (signingTransporter.transport?.mode === TransportMode.Road && (

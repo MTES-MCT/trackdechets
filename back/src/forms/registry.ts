@@ -1,4 +1,3 @@
-import { BsddFinalOperation } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
@@ -22,6 +21,7 @@ import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
 import { splitAddress } from "../common/addresses";
+import { isFinalOperationCode } from "../common/operationCodes";
 
 const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
   if (!bsdd.forwardedIn) return {};
@@ -279,24 +279,45 @@ export function getRegistryFields(
  * maintaining the order
  */
 const getFinalOperationsData = (
-  bsdd: Bsdd & {
-    finalOperations: BsddFinalOperation[];
-  }
+  bsdd: ReturnType<typeof formToBsdd>
 ): Pick<
   OutgoingWaste | AllWaste,
-  "destinationFinalOperationCodes" | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCodes"
+  | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCompanySirets"
 > => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
+  const destinationFinalOperationCompanySirets: string[] = [];
   // Check if finalOperations is defined and has elements
-  if (bsdd.finalOperations && bsdd.finalOperations.length > 0) {
+
+  if (
+    bsdd.destinationOperationSignatureDate &&
+    bsdd.destinationOperationCode &&
+    // Cf tra-14603 => si le code de traitement du bordereau initial est final,
+    // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
+    // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
+    !isFinalOperationCode(bsdd.destinationOperationCode) &&
+    !bsdd.destinationOperationNoTraceability &&
+    bsdd.finalOperations?.length
+  ) {
     // Iterate through each operation once and fill both arrays
     bsdd.finalOperations.forEach(ope => {
       destinationFinalOperationCodes.push(ope.operationCode);
       destinationFinalOperationWeights.push(ope.quantity.toNumber());
+      if (ope.finalForm.recipientCompanySiret) {
+        // cela devrait tout le temps être le cas
+        destinationFinalOperationCompanySirets.push(
+          ope.finalForm.recipientCompanySiret
+        );
+      }
     });
   }
-  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+  return {
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    destinationFinalOperationCompanySirets
+  };
 };
 
 export const getSubType = (bsdd: Bsdd): BsdSubType => {
@@ -352,6 +373,8 @@ export function toGenericWaste(
       bsdd.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdd.destinationOperationDate,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     wasteAdr: bsdd.wasteAdr,
     workerCompanyName: null,
@@ -360,6 +383,7 @@ export function toGenericWaste(
     workerCompanyPostalCode: null,
     workerCompanyCity: null,
     workerCompanyCountry: null,
+    weight: bsdd.weightValue,
     brokerCompanyMail: bsdd.brokerCompanyMail,
     traderCompanyMail: bsdd.traderCompanyMail,
     parcelCities: bsdd.parcelCities,
@@ -404,6 +428,9 @@ export function toIncomingWaste(
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
@@ -429,6 +456,10 @@ export function toOutgoingWaste(
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     weight: bsdd.weightValue,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd),
@@ -477,6 +508,9 @@ export function toManagedWaste(
     destinationPlannedOperationMode: null,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
     ...getTransportersData(bsdd)
@@ -504,6 +538,10 @@ export function toAllWaste(
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,

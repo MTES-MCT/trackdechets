@@ -19,7 +19,7 @@ export type UpdateBsdasriFn = (
 export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
   return async (where, data, logMetadata?) => {
     const { prisma, user } = deps;
-    const previousBsdasri = await prisma.bsdasri.findUnique({
+    const previousBsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where,
       include: {
         synthesizing: true,
@@ -44,7 +44,7 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
       ].filter(Boolean);
 
       await prisma.bsdasri.update({
-        where,
+        where: { id: bsdasri.id },
         data: { synthesisEmitterSirets }
       });
     }
@@ -55,7 +55,7 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
         ...new Set(bsdasri.grouping.map(grouped => grouped.emitterCompanySiret))
       ].filter(Boolean);
       await prisma.bsdasri.update({
-        where,
+        where: { id: bsdasri.id },
         data: { groupingEmitterSirets }
       });
     }

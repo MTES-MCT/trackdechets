@@ -157,7 +157,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     resealedForm = await formRepository.update({ id }, formUpdateInput);
   } else {
     resealedForm = await formRepository.update(
-      { id: form.id },
+      { id: form.id, status: form.status },
       {
         status: transitionForm(form, {
           type: EventType.MarkAsResealed,

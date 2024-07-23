@@ -58,6 +58,8 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   pop: null,
   id: null,
   destinationReceptionWeight: null,
+  destinationReceptionAcceptedWeight: null,
+  destinationReceptionRefusedWeight: null,
   initialEmitterCompanyName: null,
   initialEmitterCompanySiret: null,
   initialEmitterCompanyAddress: null,
@@ -131,6 +133,7 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   workerCompanyName: null,
   workerCompanySiret: null,
   workerCompanyAddress: null,
+  weight: null,
   nextDestinationNotificationNumber: null,
   nextDestinationProcessingOperation: null,
   brokerCompanyMail: null,
@@ -257,6 +260,11 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   workerCompanyAddress: null,
   destinationFinalOperationCodes: [],
   destinationFinalOperationWeights: [],
+  destinationReceptionAcceptedWeight: null,
+  destinationReceptionRefusedWeight: null,
+  traderCompanyMail: null,
+  brokerCompanyMail: null,
+  destinationFinalOperationCompanySirets: [],
   nextDestinationNotificationNumber: null,
   nextDestinationProcessingOperation: null,
   postTempStorageDestinationAddress: null,
@@ -265,8 +273,6 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   postTempStorageDestinationPostalCode: null,
   postTempStorageDestinationSiret: null,
   postTempStorageDestinationCountry: null,
-  brokerCompanyMail: null,
-  traderCompanyMail: null,
   parcelCities: null,
   parcelPostalCodes: null,
   parcelNumbers: null,
@@ -503,9 +509,6 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   parcelPostalCodes: null,
   parcelNumbers: null,
   parcelCoordinates: null,
-  // En attente des correctifs recette sur TRA-12745
-  // finalOperationCodes: null,
-  // finalReceptionWeights: null
   brokerCompanyMail: null,
   traderCompanyMail: null,
   transporter2CompanyCity: null,
@@ -534,7 +537,10 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   emitterPickupsitePostalCode: null,
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
-  emitterCompanyPostalCode: null
+  emitterCompanyPostalCode: null,
+  destinationReceptionAcceptedWeight: null,
+  destinationReceptionRefusedWeight: null,
+  weight: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -600,6 +606,8 @@ export const emptyAllWaste: Required<AllWaste> = {
   brokerCompanySiret: null,
   brokerRecepisseNumber: null,
   destinationReceptionWeight: null,
+  destinationReceptionAcceptedWeight: null,
+  destinationReceptionRefusedWeight: null,
   destinationCompanyName: null,
   destinationCompanySiret: null,
   destinationCompanyAddress: null,
@@ -634,6 +642,7 @@ export const emptyAllWaste: Required<AllWaste> = {
   workerCompanyAddress: null,
   destinationFinalOperationCodes: [],
   destinationFinalOperationWeights: [],
+  destinationFinalOperationCompanySirets: [],
   nextDestinationNotificationNumber: null,
   nextDestinationProcessingOperation: null,
   intermediary1CompanyName: null,

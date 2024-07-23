@@ -213,7 +213,7 @@ async function updateBsvhu(
   return runInTransaction(async transaction => {
     const bsvhuRepository = getBsvhuRepository(user, transaction);
     const signBsda = await bsvhuRepository.update(
-      { id: bsvhu.id },
+      { id: bsvhu.id, status: bsvhu.status },
       updateInput
     );
     return signBsda;

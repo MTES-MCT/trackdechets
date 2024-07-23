@@ -8,23 +8,17 @@
     }
   }
 
-  &--error {
+  &--error,
+  &--canceled {
     &:before {
       display: inline-block !important;
       -webkit-mask-image: url("/icons/system/fr--error-fill.svg") !important;
     }
   }
 
-  &--canceled {
-    &:before {
-      -webkit-mask-image: url("/icons/system/fr--info-fill.svg") !important;
-    }
-  }
-
   &--DRAFT,
   &--INITIAL,
-  &--SEALED,
-  &--SIGNED_BY_PRODUCER {
+  &--SEALED {
     background-color: #fbf6ed;
     color: #716043;
   }
@@ -33,7 +27,8 @@
   &--SENT,
   &--RESENT,
   &--SIGNED_BY_TEMP_STORER,
-  &--SIGNED_BY_EMITTER {
+  &--SIGNED_BY_EMITTER,
+  &--SIGNED_BY_PRODUCER {
     background-color: #e6eefe;
     color: #3558a2;
   }
@@ -43,7 +38,6 @@
       width: 200px;
     }
   }
-  &--RECEIVED,
   &--AWAITING_GROUP {
     background-color: #e5fbfd;
     color: #006a6f;
@@ -89,7 +83,8 @@
   &--RESEALED,
   &--AWAITING_CHILD,
   &--GROUPED,
-  &--INTERMEDIATELY_PROCESSED {
+  &--INTERMEDIATELY_PROCESSED,
+  &--RECEIVED {
     background-color: #e5fbfd;
     color: #006a6f;
   }

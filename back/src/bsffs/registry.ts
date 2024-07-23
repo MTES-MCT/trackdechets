@@ -23,6 +23,8 @@ import { RegistryBsff } from "../registry/elastic";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { BsffWithTransporters } from "./types";
 import { splitAddress } from "../common/addresses";
+import Decimal from "decimal.js";
+import { isFinalOperation } from "./constants";
 
 const getOperationData = (bsff: RegistryBsff) => {
   const bsffDestination = toBsffDestination(bsff.packagings);
@@ -34,21 +36,53 @@ const getOperationData = (bsff: RegistryBsff) => {
   };
 };
 
-const getFinalOperationsData = (bsff: RegistryBsff) => {
+const getFinalOperationsData = (
+  bsff: RegistryBsff
+): Pick<
+  OutgoingWaste | AllWaste,
+  | "destinationFinalOperationCodes"
+  | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCompanySirets"
+> => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
+  const destinationFinalOperationCompanySirets: string[] = [];
   // Check if finalOperations is defined and has elements
   for (const packaging of bsff.packagings) {
-    if (packaging.finalOperations && packaging.finalOperations.length > 0) {
+    if (
+      packaging.operationSignatureDate &&
+      packaging.operationCode &&
+      // Cf tra-14603 => si le code de traitement du bordereau initial est final,
+      // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
+      // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
+      !isFinalOperation(
+        packaging.operationCode,
+        packaging.operationNoTraceability
+      ) &&
+      packaging.finalOperations?.length
+    ) {
       // Iterate through each operation once and fill both arrays
       packaging.finalOperations.forEach(ope => {
         destinationFinalOperationCodes.push(ope.operationCode);
-        destinationFinalOperationWeights.push(ope.quantity.toNumber());
+        // conversion en tonnes
+        destinationFinalOperationWeights.push(
+          ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
+        );
+        if (ope.finalBsffPackaging.bsff.destinationCompanySiret) {
+          // cela devrait tout le temps être le cas
+          destinationFinalOperationCompanySirets.push(
+            ope.finalBsffPackaging.bsff.destinationCompanySiret
+          );
+        }
       });
     }
   }
 
-  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+  return {
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    destinationFinalOperationCompanySirets
+  };
 };
 
 const getInitialEmitterData = (bsff: RegistryBsff) => {
@@ -309,8 +343,14 @@ export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     destinationReceptionAcceptationStatus:
       bsffDestination.receptionAcceptationStatus,
     destinationOperationDate: bsffDestination.operationDate,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     destinationReceptionWeight: bsffDestination.receptionWeight
-      ? bsffDestination.receptionWeight / 1000
+      ? new Decimal(bsffDestination.receptionWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : bsffDestination.receptionWeight,
     wasteAdr: bsff.wasteAdr,
     workerCompanyName: null,
@@ -379,7 +419,7 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toNumber()
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     ...getOperationData(bsff),
     ...getFinalOperationsData(bsff),
@@ -400,7 +440,7 @@ export function toTransportedWaste(
     ...genericWaste,
     destinationReceptionDate: bsff.destinationReceptionDate,
     weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toNumber()
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     traderCompanyName: null,
     traderCompanySiret: null,
@@ -450,7 +490,7 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     brokerRecepisseNumber: null,
     destinationPlannedOperationMode: null,
     weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toNumber()
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     traderCompanyName: null,
     traderCompanySiret: null,

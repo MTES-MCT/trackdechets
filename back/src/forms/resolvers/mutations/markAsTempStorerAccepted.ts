@@ -12,6 +12,7 @@ import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
 import { prismaJsonNoNull } from "../../../common/converter";
+import { bsddWasteQuantities } from "../../helpers/bsddWasteQuantities";
 
 const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccepted"] =
   async (_, args, context) => {
@@ -25,13 +26,21 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
 
     const { quantityType, ...tmpStorerAcceptedInfo } = tempStorerAcceptedInfo;
 
+    const wasteQuantities = bsddWasteQuantities({
+      quantityReceived: tmpStorerAcceptedInfo.quantityReceived,
+      quantityRefused: tmpStorerAcceptedInfo.quantityRefused,
+      wasteAcceptationStatus: tmpStorerAcceptedInfo.wasteAcceptationStatus
+    });
+
     const formUpdateInput: Prisma.FormUpdateInput = {
       ...tmpStorerAcceptedInfo,
       signedAt: new Date(tempStorerAcceptedInfo.signedAt),
       forwardedIn: {
         // pre-complete waste details repackaging info on BSD suite
         update: {
-          wasteDetailsQuantity: tmpStorerAcceptedInfo.quantityReceived,
+          wasteDetailsQuantity:
+            wasteQuantities?.quantityAccepted ??
+            tmpStorerAcceptedInfo.quantityReceived,
           wasteDetailsQuantityType: quantityType,
           wasteDetailsOnuCode: form.wasteDetailsOnuCode,
           wasteDetailsPackagingInfos: prismaJsonNoNull(
@@ -44,7 +53,7 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
     const tempStoredForm = await runInTransaction(async transaction => {
       const formRepository = getFormRepository(user, transaction);
       const tempStoredForm = await formRepository.update(
-        { id: form.id },
+        { id: form.id, status: form.status },
         {
           status: transitionForm(form, {
             type: EventType.MarkAsTempStorerAccepted,

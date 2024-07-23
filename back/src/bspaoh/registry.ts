@@ -21,6 +21,7 @@ import {
 import { getWasteDescription } from "./utils";
 import { getFirstTransporterSync } from "./converter";
 import { splitAddress } from "../common/addresses";
+import Decimal from "decimal.js";
 
 const getInitialEmitterData = () => {
   const initialEmitter: Record<string, string | null> = {
@@ -170,7 +171,12 @@ export function toGenericWaste(
       bspaoh.destinationReceptionAcceptationStatus,
     destinationOperationDate: bspaoh.destinationOperationDate,
     destinationReceptionWeight:
-      bspaoh.destinationReceptionWasteReceivedWeightValue,
+      bspaoh.destinationReceptionWasteReceivedWeightValue
+        ? new Decimal(bspaoh.destinationReceptionWasteReceivedWeightValue)
+            .dividedBy(1000)
+            .toDecimalPlaces(6)
+            .toNumber()
+        : bspaoh.destinationReceptionWasteReceivedWeightValue,
     wasteAdr: bspaoh.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
@@ -195,7 +201,14 @@ export function toGenericWaste(
     emitterCompanyCity,
     emitterCompanyCountry,
     emitterCompanyName: bspaoh.emitterCompanyName,
-    emitterCompanySiret: bspaoh.emitterCompanySiret
+    emitterCompanySiret: bspaoh.emitterCompanySiret,
+    weight: bspaoh.emitterWasteWeightValue
+      ? new Decimal(bspaoh.emitterWasteWeightValue)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : bspaoh.emitterWasteWeightValue,
+    ...getTransporterData(bspaoh)
   };
 }
 

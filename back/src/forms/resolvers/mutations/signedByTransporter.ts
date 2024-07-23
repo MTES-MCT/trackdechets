@@ -149,7 +149,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       };
 
       const resentForm = await formRepository.update(
-        { id: form.id },
+        { id: form.id, status: form.status },
         {
           status: transitionForm(form, {
             type: EventType.SignedByTransporter,
@@ -206,7 +206,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     };
 
     const sentForm = await formRepository.update(
-      { id: form.id },
+      { id: form.id, status: form.status },
       {
         status: transitionForm(form, {
           type: EventType.SignedByTransporter,
