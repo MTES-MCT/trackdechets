@@ -234,6 +234,7 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   destinationReceptionRefusedWeight: null,
   traderCompanyMail: null,
   brokerCompanyMail: null,
+  destinationFinalOperationCompanySirets: [],
   nextDestinationNotificationNumber: null,
   nextDestinationProcessingOperation: null,
   postTempStorageDestinationAddress: null,
@@ -421,9 +422,6 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   parcelPostalCodes: null,
   parcelNumbers: null,
   parcelCoordinates: null,
-  // En attente des correctifs recette sur TRA-12745
-  // finalOperationCodes: null,
-  // finalReceptionWeights: null
   destinationReceptionAcceptedWeight: null,
   destinationReceptionRefusedWeight: null,
   weight: null,
@@ -530,6 +528,7 @@ export const emptyAllWaste: Required<AllWaste> = {
   workerCompanyAddress: null,
   destinationFinalOperationCodes: [],
   destinationFinalOperationWeights: [],
+  destinationFinalOperationCompanySirets: [],
   nextDestinationNotificationNumber: null,
   nextDestinationProcessingOperation: null,
   intermediary1CompanyName: null,

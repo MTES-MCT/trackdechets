@@ -348,33 +348,44 @@ describe("toOutgoingWaste", () => {
       " and destinationfinalOperationWeights",
     async () => {
       const user = await userFactory();
-      const finalForm1 = await formFactory({ ownerId: user.id });
-      const finalForm2 = await formFactory({ ownerId: user.id });
-      const finalForm3 = await formFactory({ ownerId: user.id });
+      const finalForm1 = await formFactory({
+        ownerId: user.id,
+        opt: { processingOperationDone: "R 1", quantityReceived: 1 }
+      });
+      const finalForm2 = await formFactory({
+        ownerId: user.id,
+        opt: { processingOperationDone: "R 2", quantityReceived: 2 }
+      });
+      const finalForm3 = await formFactory({
+        ownerId: user.id,
+        opt: { processingOperationDone: "D 13", quantityReceived: 3 }
+      });
 
       const form = await formFactory({
         ownerId: user.id,
         opt: {
+          processingOperationDone: "D 13",
+          processedAt: new Date(),
           finalOperations: {
             createMany: {
               data: [
                 {
                   finalFormId: finalForm1.id,
-                  operationCode: "R 1",
+                  operationCode: finalForm1.processingOperationDone!,
                   noTraceability: false,
-                  quantity: 1
+                  quantity: finalForm1.quantityReceived!
                 },
                 {
                   finalFormId: finalForm2.id,
-                  operationCode: "R 2",
+                  operationCode: finalForm2.processingOperationDone!,
                   noTraceability: false,
-                  quantity: 2
+                  quantity: finalForm2.quantityReceived!
                 },
                 {
                   finalFormId: finalForm3.id,
-                  operationCode: "D 13",
+                  operationCode: finalForm3.processingOperationDone!,
                   noTraceability: true,
-                  quantity: 3
+                  quantity: finalForm3.quantityReceived!
                 }
               ]
             }
@@ -387,11 +398,61 @@ describe("toOutgoingWaste", () => {
       });
       const waste = toOutgoingWaste(formToBsdd(formForRegistry));
       expect(waste.destinationFinalOperationCodes).toStrictEqual([
-        "R 1",
-        "R 2",
-        "D 13"
+        finalForm1.processingOperationDone,
+        finalForm2.processingOperationDone,
+        finalForm3.processingOperationDone
       ]);
-      expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2, 3]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([
+        finalForm1.quantityReceived?.toNumber(),
+        finalForm2.quantityReceived?.toNumber(),
+        finalForm3.quantityReceived?.toNumber()
+      ]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([
+        finalForm1.recipientCompanySiret,
+        finalForm2.recipientCompanySiret,
+        finalForm3.recipientCompanySiret
+      ]);
+    }
+  );
+
+  test(
+    "destinationFinalOperationCodes and destinationfinalOperationWeights should be empty" +
+      " when bsdd has a final operation",
+    async () => {
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          processingOperationDone: "R 1",
+          processedAt: new Date(),
+          quantityReceived: 1
+        }
+      });
+      await prisma.form.update({
+        where: { id: form.id },
+        data: {
+          finalOperations: {
+            createMany: {
+              data: [
+                {
+                  finalFormId: form.id,
+                  operationCode: form.recipientProcessingOperation!,
+                  noTraceability: false,
+                  quantity: form.quantityReceived!
+                }
+              ]
+            }
+          }
+        }
+      });
+      const formForRegistry = await prisma.form.findUniqueOrThrow({
+        where: { id: form.id },
+        include: RegistryFormInclude
+      });
+      const waste = toOutgoingWaste(formToBsdd(formForRegistry));
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([]);
     }
   );
 
@@ -705,33 +766,99 @@ describe("toAllWaste", () => {
       " and destinationfinalOperationWeights",
     async () => {
       const user = await userFactory();
-      const finalForm1 = await formFactory({ ownerId: user.id });
-      const finalForm2 = await formFactory({ ownerId: user.id });
-      const finalForm3 = await formFactory({ ownerId: user.id });
+
+      const finalForm1 = await formFactory({
+        ownerId: user.id,
+        opt: { processingOperationDone: "R 1", quantityReceived: 1 }
+      });
+      const finalForm2 = await formFactory({
+        ownerId: user.id,
+        opt: { processingOperationDone: "R 2", quantityReceived: 2 }
+      });
+      const finalForm3 = await formFactory({
+        ownerId: user.id,
+        opt: { processingOperationDone: "D 13", quantityReceived: 3 }
+      });
 
       const form = await formFactory({
         ownerId: user.id,
         opt: {
+          processingOperationDone: "D 13",
+          processedAt: new Date(),
           finalOperations: {
             createMany: {
               data: [
                 {
                   finalFormId: finalForm1.id,
-                  operationCode: "R 1",
+                  operationCode: finalForm1.processingOperationDone!,
                   noTraceability: false,
-                  quantity: 1
+                  quantity: finalForm1.quantityReceived!
                 },
                 {
                   finalFormId: finalForm2.id,
-                  operationCode: "R 2",
+                  operationCode: finalForm2.processingOperationDone!,
                   noTraceability: false,
-                  quantity: 2
+                  quantity: finalForm2.quantityReceived!
                 },
                 {
                   finalFormId: finalForm3.id,
-                  operationCode: "D 13",
+                  operationCode: finalForm3.processingOperationDone!,
                   noTraceability: true,
-                  quantity: 3
+                  quantity: finalForm3.quantityReceived!
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      const formForRegistry = await prisma.form.findUniqueOrThrow({
+        where: { id: form.id },
+        include: RegistryFormInclude
+      });
+      const waste = toAllWaste(formToBsdd(formForRegistry));
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([
+        finalForm1.processingOperationDone,
+        finalForm2.processingOperationDone,
+        finalForm3.processingOperationDone
+      ]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([
+        finalForm1.quantityReceived?.toNumber(),
+        finalForm2.quantityReceived?.toNumber(),
+        finalForm3.quantityReceived?.toNumber()
+      ]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([
+        finalForm1.recipientCompanySiret,
+        finalForm2.recipientCompanySiret,
+        finalForm3.recipientCompanySiret
+      ]);
+    }
+  );
+
+  test(
+    "destinationFinalOperationCodes and destinationfinalOperationWeights should be empty" +
+      " when bsdd has a final operation",
+    async () => {
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          processingOperationDone: "R 1",
+          processedAt: new Date(),
+          quantityReceived: 1
+        }
+      });
+      await prisma.form.update({
+        where: { id: form.id },
+        data: {
+          finalOperations: {
+            createMany: {
+              data: [
+                {
+                  finalFormId: form.id,
+                  operationCode: form.recipientProcessingOperation!,
+                  noTraceability: false,
+                  quantity: form.quantityReceived!
                 }
               ]
             }
@@ -743,12 +870,9 @@ describe("toAllWaste", () => {
         include: RegistryFormInclude
       });
       const waste = toAllWaste(formToBsdd(formForRegistry));
-      expect(waste.destinationFinalOperationCodes).toStrictEqual([
-        "R 1",
-        "R 2",
-        "D 13"
-      ]);
-      expect(waste.destinationFinalOperationWeights).toStrictEqual([1, 2, 3]);
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([]);
+      expect(waste.destinationFinalOperationCompanySirets).toStrictEqual([]);
     }
   );
 

@@ -10,11 +10,14 @@ import { updateTransport } from "../steps/updateTransport";
 
 export default {
   title: `Acheminement direct du producteur des déchets vers le crématorium`,
-  description: "plop",
   companies: [
     { name: "emetteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur", companyTypes: ["TRANSPORTER"] },
-    { name: "crematorium", companyTypes: ["CREMATORIUM"] }
+    {
+      name: "crematorium",
+      companyTypes: ["WASTEPROCESSOR"],
+      opt: { wasteProcessorTypes: ["CREMATION"] }
+    }
   ],
   steps: [
     createBspaoh("emetteur"),

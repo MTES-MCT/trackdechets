@@ -540,6 +540,9 @@ type OutgoingWaste {
   "Extra - Quantité(s) correspondante(s) au traitement réalisé par le ou les exutoires finaux"
   destinationFinalOperationWeights: [Float!]
 
+  "Extra - Installation(s) de traitement dans le ou lesquelles le traitement final a été réalisé"
+  destinationFinalOperationCompanySirets: [String!]
+
   "Extra - Adresse email de contact du transporteur"
   transporterCompanyMail: String
 
@@ -1443,6 +1446,9 @@ type AllWaste {
 
   "Extra - Quantité(s) correspondante(s) au traitement réalisé par le ou les exutoires finaux"
   destinationFinalOperationWeights: [Float!]
+
+  "Extra - Installation(s) de traitement dans le ou lesquelles le traitement final a été réalisé"
+  destinationFinalOperationCompanySirets: [String!]
 
   "Extra - Adresse email de contact de l'expéditeur du déchet"
   emitterCompanyMail: String

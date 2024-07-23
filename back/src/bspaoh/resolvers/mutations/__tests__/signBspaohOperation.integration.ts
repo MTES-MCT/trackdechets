@@ -30,7 +30,10 @@ describe("Mutation.Bspaoh.sign", () => {
 
   describe("OPERATION", () => {
     it("should allow destination to sign operation", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company
@@ -99,7 +102,10 @@ describe("Mutation.Bspaoh.sign", () => {
     });
 
     it("should disallow destination to sign operation if reception is not signed", async () => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN, {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      });
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
         company: transporter.company

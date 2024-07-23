@@ -1,4 +1,3 @@
-import { BsddFinalOperation } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -23,6 +22,7 @@ import { splitAddress } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
+import { isFinalOperationCode } from "../common/operationCodes";
 
 const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
   if (!bsdd.forwardedIn) return {};
@@ -186,24 +186,45 @@ export function getRegistryFields(
  * maintaining the order
  */
 const getFinalOperationsData = (
-  bsdd: Bsdd & {
-    finalOperations: BsddFinalOperation[];
-  }
+  bsdd: ReturnType<typeof formToBsdd>
 ): Pick<
   OutgoingWaste | AllWaste,
-  "destinationFinalOperationCodes" | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCodes"
+  | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCompanySirets"
 > => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
+  const destinationFinalOperationCompanySirets: string[] = [];
   // Check if finalOperations is defined and has elements
-  if (bsdd.finalOperations && bsdd.finalOperations.length > 0) {
+
+  if (
+    bsdd.destinationOperationSignatureDate &&
+    bsdd.destinationOperationCode &&
+    // Cf tra-14603 => si le code de traitement du bordereau initial est final,
+    // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
+    // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
+    !isFinalOperationCode(bsdd.destinationOperationCode) &&
+    !bsdd.destinationOperationNoTraceability &&
+    bsdd.finalOperations?.length
+  ) {
     // Iterate through each operation once and fill both arrays
     bsdd.finalOperations.forEach(ope => {
       destinationFinalOperationCodes.push(ope.operationCode);
       destinationFinalOperationWeights.push(ope.quantity.toNumber());
+      if (ope.finalForm.recipientCompanySiret) {
+        // cela devrait tout le temps être le cas
+        destinationFinalOperationCompanySirets.push(
+          ope.finalForm.recipientCompanySiret
+        );
+      }
     });
   }
-  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+  return {
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    destinationFinalOperationCompanySirets
+  };
 };
 
 export const getSubType = (bsdd: Bsdd): BsdSubType => {

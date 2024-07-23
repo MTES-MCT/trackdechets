@@ -84,7 +84,9 @@ export const RegistryFormInclude = Prisma.validator<Prisma.FormInclude>()({
   forwarding: { include: { transporters: true } },
   intermediaries: true,
   forwardedIn: { include: { transporters: true } },
-  finalOperations: true,
+  finalOperations: {
+    include: { finalForm: { select: { recipientCompanySiret: true } } }
+  },
   grouping: { include: { initialForm: { include: { transporters: true } } } },
   transporters: true
 });
@@ -99,14 +101,23 @@ export const RegistryBsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
   intermediaries: true,
   forwardedIn: true,
   transporters: true,
-  finalOperations: true
+  finalOperations: {
+    include: { finalBsda: { select: { destinationCompanySiret: true } } }
+  }
 });
 
 export type RegistryBsda = Prisma.BsdaGetPayload<{
   include: typeof RegistryBsdaInclude;
 }>;
 
-export const RegistryBsdasriInclude = { grouping: true, finalOperations: true };
+export const RegistryBsdasriInclude = Prisma.validator<Prisma.BsdasriInclude>()(
+  {
+    grouping: true,
+    finalOperations: {
+      include: { finalBsdasri: { select: { destinationCompanySiret: true } } }
+    }
+  }
+);
 
 export type RegistryBsdasri = Prisma.BsdasriGetPayload<{
   include: typeof RegistryBsdasriInclude;
@@ -124,7 +135,13 @@ export const RegistryBsffInclude = Prisma.validator<Prisma.BsffInclude>()({
   transporters: true,
   packagings: {
     include: {
-      finalOperations: true,
+      finalOperations: {
+        include: {
+          finalBsffPackaging: {
+            include: { bsff: { select: { destinationCompanySiret: true } } }
+          }
+        }
+      },
       previousPackagings: {
         include: { bsff: true }
       }

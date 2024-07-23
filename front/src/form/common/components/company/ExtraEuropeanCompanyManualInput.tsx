@@ -11,13 +11,17 @@ interface ExtraEuropeanCompanyManualProps {
   optional: boolean;
   extraEuropeanCompanyId?: string | null;
   onExtraEuropeanCompanyId: (value: string) => void;
+  vatNumber?: string | null;
+  onVatNumberChange: (value: string) => void;
 }
 
 export default function ExtraEuropeanCompanyManualInput({
   name,
   optional,
   extraEuropeanCompanyId,
-  onExtraEuropeanCompanyId
+  onExtraEuropeanCompanyId,
+  vatNumber,
+  onVatNumberChange
 }: ExtraEuropeanCompanyManualProps) {
   const [field] = useField<FormCompany>({ name });
   const { setFieldValue } = useFormikContext();
@@ -41,8 +45,9 @@ export default function ExtraEuropeanCompanyManualInput({
           <Tooltip msg="À renseigner si le numéro de TVA n'est pas reconnu dans le champ de recherche" />
           <input
             type="text"
-            value={field.value.vatNumber!}
+            value={vatNumber!}
             name={`${field.name}.vatNumber`}
+            onChange={e => onVatNumberChange(e.target.value)}
             className="td-input"
           />
         </label>

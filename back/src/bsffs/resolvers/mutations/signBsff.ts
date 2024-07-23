@@ -158,7 +158,7 @@ async function signEmission(
   const { updateBsff } = getBsffRepository(user);
 
   return updateBsff({
-    where: { id: bsff.id },
+    where: { id: bsff.id, status: bsff.status },
     data: {
       status: BsffStatus.SIGNED_BY_EMITTER,
       emitterEmissionSignatureDate: input.date,

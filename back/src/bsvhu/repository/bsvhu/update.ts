@@ -17,7 +17,7 @@ export function buildUpdateBsvhu(deps: RepositoryFnDeps): UpdateBsvhuFn {
   return async (where, data, logMetadata?) => {
     const { prisma, user } = deps;
 
-    const previousBsvhu = await prisma.bsvhu.findUnique({ where });
+    const previousBsvhu = await prisma.bsvhu.findUniqueOrThrow({ where });
     const bsvhu = await prisma.bsvhu.update({ where, data });
 
     const { updatedAt, ...updateDiff } = objectDiff(previousBsvhu, bsvhu);

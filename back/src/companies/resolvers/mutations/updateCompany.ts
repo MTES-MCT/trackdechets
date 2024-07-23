@@ -82,6 +82,11 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   const { companyTypes, collectorTypes, wasteProcessorTypes } =
     await validateCompanyTypes(company, args);
 
+  if (companyTypes.includes("CREMATORIUM")) {
+    throw new UserInputError(
+      "Le type CREMATORIUM est déprécié, utiliser WasteProcessorTypes.CREMATION."
+    );
+  }
   const { ecoOrganismeAgreements } = args;
   // update to anything else than ony a TRANSPORTER
   const updateOtherThanTransporter = args.companyTypes?.some(
