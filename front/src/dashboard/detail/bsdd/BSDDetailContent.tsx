@@ -77,8 +77,12 @@ import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
-import { BSD_DETAILS_QTY_TOOLTIP } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
 import { isDefined } from "../../../common/helper";
+import TdTooltip from "../../../common/components/Tooltip";
+import {
+  BSD_DETAILS_QTY_TOOLTIP,
+  NON_RENSEIGNE
+} from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -412,6 +416,18 @@ const Recipient = ({
           tooltip={BSD_DETAILS_QTY_TOOLTIP}
           showEmpty={hasBeenReceived}
         />
+        <DetailRow
+          value={
+            form?.quantityRefused ? (
+              `${form?.quantityRefused} tonnes`
+            ) : (
+              <>
+                {NON_RENSEIGNE} <TdTooltip msg={BSD_DETAILS_QTY_TOOLTIP} />
+              </>
+            )
+          }
+          label="Quantité refusée"
+        />
         <DetailRow value={form.wasteRefusalReason} label="Motif de refus" />
       </div>
       <div className={styles.detailGrid}>
@@ -420,6 +436,18 @@ const Recipient = ({
           label="Quantité traitée"
           tooltip={BSD_DETAILS_QTY_TOOLTIP}
           showEmpty={hasBeenReceived}
+        />
+        <DetailRow
+          value={
+            form?.quantityAccepted ? (
+              `${form?.quantityAccepted} tonnes`
+            ) : (
+              <>
+                {NON_RENSEIGNE} <TdTooltip msg={BSD_DETAILS_QTY_TOOLTIP} />
+              </>
+            )
+          }
+          label="Quantité traitée"
         />
         <DetailRow
           value={recipient?.processingOperation}

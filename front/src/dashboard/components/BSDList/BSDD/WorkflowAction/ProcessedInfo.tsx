@@ -137,7 +137,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   const notificationNumberIsOptional = !notificationNumberIsMandatory;
   // nextDestination + hasVatNumber + isDangerousOrPop
   const notificationNumberPlaceHolder = isDangerousOrPop
-    ? "PP AAAA DDDRRR"
+    ? "PPAAAADDDRRR"
     : "A7E AAAA DDDRRR";
   const notificationNumberLabel = isDangerousOrPop
     ? `Numéro de notification ${
@@ -145,7 +145,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
       }`
     : "Numéro de déclaration Annexe 7 (optionnel)";
   const notificationNumberTooltip = isDangerousOrPop
-    ? "En cas d'export, indiquer ici le N° de notification prévu à l'annexe 1-B du règlement N°1013/2006, au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre."
+    ? "En cas d'export, indiquer ici le N° de notification prévu à l'annexe 1-B du règlement N°1013/2006, au format PPAAAADDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre."
     : "En cas d'export, indiquer ici le N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre. ";
 
   return (
