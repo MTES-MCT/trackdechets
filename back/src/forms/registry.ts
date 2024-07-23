@@ -420,7 +420,6 @@ export function toIncomingWaste(
     ...emptyIncomingWaste,
     ...genericWaste,
     destinationReceptionDate: bsdd.destinationReceptionDate,
-    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
