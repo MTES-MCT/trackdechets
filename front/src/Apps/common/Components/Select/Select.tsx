@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode, useMemo } from "react";
 import { filter_type_select_option_placeholder } from "../../wordings/dashboard/wordingsDashboard";
 import MultiSelectWrapper from "../MultiSelect/MultiSelect";
 import SelectWithSubOptions from "../SelectWithSubOptions/SelectWithSubOptions";
@@ -38,48 +38,57 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     },
     ref
   ) => {
-    const hasSubOptions = options.find(o => o.options?.length);
+    const select: ReactNode = useMemo(() => {
+      const hasSubOptions = options.find(o => o.options?.length);
 
-    const selectWithSubOptions = (
-      <SelectWithSubOptions
-        options={options}
-        onChange={values => {
-          console.log(">> values", values);
-        }}
-      />
-    );
-    const regularSelect = (
-      <select
-        ref={ref}
-        id={id}
-        className="fr-select"
-        onChange={onChange}
-        defaultValue={defaultValue}
-      >
-        <option value="" disabled hidden>
-          {placeholder}
-        </option>
-        {options?.map(option => (
-          <option key={option.value} value={option.value}>
-            {option.label}
+      const selectWithSubOptions = (
+        <SelectWithSubOptions options={options} onChange={onChange} />
+      );
+      const regularSelect = (
+        <select
+          ref={ref}
+          id={id}
+          className="fr-select"
+          onChange={onChange}
+          defaultValue={defaultValue}
+        >
+          <option value="" disabled hidden>
+            {placeholder}
           </option>
-        ))}
-      </select>
-    );
-    const multipleSelect = (
-      <MultiSelectWrapper
-        options={options}
-        selected={selected}
-        onChange={onChange}
-        placeholder={placeholder}
-        disableSearch={disableSearch}
-        showRendererText={showRendererText}
-      />
-    );
+          {options?.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      );
+      const multipleSelect = (
+        <MultiSelectWrapper
+          options={options}
+          selected={selected}
+          onChange={onChange}
+          placeholder={placeholder}
+          disableSearch={disableSearch}
+          showRendererText={showRendererText}
+        />
+      );
 
-    let select = regularSelect;
-    if (hasSubOptions) select = selectWithSubOptions;
-    else if (isMultiple) select = multipleSelect;
+      if (hasSubOptions) return selectWithSubOptions;
+      else if (isMultiple) return multipleSelect;
+      return regularSelect;
+    }, [
+      label,
+      options,
+      id,
+      // onChange, // TODO: investigate why infinite re-renders. Maybe useMemo not useful?
+      isMultiple,
+      // selected,
+      disableSearch,
+      defaultValue,
+      placeholder,
+      showRendererText,
+      ref
+    ]);
 
     return (
       <div className="fr-select-group">

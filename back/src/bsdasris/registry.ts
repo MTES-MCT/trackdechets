@@ -4,7 +4,6 @@ import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
-  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -21,6 +20,7 @@ import {
 } from "../registry/types";
 import { getWasteDescription } from "./utils";
 import { RegistryBsdasri } from "../registry/elastic";
+import { getBsdasriSubType } from "../common/subTypes";
 
 const getOperationData = (bsdasri: Bsdasri) => ({
   destinationPlannedOperationCode: bsdasri.destinationOperationCode,
@@ -105,17 +105,6 @@ export function getRegistryFields(
   return registryFields;
 }
 
-export const getSubType = (bsdasri: Bsdasri): BsdSubType => {
-  switch (bsdasri.type) {
-    case "SIMPLE":
-      return "INITIAL";
-    case "SYNTHESIS":
-      return "SYNTHESIS";
-    case "GROUPING":
-      return "GATHERING";
-  }
-};
-
 export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
   return {
     wasteDescription: bsdasri.wasteCode
@@ -130,7 +119,7 @@ export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     ecoOrganismeName: bsdasri.ecoOrganismeName,
     ecoOrganismeSiren: bsdasri.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDASRI",
-    bsdSubType: getSubType(bsdasri),
+    bsdSubType: getBsdasriSubType(bsdasri),
     status: bsdasri.status,
     customId: null,
     destinationCap: null,

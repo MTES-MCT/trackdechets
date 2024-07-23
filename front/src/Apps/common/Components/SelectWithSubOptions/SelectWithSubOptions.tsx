@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import "./selectWithSubOptions.scss";
-import { getLabel, onSelectChange } from "./SelectWithSubOptions.utils";
+import {
+  getLabel,
+  getOptionsFromValues,
+  onSelectChange
+} from "./SelectWithSubOptions.utils";
 import { Option } from "../Select/Select";
 
 interface SelectWithSubOptions {
   options: Option[];
-  onChange: (values: string[]) => void;
+  onChange: (e: any) => void;
 }
 
 const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
@@ -18,7 +22,13 @@ const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
 
   // Trigger the 'onChange' method
   useEffect(() => {
-    onChange(selectedOptionsValues);
+    // Transform back values array into options array
+    const optionsFromValues = getOptionsFromValues(
+      selectedOptionsValues,
+      options
+    );
+
+    onChange(optionsFromValues);
   }, [selectedOptionsValues, onChange]);
 
   // Close select if user clicks elsewhere in the page

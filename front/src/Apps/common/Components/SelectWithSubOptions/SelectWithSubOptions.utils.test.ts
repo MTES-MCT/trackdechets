@@ -1,4 +1,9 @@
-import { getLabel, onSelectChange } from "./SelectWithSubOptions.utils";
+import {
+  getLabel,
+  getOptionsFromValues,
+  getValuesFromOptions,
+  onSelectChange
+} from "./SelectWithSubOptions.utils";
 import { Option } from "../Select/Select";
 
 const OPTIONS: Option[] = [
@@ -82,10 +87,6 @@ describe("getLabel", () => {
 });
 
 describe("onSelectChange", () => {
-  afterEach(() => {
-    jest.resetAllMocks();
-  });
-
   it("Should update selected options, adding latest selected value", () => {
     // Given
     let selectedOptions = [];
@@ -172,5 +173,139 @@ describe("onSelectChange", () => {
 
     // Then
     expect(selectedOptions).toEqual([]);
+  });
+});
+
+describe("getOptionsFromValues", () => {
+  it("should return original options from values", () => {
+    // Given
+    const res = getOptionsFromValues(["OPTION1", "OPTION2"], OPTIONS);
+
+    // Then
+    expect(res).toStrictEqual([
+      {
+        value: "OPTION1",
+        label: "Option 1"
+      },
+      {
+        value: "OPTION2",
+        label: "Option 2"
+      }
+    ]);
+  });
+
+  it("should return original options including nested ones, from values", () => {
+    // Given
+    const res = getOptionsFromValues(
+      [
+        "OPTION1",
+        "OPTION3",
+        "OPTION3.OPTION3.2",
+        "OPTION3.OPTION3.2.OPTION3.2.1"
+      ],
+      OPTIONS
+    );
+
+    // Then
+    expect(res).toStrictEqual([
+      {
+        value: "OPTION1",
+        label: "Option 1"
+      },
+      {
+        value: "OPTION3",
+        label: "Option 3",
+        options: [
+          {
+            value: "OPTION3.2",
+            label: "Option 3.2",
+            options: [
+              {
+                value: "OPTION3.2.1",
+                label: "Option 3.2.1"
+              }
+            ]
+          }
+        ]
+      }
+    ]);
+  });
+
+  it("should return empty array of no values", () => {
+    // Given
+    const res = getOptionsFromValues([], OPTIONS);
+
+    // Then
+    expect(res).toStrictEqual([]);
+  });
+});
+
+describe("getValuesFromOptions", () => {
+  it("should return the values from the options", () => {
+    // When
+    const options = [
+      {
+        value: "OPTION1",
+        label: "Option 1"
+      },
+      {
+        value: "OPTION3",
+        label: "Option 3"
+      }
+    ];
+
+    // Given
+    const res = getValuesFromOptions(options);
+
+    // Then
+    expect(res).toStrictEqual(["OPTION1", "OPTION3"]);
+  });
+
+  it("should return the values including nested, from the options", () => {
+    // When
+    const options = [
+      {
+        value: "OPTION1",
+        label: "Option 1"
+      },
+      {
+        value: "OPTION3",
+        label: "Option 3",
+        options: [
+          {
+            value: "OPTION3.1",
+            label: "Option 3.1",
+            options: [
+              {
+                value: "OPTION3.1.1",
+                label: "Option 3.1.1"
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    // Given
+    const res = getValuesFromOptions(options);
+
+    // Then
+    expect(res).toStrictEqual([
+      "OPTION1",
+      "OPTION3",
+      "OPTION3.OPTION3.1",
+      "OPTION3.OPTION3.1.OPTION3.1.1"
+    ]);
+  });
+
+  it("should return empty array if no values", () => {
+    // When
+    const options = [];
+
+    // Given
+    const res = getValuesFromOptions(options);
+
+    // Then
+    expect(res).toStrictEqual([]);
   });
 });

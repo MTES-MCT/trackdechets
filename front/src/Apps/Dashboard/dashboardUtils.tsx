@@ -351,7 +351,14 @@ export const filterPredicates: {
 }[] = [
   {
     filterName: FilterName.types,
-    where: value => ({ type: { _in: value } })
+    where: value => {
+      console.log(">> filterPredicates");
+      console.log("value", value);
+
+      const filter = { type: { _in: value } };
+
+      return filter;
+    }
   },
   {
     filterName: FilterName.waste,

@@ -1,5 +1,4 @@
 import {
-  getSubType,
   toAllWaste,
   toIncomingWaste,
   toManagedWaste,
@@ -10,7 +9,7 @@ import { prisma } from "@td/prisma";
 import { RegistryBsdaInclude } from "../../registry/elastic";
 import { bsdaFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { BsdaType, UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import {
   companyFactory,
   toIntermediaryCompany,
@@ -656,41 +655,4 @@ describe("toGenericWaste", () => {
     expect(waste.destinationCompanyMail).toStrictEqual("destination@mail.com");
     expect(waste.brokerCompanyMail).toStrictEqual("broker@mail.com");
   });
-});
-
-describe("getSubType", () => {
-  afterAll(resetDatabase);
-
-  it("type is OTHER_COLLECTIONS > should return INITIAL", async () => {
-    // Given
-    const bsda = await bsdaFactory({ opt: { type: "OTHER_COLLECTIONS" } });
-
-    // When
-    const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
-      where: { id: bsda.id },
-      include: RegistryBsdaInclude
-    });
-    const subType = getSubType(bsdaForRegistry);
-
-    // Then
-    expect(subType).toBe("INITIAL");
-  });
-
-  it.each([BsdaType.GATHERING, BsdaType.RESHIPMENT, BsdaType.COLLECTION_2710])(
-    "type is %p > should return %p",
-    async type => {
-      // Given
-      const bsda = await bsdaFactory({ opt: { type } });
-
-      // When
-      const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
-        where: { id: bsda.id },
-        include: RegistryBsdaInclude
-      });
-      const subType = getSubType(bsdaForRegistry);
-
-      // Then
-      expect(subType).toBe(type);
-    }
-  );
 });

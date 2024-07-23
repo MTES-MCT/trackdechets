@@ -1,5 +1,4 @@
 import {
-  getSubType,
   toAllWaste,
   toIncomingWaste,
   toManagedWaste,
@@ -16,7 +15,6 @@ import {
 } from "./factories";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { BsffType } from "@prisma/client";
 
 const createBsffWith5Transporters = async () => {
   const transporter1 = await userWithCompanyFactory("MEMBER", {
@@ -412,30 +410,5 @@ describe("toGenericWaste", () => {
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
-  });
-});
-
-describe("getSubType", () => {
-  afterAll(resetDatabase);
-
-  it.each([
-    [BsffType.COLLECTE_PETITES_QUANTITES, "INITIAL"],
-    [BsffType.TRACER_FLUIDE, "INITIAL"],
-    [BsffType.GROUPEMENT, "GROUPEMENT"],
-    [BsffType.RECONDITIONNEMENT, "RECONDITIONNEMENT"],
-    [BsffType.REEXPEDITION, "RESHIPMENT"]
-  ])("type is %p > should return %p", async (type, expectedSubType) => {
-    // Given
-    const bsff = await createBsff({}, { data: { type } });
-
-    // When
-    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
-      where: { id: bsff.id },
-      include: RegistryBsffInclude
-    });
-    const subType = getSubType(bsffForRegistry);
-
-    // Then
-    expect(subType).toBe(expectedSubType);
   });
 });

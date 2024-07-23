@@ -23,6 +23,7 @@ import {
   getNextTransporterSync,
   getTransportersSync
 } from "./database";
+import { getBsdaSubType } from "../common/subTypes";
 
 export type BsdaForElastic = Bsda &
   BsdaWithTransporters &
@@ -282,6 +283,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
 
   return {
     type: BsdType.BSDA,
+    subType: getBsdaSubType(bsda),
     createdAt: bsda.createdAt?.getTime(),
     updatedAt: bsda.updatedAt?.getTime(),
     id: bsda.id,

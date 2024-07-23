@@ -21,6 +21,7 @@ import {
 
 import { getWasteDescription } from "./utils";
 import { getFirstTransporterSync } from "./converter";
+import { getBspaohSubType } from "../common/subTypes";
 
 const getTransporterData = (
   bspaoh: Bspaoh & {
@@ -120,7 +121,7 @@ export function toGenericWaste(
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSPAOH",
-    bsdSubType: "INITIAL",
+    bsdSubType: getBspaohSubType(bspaoh),
     status: bspaoh.status,
     customId: null,
     destinationCap: null,

@@ -137,3 +137,83 @@ export const onSelectChange = (
     );
   }
 };
+
+/**
+ * Transforms an array of values into an array of their corresponding options.
+ *
+ * ex: ['OPTION1', 'OPTION2', 'OPTION2.OPTION1'] becomes
+ * [{ value: "OPTION1", label: "Option 1"}, {value: "OPTION2", label: etc. }]
+ *
+ * @param optionsValues the options values
+ * @param options the options corresponding to the values
+ */
+export const getOptionsFromValues = (
+  optionsValues: string[],
+  options: Option[],
+  parentPaths: string[] = []
+): Option[] => {
+  const res: Option[] = [];
+
+  options.forEach(option => {
+    const optionPath = parentPaths.length
+      ? [...parentPaths, option.value].join(".")
+      : option.value;
+
+    if (optionsValues.includes(optionPath)) {
+      // Option has sub-options
+      if (option.options) {
+        const subRes = getOptionsFromValues(optionsValues, option.options, [
+          ...parentPaths,
+          option.value
+        ]);
+        const op = { ...option };
+
+        if (subRes?.length) {
+          op.options = subRes;
+        } else {
+          delete op.options;
+        }
+
+        res.push(op);
+      } else {
+        res.push(option);
+      }
+    }
+  });
+
+  return res;
+};
+
+/**
+ * From a given array of options, will return its values, using nested path
+ *
+ * ie: ["OPTION1", "OPTION2.OPTION2.1", "OPTION3"]
+ *
+ * @param options the options to extract the values from
+ */
+export const getValuesFromOptions = (
+  options: Option[] = [],
+  parentPaths: string[] = []
+): string[] => {
+  let res: string[] = [];
+
+  options.forEach(option => {
+    const optionPath = parentPaths.length
+      ? [...parentPaths, option.value].join(".")
+      : option.value;
+
+    res.push(optionPath);
+
+    // Option has sub-options. Go recursive
+    if (option.options) {
+      const subOptionsValues = getValuesFromOptions(option.options, [
+        ...parentPaths,
+        option.value
+      ]);
+
+      res = [...res, ...subOptionsValues];
+    }
+  });
+
+  return res;
+};

@@ -17,6 +17,7 @@ import {
   emptyTransportedWaste
 } from "../registry/types";
 import { getWasteDescription } from "./utils";
+import { getBsvhuSubType } from "../common/subTypes";
 
 const getOperationData = (bsvhu: Bsvhu) => ({
   destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
@@ -96,7 +97,7 @@ export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSVHU",
-    bsdSubType: "INITIAL",
+    bsdSubType: getBsvhuSubType(bsvhu),
     status: bsvhu.status,
     customId: null,
     destinationCap: null,

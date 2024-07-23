@@ -4,7 +4,6 @@ import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
-  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -23,6 +22,7 @@ import { splitAddress } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
+import { getBsddSubType } from "../common/subTypes";
 
 const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
   if (!bsdd.forwardedIn) return {};
@@ -206,22 +206,6 @@ const getFinalOperationsData = (
   return { destinationFinalOperationCodes, destinationFinalOperationWeights };
 };
 
-export const getSubType = (bsdd: Bsdd): BsdSubType => {
-  if (bsdd.forwardedInId || bsdd.id.endsWith("-suite")) {
-    return "TEMP_STORED";
-  }
-
-  if (bsdd.emitterType === "APPENDIX1") {
-    return "TOURNEE";
-  } else if (bsdd.emitterType === "APPENDIX1_PRODUCER") {
-    return "APPENDIX1";
-  } else if (bsdd.emitterType === "APPENDIX2") {
-    return "APPENDIX2";
-  }
-
-  return "INITIAL";
-};
-
 export function toGenericWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): GenericWaste {
@@ -252,7 +236,7 @@ export function toGenericWaste(
     ecoOrganismeName: bsdd.ecoOrganismeName,
     ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDD",
-    bsdSubType: getSubType(bsdd),
+    bsdSubType: getBsddSubType(bsdd),
     status: bsdd.status,
     customId: bsdd.customId,
     destinationCap: bsdd.destinationCap,

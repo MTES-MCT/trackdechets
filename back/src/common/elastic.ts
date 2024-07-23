@@ -4,7 +4,7 @@ import { Client, RequestParams } from "@elastic/elasticsearch";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import { logger } from "@td/logger";
-import { BsdType, FormCompany } from "../generated/graphql/types";
+import { BsdSubType, BsdType, FormCompany } from "../generated/graphql/types";
 import {
   BsdaRevisionRequest,
   BsddRevisionRequest,
@@ -20,6 +20,7 @@ import { BspaohForElastic } from "../bspaoh/elastic";
 
 export interface BsdElastic {
   type: BsdType;
+  subType: BsdSubType;
 
   id: string;
   readableId: string;
@@ -213,6 +214,7 @@ const settings = {
 
 const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   type: stringField,
+  subType: stringField,
   id: stringField,
   readableId: stringField,
   createdAt: dateField,

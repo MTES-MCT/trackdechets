@@ -1,5 +1,4 @@
 import {
-  getSubType,
   toAllWaste,
   toIncomingWaste,
   toManagedWaste,
@@ -11,7 +10,6 @@ import { prisma } from "@td/prisma";
 import { RegistryBsdasriInclude } from "../../registry/elastic";
 import { bsdasriFactory } from "./factories";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { BsdasriType } from "@prisma/client";
 import { companyFactory } from "../../__tests__/factories";
 
 describe("toIncomingWaste", () => {
@@ -321,28 +319,5 @@ describe("toGenericWaste", () => {
 
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
-  });
-});
-
-describe("getSubType", () => {
-  afterAll(resetDatabase);
-
-  it.each([
-    [BsdasriType.SIMPLE, "INITIAL"],
-    [BsdasriType.SYNTHESIS, "SYNTHESIS"],
-    [BsdasriType.GROUPING, "GATHERING"]
-  ])("type is %p > should return %p", async (type, expectedSubType) => {
-    // Given
-    const bsdasri = await bsdasriFactory({ opt: { type } });
-
-    // When
-    const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
-      where: { id: bsdasri.id },
-      include: RegistryBsdasriInclude
-    });
-    const subType = getSubType(bsdasriForRegistry);
-
-    // Then
-    expect(subType).toBe(expectedSubType);
   });
 });

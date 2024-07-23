@@ -18,6 +18,7 @@ import {
   getNextTransporterSync,
   getTransportersSync
 } from "./database";
+import { getBsffSubType } from "../common/subTypes";
 
 export type BsffForElastic = Bsff &
   BsffWithPackagings &
@@ -226,6 +227,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
 
   const bsd = {
     type: BsdType.BSFF,
+    subType: getBsffSubType(bsff),
     createdAt: bsff.createdAt?.getTime(),
     updatedAt: bsff.updatedAt?.getTime(),
     id: bsff.id,
