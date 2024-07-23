@@ -53,7 +53,7 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
     );
 
     const acceptedForm = await update(
-      { id: form.id },
+      { id: form.id, status: form.status },
       {
         status: transitionForm(form, {
           type: EventType.MarkAsAccepted,

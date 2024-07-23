@@ -72,7 +72,7 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   };
 
   const resentForm = await getFormRepository(user).update(
-    { id: form.id },
+    { id: form.id, status: form.status },
     {
       status: transitionForm(form, {
         type: EventType.MarkAsResent,

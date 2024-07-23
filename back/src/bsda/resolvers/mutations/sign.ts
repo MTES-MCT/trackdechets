@@ -342,7 +342,10 @@ async function updateBsda(
 ) {
   return runInTransaction(async transaction => {
     const bsdaRepository = getBsdaRepository(user, transaction);
-    const signBsda = await bsdaRepository.update({ id: bsda.id }, updateInput);
+    const signBsda = await bsdaRepository.update(
+      { id: bsda.id, status: bsda.status },
+      updateInput
+    );
     await postSignatureHook(signBsda, bsdaRepository);
     return signBsda;
   });
