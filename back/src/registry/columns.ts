@@ -20,13 +20,15 @@ export type CustomWasteColumns = {
   statusLabel: string;
 };
 
+export type WasteField = keyof (IncomingWaste &
+  OutgoingWaste &
+  TransportedWaste &
+  ManagedWaste &
+  AllWaste &
+  CustomWasteColumns);
+
 type Column = {
-  field: keyof (IncomingWaste &
-    OutgoingWaste &
-    TransportedWaste &
-    ManagedWaste &
-    AllWaste &
-    CustomWasteColumns);
+  field: WasteField;
   label: string;
   format?: (v: unknown, full: unknown) => string | number | null;
 };
@@ -181,6 +183,7 @@ export const columns: Column[] = [
     label: "Producteur initial Pays"
   },
   { field: "emitterCompanyName", label: "Expéditeur raison sociale" },
+  { field: "emitterCompanyGivenName", label: "Expéditeur Nom usuel" },
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },
   { field: "emitterCompanyAddress", label: "Expéditeur Adresse" },
   { field: "emitterCompanyPostalCode", label: "Expéditeur Code postal" },
@@ -254,6 +257,7 @@ export const columns: Column[] = [
   },
   { field: "intermediary3CompanySiret", label: "Intermédiaire n°3 - SIRET" },
   { field: "transporterCompanyName", label: "Transporteur raison sociale" },
+  { field: "transporterCompanyGivenName", label: "Transporteur Nom usuel" },
   {
     field: "transporterCompanySiret",
     label: "Transporteur SIRET ou n° de TVA intracommunautaire"
@@ -289,6 +293,7 @@ export const columns: Column[] = [
   // Destination du déchet
   { field: "destinationCap", label: "CAP" },
   { field: "destinationCompanyName", label: "Destination raison sociale" },
+  { field: "destinationCompanyGivenName", label: "Destination Nom usuel" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },
   { field: "destinationCompanyAddress", label: "Destination adresse" },
   { field: "destinationCompanyPostalCode", label: "Destination Code postal" },
@@ -390,6 +395,10 @@ export const columns: Column[] = [
     field: "transporter2CompanyName",
     label: "Transporteur n°2 raison sociale"
   },
+  {
+    field: "transporter2CompanyGivenName",
+    label: "Transporteur n°2 Nom usuel"
+  },
   { field: "transporter2CompanyAddress", label: "Transporteur n°2 adresse" },
   {
     field: "transporter2CompanyPostalCode",
@@ -429,6 +438,10 @@ export const columns: Column[] = [
     label: "Transporteur n°3 raison sociale"
   },
   {
+    field: "transporter3CompanyGivenName",
+    label: "Transporteur n°3 Nom usuel"
+  },
+  {
     field: "transporter3CompanySiret",
     label: "Transporteur n°3 SIRET ou n° de TVA intracommunautaire"
   },
@@ -466,6 +479,10 @@ export const columns: Column[] = [
     label: "Transporteur n°4 raison sociale"
   },
   {
+    field: "transporter4CompanyGivenName",
+    label: "Transporteur n°4 Nom usuel"
+  },
+  {
     field: "transporter4CompanySiret",
     label: "Transporteur n°4 SIRET ou n° de TVA intracommunautaire"
   },
@@ -501,6 +518,10 @@ export const columns: Column[] = [
   {
     field: "transporter5CompanyName",
     label: "Transporteur n°5 raison sociale"
+  },
+  {
+    field: "transporter5CompanyGivenName",
+    label: "Transporteur n°5 Nom usuel"
   },
   {
     field: "transporter5CompanySiret",

@@ -99,7 +99,7 @@ const bsdsToWastes: Record<WasteRegistryType, any> = {
   ALL: bsdsToAllWastes
 };
 
-type WasteMap<WasteType> = {
+export type WasteMap<WasteType> = {
   BSDD: WasteType[];
   BSDA: WasteType[];
   BSDASRI: WasteType[];
