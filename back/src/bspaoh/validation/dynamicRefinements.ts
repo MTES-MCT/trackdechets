@@ -5,7 +5,7 @@ import { BspaohValidationContext } from "./index";
 import { ZodBspaoh, ZodFullBspaoh } from "./schema";
 import { distinct } from "../../common/arrays";
 import { CompanyVerificationStatus } from "@prisma/client";
-import { hasCremationProfile, isCrematorium } from "../../companies/validation";
+import { hasCremationProfile } from "../../companies/validation";
 import {
   isTransporterRefinement,
   refineSiretAndGetCompany
@@ -186,7 +186,7 @@ function validateWeightFields(
 }
 export async function isCrematoriumRefinement(siret: string, ctx) {
   const company = await refineSiretAndGetCompany(siret, ctx);
-  if (company && !isCrematorium(company) && !hasCremationProfile(company)) {
+  if (company && !hasCremationProfile(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:

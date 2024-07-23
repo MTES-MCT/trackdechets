@@ -583,8 +583,7 @@ describe("/oidc/token - id/secret auth", () => {
           "TRANSPORTER",
           "WASTEPROCESSOR",
           "WORKER",
-          "WASTE_VEHICLES",
-          "CREMATORIUM"
+          "WASTE_VEHICLES"
         ],
         verified: false
       }
@@ -1086,8 +1085,7 @@ describe("/oidc/token - basic auth", () => {
           "TRANSPORTER",
           "WASTEPROCESSOR",
           "WORKER",
-          "WASTE_VEHICLES",
-          "CREMATORIUM"
+          "WASTE_VEHICLES"
         ],
         verified: true
       }

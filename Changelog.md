@@ -28,6 +28,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
+- Le profil crématorium est déprécié au profit du sous-type crémation [PR 3468](https://github.com/MTES-MCT/trackdechets/pull/3468)
+
 #### :nail_care: Améliorations
 
 - Amélioration du message d'erreur à l'ajout d'un Crématorium non inscrit / n'ayant pas le bon profil [PR 3401](https://github.com/MTES-MCT/trackdechets/pull/3401)
