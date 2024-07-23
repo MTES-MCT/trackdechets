@@ -64,7 +64,7 @@ const getFinalOperationsData = (
         destinationFinalOperationCodes.push(ope.operationCode);
         // conversion en tonnes
         destinationFinalOperationWeights.push(
-          ope.quantity.dividedBy(1000).toNumber()
+          ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
         );
         if (ope.finalBsffPackaging.bsff.destinationCompanySiret) {
           // cela devrait tout le temps être le cas
@@ -317,7 +317,7 @@ export function toOutgoingWaste(bsff: RegistryBsff): Required<OutgoingWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toNumber()
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     ...getOperationData(bsff),
     ...getFinalOperationsData(bsff),
@@ -337,7 +337,7 @@ export function toTransportedWaste(
     ...genericWaste,
     destinationReceptionDate: bsff.destinationReceptionDate,
     weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toNumber()
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     emitterCompanyAddress: bsff.emitterCompanyAddress,
     emitterCompanyName: bsff.emitterCompanyName,
@@ -411,7 +411,7 @@ export function toAllWaste(bsff: RegistryBsff): Required<AllWaste> {
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
     weight: bsff.weightValue
-      ? bsff.weightValue.dividedBy(1000).toNumber()
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     traderCompanyName: null,
     traderCompanySiret: null,

@@ -56,7 +56,7 @@ const getFinalOperationsData = (
       destinationFinalOperationCodes.push(ope.operationCode);
       destinationFinalOperationWeights.push(
         // conversion en tonnes
-        ope.quantity.dividedBy(1000).toNumber()
+        ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
       );
       if (ope.finalBsdasri.destinationCompanySiret) {
         // cela devrait tout le temps être le cas
@@ -250,7 +250,10 @@ export function toOutgoingWaste(
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
+      ? bsdasri.emitterWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
     ...getOperationData(bsdasri),
     ...getFinalOperationsData(bsdasri)
@@ -269,7 +272,10 @@ export function toTransportedWaste(
     ...getTransporterData(bsdasri, true),
     destinationReceptionDate: bsdasri.destinationReceptionDate,
     weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
+      ? bsdasri.emitterWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,

@@ -85,7 +85,7 @@ const getFinalOperationsData = (
       destinationFinalOperationCodes.push(ope.operationCode);
       destinationFinalOperationWeights.push(
         // conversion en tonnes
-        ope.quantity.dividedBy(1000).toNumber()
+        ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
       );
       if (ope.finalBsda.destinationCompanySiret) {
         // cela devrait tout le temps être le cas
@@ -360,7 +360,7 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toNumber()
+      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     ...getOperationData(bsda),
     ...getFinalOperationsData(bsda),
