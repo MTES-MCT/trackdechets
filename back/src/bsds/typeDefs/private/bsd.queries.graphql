@@ -25,4 +25,6 @@ type Query {
     first: Int
     orderBy: OrderBy
   ): BsdConnection!
+
+  bsd(id: String!): Bsd!
 }

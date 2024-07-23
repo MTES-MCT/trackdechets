@@ -716,7 +716,7 @@ export default function BSDDetailContent({
   form,
   children = null
 }: BSDDetailContentProps) {
-  const { siret } = useParams<{ siret: string }>();
+  const { siret = "" } = useParams<{ siret: string }>();
   const query = useQueryString();
   const navigate = useNavigate();
   const { permissions } = usePermissions();

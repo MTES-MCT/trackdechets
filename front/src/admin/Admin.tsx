@@ -12,6 +12,7 @@ import { Impersonate } from "./user/impersonate";
 import { Registry } from "./registry/Registry";
 import { MembersAdmin } from "./company/MembersAdmin";
 import { CompaniesDashboard } from "./companies/CompaniesDashboard";
+import { BsdAdmin } from "./bsd/BsdAdmin";
 
 const toRelative = route => {
   return getRelativeRoute(routes.admin.index, route);
@@ -47,7 +48,7 @@ export default function Admin() {
                     : "sidebarv2__item sidebarv2__item--indented"
                 }
               >
-                Entreprises
+                Données entreprises
               </NavLink>
             </li>
             <li className="tw-mb-1">
@@ -122,6 +123,18 @@ export default function Admin() {
                 Gestion des admins
               </NavLink>
             </li>
+            <li className="tw-mb-1">
+              <NavLink
+                to={routes.admin.bsdAdmin}
+                className={({ isActive }) =>
+                  isActive
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
+                }
+              >
+                Consultation BSD
+              </NavLink>
+            </li>
           </ul>
         </Accordion>
       </SideBar>
@@ -166,6 +179,11 @@ export default function Admin() {
           <Route
             path={toRelative(routes.admin.membersAdmin)}
             element={<MembersAdmin />}
+          />
+
+          <Route
+            path={toRelative(routes.admin.bsdAdmin)}
+            element={<BsdAdmin />}
           />
 
           <Route
