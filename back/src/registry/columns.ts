@@ -76,13 +76,7 @@ const formatTransportMode = (mode?: TransportMode): string => {
       return "";
   }
 };
-/**
- * Clean Final Operation lists
- */
-const formatFinalOperations = (val?: string[]) =>
-  val ? val.map(quant => quant.replace(/ /g, "")).join(" ") : ""; // be consistent and remove all white spaces
-const formatFinalOperationWeights = (val?: number[]) =>
-  val ? val.map(quant => quant.toLocaleString("fr")).join(" ") : "";
+
 export const formatSubType = (subType?: BsdSubType) => {
   if (!subType) return "";
 
@@ -317,19 +311,24 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   {
+    field: "destinationFinalOperationCompanySirets",
+    label: "SIRET de la destination finale",
+    format: (v: string[]) => formatArray(v)
+  },
+  {
     field: "destinationFinalOperationCodes",
-    label: "Opération(s) finale(s) réalisée(s) par la traçabilité suite",
-    format: formatFinalOperations
+    label: "Code opération finale réalisée",
+    format: (codes: string[]) =>
+      formatArray(codes.map(c => formatOperationCode(c)))
   },
   {
     field: "destinationFinalOperationWeights",
-    label: "Quantité(s) liée(s) (tonnes)",
-    format: formatFinalOperationWeights
-  },
-  {
-    field: "destinationFinalOperationCompanySirets",
-    label: "SIRET(s) de la destination finale",
-    format: (v: string[]) => formatArray(v, " ")
+    label: "Quantité finale (tonnes)",
+    format: (quantities: number[]) =>
+      formatArray(
+        quantities.map(q => q.toLocaleString("fr")),
+        " - "
+      )
   },
   {
     field: "nextDestinationNotificationNumber",
