@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { AuthType, applyAuthStrategies } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
-import { QueryFindBsdArgs } from "../../../generated/graphql/types";
+import { QueryBsdArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandBsdasriFromDB } from "../../../bsdasris/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";
@@ -10,9 +10,9 @@ import { expandBspaohFromDb } from "../../../bspaoh/converter";
 import { expandFormFromDb } from "../../../forms/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 
-export async function findBsdResolver(
+export async function bsdResolver(
   _,
-  { id }: QueryFindBsdArgs,
+  { id }: QueryBsdArgs,
   context: GraphQLContext
 ) {
   applyAuthStrategies(context, [AuthType.Session]);

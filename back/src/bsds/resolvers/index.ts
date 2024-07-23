@@ -1,11 +1,11 @@
 import { QueryResolvers } from "../../generated/graphql/types";
 import bsds from "./queries/bsds";
-import { findBsdResolver } from "./queries/findBsd";
+import { bsdResolver } from "./queries/bsd";
 import { Mutation } from "./Mutation";
 
 const Query: QueryResolvers = {
   bsds,
-  findBsd: findBsdResolver
+  bsd: bsdResolver
 };
 
 export default { Query, Mutation };

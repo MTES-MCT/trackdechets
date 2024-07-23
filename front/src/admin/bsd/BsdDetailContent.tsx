@@ -7,7 +7,7 @@ import { BsffDetailContent } from "../../dashboard/detail/bsff/BsffDetailContent
 import BspaohDetailContent from "../../dashboard/detail/bspaoh/BspaohDetailContent";
 import { BsvhuDetailContent } from "../../dashboard/detail/bsvhu/BsvhuDetailContent";
 
-export function PreviewModal({ bsd }: { bsd: Bsd }) {
+export function BsdDetailContent({ bsd }: { bsd: Bsd }) {
   if (bsd.__typename === "Bsda") {
     return <BsdaDetailContent form={bsd} />;
   }

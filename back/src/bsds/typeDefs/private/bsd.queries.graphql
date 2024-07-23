@@ -26,5 +26,5 @@ type Query {
     orderBy: OrderBy
   ): BsdConnection!
 
-  findBsd(id: String!): Bsd!
+  bsd(id: String!): Bsd!
 }

@@ -24,11 +24,11 @@ import {
 } from "../../Apps/common/queries/fragments";
 import { Modal } from "../../common/components";
 import { PermissionsContext } from "../../common/contexts/PermissionsContext";
-import { PreviewModal } from "./PreviewModal";
+import { BsdDetailContent } from "./BsdDetailContent";
 
-const FIND_BSD = gql`
-  query FindBsd($id: String!) {
-    findBsd(id: $id) {
+const BSD = gql`
+  query Bsd($id: String!) {
+    bsd(id: $id) {
       ... on Form {
         ...DashboardFormFragment
       }
@@ -80,8 +80,7 @@ const { VITE_API_ENDPOINT } = import.meta.env;
 export function BsdAdmin() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  const [findBsd, { loading, error, data }] =
-    useLazyQuery<Pick<Query, "findBsd">>(FIND_BSD);
+  const [bsd, { loading, error, data }] = useLazyQuery<Pick<Query, "bsd">>(BSD);
 
   const [
     search,
@@ -96,24 +95,24 @@ export function BsdAdmin() {
 
   const possibleImpersonations = [
     [
-      data?.findBsd?.emitter?.company?.siret,
-      data?.findBsd?.emitter?.company?.name,
+      data?.bsd?.emitter?.company?.siret,
+      data?.bsd?.emitter?.company?.name,
       "Emetteur"
     ],
     [
-      data?.findBsd?.transporter?.company?.siret,
-      data?.findBsd?.transporter?.company?.name,
+      data?.bsd?.transporter?.company?.siret,
+      data?.bsd?.transporter?.company?.name,
       "Transporteur"
     ],
     [
-      (data?.findBsd as Form)?.recipient?.company?.siret,
-      (data?.findBsd as Form)?.recipient?.company?.name,
+      (data?.bsd as Form)?.recipient?.company?.siret,
+      (data?.bsd as Form)?.recipient?.company?.name,
       "Destination"
     ],
     [
-      (data?.findBsd as Bsda | Bsdasri | Bsff | Bsvhu | Bspaoh)?.destination
+      (data?.bsd as Bsda | Bsdasri | Bsff | Bsvhu | Bspaoh)?.destination
         ?.company?.siret,
-      (data?.findBsd as Bsda | Bsdasri | Bsff | Bsvhu | Bspaoh)?.destination
+      (data?.bsd as Bsda | Bsdasri | Bsff | Bsvhu | Bspaoh)?.destination
         ?.company?.name,
       "Destination"
     ]
@@ -162,7 +161,7 @@ export function BsdAdmin() {
           e.preventDefault();
           const formData = new FormData(e.target as HTMLFormElement);
 
-          findBsd({ variables: { id: formData.get("id") } });
+          bsd({ variables: { id: formData.get("id") } });
         }}
       >
         <div className="fr-grid-row fr-grid-row--bottom">
@@ -195,7 +194,7 @@ export function BsdAdmin() {
               }}
             >
               <BsdCard
-                bsd={data.findBsd}
+                bsd={data.bsd}
                 currentSiret={"unset"}
                 bsdCurrentTab={"followTab"}
                 onValidate={() => {}}
@@ -212,7 +211,7 @@ export function BsdAdmin() {
             isOpen={isPreviewOpen}
             onClose={() => setIsPreviewOpen(false)}
           >
-            <PreviewModal bsd={data.findBsd} />
+            <BsdDetailContent bsd={data.bsd} />
           </Modal>
 
           <h4 className="fr-h4 fr-mt-4w">Impersonation</h4>
