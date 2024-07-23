@@ -1,6 +1,7 @@
 import { getCompanyInfos } from "../companyInfos";
 import { ErrorCode, UserInputError } from "../../../../common/errors";
 import { siretify } from "../../../../__tests__/factories";
+import { WasteVehiclesType } from "@td/codegen-ui";
 
 const searchCompanyMock = jest.fn();
 const vatMock = jest.fn();
@@ -76,6 +77,7 @@ describe("companyInfos with SIRET", () => {
       companyTypes: [],
       wasteProcessorTypes: [],
       collectorTypes: [],
+      wasteVehiclesType: [],
       installation: {
         codeS3ic: "0055.14316"
       },
@@ -116,6 +118,7 @@ describe("companyInfos with SIRET", () => {
       companyTypes: [],
       wasteProcessorTypes: [],
       collectorTypes: [],
+      wasteVehiclesType: [],
       ecoOrganismeAgreements: [],
       installation: undefined,
       address: undefined,
@@ -195,6 +198,7 @@ describe("companyInfos search with a VAT number", () => {
       companyTypes: [],
       wasteProcessorTypes: [],
       collectorTypes: [],
+      wasteVehiclesType: [],
       installation: undefined,
       statutDiffusionEtablissement: "O",
       allowBsdasriTakeOverWithoutSignature: undefined,
@@ -234,6 +238,7 @@ describe("companyInfos search with a VAT number", () => {
       companyTypes: [],
       wasteProcessorTypes: [],
       collectorTypes: [],
+      wasteVehiclesType: [],
       ecoOrganismeAgreements: [],
       installation: undefined,
       statutDiffusionEtablissement: "O",

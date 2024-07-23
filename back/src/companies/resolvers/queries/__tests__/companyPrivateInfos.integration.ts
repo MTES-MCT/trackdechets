@@ -1,4 +1,9 @@
-import { CompanyType, WasteProcessorType, CollectorType } from "@prisma/client";
+import {
+  CompanyType,
+  WasteProcessorType,
+  CollectorType,
+  WasteVehiclesType
+} from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth";
 import { TEST_COMPANY_PREFIX } from "@td/constants";
@@ -127,6 +132,9 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       },
       collectorTypes: {
         set: [CollectorType.DANGEROUS_WASTES]
+      },
+      wasteVehiclesTypes: {
+        set: [WasteVehiclesType.BROYEUR]
       }
     });
 
@@ -147,8 +155,9 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
           libelleNaf
           isRegistered
           companyTypes
-                wasteProcessorTypes
+          wasteProcessorTypes
           collectorTypes
+          wasteVehiclesTypes
           contactEmail
           contactPhone
           website
@@ -171,6 +180,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       companyTypes: [CompanyType.WASTEPROCESSOR],
       wasteProcessorTypes: [WasteProcessorType.CREMATION],
       collectorTypes: [CollectorType.DANGEROUS_WASTES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR],
       contactEmail: "john.snow@trackdechets.fr",
       contactPhone: "0600000000",
       website: "https://trackdechets.beta.gouv.fr",

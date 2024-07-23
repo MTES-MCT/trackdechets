@@ -48,6 +48,9 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   "Sous-types d'entreprises pour les installation de traitement de déchets"
   wasteProcessorTypes: [WasteProcessorType!]
 
+  "Sous-types d'installation de traitement VHU"
+  wasteVehiclesTypes: [WasteVehiclesType!]
+
   "SIRET ou TVA de l'établissement"
   orgId: String!
 

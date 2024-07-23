@@ -4,7 +4,8 @@ import {
   CompanyVerificationMode,
   CompanyVerificationStatus,
   Prisma,
-  WasteProcessorType
+  WasteProcessorType,
+  WasteVehiclesType
 } from "@prisma/client";
 import { convertUrls } from "../../database";
 import { prisma } from "@td/prisma";
@@ -52,8 +53,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
 
-  const { companyTypes, collectorTypes, wasteProcessorTypes } =
-    await companyTypesValidationSchema.validate(companyInput);
+  const {
+    companyTypes,
+    collectorTypes,
+    wasteProcessorTypes,
+    wasteVehiclesTypes
+  } = await companyTypesValidationSchema.validate(companyInput);
 
   const {
     codeNaf,
@@ -160,6 +165,9 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       : undefined,
     wasteProcessorTypes: wasteProcessorTypes
       ? { set: wasteProcessorTypes as WasteProcessorType[] }
+      : undefined,
+    wasteVehiclesTypes: wasteVehiclesTypes
+      ? { set: wasteVehiclesTypes as WasteVehiclesType[] }
       : undefined,
     securityCode: randomNumber(4),
     verificationCode: randomNumber(5).toString(),

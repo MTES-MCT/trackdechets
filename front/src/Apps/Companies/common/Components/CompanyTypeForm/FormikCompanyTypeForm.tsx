@@ -223,7 +223,7 @@ const FormikCompanyTypeForm: React.FC<FormikCompanyTypeFormProps> = ({
           validityLimit: (errors.workerCertification as any)?.validityLimit,
           organisation: (errors.workerCertification as any)?.organisation
         },
-        ecoOrganismeAgreements: errors?.ecoOrganismeAgreements
+        ecoOrganismeAgreements: errors?.ecoOrganismeAgreements as string
       }}
     />
   );
