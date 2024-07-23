@@ -6,13 +6,12 @@ import {
 } from "../../../generated/graphql/types";
 
 import { GraphQLContext } from "../../../types";
-import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
-import { validateBsvhu } from "../../validation";
+import { expandVhuFormFromDb } from "../../converter";
+import { parseBsvhuAsync } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
-import { sirenify } from "../../sirenify";
-import { recipify } from "../../recipify";
 
 import { checkCanCreate } from "../../permissions";
+import { graphQlInputToZodBsvhu } from "../../validation/helpers";
 
 type CreateBsvhu = {
   isDraft: boolean;
@@ -31,17 +30,22 @@ export default async function create(
 export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
   const user = checkIsAuthenticated(context);
 
-  const sirenifiedInput = await sirenify(input, user);
-  const autocompletedInput = await recipify(sirenifiedInput);
-
   await checkCanCreate(user, input);
-  const form = flattenVhuInput(autocompletedInput);
 
-  await validateBsvhu(form, { emissionSignature: !isDraft });
+  const zodBsvhu = await graphQlInputToZodBsvhu(input);
+
+  const { createdAt, ...parsedZodBsvhu } = await parseBsvhuAsync(
+    { ...zodBsvhu, isDraft, createdAt: new Date() },
+    {
+      user,
+      currentSignatureType: !isDraft ? "EMISSION" : undefined
+    }
+  );
+
   const bsvhuRepository = getBsvhuRepository(user);
 
   const newForm = await bsvhuRepository.create({
-    ...form,
+    ...parsedZodBsvhu,
     id: getReadableId(ReadableIdPrefix.VHU),
     isDraft
   });

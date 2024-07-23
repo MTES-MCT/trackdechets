@@ -3,10 +3,11 @@ import { MutationPublishBsvhuArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
-import { validateBsvhu } from "../../validation";
+import { parseBsvhuAsync } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
 import { ForbiddenError } from "../../../common/errors";
+import { prismaToZodBsvhu } from "../../validation/helpers";
 
 export default async function publish(
   _,
@@ -25,10 +26,18 @@ export default async function publish(
     );
   }
 
-  await validateBsvhu(existingBsvhu, { emissionSignature: true });
-  const bsvhuRepository = getBsvhuRepository(user);
+  await parseBsvhuAsync(
+    { ...prismaToZodBsvhu(existingBsvhu), isDraft: false },
+    {
+      user,
+      currentSignatureType: "EMISSION"
+    }
+  );
 
-  const updatedBsvhu = await bsvhuRepository.update({ id }, { isDraft: false });
+  const updatedBsvhu = await getBsvhuRepository(user).update(
+    { id },
+    { isDraft: false }
+  );
 
   return expandVhuFormFromDb(updatedBsvhu);
 }

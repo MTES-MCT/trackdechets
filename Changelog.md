@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - ETQ utilisateur, je peux faire du multi-modal sur le BSFF [PR #3421](https://github.com/MTES-MCT/trackdechets/pull/3421)
 
+#### :house: Interne
+
+- Refacto de la validation BSVHU [PR 3477](https://github.com/MTES-MCT/trackdechets/pull/3477)
+
 # [2024.7.1] 02/07/2024
 
 #### :rocket: Nouvelles fonctionnalités

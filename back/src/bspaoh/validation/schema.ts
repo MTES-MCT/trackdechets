@@ -4,6 +4,7 @@ import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { isCrematoriumRefinement } from "./dynamicRefinements";
 import { BSPAOH_WASTE_CODES, BSPAOH_WASTE_TYPES } from "@td/constants";
 import {
+  CompanyRole,
   foreignVatNumberSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
@@ -44,7 +45,7 @@ const rawBspaohSchema = z.object({
 
   // emitter
   emitterCompanyName: z.string().nullish(),
-  emitterCompanySiret: siretSchema.nullish(),
+  emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),
   emitterCompanyContact: z.string().nullish(),
   emitterCompanyPhone: z.string().nullish(),
@@ -67,7 +68,7 @@ const rawBspaohSchema = z.object({
 
   // destination
   destinationCompanyName: z.string().nullish(),
-  destinationCompanySiret: siretSchema
+  destinationCompanySiret: siretSchema(CompanyRole.Destination)
     .nullish()
     .superRefine(isCrematoriumRefinement),
   destinationCompanyAddress: z.string().nullish(),
@@ -126,12 +127,12 @@ export type ZodBspaoh = z.infer<typeof rawBspaohSchema>;
 
 const rawBspaohTransporterSchema = z.object({
   transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema.nullish(), // Further verifications done here under in superRefine
+  transporterCompanySiret: siretSchema(CompanyRole.Transporter).nullish(), // Further verifications done here under in superRefine
   transporterCompanyAddress: z.string().nullish(),
   transporterCompanyContact: z.string().nullish(),
   transporterCompanyPhone: z.string().nullish(),
   transporterCompanyMail: z.string().nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema
+  transporterCompanyVatNumber: foreignVatNumberSchema(CompanyRole.Transporter)
     .nullish()
     .superRefine(isRegisteredVatNumberRefinement),
   transporterCustomInfo: z.string().nullish(),

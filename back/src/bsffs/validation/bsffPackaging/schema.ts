@@ -13,8 +13,9 @@ import {
 import { BsffPackagingValidationContext } from "./types";
 import { sirenifyBsffPackaging } from "./sirenify";
 import {
-  siretSchema,
-  vatNumberSchema
+  CompanyRole,
+  foreignVatNumberSchema,
+  siretSchema
 } from "../../../common/validation/zod/schema";
 
 const rawBsffPackagingSchema = z.object({
@@ -55,8 +56,12 @@ const rawBsffPackagingSchema = z.object({
   operationNextDestinationPlannedOperationCode: ZodOperationEnum,
   operationNextDestinationCap: z.string().nullish(),
   operationNextDestinationCompanyName: z.string().nullish(),
-  operationNextDestinationCompanySiret: siretSchema.nullish(),
-  operationNextDestinationCompanyVatNumber: vatNumberSchema.nullish(),
+  operationNextDestinationCompanySiret: siretSchema(
+    CompanyRole.NextDestination
+  ).nullish(),
+  operationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
+    CompanyRole.NextDestination
+  ).nullish(),
   operationNextDestinationCompanyAddress: z.string().nullish(),
   operationNextDestinationCompanyContact: z.string().nullish(),
   operationNextDestinationCompanyPhone: z.string().nullish(),

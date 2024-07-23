@@ -5574,6 +5574,8 @@ export const BSFF_WASTE_CODES = [
 export const BSPAOH_WASTE_CODES = ["18 01 02"] as const; // let's use an array, because some day we'll have to fill it…
 export const BSPAOH_WASTE_TYPES = ["PAOH", "FOETUS"] as const;
 
+export const BSVHU_WASTE_CODES = ["16 01 06", "16 01 04*"] as const;
+
 export const BSDD_WASTES_TREE = toWasteTree(ALL_WASTES_TREE, {
   exclude: [
     ...bsffOnlyWasteCodes,
