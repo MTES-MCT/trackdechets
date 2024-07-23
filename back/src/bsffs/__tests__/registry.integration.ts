@@ -469,7 +469,7 @@ describe("toOutgoingWaste", () => {
     expect(waste["transporter4NumberPlates"]).toBeUndefined();
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
   });
@@ -477,54 +477,6 @@ describe("toOutgoingWaste", () => {
 
 describe("toTransportedWaste", () => {
   afterAll(resetDatabase);
-
-  it("should contain transporters info including plates", async () => {
-    // Given
-    const { bsff } = await createBsffWith5Transporters();
-
-    // When
-    const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
-      where: { id: bsff.id },
-      include: RegistryBsffInclude
-    });
-    const waste = toTransportedWaste(bsffForRegistry);
-
-    // Then
-    expect(waste.transporterCompanySiret).toBe(
-      bsffForRegistry.transporters[0].transporterCompanySiret
-    );
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER1-NBR-PLATES"
-    ]);
-
-    expect(waste.transporter2CompanySiret).toBe(
-      bsffForRegistry.transporters[1].transporterCompanySiret
-    );
-    expect(waste.transporter2NumberPlates).toStrictEqual([
-      "TRANSPORTER2-NBR-PLATES"
-    ]);
-
-    expect(waste.transporter3CompanySiret).toBe(
-      bsffForRegistry.transporters[2].transporterCompanySiret
-    );
-    expect(waste.transporter3NumberPlates).toStrictEqual([
-      "TRANSPORTER3-NBR-PLATES"
-    ]);
-
-    expect(waste.transporter4CompanySiret).toBe(
-      bsffForRegistry.transporters[3].transporterCompanySiret
-    );
-    expect(waste.transporter4NumberPlates).toStrictEqual([
-      "TRANSPORTER4-NBR-PLATES"
-    ]);
-
-    expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanyVatNumber
-    );
-    expect(waste.transporter5NumberPlates).toStrictEqual([
-      "TRANSPORTER5-NBR-PLATES"
-    ]);
-  });
 
   it("should contain emitted weight and destinationReception weight", async () => {
     // Given
@@ -601,7 +553,7 @@ describe("toTransportedWaste", () => {
     ]);
 
     expect(waste.transporter5CompanySiret).toBe(
-      bsffForRegistry.transporters[4].transporterCompanySiret
+      bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
     expect(waste.transporter5NumberPlates).toStrictEqual([
       "TRANSPORTER5-NBR-PLATES"

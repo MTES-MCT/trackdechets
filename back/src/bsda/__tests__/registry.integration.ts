@@ -678,7 +678,7 @@ describe("toTransportedWaste", () => {
       "TRANSPORTER4-NBR-PLATES"
     ]);
 
-    expect(waste.transporter5CompanySiret).toBe(data.transporter5.siret);
+    expect(waste.transporter5CompanySiret).toBe(data.transporter5.vatNumber);
     expect(waste.transporter5NumberPlates).toStrictEqual([
       "TRANSPORTER5-NBR-PLATES"
     ]);
