@@ -143,7 +143,7 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
 
   return {
     type: BsdType.BSPAOH,
-    subType: getBspaohSubType(bspaoh),
+    bsdSubType: getBspaohSubType(bspaoh),
     createdAt: bspaoh.createdAt?.getTime(),
     updatedAt: bspaoh.updatedAt?.getTime(),
     id: bspaoh.id,

@@ -106,7 +106,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
 
   return {
     type: BsdType.BSVHU,
-    subType: getBsvhuSubType(bsvhu),
+    bsdSubType: getBsvhuSubType(bsvhu),
     createdAt: bsvhu.createdAt?.getTime(),
     updatedAt: bsvhu.updatedAt?.getTime(),
     id: bsvhu.id,

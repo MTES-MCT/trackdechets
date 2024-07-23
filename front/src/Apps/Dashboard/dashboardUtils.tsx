@@ -59,6 +59,7 @@ import {
 import { getOperationCodesFromSearchString } from "./dashboardServices";
 import { BsdCurrentTab } from "../common/types/commonTypes";
 import { BsdSubType, BsdType, BsdWhere, OrderBy } from "@td/codegen-ui";
+import { getOptionsFromValues } from "../common/Components/SelectWithSubOptions/SelectWithSubOptions.utils";
 
 export const MAX_FILTER = 5;
 
@@ -351,11 +352,29 @@ export const filterPredicates: {
 }[] = [
   {
     filterName: FilterName.types,
+    // TODO: unit test for dat?
     where: value => {
-      console.log(">> filterPredicates");
-      console.log("value", value);
+      const options = getOptionsFromValues(value, bsdTypeFilterSelectOptions);
 
-      const filter = { type: { _in: value } };
+      const filter: BsdWhere = { _or: [] };
+
+      // Each option is a bsd type (BSDD, BSDA etc.)
+      options.forEach(option => {
+        const res = { type: { _eq: option.value as BsdType } };
+
+        // SubTypes have been selected (INITAL, GATHERING etc.)
+        if (option.options) {
+          const subRes: BsdWhere = { bsdSubType: { _in: [] } };
+
+          option.options.forEach(option => {
+            subRes.bsdSubType?._in?.push(option.value as BsdSubType);
+          });
+
+          filter._or?.push({ _and: [res, subRes] });
+        } else {
+          filter._or?.push(res);
+        }
+      });
 
       return filter;
     }

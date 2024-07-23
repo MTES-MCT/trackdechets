@@ -283,7 +283,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
 
   return {
     type: BsdType.BSDA,
-    subType: getBsdaSubType(bsda),
+    bsdSubType: getBsdaSubType(bsda),
     createdAt: bsda.createdAt?.getTime(),
     updatedAt: bsda.updatedAt?.getTime(),
     id: bsda.id,

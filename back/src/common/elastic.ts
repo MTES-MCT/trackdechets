@@ -20,7 +20,7 @@ import { BspaohForElastic } from "../bspaoh/elastic";
 
 export interface BsdElastic {
   type: BsdType;
-  subType: BsdSubType;
+  bsdSubType: BsdSubType;
 
   id: string;
   readableId: string;
@@ -214,7 +214,7 @@ const settings = {
 
 const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   type: stringField,
-  subType: stringField,
+  bsdSubType: stringField,
   id: stringField,
   readableId: stringField,
   createdAt: dateField,

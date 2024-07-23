@@ -150,7 +150,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
 
   return {
     type: BsdType.BSDASRI,
-    subType: getBsdasriSubType(bsdasri),
+    bsdSubType: getBsdasriSubType(bsdasri),
     createdAt: bsdasri.createdAt?.getTime(),
     updatedAt: bsdasri.updatedAt?.getTime(),
     id: bsdasri.id,

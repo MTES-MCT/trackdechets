@@ -61,7 +61,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
 
   return {
     type: "BSDD",
-    subType: getBsddSubType(form),
+    bsdSubType: getBsddSubType(form),
     createdAt: form.createdAt?.getTime(),
     updatedAt: form.updatedAt?.getTime(),
     id: form.id,

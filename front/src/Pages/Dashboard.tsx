@@ -124,7 +124,11 @@ const DashboardPage = () => {
       });
 
       if (routePredicate) {
-        variables.where = { ...newVariables.where, ...routePredicate };
+        if (newVariables.where) {
+          variables.where = { _and: [newVariables.where, routePredicate] };
+        } else {
+          variables.where = { ...routePredicate };
+        }
       }
 
       lazyFetchBsds({ variables });

@@ -227,7 +227,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
 
   const bsd = {
     type: BsdType.BSFF,
-    subType: getBsffSubType(bsff),
+    bsdSubType: getBsffSubType(bsff),
     createdAt: bsff.createdAt?.getTime(),
     updatedAt: bsff.updatedAt?.getTime(),
     id: bsff.id,
