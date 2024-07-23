@@ -53,7 +53,8 @@ import {
   DateRow,
   DetailRow,
   YesNoRow,
-  PackagingRow
+  PackagingRow,
+  QuantityRow
 } from "../common/Components";
 import { WorkflowAction } from "../../components/BSDList";
 import { Modal } from "../../../common/components";
@@ -76,6 +77,7 @@ import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
+import { isDefined } from "../../../common/helper";
 import TdTooltip from "../../../common/components/Tooltip";
 import {
   BSD_DETAILS_QTY_TOOLTIP,
@@ -119,6 +121,10 @@ const Company = ({ company, label }: CompanyProps) => (
 const TempStorage = ({ form }) => {
   const { temporaryStorageDetail } = form;
 
+  const hasBeenReceived = isDefined(
+    temporaryStorageDetail?.temporaryStorer?.quantityReceived
+  );
+
   return (
     <>
       <div className={styles.detailColumns}>
@@ -139,9 +145,23 @@ const TempStorage = ({ form }) => {
           />
 
           <PackagingRow packagingInfos={form.stateSummary?.packagingInfos} />
+
           <DetailRow
             value={temporaryStorageDetail?.temporaryStorer?.quantityReceived}
             label="Quantité reçue"
+            showEmpty={hasBeenReceived}
+          />
+          <QuantityRow
+            value={temporaryStorageDetail?.temporaryStorer?.quantityRefused}
+            label="Quantité refusée"
+            tooltip={BSD_DETAILS_QTY_TOOLTIP}
+            showEmpty={hasBeenReceived}
+          />
+          <QuantityRow
+            value={temporaryStorageDetail?.temporaryStorer?.quantityAccepted}
+            label="Quantité traitée"
+            tooltip={BSD_DETAILS_QTY_TOOLTIP}
+            showEmpty={hasBeenReceived}
           />
           <DetailRow
             value={getVerboseQuantityType(
@@ -368,6 +388,9 @@ const Recipient = ({
   const recipient = hasTempStorage
     ? form.temporaryStorageDetail?.destination
     : form.recipient;
+
+  const hasBeenReceived = isDefined(form?.quantityReceived);
+
   return (
     <>
       {" "}
@@ -385,6 +408,13 @@ const Recipient = ({
         <DetailRow
           value={form?.quantityReceived && `${form?.quantityReceived} tonnes`}
           label="Quantité reçue"
+          showEmpty={hasBeenReceived}
+        />
+        <QuantityRow
+          value={form?.quantityRefused}
+          label="Quantité refusée"
+          tooltip={BSD_DETAILS_QTY_TOOLTIP}
+          showEmpty={hasBeenReceived}
         />
         <DetailRow
           value={
@@ -401,6 +431,12 @@ const Recipient = ({
         <DetailRow value={form.wasteRefusalReason} label="Motif de refus" />
       </div>
       <div className={styles.detailGrid}>
+        <QuantityRow
+          value={form?.quantityAccepted}
+          label="Quantité traitée"
+          tooltip={BSD_DETAILS_QTY_TOOLTIP}
+          showEmpty={hasBeenReceived}
+        />
         <DetailRow
           value={
             form?.quantityAccepted ? (

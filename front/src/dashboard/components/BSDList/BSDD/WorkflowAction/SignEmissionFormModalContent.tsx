@@ -8,7 +8,6 @@ import {
   SimpleNotificationError
 } from "../../../../../Apps/common/Components/Error/Error";
 import { fullFormFragment } from "../../../../../Apps/common/queries/fragments";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import {
   FormStatus,
   Mutation,
@@ -23,6 +22,7 @@ import { FormJourneySummary } from "./FormJourneySummary";
 import SignatureCodeInput from "../../../../../form/common/components/custom-inputs/SignatureCodeInput";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
+import { GET_FORM } from "../../../../../Apps/common/queries/bsdd/queries";
 
 interface SignEmissionFormModalProps {
   title: string;

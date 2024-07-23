@@ -7,7 +7,7 @@ import { ActionButton } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
 import { IconWaterDam } from "../../../../../Apps/common/Components/Icons/Icons";
 import ReceivedInfo from "./ReceivedInfo";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
+import { GET_FORM } from "../../../../../Apps/common/queries/bsdd/queries";
 
 export default function MarkAsReceived({ form }: WorkflowActionProps) {
   const [getBsdd, { data }] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(

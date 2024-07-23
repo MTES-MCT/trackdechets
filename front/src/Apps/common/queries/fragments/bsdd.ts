@@ -119,6 +119,8 @@ export const temporaryStorageDetailFragment = gql`
     temporaryStorer {
       quantityType
       quantityReceived
+      quantityRefused
+      quantityAccepted
       wasteAcceptationStatus
       wasteRefusalReason
       receivedAt
@@ -191,6 +193,8 @@ const mutableFieldsFragment = gql`
     emittedByEcoOrganisme
     takenOverAt
     takenOverBy
+    receivedBy
+    receivedAt
     emitter {
       ...EmitterFragment
     }
@@ -255,6 +259,7 @@ const mutableFieldsFragment = gql`
       }
     }
     quantityGrouped
+    quantityReceived
     ecoOrganisme {
       name
       siret

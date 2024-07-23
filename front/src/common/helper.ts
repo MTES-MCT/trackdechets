@@ -1,6 +1,7 @@
 import { DocumentNode } from "graphql";
 import { ApolloError, DataProxy } from "@apollo/client";
 import { getCountries, isValidPhoneNumber } from "libphonenumber-js";
+import Decimal from "decimal.js";
 
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
@@ -190,3 +191,32 @@ export function removeOrgId(obj: any, insideCompany = false): any {
 
   return newObj;
 }
+
+export const multiplyByRounded = (
+  num: number | null = 0,
+  multBy = 1000
+): number => {
+  if (!isDefinedStrict(num)) {
+    return 0;
+  }
+
+  return new Decimal(num ?? 0).times(multBy).toDecimalPlaces(6).toNumber();
+};
+
+export const isDefined = (
+  val: any,
+  accept = { acceptEmptyString: true }
+): boolean => {
+  if (val === "") return accept.acceptEmptyString;
+
+  return val !== undefined && val !== null;
+};
+
+/**
+ * This one does not consider empty strings "" as 'defined'
+ */
+export const isDefinedStrict = (val: any): boolean => {
+  if (val === "") return false;
+
+  return isDefined(val);
+};

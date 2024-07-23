@@ -14,7 +14,7 @@ import { Loader } from "../../../../../Apps/common/Components";
 import { IconWaterDam } from "../../../../../Apps/common/Components/Icons/Icons";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import AcceptedInfo from "./AcceptedInfo";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
+import { GET_FORM } from "../../../../../Apps/common/queries/bsdd/queries";
 
 const MARK_AS_ACCEPTED = gql`
   mutation MarkAsAccepted($id: ID!, $acceptedInfo: AcceptedFormInput!) {

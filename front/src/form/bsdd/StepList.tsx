@@ -19,7 +19,6 @@ import {
   getInitialState
 } from "./utils/initial-state";
 import { formSchema } from "./utils/schema";
-import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
 import { Loader } from "../../Apps/common/Components";
 import { toastApolloError } from "../common/stepper/toaster";
 import { IStepContainerProps } from "../common/stepper/Step";
@@ -28,6 +27,11 @@ import {
   UPDATE_FORM_TRANSPORTER
 } from "../../Apps/Forms/Components/query";
 import { isForeignVat } from "@td/constants";
+import {
+  CREATE_FORM,
+  GET_FORM,
+  UPDATE_FORM
+} from "../../Apps/common/queries/bsdd/queries";
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (form: Form | undefined) => ReactElement;
