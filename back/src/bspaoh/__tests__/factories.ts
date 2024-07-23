@@ -1,7 +1,11 @@
 import { prisma } from "@td/prisma";
 import { BspaohStatus, Prisma } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
-import { siretify, upsertBaseSiret } from "../../__tests__/factories";
+import {
+  siretify,
+  upsertBaseSiret,
+  companyFactory
+} from "../../__tests__/factories";
 
 const getBspaohTransporter = (
   transporterCompanySiret
@@ -84,6 +88,11 @@ export const bspaohFactory = async ({
   await upsertBaseSiret(emitterCompanySiret);
   await upsertBaseSiret(destinationCompanySiret);
   await upsertBaseSiret(transporterCompanySiret);
+
+  await prisma.company.update({
+    where: { siret: destinationCompanySiret },
+    data: { wasteProcessorTypes: ["CREMATION"] }
+  });
   const bspaohObject = getBspaohObject(
     emitterCompanySiret,
     destinationCompanySiret,
@@ -120,5 +129,16 @@ export const bspaohFactory = async ({
       transportersSirets
     },
     include: { transporters: true }
+  });
+};
+
+export const crematoriumFactory = async (
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
+) => {
+  const opts = companyOpts || {};
+  return companyFactory({
+    companyTypes: { set: ["WASTEPROCESSOR"] },
+    wasteProcessorTypes: { set: ["CREMATION"] },
+    ...opts
   });
 };

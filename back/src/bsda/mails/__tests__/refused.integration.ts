@@ -26,6 +26,7 @@ describe("renderBsdaRefusedEmail", () => {
         emitterEmissionSignatureDate: new Date("2022-01-01"),
         destinationReceptionDate: new Date("2022-01-02"),
         status: Status.REFUSED,
+        destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
         destinationReceptionRefusalReason: "Parce que !!"
       }
@@ -53,6 +54,12 @@ describe("renderBsdaRefusedEmail", () => {
     <li>Numéro du BSD: ${bsda.id}</li>
     <li>Appellation du déchet : ${bsda.wasteMaterialName}</li>
     <li>Code déchet : ${bsda.wasteCode}</li>
+    <li>Quantité réelle présentée nette: ${bsda.destinationReceptionWeight
+      ?.dividedBy(1000)
+      .toDecimalPlaces(6)
+      .toNumber()} tonnes</li>
+    <li>Quantité refusée: Non renseignée</li>
+    <li>Quantité acceptée: Non renseignée</li>
     <li>
       Motif de refus :
       <span>${bsda.destinationReceptionRefusalReason}</span>`);
@@ -130,7 +137,8 @@ describe("renderBsdaRefusedEmail", () => {
         status: Status.PROCESSED,
         destinationReceptionAcceptationStatus:
           WasteAcceptationStatus.PARTIALLY_REFUSED,
-        destinationReceptionRefusalReason: "Parce que !!"
+        destinationReceptionRefusalReason: "Parce que !!",
+        destinationReceptionWeight: 10
       }
     });
     const email = await renderBsdaRefusedEmail(bsda);
@@ -156,9 +164,12 @@ describe("renderBsdaRefusedEmail", () => {
     <li>Numéro du BSD : ${bsda.id}</li>
     <li>Appellation du déchet : ${bsda.wasteMaterialName}</li>
     <li>Code déchet : ${bsda.wasteCode}</li>
-    <li>Quantité acceptée: ${
-      bsda.destinationReceptionWeight! / 1000
-    } tonnes</li>
+    <li>Quantité réelle présentée nette: ${bsda.destinationReceptionWeight
+      ?.dividedBy(1000)
+      .toDecimalPlaces(6)
+      .toNumber()} tonnes</li>
+    <li>Quantité refusée: Non renseignée</li>
+    <li>Quantité acceptée: Non renseignée</li>
     <li>
       Motif de refus :
       <span>${bsda.destinationReceptionRefusalReason}</span>`);

@@ -21,6 +21,7 @@ import {
 } from "./transformers";
 import { updateTransportersRecepisse } from "../../../common/validation/zod/transformers";
 import {
+  CompanyRole,
   rawTransporterSchema,
   siretSchema
 } from "../../../common/validation/zod/schema";
@@ -102,7 +103,7 @@ const rawBsffSchema = z.object({
     .nullish()
     .transform(t => t ?? BsffType.COLLECTE_PETITES_QUANTITES),
   emitterCompanyName: z.string().nullish(),
-  emitterCompanySiret: siretSchema.nullish(),
+  emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),
   emitterCompanyContact: z.string().nullish(),
   emitterCompanyPhone: z.string().nullish(),
@@ -122,7 +123,7 @@ const rawBsffSchema = z.object({
   wasteDescription: z.string().nullish(),
   transporterTransportSignatureDate: z.coerce.date().nullish(),
   destinationCompanyName: z.string().nullish(),
-  destinationCompanySiret: siretSchema.nullish(),
+  destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
   destinationCompanyAddress: z.string().nullish(),
   destinationCompanyContact: z.string().nullish(),
   destinationCompanyPhone: z.string().nullish(),

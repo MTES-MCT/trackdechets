@@ -8,7 +8,7 @@ import { Loader } from "../../../../../Apps/common/Components";
 import { IconWarehouseStorage } from "../../../../../Apps/common/Components/Icons/Icons";
 import ReceivedInfo from "./ReceivedInfo";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
+import { GET_FORM } from "../../../../../Apps/common/queries/bsdd/queries";
 
 export default function MarkAsTempStored({ form }: WorkflowActionProps) {
   const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =

@@ -351,7 +351,6 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
   test("companyOrgIds > should contain the orgIds of ALL BSFF companies", async () => {
     // Then
     expect(elasticBsff.companyOrgIds).toContain(emitter.company.siret);
-    expect(elasticBsff.companyOrgIds).toContain(transporter.company.siret);
     expect(elasticBsff.companyOrgIds).toContain(transporter.company.vatNumber);
     expect(elasticBsff.companyOrgIds).toContain(destination.company.siret);
     expect(elasticBsff.companyOrgIds).toContain(detenteur1.company.siret);

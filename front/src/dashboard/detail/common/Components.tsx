@@ -12,6 +12,9 @@ import {
 import { getPackagingInfosSummary } from "../../../Apps/common/utils/packagingsBsddSummary";
 import { isForeignVat } from "@td/constants";
 import { toCamelCaseVarName } from "../../../Apps/utils/utils";
+import { isDefined } from "../../../common/helper";
+import { QUANTITY_NON_RENSEIGNE } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
+import TdTooltip from "../../../common/components/Tooltip";
 import { transportModeLabels } from "../../constants";
 import { Company } from "../bsda/BsdaDetailContent";
 
@@ -184,5 +187,37 @@ export const Transporter: React.FC<{
         />
       </div>
     </>
+  );
+};
+
+export const QuantityRow = ({
+  value,
+  label,
+  tooltip,
+  showEmpty = false
+}: {
+  value: string | number | ReactNode | undefined | null;
+  label: string;
+  tooltip: string | undefined | null;
+  showEmpty: boolean;
+}) => {
+  const hasValue = isDefined(value);
+
+  if (!hasValue && !showEmpty) return null;
+
+  return (
+    <DetailRow
+      value={
+        hasValue ? (
+          `${value} tonnes`
+        ) : (
+          <>
+            {QUANTITY_NON_RENSEIGNE} {tooltip && <TdTooltip msg={tooltip} />}
+          </>
+        )
+      }
+      showEmpty={showEmpty}
+      label={label}
+    />
   );
 };

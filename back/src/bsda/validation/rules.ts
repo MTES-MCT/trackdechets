@@ -142,6 +142,19 @@ const sealedFromEmissionExceptAddOrRemoveNextDestination: GetBsdaSignatureTypeFn
   return isEmitter ? "WORK" : "EMISSION";
 };
 
+/**
+ * Régle de verrouillage des champs définie à partir d'une fonction.
+ * Un champ appliquant cette règle est verrouillé à partir de la
+ * signature émetteur s'il n'y a pas d'entreprise de travaux sur le BSDA.
+ * Sinon, le champ est vérouillé à partir de la signature de l'entreprise de
+ * travaux..
+ */
+const sealedFromWorkOrEmissionWhenThereIsNoWorker: GetBsdaSignatureTypeFn<
+  ZodBsda
+> = ({ workerCompanySiret }, _) => {
+  return workerCompanySiret ? "WORK" : "EMISSION";
+};
+
 function transporterSignature(
   transporter: ZodBsdaTransporter
 ): AllBsdaSignatureType {
@@ -727,17 +740,17 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   wasteAdr: { readableFieldName: "la mention ADR", sealed: { from: "WORK" } },
   wasteFamilyCode: {
-    sealed: { from: "WORK" },
+    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
     required: { from: "WORK" },
     readableFieldName: "le code famille"
   },
   wasteMaterialName: {
     readableFieldName: "le nom de matériau",
-    sealed: { from: "WORK" },
+    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
     required: { from: "WORK" }
   },
   wasteConsistence: {
-    sealed: { from: "WORK" },
+    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
     required: { from: "WORK" },
     readableFieldName: "la consistance"
   },
@@ -747,24 +760,24 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   wastePop: {
     readableFieldName: "le champ sur les polluants organiques persistants",
-    sealed: { from: "WORK" },
+    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
     required: { from: "WORK" }
   },
   packagings: {
-    sealed: { from: "WORK" },
+    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
     required: {
       from: "WORK"
     },
     readableFieldName: "le conditionnement"
   },
   weightIsEstimate: {
-    readableFieldName: "le champ pour indiquer sile poids est estimé",
-    sealed: { from: "WORK" },
+    readableFieldName: "le champ pour indiquer si le poids est estimé",
+    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
     required: { from: "WORK" }
   },
   weightValue: {
     readableFieldName: "le poids",
-    sealed: { from: "WORK" },
+    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
     required: { from: "WORK" }
   },
   grouping: { sealed: { from: "EMISSION" } },

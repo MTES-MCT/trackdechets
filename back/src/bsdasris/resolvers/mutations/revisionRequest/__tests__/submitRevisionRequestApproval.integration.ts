@@ -782,7 +782,7 @@ describe("Mutation.submitBsdasriRevisionRequestApproval", () => {
       }
     });
 
-    const res = await mutate<
+    await mutate<
       Pick<Mutation, "submitBsdasriRevisionRequestApproval">,
       MutationSubmitBsdasriRevisionRequestApprovalArgs
     >(SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL, {
@@ -791,7 +791,7 @@ describe("Mutation.submitBsdasriRevisionRequestApproval", () => {
         isApproved: true
       }
     });
-    console.log(res);
+
     const updatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: bsdasri.id }
     });

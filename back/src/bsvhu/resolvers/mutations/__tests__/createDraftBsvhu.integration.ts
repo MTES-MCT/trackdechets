@@ -8,10 +8,6 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { sirenify } from "../../../sirenify";
-
-jest.mock("../../../sirenify");
-(sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
 
 const CREATE_VHU_FORM = `
 mutation CreateVhuForm($input: BsvhuInput!) {
@@ -47,7 +43,6 @@ mutation CreateVhuForm($input: BsvhuInput!) {
 describe("Mutation.Vhu.createDraft", () => {
   afterEach(async () => {
     await resetDatabase();
-    (sirenify as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -130,7 +125,5 @@ describe("Mutation.Vhu.createDraft", () => {
     expect(data.createDraftBsvhu.destination!.company).toMatchObject(
       input.destination.company
     );
-    // check input is sirenified
-    expect(sirenify).toHaveBeenCalledTimes(1);
   });
 });

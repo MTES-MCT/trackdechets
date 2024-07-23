@@ -92,7 +92,10 @@ describe("Query.bsds.bspaohs base workflow", () => {
     await transporterReceiptFactory({ company: transporter.company });
     destination = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
-        set: ["CREMATORIUM"]
+        set: ["WASTEPROCESSOR"]
+      },
+      wasteProcessorTypes: {
+        set: ["CREMATION"]
       }
     });
   });

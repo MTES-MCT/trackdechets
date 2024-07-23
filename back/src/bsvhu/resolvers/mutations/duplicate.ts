@@ -1,4 +1,4 @@
-import { Prisma, BsvhuStatus, Bsvhu } from "@prisma/client";
+import { Prisma, BsvhuStatus, Bsvhu, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsvhuArgs } from "../../../generated/graphql/types";
@@ -7,7 +7,8 @@ import { getBsvhuOrNotFound } from "../../database";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
 import { prisma } from "@td/prisma";
-import { sirenifyBsvhuCreateInput } from "../../sirenify";
+import { prismaToZodBsvhu } from "../../validation/helpers";
+import { parseBsvhuAsync } from "../../validation";
 
 export default async function duplicate(
   _,
@@ -21,23 +22,19 @@ export default async function duplicate(
   await checkCanDuplicate(user, prismaBsvhu);
   const bsvhuRepository = getBsvhuRepository(user);
 
-  const duplicateData = await getDuplicateData(prismaBsvhu);
+  const duplicateData = await getDuplicateData(prismaBsvhu, user);
 
-  const sirenified = await sirenifyBsvhuCreateInput(duplicateData, []);
-
-  const newBsvhu = await bsvhuRepository.create(sirenified);
+  const newBsvhu = await bsvhuRepository.create(duplicateData);
 
   return expandVhuFormFromDb(newBsvhu);
 }
 
 async function getDuplicateData(
-  bsvhu: Bsvhu
+  bsvhu: Bsvhu,
+  user: User
 ): Promise<Prisma.BsvhuCreateInput> {
   const {
     id,
-    createdAt,
-    updatedAt,
-    rowNumber,
     emitterEmissionSignatureAuthor,
     emitterEmissionSignatureDate,
     transporterTransportSignatureAuthor,
@@ -54,46 +51,39 @@ async function getDuplicateData(
     destinationOperationMode,
     destinationOperationSignatureAuthor,
     destinationOperationSignatureDate,
-    ...rest
-  } = bsvhu;
+    ...zodBsvhu
+  } = prismaToZodBsvhu(bsvhu);
+
+  const parsedBsvhu = await parseBsvhuAsync(zodBsvhu, {
+    user
+  });
 
   const { emitter, transporter, destination } = await getBsvhuCompanies(bsvhu);
 
   return {
-    ...rest,
+    ...parsedBsvhu,
     id: getReadableId(ReadableIdPrefix.VHU),
     status: BsvhuStatus.INITIAL,
     isDraft: true,
-    emitterCompanyName: emitter?.name ?? bsvhu.emitterCompanyName,
-    emitterCompanyAddress: emitter?.address ?? bsvhu.emitterCompanyAddress,
-    emitterCompanyContact: emitter?.contact ?? bsvhu.emitterCompanyContact,
-    emitterCompanyPhone: emitter?.contactPhone ?? bsvhu.emitterCompanyPhone,
-    emitterCompanyMail: emitter?.contactEmail ?? bsvhu.emitterCompanyMail,
-    destinationCompanyName: destination?.name ?? bsvhu.destinationCompanyName,
-    destinationCompanyAddress:
-      destination?.address ?? bsvhu.destinationCompanyAddress,
+    createdAt: new Date(),
+    emitterCompanyContact:
+      emitter?.contact ?? parsedBsvhu.emitterCompanyContact,
+    emitterCompanyPhone:
+      emitter?.contactPhone ?? parsedBsvhu.emitterCompanyPhone,
+    emitterCompanyMail: emitter?.contactEmail ?? parsedBsvhu.emitterCompanyMail,
     destinationCompanyContact:
-      destination?.contact ?? bsvhu.destinationCompanyContact,
+      destination?.contact ?? parsedBsvhu.destinationCompanyContact,
     destinationCompanyPhone:
-      destination?.contactPhone ?? bsvhu.destinationCompanyPhone,
+      destination?.contactPhone ?? parsedBsvhu.destinationCompanyPhone,
     destinationCompanyMail:
-      destination?.contactEmail ?? bsvhu.destinationCompanyMail,
-    transporterCompanyName: transporter?.name ?? bsvhu.transporterCompanyName,
-    transporterCompanyAddress:
-      transporter?.address ?? bsvhu.transporterCompanyAddress,
+      destination?.contactEmail ?? parsedBsvhu.destinationCompanyMail,
     transporterCompanyContact:
-      transporter?.contact ?? bsvhu.transporterCompanyContact,
+      transporter?.contact ?? parsedBsvhu.transporterCompanyContact,
     transporterCompanyPhone:
-      transporter?.contactPhone ?? bsvhu.transporterCompanyPhone,
+      transporter?.contactPhone ?? parsedBsvhu.transporterCompanyPhone,
     transporterCompanyMail:
-      transporter?.contactEmail ?? bsvhu.transporterCompanyMail,
-    transporterCompanyVatNumber: bsvhu.transporterCompanyVatNumber,
-    transporterRecepisseNumber:
-      transporter?.transporterReceipt?.receiptNumber ?? null,
-    transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ?? null,
-    transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit ?? null
+      transporter?.contactEmail ?? parsedBsvhu.transporterCompanyMail,
+    transporterCompanyVatNumber: parsedBsvhu.transporterCompanyVatNumber
   };
 }
 

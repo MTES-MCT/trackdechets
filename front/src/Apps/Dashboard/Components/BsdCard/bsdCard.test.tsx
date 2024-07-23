@@ -398,6 +398,21 @@ describe("Bsd card primary action label", () => {
         customInfo: null,
         __typename: "BsffTransporter"
       },
+      transporters: [
+        {
+          company: {
+            siret: "13001045700013",
+            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+            __typename: "FormCompany"
+          },
+          transport: {
+            plates: [],
+            __typename: "BsffTransport"
+          },
+          customInfo: null,
+          __typename: "BsffTransporter"
+        }
+      ],
       bsffDestination: {
         company: {
           siret: "13001045700013",

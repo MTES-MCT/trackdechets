@@ -90,6 +90,29 @@ describe("mutation updateCompany", () => {
     expect(updatedCompany).toMatchObject(variables);
   });
 
+  it("should fail to update a company with crematorium companyType", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const variables = {
+      id: company.id,
+      companyTypes: ["CREMATORIUM"]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le type CREMATORIUM est déprécié, utiliser WasteProcessorTypes.CREMATION."
+      })
+    ]);
+  });
+
   it("should update a french company information with name and adresse from Sirene index", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN", {
       codeNaf: "0112Z"

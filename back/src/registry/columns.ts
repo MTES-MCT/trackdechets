@@ -47,7 +47,8 @@ const formatBoolean = (b: boolean | null) => {
   return b ? "O" : "N";
 };
 const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // return as a number to allow xls cells formulas
-const formatArray = (arr: any[]) => (Array.isArray(arr) ? arr.join(",") : "");
+const formatArray = (arr: any[], sep = ",") =>
+  Array.isArray(arr) ? arr.join(sep) : "";
 const formatArrayWithMissingElements = (arr: any[]) => {
   if (!Array.isArray(arr)) {
     return "";
@@ -77,13 +78,7 @@ const formatTransportMode = (mode?: TransportMode): string => {
       return "";
   }
 };
-/**
- * Clean Final Operation lists
- */
-const formatFinalOperations = (val?: string[]) =>
-  val ? val.map(quant => quant.replace(/ /g, "")).join("; ") : ""; // be consistent and remove all white spaces
-const formatFinalOperationWeights = (val?: number[]) =>
-  val ? val.map(quant => quant.toFixed(2)).join("; ") : "";
+
 export const formatSubType = (subType?: BsdSubType) => {
   if (!subType) return "";
 
@@ -160,7 +155,11 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   { field: "pop", label: "POP", format: formatBoolean },
-  { field: "weight", label: "Quantité de déchet", format: formatNumber },
+  {
+    field: "weight",
+    label: "Quantité de déchet",
+    format: formatNumber
+  },
   // Origine du déchet
   {
     field: "initialEmitterCompanyName",
@@ -171,25 +170,52 @@ export const columns: Column[] = [
     field: "initialEmitterCompanyAddress",
     label: "Producteur initial adresse"
   },
+  {
+    field: "initialEmitterCompanyPostalCode",
+    label: "Producteur initial Code postal"
+  },
+  {
+    field: "initialEmitterCompanyCity",
+    label: "Producteur initial Commune"
+  },
+  {
+    field: "initialEmitterCompanyCountry",
+    label: "Producteur initial Pays"
+  },
   { field: "emitterCompanyName", label: "Expéditeur raison sociale" },
   { field: "emitterCompanyGivenName", label: "Expéditeur Nom usuel" },
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },
-  { field: "emitterCompanyAddress", label: "Expéditeur adresse" },
+  { field: "emitterCompanyAddress", label: "Expéditeur Adresse" },
+  { field: "emitterCompanyPostalCode", label: "Expéditeur Code postal" },
+  { field: "emitterCompanyCity", label: "Expéditeur Commune" },
+  { field: "emitterCompanyCountry", label: "Expéditeur Pays" },
   { field: "emitterPickupsiteName", label: "Nom du point de prise en charge" },
-  { field: "emitterPickupsiteAddress", label: "Adresse de prise en charge" },
+  { field: "emitterPickupsiteAddress", label: "Prise en charge adresse" },
+  {
+    field: "emitterPickupsitePostalCode",
+    label: "Prise en charge Code postal"
+  },
+  { field: "emitterPickupsiteCity", label: "Prise en charge Commune" },
+  { field: "emitterPickupsiteCountry", label: "Prise en charge Pays" },
   { field: "emitterCompanyMail", label: "Expéditeur contact" },
   { field: "workerCompanyName", label: "Entreprise de travaux raison sociale" },
   { field: "workerCompanySiret", label: "Entreprise de travaux SIRET" },
   { field: "workerCompanyAddress", label: "Entreprise de travaux adresse" },
   {
+    field: "workerCompanyPostalCode",
+    label: "Entreprise de travaux Code postal"
+  },
+  { field: "workerCompanyCity", label: "Entreprise de travaux Commune" },
+  { field: "workerCompanyCountry", label: "Entreprise de travaux Pays" },
+  {
     field: "parcelCities",
     label: "Parcelle commune",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "parcelPostalCodes",
     label: "Parcelle code postal",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "parcelNumbers",
@@ -237,6 +263,9 @@ export const columns: Column[] = [
     label: "Transporteur SIRET ou n° de TVA intracommunautaire"
   },
   { field: "transporterCompanyAddress", label: "Transporteur adresse" },
+  { field: "transporterCompanyPostalCode", label: "Transporteur Code postal" },
+  { field: "transporterCompanyCity", label: "Transporteur Commune" },
+  { field: "transporterCompanyCountry", label: "Transporteur Pays" },
   {
     field: "transporterRecepisseIsExempted",
     label: "Transporteur exemption de récépissé",
@@ -246,7 +275,7 @@ export const columns: Column[] = [
   {
     field: "transporterNumberPlates",
     label: "Transporteur immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporterTransportMode",
@@ -267,6 +296,9 @@ export const columns: Column[] = [
   { field: "destinationCompanyGivenName", label: "Destination Nom usuel" },
   { field: "destinationCompanySiret", label: "Destination SIRET" },
   { field: "destinationCompanyAddress", label: "Destination adresse" },
+  { field: "destinationCompanyPostalCode", label: "Destination Code postal" },
+  { field: "destinationCompanyCity", label: "Destination Commune" },
+  { field: "destinationCompanyCountry", label: "Destination Pays" },
   { field: "destinationCompanyMail", label: "Destination Contact" },
   {
     field: "postTempStorageDestinationName",
@@ -298,7 +330,17 @@ export const columns: Column[] = [
   },
   {
     field: "destinationReceptionWeight",
-    label: "Quantité de déchet entrant (t)",
+    label: "Quantité réceptionnée nette (tonnes)",
+    format: formatNumber
+  },
+  {
+    field: "destinationReceptionRefusedWeight",
+    label: "Quantité refusée (tonnes)",
+    format: formatNumber
+  },
+  {
+    field: "destinationReceptionAcceptedWeight",
+    label: "Quantité acceptée / traitée (tonnes)",
     format: formatNumber
   },
   {
@@ -321,14 +363,24 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   {
+    field: "destinationFinalOperationCompanySirets",
+    label: "SIRET de la destination finale",
+    format: (v: string[]) => formatArray(v)
+  },
+  {
     field: "destinationFinalOperationCodes",
-    label: "Opération(s) finale(s) réalisée(s) par la traçabilité suite",
-    format: formatFinalOperations
+    label: "Code opération finale réalisée",
+    format: (codes: string[]) =>
+      formatArray(codes.map(c => formatOperationCode(c)))
   },
   {
     field: "destinationFinalOperationWeights",
-    label: "Quantité(s) liée(s)",
-    format: formatFinalOperationWeights
+    label: "Quantité finale (tonnes)",
+    format: (quantities: number[]) =>
+      formatArray(
+        quantities.map(q => q.toLocaleString("fr")),
+        " - "
+      )
   },
   {
     field: "nextDestinationNotificationNumber",
@@ -349,6 +401,13 @@ export const columns: Column[] = [
   },
   { field: "transporter2CompanyAddress", label: "Transporteur n°2 adresse" },
   {
+    field: "transporter2CompanyPostalCode",
+    label: "Transporteur n°2 Code postal"
+  },
+  { field: "transporter2CompanyCity", label: "Transporteur n°2 Commune" },
+  { field: "transporter2CompanyCountry", label: "Transporteur n°2 Pays" },
+
+  {
     field: "transporter2CompanySiret",
     label: "Transporteur n°2 SIRET ou n° de TVA intracommunautaire"
   },
@@ -361,7 +420,7 @@ export const columns: Column[] = [
   {
     field: "transporter2NumberPlates",
     label: "Transporteur n°2 immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporter2TransportMode",
@@ -388,6 +447,12 @@ export const columns: Column[] = [
   },
   { field: "transporter3CompanyAddress", label: "Transporteur n°3 adresse" },
   {
+    field: "transporter3CompanyPostalCode",
+    label: "Transporteur n°3 Code postal"
+  },
+  { field: "transporter3CompanyCity", label: "Transporteur n°3 Commune" },
+  { field: "transporter3CompanyCountry", label: "Transporteur n°3 Pays" },
+  {
     field: "transporter3RecepisseIsExempted",
     label: "Transporteur n°3 exemption de récépissé",
     format: formatBoolean
@@ -396,7 +461,7 @@ export const columns: Column[] = [
   {
     field: "transporter3NumberPlates",
     label: "Transporteur n°3 immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporter3TransportMode",
@@ -423,6 +488,12 @@ export const columns: Column[] = [
   },
   { field: "transporter4CompanyAddress", label: "Transporteur n°4 adresse" },
   {
+    field: "transporter4CompanyPostalCode",
+    label: "Transporteur n°4 Code postal"
+  },
+  { field: "transporter4CompanyCity", label: "Transporteur n°4 Commune" },
+  { field: "transporter4CompanyCountry", label: "Transporteur n°4 Pays" },
+  {
     field: "transporter4RecepisseIsExempted",
     label: "Transporteur n°4 exemption de récépissé",
     format: formatBoolean
@@ -431,7 +502,7 @@ export const columns: Column[] = [
   {
     field: "transporter4NumberPlates",
     label: "Transporteur n°4 immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporter4TransportMode",
@@ -458,6 +529,12 @@ export const columns: Column[] = [
   },
   { field: "transporter5CompanyAddress", label: "Transporteur n°5 adresse" },
   {
+    field: "transporter5CompanyPostalCode",
+    label: "Transporteur n°5 Code postal"
+  },
+  { field: "transporter5CompanyCity", label: "Transporteur n°5 Commune" },
+  { field: "transporter5CompanyCountry", label: "Transporteur n°5 Pays" },
+  {
     field: "transporter5RecepisseIsExempted",
     label: "Transporteur n°5 exemption de récépissé",
     format: formatBoolean
@@ -466,7 +543,7 @@ export const columns: Column[] = [
   {
     field: "transporter5NumberPlates",
     label: "Transporteur n°5 immatriculation",
-    format: formatArray
+    format: (v: string[]) => formatArray(v)
   },
   {
     field: "transporter5TransportMode",

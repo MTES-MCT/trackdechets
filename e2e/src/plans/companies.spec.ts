@@ -134,8 +134,10 @@ test.describe
     await test.step("#005 - Installation de Transit, Regroupement ou Tri des déchets", async () => {
       await createWasteManagingCompany(page, {
         company: {
-          name: "005 - Installation de Tri, transit regroupement de déchets",
-          roles: ["Installation de Tri, transit regroupement de déchets"]
+          name: "005 - Installation de Tri, transit regroupement de déchets y compris non classée",
+          roles: [
+            "Installation de Tri, transit regroupement de déchets y compris non classée"
+          ]
         },
         contact: {
           name: "Installation TTR 005",
@@ -267,20 +269,6 @@ test.describe
       });
     });
 
-    await test.step("#013 - Crématorium", async () => {
-      await createWasteManagingCompany(page, {
-        company: {
-          name: "013 - Crématorium",
-          roles: ["Crématorium"]
-        },
-        contact: {
-          name: "Crématorium 013",
-          phone: "+33 4 75 84 85 78",
-          email: "crematorium@installation.com"
-        }
-      });
-    });
-
     await test.step("Établissement à supprimer", async () => {
       let producerSiret;
 
@@ -299,6 +287,21 @@ test.describe
 
       await test.step("Suppression de l'établissement", async () => {
         await deleteCompany(page, { siret: producerSiret });
+      });
+    });
+
+    await test.step("#013 - Crématorium", async () => {
+      await createWasteManagingCompany(page, {
+        company: {
+          name: "013 - Crématorium",
+          roles: ["Installation de traitement"],
+          subRoles: ["Crématorium (et cimetières pour la Guyane)"]
+        },
+        contact: {
+          name: "Crématorium 013",
+          phone: "+33 4 75 84 85 78",
+          email: "crematorium@installation.com"
+        }
       });
     });
 
@@ -321,7 +324,7 @@ test.describe
       });
     });
 
-    await test.step("#015 - Entreprise de travaux amiante + Transporteur", async () => {
+    await test.step("#014 - Entreprise de travaux amiante + Transporteur", async () => {
       await createWasteManagingCompany(page, {
         company: {
           name: "015 - Entreprise de travaux amiante + transporteur",

@@ -115,7 +115,7 @@ async function updateForm(
   };
 
   return getFormRepository(user).update(
-    { id: form.id },
+    { id: form.id, status: form.status },
     {
       status: transitionForm(form, {
         type: EventType.ImportPaperForm,

@@ -455,7 +455,7 @@ describe("validation > parseBsffPackaging", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: `L'établissement avec le SIRET ${randomSiret} n'est pas inscrit sur Trackdéchets`
+            message: `Destination : L'établissement avec le SIRET ${randomSiret} n'est pas inscrit sur Trackdéchets`
           })
         ]);
       }

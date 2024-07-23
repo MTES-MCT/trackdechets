@@ -18,7 +18,7 @@ export type UpdateBspaohFn = (
 export function buildUpdateBspaoh(deps: RepositoryFnDeps): UpdateBspaohFn {
   return async (where, data, logMetadata?) => {
     const { prisma, user } = deps;
-    const previousPaoh = await prisma.bspaoh.findUnique({
+    const previousPaoh = await prisma.bspaoh.findUniqueOrThrow({
       where,
       include: {
         transporters: true

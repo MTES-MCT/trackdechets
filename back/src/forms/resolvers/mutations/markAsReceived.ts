@@ -89,7 +89,7 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     } = getFormRepository(user, transaction);
 
     const receivedForm = await update(
-      { id: form.id },
+      { id: form.id, status: form.status },
       {
         status: transitionForm(form, {
           type: EventType.MarkAsReceived,

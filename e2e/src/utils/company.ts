@@ -7,19 +7,21 @@ type CompanyRole =
   | "Transporteur"
   | "Installation de collecte de déchets apportés par le producteur initial"
   | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
-  | "Installation de Tri, transit regroupement de déchets"
+  | "Installation de Tri, transit regroupement de déchets y compris non classée"
   | "Installation de traitement"
   | "Négociant"
   | "Courtier"
-  | "Crématorium"
   | "Entreprise de travaux amiante"
   | "Intermédiaire : établissement qui peut être ajouté à une traçabilité, sans responsabilité réglementaire (y compris entreprises de travaux hors amiante)"
   | "Installation de valorisation de T&S"
   | "Installation dans laquelle les déchets perdent leur statut de déchet";
 
+type CompanySubRole = "Crématorium (et cimetières pour la Guyane)";
+
 interface Company {
   name: string;
   roles: CompanyRole[];
+  subRoles?: CompanySubRole[];
   producesDASRI?: boolean;
 }
 
@@ -66,12 +68,11 @@ export const getCreateButtonName = (roles: CompanyRole[]) => {
       [
         "Installation de collecte de déchets apportés par le producteur initial",
         "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
-        "Installation de Tri, transit regroupement de déchets",
+        "Installation de Tri, transit regroupement de déchets y compris non classée",
         "Transporteur",
         "Installation de traitement",
         "Négociant",
         "Courtier",
-        "Crématorium",
         "Entreprise de travaux amiante"
       ].includes(role)
     ) {
@@ -226,6 +227,11 @@ export const fillInGenericCompanyInfo = async (
   // Select the role
   for (const role of company.roles)
     await page.getByText(role, { exact: true }).click();
+
+  // Select the subRole
+  company.subRoles?.forEach(
+    async subRole => await page.getByText(subRole, { exact: true }).click()
+  );
 };
 
 /**
@@ -344,6 +350,9 @@ export const submitAndVerifyGenericInfo = async (
   for (const role of company.roles) {
     await expect(rolesDiv.getByText(role)).toBeVisible();
   }
+  company.subRoles?.forEach(async subRole => {
+    await expect(rolesDiv.getByText(subRole)).toBeVisible();
+  });
   await expect(companyDiv.getByText(`Nom Usuel${company.name}`)).toBeVisible();
   await expect(companyDiv.getByText("AdresseAdresse test")).toBeVisible();
   await expect(companyDiv.getByText("Code NAFXXXXX -")).toBeVisible();

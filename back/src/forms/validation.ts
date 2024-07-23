@@ -72,6 +72,7 @@ import { ConditionConfig } from "yup/lib/Condition";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
+import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 
 // set yup default error messages
 configureYup();
@@ -254,6 +255,83 @@ export const hasPipeline = (value: {
   }>;
 }): boolean =>
   value.wasteDetailsPackagingInfos?.some(i => i.type === "PIPELINE");
+
+export const quantityRefused = weight(WeightUnits.Tonne)
+  .min(0)
+  .test(
+    "not-defined-if-no-quantity-received",
+    "La quantité refusée (quantityRefused) ne peut être définie si la quantité reçue (quantityReceived) ne l'est pas",
+    (value, context) => {
+      const { quantityReceived } = context.parent;
+
+      const quantityReceivedIsDefined =
+        quantityReceived !== null && quantityReceived !== undefined;
+      const quantityRefusedIsDefined = value !== null && value !== undefined;
+
+      if (!quantityReceivedIsDefined && quantityRefusedIsDefined) return false;
+      return true;
+    }
+  )
+  .test(
+    "waste-is-accepted",
+    "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)",
+    (value, context) => {
+      const { wasteAcceptationStatus } = context.parent;
+
+      if (wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED)
+        return true;
+
+      // Legacy
+      if (value === null || value === undefined) return true;
+
+      return value === 0;
+    }
+  )
+  .test(
+    "waste-is-refused",
+    "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)",
+    (value, context) => {
+      const { wasteAcceptationStatus, quantityReceived } = context.parent;
+
+      if (wasteAcceptationStatus !== WasteAcceptationStatus.REFUSED)
+        return true;
+
+      // Legacy
+      if (value === null || value === undefined) return true;
+
+      return value === quantityReceived;
+    }
+  )
+  .test(
+    "waste-is-partially-refused",
+    "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)",
+    (value, context) => {
+      const { wasteAcceptationStatus, quantityReceived } = context.parent;
+
+      if (wasteAcceptationStatus !== WasteAcceptationStatus.PARTIALLY_REFUSED)
+        return true;
+
+      // Legacy
+      if (value === null || value === undefined) return true;
+
+      return value > 0 && value < quantityReceived;
+    }
+  )
+  .test(
+    "lower-than-quantity-received",
+    "La quantité refusée (quantityRefused) doit être inférieure ou égale à la quantité réceptionnée (quantityReceived)",
+    (value, context) => {
+      const { quantityReceived } = context.parent;
+
+      if (quantityReceived === null || quantityReceived === undefined)
+        return true;
+
+      // Legacy
+      if (value === null || value === undefined) return true;
+
+      return value <= quantityReceived;
+    }
+  );
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
@@ -1206,8 +1284,9 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
   signedAt: yup.date().nullable(),
   quantityReceived: weight(WeightUnits.Tonne)
     .label("Réception")
-    .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
+    .when("wasteAcceptationStatus", weightConditions.bsddWasteAcceptationStatus)
     .when("transporters", weightConditions.transporters(WeightUnits.Tonne)),
+  quantityRefused,
   wasteAcceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
     .test(
@@ -1250,8 +1329,9 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
     .required("${path} : Le poids reçu en tonnes est obligatoire")
     .when(
       "wasteAcceptationStatus",
-      weightConditions.wasteAcceptationStatus as any
+      weightConditions.bsddWasteAcceptationStatus as any
     ),
+  quantityRefused,
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
   wasteRefusalReason: yup
     .string()
@@ -1414,7 +1494,7 @@ const withNextDestination = (required: boolean) =>
               schema
                 .max(
                   15,
-                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                  "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
                 )
                 .nullable()
                 .required(
@@ -1424,7 +1504,7 @@ const withNextDestination = (required: boolean) =>
               schema
                 .max(
                   15,
-                  "Destination ultérieure : Le numéro de notification (format PP AAAA DDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
+                  "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
                 )
                 .notRequired()
                 .nullable()
@@ -1911,10 +1991,15 @@ export async function validateAppendix2Groupement(
         ];
       }
 
+      const getQuantity = form => {
+        const wasteQuantities = bsddWasteQuantities(form);
+        return wasteQuantities?.quantityAccepted ?? form.quantityReceived;
+      };
+
       const quantityLeftToGroup = new Decimal(
         initialForm.forwardedIn
-          ? initialForm.forwardedIn.quantityReceived!
-          : initialForm.quantityReceived!
+          ? getQuantity(initialForm.forwardedIn)
+          : getQuantity(initialForm)
       )
         .minus(quantityGroupedInOtherForms)
         .toDecimalPlaces(6); // set precision to gramme

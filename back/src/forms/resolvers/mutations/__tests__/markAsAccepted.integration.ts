@@ -224,55 +224,9 @@ describe("Test Form reception", () => {
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
-          "Refus de prise en charge de votre déchet de l'entreprise company_1"
+          "Le déchet de l’entreprise company_1 a été totalement refusé à réception"
       })
     );
-  });
-
-  it("should not accept a non-zero quantity when waste is refused", async () => {
-    const { emitterCompany, recipient, recipientCompany, form } =
-      await prepareDB();
-    await prisma.form.update({
-      where: { id: form.id },
-      data: {
-        status: "RECEIVED",
-        receivedBy: "Bill",
-        receivedAt: new Date("2019-01-17T10:22:00+0100")
-      }
-    });
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
-    const { mutate } = makeClient(recipient);
-    // trying to refuse waste with a non-zero quantityReceived
-    await mutate(MARK_AS_ACCEPTED, {
-      variables: {
-        id: form.id,
-        acceptedInfo: {
-          signedBy: "Holden",
-          signedAt: "2019-01-17T10:22:00+0100",
-          wasteAcceptationStatus: "REFUSED",
-          wasteRefusalReason: "Lorem ipsum",
-          quantityReceived: 21
-        }
-      }
-    });
-
-    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
-
-    // form is still sent
-    expect(frm.status).toBe("RECEIVED");
-
-    expect(frm.wasteAcceptationStatus).toBe(null);
-    expect(frm.signedBy).toBe(null);
-    expect(frm.quantityReceived).toBe(null);
-
-    // No StatusLog object was created
-    const logs = await prisma.statusLog.findMany({
-      where: { form: { id: frm.id }, user: { id: recipient.id } }
-    });
-    expect(logs.length).toBe(0);
   });
 
   it("should mark a received form as partially refused", async () => {
@@ -323,7 +277,7 @@ describe("Test Form reception", () => {
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
-          "Refus partiel de prise en charge de votre déchet de l'entreprise company_1"
+          "Le déchet de l’entreprise company_1 a été partiellement refusé à réception"
       })
     );
   });
@@ -613,5 +567,51 @@ describe("Test Form reception", () => {
       });
       expect(refreshedItem.status).toBe(Status.ACCEPTED);
     });
+  });
+
+  it("should accept quantityRefused", async () => {
+    // Given
+    const {
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form: initialForm
+    } = await prepareDB();
+    const form = await prisma.form.update({
+      where: { id: initialForm.id },
+      data: {
+        status: "RECEIVED",
+        receivedBy: "Bill",
+        receivedAt: new Date("2019-01-17T10:22:00+0100")
+      }
+    });
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    // When
+    const { mutate } = makeClient(recipient);
+    const { errors } = await mutate(MARK_AS_ACCEPTED, {
+      variables: {
+        id: form.id,
+        acceptedInfo: {
+          signedAt: "2019-01-17T10:22:00+0100",
+          signedBy: "Bill",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          wasteRefusalReason: "Parce que",
+          quantityReceived: 11,
+          quantityRefused: 7
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    const acceptedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(acceptedForm.quantityReceived?.toNumber()).toEqual(11);
+    expect(acceptedForm.quantityRefused?.toNumber()).toEqual(7);
   });
 });

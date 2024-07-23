@@ -1220,7 +1220,9 @@ const canDeleteBsdasri = (bsd, siret) =>
       bsd.status === BsdStatusCode.SignedByProducer));
 
 const canDeleteBsvhu = bsd =>
-  bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.Initial;
+  bsd.type === BsdType.Bsvhu &&
+  (bsd.status === BsdStatusCode.Initial ||
+    bsd.status === BsdStatusCode.SignedByProducer);
 
 const canDeleteBspaoh = bsd =>
   bsd.type === BsdType.Bspaoh && bsd.status === BsdStatusCode.Initial;
@@ -1240,11 +1242,13 @@ const canDuplicateBsdd = bsd =>
 
 export const canDuplicateBsff = (bsd, siret) => {
   const emitterSiret = bsd.emitter?.company?.siret;
-  const transporterSiret = bsd.transporter?.company?.siret;
+  const transporterOrgsIds = bsd.transporters?.map(t => t.company?.orgId);
   const destinationSiret = bsd.destination?.company?.siret;
   return (
     bsd.type === BsdType.Bsff &&
-    [emitterSiret, transporterSiret, destinationSiret].includes(siret)
+    [emitterSiret, destinationSiret, ...transporterOrgsIds]
+      .filter(Boolean)
+      .includes(siret)
   );
 };
 

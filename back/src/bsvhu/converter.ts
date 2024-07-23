@@ -23,11 +23,7 @@ import {
   BsvhuTransport,
   BsvhuTransportInput
 } from "../generated/graphql/types";
-import {
-  Prisma,
-  Bsvhu as PrismaVhuForm,
-  WasteAcceptationStatus
-} from "@prisma/client";
+import { Bsvhu as PrismaVhuForm, WasteAcceptationStatus } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 
 export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
@@ -139,9 +135,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
   };
 }
 
-export function flattenVhuInput(
-  formInput: BsvhuInput
-): Partial<Prisma.BsvhuCreateInput> {
+export function flattenVhuInput(formInput: BsvhuInput) {
   return safeInput({
     ...flattenVhuEmitterInput(formInput),
     ...flattenVhuDestinationInput(formInput),

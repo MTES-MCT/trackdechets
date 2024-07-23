@@ -1,9 +1,9 @@
 import { RefinementCtx, z } from "zod";
 import { isFRVat, isVat } from "@td/constants";
-import { siretSchema } from "./zod/schema";
+import { CompanyRole, siretSchema } from "./zod/schema";
 
 export const intermediarySchema = z.object({
-  siret: siretSchema,
+  siret: siretSchema(CompanyRole.Intermediary),
   contact: z.string({
     required_error:
       "Intermédiaires : les nom et prénom de contact sont obligatoires"

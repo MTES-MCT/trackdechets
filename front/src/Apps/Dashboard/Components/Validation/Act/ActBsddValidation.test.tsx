@@ -3,10 +3,10 @@ import { MockedProvider } from "@apollo/client/testing";
 
 import { render, screen, waitFor } from "@testing-library/react";
 import ActBsddValidation from "./ActBsddValidation";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import ActBsdSuiteValidation from "./ActBsdSuiteValidation";
 import { MemoryRouter } from "react-router-dom";
 import { Form } from "@td/codegen-ui";
+import { GET_FORM } from "../../../../common/queries/bsdd/queries";
 
 describe("ActBsddValidation", () => {
   const onClose = jest.fn();
@@ -223,9 +223,7 @@ describe("ActBsddValidation", () => {
     );
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
     await waitFor(async () => {
-      expect(
-        await screen.getByText("Valider la réception")
-      ).toBeInTheDocument();
+      expect(await screen.getByText("Signer la réception")).toBeInTheDocument();
     });
   });
 
@@ -276,7 +274,7 @@ describe("ActBsddValidation", () => {
     await waitFor(async () => {
       expect(
         await screen.getByText(
-          "Valider l'acceptation de l'entreposage provisoire"
+          "Signer l'acceptation de l'entreposage provisoire"
         )
       ).toBeInTheDocument();
     });
@@ -302,9 +300,7 @@ describe("ActBsddValidation", () => {
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
 
     await waitFor(async () => {
-      expect(
-        await screen.getByText("Valider la réception")
-      ).toBeInTheDocument();
+      expect(await screen.getByText("Signer la réception")).toBeInTheDocument();
     });
   });
 
@@ -329,7 +325,7 @@ describe("ActBsddValidation", () => {
 
     await waitFor(async () => {
       expect(
-        await screen.getByText("Valider l'entreposage provisoire")
+        await screen.getByText("Signer l'entreposage provisoire")
       ).toBeInTheDocument();
     });
   });
@@ -396,7 +392,7 @@ describe("ActBsddValidation", () => {
 
     await waitFor(async () => {
       expect(
-        await screen.getByText("Valider l'acceptation")
+        await screen.getByText("Signer l'acceptation")
       ).toBeInTheDocument();
     });
   });
