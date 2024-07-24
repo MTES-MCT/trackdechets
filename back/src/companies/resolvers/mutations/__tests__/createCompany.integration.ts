@@ -15,7 +15,8 @@ import {
   CompanyType,
   CompanyVerificationMode,
   CompanyVerificationStatus,
-  WasteProcessorType
+  WasteProcessorType,
+  WasteVehiclesType
 } from "@prisma/client";
 import {
   onboardingFirstStep,
@@ -29,6 +30,7 @@ import {
 } from "../../../../generated/graphql/types";
 import { searchCompany } from "../../../search";
 import { sendVerificationCodeLetter } from "../../../../common/post";
+import gql from "graphql-tag";
 
 // Mock external search services
 jest.mock("../../../search");
@@ -45,7 +47,7 @@ jest.mock("../../../geo/geocode");
 const geoInfo = { latitude: 43.302546, longitude: 5.384324 };
 (geocode as jest.Mock).mockResolvedValue(geoInfo);
 
-const CREATE_COMPANY = `
+const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
       orgId
@@ -57,6 +59,7 @@ const CREATE_COMPANY = `
       companyTypes
       collectorTypes
       wasteProcessorTypes
+      wasteVehiclesTypes
       ecoOrganismeAgreements
       transporterReceipt {
         id
@@ -68,6 +71,27 @@ const CREATE_COMPANY = `
         id
         receiptNumber
         validityLimit
+        department
+      }
+      brokerReceipt {
+        id
+        receiptNumber
+        validityLimit
+        department
+      }
+      workerCertification {
+        hasSubSectionFour
+        hasSubSectionThree
+        certificationNumber
+        validityLimit
+        organisation
+      }
+      vhuAgrementDemolisseur {
+        agrementNumber
+        department
+      }
+      vhuAgrementBroyeur {
+        agrementNumber
         department
       }
       allowBsdasriTakeOverWithoutSignature
@@ -249,6 +273,7 @@ describe("Mutation.createCompany", () => {
       })
     ]);
   });
+
   it("should link to a transporterReceipt", async () => {
     const user = await userFactory();
 
@@ -295,7 +320,50 @@ describe("Mutation.createCompany", () => {
     );
   });
 
-  it("should link to a traderReceipt", async () => {
+  it("should fail to link a transporterReceipt if the company is not TRANSPORTER", async () => {
+    const user = await userFactory();
+
+    const transporterReceipt = await prisma.transporterReceipt.create({
+      data: {
+        receiptNumber: "1234",
+        validityLimit: "2023-03-31T00:00:00.000Z",
+        department: "07"
+      }
+    });
+    const orgId = siretify(1);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["PRODUCER"],
+      transporterReceiptId: transporterReceipt.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de renseigner un récépissé transporteur si le profil transporteur n'est pas sélectionné"
+      })
+    ]);
+  });
+
+  it("should link to a trader receipt", async () => {
     const user = await userFactory();
 
     const traderReceipt = await prisma.traderReceipt.create({
@@ -340,6 +408,403 @@ describe("Mutation.createCompany", () => {
     expect(data.createCompany.traderReceipt!.department).toEqual(
       traderReceipt.department
     );
+  });
+
+  it("should fail to link to a trader receipt if company is not TRADER", async () => {
+    const user = await userFactory();
+
+    const traderReceipt = await prisma.traderReceipt.create({
+      data: {
+        receiptNumber: "1234",
+        validityLimit: "2023-03-31T00:00:00.000Z",
+        department: "07"
+      }
+    });
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["PRODUCER"],
+      traderReceiptId: traderReceipt.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de renseigner un récépissé négociant si le profil négociant n'est pas sélectionné"
+      })
+    ]);
+  });
+
+  it("should link to a broker receipt", async () => {
+    const user = await userFactory();
+
+    const brokerReceipt = await prisma.brokerReceipt.create({
+      data: {
+        receiptNumber: "1234",
+        validityLimit: "2023-03-31T00:00:00.000Z",
+        department: "07"
+      }
+    });
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["BROKER"],
+      brokerReceiptId: brokerReceipt.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    // check the broker Receipt was created in db
+    expect(data.createCompany.brokerReceipt!.receiptNumber).toEqual(
+      brokerReceipt.receiptNumber
+    );
+    expect(data.createCompany.brokerReceipt!.validityLimit).toEqual(
+      brokerReceipt.validityLimit.toISOString()
+    );
+    expect(data.createCompany.brokerReceipt!.department).toEqual(
+      brokerReceipt.department
+    );
+  });
+
+  it("should fail to link to a broker receipt if company is not BROKER", async () => {
+    const user = await userFactory();
+
+    const brokerReceipt = await prisma.brokerReceipt.create({
+      data: {
+        receiptNumber: "1234",
+        validityLimit: "2023-03-31T00:00:00.000Z",
+        department: "07"
+      }
+    });
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["PRODUCER"],
+      brokerReceiptId: brokerReceipt.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de renseigner un récépissé courtier si le profil courtier n'est pas sélectionné"
+      })
+    ]);
+  });
+
+  it("should link to a worker certification", async () => {
+    const user = await userFactory();
+
+    const workerCertification = await prisma.workerCertification.create({
+      data: {
+        hasSubSectionFour: true,
+        hasSubSectionThree: false,
+        certificationNumber: "certification",
+        validityLimit: new Date(),
+        organisation: "AFNOR"
+      }
+    });
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["WORKER"],
+      workerCertificationId: workerCertification.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    // check the worker certification was created in db
+    expect(data.createCompany.workerCertification!.hasSubSectionFour).toEqual(
+      true
+    );
+    expect(data.createCompany.workerCertification!.certificationNumber).toEqual(
+      "certification"
+    );
+    expect(data.createCompany.workerCertification!.organisation).toEqual(
+      "AFNOR"
+    );
+  });
+
+  it("should should fail to link to a worker certification if company is not WORKER", async () => {
+    const user = await userFactory();
+
+    const workerCertification = await prisma.workerCertification.create({
+      data: {
+        hasSubSectionFour: true,
+        hasSubSectionThree: false,
+        certificationNumber: "certification",
+        validityLimit: new Date(),
+        organisation: "AFNOR"
+      }
+    });
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["PRODUCER"],
+      workerCertificationId: workerCertification.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de renseigner une certification d'entreprise de travaux amiante si le profil entreprise de travaux n'est pas sélectionné"
+      })
+    ]);
+  });
+
+  it("should link to VHU démolisseur agrement", async () => {
+    const user = await userFactory();
+
+    const vhuAgrementDemolisseur = await prisma.vhuAgrement.create({
+      data: {
+        agrementNumber: "agrement",
+        department: "07"
+      }
+    });
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["DEMOLISSEUR"],
+      vhuAgrementDemolisseurId: vhuAgrementDemolisseur.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    // check the vhu agrement was created in db
+    expect(data.createCompany.vhuAgrementDemolisseur!.agrementNumber).toEqual(
+      "agrement"
+    );
+    expect(data.createCompany.vhuAgrementDemolisseur!.department).toEqual("07");
+  });
+
+  it("should fail to link to VHU démolisseur agrement if company is not DEMOLISSEUR", async () => {
+    const user = await userFactory();
+
+    const vhuAgrementDemolisseur = await prisma.vhuAgrement.create({
+      data: {
+        agrementNumber: "agrement",
+        department: "07"
+      }
+    });
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR"],
+      vhuAgrementDemolisseurId: vhuAgrementDemolisseur.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de renseigner un agrément démolissuer si le profil démolisseur VHU n'est pas sélectionné"
+      })
+    ]);
+  });
+
+  it("should link to VHU broyeur agrement", async () => {
+    const user = await userFactory();
+
+    const vhuAgrementBroyeur = await prisma.vhuAgrement.create({
+      data: {
+        agrementNumber: "agrement",
+        department: "07"
+      }
+    });
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR"],
+      vhuAgrementBroyeurId: vhuAgrementBroyeur.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    // check the vhu agrement was created in db
+    expect(data.createCompany.vhuAgrementBroyeur!.agrementNumber).toEqual(
+      "agrement"
+    );
+    expect(data.createCompany.vhuAgrementBroyeur!.department).toEqual("07");
+  });
+
+  it("should fail to link to VHU broyeur agrement if company is not BROYEUR", async () => {
+    const user = await userFactory();
+
+    const vhuAgrementBroyeur = await prisma.vhuAgrement.create({
+      data: {
+        agrementNumber: "agrement",
+        department: "07"
+      }
+    });
+    const orgId = siretify(7);
+    const companyInput = {
+      siret: orgId,
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["DEMOLISSEUR"],
+      vhuAgrementBroyeurId: vhuAgrementBroyeur.id
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de renseigner un agrément broyeur si le profil broyeur VHU n'est pas sélectionné"
+      })
+    ]);
   });
 
   it("should throw error if the company already exist", async () => {
@@ -395,8 +860,11 @@ describe("Mutation.createCompany", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : contact@trackdechets.beta.gouv.fr"
+        message: [
+          "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. " +
+            "Contactez-nous si vous pensez qu'il s'agit d'une erreur : contact@trackdechets.beta.gouv.fr",
+          "L'URL de l'agrément de l'éco-organisme est requis."
+        ].join("\n")
       })
     ]);
   });
@@ -619,7 +1087,7 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
 
     for (const type in CompanyType) {
-      if (type === "TRANSPORTER") {
+      if (type === "TRANSPORTER" || type === "CREMATORIUM") {
         continue;
       }
       const companyInput = {
@@ -665,7 +1133,7 @@ describe("Mutation.createCompany", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
+          "Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
       })
     ]);
   });
@@ -1178,7 +1646,8 @@ describe("Mutation.createCompany", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Your company needs to be a Collector to have collectorTypes"
+      "Impossible de sélectionner un sous-type d'installation de tri, transit, regroupement" +
+        " si le profil Installation de Tri, transit regroupement de déchets n'est pas sélectionné"
     );
   });
 
@@ -1363,7 +1832,8 @@ describe("Mutation.createCompany", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Your company needs to be a WasteProcessor to have wasteProcessorTypes"
+      "Impossible de sélectionner un sous-type d'installation de traitement" +
+        " si le profil Installation de traitement n'est pas sélectionné"
     );
   });
 
@@ -1400,6 +1870,189 @@ describe("Mutation.createCompany", () => {
       expect(errors).toBeUndefined();
       expect(data.createCompany).toMatchObject({
         companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: []
+      });
+    }
+  );
+
+  it("VHU treatment facility should be able to chose waste vehicles types", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "VHU",
+      address: "une adresse",
+      companyTypes: [CompanyType.PRODUCER, CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [
+        WasteVehiclesType.BROYEUR,
+        WasteVehiclesType.DEMOLISSEUR
+      ]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      companyTypes: [CompanyType.PRODUCER, CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [
+        WasteVehiclesType.BROYEUR,
+        WasteVehiclesType.DEMOLISSEUR
+      ]
+    });
+  });
+
+  it("waste vehicles types must be valid WasteVehiclesType", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "VHU",
+      address: "une adresse",
+      companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteProcessorType.CREMATION]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      `Variable "$companyInput" got invalid value "CREMATION" at "companyInput.wasteVehiclesTypes[0]"; Value "CREMATION" does not exist in "WasteVehiclesType" enum.`
+    );
+  });
+
+  it("waste vehicles types should not be duplicated", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "VHU",
+      address: "une adresse",
+      companyTypes: [CompanyType.PRODUCER, CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR, WasteVehiclesType.BROYEUR]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      companyTypes: [CompanyType.PRODUCER, CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+    });
+  });
+
+  test("non VHU should NOT be able to chose waste vehicles types", async () => {
+    // Given
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Wanabee VHU",
+      address: "une adresse",
+      companyTypes: [CompanyType.PRODUCER],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Impossible de sélectionner un sous-type d'installation de traitement VHU" +
+        " si le profil Installation de traitement VHU n'est pas sélectionné"
+    );
+  });
+
+  it.each([null, undefined, []])(
+    "waste vehicles types are optional > empty value '%p'",
+    async wasteVehiclesTypes => {
+      // Given
+      const user = await userFactory();
+      const siret = siretify(8);
+      const orgId = siret;
+      (searchCompany as jest.Mock).mockResolvedValueOnce({
+        orgId,
+        siret: orgId,
+        etatAdministratif: "A"
+      });
+
+      const companyInput = {
+        siret,
+        companyName: "VHU",
+        address: "une adresse",
+        companyTypes: [CompanyType.WASTE_VEHICLES],
+        wasteVehiclesTypes
+      };
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { data, errors } = await mutate(CREATE_COMPANY, {
+        variables: {
+          companyInput
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createCompany).toMatchObject({
+        companyTypes: [CompanyType.WASTE_VEHICLES],
         wasteProcessorTypes: []
       });
     }
