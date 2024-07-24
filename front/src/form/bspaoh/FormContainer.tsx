@@ -1,19 +1,21 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { DsfrModal } from "../../Apps/common/Components/Modal/DsfrModal";
 import { ControlledTabs } from "./FormSteps";
+import TdModal from "../../Apps/common/Components/Modal/Modal";
 
 export default function FormContainer() {
   const { id } = useParams<{ id?: string; siret: string }>();
   const navigate = useNavigate();
 
   return (
-    <DsfrModal
+    <TdModal
       onClose={() => navigate(-1)}
+      ariaLabel="Annuler la modification"
       closeLabel="Annuler"
-      size="BSD_FORM"
+      isOpen
+      size="TD_SIZE"
     >
       <ControlledTabs bsdId={id} />
-    </DsfrModal>
+    </TdModal>
   );
 }

@@ -694,8 +694,7 @@ const Appendix1 = ({
         onClose={() => setIsOpen(false)}
         ariaLabel="Ajout d'une annexe 1 au chapeau"
         isOpen={isOpen}
-        padding={false}
-        wide={true}
+        size="L"
       >
         <Appendix1ProducerForm
           container={container}
