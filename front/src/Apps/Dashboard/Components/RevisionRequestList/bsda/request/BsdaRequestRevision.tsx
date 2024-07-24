@@ -336,7 +336,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 </Select>
                 <RhfOperationModeSelect
                   operationCode={formValues?.destination?.operation?.code}
-                  path={"destination.operation.code"}
+                  path={"destination.operation.mode"}
                 />
               </RhfReviewableField>
 
