@@ -416,18 +416,6 @@ const Recipient = ({
           tooltip={BSD_DETAILS_QTY_TOOLTIP}
           showEmpty={hasBeenReceived}
         />
-        <DetailRow
-          value={
-            form?.quantityRefused ? (
-              `${form?.quantityRefused} tonnes`
-            ) : (
-              <>
-                {NON_RENSEIGNE} <TdTooltip msg={BSD_DETAILS_QTY_TOOLTIP} />
-              </>
-            )
-          }
-          label="Quantité refusée"
-        />
         <DetailRow value={form.wasteRefusalReason} label="Motif de refus" />
       </div>
       <div className={styles.detailGrid}>
