@@ -90,36 +90,36 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   if (transporterReceiptId !== undefined) {
     data.transporterReceipt = transporterReceiptId
       ? { connect: { id: transporterReceiptId } }
-      : { disconnect: {} };
+      : { disconnect: true };
   }
 
   if (traderReceiptId !== undefined) {
     data.traderReceipt = traderReceiptId
       ? { connect: { id: traderReceiptId } }
-      : { disconnect: {} };
+      : { disconnect: true };
   }
 
   if (brokerReceiptId !== undefined) {
     data.brokerReceipt = brokerReceiptId
       ? { connect: { id: brokerReceiptId } }
-      : { disconnect: {} };
+      : { disconnect: true };
   }
 
   if (workerCertificationId !== undefined) {
     data.workerCertification = workerCertificationId
       ? { connect: { id: workerCertificationId } }
-      : { disconnect: {} };
+      : { disconnect: true };
   }
   if (vhuAgrementBroyeurId !== undefined) {
     data.vhuAgrementBroyeur = vhuAgrementBroyeurId
       ? { connect: { id: vhuAgrementBroyeurId } }
-      : { disconnect: {} };
+      : { disconnect: true };
   }
 
   if (vhuAgrementDemolisseurId !== undefined) {
     data.vhuAgrementDemolisseur = vhuAgrementDemolisseurId
       ? { connect: { id: vhuAgrementDemolisseurId } }
-      : { disconnect: {} };
+      : { disconnect: true };
   }
 
   // Trigger update name and address

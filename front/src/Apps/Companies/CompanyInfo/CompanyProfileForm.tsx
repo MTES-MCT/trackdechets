@@ -608,7 +608,11 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     const args: MutationUpdateCompanyArgs = {
       id: company.id,
       companyTypes: data.companyTypes,
-      ecoOrganismeAgreements: data.ecoOrganismeAgreements,
+      ecoOrganismeAgreements: data.companyTypes.includes(
+        CompanyType.EcoOrganisme
+      )
+        ? data.ecoOrganismeAgreements
+        : [],
       collectorTypes: data.companyTypes.includes(CompanyType.Collector)
         ? data.collectorTypes
         : [],

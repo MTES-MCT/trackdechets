@@ -14,6 +14,7 @@ import {
   WasteProcessorType,
   WasteVehiclesType
 } from "@prisma/client";
+import gql from "graphql-tag";
 
 const mockGetUpdatedCompanyNameAndAddress = jest.fn();
 // Mock external search services
@@ -24,46 +25,46 @@ jest.mock("../../../database", () => ({
     mockGetUpdatedCompanyNameAndAddress(...args)
 }));
 
-const UPDATE_COMPANY = `
+const UPDATE_COMPANY = gql`
   mutation UpdateCompany(
-    $id: String!,
-    $gerepId: String,
-    $contactEmail: String,
-    $contactPhone: String,
-    $website: String,
-    $companyTypes: [CompanyType!],
-    $collectorTypes: [CollectorType!],
-    $wasteProcessorTypes: [WasteProcessorType!],
-    $wasteVehiclesTypes: [WasteVehiclesType!],
-    $givenName: String,
-    $transporterReceiptId: String,
-    $traderReceiptId: String,
-    $ecoOrganismeAgreements: [URL!],
+    $id: String!
+    $gerepId: String
+    $contactEmail: String
+    $contactPhone: String
+    $website: String
+    $companyTypes: [CompanyType!]
+    $collectorTypes: [CollectorType!]
+    $wasteProcessorTypes: [WasteProcessorType!]
+    $wasteVehiclesTypes: [WasteVehiclesType!]
+    $givenName: String
+    $transporterReceiptId: String
+    $traderReceiptId: String
+    $ecoOrganismeAgreements: [URL!]
     $allowBsdasriTakeOverWithoutSignature: Boolean
-    ){
-      updateCompany(
-        id: $id,
-        gerepId: $gerepId,
-        contactEmail: $contactEmail,
-        contactPhone: $contactPhone,
-        companyTypes: $companyTypes,
-        collectorTypes: $collectorTypes,
-        wasteProcessorTypes: $wasteProcessorTypes,
-        wasteVehiclesTypes: $wasteVehiclesTypes,
-        website: $website,
-        givenName: $givenName,
-        transporterReceiptId: $transporterReceiptId,
-        traderReceiptId: $traderReceiptId,
-        ecoOrganismeAgreements: $ecoOrganismeAgreements,
-        allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature,
-      ){
-        id
-        name
-        address
-        naf
-        libelleNaf
-      }
+  ) {
+    updateCompany(
+      id: $id
+      gerepId: $gerepId
+      contactEmail: $contactEmail
+      contactPhone: $contactPhone
+      companyTypes: $companyTypes
+      collectorTypes: $collectorTypes
+      wasteProcessorTypes: $wasteProcessorTypes
+      wasteVehiclesTypes: $wasteVehiclesTypes
+      website: $website
+      givenName: $givenName
+      transporterReceiptId: $transporterReceiptId
+      traderReceiptId: $traderReceiptId
+      ecoOrganismeAgreements: $ecoOrganismeAgreements
+      allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature
+    ) {
+      id
+      name
+      address
+      naf
+      libelleNaf
     }
+  }
 `;
 
 describe("mutation updateCompany", () => {
