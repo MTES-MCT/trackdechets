@@ -38,7 +38,10 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
     }
   );
 
-  await checkCanRead(user, form);
+  // The admin dashboard shows BSD cards & must allow PDF downloads
+  if (!user.isAdmin) {
+    await checkCanRead(user, form);
+  }
 
   return getFileDownload({
     handler: formPdfDownloadHandler.name,

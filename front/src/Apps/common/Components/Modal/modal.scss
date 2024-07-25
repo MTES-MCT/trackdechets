@@ -1,0 +1,25 @@
+@import "../../../../scss/Constants.scss";
+@import "../../../../scss/Breakpoints.scss";
+
+.tdModalOverlay {
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  overflow: auto;
+  height: 100%;
+}
+
+.tdModalInner {
+  position: relative;
+  top: 50%;
+  right: 50%;
+  transform: translate(50%, -50%);
+}
+
+.fr-modal__header.close-btn-override {
+  padding: 1rem;
+}

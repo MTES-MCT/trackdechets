@@ -22,8 +22,8 @@ const RevisionList = ({ reviews, title }: RevisionListProps) => {
 
       {latestRevision?.isCanceled ? (
         <>
-          <p>
-            L'entreprise
+          <p className="fr-mb-4v">
+            L'entreprise{" "}
             <strong>{latestRevision?.authoringCompany?.name}</strong> a demandé
             l'annulation du bordereau
           </p>
@@ -33,6 +33,7 @@ const RevisionList = ({ reviews, title }: RevisionListProps) => {
               <li>{latestRevision.comment}</li>
             </ul>
           </div>
+          <ActorStatus review={latestRevision} />
         </>
       ) : (
         reviews?.map(review => (

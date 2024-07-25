@@ -27,7 +27,10 @@ describe("renderBspaohRefusedEmail", () => {
         destinationReceptionDate: new Date("2022-01-02"),
         status: Status.REFUSED,
         destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
-        destinationReceptionWasteRefusalReason: "Parce que !!"
+        destinationReceptionWasteRefusalReason: "Parce que !!",
+        destinationReceptionWasteReceivedWeightValue: 10,
+        destinationReceptionWasteRefusedWeightValue: 10,
+        destinationReceptionWasteAcceptedWeightValue: 0
       }
     });
     const email = await renderBspaohRefusedEmail(bspaoh);
@@ -53,6 +56,9 @@ describe("renderBspaohRefusedEmail", () => {
     <li>Numéro du BSD: ${bspaoh.id}</li>
     <li>Appellation du déchet : Pièce anatomique d&#39;origine humaine</li>
     <li>Code déchet : ${bspaoh.wasteCode}</li>
+    <li>Quantité réelle présentée nette : 0.01 tonnes</li>
+    <li>Quantité refusée nette : 0.01 tonnes</li>
+    <li>Quantité acceptée nette : 0 tonnes</li>
     <li>
       Motif de refus :
       <span>${bspaoh.destinationReceptionWasteRefusalReason}</span>`);
@@ -76,7 +82,9 @@ describe("renderBspaohRefusedEmail", () => {
         destinationReceptionAcceptationStatus:
           WasteAcceptationStatus.PARTIALLY_REFUSED,
         destinationReceptionWasteRefusalReason: "Parce que !!",
-        destinationReceptionWasteAcceptedWeightValue: 10
+        destinationReceptionWasteReceivedWeightValue: 50,
+        destinationReceptionWasteAcceptedWeightValue: 20,
+        destinationReceptionWasteRefusedWeightValue: 30
       }
     });
     const email = await renderBspaohRefusedEmail(bspaoh);
@@ -102,7 +110,9 @@ describe("renderBspaohRefusedEmail", () => {
     <li>Numéro du BSD : ${bspaoh.id}</li>
     <li>Appellation du déchet : Pièce anatomique d&#39;origine humaine</li>
     <li>Code déchet : ${bspaoh.wasteCode}</li>
-    <li>Quantité acceptée: ${10 / 1000} tonnes</li>
+    <li>Quantité réelle présentée nette : 0.05 tonnes</li>
+    <li>Quantité refusée nette : 0.03 tonnes</li>
+    <li>Quantité acceptée nette : 0.02 tonnes</li>
     <li>
       Motif de refus :
       <span>${bspaoh.destinationReceptionWasteRefusalReason}</span>`);

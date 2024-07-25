@@ -626,6 +626,62 @@ $ ./restore-db.sh
 # La première question détermine si vous souhaitez utiliser un backup distant ou local
 ```
 
+#### Procédure automatique de restauration partielle d'une base de donnée de production
+
+Un script permettant de faire un dump partiel d'une DB a été créé. Il part d'un BSD spécifique qui doit être testé, et traverse récursivement la db pour trouver tous les objets qui y sont reliés, de façon à avoir un environnement de test complet pour reproduire un problème.
+
+Etapes préliminaires:
+
+- créer une nouvelle DB vide et la mettre dans la variable _DATABASE_URL_ du fichier .env
+- appliquer `npx prisma migrate dev`
+- ouvrir un tunnel SSH vers la db à dumper en utilisant le client scalingo
+  - `scalingo login` (nécéssite d'avoir une clé SSH renseignée dans Scalingo)
+  - `scalingo -a <id de la db scalingo> db-tunnel SCALINGO_POSTGRESQL_URL`
+- ajouter l'url de la DB tunnelée dans _TUNNELED_DB_ dans le fichier .env. Utiliser un utilisateur read-only pour l'accès, voir avec l'équipe pour en créer un ou obtenir ses credentials.
+
+Utilisation du script:
+
+```bash
+$ npx nx run partial-backup:run
+```
+
+Le script vous demandera l'id du BSD de départ (utiliser le readableId "BSD-..." pour les BSDD/Form), puis se chargera de charger tous les objets en relation. Une fois le chargement fait, vous aurez un aperçu des données sous cette forme :
+
+```
+What will be copied :
+{
+  Bsdasri: 3,
+  Company: 297,
+  AnonymousCompany: 3,
+  User: 78,
+  TransporterReceipt: 65,
+  CompanyAssociation: 408,
+  MembershipRequest: 65,
+  VhuAgrement: 54,
+  BrokerReceipt: 12,
+  AccessToken: 77,
+  Grant: 12,
+  Application: 3,
+  WorkerCertification: 35,
+  SignatureAutomation: 40,
+  TraderReceipt: 11,
+  UserActivationHash: 3,
+  UserResetPasswordHash: 11,
+  FeatureFlag: 1
+}
+```
+
+Si les informations semblent raisonnables, vous pouvez accepter d'écrire dans votre DB de destination en tapant "Y".
+
+Si une erreur survient lors du processus d'écriture, il est possible que ce soit dû à:
+
+- le schema utilisé en local ne correspond pas à celui de la db source
+- le schema Prisma ne correspond pas au schema de la db source
+- la DB de destination n'est pas vide
+- le schema de la DB de destination n'a pas été créé (`npx prisma migrate dev`)
+
+Si tout se passe correctement, il ne vous reste plus qu'à reconstruire l'index elastic avec les données chargées en appliquant `npx nx run back:reindex-all-bsds-bulk -- -f`.
+
 #### Procédure manuelle
 
 1. Télécharger un backup de la base de donnée nommée `prisma` que vous souhaitez restaurer

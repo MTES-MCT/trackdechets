@@ -11,10 +11,13 @@ import {
 } from "@td/codegen-ui";
 import React from "react";
 import { getInitialEmitterWorkSite } from "../utils/initial-state";
-import { CREATE_FORM, UPDATE_FORM } from "../utils/queries";
 import WorkSite from "../../common/components/work-site/WorkSite";
 import { TOAST_DURATION } from "../../../common/config";
 import { getInitialCompany } from "../../../Apps/common/data/initialState";
+import {
+  CREATE_FORM,
+  UPDATE_FORM
+} from "../../../Apps/common/queries/bsdd/queries";
 
 export function Appendix1ProducerForm({
   container,

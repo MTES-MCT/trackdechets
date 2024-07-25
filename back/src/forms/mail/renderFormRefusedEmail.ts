@@ -10,6 +10,7 @@ import {
 } from "@td/mail";
 import { getTransporterCompanyOrgId, Dreals } from "@td/constants";
 import { getFirstTransporter } from "../database";
+import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -89,6 +90,8 @@ export async function renderFormRefusedEmail(
     forwardedInTransporter = await getFirstTransporter(forwardedIn);
   }
 
+  const wasteQuantities = bsddWasteQuantities(form);
+
   return renderMail(mailTemplate, {
     to,
     cc,
@@ -100,6 +103,8 @@ export async function renderFormRefusedEmail(
         emitterCompanyName: form.emitterCompanyName,
         emitterCompanySiret: form.emitterCompanySiret,
         emitterCompanyAddress: form.emitterCompanyAddress,
+        quantityAccepted: wasteQuantities?.quantityAccepted,
+        quantityRefused: wasteQuantities?.quantityRefused,
         ...(isFinalDestinationRefusal
           ? {
               signedAt: forwardedIn.signedAt,
@@ -115,7 +120,7 @@ export async function renderFormRefusedEmail(
               ),
               transporterReceipt: forwardedInTransporter?.transporterReceipt,
               sentBy: forwardedIn.sentBy,
-              quantityReceived: forwardedIn.quantityReceived
+              quantityReceived: forwardedIn.quantityReceived?.toDecimalPlaces(6)
             }
           : {
               signedAt: form.signedAt,
@@ -128,7 +133,7 @@ export async function renderFormRefusedEmail(
               transporterCompanySiret: getTransporterCompanyOrgId(transporter),
               transporterReceipt: transporter?.transporterReceipt,
               sentBy: form.sentBy,
-              quantityReceived: form.quantityReceived
+              quantityReceived: form.quantityReceived?.toDecimalPlaces(6)
             })
       }
     },

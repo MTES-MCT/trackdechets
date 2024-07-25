@@ -11,12 +11,25 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - ETQ utilisateur, je peux faire du multi-modal sur le BSFF [PR #3421](https://github.com/MTES-MCT/trackdechets/pull/3421)
 
+#### :house: Interne
+
+- Refacto de la validation BSVHU [PR 3477](https://github.com/MTES-MCT/trackdechets/pull/3477)
+
+#### :nail_care: Améliorations
+
+- ETQ utilisateur, je peux préciser la quantité refusée lors de la réception d'un BSDD [PR 3252](https://github.com/MTES-MCT/trackdechets/pull/3252), [PR 3418](https://github.com/MTES-MCT/trackdechets/pull/3418)
+- Ajout de la date et de l'heure d'édition dans les PDFs [PR 3452](https://github.com/MTES-MCT/trackdechets/pull/3452)
+- Suppression de colonnes dépréciées dans les registres (champ libre transporteur, expéditeur & destination, date de cession & d'acquisition, producteurs initiaux codes postaux, producteur initial (regitres de transport & gestion), plaques d'immatriculations (tous les registres sauf transport & exhaustif)) [PR 3446](https://github.com/MTES-MCT/trackdechets/pull/3446)
+- Ajout des noms usuels de l'expéditeur, des transporteurs ainsi que de la destination sur le registre exhaustif [PR 3464](https://github.com/MTES-MCT/trackdechets/pull/3464)
+- Séparation des adresses des registres en 4 champs: Libellé, Code postal, Commune, Pays [PR 3456](https://github.com/MTES-MCT/trackdechets/pull/3456)
+
 # [2024.7.1] 02/07/2024
 
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de la possibilité de gérer les rôles des membres d'une entreprise depuis la liste des membres [PR 3384](https://github.com/MTES-MCT/trackdechets/pull/3384)
 - Ajout d'une gestion des membres d'entreprises pour les admin Trackdéchets [PR 3384](https://github.com/MTES-MCT/trackdechets/pull/3384)
+- Ajout du N°SIRET de la destination finale sur les registres sortants et exhaustifs [PR 3447](https://github.com/MTES-MCT/trackdechets/pull/3447)
 
 #### :bug: Corrections de bugs
 
@@ -25,8 +38,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Le champ allowBsdasriTakeOverWithoutSignature est désormais retourné par la requête companyInfos même pour des entreprises non-diffusibles [PR 3399](https://github.com/MTES-MCT/trackdechets/pull/3399)
 - Le volume total d'un DASRI est désormais un Float, et déprécié [PR 3398](https://github.com/MTES-MCT/trackdechets/pull/3398)
 - Une déchetterie (WASTE_CENTER) non vérifiée peut désormais créer un BSDA COLLECTION_2710 [PR 3436](https://github.com/MTES-MCT/trackdechets/pull/3436)
+- Corriger les données remontées dans la colonne Quantité(s) liée(s) [PR 3447](https://github.com/MTES-MCT/trackdechets/pull/3447)
 
 #### :boom: Breaking changes
+
+- Le profil crématorium est déprécié au profit du sous-type crémation [PR 3468](https://github.com/MTES-MCT/trackdechets/pull/3468)
 
 #### :nail_care: Améliorations
 

@@ -117,6 +117,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     throw new UserInputError(CLOSED_COMPANY_ERROR);
   }
 
+  if (companyTypes.includes("CREMATORIUM")) {
+    throw new UserInputError(
+      "Le type CREMATORIUM est déprécié, utiliser WasteProcessorTypes.CREMATION."
+    );
+  }
+
   if (companyTypes.includes("ECO_ORGANISME") && siret) {
     const ecoOrganismeExists = await prisma.ecoOrganisme.findUnique({
       where: { siret }
@@ -285,7 +291,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   ) {
     await sendFirstOnboardingEmail(companyInput, user);
   }
-
   return convertUrls(company);
 };
 

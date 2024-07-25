@@ -103,6 +103,12 @@ type Form {
   "Quantité réelle présentée en tonnes (case 10)"
   quantityReceived: Float
 
+  "Quantité acceptée nette"
+  quantityAccepted: Float
+
+  "Quantité refusée nette"
+  quantityRefused: Float
+
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
 
@@ -212,6 +218,13 @@ type InitialForm {
   dont la provenance reste identifiable (en tonnes)
   """
   quantityReceived: Float
+
+  "Quantité acceptée nette"
+  quantityAccepted: Float
+
+  "Quantité refusée nette"
+  quantityRefused: Float
+
   """
   Opération de transformation ou un traitement aboutissant à des déchets dont la provenance reste identifiable effectuée
   par l'installation de regroupement
@@ -323,6 +336,10 @@ type TemporaryStorer {
   quantityType: QuantityType
   "Quantité reçue en tonnes"
   quantityReceived: Float
+  "Quantité refusée nette en tonnes"
+  quantityRefused: Float
+  "Quantité acceptée nette en tonnes"
+  quantityAccepted: Float
   wasteAcceptationStatus: WasteAcceptationStatus
   wasteRefusalReason: String
 

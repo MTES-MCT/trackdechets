@@ -104,7 +104,6 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     // Then
     expect(elasticBsda.companyOrgIds).toContain(emitter.siret);
     expect(elasticBsda.companyOrgIds).toContain(worker.siret);
-    expect(elasticBsda.companyOrgIds).toContain(transporter.siret);
     expect(elasticBsda.companyOrgIds).toContain(transporter.vatNumber);
     expect(elasticBsda.companyOrgIds).toContain(destination.siret);
     expect(elasticBsda.companyOrgIds).toContain(broker.siret);

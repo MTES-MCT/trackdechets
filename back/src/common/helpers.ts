@@ -12,3 +12,10 @@ export const dateToXMonthAtHHMM = (date: Date = new Date()): string => {
 
   return date.toLocaleDateString("fr-FR", options);
 };
+
+/**
+ * Tests if an object is defined. 0 will be considered as defined.
+ */
+export const isDefined = (obj: any) => {
+  return obj !== null && obj !== undefined;
+};

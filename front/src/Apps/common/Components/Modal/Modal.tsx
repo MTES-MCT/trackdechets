@@ -1,26 +1,35 @@
 import React from "react";
 import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
-import styles from "./Modal.module.scss";
-import { IconDelete } from "../Icons/Icons";
-import classNames from "classnames";
+import "./modal.scss";
+
+const ModalSizesClass = {
+  M: "fr-col-12 fr-col-md-6 fr-col-lg-6",
+  L: "fr-col-12 fr-col-md-8 fr-col-lg-8",
+  XL: "fr-col-12 fr-col-md-12 fr-col-lg-12",
+  TD_SIZE: "td-dsfr-modal-bsd-form" // custom class to host bsd forms
+};
+export type ModalSizes = keyof typeof ModalSizesClass;
 
 type ModalProps = {
   state: OverlayTriggerState;
   children: React.ReactNode;
   padding?: boolean;
+  title?: string;
+  closeLabel?: string;
   ariaLabel: string;
-  wide?: boolean;
   isDismissable: boolean;
   isKeyboardDismissDisabled: boolean;
+  size?: ModalSizes;
 };
 
 export function Modal({
   state,
   children,
+  closeLabel = "Fermer",
+  title,
   ariaLabel,
-  padding = true,
-  wide = false,
+  size = "M",
   ...props
 }: ModalProps) {
   const ref = React.useRef(null);
@@ -28,25 +37,37 @@ export function Modal({
 
   return (
     <Overlay>
-      <div className={styles.tdModalOverlay} {...underlayProps}>
-        <div
-          className={classNames(styles.tdModal, {
-            [styles.tdModalWide]: wide,
-            [styles.tdModalPadding]: padding
-          })}
-          aria-label={ariaLabel}
-          {...modalProps}
-          ref={ref}
-        >
-          <button
-            type="button"
-            className={styles.ModalCloseButton}
-            onClick={state.close}
-            aria-label="Close"
+      <div className="tdModalOverlay" {...underlayProps}>
+        <div className="tdModalInner">
+          <div
+            className="fr-container fr-container--fluid fr-container-md"
+            aria-label={ariaLabel}
+            {...modalProps}
+            ref={ref}
           >
-            Fermer <IconDelete aria-hidden />
-          </button>
-          {children}
+            <div className="fr-grid-row fr-grid-row--center">
+              <div className={ModalSizesClass[size]}>
+                <div className="fr-modal__body">
+                  <div className="fr-modal__header close-btn-override">
+                    <button
+                      type="button"
+                      className="fr-btn--close fr-btn"
+                      onClick={state.close}
+                      aria-label="Close"
+                    >
+                      {closeLabel}
+                    </button>
+                  </div>
+                  {title && (
+                    <h1 className="fr-modal__header fr-modal__title">
+                      {title}
+                    </h1>
+                  )}
+                  <div className="fr-modal__content">{children}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </Overlay>
@@ -57,6 +78,9 @@ type TdModalProps = {
   children: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
+  title?: string;
+  closeLabel?: string;
+  size?: ModalSizes;
 };
 
 export default function TdModal({
@@ -64,10 +88,12 @@ export default function TdModal({
   isOpen,
   onClose,
   padding,
-  wide,
   ariaLabel,
+  closeLabel = "Fermer",
+  title,
+  size,
   ...props
-}: Pick<ModalProps, "padding" | "ariaLabel" | "wide"> & TdModalProps) {
+}: Pick<ModalProps, "padding" | "ariaLabel"> & TdModalProps) {
   const state = useOverlayTriggerState({
     isOpen: isOpen,
     onOpenChange: isOpen => {
@@ -79,12 +105,13 @@ export default function TdModal({
   return state.isOpen ? (
     <Modal
       ariaLabel={ariaLabel}
-      wide={wide}
-      padding={padding}
-      isDismissable
+      isDismissable={false}
       isKeyboardDismissDisabled
       {...props}
       state={state}
+      closeLabel={closeLabel}
+      title={title}
+      size={size}
     >
       {children}
     </Modal>
@@ -94,16 +121,19 @@ export default function TdModal({
 type TdModalTriggerProps = {
   trigger: (open: () => void) => React.ReactElement;
   modalContent: (close: () => void) => React.ReactElement | null;
+  title?: string;
+  closeLabel?: string;
 };
 
 export function TdModalTrigger({
   trigger,
   modalContent,
   padding,
-  wide,
   ariaLabel,
+  title,
+  closeLabel,
   ...props
-}: Pick<ModalProps, "padding" | "ariaLabel" | "wide"> & TdModalTriggerProps) {
+}: Pick<ModalProps, "padding" | "ariaLabel"> & TdModalTriggerProps) {
   const state = useOverlayTriggerState(props);
   const { triggerProps, overlayProps } = useOverlayTrigger(
     { type: "dialog" },
@@ -118,9 +148,9 @@ export function TdModalTrigger({
       {state.isOpen && (
         <Modal
           ariaLabel={ariaLabel}
-          wide={wide}
-          padding={padding}
-          isDismissable
+          closeLabel={closeLabel}
+          title={title}
+          isDismissable={false}
           isKeyboardDismissDisabled
           {...props}
           state={state}

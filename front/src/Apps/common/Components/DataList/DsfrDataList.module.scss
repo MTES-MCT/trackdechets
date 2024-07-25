@@ -4,6 +4,7 @@
 .DataList {
   display: flex;
   flex-wrap: wrap;
+  padding-inline-start: initial;
 
   &:not(:last-child) {
     padding-bottom: 1rem;
@@ -29,4 +30,5 @@
 
 .DataListDescription {
   font-weight: bold;
+  padding-inline-start: initial;
 }

@@ -59,7 +59,7 @@ export const createPasswordResetRequest: MailTemplate<{
 
 export const formNotAccepted: MailTemplate<{ form: Form & BsddTransporter }> = {
   subject: ({ form }) =>
-    `Refus de prise en charge de votre déchet de l'entreprise ${form.emitterCompanyName}`,
+    `Le déchet de l’entreprise ${form.emitterCompanyName} a été totalement refusé à réception`,
   body: mustacheRenderer("refus-total-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {
@@ -83,7 +83,7 @@ export const formPartiallyRefused: MailTemplate<{
   form: Form & BsddTransporter;
 }> = {
   subject: ({ form }) =>
-    `Refus partiel de prise en charge de votre déchet de l'entreprise ${form.emitterCompanyName}`,
+    `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
   body: mustacheRenderer("refus-partiel-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {
@@ -94,9 +94,6 @@ export const formPartiallyRefused: MailTemplate<{
         transporterCompanyName: cleanupSpecialChars(
           form.transporterCompanyName
         ),
-        quantityPartiallyRefused: form.wasteDetailsQuantity
-          ?.minus(form.quantityReceived!)
-          .toNumber(),
         signedAt: form.signedAt
           ? toFrFormat(new Date(form.signedAt))
           : form.signedAt,

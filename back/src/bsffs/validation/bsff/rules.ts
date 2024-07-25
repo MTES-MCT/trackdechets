@@ -633,7 +633,7 @@ export async function checkBsffSealedFields(
 export async function getSealedFields(
   bsff: ZodBsff,
   context: BsffValidationContext
-) {
+): Promise<(keyof BsffEditionRules)[]> {
   const currentSignatureType =
     context.currentSignatureType ?? getCurrentSignatureType(bsff);
   // Some signatures may be skipped, so always check all the hierarchy

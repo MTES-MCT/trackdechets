@@ -1,17 +1,14 @@
 import React from "react";
 import { EmitterType, Form, FormStatus, UserPermission } from "@td/codegen-ui";
 import MarkAsSealed from "./MarkAsSealed";
-import MarkAsReceived from "./MarkAsReceived";
-import MarkAsAccepted from "./MarkAsAccepted";
 import MarkAsProcessed from "./MarkAsProcessed";
-import MarkAsTempStored from "./MarkAsTempStored";
 import MarkAsResealed from "./MarkAsResealed";
-import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
 import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
 import routes from "../../../../../Apps/routes";
 import { useMatch } from "react-router-dom";
 import { usePermissions } from "../../../../../common/contexts/PermissionsContext";
+import { SignReception } from "../../../../../Apps/Dashboard/Components/Validation/BSDD/SignReception";
 
 export interface WorkflowActionProps {
   form: Form;
@@ -89,10 +86,18 @@ export function WorkflowAction(props: WorkflowActionProps) {
         if (!permissions.includes(UserPermission.BsdCanSignAcceptation))
           return null;
 
+        let title = "Signer la réception";
         if (isTempStorage) {
-          return <MarkAsTempStored {...props} />;
+          title = "Signer la réception de l'entreposage provisoire";
         }
-        return <MarkAsReceived {...props} />;
+
+        return (
+          <SignReception
+            title={title}
+            formId={form.id}
+            displayActionButton={false}
+          />
+        );
       }
 
       if (form.transporters?.length > 1) {
@@ -116,7 +121,13 @@ export function WorkflowAction(props: WorkflowActionProps) {
         siret === form.recipient?.company?.siret &&
         permissions.includes(UserPermission.BsdCanSignAcceptation)
       ) {
-        return <MarkAsTempStorerAccepted {...props} />;
+        return (
+          <SignReception
+            title={"Signer l'acceptation de l'entreposage provisoire"}
+            formId={form.id}
+            displayActionButton={false}
+          />
+        );
       }
       return null;
     }
@@ -160,7 +171,13 @@ export function WorkflowAction(props: WorkflowActionProps) {
         siret === form.temporaryStorageDetail?.destination?.company?.siret &&
         permissions.includes(UserPermission.BsdCanSignAcceptation)
       ) {
-        return <MarkAsReceived {...props} />;
+        return (
+          <SignReception
+            title={"Signer la réception"}
+            formId={form.id}
+            displayActionButton={false}
+          />
+        );
       }
       return null;
     }
@@ -175,7 +192,13 @@ export function WorkflowAction(props: WorkflowActionProps) {
           (!isTempStorage && siret === form.recipient?.company?.siret)) &&
         permissions.includes(UserPermission.BsdCanSignAcceptation)
       ) {
-        return <MarkAsAccepted {...props} />;
+        return (
+          <SignReception
+            title={"Signer l'acceptation"}
+            formId={form.id}
+            displayActionButton={false}
+          />
+        );
       }
       return null;
     }

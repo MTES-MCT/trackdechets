@@ -14,13 +14,17 @@ const RevisionDetail = ({
     ) : (
       value?.toString()
     );
+
+  const isNewValueRevisedByZero =
+    typeof dataNewValue === "number" && dataNewValue === 0;
   return (
     <div className="revision-list__detail">
-      {dataNewValue && (
+      {(dataNewValue || isNewValueRevisedByZero) && (
         <div>
           <p className="revision-list__detail__title">{dataName}</p>
           <p>
-            {ANCIENNE_VALEUR}&nbsp;: {formatValue(dataOldValue)}
+            {ANCIENNE_VALEUR}&nbsp;:{" "}
+            {dataOldValue ? formatValue(dataOldValue) : ""}
           </p>
           <p>
             {NOUVELLE_VALEUR}&nbsp;: {formatValue(dataNewValue)}

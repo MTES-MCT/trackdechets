@@ -18,11 +18,11 @@ import {
   BsffFicheIntervention
 } from "../../generated/graphql/types";
 import { BSFF_WASTES } from "@td/constants";
-import { extractPostalCode } from "../../utils";
 import { Decimal } from "decimal.js";
 import { getOperationModeLabel } from "../../common/operationModes";
 import { dateToXMonthAtHHMM } from "../../common/helpers";
 import Transporter from "../../common/pdf/components/Transporter";
+import { extractPostalCode } from "../../common/addresses";
 
 type Props = {
   bsff: Bsff & { packagings: BsffPackaging[] } & {

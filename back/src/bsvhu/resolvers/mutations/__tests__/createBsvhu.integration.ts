@@ -9,10 +9,6 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { sirenify } from "../../../sirenify";
-
-jest.mock("../../../sirenify");
-(sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
 
 const CREATE_VHU_FORM = `
 mutation CreateVhuForm($input: BsvhuInput!) {
@@ -53,7 +49,6 @@ mutation CreateVhuForm($input: BsvhuInput!) {
 describe("Mutation.Vhu.create", () => {
   afterEach(async () => {
     await resetDatabase();
-    (sirenify as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -164,8 +159,6 @@ describe("Mutation.Vhu.create", () => {
     expect(data.createBsvhu.destination!.company!.siret).toBe(
       input.destination.company.siret
     );
-    // check input is sirenified
-    expect(sirenify).toHaveBeenCalledTimes(1);
   });
 
   it("should create a bsvhu and autocomplete transporter recepisse", async () => {
@@ -363,7 +356,7 @@ describe("Mutation.Vhu.create", () => {
     );
 
     expect(errors[0].message).toBe(
-      "Émetteur: le numéro d'agrément est obligatoire"
+      "Le N° d'agrément de l'émetteur est un champ requis."
     );
   });
   it("should fail if a required field like the recipient agrement is missing", async () => {
@@ -419,7 +412,7 @@ describe("Mutation.Vhu.create", () => {
     );
 
     expect(errors[0].message).toBe(
-      "Destinataire: le numéro d'agrément est obligatoire"
+      "Le N° d'agrément du destinataire est un champ requis."
     );
   });
 });

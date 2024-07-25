@@ -8,7 +8,8 @@ const routes = {
     user: "/admin/user",
     impersonate: "/admin/impersonate",
     registry: "/admin/registry",
-    membersAdmin: "admin/members"
+    membersAdmin: "admin/members",
+    bsdAdmin: "admin/bsd"
   },
   login: "/login",
   invite: "/invite",

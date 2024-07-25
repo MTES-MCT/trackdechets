@@ -35,6 +35,8 @@ import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../common/operationModes";
 import { FormCompanyDetails } from "../../common/pdf/components/FormCompanyDetails";
 import { isFrenchCompany } from "../../companies/validation";
+import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
+import { displayWasteQuantity } from "../../registry/utils";
 import { dateToXMonthAtHHMM } from "../../common/helpers";
 
 type ReceiptFieldsProps = Partial<
@@ -93,13 +95,23 @@ type AcceptationFieldsProps = {
   wasteAcceptationStatus?: WasteAcceptationStatus | null;
   wasteRefusalReason?: string | null;
   signedAt?: Date | null;
+  quantityReceived?: number | null;
+  quantityRefused?: number | null;
 };
 
 function AcceptationFields({
   wasteAcceptationStatus,
   wasteRefusalReason,
-  signedAt
+  signedAt,
+  quantityReceived,
+  quantityRefused
 }: AcceptationFieldsProps) {
+  const wasteQuantities = bsddWasteQuantities({
+    wasteAcceptationStatus,
+    quantityReceived,
+    quantityRefused
+  });
+
   return (
     <p>
       Lot accepté :{" "}
@@ -123,6 +135,12 @@ function AcceptationFields({
         readOnly
       />{" "}
       partiellement
+      <br />
+      Quantité refusée nette :{" "}
+      {displayWasteQuantity(wasteQuantities?.quantityRefused)}
+      <br />
+      Quantité acceptée nette :{" "}
+      {displayWasteQuantity(wasteQuantities?.quantityAccepted)}
       <br />
       Motif de refus (même partiel) :<br />
       {wasteRefusalReason}
@@ -757,7 +775,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
             ) : (
               <>
                 <p>
-                  Quantité réelle présentée : {form.quantityReceived} tonne(s)
+                  Quantité présentée nette : {form.quantityReceived} tonne(s)
                   <br />
                   Date de présentation : {formatDate(form.receivedAt)}
                 </p>
@@ -864,7 +882,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                     cadre 2
                   </strong>
                 </p>
-                <p>Quantité présentée :</p>
+                <p>Quantité présentée nette :</p>
                 <QuantityFields
                   quantity={
                     form.temporaryStorageDetail?.temporaryStorer
@@ -1113,7 +1131,8 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                       <td>{groupedForm?.wasteDetails?.code}</td>
                       <td>{groupedForm?.wasteDetails?.name}</td>
                       <td>
-                        {groupedForm?.quantityReceived ??
+                        {groupedForm?.quantityAccepted ??
+                          groupedForm?.quantityReceived ??
                           groupedForm?.wasteDetails?.quantity}
                       </td>
                       <td>

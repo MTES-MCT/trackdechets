@@ -1,15 +1,12 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsvhuArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
+import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
-
-import { validateBsvhu } from "../../validation";
+import { mergeInputAndParseBsvhuAsync } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
-import { checkEditionRules } from "../../edition";
-import { sirenify } from "../../sirenify";
-import { recipify } from "../../recipify";
 import { checkCanUpdate } from "../../permissions";
+import { Prisma } from "@prisma/client";
 
 export default async function edit(
   _,
@@ -22,25 +19,24 @@ export default async function edit(
 
   await checkCanUpdate(user, existingBsvhu, input);
 
-  const sirenifiedInput = await sirenify(input, user);
-  const autocompletedInput = await recipify(sirenifiedInput);
+  const { parsedBsvhu, updatedFields } = await mergeInputAndParseBsvhuAsync(
+    existingBsvhu,
+    input,
+    { user }
+  );
+  if (updatedFields.length === 0) {
+    // Évite de faire un update "à blanc" si l'input
+    // ne modifie pas les données. Cela permet de limiter
+    // le nombre d'évenements crées dans Mongo.
+    return expandVhuFormFromDb(existingBsvhu);
+  }
 
-  const formUpdate = flattenVhuInput(autocompletedInput);
+  const { update } = getBsvhuRepository(user);
+  const { createdAt, ...bsvhu } = parsedBsvhu;
 
-  const resultingForm = { ...existingBsvhu, ...formUpdate };
+  const data: Prisma.BsvhuUpdateInput = { ...bsvhu };
 
-  await checkEditionRules(existingBsvhu, input, user);
-
-  await validateBsvhu(resultingForm, {
-    emissionSignature: existingBsvhu.emitterEmissionSignatureAuthor != null,
-    operationSignature:
-      existingBsvhu.destinationOperationSignatureAuthor != null,
-    transportSignature:
-      existingBsvhu.transporterTransportSignatureAuthor != null
-  });
-  const bsvhuRepository = getBsvhuRepository(user);
-
-  const updatedBsvhu = await bsvhuRepository.update({ id }, formUpdate);
+  const updatedBsvhu = await update({ id }, data);
 
   return expandVhuFormFromDb(updatedBsvhu);
 }

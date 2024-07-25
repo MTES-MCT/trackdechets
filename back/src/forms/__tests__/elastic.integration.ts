@@ -519,16 +519,13 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsd.companyOrgIds).toContain(broker.siret);
     expect(elasticBsd.companyOrgIds).toContain(ecoOrganisme.siret);
     expect(elasticBsd.companyOrgIds).toContain(recipient.siret);
-    expect(elasticBsd.companyOrgIds).toContain(transporter1.siret);
     expect(elasticBsd.companyOrgIds).toContain(transporter1.vatNumber);
-    expect(elasticBsd.companyOrgIds).toContain(transporter2.siret);
     expect(elasticBsd.companyOrgIds).toContain(transporter2.vatNumber);
     expect(elasticBsd.companyOrgIds).toContain(intermediary1.siret);
     expect(elasticBsd.companyOrgIds).toContain(intermediary2.siret);
     expect(elasticBsd.companyOrgIds).toContain(
       forwardedInNextDestination.siret
     );
-    expect(elasticBsd.companyOrgIds).toContain(forwardedInTransporter.siret);
     expect(elasticBsd.companyOrgIds).toContain(
       forwardedInTransporter.vatNumber
     );

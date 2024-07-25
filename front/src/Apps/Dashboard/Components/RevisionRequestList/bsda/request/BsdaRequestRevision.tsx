@@ -291,7 +291,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                     type: "number"
                   }}
                 />
-                {formValues.destination?.reception?.weight && (
+                {Boolean(formValues.destination?.reception?.weight) && (
                   <p className="fr-info-text">
                     Soit{" "}
                     {Number(formValues.destination?.reception?.weight) * 1000}
@@ -336,7 +336,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 </Select>
                 <RhfOperationModeSelect
                   operationCode={formValues?.destination?.operation?.code}
-                  path={"destination.operation.code"}
+                  path={"destination.operation.mode"}
                 />
               </RhfReviewableField>
 

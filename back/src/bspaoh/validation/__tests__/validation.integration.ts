@@ -177,7 +177,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "1 n'est pas un numéro de SIRET valide"
+        "Émetteur : 1 n'est pas un numéro de SIRET valide"
       );
     });
 
@@ -194,7 +194,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "1 n'est pas un numéro de SIRET valide"
+        "Transporteur : 1 n'est pas un numéro de SIRET valide"
       );
     });
 
@@ -211,7 +211,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+        "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
       );
     });
 
@@ -236,7 +236,7 @@ describe("BSPAOH validation", () => {
         expect(error.issues).toEqual([
           expect.objectContaining({
             message:
-              "L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+              "Transporteur : L'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
           })
         ]);
       }
@@ -326,7 +326,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "1 n'est pas un numéro de SIRET valide"
+        "Destination : 1 n'est pas un numéro de SIRET valide"
       );
     });
 
@@ -347,7 +347,10 @@ describe("BSPAOH validation", () => {
     });
 
     test("when destination is registered with wrong profile", async () => {
-      const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+      const company = await companyFactory({
+        companyTypes: ["PRODUCER"],
+        wasteProcessorTypes: []
+      });
       const bspaoh = await bspaohFactory({});
       const data = {
         ...bspaoh,
@@ -467,7 +470,13 @@ describe("BSPAOH validation", () => {
   it("should be possible to update any fields when bspaoh status is SIGNED_BY_PRODUCER", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const { company: destinationCompany } = await userWithCompanyFactory();
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: { set: ["WASTEPROCESSOR"] },
+        wasteProcessorTypes: { set: ["CREMATION"] }
+      }
+    );
     const bspaoh = await bspaohFactory({
       opt: {
         transporters: {

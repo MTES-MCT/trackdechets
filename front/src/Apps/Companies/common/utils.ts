@@ -1,5 +1,7 @@
 import { CollectorType, CompanyType, WasteProcessorType } from "@td/codegen-ui";
 import { format, isValid } from "date-fns";
+// eslint-disable-next-line import/no-duplicates
+import fr from "date-fns/locale/fr";
 import { parseDate } from "../../../common/datetime";
 
 export const COMPANY_CONSTANTS = [
@@ -82,12 +84,6 @@ export const COMPANY_CONSTANTS = [
     label:
       "Installation dans laquelle les déchets perdent leur statut de déchet",
     helpText: ""
-  },
-  {
-    value: CompanyType.Crematorium,
-    label: "Crématorium",
-    helpText:
-      "Un crématorium autorisé prend en charge l'incinération des pièces anatomiques d'origine humaine"
   }
 ];
 
@@ -125,7 +121,7 @@ export const WASTE_PROCESSOR_OPTIONS = [
     value: WasteProcessorType.NonDangerousWastesIncineration
   },
   {
-    label: "Crémation",
+    label: "Crématorium (et cimetières pour la Guyane)",
     value: WasteProcessorType.Cremation
   },
   {
@@ -159,9 +155,17 @@ export const parsedDate = date => {
 };
 
 export const formatDate = date => {
-  return date ? format(parsedDate(date) as Date, "yyyy-MM-dd") : "";
+  return date
+    ? format(parsedDate(date) as Date, "yyyy-MM-dd", {
+        locale: fr
+      })
+    : "";
 };
 
 export const formatDateViewDisplay = date => {
-  return date ? format(parsedDate(date) as Date, "dd/MM/yyyy") : "";
+  return date
+    ? format(parsedDate(date) as Date, "dd/MM/yyyy", {
+        locale: fr
+      })
+    : "";
 };

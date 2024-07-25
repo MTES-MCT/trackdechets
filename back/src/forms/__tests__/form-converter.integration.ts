@@ -180,6 +180,8 @@ describe("expandFormFromDb", () => {
       temporaryStorer: {
         quantityType: null,
         quantityReceived: null,
+        quantityAccepted: null,
+        quantityRefused: null,
         wasteAcceptationStatus: null,
         wasteRefusalReason: null,
         receivedAt: null,
