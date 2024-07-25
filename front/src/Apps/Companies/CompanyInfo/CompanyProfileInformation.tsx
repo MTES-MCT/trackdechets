@@ -1,5 +1,5 @@
 import { Highlight } from "@codegouvfr/react-dsfr/Highlight";
-import { CompanyPrivate, CompanyType } from "@td/codegen-ui";
+import { CompanyPrivate, CompanyType, WasteVehiclesType } from "@td/codegen-ui";
 import React from "react";
 import {
   COLLECTOR_TYPE_OPTIONS,
@@ -208,42 +208,53 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                   </Highlight>
                 </div>
               )}
-              {companyType.value === CompanyType.WasteVehicles && (
-                <div data-testid="wasteVehiculesReceipt">
-                  <Highlight>
-                    <p className="companyFormWrapper__title-field">
-                      Numéro de récépissé
-                    </p>
-                    <p className="companyFormWrapper__value-field">
-                      Récépissé broyeur{" : "}
-                      <span data-testid="vhuAgrementBroyeur_agrementNumber">
-                        {company.vhuAgrementBroyeur?.agrementNumber || " - "}
-                      </span>
-                      <br />
-                      Récépissé Démolisseur{" : "}
-                      <span data-testid="vhuAgrementDemolisseur_agrementNumber">
-                        {company.vhuAgrementDemolisseur?.agrementNumber ||
-                          " - "}
-                      </span>
-                    </p>
-
-                    <p className="companyFormWrapper__title-field">
-                      Département
-                    </p>
-                    <p className="companyFormWrapper__value-field">
-                      Département broyeur{" : "}
-                      <span data-testid="vhuAgrementBroyeur_department">
-                        {company.vhuAgrementBroyeur?.department || " - "}
-                      </span>
-                      <br />
-                      Département démolisseur{" : "}
-                      <span data-testid="vhuAgrementDemolisseur_department">
-                        {company.vhuAgrementDemolisseur?.department || " - "}
-                      </span>
-                    </p>
-                  </Highlight>
-                </div>
-              )}
+              {companyType.value === CompanyType.WasteVehicles &&
+                company.wasteVehiclesTypes.includes(
+                  WasteVehiclesType.Broyeur
+                ) && (
+                  <div data-testid="wasteVehiculesReceipt">
+                    <Highlight>
+                      <p className="companyFormWrapper__title-field">
+                        Broyeur VHU
+                      </p>
+                      <p className="companyFormWrapper__value-field">
+                        Numéro récepissé{" : "}
+                        <span data-testid="vhuAgrementBroyeur_agrementNumber">
+                          {company.vhuAgrementBroyeur?.agrementNumber || " - "}
+                        </span>
+                        <br />
+                        Département {" : "}
+                        <span data-testid="vhuAgrementBroyeur_department">
+                          {company.vhuAgrementBroyeur?.department || " - "}
+                        </span>
+                      </p>
+                    </Highlight>
+                  </div>
+                )}
+              {companyType.value === CompanyType.WasteVehicles &&
+                company.wasteVehiclesTypes.includes(
+                  WasteVehiclesType.Demolisseur
+                ) && (
+                  <div data-testid="wasteVehiculesReceipt">
+                    <Highlight>
+                      <p className="companyFormWrapper__title-field">
+                        Casse automobile / démolisseur
+                      </p>
+                      <p className="companyFormWrapper__value-field">
+                        Numéro récépissé {" : "}
+                        <span data-testid="vhuAgrementDemolisseur_agrementNumber">
+                          {company.vhuAgrementDemolisseur?.agrementNumber ||
+                            " - "}
+                        </span>
+                        <br />
+                        Département {" : "}
+                        <span data-testid="vhuAgrementDemolisseur_department">
+                          {company.vhuAgrementDemolisseur?.department || " - "}
+                        </span>
+                      </p>
+                    </Highlight>
+                  </div>
+                )}
               {companyType.value === CompanyType.Wasteprocessor && (
                 <Highlight>
                   {company.wasteProcessorTypes?.map(wasteProcessorType => {
