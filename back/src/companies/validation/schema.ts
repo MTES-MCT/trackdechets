@@ -14,7 +14,8 @@ import {
   checkEcoOrganisme,
   checkForeignTransporter,
   checkRecepisses,
-  checkSubTypes
+  checkSubTypes,
+  isValidWebsite
 } from "./refinements";
 
 function toSet(arr: any[]) {
@@ -34,7 +35,12 @@ const rawCompanySchema = z.object({
   contactEmail: z.string().email().nullish(),
   contactPhone: z.string().nullish(),
   contact: z.string().nullish(),
-  website: z.string().nullish(),
+  website: z
+    .string()
+    .nullish()
+    .refine(v => {
+      return v ? isValidWebsite(v) : true;
+    }, "L'URL est invalide"),
   ecoOrganismeAgreements: z.array(z.string()).default([]),
   companyTypes: z
     .array(z.nativeEnum(CompanyType))
@@ -47,26 +53,32 @@ const rawCompanySchema = z.object({
   wasteProcessorTypes: z
     .array(z.nativeEnum(WasteProcessorType))
     .nullish()
-    .transform(toSet)
-    .default([]),
+    .transform(arr => arr ?? [])
+    .transform(toSet),
   collectorTypes: z
     .array(z.nativeEnum(CollectorType))
     .nullish()
-    .transform(toSet)
-    .default([]),
+    .transform(arr => arr ?? [])
+    .transform(toSet),
   wasteVehiclesTypes: z
     .array(z.nativeEnum(WasteVehiclesType))
     .nullish()
-    .transform(toSet)
-    .default([]),
+    .transform(arr => arr ?? [])
+    .transform(toSet),
   transporterReceiptId: z.string().nullish(),
   traderReceiptId: z.string().nullish(),
   brokerReceiptId: z.string().nullish(),
   workerCertificationId: z.string().nullish(),
   vhuAgrementDemolisseurId: z.string().nullish(),
   vhuAgrementBroyeurId: z.string().nullish(),
-  allowBsdasriTakeOverWithoutSignature: z.boolean().nullish().default(false),
-  allowAppendix1SignatureAutomation: z.boolean().nullish().default(false)
+  allowBsdasriTakeOverWithoutSignature: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
+  allowAppendix1SignatureAutomation: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v))
 });
 
 export type ZodCompany = z.input<typeof rawCompanySchema>;

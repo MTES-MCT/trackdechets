@@ -129,7 +129,8 @@ describe("Mutation.createCompany", () => {
       gerepId: "1234",
       companyName: "Acme",
       address: "3 rue des granges",
-      companyTypes: [companyType]
+      companyTypes: [companyType],
+      website: "https://trackdechets.beta.gouv.fr"
     };
 
     (searchCompany as jest.Mock).mockResolvedValueOnce({
@@ -1107,7 +1108,8 @@ describe("Mutation.createCompany", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Impossible de créer un établissement identifié par un numéro de TVA d'un autre type que TRANSPORTER"
+            "Seul un établissement ayant comme unique profil Transporteur" +
+            " peut être identifié par à un numéro de TVA (établissement étranger)"
         })
       ]);
     }

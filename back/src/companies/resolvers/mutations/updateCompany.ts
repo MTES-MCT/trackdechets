@@ -1,70 +1,23 @@
-import {
-  MutationResolvers,
-  MutationUpdateCompanyArgs,
-  RequireFields,
-  WasteVehiclesType
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
-import { updateCompanyFn } from "./updateCompanyService";
-import { isForeignVat } from "@td/constants";
+import {
+  convertUrls,
+  getCompanyOrCompanyNotFound,
+  getUpdatedCompanyNameAndAddress,
+  updateFavorites
+} from "../../database";
+
 import { checkUserPermissions, Permission } from "../../../permissions";
-import {
-  NotCompanyAdminErrorMsg,
-  UserInputError
-} from "../../../common/errors";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
-import {
-  CollectorType,
-  Company,
-  CompanyType,
-  WasteProcessorType
-} from "@prisma/client";
-import { companyTypesValidationSchema } from "../../validation";
-
-const validateCompanyTypes = (
-  company: Company,
-  args: RequireFields<MutationUpdateCompanyArgs, "id">
-) => {
-  const mergedCompanyData = {
-    ...company,
-    ...args
-  };
-
-  const { companyTypes } = mergedCompanyData;
-  let { collectorTypes, wasteProcessorTypes, wasteVehiclesTypes } =
-    mergedCompanyData;
-
-  // Nullify sub-types automatically
-  if (args?.companyTypes?.length) {
-    if (
-      company.companyTypes?.includes(CompanyType.COLLECTOR) &&
-      !args?.companyTypes?.includes(CompanyType.COLLECTOR)
-    ) {
-      collectorTypes = [];
-    }
-    if (
-      company.companyTypes?.includes(CompanyType.WASTEPROCESSOR) &&
-      !args?.companyTypes?.includes(CompanyType.WASTEPROCESSOR)
-    ) {
-      wasteProcessorTypes = [];
-    }
-    if (
-      company.companyTypes?.includes(CompanyType.WASTE_VEHICLES) &&
-      !args?.companyTypes?.includes(CompanyType.WASTE_VEHICLES)
-    ) {
-      wasteVehiclesTypes = [];
-    }
-  }
-
-  return companyTypesValidationSchema.validate({
-    companyTypes,
-    collectorTypes,
-    wasteProcessorTypes,
-    wasteVehiclesTypes
-  });
-};
+import { Company, Prisma } from "@prisma/client";
+import { ZodCompany } from "../../validation/schema";
+import { safeInput } from "../../../common/converter";
+import { parseCompanyAsync } from "../../validation/index";
+import { SiretNotFoundError } from "../../sirene/errors";
+import { logger } from "@td/logger";
+import { prisma } from "@td/prisma";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -79,69 +32,131 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   }
   applyAuthStrategies(context, authStrategies);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ id: args.id });
+  const existingCompany = await getCompanyOrCompanyNotFound({ id: args.id });
   await checkUserPermissions(
     user,
-    company.orgId,
+    existingCompany.orgId,
     Permission.CompanyCanUpdate,
-    NotCompanyAdminErrorMsg(company.orgId)
+    NotCompanyAdminErrorMsg(existingCompany.orgId)
   );
 
-  // Validate & transform company types & sub-types
+  const zodCompany: ZodCompany = {
+    ...existingCompany,
+    ...safeInput(args),
+    companyTypes: args.companyTypes ?? existingCompany.companyTypes,
+    ecoOrganismeAgreements: args.ecoOrganismeAgreements
+      ? args.ecoOrganismeAgreements.map(a => a.href)
+      : existingCompany.ecoOrganismeAgreements
+  };
+
   const {
     companyTypes,
     collectorTypes,
     wasteProcessorTypes,
-    wasteVehiclesTypes
-  } = await validateCompanyTypes(company, args);
+    wasteVehiclesTypes,
+    gerepId,
+    contact,
+    contactEmail,
+    contactPhone,
+    website,
+    givenName,
+    allowBsdasriTakeOverWithoutSignature,
+    allowAppendix1SignatureAutomation,
+    transporterReceiptId,
+    traderReceiptId,
+    brokerReceiptId,
+    workerCertificationId,
+    vhuAgrementBroyeurId,
+    vhuAgrementDemolisseurId,
+    ecoOrganismeAgreements
+  } = await parseCompanyAsync(zodCompany);
 
-  if (companyTypes.includes("CREMATORIUM")) {
-    throw new UserInputError(
-      "Le type CREMATORIUM est déprécié, utiliser WasteProcessorTypes.CREMATION."
-    );
+  const data: Prisma.CompanyUpdateInput = {
+    companyTypes,
+    collectorTypes,
+    wasteProcessorTypes,
+    wasteVehiclesTypes,
+    gerepId,
+    contact,
+    contactEmail,
+    contactPhone,
+    website,
+    givenName,
+    allowBsdasriTakeOverWithoutSignature,
+    allowAppendix1SignatureAutomation,
+    ecoOrganismeAgreements
+  };
+
+  if (transporterReceiptId !== undefined) {
+    data.transporterReceipt = transporterReceiptId
+      ? { connect: { id: transporterReceiptId } }
+      : { disconnect: {} };
   }
-  const { ecoOrganismeAgreements } = args;
-  // update to anything else than ony a TRANSPORTER
-  const updateOtherThanTransporter = args.companyTypes?.some(
-    elt => elt !== "TRANSPORTER"
-  );
-  // check that a TRANSPORTER identified by VAT is not updated to any other type
-  if (isForeignVat(company.vatNumber) && updateOtherThanTransporter) {
-    throw new UserInputError(
-      "Impossible de changer de type TRANSPORTER pour un établissement transporteur étranger"
-    );
+
+  if (traderReceiptId !== undefined) {
+    data.traderReceipt = traderReceiptId
+      ? { connect: { id: traderReceiptId } }
+      : { disconnect: {} };
   }
-  if (companyTypes.includes("ECO_ORGANISME")) {
-    if (
-      Array.isArray(ecoOrganismeAgreements) &&
-      ecoOrganismeAgreements.length < 1
-    ) {
-      throw new UserInputError(
-        "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : elle doit en posséder au moins 1."
-      );
+
+  if (brokerReceiptId !== undefined) {
+    data.brokerReceipt = brokerReceiptId
+      ? { connect: { id: brokerReceiptId } }
+      : { disconnect: {} };
+  }
+
+  if (workerCertificationId !== undefined) {
+    data.workerCertification = workerCertificationId
+      ? { connect: { id: workerCertificationId } }
+      : { disconnect: {} };
+  }
+  if (vhuAgrementBroyeurId !== undefined) {
+    data.vhuAgrementBroyeur = vhuAgrementBroyeurId
+      ? { connect: { id: vhuAgrementBroyeurId } }
+      : { disconnect: {} };
+  }
+
+  if (vhuAgrementDemolisseurId !== undefined) {
+    data.vhuAgrementDemolisseur = vhuAgrementDemolisseurId
+      ? { connect: { id: vhuAgrementDemolisseurId } }
+      : { disconnect: {} };
+  }
+
+  // Trigger update name and address
+  try {
+    const updateFromExternalService = await getUpdatedCompanyNameAndAddress(
+      existingCompany
+    );
+    if (updateFromExternalService) {
+      data.name = updateFromExternalService.name;
+      data.address = updateFromExternalService.address;
+
+      if (updateFromExternalService.codeNaf) {
+        data.codeNaf = updateFromExternalService.codeNaf;
+      }
     }
-  } else if (
-    Array.isArray(ecoOrganismeAgreements) &&
-    ecoOrganismeAgreements.length > 0
-  ) {
-    throw new UserInputError(
-      "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : il ne s'agit pas d'un éco-organisme."
+  } catch (err) {
+    // update was only for name and address
+    if (Object.keys(args).length === 1 && !!args.id) {
+      if (err.name === "GraphQLError") {
+        throw new SiretNotFoundError();
+      }
+      throw new Error(`Erreur durant la requête, veuillez réessayer plus tard`);
+    }
+    logger.error(
+      `Error updating Company ${existingCompany.orgId} from INSEE: `,
+      err
     );
   }
 
-  const updatedCompany = await updateCompanyFn(
-    {
-      ...args,
-      companyTypes: companyTypes as CompanyType[],
-      collectorTypes: collectorTypes as CollectorType[],
-      wasteProcessorTypes: wasteProcessorTypes as WasteProcessorType[],
-      wasteVehiclesTypes: wasteVehiclesTypes as WasteVehiclesType[]
-    },
-    company
-  );
+  const updatedCompany = await prisma.company.update({
+    where: { id: existingCompany.id },
+    data
+  });
+  await updateFavorites([existingCompany.orgId]);
 
   // conversion to CompanyPrivate type
-  const naf = (updatedCompany as Company).codeNaf ?? company.codeNaf;
+  const naf = (updatedCompany as Company).codeNaf ?? existingCompany.codeNaf;
   const libelleNaf = libelleFromCodeNaf(naf!);
   return {
     ...convertUrls(updatedCompany),

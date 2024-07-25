@@ -16,7 +16,7 @@ export const checkForeignTransporter: Refinement<ParsedZodCompany> = (
     addIssue({
       code: "custom",
       message:
-        "Impossible de créer un établissement identifié par un numéro de TVA d'un autre type que TRANSPORTER"
+        "Seul un établissement ayant comme unique profil Transporteur peut être identifié par à un numéro de TVA (établissement étranger)"
     });
   }
 };
@@ -176,3 +176,15 @@ export const checkRecepisses: Refinement<ParsedZodCompany> = (
     });
   }
 };
+
+export function isValidWebsite(s: string): boolean {
+  try {
+    const url = new URL(s);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return true;
+    }
+    return false;
+  } catch (err) {
+    return false;
+  }
+}
