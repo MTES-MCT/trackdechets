@@ -352,7 +352,6 @@ export const filterPredicates: {
 }[] = [
   {
     filterName: FilterName.types,
-    // TODO: unit test for dat?
     where: value => {
       const options = getOptionsFromValues(value, bsdTypeFilterSelectOptions);
 
@@ -382,30 +381,22 @@ export const filterPredicates: {
   {
     filterName: FilterName.waste,
     where: value => ({
-      _and: [
-        {
-          _or: [
-            { waste: { code: { _contains: value } } },
-            { waste: { description: { _match: value } } }
-          ]
-        }
+      _or: [
+        { waste: { code: { _contains: value } } },
+        { waste: { description: { _match: value } } }
       ]
     })
   },
   {
     filterName: FilterName.readableId,
     where: value => ({
-      _and: [
-        {
-          _or: [
-            { readableId: { _contains: value } },
-            { customId: { _contains: value } },
-            { packagingNumbers: { _hasSome: value } },
-            { packagingNumbers: { _itemContains: value } },
-            { identificationNumbers: { _itemContains: value } },
-            { identificationNumbers: { _hasSome: value } }
-          ]
-        }
+      _or: [
+        { readableId: { _contains: value } },
+        { customId: { _contains: value } },
+        { packagingNumbers: { _hasSome: value } },
+        { packagingNumbers: { _itemContains: value } },
+        { identificationNumbers: { _itemContains: value } },
+        { identificationNumbers: { _hasSome: value } }
       ]
     })
   },
@@ -432,26 +423,22 @@ export const filterPredicates: {
   {
     filterName: FilterName.tvaIntra,
     where: value => ({
-      _and: [
+      _or: [
         {
-          _or: [
-            {
-              transporter: {
-                company: {
-                  vatNumber: { _contains: value }
-                }
-              }
-            },
-            {
-              destination: {
-                operation: {
-                  nextDestination: {
-                    company: { vatNumber: { _contains: value } }
-                  }
-                }
+          transporter: {
+            company: {
+              vatNumber: { _contains: value }
+            }
+          }
+        },
+        {
+          destination: {
+            operation: {
+              nextDestination: {
+                company: { vatNumber: { _contains: value } }
               }
             }
-          ]
+          }
         }
       ]
     })
@@ -459,13 +446,9 @@ export const filterPredicates: {
   {
     filterName: FilterName.givenName,
     where: value => ({
-      _and: [
-        {
-          _or: [
-            { companyNames: { _match: value } },
-            { companyOrgIds: { _itemContains: value } }
-          ]
-        }
+      _or: [
+        { companyNames: { _match: value } },
+        { companyOrgIds: { _itemContains: value } }
       ]
     })
   },
