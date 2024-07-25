@@ -146,20 +146,20 @@ const TempStorage = ({ form }) => {
 
           <PackagingRow packagingInfos={form.stateSummary?.packagingInfos} />
 
-          <DetailRow
+          <QuantityRow
             value={temporaryStorageDetail?.temporaryStorer?.quantityReceived}
-            label="Quantité reçue"
+            label="Quantité reçue nette"
             showEmpty={hasBeenReceived}
           />
           <QuantityRow
             value={temporaryStorageDetail?.temporaryStorer?.quantityRefused}
-            label="Quantité refusée"
+            label="Quantité refusée nette"
             tooltip={BSD_DETAILS_QTY_TOOLTIP}
             showEmpty={hasBeenReceived}
           />
           <QuantityRow
             value={temporaryStorageDetail?.temporaryStorer?.quantityAccepted}
-            label="Quantité traitée"
+            label="Quantité traitée nette"
             tooltip={BSD_DETAILS_QTY_TOOLTIP}
             showEmpty={hasBeenReceived}
           />
@@ -405,14 +405,14 @@ const Recipient = ({
           value={getVerboseAcceptationStatus(form?.wasteAcceptationStatus)}
           label="Lot accepté"
         />
-        <DetailRow
-          value={form?.quantityReceived && `${form?.quantityReceived} tonnes`}
-          label="Quantité reçue"
+        <QuantityRow
+          value={form?.quantityReceived}
+          label="Quantité reçue nette"
           showEmpty={hasBeenReceived}
         />
         <QuantityRow
           value={form?.quantityRefused}
-          label="Quantité refusée"
+          label="Quantité refusée nette"
           tooltip={BSD_DETAILS_QTY_TOOLTIP}
           showEmpty={hasBeenReceived}
         />
@@ -421,21 +421,9 @@ const Recipient = ({
       <div className={styles.detailGrid}>
         <QuantityRow
           value={form?.quantityAccepted}
-          label="Quantité traitée"
+          label="Quantité traitée nette"
           tooltip={BSD_DETAILS_QTY_TOOLTIP}
           showEmpty={hasBeenReceived}
-        />
-        <DetailRow
-          value={
-            form?.quantityAccepted ? (
-              `${form?.quantityAccepted} tonnes`
-            ) : (
-              <>
-                {NON_RENSEIGNE} <TdTooltip msg={BSD_DETAILS_QTY_TOOLTIP} />
-              </>
-            )
-          }
-          label="Quantité traitée"
         />
         <DetailRow
           value={recipient?.processingOperation}

@@ -198,7 +198,7 @@ export const QuantityRow = ({
 }: {
   value: string | number | ReactNode | undefined | null;
   label: string;
-  tooltip: string | undefined | null;
+  tooltip?: string | undefined | null;
   showEmpty: boolean;
 }) => {
   const hasValue = isDefined(value);
