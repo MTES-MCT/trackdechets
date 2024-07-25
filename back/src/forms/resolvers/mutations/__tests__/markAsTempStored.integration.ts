@@ -845,9 +845,9 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
-        body: expect.stringContaining(`<li>Quantité réelle présentée nette: 10 tonnes</li>
-    <li>Quantité refusée nette: 7 tonnes</li>
-    <li>Quantité acceptée nette: 3 tonnes</li>`)
+        body: expect.stringContaining(`<li>Quantité réelle présentée nette : 10 tonnes</li>
+    <li>Quantité refusée nette : 7 tonnes</li>
+    <li>Quantité acceptée nette : 3 tonnes</li>`)
       })
     );
   });
@@ -921,9 +921,9 @@ describe("{ mutation { markAsTempStored } }", () => {
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
-        body: expect.stringContaining(`<li>Quantité réelle présentée nette: 10 tonnes</li>
-    <li>Quantité refusée nette: Non renseignée</li>
-    <li>Quantité acceptée nette: Non renseignée</li>`)
+        body: expect.stringContaining(`<li>Quantité réelle présentée nette : 10 tonnes</li>
+    <li>Quantité refusée nette : Non renseignée</li>
+    <li>Quantité acceptée nette : Non renseignée</li>`)
       })
     );
   });
