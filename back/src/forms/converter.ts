@@ -936,8 +936,6 @@ export function expandInitialFormFromDb(
     quantityRefused
   });
 
-  console.log("wasteQuantities", wasteQuantities);
-
   return {
     id,
     readableId,
