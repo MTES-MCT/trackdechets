@@ -24,6 +24,7 @@ import {
 import { getFormRepository } from "../../repository";
 import { sirenifyResealedFormInput } from "../../sirenify";
 import { prismaJsonNoNull } from "../../../common/converter";
+import { bsddWasteQuantities } from "../../helpers/bsddWasteQuantities";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,
@@ -54,6 +55,12 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     wasteDetails
   } = await sirenifyResealedFormInput(resealedInfos, user);
 
+  const wasteQuantities = bsddWasteQuantities({
+    wasteAcceptationStatus: form.wasteAcceptationStatus,
+    quantityReceived: form.quantityReceived,
+    quantityRefused: form.quantityRefused
+  });
+
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput = {
     emitterType: EmitterType.PRODUCER,
@@ -71,7 +78,8 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     wasteDetailsPop: form.wasteDetailsPop,
     wasteDetailsQuantityType: QuantityType.REAL,
-    wasteDetailsQuantity: form.quantityReceived,
+    wasteDetailsQuantity:
+      wasteQuantities?.quantityAccepted ?? form.quantityReceived,
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       form.wasteDetailsPackagingInfos
     ),
