@@ -3,9 +3,17 @@ import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "../../../../generated/graphql/types";
+import {
+  Mutation,
+  MutationUpdateCompanyArgs
+} from "../../../../generated/graphql/types";
 import { libelleFromCodeNaf } from "../../../sirene/utils";
-import { CollectorType, CompanyType, WasteProcessorType } from "@prisma/client";
+import {
+  CollectorType,
+  CompanyType,
+  WasteProcessorType,
+  WasteVehiclesType
+} from "@prisma/client";
 
 const mockGetUpdatedCompanyNameAndAddress = jest.fn();
 // Mock external search services
@@ -26,6 +34,7 @@ const UPDATE_COMPANY = `
     $companyTypes: [CompanyType!],
     $collectorTypes: [CollectorType!],
     $wasteProcessorTypes: [WasteProcessorType!],
+    $wasteVehiclesTypes: [WasteVehiclesType!],
     $givenName: String,
     $transporterReceiptId: String,
     $traderReceiptId: String,
@@ -40,6 +49,7 @@ const UPDATE_COMPANY = `
         companyTypes: $companyTypes,
         collectorTypes: $collectorTypes,
         wasteProcessorTypes: $wasteProcessorTypes,
+        wasteVehiclesTypes: $wasteVehiclesTypes,
         website: $website,
         givenName: $givenName,
         transporterReceiptId: $transporterReceiptId,
@@ -215,7 +225,7 @@ describe("mutation updateCompany", () => {
     );
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "L'url est invalide"
+        message: "L'URL est invalide"
       })
     ]);
   });
@@ -235,7 +245,7 @@ describe("mutation updateCompany", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : il ne s'agit pas d'un éco-organisme."
+          "Impossible de lier des agréments d'éco-organisme : l'entreprise n'est pas un éco-organisme."
       })
     ]);
   });
@@ -261,8 +271,10 @@ describe("mutation updateCompany", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : elle doit en posséder au moins 1."
+        message: [
+          "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : contact@trackdechets.beta.gouv.fr",
+          "L'URL de l'agrément de l'éco-organisme est requis."
+        ].join("\n")
       })
     ]);
   });
@@ -273,7 +285,8 @@ describe("mutation updateCompany", () => {
         set: ["TRANSPORTER"]
       },
       vatNumber: "RO17579668",
-      siret: "RO17579668"
+      orgId: "RO17579668",
+      siret: null
     });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
@@ -288,7 +301,8 @@ describe("mutation updateCompany", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Impossible de changer de type TRANSPORTER pour un établissement transporteur étranger"
+          "Seul un établissement ayant comme unique profil Transporteur " +
+          "peut être identifié par à un numéro de TVA (établissement étranger)"
       })
     ]);
 
@@ -378,7 +392,8 @@ describe("mutation updateCompany", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Your company needs to be a Collector to have collectorTypes"
+      "Impossible de sélectionner un sous-type d'installation de tri, transit, regroupement" +
+        " si le profil Installation de Tri, transit regroupement de déchets n'est pas sélectionné"
     );
   });
 
@@ -452,7 +467,7 @@ describe("mutation updateCompany", () => {
     });
   });
 
-  it("if no longer collector, should remove collector types", async () => {
+  it("should throw error on collectorTypes when removing type COLLECTOR", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN", {
       companyTypes: [CompanyType.COLLECTOR],
@@ -475,15 +490,13 @@ describe("mutation updateCompany", () => {
     );
 
     // Then
-    expect(errors).toBeUndefined();
-
-    const updatedCompany = await prisma.company.findUnique({
-      where: { id: company.id }
-    });
-    expect(updatedCompany).toMatchObject({
-      companyTypes: [CompanyType.PRODUCER],
-      collectorTypes: []
-    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de sélectionner un sous-type d'installation de tri, transit, regroupement si" +
+          " le profil Installation de Tri, transit regroupement de déchets n'est pas sélectionné"
+      })
+    ]);
   });
 
   it.each([null, undefined, []])(
@@ -630,7 +643,7 @@ describe("mutation updateCompany", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Your company needs to be a WasteProcessor to have wasteProcessorTypes"
+      "Impossible de sélectionner un sous-type d'installation de traitement si le profil Installation de traitement n'est pas sélectionné"
     );
   });
 
@@ -698,7 +711,7 @@ describe("mutation updateCompany", () => {
     });
   });
 
-  it("if no longer waste processor, should remove waste processor types", async () => {
+  it("should throw error on wasteProcessorTypes when removing type WASTEPROCESSOR", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN", {
       companyTypes: [CompanyType.WASTEPROCESSOR],
@@ -718,15 +731,12 @@ describe("mutation updateCompany", () => {
     );
 
     // Then
-    expect(errors).toBeUndefined();
-
-    const updatedCompany = await prisma.company.findUnique({
-      where: { id: company.id }
-    });
-    expect(updatedCompany).toMatchObject({
-      companyTypes: [CompanyType.PRODUCER],
-      wasteProcessorTypes: []
-    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de sélectionner un sous-type d'installation de traitement si le profil Installation de traitement n'est pas sélectionné"
+      })
+    ]);
   });
 
   it.each([null, undefined, []])(
@@ -791,6 +801,243 @@ describe("mutation updateCompany", () => {
     expect(updatedCompany).toMatchObject({
       companyTypes: [CompanyType.WASTEPROCESSOR],
       wasteProcessorTypes: [WasteProcessorType.CREMATION]
+    });
+  });
+
+  it("should update a company's wasteVehiclesTypes", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate<
+      Pick<Mutation, "updateCompany">,
+      MutationUpdateCompanyArgs
+    >(UPDATE_COMPANY, {
+      variables: {
+        id: company.id,
+        wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+      }
+    });
+
+    // Then
+    expect(data.updateCompany.id).toEqual(company.id);
+
+    const updatedCompany = await prisma.company.findUnique({
+      where: { id: company.id }
+    });
+    expect(updatedCompany).toMatchObject({
+      companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+    });
+  });
+
+  it("wasteVehiclesTypes must be valid", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables: {
+          id: company.id,
+          wasteVehiclesTypes: [CollectorType.DEEE_WASTES]
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      `Variable "$wasteVehiclesTypes" got invalid value "DEEE_WASTES" at "wasteVehiclesTypes[0]"; Value "DEEE_WASTES" does not exist in "WasteVehiclesType" enum.`
+    );
+  });
+
+  it("should not update a company's wasteVehiclesTypes if not a VHU facility", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.PRODUCER]
+    });
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables: {
+          id: company.id,
+          wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Impossible de sélectionner un sous-type d'installation de traitement VHU si le profil Installation de traitement VHU n'est pas sélectionné"
+    );
+  });
+
+  it("should update a company's wasteVehiclesTypes if not VHU but updating to VHU type", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.PRODUCER]
+    });
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables: {
+          id: company.id,
+          companyTypes: [CompanyType.WASTE_VEHICLES],
+          wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const updatedCompany = await prisma.company.findUnique({
+      where: { id: company.id }
+    });
+    expect(updatedCompany).toMatchObject({
+      companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+    });
+  });
+
+  it("should not save duplicated waste vehicles types", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables: {
+          id: company.id,
+          wasteVehiclesTypes: [
+            WasteVehiclesType.BROYEUR,
+            WasteVehiclesType.BROYEUR
+          ]
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const updatedCompany = await prisma.company.findUnique({
+      where: { id: company.id }
+    });
+    expect(updatedCompany).toMatchObject({
+      companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+    });
+  });
+
+  it("should throw error on wasteVehiclesTypes when removing type WASTE_VEHICLES", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+    });
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables: {
+          id: company.id,
+          companyTypes: [CompanyType.PRODUCER]
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de sélectionner un sous-type d'installation de traitement VHU si le profil Installation de traitement VHU n'est pas sélectionné"
+      })
+    ]);
+  });
+
+  it.each([null, undefined, []])(
+    "user can manually remove waste vehicles types (value '%p')",
+    async wasteVehiclesTypes => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: [CompanyType.WASTE_VEHICLES],
+        wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+      });
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+        UPDATE_COMPANY,
+        {
+          variables: {
+            id: company.id,
+            wasteVehiclesTypes
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedCompany = await prisma.company.findUnique({
+        where: { id: company.id }
+      });
+      expect(updatedCompany).toMatchObject({
+        companyTypes: [CompanyType.WASTE_VEHICLES],
+        wasteVehiclesTypes: []
+      });
+    }
+  );
+
+  it("user can omit waste vehicles types (optional)", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+    });
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables: {
+          id: company.id,
+          codeNaf: "0112Z"
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const updatedCompany = await prisma.company.findUnique({
+      where: { id: company.id }
+    });
+    expect(updatedCompany).toMatchObject({
+      companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
     });
   });
 });

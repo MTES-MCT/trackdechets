@@ -1,4 +1,8 @@
-import { PrivateCompanyInput } from "../../generated/graphql/types";
+import { Company } from "@prisma/client";
+import {
+  MutationUpdateCompanyArgs,
+  PrivateCompanyInput
+} from "../../generated/graphql/types";
 import { ZodCompany } from "./schema";
 
 export function companyInputToZodCompany(
