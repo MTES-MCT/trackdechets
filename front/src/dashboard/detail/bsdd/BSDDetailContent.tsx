@@ -385,8 +385,6 @@ const Recipient = ({
     ? form.temporaryStorageDetail?.destination
     : form.recipient;
 
-  const hasBeenReceived = isDefined(form?.quantityReceived);
-
   return (
     <>
       {" "}
@@ -404,13 +402,13 @@ const Recipient = ({
         <QuantityRow
           value={form?.quantityReceived}
           label="Quantité reçue nette"
-          showEmpty={hasBeenReceived}
+          showEmpty={true}
         />
         <QuantityRow
           value={form?.quantityRefused}
           label="Quantité refusée nette"
           tooltip={BSD_DETAILS_QTY_TOOLTIP}
-          showEmpty={hasBeenReceived}
+          showEmpty={true}
         />
         <DetailRow value={form.wasteRefusalReason} label="Motif de refus" />
       </div>
@@ -419,7 +417,7 @@ const Recipient = ({
           value={form?.quantityAccepted}
           label="Quantité traitée nette"
           tooltip={BSD_DETAILS_QTY_TOOLTIP}
-          showEmpty={hasBeenReceived}
+          showEmpty={true}
         />
         <DetailRow
           value={recipient?.processingOperation}
