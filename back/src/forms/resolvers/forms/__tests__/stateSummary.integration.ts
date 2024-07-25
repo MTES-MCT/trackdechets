@@ -39,7 +39,7 @@ const FORM = gql`
 `;
 
 describe("stateSummary of a form with temporaryStorageDetail", () => {
-  afterAll(resetDatabase);
+  afterEach(resetDatabase);
 
   let form,
     emitter,
@@ -48,7 +48,7 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
     transporter2Company,
     traiteurCompany;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     emitter = await userWithCompanyFactory("MEMBER");
     transporter1Company = await companyFactory();
     collectorCompany = await companyFactory();
@@ -232,5 +232,65 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
     });
 
     expect(stateSummary!.quantity).toEqual(quantityReceived);
+  });
+
+  test("when the form is temp stored and received at final destination with a quantityRefused", async () => {
+    // Given
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        status: Status.PROCESSED,
+        forwardedIn: {
+          update: {
+            processedAt: new Date(),
+            wasteAcceptationStatus: "PARTIALLY_REFUSED",
+            quantityReceived: 7.8,
+            quantityRefused: 3.5
+          }
+        }
+      }
+    });
+
+    // When
+    const { query } = makeClient(emitter.user);
+    const {
+      data: {
+        form: { stateSummary }
+      }
+    } = await query<Pick<Query, "form">, QueryFormArgs>(FORM, {
+      variables: { id: form.id }
+    });
+
+    // Then
+    expect(stateSummary!.quantity).toEqual(4.3);
+  });
+
+  test("when the form is received at final destination and PARTIALLY_ACCEPTED", async () => {
+    // Given
+    form = await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        status: Status.TEMP_STORER_ACCEPTED,
+        processedAt: new Date(),
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 11.7,
+        quantityRefused: 8.6
+      }
+    });
+
+    // When
+    const { query } = makeClient(emitter.user);
+    const {
+      errors,
+      data: {
+        form: { stateSummary }
+      }
+    } = await query<Pick<Query, "form">, QueryFormArgs>(FORM, {
+      variables: { id: form.id }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(stateSummary!.quantity).toEqual(3.1);
   });
 });
