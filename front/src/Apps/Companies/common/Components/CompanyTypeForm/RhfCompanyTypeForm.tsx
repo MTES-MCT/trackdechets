@@ -307,7 +307,10 @@ const RhfCompanyTypeForm: React.FC<RhfCompanyTypeFormProps> = ({
           })
         },
         ecoOrganismeAgreements: {
-          value: index => register(`ecoOrganismeAgreements.${index}`),
+          value: index =>
+            register(`ecoOrganismeAgreements.${index}`, {
+              required: "Champ requis"
+            }),
           push: (v: string) => {
             setValue("ecoOrganismeAgreements", [...ecoOrganismeAgreements, v]);
           },
@@ -350,6 +353,8 @@ const RhfCompanyTypeForm: React.FC<RhfCompanyTypeFormProps> = ({
           validityLimit: errors.workerCertification?.validityLimit?.message,
           organisation: errors.workerCertification?.organisation?.message
         }
+        // FIXME handle ecoOrganismeAgreements errors
+        //ecoOrganismeAgreements: errors?.ecoOrganismeAgreements
       }}
     />
   );

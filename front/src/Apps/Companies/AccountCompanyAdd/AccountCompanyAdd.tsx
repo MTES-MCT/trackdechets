@@ -72,14 +72,17 @@ export const CREATE_COMPANY_HOOK_OPTIONS = navigate => ({
 });
 
 export type CompanyValues = FormikCompanyTypeValues & {
-  siret: string;
-  vatNumber: string;
+  siret?: string | null;
+  vatNumber?: string | null;
   companyName: string;
-  givenName: string;
+  givenName?: string | null;
   address: string;
   companyTypes: _CompanyType[];
-  gerepId: string;
-  codeNaf: string;
+  gerepId?: string | null;
+  codeNaf?: string | null;
+  contact?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
   isAllowed: boolean;
   willManageDasris: boolean;
   allowBsdasriTakeOverWithoutSignature: Maybe<boolean>;
@@ -269,7 +272,14 @@ export default function AccountCompanyAdd() {
 
     if (isWorker(values.companyTypes) && workerCertification) {
       const { data } = await createWorkerCertification({
-        variables: { input: workerCertification }
+        variables: {
+          input: {
+            ...workerCertification,
+            hasSubSectionThree:
+              workerCertification?.hasSubSectionThree ?? false,
+            hasSubSectionFour: workerCertification?.hasSubSectionFour ?? false
+          }
+        }
       });
 
       if (data) {
@@ -297,7 +307,9 @@ export default function AccountCompanyAdd() {
           vhuAgrementBroyeurId,
           workerCertificationId,
           // Filter out empty agreements
-          ecoOrganismeAgreements: ecoOrganismeAgreements.filter(Boolean),
+          ecoOrganismeAgreements: isEcoOrganisme(values.companyTypes)
+            ? ecoOrganismeAgreements.filter(Boolean)
+            : [],
           ...(allowBsdasriTakeOverWithoutSignature !== null
             ? { allowBsdasriTakeOverWithoutSignature }
             : {})
@@ -369,17 +381,17 @@ export default function AccountCompanyAdd() {
           {companyInfos && !isForeignCompany && !companyInfos.isRegistered && (
             <Formik<CompanyValues>
               initialValues={{
-                siret: companyInfos?.siret ?? "",
-                vatNumber: companyInfos?.vatNumber ?? "",
+                siret: companyInfos?.siret,
+                vatNumber: companyInfos?.vatNumber,
                 companyName: companyInfos?.name ?? "",
-                givenName: "",
+                givenName: null,
                 address: companyInfos?.address ?? "",
                 companyTypes: initCompanyTypes(companyInfos),
                 collectorTypes: [],
                 wasteProcessorTypes: [],
                 wasteVehiclesTypes: [],
-                gerepId: companyInfos?.installation?.codeS3ic ?? "",
-                codeNaf: companyInfos?.naf ?? "",
+                gerepId: companyInfos?.installation?.codeS3ic,
+                codeNaf: companyInfos?.naf,
                 isAllowed: false,
                 willManageDasris: false,
                 allowBsdasriTakeOverWithoutSignature: null,
@@ -408,18 +420,48 @@ export default function AccountCompanyAdd() {
                   filledTransporterRecepisseFields.length < 3;
 
                 const isTrader_ = isTrader(values.companyTypes);
+                const missingTraderReceiptField =
+                  isTrader_ &&
+                  (!values.traderReceipt?.department ||
+                    !values.traderReceipt?.validityLimit ||
+                    !values.traderReceipt?.receiptNumber);
 
                 const isBroker_ = isBroker(values.companyTypes);
+
+                const missingBrokerReceiptField =
+                  isBroker_ &&
+                  (!values.brokerReceipt?.department ||
+                    !values.brokerReceipt?.validityLimit ||
+                    !values.brokerReceipt?.receiptNumber);
 
                 const isVhuBroyeur_ = isVhuBroyeur(
                   values.companyTypes,
                   values.wasteVehiclesTypes
                 );
 
+                const missingVhuBroyeurAgrementField =
+                  isVhuBroyeur_ &&
+                  (!values.vhuAgrementBroyeur?.agrementNumber ||
+                    !values.vhuAgrementBroyeur?.department);
+
                 const isVhuDemolisseur_ = isVhuDemolisseur(
                   values.companyTypes,
                   values.wasteVehiclesTypes
                 );
+
+                const missingVhuDemolisseurAgrementField =
+                  isVhuDemolisseur_ &&
+                  (!values.vhuAgrementDemolisseur?.agrementNumber ||
+                    !values.vhuAgrementDemolisseur?.department);
+
+                const _isWorker = isWorker(values.companyTypes);
+
+                const missingCertification =
+                  _isWorker &&
+                  values.workerCertification?.hasSubSectionThree &&
+                  (!values.workerCertification?.certificationNumber ||
+                    !values.workerCertification?.validityLimit ||
+                    !values?.workerCertification?.organisation);
 
                 return {
                   ...(!values.companyName && {
@@ -467,7 +509,7 @@ export default function AccountCompanyAdd() {
                         }
                       }
                     : {}),
-                  ...(isTrader_
+                  ...(missingTraderReceiptField
                     ? {
                         traderReceipt: {
                           receiptNumber: !values.traderReceipt?.receiptNumber
@@ -482,7 +524,7 @@ export default function AccountCompanyAdd() {
                         }
                       }
                     : {}),
-                  ...(isBroker_
+                  ...(missingBrokerReceiptField
                     ? {
                         brokerReceipt: {
                           receiptNumber: !values.brokerReceipt?.receiptNumber
@@ -497,7 +539,7 @@ export default function AccountCompanyAdd() {
                         }
                       }
                     : {}),
-                  ...(isVhuBroyeur_
+                  ...(missingVhuBroyeurAgrementField
                     ? {
                         vhuAgrementBroyeur: {
                           agrementNumber: !values.vhuAgrementBroyeur
@@ -510,7 +552,7 @@ export default function AccountCompanyAdd() {
                         }
                       }
                     : {}),
-                  ...(isVhuDemolisseur_
+                  ...(missingVhuDemolisseurAgrementField
                     ? {
                         vhuAgrementDemolisseur: {
                           agrementNumber: !values.vhuAgrementDemolisseur
@@ -527,8 +569,7 @@ export default function AccountCompanyAdd() {
                     values.ecoOrganismeAgreements.length < 1 && {
                       ecoOrganismeAgreements: "Champ obligatoire"
                     }),
-                  ...(isWorker(values.companyTypes) &&
-                  values.workerCertification?.hasSubSectionThree
+                  ...(missingCertification
                     ? {
                         workerCertification: {
                           certificationNumber: !values.workerCertification
@@ -559,297 +600,307 @@ export default function AccountCompanyAdd() {
                 errors,
                 touched,
                 handleSubmit
-              }) => (
-                <Form className={styles.companyAddForm} onSubmit={handleSubmit}>
-                  <Field name="givenName">
-                    {({ field }) => {
-                      return (
-                        <Input
-                          label="Nom usuel (optionnel)"
-                          hintText="Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant la même raison sociale"
-                          nativeInputProps={field}
-                        ></Input>
-                      );
-                    }}
-                  </Field>
-                  <GivenNameNotice />
+              }) => {
+                console.log(errors);
+                return (
+                  <Form
+                    className={styles.companyAddForm}
+                    onSubmit={handleSubmit}
+                  >
+                    <Field name="givenName">
+                      {({ field }) => {
+                        return (
+                          <Input
+                            label="Nom usuel (optionnel)"
+                            hintText="Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant la même raison sociale"
+                            nativeInputProps={field}
+                          ></Input>
+                        );
+                      }}
+                    </Field>
+                    <GivenNameNotice />
 
-                  <div className={styles.field}>
-                    {companyInfos?.name ? (
-                      <>
-                        <label className={`text-right`}>Raison sociale</label>
+                    <div className={styles.field}>
+                      {companyInfos?.name ? (
+                        <>
+                          <label className={`text-right`}>Raison sociale</label>
 
+                          <div className={styles.field__value}>
+                            {companyInfos.name}
+                          </div>
+                        </>
+                      ) : (
+                        <Field name="companyName">
+                          {({ field }) => {
+                            return (
+                              <Input
+                                label={"Raison Sociale"}
+                                disabled={!!companyInfos?.name}
+                                nativeInputProps={field}
+                              ></Input>
+                            );
+                          }}
+                        </Field>
+                      )}
+                    </div>
+
+                    {companyInfos?.naf ? (
+                      <div className={styles.field}>
+                        <label className={`text-right`}>Code NAF</label>
                         <div className={styles.field__value}>
-                          {companyInfos.name}
+                          {`${companyInfos?.naf} - ${companyInfos?.libelleNaf}`}
                         </div>
-                      </>
+                      </div>
                     ) : (
-                      <Field name="companyName">
+                      <Field name="codeNaf">
                         {({ field }) => {
                           return (
                             <Input
-                              label={"Raison Sociale"}
-                              disabled={!!companyInfos?.name}
+                              label="Code NAF"
+                              disabled={isForcedTransporter(companyInfos)}
                               nativeInputProps={field}
                             ></Input>
                           );
                         }}
                       </Field>
                     )}
-                  </div>
 
-                  {companyInfos?.naf ? (
-                    <div className={styles.field}>
-                      <label className={`text-right`}>Code NAF</label>
-                      <div className={styles.field__value}>
-                        {`${companyInfos?.naf} - ${companyInfos?.libelleNaf}`}
+                    {companyInfos?.address ? (
+                      <div className={styles.field}>
+                        <label className={`text-right`}>Adresse</label>
+                        <div className={styles.field__value}>
+                          {companyInfos?.address}
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <Field name="codeNaf">
-                      {({ field }) => {
-                        return (
-                          <Input
-                            label="Code NAF"
-                            disabled={isForcedTransporter(companyInfos)}
-                            nativeInputProps={field}
-                          ></Input>
-                        );
-                      }}
-                    </Field>
-                  )}
-
-                  {companyInfos?.address ? (
-                    <div className={styles.field}>
-                      <label className={`text-right`}>Adresse</label>
-                      <div className={styles.field__value}>
-                        {companyInfos?.address}
-                      </div>
-                    </div>
-                  ) : (
-                    <Field name="address">
-                      {({ field }) => {
-                        return (
-                          <Input
-                            label="Adresse"
-                            disabled={!!companyInfos?.address}
-                            state={
-                              errors.address && touched.address
-                                ? "error"
-                                : "default"
-                            }
-                            stateRelatedMessage={
-                              errors.address && touched.address
-                                ? errors.isAllowed
-                                : ""
-                            }
-                            nativeInputProps={field}
-                          ></Input>
-                        );
-                      }}
-                    </Field>
-                  )}
-
-                  <Field name="contact">
-                    {({ field }) => {
-                      return (
-                        <Input
-                          label="Personne à contacter"
-                          hintText="Optionnel"
-                          nativeInputProps={field}
-                        ></Input>
-                      );
-                    }}
-                  </Field>
-
-                  <div className="fr-container-fluid fr-mb-4w">
-                    <div className="fr-grid-row fr-grid-row--gutters">
-                      <div className="fr-col-6">
-                        <Field name="contactPhone">
-                          {({ field }) => {
-                            return (
-                              <Input
-                                label="Téléphone"
-                                hintText="Optionnel"
-                                nativeInputProps={field}
-                              ></Input>
-                            );
-                          }}
-                        </Field>
-                      </div>
-                      <div className="fr-col-6">
-                        <Field name="contactEmail">
-                          {({ field }) => {
-                            return (
-                              <Input
-                                label="E-mail"
-                                hintText="Optionnel"
-                                nativeInputProps={field}
-                              ></Input>
-                            );
-                          }}
-                        </Field>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.separator} />
-
-                  <div className={styles.field}>
-                    <div className={styles.field__value}>
-                      {isForcedTransporter(companyInfos) ? (
-                        <Field
-                          name="companyTypes"
-                          value={[_CompanyType.Transporter]}
-                          disabled={true}
-                        ></Field>
-                      ) : (
-                        <FormikCompanyTypeForm
-                          values={values}
-                          setFieldValue={setFieldValue}
-                          handleBlur={handleBlur}
-                          handleChange={handleChange}
-                          errors={errors}
-                        />
-                      )}
-                      <RedErrorMessage name="companyTypes" />
-                    </div>
-                  </div>
-
-                  <div className={styles.separator} />
-
-                  {!isForcedTransporter(companyInfos) && (
-                    <>
-                      <Field name="gerepId">
+                    ) : (
+                      <Field name="address">
                         {({ field }) => {
                           return (
                             <Input
-                              label="Identifiant GEREP (optionnel)"
-                              hintText="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP."
+                              label="Adresse"
+                              disabled={!!companyInfos?.address}
+                              state={
+                                errors.address && touched.address
+                                  ? "error"
+                                  : "default"
+                              }
+                              stateRelatedMessage={
+                                errors.address && touched.address
+                                  ? errors.isAllowed
+                                  : ""
+                              }
                               nativeInputProps={field}
                             ></Input>
                           );
                         }}
                       </Field>
+                    )}
 
-                      <div className={classNames(styles.field)}>
-                        <Field name="allowBsdasriTakeOverWithoutSignature">
-                          {({ field }) => {
-                            return (
-                              <ToggleSwitch
-                                onChange={e => {
-                                  setFieldValue(field.name, e);
-                                }}
-                                inputTitle={field.name}
-                                label="Mon établissement produit des DASRI. Je dispose d'une convention avec un collecteur et j'accepte que ce collecteur prenne en charge mes DASRI sans ma signature lors de la collecte si je ne suis pas disponible. Ce choix est modifiable utérieurement."
-                                helperText="(DASRI, Déchets d'Acivité de Soins à Risques Infectieux, par exemple les boîtes et les containers jaunes pour les seringues.)"
-                              />
-                            );
-                          }}
-                        </Field>
-                      </div>
-                    </>
-                  )}
-                  <hr />
-                  <div className={styles.field}>
-                    <Field name="isAllowed">
+                    <Field name="contact">
                       {({ field }) => {
                         return (
-                          <Checkbox
-                            state={
-                              errors.isAllowed && touched.isAllowed
-                                ? "error"
-                                : "default"
-                            }
-                            stateRelatedMessage={
-                              errors.isAllowed && touched.isAllowed
-                                ? errors.isAllowed
-                                : ""
-                            }
-                            options={[
-                              {
-                                label:
-                                  "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise",
-                                nativeInputProps: {
-                                  name: field.name,
-                                  checked: field.value,
-                                  onChange: field.onChange,
-                                  onBlur: field.onBlur
-                                }
-                              }
-                            ]}
-                          />
+                          <Input
+                            label="Personne à contacter"
+                            hintText="Optionnel"
+                            nativeInputProps={field}
+                          ></Input>
                         );
                       }}
                     </Field>
-                  </div>
 
-                  <div className={styles.alertWrapper}>
-                    <Alert
-                      severity="info"
-                      title="Information"
-                      description={
-                        <>
-                          En tant qu'administrateur de l'établissement, j'ai
-                          pris connaissance des{" "}
-                          <a
-                            href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            modalités de gestion des membres
-                          </a>
-                          .<br />
-                          Je m'engage notamment à traiter les éventuelles
-                          demandes de rattachement et à ce que, à tout moment,
-                          au moins un administrateur ait accès à cet
-                          établissement dans Trackdéchets.
-                        </>
-                      }
-                    />
-                  </div>
+                    <div className="fr-container-fluid fr-mb-4w">
+                      <div className="fr-grid-row fr-grid-row--gutters">
+                        <div className="fr-col-6">
+                          <Field name="contactPhone">
+                            {({ field }) => {
+                              return (
+                                <Input
+                                  label="Téléphone"
+                                  hintText="Optionnel"
+                                  nativeInputProps={field}
+                                ></Input>
+                              );
+                            }}
+                          </Field>
+                        </div>
+                        <div className="fr-col-6">
+                          <Field name="contactEmail">
+                            {({ field }) => {
+                              return (
+                                <Input
+                                  label="E-mail"
+                                  hintText="Optionnel"
+                                  nativeInputProps={field}
+                                ></Input>
+                              );
+                            }}
+                          </Field>
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className={styles["submit-form"]}>
-                    <Button
-                      priority="tertiary"
-                      type="button"
-                      disabled={isSubmitting}
-                      onClick={() => {
-                        navigate(-1);
-                      }}
-                    >
-                      Annuler
-                    </Button>
+                    <div className={styles.separator} />
 
-                    <Button type="submit" disabled={isSubmitting}>
-                      {isSubmitting ? "Création..." : "Créer"}
-                    </Button>
-                  </div>
-                  {/* // ERRORS */}
-                  {createTransporterReceiptError && (
-                    <NotificationError
-                      apolloError={createTransporterReceiptError}
-                    />
-                  )}
-                  {createTraderReceiptError && (
-                    <NotificationError apolloError={createTraderReceiptError} />
-                  )}
-                  {createBrokerReceiptError && (
-                    <NotificationError apolloError={createBrokerReceiptError} />
-                  )}
-                  {createVhuAgrementError && (
-                    <NotificationError apolloError={createVhuAgrementError} />
-                  )}
-                  {createWorkerCertificationError && (
-                    <NotificationError
-                      apolloError={createWorkerCertificationError}
-                    />
-                  )}
-                  {savingError && (
-                    <NotificationError apolloError={savingError} />
-                  )}
-                </Form>
-              )}
+                    <div className={styles.field}>
+                      <div className={styles.field__value}>
+                        {isForcedTransporter(companyInfos) ? (
+                          <Field
+                            name="companyTypes"
+                            value={[_CompanyType.Transporter]}
+                            disabled={true}
+                          ></Field>
+                        ) : (
+                          <FormikCompanyTypeForm
+                            values={values}
+                            setFieldValue={setFieldValue}
+                            handleBlur={handleBlur}
+                            handleChange={handleChange}
+                            errors={errors}
+                          />
+                        )}
+                        <RedErrorMessage name="companyTypes" />
+                      </div>
+                    </div>
+
+                    <div className={styles.separator} />
+
+                    {!isForcedTransporter(companyInfos) && (
+                      <>
+                        <Field name="gerepId">
+                          {({ field }) => {
+                            return (
+                              <Input
+                                label="Identifiant GEREP (optionnel)"
+                                hintText="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP."
+                                nativeInputProps={field}
+                              ></Input>
+                            );
+                          }}
+                        </Field>
+
+                        <div className={classNames(styles.field)}>
+                          <Field name="allowBsdasriTakeOverWithoutSignature">
+                            {({ field }) => {
+                              return (
+                                <ToggleSwitch
+                                  onChange={e => {
+                                    setFieldValue(field.name, e);
+                                  }}
+                                  inputTitle={field.name}
+                                  label="Mon établissement produit des DASRI. Je dispose d'une convention avec un collecteur et j'accepte que ce collecteur prenne en charge mes DASRI sans ma signature lors de la collecte si je ne suis pas disponible. Ce choix est modifiable utérieurement."
+                                  helperText="(DASRI, Déchets d'Acivité de Soins à Risques Infectieux, par exemple les boîtes et les containers jaunes pour les seringues.)"
+                                />
+                              );
+                            }}
+                          </Field>
+                        </div>
+                      </>
+                    )}
+                    <hr />
+                    <div className={styles.field}>
+                      <Field name="isAllowed">
+                        {({ field }) => {
+                          return (
+                            <Checkbox
+                              state={
+                                errors.isAllowed && touched.isAllowed
+                                  ? "error"
+                                  : "default"
+                              }
+                              stateRelatedMessage={
+                                errors.isAllowed && touched.isAllowed
+                                  ? errors.isAllowed
+                                  : ""
+                              }
+                              options={[
+                                {
+                                  label:
+                                    "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise",
+                                  nativeInputProps: {
+                                    name: field.name,
+                                    checked: field.value,
+                                    onChange: field.onChange,
+                                    onBlur: field.onBlur
+                                  }
+                                }
+                              ]}
+                            />
+                          );
+                        }}
+                      </Field>
+                    </div>
+
+                    <div className={styles.alertWrapper}>
+                      <Alert
+                        severity="info"
+                        title="Information"
+                        description={
+                          <>
+                            En tant qu'administrateur de l'établissement, j'ai
+                            pris connaissance des{" "}
+                            <a
+                              href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              modalités de gestion des membres
+                            </a>
+                            .<br />
+                            Je m'engage notamment à traiter les éventuelles
+                            demandes de rattachement et à ce que, à tout moment,
+                            au moins un administrateur ait accès à cet
+                            établissement dans Trackdéchets.
+                          </>
+                        }
+                      />
+                    </div>
+
+                    <div className={styles["submit-form"]}>
+                      <Button
+                        priority="tertiary"
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={() => {
+                          navigate(-1);
+                        }}
+                      >
+                        Annuler
+                      </Button>
+
+                      <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? "Création..." : "Créer"}
+                      </Button>
+                    </div>
+                    {/* // ERRORS */}
+                    {createTransporterReceiptError && (
+                      <NotificationError
+                        apolloError={createTransporterReceiptError}
+                      />
+                    )}
+                    {createTraderReceiptError && (
+                      <NotificationError
+                        apolloError={createTraderReceiptError}
+                      />
+                    )}
+                    {createBrokerReceiptError && (
+                      <NotificationError
+                        apolloError={createBrokerReceiptError}
+                      />
+                    )}
+                    {createVhuAgrementError && (
+                      <NotificationError apolloError={createVhuAgrementError} />
+                    )}
+                    {createWorkerCertificationError && (
+                      <NotificationError
+                        apolloError={createWorkerCertificationError}
+                      />
+                    )}
+                    {savingError && (
+                      <NotificationError apolloError={savingError} />
+                    )}
+                  </Form>
+                );
+              }}
             </Formik>
           )}
         </div>
