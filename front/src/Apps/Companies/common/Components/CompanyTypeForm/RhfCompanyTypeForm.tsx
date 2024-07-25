@@ -1,5 +1,5 @@
 import React from "react";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, Validate } from "react-hook-form";
 import {
   AllCompanyType,
   COLLECTOR_TYPE_VALUES,
@@ -64,14 +64,16 @@ const RhfCompanyTypeForm: React.FC<RhfCompanyTypeFormProps> = ({
     if (COMPANY_TYPE_VALUES.includes(value as CompanyType)) {
       if (checked) {
         setValue("companyTypes", [...companyTypes, value as CompanyType], {
-          shouldDirty: true
+          shouldDirty: true,
+          shouldValidate: true
         });
       } else {
         setValue(
           "companyTypes",
           companyTypes.filter(c => c !== value),
           {
-            shouldDirty: true
+            shouldDirty: true,
+            shouldValidate: true
           }
         );
       }
@@ -149,12 +151,35 @@ const RhfCompanyTypeForm: React.FC<RhfCompanyTypeFormProps> = ({
 
   const hasSubSectionThree = watch("workerCertification.hasSubSectionThree");
 
-  const requiredWhenHasSubSectionThree = (value: string) => {
-    if (hasSubSectionThree && !value) {
+  const requiredWhenHasSubSectionThree: Validate<
+    string,
+    RhfCompanyTypeFormField
+  > = (value, { companyTypes }) => {
+    if (
+      companyTypes.includes(CompanyType.Worker) &&
+      hasSubSectionThree &&
+      !value
+    ) {
       return "Champ requis";
     }
     return true;
   };
+
+  const requiredWhenCompanyType: (
+    companyType: CompanyType,
+    wasteVehicleType?: WasteVehiclesType
+  ) => Validate<string, RhfCompanyTypeFormField> =
+    (companyType, wasteVehicleType) =>
+    (value, { companyTypes, wasteVehiclesTypes }) => {
+      if (
+        companyTypes.includes(companyType) &&
+        (!wasteVehicleType || wasteVehiclesTypes.includes(wasteVehicleType)) &&
+        !value
+      ) {
+        return "Champ requis";
+      }
+      return true;
+    };
 
   return (
     <CompanyTypeForm
@@ -168,27 +193,100 @@ const RhfCompanyTypeForm: React.FC<RhfCompanyTypeFormProps> = ({
       handleToggle={handleToggle}
       inputProps={{
         transporterReceipt: {
-          receiptNumber: register("transporterReceipt.receiptNumber"),
-          validityLimit: register("transporterReceipt.validityLimit"),
-          department: register("transporterReceipt.department")
+          receiptNumber: register("transporterReceipt.receiptNumber", {
+            validate: (value, { transporterReceipt, companyTypes }) => {
+              // FIXME utiliser `trigger`pour re-valider en cas de changement
+              // après un premier submit
+              if (
+                companyTypes.includes(CompanyType.Transporter) &&
+                // Validation "tout un rien"
+                !value &&
+                (!!transporterReceipt?.validityLimit ||
+                  !!transporterReceipt?.department)
+              ) {
+                return "Champ requis";
+              }
+              return true;
+            }
+          }),
+          validityLimit: register("transporterReceipt.validityLimit", {
+            validate: (value, { transporterReceipt, companyTypes }) => {
+              if (
+                companyTypes.includes(CompanyType.Transporter) &&
+                // Validation "tout un rien"
+                !value &&
+                (!!transporterReceipt?.receiptNumber ||
+                  !!transporterReceipt?.department)
+              ) {
+                return "Champ requis";
+              }
+              return true;
+            }
+          }),
+          department: register("transporterReceipt.department", {
+            validate: (value, { transporterReceipt, companyTypes }) => {
+              if (
+                companyTypes.includes(CompanyType.Transporter) &&
+                // Validation "tout un rien"
+                !value &&
+                (!!transporterReceipt?.receiptNumber ||
+                  !!transporterReceipt?.validityLimit)
+              ) {
+                return "Champ requis";
+              }
+              return true;
+            }
+          })
         },
         brokerReceipt: {
-          receiptNumber: register("brokerReceipt.receiptNumber"),
-          validityLimit: register("brokerReceipt.validityLimit"),
-          department: register("brokerReceipt.department")
+          receiptNumber: register("brokerReceipt.receiptNumber", {
+            validate: requiredWhenCompanyType(CompanyType.Broker)
+          }),
+          validityLimit: register("brokerReceipt.validityLimit", {
+            validate: requiredWhenCompanyType(CompanyType.Broker)
+          }),
+          department: register("brokerReceipt.department", {
+            validate: requiredWhenCompanyType(CompanyType.Broker)
+          })
         },
         traderReceipt: {
-          receiptNumber: register("traderReceipt.receiptNumber"),
-          validityLimit: register("traderReceipt.validityLimit"),
-          department: register("traderReceipt.department")
+          receiptNumber: register("traderReceipt.receiptNumber", {
+            validate: requiredWhenCompanyType(CompanyType.Trader)
+          }),
+          validityLimit: register("traderReceipt.validityLimit", {
+            validate: requiredWhenCompanyType(CompanyType.Trader)
+          }),
+          department: register("traderReceipt.department", {
+            validate: requiredWhenCompanyType(CompanyType.Trader)
+          })
         },
         vhuAgrementBroyeur: {
-          agrementNumber: register("vhuAgrementBroyeur.agrementNumber"),
-          department: register("vhuAgrementBroyeur.department")
+          agrementNumber: register("vhuAgrementBroyeur.agrementNumber", {
+            validate: requiredWhenCompanyType(
+              CompanyType.WasteVehicles,
+              WasteVehiclesType.Broyeur
+            )
+          }),
+          department: register("vhuAgrementBroyeur.department", {
+            validate: requiredWhenCompanyType(
+              CompanyType.WasteVehicles,
+              WasteVehiclesType.Broyeur
+            )
+          })
         },
         vhuAgrementDemolisseur: {
-          agrementNumber: register("vhuAgrementDemolisseur.agrementNumber"),
-          department: register("vhuAgrementDemolisseur.department")
+          agrementNumber: register("vhuAgrementDemolisseur.agrementNumber", {
+            validate: requiredWhenCompanyType(
+              CompanyType.WasteVehicles,
+              WasteVehiclesType.Demolisseur
+            )
+          }),
+          department: register("vhuAgrementDemolisseur.department", {
+            validate: requiredWhenCompanyType(
+              CompanyType.WasteVehicles,
+              WasteVehiclesType.Demolisseur
+            )
+          })
         },
         workerCertification: {
           hasSubSectionThree: register(

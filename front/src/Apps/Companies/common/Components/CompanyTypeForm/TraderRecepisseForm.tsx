@@ -16,7 +16,7 @@ const TraderRecepisseForm: React.FC<TraderRecepisseFormProps> = ({
 }) => {
   return (
     <RecepisseForm
-      title="Récépissé Négociant (optionnel)"
+      title="Récépissé Négociant"
       inputProps={inputProps.traderReceipt}
       inputErrors={inputErrors.traderReceipt}
     />
