@@ -58,8 +58,8 @@ describe("renderBsdaRefusedEmail", () => {
       ?.dividedBy(1000)
       .toDecimalPlaces(6)
       .toNumber()} tonnes</li>
-    <li>Quantité refusée: Non renseignée</li>
-    <li>Quantité acceptée: Non renseignée</li>
+    <li>Quantité refusée nette: Non renseignée</li>
+    <li>Quantité acceptée nette: Non renseignée</li>
     <li>
       Motif de refus :
       <span>${bsda.destinationReceptionRefusalReason}</span>`);
@@ -168,8 +168,8 @@ describe("renderBsdaRefusedEmail", () => {
       ?.dividedBy(1000)
       .toDecimalPlaces(6)
       .toNumber()} tonnes</li>
-    <li>Quantité refusée: Non renseignée</li>
-    <li>Quantité acceptée: Non renseignée</li>
+    <li>Quantité refusée nette: Non renseignée</li>
+    <li>Quantité acceptée nette: Non renseignée</li>
     <li>
       Motif de refus :
       <span>${bsda.destinationReceptionRefusalReason}</span>`);

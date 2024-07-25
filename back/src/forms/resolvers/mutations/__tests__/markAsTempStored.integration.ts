@@ -846,8 +846,8 @@ describe("{ mutation { markAsTempStored } }", () => {
       expect.objectContaining({
         subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
         body: expect.stringContaining(`<li>Quantité réelle présentée nette: 10 tonnes</li>
-    <li>Quantité refusée: 7 tonnes</li>
-    <li>Quantité acceptée: 3 tonnes</li>`)
+    <li>Quantité refusée nette: 7 tonnes</li>
+    <li>Quantité acceptée nette: 3 tonnes</li>`)
       })
     );
   });
@@ -922,8 +922,8 @@ describe("{ mutation { markAsTempStored } }", () => {
       expect.objectContaining({
         subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
         body: expect.stringContaining(`<li>Quantité réelle présentée nette: 10 tonnes</li>
-    <li>Quantité refusée: Non renseignée</li>
-    <li>Quantité acceptée: Non renseignée</li>`)
+    <li>Quantité refusée nette: Non renseignée</li>
+    <li>Quantité acceptée nette: Non renseignée</li>`)
       })
     );
   });

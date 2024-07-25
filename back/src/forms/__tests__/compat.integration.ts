@@ -852,6 +852,32 @@ describe("simpleFormToBsdd", () => {
     expect(bsdd.destinationReceptionRefusedWeight).toEqual(3);
   });
 
+  it("should return destinationReceptionAcceptedWeight = 0", async () => {
+    // Given
+    const { user } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        wasteAcceptationStatus: "REFUSED",
+        quantityReceived: new Decimal(10),
+        quantityRefused: new Decimal(10)
+      }
+    });
+
+    // When
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: RegistryFormInclude
+    });
+
+    const bsdd = formToBsdd(fullForm);
+
+    // Then
+    expect(bsdd.destinationReceptionWeight).toEqual(10);
+    expect(bsdd.destinationReceptionAcceptedWeight).toEqual(0);
+    expect(bsdd.destinationReceptionRefusedWeight).toEqual(10);
+  });
+
   it("[legacy] should return quantityReceived (destinationReceptionWeight)", async () => {
     // Given
     const { user } = await userWithCompanyFactory("MEMBER");
