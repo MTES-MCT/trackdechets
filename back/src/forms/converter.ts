@@ -619,9 +619,9 @@ export function expandFormFromDb(
   });
 
   const forwardedInWasteQuantities = bsddWasteQuantities({
-    wasteAcceptationStatus: form.forwardedIn?.wasteAcceptationStatus,
-    quantityReceived: form.forwardedIn?.quantityReceived,
-    quantityRefused: form.forwardedIn?.quantityRefused
+    wasteAcceptationStatus: forwardedIn?.wasteAcceptationStatus,
+    quantityReceived: forwardedIn?.quantityReceived,
+    quantityRefused: forwardedIn?.quantityRefused
   });
 
   return {
@@ -749,8 +749,9 @@ export function expandFormFromDb(
     quantityRefused: forwardedIn
       ? processDecimal(forwardedIn.quantityRefused)?.toNumber()
       : processDecimal(form.quantityRefused)?.toNumber(),
-    quantityAccepted:
-      forwardedInWasteQuantities?.quantityAccepted?.toNumber() ?? null,
+    quantityAccepted: forwardedIn
+      ? forwardedInWasteQuantities?.quantityAccepted?.toNumber()
+      : wasteQuantities?.quantityAccepted?.toNumber(),
     quantityGrouped: form.quantityGrouped,
     processingOperationDone: forwardedIn
       ? forwardedIn.processingOperationDone
