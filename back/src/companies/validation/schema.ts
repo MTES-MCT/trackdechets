@@ -24,8 +24,8 @@ function toSet(arr: any[]) {
 
 const rawCompanySchema = z.object({
   id: z.string().nullish(),
-  siret: siretSchema.nullish(),
-  vatNumber: foreignVatNumberSchema.nullish(),
+  siret: siretSchema().nullish(),
+  vatNumber: foreignVatNumberSchema().nullish(),
   orgId: z.string().nullish(),
   name: z.string(),
   address: z.string().nullish(),

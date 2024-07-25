@@ -1,7 +1,6 @@
 import { getCompanyInfos } from "../companyInfos";
 import { ErrorCode, UserInputError } from "../../../../common/errors";
 import { siretify } from "../../../../__tests__/factories";
-import { WasteVehiclesType } from "@td/codegen-ui";
 
 const searchCompanyMock = jest.fn();
 const vatMock = jest.fn();
