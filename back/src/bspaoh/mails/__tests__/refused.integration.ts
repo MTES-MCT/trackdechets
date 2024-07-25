@@ -111,8 +111,8 @@ describe("renderBspaohRefusedEmail", () => {
     <li>Appellation du déchet : Pièce anatomique d&#39;origine humaine</li>
     <li>Code déchet : ${bspaoh.wasteCode}</li>
     <li>Quantité réelle présentée nette : 0.05 tonnes</li>
-    <li>Quantité refusée : 0.03 tonnes</li>
-    <li>Quantité acceptée : 0.02 tonnes</li>
+    <li>Quantité refusée nette : 0.03 tonnes</li>
+    <li>Quantité acceptée nette : 0.02 tonnes</li>
     <li>
       Motif de refus :
       <span>${bspaoh.destinationReceptionWasteRefusalReason}</span>`);
