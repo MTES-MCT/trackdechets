@@ -122,7 +122,10 @@ function Company({ company, label }: CompanyProps) {
       <DetailRow label="Numéro de TVA" value={company?.vatNumber} />
       <DetailRow label="Adresse" value={company?.address} />
       <DetailRow label="Tél" value={company?.phone} />
-      <DetailRow label="Mél" value={company?.mail} />
+      <dt>Mél</dt>
+      <dd data-testid="mel" style={{ width: "110px" }}>
+        {company?.mail}
+      </dd>
       <DetailRow label="Contact" value={company?.contact} />
     </>
   );
