@@ -138,12 +138,24 @@ export default function AccountCompanyAdd() {
     return companyTypes.includes(_CompanyType.WasteVehicles);
   }
 
-  function isVhuDemolisseur(wasteVechiclesTypes: WasteVehiclesType[]) {
-    return wasteVechiclesTypes.includes(WasteVehiclesType.Demolisseur);
+  function isVhuDemolisseur(
+    companyTypes: _CompanyType[],
+    wasteVechiclesTypes: WasteVehiclesType[]
+  ) {
+    return (
+      isVhu(companyTypes) &&
+      wasteVechiclesTypes.includes(WasteVehiclesType.Demolisseur)
+    );
   }
 
-  function isVhuBroyeur(wasteVechiclesTypes: WasteVehiclesType[]) {
-    return wasteVechiclesTypes.includes(WasteVehiclesType.Broyeur);
+  function isVhuBroyeur(
+    companyTypes: _CompanyType[],
+    wasteVechiclesTypes: WasteVehiclesType[]
+  ) {
+    return (
+      isVhu(companyTypes) &&
+      wasteVechiclesTypes.includes(WasteVehiclesType.Broyeur)
+    );
   }
 
   function isForcedTransporter(companyInfos: CompanySearchResult) {
@@ -226,28 +238,30 @@ export default function AccountCompanyAdd() {
     let vhuAgrementBroyeurId: string | null = null;
 
     // create vhu agrements if any
-    if (isVhu(values.companyTypes)) {
-      if (
-        isVhuDemolisseur(values.wasteVehiclesTypes) &&
-        vhuAgrementDemolisseur
-      ) {
-        const { data } = await createVhuAgrement({
-          variables: { input: vhuAgrementDemolisseur }
-        });
 
-        if (data) {
-          vhuAgrementDemolisseurId = data.createVhuAgrement.id;
-        }
+    if (
+      isVhuDemolisseur(values.companyTypes, values.wasteVehiclesTypes) &&
+      vhuAgrementDemolisseur
+    ) {
+      const { data } = await createVhuAgrement({
+        variables: { input: vhuAgrementDemolisseur }
+      });
+
+      if (data) {
+        vhuAgrementDemolisseurId = data.createVhuAgrement.id;
       }
+    }
 
-      if (isVhuBroyeur(values.wasteVehiclesTypes) && vhuAgrementBroyeur) {
-        const { data } = await createVhuAgrement({
-          variables: { input: vhuAgrementBroyeur }
-        });
+    if (
+      isVhuBroyeur(values.companyTypes, values.wasteVehiclesTypes) &&
+      vhuAgrementBroyeur
+    ) {
+      const { data } = await createVhuAgrement({
+        variables: { input: vhuAgrementBroyeur }
+      });
 
-        if (data) {
-          vhuAgrementBroyeurId = data.createVhuAgrement.id;
-        }
+      if (data) {
+        vhuAgrementBroyeurId = data.createVhuAgrement.id;
       }
     }
 
@@ -395,33 +409,17 @@ export default function AccountCompanyAdd() {
 
                 const isTrader_ = isTrader(values.companyTypes);
 
-                const filledTraderRecepisseFields = [
-                  values.traderReceipt?.receiptNumber,
-                  values.traderReceipt?.validityLimit,
-                  values.traderReceipt?.department
-                ].filter(Boolean);
-
-                // Les champs du récépissé négociant doivent être
-                // soit tous nuls soit tous remplis.
-                const missingTraderReceipField =
-                  isTrader_ &&
-                  filledTraderRecepisseFields.length > 0 &&
-                  filledTraderRecepisseFields.length < 3;
-
                 const isBroker_ = isBroker(values.companyTypes);
 
-                const filledBrokerRecepisseFields = [
-                  values.brokerReceipt?.receiptNumber,
-                  values.brokerReceipt?.validityLimit,
-                  values.brokerReceipt?.department
-                ].filter(Boolean);
+                const isVhuBroyeur_ = isVhuBroyeur(
+                  values.companyTypes,
+                  values.wasteVehiclesTypes
+                );
 
-                // Les champs du récépissé courtier doivent être
-                // soit tous nuls soit tous remplis.
-                const missingBrokerReceipField =
-                  isBroker_ &&
-                  filledBrokerRecepisseFields.length > 0 &&
-                  filledBrokerRecepisseFields.length < 3;
+                const isVhuDemolisseur_ = isVhuDemolisseur(
+                  values.companyTypes,
+                  values.wasteVehiclesTypes
+                );
 
                 return {
                   ...(!values.companyName && {
@@ -457,44 +455,70 @@ export default function AccountCompanyAdd() {
                         transporterReceipt: {
                           receiptNumber: !values.transporterReceipt
                             ?.receiptNumber
-                            ? "Champ obligatoire"
+                            ? "Champ requis"
                             : undefined,
                           validityLimit: !values.transporterReceipt
                             ?.validityLimit
-                            ? "Champ obligatoire"
+                            ? "Champ requis"
                             : undefined,
                           department: !values.transporterReceipt?.department
-                            ? "Champ obligatoire"
+                            ? "Champ requis"
                             : undefined
                         }
                       }
                     : {}),
-                  ...(missingTraderReceipField
+                  ...(isTrader_
                     ? {
                         traderReceipt: {
                           receiptNumber: !values.traderReceipt?.receiptNumber
-                            ? "Champ obligatoire"
+                            ? "Champ requis"
                             : undefined,
                           validityLimit: !values.traderReceipt?.validityLimit
-                            ? "Champ obligatoire"
+                            ? "Champ requis"
                             : undefined,
                           department: !values.traderReceipt?.department
-                            ? "Champ obligatoire"
+                            ? "Champ requis"
                             : undefined
                         }
                       }
                     : {}),
-                  ...(missingBrokerReceipField
+                  ...(isBroker_
                     ? {
                         brokerReceipt: {
                           receiptNumber: !values.brokerReceipt?.receiptNumber
-                            ? "Champ obligatoire"
+                            ? "Champ requis"
                             : undefined,
                           validityLimit: !values.brokerReceipt?.validityLimit
-                            ? "Champ obligatoire"
+                            ? "Champ requis"
                             : undefined,
                           department: !values.brokerReceipt?.department
-                            ? "Champ obligatoire"
+                            ? "Champ requis"
+                            : undefined
+                        }
+                      }
+                    : {}),
+                  ...(isVhuBroyeur_
+                    ? {
+                        vhuAgrementBroyeur: {
+                          agrementNumber: !values.vhuAgrementBroyeur
+                            ?.agrementNumber
+                            ? "Champ requis"
+                            : undefined,
+                          department: !values.vhuAgrementBroyeur?.department
+                            ? "Champ requis"
+                            : undefined
+                        }
+                      }
+                    : {}),
+                  ...(isVhuDemolisseur_
+                    ? {
+                        vhuAgrementDemolisseur: {
+                          agrementNumber: !values.vhuAgrementDemolisseur
+                            ?.agrementNumber
+                            ? "Champ requis"
+                            : undefined,
+                          department: !values.vhuAgrementDemolisseur?.department
+                            ? "Champ requis"
                             : undefined
                         }
                       }

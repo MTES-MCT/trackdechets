@@ -88,7 +88,7 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
     return (
       <div className="fr-mb-5v">
         <VhuAgrementForm
-          title="Agrément broyeur (optionnel)"
+          title="Agrément broyeur"
           inputProps={inputProps?.vhuAgrementBroyeur}
           inputErrors={inputErrors?.vhuAgrementBroyeur}
         />
@@ -97,7 +97,7 @@ const CertificationForm: React.FC<CertificationFormProps> = ({
   } else if (companyType === WasteVehiclesType.Demolisseur) {
     return (
       <VhuAgrementForm
-        title="Agrément démolisseur / casse automobile (optionnel)"
+        title="Agrément démolisseur / casse automobile"
         inputProps={inputProps?.vhuAgrementDemolisseur}
         inputErrors={inputErrors?.vhuAgrementDemolisseur}
       />
