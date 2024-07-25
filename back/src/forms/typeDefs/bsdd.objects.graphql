@@ -103,10 +103,10 @@ type Form {
   "Quantité réelle présentée en tonnes (case 10)"
   quantityReceived: Float
 
-  "Quantité acceptée"
+  "Quantité acceptée nette"
   quantityAccepted: Float
 
-  "Quantité refusée"
+  "Quantité refusée nette"
   quantityRefused: Float
 
   "Traitement réalisé (code D/R)"
@@ -219,10 +219,10 @@ type InitialForm {
   """
   quantityReceived: Float
 
-  "Quantité acceptée"
+  "Quantité acceptée nette"
   quantityAccepted: Float
 
-  "Quantité refusée"
+  "Quantité refusée nette"
   quantityRefused: Float
 
   """
@@ -336,9 +336,9 @@ type TemporaryStorer {
   quantityType: QuantityType
   "Quantité reçue en tonnes"
   quantityReceived: Float
-  "Quantité refusée en tonnes"
+  "Quantité refusée nette en tonnes"
   quantityRefused: Float
-  "Quantité acceptée en tonnes"
+  "Quantité acceptée nette en tonnes"
   quantityAccepted: Float
   wasteAcceptationStatus: WasteAcceptationStatus
   wasteRefusalReason: String

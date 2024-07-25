@@ -1,7 +1,8 @@
 import Decimal from "decimal.js";
+import { isDefined } from "../common/helpers";
 
 export const displayWasteQuantity = (quantity, units = "tonne(s)") => {
-  if (quantity !== null && quantity !== undefined) {
+  if (isDefined(quantity)) {
     return `${new Decimal(quantity).toDecimalPlaces(6).toNumber()} ${units}`;
   }
 

@@ -105,7 +105,7 @@ input AcceptedFormInput {
   quantityReceived: Float!
 
   """
-  Quantité refusée (optionnelle)
+  Quantité refusée nette (optionnelle)
 
   Si définie:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
@@ -143,7 +143,7 @@ input ReceivedFormInput {
   quantityReceived: Float
 
   """
-  Quantité refusée (optionnelle)
+  Quantité refusée nette (optionnelle)
 
   Si définie:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
@@ -729,7 +729,7 @@ input TempStorerAcceptedFormInput {
   quantityReceived: Float!
 
   """
-  Quantité refusée (optionnelle)
+  Quantité refusée nette (optionnelle)
 
   Si définie:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
@@ -769,7 +769,7 @@ input TempStoredFormInput {
   quantityReceived: Float!
 
   """
-  Quantité refusée (optionnelle)
+  Quantité refusée nette (optionnelle)
 
   Si définie:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
@@ -934,7 +934,7 @@ input FormRevisionRequestContentInput {
   "Quantité reçue sur l'installation de destination, en tonnes"
   quantityReceived: Float
 
-  "Quantité refusée, en tonnes"
+  "Quantité refusée nette, en tonnes"
   quantityRefused: Float
 
   "Traitement réalisé (code D/R)"

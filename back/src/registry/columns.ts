@@ -12,6 +12,7 @@ import { formatStatusLabel } from "@td/constants";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { TransportMode } from "@prisma/client";
+import { isDefined } from "../common/helpers";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)
@@ -46,7 +47,8 @@ const formatBoolean = (b: boolean | null) => {
   }
   return b ? "O" : "N";
 };
-const formatNumber = (n: number) => (!!n ? parseFloat(n.toFixed(3)) : null); // return as a number to allow xls cells formulas
+const formatNumber = (n: number) =>
+  isDefined(n) ? parseFloat(n.toFixed(3)) : null; // return as a number to allow xls cells formulas
 const formatArray = (arr: any[], sep = ",") =>
   Array.isArray(arr) ? arr.join(sep) : "";
 const formatArrayWithMissingElements = (arr: any[]) => {
@@ -335,12 +337,12 @@ export const columns: Column[] = [
   },
   {
     field: "destinationReceptionRefusedWeight",
-    label: "Quantité refusée (tonnes)",
+    label: "Quantité refusée nette (tonnes)",
     format: formatNumber
   },
   {
     field: "destinationReceptionAcceptedWeight",
-    label: "Quantité acceptée / traitée (tonnes)",
+    label: "Quantité acceptée / traitée nette (tonnes)",
     format: formatNumber
   },
   {

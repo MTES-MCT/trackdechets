@@ -120,7 +120,7 @@ export async function renderFormRefusedEmail(
               ),
               transporterReceipt: forwardedInTransporter?.transporterReceipt,
               sentBy: forwardedIn.sentBy,
-              quantityReceived: forwardedIn.quantityReceived
+              quantityReceived: forwardedIn.quantityReceived?.toDecimalPlaces(6)
             }
           : {
               signedAt: form.signedAt,
@@ -133,7 +133,7 @@ export async function renderFormRefusedEmail(
               transporterCompanySiret: getTransporterCompanyOrgId(transporter),
               transporterReceipt: transporter?.transporterReceipt,
               sentBy: form.sentBy,
-              quantityReceived: form.quantityReceived
+              quantityReceived: form.quantityReceived?.toDecimalPlaces(6)
             })
       }
     },

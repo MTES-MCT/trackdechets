@@ -296,6 +296,33 @@ describe("toIncomingWaste", () => {
     expect(wasteRegistry.destinationReceptionRefusedWeight).toBe(8.6);
   });
 
+  it("should contain acceptedWeight = 0 in case of refusal", async () => {
+    // Given
+    const user = await userFactory();
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        wasteDetailsQuantity: 10.5,
+        wasteAcceptationStatus: "REFUSED",
+        quantityReceived: 11.7,
+        quantityRefused: 11.7
+      }
+    });
+
+    // When
+    const formForRegistry = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id },
+      include: RegistryFormInclude
+    });
+    const wasteRegistry = toIncomingWaste(formToBsdd(formForRegistry));
+
+    // Then
+    expect(wasteRegistry.weight).toBe(10.5);
+    expect(wasteRegistry.destinationReceptionWeight).toBe(11.7);
+    expect(wasteRegistry.destinationReceptionAcceptedWeight).toBe(0);
+    expect(wasteRegistry.destinationReceptionRefusedWeight).toBe(11.7);
+  });
+
   it("should contain nextDestination operation code & notification number", async () => {
     // Given
     const user = await userFactory();

@@ -54,12 +54,12 @@ describe("renderBsdaRefusedEmail", () => {
     <li>Numéro du BSD: ${bsda.id}</li>
     <li>Appellation du déchet : ${bsda.wasteMaterialName}</li>
     <li>Code déchet : ${bsda.wasteCode}</li>
-    <li>Quantité réelle présentée nette: ${bsda.destinationReceptionWeight
+    <li>Quantité réelle présentée nette : ${bsda.destinationReceptionWeight
       ?.dividedBy(1000)
       .toDecimalPlaces(6)
       .toNumber()} tonnes</li>
-    <li>Quantité refusée: Non renseignée</li>
-    <li>Quantité acceptée: Non renseignée</li>
+    <li>Quantité refusée nette : Non renseignée</li>
+    <li>Quantité acceptée nette : Non renseignée</li>
     <li>
       Motif de refus :
       <span>${bsda.destinationReceptionRefusalReason}</span>`);
@@ -164,12 +164,12 @@ describe("renderBsdaRefusedEmail", () => {
     <li>Numéro du BSD : ${bsda.id}</li>
     <li>Appellation du déchet : ${bsda.wasteMaterialName}</li>
     <li>Code déchet : ${bsda.wasteCode}</li>
-    <li>Quantité réelle présentée nette: ${bsda.destinationReceptionWeight
+    <li>Quantité réelle présentée nette : ${bsda.destinationReceptionWeight
       ?.dividedBy(1000)
       .toDecimalPlaces(6)
       .toNumber()} tonnes</li>
-    <li>Quantité refusée: Non renseignée</li>
-    <li>Quantité acceptée: Non renseignée</li>
+    <li>Quantité refusée nette : Non renseignée</li>
+    <li>Quantité acceptée nette : Non renseignée</li>
     <li>
       Motif de refus :
       <span>${bsda.destinationReceptionRefusalReason}</span>`);

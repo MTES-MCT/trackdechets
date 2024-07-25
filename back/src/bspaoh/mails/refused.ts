@@ -13,7 +13,11 @@ import { buildPdfAsBase64 } from "../pdf/generator";
 
 const getValueDividedBy1000 = (quantity: number | null) => {
   if (quantity !== null) {
-    return new Decimal(quantity).dividedBy(1000).toNumber().toString(); // mustache doesn't differenciate 0 and null, so return a string
+    return new Decimal(quantity)
+      .dividedBy(1000)
+      .toDecimalPlaces(6)
+      .toNumber()
+      .toString(); // mustache doesn't differenciate 0 and null, so return a string
   }
 
   return null;

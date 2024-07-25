@@ -168,6 +168,23 @@ describe("formatRow", () => {
       Object.keys(waste).length + CUSTOM_WASTE_COLUMNS.length
     );
   });
+
+  it("should contain received, refused & accepted quantities", () => {
+    const waste: AllWaste = {
+      destinationReceptionWeight: 11.7,
+      destinationReceptionRefusedWeight: 11.7,
+      destinationReceptionAcceptedWeight: 0
+    };
+
+    const formattedWithLabels = formatRow(waste, true);
+    expect(formattedWithLabels).toEqual(
+      expect.objectContaining({
+        "Quantité réceptionnée nette (tonnes)": 11.7,
+        "Quantité refusée nette (tonnes)": 11.7,
+        "Quantité acceptée / traitée nette (tonnes)": 0
+      })
+    );
+  });
 });
 
 describe("formatSubType", () => {

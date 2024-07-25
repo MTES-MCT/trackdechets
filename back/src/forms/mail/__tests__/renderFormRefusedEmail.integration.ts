@@ -59,9 +59,9 @@ describe("renderFormRefusedEmail", () => {
     <li>Numéro du BSD: ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
-    <li>Quantité réelle présentée nette: ${form.quantityReceived} tonnes</li>
-    <li>Quantité refusée: Non renseignée</li>
-    <li>Quantité acceptée: Non renseignée</li>
+    <li>Quantité réelle présentée nette : ${form.quantityReceived} tonnes</li>
+    <li>Quantité refusée nette : Non renseignée</li>
+    <li>Quantité acceptée nette : Non renseignée</li>
     <li>
       Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
@@ -143,9 +143,9 @@ describe("renderFormRefusedEmail", () => {
     <li>Numéro du BSD : ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
-    <li>Quantité réelle présentée nette: ${form.quantityReceived} tonnes</li>
-    <li>Quantité refusée: Non renseignée</li>
-    <li>Quantité acceptée: Non renseignée</li>
+    <li>Quantité réelle présentée nette : ${form.quantityReceived} tonnes</li>
+    <li>Quantité refusée nette : Non renseignée</li>
+    <li>Quantité acceptée nette : Non renseignée</li>
     <li>
       Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
@@ -196,12 +196,51 @@ describe("renderFormRefusedEmail", () => {
     <li>Numéro du BSD : ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
-    <li>Quantité réelle présentée nette: 7.5 tonnes</li>
-    <li>Quantité refusée: 7.5 tonnes</li>
-    <li>Quantité acceptée: 0 tonnes</li>
+    <li>Quantité réelle présentée nette : 7.5 tonnes</li>
+    <li>Quantité refusée nette : 7.5 tonnes</li>
+    <li>Quantité acceptée nette : 0 tonnes</li>
     <li>
       Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
+  });
+
+  test("when the form is partially refused by the recipient (with quantityRefused) > testing decimals", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        emitterCompanyAddress: emitter.company.address,
+        recipientCompanySiret: destination.company.siret,
+        recipientCompanyName: destination.company.name,
+        recipientCompanyAddress: destination.company.address,
+        sentAt: new Date("2022-01-01"),
+        signedAt: new Date("2022-01-02"),
+        status: Status.ACCEPTED,
+        wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+        quantityReceived: 8.7,
+        quantityRefused: 4.5,
+        wasteRefusalReason: "Parce que !!"
+      }
+    });
+
+    // When
+    const email = await renderFormRefusedEmail(form);
+
+    // Then
+    expect(email!.body).toContain(
+      `<li>Quantité réelle présentée nette : 8.7 tonnes</li>`
+    );
+    expect(email!.body).toContain(
+      `<li>Quantité refusée nette : 4.5 tonnes</li>`
+    );
+    expect(email!.body).toContain(
+      `<li>Quantité acceptée nette : 4.2 tonnes</li>`
+    );
   });
 
   test("when the form is refused by the temp storer", async () => {
@@ -256,9 +295,9 @@ describe("renderFormRefusedEmail", () => {
     <li>Numéro du BSD: ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
-    <li>Quantité réelle présentée nette: ${form.quantityReceived} tonnes</li>
-    <li>Quantité refusée: Non renseignée</li>
-    <li>Quantité acceptée: Non renseignée</li>
+    <li>Quantité réelle présentée nette : ${form.quantityReceived} tonnes</li>
+    <li>Quantité refusée nette : Non renseignée</li>
+    <li>Quantité acceptée nette : Non renseignée</li>
     <li>
       Motif de refus :
       <span>${form.wasteRefusalReason}</span>`);
@@ -325,11 +364,11 @@ describe("renderFormRefusedEmail", () => {
     <li>Numéro du BSD: ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
-    <li>Quantité réelle présentée nette: ${
+    <li>Quantité réelle présentée nette : ${
       forwardedIn?.quantityReceived
     } tonnes</li>
-    <li>Quantité refusée: Non renseignée</li>
-    <li>Quantité acceptée: Non renseignée</li>
+    <li>Quantité refusée nette : Non renseignée</li>
+    <li>Quantité acceptée nette : Non renseignée</li>
     <li>
       Motif de refus :
       <span>${forwardedIn!.wasteRefusalReason}</span>`);

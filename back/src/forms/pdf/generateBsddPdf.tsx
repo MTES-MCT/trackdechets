@@ -136,10 +136,10 @@ function AcceptationFields({
       />{" "}
       partiellement
       <br />
-      Quantité refusée :{" "}
+      Quantité refusée nette :{" "}
       {displayWasteQuantity(wasteQuantities?.quantityRefused)}
       <br />
-      Quantité acceptée :{" "}
+      Quantité acceptée nette :{" "}
       {displayWasteQuantity(wasteQuantities?.quantityAccepted)}
       <br />
       Motif de refus (même partiel) :<br />

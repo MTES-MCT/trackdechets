@@ -14,15 +14,15 @@
     <li>Numéro du BSD : {{form.readableId}}</li>
     <li>Appellation du déchet : {{form.wasteDetailsName}}</li>
     <li>Code déchet : {{form.wasteDetailsCode}}</li>
-    <li>Quantité réelle présentée nette: {{form.quantityReceived}} tonnes</li>
+    <li>Quantité réelle présentée nette : {{form.quantityReceived}} tonnes</li>
     {{#form.quantityRefused}}
-    <li>Quantité refusée: {{form.quantityRefused}} tonnes</li>
+    <li>Quantité refusée nette : {{form.quantityRefused}} tonnes</li>
     {{/form.quantityRefused}} {{^form.quantityRefused}}
-    <li>Quantité refusée: Non renseignée</li>
+    <li>Quantité refusée nette : Non renseignée</li>
     {{/form.quantityRefused}} {{#form.quantityAccepted}}
-    <li>Quantité acceptée: {{form.quantityAccepted}} tonnes</li>
+    <li>Quantité acceptée nette : {{form.quantityAccepted}} tonnes</li>
     {{/form.quantityAccepted}} {{^form.quantityAccepted}}
-    <li>Quantité acceptée: Non renseignée</li>
+    <li>Quantité acceptée nette : Non renseignée</li>
     {{/form.quantityAccepted}}
     <li>
       Motif de refus :
