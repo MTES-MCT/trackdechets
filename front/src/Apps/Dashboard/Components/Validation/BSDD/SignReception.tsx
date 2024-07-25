@@ -399,7 +399,7 @@ function SignReceptionModal({
                 }
                 nativeInputProps={{
                   inputMode: "decimal",
-                  step: "0.1",
+                  step: "0.000001",
                   type: "number",
                   ...register("receivedWeight")
                 }}
@@ -463,7 +463,7 @@ function SignReceptionModal({
                 }
                 nativeInputProps={{
                   inputMode: "decimal",
-                  step: "0.1",
+                  step: "0.000001",
                   type: "number",
                   ...register("refusedWeight")
                 }}
@@ -488,7 +488,7 @@ function SignReceptionModal({
                 nativeInputProps={{
                   value: acceptedWeight,
                   inputMode: "decimal",
-                  step: "0.1",
+                  step: "0.000001",
                   type: "number",
                   ...register("acceptedWeight")
                 }}
