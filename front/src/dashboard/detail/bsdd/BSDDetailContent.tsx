@@ -78,11 +78,7 @@ import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import { isDefined } from "../../../common/helper";
-import TdTooltip from "../../../common/components/Tooltip";
-import {
-  BSD_DETAILS_QTY_TOOLTIP,
-  NON_RENSEIGNE
-} from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
+import { BSD_DETAILS_QTY_TOOLTIP } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
 
 type CompanyProps = {
   company?: FormCompany | null;
