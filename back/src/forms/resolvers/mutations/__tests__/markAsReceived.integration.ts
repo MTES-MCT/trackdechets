@@ -27,6 +27,7 @@ import { getFirstTransporter } from "../../../database";
 jest.mock("../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
+// No PDFs
 jest.mock("../../../pdf/generateBsddPdf");
 (generateBsddPdfToBase64 as jest.Mock).mockResolvedValue("");
 
@@ -42,6 +43,17 @@ const MARK_AS_RECEIVED = `
 describe("Test Form reception", () => {
   afterEach(async () => {
     await resetDatabase();
+    jest.resetAllMocks();
+  });
+
+  beforeEach(() => {
+    // No mails
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // No PDFs
+    jest.mock("../../../pdf/generateBsddPdf");
+    (generateBsddPdfToBase64 as jest.Mock).mockResolvedValue("");
   });
 
   it("should mark a sent form as received", async () => {
