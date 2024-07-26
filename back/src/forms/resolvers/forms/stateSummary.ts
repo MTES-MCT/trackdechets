@@ -1,4 +1,4 @@
-import { Status } from "@prisma/client";
+import { QuantityType, Status } from "@prisma/client";
 import {
   Form,
   FormResolvers,
@@ -59,9 +59,12 @@ export function getStateSummary(form: Form) {
     (form.status === Status.RESEALED ||
       !!form.temporaryStorageDetail?.emittedAt);
 
+  // Quantity & quantity type
   let quantity: number | undefined | null;
+  let quantityType: QuantityType | undefined | null = QuantityType.REAL;
   if (isDefined(form.quantityReceived)) {
     quantity = form.quantityAccepted ?? form.quantityReceived;
+    quantityType = form.quantityReceivedType ?? QuantityType.REAL;
   } else {
     if (
       [Status.TEMP_STORED, Status.TEMP_STORER_ACCEPTED].includes(
@@ -71,10 +74,17 @@ export function getStateSummary(form: Form) {
       quantity =
         form.temporaryStorageDetail?.temporaryStorer?.quantityAccepted ??
         form.temporaryStorageDetail?.temporaryStorer?.quantityReceived;
+      quantityType =
+        form.temporaryStorageDetail?.temporaryStorer?.quantityType ??
+        QuantityType.REAL;
     } else if (isResealed) {
       quantity = form.temporaryStorageDetail?.wasteDetails?.quantity;
+      quantityType =
+        form.temporaryStorageDetail?.wasteDetails?.quantityType ??
+        QuantityType.REAL;
     } else {
       quantity = form.wasteDetails?.quantity;
+      quantityType = form.wasteDetails?.quantityType ?? QuantityType.REAL;
     }
   }
 
@@ -109,6 +119,7 @@ export function getStateSummary(form: Form) {
 
   return {
     quantity,
+    quantityType,
     packagingInfos,
     packagings: packagingInfos.map(pi => pi.type),
     onuCode,
