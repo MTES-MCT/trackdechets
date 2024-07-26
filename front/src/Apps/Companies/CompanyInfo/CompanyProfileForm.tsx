@@ -17,6 +17,7 @@ import {
   MutationUpdateBrokerReceiptArgs,
   MutationUpdateCompanyArgs,
   MutationUpdateTraderReceiptArgs,
+  MutationUpdateTransporterReceiptArgs,
   MutationUpdateVhuAgrementArgs,
   MutationUpdateWorkerCertificationArgs,
   UserRole,
@@ -48,7 +49,6 @@ import CompanyProfileInformation from "./CompanyProfileInformation";
 import RhfCompanyTypeForm, {
   RhfCompanyTypeFormField
 } from "../common/Components/CompanyTypeForm/RhfCompanyTypeForm";
-import { MutationUpdateTransporterReceiptArgs } from "back/src/generated/graphql/types";
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
