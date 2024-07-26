@@ -138,6 +138,14 @@ const RhfCompanyTypeForm: React.FC<RhfCompanyTypeFormProps> = ({
         );
       }
     }
+
+    if (value === CompanyType.EcoOrganisme) {
+      if (checked) {
+        setValue("ecoOrganismeAgreements", [""]);
+      } else {
+        setValue("ecoOrganismeAgreements", []);
+      }
+    }
   };
 
   const { errors } = formState;
@@ -352,9 +360,13 @@ const RhfCompanyTypeForm: React.FC<RhfCompanyTypeFormProps> = ({
             errors.workerCertification?.certificationNumber?.message,
           validityLimit: errors.workerCertification?.validityLimit?.message,
           organisation: errors.workerCertification?.organisation?.message
-        }
-        // FIXME handle ecoOrganismeAgreements errors
-        //ecoOrganismeAgreements: errors?.ecoOrganismeAgreements
+        },
+        ecoOrganismeAgreements: ecoOrganismeAgreements.map((_, i) => {
+          if (!!errors.ecoOrganismeAgreements) {
+            return errors.ecoOrganismeAgreements[i]?.message ?? null;
+          }
+          return null;
+        })
       }}
     />
   );
