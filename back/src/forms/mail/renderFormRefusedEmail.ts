@@ -79,7 +79,6 @@ export async function renderFormRefusedEmail(
   ].map(admin => ({ email: admin.email, name: admin.name ?? "" }));
 
   // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value
-  console.log("wasteAcceptationStatus", wasteAcceptationStatus);
   const mailTemplate = {
     REFUSED: formNotAccepted,
     PARTIALLY_REFUSED: formPartiallyRefused
