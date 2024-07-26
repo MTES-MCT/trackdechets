@@ -35,6 +35,7 @@ describe("expandFormFromDb", () => {
       readableId: form.readableId,
       customId: null,
       isImportedFromPaper: false,
+      metadata: undefined,
       emitter: {
         type: form.emitterType,
         workSite: null,
@@ -151,6 +152,9 @@ describe("expandFormFromDb", () => {
       receivedAt: null,
       signedAt: null,
       quantityReceived: undefined,
+      quantityRefused: undefined,
+      quantityReceivedType: null,
+      quantityAccepted: undefined,
       processingOperationDone: null,
       quantityGrouped: 0,
       processingOperationDescription: null,
