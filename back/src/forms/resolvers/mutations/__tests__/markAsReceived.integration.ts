@@ -1139,4 +1139,159 @@ describe("Test Form reception", () => {
     expect(frm.quantityReceived?.toNumber()).toEqual(12.5);
     expect(frm.quantityRefused?.toNumber()).toEqual(7.5);
   });
+
+  it("when final destination refuses a BSD, a mail should be sent", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const tempStorer = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: tempStorer.company.siret,
+        status: "RESENT",
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 2
+      },
+      forwardedInOpts: {
+        sentAt: new Date(),
+        emitterCompanySiret: tempStorer.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date()
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsReceived">,
+      MutationMarkAsReceivedArgs
+    >(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedAt: new Date("2022-01-01").toISOString() as any,
+          receivedBy: "John",
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Bof",
+          quantityReceived: 8,
+          quantityRefused: 8
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject:
+          "Le déchet de l’entreprise WASTE PRODUCER a été totalement refusé à réception"
+      })
+    );
+  });
+
+  it("when final destination partially refuses a BSD, a mail should be sent", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const tempStorer = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: tempStorer.company.siret,
+        status: "RESENT",
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 2
+      },
+      forwardedInOpts: {
+        sentAt: new Date(),
+        emitterCompanySiret: tempStorer.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date()
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsReceived">,
+      MutationMarkAsReceivedArgs
+    >(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedAt: new Date("2022-01-01").toISOString() as any,
+          receivedBy: "John",
+          wasteAcceptationStatus: "PARTIALLY_REFUSED",
+          wasteRefusalReason: "Bof",
+          quantityReceived: 8,
+          quantityRefused: 6
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject:
+          "Le déchet de l’entreprise WASTE PRODUCER a été partiellement refusé à réception"
+      })
+    );
+  });
+
+  // Bug was "Cannot destructure property 'prepareVariables' of 'mailTemplate' as it is undefined."
+  // Use-case:
+  // - Create a tmp storage BSD
+  // - Temp storer partially accepts the waste
+  // - Final destination tries to receive the waste (no acceptation, just receive)
+  // - markAsReceived detects that waste was partially refused (by tmp storer) and tries to send a mail,
+  //   but wasteAcceptationStatus does not exist yet for the final destination. Cannot find the mail template
+  //   and crashes
+  it("when final destination receives a BSD (without acceptation), no mail should be sent even if temp storage partially refused the BSD", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const tempStorer = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: tempStorer.company.siret,
+        status: "RESENT",
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 2
+      },
+      forwardedInOpts: {
+        sentAt: new Date(),
+        emitterCompanySiret: tempStorer.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date()
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsReceived">,
+      MutationMarkAsReceivedArgs
+    >(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedAt: new Date("2022-01-01").toISOString() as any,
+          receivedBy: "John"
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+  });
 });
