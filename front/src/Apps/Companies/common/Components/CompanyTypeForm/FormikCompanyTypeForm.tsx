@@ -110,6 +110,14 @@ const FormikCompanyTypeForm: React.FC<FormikCompanyTypeFormProps> = ({
         );
       }
     }
+
+    if (value === CompanyType.EcoOrganisme) {
+      if (checked) {
+        setFieldValue("ecoOrganismeAgreements", [""]);
+      } else {
+        setFieldValue("ecoOrganismeAgreements", []);
+      }
+    }
   };
 
   const allCompanyTypes = [
@@ -223,7 +231,8 @@ const FormikCompanyTypeForm: React.FC<FormikCompanyTypeFormProps> = ({
           validityLimit: (errors.workerCertification as any)?.validityLimit,
           organisation: (errors.workerCertification as any)?.organisation
         },
-        ecoOrganismeAgreements: errors?.ecoOrganismeAgreements as string
+        ecoOrganismeAgreements: (errors?.ecoOrganismeAgreements ??
+          []) as string[]
       }}
     />
   );

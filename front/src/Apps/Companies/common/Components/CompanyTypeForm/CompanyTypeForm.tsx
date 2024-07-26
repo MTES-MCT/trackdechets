@@ -86,7 +86,7 @@ export type CompanyTypeInputErrors = {
     validityLimit?: string;
     organisation?: string;
   };
-  ecoOrganismeAgreements?: string;
+  ecoOrganismeAgreements?: (string | null)[];
 };
 
 type CompanyTypeFormProps = {

@@ -6,7 +6,6 @@ import {
 } from "./CompanyTypeForm";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type EcoOrganismeAgrementForm = {
   inputValues: Pick<CompanyTypeInputValues, "ecoOrganismeAgreements">;
@@ -28,12 +27,6 @@ const EcoOrganismeAgrementsForm: React.FC<EcoOrganismeAgrementForm> = ({
       <div className="fr-grid-row">
         <div className="fr-col-12">
           <p className="fr-text--bold">Agréments éco-organisme</p>
-          {inputErrors?.ecoOrganismeAgreements && (
-            <Alert
-              title={inputErrors?.ecoOrganismeAgreements}
-              severity="error"
-            ></Alert>
-          )}
         </div>
       </div>
 
@@ -50,11 +43,18 @@ const EcoOrganismeAgrementsForm: React.FC<EcoOrganismeAgrementForm> = ({
                 placeholder: "https://",
                 ...(value && value(index))
               }}
-            ></Input>
+              state={
+                inputErrors?.ecoOrganismeAgreements?.[index]
+                  ? "error"
+                  : "default"
+              }
+              stateRelatedMessage={inputErrors?.ecoOrganismeAgreements?.[index]}
+            />
           </div>
           <div className="fr-col-3">
             <Button
               iconId="ri-delete-bin-line"
+              disabled={index === 0}
               onClick={() => {
                 if (remove) {
                   remove(index);

@@ -463,6 +463,10 @@ export default function AccountCompanyAdd() {
                     !values.workerCertification?.validityLimit ||
                     !values?.workerCertification?.organisation);
 
+                const missingEcoOrganismeAgreeemnts =
+                  isEcoOrganisme(values.companyTypes) &&
+                  (values.ecoOrganismeAgreements ?? []).some(a => !a);
+
                 return {
                   ...(!values.companyName && {
                     companyName: "Champ obligatoire"
@@ -565,10 +569,11 @@ export default function AccountCompanyAdd() {
                         }
                       }
                     : {}),
-                  ...(isEcoOrganisme(values.companyTypes) &&
-                    values.ecoOrganismeAgreements.length < 1 && {
-                      ecoOrganismeAgreements: "Champ obligatoire"
-                    }),
+                  ...(missingEcoOrganismeAgreeemnts && {
+                    ecoOrganismeAgreements: (
+                      values.ecoOrganismeAgreements ?? []
+                    ).map(a => (!a ? "Champ requis" : null))
+                  }),
                   ...(missingCertification
                     ? {
                         workerCertification: {
