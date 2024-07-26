@@ -277,7 +277,7 @@ export default function Appendix2MultiSelect() {
                             className="td-input td-input--small"
                             type="number"
                             min={0}
-                            step={0.0001} // increment kg
+                            step={0.000001} // increment kg
                             disabled={
                               !appendix2Selected
                                 .map(({ form: f }) => f.id)
