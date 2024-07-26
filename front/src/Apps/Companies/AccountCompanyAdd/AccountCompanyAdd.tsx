@@ -6,7 +6,6 @@ import routes from "../../routes";
 import { NotificationError } from "../../common/Components/Error/Error";
 import RedErrorMessage from "../../../common/components/RedErrorMessage";
 import AccountCompanyAddSiret from "./companyAdd/AccountCompanyAddSiret";
-// import AccountCompanyAddEcoOrganisme from "./companyAdd/AccountCompanyAddEcoOrganisme";
 import styles from "./AccountCompanyAdd.module.scss";
 
 import {
