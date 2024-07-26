@@ -77,12 +77,11 @@ const getConsistenceLabel = (consistence: Maybe<Consistence> | undefined) => {
 const getWasteQuantityAndIsEstimated = (
   form
 ): { quantity: number; isEstimated: boolean } => {
-  if (isDefined(form.quantityAccepted)) {
-    return { quantity: form.accepted, isEstimated: false };
-  }
-
-  if (isDefined(form.quantityReceived)) {
-    return { quantity: form.quantityReceived, isEstimated: false };
+  if (isDefined(form.stateSummary?.quantity)) {
+    return {
+      quantity: form.stateSummary.quantity,
+      isEstimated: form.stateSummary.quantityType === QuantityType.Estimated
+    };
   }
 
   return {
