@@ -743,6 +743,9 @@ export function expandFormFromDb(
       forwardedIn ? forwardedIn.receivedAt : form.receivedAt
     ),
     signedAt: processDate(forwardedIn ? forwardedIn.signedAt : form.signedAt),
+    quantityReceivedType: forwardedIn
+      ? forwardedIn.quantityReceivedType
+      : form.quantityReceivedType,
     quantityReceived: forwardedIn
       ? processDecimal(forwardedIn.quantityReceived)?.toNumber()
       : processDecimal(form.quantityReceived)?.toNumber(),
