@@ -20,7 +20,7 @@ import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
 
-const isWasteRefused = form => {
+export const isWasteRefused = form => {
   // Final destination
   if (form.forwardedIn && !!form.forwardedIn.sentAt) {
     return (
