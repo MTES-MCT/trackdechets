@@ -90,7 +90,9 @@ export async function renderFormRefusedEmail(
     forwardedInTransporter = await getFirstTransporter(forwardedIn);
   }
 
-  const wasteQuantities = bsddWasteQuantities(form);
+  const wasteQuantities = isFinalDestinationRefusal
+    ? bsddWasteQuantities(forwardedIn)
+    : bsddWasteQuantities(form);
 
   return renderMail(mailTemplate, {
     to,

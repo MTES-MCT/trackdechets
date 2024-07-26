@@ -373,4 +373,108 @@ describe("renderFormRefusedEmail", () => {
       Motif de refus :
       <span>${forwardedIn!.wasteRefusalReason}</span>`);
   });
+
+  test("when the form is partially refused by temp storer", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        emitterCompanyAddress: emitter.company.address,
+        recipientCompanySiret: ttr.company.siret,
+        recipientCompanyName: ttr.company.name,
+        recipientCompanyAddress: ttr.company.address,
+        sentAt: new Date("2022-01-01"),
+        signedAt: new Date("2022-01-02"),
+        status: Status.ACCEPTED,
+        wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+        wasteRefusalReason: "Parce que !!",
+        quantityReceived: 9.8,
+        quantityRefused: 2.3
+      },
+      forwardedInOpts: {
+        sentAt: null,
+        emitterCompanySiret: ttr.company.siret,
+        emitterCompanyName: ttr.company.name,
+        emitterCompanyAddress: ttr.company.address,
+        recipientCompanySiret: destination.company.siret,
+        recipientCompanyName: destination.company.name,
+        recipientCompanyAddress: destination.company.address
+      }
+    });
+
+    // When
+    const email = await renderFormRefusedEmail(form);
+
+    // Then
+    expect(email!.body).toContain(
+      "<li>Quantité réelle présentée nette : 9.8 tonnes</li>"
+    );
+    expect(email!.body).toContain(
+      "<li>Quantité refusée nette : 2.3 tonnes</li>"
+    );
+    expect(email!.body).toContain(
+      "<li>Quantité acceptée nette : 7.5 tonnes</li>"
+    );
+  });
+
+  test("when the form is partially refused by the final destination after temp storage also partially refused", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        emitterCompanyAddress: emitter.company.address,
+        recipientCompanySiret: ttr.company.siret,
+        recipientCompanyName: ttr.company.name,
+        recipientCompanyAddress: ttr.company.address,
+        sentAt: new Date("2022-01-01"),
+        signedAt: new Date("2022-01-02"),
+        status: Status.ACCEPTED,
+        wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+        wasteRefusalReason: "Bof",
+        quantityReceived: 10,
+        quantityRefused: 2
+      },
+      forwardedInOpts: {
+        emitterCompanySiret: ttr.company.siret,
+        emitterCompanyName: ttr.company.name,
+        emitterCompanyAddress: ttr.company.address,
+        recipientCompanySiret: destination.company.siret,
+        recipientCompanyName: destination.company.name,
+        recipientCompanyAddress: destination.company.address,
+        sentAt: new Date("2022-01-01"),
+        signedAt: new Date("2022-01-02"),
+        status: Status.ACCEPTED,
+        wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+        wasteRefusalReason: "Bof",
+        quantityReceived: 7.5,
+        quantityRefused: 1.3
+      }
+    });
+
+    // When
+    const email = await renderFormRefusedEmail(form);
+
+    // Then
+    expect(email!.body).toContain(
+      "<li>Quantité réelle présentée nette : 7.5 tonnes</li>"
+    );
+    expect(email!.body).toContain(
+      "<li>Quantité refusée nette : 1.3 tonnes</li>"
+    );
+    expect(email!.body).toContain(
+      "<li>Quantité acceptée nette : 6.2 tonnes</li>"
+    );
+  });
 });
