@@ -20,6 +20,28 @@ import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
 
+const isWasteRefused = form => {
+  // Final destination
+  if (form.forwardedIn && !!form.forwardedIn.sentAt) {
+    return (
+      form.forwardedIn.wasteAcceptationStatus &&
+      (form.forwardedIn.wasteAcceptationStatus ===
+        WasteAcceptationStatus.REFUSED ||
+        form.forwardedIn.wasteAcceptationStatus ===
+          WasteAcceptationStatus.PARTIALLY_REFUSED)
+    );
+  }
+  // Temp storer
+  else {
+    return (
+      form.wasteAcceptationStatus &&
+      (form.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED ||
+        form.wasteAcceptationStatus ===
+          WasteAcceptationStatus.PARTIALLY_REFUSED)
+    );
+  }
+};
+
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
   args,
@@ -120,11 +142,9 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     return receivedForm;
   });
 
-  if (
-    receivedForm.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED ||
-    receivedForm.wasteAcceptationStatus ===
-      WasteAcceptationStatus.PARTIALLY_REFUSED
-  ) {
+  // If the waste has been refused by the temp storer or the final destination,
+  // send an email
+  if (isWasteRefused(receivedForm)) {
     const refusedEmail = await renderFormRefusedEmail(receivedForm);
     if (refusedEmail) {
       sendMail(refusedEmail);

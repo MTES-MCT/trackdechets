@@ -193,7 +193,7 @@ function SignReceptionModal({
     } = data;
 
     if (isReception) {
-      isTempStorage
+      isTempStorage && !isFinalDestination
         ? await markAsTempStored({
             variables: {
               id: form.id,
@@ -222,7 +222,7 @@ function SignReceptionModal({
     if (
       ["ACCEPTED", "REFUSED", "PARTIALLY_REFUSED"].includes(acceptationStatus)
     ) {
-      isTempStorage
+      isTempStorage && !isFinalDestination
         ? await markAsTempStorerAccepted({
             variables: {
               id: form.id,

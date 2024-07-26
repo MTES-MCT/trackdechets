@@ -4,6 +4,7 @@ import {
   FormResolvers,
   TemporaryStorageDetail
 } from "../../../generated/graphql/types";
+import { isDefined } from "../../../common/helpers";
 
 function getLastActionOn(
   form: Form,
@@ -58,15 +59,24 @@ export function getStateSummary(form: Form) {
     (form.status === Status.RESEALED ||
       !!form.temporaryStorageDetail?.emittedAt);
 
-  const quantity =
-    form.quantityReceived ??
-    ([Status.TEMP_STORED, Status.TEMP_STORER_ACCEPTED].includes(
-      form.status as any
-    )
-      ? form.temporaryStorageDetail?.temporaryStorer?.quantityReceived
-      : isResealed
-      ? form.temporaryStorageDetail?.wasteDetails?.quantity
-      : form.wasteDetails?.quantity);
+  let quantity: number | undefined | null;
+  if (isDefined(form.quantityReceived)) {
+    quantity = form.quantityAccepted ?? form.quantityReceived;
+  } else {
+    if (
+      [Status.TEMP_STORED, Status.TEMP_STORER_ACCEPTED].includes(
+        form.status as any
+      )
+    ) {
+      quantity =
+        form.temporaryStorageDetail?.temporaryStorer?.quantityAccepted ??
+        form.temporaryStorageDetail?.temporaryStorer?.quantityReceived;
+    } else if (isResealed) {
+      quantity = form.temporaryStorageDetail?.wasteDetails?.quantity;
+    } else {
+      quantity = form.wasteDetails?.quantity;
+    }
+  }
 
   const onuCode = isResealed
     ? form.temporaryStorageDetail?.wasteDetails?.onuCode
