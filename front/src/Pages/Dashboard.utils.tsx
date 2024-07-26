@@ -164,8 +164,8 @@ export const filtersToQueryBsdsArgs = (filterValues, previousBsdsArgs) => {
   const filterKeys = Object.keys(filterValues);
   const filters = filterList.filter(filter => filterKeys.includes(filter.name));
 
-  // Group all filters
-  const wheres: BsdWhere[] = [];
+  // Group all filters in a '_and'
+  const _ands: BsdWhere[] = [];
   filters.forEach(f => {
     const predicate = filterPredicates.find(
       filterPredicate => filterPredicate.filterName === f.name
@@ -174,7 +174,7 @@ export const filtersToQueryBsdsArgs = (filterValues, previousBsdsArgs) => {
       const filterValue = filterValues[f.name];
       const where = predicate.where(filterValue);
 
-      wheres.push(where);
+      _ands.push(where);
 
       if (predicate.orderBy) {
         variables.orderBy![predicate.orderBy] = OrderType.Asc;
@@ -182,8 +182,8 @@ export const filtersToQueryBsdsArgs = (filterValues, previousBsdsArgs) => {
     }
   });
 
-  // Add the filters into an '_and', if any
-  if (wheres.length) variables.where!._and = [...wheres];
+  // Add the filters
+  if (_ands.length) variables.where!._and = [..._ands];
 
   return variables;
 };

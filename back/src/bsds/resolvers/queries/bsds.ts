@@ -5,8 +5,7 @@ import {
   Bsd,
   QueryBsdsArgs,
   BsdType,
-  OrderType,
-  BsdWhere
+  OrderType
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -35,7 +34,6 @@ import { BsffForElastic } from "../../../bsffs/elastic";
 import { BspaohForElastic } from "../../../bspaoh/elastic";
 import { QueryContainer } from "@elastic/elasticsearch/api/types";
 import { GraphQLContext } from "../../../types";
-import { isDefined } from "../../../common/helpers";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -82,38 +80,6 @@ async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
   };
 }
 
-/**
- * Will try to find where the tabs-specific filters are in the where
- * object. This is needed as when the front combines several filters it has
- * to use _and, so the tabs filter can be moved into said _and instead of
- * being top-level (because having a top-level filter and a _and on the same
- * level is not permitted)
- */
-const getTabsFilters = (where: BsdWhere | null) => {
-  if (!where) return {};
-
-  const TABS_KEYS = [
-    "isDraftFor",
-    "isForActionFor",
-    "isFollowFor",
-    "isArchivedFor",
-    "isToCollectFor",
-    "isCollectedFor",
-    "isInRevisionFor",
-    "isRevisedFor"
-  ];
-  const hasTabsFilter = obj => {
-    return (
-      isDefined(obj) &&
-      Object.keys(obj).length &&
-      Object.keys(obj).some(key => TABS_KEYS.includes(key))
-    );
-  };
-
-  if (hasTabsFilter(where)) return where;
-  else if (where?._and) return where?._and.find(hasTabsFilter) ?? null;
-};
-
 async function buildQuery(
   { clue, where = {} }: QueryBsdsArgs,
   user: Express.User
@@ -129,19 +95,17 @@ async function buildQuery(
     }
   };
 
-  const tabsFilters = getTabsFilters(where);
-
   const tabsQuery: Array<QueryContainer> = [];
 
   Object.entries({
-    isDraftFor: tabsFilters?.isDraftFor,
-    isForActionFor: tabsFilters?.isForActionFor,
-    isFollowFor: tabsFilters?.isFollowFor,
-    isArchivedFor: tabsFilters?.isArchivedFor,
-    isToCollectFor: tabsFilters?.isToCollectFor,
-    isCollectedFor: tabsFilters?.isCollectedFor,
-    isInRevisionFor: tabsFilters?.isInRevisionFor,
-    isRevisedFor: tabsFilters?.isRevisedFor
+    isDraftFor: where?.isDraftFor,
+    isForActionFor: where?.isForActionFor,
+    isFollowFor: where?.isFollowFor,
+    isArchivedFor: where?.isArchivedFor,
+    isToCollectFor: where?.isToCollectFor,
+    isCollectedFor: where?.isCollectedFor,
+    isInRevisionFor: where?.isInRevisionFor,
+    isRevisedFor: where?.isRevisedFor
   })
     .filter(([_, value]) => value != null)
     .forEach(([key, value]) => {

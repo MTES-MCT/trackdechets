@@ -190,7 +190,7 @@ export function toElasticSimpleQuery(where: BsdWhere) {
   };
 }
 
-const MAX_DEPTH = 4;
+const MAX_DEPTH = 3;
 export function toElasticQuery(where: BsdWhere): estypes.QueryContainer {
   function inner(where: BsdWhere, depth = 0) {
     if (depth > MAX_DEPTH) {

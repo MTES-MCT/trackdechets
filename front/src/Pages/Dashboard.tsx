@@ -125,7 +125,10 @@ const DashboardPage = () => {
 
       if (routePredicate) {
         if (newVariables.where && Object.keys(newVariables.where).length) {
-          variables.where = { _and: [newVariables.where, routePredicate] };
+          variables.where = {
+            ...routePredicate,
+            _and: [...newVariables.where._and]
+          };
         } else {
           variables.where = { ...routePredicate };
         }
