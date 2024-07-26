@@ -1,10 +1,11 @@
-import { Status } from "@prisma/client";
+import { QuantityType, Status } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query, QueryFormArgs } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,
+  formFactory,
   formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -16,6 +17,7 @@ const FORM = gql`
     form(id: $id) {
       stateSummary {
         quantity
+        quantityType
         packagingInfos {
           type
           quantity
@@ -71,6 +73,7 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
           }
         },
         wasteDetailsQuantity: 1,
+        wasteDetailsQuantityType: QuantityType.ESTIMATED,
         wasteDetailsOnuCode: "onu 1",
         wasteDetailsPackagingInfos: [
           { type: "BENNE", quantity: 1, other: null }
@@ -108,6 +111,7 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
     expect(stateSummary!.quantity).toEqual(
       form.wasteDetailsQuantity.toNumber()
     );
+    expect(stateSummary!.quantityType).toEqual(form.wasteDetailsQuantityType);
     expect(stateSummary!.packagingInfos).toEqual([
       { type: "BENNE", quantity: 1 }
     ]);
@@ -127,7 +131,8 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
       data: {
         status: Status.TEMP_STORER_ACCEPTED,
         receivedAt: new Date(),
-        quantityReceived: quantityTempStored
+        quantityReceived: quantityTempStored,
+        quantityReceivedType: QuantityType.ESTIMATED
       }
     });
 
@@ -142,6 +147,7 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
     });
 
     expect(stateSummary!.quantity).toEqual(quantityTempStored);
+    expect(stateSummary!.quantityType).toEqual(QuantityType.ESTIMATED);
   });
 
   test("when the form is resealed", async () => {
@@ -152,6 +158,7 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
         forwardedIn: {
           update: {
             wasteDetailsQuantity: 3,
+            wasteDetailsQuantityType: QuantityType.ESTIMATED,
             wasteDetailsOnuCode: "onu 2",
             wasteDetailsPackagingInfos: [
               { type: "FUT", quantity: 2, other: null }
@@ -187,6 +194,7 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
     expect(stateSummary!.quantity).toEqual(
       updatedForm.forwardedIn!.wasteDetailsQuantity?.toNumber()
     );
+    expect(stateSummary!.quantityType).toEqual(QuantityType.ESTIMATED);
     expect(stateSummary!.packagingInfos).toEqual([
       { type: "FUT", quantity: 2 }
     ]);
@@ -292,5 +300,37 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
     // Then
     expect(errors).toBeUndefined();
     expect(stateSummary!.quantity).toEqual(3.1);
+  });
+
+  test("simple form with no forwarding", async () => {
+    // Given
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        status: Status.RECEIVED,
+        processedAt: new Date(),
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 11.7,
+        quantityRefused: 8.6,
+        quantityReceivedType: QuantityType.ESTIMATED
+      }
+    });
+
+    // When
+    const { query } = makeClient(emitter.user);
+    const {
+      errors,
+      data: {
+        form: { stateSummary }
+      }
+    } = await query<Pick<Query, "form">, QueryFormArgs>(FORM, {
+      variables: { id: form.id }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(stateSummary!.quantity).toEqual(3.1);
+    expect(stateSummary!.quantityType).toEqual(QuantityType.ESTIMATED);
   });
 });

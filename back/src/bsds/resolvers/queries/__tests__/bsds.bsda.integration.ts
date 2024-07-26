@@ -1,4 +1,4 @@
-import { Company, User, UserRole } from "@prisma/client";
+import { BsdaConsistence, Company, User, UserRole } from "@prisma/client";
 import {
   refreshElasticSearch,
   resetDatabase
@@ -1627,7 +1627,18 @@ describe("Bsda sub-resolvers in query bsds", () => {
         variables: {
           input: {
             type: "GATHERING",
-            waste: { code: "06 07 01*" },
+            waste: {
+              code: "06 07 01*",
+              materialName: "Test",
+              pop: false,
+              familyCode: "TEST",
+              consistence: BsdaConsistence.SOLIDE
+            },
+            packagings: [{ quantity: 1, type: "BIG_BAG" }],
+            weight: {
+              isEstimate: true,
+              value: 1
+            },
             emitter: {
               company: {
                 siret: ttr.company.siret,
@@ -1702,7 +1713,18 @@ describe("Bsda sub-resolvers in query bsds", () => {
         variables: {
           input: {
             type: "GATHERING",
-            waste: { code: "06 07 01*" },
+            waste: {
+              code: "06 07 01*",
+              materialName: "Test",
+              pop: false,
+              familyCode: "TEST",
+              consistence: BsdaConsistence.SOLIDE
+            },
+            packagings: [{ quantity: 1, type: "BIG_BAG" }],
+            weight: {
+              isEstimate: true,
+              value: 1
+            },
             emitter: {
               company: {
                 siret: ttr.company.siret,
@@ -1776,7 +1798,18 @@ describe("Bsda sub-resolvers in query bsds", () => {
         variables: {
           input: {
             type: "RESHIPMENT",
-            waste: { code: "06 07 01*" },
+            waste: {
+              code: "06 07 01*",
+              materialName: "Test",
+              pop: false,
+              familyCode: "TEST",
+              consistence: BsdaConsistence.SOLIDE
+            },
+            packagings: [{ quantity: 1, type: "BIG_BAG" }],
+            weight: {
+              isEstimate: true,
+              value: 1
+            },
             emitter: {
               company: {
                 siret: ttr.company.siret,
@@ -1847,7 +1880,18 @@ describe("Bsda sub-resolvers in query bsds", () => {
         variables: {
           input: {
             type: "RESHIPMENT",
-            waste: { code: "06 07 01*" },
+            waste: {
+              code: "06 07 01*",
+              materialName: "Test",
+              pop: false,
+              familyCode: "TEST",
+              consistence: BsdaConsistence.SOLIDE
+            },
+            packagings: [{ quantity: 1, type: "BIG_BAG" }],
+            weight: {
+              isEstimate: true,
+              value: 1
+            },
             emitter: {
               company: {
                 siret: ttr.company.siret,
