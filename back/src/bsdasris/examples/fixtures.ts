@@ -113,8 +113,7 @@ const operationForGroupingInput = {
   weight: {
     value: 1
   },
-  code: "D12",
-  mode: "ELIMINATION",
+  code: "D13",
   date: "2020-04-28"
 };
 

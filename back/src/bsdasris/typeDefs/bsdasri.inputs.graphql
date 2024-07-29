@@ -260,7 +260,7 @@ input BsdasriOperationInput {
   weight: BsdasriRealWeightInput
   """
   Code de traitement
-  Les codes R12 et D12 ne sont autorisé que si le destinataire est une installation TTR (tri transit regroupement).
+  Les codes R12 et D13 ne sont autorisé que si le destinataire est une installation TTR (tri transit regroupement).
   """
   code: String
   "Qualification du traitement final"

@@ -378,7 +378,7 @@ describe("Mutation.updateBsdasri", () => {
 
   it.each([
     ["R12", undefined],
-    ["D12", "ELIMINATION"]
+    ["D13", undefined]
   ])(
     "should forbid %p operation code on synthesis dasri",
     async (operationCode, operationMode) => {
@@ -441,7 +441,7 @@ describe("Mutation.updateBsdasri", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Les codes R12 et D12 sont interdits sur un bordereau de synthèse",
+            "Les codes R12 et D13 sont interdits sur un bordereau de synthèse",
           extensions: expect.objectContaining({
             code: ErrorCode.BAD_USER_INPUT
           })

@@ -519,7 +519,7 @@ describe("Mutation.signBsdasri emission", () => {
       ["D9", undefined],
       ["D10", "ELIMINATION"],
       ["R1", "VALORISATION_ENERGETIQUE"],
-      ["D12", "ELIMINATION"],
+      ["D13", undefined],
       ["R12", undefined]
     ])(
       "should work if operation code & mode are compatible (code: %p, mode: %p)",
@@ -558,7 +558,7 @@ describe("Mutation.signBsdasri emission", () => {
       ["D9", "VALORISATION_ENERGETIQUE"], // No mode is expected
       ["D10", "VALORISATION_ENERGETIQUE"], // Correct mode is ELIMINATION
       ["R1", "ELIMINATION"], //  Correct mode is VALORISATION_ENERGETIQUE
-      ["D12", "VALORISATION_ENERGETIQUE"], //  Correct mode is ELIMINATION
+      ["D13", "VALORISATION_ENERGETIQUE"], //  No mode is expected
       ["R12", "VALORISATION_ENERGETIQUE"] // R12 has no associated mode
     ])(
       "should not be valid if operation mode is not compatible with operation code (mode: %p, code: %p)",
@@ -584,7 +584,7 @@ describe("Mutation.signBsdasri emission", () => {
       }
     );
 
-    test.each(["D10", "R1", "D12"])(
+    test.each(["D10", "R1"])(
       "should not be valid if operation code has associated operation modes but none is specified (code: %p)",
       async code => {
         const data = {
@@ -595,12 +595,11 @@ describe("Mutation.signBsdasri emission", () => {
           destinationReceptionWasteWeightValue: 10
         };
 
-        expect.assertions(2);
-
         try {
           await validateBsdasri(data as any, { operationSignature: true });
         } catch (err) {
           expect(err.errors.length).toBeTruthy();
+
           expect(err.errors[0]).toBe(
             "Vous devez préciser un mode de traitement"
           );

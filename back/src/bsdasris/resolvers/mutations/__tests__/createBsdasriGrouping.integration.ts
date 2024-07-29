@@ -164,7 +164,7 @@ describe("Mutation.createDasri", () => {
         status: BsdasriStatus.AWAITING_GROUP,
         emitterCompanySiret: siretify(1),
         destinationCompanySiret: company.siret,
-        destinationOperationCode: "D12"
+        destinationOperationCode: "D13"
       }
     });
 
