@@ -10,26 +10,37 @@
   table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
+
   &__tr {
     border-bottom: 1px solid $grey-light;
   }
+
   &__head-tr {
     background: #eaeaea;
     font-size: 0.875em;
     font-weight: 700;
     text-transform: uppercase;
   }
+
+  & th {
+    overflow-wrap: break-word;
+  }
+
+  & td {
+    overflow-wrap: anywhere;
+  }
+
   & td,
   th {
     padding: 1em 0.2em;
     text-align: left;
-    overflow-wrap: anywhere;
 
     @include lg-desktop {
       padding: 1em 1em;
     }
   }
 }
+
 .shortenable {
   overflow: hidden;
   text-overflow: ellipsis;
