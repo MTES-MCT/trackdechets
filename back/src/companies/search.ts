@@ -152,7 +152,7 @@ export async function searchCompany(
       statutDiffusionEtablissement: cleanedClue.startsWith(TEST_COMPANY_PREFIX)
         ? "O"
         : ("P" as StatutDiffusionEtablissement),
-      etatAdministratif: "A",
+      etatAdministratif: anonymousCompany.etatAdministratif,
       naf: anonymousCompany.codeNaf,
       codePaysEtrangerEtablissement
     };
