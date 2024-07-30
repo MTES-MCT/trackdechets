@@ -1,0 +1,34 @@
+@import "../../../../scss/Constants.scss";
+@import "../../../../scss/Breakpoints";
+
+.DataList {
+  display: flex;
+  flex-wrap: wrap;
+  padding-inline-start: initial;
+
+  &:not(:last-child) {
+    padding-bottom: 1rem;
+  }
+}
+
+.DataListItem {
+  width: 100%;
+
+  &:not(:last-child) {
+    padding-bottom: 0.5rem;
+  }
+
+  @include tablet {
+    width: 33.33%;
+  }
+}
+
+.DataListTerm {
+  font-size: 0.875rem; //14px
+  color: $black;
+}
+
+.DataListDescription {
+  font-weight: bold;
+  padding-inline-start: initial;
+}

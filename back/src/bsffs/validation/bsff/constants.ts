@@ -1,9 +1,9 @@
 import { AllBsffSignatureType } from "./types";
 import { ZodBsff } from "./schema";
 
-function transporterNSignatureDate(bsda: ZodBsff, n: number) {
-  if (bsda.transporters && bsda.transporters.length > n - 1) {
-    return bsda.transporters[n - 1].transporterTransportSignatureDate;
+function transporterNSignatureDate(bsff: ZodBsff, n: number) {
+  if (bsff.transporters && bsff.transporters.length > n - 1) {
+    return bsff.transporters[n - 1].transporterTransportSignatureDate;
   }
   return null;
 }

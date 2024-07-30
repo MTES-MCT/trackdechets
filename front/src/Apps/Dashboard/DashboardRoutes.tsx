@@ -21,9 +21,9 @@ import {
 } from "react-router-dom";
 import Loader from "../common/Components/Loader/Loaders";
 import { ExtraSignatureType } from "../../dashboard/components/BSDList/BSDasri/types";
-import { RouteBsdaRequestRevision } from "../../dashboard/components/RevisionRequestList/bsda/request";
-import { RouteBsdasriRequestRevision } from "../../dashboard/components/RevisionRequestList/bsdasri/request";
-import { RouteBsddRequestRevision } from "../../dashboard/components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
+import { RouteBsdaRequestRevision } from "./Components/RevisionRequestList/bsda/request";
+import { RouteBsdasriRequestRevision } from "./Components//RevisionRequestList/bsdasri/request";
+import { RouteBsddRequestRevision } from "./Components//RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 import {
   RouteBSDasrisView,
   RouteBSDasView,
@@ -34,7 +34,6 @@ import {
 } from "../../dashboard/detail";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 import { usePermissions } from "../../common/contexts/PermissionsContext";
-import { DsfrModal } from "../common/Components/Modal/DsfrModal";
 import BspaohFormContainer from "../../form/bspaoh/FormContainer";
 import "./dashboard.scss";
 import { useMedia } from "../../common/use-media";
@@ -135,6 +134,9 @@ function DashboardRoutes() {
       />
     );
   }
+
+  const overviewModalSize = "XL";
+  const reviewModalSize = "TD_SIZE";
 
   return (
     <div id="dashboard" className="dashboard">
@@ -293,8 +295,7 @@ function DashboardRoutes() {
                   onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
-                  padding={false}
-                  wide={true}
+                  size={overviewModalSize}
                 >
                   <RouteBSDDsView />
                 </Modal>
@@ -308,8 +309,7 @@ function DashboardRoutes() {
                   onClose={goBack}
                   ariaLabel="Demande de révision"
                   isOpen
-                  padding={false}
-                  wide={true}
+                  size={reviewModalSize}
                 >
                   <RouteBsddRequestRevision />
                 </Modal>
@@ -328,7 +328,12 @@ function DashboardRoutes() {
             <Route
               path={toRelative(routes.dashboard.bsdasris.sign.publish)}
               element={
-                <Modal onClose={goBack} ariaLabel="Publier un dasri" isOpen>
+                <Modal
+                  onClose={goBack}
+                  ariaLabel="Publier un dasri"
+                  isOpen
+                  size="L"
+                >
                   <RoutePublishBsdasri />
                 </Modal>
               }
@@ -343,6 +348,7 @@ function DashboardRoutes() {
                   onClose={goToCollectDashboard}
                   ariaLabel="Signature producteur avec code de sécurité"
                   isOpen
+                  size="L"
                 >
                   <RouteBSDasrisSignEmissionSecretCode />
                 </Modal>
@@ -356,6 +362,7 @@ function DashboardRoutes() {
                   onClose={goToCollectDashboard}
                   ariaLabel="Emport direct transporteur"
                   isOpen
+                  size="L"
                 >
                   <RouteSignBsdasri
                     UIsignatureType={ExtraSignatureType.DirectTakeover}
@@ -373,6 +380,7 @@ function DashboardRoutes() {
                   onClose={goToCollectDashboard}
                   ariaLabel="Bordereau de synthèse: Transporteur"
                   isOpen
+                  size="L"
                 >
                   <RouteSignBsdasri
                     UIsignatureType={ExtraSignatureType.SynthesisTakeOver}
@@ -388,6 +396,7 @@ function DashboardRoutes() {
                   onClose={goToActionDashboard}
                   ariaLabel="Signature transporteur"
                   isOpen
+                  size="L"
                 >
                   <RouteSignBsdasri
                     UIsignatureType={BsdasriSignatureType.Transport}
@@ -403,6 +412,7 @@ function DashboardRoutes() {
                   onClose={goToActionDashboard}
                   ariaLabel="Signature producteur"
                   isOpen
+                  size="L"
                 >
                   <RouteSignBsdasri
                     UIsignatureType={BsdasriSignatureType.Emission}
@@ -418,6 +428,7 @@ function DashboardRoutes() {
                   onClose={goToActionDashboard}
                   ariaLabel="Signature réception"
                   isOpen
+                  size="L"
                 >
                   <RouteSignBsdasri
                     UIsignatureType={BsdasriSignatureType.Reception}
@@ -433,6 +444,7 @@ function DashboardRoutes() {
                   onClose={goToActionDashboard}
                   ariaLabel="Signature traitement"
                   isOpen
+                  size="L"
                 >
                   <RouteSignBsdasri
                     UIsignatureType={BsdasriSignatureType.Operation}
@@ -448,8 +460,7 @@ function DashboardRoutes() {
                   onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
-                  padding={false}
-                  wide={true}
+                  size={overviewModalSize}
                 >
                   <RouteBSDasrisView />
                 </Modal>
@@ -463,8 +474,7 @@ function DashboardRoutes() {
                   onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
-                  padding={false}
-                  wide={true}
+                  size={overviewModalSize}
                 >
                   <RouteBsvhusView />
                 </Modal>
@@ -478,8 +488,7 @@ function DashboardRoutes() {
                   onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
-                  padding={false}
-                  wide={true}
+                  size={overviewModalSize}
                 >
                   <RouteBSDasView />
                 </Modal>
@@ -488,9 +497,14 @@ function DashboardRoutes() {
             <Route
               path={toRelative(routes.dashboard.bspaohs.view)}
               element={
-                <DsfrModal onClose={goBack} size="XL" padding={false}>
+                <Modal
+                  onClose={goBack}
+                  ariaLabel="Aperçu du bordereau"
+                  isOpen
+                  size={overviewModalSize}
+                >
                   <RouteBspaohsView />
-                </DsfrModal>
+                </Modal>
               }
             />
 
@@ -501,8 +515,7 @@ function DashboardRoutes() {
                   onClose={goBack}
                   ariaLabel="Demande de révision"
                   isOpen
-                  padding={false}
-                  wide={true}
+                  size={reviewModalSize}
                 >
                   <RouteBsdaRequestRevision />
                 </Modal>
@@ -515,8 +528,7 @@ function DashboardRoutes() {
                   onClose={goBack}
                   ariaLabel="Demande de révision"
                   isOpen
-                  padding={false}
-                  wide={true}
+                  size={reviewModalSize}
                 >
                   <RouteBsdasriRequestRevision />
                 </Modal>
@@ -529,8 +541,7 @@ function DashboardRoutes() {
                   onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
-                  padding={false}
-                  wide={true}
+                  size={overviewModalSize}
                 >
                   <RouteBsffsView />
                 </Modal>

@@ -1,9 +1,10 @@
-import { Status } from "@prisma/client";
+import { QuantityType, Status } from "@prisma/client";
 import {
   Form,
   FormResolvers,
   TemporaryStorageDetail
 } from "../../../generated/graphql/types";
+import { isDefined } from "../../../common/helpers";
 
 function getLastActionOn(
   form: Form,
@@ -58,15 +59,34 @@ export function getStateSummary(form: Form) {
     (form.status === Status.RESEALED ||
       !!form.temporaryStorageDetail?.emittedAt);
 
-  const quantity =
-    form.quantityReceived ??
-    ([Status.TEMP_STORED, Status.TEMP_STORER_ACCEPTED].includes(
-      form.status as any
-    )
-      ? form.temporaryStorageDetail?.temporaryStorer?.quantityReceived
-      : isResealed
-      ? form.temporaryStorageDetail?.wasteDetails?.quantity
-      : form.wasteDetails?.quantity);
+  // Quantity & quantity type
+  let quantity: number | undefined | null;
+  let quantityType: QuantityType | undefined | null = QuantityType.REAL;
+  if (isDefined(form.quantityReceived)) {
+    quantity = form.quantityAccepted ?? form.quantityReceived;
+    quantityType = form.quantityReceivedType ?? QuantityType.REAL;
+  } else {
+    if (
+      [Status.TEMP_STORED, Status.TEMP_STORER_ACCEPTED].includes(
+        form.status as any
+      )
+    ) {
+      quantity =
+        form.temporaryStorageDetail?.temporaryStorer?.quantityAccepted ??
+        form.temporaryStorageDetail?.temporaryStorer?.quantityReceived;
+      quantityType =
+        form.temporaryStorageDetail?.temporaryStorer?.quantityType ??
+        QuantityType.REAL;
+    } else if (isResealed) {
+      quantity = form.temporaryStorageDetail?.wasteDetails?.quantity;
+      quantityType =
+        form.temporaryStorageDetail?.wasteDetails?.quantityType ??
+        QuantityType.REAL;
+    } else {
+      quantity = form.wasteDetails?.quantity;
+      quantityType = form.wasteDetails?.quantityType ?? QuantityType.REAL;
+    }
+  }
 
   const onuCode = isResealed
     ? form.temporaryStorageDetail?.wasteDetails?.onuCode
@@ -99,6 +119,7 @@ export function getStateSummary(form: Form) {
 
   return {
     quantity,
+    quantityType,
     packagingInfos,
     packagings: packagingInfos.map(pi => pi.type),
     onuCode,

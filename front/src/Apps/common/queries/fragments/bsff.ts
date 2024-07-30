@@ -28,6 +28,28 @@ export const dashboardBsffFragment = gql`
       }
       customInfo
     }
+    transporters {
+      id
+      company {
+        name
+        siret
+        orgId
+      }
+      customInfo
+      recepisse {
+        number
+        department
+        validityLimit
+        isExempted
+      }
+      transport {
+        plates
+        mode
+        signature {
+          date
+        }
+      }
+    }
     bsffDestination: destination {
       company {
         siret
@@ -164,6 +186,28 @@ export const FullBsffFragment = gql`
         plates
       }
       customInfo
+    }
+    transporters {
+      id
+      company {
+        ...CompanyFragment
+      }
+      customInfo
+      recepisse {
+        number
+        department
+        validityLimit
+        isExempted
+      }
+      transport {
+        mode
+        plates
+        takenOverAt
+        signature {
+          author
+          date
+        }
+      }
     }
     destination {
       company {

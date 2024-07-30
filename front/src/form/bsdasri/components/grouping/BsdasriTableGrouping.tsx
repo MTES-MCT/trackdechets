@@ -78,7 +78,7 @@ export default function BsdasriTableGrouping({
           operation: {
             code: {
               _in: [
-                DestinationOperationCodeTypes.D12,
+                DestinationOperationCodeTypes.D13,
                 DestinationOperationCodeTypes.R12
               ]
             }

@@ -197,6 +197,7 @@ function DeleteModal({ bsdId, bsdType, isOpen, onClose }) {
       isOpen={isOpen}
       onClose={onClose}
       ariaLabel="Supprimer un bordereau"
+      size="M"
     >
       <h2 className="td-modal-title">Confirmer la suppression ?</h2>
       <p>Cette action est irréversible.</p>

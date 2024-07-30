@@ -480,8 +480,6 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       gqlquery
     );
 
-    console.log(response);
-
     expect(response.data.companyPrivateInfos.users).toEqual([
       { email: companyMember.email }
     ]);

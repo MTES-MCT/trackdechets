@@ -375,7 +375,7 @@ describe("Mutation.createBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
+        message: `Transporteur : L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
       })
     ]);
   });
@@ -410,7 +410,7 @@ describe("Mutation.createBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
+        message: `Destination : L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
       })
     ]);
   });

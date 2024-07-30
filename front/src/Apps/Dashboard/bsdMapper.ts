@@ -10,7 +10,8 @@ import {
   BsdasriType,
   FormStatus,
   Transporter,
-  BsdaTransporter
+  BsdaTransporter,
+  BsffTransporter
 } from "@td/codegen-ui";
 
 import {
@@ -77,13 +78,16 @@ export const getCurrentTransporterInfos = (
     case BsdTypename.Bsdd:
       return getBsddCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
     case BsdTypename.Bsda:
-      return getBsdaCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
+    case BsdTypename.Bsff:
+      return getMultiModalCurrentTransporterInfos(
+        bsd,
+        currentSiret,
+        isToCollectTab
+      );
     case BsdTypename.Bsdasri:
       return getBsdasriCurrentTransporterInfos(bsd, currentSiret);
     case BsdTypename.Bsvhu:
       return null;
-    case BsdTypename.Bsff:
-      return getBsffCurrentTransporterInfos(bsd, currentSiret);
     case BsdTypename.Bspaoh:
       return getBspaohCurrentTransporterInfos(bsd, currentSiret);
     default:
@@ -141,22 +145,22 @@ export const getBsddCurrentTransporterInfos = (
   };
 };
 
-export const getBsdaCurrentTransporterInfos = (
-  bsda: Bsda,
+export const getMultiModalCurrentTransporterInfos = (
+  bsd: Bsda | Bsff,
   currentSiret: string,
   isToCollectTab: boolean
 ): BsdCurrentTransporterInfos => {
-  let currentTransporter: BsdaTransporter | undefined;
+  let currentTransporter: BsdaTransporter | BsffTransporter | undefined;
   if (isToCollectTab) {
     // find the first transporter with this SIRET who hasn't taken over yet
-    currentTransporter = bsda.transporters?.find(
+    currentTransporter = bsd.transporters?.find(
       transporter =>
         transporter.company?.orgId === currentSiret &&
         !transporter.transport?.signature?.date
     );
   } else {
     // find the last transporter with this SIRET who has taken over
-    currentTransporter = [...(bsda.transporters ?? [])]
+    currentTransporter = [...(bsd.transporters ?? [])]
       .reverse()
       .find(
         transporter =>
@@ -192,21 +196,6 @@ export const getBsdasriCurrentTransporterInfos = (
   };
 };
 
-export const getBsffCurrentTransporterInfos = (
-  bsff: Bsff,
-  currentSiret: string
-): BsdCurrentTransporterInfos => {
-  const currentTransporter = bsff.transporter || bsff["bsffTransporter"];
-  if (currentTransporter?.company?.orgId !== currentSiret) {
-    return {};
-  }
-  return {
-    transporterNumberPlate: currentTransporter?.transport?.plates,
-    transporterCustomInfo: currentTransporter?.customInfo,
-    transporterMode: currentTransporter?.transport?.mode ?? undefined
-  };
-};
-
 export const getBspaohCurrentTransporterInfos = (
   bspaoh: Bspaoh,
   currentSiret: string
@@ -234,10 +223,7 @@ export const mapBsdd = (bsdd: Form): BsdDisplay => {
     wasteDetails: {
       code: bsdd.wasteDetails?.code,
       name: bsdd.wasteDetails?.name,
-      weight:
-        bsdd.quantityReceived ||
-        bsdd.temporaryStorageDetail?.wasteDetails?.quantity ||
-        bsdd.wasteDetails?.quantity
+      weight: bsdd.stateSummary?.quantity || bsdd.wasteDetails?.quantity
     },
     isTempStorage: bsdd.recipient?.isTempStorage,
     emitter: bsdd.emitter,
@@ -378,6 +364,7 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     emitter: bsff.emitter || bsff["bsffEmitter"],
     destination: bsff.destination || bsff["bsffDestination"],
     transporter: bsff.transporter || bsff["bsffTransporter"],
+    transporters: bsff.transporters,
     updatedAt: bsff["bsffUpdatedAt"],
     bsdWorkflowType: bsff["bsffType"] || bsff.type,
     grouping: bsff.grouping,

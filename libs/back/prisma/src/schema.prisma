@@ -319,15 +319,16 @@ model Company {
 // Cette table permet également de stocker de "faux établissements" pouvant être visés lors
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
-  id          String  @id @default(cuid())
-  orgId       String  @unique(map: "AnonymousCompany.orgId_unique")
-  siret       String? @unique(map: "AnonymousCompany.siret_unique")
-  vatNumber   String? @unique(map: "AnonymousCompany.vatnumber_unique")
-  name        String
-  address     String
-  codeNaf     String
-  libelleNaf  String
-  codeCommune String
+  id                String  @id @default(cuid())
+  orgId             String  @unique(map: "AnonymousCompany.orgId_unique")
+  siret             String? @unique(map: "AnonymousCompany.siret_unique")
+  vatNumber         String? @unique(map: "AnonymousCompany.vatnumber_unique")
+  name              String
+  address           String
+  codeNaf           String
+  libelleNaf        String
+  codeCommune       String
+  etatAdministratif String  @default("A")
 
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
@@ -505,6 +506,7 @@ model Form {
   receivedBy                            String?
   receivedAt                            DateTime?               @db.Timestamptz(6)
   quantityReceived                      Decimal?                @db.Decimal(65, 30)
+  quantityRefused                       Decimal?                @db.Decimal(65, 30)
   processedBy                           String?
   processedAt                           DateTime?               @db.Timestamptz(6)
   processingOperationDone               String?
@@ -534,7 +536,7 @@ model Form {
   canAccessDraftSirets String[] @default([])
 
   // Fraction du bordereau regroupée dans des bordereaux de regroupement
-  // La quantité restante à regrouper s'obtient en faisant quantityReceived - quantityGrouped
+  // La quantité restante à regrouper s'obtient en faisant quantityReceived (- quantityRefused?) - quantityGrouped
   quantityGrouped Float @default(0)
 
   // Relation vers les infos de traçabilité finales
@@ -615,9 +617,12 @@ model BsddRevisionRequest {
   wasteDetailsName                                String?
   wasteDetailsPop                                 Boolean?
   wasteDetailsPackagingInfos                      Json?
+  wasteAcceptationStatus                          WasteAcceptationStatus?
+  wasteRefusalReason                              String?
   wasteDetailsSampleNumber                        String?
-  wasteDetailsQuantity                            Decimal?       @db.Decimal(65, 30)
+  wasteDetailsQuantity                            Decimal?                @db.Decimal(65, 30)
   quantityReceived                                Float?
+  quantityRefused                                 Float?
   processingOperationDone                         String?
   destinationOperationMode                        OperationMode?
   processingOperationDescription                  String?
@@ -629,7 +634,7 @@ model BsddRevisionRequest {
   brokerCompanyMail                               String?
   brokerReceipt                                   String?
   brokerDepartment                                String?
-  brokerValidityLimit                             DateTime?      @db.Timestamptz(6)
+  brokerValidityLimit                             DateTime?               @db.Timestamptz(6)
   traderCompanyName                               String?
   traderCompanySiret                              String?
   traderCompanyAddress                            String?
@@ -638,7 +643,7 @@ model BsddRevisionRequest {
   traderCompanyMail                               String?
   traderReceipt                                   String?
   traderDepartment                                String?
-  traderValidityLimit                             DateTime?      @db.Timestamptz(6)
+  traderValidityLimit                             DateTime?               @db.Timestamptz(6)
   temporaryStorageDestinationCap                  String?
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?

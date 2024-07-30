@@ -42,7 +42,7 @@ export const DASRI_PROCESSING_OPERATIONS = [
 export const DASRI_GROUPING_OPERATIONS = [
   {
     type: DasriProcessingOperationType.RegroupementPrealableD9D10,
-    code: "D12",
+    code: "D13",
     description:
       "Groupement avant désinfection en D9 ou incinération en D10 sur un site relevant de la rubrique 2718"
   },

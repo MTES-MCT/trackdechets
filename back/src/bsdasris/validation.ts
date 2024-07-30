@@ -573,7 +573,7 @@ export const operationSchema: FactorySchemaOf<
   BsdasriValidationContext,
   Operation
 > = context => {
-  // a grouping dasri should not have a grouping operation code (D12, R12)
+  // a grouping dasri should not have a grouping operation code (D13, R12)
   const allowedOperations = context?.isGrouping
     ? DASRI_PROCESSING_OPERATIONS_CODES
     : DASRI_ALL_OPERATIONS_CODES;
@@ -585,7 +585,7 @@ export const operationSchema: FactorySchemaOf<
         "operation-quantity-required-if-final-processing-operation",
         "Le poids du déchet traité en kg est obligatoire si le code correspond à un traitement final",
         function (value) {
-          // We do not run this validator until processing signature because fields are not avilable in UI until then
+          // We do not run this validator until processing signature because fields are not available in UI until then
           if (!context.operationSignature) {
             return true;
           }
@@ -609,7 +609,7 @@ export const operationSchema: FactorySchemaOf<
       .requiredIf(context.operationSignature)
       .test(
         "recipientIsCollectorForGroupingCodes",
-        "Les codes R12 et D12 sont réservés aux installations de tri transit regroupement",
+        "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement",
         async (value, ctx) => {
           const recipientSiret = ctx.parent.destinationCompanySiret;
 
@@ -631,7 +631,7 @@ export const operationSchema: FactorySchemaOf<
       )
       .test(
         "groupingCodesFordbiddenForSynthesis",
-        "Les codes R12 et D12 sont interdits sur un bordereau de synthèse",
+        "Les codes R12 et D13 sont interdits sur un bordereau de synthèse",
         async (value, ctx) => {
           const type = ctx.parent.type;
 

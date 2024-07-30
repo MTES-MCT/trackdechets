@@ -715,4 +715,42 @@ describe("Mutation markAsResealed", () => {
       })
     ]);
   });
+
+  test("wasteDetailsQuantity should be updated with quantityAccepted, if available", async () => {
+    // Given
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+    const { mutate } = makeClient(user);
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanySiret: collector.siret,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10.5,
+        quantityRefused: 7.2
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
+    });
+
+    // When
+    await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {}
+      }
+    });
+
+    // Then
+    const resealedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.forwardedInId! }
+    });
+    expect(resealedForm.wasteDetailsQuantity?.toNumber()).toEqual(3.3);
+  });
 });

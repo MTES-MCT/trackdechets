@@ -65,7 +65,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   const resultingForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
     const sealedForm = await formRepository.update(
-      { id: form.id },
+      { id: form.id, status: form.status },
       {
         status: transitionForm(form, {
           type: EventType.MarkAsSealed
@@ -97,7 +97,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
         sealedForm.emitterIsPrivateIndividual === true)
     ) {
       return formRepository.update(
-        { id: sealedForm.id },
+        { id: sealedForm.id, status: sealedForm.status },
         {
           status: transitionForm(sealedForm, {
             type: EventType.SignedByProducer,

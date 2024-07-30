@@ -142,6 +142,17 @@ const sealedFromEmissionExceptAddOrRemoveNextDestination: GetBsdaSignatureTypeFn
   return isEmitter ? "WORK" : "EMISSION";
 };
 
+/**
+ * Renvoie la signature émetteur s'il n'y a pas d'entreprise de travaux sur le BSDA.
+ * Sinon, renvoie la signature de l'entreprise de travaux.
+ */
+const fromWorkOrEmissionWhenThereIsNoWorker: GetBsdaSignatureTypeFn<ZodBsda> = (
+  bsda,
+  _
+) => {
+  return hasWorker(bsda) ? "WORK" : "EMISSION";
+};
+
 function transporterSignature(
   transporter: ZodBsdaTransporter
 ): AllBsdaSignatureType {
@@ -727,18 +738,18 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   wasteAdr: { readableFieldName: "la mention ADR", sealed: { from: "WORK" } },
   wasteFamilyCode: {
-    sealed: { from: "WORK" },
-    required: { from: "WORK" },
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
     readableFieldName: "le code famille"
   },
   wasteMaterialName: {
     readableFieldName: "le nom de matériau",
-    sealed: { from: "WORK" },
-    required: { from: "WORK" }
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
   },
   wasteConsistence: {
-    sealed: { from: "WORK" },
-    required: { from: "WORK" },
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
     readableFieldName: "la consistance"
   },
   wasteSealNumbers: {
@@ -747,25 +758,25 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   wastePop: {
     readableFieldName: "le champ sur les polluants organiques persistants",
-    sealed: { from: "WORK" },
-    required: { from: "WORK" }
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
   },
   packagings: {
-    sealed: { from: "WORK" },
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
     required: {
-      from: "WORK"
+      from: fromWorkOrEmissionWhenThereIsNoWorker
     },
     readableFieldName: "le conditionnement"
   },
   weightIsEstimate: {
-    readableFieldName: "le champ pour indiquer sile poids est estimé",
-    sealed: { from: "WORK" },
-    required: { from: "WORK" }
+    readableFieldName: "le champ pour indiquer si le poids est estimé",
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
   },
   weightValue: {
     readableFieldName: "le poids",
-    sealed: { from: "WORK" },
-    required: { from: "WORK" }
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
   },
   grouping: { sealed: { from: "EMISSION" } },
   forwarding: { sealed: { from: "EMISSION" } },

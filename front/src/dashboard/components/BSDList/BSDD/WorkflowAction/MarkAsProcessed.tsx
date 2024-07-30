@@ -5,8 +5,8 @@ import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "../../../../../Apps/common/Components/Modal/Modal";
 import { ActionButton } from "../../../../../common/components";
 import { IconCogApproved } from "../../../../../Apps/common/Components/Icons/Icons";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
 import MarkAsProcessedModalContent from "./MarkAsProcessedModalContent";
+import { GET_FORM } from "../../../../../Apps/common/queries/bsdd/queries";
 
 export default function MarkAsProcessed({ form }: WorkflowActionProps) {
   const [getBsdd, { data }] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(

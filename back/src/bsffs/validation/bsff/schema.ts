@@ -14,10 +14,14 @@ import {
 import { BsffValidationContext } from "./types";
 import { weightSchema } from "../../../common/validation/weight";
 import { WeightUnits } from "../../../common/validation";
-import { sirenifyBsff } from "./sirenify";
-import { checkAndSetPreviousPackagings } from "./transformers";
+import { sirenifyBsff, sirenifyBsffTransporter } from "./sirenify";
+import {
+  checkAndSetPreviousPackagings,
+  updateTransporterRecepisse
+} from "./transformers";
 import { updateTransportersRecepisse } from "../../../common/validation/zod/transformers";
 import {
+  CompanyRole,
   rawTransporterSchema,
   siretSchema
 } from "../../../common/validation/zod/schema";
@@ -99,7 +103,7 @@ const rawBsffSchema = z.object({
     .nullish()
     .transform(t => t ?? BsffType.COLLECTE_PETITES_QUANTITES),
   emitterCompanyName: z.string().nullish(),
-  emitterCompanySiret: siretSchema.nullish(),
+  emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),
   emitterCompanyContact: z.string().nullish(),
   emitterCompanyPhone: z.string().nullish(),
@@ -119,7 +123,7 @@ const rawBsffSchema = z.object({
   wasteDescription: z.string().nullish(),
   transporterTransportSignatureDate: z.coerce.date().nullish(),
   destinationCompanyName: z.string().nullish(),
-  destinationCompanySiret: siretSchema.nullish(),
+  destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
   destinationCompanyAddress: z.string().nullish(),
   destinationCompanyContact: z.string().nullish(),
   destinationCompanyPhone: z.string().nullish(),
@@ -151,19 +155,6 @@ const rawBsffSchema = z.object({
     .nullish(),
   grouping: z.array(z.string()).nullish()
 });
-
-// Type inféré par Zod - avant parsing
-// Voir https://zod.dev/?id=type-inference
-export type ZodBsffTransporter = z.input<typeof rawBsffTransporterSchema>;
-
-// Type inféré par Zod - après parsing par le schéma "brut".
-// On pourra utiliser ce type en entrée et en sortie dans les refinements et
-// les transformers qui arrivent après le parsing initial (on fait pour cela
-// la supposition que les transformers n'apportent pas de modification au typage)
-// Voir https://zod.dev/?id=type-inference
-export type ParsedZodBsffTransporter = z.output<
-  typeof rawBsffTransporterSchema
->;
 
 // Type inféré par Zod - avant parsing
 // Voir https://zod.dev/?id=type-inference
@@ -219,3 +210,20 @@ export const contextualBsffSchemaAsync = (context: BsffValidationContext) => {
     .superRefine(checkFicheInterventions)
     .transform(checkAndSetPreviousPackagings);
 };
+
+// Type inféré par Zod - avant parsing
+// Voir https://zod.dev/?id=type-inference
+export type ZodBsffTransporter = z.input<typeof rawBsffTransporterSchema>;
+
+// Type inféré par Zod - après parsing par le schéma "brut".
+// On pourra utiliser ce type en entrée et en sortie dans les refinements et
+// les transformers qui arrivent après le parsing initial (on fait pour cela
+// la supposition que les transformers n'apportent pas de modification au typage)
+// Voir https://zod.dev/?id=type-inference
+export type ParsedZodBsffTransporter = z.output<
+  typeof rawBsffTransporterSchema
+>;
+
+export const transformedBsffTransporterSchema = rawBsffTransporterSchema
+  .transform(updateTransporterRecepisse)
+  .transform(sirenifyBsffTransporter);

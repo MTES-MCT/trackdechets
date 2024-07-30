@@ -6,6 +6,7 @@ import { MockedProvider } from "@apollo/client/testing";
 import {
   BsdType,
   BsdaTransporter,
+  BsffTransporter,
   CompanySearchResult,
   CompanyType,
   FavoriteType,
@@ -38,7 +39,7 @@ const defaultBsddTransporter: Transporter = {
   mode: TransportMode.Road
 };
 
-const defaultBsdaTransporter: BsdaTransporter = {
+const defaultTransporter: BsdaTransporter = {
   id: "clpju9r3c000dljj5gcpkvlgu",
   company: {
     siret: "38128881000033",
@@ -66,7 +67,7 @@ function getDefaultTransporter(bsdType: BsdType) {
   if (bsdType === BsdType.Bsdd) {
     return defaultBsddTransporter;
   }
-  return defaultBsdaTransporter;
+  return defaultTransporter;
 }
 
 const searchCompaniesMock = (
@@ -105,15 +106,18 @@ const searchCompaniesMock = (
               receiptNumber:
                 bsdType === BsdType.Bsdd
                   ? (transporter as Transporter)?.receipt
-                  : (transporter as BsdaTransporter)?.recepisse?.number,
+                  : (transporter as BsdaTransporter | BsffTransporter)
+                      ?.recepisse?.number,
               validityLimit:
                 bsdType === BsdType.Bsdd
                   ? (transporter as Transporter)?.validityLimit
-                  : (transporter as BsdaTransporter)?.recepisse?.validityLimit,
+                  : (transporter as BsdaTransporter | BsffTransporter)
+                      ?.recepisse?.validityLimit,
               department:
                 bsdType === BsdType.Bsdd
                   ? (transporter as Transporter)?.department
-                  : (transporter as BsdaTransporter)?.recepisse?.department
+                  : (transporter as BsdaTransporter | BsffTransporter)
+                      ?.recepisse?.department
             },
             vhuAgrementDemolisseur: null,
             vhuAgrementBroyeur: null,
@@ -150,27 +154,26 @@ describe("TransporterForm", () => {
     </MockedProvider>
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
-    "it renders correctly when bsdType is %p",
-    bsdType => {
-      const { container } = render(
-        Component({ data: getDefaultTransporter(bsdType), bsdType })
-      );
-      expect(container).toBeTruthy();
-      const isExemptedOfReceiptInput = screen.getByText(
-        "Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'"
-      );
-      expect(isExemptedOfReceiptInput).toBeInTheDocument();
-      const transportModeInput = screen.getByLabelText("Mode de transport");
-      expect(transportModeInput).toBeInTheDocument();
-      const plateInput = screen.getByLabelText("Immatriculation", {
-        exact: false
-      });
-      expect(plateInput).toBeInTheDocument();
-    }
-  );
+  const bsdTypes = [BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff];
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)("it renders correctly when bsdType is %p", bsdType => {
+    const { container } = render(
+      Component({ data: getDefaultTransporter(bsdType), bsdType })
+    );
+    expect(container).toBeTruthy();
+    const isExemptedOfReceiptInput = screen.getByText(
+      "Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'"
+    );
+    expect(isExemptedOfReceiptInput).toBeInTheDocument();
+    const transportModeInput = screen.getByLabelText("Mode de transport");
+    expect(transportModeInput).toBeInTheDocument();
+    const plateInput = screen.getByLabelText("Immatriculation", {
+      exact: false
+    });
+    expect(plateInput).toBeInTheDocument();
+  });
+
+  test.each(bsdTypes)(
     "transporter recepisse info is displayed when bsdType is %p",
     bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
@@ -201,7 +204,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "transporter recepisse error is displayed if recepisse is not present and bsdType is %p",
     bsdType => {
       const data =
@@ -231,7 +234,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "transporter recepisse error is not displayed if exemption is true and bsdType is %p",
     bsdType => {
       const data =
@@ -267,7 +270,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "transporter recepisse is not displayed if company is foreign and bsdType is %p",
     bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
@@ -291,7 +294,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "transporter recepisse error is not displayed if transport mode is not road and bsdType is %p",
     bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
@@ -322,7 +325,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsda])(
+  test.each([BsdType.Bsda, BsdType.Bsff])(
     "transporter recepisse is updated based on searchCompanies result when bsdType is %p",
     async bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
@@ -365,7 +368,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "transporter contact info is NOT updated based on searchCompanies result when bsdType is %p",
     async bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
@@ -402,7 +405,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "contact info and transporter receipt should be auto-completed when another company is selected and bsdType is %p",
     async bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
@@ -504,7 +507,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "exemption of recepisse should be disabled when transporter is foreign and bsdType is %p",
     async bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
@@ -533,7 +536,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "an error message should be displayed if company is not registered in Trackdéchets and bsdType is %p",
     async bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
@@ -558,7 +561,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "an error message should be displayed if company has not the TRANSPORTER profile and bsdType is %p",
     async bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
@@ -583,22 +586,21 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "no error message should be displayed if company has not the TRANSPORTER profile but exemption is active and bsdType is %p",
     async bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);
 
       const data = {
         ...defaultTransporter,
-        ...(bsdType === BsdType.Bsdd ? { isExemptedOfReceipt: true } : {}),
-        ...(bsdType === BsdType.Bsda
-          ? {
+        ...(bsdType === BsdType.Bsdd
+          ? { isExemptedOfReceipt: true }
+          : {
               recepisse: {
                 ...(defaultTransporter as BsdaTransporter).recepisse,
                 isExempted: true
               }
-            }
-          : {})
+            })
       };
 
       render(
@@ -621,7 +623,7 @@ describe("TransporterForm", () => {
     }
   );
 
-  test.each([BsdType.Bsdd, BsdType.Bsda])(
+  test.each(bsdTypes)(
     "favorites should be displayed when we focus the search bar and bsdType is %p",
     async bsdType => {
       const defaultTransporter = getDefaultTransporter(bsdType);

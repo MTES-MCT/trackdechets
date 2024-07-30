@@ -119,6 +119,8 @@ export const temporaryStorageDetailFragment = gql`
     temporaryStorer {
       quantityType
       quantityReceived
+      quantityRefused
+      quantityAccepted
       wasteAcceptationStatus
       wasteRefusalReason
       receivedAt
@@ -191,6 +193,8 @@ const mutableFieldsFragment = gql`
     emittedByEcoOrganisme
     takenOverAt
     takenOverBy
+    receivedBy
+    receivedAt
     emitter {
       ...EmitterFragment
     }
@@ -255,6 +259,7 @@ const mutableFieldsFragment = gql`
       }
     }
     quantityGrouped
+    quantityReceived
     ecoOrganisme {
       name
       siret
@@ -315,6 +320,8 @@ export const detailFormFragment = gql`
     receivedAt
     receivedBy
     quantityReceived
+    quantityRefused
+    quantityAccepted
     wasteAcceptationStatus
     wasteRefusalReason
     signedAt
@@ -354,6 +361,8 @@ export const detailFormFragment = gql`
           quantity
         }
         quantityReceived
+        quantityRefused
+        quantityAccepted
         signedAt
         emitterPostalCode
       }
@@ -453,6 +462,7 @@ export const dashboardFormFragment = gql`
       name
     }
     stateSummary {
+      quantity
       transporterCustomInfo
       transporterNumberPlate
       transporter {

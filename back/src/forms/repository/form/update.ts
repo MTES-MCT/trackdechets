@@ -119,8 +119,9 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
 
         canAccessDraftSirets.push(...ownerOrgIdsInForm);
       }
+
       await prisma.form.update({
-        where,
+        where: { id: updatedForm.id },
         data: { ...denormalizedSirets, canAccessDraftSirets }
       });
     }

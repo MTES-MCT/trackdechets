@@ -28,10 +28,9 @@ describe("Mutation.updateBsdaTransporter", () => {
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient(null);
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
-    const bsddTransporter = await prisma.bsddTransporter.create({
+    const bsdaTransporter = await prisma.bsdaTransporter.create({
       data: {
         number: 0,
-        readyToTakeOver: true,
         transporterCompanySiret: transporter.siret,
         transporterCompanyName: transporter.name,
         transporterTransportMode: "ROAD"
@@ -42,7 +41,7 @@ describe("Mutation.updateBsdaTransporter", () => {
       MutationUpdateBsdaTransporterArgs
     >(UPDATE_BSDA_TRANSPORTER, {
       variables: {
-        id: bsddTransporter.id,
+        id: bsdaTransporter.id,
         input: {
           transport: { mode: "RAIL" }
         }
@@ -111,8 +110,8 @@ describe("Mutation.updateBsdaTransporter", () => {
       }
     });
     expect(errors).toBeUndefined();
-    const updatedBsddTransporter = await getFirstTransporter(bsda);
-    expect(updatedBsddTransporter?.transporterCompanySiret).toEqual(
+    const updatedBsdaTransporter = await getFirstTransporter(bsda);
+    expect(updatedBsdaTransporter?.transporterCompanySiret).toEqual(
       transporter.siret
     );
 
@@ -150,7 +149,7 @@ describe("Mutation.updateBsdaTransporter", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "123 n'est pas un numéro de SIRET valide"
+        message: "Transporteur : 123 n'est pas un numéro de SIRET valide"
       })
     ]);
   });

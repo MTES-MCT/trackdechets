@@ -59,9 +59,10 @@ import {
   WorkSite
 } from "../generated/graphql/types";
 import { prisma } from "@td/prisma";
-import { extractPostalCode } from "../utils";
 import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";
+import { extractPostalCode } from "../common/addresses";
+import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
@@ -373,6 +374,8 @@ export function flattenBsddRevisionRequestInput(
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       chain(reviewContent, c => chain(c.wasteDetails, w => w.packagingInfos))
     ),
+    wasteAcceptationStatus: chain(reviewContent, c => c.wasteAcceptationStatus),
+    wasteRefusalReason: chain(reviewContent, c => c.wasteRefusalReason),
     wasteDetailsSampleNumber: chain(reviewContent, c =>
       chain(c.wasteDetails, w => w.sampleNumber)
     ),
@@ -380,6 +383,7 @@ export function flattenBsddRevisionRequestInput(
       chain(c.wasteDetails, w => w.quantity)
     ),
     quantityReceived: chain(reviewContent, c => c.quantityReceived),
+    quantityRefused: chain(reviewContent, c => c.quantityRefused),
     processingOperationDone: chain(
       reviewContent,
       c => c.processingOperationDone
@@ -608,6 +612,18 @@ export function expandFormFromDb(
     transporters: forwardedInTransporters
   });
 
+  const wasteQuantities = bsddWasteQuantities({
+    wasteAcceptationStatus: form.wasteAcceptationStatus,
+    quantityReceived: form.quantityReceived,
+    quantityRefused: form.quantityRefused
+  });
+
+  const forwardedInWasteQuantities = bsddWasteQuantities({
+    wasteAcceptationStatus: forwardedIn?.wasteAcceptationStatus,
+    quantityReceived: forwardedIn?.quantityReceived,
+    quantityRefused: forwardedIn?.quantityRefused
+  });
+
   return {
     id: form.id,
     readableId: form.readableId,
@@ -727,9 +743,18 @@ export function expandFormFromDb(
       forwardedIn ? forwardedIn.receivedAt : form.receivedAt
     ),
     signedAt: processDate(forwardedIn ? forwardedIn.signedAt : form.signedAt),
+    quantityReceivedType: forwardedIn
+      ? forwardedIn.quantityReceivedType
+      : form.quantityReceivedType,
     quantityReceived: forwardedIn
       ? processDecimal(forwardedIn.quantityReceived)?.toNumber()
       : processDecimal(form.quantityReceived)?.toNumber(),
+    quantityRefused: forwardedIn
+      ? processDecimal(forwardedIn.quantityRefused)?.toNumber()
+      : processDecimal(form.quantityRefused)?.toNumber(),
+    quantityAccepted: forwardedIn
+      ? forwardedInWasteQuantities?.quantityAccepted?.toNumber()
+      : wasteQuantities?.quantityAccepted?.toNumber(),
     quantityGrouped: form.quantityGrouped,
     processingOperationDone: forwardedIn
       ? forwardedIn.processingOperationDone
@@ -794,6 +819,11 @@ export function expandFormFromDb(
             quantityReceived: form.quantityReceived
               ? processDecimal(form.quantityReceived).toNumber()
               : null,
+            quantityRefused: form.quantityRefused
+              ? processDecimal(form.quantityRefused).toNumber()
+              : null,
+            quantityAccepted:
+              wasteQuantities?.quantityAccepted?.toNumber() ?? null,
             wasteAcceptationStatus: form.wasteAcceptationStatus,
             wasteRefusalReason: form.wasteRefusalReason,
             receivedAt: processDate(form.receivedAt),
@@ -889,7 +919,9 @@ export function expandInitialFormFromDb(
     transporter,
     takenOverAt,
     signedAt,
+    wasteAcceptationStatus,
     quantityReceived,
+    quantityRefused,
     processingOperationDone,
     quantityGrouped
   } = expandFormFromDb({
@@ -900,6 +932,12 @@ export function expandInitialFormFromDb(
 
   const hasPickupSite =
     emitter?.workSite?.postalCode && emitter.workSite.postalCode.length > 0;
+
+  const wasteQuantities = bsddWasteQuantities({
+    wasteAcceptationStatus,
+    quantityReceived,
+    quantityRefused
+  });
 
   return {
     id,
@@ -915,6 +953,8 @@ export function expandInitialFormFromDb(
     recipient,
     transporter,
     quantityReceived,
+    quantityRefused,
+    quantityAccepted: wasteQuantities?.quantityAccepted?.toNumber() ?? null,
     quantityGrouped,
     processingOperationDone
   };

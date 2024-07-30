@@ -324,7 +324,7 @@ async function updateBsdasri(
   return runInTransaction(async transaction => {
     const bsdasriRepository = getBsdasriRepository(user, transaction);
     const signedBsdasri = await bsdasriRepository.update(
-      { id: bsdasri.id },
+      { id: bsdasri.id, status: bsdasri.status },
       updateInput
     );
     await postSignatureHook(signedBsdasri, bsdasriRepository);

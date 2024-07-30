@@ -53,7 +53,8 @@ import {
   DateRow,
   DetailRow,
   YesNoRow,
-  PackagingRow
+  PackagingRow,
+  QuantityRow
 } from "../common/Components";
 import { WorkflowAction } from "../../components/BSDList";
 import { Modal } from "../../../common/components";
@@ -71,11 +72,13 @@ import {
   COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS,
   SEARCH_COMPANIES
 } from "../../../Apps/common/queries/company/query";
-import { formTransportIsPipeline } from "../../../form/bsdd/utils/packagings";
-import { getOperationModeLabel } from "../../../common/operationModes";
+import { formTransportIsPipeline } from "../../../Apps/common/utils/packagingsBsddSummary";
+import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
+import { isDefined } from "../../../common/helper";
+import { BSD_DETAILS_QTY_TOOLTIP } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -114,6 +117,10 @@ const Company = ({ company, label }: CompanyProps) => (
 const TempStorage = ({ form }) => {
   const { temporaryStorageDetail } = form;
 
+  const hasBeenReceived = isDefined(
+    temporaryStorageDetail?.temporaryStorer?.quantityReceived
+  );
+
   return (
     <>
       <div className={styles.detailColumns}>
@@ -134,9 +141,23 @@ const TempStorage = ({ form }) => {
           />
 
           <PackagingRow packagingInfos={form.stateSummary?.packagingInfos} />
-          <DetailRow
+
+          <QuantityRow
             value={temporaryStorageDetail?.temporaryStorer?.quantityReceived}
-            label="Quantité reçue"
+            label="Quantité reçue nette"
+            showEmpty={hasBeenReceived}
+          />
+          <QuantityRow
+            value={temporaryStorageDetail?.temporaryStorer?.quantityRefused}
+            label="Quantité refusée nette"
+            tooltip={BSD_DETAILS_QTY_TOOLTIP}
+            showEmpty={hasBeenReceived}
+          />
+          <QuantityRow
+            value={temporaryStorageDetail?.temporaryStorer?.quantityAccepted}
+            label="Quantité traitée nette"
+            tooltip={BSD_DETAILS_QTY_TOOLTIP}
+            showEmpty={hasBeenReceived}
           />
           <DetailRow
             value={getVerboseQuantityType(
@@ -363,6 +384,7 @@ const Recipient = ({
   const recipient = hasTempStorage
     ? form.temporaryStorageDetail?.destination
     : form.recipient;
+
   return (
     <>
       {" "}
@@ -377,13 +399,26 @@ const Recipient = ({
           value={getVerboseAcceptationStatus(form?.wasteAcceptationStatus)}
           label="Lot accepté"
         />
-        <DetailRow
-          value={form?.quantityReceived && `${form?.quantityReceived} tonnes`}
-          label="Quantité reçue"
+        <QuantityRow
+          value={form?.quantityReceived}
+          label="Quantité reçue nette"
+          showEmpty={true}
+        />
+        <QuantityRow
+          value={form?.quantityRefused}
+          label="Quantité refusée nette"
+          tooltip={BSD_DETAILS_QTY_TOOLTIP}
+          showEmpty={true}
         />
         <DetailRow value={form.wasteRefusalReason} label="Motif de refus" />
       </div>
       <div className={styles.detailGrid}>
+        <QuantityRow
+          value={form?.quantityAccepted}
+          label="Quantité traitée nette"
+          tooltip={BSD_DETAILS_QTY_TOOLTIP}
+          showEmpty={true}
+        />
         <DetailRow
           value={recipient?.processingOperation}
           label="Opération de traitement prévue"
@@ -459,7 +494,11 @@ const Appendix2 = ({
             <td>{form?.readableId}</td>
             <td>{form?.wasteDetails?.code}</td>
             <td>{form?.wasteDetails?.name}</td>
-            <td>{form?.quantityReceived ?? form?.wasteDetails?.quantity}</td>
+            <td>
+              {form?.quantityAccepted ??
+                form?.quantityReceived ??
+                form?.wasteDetails?.quantity}
+            </td>
             <td>
               {form?.quantityReceived
                 ? "R"
@@ -625,8 +664,7 @@ const Appendix1 = ({
         onClose={() => setIsOpen(false)}
         ariaLabel="Ajout d'une annexe 1 au chapeau"
         isOpen={isOpen}
-        padding={false}
-        wide={true}
+        size="L"
       >
         <Appendix1ProducerForm
           container={container}
@@ -647,7 +685,7 @@ export default function BSDDetailContent({
   form,
   children = null
 }: BSDDetailContentProps) {
-  const { siret } = useParams<{ siret: string }>();
+  const { siret = "" } = useParams<{ siret: string }>();
   const query = useQueryString();
   const navigate = useNavigate();
   const { permissions } = usePermissions();

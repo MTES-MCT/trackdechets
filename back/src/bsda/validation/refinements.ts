@@ -329,11 +329,13 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
   await isDestinationRefinement(
     bsda.destinationCompanySiret,
     zodContext,
+    "DESTINATION",
     isBsdaDestinationExemptFromVerification
   );
   await isDestinationRefinement(
     bsda.destinationOperationNextDestinationCompanySiret,
     zodContext,
+    "DESTINATION",
     isBsdaDestinationExemptFromVerification
   );
   for (const transporter of bsda.transporters ?? []) {

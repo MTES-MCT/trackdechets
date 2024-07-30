@@ -27,7 +27,9 @@ trackdechetsId
 contact
 contactPhone
 contactEmail
-companyTypes
+companyTypes`;
+
+const commonCompanyTypesSearchString = `
 collectorTypes
 wasteProcessorTypes`;
 
@@ -76,6 +78,7 @@ workerCertification {
 const companySearchResultFragment = gql`
   fragment CompanySearchResultFragment on CompanySearchResult {
     ${commonCompanySearchString}
+    ${commonCompanyTypesSearchString}
     ${transporterReceiptCompanySearchString}
     ${traderReceiptCompanySearchString}
     ${brokerReceiptCompanySearchString}

@@ -11,6 +11,7 @@ import { EventType } from "../../workflow/types";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
+import { isWasteRefused } from "./markAsReceived";
 
 const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
   _,
@@ -53,7 +54,7 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
     );
 
     const acceptedForm = await update(
-      { id: form.id },
+      { id: form.id, status: form.status },
       {
         status: transitionForm(form, {
           type: EventType.MarkAsAccepted,
@@ -80,11 +81,7 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
     return acceptedForm;
   });
 
-  if (
-    acceptedForm.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED ||
-    acceptedForm.wasteAcceptationStatus ===
-      WasteAcceptationStatus.PARTIALLY_REFUSED
-  ) {
+  if (isWasteRefused(acceptedForm)) {
     const refusedEmail = await renderFormRefusedEmail(acceptedForm);
     if (refusedEmail) {
       sendMail(refusedEmail);

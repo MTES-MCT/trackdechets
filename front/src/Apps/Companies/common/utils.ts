@@ -1,5 +1,7 @@
 import { CollectorType, CompanyType, WasteProcessorType } from "@td/codegen-ui";
 import { format, isValid } from "date-fns";
+// eslint-disable-next-line import/no-duplicates
+import fr from "date-fns/locale/fr";
 import { parseDate } from "../../../common/datetime";
 
 export const COMPANY_CONSTANTS = [
@@ -17,7 +19,8 @@ export const COMPANY_CONSTANTS = [
   },
   {
     value: CompanyType.Collector,
-    label: "Installation de Tri, transit regroupement de déchets",
+    label:
+      "Installation de Tri, transit regroupement de déchets y compris non classée",
     helpText:
       "Installations sur lesquelles sont regroupés, triés ou en transit les déchets dangereux et/ou non dangereux - installations relevant des rubriques suivantes de la nomenclature ICPE:  2711, 2713, 2714, 2715, 2716, 2718, 2719, 2731, 2792-1, 2793-1, 2793-2, 2797-1, 2798."
   },
@@ -81,12 +84,6 @@ export const COMPANY_CONSTANTS = [
     label:
       "Installation dans laquelle les déchets perdent leur statut de déchet",
     helpText: ""
-  },
-  {
-    value: CompanyType.Crematorium,
-    label: "Crématorium",
-    helpText:
-      "Un crématorium autorisé prend en charge l'incinération des pièces anatomiques d'origine humaine"
   }
 ];
 
@@ -124,7 +121,7 @@ export const WASTE_PROCESSOR_OPTIONS = [
     value: WasteProcessorType.NonDangerousWastesIncineration
   },
   {
-    label: "Crémation",
+    label: "Crématorium (et cimetières pour la Guyane)",
     value: WasteProcessorType.Cremation
   },
   {
@@ -158,9 +155,17 @@ export const parsedDate = date => {
 };
 
 export const formatDate = date => {
-  return date ? format(parsedDate(date) as Date, "yyyy-MM-dd") : "";
+  return date
+    ? format(parsedDate(date) as Date, "yyyy-MM-dd", {
+        locale: fr
+      })
+    : "";
 };
 
 export const formatDateViewDisplay = date => {
-  return date ? format(parsedDate(date) as Date, "dd/MM/yyyy") : "";
+  return date
+    ? format(parsedDate(date) as Date, "dd/MM/yyyy", {
+        locale: fr
+      })
+    : "";
 };

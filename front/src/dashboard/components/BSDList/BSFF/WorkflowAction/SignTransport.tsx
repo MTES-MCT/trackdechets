@@ -3,43 +3,57 @@ import { useMutation } from "@apollo/client";
 import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
 import {
+  BsdType,
   Bsff,
   BsffSignatureType,
+  BsffTransporterTransportInput,
   Mutation,
   MutationSignBsffArgs,
-  MutationUpdateBsffArgs,
+  MutationUpdateBsffTransporterArgs,
+  SignatureInput,
   TransportMode
 } from "@td/codegen-ui";
 import { RedErrorMessage } from "../../../../../common/components";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
-import {
-  SIGN_BSFF,
-  UPDATE_BSFF_FORM
-} from "../../../../../Apps/common/queries/bsff/queries";
+import { SIGN_BSFF } from "../../../../../Apps/common/queries/bsff/queries";
 import { SignBsff } from "./SignBsff";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import { subMonths } from "date-fns";
-import TagsInput from "../../../../../common/components/tags-input/TagsInput";
+import { UPDATE_BSFF_TRANSPORTER } from "../../../../../Apps/Forms/Components/query";
+import TransportPlates from "../../../../../Apps/Forms/Components/TransportPlates/TransportPlates";
 
 const validationSchema = yup.object({
-  takenOverAt: yup.date().required("La date de prise en charge est requise"),
-  signatureAuthor: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis")
+  transport: yup.object({
+    takenOverAt: yup.date().required("La date de prise en charge est requise")
+  }),
+  signature: yup.object({
+    date: yup.date().required("La date est requise"),
+    author: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis")
+  })
 });
 
 interface SignTransportFormProps {
   bsff: Bsff;
-  onCancel: () => void;
+  onClose: () => void;
 }
 
-function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
-  const [updateBsff, updateBsffResult] = useMutation<
-    Pick<Mutation, "updateBsff">,
-    MutationUpdateBsffArgs
-  >(UPDATE_BSFF_FORM);
+type FormikValues = {
+  transport: BsffTransporterTransportInput;
+  signature: SignatureInput;
+};
+
+function SignTransportForm({
+  bsff,
+  onClose
+}: Readonly<SignTransportFormProps>) {
+  const [updateBsffTransporter, updateBsffTransporterResult] = useMutation<
+    Pick<Mutation, "updateBsffTransporter">,
+    MutationUpdateBsffTransporterArgs
+  >(UPDATE_BSFF_TRANSPORTER);
 
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
@@ -48,40 +62,56 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
 
   const TODAY = new Date();
 
+  const signingTransporter = bsff.transporters?.find(
+    t => !t.transport?.signature?.date
+  );
+
+  const loading = React.useMemo(
+    () => updateBsffTransporterResult.loading || signBsffResult.loading,
+    [updateBsffTransporterResult, signBsffResult]
+  );
+
+  if (!signingTransporter) {
+    return <div>Tous les transporteurs ont déjà signé</div>;
+  }
+
   return (
-    <Formik
+    <Formik<FormikValues>
       initialValues={{
-        signatureAuthor: "",
-        takenOverAt: TODAY.toISOString(),
-        transporterTransportPlates: bsff.transporter?.transport?.plates
+        transport: {
+          mode: signingTransporter.transport?.mode ?? TransportMode.Road,
+          plates: signingTransporter.transport?.plates ?? [],
+          takenOverAt:
+            signingTransporter.transport?.takenOverAt ??
+            new Date().toISOString()
+        },
+        signature: {
+          author: "",
+          date: TODAY.toISOString()
+        }
       }}
       validationSchema={validationSchema}
       onSubmit={async values => {
-        await updateBsff({
+        const { transport, signature } = values;
+
+        await updateBsffTransporter({
           variables: {
-            id: bsff.id,
-            input: {
-              transporter: {
-                transport: {
-                  takenOverAt: values.takenOverAt,
-                  plates: values.transporterTransportPlates,
-                  mode: bsff.transporter?.transport?.mode ?? TransportMode.Road
-                }
-              }
-            }
+            id: signingTransporter.id,
+            input: { transport: transport }
           }
         });
+
         await signBsff({
           variables: {
             id: bsff.id,
             input: {
               type: BsffSignatureType.Transport,
-              author: values.signatureAuthor,
-              date: values.takenOverAt
+              author: signature.author,
+              date: signature.date
             }
           }
         });
-        onCancel();
+        onClose();
       }}
     >
       {() => (
@@ -91,15 +121,15 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             les informations ci-dessus sont correctes. En signant ce document,
             je déclare prendre en charge le déchet.
           </p>
-          <TransporterRecepisseWrapper transporter={bsff.transporter!} />
+          <TransporterRecepisseWrapper transporter={signingTransporter} />
 
-          {!bsff.transporter?.transport?.mode ||
-            (bsff.transporter?.transport?.mode === TransportMode.Road && (
-              <div className="form__row">
-                <label htmlFor="transporterTransportPlates">
-                  Immatriculations
-                </label>
-                <TagsInput name="transporterTransportPlates" />
+          {!signingTransporter.transport?.mode ||
+            (signingTransporter.transport?.mode === TransportMode.Road && (
+              <div style={{ width: "300px" }}>
+                <TransportPlates
+                  bsdType={BsdType.Bsff}
+                  fieldName={"transport.plates"}
+                />
               </div>
             ))}
 
@@ -108,7 +138,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
               Date de prise en charge
               <div className="td-date-wrapper">
                 <Field
-                  name="takenOverAt"
+                  name="transport.takenOverAt"
                   component={DateInput}
                   className="td-input"
                   minDate={subMonths(TODAY, 2)}
@@ -117,7 +147,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
                 />
               </div>
             </label>
-            <RedErrorMessage name="takenOverAt" />
+            <RedErrorMessage name="transport.takenOverAt" />
           </div>
 
           <div className="form__row">
@@ -125,12 +155,18 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
               NOM et prénom du signataire
               <Field
                 className="td-input"
-                name="signatureAuthor"
+                name="signature.author"
                 placeholder="NOM Prénom"
               />
             </label>
-            <RedErrorMessage name="signatureAuthor" />
+            <RedErrorMessage name="signature.author" />
           </div>
+
+          {updateBsffTransporterResult.error && (
+            <NotificationError
+              apolloError={updateBsffTransporterResult.error}
+            />
+          )}
 
           {signBsffResult.error && (
             <NotificationError apolloError={signBsffResult.error} />
@@ -140,7 +176,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             <button
               type="button"
               className="btn btn--outline-primary"
-              onClick={onCancel}
+              onClick={onClose}
             >
               Annuler
             </button>
@@ -150,9 +186,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
               disabled={signBsffResult.loading}
             >
               <span>
-                {updateBsffResult.loading || signBsffResult.loading
-                  ? "Signature en cours..."
-                  : "Signer l'enlèvement"}
+                {loading ? "Signature en cours..." : "Signer l'enlèvement"}
               </span>
             </button>
           </div>
@@ -184,7 +218,7 @@ export function SignTransport({
       displayActionButton={displayActionButton}
     >
       {({ bsff, onClose }) => (
-        <SignTransportForm bsff={bsff} onCancel={onClose} />
+        <SignTransportForm bsff={bsff} onClose={onClose} />
       )}
     </SignBsff>
   );

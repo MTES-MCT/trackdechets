@@ -110,11 +110,11 @@ describe("Mutation.createDraftBsdasri", () => {
 
   it.each([
     ["R12", undefined],
-    ["D12", "ELIMINATION"]
+    ["D13", undefined]
   ])(
-    "should disallow R12 & D12 for non waste processor destination ",
+    "should disallow R12 & D13 for non waste processor destination ",
     async (code, mode) => {
-      // both R12 & D12 operation codes require the destination to be a COLLECTOR
+      // both R12 & D13 operation codes require the destination to be a COLLECTOR
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -151,7 +151,7 @@ describe("Mutation.createDraftBsdasri", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Les codes R12 et D12 sont réservés aux installations de tri transit regroupement",
+            "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement",
           extensions: expect.objectContaining({
             code: ErrorCode.BAD_USER_INPUT
           })
@@ -161,9 +161,9 @@ describe("Mutation.createDraftBsdasri", () => {
   );
   it.each([
     ["R12", undefined],
-    ["D12", "ELIMINATION"]
-  ])("should allow R12 & D12 for waste processor ", async (code, mode) => {
-    // both R12 & D12 operation codes require the destination to be a COLLECTOR
+    ["D13", undefined]
+  ])("should allow R12 & D13 for waste processor ", async (code, mode) => {
+    // both R12 & D13 operation codes require the destination to be a COLLECTOR
 
     const { user, company } = await userWithCompanyFactory("MEMBER");
 

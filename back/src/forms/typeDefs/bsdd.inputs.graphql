@@ -103,6 +103,16 @@ input AcceptedFormInput {
   Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
+
+  """
+  Quantité refusée nette (optionnelle)
+
+  Si définie:
+  - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
+  - doit être égale à 0 si le déchet est totalement accepté.
+  - doit être égale à quantityReceived si le déchet est totalement refusé.
+  """
+  quantityRefused: Float
 }
 
 "Payload de réception d'un BSD"
@@ -128,9 +138,19 @@ input ReceivedFormInput {
   Doit être supérieure à 0 lorsque le déchet est accepté.
   Doit être égale à 0 lorsque le déchet est refusé.
 
-  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  Doit être inférieure à 40T en cas de transport routier et inférieure à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float
+
+  """
+  Quantité refusée nette (optionnelle)
+
+  Si définie:
+  - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
+  - doit être égale à 0 si le déchet est totalement accepté.
+  - doit être égale à quantityReceived si le déchet est totalement refusé.
+  """
+  quantityRefused: Float
 }
 
 "Payload de traitement d'un BSD"
@@ -708,6 +728,16 @@ input TempStorerAcceptedFormInput {
   """
   quantityReceived: Float!
 
+  """
+  Quantité refusée nette (optionnelle)
+
+  Si définie:
+  - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
+  - doit être égale à 0 si le déchet est totalement accepté.
+  - doit être égale à quantityReceived si le déchet est totalement refusé.
+  """
+  quantityRefused: Float
+
   "Réelle ou estimée"
   quantityType: QuantityType!
 }
@@ -737,6 +767,16 @@ input TempStoredFormInput {
   Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
+
+  """
+  Quantité refusée nette (optionnelle)
+
+  Si définie:
+  - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
+  - doit être égale à 0 si le déchet est totalement accepté.
+  - doit être égale à quantityReceived si le déchet est totalement refusé.
+  """
+  quantityRefused: Float
 
   "Réelle ou estimée"
   quantityType: QuantityType!
@@ -885,8 +925,17 @@ input FormRevisionRequestContentInput {
   "Informations sur l'installation de destination ou d’entreposage ou de reconditionnement prévue (édition partielle uniquement)"
   recipient: FormRevisionRequestRecipientInput
 
+  "Statut d'acceptation du déchet (case 10)"
+  wasteAcceptationStatus: WasteAcceptationStatus
+
+  "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
+  wasteRefusalReason: String
+
   "Quantité reçue sur l'installation de destination, en tonnes"
   quantityReceived: Float
+
+  "Quantité refusée nette, en tonnes"
+  quantityRefused: Float
 
   "Traitement réalisé (code D/R)"
   processingOperationDone: String

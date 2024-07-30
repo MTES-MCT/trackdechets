@@ -3,6 +3,7 @@ import { Document, formatDate, SignatureStamp } from "../../../common/pdf";
 import { Bsvhu, OperationMode } from "../../../generated/graphql/types";
 import { Recepisse } from "./Recepisse";
 import { getOperationModeLabel } from "../../../common/operationModes";
+import { dateToXMonthAtHHMM } from "../../../common/helpers";
 
 const IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
@@ -46,6 +47,9 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
               className="QrCode"
               dangerouslySetInnerHTML={{ __html: qrCode }}
             />
+            <div>
+              <b>Document édité le {dateToXMonthAtHHMM()}</b>
+            </div>
           </div>
         </div>
         {/* end 3-parts header */}

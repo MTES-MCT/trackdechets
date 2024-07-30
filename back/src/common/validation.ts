@@ -57,6 +57,7 @@ export const weight = (unit = WeightUnits.Kilogramme) =>
 // Differents conditions than can be applied to a weight based on the
 // value of other sibling fields
 type WeightConditions = {
+  bsddWasteAcceptationStatus: ConditionBuilder<yup.NumberSchema>;
   wasteAcceptationStatus: ConditionBuilder<yup.NumberSchema>;
   transportMode: (unit: WeightUnits) => ConditionConfig<yup.NumberSchema>;
   // Same condition as `transportMode` except that is take
@@ -74,6 +75,21 @@ const maxWeightByRoadErrorMessage =
   ` tonnes lorsque le transport se fait par la route`;
 
 export const weightConditions: WeightConditions = {
+  // Specific for BSDDs, for the quantityRefused migration. quantityReceived
+  // must now be the actual received quantity, so it must be > 0 even when REFUSED
+  bsddWasteAcceptationStatus: (status, weight) => {
+    if (
+      [
+        WasteAcceptationStatus.ACCEPTED,
+        WasteAcceptationStatus.PARTIALLY_REFUSED
+      ].includes(status)
+    ) {
+      return weight.positive(
+        "${path} : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
+      );
+    }
+    return weight;
+  },
   wasteAcceptationStatus: (status, weight) => {
     if (status === WasteAcceptationStatus.REFUSED) {
       return weight.test({

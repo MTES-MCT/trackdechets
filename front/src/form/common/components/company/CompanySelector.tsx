@@ -20,7 +20,6 @@ import React, {
 } from "react";
 
 import { debounce } from "../../../../common/helper";
-import { getInitialCompany } from "../../../bsdd/utils/initial-state";
 import {
   BsdasriTransporterInput,
   BsdaTransporterInput,
@@ -48,6 +47,7 @@ import {
   SEARCH_COMPANIES
 } from "../../../../Apps/common/queries/company/query";
 import TransporterRecepisseWrapper from "./TransporterRecepisseWrapper";
+import { getInitialCompany } from "../../../../Apps/common/data/initialState";
 
 const DEBOUNCE_DELAY = 500;
 

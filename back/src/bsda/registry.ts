@@ -1,7 +1,6 @@
 import { Bsda } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   BsdSubType,
@@ -19,10 +18,11 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode, splitAddress } from "../utils";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { RegistryBsda } from "../registry/elastic";
 import { BsdaForElastic } from "./elastic";
+import { splitAddress } from "../common/addresses";
+import { isFinalOperationCode } from "../common/operationCodes";
 
 const getPostTempStorageDestination = (bsda: RegistryBsda) => {
   if (!bsda.forwardedIn) return {};
@@ -57,73 +57,211 @@ const getIntermediariesData = (bsda: RegistryBsda) => ({
   intermediary3CompanySiret: bsda.intermediaries?.[2]?.siret ?? null
 });
 
-const getFinalOperationsData = (bsda: RegistryBsda) => {
+const getFinalOperationsData = (
+  bsda: RegistryBsda
+): Pick<
+  OutgoingWaste | AllWaste,
+  | "destinationFinalOperationCodes"
+  | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCompanySirets"
+> => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
+  const destinationFinalOperationCompanySirets: string[] = [];
+
   // Check if finalOperations is defined and has elements
-  if (bsda.finalOperations && bsda.finalOperations.length > 0) {
+  if (
+    bsda.destinationOperationSignatureDate &&
+    bsda.destinationOperationCode &&
+    // Cf tra-14603 => si le code de traitement du bordereau initial est final,
+    // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
+    // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
+    !isFinalOperationCode(bsda.destinationOperationCode) &&
+    bsda.finalOperations?.length
+  ) {
     // Iterate through each operation once and fill both arrays
     bsda.finalOperations.forEach(ope => {
       destinationFinalOperationCodes.push(ope.operationCode);
-      destinationFinalOperationWeights.push(ope.quantity.toNumber());
+      destinationFinalOperationWeights.push(
+        // conversion en tonnes
+        ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      );
+      if (ope.finalBsda.destinationCompanySiret) {
+        // cela devrait tout le temps être le cas
+        destinationFinalOperationCompanySirets.push(
+          ope.finalBsda.destinationCompanySiret
+        );
+      }
     });
   }
-  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+  return {
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    destinationFinalOperationCompanySirets
+  };
 };
 
-const getTransportersData = (bsda: RegistryBsda): Partial<GenericWaste> => {
+const getInitialEmitterData = (bsda: RegistryBsda) => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  if (bsda.forwarding) {
+    const { street, postalCode, city, country } = splitAddress(
+      bsda.forwarding.emitterCompanyAddress
+    );
+
+    initialEmitter.initialEmitterCompanyAddress = street;
+    initialEmitter.initialEmitterCompanyPostalCode = postalCode;
+    initialEmitter.initialEmitterCompanyCity = city;
+    initialEmitter.initialEmitterCompanyCountry = country;
+
+    initialEmitter.initialEmitterCompanyName =
+      bsda.forwarding.emitterCompanyName;
+    initialEmitter.initialEmitterCompanySiret =
+      bsda.forwarding.emitterCompanySiret;
+  }
+
+  return initialEmitter;
+};
+
+export const getTransportersData = (
+  bsda: RegistryBsda,
+  includePlates = false
+) => {
   const transporters = getTransportersSync(bsda);
 
   const [transporter, transporter2, transporter3, transporter4, transporter5] =
     transporters;
 
-  return {
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    transporter.transporterCompanyAddress,
+    transporter.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    transporter2?.transporterCompanyAddress,
+    transporter2?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    transporter3?.transporterCompanyAddress,
+    transporter3?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    transporter4?.transporterCompanyAddress,
+    transporter4?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    transporter5?.transporterCompanyAddress,
+    transporter5?.transporterCompanyVatNumber
+  );
+
+  const data = {
     transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
-    transporterCompanyAddress: transporter?.transporterCompanyAddress,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter),
     transporterRecepisseNumber: transporter?.transporterRecepisseNumber,
-    transporterNumberPlates: transporter?.transporterTransportPlates,
     transporterCompanyMail: transporter?.transporterCompanyMail,
     transporterRecepisseIsExempted: transporter?.transporterRecepisseIsExempted,
     transporterTransportMode: transporter?.transporterTransportMode,
-    transporter2CompanyAddress: transporter2?.transporterCompanyAddress,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
     transporter2CompanyName: transporter2?.transporterCompanyName,
     transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
     transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
-    transporter2NumberPlates: transporter2?.transporterTransportPlates,
     transporter2CompanyMail: transporter2?.transporterCompanyMail,
     transporter2RecepisseIsExempted:
       transporter2?.transporterRecepisseIsExempted,
     transporter2TransportMode: transporter2?.transporterTransportMode,
-    transporter3CompanyAddress: transporter3?.transporterCompanyAddress,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
     transporter3CompanyName: transporter3?.transporterCompanyName,
     transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
     transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
-    transporter3NumberPlates: transporter3?.transporterTransportPlates,
     transporter3CompanyMail: transporter3?.transporterCompanyMail,
     transporter3RecepisseIsExempted:
       transporter3?.transporterRecepisseIsExempted,
     transporter3TransportMode: transporter3?.transporterTransportMode,
-    transporter4CompanyAddress: transporter4?.transporterCompanyAddress,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
     transporter4CompanyName: transporter4?.transporterCompanyName,
     transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
     transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
-    transporter4NumberPlates: transporter4?.transporterTransportPlates,
     transporter4CompanyMail: transporter4?.transporterCompanyMail,
     transporter4RecepisseIsExempted:
       transporter4?.transporterRecepisseIsExempted,
     transporter4TransportMode: transporter4?.transporterTransportMode,
-    transporter5CompanyAddress: transporter5?.transporterCompanyAddress,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
     transporter5CompanyName: transporter5?.transporterCompanyName,
     transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
     transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
-    transporter5NumberPlates: transporter5?.transporterTransportPlates,
     transporter5CompanyMail: transporter5?.transporterCompanyMail,
     transporter5RecepisseIsExempted:
       transporter5?.transporterRecepisseIsExempted,
     transporter5TransportMode: transporter5?.transporterTransportMode
   };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: transporter?.transporterTransportPlates ?? null,
+      transporter2NumberPlates:
+        transporter2?.transporterTransportPlates ?? null,
+      transporter3NumberPlates:
+        transporter3?.transporterTransportPlates ?? null,
+      transporter4NumberPlates:
+        transporter4?.transporterTransportPlates ?? null,
+      transporter5NumberPlates: transporter5?.transporterTransportPlates ?? null
+    };
+  }
+
+  return data;
 };
 
 export function getRegistryFields(
@@ -195,7 +333,28 @@ export const getSubType = (bsda: RegistryBsda): BsdSubType => {
   return bsda.type;
 };
 
-function toGenericWaste(bsda: RegistryBsda): GenericWaste {
+export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsda.destinationCompanyAddress);
+
+  const {
+    street: workerCompanyAddress,
+    postalCode: workerCompanyPostalCode,
+    city: workerCompanyCity,
+    country: workerCompanyCountry
+  } = splitAddress(bsda.workerCompanyAddress);
+
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsda.emitterCompanyAddress);
+
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
@@ -216,113 +375,67 @@ function toGenericWaste(bsda: RegistryBsda): GenericWaste {
       bsda.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsda.destinationOperationDate,
     destinationReceptionWeight: bsda.destinationReceptionWeight
-      ? bsda.destinationReceptionWeight.dividedBy(1000).toNumber()
+      ? bsda.destinationReceptionWeight
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
-
+    weight: bsda.weightValue
+      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     wasteAdr: bsda.wasteAdr,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
-    workerCompanyAddress: bsda.workerCompanyAddress,
-    ...getTransportersData(bsda),
+    workerCompanyAddress,
+    workerCompanyPostalCode,
+    workerCompanyCity,
+    workerCompanyCountry,
     destinationCompanyMail: bsda.destinationCompanyMail,
-    brokerCompanyMail: bsda.brokerCompanyMail
+    brokerCompanyMail: bsda.brokerCompanyMail,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bsda.destinationCompanyName,
+    destinationCompanySiret: bsda.destinationCompanySiret,
+    emitterPickupsiteName: bsda.emitterPickupSiteName,
+    emitterPickupsiteAddress: bsda.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bsda.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bsda.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bsda.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bsda.emitterCompanyName,
+    emitterCompanySiret: bsda.emitterCompanySiret
   };
 }
 
 export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
-  const initialEmitter: Pick<
-    IncomingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsda.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    //secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsda.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsda.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsda.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyIncomingWaste,
     ...genericWaste,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
     destinationReceptionDate: bsda.destinationReceptionDate,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
-    ...initialEmitter,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: null,
-    destinationCustomInfo: bsda.destinationCustomInfo,
     emitterCompanyMail: bsda.emitterCompanyMail,
     ...getOperationData(bsda),
     nextDestinationProcessingOperation:
-      bsda.destinationOperationNextDestinationPlannedOperationCode
+      bsda.destinationOperationNextDestinationPlannedOperationCode,
+    ...getTransportersData(bsda),
+    ...getInitialEmitterData(bsda)
   };
 }
 
 export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
-  const initialEmitter: Pick<
-    OutgoingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsda.forwarding) {
-    initialEmitter.initialEmitterCompanyAddress =
-      bsda.forwarding.emitterCompanyAddress;
-    initialEmitter.initialEmitterCompanyName =
-      bsda.forwarding.emitterCompanyName;
-    initialEmitter.initialEmitterCompanySiret =
-      bsda.forwarding.emitterCompanySiret;
-  }
-
-  if (bsda.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsda.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
@@ -333,67 +446,25 @@ export function toOutgoingWaste(bsda: RegistryBsda): Required<OutgoingWaste> {
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
-    ...initialEmitter,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsda.weightValue
-      ? bsda.weightValue.dividedBy(1000).toNumber()
+      ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    emitterCustomInfo: bsda.emitterCustomInfo,
     ...getOperationData(bsda),
     ...getFinalOperationsData(bsda),
     nextDestinationProcessingOperation:
-      bsda.destinationOperationNextDestinationPlannedOperationCode
+      bsda.destinationOperationNextDestinationPlannedOperationCode,
+    ...getTransportersData(bsda),
+    ...getInitialEmitterData(bsda)
   };
 }
 
 export function toTransportedWaste(
   bsda: RegistryBsda
 ): Required<TransportedWaste> {
-  const initialEmitter: Pick<
-    TransportedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsda.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    // secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsda.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsda.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsda.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
@@ -404,124 +475,38 @@ export function toTransportedWaste(
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toNumber()
       : null,
-    ...initialEmitter,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
-    emitterCompanyMail: bsda.emitterCompanyMail
+    emitterCompanyMail: bsda.emitterCompanyMail,
+    ...getTransportersData(bsda, true)
   };
 }
 
 export function toManagedWaste(bsda: RegistryBsda): Required<ManagedWaste> {
-  const initialEmitter: Pick<
-    ManagedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsda.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    // secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsda.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsda.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsda.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
-    ...initialEmitter,
     emitterCompanyMail: bsda.emitterCompanyMail,
     destinationCompanyMail: bsda.destinationCompanyMail,
     nextDestinationProcessingOperation:
-      bsda.destinationOperationNextDestinationPlannedOperationCode
+      bsda.destinationOperationNextDestinationPlannedOperationCode,
+    ...getTransportersData(bsda)
   };
 }
 
 export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
-  const initialEmitter: Pick<
-    AllWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsda.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    // secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsda.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsda.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsda.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsda);
 
   return {
@@ -534,27 +519,10 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: bsda.brokerRecepisseNumber,
-    destinationCompanyAddress: bsda.destinationCompanyAddress,
-    destinationCompanyName: bsda.destinationCompanyName,
-    destinationCompanySiret: bsda.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterCompanyName: bsda.emitterCompanyName,
-    emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteName: bsda.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress(
-      [
-        bsda.emitterPickupSiteAddress,
-        bsda.emitterPickupSitePostalCode,
-        bsda.emitterPickupSiteCity
-      ].filter(Boolean)
-    ),
-    ...initialEmitter,
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toNumber()
       : null,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -563,6 +531,8 @@ export function toAllWaste(bsda: RegistryBsda): Required<AllWaste> {
     ...getFinalOperationsData(bsda),
     nextDestinationProcessingOperation:
       bsda.destinationOperationNextDestinationPlannedOperationCode,
-    ...getIntermediariesData(bsda)
+    ...getIntermediariesData(bsda),
+    ...getTransportersData(bsda, true),
+    ...getInitialEmitterData(bsda)
   };
 }

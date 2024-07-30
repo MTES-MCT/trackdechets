@@ -1,0 +1,17 @@
+@import "../../../../scss/Constants.scss";
+.wasteCode {
+  &Widgets {
+    display: flex;
+    align-items: center;
+  }
+  &Input {
+    width: 150px;
+    margin-right: 0.5rem;
+  }
+}
+.textQuote {
+  margin: 10px 0;
+}
+.inputError {
+  border-color: $red;
+}

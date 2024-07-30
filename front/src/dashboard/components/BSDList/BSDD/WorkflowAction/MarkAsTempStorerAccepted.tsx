@@ -16,7 +16,7 @@ import { Loader } from "../../../../../Apps/common/Components";
 import { IconWarehouseStorage } from "../../../../../Apps/common/Components/Icons/Icons";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import AcceptedInfo from "./AcceptedInfo";
-import { GET_FORM } from "../../../../../form/bsdd/utils/queries";
+import { GET_FORM } from "../../../../../Apps/common/queries/bsdd/queries";
 
 const MARK_TEMP_STORER_ACCEPTED = gql`
   mutation MarkAsTempStorerAccepted(

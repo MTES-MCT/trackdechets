@@ -70,15 +70,14 @@ export const companyFactory = async (
   return prisma.company.create({
     data: {
       orgId: opts.vatNumber ?? siret,
-      siret,
+      siret: opts.vatNumber ? null : siret,
       companyTypes: {
         set: [
           "PRODUCER",
           "TRANSPORTER",
           "WASTEPROCESSOR",
           "WORKER",
-          "WASTE_VEHICLES",
-          "CREMATORIUM"
+          "WASTE_VEHICLES"
         ]
       },
       name: `company_${companyIndex}`,
@@ -372,7 +371,7 @@ export const upsertBaseSiret = async siret => {
           orgId: siret,
           siret,
           companyTypes: {
-            set: ["TRANSPORTER", "WASTEPROCESSOR", "WORKER", "CREMATORIUM"]
+            set: ["TRANSPORTER", "WASTEPROCESSOR", "WORKER"]
           },
           name: `company_${siret}`,
           securityCode: 1234,
@@ -409,13 +408,20 @@ export const formFactory = async ({
     canAccessDraftSirets: ownerOrgIds,
     ...opt,
     transporters: {
-      create: {
-        ...formdata.transporters!.create,
-        ...opt.transporters?.create,
-        number: 1
-      }
+      ...(opt.transporters?.createMany
+        ? {
+            createMany: opt.transporters!.createMany
+          }
+        : {
+            create: {
+              ...formdata.transporters!.create,
+              ...opt.transporters?.create,
+              number: 1
+            }
+          })
     }
   };
+
   return prisma.form.create({
     data: {
       readableId: getReadableId(),

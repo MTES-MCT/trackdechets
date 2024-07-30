@@ -10,6 +10,7 @@ import {
 } from "@td/mail";
 import { getTransporterCompanyOrgId, Dreals } from "@td/constants";
 import { getFirstTransporter } from "../database";
+import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -83,11 +84,17 @@ export async function renderFormRefusedEmail(
     PARTIALLY_REFUSED: formPartiallyRefused
   }[wasteAcceptationStatus];
 
+  if (!mailTemplate) return;
+
   const transporter = await getFirstTransporter(form);
   let forwardedInTransporter: BsddTransporter | null = null;
   if (forwardedIn) {
     forwardedInTransporter = await getFirstTransporter(forwardedIn);
   }
+
+  const wasteQuantities = isFinalDestinationRefusal
+    ? bsddWasteQuantities(forwardedIn)
+    : bsddWasteQuantities(form);
 
   return renderMail(mailTemplate, {
     to,
@@ -100,6 +107,8 @@ export async function renderFormRefusedEmail(
         emitterCompanyName: form.emitterCompanyName,
         emitterCompanySiret: form.emitterCompanySiret,
         emitterCompanyAddress: form.emitterCompanyAddress,
+        quantityAccepted: wasteQuantities?.quantityAccepted,
+        quantityRefused: wasteQuantities?.quantityRefused,
         ...(isFinalDestinationRefusal
           ? {
               signedAt: forwardedIn.signedAt,
@@ -115,7 +124,7 @@ export async function renderFormRefusedEmail(
               ),
               transporterReceipt: forwardedInTransporter?.transporterReceipt,
               sentBy: forwardedIn.sentBy,
-              quantityReceived: forwardedIn.quantityReceived
+              quantityReceived: forwardedIn.quantityReceived?.toDecimalPlaces(6)
             }
           : {
               signedAt: form.signedAt,
@@ -128,7 +137,7 @@ export async function renderFormRefusedEmail(
               transporterCompanySiret: getTransporterCompanyOrgId(transporter),
               transporterReceipt: transporter?.transporterReceipt,
               sentBy: form.sentBy,
-              quantityReceived: form.quantityReceived
+              quantityReceived: form.quantityReceived?.toDecimalPlaces(6)
             })
       }
     },

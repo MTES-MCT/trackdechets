@@ -1,7 +1,5 @@
-import { BsddFinalOperation } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   BsdSubType,
@@ -19,10 +17,11 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode, splitAddress } from "../utils";
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
+import { splitAddress } from "../common/addresses";
+import { isFinalOperationCode } from "../common/operationCodes";
 
 const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
   if (!bsdd.forwardedIn) return {};
@@ -48,55 +47,163 @@ const getOperationData = (bsdd: Bsdd) => ({
   destinationOperationMode: bsdd.destinationOperationMode
 });
 
-const getTransportersData = (bsdd: Bsdd) => ({
-  transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
-  transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
-  transporterCompanyAddress: bsdd.transporterCompanyAddress,
-  transporterCompanyName: bsdd.transporterCompanyName,
-  transporterCompanySiret: bsdd.transporterCompanySiret?.length
-    ? bsdd.transporterCompanySiret
-    : bsdd.transporterCompanyVatNumber,
-  transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
-  transporterNumberPlates: bsdd.transporterNumberPlates,
-  transporterTransportMode: bsdd.transporterTransportMode,
-  transporterCompanyMail: bsdd.transporterCompanyMail,
-  transporter2CompanyAddress: bsdd.transporter2CompanyAddress,
-  transporter2CompanyName: bsdd.transporter2CompanyName,
-  transporter2CompanySiret: bsdd.transporter2CompanySiret?.length
-    ? bsdd.transporter2CompanySiret
-    : bsdd.transporter2CompanyVatNumber,
-  transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
-  transporter2NumberPlates: bsdd.transporter2NumberPlates,
-  transporter2CompanyMail: bsdd.transporter2CompanyMail,
-  transporter2TransportMode: bsdd.transporter2TransportMode,
-  transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
-  transporter3CompanyName: bsdd.transporter3CompanyName,
-  transporter3CompanySiret: bsdd.transporter3CompanySiret?.length
-    ? bsdd.transporter3CompanySiret
-    : bsdd.transporter3CompanyVatNumber,
-  transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
-  transporter3NumberPlates: bsdd.transporter3NumberPlates,
-  transporter3CompanyMail: bsdd.transporter3CompanyMail,
-  transporter3TransportMode: bsdd.transporter3TransportMode,
-  transporter4CompanyAddress: bsdd.transporter4CompanyAddress,
-  transporter4CompanyName: bsdd.transporter4CompanyName,
-  transporter4CompanySiret: bsdd.transporter4CompanySiret?.length
-    ? bsdd.transporter4CompanySiret
-    : bsdd.transporter4CompanyVatNumber,
-  transporter4RecepisseNumber: bsdd.transporter4RecepisseNumber,
-  transporter4NumberPlates: bsdd.transporter4NumberPlates,
-  transporter4CompanyMail: bsdd.transporter4CompanyMail,
-  transporter4TransportMode: bsdd.transporter4TransportMode,
-  transporter5CompanyAddress: bsdd.transporter5CompanyAddress,
-  transporter5CompanyName: bsdd.transporter5CompanyName,
-  transporter5CompanySiret: bsdd.transporter5CompanySiret?.length
-    ? bsdd.transporter5CompanySiret
-    : bsdd.transporter5CompanyVatNumber,
-  transporter5RecepisseNumber: bsdd.transporter5RecepisseNumber,
-  transporter5NumberPlates: bsdd.transporter5NumberPlates,
-  transporter5CompanyMail: bsdd.transporter5CompanyMail,
-  transporter5TransportMode: bsdd.transporter5TransportMode
-});
+const getInitialEmitterData = (bsdd: ReturnType<typeof formToBsdd>) => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  // Bsd suite. Fill initial emitter data.
+  if (bsdd.forwarding) {
+    const { street, city, postalCode, country } = splitAddress(
+      bsdd.forwarding.emitterCompanyAddress
+    );
+    initialEmitter.initialEmitterCompanyAddress = street;
+    initialEmitter.initialEmitterCompanyCity = city;
+    initialEmitter.initialEmitterCompanyPostalCode = postalCode;
+    initialEmitter.initialEmitterCompanyCountry = country;
+
+    initialEmitter.initialEmitterCompanyName =
+      bsdd.forwarding.emitterCompanyName;
+    initialEmitter.initialEmitterCompanySiret =
+      bsdd.forwarding.emitterCompanySiret;
+  }
+
+  return initialEmitter;
+};
+
+export const getTransportersData = (bsdd: Bsdd, includePlates = false) => {
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    bsdd.transporterCompanyAddress,
+    bsdd.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    bsdd.transporter2CompanyAddress,
+    bsdd.transporter2CompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    bsdd.transporter3CompanyAddress,
+    bsdd.transporter3CompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    bsdd.transporter4CompanyAddress,
+    bsdd.transporter4CompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    bsdd.transporter5CompanyAddress,
+    bsdd.transporter5CompanyVatNumber
+  );
+
+  const data = {
+    transporterRecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
+    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
+    transporterCompanyName: bsdd.transporterCompanyName,
+    transporterCompanySiret: bsdd.transporterCompanySiret?.length
+      ? bsdd.transporterCompanySiret
+      : bsdd.transporterCompanyVatNumber,
+    transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
+    transporterTransportMode: bsdd.transporterTransportMode,
+    transporterCompanyMail: bsdd.transporterCompanyMail,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
+    transporter2CompanyName: bsdd.transporter2CompanyName ?? null,
+    transporter2CompanySiret:
+      (bsdd.transporter2CompanySiret?.length
+        ? bsdd.transporter2CompanySiret
+        : bsdd.transporter2CompanyVatNumber) ?? null,
+    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber ?? null,
+    transporter2CompanyMail: bsdd.transporter2CompanyMail ?? null,
+    transporter2TransportMode: bsdd.transporter2TransportMode ?? null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
+    transporter3CompanyName: bsdd.transporter3CompanyName ?? null,
+    transporter3CompanySiret:
+      (bsdd.transporter3CompanySiret?.length
+        ? bsdd.transporter3CompanySiret
+        : bsdd.transporter3CompanyVatNumber) ?? null,
+    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber ?? null,
+    transporter3CompanyMail: bsdd.transporter3CompanyMail ?? null,
+    transporter3TransportMode: bsdd.transporter3TransportMode ?? null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
+    transporter4CompanyName: bsdd.transporter4CompanyName ?? null,
+    transporter4CompanySiret:
+      (bsdd.transporter4CompanySiret?.length
+        ? bsdd.transporter4CompanySiret
+        : bsdd.transporter4CompanyVatNumber) ?? null,
+    transporter4RecepisseNumber: bsdd.transporter4RecepisseNumber ?? null,
+    transporter4CompanyMail: bsdd.transporter4CompanyMail ?? null,
+    transporter4TransportMode: bsdd.transporter4TransportMode ?? null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
+    transporter5CompanyName: bsdd.transporter5CompanyName ?? null,
+    transporter5CompanySiret:
+      (bsdd.transporter5CompanySiret?.length
+        ? bsdd.transporter5CompanySiret
+        : bsdd.transporter5CompanyVatNumber) ?? null,
+    transporter5RecepisseNumber: bsdd.transporter5RecepisseNumber ?? null,
+    transporter5CompanyMail: bsdd.transporter5CompanyMail ?? null,
+    transporter5TransportMode: bsdd.transporter5TransportMode ?? null
+  };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: bsdd.transporterNumberPlates ?? null,
+      transporter2NumberPlates: bsdd.transporter2NumberPlates ?? null,
+      transporter3NumberPlates: bsdd.transporter3NumberPlates ?? null,
+      transporter4NumberPlates: bsdd.transporter4NumberPlates ?? null,
+      transporter5NumberPlates: bsdd.transporter5NumberPlates ?? null
+    };
+  }
+
+  return data;
+};
 
 const getIntermediariesData = (bsdd: ReturnType<typeof formToBsdd>) => ({
   intermediary1CompanyName: bsdd.intermediaries?.[0]?.name ?? null,
@@ -172,24 +279,45 @@ export function getRegistryFields(
  * maintaining the order
  */
 const getFinalOperationsData = (
-  bsdd: Bsdd & {
-    finalOperations: BsddFinalOperation[];
-  }
+  bsdd: ReturnType<typeof formToBsdd>
 ): Pick<
   OutgoingWaste | AllWaste,
-  "destinationFinalOperationCodes" | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCodes"
+  | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCompanySirets"
 > => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
+  const destinationFinalOperationCompanySirets: string[] = [];
   // Check if finalOperations is defined and has elements
-  if (bsdd.finalOperations && bsdd.finalOperations.length > 0) {
+
+  if (
+    bsdd.destinationOperationSignatureDate &&
+    bsdd.destinationOperationCode &&
+    // Cf tra-14603 => si le code de traitement du bordereau initial est final,
+    // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
+    // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
+    !isFinalOperationCode(bsdd.destinationOperationCode) &&
+    !bsdd.destinationOperationNoTraceability &&
+    bsdd.finalOperations?.length
+  ) {
     // Iterate through each operation once and fill both arrays
     bsdd.finalOperations.forEach(ope => {
       destinationFinalOperationCodes.push(ope.operationCode);
       destinationFinalOperationWeights.push(ope.quantity.toNumber());
+      if (ope.finalForm.recipientCompanySiret) {
+        // cela devrait tout le temps être le cas
+        destinationFinalOperationCompanySirets.push(
+          ope.finalForm.recipientCompanySiret
+        );
+      }
     });
   }
-  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+  return {
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    destinationFinalOperationCompanySirets
+  };
 };
 
 export const getSubType = (bsdd: Bsdd): BsdSubType => {
@@ -211,21 +339,19 @@ export const getSubType = (bsdd: Bsdd): BsdSubType => {
 export function toGenericWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): GenericWaste {
-  const initialEmitter: Record<string, string | string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null
-  };
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsdd.destinationCompanyAddress);
 
-  // Bsd suite. Fill initial emitter data.
-  if (bsdd.forwarding) {
-    initialEmitter.initialEmitterCompanyAddress =
-      bsdd.forwarding.emitterCompanyAddress;
-    initialEmitter.initialEmitterCompanyName =
-      bsdd.forwarding.emitterCompanyName;
-    initialEmitter.initialEmitterCompanySiret =
-      bsdd.forwarding.emitterCompanySiret;
-  }
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsdd.emitterCompanyAddress);
 
   return {
     wasteDescription: bsdd.wasteDescription,
@@ -247,92 +373,74 @@ export function toGenericWaste(
       bsdd.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdd.destinationOperationDate,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     wasteAdr: bsdd.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+    weight: bsdd.weightValue,
     brokerCompanyMail: bsdd.brokerCompanyMail,
     traderCompanyMail: bsdd.traderCompanyMail,
     parcelCities: bsdd.parcelCities,
     parcelPostalCodes: bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
     parcelCoordinates: bsdd.parcelCoordinates,
-    ...getTransportersData(bsdd),
-    ...initialEmitter
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bsdd.destinationCompanyName,
+    destinationCompanySiret: bsdd.destinationCompanySiret,
+    emitterPickupsiteName: bsdd.emitterPickupSiteName,
+    emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bsdd.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bsdd.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bsdd.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bsdd.emitterCompanyName,
+    emitterCompanySiret: bsdd.emitterCompanySiret
   };
 }
 
 export function toIncomingWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<IncomingWaste> {
-  const initialEmitter: Record<string, string | string[] | null> = {
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    //secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsdd.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyIncomingWaste,
     ...genericWaste,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
     destinationReceptionDate: bsdd.destinationReceptionDate,
-    destinationReceptionWeight: bsdd.destinationReceptionWeight,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
-    ...initialEmitter,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
-    destinationCustomInfo: null,
     emitterCompanyMail: bsdd.emitterCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
-    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
+    ...getTransportersData(bsdd),
+    ...getInitialEmitterData(bsdd)
   };
 }
 
 export function toOutgoingWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<OutgoingWaste> {
-  const initialEmitter: Record<string, string | string[] | null> = {
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
@@ -343,57 +451,27 @@ export function toOutgoingWaste(
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
-    ...initialEmitter,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     weight: bsdd.weightValue,
-    emitterCustomInfo: null,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
-    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
+    ...getTransportersData(bsdd),
+    ...getInitialEmitterData(bsdd)
   };
 }
 
 export function toTransportedWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<TransportedWaste> {
-  const initialEmitter: Record<string, string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    //secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsdd.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
@@ -402,109 +480,45 @@ export function toTransportedWaste(
     ...genericWaste,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     weight: bsdd.weightValue,
-    ...initialEmitter,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    emitterCompanyMail: bsdd.emitterCompanyMail
+    emitterCompanyMail: bsdd.emitterCompanyMail,
+    ...getTransportersData(bsdd, true)
   };
 }
 
 export function toManagedWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<ManagedWaste> {
-  const initialEmitter: Record<string, string[] | null> = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    //secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsdd.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     brokerCompanyName: null,
     brokerCompanySiret: null,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
-    ...initialEmitter,
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
-    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation
+    nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
+    ...getTransportersData(bsdd)
   };
 }
 
 export function toAllWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): Required<AllWaste> {
-  const initialEmitter: Record<string, string[] | null> = {
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdd.forwarding) {
-    // ce n'est pas 100% en accord avec le registre puisque le texte demande de faire apparaitre
-    // ici le N°SIRET et la raison sociale de l'émetteur initial. Cependant, pour protéger le
-    //secret des affaires, et en attendant une clarification officielle, on se limite ici au code postal.
-    initialEmitter.initialEmitterPostalCodes = [
-      extractPostalCode(bsdd.forwarding.emitterCompanyAddress)
-    ].filter(s => !!s);
-  }
-
-  if (bsdd.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdd.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdd);
 
   return {
@@ -517,31 +531,22 @@ export function toAllWaste(
     brokerCompanyName: bsdd.brokerCompanyName,
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
-    destinationCompanyAddress: bsdd.destinationCompanyAddress,
-    destinationCompanyName: bsdd.destinationCompanyName,
-    destinationCompanySiret: bsdd.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdd.emitterCompanyAddress,
-    emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret,
-    emitterPickupsiteName: bsdd.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteAddress,
-      bsdd.emitterPickupSitePostalCode,
-      bsdd.emitterPickupSiteCity
-    ]),
-    ...initialEmitter,
     weight: bsdd.weightValue,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanySiret: bsdd.traderCompanySiret,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
     emitterCompanyMail: bsdd.emitterCompanyMail,
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
     ...getOperationData(bsdd),
     ...getFinalOperationsData(bsdd),
     nextDestinationNotificationNumber: bsdd.nextDestinationNotificationNumber,
     nextDestinationProcessingOperation: bsdd.nextDestinationProcessingOperation,
-    ...getIntermediariesData(bsdd)
+    ...getIntermediariesData(bsdd),
+    ...getTransportersData(bsdd, true),
+    ...getInitialEmitterData(bsdd)
   };
 }

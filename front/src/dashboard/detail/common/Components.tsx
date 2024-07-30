@@ -1,17 +1,23 @@
 import React, { ReactNode, useMemo } from "react";
 import { formatDate, formatDateTime } from "../../../common/datetime";
 import styles from "./BSDDetailContent.module.scss";
-
 import {
   PackagingInfo,
   BsvhuTransporter,
   BsdaTransporter,
   BsdasriTransporter,
-  BspaohTransporter
+  BspaohTransporter,
+  BsffTransporter
 } from "@td/codegen-ui";
-import { getPackagingInfosSummary } from "../../../form/bsdd/utils/packagings";
+import { getPackagingInfosSummary } from "../../../Apps/common/utils/packagingsBsddSummary";
 import { isForeignVat } from "@td/constants";
 import { toCamelCaseVarName } from "../../../Apps/utils/utils";
+import { isDefined } from "../../../common/helper";
+import { QUANTITY_NON_RENSEIGNE } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
+import TdTooltip from "../../../common/components/Tooltip";
+import { transportModeLabels } from "../../constants";
+import { Company } from "../bsda/BsdaDetailContent";
+
 const nbsp = "\u00A0";
 export const DetailRow = ({
   value,
@@ -102,6 +108,7 @@ export const TransporterReceiptDetails = ({
     | BsdaTransporter
     | BsdasriTransporter
     | BspaohTransporter
+    | BsffTransporter
     | null;
 }) => {
   return !isForeignVat(transporter?.company?.vatNumber!) ? (
@@ -133,4 +140,84 @@ export const TransporterReceiptDetails = ({
       )}
     </div>
   ) : null;
+};
+
+export const Transporter: React.FC<{
+  transporter: BsdaTransporter | BsffTransporter;
+  isMultiModal: boolean;
+  numero: number;
+}> = ({ transporter, isMultiModal, numero }) => {
+  return (
+    <>
+      <div className={styles.detailGrid}>
+        <Company
+          label={isMultiModal ? `Transporteur n°${numero}` : "Transporteur"}
+          company={transporter?.company}
+        />
+      </div>
+      <TransporterReceiptDetails transporter={transporter} />
+      <div className={`${styles.detailGrid} `}>
+        <DateRow
+          value={transporter?.transport?.takenOverAt}
+          label="Emporté le"
+        />
+        <DateRow
+          value={transporter?.transport?.signature?.date}
+          label="Signé le"
+        />
+        <DetailRow
+          value={transporter?.transport?.signature?.author}
+          label="Signé par"
+        />
+        <DetailRow
+          value={transporter?.customInfo}
+          label="Informations tranporteur"
+        />
+        <DetailRow
+          value={
+            transporter?.transport?.mode
+              ? transportModeLabels[transporter.transport.mode]
+              : ""
+          }
+          label="Mode de transport"
+        />
+        <DetailRow
+          value={transporter?.transport?.plates?.join(", ")}
+          label="Immatriculations"
+        />
+      </div>
+    </>
+  );
+};
+
+export const QuantityRow = ({
+  value,
+  label,
+  tooltip,
+  showEmpty = false
+}: {
+  value: string | number | ReactNode | undefined | null;
+  label: string;
+  tooltip?: string | undefined | null;
+  showEmpty: boolean;
+}) => {
+  const hasValue = isDefined(value);
+
+  if (!hasValue && !showEmpty) return null;
+
+  return (
+    <DetailRow
+      value={
+        hasValue ? (
+          `${value} tonnes`
+        ) : (
+          <>
+            {QUANTITY_NON_RENSEIGNE} {tooltip && <TdTooltip msg={tooltip} />}
+          </>
+        )
+      }
+      showEmpty={showEmpty}
+      label={label}
+    />
+  );
 };

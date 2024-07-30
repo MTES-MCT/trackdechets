@@ -1,7 +1,6 @@
 import { Bsdasri } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import { buildAddress } from "../companies/sirene/utils";
 import {
   AllWaste,
   BsdSubType,
@@ -19,9 +18,10 @@ import {
   emptyOutgoingWaste,
   emptyTransportedWaste
 } from "../registry/types";
-import { extractPostalCode } from "../utils";
 import { getWasteDescription } from "./utils";
 import { RegistryBsdasri } from "../registry/elastic";
+import { splitAddress } from "../common/addresses";
+import { isFinalOperationCode } from "../common/operationCodes";
 
 const getOperationData = (bsdasri: Bsdasri) => ({
   destinationPlannedOperationCode: bsdasri.destinationOperationCode,
@@ -29,32 +29,98 @@ const getOperationData = (bsdasri: Bsdasri) => ({
   destinationOperationMode: bsdasri.destinationOperationMode
 });
 
-const getFinalOperationsData = (bsdasri: RegistryBsdasri) => {
+const getFinalOperationsData = (
+  bsdasri: RegistryBsdasri
+): Pick<
+  OutgoingWaste | AllWaste,
+  | "destinationFinalOperationCodes"
+  | "destinationFinalOperationWeights"
+  | "destinationFinalOperationCompanySirets"
+> => {
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
+  const destinationFinalOperationCompanySirets: string[] = [];
+
   // Check if finalOperations is defined and has elements
-  if (bsdasri.finalOperations && bsdasri.finalOperations.length > 0) {
+  if (
+    bsdasri.destinationOperationSignatureDate &&
+    bsdasri.destinationOperationCode &&
+    // Cf tra-14603 => si le code de traitement du bordereau initial est final,
+    // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
+    // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
+    !isFinalOperationCode(bsdasri.destinationOperationCode) &&
+    bsdasri.finalOperations?.length
+  ) {
     // Iterate through each operation once and fill both arrays
     bsdasri.finalOperations.forEach(ope => {
       destinationFinalOperationCodes.push(ope.operationCode);
-      destinationFinalOperationWeights.push(ope.quantity.toNumber());
+      destinationFinalOperationWeights.push(
+        // conversion en tonnes
+        ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      );
+      if (ope.finalBsdasri.destinationCompanySiret) {
+        // cela devrait tout le temps être le cas
+        destinationFinalOperationCompanySirets.push(
+          ope.finalBsdasri.destinationCompanySiret
+        );
+      }
     });
   }
-  return { destinationFinalOperationCodes, destinationFinalOperationWeights };
+  return {
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    destinationFinalOperationCompanySirets
+  };
 };
 
-const getTransporterData = (bsdasri: Bsdasri) => ({
-  transporterRecepisseIsExempted: bsdasri.transporterRecepisseIsExempted,
-  transporterNumberPlates: bsdasri.transporterTransportPlates,
-  transporterCompanyAddress: bsdasri.transporterCompanyAddress,
-  transporterCompanyName: bsdasri.transporterCompanyName,
-  transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-  transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
-  transporterCompanyMail: bsdasri.transporterCompanyMail,
-  transporterCustomInfo: bsdasri.transporterCustomInfo,
-  transporterTakenOverAt: bsdasri.transporterTakenOverAt,
-  transporterTransportMode: bsdasri.transporterTransportMode
-});
+const getInitialEmitterData = () => {
+  const initialEmitter: Record<string, string | null> = {
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyCountry: null,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null
+  };
+
+  return initialEmitter;
+};
+
+export const getTransporterData = (bsdasri: Bsdasri, includePlates = false) => {
+  const {
+    street: transporterCompanyAddress,
+    postalCode: transporterCompanyPostalCode,
+    city: transporterCompanyCity,
+    country: transporterCompanyCountry
+  } = splitAddress(
+    bsdasri.transporterCompanyAddress,
+    bsdasri.transporterCompanyVatNumber
+  );
+
+  const data = {
+    transporterRecepisseIsExempted: bsdasri.transporterRecepisseIsExempted,
+    transporterCompanyAddress,
+    transporterCompanyPostalCode,
+    transporterCompanyCity,
+    transporterCompanyCountry,
+    transporterCompanyName: bsdasri.transporterCompanyName,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
+    transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
+    transporterCompanyMail: bsdasri.transporterCompanyMail,
+    transporterCustomInfo: bsdasri.transporterCustomInfo,
+    transporterTakenOverAt: bsdasri.transporterTakenOverAt,
+    transporterTransportMode: bsdasri.transporterTransportMode
+  };
+
+  if (includePlates) {
+    return {
+      ...data,
+      transporterNumberPlates: bsdasri.transporterTransportPlates ?? null
+    };
+  }
+
+  return data;
+};
 
 export function getRegistryFields(
   bsdasri: Bsdasri
@@ -107,7 +173,21 @@ export const getSubType = (bsdasri: Bsdasri): BsdSubType => {
   }
 };
 
-function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
+export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsdasri.destinationCompanyAddress);
+
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsdasri.emitterCompanyAddress);
+
   return {
     wasteDescription: bsdasri.wasteCode
       ? getWasteDescription(bsdasri.wasteCode)
@@ -130,179 +210,121 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
       bsdasri.destinationReceptionAcceptationStatus,
     destinationOperationDate: bsdasri.destinationOperationDate,
     destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue.dividedBy(1000).toNumber()
+      ? bsdasri.destinationReceptionWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
     wasteAdr: bsdasri.wasteAdr,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,
-    ...getTransporterData(bsdasri),
-    destinationCompanyMail: bsdasri.destinationCompanyMail
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+    destinationCompanyMail: bsdasri.destinationCompanyMail,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyName: bsdasri.destinationCompanyName,
+    destinationCompanySiret: bsdasri.destinationCompanySiret,
+    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
+    emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bsdasri.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bsdasri.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bsdasri.emitterPickupSiteAddress ? "FR" : null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyName: bsdasri.emitterCompanyName,
+    emitterCompanySiret: bsdasri.emitterCompanySiret,
+    weight: bsdasri.emitterWasteWeightValue
+      ? bsdasri.emitterWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
+    ...getTransporterData(bsdasri)
   };
 }
 
 export function toIncomingWaste(
   bsdasri: RegistryBsdasri
 ): Required<IncomingWaste> {
-  const initialEmitter: Pick<
-    IncomingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyIncomingWaste,
     ...genericWaste,
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
+    ...getTransporterData(bsdasri),
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
-    ...initialEmitter,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCustomInfo: bsdasri.destinationCustomInfo,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
-    ...getOperationData(bsdasri)
+    ...getOperationData(bsdasri),
+    ...getInitialEmitterData()
   };
 }
 
 export function toOutgoingWaste(
   bsdasri: RegistryBsdasri
 ): Required<OutgoingWaste> {
-  const initialEmitter: Pick<
-    OutgoingWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyOutgoingWaste,
     ...genericWaste,
+    ...getTransporterData(bsdasri),
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
-    ...initialEmitter,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
+      ? bsdasri.emitterWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
-    emitterCustomInfo: bsdasri.emitterCustomInfo,
     ...getOperationData(bsdasri),
-    ...getFinalOperationsData(bsdasri)
+    ...getFinalOperationsData(bsdasri),
+    ...getInitialEmitterData()
   };
 }
 
 export function toTransportedWaste(
   bsdasri: RegistryBsdasri
 ): Required<TransportedWaste> {
-  const initialEmitter: Pick<
-    TransportedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyTransportedWaste,
     ...genericWaste,
+    ...getTransporterData(bsdasri, true),
     destinationReceptionDate: bsdasri.destinationReceptionDate,
     weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
+      ? bsdasri.emitterWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
       : null,
-    ...initialEmitter,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
@@ -314,110 +336,45 @@ export function toTransportedWaste(
 export function toManagedWaste(
   bsdasri: RegistryBsdasri
 ): Required<ManagedWaste> {
-  const initialEmitter: Pick<
-    ManagedWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    managedStartDate: null,
-    managedEndDate: null,
+    ...getTransporterData(bsdasri),
     traderCompanyName: null,
     traderCompanySiret: null,
     brokerCompanyName: null,
     brokerCompanySiret: null,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
-    ...initialEmitter,
     emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
 
 export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
-  const initialEmitter: Pick<
-    AllWaste,
-    | "initialEmitterCompanyAddress"
-    | "initialEmitterCompanyName"
-    | "initialEmitterCompanySiret"
-    | "initialEmitterPostalCodes"
-  > = {
-    initialEmitterCompanyAddress: null,
-    initialEmitterCompanyName: null,
-    initialEmitterCompanySiret: null,
-    initialEmitterPostalCodes: null
-  };
-
-  if (bsdasri.grouping?.length > 0) {
-    initialEmitter.initialEmitterPostalCodes = bsdasri.grouping
-      .map(grouped => extractPostalCode(grouped.emitterCompanyAddress))
-      .filter(s => !!s);
-  }
-
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyAllWaste,
     ...genericWaste,
+    ...getTransporterData(bsdasri, true),
     createdAt: bsdasri.createdAt,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
     brokerCompanyName: null,
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
-    destinationCompanyAddress: bsdasri.destinationCompanyAddress,
-    destinationCompanyName: bsdasri.destinationCompanyName,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
     destinationPlannedOperationMode: null,
-    emitterCompanyAddress: bsdasri.emitterCompanyAddress,
-    emitterCompanyName: bsdasri.emitterCompanyName,
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
-    emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteAddress,
-      bsdasri.emitterPickupSitePostalCode,
-      bsdasri.emitterPickupSiteCity
-    ]),
-    ...initialEmitter,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
-    managedEndDate: null,
-    managedStartDate: null,
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     ...getOperationData(bsdasri),
-    ...getFinalOperationsData(bsdasri)
+    ...getFinalOperationsData(bsdasri),
+    ...getInitialEmitterData()
   };
 }

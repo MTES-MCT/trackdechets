@@ -20,7 +20,8 @@ import {
   UserPermission,
   Transporter,
   BsdaTransporter,
-  BsdasriStatus
+  BsdasriStatus,
+  BsffTransporter
 } from "@td/codegen-ui";
 import {
   ACCEPTE,
@@ -78,7 +79,7 @@ export const getBsdStatusLabel = (
   bsdType?: BsdType,
   operationCode?: string,
   bsdaAnnexed?: boolean,
-  transporters?: Transporter[] | BsdaTransporter[]
+  transporters?: Transporter[] | BsdaTransporter[] | BsffTransporter[]
 ) => {
   switch (status) {
     case BsdStatusCode.Draft:
@@ -94,7 +95,7 @@ export const getBsdStatusLabel = (
           lastTransporterNumero = (transporters as Transporter[]).filter(t =>
             Boolean(t.takenOverAt)
           ).length;
-        } else if (isBsda(bsdType)) {
+        } else if (isBsda(bsdType) || isBsff(bsdType)) {
           lastTransporterNumero = (transporters as BsdaTransporter[]).filter(
             t => Boolean(t.transport?.signature?.date)
           ).length;
@@ -159,7 +160,7 @@ export const getBsdStatusLabel = (
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
     case BsdStatusCode.AwaitingGroup:
       if (bsdType === BsdType.Bsdasri) {
-        if (operationCode === "R12" || operationCode === "D12") {
+        if (operationCode === "R12" || operationCode === "D13") {
           return EN_ATTENTE_BSD_SUITE;
         }
         return ANNEXE_BORDEREAU_SUITE;
@@ -636,27 +637,44 @@ export const getSentBtnLabel = (
     return VALIDER_RECEPTION;
   }
   // BSFF
-  if (
-    isBsff(bsd.type) &&
-    isActTab &&
-    isSameSiretDestination(currentSiret, bsd) &&
-    permissions.includes(UserPermission.BsdCanSignAcceptation)
-  ) {
-    return VALIDER_RECEPTION;
+  if (isBsff(bsd.type)) {
+    if (
+      isActTab &&
+      isSameSiretDestination(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignAcceptation)
+    ) {
+      return VALIDER_RECEPTION;
+    }
+    if (
+      isToCollectTab &&
+      isSameSiretNextTransporter(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
+    ) {
+      return SIGNER;
+    }
   }
   // BSDA
-  if (
-    isToCollectTab &&
-    isBsda(bsd.type) &&
-    isSameSiretNextTransporter(currentSiret, bsd) &&
-    permissions.includes(UserPermission.BsdCanSignTransport)
-  ) {
-    return SIGNER;
+  if (isBsda(bsd.type)) {
+    if (
+      isToCollectTab &&
+      isSameSiretNextTransporter(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
+    ) {
+      return SIGNER;
+    }
+
+    if (
+      isActTab &&
+      isSameSiretDestination(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignOperation)
+    ) {
+      return VALIDER_TRAITEMENT;
+    }
   }
   // VHU
   if (
     isSameSiretDestination(currentSiret, bsd) &&
-    (isBsvhu(bsd.type) || isBsda(bsd.type)) &&
+    isBsvhu(bsd.type) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     return VALIDER_TRAITEMENT;
@@ -1202,7 +1220,9 @@ const canDeleteBsdasri = (bsd, siret) =>
       bsd.status === BsdStatusCode.SignedByProducer));
 
 const canDeleteBsvhu = bsd =>
-  bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.Initial;
+  bsd.type === BsdType.Bsvhu &&
+  (bsd.status === BsdStatusCode.Initial ||
+    bsd.status === BsdStatusCode.SignedByProducer);
 
 const canDeleteBspaoh = bsd =>
   bsd.type === BsdType.Bspaoh && bsd.status === BsdStatusCode.Initial;
@@ -1222,11 +1242,13 @@ const canDuplicateBsdd = bsd =>
 
 export const canDuplicateBsff = (bsd, siret) => {
   const emitterSiret = bsd.emitter?.company?.siret;
-  const transporterSiret = bsd.transporter?.company?.siret;
+  const transporterOrgsIds = bsd.transporters?.map(t => t.company?.orgId);
   const destinationSiret = bsd.destination?.company?.siret;
   return (
     bsd.type === BsdType.Bsff &&
-    [emitterSiret, transporterSiret, destinationSiret].includes(siret)
+    [emitterSiret, destinationSiret, ...transporterOrgsIds]
+      .filter(Boolean)
+      .includes(siret)
   );
 };
 
@@ -1255,7 +1277,11 @@ export const canDeleteBsd = (bsd, siret) =>
 
 const canUpdateBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
-  [BsdStatusCode.Initial, BsdStatusCode.SignedByEmitter].includes(bsd.status) &&
+  [
+    BsdStatusCode.Initial,
+    BsdStatusCode.SignedByEmitter,
+    BsdStatusCode.Sent
+  ].includes(bsd.status) &&
   canDuplicateBsff(bsd, siret);
 
 const canReviewBsda = (bsd, siret) => {

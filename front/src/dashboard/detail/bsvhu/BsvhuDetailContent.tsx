@@ -17,7 +17,7 @@ import {
 
 import styles from "../common/BSDDetailContent.module.scss";
 import { getVerboseAcceptationStatus } from "../common/utils";
-import { getOperationModeLabel } from "../../../common/operationModes";
+import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { VHU_VERBOSE_STATUSES } from "@td/constants";
 
 type CompanyProps = {
@@ -122,7 +122,10 @@ function Company({ company, label }: CompanyProps) {
       <DetailRow label="Numéro de TVA" value={company?.vatNumber} />
       <DetailRow label="Adresse" value={company?.address} />
       <DetailRow label="Tél" value={company?.phone} />
-      <DetailRow label="Mél" value={company?.mail} />
+      <dt>Mél</dt>
+      <dd data-testid="mel" style={{ width: "110px" }}>
+        {company?.mail}
+      </dd>
       <DetailRow label="Contact" value={company?.contact} />
     </>
   );

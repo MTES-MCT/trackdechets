@@ -16,8 +16,9 @@ import { TraceabilityTable } from "./TraceabilityTable";
 import { PackagingInfosTable } from "./PackagingInfosTable";
 import { FormCompanyFields } from "./FormCompanyFields";
 import { BsdasriType, OperationMode } from "@prisma/client";
-import { Recepisse } from "../../../bsda/pdf/components/Recepisse";
 import { getOperationModeLabel } from "../../../common/operationModes";
+import { dateToXMonthAtHHMM } from "../../../common/helpers";
+import { Recepisse } from "../../../common/pdf/components/Recepisse";
 
 type Props = {
   bsdasri: Bsdasri;
@@ -56,6 +57,9 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               className="QrCode"
               dangerouslySetInnerHTML={{ __html: qrCode }}
             />
+            <div>
+              <b>Document édité le {dateToXMonthAtHHMM()}</b>
+            </div>
           </div>
         </div>
         {/* end 3-parts header */}
@@ -459,10 +463,10 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
             <p>
               <input
                 type="checkbox"
-                checked={bsdasri?.destination?.operation?.code === "D12"}
+                checked={bsdasri?.destination?.operation?.code === "D13"}
                 readOnly
               />{" "}
-              Groupement avant D9 ou D10 (D12) sur site relevant de la 2718
+              Groupement avant D9 ou D10 (D13) sur site relevant de la 2718
             </p>
             <p>
               <input

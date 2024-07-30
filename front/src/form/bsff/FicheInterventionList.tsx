@@ -2,7 +2,6 @@ import { gql, useMutation } from "@apollo/client";
 import { Modal, RedErrorMessage } from "../../common/components";
 import { NotificationError } from "../../Apps/common/Components/Error/Error";
 import { IconClose } from "../../Apps/common/Components/Icons/Icons";
-import { getInitialCompany } from "../bsdd/utils/initial-state";
 import CompanySelector from "../common/components/company/CompanySelector";
 import NumberInput from "../common/components/custom-inputs/NumberInput";
 import { Field, Form, Formik, useFormikContext } from "formik";
@@ -17,6 +16,7 @@ import {
 import * as React from "react";
 import * as yup from "yup";
 import { FicheInterventionFragment } from "../../Apps/common/queries/fragments";
+import { getInitialCompany } from "../../Apps/common/data/initialState";
 
 const CREATE_BSFF_FICHE_INTERVENTION = gql`
   mutation CreateBsffFicheIntervention($input: BsffFicheInterventionInput!) {
