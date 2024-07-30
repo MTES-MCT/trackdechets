@@ -164,25 +164,17 @@ export const filtersToQueryBsdsArgs = (filterValues, previousBsdsArgs) => {
   const filterKeys = Object.keys(filterValues);
   const filters = filterList.filter(filter => filterKeys.includes(filter.name));
 
-  // Careful. Multiple filters might use '_and', let's not override
-  // it each iteration because of key uniqueness
-  let _ands: BsdWhere[] = [];
-
+  // Group all filters in a '_and'
+  const _ands: BsdWhere[] = [];
   filters.forEach(f => {
     const predicate = filterPredicates.find(
       filterPredicate => filterPredicate.filterName === f.name
     );
     if (predicate) {
       const filterValue = filterValues[f.name];
-      const { _and, ...wheres } = predicate.where(filterValue);
+      const where = predicate.where(filterValue);
 
-      // Store the '_and' filters separately
-      if (_and) _ands = [..._ands, ..._and];
-
-      variables.where = {
-        ...variables.where,
-        ...wheres
-      };
+      _ands.push(where);
 
       if (predicate.orderBy) {
         variables.orderBy![predicate.orderBy] = OrderType.Asc;
@@ -190,8 +182,8 @@ export const filtersToQueryBsdsArgs = (filterValues, previousBsdsArgs) => {
     }
   });
 
-  // Add all the compiled '_and', if any
-  if (_ands.length) variables.where!._and = _ands;
+  // Add the filters
+  if (_ands.length) variables.where!._and = [..._ands];
 
   return variables;
 };

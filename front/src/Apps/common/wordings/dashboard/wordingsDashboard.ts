@@ -121,6 +121,17 @@ export const bsd_type_option_bsda = "Déchets d'Amiante";
 export const bsd_type_option_bsdasri =
   "Déchets d'Activités de Soins à Risque Infectieux";
 export const bsd_type_option_bspaoh = "Pièces Anatomiques d'Origine Humaine";
+export const bsd_sub_type_option_initial = "Initial";
+export const bsd_sub_type_option_tournee = "Tournée dédiée";
+export const bsd_sub_type_option_appendix1 = "Annexe 1";
+export const bsd_sub_type_option_appendix2 = "Annexe 2";
+export const bsd_sub_type_option_temp_stored = "Entreposage provisoire";
+export const bsd_sub_type_option_collection_2710 = "Collecte en déchetterie";
+export const bsd_sub_type_option_gathering = "Groupement";
+export const bsd_sub_type_option_groupement = "Regroupement";
+export const bsd_sub_type_option_reshipment = "Réexpédition";
+export const bsd_sub_type_option_reconditionnement = "Reconditionnement";
+export const bsd_sub_type_option_synthesis = "Synthèse";
 export const filter_type_select_option_placeholder = "Sélectionner une option";
 export const max_filter_autorized_label =
   "Vous avez atteint le nombre de filtres maximum";

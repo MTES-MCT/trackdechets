@@ -3,7 +3,6 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,
-  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -22,6 +21,7 @@ import { toBsffDestination } from "./compat";
 import { RegistryBsff } from "../registry/elastic";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { BsffWithTransporters } from "./types";
+import { getBsffSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import Decimal from "decimal.js";
 import { isFinalOperation } from "./constants";
@@ -296,18 +296,6 @@ export function getRegistryFields(
   return registryFields;
 }
 
-export const getSubType = (bsff: RegistryBsff): BsdSubType => {
-  if (bsff.type === "GROUPEMENT") {
-    return "GROUPEMENT";
-  } else if (bsff.type === "RECONDITIONNEMENT") {
-    return "RECONDITIONNEMENT";
-  } else if (bsff.type === "REEXPEDITION") {
-    return "RESHIPMENT";
-  }
-
-  return "INITIAL";
-};
-
 export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
   const bsffDestination = toBsffDestination(bsff.packagings);
 
@@ -336,7 +324,7 @@ export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSFF",
-    bsdSubType: getSubType(bsff),
+    bsdSubType: getBsffSubType(bsff),
     status: bsff.status,
     customId: null,
     destinationOperationNoTraceability: false,

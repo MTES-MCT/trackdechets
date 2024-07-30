@@ -14,6 +14,7 @@ import { getFirstTransporterSync } from "./converter";
 import { prisma } from "@td/prisma";
 import { distinct } from "../common/arrays";
 import { BspaohIncludes } from "./types";
+import { getBspaohSubType } from "../common/subTypes";
 
 export const BspaohForElasticInclude = {
   ...BspaohIncludes
@@ -142,6 +143,7 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
 
   return {
     type: BsdType.BSPAOH,
+    bsdSubType: getBspaohSubType(bspaoh),
     createdAt: bspaoh.createdAt?.getTime(),
     updatedAt: bspaoh.updatedAt?.getTime(),
     id: bspaoh.id,
