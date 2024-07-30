@@ -462,6 +462,7 @@ export const dashboardFormFragment = gql`
       name
     }
     stateSummary {
+      quantity
       transporterCustomInfo
       transporterNumberPlate
       transporter {
