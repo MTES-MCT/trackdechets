@@ -86,7 +86,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
         }
       }
     });
-    navigate(-1);
   };
 
   const onSubmit: SubmitHandler<ValidationSchema> = async data => {
