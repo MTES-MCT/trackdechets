@@ -96,7 +96,6 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
         }
       }
     });
-    navigate(-1);
   };
 
   const onSubmit: SubmitHandler<ValidationSchema> = async data => {
