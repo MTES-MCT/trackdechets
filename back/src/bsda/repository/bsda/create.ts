@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { BsdaStatus, Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
@@ -6,6 +6,7 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
 import { BsdaWithTransporters } from "../../types";
+import { getUserCompanies } from "../../../users/database";
 
 export type CreateBsdaFn = (
   data: Prisma.BsdaCreateInput,
@@ -20,7 +21,8 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
       data,
       include: {
         grouping: { select: { id: true } },
-        transporters: true
+        transporters: true,
+        intermediaries: true
       }
     });
 
@@ -50,21 +52,49 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
         )
       );
     }
+    const intermediariesOrgIds: string[] = bsda.intermediaries
+      ? bsda.intermediaries
+          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+          .filter(Boolean)
+      : [];
+    const transportersOrgIds: string[] = bsda.transporters
+      ? bsda.transporters
+          .flatMap(t => [
+            t.transporterCompanySiret,
+            t.transporterCompanyVatNumber
+          ])
+          .filter(Boolean)
+      : [];
+    // For drafts, only the owner's sirets that appear on the bsd have access
+    const canAccessDraftOrgIds: string[] = [];
+    if (bsda.status === BsdaStatus.INITIAL) {
+      const userCompanies = await getUserCompanies(user.id);
+      const userOrgIds = userCompanies.map(company => company.orgId);
 
-    if (data.transporters) {
-      // compute transporterOrgIds
-      await prisma.bsda.update({
-        where: { id: bsda.id },
-        data: {
-          transportersOrgIds: bsda.transporters
-            .flatMap(t => [
-              t.transporterCompanySiret,
-              t.transporterCompanyVatNumber
-            ])
-            .filter(Boolean)
-        }
-      });
+      const bsdaOrgIds = [
+        ...intermediariesOrgIds,
+        ...transportersOrgIds,
+        bsda.emitterCompanySiret,
+        bsda.ecoOrganismeSiret,
+        bsda.destinationCompanySiret,
+        bsda.destinationOperationNextDestinationCompanySiret,
+        bsda.workerCompanySiret,
+        bsda.brokerCompanySiret
+      ].filter(Boolean);
+      const userOrgIdsInForm = userOrgIds.filter(orgId =>
+        bsdaOrgIds.includes(orgId)
+      );
+      canAccessDraftOrgIds.push(...userOrgIdsInForm);
     }
+
+    await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {}),
+        ...(transportersOrgIds.length ? { transportersOrgIds } : {}),
+        transportersOrgIds
+      }
+    });
 
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsda.id));
 
