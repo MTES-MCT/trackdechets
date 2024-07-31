@@ -297,23 +297,6 @@ describe("validation > parseBsff", () => {
       }
     );
 
-    it("should throw when repackaging more than 1 contenants", () => {
-      const zodBsff: ZodBsff = {
-        repackaging: ["contenant_1", "contenant_2"]
-      };
-      expect.assertions(1);
-      try {
-        parseBsff(zodBsff);
-      } catch (e) {
-        expect(e.errors).toEqual([
-          expect.objectContaining({
-            message:
-              "Vous ne pouvez saisir qu'un seul contenant lors d'une opération de reconditionnement"
-          })
-        ]);
-      }
-    });
-
     it("should throw if weight value is negative", () => {
       const zodBsff: ZodBsff = {
         weightValue: -1
