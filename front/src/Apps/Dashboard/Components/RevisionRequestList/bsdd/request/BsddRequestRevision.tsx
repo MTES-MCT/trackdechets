@@ -304,7 +304,9 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         }`,
                         { valueAsNumber: true }
                       ),
-                      type: "number"
+                      type: "number",
+                      inputMode: "decimal",
+                      step: "0.000001"
                     }}
                   />
                   {quantityReceivedFormValue && (
