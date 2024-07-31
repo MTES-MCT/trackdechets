@@ -146,13 +146,7 @@ const rawBsffSchema = z.object({
   packagings: z.array(rawBsffPackagingSchema).nullish(),
   ficheInterventions: z.string().array().nullish(),
   forwarding: z.array(z.string()).nullish(),
-  repackaging: z
-    .array(z.string())
-    // .max(
-    //   1,
-    //   "Vous ne pouvez saisir qu'un seul contenant lors d'une opération de reconditionnement"
-    // )
-    .nullish(),
+  repackaging: z.array(z.string()).nullish(),
   grouping: z.array(z.string()).nullish()
 });
 
