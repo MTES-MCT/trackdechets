@@ -148,10 +148,10 @@ const rawBsffSchema = z.object({
   forwarding: z.array(z.string()).nullish(),
   repackaging: z
     .array(z.string())
-    .max(
-      1,
-      "Vous ne pouvez saisir qu'un seul contenant lors d'une opération de reconditionnement"
-    )
+    // .max(
+    //   1,
+    //   "Vous ne pouvez saisir qu'un seul contenant lors d'une opération de reconditionnement"
+    // )
     .nullish(),
   grouping: z.array(z.string()).nullish()
 });
