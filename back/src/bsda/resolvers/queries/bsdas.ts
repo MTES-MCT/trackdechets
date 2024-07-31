@@ -7,7 +7,7 @@ import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
 import { getBsdaRepository } from "../../repository";
 import { Permission, can, getUserRoles } from "../../../permissions";
-import { Prisma } from "@prisma/client";
+import { BsdaStatus, Prisma } from "@prisma/client";
 
 export default async function bsdas(
   _,
@@ -37,12 +37,26 @@ export default async function bsdas(
     ]
   };
 
+  const draftMask: Prisma.BsdaWhereInput = {
+    OR: [
+      {
+        status: { not: BsdaStatus.INITIAL },
+        ...mask
+      },
+      {
+        status: BsdaStatus.INITIAL,
+        canAccessDraftOrgIds: { hasSome: orgIdsWithListPermission },
+        ...mask
+      }
+    ]
+  };
+
   const prismaWhere = {
     ...(whereArgs ? toPrismaWhereInput(whereArgs) : {}),
     isDeleted: false
   };
 
-  const where = applyMask<Prisma.BsdaWhereInput>(prismaWhere, mask);
+  const where = applyMask<Prisma.BsdaWhereInput>(prismaWhere, draftMask);
   const bsdaRepository = getBsdaRepository(user);
   const totalCount = await bsdaRepository.count(where);
 

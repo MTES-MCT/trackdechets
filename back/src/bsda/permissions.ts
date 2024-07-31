@@ -10,19 +10,21 @@ import { prisma } from "@td/prisma";
  * Retrieves organisations allowed to read a BSDA
  */
 function readers(bsda: BsdaWithTransporters): string[] {
-  return [
-    bsda.emitterCompanySiret,
-    bsda.ecoOrganismeSiret,
-    bsda.destinationCompanySiret,
-    ...bsda.transporters.flatMap(t => [
-      t.transporterCompanySiret,
-      t.transporterCompanyVatNumber
-    ]),
-    bsda.workerCompanySiret,
-    bsda.brokerCompanySiret,
-    bsda.destinationOperationNextDestinationCompanySiret,
-    ...bsda.intermediariesOrgIds
-  ].filter(Boolean);
+  return bsda.status === BsdaStatus.INITIAL
+    ? [...bsda.canAccessDraftOrgIds]
+    : [
+        bsda.emitterCompanySiret,
+        bsda.ecoOrganismeSiret,
+        bsda.destinationCompanySiret,
+        ...bsda.transporters.flatMap(t => [
+          t.transporterCompanySiret,
+          t.transporterCompanyVatNumber
+        ]),
+        bsda.workerCompanySiret,
+        bsda.brokerCompanySiret,
+        bsda.destinationOperationNextDestinationCompanySiret,
+        ...bsda.intermediariesOrgIds
+      ].filter(Boolean);
 }
 
 /**
@@ -35,6 +37,9 @@ async function contributors(
   bsda: BsdaWithTransporters,
   input?: BsdaInput
 ): Promise<string[]> {
+  if (bsda.status === BsdaStatus.INITIAL) {
+    return [...bsda.canAccessDraftOrgIds];
+  }
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateEcoOrganismeCompanySiret = input?.ecoOrganisme?.siret;
   const updateDestinationCompanySiret = input?.destination?.company?.siret;
