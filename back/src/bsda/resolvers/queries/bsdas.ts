@@ -7,7 +7,7 @@ import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
 import { getBsdaRepository } from "../../repository";
 import { Permission, can, getUserRoles } from "../../../permissions";
-import { BsdaStatus, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 export default async function bsdas(
   _,
@@ -40,11 +40,11 @@ export default async function bsdas(
   const draftMask: Prisma.BsdaWhereInput = {
     OR: [
       {
-        status: { not: BsdaStatus.INITIAL },
+        isDraft: false,
         ...mask
       },
       {
-        status: BsdaStatus.INITIAL,
+        isDraft: true,
         canAccessDraftOrgIds: { hasSome: orgIdsWithListPermission },
         ...mask
       }

@@ -29,7 +29,6 @@ export default async function create(
 
 export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const user = checkIsAuthenticated(context);
-
   await checkCanCreate(user, input);
   const companies = await getUserCompanies(user.id);
   const destinationCompany = companies.find(
@@ -100,6 +99,5 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     intermediaries,
     transporters
   });
-
   return expandBsdaFromDb(newBsda);
 }

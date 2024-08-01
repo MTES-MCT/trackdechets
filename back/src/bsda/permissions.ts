@@ -10,7 +10,7 @@ import { prisma } from "@td/prisma";
  * Retrieves organisations allowed to read a BSDA
  */
 function readers(bsda: BsdaWithTransporters): string[] {
-  return bsda.status === BsdaStatus.INITIAL
+  return bsda.isDraft
     ? [...bsda.canAccessDraftOrgIds]
     : [
         bsda.emitterCompanySiret,
@@ -37,7 +37,7 @@ async function contributors(
   bsda: BsdaWithTransporters,
   input?: BsdaInput
 ): Promise<string[]> {
-  if (bsda.status === BsdaStatus.INITIAL) {
+  if (bsda.isDraft) {
     return [...bsda.canAccessDraftOrgIds];
   }
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
@@ -290,18 +290,15 @@ export async function checkCanUpdateBsdaTransporter(
 }
 
 export async function checkCanDelete(user: User, bsda: BsdaWithTransporters) {
-  const authorizedOrgIds =
-    bsda.status === BsdaStatus.INITIAL
-      ? await contributors(bsda)
-      : bsda.status === BsdaStatus.SIGNED_BY_PRODUCER &&
-        bsda.emitterCompanySiret
-      ? [bsda.emitterCompanySiret]
-      : [];
+  const authorizedOrgIds = bsda.isDraft
+    ? await contributors(bsda)
+    : bsda.status === BsdaStatus.SIGNED_BY_PRODUCER && bsda.emitterCompanySiret
+    ? [bsda.emitterCompanySiret]
+    : [];
 
-  const errorMsg =
-    bsda.status === BsdaStatus.INITIAL
-      ? "Vous n'êtes pas autorisé à supprimer ce bordereau."
-      : "Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés";
+  const errorMsg = bsda.isDraft
+    ? "Vous n'êtes pas autorisé à supprimer ce bordereau."
+    : "Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés";
   return checkUserPermissions(
     user,
     authorizedOrgIds,

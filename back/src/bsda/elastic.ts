@@ -103,7 +103,7 @@ const getBsdaSirets = (
   };
 
   // Drafts only appear in the dashboard for companies the bsda owner belongs to
-  if (bsda.status === BsdaStatus.INITIAL) {
+  if (bsda.isDraft) {
     const draftFormSiretsEntries = Object.entries(bsdaSirets).filter(
       ([, siret]) => siret && bsda.canAccessDraftOrgIds.includes(siret)
     );
