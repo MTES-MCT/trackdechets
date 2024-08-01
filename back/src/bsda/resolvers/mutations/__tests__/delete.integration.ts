@@ -23,7 +23,9 @@ describe("Mutation.deleteBsda", () => {
   it("should allow user to delete a bsda", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
+      userId: user.id,
       opt: {
+        isDraft: true,
         emitterCompanySiret: company.siret
       }
     });
@@ -65,7 +67,11 @@ describe("Mutation.deleteBsda", () => {
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(user);
 
-    const bsda = await bsdaFactory({ opt: {} });
+    const bsda = await bsdaFactory({
+      opt: {
+        isDraft: true
+      }
+    });
     const { errors } = await mutate<
       Pick<Mutation, "deleteBsda">,
       MutationDeleteBsdaArgs
@@ -157,12 +163,16 @@ describe("Mutation.deleteBsda", () => {
   it("should remove forwardedIn link in deleted BSDA", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const forwardedBsda = await bsdaFactory({
+      userId: user.id,
       opt: {
+        isDraft: true,
         destinationCompanySiret: company.siret
       }
     });
     const forwardingBsda = await bsdaFactory({
+      userId: user.id,
       opt: {
+        isDraft: true,
         forwarding: { connect: { id: forwardedBsda.id } },
         emitterCompanySiret: company.siret
       }
@@ -223,6 +233,8 @@ describe("Mutation.deleteBsda", () => {
         status: BsdaStatus.SIGNED_BY_PRODUCER
       }
     });
+    console.log(bsda);
+
     const { errors } = await mutate<
       Pick<Mutation, "deleteBsda">,
       MutationDeleteBsdaArgs
