@@ -287,7 +287,9 @@ export function BsdaRequestRevision({ bsda }: Props) {
                     ...register("destination.reception.weight", {
                       valueAsNumber: true
                     }),
-                    type: "number"
+                    type: "number",
+                    inputMode: "decimal",
+                    step: "0.000001"
                   }}
                 />
                 {Boolean(formValues.destination?.reception?.weight) && (
