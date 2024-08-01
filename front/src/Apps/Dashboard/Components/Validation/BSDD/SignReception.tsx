@@ -18,7 +18,6 @@ import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import { useParams } from "react-router-dom";
 import {
   isDefinedStrict,
   multiplyByRounded
@@ -137,8 +136,6 @@ function SignReceptionModal({
   form,
   onCancel
 }: Readonly<SignReceptionModalProps>) {
-  const { siret } = useParams<{ siret: string }>();
-
   const [
     markAsReceived,
     { loading: loadingMarkAsReceived, error: errorMarkAsReceived }
@@ -176,10 +173,6 @@ function SignReceptionModal({
     form.status
   );
   const isTempStorage = form.recipient?.isTempStorage;
-  const isFinalDestination =
-    (isTempStorage &&
-      siret === form.temporaryStorageDetail?.destination?.company?.siret) ||
-    (!isTempStorage && siret === form.recipient?.company?.siret);
 
   const onSubmit = async data => {
     const {
@@ -193,7 +186,7 @@ function SignReceptionModal({
     } = data;
 
     if (isReception) {
-      isTempStorage && !isFinalDestination
+      isTempStorage && form.status === FormStatus.Sent
         ? await markAsTempStored({
             variables: {
               id: form.id,
@@ -222,7 +215,7 @@ function SignReceptionModal({
     if (
       ["ACCEPTED", "REFUSED", "PARTIALLY_REFUSED"].includes(acceptationStatus)
     ) {
-      isTempStorage && !isFinalDestination
+      isTempStorage && form.status === FormStatus.TempStored
         ? await markAsTempStorerAccepted({
             variables: {
               id: form.id,
@@ -410,7 +403,7 @@ function SignReceptionModal({
               </p>
             </div>
           </div>
-          {!isFinalDestination && (
+          {isTempStorage && form.status === FormStatus.Sent && (
             <>
               <p className="fr-text fr-mb-2w">Cette quantité est</p>
               <RadioButtons
