@@ -376,61 +376,57 @@ function SignReceptionModal({
         options={acceptationRadioOptions}
       />
 
-      {isReception && (
+      <h4 className="fr-h4">
+        <strong>Réception</strong>
+      </h4>
+      <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+        <div className="fr-col-12 fr-col-md-4">
+          <Input
+            label="Poids total net en tonnes"
+            className="fr-col-12"
+            state={errors?.receivedWeight && "error"}
+            stateRelatedMessage={
+              (errors?.receivedWeight?.message as string) ?? ""
+            }
+            nativeInputProps={{
+              inputMode: "decimal",
+              step: "0.000001",
+              type: "number",
+              ...register("receivedWeight")
+            }}
+          />
+          <p className="fr-text fr-text--xs" style={{ color: "#0063CB" }}>
+            <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
+            {multiplyByRounded(receivedWeight)} kilos
+          </p>
+        </div>
+      </div>
+      {isTempStorage && form.status === FormStatus.Sent && (
         <>
-          <h4 className="fr-h4">
-            <strong>Réception</strong>
-          </h4>
-          <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
-            <div className="fr-col-12 fr-col-md-4">
-              <Input
-                label="Poids total net en tonnes"
-                className="fr-col-12"
-                state={errors?.receivedWeight && "error"}
-                stateRelatedMessage={
-                  (errors?.receivedWeight?.message as string) ?? ""
+          <p className="fr-text fr-mb-2w">Cette quantité est</p>
+          <RadioButtons
+            state={errors?.quantityType && "error"}
+            stateRelatedMessage={
+              (errors?.quantityType?.message as string) ?? ""
+            }
+            options={[
+              {
+                label: "Réelle",
+                nativeInputProps: {
+                  ...register("quantityType", {}),
+                  value: "REAL",
+                  defaultChecked: true
                 }
-                nativeInputProps={{
-                  inputMode: "decimal",
-                  step: "0.000001",
-                  type: "number",
-                  ...register("receivedWeight")
-                }}
-              />
-              <p className="fr-text fr-text--xs" style={{ color: "#0063CB" }}>
-                <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
-                {multiplyByRounded(receivedWeight)} kilos
-              </p>
-            </div>
-          </div>
-          {isTempStorage && form.status === FormStatus.Sent && (
-            <>
-              <p className="fr-text fr-mb-2w">Cette quantité est</p>
-              <RadioButtons
-                state={errors?.quantityType && "error"}
-                stateRelatedMessage={
-                  (errors?.quantityType?.message as string) ?? ""
+              },
+              {
+                label: "Estimée",
+                nativeInputProps: {
+                  ...register("quantityType", {}),
+                  value: "ESTIMATED"
                 }
-                options={[
-                  {
-                    label: "Réelle",
-                    nativeInputProps: {
-                      ...register("quantityType", {}),
-                      value: "REAL",
-                      defaultChecked: true
-                    }
-                  },
-                  {
-                    label: "Estimée",
-                    nativeInputProps: {
-                      ...register("quantityType", {}),
-                      value: "ESTIMATED"
-                    }
-                  }
-                ]}
-              />
-            </>
-          )}
+              }
+            ]}
+          />
         </>
       )}
 
