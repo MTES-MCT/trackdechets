@@ -637,6 +637,45 @@ describe("Mutation.updateBsdasri", () => {
     });
     expect(updatedDasri.handedOverToRecipientAt).toBeNull();
   });
+
+  it("should compute destinationReceptionWasteVolume ", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.SENT,
+        emitterCompanySiret: company.siret,
+        transporterTransportSignatureAuthor: user.name,
+        transportSignatory: { connect: { id: user.id } },
+        transporterTransportSignatureDate: new Date().toISOString(),
+        ...readyToPublishData(await companyFactory())
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      destination: {
+        reception: {
+          packagings: [
+            { type: "BOITE_CARTON", quantity: 3, volume: 3 },
+            { type: "BOITE_CARTON", quantity: 2, volume: 1 }
+          ]
+        }
+      }
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: { id: dasri.id, input }
+      }
+    );
+    expect(data.updateBsdasri.destination!.reception!.volume).toEqual(11);
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id }
+    });
+    expect(updatedDasri.destinationReceptionWasteVolume).toEqual(11);
+  });
+
   it("should allow destination fields update after transport signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
