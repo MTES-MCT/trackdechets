@@ -181,6 +181,12 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
                     setTag();
                   }
                 }}
+                onKeyPress={e => {
+                  // to avoid submitting a form on enter tag
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
+                }}
                 onBlur={() => {
                   setTag();
                 }}
