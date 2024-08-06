@@ -1351,6 +1351,15 @@ export const canReviewBsdd = (bsd, siret) => {
   );
 };
 
+const canReviewBsddAppendix1 = (bsd, siret) => {
+  return (
+    bsd.type === BsdType.Bsdd &&
+    isAppendix1Producer(bsd) &&
+    BsdStatusCode.Sent === bsd.status &&
+    isSameSiretTransporter(siret, bsd)
+  );
+};
+
 export const canReviewBsd = (bsd, siret) => {
   const isTransporter = isSameSiretTransporter(siret, bsd);
   const isDestination = isSameSiretDestination(siret, bsd);
@@ -1360,10 +1369,11 @@ export const canReviewBsd = (bsd, siret) => {
     isTransporter && !isDestination && !isProducer && !isWorker;
 
   return (
-    (canReviewBsdd(bsd, siret) ||
+    ((canReviewBsdd(bsd, siret) ||
       canReviewBsda(bsd, siret) ||
       canReviewBsdasri(bsd, siret)) &&
-    !isTransporterOnly
+      !isTransporterOnly) ||
+    canReviewBsddAppendix1(bsd, siret)
   );
 };
 
