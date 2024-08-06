@@ -60,7 +60,7 @@ export function SignTransport({
       {({ bsvhu, onClose }) => {
         const TODAY = new Date();
 
-        return bsvhu.metadata?.errors.some(
+        return (bsvhu.metadata?.errors ?? []).some(
           error =>
             error.requiredFor === SignatureTypeInput.Transport &&
             // Transporter Receipt will be auto-completed by the transporter
