@@ -71,6 +71,7 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
   const destination = await userWithCompanyFactory();
 
   const bsda = await bsdaFactory({
+    userId: emitter.user.id,
     opt: {
       emitterCompanySiret: emitter.company.siret,
       emitterCompanyName: emitter.company.name,
@@ -278,6 +279,7 @@ describe("Mutation.Bsda.duplicate", () => {
       "groupedInId",
       "intermediaries",
       "intermediariesOrgIds",
+      "canAccessDraftOrgIds",
       "transporters"
     ];
 

@@ -6,6 +6,7 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
 import { BsdaWithTransporters } from "../../types";
+import { getUserCompanies } from "../../../users/database";
 
 export type CreateBsdaFn = (
   data: Prisma.BsdaCreateInput,
@@ -20,7 +21,8 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
       data,
       include: {
         grouping: { select: { id: true } },
-        transporters: true
+        transporters: true,
+        intermediaries: true
       }
     });
 
@@ -50,23 +52,57 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
         )
       );
     }
-
-    if (data.transporters) {
-      // compute transporterOrgIds
-      await prisma.bsda.update({
-        where: { id: bsda.id },
-        data: {
-          transportersOrgIds: bsda.transporters
-            .flatMap(t => [
-              t.transporterCompanySiret,
-              t.transporterCompanyVatNumber
-            ])
-            .filter(Boolean)
-        }
-      });
+    const intermediariesOrgIds: string[] = bsda.intermediaries
+      ? bsda.intermediaries
+          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+          .filter(Boolean)
+      : [];
+    const transportersOrgIds: string[] = bsda.transporters
+      ? bsda.transporters
+          .flatMap(t => [
+            t.transporterCompanySiret,
+            t.transporterCompanyVatNumber
+          ])
+          .filter(Boolean)
+      : [];
+    // For drafts, only the owner's sirets that appear on the bsd have access
+    const canAccessDraftOrgIds: string[] = [];
+    if (bsda.isDraft) {
+      const userCompanies = await getUserCompanies(user.id);
+      const userOrgIds = userCompanies.map(company => company.orgId);
+      const bsdaOrgIds = [
+        ...intermediariesOrgIds,
+        ...transportersOrgIds,
+        bsda.emitterCompanySiret,
+        bsda.ecoOrganismeSiret,
+        bsda.destinationCompanySiret,
+        bsda.destinationOperationNextDestinationCompanySiret,
+        bsda.workerCompanySiret,
+        bsda.brokerCompanySiret
+      ].filter(Boolean);
+      const userOrgIdsInForm = userOrgIds.filter(orgId =>
+        bsdaOrgIds.includes(orgId)
+      );
+      canAccessDraftOrgIds.push(...userOrgIdsInForm);
     }
 
-    prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsda.id));
+    const updatedBsda = await prisma.bsda.update({
+      where: { id: bsda.id },
+      data: {
+        ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {}),
+        ...(transportersOrgIds.length ? { transportersOrgIds } : {}),
+        transportersOrgIds
+      },
+      include: {
+        grouping: { select: { id: true } },
+        transporters: true,
+        intermediaries: true
+      }
+    });
+
+    prisma.addAfterCommitCallback(() =>
+      enqueueCreatedBsdToIndex(updatedBsda.id)
+    );
 
     // Une optimisation est en place sur le calcul des champs
     // `Bsda.forwardedIn` et `Bsda.groupedIn` dans la query `bsds`
@@ -75,18 +111,18 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
     // de regroupement ou de réexpedition, on est obligé de
     // réindexer les bordereaux initiaux.
 
-    if (bsda.grouping.length > 0) {
-      for (const { id } of bsda.grouping) {
+    if (updatedBsda.grouping.length > 0) {
+      for (const { id } of updatedBsda.grouping) {
         prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(id));
       }
     }
 
-    if (bsda.forwardingId) {
+    if (updatedBsda.forwardingId) {
       prisma.addAfterCommitCallback(() =>
-        enqueueCreatedBsdToIndex(bsda.forwardingId!)
+        enqueueCreatedBsdToIndex(updatedBsda.forwardingId!)
       );
     }
 
-    return bsda;
+    return updatedBsda;
   };
 }

@@ -14,6 +14,7 @@ export function bsdaReducer(
         intermediaries,
         wasteSealNumbers,
         intermediariesOrgIds,
+        canAccessDraftOrgIds,
         transporters,
         ...bsda
       } = event.data;
@@ -31,6 +32,7 @@ export function bsdaReducer(
         grouping,
         intermediaries,
         intermediariesOrgIds,
+        canAccessDraftOrgIds,
         transporters,
         forwarding,
         ...bsda

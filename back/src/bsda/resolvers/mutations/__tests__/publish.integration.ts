@@ -63,6 +63,7 @@ describe("Mutation.Bsda.publish", () => {
   it("should pass the form as non draft", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await bsdaFactory({
+      userId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
         isDraft: true

@@ -10,19 +10,21 @@ import { prisma } from "@td/prisma";
  * Retrieves organisations allowed to read a BSDA
  */
 function readers(bsda: BsdaWithTransporters): string[] {
-  return [
-    bsda.emitterCompanySiret,
-    bsda.ecoOrganismeSiret,
-    bsda.destinationCompanySiret,
-    ...bsda.transporters.flatMap(t => [
-      t.transporterCompanySiret,
-      t.transporterCompanyVatNumber
-    ]),
-    bsda.workerCompanySiret,
-    bsda.brokerCompanySiret,
-    bsda.destinationOperationNextDestinationCompanySiret,
-    ...bsda.intermediariesOrgIds
-  ].filter(Boolean);
+  return bsda.isDraft
+    ? [...bsda.canAccessDraftOrgIds]
+    : [
+        bsda.emitterCompanySiret,
+        bsda.ecoOrganismeSiret,
+        bsda.destinationCompanySiret,
+        ...bsda.transporters.flatMap(t => [
+          t.transporterCompanySiret,
+          t.transporterCompanyVatNumber
+        ]),
+        bsda.workerCompanySiret,
+        bsda.brokerCompanySiret,
+        bsda.destinationOperationNextDestinationCompanySiret,
+        ...bsda.intermediariesOrgIds
+      ].filter(Boolean);
 }
 
 /**
@@ -35,6 +37,9 @@ async function contributors(
   bsda: BsdaWithTransporters,
   input?: BsdaInput
 ): Promise<string[]> {
+  if (bsda.isDraft) {
+    return [...bsda.canAccessDraftOrgIds];
+  }
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateEcoOrganismeCompanySiret = input?.ecoOrganisme?.siret;
   const updateDestinationCompanySiret = input?.destination?.company?.siret;
@@ -285,18 +290,15 @@ export async function checkCanUpdateBsdaTransporter(
 }
 
 export async function checkCanDelete(user: User, bsda: BsdaWithTransporters) {
-  const authorizedOrgIds =
-    bsda.status === BsdaStatus.INITIAL
-      ? await contributors(bsda)
-      : bsda.status === BsdaStatus.SIGNED_BY_PRODUCER &&
-        bsda.emitterCompanySiret
-      ? [bsda.emitterCompanySiret]
-      : [];
+  const authorizedOrgIds = bsda.isDraft
+    ? await contributors(bsda)
+    : bsda.status === BsdaStatus.SIGNED_BY_PRODUCER && bsda.emitterCompanySiret
+    ? [bsda.emitterCompanySiret]
+    : [];
 
-  const errorMsg =
-    bsda.status === BsdaStatus.INITIAL
-      ? "Vous n'êtes pas autorisé à supprimer ce bordereau."
-      : "Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés";
+  const errorMsg = bsda.isDraft
+    ? "Vous n'êtes pas autorisé à supprimer ce bordereau."
+    : "Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés";
   return checkUserPermissions(
     user,
     authorizedOrgIds,
