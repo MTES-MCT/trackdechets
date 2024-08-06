@@ -5,7 +5,7 @@ import { Route, Navigate, Routes, Link } from "react-router-dom";
 import Loader from "../common/Components/Loader/Loaders";
 import { InlineError } from "../common/Components/Error/Error";
 import { Redirect } from "../utils/routerUtils";
-import AccountInfo from "./AccountInfo";
+import AccountInfo from "./AccountInfo/AccountInfo";
 import AccountAccessTokenList from "./accessTokens/AccountAccessTokenList";
 import AccountContentWrapper from "./AccountContentWrapper";
 import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
@@ -51,7 +51,7 @@ export default function Account() {
             <Route
               path={toRelative(routes.account.info)}
               element={
-                <AccountContentWrapper title="Informations générales">
+                <AccountContentWrapper title="Mes paramètres">
                   <AccountInfo me={data.me} />
                 </AccountContentWrapper>
               }
