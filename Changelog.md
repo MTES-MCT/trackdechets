@@ -5,6 +5,28 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.8.1] 27/08/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+  
+
+#### :bug: Corrections de bugs
+
+  
+
+#### :boom: Breaking changes
+
+- Le champ volume de BsdasriReceptionInput est supprimé, BsdasriReception/volume étant calculé à partir des packagings [PR #3509](https://github.com/MTES-MCT/trackdechets/pull/3509)
+
+
+#### :nail_care: Améliorations
+
+  
+
+#### :house: Interne
+
+
 # [2024.7.2] 30/07/2024
 
 #### :rocket: Nouvelles fonctionnalités
