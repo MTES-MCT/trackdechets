@@ -4,7 +4,8 @@ import {
   CompanyVerificationMode,
   CompanyVerificationStatus,
   Prisma,
-  WasteProcessorType
+  WasteProcessorType,
+  WasteVehiclesType
 } from "@prisma/client";
 import { convertUrls } from "../../database";
 import { prisma } from "@td/prisma";
@@ -16,11 +17,7 @@ import { randomNumber } from "../../../utils";
 import { renderMail, verificationProcessInfo } from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
-  cleanClue,
   isClosedCompany,
-  isFRVat,
-  isSiret,
-  isVat,
   CLOSED_COMPANY_ERROR,
   isProfessional
 } from "@td/constants";
@@ -30,13 +27,12 @@ import {
   addToSetCompanyDepartementQueue
 } from "../../../queue/producers/company";
 import { UserInputError } from "../../../common/errors";
-import {
-  companyTypesValidationSchema,
-  isForeignTransporter
-} from "../../validation";
+import { isForeignTransporter } from "../../validation";
 import { sendFirstOnboardingEmail } from "./verifyCompany";
 import { sendVerificationCodeLetter } from "../../../common/post";
 import { isGenericEmail } from "@td/constants";
+import { parseCompanyAsync } from "../../validation/index";
+import { companyInputToZodCompany } from "../../validation/helpers";
 
 /**
  * Create a new company and associate it to a user
@@ -52,13 +48,16 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
 
-  const { companyTypes, collectorTypes, wasteProcessorTypes } =
-    await companyTypesValidationSchema.validate(companyInput);
+  const zodCompany = companyInputToZodCompany(companyInput);
 
   const {
+    companyTypes,
+    collectorTypes,
+    wasteProcessorTypes,
+    wasteVehiclesTypes,
     codeNaf,
     gerepId,
-    companyName: name,
+    name,
     givenName,
     address,
     transporterReceiptId,
@@ -66,37 +65,17 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     brokerReceiptId,
     vhuAgrementDemolisseurId,
     vhuAgrementBroyeurId,
+    workerCertificationId,
     allowBsdasriTakeOverWithoutSignature,
     allowAppendix1SignatureAutomation,
     contact,
     contactEmail,
-    contactPhone
-  } = companyInput;
-
-  const ecoOrganismeAgreements =
-    companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
-  const siret = companyInput.siret ? cleanClue(companyInput.siret) : null;
-  const vatNumber = companyInput.vatNumber
-    ? cleanClue(companyInput.vatNumber)
-    : null;
-  const orgId = siret ?? (vatNumber as string);
-
-  if (isVat(vatNumber)) {
-    if (isFRVat(vatNumber)) {
-      throw new UserInputError(
-        "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
-      );
-    }
-    if (companyTypes.join("") !== CompanyType.TRANSPORTER) {
-      throw new UserInputError(
-        "Impossible de créer un établissement identifié par un numéro de TVA d'un autre type que TRANSPORTER"
-      );
-    }
-  } else if (!isSiret(siret)) {
-    throw new UserInputError(
-      "Impossible de créer un établissement sans un SIRET valide ni un numéro de TVA étranger valide"
-    );
-  }
+    contactPhone,
+    ecoOrganismeAgreements,
+    siret,
+    vatNumber,
+    orgId
+  } = await parseCompanyAsync(zodCompany);
 
   const existingCompany = await prisma.company.findUnique({
     where: {
@@ -117,33 +96,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     throw new UserInputError(CLOSED_COMPANY_ERROR);
   }
 
-  if (companyTypes.includes("CREMATORIUM")) {
-    throw new UserInputError(
-      "Le type CREMATORIUM est déprécié, utiliser WasteProcessorTypes.CREMATION."
-    );
-  }
-
-  if (companyTypes.includes("ECO_ORGANISME") && siret) {
-    const ecoOrganismeExists = await prisma.ecoOrganisme.findUnique({
-      where: { siret }
-    });
-    if (!ecoOrganismeExists) {
-      throw new UserInputError(
-        "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : contact@trackdechets.beta.gouv.fr"
-      );
-    }
-
-    if (ecoOrganismeAgreements.length < 1) {
-      throw new UserInputError(
-        "L'URL de l'agrément de l'éco-organisme est requis."
-      );
-    }
-  } else if (ecoOrganismeAgreements.length > 0) {
-    throw new UserInputError(
-      "Impossible de lier des agréments d'éco-organisme : l'entreprise n'est pas un éco-organisme."
-    );
-  }
-
   const companyCreateInput: Prisma.CompanyCreateInput = {
     orgId,
     siret,
@@ -159,6 +111,9 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       : undefined,
     wasteProcessorTypes: wasteProcessorTypes
       ? { set: wasteProcessorTypes as WasteProcessorType[] }
+      : undefined,
+    wasteVehiclesTypes: wasteVehiclesTypes
+      ? { set: wasteVehiclesTypes as WasteVehiclesType[] }
       : undefined,
     securityCode: randomNumber(4),
     verificationCode: randomNumber(5).toString(),
@@ -203,6 +158,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   if (!!vhuAgrementBroyeurId) {
     companyCreateInput.vhuAgrementBroyeur = {
       connect: { id: vhuAgrementBroyeurId }
+    };
+  }
+
+  if (!!workerCertificationId) {
+    companyCreateInput.workerCertification = {
+      connect: { id: workerCertificationId }
     };
   }
 

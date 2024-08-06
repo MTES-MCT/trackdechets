@@ -70,6 +70,14 @@ enum WasteProcessorType {
   OTHER_NON_DANGEROUS_WASTES
 }
 
+// Sous-type d'installation de traitement VHU
+enum WasteVehiclesType {
+  // Broyeur VHU
+  BROYEUR
+  // Casse-auto / démolissuer
+  DEMOLISSEUR
+}
+
 enum CompanyVerificationMode {
   MANUAL
   LETTER
@@ -264,6 +272,7 @@ model Company {
   companyTypes                         CompanyType[]
   collectorTypes                       CollectorType[]
   wasteProcessorTypes                  WasteProcessorType[]
+  wasteVehiclesTypes                   WasteVehiclesType[]
   address                              String?
   latitude                             Float?
   longitude                            Float?

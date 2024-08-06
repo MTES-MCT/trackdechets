@@ -46,6 +46,7 @@ export async function getCompanyInfos(
     isRegistered: searchResult.isRegistered,
     companyTypes: searchResult.companyTypes ?? [],
     wasteProcessorTypes: searchResult.wasteProcessorTypes ?? [],
+    wasteVehiclesTypes: searchResult.wasteVehiclesTypes ?? [],
     collectorTypes: searchResult.collectorTypes ?? [],
     ecoOrganismeAgreements: searchResult.ecoOrganismeAgreements ?? [],
     allowBsdasriTakeOverWithoutSignature:

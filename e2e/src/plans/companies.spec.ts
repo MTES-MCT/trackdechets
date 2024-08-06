@@ -163,13 +163,12 @@ test.describe
       });
     });
 
-    await test.step("#007 - Installation de traitement de VHU (casse automobile et/ou broyeur agréé)", async () => {
+    await test.step("#007 - Installation de traitement de VHU", async () => {
       await createWasteManagingCompany(page, {
         company: {
           name: "007 Installation de traitement de VHU",
-          roles: [
-            "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
-          ]
+          roles: ["Installation de traitement de VHU"],
+          subRoles: ["Broyeur VHU", "Casse automobile / démolisseur"]
         },
         contact: {
           name: "VHU 007",

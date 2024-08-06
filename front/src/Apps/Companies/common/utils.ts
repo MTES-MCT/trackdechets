@@ -1,10 +1,115 @@
-import { CollectorType, CompanyType, WasteProcessorType } from "@td/codegen-ui";
+import {
+  CollectorType,
+  CompanyType,
+  WasteProcessorType,
+  WasteVehiclesType
+} from "@td/codegen-ui";
 import { format, isValid } from "date-fns";
 // eslint-disable-next-line import/no-duplicates
 import fr from "date-fns/locale/fr";
 import { parseDate } from "../../../common/datetime";
 
-export const COMPANY_CONSTANTS = [
+export type CompanySubType =
+  | CollectorType
+  | WasteProcessorType
+  | WasteVehiclesType;
+
+export type AllCompanyType = CompanyType | CompanySubType;
+
+export type CompanySubTypeOption = {
+  label: string;
+  value: CompanySubType;
+};
+
+export type CompanyTypeOption = {
+  label: string;
+  value: CompanyType;
+  helpText?: string;
+  subTypes?: CompanySubTypeOption[];
+  subTypesName?: string;
+};
+
+export const COLLECTOR_TYPE_OPTIONS: CompanySubTypeOption[] = [
+  {
+    label: "Déchets non Dangereux (Rubriques 2713, 2714, 2715, 2716)",
+    value: CollectorType.NonDangerousWastes
+  },
+  {
+    label: "Déchets Dangereux (Rubrique 2718)",
+    value: CollectorType.DangerousWastes
+  },
+  {
+    label: "Déchets DEEE (Rubrique 2711)",
+    value: CollectorType.DeeeWastes
+  },
+  {
+    label: "Autres cas déchets non dangereux (Rubrique 2731)",
+    value: CollectorType.OtherNonDangerousWastes
+  },
+  {
+    label:
+      "Autres cas déchets dangereux (Rubriques 2719, 2792-1, 2793-1, 2793-2, 2797-1, 2798)",
+    value: CollectorType.OtherDangerousWastes
+  }
+];
+
+export const COLLECTOR_TYPE_VALUES = COLLECTOR_TYPE_OPTIONS.map(
+  option => option.value
+) as CollectorType[];
+
+export const WASTE_PROCESSOR_TYPE_OPTIONS: CompanySubTypeOption[] = [
+  {
+    label: "Incinération de déchets dangereux",
+    value: WasteProcessorType.DangerousWastesIncineration
+  },
+  {
+    label: "Incinération de déchets non dangereux",
+    value: WasteProcessorType.NonDangerousWastesIncineration
+  },
+  {
+    label: "Crématorium (et cimetières pour la Guyane)",
+    value: WasteProcessorType.Cremation
+  },
+  {
+    label: "Installation de stockage de déchets dangereux",
+    value: WasteProcessorType.DangerousWastesStorage
+  },
+  {
+    label:
+      "Installation de stockage de déchets non dangereux (y compris casiers dédiés amiante, plâtre)",
+    value: WasteProcessorType.NonDangerousWastesStorage
+  },
+  {
+    label: "Installation de stockage de déchets inertes",
+    value: WasteProcessorType.InertWastesStorage
+  },
+  {
+    label: "Autres traitement de déchets non dangereux",
+    value: WasteProcessorType.OtherNonDangerousWastes
+  },
+  {
+    label: "Autres traitements de déchets dangereux",
+    value: WasteProcessorType.OtherDangerousWastes
+  }
+];
+
+export const WASTE_PROCESSOR_TYPE_VALUES = WASTE_PROCESSOR_TYPE_OPTIONS.map(
+  option => option.value
+) as WasteProcessorType[];
+
+export const WASTE_VEHICLES_TYPE_OPTIONS: CompanySubTypeOption[] = [
+  { label: "Broyeur VHU", value: WasteVehiclesType.Broyeur },
+  {
+    label: "Casse automobile / démolisseur",
+    value: WasteVehiclesType.Demolisseur
+  }
+];
+
+export const WASTE_VEHICLES_TYPE_VALUES = WASTE_VEHICLES_TYPE_OPTIONS.map(
+  option => option.value
+) as WasteVehiclesType[];
+
+export const COMPANY_TYPE_OPTIONS: CompanyTypeOption[] = [
   {
     value: CompanyType.Producer,
     label: "Producteur de déchets : producteurs de déchets, y compris T&S",
@@ -22,13 +127,17 @@ export const COMPANY_CONSTANTS = [
     label:
       "Installation de Tri, transit regroupement de déchets y compris non classée",
     helpText:
-      "Installations sur lesquelles sont regroupés, triés ou en transit les déchets dangereux et/ou non dangereux - installations relevant des rubriques suivantes de la nomenclature ICPE:  2711, 2713, 2714, 2715, 2716, 2718, 2719, 2731, 2792-1, 2793-1, 2793-2, 2797-1, 2798."
+      "Installations sur lesquelles sont regroupés, triés ou en transit les déchets dangereux et/ou non dangereux - installations relevant des rubriques suivantes de la nomenclature ICPE:  2711, 2713, 2714, 2715, 2716, 2718, 2719, 2731, 2792-1, 2793-1, 2793-2, 2797-1, 2798.",
+    subTypes: COLLECTOR_TYPE_OPTIONS,
+    subTypesName: "collectorTypes"
   },
   {
     value: CompanyType.Wasteprocessor,
     label: "Installation de traitement",
     helpText:
-      "Installations sur lesquelles sont traités les déchets, et relevant des rubriques suivantes de la nomenclature ICPE :  2720, 2730, 2740, 2750, 2751, 2752, 2760, 2770, 2771, 2780, 2781, 2782, 2790, 2791, 2792-2, 2793-3, 2794, 2795, 2797-2 et 3510, 3520, 3531, 3532, 3540, 3550, 3560."
+      "Installations sur lesquelles sont traités les déchets, et relevant des rubriques suivantes de la nomenclature ICPE :  2720, 2730, 2740, 2750, 2751, 2752, 2760, 2770, 2771, 2780, 2781, 2782, 2790, 2791, 2792-2, 2793-3, 2794, 2795, 2797-2 et 3510, 3520, 3531, 3532, 3540, 3550, 3560.",
+    subTypes: WASTE_PROCESSOR_TYPE_OPTIONS,
+    subTypesName: "wasteProcessorTypes"
   },
   {
     value: CompanyType.DisposalFacility,
@@ -44,10 +153,11 @@ export const COMPANY_CONSTANTS = [
   },
   {
     value: CompanyType.WasteVehicles,
-    label:
-      "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
+    label: "Installation de traitement de VHU",
     helpText:
-      "Casse automobile, installations d'entreposage, dépollution, démontage de tout type de véhicules hors d'usage - installations relevant de la rubrique 2712 de la nomenclature ICPE"
+      "Casse automobile, installations d'entreposage, dépollution, démontage de tout type de véhicules hors d'usage - installations relevant de la rubrique 2712 de la nomenclature ICPE",
+    subTypes: WASTE_VEHICLES_TYPE_OPTIONS,
+    subTypesName: "wasteVehiclesTypes"
   },
   {
     value: CompanyType.Transporter,
@@ -87,63 +197,22 @@ export const COMPANY_CONSTANTS = [
   }
 ];
 
-export const COLLECTOR_OPTIONS = [
-  {
-    label: "Déchets non Dangereux (Rubriques 2713, 2714, 2715, 2716)",
-    value: CollectorType.NonDangerousWastes
-  },
-  {
-    label: "Déchets Dangereux (Rubrique 2718)",
-    value: CollectorType.DangerousWastes
-  },
-  {
-    label: "Déchets DEEE (Rubrique 2711)",
-    value: CollectorType.DeeeWastes
-  },
-  {
-    label: "Autres cas déchets non dangereux (Rubrique 2731)",
-    value: CollectorType.OtherNonDangerousWastes
-  },
-  {
-    label:
-      "Autres cas déchets dangereux (Rubriques 2719, 2792-1, 2793-1, 2793-2, 2797-1, 2798)",
-    value: CollectorType.OtherDangerousWastes
-  }
-];
+export const COMPANY_TYPE_VALUES = COMPANY_TYPE_OPTIONS.map(
+  option => option.value
+);
 
-export const WASTE_PROCESSOR_OPTIONS = [
+export const WORKER_AGREMENT_ORGANISATION_OPTIONS = [
   {
-    label: "Incinération de déchets dangereux",
-    value: WasteProcessorType.DangerousWastesIncineration
+    value: "AFNOR Certification",
+    label: "AFNOR Certification"
   },
   {
-    label: "Incinération de déchets non dangereux",
-    value: WasteProcessorType.NonDangerousWastesIncineration
+    value: "QUALIBAT",
+    label: "QUALIBAT"
   },
   {
-    label: "Crématorium (et cimetières pour la Guyane)",
-    value: WasteProcessorType.Cremation
-  },
-  {
-    label: "Installation de stockage de déchets dangereux",
-    value: WasteProcessorType.DangerousWastesStorage
-  },
-  {
-    label:
-      "Installation de stockage de déchets non dangereux (y compris casiers dédiés amiante, plâtre)",
-    value: WasteProcessorType.NonDangerousWastesStorage
-  },
-  {
-    label: "Installation de stockage de déchets inertes",
-    value: WasteProcessorType.InertWastesStorage
-  },
-  {
-    label: "Autres traitement de déchets non dangereux",
-    value: WasteProcessorType.OtherNonDangerousWastes
-  },
-  {
-    label: "Autres traitements de déchets dangereux",
-    value: WasteProcessorType.OtherDangerousWastes
+    value: "GLOBAL CERTIFICATION",
+    label: "GLOBAL CERTIFICATION"
   }
 ];
 

@@ -76,6 +76,7 @@ describe("companyInfos with SIRET", () => {
       companyTypes: [],
       wasteProcessorTypes: [],
       collectorTypes: [],
+      wasteVehiclesTypes: [],
       installation: {
         codeS3ic: "0055.14316"
       },
@@ -116,6 +117,7 @@ describe("companyInfos with SIRET", () => {
       companyTypes: [],
       wasteProcessorTypes: [],
       collectorTypes: [],
+      wasteVehiclesTypes: [],
       ecoOrganismeAgreements: [],
       installation: undefined,
       address: undefined,
@@ -195,6 +197,7 @@ describe("companyInfos search with a VAT number", () => {
       companyTypes: [],
       wasteProcessorTypes: [],
       collectorTypes: [],
+      wasteVehiclesTypes: [],
       installation: undefined,
       statutDiffusionEtablissement: "O",
       allowBsdasriTakeOverWithoutSignature: undefined,
@@ -234,6 +237,7 @@ describe("companyInfos search with a VAT number", () => {
       companyTypes: [],
       wasteProcessorTypes: [],
       collectorTypes: [],
+      wasteVehiclesTypes: [],
       ecoOrganismeAgreements: [],
       installation: undefined,
       statutDiffusionEtablissement: "O",
