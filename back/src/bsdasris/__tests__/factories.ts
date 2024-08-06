@@ -6,9 +6,10 @@ import {
   BsdasriType,
   OperationMode
 } from "@prisma/client";
+import { BsdasriPackagingsInput } from "../../generated/graphql/types";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { distinct } from "../../common/arrays";
-
+import { computeTotalVolume } from "../converter";
 const dasriData = () => ({
   status: "INITIAL" as BsdasriStatus,
   id: getReadableId(ReadableIdPrefix.DASRI),
@@ -20,7 +21,18 @@ export const bsdasriFactory = async ({
 }: {
   opt?: Partial<Prisma.BsdasriCreateInput>;
 }) => {
-  const dasriParams = { ...dasriData(), ...opt };
+  const dasriParams = {
+    ...dasriData(),
+    ...opt,
+    ...(opt.destinationWastePackagings
+      ? {
+          destinationReceptionWasteVolume: computeTotalVolume(
+            opt.destinationWastePackagings as BsdasriPackagingsInput[]
+          )
+        }
+      : {})
+  };
+
   const created = await prisma.bsdasri.create({
     data: {
       ...dasriParams
@@ -103,7 +115,6 @@ export const readyToReceiveData = () => ({
   destinationWastePackagings: [
     { type: "BOITE_CARTON", volume: 22, quantity: 3 }
   ],
-  destinationReceptionWasteVolume: 66,
   destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
   destinationReceptionDate: new Date()
 });
