@@ -133,7 +133,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
   };
 
   const handleAddSealNumbers = value => {
-    if (value && !bsda.waste?.sealNumbers?.includes(value)) {
+    if (value && ![...sealNumbersTags]?.includes(value)) {
       setSealNumbersTags([...sealNumbersTags, value]);
       setValue("waste.sealNumbers", [...sealNumbersTags, value]);
     }
