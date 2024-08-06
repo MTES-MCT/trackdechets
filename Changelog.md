@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Résolution d'un problème de resolver BsdaRevisionRequest qui empêchait l'ouverture de la modale de révision [PR 3513](https://github.com/MTES-MCT/trackdechets/pull/3513)
 
+#### :boom: Breaking changes
+
+- Le champ volume de BsdasriReceptionInput est supprimé, BsdasriReception/volume étant calculé à partir des packagings [PR #3509](https://github.com/MTES-MCT/trackdechets/pull/3509)
+
 # [2024.7.2] 30/07/2024
 
 #### :rocket: Nouvelles fonctionnalités
