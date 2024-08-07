@@ -370,7 +370,7 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
         <div className="BoxRow">
           <div className="BoxCol">
             <p>
-              J'émets un BSDD pour :{" "}
+              J'émets un BSD pour :{" "}
               <input
                 type="checkbox"
                 checked={form.emitter?.type === EmitterType.PRODUCER}
