@@ -1299,14 +1299,13 @@ const canReviewBsda = (bsd, siret) => {
 
 const canReviewBsdasri = (bsd, siret) => {
   // You can't review a SYNTHESIS dasri with RECEIVED status
-  if (bsd.synthesizing && bsd.status === BsdasriStatus.Received) {
+  if (
+    [BsdasriType.Synthesis].includes(bsd.bsdWorkflowType?.toString()) &&
+    bsd.status === BsdasriStatus.Received
+  ) {
     return false;
   }
 
-  // these types are not implemented yet
-  if ([BsdasriType.Synthesis, BsdasriType.Grouping].includes(bsd.type)) {
-    return false;
-  }
   if (bsd.groupedInId || bsd.synthesizedInId) {
     return false;
   }
