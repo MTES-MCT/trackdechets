@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.8.1] 27/08/2024
+
+#### :bug: Corrections de bugs
+
+- Résolution d'un problème de resolver BsdaRevisionRequest qui empêchait l'ouverture de la modale de révision [PR 3513](https://github.com/MTES-MCT/trackdechets/pull/3513)
+
 # [2024.7.2] 30/07/2024
 
 #### :rocket: Nouvelles fonctionnalités
