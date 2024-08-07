@@ -24,7 +24,12 @@ import { expandBsffFromElastic } from "../../../bsffs/converter";
 import { expandBspaohFromElastic } from "../../../bspaoh/converter";
 import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
-import { Permission, can, getUserRoles } from "../../../permissions";
+import {
+  Permission,
+  can,
+  getUserRoles,
+  hasGovernmentReadAllBsdsPermOrThrow
+} from "../../../permissions";
 import { distinct } from "../../../common/arrays";
 import { FormForElastic } from "../../../forms/elastic";
 import { BsdasriForElastic } from "../../../bsdasris/elastic";
@@ -80,9 +85,17 @@ async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
   };
 }
 
+/**
+ *
+ * @param param0
+ * @param user
+ * @param bypassOrgIdsWithListPermission : do not restrict search to user companies (for gerico gov account)
+ * @returns
+ */
 async function buildQuery(
   { clue, where = {} }: QueryBsdsArgs,
-  user: Express.User
+  user: Express.User,
+  bypassOrgIdsWithListPermission?: boolean
 ) {
   const query: {
     bool: estypes.BoolQuery & {
@@ -156,11 +169,13 @@ async function buildQuery(
     can(roles[orgId], Permission.BsdCanList)
   );
 
-  query.bool.filter.push({
-    terms: {
-      sirets: orgIdsWithListPermission
-    }
-  });
+  if (!bypassOrgIdsWithListPermission) {
+    query.bool.filter.push({
+      terms: {
+        sirets: orgIdsWithListPermission
+      }
+    });
+  }
 
   return query;
 }
@@ -312,15 +327,38 @@ async function buildDasris(dasris: BsdasriForElastic[]) {
 }
 
 const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
+  // This query is restricted to Session users (UI) and government accounts (gerico)
+
+  // store user
+  const contextUser = context.user;
+
+  // is user is not authenticated with Session, context.user is set to null
   applyAuthStrategies(context, [AuthType.Session]);
+  let bypassOrgIdsWithListPermission = false;
+
+  // if user is authenticated with Bearer and has a gov account id, check their perms
+  if (!context.user && contextUser?.governmentAccountId) {
+    try {
+      await hasGovernmentReadAllBsdsPermOrThrow(contextUser);
+      // if permission matches, set context.user back
+      context.user = contextUser;
+      bypassOrgIdsWithListPermission = true;
+    } catch (_) {
+      bypassOrgIdsWithListPermission = false;
+    }
+  }
+
   const user = checkIsAuthenticated(context);
+
+  // check if user
+
   const MIN_SIZE = 0;
   const MAX_SIZE = 100;
   const { first = MAX_SIZE } = args;
   const size = Math.max(Math.min(first!, MAX_SIZE), MIN_SIZE);
   await bsdSearchSchema.validate(args.where, { abortEarly: false });
 
-  const query = await buildQuery(args, user);
+  const query = await buildQuery(args, user, bypassOrgIdsWithListPermission);
   const sort = buildSort(args);
   const search_after = await buildSearchAfter(args, sort);
 

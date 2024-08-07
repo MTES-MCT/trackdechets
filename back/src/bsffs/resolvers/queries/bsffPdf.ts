@@ -9,6 +9,7 @@ import { checkCanRead } from "../../permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { buildPdf, getBsffForBuildPdf } from "../../pdf/generator";
+import { hasGovernmentReadAllBsdsPermOrThrow } from "../../../permissions";
 
 export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
   name: "bsffPdf",
@@ -22,8 +23,12 @@ export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
 const bsffPdf: QueryResolvers["bsffPdf"] = async (_, { id }, context) => {
   const user = checkIsAuthenticated(context);
   const bsff = await getBsffOrNotFound({ id });
-  await checkCanRead(user, bsff);
-
+  if (!user.isAdmin && !user.governmentAccountId) {
+    await checkCanRead(user, bsff);
+  }
+  if (user.governmentAccountId) {
+    await hasGovernmentReadAllBsdsPermOrThrow(user);
+  }
   return getFileDownload({
     handler: bsffPdfDownloadHandler.name,
     params: { id }

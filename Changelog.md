@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Résolution d'un problème de resolver BsdaRevisionRequest qui empêchait l'ouverture de la modale de révision [PR 3513](https://github.com/MTES-MCT/trackdechets/pull/3513)
 
+#### :house: Interne
+
+- Modification des permissions pour la query Bsds et toutes les queries Pdf [PR 3519](https://github.com/MTES-MCT/trackdechets/pull/3519)
+
 # [2024.7.2] 30/07/2024
 
 #### :rocket: Nouvelles fonctionnalités

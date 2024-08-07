@@ -864,6 +864,10 @@ model User {
 enum GovernmentPermission {
   // Accès en lecture au registre de tous les établissements
   REGISTRY_CAN_READ_ALL
+  // Accès en lecture à la recherche multi bsds (query bsds)
+  BSDS_CAN_READ_ALL
+  // Accès au téléchargement de tout bsd au format pdf
+  BSDS_PDF_CAN_DOWNLOAD_ALL
 }
 
 model GovernmentAccount {
