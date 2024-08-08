@@ -44,7 +44,7 @@ export function bsdaReducer(
     case "BsdaSigned":
       return {
         ...currentState,
-        status: event.data.status
+        ...(event.data.status ? { status: event.data.status } : {})
       };
 
     case "BsdaDeleted":
