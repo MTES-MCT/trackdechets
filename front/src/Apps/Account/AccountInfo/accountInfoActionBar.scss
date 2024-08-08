@@ -1,0 +1,13 @@
+.account-info {
+  display: flex;
+  h4 {
+    width: 100%;
+  }
+  &__bar {
+    display: flex;
+    justify-content: end;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+  }
+}

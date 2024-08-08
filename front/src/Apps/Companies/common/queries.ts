@@ -4,7 +4,7 @@ import {
   AccountCompanyMemberFragment,
   AccountInfoAutoUpdateFragments
 } from "./fragments";
-import AccountInfo from "../../Account/AccountInfo";
+import AccountInfo from "../../Account/AccountInfo/AccountInfo";
 
 export const UPDATE_CONTACT_INFOS = gql`
   mutation UpdateCompany(

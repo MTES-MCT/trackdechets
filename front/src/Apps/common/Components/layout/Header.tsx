@@ -383,7 +383,7 @@ function MobileSubNav({ currentCompany }) {
                     <MenuLink
                       entry={{
                         navlink: true,
-                        caption: "Informations générales",
+                        caption: "Mes paramètres",
                         href: routes.account.info
                       }}
                     />

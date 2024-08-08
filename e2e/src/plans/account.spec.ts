@@ -7,9 +7,8 @@ import {
   successfulSignup,
   testAccountInfo,
   testPasswordUpdate,
-  testPhoneNbrUpdate,
   testSignupPasswordPolicy,
-  testUsernameUpdate
+  testUserProfileUpdate
 } from "../utils/user";
 import { testNavigation } from "../utils/navigation";
 
@@ -81,11 +80,11 @@ test.describe
       });
     });
 
-    await test.step("Clic sur 'Mon compte' > redirige vers la page 'Informations générales'", async () => {
+    await test.step("Clic sur 'Mon compte' > redirige vers la page 'Mes paramètres'", async () => {
       await testNavigation(page, {
         linkLabel: "Mon compte",
         targetUrl: "/account/info",
-        targetPageLabel: "Informations générales"
+        targetPageLabel: "Mes paramètres"
       });
     });
 
@@ -96,12 +95,8 @@ test.describe
       });
     });
 
-    await test.step("Onglet 'Mon compte' > Modification du nom d'utilisateur", async () => {
-      await testUsernameUpdate(page);
-    });
-
-    await test.step("Onglet 'Mon compte' > Modification du numéro de téléphone", async () => {
-      await testPhoneNbrUpdate(page);
+    await test.step("Onglet 'Mon compte' > Modification des paramètres de l'utilisateur", async () => {
+      await testUserProfileUpdate(page);
     });
 
     await test.step("Onglet 'Mon compte' > Modification du mot de passe", async () => {
