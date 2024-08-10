@@ -71,6 +71,19 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
             </p>
 
             <div>
+              {bsvhu?.emitter?.irregularSituation ? (
+                <p className="mb-3">
+                  <input
+                    type="checkbox"
+                    checked={true}
+                    readOnly
+                    id="e_irregularSituation"
+                  />{" "}
+                  <label htmlFor="e_irregularSituation">
+                    Établissement en situation irrégulière
+                  </label>
+                </p>
+              ) : null}
               <p className="mb-3">
                 N° Agrément : {bsvhu?.emitter?.agrementNumber}
               </p>

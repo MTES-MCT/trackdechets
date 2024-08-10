@@ -20,6 +20,7 @@ import {
   getTransporterReceipt
 } from "../../../companies/recipify";
 import { prismaToZodBsvhu } from "../../validation/helpers";
+import { prisma } from "@td/prisma";
 
 export default async function sign(
   _,
@@ -129,8 +130,28 @@ async function signTransport(
   if (bsvhu.transporterTransportSignatureDate !== null) {
     throw new AlreadySignedError();
   }
+  // le bsvhu n'a pas reçu de signature émetteur
+  // Ce cas est possible en situation irrégulière,
+  // si l'entreprise n'est pas sur TD ou si il n'y a pas de SIRET
+  let emitterCompanyNotOnTD = false;
+  if (!bsvhu.emitterEmissionSignatureDate) {
+    if (!bsvhu.emitterNoSiret && bsvhu.emitterCompanySiret) {
+      const emitterCompany = await prisma.company.findFirst({
+        where: {
+          orgId: bsvhu.emitterCompanySiret
+        }
+      });
+      if (!emitterCompany) {
+        emitterCompanyNotOnTD = true;
+      }
+    }
+  }
 
-  const nextStatus = await getNextStatus(bsvhu, input.type);
+  const nextStatus = await getNextStatus(
+    bsvhu,
+    input.type,
+    emitterCompanyNotOnTD
+  );
 
   const updateInput: Prisma.BsvhuUpdateInput = {
     transporterTransportSignatureAuthor: input.author,
@@ -172,7 +193,8 @@ async function signOperation(
  */
 export async function getNextStatus(
   bsvhu: Bsvhu,
-  signatureType: SignatureTypeInput
+  signatureType: SignatureTypeInput,
+  emitterCompanyNotOnTD?: boolean
 ) {
   if (bsvhu.isDraft) {
     throw new InvalidTransition();
@@ -182,7 +204,8 @@ export async function getNextStatus(
   // Use state machine to calculate new status
   const nextState = machine.transition(currentStatus, {
     type: signatureType,
-    bsvhu
+    bsvhu,
+    emitterCompanyNotOnTD
   });
 
   // This transition is not possible

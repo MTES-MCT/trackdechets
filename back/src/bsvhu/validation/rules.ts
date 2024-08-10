@@ -91,57 +91,55 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   emitterAgrementNumber: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
     readableFieldName: "Le N° d'agrément de l'émetteur"
   },
-  emitterCompanyName: {
+  emitterIrregularSituation: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
+    readableFieldName: "La situation (irrégulière ou non) de l'émetteur"
+  },
+  emitterNoSiret: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    readableFieldName: "La présence ou absence de N° SIRET de l'émetteur"
+  },
+  emitterCompanyName: {
+    sealed: { from: "EMISSION" },
     required: { from: "EMISSION" },
     readableFieldName: "La raison sociale de l'émetteur"
   },
   emitterCompanySiret: {
-    sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    sealed: { from: "EMISSION" },
+    required: { from: "EMISSION", when: bsda => !bsda.emitterNoSiret },
     readableFieldName: "Le N° SIRET de l'émetteur"
   },
   emitterCompanyAddress: {
-    sealed: { from: sealedFromEmissionExceptForEmitter },
+    sealed: { from: "EMISSION" },
     required: { from: "EMISSION" },
     readableFieldName: "L'adresse de l'émetteur"
   },
   emitterCompanyContact: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsda => !bsda.emitterIrregularSituation
+    },
     readableFieldName: "La personne à contacter chez l'émetteur"
   },
   emitterCompanyPhone: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsda => !bsda.emitterIrregularSituation
+    },
     readableFieldName: "Le N° de téléphone de l'émetteur"
   },
   emitterCompanyMail: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsda => !bsda.emitterIrregularSituation
+    },
     readableFieldName: "L'adresse e-mail de l'émetteur"
   },
-  // emitterEmissionSignatureAuthor: {
-  //   sealed: { from: "EMISSION" },
-  //   required: {
-  //     from: "TRANSPORT",
-  //     customErrorMessage:
-  //       "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
-  //   },
-  //   readableFieldName: "L'auteur de la signature émetteur"
-  // },
-  // emitterEmissionSignatureDate: {
-  //   sealed: { from: "EMISSION" },
-  //   required: {
-  //     from: "TRANSPORT",
-  //     customErrorMessage:
-  //       "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
-  //   },
-  //   readableFieldName: "La date de signature de l'émetteur"
-  // },
   destinationType: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
@@ -490,10 +488,7 @@ export async function checkBsvhuSealedFields(
 
     if (isSealed) {
       sealedFieldErrors.push(
-        [
-          `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
-          sealedRule.customErrorMessage
-        ]
+        [fieldDescription, sealedRule.customErrorMessage]
           .filter(Boolean)
           .join(" ")
       );

@@ -5,6 +5,7 @@ import { SignatureTypeInput } from "../generated/graphql/types";
 type Event = {
   type: SignatureTypeInput;
   bsvhu: Bsvhu;
+  emitterCompanyNotOnTD?: boolean;
 };
 
 export const machine = Machine<never, Event>(
@@ -16,6 +17,12 @@ export const machine = Machine<never, Event>(
         on: {
           EMISSION: {
             target: BsvhuStatus.SIGNED_BY_PRODUCER
+          },
+          // if the emitter is not registered on TD, the transporter
+          // is the first to sign
+          TRANSPORT: {
+            target: BsvhuStatus.SENT,
+            cond: "emitterCompanyNotOnTDAndIrregularSituation"
           }
         }
       },
@@ -46,7 +53,10 @@ export const machine = Machine<never, Event>(
   {
     guards: {
       isBsvhuRefused: (_, event) =>
-        event.bsvhu?.destinationReceptionAcceptationStatus === "REFUSED"
+        event.bsvhu?.destinationReceptionAcceptationStatus === "REFUSED",
+      emitterCompanyNotOnTDAndIrregularSituation: (_, event) =>
+        !!event.bsvhu?.emitterIrregularSituation &&
+        (!!event.emitterCompanyNotOnTD || !!event.bsvhu?.emitterNoSiret)
     }
   }
 );

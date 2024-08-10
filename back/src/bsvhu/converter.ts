@@ -35,6 +35,8 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
     status: form.status,
     emitter: nullIfNoValues<BsvhuEmitter>({
       agrementNumber: form.emitterAgrementNumber,
+      irregularSituation: form.emitterIrregularSituation,
+      noSiret: form.emitterNoSiret,
       company: nullIfNoValues<FormCompany>({
         name: form.emitterCompanyName,
         siret: form.emitterCompanySiret,
@@ -151,6 +153,8 @@ export function flattenVhuInput(formInput: BsvhuInput) {
 function flattenVhuEmitterInput({ emitter }: Pick<BsvhuInput, "emitter">) {
   return {
     emitterAgrementNumber: chain(emitter, e => e.agrementNumber),
+    emitterIrregularSituation: chain(emitter, e => e.irregularSituation),
+    emitterNoSiret: chain(emitter, e => e.noSiret),
     emitterCompanyName: chain(emitter, e => chain(e.company, c => c.name)),
     emitterCompanySiret: chain(emitter, e => chain(e.company, c => c.siret)),
     emitterCompanyAddress: chain(emitter, e =>

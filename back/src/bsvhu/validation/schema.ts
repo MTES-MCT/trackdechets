@@ -6,7 +6,8 @@ import {
   checkWeights,
   checkRequiredFields,
   checkOperationMode,
-  checkReceptionWeight
+  checkReceptionWeight,
+  checkEmitterSituation
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
@@ -75,6 +76,14 @@ const rawBsvhuSchema = z.object({
   isDeleted: z.boolean().default(false),
 
   emitterAgrementNumber: z.string().max(100).nullish(),
+  emitterIrregularSituation: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
+  emitterNoSiret: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   emitterCompanyName: z.string().nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),
@@ -181,7 +190,8 @@ export type ParsedZodBsvhu = z.output<typeof rawBsvhuSchema>;
 const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkWeights)
   .superRefine(checkReceptionWeight)
-  .superRefine(checkOperationMode);
+  .superRefine(checkOperationMode)
+  .superRefine(checkEmitterSituation);
 
 /**
  * Modification du schéma Zod pour appliquer des tranformations et

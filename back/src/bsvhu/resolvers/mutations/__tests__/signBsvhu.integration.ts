@@ -1,9 +1,13 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsvhuFactory } from "../../../__tests__/factories.vhu";
+import { companyFactory } from "../../../../__tests__/factories";
 
 const SIGN_VHU_FORM = `
 mutation SignVhuForm($id: ID!, $input: BsvhuSignatureInput!) {
@@ -11,6 +15,14 @@ mutation SignVhuForm($id: ID!, $input: BsvhuSignatureInput!) {
       id
       emitter {
         emission {
+          signature {
+            author
+            date
+          }
+        }
+      }
+      transporter {
+        transport {
           signature {
             author
             date
@@ -82,5 +94,138 @@ describe("Mutation.Vhu.sign", () => {
 
     expect(data.signBsvhu.emitter!.emission!.signature!.author).toBe(user.name);
     expect(data.signBsvhu.emitter!.emission!.signature!.date).toBe(date);
+  });
+
+  it("should require emitter signature if the emitter is on TD and situation is not irregular", async () => {
+    const emitterCompany = await companyFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanySiret: company.siret,
+        transporterRecepisseIsExempted: true
+      }
+    });
+
+    const date = new Date().toISOString();
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
+      SIGN_VHU_FORM,
+      {
+        variables: {
+          id: bsvhu.id,
+          input: { type: "TRANSPORT", author: user.name, date }
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas apposer cette signature sur le bordereau.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should require emitter signature if the emitter is on TD and situation is irregular", async () => {
+    const emitterCompany = await companyFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterIrregularSituation: true,
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanySiret: company.siret,
+        transporterRecepisseIsExempted: true
+      }
+    });
+
+    const date = new Date().toISOString();
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
+      SIGN_VHU_FORM,
+      {
+        variables: {
+          id: bsvhu.id,
+          input: { type: "TRANSPORT", author: user.name, date }
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas apposer cette signature sur le bordereau.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should not require emitter signature if the emitter is not on TD and situation is irregular", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterIrregularSituation: true,
+        emitterCompanySiret: siretify(45345),
+        transporterCompanySiret: company.siret,
+        transporterRecepisseIsExempted: true
+      }
+    });
+
+    const date = new Date().toISOString();
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "TRANSPORT", author: user.name, date }
+      }
+    });
+    expect(data.signBsvhu.transporter!.transport!.signature!.author).toBe(
+      user.name
+    );
+    expect(data.signBsvhu.transporter!.transport!.signature!.date).toBe(date);
+  });
+
+  it("should not require emitter signature if the emitter doesn't have a SIRET and situation is irregular", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterIrregularSituation: true,
+        emitterNoSiret: true,
+        emitterCompanySiret: null,
+        transporterCompanySiret: company.siret,
+        transporterRecepisseIsExempted: true
+      }
+    });
+
+    const date = new Date().toISOString();
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<Pick<Mutation, "signBsvhu">>(
+      SIGN_VHU_FORM,
+      {
+        variables: {
+          id: bsvhu.id,
+          input: { type: "TRANSPORT", author: user.name, date }
+        }
+      }
+    );
+    console.log(errors);
+
+    expect(data.signBsvhu.transporter!.transport!.signature!.author).toBe(
+      user.name
+    );
+    expect(data.signBsvhu.transporter!.transport!.signature!.date).toBe(date);
   });
 });

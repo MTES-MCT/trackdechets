@@ -75,21 +75,25 @@ export async function recipifyBsdTransporter<Bsd extends ParsedZodBsvhu>(
     transporterCompanyVatNumber: bsd.transporterCompanyVatNumber ?? null
   });
   if (orgId && !bsd.transporterRecepisseIsExempted) {
-    const transporterReceipt = await prisma.company
-      .findUnique({
-        where: {
-          orgId
-        }
-      })
-      .transporterReceipt();
+    try {
+      const transporterReceipt = await prisma.company
+        .findUnique({
+          where: {
+            orgId
+          }
+        })
+        .transporterReceipt();
 
-    return {
-      ...bsd,
-      transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
-      transporterRecepisseValidityLimit:
-        transporterReceipt?.validityLimit ?? null,
-      transporterRecepisseDepartment: transporterReceipt?.department ?? null
-    };
+      return {
+        ...bsd,
+        transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
+        transporterRecepisseValidityLimit:
+          transporterReceipt?.validityLimit ?? null,
+        transporterRecepisseDepartment: transporterReceipt?.department ?? null
+      };
+    } catch (error) {
+      // do nothing
+    }
   }
   if (bsd.transporterRecepisseIsExempted) {
     return {

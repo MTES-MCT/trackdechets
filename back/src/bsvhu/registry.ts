@@ -177,6 +177,7 @@ export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     emitterCompanyCountry,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
+    emitterCompanyIrregularSituation: !!bsvhu.emitterIrregularSituation,
     weight: bsvhu.weightValue
       ? new Decimal(bsvhu.weightValue)
           .dividedBy(1000)
