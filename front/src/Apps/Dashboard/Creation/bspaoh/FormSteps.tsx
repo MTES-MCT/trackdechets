@@ -27,6 +27,11 @@ import {
   GET_BSPAOH,
   UPDATE_BSPAOH
 } from "./utils/queries";
+import { Waste } from "./steps/Waste";
+import { Emitter } from "./steps/Emitter";
+import { Transporter } from "./steps/Transporter";
+import { Destination } from "./steps/Destination";
+import { getTabs } from "../utils";
 
 const paohToInput = (paoh: BspaohInput): BspaohInput => {
   return omitDeep(paoh, [
@@ -115,6 +120,12 @@ export function ControlledTabs(props: Readonly<Props>) {
       }
     }
   }
+  const tabsContent = {
+    waste: <Waste />,
+    emitter: <Emitter />,
+    transporter: <Transporter />,
+    destination: <Destination />
+  };
   return (
     <>
       <FormStepsContent
@@ -124,6 +135,8 @@ export function ControlledTabs(props: Readonly<Props>) {
         saveForm={saveForm}
         sealedFields={sealedFields}
         useformMethods={methods}
+        tabList={getTabs(true)}
+        tabsContent={tabsContent}
       />
       {loading && <Loader />}
     </>

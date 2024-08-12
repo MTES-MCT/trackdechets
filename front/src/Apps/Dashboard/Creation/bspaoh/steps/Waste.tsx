@@ -2,9 +2,10 @@ import React, { useContext } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { useFormContext } from "react-hook-form";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { PaohPackagings } from "../bspaoh/components/Packagings";
-import { ZodBspaoh } from "../bspaoh/schema";
-import { SealedFieldsContext } from "../../../Dashboard/Creation/context";
+import { PaohPackagings } from "../components/Packagings";
+import { ZodBspaoh } from "../schema";
+import { SealedFieldsContext } from "../../context";
+import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
 
 export function Waste() {
   const { register, watch, setValue, formState } = useFormContext<ZodBspaoh>(); // retrieve all hook methods
@@ -18,10 +19,9 @@ export function Waste() {
 
   return (
     <div>
-      <h4 className="fr-h4">Type</h4>
-      <RadioButtons
+      <WasteRadioGroup
+        title="Type"
         disabled={sealedFields.includes("waste.type")}
-        className="fr-col-sm-5"
         options={[
           {
             label: "18 01 02 - PAOH",

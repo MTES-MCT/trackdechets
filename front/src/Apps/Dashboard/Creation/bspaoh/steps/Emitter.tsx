@@ -2,12 +2,12 @@ import React, { useMemo, useEffect, useContext } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import { useFormContext } from "react-hook-form";
-import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 
 import { FavoriteType } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
-import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import { SealedFieldsContext } from "../../../Dashboard/Creation/context";
+import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
+import { SealedFieldsContext } from "../../context";
 
 const actor = "emitter";
 

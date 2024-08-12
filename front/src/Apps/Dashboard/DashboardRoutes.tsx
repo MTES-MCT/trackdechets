@@ -549,7 +549,7 @@ function DashboardRoutes() {
               }
             />
 
-            {/** PAOH Form modals */}
+            {/** create / update Form modals */}
             <Route
               path={toRelative(routes.dashboard.bspaohs.create)}
               element={<FormContainer bsdTypeName={BsdTypename.Bspaoh} />}
@@ -557,6 +557,16 @@ function DashboardRoutes() {
             <Route
               path={toRelative(routes.dashboard.bspaohs.edit)}
               element={<FormContainer bsdTypeName={BsdTypename.Bspaoh} />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsvhus.create)}
+              element={<FormContainer bsdTypeName={BsdTypename.Bsvhu} />}
+            />
+
+            <Route
+              path={toRelative(routes.dashboard.bsvhus.edit)}
+              element={<FormContainer bsdTypeName={BsdTypename.Bsvhu} />}
             />
           </Routes>
         )}

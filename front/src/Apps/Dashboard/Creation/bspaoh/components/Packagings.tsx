@@ -1,74 +1,15 @@
-import React, { useReducer, useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { Tag } from "@codegouvfr/react-dsfr/Tag";
-import styles from "./Packagings.module.scss";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { emptyPackaging } from "../initial-state";
-import classNames from "classnames";
+import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
 
-const SET_INPUT_CODE = "set_input_code";
-const ADD_CODE = "add_code";
-const REMOVE_CODE = "remove_code";
-
-function packagingReducer(state, action) {
-  switch (action.type) {
-    case SET_INPUT_CODE:
-      return { ...state, inputCode: action.payload };
-    case ADD_CODE: {
-      if (!state.inputCode || state.codes.includes(state.inputCode)) {
-        return state;
-      }
-      return {
-        ...state,
-        codes: [...state.codes, state.inputCode],
-        inputCode: ""
-      };
-    }
-    case REMOVE_CODE: {
-      const codes = [...state.codes];
-      codes.splice(action.payload, 1);
-
-      return {
-        ...state,
-        codes
-      };
-    }
-  }
-  throw Error("Unknown action: " + action.type);
-}
 const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
-  const { register, setValue, getValues, getFieldState } = useFormContext();
+  const { register, getFieldState } = useFormContext();
   const name = `waste.packagings.${idx}`;
-  const tagInputRef = useRef<HTMLInputElement>(null);
-
-  const onClear = () => {
-    if (disabled) {
-      return;
-    }
-    if (tagInputRef?.current?.value) {
-      tagInputRef.current.value = "";
-    }
-  };
-
-  const setTag = () => {
-    if (disabled) {
-      return;
-    }
-    dispatch({ type: ADD_CODE });
-    onClear();
-  };
-
-  const [state, dispatch] = useReducer(packagingReducer, {
-    codes: getValues(`${name}.identificationCodes`),
-    inputCode: ""
-  });
-
-  useEffect(() => {
-    setValue(`${name}.identificationCodes`, state.codes);
-  }, [state, name, setValue]);
 
   const { error: typeError } = getFieldState(`${name}.type`);
   const { error: consistenceError } = getFieldState(`${name}.consistence`);
@@ -145,62 +86,12 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
           <p className="f fr-mb-1v">
             Codes d'identification utilisés par l'établissement
           </p>
-
-          <div
-            className={classNames(
-              "fr-grid-row fr-grid-row--bottom",
-              styles.multiTags
-            )}
-          >
-            {state.codes.map((code, idx) => (
-              <Tag
-                dismissible
-                key={idx}
-                className="fr-mr-2v"
-                nativeButtonProps={{
-                  type: "button",
-                  onClick: () =>
-                    !disabled && dispatch({ type: REMOVE_CODE, payload: idx })
-                }}
-              >
-                {code}
-              </Tag>
-            ))}
-
-            {!disabled && (
-              <input
-                type="text"
-                ref={tagInputRef}
-                placeholder="Code…"
-                className={styles.multiTagsInput}
-                onChange={e =>
-                  dispatch({ type: SET_INPUT_CODE, payload: e.target.value })
-                }
-                onKeyUp={e => {
-                  if (e.key === "Enter") {
-                    setTag();
-                  }
-                }}
-                onKeyPress={e => {
-                  // to avoid submitting a form on enter tag
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                  }
-                }}
-                onBlur={() => {
-                  setTag();
-                }}
-              />
-            )}
-          </div>
-
-          <p
-            className={`${
-              identificationCodesError ? "fr-error-text" : "fr-info-text"
-            } fr-mt-5v`}
-          >
-            Vous avez {state.codes.length} {paohType} pour ce contenant
-          </p>
+          <IdentificationNumber
+            disabled={disabled}
+            name={`${name}.identificationCodes`}
+            error={identificationCodesError}
+            type={paohType}
+          />
         </div>
       </div>
       <div className="fr-mt-10v">

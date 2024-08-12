@@ -6,10 +6,10 @@ import {
   WasteProcessorType
 } from "@td/codegen-ui";
 import { useFormContext, useWatch } from "react-hook-form";
-import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 import { useParams } from "react-router-dom";
-import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import { SealedFieldsContext } from "../../../Dashboard/Creation/context";
+import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
+import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 
 const actor = "destination";
 
@@ -55,7 +55,7 @@ export function Destination() {
     <div>
       <CompanySelectorWrapper
         orgId={siret}
-        favoriteType={FavoriteType.Transporter}
+        favoriteType={FavoriteType.Destination}
         disabled={sealedFields.includes(`${actor}.company.siret`)}
         selectedCompanyOrgId={orgId}
         selectedCompanyError={selectedCompanyError}

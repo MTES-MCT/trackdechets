@@ -1,18 +1,16 @@
-import React, { useMemo, useState, useEffect, useContext } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { useFormContext } from "react-hook-form";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
-import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
-import { FavoriteType, TransportMode, BspaohRecepisse } from "@td/codegen-ui";
-import { useParams } from "react-router-dom";
-import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import TransporterRecepisse from "../../../Forms/Components/TransporterRecepisse/TransporterRecepisse";
-import { RhfTagsInputWrapper } from "../../../Forms/Components/TagsInput/TagsInputWrapper";
-
+import { BspaohRecepisse, FavoriteType, TransportMode } from "@td/codegen-ui";
 import { isForeignVat } from "@td/constants";
-
-import { SealedFieldsContext } from "../../../Dashboard/Creation/context";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import { useParams } from "react-router-dom";
+import RecepisseExemption from "../../../../Forms/Components/RecepisseExemption/RecepiceExemption";
+import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
+import { RhfTagsInputWrapper } from "../../../../Forms/Components/TagsInput/TagsInputWrapper";
+import TransporterRecepisse from "../../../../Forms/Components/TransporterRecepisse/TransporterRecepisse";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import { SealedFieldsContext } from "../../context";
 
 const actor = "transporter";
 
@@ -96,28 +94,13 @@ export function Transporter() {
             validityLimit={recepisse?.validityLimit}
           />
         )}
-      <h4 className="fr-h4">
-        Exemption de récépissé de déclaration de transport de déchets
-      </h4>
-      <ToggleSwitch
-        disabled={sealedFields.includes(`transporter.recepisse.isExempted`)}
-        label={
-          <div>
-            Le transporteur déclare être exempté de récépissé conformément aux
-            dispositions de l'
-            <a
-              className="fr-link"
-              target="_blank"
-              rel="noreferrer"
-              href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000046669839"
-            >
-              article R.541-50 du code de l'environnement
-            </a>
-          </div>
-        }
-        checked={transporter.recepisse?.isExempted}
+
+      <RecepisseExemption
         onChange={v => setValue(`${actor}.recepisse.isExempted`, v)}
+        checked={transporter.recepisse?.isExempted}
+        disabled={sealedFields.includes(`transporter.recepisse.isExempted`)}
       />
+
       <h4 className="fr-h4">Transport du déchet</h4>
       <div className="fr-grid-row">
         <div className="fr-col-6">

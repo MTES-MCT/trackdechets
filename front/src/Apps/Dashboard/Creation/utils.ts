@@ -17,11 +17,13 @@ export const getPrevTab = (tabIds, currentTabId) => {
 export type TabsName = "waste" | "emitter" | "transporter" | "destination";
 type IconIdName = "fr-icon-arrow-right-line";
 
-export const tabs: {
+export const getTabs = (
+  isCrematorium?: boolean
+): {
   tabId: TabsName;
   label: string;
   iconId: IconIdName;
-}[] = [
+}[] => [
   {
     tabId: "waste",
     label: "Déchet",
@@ -39,7 +41,7 @@ export const tabs: {
   },
   {
     tabId: "destination",
-    label: "Crématorium",
+    label: isCrematorium ? "Crématorium" : "Destination Finale",
     iconId: "fr-icon-arrow-right-line"
   }
 ];

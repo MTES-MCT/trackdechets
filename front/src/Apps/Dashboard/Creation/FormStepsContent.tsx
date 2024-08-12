@@ -2,17 +2,12 @@ import React, { useState } from "react";
 import { FormProvider, UseFormReturn } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toastApolloError } from "./toaster";
-
-import { SealedFieldsContext } from "./context";
-import FormStepsTabs from "../../Forms/Components/FormStepsTabs/FormStepsTabs";
 import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
-import { TabsName, getNextTab, getPrevTab, tabs } from "./utils";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import FormStepsTabs from "../../Forms/Components/FormStepsTabs/FormStepsTabs";
 import { Loader } from "../../common/Components";
-import { Waste } from "./steps/Waste";
-import { Emitter } from "./steps/Emitter";
-import { Transporter } from "./steps/Transporter";
-import { Destination } from "./steps/Destination";
+import { SealedFieldsContext } from "./context";
+import { TabsName, getNextTab, getPrevTab, getTabs } from "./utils";
 
 interface FormStepsContentProps {
   tabList?: {
@@ -20,16 +15,23 @@ interface FormStepsContentProps {
     label: React.ReactNode;
     iconId: FrIconClassName | RiIconClassName;
   }[];
-  sealedFields: string[];
+  sealedFields?: string[];
   isLoading: boolean;
   useformMethods: UseFormReturn<any>;
   saveForm: Function;
   draftCtaLabel: string;
   mainCtaLabel: string;
+  tabsContent: {
+    waste: React.JSX.Element;
+    emitter: React.JSX.Element;
+    transporter: React.JSX.Element;
+    destination: React.JSX.Element;
+  };
 }
 const FormStepsContent = ({
-  tabList = tabs,
-  sealedFields,
+  tabList = getTabs(),
+  tabsContent,
+  sealedFields = [],
   isLoading,
   useformMethods,
   draftCtaLabel,
@@ -55,13 +57,6 @@ const FormStepsContent = ({
 
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
-  };
-
-  const tabsContent = {
-    waste: <Waste />,
-    emitter: <Emitter />,
-    transporter: <Transporter />,
-    destination: <Destination />
   };
 
   const errors = useformMethods?.formState?.errors;
