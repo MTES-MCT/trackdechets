@@ -8,9 +8,9 @@ import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { ZodBsvhu } from "../schema";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 
-const WasteBsvhu = () => {
-  const { register, watch, setValue, formState } = useFormContext<ZodBsvhu>(); // retrieve all hook methods
-  const { errors } = formState;
+const WasteBsvhu = ({ errors }) => {
+  const { register, watch, setValue, formState, setError } =
+    useFormContext<ZodBsvhu>(); // retrieve all hook methods
 
   const weight = watch("weight.value");
   const quantity = watch("quantity") ?? 0;
@@ -23,6 +23,30 @@ const WasteBsvhu = () => {
   useEffect(() => {
     setValue("quantity", identificationNumbers?.length);
   }, [setValue, identificationNumbers]);
+
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      const weightError = errors?.find(
+        error => error.name === "weight.value"
+      )?.message;
+
+      if (weightError && !!formState.errors?.weight?.value === false) {
+        setError("weight.value", {
+          type: "custom",
+          message: weightError
+        });
+      }
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState?.errors,
+    formState.errors?.weight?.value,
+    setError
+  ]);
 
   return (
     <>
@@ -126,9 +150,9 @@ const WasteBsvhu = () => {
           <Input
             label="Poids total en tonnes"
             disabled={sealedFields.includes("weight.value")}
-            state={errors?.weight?.value && "error"}
+            state={formState.errors?.weight?.value && "error"}
             stateRelatedMessage={
-              (errors?.weight?.value?.message as string) ?? ""
+              (formState.errors?.weight?.value?.message as string) ?? ""
             }
             nativeInputProps={{
               inputMode: "decimal",
@@ -148,9 +172,9 @@ const WasteBsvhu = () => {
             legend="Cette quantité est"
             disabled={sealedFields.includes("weight.isEstimate")}
             orientation="horizontal"
-            state={errors?.weight?.isEstimate && "error"}
+            state={formState.errors?.weight?.isEstimate && "error"}
             stateRelatedMessage={
-              (errors?.weight?.isEstimate?.message as string) ?? ""
+              (formState.errors?.weight?.isEstimate?.message as string) ?? ""
             }
             options={[
               {

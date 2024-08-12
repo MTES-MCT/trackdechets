@@ -7,10 +7,18 @@ import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactIn
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
+import {
+  isCompanyAddressPath,
+  isCompanyContactPath,
+  isCompanyMailPath,
+  isCompanyPhonePath,
+  isCompanySiretPath,
+  isVatNumberPath
+} from "../../utils";
 
-const TransporterBsvhu = () => {
+const TransporterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch } = useFormContext(); // retrieve all hook methods
+  const { register, setValue, watch, formState, setError } = useFormContext(); // retrieve all hook methods
   const actor = "transporter";
   const transporter = watch("transporter") ?? {};
   const sealedFields = useContext(SealedFieldsContext);
@@ -26,6 +34,83 @@ const TransporterBsvhu = () => {
   }, [register]);
 
   register(`${actor}.recepisse.isExempted`);
+
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      const siretError = isCompanySiretPath(errors, actor);
+      if (
+        siretError &&
+        !!formState.errors?.[actor]?.["company"]?.siret === false
+      ) {
+        setError(`${actor}.company.siret`, {
+          type: "custom",
+          message: siretError
+        });
+      }
+
+      const contactError = isCompanyContactPath(errors, actor);
+      if (
+        contactError &&
+        !!formState.errors?.[actor]?.["company"]?.contact === false
+      ) {
+        setError(`${actor}.company.contact`, {
+          type: "custom",
+          message: contactError
+        });
+      }
+
+      const adressError = isCompanyAddressPath(errors, actor);
+      if (
+        adressError &&
+        !!formState.errors?.[actor]?.["company"]?.address === false
+      ) {
+        setError(`${actor}.company.address`, {
+          type: "custom",
+          message: adressError
+        });
+      }
+      const phoneError = isCompanyPhonePath(errors, actor);
+      if (
+        phoneError &&
+        !!formState.errors?.[actor]?.["company"]?.phone === false
+      ) {
+        setError(`${actor}.company.phone`, {
+          type: "custom",
+          message: phoneError
+        });
+      }
+      const mailError = isCompanyMailPath(errors, actor);
+      if (
+        mailError &&
+        !!formState.errors?.[actor]?.["company"]?.mail === false
+      ) {
+        setError(`${actor}.company.mail`, {
+          type: "custom",
+          message: mailError
+        });
+      }
+
+      const vatNumberError = isVatNumberPath(errors, actor);
+      if (
+        vatNumberError &&
+        !!formState.errors?.[actor]?.["company"]?.vatNumber === false
+      ) {
+        setError(`${actor}.company.vatNumber`, {
+          type: "custom",
+          message: vatNumberError
+        });
+      }
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState.errors,
+    formState.errors?.length,
+    setError
+  ]);
 
   const orgId = useMemo(
     () => transporter?.company?.orgId ?? transporter?.company?.siret ?? null,

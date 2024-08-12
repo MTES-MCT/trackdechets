@@ -11,11 +11,19 @@ import { RhfTagsInputWrapper } from "../../../../Forms/Components/TagsInput/Tags
 import TransporterRecepisse from "../../../../Forms/Components/TransporterRecepisse/TransporterRecepisse";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 import { SealedFieldsContext } from "../../context";
+import {
+  isCompanyAddressPath,
+  isCompanyContactPath,
+  isCompanyMailPath,
+  isCompanyPhonePath,
+  isCompanySiretPath,
+  isVatNumberPath
+} from "../../utils";
 
 const actor = "transporter";
 
-export function Transporter() {
-  const { register, setValue, watch } = useFormContext(); // retrieve all hook methods
+export function Transporter({ errors }) {
+  const { register, setValue, watch, setError, formState } = useFormContext(); // retrieve all hook methods
   const [recepisse, setRecepisse] = useState<BspaohRecepisse>({});
   const sealedFields = useContext(SealedFieldsContext);
 
@@ -31,6 +39,108 @@ export function Transporter() {
   }, [register]);
 
   register(`${actor}.recepisse.isExempted`);
+
+  useEffect(() => {
+    // register fields managed under the hood by company selector
+    register(`${actor}.company.orgId`);
+    register(`${actor}.company.siret`);
+    register(`${actor}.company.name`);
+    register(`${actor}.company.vatNumber`);
+    register(`${actor}.company.address`);
+    register(`${actor}.company.mail`);
+    register(`${actor}.transport.plates`);
+  }, [register]);
+
+  register(`${actor}.recepisse.isExempted`);
+
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      const siretError = isCompanySiretPath(errors, actor);
+      if (
+        siretError &&
+        !!formState.errors?.[actor]?.["company"]?.siret === false
+      ) {
+        setError(`${actor}.company.siret`, {
+          type: "custom",
+          message: siretError
+        });
+      }
+
+      const contactError = isCompanyContactPath(errors, actor);
+      if (
+        contactError &&
+        !!formState.errors?.[actor]?.["company"]?.contact === false
+      ) {
+        setError(`${actor}.company.contact`, {
+          type: "custom",
+          message: contactError
+        });
+      }
+
+      const adressError = isCompanyAddressPath(errors, actor);
+      if (
+        adressError &&
+        !!formState.errors?.[actor]?.["company"]?.address === false
+      ) {
+        setError(`${actor}.company.address`, {
+          type: "custom",
+          message: adressError
+        });
+      }
+      const phoneError = isCompanyPhonePath(errors, actor);
+      if (
+        phoneError &&
+        !!formState.errors?.[actor]?.["company"]?.phone === false
+      ) {
+        setError(`${actor}.company.phone`, {
+          type: "custom",
+          message: phoneError
+        });
+      }
+      const mailError = isCompanyMailPath(errors, actor);
+      if (
+        mailError &&
+        !!formState.errors?.[actor]?.["company"]?.mail === false
+      ) {
+        setError(`${actor}.company.mail`, {
+          type: "custom",
+          message: mailError
+        });
+      }
+
+      const vatNumberError = isVatNumberPath(errors, actor);
+      if (
+        vatNumberError &&
+        !!formState.errors?.[actor]?.["company"]?.vatNumber === false
+      ) {
+        setError(`${actor}.company.vatNumber`, {
+          type: "custom",
+          message: vatNumberError
+        });
+      }
+      const platesError = errors?.find(
+        error => error.name === `${actor}.transport.plates`
+      )?.message;
+      if (
+        platesError &&
+        !!formState.errors?.[actor]?.["transport"]?.plates === false
+      ) {
+        setError(`${actor}.transport.plates`, {
+          type: "custom",
+          message: platesError
+        });
+      }
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState.errors,
+    formState.errors?.length,
+    setError
+  ]);
 
   const { siret } = useParams<{ siret: string }>();
   const transporter = watch(actor) ?? {};
@@ -79,6 +189,11 @@ export function Transporter() {
           }
         }}
       />
+      {formState.errors?.transporter?.["company"]?.siret && (
+        <p className="fr-text--sm fr-error-text fr-mb-4v">
+          {formState.errors?.transporter?.["company"]?.siret?.message}
+        </p>
+      )}
       <CompanyContactInfo
         fieldName={`${actor}.company`}
         disabled={sealedFields.includes(`transporter.company.siret`)}
@@ -128,6 +243,11 @@ export function Transporter() {
             fieldName={`${actor}.transport.plates`}
             hintText="2 max : Véhicule, remorque"
           />
+          {formState.errors?.transporter?.["transport"]?.plates && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {formState.errors?.transporter?.["transport"]?.plates?.message}
+            </p>
+          )}
         </div>
       </div>
 
