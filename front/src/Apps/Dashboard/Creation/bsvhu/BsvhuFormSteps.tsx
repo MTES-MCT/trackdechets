@@ -10,7 +10,7 @@ import {
   QueryBsvhuArgs
 } from "@td/codegen-ui";
 import omitDeep from "omit-deep-lodash";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { Loader } from "../../../common/Components";
@@ -30,6 +30,12 @@ import {
   UPDATE_VHU_FORM
 } from "./utils/queries";
 import { cleanPayload } from "../bspaoh/utils/payload";
+import {
+  getErrorTabIds,
+  getPublishErrorMessages,
+  getPublishErrorTabIds,
+  getTabs
+} from "../utils";
 
 const vhuToInput = (paoh: BsvhuInput): BsvhuInput => {
   return omitDeep(paoh, [
@@ -42,9 +48,25 @@ const vhuToInput = (paoh: BsvhuInput): BsvhuInput => {
 };
 interface Props {
   bsdId?: string;
+  publishErrorsFromRedirect?: {
+    code: string;
+    path: string[];
+    message: string;
+  }[];
 }
-const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
+const BsvhuFormSteps = ({
+  bsdId,
+  publishErrorsFromRedirect
+}: Readonly<Props>) => {
   const { siret, id } = useParams<{ id?: string; siret: string }>();
+  const [publishErrors, setPublishErrors] = useState<
+    | {
+        code: string;
+        path: string[];
+        message: string;
+      }[]
+    | undefined
+  >();
 
   const formQuery = useQuery<Pick<Query, "bsvhu">, QueryBsvhuArgs>(
     GET_VHU_FORM,
@@ -111,11 +133,48 @@ const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
   const transporter = formState?.transporter;
   const isDisabled = isStepDisabled(emitter, transporter, siret, id);
 
+  const tabIds = getTabs().map(tab => tab.tabId);
+  const errorsFromPublishApi = publishErrors || publishErrorsFromRedirect;
+  const publishErrorTabIds = getPublishErrorTabIds(
+    errorsFromPublishApi,
+    tabIds
+  );
+  const formStateErrorsKeys = Object.keys(methods?.formState?.errors);
+  const errorTabIds = getErrorTabIds(publishErrorTabIds, formStateErrorsKeys);
+
+  const publishErrorMessages = getPublishErrorMessages(errorsFromPublishApi);
+
   const tabsContent = {
-    waste: <WasteBsvhu isDisabled={isDisabled} />,
-    emitter: <EmitterBsvhu isDisabled={isDisabled} />,
-    transporter: <TransporterBsvhu isDisabled={isDisabled} />,
-    destination: <DestinationBsvhu isDisabled={isDisabled} />
+    waste: (
+      <WasteBsvhu
+        isDisabled={isDisabled}
+        errors={publishErrorMessages?.filter(error => error.tabId === "waste")}
+      />
+    ),
+    emitter: (
+      <EmitterBsvhu
+        isDisabled={isDisabled}
+        errors={publishErrorMessages?.filter(
+          error => error.tabId === "emitter"
+        )}
+      />
+    ),
+    transporter: (
+      <TransporterBsvhu
+        isDisabled={isDisabled}
+        errors={publishErrorMessages?.filter(
+          error => error.tabId === "transporter"
+        )}
+      />
+    ),
+    destination: (
+      <DestinationBsvhu
+        isDisabled={isDisabled}
+        errors={publishErrorMessages?.filter(
+          error => error.tabId === "destination"
+        )}
+      />
+    )
   };
 
   return (
@@ -127,6 +186,8 @@ const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
         saveForm={saveForm}
         useformMethods={methods}
         tabsContent={tabsContent}
+        setPublishErrors={setPublishErrors}
+        errorTabIds={errorTabIds}
       />
       {loading && <Loader />}
     </>

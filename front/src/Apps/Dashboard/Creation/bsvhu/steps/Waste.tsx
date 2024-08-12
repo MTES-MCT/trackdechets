@@ -7,9 +7,9 @@ import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRa
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { ZodBsvhu } from "../schema";
 
-const WasteBsvhu = ({ isDisabled }) => {
-  const { register, watch, setValue, formState } = useFormContext<ZodBsvhu>(); // retrieve all hook methods
-  const { errors } = formState;
+const WasteBsvhu = ({ isDisabled, errors }) => {
+  const { register, watch, setValue, formState, setError } =
+    useFormContext<ZodBsvhu>(); // retrieve all hook methods
 
   const weight = watch("weight.value");
   const quantity = watch("quantity") ?? 0;
@@ -21,6 +21,30 @@ const WasteBsvhu = ({ isDisabled }) => {
   useEffect(() => {
     setValue("quantity", identificationNumbers?.length);
   }, [setValue, identificationNumbers]);
+
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      const weightError = errors?.find(
+        error => error.name === "weight.value"
+      )?.message;
+
+      if (weightError && !!formState.errors?.weight?.value === false) {
+        setError("weight.value", {
+          type: "custom",
+          message: weightError
+        });
+      }
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState?.errors,
+    formState.errors?.weight?.value,
+    setError
+  ]);
 
   return (
     <>
@@ -124,9 +148,9 @@ const WasteBsvhu = ({ isDisabled }) => {
           <Input
             label="Poids total en tonnes"
             disabled={isDisabled}
-            state={errors?.weight?.value && "error"}
+            state={formState.errors?.weight?.value && "error"}
             stateRelatedMessage={
-              (errors?.weight?.value?.message as string) ?? ""
+              (formState.errors?.weight?.value?.message as string) ?? ""
             }
             nativeInputProps={{
               inputMode: "decimal",
@@ -146,9 +170,9 @@ const WasteBsvhu = ({ isDisabled }) => {
             legend="Cette quantité est"
             disabled={isDisabled}
             orientation="horizontal"
-            state={errors?.weight?.isEstimate && "error"}
+            state={formState.errors?.weight?.isEstimate && "error"}
             stateRelatedMessage={
-              (errors?.weight?.isEstimate?.message as string) ?? ""
+              (formState.errors?.weight?.isEstimate?.message as string) ?? ""
             }
             options={[
               {
