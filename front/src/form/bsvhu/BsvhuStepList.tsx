@@ -2,9 +2,9 @@ import { useMutation, useQuery } from "@apollo/client";
 import React, { ReactElement, useMemo, lazy } from "react";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import routes from "../../Apps/routes";
-import { getComputedState } from "../common/getComputedState";
+import { getComputedState } from "../../Apps/Dashboard/Creation/getComputedState";
 import { IStepContainerProps } from "../common/stepper/Step";
-import { toastApolloError } from "../common/stepper/toaster";
+import { toastApolloError } from "../../Apps/Dashboard/Creation/toaster";
 import {
   Mutation,
   MutationCreateBsvhuArgs,

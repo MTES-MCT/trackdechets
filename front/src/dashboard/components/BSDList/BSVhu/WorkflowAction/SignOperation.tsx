@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
 import Operation from "../../../../../form/bsvhu/Operation";
 import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
-import { getComputedState } from "../../../../../form/common/getComputedState";
+import { getComputedState } from "../../../../../Apps/Dashboard/Creation/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   Mutation,

@@ -34,10 +34,11 @@ import {
 } from "../../dashboard/detail";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 import { usePermissions } from "../../common/contexts/PermissionsContext";
-import BspaohFormContainer from "../../form/bspaoh/FormContainer";
 import "./dashboard.scss";
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
+import FormContainer from "./Creation/FormContainer";
+import { BsdTypename } from "../common/types/bsdTypes";
 
 export const GET_ME = gql`
   {
@@ -551,11 +552,11 @@ function DashboardRoutes() {
             {/** PAOH Form modals */}
             <Route
               path={toRelative(routes.dashboard.bspaohs.create)}
-              element={<BspaohFormContainer />}
+              element={<FormContainer bsdTypeName={BsdTypename.Bspaoh} />}
             />
             <Route
               path={toRelative(routes.dashboard.bspaohs.edit)}
-              element={<BspaohFormContainer />}
+              element={<FormContainer bsdTypeName={BsdTypename.Bspaoh} />}
             />
           </Routes>
         )}
