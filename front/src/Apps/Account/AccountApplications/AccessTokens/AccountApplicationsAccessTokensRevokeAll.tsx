@@ -1,24 +1,21 @@
 import * as React from "react";
-import { Modal } from "../../../common/components";
+import { Modal } from "../../../../common/components";
 import { useMutation } from "@apollo/client";
 import { ACCESS_TOKENS, REVOKE_ALL_ACCESS_TOKENS } from "./queries";
-import { NotificationError } from "../../common/Components/Error/Error";
+import { NotificationError } from "../../../common/Components/Error/Error";
 
-type AccountAccessTokenRevokeAllProps = {
+type AccountApplicationsAccessTokenRevokeAllProps = {
   onClose: () => void;
-  onRevokeAll: () => void;
 };
 
-export default function AccountAccessTokenRevokeAll({
-  onClose,
-  onRevokeAll
-}: AccountAccessTokenRevokeAllProps) {
+export default function AccountApplicationsAccessTokenRevokeAll({
+  onClose
+}: AccountApplicationsAccessTokenRevokeAllProps) {
   const [revokeAllAccessTokens, { loading, error }] = useMutation(
     REVOKE_ALL_ACCESS_TOKENS,
     {
       refetchQueries: [ACCESS_TOKENS],
       onCompleted: () => {
-        onRevokeAll();
         onClose();
       }
     }
@@ -26,6 +23,7 @@ export default function AccountAccessTokenRevokeAll({
 
   return (
     <Modal
+      title="Révoquer tous les jetons d'accès"
       ariaLabel="Supprimer tous les jetons d'accès ?"
       onClose={onClose}
       isOpen
@@ -41,17 +39,15 @@ export default function AccountAccessTokenRevokeAll({
         accès.
       </div>
       <div className="td-modal-actions">
-        <button className="btn btn--outline-primary" onClick={() => onClose()}>
+        <button className="fr-btn" onClick={() => onClose()}>
           Annuler
         </button>
         <button
-          className="btn btn--danger"
+          className="fr-btn fr-btn--secondary"
           onClick={() => revokeAllAccessTokens()}
           disabled={loading}
         >
-          {loading
-            ? "Suppression..."
-            : "J'ai compris, révoquer tous les jetons"}
+          {loading ? "Suppression..." : "Révoquer"}
         </button>
       </div>
       {error && <NotificationError apolloError={error} />}

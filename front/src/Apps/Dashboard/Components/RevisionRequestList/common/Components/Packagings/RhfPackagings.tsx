@@ -136,7 +136,7 @@ const BsdPackaging = ({ bsdType, path, idx, remove, disabled }) => {
             <Button
               priority="tertiary"
               type="button"
-              iconId="fr-icon-delete-bin-line"
+              iconId="ri-delete-bin-line"
               title="Supprimer ce conditionnement"
               nativeButtonProps={{ onClick: () => remove(idx) }}
             />
