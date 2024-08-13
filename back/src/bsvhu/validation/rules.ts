@@ -102,17 +102,17 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "La présence ou absence de N° SIRET de l'émetteur"
   },
   emitterCompanyName: {
-    sealed: { from: "EMISSION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "La raison sociale de l'émetteur"
   },
   emitterCompanySiret: {
-    sealed: { from: "EMISSION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION", when: bsda => !bsda.emitterNoSiret },
     readableFieldName: "Le N° SIRET de l'émetteur"
   },
   emitterCompanyAddress: {
-    sealed: { from: "EMISSION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "L'adresse de l'émetteur"
   },
@@ -120,7 +120,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
-      when: bsda => !bsda.emitterIrregularSituation
+      when: bsda => !bsda.emitterNoSiret
     },
     readableFieldName: "La personne à contacter chez l'émetteur"
   },
