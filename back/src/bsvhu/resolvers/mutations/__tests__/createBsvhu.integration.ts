@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { Mutation } from "../../../../generated/graphql/types";
+import { BsvhuInput, Mutation } from "../../../../generated/graphql/types";
 import {
   companyFactory,
   siretify,
@@ -22,6 +22,9 @@ mutation CreateVhuForm($input: BsvhuInput!) {
     emitter {
       company {
           siret
+          name
+          address
+          contact
       }
     }
     transporter {
@@ -359,5 +362,201 @@ describe("Mutation.Vhu.create", () => {
     expect(errors[0].message).toBe(
       "Le N° d'agrément du destinataire est un champ requis."
     );
+  });
+
+  it("should create a bsvhu with split address input and get a composite address output", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: ["TRANSPORTER"]
+      }
+    );
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"]
+    });
+
+    await transporterReceiptFactory({
+      company: transporter
+    });
+    const input: BsvhuInput = {
+      emitter: {
+        irregularSituation: true,
+        noSiret: true,
+        company: {
+          name: "The crusher",
+          street: "34 Rue de la carcasse",
+          city: "Lyon",
+          postalCode: "69004",
+          contact: "Irène Gular",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      },
+      transporter: { company: { siret: transporter.siret } }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsvhu.emitter!.company!.address).toEqual(
+      "34 Rue de la carcasse 69004 Lyon"
+    );
+  });
+
+  it("should create a bsvhu without emitter email and phone if situation is irregular", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: ["TRANSPORTER"]
+      }
+    );
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"]
+    });
+
+    await transporterReceiptFactory({
+      company: transporter
+    });
+    const input: BsvhuInput = {
+      emitter: {
+        irregularSituation: true,
+        noSiret: false,
+        company: {
+          siret: siretify(8),
+          name: "The crusher",
+          street: "34 Rue de la carcasse",
+          city: "Lyon",
+          postalCode: "69004",
+          contact: "Irène Gular"
+        }
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      },
+      transporter: { company: { siret: transporter.siret } }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsvhu.emitter!.company!.contact).toEqual("Irène Gular");
+  });
+
+  it("should create a bsvhu without emitter contact if situation is irregular and there is no SIRET", async () => {
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: ["TRANSPORTER"]
+      }
+    );
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"]
+    });
+
+    await transporterReceiptFactory({
+      company: transporter
+    });
+    const input: BsvhuInput = {
+      emitter: {
+        irregularSituation: true,
+        noSiret: true,
+        company: {
+          name: "The crusher",
+          street: "34 Rue de la carcasse",
+          city: "Lyon",
+          postalCode: "69004"
+        }
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      },
+      transporter: { company: { siret: transporter.siret } }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsvhu.emitter!.company!.name).toEqual("The crusher");
   });
 });

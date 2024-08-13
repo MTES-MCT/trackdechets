@@ -108,19 +108,40 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   emitterCompanySiret: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION", when: bsda => !bsda.emitterNoSiret },
+    required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterNoSiret },
     readableFieldName: "Le N° SIRET de l'émetteur"
   },
   emitterCompanyAddress: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsvhu =>
+        !bsvhu.emitterCompanyStreet ||
+        !bsvhu.emitterCompanyCity ||
+        !bsvhu.emitterCompanyPostalCode
+    },
+    readableFieldName: "L'adresse de l'émetteur"
+  },
+  emitterCompanyStreet: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterCompanyAddress },
+    readableFieldName: "L'adresse de l'émetteur"
+  },
+  emitterCompanyCity: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterCompanyAddress },
+    readableFieldName: "L'adresse de l'émetteur"
+  },
+  emitterCompanyPostalCode: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterCompanyAddress },
     readableFieldName: "L'adresse de l'émetteur"
   },
   emitterCompanyContact: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
-      when: bsda => !bsda.emitterNoSiret
+      when: bsvhu => !bsvhu.emitterNoSiret
     },
     readableFieldName: "La personne à contacter chez l'émetteur"
   },
@@ -128,7 +149,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
-      when: bsda => !bsda.emitterIrregularSituation
+      when: bsvhu => !bsvhu.emitterIrregularSituation
     },
     readableFieldName: "Le N° de téléphone de l'émetteur"
   },
@@ -136,7 +157,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
-      when: bsda => !bsda.emitterIrregularSituation
+      when: bsvhu => !bsvhu.emitterIrregularSituation
     },
     readableFieldName: "L'adresse e-mail de l'émetteur"
   },

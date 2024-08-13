@@ -99,7 +99,61 @@ input BsvhuEmitterInput {
   "Indique si l'émetteur est un particulier ou une entreprise sans SIRET"
   noSiret: Boolean
   "Coordonnées de l'entreprise émétrice"
-  company: CompanyInput
+  company: BsvhuCompanyInput
+}
+
+"Extension de CompanyInput ajoutant des champs d'adresse séparés"
+input BsvhuCompanyInput {
+  """
+  SIRET de l'établissement composé de 14 caractères numériques.
+
+  Un établissement visé sur un bordereau en tant que transporteur doit être inscrit sur Trackdéchets avec le profil Transporteur.
+  Un établissement visé sur un bordereau en tant qu'installation de destination doit être inscrit sur Trackdéchets avec un profil d'installation
+  de transit ou de traitement.
+  """
+  siret: String
+
+  """
+  Numéro de TVA intra-communautaire de l'établissement. À renseigner pour
+  les transporteurs étrangers uniquement.
+
+  Un transporteur étranger visé sur un bordereau par son numéro de TVA intra-communautaire doit être inscrit sur Trackdéchets
+  avec le profil Transporteur.
+  """
+  vatNumber: String
+
+  "Nom de l'établissement"
+  name: String
+
+  "Adresse de l'établissement"
+  address: String
+  "Rue de l'adresse de l'établissement"
+  street: String
+  "Ville de l'adresse de l'établissement"
+  city: String
+  "code postal de l'adresse de l'établissement"
+  postalCode: String
+
+  "Nom du contact dans l'établissement"
+  contact: String
+
+  "Email du contact dans l'établissement"
+  mail: String
+
+  "Numéro de téléphone de contact dans l'établissement"
+  phone: String
+
+  "Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise"
+  country: String
+
+  """
+  Numéro OMI ou IMO (International Maritime Organization) pour les navires étrangers (sans SIRET).
+  Il est composé des trois lettres IMO suivi d'un nombre de sept chiffres (ex: IMO 1234567).
+  """
+  omiNumber: String
+
+  "Un identifiant d'établissement hors EU"
+  extraEuropeanId: String
 }
 
 input BsvhuIdentificationInput {

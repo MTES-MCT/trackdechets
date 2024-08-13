@@ -946,6 +946,10 @@ model Bsvhu {
   emitterCompanyName                                  String?
   emitterCompanySiret                                 String?                  @db.VarChar(17)
   emitterCompanyAddress                               String?
+  emitterCompanyStreet                                String?
+  emitterCompanyCity                                  String?
+  emitterCompanyPostalCode                            String?
+  emitterCompanyCountry                               String?
   emitterCompanyContact                               String?
   emitterCompanyPhone                                 String?
   emitterCompanyMail                                  String?
