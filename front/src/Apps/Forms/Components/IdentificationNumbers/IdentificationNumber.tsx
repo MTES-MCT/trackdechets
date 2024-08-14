@@ -9,13 +9,15 @@ interface IdentificationNumberProps {
   disabled: boolean;
   error?: {};
   type?: string;
+  defaultValue?: (string | undefined)[] | null | undefined;
 }
 const IdentificationNumber = ({
   title = "Détail des identifications",
   name,
   disabled,
   error,
-  type
+  type,
+  defaultValue
 }: IdentificationNumberProps) => {
   const { setValue, getValues } = useFormContext();
 
@@ -28,6 +30,13 @@ const IdentificationNumber = ({
       case SET_INPUT_CODE:
         return { ...state, inputCode: action.payload };
       case ADD_CODE: {
+        if (!state.codes.length && defaultValue?.length) {
+          return {
+            ...state,
+            codes: [...state.codes, ...defaultValue],
+            inputCode: ""
+          };
+        }
         if (!state.inputCode || state.codes.includes(state.inputCode)) {
           return state;
         }
@@ -78,6 +87,12 @@ const IdentificationNumber = ({
     setValue(name, state.codes);
   }, [state, name, setValue]);
 
+  useEffect(() => {
+    if (defaultValue) {
+      dispatch({ type: ADD_CODE, payload: defaultValue });
+    }
+  }, [defaultValue]);
+
   return (
     <>
       <p>
@@ -85,7 +100,7 @@ const IdentificationNumber = ({
         <TdTooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
       </p>
       <div className="fr-grid-row fr-grid-row--bottom multiTags">
-        {state.codes.map((code, idx) => (
+        {state?.codes?.map((code, idx) => (
           <Tag
             dismissible
             key={idx}
@@ -93,7 +108,8 @@ const IdentificationNumber = ({
             nativeButtonProps={{
               type: "button",
               onClick: () =>
-                !disabled && dispatch({ type: REMOVE_CODE, payload: idx })
+                !disabled && dispatch({ type: REMOVE_CODE, payload: idx }),
+              ...{ "data-testid": "tagInputIdentificationNumber" }
             }}
           >
             {code}
@@ -103,6 +119,7 @@ const IdentificationNumber = ({
         {!disabled && (
           <input
             type="text"
+            data-testid="identificationNumberInput"
             ref={tagInputRef}
             className="multiTagsInput"
             placeholder="Code…"

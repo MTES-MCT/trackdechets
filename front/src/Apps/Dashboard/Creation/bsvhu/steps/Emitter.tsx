@@ -33,6 +33,7 @@ const EmitterBsvhu = ({ isDisabled }) => {
     <>
       {isDisabled && <DisabledParagraphStep />}
       <div className="fr-col-md-10 fr-mt-4w">
+        <h4 className="fr-h4">Entreprise</h4>
         <CompanySelectorWrapper
           orgId={siret}
           favoriteType={FavoriteType.Emitter}

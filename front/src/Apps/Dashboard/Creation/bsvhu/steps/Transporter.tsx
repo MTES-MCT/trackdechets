@@ -22,7 +22,6 @@ const TransporterBsvhu = ({ isDisabled }) => {
     register(`${actor}.company.vatNumber`);
     register(`${actor}.company.address`);
     register(`${actor}.company.mail`);
-    register(`${actor}.transport.plates`);
   }, [register]);
 
   register(`${actor}.recepisse.isExempted`);
@@ -36,6 +35,7 @@ const TransporterBsvhu = ({ isDisabled }) => {
     <>
       {isDisabled && <DisabledParagraphStep />}
       <div className="fr-col-md-10 fr-mt-4w">
+        <h4 className="fr-h4">Entreprise</h4>
         <CompanySelectorWrapper
           orgId={siret}
           favoriteType={FavoriteType.Transporter}

@@ -1,7 +1,7 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import React from "react";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
 import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
 import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
@@ -14,10 +14,13 @@ const WasteBsvhu = ({ isDisabled }) => {
   const weight = watch("weight.value");
   const quantity = watch("quantity") ?? 0;
   const isEstimate = watch("weight.isEstimate");
+  const identificationNumbersDefaultValue =
+    formState.defaultValues?.identification?.numbers;
+  const identificationNumbers = watch("identification.numbers");
 
-  const { fields } = useFieldArray({
-    name: "identification.numbers"
-  });
+  useEffect(() => {
+    setValue("quantity", identificationNumbers?.length);
+  }, [setValue, identificationNumbers]);
 
   return (
     <>
@@ -89,13 +92,16 @@ const WasteBsvhu = ({ isDisabled }) => {
       />
 
       <div className="fr-col-md-12 fr-mb-4w">
-        {fields.map(field => (
-          <IdentificationNumber
-            key={field.id}
-            disabled={isDisabled}
-            name="identification.numbers"
-          />
-        ))}
+        <IdentificationNumber
+          disabled={isDisabled}
+          name="identification.numbers"
+          defaultValue={identificationNumbersDefaultValue}
+        />
+        {formState.errors.identification?.numbers?.message && (
+          <p className="fr-text fr-error-text">
+            {formState.errors.identification?.numbers?.message}
+          </p>
+        )}
       </div>
 
       <h4 className="fr-h4">Quantité remise</h4>

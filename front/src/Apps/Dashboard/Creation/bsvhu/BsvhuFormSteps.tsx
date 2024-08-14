@@ -9,26 +9,37 @@ import {
   Query,
   QueryBsvhuArgs
 } from "@td/codegen-ui";
+import omitDeep from "omit-deep-lodash";
 import React, { useMemo } from "react";
 import { useForm } from "react-hook-form";
-import FormStepsContent from "../FormStepsContent";
+import { useParams } from "react-router-dom";
 import { Loader } from "../../../common/Components";
+import FormStepsContent from "../FormStepsContent";
 import { getComputedState } from "../getComputedState";
-import initialState from "./utils/initial-state";
-
 import { ZodBsvhu, rawBsvhuSchema } from "./schema";
+import DestinationBsvhu from "./steps/Destination";
+import EmitterBsvhu from "./steps/Emitter";
+import TransporterBsvhu from "./steps/Transporter";
+import WasteBsvhu from "./steps/Waste";
+import { isStepDisabled } from "./steps/isStepDisabled";
+import initialState from "./utils/initial-state";
 import {
-  CREATE_VHU_FORM,
+  CREATE_BSVHU,
+  CREATE_DRAFT_VHU,
   GET_VHU_FORM,
   UPDATE_VHU_FORM
 } from "./utils/queries";
-import WasteBsvhu from "./steps/Waste";
-import EmitterBsvhu from "./steps/Emitter";
-import TransporterBsvhu from "./steps/Transporter";
-import { isStepDisabled } from "./steps/isStepDisabled";
-import { useParams } from "react-router-dom";
-import DestinationBsvhu from "./steps/Destination";
+import { cleanPayload } from "../bspaoh/utils/payload";
 
+const vhuToInput = (paoh: BsvhuInput): BsvhuInput => {
+  return omitDeep(paoh, [
+    "isDraft",
+    "emitter.emission.signature",
+    "transporter.transport.signature",
+    "destination.reception.signature",
+    "destination.operation.signature"
+  ]);
+};
 interface Props {
   bsdId?: string;
 }
@@ -62,12 +73,12 @@ const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
   const [createDraftVhuForm, { loading: creatingDraft }] = useMutation<
     Pick<Mutation, "createDraftBsvhu">,
     MutationCreateDraftBsvhuArgs
-  >(CREATE_VHU_FORM); // FIXME draft
+  >(CREATE_DRAFT_VHU);
 
   const [createVhuForm, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsvhu">,
     MutationCreateBsvhuArgs
-  >(CREATE_VHU_FORM);
+  >(CREATE_BSVHU);
 
   const [updateVhuForm, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBsvhu">,
@@ -79,15 +90,19 @@ const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
   const draftCtaLabel = formState.id ? "" : "Enregistrer en brouillon";
 
   const saveForm = (input: BsvhuInput, draft: boolean): Promise<any> => {
+    const cleanedInput = vhuToInput(input);
     if (formState.id!) {
+      const cleanedPayload = cleanPayload(omitDeep(cleanedInput));
       return updateVhuForm({
-        variables: { id: formState.id, input }
+        variables: { id: formState.id, input: cleanedPayload }
       });
     } else {
+      const cleanedPayload = cleanPayload(cleanedInput);
+
       if (draft) {
-        return createDraftVhuForm({ variables: { input } });
+        return createDraftVhuForm({ variables: { input: cleanedPayload } });
       } else {
-        return createVhuForm({ variables: { input } });
+        return createVhuForm({ variables: { input: cleanedPayload } });
       }
     }
   };

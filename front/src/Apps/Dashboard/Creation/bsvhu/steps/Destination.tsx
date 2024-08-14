@@ -8,7 +8,7 @@ import {
 } from "@td/codegen-ui";
 import subMonths from "date-fns/subMonths";
 import React, { useEffect, useMemo, useState } from "react";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
@@ -16,6 +16,7 @@ import CompanySelectorWrapper from "../../../../common/Components/CompanySelecto
 import RhfOperationModeSelect from "../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import format from "date-fns/format";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 const DestinationBsvhu = ({ isDisabled }) => {
   const { siret } = useParams<{ siret: string }>();
@@ -26,9 +27,9 @@ const DestinationBsvhu = ({ isDisabled }) => {
   const wasteCode = watch("wasteCode");
   const isDangerousWasteCode = wasteCode === "16 01 04*";
   const destination = watch(actor) ?? {};
-  const { fields } = useFieldArray({
-    name: "destination.reception.identification.numbers"
-  });
+  const identificationNumbers =
+    formState.defaultValues?.destination?.reception?.identification?.numbers;
+  const agrementNumber = watch("destination.agrementNumber");
 
   useEffect(() => {
     if (isDangerousWasteCode) {
@@ -38,7 +39,6 @@ const DestinationBsvhu = ({ isDisabled }) => {
 
   const updateAgrementNumber = (destination, type?) => {
     const destinationType = type || destination?.type;
-
     const agrementNumber =
       destinationType === "BROYEUR"
         ? destination?.vhuAgrementBroyeur?.agrementNumber
@@ -73,6 +73,16 @@ const DestinationBsvhu = ({ isDisabled }) => {
     () => destination?.company?.orgId ?? destination?.company?.siret ?? null,
     [destination?.company?.orgId, destination?.company?.siret]
   );
+  const orgIdNextDestination = useMemo(
+    () =>
+      destination?.operation?.nextDestination.company.orgId ??
+      destination?.operation?.nextDestination?.company.siret ??
+      null,
+    [
+      destination?.operation?.nextDestination.company.orgId,
+      destination?.operation?.nextDestination.company.siret
+    ]
+  );
   const TODAY = new Date();
 
   return (
@@ -95,13 +105,15 @@ const DestinationBsvhu = ({ isDisabled }) => {
               required: true,
               ...register("destination.reception.date"),
               onChange: e =>
-                setValue("destination.reception.date", e.target.value)
+                setValue("destination.reception.date", e.target.value),
+              value: destination?.reception?.date
+                ? format(new Date(destination?.reception?.date), "yyyy-MM-dd")
+                : ""
             }}
           />
           <div className="fr-col-12 fr-col-md-6">
             <RadioButtons
               legend="Lot accepté"
-              disabled={isDangerousWasteCode || isDisabled}
               options={[
                 {
                   label: "Accepté en totalité",
@@ -158,15 +170,12 @@ const DestinationBsvhu = ({ isDisabled }) => {
                 {destination?.type === BsvhuDestinationType.Demolisseur && (
                   <>
                     <h4 className="fr-h4">Identification</h4>
-
-                    {fields.map(field => (
-                      <IdentificationNumber
-                        key={field.id}
-                        title="Identification des numeros entrant des lots ou de véhicules hors d'usage (livre de police)"
-                        disabled={isDisabled}
-                        name="destination.reception.identification.numbers"
-                      />
-                    ))}
+                    <IdentificationNumber
+                      title="Identification des numeros entrant des lots ou de véhicules hors d'usage (livre de police)"
+                      disabled={isDisabled}
+                      name="destination.reception.identification.numbers"
+                      defaultValue={identificationNumbers}
+                    />
                   </>
                 )}
                 <h4 className="fr-h4 fr-mt-4w">Opération</h4>
@@ -188,7 +197,13 @@ const DestinationBsvhu = ({ isDisabled }) => {
                     ...register("destination.operation.date"),
                     onChange: e =>
                       setValue("destination.operation.date", e.target.value),
-                    required: true
+                    required: true,
+                    value: destination?.operation?.date
+                      ? format(
+                          new Date(destination?.operation?.date),
+                          "yyyy-MM-dd"
+                        )
+                      : ""
                   }}
                 />
 
@@ -211,7 +226,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
                   </Select>
                 </div>
                 <RhfOperationModeSelect
-                  path="destination.operation.code"
+                  path="destination.operation.mode"
                   operationCode={destination?.operation?.code}
                 />
               </>
@@ -221,10 +236,12 @@ const DestinationBsvhu = ({ isDisabled }) => {
         </>
       )}
       {isDangerousWasteCode && (
-        <div className="notification success tw-mb-2">
-          Vous avez saisi le code déchet dangereux <strong>16 01 04*</strong>.
-          Le destinataire est obligatoirement un démolisseur agréé.
-        </div>
+        <Alert
+          description=" Vous avez saisi le code déchet dangereux 16 01 04*. Le destinataire est obligatoirement un démolisseur agréé."
+          severity="info"
+          small
+          className="fr-mb-2w"
+        />
       )}
 
       <div className="fr-col-12 fr-col-md-6">
@@ -252,6 +269,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
         />
       </div>
       <div className="fr-col-md-10 fr-mt-4w">
+        <h4 className="fr-h4">Installation de destination</h4>
         <CompanySelectorWrapper
           orgId={siret}
           favoriteType={FavoriteType.Destination}
@@ -278,8 +296,8 @@ const DestinationBsvhu = ({ isDisabled }) => {
                 company.contactEmail || destination?.company?.mail
               );
 
-              setSelectedDestination(destination);
-              updateAgrementNumber(destination);
+              setSelectedDestination(company);
+              updateAgrementNumber(company, destination?.type);
             }
           }}
         />
@@ -295,7 +313,8 @@ const DestinationBsvhu = ({ isDisabled }) => {
           label="Numéro d'agrément"
           disabled={isDisabled}
           nativeInputProps={{
-            ...register(`${actor}.agrementNumber`)
+            ...register(`${actor}.agrementNumber`),
+            value: agrementNumber
           }}
         />
       </div>
@@ -319,20 +338,35 @@ const DestinationBsvhu = ({ isDisabled }) => {
       </div>
       {destination?.type === "DEMOLISSEUR" && (
         <div className="fr-col-md-10 fr-mt-4w">
+          <h4 className="fr-h4 fr-mt-2w">
+            Installation de broyage prévisionelle
+          </h4>
           <CompanySelectorWrapper
             orgId={siret}
             favoriteType={FavoriteType.Destination}
             disabled={isDisabled}
-            selectedCompanyOrgId={orgId}
+            selectedCompanyOrgId={orgIdNextDestination}
             onCompanySelected={company => {
               if (company) {
+                const name = `${actor}.operation.nextDestination.company`;
+                setValue(`${name}.orgId`, company.orgId);
+                setValue(`${name}.siret`, company.siret);
+                setValue(`${name}.name`, company.name);
+                setValue(`${name}.vatNumber`, company.vatNumber);
+                setValue(`${name}.address`, company.address);
+                setValue(`${name}.contact`, company.contact);
+                setValue(`${name}.phone`, company.contactPhone);
+
+                setValue(`${name}.mail`, company.contactEmail);
+
                 const agrementNumber =
-                  destination?.type === "BROYEUR"
-                    ? destination?.vhuAgrementBroyeur?.agrementNumber
-                    : destination?.vhuAgrementDemolisseur?.agrementNumber;
+                  company?.vhuAgrementBroyeur?.agrementNumber;
 
                 if (agrementNumber) {
-                  setValue("destination.agrementNumber", agrementNumber);
+                  setValue(
+                    "destination.agrementNumber",
+                    company?.vhuAgrementBroyeur?.agrementNumber
+                  );
                 } else {
                   setValue("destination.agrementNumber", "");
                 }
@@ -340,9 +374,9 @@ const DestinationBsvhu = ({ isDisabled }) => {
             }}
           />
           <CompanyContactInfo
-            fieldName={`${actor}.company`}
+            fieldName={`${actor}.operation.nextDestination.company`}
             disabled={isDisabled}
-            key={orgId}
+            key={orgIdNextDestination}
           />
         </div>
       )}

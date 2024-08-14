@@ -22,6 +22,7 @@ export default {
       date: null,
       acceptationStatus: null,
       refusalReason: "",
+      weight: null,
       quantity: null,
       identification: {
         numbers: []
@@ -30,6 +31,7 @@ export default {
     operation: {
       date: null,
       code: "",
+      mode: null,
       nextDestination: { company: getInitialCompany() }
     }
   },

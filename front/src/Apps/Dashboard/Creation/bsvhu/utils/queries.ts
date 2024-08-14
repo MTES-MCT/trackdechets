@@ -51,13 +51,20 @@ export const DUPLICATE_VHU_FORM = gql`
   ${FullBsvhuFragment}
 `;
 
-export const CREATE_VHU_FORM = gql`
-  mutation CreateDraftBsvhu($input: BsvhuInput!) {
+export const CREATE_DRAFT_VHU = gql`
+  mutation CreateDraftVhu($input: BsvhuInput!) {
     createDraftBsvhu(input: $input) {
-      ...FullBsvhu
+      id
     }
   }
-  ${FullBsvhuFragment}
+`;
+
+export const CREATE_BSVHU = gql`
+  mutation CreateBsvhu($input: BsvhuInput!) {
+    createBsvhu(input: $input) {
+      id
+    }
+  }
 `;
 
 export const UPDATE_VHU_FORM = gql`

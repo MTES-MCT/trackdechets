@@ -41,7 +41,7 @@ export const getTabs = (
   },
   {
     tabId: "destination",
-    label: isCrematorium ? "Crématorium" : "Destination Finale",
+    label: isCrematorium ? "Crématorium" : "Destination finale",
     iconId: "fr-icon-arrow-right-line"
   }
 ];

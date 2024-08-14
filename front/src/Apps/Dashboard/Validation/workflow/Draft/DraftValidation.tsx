@@ -322,6 +322,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                   id: bsd.id
                 })}
                 className="btn btn--primary"
+                onClick={onClose}
+                state={{ background: location }}
               >
                 Mettre le bordereau à jour pour le publier
               </Link>
