@@ -14,12 +14,7 @@ import {
   CompanyInput
 } from "../../generated/graphql/types";
 import { bsvhuEditionRules } from "../validation/rules";
-import {
-  getCurrentSignatureType,
-  graphQlInputToZodBsvhu,
-  prismaToZodBsvhu
-} from "../validation/helpers";
-import { bsvhuFactory } from "./factories.vhu";
+import { graphQlInputToZodBsvhu } from "../validation/helpers";
 
 describe("edition", () => {
   test("an edition rule should be defined for every key in BsdaInput", () => {
@@ -115,32 +110,5 @@ describe("edition", () => {
     for (const key of Object.keys(flatInput)) {
       expect(Object.keys(bsvhuEditionRules)).toContain(key);
     }
-  });
-
-  test("getCurrentSignatureType should recursively checks the signature hierarchy", async () => {
-    const prismaBsvhu = await bsvhuFactory({
-      opt: { status: "INITIAL" }
-    });
-    const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const currentSignature = getCurrentSignatureType(bsvhu);
-    expect(currentSignature).toEqual(undefined);
-    const afterEmission = {
-      ...bsvhu,
-      emitterEmissionSignatureDate: new Date()
-    };
-    const currentSignature2 = getCurrentSignatureType(afterEmission);
-    expect(currentSignature2).toEqual("EMISSION");
-    const afterTransport = {
-      ...afterEmission,
-      transporterTransportSignatureDate: new Date()
-    };
-    const currentSignature3 = getCurrentSignatureType(afterTransport);
-    expect(currentSignature3).toEqual("TRANSPORT");
-    const afterOperation = {
-      ...afterTransport,
-      destinationOperationSignatureDate: new Date()
-    };
-    const currentSignature4 = getCurrentSignatureType(afterOperation);
-    expect(currentSignature4).toEqual("OPERATION");
   });
 });

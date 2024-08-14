@@ -10,7 +10,7 @@ import { searchCompany } from "../../../companies/search";
 import { bsvhuFactory } from "../../__tests__/factories.vhu";
 import { ZodBsvhu } from "../schema";
 import { BsvhuValidationContext } from "../types";
-import { prismaToZodBsvhu } from "../helpers";
+import { getCurrentSignatureType, prismaToZodBsvhu } from "../helpers";
 import { parseBsvhu, parseBsvhuAsync } from "..";
 import { ZodError } from "zod";
 
@@ -631,6 +631,35 @@ describe("BSVHU validation", () => {
           transporterRecepisseValidityLimit: null
         })
       );
+    });
+  });
+
+  describe("getCurrentSignatureType", () => {
+    it("getCurrentSignatureType should recursively checks the signature hierarchy", async () => {
+      const prismaBsvhu = await bsvhuFactory({
+        opt: { status: "INITIAL" }
+      });
+      const bsvhu = prismaToZodBsvhu(prismaBsvhu);
+      const currentSignature = getCurrentSignatureType(bsvhu);
+      expect(currentSignature).toEqual(undefined);
+      const afterEmission = {
+        ...bsvhu,
+        emitterEmissionSignatureDate: new Date()
+      };
+      const currentSignature2 = getCurrentSignatureType(afterEmission);
+      expect(currentSignature2).toEqual("EMISSION");
+      const afterTransport = {
+        ...afterEmission,
+        transporterTransportSignatureDate: new Date()
+      };
+      const currentSignature3 = getCurrentSignatureType(afterTransport);
+      expect(currentSignature3).toEqual("TRANSPORT");
+      const afterOperation = {
+        ...afterTransport,
+        destinationOperationSignatureDate: new Date()
+      };
+      const currentSignature4 = getCurrentSignatureType(afterOperation);
+      expect(currentSignature4).toEqual("OPERATION");
     });
   });
 });
