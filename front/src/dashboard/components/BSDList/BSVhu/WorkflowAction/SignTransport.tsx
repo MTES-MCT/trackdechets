@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
 import routes from "../../../../../Apps/routes";
-import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
+import { UPDATE_VHU_FORM } from "../../../../../Apps/Dashboard/Creation/bsvhu/utils/queries";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { Field, Form, Formik } from "formik";
