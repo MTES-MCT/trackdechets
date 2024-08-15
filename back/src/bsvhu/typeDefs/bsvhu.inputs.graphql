@@ -131,7 +131,7 @@ input BsvhuCompanyInput {
   street: String
   "Ville de l'adresse de l'établissement"
   city: String
-  "code postal de l'adresse de l'établissement"
+  "Code postal de l'adresse de l'établissement"
   postalCode: String
 
   "Nom du contact dans l'établissement"

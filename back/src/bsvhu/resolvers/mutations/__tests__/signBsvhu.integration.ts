@@ -212,16 +212,12 @@ describe("Mutation.Vhu.sign", () => {
 
     const date = new Date().toISOString();
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "signBsvhu">>(
-      SIGN_VHU_FORM,
-      {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "TRANSPORT", author: user.name, date }
-        }
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "TRANSPORT", author: user.name, date }
       }
-    );
-    console.log(errors);
+    });
 
     expect(data.signBsvhu.transporter!.transport!.signature!.author).toBe(
       user.name
