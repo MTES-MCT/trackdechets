@@ -87,6 +87,7 @@ export async function createBsdasriRevisionRequest(
   );
 
   const flatContent = await getFlatContent(content, bsdasri);
+  const history = getBsdasriHistory(bsdasri);
 
   return bsdasriRepository.createRevisionRequest({
     bsdasri: { connect: { id: bsdasri.id } },
@@ -96,7 +97,7 @@ export async function createBsdasriRevisionRequest(
       create: approversSirets.map(approverSiret => ({ approverSiret }))
     },
     comment,
-    bsdasriSnapshot: JSON.stringify(bsdasri)
+    ...history
   });
 }
 
@@ -214,4 +215,21 @@ async function getFlatContent(
   checkRevisionRules(fields, bsdasri);
 
   return flatContent;
+}
+
+function getBsdasriHistory(bsdasri: Bsdasri) {
+  return {
+    initialWasteCode: bsdasri.wasteCode,
+    initialDestinationWastePackagings:
+      bsdasri.destinationWastePackagings as Prisma.InputJsonValue,
+    initialDestinationReceptionWasteWeightValue:
+      bsdasri.destinationReceptionWasteWeightValue,
+    initialDestinationOperationCode: bsdasri.destinationOperationCode,
+    initialDestinationOperationMode: bsdasri.destinationOperationMode,
+    initialEmitterPickupSiteName: bsdasri.emitterPickupSiteName,
+    initialEmitterPickupSiteAddress: bsdasri.emitterPickupSiteAddress,
+    initialEmitterPickupSiteCity: bsdasri.emitterPickupSiteCity,
+    initialEmitterPickupSitePostalCode: bsdasri.emitterPickupSitePostalCode,
+    initialEmitterPickupSiteInfos: bsdasri.emitterPickupSiteInfos
+  };
 }

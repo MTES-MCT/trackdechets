@@ -102,10 +102,7 @@ export async function createBsdaRevisionRequest(
   );
 
   const flatContent = await getFlatContent(content, bsda);
-  const bsdaSnapshot = await bsdaRepository.findUnique(
-    { id: bsda.id },
-    { include: { transporters: true } }
-  );
+  const history = getBsdaHistory(bsda);
 
   return bsdaRepository.createRevisionRequest({
     bsda: { connect: { id: bsda.id } },
@@ -115,7 +112,7 @@ export async function createBsdaRevisionRequest(
       create: approversSirets.map(approverSiret => ({ approverSiret }))
     },
     comment,
-    bsdaSnapshot
+    ...history
   });
 }
 
@@ -309,3 +306,33 @@ const schema = rawBsdaSchema
       }
     }
   });
+
+function getBsdaHistory(bsda: Bsda) {
+  return {
+    initialWasteCode: bsda.wasteCode,
+    initialWastePop: bsda.wastePop,
+    initialPackagings: bsda.packagings,
+    initialWasteSealNumbers: bsda.wasteSealNumbers,
+    initialWasteMaterialName: bsda.wasteMaterialName,
+    initialDestinationCap: bsda.destinationCap,
+    initialDestinationReceptionWeight: bsda.destinationReceptionWeight,
+    initialDestinationOperationCode: bsda.destinationOperationCode,
+    initialDestinationOperationDescription:
+      bsda.destinationOperationDescription,
+    initialDestinationOperationMode: bsda.destinationOperationMode,
+    initialBrokerCompanyName: bsda.brokerCompanyName,
+    initialBrokerCompanySiret: bsda.brokerCompanySiret,
+    initialBrokerCompanyAddress: bsda.brokerCompanyAddress,
+    initialBrokerCompanyContact: bsda.brokerCompanyContact,
+    initialBrokerCompanyPhone: bsda.brokerCompanyPhone,
+    initialBrokerCompanyMail: bsda.brokerCompanyMail,
+    initialBrokerRecepisseNumber: bsda.brokerRecepisseNumber,
+    initialBrokerRecepisseDepartment: bsda.brokerRecepisseDepartment,
+    initialBrokerRecepisseValidityLimit: bsda.brokerRecepisseValidityLimit,
+    initialEmitterPickupSiteName: bsda.emitterPickupSiteName,
+    initialEmitterPickupSiteAddress: bsda.emitterPickupSiteAddress,
+    initialEmitterPickupSiteCity: bsda.emitterPickupSiteCity,
+    initialEmitterPickupSitePostalCode: bsda.emitterPickupSitePostalCode,
+    initialEmitterPickupSiteInfos: bsda.emitterPickupSiteInfos
+  };
+}
