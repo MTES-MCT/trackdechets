@@ -542,7 +542,8 @@ function getBsddHistory(bsdd: Form & { forwardedIn: Form | null }) {
     initialWasteDetailsCode: bsdd.wasteDetailsCode,
     initialWasteDetailsName: bsdd.wasteDetailsName,
     initialWasteDetailsPop: bsdd.wasteDetailsPop,
-    initialWasteDetailsPackagingInfos: bsdd.wasteDetailsPackagingInfos as Prisma.InputJsonValue,
+    initialWasteDetailsPackagingInfos:
+      bsdd.wasteDetailsPackagingInfos as Prisma.InputJsonValue,
     initialWasteAcceptationStatus: bsdd.wasteAcceptationStatus,
     initialWasteRefusalReason: bsdd.wasteRefusalReason,
     initialWasteDetailsSampleNumber: bsdd.wasteDetailsSampleNumber,
