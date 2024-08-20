@@ -11,7 +11,6 @@ type EventLike = Omit<Event, "metadata" | "data"> & {
 type EventCollection = { _id: string } & Omit<EventLike, "id">;
 
 const { MONGO_URL } = process.env;
-logger.info(MONGO_URL);
 const EVENTS_COLLECTION = "events";
 
 async function getUserCompanies(userId: string): Promise<Company[]> {
@@ -51,9 +50,6 @@ export async function run() {
           : {}),
         where: {
           isDraft: true
-          // canAccessDraftOrgIds: {
-          //   isEmpty: true
-          // }
         },
         include: {
           intermediaries: true,
