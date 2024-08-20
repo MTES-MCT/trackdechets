@@ -149,7 +149,7 @@ type Mutation {
   ou après une étape d'entreposage provisoire ou de reconditionnement (signatures en case 18 et 19).
   Cette mutation doit être appelée avec le token du collecteur-transporteur.
   L'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement) est authentifié quant à lui
-  grâce à son code de signature disponible sur le tableau de bord Trackdéchets (Mon Compte > Établissements > Sécurité).
+  grâce à son code de signature disponible sur le tableau de bord Trackdéchets (Mes établissements > Sécurité).
   D'un point de vue pratique, cela implique qu'un responsable de l'établissement émetteur (resp. d'entreposage provisoire ou de reconditionnement)
   renseigne le code de signature sur le terminal du collecteur-transporteur.
   Dans le cas où un éco-organisme figure sur le BSD, il est également possible de signer avec son code plutôt que celui de l'émetteur.
