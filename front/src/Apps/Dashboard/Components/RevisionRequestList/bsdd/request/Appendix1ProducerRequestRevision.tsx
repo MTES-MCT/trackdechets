@@ -72,7 +72,9 @@ const Appendix1ProducerRequestRevision = ({
           className="fr-col-2"
           nativeInputProps={{
             ...register("wasteDetails.quantity", { valueAsNumber: true }),
-            type: "number"
+            type: "number",
+            inputMode: "decimal",
+            step: "0.000001"
           }}
         />
         {Boolean(wasteQuantityValue) && (

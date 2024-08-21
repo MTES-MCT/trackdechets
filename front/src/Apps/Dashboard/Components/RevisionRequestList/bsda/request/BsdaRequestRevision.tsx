@@ -133,7 +133,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
   };
 
   const handleAddSealNumbers = value => {
-    if (value && !bsda.waste?.sealNumbers?.includes(value)) {
+    if (value && ![...sealNumbersTags]?.includes(value)) {
       setSealNumbersTags([...sealNumbersTags, value]);
       setValue("waste.sealNumbers", [...sealNumbersTags, value]);
     }
@@ -287,7 +287,9 @@ export function BsdaRequestRevision({ bsda }: Props) {
                     ...register("destination.reception.weight", {
                       valueAsNumber: true
                     }),
-                    type: "number"
+                    type: "number",
+                    inputMode: "decimal",
+                    step: "0.000001"
                   }}
                 />
                 {Boolean(formValues.destination?.reception?.weight) && (
