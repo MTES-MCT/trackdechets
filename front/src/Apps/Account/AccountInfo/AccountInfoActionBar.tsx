@@ -52,7 +52,7 @@ const AccountInfoActionBar = ({
               disabled={isDisabled}
               nativeButtonProps={{ "data-testid": "submit-info-cta" }}
             >
-              Modifier
+              Valider
             </Button>
           </div>
         </>
