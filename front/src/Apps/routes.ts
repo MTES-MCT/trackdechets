@@ -104,7 +104,7 @@ const routes = {
       list: "/account/companies",
       orientation: "/account/companies/create"
     },
-    authorizedApplications: "/account/applications",
+    applications: "/account/applications",
     tokens: { list: "/account/tokens/list" },
     oauth2: {
       create: "/account/oauth2/create",

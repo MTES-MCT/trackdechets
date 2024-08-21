@@ -402,7 +402,7 @@ function MobileSubNav({ currentCompany }) {
                       entry={{
                         navlink: true,
                         caption: "Application autorisées",
-                        href: routes.account.authorizedApplications
+                        href: routes.account.applications
                       }}
                     />
                   </li>

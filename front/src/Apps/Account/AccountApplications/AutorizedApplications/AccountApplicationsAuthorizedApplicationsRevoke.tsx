@@ -1,41 +1,49 @@
 import * as React from "react";
-import { Modal } from "../../../common/components";
+import { Modal } from "../../../../common/components";
 import { AuthorizedApplication } from "@td/codegen-ui";
 import { useMutation } from "@apollo/client";
 import {
   REVOKE_AUTHORIZED_APPLICATION,
   AUTHORIZED_APPLICATIONS
 } from "./queries";
-import { NotificationError } from "../../common/Components/Error/Error";
+import { NotificationError } from "../../../common/Components/Error/Error";
 
-type AccountAuthorizedAppRevokeProps = {
+type AccountApplicationsAuthorizedApplicationsRevokeProps = {
   authorizedApplication: AuthorizedApplication;
   onClose: () => void;
 };
 
-export default function AccountAuthorizedAppRevoke({
+export default function AccountApplicationsAuthorizedApplicationsRevoke({
   authorizedApplication,
   onClose
-}: AccountAuthorizedAppRevokeProps) {
+}: AccountApplicationsAuthorizedApplicationsRevokeProps) {
   const [revokeAuthorizedApplication, { loading, error }] = useMutation(
     REVOKE_AUTHORIZED_APPLICATION,
     {
-      refetchQueries: [AUTHORIZED_APPLICATIONS]
+      refetchQueries: [AUTHORIZED_APPLICATIONS],
+      onCompleted: () => {
+        onClose();
+      }
     }
   );
 
   return (
-    <Modal ariaLabel="Révoquer une application" onClose={onClose} isOpen>
+    <Modal
+      title="Révoquer une application"
+      ariaLabel="Révoquer une application"
+      onClose={onClose}
+      isOpen
+    >
       <div>
         Etes vous sûr.e de vouloir révoquer l'accès donné à l'application "
         {authorizedApplication.name}" ?
       </div>
       <div className="td-modal-actions">
-        <button className="btn btn--outline-primary" onClick={() => onClose()}>
+        <button className="fr-btn" onClick={() => onClose()}>
           Annuler
         </button>
         <button
-          className="btn btn--danger"
+          className="fr-btn fr-btn--secondary"
           onClick={() =>
             revokeAuthorizedApplication({
               variables: { id: authorizedApplication.id }
@@ -43,7 +51,7 @@ export default function AccountAuthorizedAppRevoke({
           }
           disabled={loading}
         >
-          {loading ? "Révocation..." : "Supprimer"}
+          {loading ? "Révocation..." : "Révoquer"}
         </button>
       </div>
       {error && <NotificationError apolloError={error} />}
