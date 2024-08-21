@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Résolution d'un problème de resolver BsdaRevisionRequest qui empêchait l'ouverture de la modale de révision [PR 3513](https://github.com/MTES-MCT/trackdechets/pull/3513)
+- Une demande de rattachement est automatiquement acceptée si l'utilisateur est invité dans un établissement [PR 3526](https://github.com/MTES-MCT/trackdechets/pull/3526)
 
 # [2024.7.2] 30/07/2024
 
