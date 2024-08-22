@@ -59,7 +59,7 @@ export async function hasGovernmentRegistryPerm(
 }
 
 /**
- * La fiche établissement/gerico necessit des permissions spéicifique via un compte gouvernemental
+ * La fiche établissement/gerico necessite des permissions spécifiques via un compte gouvernemental
  */
 export async function hasGovernmentReadAllBsdsPermOrThrow(
   user: Express.User

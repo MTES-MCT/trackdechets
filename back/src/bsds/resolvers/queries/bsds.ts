@@ -338,14 +338,11 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
 
   // if user is authenticated with Bearer and has a gov account id, check their perms
   if (!context.user && contextUser?.governmentAccountId) {
-    try {
-      await hasGovernmentReadAllBsdsPermOrThrow(contextUser);
-      // if permission matches, set context.user back
-      context.user = contextUser;
-      bypassOrgIdsWithListPermission = true;
-    } catch (_) {
-      bypassOrgIdsWithListPermission = false;
-    }
+    // throw NotLoggedIn if perms do not match
+    await hasGovernmentReadAllBsdsPermOrThrow(contextUser);
+    // if permission matches, set context.user back
+    context.user = contextUser;
+    bypassOrgIdsWithListPermission = true;
   }
 
   const user = checkIsAuthenticated(context);
