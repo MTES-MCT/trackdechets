@@ -1545,6 +1545,7 @@ model Bsda {
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
   transportersOrgIds   String[] @default([])
+  canAccessDraftOrgIds String[] @default([])
 
   // Relation vers les infos de traçabilité finales
   // Même si aujourd'hui il ne peut y avoir qu'une opération finale, on anticipe le fait 
@@ -1563,6 +1564,7 @@ model Bsda {
   @@index([updatedAt], map: "_BsdaUpdatedAtIdx")
   @@index([intermediariesOrgIds], map: "_BsdaIntermediariesOrgIdsIdx", type: Gin)
   @@index([transportersOrgIds], map: "_BsdaTransportersOrgIdsIdx", type: Gin)
+  @@index([canAccessDraftOrgIds], map: "_BsdaCanAccessDraftOrgIdsIdx", type: Gin)
 }
 
 model BsdaFinalOperation {

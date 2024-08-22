@@ -250,7 +250,7 @@ describe("Query.bsds.bsda base workflow", () => {
         expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
-    it("draft bsda should be isDraftFor worker", async () => {
+    it("draft bsda should not be isDraftFor worker (not author)", async () => {
       const { query } = makeClient(worker.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -263,11 +263,9 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
-      ]);
+      expect(data.bsds.edges).toEqual([]);
     });
-    it("draft bsda should be isDraftFor transporter", async () => {
+    it("draft bsda should not be isDraftFor transporter (not author)", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -280,11 +278,9 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
-      ]);
+      expect(data.bsds.edges).toEqual([]);
     });
-    it("draft bsda should be isDraftFor destination", async () => {
+    it("draft bsda should not be isDraftFor destination (not author)", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -297,9 +293,7 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
-      ]);
+      expect(data.bsds.edges).toEqual([]);
     });
   });
 
@@ -1477,7 +1471,9 @@ describe("Query.bsds.bsdas mutations", () => {
     });
 
     const bsda = await bsdaFactory({
+      userId: emitter.user.id,
       opt: {
+        isDraft: true,
         emitterCompanySiret: emitter.company.siret
       }
     });

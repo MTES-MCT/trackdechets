@@ -68,6 +68,7 @@ describe("wastesReader", () => {
         .fill(1)
         .map(() =>
           bsdaFactory({
+            userId: destination.user.id,
             opt: {
               destinationCompanySiret: destination.company.siret,
               destinationReceptionDate: new Date(),
