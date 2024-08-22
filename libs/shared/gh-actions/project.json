@@ -1,0 +1,42 @@
+{
+  "name": "gh-actions",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/gh-actions/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "libs/shared/gh-actions/dist",
+        "format": ["cjs"],
+        "bundle": true,
+        "thirdParty": true,
+        "main": "libs/shared/gh-actions/src/main.ts",
+        "additionalEntryPoints": [],
+        "tsConfig": "libs/shared/gh-actions/tsconfig.app.json",
+        "generatePackageJson": false,
+        "esbuildOptions": {
+          "sourcemap": false,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}

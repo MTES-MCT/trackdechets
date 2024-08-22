@@ -1,0 +1,20 @@
+name: "Reviews Counter Action"
+description: "Collaborator pull request review counter."
+runs:
+  main: "dist/main.js"
+  using: "node20"
+inputs:
+  repo-token:
+    description: "GITHUB_TOKEN secret"
+    required: true
+outputs:
+  approved:
+    description: "Reviews allowing the pull request to merge."
+  changes_requested:
+    description: "Reviews blocking the pull request from merging."
+  commented:
+    description: "Informational reviews."
+  dismissed:
+    description: "Reviews that have been dismissed."
+  pending:
+    description: "Reviews that have not yet been submitted."
