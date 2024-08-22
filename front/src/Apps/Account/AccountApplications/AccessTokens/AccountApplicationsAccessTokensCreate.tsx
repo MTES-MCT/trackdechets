@@ -72,7 +72,7 @@ export default function AccountApplicationsAccessTokenCreate({
                 rel="noreferrer"
               >
                 recommandations de sécurité{" "}
-              </a>
+              </a>{" "}
               dans la documentation.
             </p>
           </div>

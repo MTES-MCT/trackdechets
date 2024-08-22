@@ -8,7 +8,7 @@ title: Obtenir un jeton d'accès personnel
 - à ne pas les embarquer dans une application frontend où ils seraient directement accessibles
 - à les révoquer en cas de doute sur leur intégrité
 
-Une fois votre compte créé et votre premier établissement rattaché en *sandbox* rendez-vous dans *Mon Compte* > *Intégration API* > *Jeton d'accès API* puis *Générer un nouveau jeton d'accès*
+Une fois votre compte créé et votre premier établissement rattaché en *sandbox* rendez-vous dans *Mon Compte* > *Applications et API* > *Jeton d'accès à l'API* puis *Créer un jeton*
 
 ![access-token-generate.png](../../../static/img/access-token-generate.png)
 
