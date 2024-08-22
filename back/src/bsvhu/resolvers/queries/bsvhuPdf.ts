@@ -7,6 +7,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsvhuOrNotFound } from "../../database";
 import { createPDFResponse } from "../../../common/pdf";
 import { buildPdf } from "../../pdf/generator";
+import { hasGovernmentReadAllBsdsPermOrThrow } from "../../../permissions";
 
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { checkCanRead } from "../../permissions";
@@ -28,7 +29,12 @@ const formPdfResolver: QueryResolvers["bsvhuPdf"] = async (
   const user = checkIsAuthenticated(context);
   const bsvhu = await getBsvhuOrNotFound(id);
 
-  await checkCanRead(user, bsvhu);
+  if (!user.isAdmin && !user.governmentAccountId) {
+    await checkCanRead(user, bsvhu);
+  }
+  if (user.governmentAccountId) {
+    await hasGovernmentReadAllBsdsPermOrThrow(user);
+  }
 
   return getFileDownload({
     handler: bsvhuPdfDownloadHandler.name,

@@ -5,6 +5,7 @@ import {
 } from "../../../generated/graphql/types";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
+import { hasGovernmentReadAllBsdsPermOrThrow } from "../../../permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanRead } from "../../permissions";
 import { generateBsddPdf } from "../../pdf";
@@ -39,10 +40,13 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
   );
 
   // The admin dashboard shows BSD cards & must allow PDF downloads
-  if (!user.isAdmin) {
+  if (!user.isAdmin && !user.governmentAccountId) {
     await checkCanRead(user, form);
   }
 
+  if (user.governmentAccountId) {
+    await hasGovernmentReadAllBsdsPermOrThrow(user);
+  }
   return getFileDownload({
     handler: formPdfDownloadHandler.name,
     params: { id }

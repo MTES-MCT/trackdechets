@@ -1,5 +1,5 @@
 import { User, UserRole } from "@prisma/client";
-import { cachedGet } from "./common/redis";
+import { cachedGet } from "../common/redis";
 import { prisma } from "@td/prisma";
 import {
   BsdaSignatureType,
@@ -8,10 +8,10 @@ import {
   SignatureTypeInput,
   UserPermission,
   BspaohSignatureType
-} from "./generated/graphql/types";
-import { checkSecurityCode } from "./common/permissions";
-import { ForbiddenError } from "./common/errors";
-import { MultiModalSignatureType } from "./common/types";
+} from "../generated/graphql/types";
+import { checkSecurityCode } from "../common/permissions";
+import { ForbiddenError } from "../common/errors";
+import { MultiModalSignatureType } from "../common/types";
 
 // List of all the permissions
 export enum Permission {
