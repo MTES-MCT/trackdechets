@@ -14,9 +14,7 @@ import { objectDiff } from "../../forms/workflow/diff";
  * typés en string côté GraphQL mais en enum côté Zod ce qui nous oblige
  * à faire un casting de type.
  */
-export async function graphQlInputToZodBsvhu(
-  input: BsvhuInput
-): Promise<ZodBsvhu> {
+export function graphQlInputToZodBsvhu(input: BsvhuInput): ZodBsvhu {
   const { ...bsvhuInput } = input;
 
   const {

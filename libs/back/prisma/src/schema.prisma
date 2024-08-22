@@ -940,10 +940,16 @@ model Bsvhu {
 
   status BsvhuStatus @default(INITIAL)
 
+  emitterIrregularSituation                           Boolean?
+  emitterNoSiret                                      Boolean?
   emitterAgrementNumber                               String?                  @db.VarChar(100)
   emitterCompanyName                                  String?
   emitterCompanySiret                                 String?                  @db.VarChar(17)
   emitterCompanyAddress                               String?
+  emitterCompanyStreet                                String?
+  emitterCompanyCity                                  String?
+  emitterCompanyPostalCode                            String?
+  emitterCompanyCountry                               String?
   emitterCompanyContact                               String?
   emitterCompanyPhone                                 String?
   emitterCompanyMail                                  String?

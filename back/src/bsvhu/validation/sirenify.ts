@@ -1,5 +1,7 @@
-import { nextBuildSirenify } from "../../companies/sirenify";
-import { CompanyInput } from "../../generated/graphql/types";
+import {
+  nextBuildSirenify,
+  NextCompanyInputAccessor
+} from "../../companies/sirenify";
 import { getSealedFields } from "./rules";
 import { ParsedZodBsvhu } from "./schema";
 import { BsvhuValidationContext, ZodBsvhuTransformer } from "./types";
@@ -8,19 +10,22 @@ const sirenifyBsvhuAccessors = (
   bsvhu: ParsedZodBsvhu,
   // Tranformations should not be run on sealed fields
   sealedFields: string[]
-) => [
+): NextCompanyInputAccessor<ParsedZodBsvhu>[] => [
   {
     siret: bsvhu?.emitterCompanySiret,
-    skip: sealedFields.includes("emitterCompanySiret"),
-    setter: (input, companyInput: CompanyInput) => {
+    skip: sealedFields.includes("emitterCompanySiret") || bsvhu.emitterNoSiret,
+    setter: (input, companyInput) => {
       input.emitterCompanyName = companyInput.name;
       input.emitterCompanyAddress = companyInput.address;
+      input.emitterCompanyCity = companyInput.city;
+      input.emitterCompanyPostalCode = companyInput.postalCode;
+      input.emitterCompanyStreet = companyInput.street;
     }
   },
   {
     siret: bsvhu?.destinationCompanySiret,
     skip: sealedFields.includes("destinationCompanySiret"),
-    setter: (input, companyInput: CompanyInput) => {
+    setter: (input, companyInput) => {
       input.destinationCompanyName = companyInput.name;
       input.destinationCompanyAddress = companyInput.address;
     }
@@ -30,7 +35,7 @@ const sirenifyBsvhuAccessors = (
     skip: sealedFields.includes(
       "destinationOperationNextDestinationCompanySiret"
     ),
-    setter: (input, companyInput: CompanyInput) => {
+    setter: (input, companyInput) => {
       input.destinationOperationNextDestinationCompanyName = companyInput.name;
       input.destinationOperationNextDestinationCompanyAddress =
         companyInput.address;
@@ -39,7 +44,7 @@ const sirenifyBsvhuAccessors = (
   {
     siret: bsvhu?.transporterCompanySiret,
     skip: sealedFields.includes("transporterCompanySiret"),
-    setter: (input, companyInput: CompanyInput) => {
+    setter: (input, companyInput) => {
       input.transporterCompanyName = companyInput.name;
       input.transporterCompanyAddress = companyInput.address;
     }

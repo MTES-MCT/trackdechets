@@ -184,6 +184,11 @@ export const columns: Column[] = [
     field: "initialEmitterCompanyCountry",
     label: "Producteur initial Pays"
   },
+  {
+    field: "emitterCompanyIrregularSituation",
+    label: "Expéditeur situation irrégulière",
+    format: formatBoolean
+  },
   { field: "emitterCompanyName", label: "Expéditeur raison sociale" },
   { field: "emitterCompanyGivenName", label: "Expéditeur Nom usuel" },
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },

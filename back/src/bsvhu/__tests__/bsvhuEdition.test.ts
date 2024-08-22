@@ -1,4 +1,3 @@
-import { Bsvhu } from "@prisma/client";
 import {
   BsvhuDestinationInput,
   BsvhuDestinationType,
@@ -14,8 +13,8 @@ import {
   BsvhuWeightInput,
   CompanyInput
 } from "../../generated/graphql/types";
-import { flattenVhuInput } from "../converter";
-import { editionRules, isAwaitingSignature } from "../edition";
+import { bsvhuEditionRules } from "../validation/rules";
+import { graphQlInputToZodBsvhu } from "../validation/helpers";
 
 describe("edition", () => {
   test("an edition rule should be defined for every key in BsdaInput", () => {
@@ -44,6 +43,8 @@ describe("edition", () => {
 
     const emitter: Required<BsvhuEmitterInput> = {
       agrementNumber: "",
+      irregularSituation: false,
+      noSiret: false,
       company
     };
 
@@ -105,41 +106,9 @@ describe("edition", () => {
       transporter,
       destination
     };
-    const flatInput = flattenVhuInput(input);
+    const flatInput = graphQlInputToZodBsvhu(input);
     for (const key of Object.keys(flatInput)) {
-      expect(Object.keys(editionRules)).toContain(key);
+      expect(Object.keys(bsvhuEditionRules)).toContain(key);
     }
-  });
-
-  test("isAwaitingSignature should recursively checks the signature hierarchy", () => {
-    const bsvhu = {
-      emitterEmissionSignatureDate: null,
-      transporterTransportSignatureDate: null,
-      destinationOperationSignatureDate: null
-    } as Bsvhu;
-    expect(isAwaitingSignature("EMISSION", bsvhu)).toEqual(true);
-    expect(isAwaitingSignature("TRANSPORT", bsvhu)).toEqual(true);
-    expect(isAwaitingSignature("OPERATION", bsvhu)).toEqual(true);
-    const afterEmission = {
-      ...bsvhu,
-      emitterEmissionSignatureDate: new Date()
-    };
-    expect(isAwaitingSignature("EMISSION", afterEmission)).toEqual(false);
-    expect(isAwaitingSignature("TRANSPORT", afterEmission)).toEqual(true);
-    expect(isAwaitingSignature("OPERATION", afterEmission)).toEqual(true);
-    const afterTransport = {
-      ...afterEmission,
-      transporterTransportSignatureDate: new Date()
-    };
-    expect(isAwaitingSignature("EMISSION", afterTransport)).toEqual(false);
-    expect(isAwaitingSignature("TRANSPORT", afterTransport)).toEqual(false);
-    expect(isAwaitingSignature("OPERATION", afterTransport)).toEqual(true);
-    const afterOperation = {
-      ...afterTransport,
-      destinationOperationSignatureDate: new Date()
-    };
-    expect(isAwaitingSignature("EMISSION", afterOperation)).toEqual(false);
-    expect(isAwaitingSignature("TRANSPORT", afterOperation)).toEqual(false);
-    expect(isAwaitingSignature("OPERATION", afterOperation)).toEqual(false);
   });
 });

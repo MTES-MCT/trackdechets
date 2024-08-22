@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2024.8.1] 27/08/2024
 
+#### :rocket: Nouvelles fonctionnalités
+
+- BSVHU: Permettre de viser un émetteur en situation irrégulière avec ou sans SIRET [PR 3517](https://github.com/MTES-MCT/trackdechets/pull/3517)
+
 #### :bug: Corrections de bugs
 
 - Résolution d'un problème de resolver BsdaRevisionRequest qui empêchait l'ouverture de la modale de révision [PR 3513](https://github.com/MTES-MCT/trackdechets/pull/3513)

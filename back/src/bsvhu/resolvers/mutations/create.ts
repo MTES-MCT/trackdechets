@@ -32,7 +32,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
 
   await checkCanCreate(user, input);
 
-  const zodBsvhu = await graphQlInputToZodBsvhu(input);
+  const zodBsvhu = graphQlInputToZodBsvhu(input);
 
   const { createdAt, ...parsedZodBsvhu } = await parseBsvhuAsync(
     { ...zodBsvhu, isDraft, createdAt: new Date() },

@@ -125,7 +125,16 @@ export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     postalCode: emitterCompanyPostalCode,
     city: emitterCompanyCity,
     country: emitterCompanyCountry
-  } = splitAddress(bsvhu.emitterCompanyAddress);
+  } = bsvhu.emitterCompanyStreet &&
+  bsvhu.emitterCompanyPostalCode &&
+  bsvhu.emitterCompanyCity
+    ? {
+        street: bsvhu.emitterCompanyStreet,
+        postalCode: bsvhu.emitterCompanyPostalCode,
+        city: bsvhu.emitterCompanyCity,
+        country: "FR"
+      }
+    : splitAddress(bsvhu.emitterCompanyAddress);
 
   return {
     wasteDescription: getWasteDescription(bsvhu.wasteCode),
@@ -177,6 +186,7 @@ export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     emitterCompanyCountry,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
+    emitterCompanyIrregularSituation: !!bsvhu.emitterIrregularSituation,
     weight: bsvhu.weightValue
       ? new Decimal(bsvhu.weightValue)
           .dividedBy(1000)
