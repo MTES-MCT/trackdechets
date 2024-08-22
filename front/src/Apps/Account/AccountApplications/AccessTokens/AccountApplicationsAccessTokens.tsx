@@ -52,7 +52,7 @@ export default function AccountApplicationsAccessTokens() {
       <div className="fr-table fr-table--lg" id="table-access-tokens-component">
         <div className="fr-table__header">
           <p className="fr-table__detail">
-            {data?.accessTokens.length || 0} jeton(s) d'accès
+            Vous avez créé {data?.accessTokens.length || 0} jeton(s) d'accès
           </p>
           <ul className="fr-btns-group fr-btns-group--right fr-btns-group--inline-md fr-btns-group--icon-left">
             <li>
