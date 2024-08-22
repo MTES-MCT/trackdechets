@@ -11,7 +11,8 @@ export default defineConfig({
     reportCompressedSize: true,
     commonjsOptions: {
       transformMixedEsModules: true
-    }
+    },
+    sourcemap: true
   },
   cacheDir: "../node_modules/.vite/front",
   plugins: [

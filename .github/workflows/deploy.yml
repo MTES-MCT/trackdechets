@@ -32,7 +32,7 @@ jobs:
           SENTRY_URL: https://sentry.incubateur.net/
         with:
           environment: production
-          sourcemaps: ./dist/back/back/src ./dist/front/assets
+          sourcemaps: ./dist/apps/api ./dist/front/assets
           projects: trackdechets-api trackdechets-front
           ignore_missing: true
 
