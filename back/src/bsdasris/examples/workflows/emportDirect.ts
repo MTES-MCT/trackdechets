@@ -10,7 +10,7 @@ export default {
   description: `Habituellement, l'emport d'un dasri nécessite la signature du producteur. 
   Néanmoins, ce dernier peut autoriser l'emport direct par un transporteur, sans signature producteur. 
   Cette facilité est possible pour les dasris simples (hors groupement).
-  Le producteur doit pour ce faire cocher la case "Emport direct de DASRI autorisé" dans Mon compte > Établissements.
+  Le producteur doit pour ce faire cocher la case "Emport direct de DASRI autorisé" dans Mes établissements.
   En termes d'api, ce paramétrage correspond au champ "allowBsdasriTakeOverWithoutSignature" accessible sur la query "companyInfos".`,
   companies: [
     {

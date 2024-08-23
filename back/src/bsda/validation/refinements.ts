@@ -585,7 +585,7 @@ export async function isWorkerRefinement(
         `L'entreprise de travaux saisie sur le bordereau (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets` +
         ` en tant qu'entreprise de travaux. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
         ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
-        ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        ` de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
     });
   }
 }
