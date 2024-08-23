@@ -1,4 +1,3 @@
-import { ValidationError } from "yup";
 import { getTransporterReceipt } from "../../companies/recipify";
 import {
   BsvhuMetadata,
@@ -9,6 +8,7 @@ import { getBsvhuOrNotFound } from "../database";
 import { parseBsvhu } from "../validation";
 import { prismaToZodBsvhu } from "../validation/helpers";
 import { SignatureTypeInput } from "../../generated/graphql/types";
+import { ZodIssue } from "zod";
 
 const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
   errors: async (
@@ -49,13 +49,15 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
         });
         return [];
       } catch (errors) {
-        return errors.inner?.map((e: ValidationError) => {
-          return {
-            message: e.message,
-            path: e.path ?? "",
-            requiredFor
-          };
-        });
+        return (
+          errors.issues?.map((e: ZodIssue) => {
+            return {
+              message: e.message,
+              path: `${e.path[0]}`, // e.path is an array, first element should be the path name
+              requiredFor
+            };
+          }) ?? []
+        );
       }
     }
   }
