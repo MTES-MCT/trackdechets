@@ -49,7 +49,6 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
         });
         return [];
       } catch (errors) {
-        console.log(JSON.stringify(errors, null, 2));
         return (
           errors.issues?.map((e: ZodIssue) => {
             return {
