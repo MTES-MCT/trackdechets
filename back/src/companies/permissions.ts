@@ -23,8 +23,8 @@ export async function checkCanReadUpdateDeleteTraderReceipt(
   const orgIds = (companies ?? []).map(c => c.orgId);
 
   if (orgIds.length === 0) {
-    // Le récépissé n'est lié à aucun établissement, on permet de le mettre à jour
-    // en connaissant uniquement son identifiant
+    // Permet de supprimer un récépissé après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
     return true;
   }
 
@@ -52,8 +52,8 @@ export async function checkCanReadUpdateDeleteBrokerReceipt(
   const orgIds = (companies ?? []).map(c => c.orgId);
 
   if (orgIds.length === 0) {
-    // Le récépissé n'est lié à aucun établissement, on permet de le mettre à jour
-    // en connaissant uniquement son identifiant
+    // Permet de supprimer un récépissé après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
     return true;
   }
 
@@ -81,8 +81,8 @@ export async function checkCanReadUpdateDeleteTransporterReceipt(
   const orgIds = (companies ?? []).map(c => c.orgId);
 
   if (orgIds.length === 0) {
-    // Le récépissé n'est lié à aucun établissement, on permet de le mettre à jour
-    // en connaissant uniquement son identifiant
+    // Permet de supprimer un récépissé après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
     return true;
   }
 
@@ -114,8 +114,8 @@ export async function checkCanReadUpdateDeleteVhuAgrement(
   );
 
   if (orgIds.length === 0) {
-    // L'agrément n'est lié à aucun établissement, on permet de le mettre à jour
-    // en connaissant uniquement son identifiant
+    // Permet de supprimer un agrément après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
     return true;
   }
 
@@ -142,8 +142,8 @@ export async function checkCanReadUpdateDeleteWorkerCertification(
   const orgIds = (companies ?? []).map(c => c.orgId);
 
   if (orgIds.length === 0) {
-    // La certification n'est lié à aucun établissement, on permet de le mettre à jour
-    // en connaissant uniquement son identifiant
+    // Permet de supprimer une certification après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
     return true;
   }
 
