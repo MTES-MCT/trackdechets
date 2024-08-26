@@ -91,6 +91,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
         <>
           <h4 className="fr-h4">Réception</h4>
           <Input
+            className="fr-col-md-6"
             label="Date de réception"
             //@ts-ignore
             state={formState.errors?.destination?.reception?.date && "error"}
@@ -180,6 +181,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
                 )}
                 <h4 className="fr-h4 fr-mt-4w">Opération</h4>
                 <Input
+                  className="fr-col-md-6"
                   label="Date de l'opération"
                   state={
                     //@ts-ignore

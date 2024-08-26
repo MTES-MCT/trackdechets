@@ -79,6 +79,7 @@ export function SignOperation({
                   operation: {
                     date: TODAY.toISOString(),
                     code: "",
+                    mode: "",
                     nextDestination: { company: getInitialCompany() }
                   }
                 }
