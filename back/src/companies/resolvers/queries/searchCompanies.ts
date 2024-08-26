@@ -8,7 +8,6 @@ const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   context
 ) => {
   checkIsAuthenticated(context);
-  console.log(">> searchCompanies");
   return searchCompanies(clue, department, allowForeignCompanies);
 };
 

@@ -64,6 +64,8 @@ type IncomingWaste {
   emitterCompanyCity: String
   "Le pays de l'établissement expéditeur des déchets"
   emitterCompanyCountry: String
+  "Indique si l'émetteur est en situation irrégulière"
+  emitterCompanyIrregularSituation: Boolean
 
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
@@ -414,6 +416,8 @@ type OutgoingWaste {
   emitterCompanyGivenName: String
   "Le numéro SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
+  "Indique si l'émetteur est en situation irrégulière"
+  emitterCompanyIrregularSituation: Boolean
 
   "L'adresse de l'établissement"
   emitterCompanyAddress: String
@@ -944,6 +948,8 @@ type TransportedWaste {
   emitterCompanyCity: String
   "Le pays de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyCountry: String
+  "Indique si l'émetteur est en situation irrégulière"
+  emitterCompanyIrregularSituation: Boolean
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
@@ -1204,6 +1210,8 @@ type ManagedWaste {
   emitterCompanyCity: String
   "Le pays de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyCountry: String
+  "Indique si l'émetteur est en situation irrégulière"
+  emitterCompanyIrregularSituation: Boolean
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
@@ -1560,6 +1568,8 @@ type AllWaste {
   emitterCompanyCity: String
   "Le pays de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyCountry: String
+  "Indique si l'émetteur est en situation irrégulière"
+  emitterCompanyIrregularSituation: Boolean
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
   emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"

@@ -319,15 +319,16 @@ model Company {
 // Cette table permet également de stocker de "faux établissements" pouvant être visés lors
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
-  id          String  @id @default(cuid())
-  orgId       String  @unique(map: "AnonymousCompany.orgId_unique")
-  siret       String? @unique(map: "AnonymousCompany.siret_unique")
-  vatNumber   String? @unique(map: "AnonymousCompany.vatnumber_unique")
-  name        String
-  address     String
-  codeNaf     String
-  libelleNaf  String
-  codeCommune String
+  id                String  @id @default(cuid())
+  orgId             String  @unique(map: "AnonymousCompany.orgId_unique")
+  siret             String? @unique(map: "AnonymousCompany.siret_unique")
+  vatNumber         String? @unique(map: "AnonymousCompany.vatnumber_unique")
+  name              String
+  address           String
+  codeNaf           String
+  libelleNaf        String
+  codeCommune       String
+  etatAdministratif String  @default("A")
 
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
@@ -619,7 +620,7 @@ model BsddRevisionRequest {
   wasteAcceptationStatus                          WasteAcceptationStatus?
   wasteRefusalReason                              String?
   wasteDetailsSampleNumber                        String?
-  wasteDetailsQuantity                            Decimal?       @db.Decimal(65, 30)
+  wasteDetailsQuantity                            Decimal?                @db.Decimal(65, 30)
   quantityReceived                                Float?
   quantityRefused                                 Float?
   processingOperationDone                         String?
@@ -633,7 +634,7 @@ model BsddRevisionRequest {
   brokerCompanyMail                               String?
   brokerReceipt                                   String?
   brokerDepartment                                String?
-  brokerValidityLimit                             DateTime?      @db.Timestamptz(6)
+  brokerValidityLimit                             DateTime?               @db.Timestamptz(6)
   traderCompanyName                               String?
   traderCompanySiret                              String?
   traderCompanyAddress                            String?
@@ -642,7 +643,7 @@ model BsddRevisionRequest {
   traderCompanyMail                               String?
   traderReceipt                                   String?
   traderDepartment                                String?
-  traderValidityLimit                             DateTime?      @db.Timestamptz(6)
+  traderValidityLimit                             DateTime?               @db.Timestamptz(6)
   temporaryStorageDestinationCap                  String?
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
@@ -863,6 +864,10 @@ model User {
 enum GovernmentPermission {
   // Accès en lecture au registre de tous les établissements
   REGISTRY_CAN_READ_ALL
+  // Accès en lecture à la recherche multi bsds (query bsds)
+  BSDS_CAN_READ_ALL
+  // Accès au téléchargement de tout bsd au format pdf
+  BSDS_PDF_CAN_DOWNLOAD_ALL
 }
 
 model GovernmentAccount {
@@ -939,10 +944,16 @@ model Bsvhu {
 
   status BsvhuStatus @default(INITIAL)
 
+  emitterIrregularSituation                           Boolean?
+  emitterNoSiret                                      Boolean?
   emitterAgrementNumber                               String?                  @db.VarChar(100)
   emitterCompanyName                                  String?
   emitterCompanySiret                                 String?                  @db.VarChar(17)
   emitterCompanyAddress                               String?
+  emitterCompanyStreet                                String?
+  emitterCompanyCity                                  String?
+  emitterCompanyPostalCode                            String?
+  emitterCompanyCountry                               String?
   emitterCompanyContact                               String?
   emitterCompanyPhone                                 String?
   emitterCompanyMail                                  String?
@@ -1076,6 +1087,7 @@ model Bsdasri {
   destinationReceptionWasteRefusalReason      String?
   destinationReceptionWasteRefusedWeightValue Decimal?                @db.Decimal(65, 30)
   destinationReceptionWasteWeightValue        Decimal?                @db.Decimal(65, 30)
+  // cached value to avoid computing it each time the dasri is accessed
   destinationReceptionWasteVolume             Float?
   destinationReceptionDate                    DateTime?               @db.Timestamptz(6)
   destinationOperationCode                    String?
@@ -1534,6 +1546,7 @@ model Bsda {
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
   transportersOrgIds   String[] @default([])
+  canAccessDraftOrgIds String[] @default([])
 
   // Relation vers les infos de traçabilité finales
   // Même si aujourd'hui il ne peut y avoir qu'une opération finale, on anticipe le fait 
@@ -1552,6 +1565,7 @@ model Bsda {
   @@index([updatedAt], map: "_BsdaUpdatedAtIdx")
   @@index([intermediariesOrgIds], map: "_BsdaIntermediariesOrgIdsIdx", type: Gin)
   @@index([transportersOrgIds], map: "_BsdaTransportersOrgIdsIdx", type: Gin)
+  @@index([canAccessDraftOrgIds], map: "_BsdaCanAccessDraftOrgIdsIdx", type: Gin)
 }
 
 model BsdaFinalOperation {

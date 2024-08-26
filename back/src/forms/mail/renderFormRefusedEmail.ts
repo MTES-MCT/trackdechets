@@ -84,13 +84,17 @@ export async function renderFormRefusedEmail(
     PARTIALLY_REFUSED: formPartiallyRefused
   }[wasteAcceptationStatus];
 
+  if (!mailTemplate) return;
+
   const transporter = await getFirstTransporter(form);
   let forwardedInTransporter: BsddTransporter | null = null;
   if (forwardedIn) {
     forwardedInTransporter = await getFirstTransporter(forwardedIn);
   }
 
-  const wasteQuantities = bsddWasteQuantities(form);
+  const wasteQuantities = isFinalDestinationRefusal
+    ? bsddWasteQuantities(forwardedIn)
+    : bsddWasteQuantities(form);
 
   return renderMail(mailTemplate, {
     to,

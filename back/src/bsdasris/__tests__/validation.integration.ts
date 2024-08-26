@@ -293,7 +293,7 @@ describe("Mutation.signBsdasri emission", () => {
         expect(err.errors).toEqual([
           `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
             " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
-            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements"
         ]);
       }
     });
@@ -320,7 +320,7 @@ describe("Mutation.signBsdasri emission", () => {
         expect(err.errors).toEqual([
           `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
             " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
-            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements"
         ]);
       }
     });
@@ -382,7 +382,7 @@ describe("Mutation.signBsdasri emission", () => {
           `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
             " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
             " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil" +
-            " de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+            " de l'établissement depuis l'interface Trackdéchets dans Mes établissements"
         ]);
       }
     });
@@ -508,7 +508,7 @@ describe("Mutation.signBsdasri emission", () => {
           `Le transporteur saisi sur le bordereau (SIRET: ${bsdasri.emitterCompanySiret}) n'est pas inscrit sur Trackdéchets` +
             ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
             ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
-            ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+            ` de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
         ]);
       }
     });
@@ -519,7 +519,7 @@ describe("Mutation.signBsdasri emission", () => {
       ["D9", undefined],
       ["D10", "ELIMINATION"],
       ["R1", "VALORISATION_ENERGETIQUE"],
-      ["D12", "ELIMINATION"],
+      ["D13", undefined],
       ["R12", undefined]
     ])(
       "should work if operation code & mode are compatible (code: %p, mode: %p)",
@@ -558,7 +558,7 @@ describe("Mutation.signBsdasri emission", () => {
       ["D9", "VALORISATION_ENERGETIQUE"], // No mode is expected
       ["D10", "VALORISATION_ENERGETIQUE"], // Correct mode is ELIMINATION
       ["R1", "ELIMINATION"], //  Correct mode is VALORISATION_ENERGETIQUE
-      ["D12", "VALORISATION_ENERGETIQUE"], //  Correct mode is ELIMINATION
+      ["D13", "VALORISATION_ENERGETIQUE"], //  No mode is expected
       ["R12", "VALORISATION_ENERGETIQUE"] // R12 has no associated mode
     ])(
       "should not be valid if operation mode is not compatible with operation code (mode: %p, code: %p)",
@@ -584,7 +584,7 @@ describe("Mutation.signBsdasri emission", () => {
       }
     );
 
-    test.each(["D10", "R1", "D12"])(
+    test.each(["D10", "R1"])(
       "should not be valid if operation code has associated operation modes but none is specified (code: %p)",
       async code => {
         const data = {
@@ -595,12 +595,11 @@ describe("Mutation.signBsdasri emission", () => {
           destinationReceptionWasteWeightValue: 10
         };
 
-        expect.assertions(2);
-
         try {
           await validateBsdasri(data as any, { operationSignature: true });
         } catch (err) {
           expect(err.errors.length).toBeTruthy();
+
           expect(err.errors[0]).toBe(
             "Vous devez préciser un mode de traitement"
           );

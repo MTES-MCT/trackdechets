@@ -170,10 +170,11 @@ describe("indexAllBsdTypeSync", () => {
   });
 
   it("should index BSDAs synchronously", async () => {
+    const user = await userFactory();
     const bsdas = await Promise.all([
-      bsdaFactory({}),
-      bsdaFactory({}),
-      bsdaFactory({})
+      bsdaFactory({ userId: user.id }),
+      bsdaFactory({ userId: user.id }),
+      bsdaFactory({ userId: user.id })
     ]);
 
     await indexAllBsdTypeSync({
@@ -316,12 +317,12 @@ describe("indexAllBsdTypeConcurrently", () => {
   });
 
   it("should index BSDAs using the index queue", async () => {
+    const user = await userFactory();
     const bsdas = await Promise.all([
-      bsdaFactory({}),
-      bsdaFactory({}),
-      bsdaFactory({})
+      bsdaFactory({ userId: user.id }),
+      bsdaFactory({ userId: user.id }),
+      bsdaFactory({ userId: user.id })
     ]);
-
     const jobs = await indexAllBsdTypeConcurrentJobs({
       bsdName: "bsda",
       index: index.alias,

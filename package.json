@@ -40,7 +40,7 @@
     "@aws-sdk/lib-storage": "^3.359.0",
     "@bull-board/api": "^4.12.2",
     "@bull-board/express": "^4.12.2",
-    "@codegouvfr/react-dsfr": "^1.2.1",
+    "@codegouvfr/react-dsfr": "^1.10.11",
     "@docusaurus/core": "3.0.1",
     "@docusaurus/preset-classic": "3.0.1",
     "@elastic/elasticsearch": "7.13",

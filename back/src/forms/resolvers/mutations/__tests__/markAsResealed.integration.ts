@@ -534,7 +534,7 @@ describe("Mutation markAsResealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        message: `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
       })
     ]);
   });
@@ -714,5 +714,43 @@ describe("Mutation markAsResealed", () => {
         message: `Vous ne pouvez pas passer ce bordereau à l'état souhaité.`
       })
     ]);
+  });
+
+  test("wasteDetailsQuantity should be updated with quantityAccepted, if available", async () => {
+    // Given
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+    const { mutate } = makeClient(user);
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanySiret: collector.siret,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10.5,
+        quantityRefused: 7.2
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
+    });
+
+    // When
+    await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {}
+      }
+    });
+
+    // Then
+    const resealedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.forwardedInId! }
+    });
+    expect(resealedForm.wasteDetailsQuantity?.toNumber()).toEqual(3.3);
   });
 });

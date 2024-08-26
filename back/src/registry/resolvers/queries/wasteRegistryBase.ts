@@ -2,10 +2,13 @@ import { QueryWastesRegistryXlsArgs } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { searchBsds } from "../../elastic";
 import { GraphQLContext } from "../../../types";
-import { Permission, syncCheckUserPermissions } from "../../../permissions";
+import {
+  Permission,
+  syncCheckUserPermissions,
+  hasGovernmentRegistryPerm
+} from "../../../permissions";
 import { UserInputError } from "../../../common/errors";
 import { TotalHits } from "@elastic/elasticsearch/api/types";
-import { hasGovernmentRegistryPerm } from "../../permissions";
 
 export async function checkWastesRegistryDownloadPermissions(
   args: QueryWastesRegistryXlsArgs,

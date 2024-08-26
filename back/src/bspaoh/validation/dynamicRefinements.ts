@@ -193,7 +193,7 @@ export async function isCrematoriumRefinement(siret: string, ctx) {
         `L'entreprise avec le SIRET "${siret}" n'est pas inscrite` +
         ` sur Trackdéchets en tant que crématorium. Cette installation ne peut` +
         ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
-        ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        ` modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
     });
   }
   if (

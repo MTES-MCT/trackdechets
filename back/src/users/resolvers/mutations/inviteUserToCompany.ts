@@ -21,7 +21,7 @@ const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] =
       Permission.CompanyCanManageMembers,
       NotCompanyAdminErrorMsg(company.orgId)
     );
-    return inviteUserToCompanyFn(args);
+    return inviteUserToCompanyFn(user, args);
   };
 
 export default inviteUserToCompanyResolver;

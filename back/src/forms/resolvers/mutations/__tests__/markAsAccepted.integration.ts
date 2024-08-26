@@ -44,6 +44,17 @@ const MARK_AS_ACCEPTED = `
 describe("Test Form reception", () => {
   afterEach(async () => {
     await resetDatabase();
+    jest.resetAllMocks();
+  });
+
+  beforeEach(() => {
+    // No mails
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // No PDFs
+    jest.mock("../../../pdf/generateBsddPdf");
+    (generateBsddPdfToBase64 as jest.Mock).mockResolvedValue("");
   });
 
   it("should mark a received form as accepted", async () => {
@@ -613,5 +624,63 @@ describe("Test Form reception", () => {
     });
     expect(acceptedForm.quantityReceived?.toNumber()).toEqual(11);
     expect(acceptedForm.quantityRefused?.toNumber()).toEqual(7);
+  });
+
+  // Bug was "Cannot destructure property 'prepareVariables' of 'mailTemplate' as it is undefined."
+  // Use-case:
+  // - Create a tmp storage BSD
+  // - Temp storer partially accepts the waste
+  // - Final destination receives the waste (no acceptation, just receive)
+  // - Final destination tries to accept the waste
+  // - markAsAccepted detects that waste was partially refused (by tmp storer) and tries to send a mail,
+  //   but wasteAcceptationStatus is ACCEPTED, so it cannot find the mail template and crashes
+  it("when final destination accepts a BSD (after reception), no mail should be sent even if temp storage partially refused the BSD", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const tempStorer = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: tempStorer.company.siret,
+        status: "RECEIVED",
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10,
+        quantityRefused: 2
+      },
+      forwardedInOpts: {
+        sentAt: new Date(),
+        emitterCompanySiret: tempStorer.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date(),
+        status: "RECEIVED",
+        receivedAt: new Date(),
+        receivedBy: "Toto"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(destination.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "markAsAccepted">,
+      MutationMarkAsAcceptedArgs
+    >(MARK_AS_ACCEPTED, {
+      variables: {
+        id: form.id,
+        acceptedInfo: {
+          quantityReceived: 10,
+          signedAt: new Date("2022-01-01").toISOString() as any,
+          signedBy: "Toto",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityRefused: 0
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+    expect(data.markAsAccepted.status).toBe("ACCEPTED");
   });
 });

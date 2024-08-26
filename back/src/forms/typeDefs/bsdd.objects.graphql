@@ -103,6 +103,9 @@ type Form {
   "Quantité réelle présentée en tonnes (case 10)"
   quantityReceived: Float
 
+  "Quantité réelle ou estimée"
+  quantityReceivedType: QuantityType
+
   "Quantité acceptée nette"
   quantityAccepted: Float
 
@@ -267,6 +270,9 @@ Cet objet `StateSummary` vise à simplifier ces questions. Il renverra toujours 
 type StateSummary {
   "Quantité la plus à jour (en tonnes)"
   quantity: Float
+
+  "Si la quantité est estimée ou pas"
+  quantityType: QuantityType
 
   "DEPRECATED Packaging le plus à jour"
   packagings: [Packagings!]! @deprecated(reason: "Utiliser packagingInfos")

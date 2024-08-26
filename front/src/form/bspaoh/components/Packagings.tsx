@@ -132,7 +132,7 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
             <Button
               priority="tertiary"
               type="button"
-              iconId="fr-icon-delete-bin-line"
+              iconId="ri-delete-bin-line"
               title="Supprimer ce conditionnement"
               nativeButtonProps={{ onClick: () => remove(idx) }}
             />
@@ -179,6 +179,12 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
                 onKeyUp={e => {
                   if (e.key === "Enter") {
                     setTag();
+                  }
+                }}
+                onKeyPress={e => {
+                  // to avoid submitting a form on enter tag
+                  if (e.key === "Enter") {
+                    e.preventDefault();
                   }
                 }}
                 onBlur={() => {

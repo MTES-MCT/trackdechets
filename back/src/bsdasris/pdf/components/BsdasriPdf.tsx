@@ -463,10 +463,10 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
             <p>
               <input
                 type="checkbox"
-                checked={bsdasri?.destination?.operation?.code === "D12"}
+                checked={bsdasri?.destination?.operation?.code === "D13"}
                 readOnly
               />{" "}
-              Groupement avant D9 ou D10 (D12) sur site relevant de la 2718
+              Groupement avant D9 ou D10 (D13) sur site relevant de la 2718
             </p>
             <p>
               <input

@@ -107,7 +107,7 @@ describe("mutation inviteUserToCompany", () => {
       vars: {
         API_URL: "http://api.trackdechets.local",
         UI_URL: "http://trackdechets.local",
-        companyName: "company_2",
+        companyName: company.name,
         companyOrgId: company.siret,
         hash: encodeURIComponent(hashValue)
       }

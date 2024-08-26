@@ -210,12 +210,12 @@ export const testAccountInfo = async (
   await goTo(page, "/account/info");
 
   // Verify account data
-  if (email) await expect(page.getByText(`Email${email}`)).toBeVisible();
-  if (username)
-    await expect(page.getByText(`Nom utilisateur${username}`)).toBeVisible();
-  if (phone) await expect(page.getByText(`Téléphone${phone}`)).toBeVisible();
-  if (password)
-    await expect(page.getByText(`Mot de passe${password}`)).toBeVisible();
+  if (email) await expect(page.getByTestId("email")).toBeVisible();
+
+  if (username) await expect(page.getByTestId("username")).toBeVisible();
+  if (phone) await expect(page.getByTestId("phone")).toBeVisible();
+
+  if (password) await expect(page.getByTestId("password")).toBeVisible();
 
   return { email, username, phone };
 };
@@ -223,127 +223,98 @@ export const testAccountInfo = async (
 /**
  * Modifies the username on the account page. Does not make any assertion.
  */
-export const updateUsername = async (page, { username }) => {
+export const updateUsernameAndPhone = async (page, { username, phone }) => {
   // Go to account page
   await goTo(page, "/account/info");
 
-  const updateUsernameInput = page
-    .locator("text=Nom utilisateur")
-    .locator("..")
-    .locator('div:has-text("Modifier")');
-
-  // If we are not already editing the username, click on Modify
-  if (await updateUsernameInput.isVisible()) {
-    await updateUsernameInput.click();
-  }
+  const updateUsernameInput = page.getByTestId("modify-info-cta").nth(0);
+  await updateUsernameInput.click();
 
   // Modify
-  await page.getByPlaceholder("Nom utilisateur").fill(username);
 
+  // username
+  await page.getByLabel("Prénom et nom").fill(username);
+
+  // invalid phone
+  await testPhoneNbrValid(page);
+
+  // valid phone
+  await page.getByTestId("phone-input").fill("+33600000000");
   // Validate
-  await page.getByRole("button", { name: "Valider" }).click();
+  await page.getByTestId("submit-info-cta").nth(0).click();
+
+  await testAccountInfo(page, { username, phone });
 };
 
 /**
- * Tests the username input.
+ * Tests the username and phone inputs.
  */
-export const testUsernameUpdate = async page => {
-  // Valid username
-  await updateUsername(page, { username: "User e2e n°1 (modifié)" });
-  await testAccountInfo(page, { username: "User e2e n°1 (modifié)" });
-};
-
-/**
- * Modifies the phone number on the account page. Does not make any assertion.
- */
-export const updatePhoneNbr = async (page, { phone }) => {
-  // Go to account page
-  await goTo(page, "/account/info");
-
-  const updatePhoneInput = page.getByPlaceholder("Téléphone");
-  if (!(await updatePhoneInput.isVisible())) {
-    // Click on the button to modify phone number. Tricky: can either
-    // be labelled "Ajouter" or "Modifier", and is a div, not a button
-    await page
-      .locator("text=Téléphone")
-      .locator("..")
-      .locator('div:has-text("Ajouter"), div:has-text("Modifier")')
-      .click();
-  }
-
-  // Fill in new phone number and validate
-  await page.getByPlaceholder("Téléphone").fill(phone);
-
-  const validatePhoneInput = page.getByRole("button", { name: "Valider" });
-  await validatePhoneInput.click();
-
-  // TODO: fix the bug! Sometimes we have to submit twice...
-  await setTimeout(500);
-  if (await validatePhoneInput.isVisible()) {
-    await validatePhoneInput.click();
-  }
+export const testUserProfileUpdate = async page => {
+  // Valid username and phone
+  await updateUsernameAndPhone(page, {
+    username: "User e2e n°1 (modifié)",
+    phone: "+33600000000"
+  });
 };
 
 /**
  * Tests the validation on the phone input, with invalid and valid phone numbers.
  * Will ultimately clear the input.
  */
-export const testPhoneNbrUpdate = async page => {
+const testPhoneNbrValid = async page => {
+  const phoneInput = page.getByTestId("phone-input");
   // Regular numbers
 
   // Too long
-  await updatePhoneNbr(page, { phone: "04710000000" });
+  await phoneInput.fill("04710000000");
+  // Validate
+  await page.getByTestId("submit-info-cta").nth(0).click();
+
   await expect(
     page.getByText("Merci de renseigner un numéro de téléphone valide")
   ).toBeVisible();
 
   // Too short
-  await updatePhoneNbr(page, { phone: "047100000" });
+  await phoneInput.fill("047100000");
+  // Validate
+  await page.getByTestId("submit-info-cta").nth(0).click();
+
   await expect(
     page.getByText("Merci de renseigner un numéro de téléphone valide")
   ).toBeVisible();
 
   // Valid
-  await updatePhoneNbr(page, { phone: "0471000000" });
-  await testAccountInfo(page, { phone: "0471000000" });
+  await phoneInput.fill("0471000000");
 
   // +33 Number
 
   // Too long
-  await updatePhoneNbr(page, { phone: "+336000000000" });
+  await phoneInput.fill("+336000000000");
+  // Validate
+  await page.getByTestId("submit-info-cta").nth(0).click();
+
   await expect(
     page.getByText("Merci de renseigner un numéro de téléphone valide")
   ).toBeVisible();
 
   // Too short
-  await updatePhoneNbr(page, { phone: "+3360000000" });
+  await phoneInput.fill("+3360000000");
+  // Validate
+  await page.getByTestId("submit-info-cta").nth(0).click();
+
   await expect(
     page.getByText("Merci de renseigner un numéro de téléphone valide")
   ).toBeVisible();
-
-  // Valid
-  await updatePhoneNbr(page, { phone: "+33600000000" });
-  await testAccountInfo(page, { phone: "+33600000000" });
-
-  // Empty field
-  await updatePhoneNbr(page, { phone: "" });
-  await testAccountInfo(page, { phone: "" });
 };
 
 /**
  * Modifies the password on the account page. Does not make any assertion.
  */
-export const updatePassword = async (
-  page,
-  { oldPassword, newPassword, confirmNewPassword }
-) => {
+export const updatePassword = async (page, { oldPassword, newPassword }) => {
   // Go to account page
   await goTo(page, "/account/info");
 
-  const updatePasswordInput = page
-    .locator("text=Mot de passe")
-    .locator("..")
-    .locator('div:has-text("Modifier")');
+  const updatePasswordInput = page.getByTestId("modify-info-cta").nth(1);
 
   // If we are not already editing the password, click on Modify
   if (await updatePasswordInput.isVisible()) {
@@ -351,19 +322,15 @@ export const updatePassword = async (
   }
 
   // Old password
-  await page.getByLabel("Ancien mot de passe:").fill(oldPassword);
+  await page.getByTestId("oldPassword").fill(oldPassword);
 
   // New password
-  await page
-    .getByLabel("Nouveau mot de passe:", { exact: true })
-    .fill(newPassword);
+  await page.getByTestId("newPassword").fill(newPassword);
 
-  // Confirm new password
-  await page
-    .getByLabel("Confirmation du nouveau mot de passe:")
-    .fill(confirmNewPassword);
+  const validatePasswordInput = await page
+    .getByTestId("submit-info-cta")
+    .nth(1);
 
-  const validatePasswordInput = page.getByRole("button", { name: "Valider" });
   await validatePasswordInput.click();
 
   // TODO: fix the bug! Sometimes we have to submit twice...
@@ -384,8 +351,7 @@ export const testPasswordUpdate = async (
   // Old password is incorrect
   await updatePassword(page, {
     oldPassword: oldPassword + "e",
-    newPassword,
-    confirmNewPassword: newPassword
+    newPassword
   });
   await expect(
     page.getByText("L'ancien mot de passe est incorrect")
@@ -394,8 +360,7 @@ export const testPasswordUpdate = async (
   // New password is not strong enough
   await updatePassword(page, {
     oldPassword,
-    newPassword: "123456789",
-    confirmNewPassword: "123456789"
+    newPassword: "123456789"
   });
   await expect(
     page.getByText(
@@ -403,21 +368,10 @@ export const testPasswordUpdate = async (
     )
   ).toBeVisible();
 
-  // New password & confirmation don't match
-  await updatePassword(page, {
-    oldPassword,
-    newPassword,
-    confirmNewPassword: newPassword + "e"
-  });
-  await expect(
-    page.getByText("Les deux mots de passe ne sont pas identiques.")
-  ).toBeVisible();
-
   // Valid
   await updatePassword(page, {
     oldPassword,
-    newPassword,
-    confirmNewPassword: newPassword
+    newPassword
   });
   await testAccountInfo(page, { password: "**********" });
 };

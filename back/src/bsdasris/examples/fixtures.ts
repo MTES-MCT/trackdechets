@@ -94,7 +94,6 @@ function destinationInput(siret: string) {
 const receptionInput = {
   acceptation: { status: "ACCEPTED" },
 
-  volume: 1,
   packagings: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }],
 
   date: "2021-04-27"
@@ -113,8 +112,7 @@ const operationForGroupingInput = {
   weight: {
     value: 1
   },
-  code: "D12",
-  mode: "ELIMINATION",
+  code: "D13",
   date: "2020-04-28"
 };
 

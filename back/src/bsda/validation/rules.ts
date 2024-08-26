@@ -143,16 +143,14 @@ const sealedFromEmissionExceptAddOrRemoveNextDestination: GetBsdaSignatureTypeFn
 };
 
 /**
- * Régle de verrouillage des champs définie à partir d'une fonction.
- * Un champ appliquant cette règle est verrouillé à partir de la
- * signature émetteur s'il n'y a pas d'entreprise de travaux sur le BSDA.
- * Sinon, le champ est vérouillé à partir de la signature de l'entreprise de
- * travaux..
+ * Renvoie la signature émetteur s'il n'y a pas d'entreprise de travaux sur le BSDA.
+ * Sinon, renvoie la signature de l'entreprise de travaux.
  */
-const sealedFromWorkOrEmissionWhenThereIsNoWorker: GetBsdaSignatureTypeFn<
-  ZodBsda
-> = ({ workerCompanySiret }, _) => {
-  return workerCompanySiret ? "WORK" : "EMISSION";
+const fromWorkOrEmissionWhenThereIsNoWorker: GetBsdaSignatureTypeFn<ZodBsda> = (
+  bsda,
+  _
+) => {
+  return hasWorker(bsda) ? "WORK" : "EMISSION";
 };
 
 function transporterSignature(
@@ -740,18 +738,18 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   wasteAdr: { readableFieldName: "la mention ADR", sealed: { from: "WORK" } },
   wasteFamilyCode: {
-    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: "WORK" },
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
     readableFieldName: "le code famille"
   },
   wasteMaterialName: {
     readableFieldName: "le nom de matériau",
-    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: "WORK" }
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
   },
   wasteConsistence: {
-    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: "WORK" },
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
     readableFieldName: "la consistance"
   },
   wasteSealNumbers: {
@@ -760,25 +758,25 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   wastePop: {
     readableFieldName: "le champ sur les polluants organiques persistants",
-    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: "WORK" }
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
   },
   packagings: {
-    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
     required: {
-      from: "WORK"
+      from: fromWorkOrEmissionWhenThereIsNoWorker
     },
     readableFieldName: "le conditionnement"
   },
   weightIsEstimate: {
     readableFieldName: "le champ pour indiquer si le poids est estimé",
-    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: "WORK" }
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
   },
   weightValue: {
     readableFieldName: "le poids",
-    sealed: { from: sealedFromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: "WORK" }
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
   },
   grouping: { sealed: { from: "EMISSION" } },
   forwarding: { sealed: { from: "EMISSION" } },

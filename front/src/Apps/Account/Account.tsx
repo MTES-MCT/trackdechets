@@ -1,18 +1,17 @@
 import React from "react";
 import { useQuery, gql } from "@apollo/client";
 import AccountMenu from "./AccountMenu";
-import { Route, Navigate, Routes, Link } from "react-router-dom";
+import { Route, Navigate, Routes } from "react-router-dom";
 import Loader from "../common/Components/Loader/Loaders";
 import { InlineError } from "../common/Components/Error/Error";
 import { Redirect } from "../utils/routerUtils";
-import AccountInfo from "./AccountInfo";
-import AccountAccessTokenList from "./accessTokens/AccountAccessTokenList";
+import AccountInfo from "./AccountInfo/AccountInfo";
 import AccountContentWrapper from "./AccountContentWrapper";
 import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
 import AccountOAuth2AppCreateUpdate from "./oauth2/AccountOauth2AppCreateUpdate";
 import { Query } from "@td/codegen-ui";
 import routes, { getRelativeRoute } from "../routes";
-import AccountAuthorizedAppList from "./apps/AccountAuthorizedAppList";
+import AccountApplications from "./AccountApplications/AccountApplications";
 
 import "../Dashboard/dashboard.scss";
 import { useMedia } from "../../common/use-media";
@@ -51,43 +50,24 @@ export default function Account() {
             <Route
               path={toRelative(routes.account.info)}
               element={
-                <AccountContentWrapper title="Informations générales">
+                <AccountContentWrapper title="Mes paramètres">
                   <AccountInfo me={data.me} />
                 </AccountContentWrapper>
               }
             />
 
             <Route
-              path={toRelative(routes.account.authorizedApplications)}
+              path={toRelative(routes.account.applications)}
               element={
-                <AccountContentWrapper title="Applications tierces autorisées">
-                  <AccountAuthorizedAppList />
+                <AccountContentWrapper title="Applications et API">
+                  <AccountApplications />
                 </AccountContentWrapper>
               }
-            />
-
-            <Route
-              path={toRelative(routes.account.tokens.list)}
-              element={<AccountAccessTokenList />}
             />
 
             <Route
               path={toRelative(routes.account.oauth2.list)}
-              element={
-                <AccountContentWrapper
-                  title="Mes applications tierces"
-                  additional={
-                    <Link
-                      className="btn btn--primary"
-                      to={routes.account.oauth2.create}
-                    >
-                      Créer une application tierce
-                    </Link>
-                  }
-                >
-                  <AccountOauth2AppList />
-                </AccountContentWrapper>
-              }
+              element={<AccountOauth2AppList />}
             />
 
             <Route

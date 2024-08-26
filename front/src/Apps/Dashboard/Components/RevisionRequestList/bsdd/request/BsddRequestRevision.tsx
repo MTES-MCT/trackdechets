@@ -86,7 +86,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
         }
       }
     });
-    navigate(-1);
   };
 
   const onSubmit: SubmitHandler<ValidationSchema> = async data => {
@@ -154,19 +153,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
     }
     setBrokerOrTraderReceipt(company?.traderReceipt, field);
   };
-
-  const quantityReceivedFormValue = !isTempStorage
-    ? formValues?.quantityReceived || undefined
-    : formValues?.temporaryStorageDetail?.temporaryStorer?.quantityReceived ||
-      undefined;
-
-  const quantityReceivedDefaultValue = !isTempStorage
-    ? initialBsddReview?.quantityReceived
-    : initialBsddReview.temporaryStorageDetail?.temporaryStorer
-        ?.quantityReceived;
-  const quantityReceivedValue = !isTempStorage
-    ? bsdd.quantityReceived
-    : bsdd.temporaryStorageDetail?.temporaryStorer?.quantityReceived;
 
   return (
     <div className={styles.container}>
@@ -275,45 +261,80 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   title={
                     !isTempStorage
                       ? "Quantité reçue"
-                      : "Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
+                      : "Quantité reçue sur l'installation de destination"
                   }
                   path="quantityReceived"
-                  value={quantityReceivedValue}
-                  defaultValue={quantityReceivedDefaultValue}
+                  value={bsdd.quantityReceived}
+                  defaultValue={initialBsddReview?.quantityReceived}
                 >
                   <Input
                     label="Poids en tonnes"
                     className="fr-col-2"
-                    state={
-                      !isTempStorage
-                        ? errors.quantityReceived && "error"
-                        : errors.temporaryStorageDetail?.temporaryStorer
-                            ?.quantityReceived && "error"
-                    }
-                    stateRelatedMessage={
-                      !isTempStorage
-                        ? errors.quantityReceived?.message ?? ""
-                        : errors.temporaryStorageDetail?.temporaryStorer
-                            ?.quantityReceived?.message ?? ""
-                    }
+                    state={errors.quantityReceived && "error"}
+                    stateRelatedMessage={errors.quantityReceived?.message ?? ""}
                     nativeInputProps={{
-                      ...register(
-                        `${
-                          !isTempStorage
-                            ? "quantityReceived"
-                            : "temporaryStorageDetail.temporaryStorer.quantityReceived"
-                        }`,
-                        { valueAsNumber: true }
-                      ),
-                      type: "number"
+                      ...register("quantityReceived", { valueAsNumber: true }),
+                      type: "number",
+                      inputMode: "decimal",
+                      step: "0.000001"
                     }}
                   />
-                  {quantityReceivedFormValue && (
+                  {formValues?.quantityReceived && (
                     <p className="fr-info-text">
-                      Soit {Number(quantityReceivedFormValue) * 1000} kg
+                      Soit {Number(formValues.quantityReceived) * 1000} kg
                     </p>
                   )}
                 </RhfReviewableField>
+
+                {isTempStorage ? (
+                  <RhfReviewableField
+                    title={
+                      "Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
+                    }
+                    path="quantityReceived"
+                    value={
+                      bsdd.temporaryStorageDetail?.temporaryStorer
+                        ?.quantityReceived
+                    }
+                    defaultValue={
+                      initialBsddReview.temporaryStorageDetail?.temporaryStorer
+                        ?.quantityReceived
+                    }
+                  >
+                    <Input
+                      label="Poids en tonnes"
+                      className="fr-col-2"
+                      state={
+                        errors.temporaryStorageDetail?.temporaryStorer
+                          ?.quantityReceived && "error"
+                      }
+                      stateRelatedMessage={
+                        errors.temporaryStorageDetail?.temporaryStorer
+                          ?.quantityReceived?.message ?? ""
+                      }
+                      nativeInputProps={{
+                        ...register(
+                          "temporaryStorageDetail.temporaryStorer.quantityReceived",
+                          { valueAsNumber: true }
+                        ),
+                        type: "number",
+                        inputMode: "decimal",
+                        step: "0.000001"
+                      }}
+                    />
+                    {formValues?.temporaryStorageDetail?.temporaryStorer
+                      ?.quantityReceived && (
+                      <p className="fr-info-text">
+                        Soit{" "}
+                        {Number(
+                          formValues.temporaryStorageDetail.temporaryStorer
+                            .quantityReceived
+                        ) * 1000}{" "}
+                        kg
+                      </p>
+                    )}
+                  </RhfReviewableField>
+                ) : null}
 
                 <RhfReviewableField
                   title="Code de l'opération D/R"

@@ -160,7 +160,7 @@ export const getBsdStatusLabel = (
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
     case BsdStatusCode.AwaitingGroup:
       if (bsdType === BsdType.Bsdasri) {
-        if (operationCode === "R12" || operationCode === "D12") {
+        if (operationCode === "R12" || operationCode === "D13") {
           return EN_ATTENTE_BSD_SUITE;
         }
         return ANNEXE_BORDEREAU_SUITE;
@@ -1299,14 +1299,13 @@ const canReviewBsda = (bsd, siret) => {
 
 const canReviewBsdasri = (bsd, siret) => {
   // You can't review a SYNTHESIS dasri with RECEIVED status
-  if (bsd.synthesizing && bsd.status === BsdasriStatus.Received) {
+  if (
+    [BsdasriType.Synthesis].includes(bsd.bsdWorkflowType?.toString()) &&
+    bsd.status === BsdasriStatus.Received
+  ) {
     return false;
   }
 
-  // these types are not implemented yet
-  if ([BsdasriType.Synthesis, BsdasriType.Grouping].includes(bsd.type)) {
-    return false;
-  }
   if (bsd.groupedInId || bsd.synthesizedInId) {
     return false;
   }
@@ -1323,6 +1322,10 @@ const canReviewBsdasri = (bsd, siret) => {
 
 export const canReviewBsdd = (bsd, siret) => {
   const isSentStatus = BsdStatusCode.Sent === bsd.status;
+
+  const isMultimodal =
+    Boolean(bsd.transporters) && bsd.transporters?.length > 1;
+
   return (
     bsd.type === BsdType.Bsdd &&
     ![
@@ -1347,7 +1350,17 @@ export const canReviewBsdd = (bsd, siret) => {
       isSameSiretEmitter(siret, bsd) &&
       canUpdateBsd(bsd, siret) &&
       bsd.status === BsdStatusCode.SignedByProducer
-    )
+    ) &&
+    !isMultimodal
+  );
+};
+
+const canReviewBsddAppendix1 = (bsd, siret) => {
+  return (
+    bsd.type === BsdType.Bsdd &&
+    isAppendix1Producer(bsd) &&
+    BsdStatusCode.Sent === bsd.status &&
+    isSameSiretTransporter(siret, bsd)
   );
 };
 
@@ -1360,10 +1373,11 @@ export const canReviewBsd = (bsd, siret) => {
     isTransporter && !isDestination && !isProducer && !isWorker;
 
   return (
-    (canReviewBsdd(bsd, siret) ||
+    ((canReviewBsdd(bsd, siret) ||
       canReviewBsda(bsd, siret) ||
       canReviewBsdasri(bsd, siret)) &&
-    !isTransporterOnly
+      !isTransporterOnly) ||
+    canReviewBsddAppendix1(bsd, siret)
   );
 };
 

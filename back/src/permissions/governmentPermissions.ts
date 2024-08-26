@@ -1,14 +1,11 @@
 import { prisma } from "@td/prisma";
 import { GovernmentPermission } from "@prisma/client";
+import { NotLoggedIn } from "../common/errors";
 
-/**
- * Les utilisateurs liés à un compte gouvernemental
- * (ex: GEREP, RNDTS) sont susceptibles d'avoir un accès
- * étendu au registre
- */
-export async function hasGovernmentRegistryPerm(
+export async function hasGovernmentPerm(
   user: Express.User,
-  sirets: string[]
+  sirets: string[],
+  requiredPermission: GovernmentPermission
 ): Promise<boolean> {
   if (!user.governmentAccountId || !user.ip) {
     return false;
@@ -26,7 +23,7 @@ export async function hasGovernmentRegistryPerm(
 
   const { permissions, authorizedIPs, authorizedOrgIds } = governmentAccount;
 
-  if (permissions.includes(GovernmentPermission.REGISTRY_CAN_READ_ALL)) {
+  if (permissions.includes(requiredPermission)) {
     const authorizedIP = (authorizedIPs ?? []).find(ip => ip === user.ip);
     if (!authorizedIP) {
       // la requête ne provient pas d'une IP autorisée
@@ -43,4 +40,37 @@ export async function hasGovernmentRegistryPerm(
   }
 
   return false;
+}
+
+/**
+ * Les utilisateurs liés à un compte gouvernemental
+ * (ex: GEREP, RNDTS) sont susceptibles d'avoir un accès
+ * étendu au registre
+ */
+export async function hasGovernmentRegistryPerm(
+  user: Express.User,
+  sirets: string[]
+): Promise<boolean> {
+  return hasGovernmentPerm(
+    user,
+    sirets,
+    GovernmentPermission.REGISTRY_CAN_READ_ALL
+  );
+}
+
+/**
+ * La fiche établissement/gerico necessite des permissions spécifiques via un compte gouvernemental
+ */
+export async function hasGovernmentReadAllBsdsPermOrThrow(
+  user: Express.User
+): Promise<void> {
+  const hasPerm = await hasGovernmentPerm(
+    user,
+    [],
+    GovernmentPermission.BSDS_CAN_READ_ALL
+  );
+
+  if (!hasPerm) {
+    throw new NotLoggedIn();
+  }
 }

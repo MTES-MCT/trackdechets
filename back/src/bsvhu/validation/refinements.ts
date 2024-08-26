@@ -114,6 +114,20 @@ export const checkReceptionWeight: Refinement<ParsedZodBsvhu> = (
   }
 };
 
+export const checkEmitterSituation: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  { addIssue }
+) => {
+  if (bsvhu.emitterNoSiret && !bsvhu.emitterIrregularSituation) {
+    // Le seul cas où l'émetteur peut ne pas avoir de SIRET est si il est en situation irrégulière
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "emitterIrregularSituation : L'émetteur doit obligatoirement avoir un numéro de SIRET si il n'est pas en situation irrégulière"
+    });
+  }
+};
+
 type CheckFieldIsDefinedArgs<T extends ZodBsvhu> = {
   resource: T;
   field: string;

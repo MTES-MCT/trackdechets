@@ -4,6 +4,7 @@ import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { getBsvhuSubType } from "../common/subTypes";
+import { getAddress } from "./converter";
 
 type WhereKeys =
   | "isDraftFor"
@@ -122,7 +123,13 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     ficheInterventionNumbers: [],
     emitterCompanyName: bsvhu.emitterCompanyName ?? "",
     emitterCompanySiret: bsvhu.emitterCompanySiret ?? "",
-    emitterCompanyAddress: bsvhu.emitterCompanyAddress ?? "",
+    emitterCompanyAddress:
+      getAddress({
+        address: bsvhu.emitterCompanyAddress,
+        street: bsvhu.emitterCompanyStreet,
+        city: bsvhu.emitterCompanyCity,
+        postalCode: bsvhu.emitterCompanyPostalCode
+      }) ?? "",
     emitterPickupSiteName: "",
     emitterPickupSiteAddress: "",
     emitterCustomInfo: bsvhu.emitterCustomInfo ?? "",

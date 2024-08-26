@@ -297,23 +297,6 @@ describe("validation > parseBsff", () => {
       }
     );
 
-    it("should throw when repackaging more than 1 contenants", () => {
-      const zodBsff: ZodBsff = {
-        repackaging: ["contenant_1", "contenant_2"]
-      };
-      expect.assertions(1);
-      try {
-        parseBsff(zodBsff);
-      } catch (e) {
-        expect(e.errors).toEqual([
-          expect.objectContaining({
-            message:
-              "Vous ne pouvez saisir qu'un seul contenant lors d'une opération de reconditionnement"
-          })
-        ]);
-      }
-    });
-
     it("should throw if weight value is negative", () => {
       const zodBsff: ZodBsff = {
         weightValue: -1
@@ -881,7 +864,7 @@ describe("validation > parseBsff", () => {
               " de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être" +
               " visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation" +
               " pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets" +
-              " Mon Compte > Établissements"
+              " dans Mes établissements"
           })
         ]);
       }
@@ -938,7 +921,7 @@ describe("validation > parseBsff", () => {
               " Cette entreprise ne peut donc pas être visée sur le bordereau." +
               " Veuillez vous rapprocher de l'administrateur de cette entreprise" +
               " pour qu'il modifie le profil de l'établissement depuis l'interface" +
-              " Trackdéchets Mon Compte > Établissements"
+              " Trackdéchets dans Mes établissements"
           })
         ]);
       }
@@ -965,7 +948,7 @@ describe("validation > parseBsff", () => {
               " Cette entreprise ne peut donc pas être visée sur le bordereau." +
               " Veuillez vous rapprocher de l'administrateur de cette entreprise" +
               " pour qu'il modifie le profil de l'établissement depuis l'interface" +
-              " Trackdéchets Mon Compte > Établissements"
+              " Trackdéchets dans Mes établissements"
           })
         ]);
       }

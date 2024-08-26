@@ -18,8 +18,8 @@ export function Waste() {
 
   return (
     <div>
+      <h4 className="fr-h4">Type</h4>
       <RadioButtons
-        legend="Type"
         disabled={sealedFields.includes("waste.type")}
         className="fr-col-sm-5"
         options={[
@@ -53,7 +53,7 @@ export function Waste() {
         disabled={sealedFields.includes("waste.packagings")}
       />
 
-      <h4 className="fr-h4">Quantité Émise</h4>
+      <h4 className="fr-h4">Quantité remise (optionnel)</h4>
 
       <div className="fr-grid-row">
         <div className="fr-col-12 fr-col-md-6">

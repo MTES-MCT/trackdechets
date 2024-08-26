@@ -5,6 +5,7 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 type TagsInputWrapperProps = {
   readonly fieldName: string;
+  readonly hintText?: string;
 } & Pick<TagsInputProps, "label" | "maxTags">;
 
 /**
@@ -45,7 +46,8 @@ type RhfTagsInputWrapperProps = TagsInputWrapperProps;
 export const RhfTagsInputWrapper: React.FC<RhfTagsInputWrapperProps> = ({
   fieldName,
   label,
-  maxTags
+  maxTags,
+  hintText
 }) => {
   const { setValue, watch, getFieldState } = useFormContext();
 
@@ -65,6 +67,7 @@ export const RhfTagsInputWrapper: React.FC<RhfTagsInputWrapperProps> = ({
         setValue(fieldName, [...tags]);
       }}
       errorMessage={error?.message}
+      hintText={hintText}
     />
   );
 };

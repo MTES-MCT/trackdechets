@@ -480,7 +480,7 @@ describe("validation > parseBsffPackaging", () => {
               " de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être" +
               " visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation" +
               " pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets" +
-              " Mon Compte > Établissements"
+              " dans Mes établissements"
           })
         ]);
       }

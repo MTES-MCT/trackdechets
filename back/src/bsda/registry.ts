@@ -145,8 +145,8 @@ export const getTransportersData = (
     city: transporterCompanyCity,
     country: transporterCompanyCountry
   } = splitAddress(
-    transporter.transporterCompanyAddress,
-    transporter.transporterCompanyVatNumber
+    transporter?.transporterCompanyAddress,
+    transporter?.transporterCompanyVatNumber
   );
 
   const {
