@@ -144,6 +144,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
               destination?.reception?.acceptationStatus
             ) && (
               <Input
+                className="fr-mb-4v"
                 textArea
                 label="Motif de refus"
                 nativeTextAreaProps={{
@@ -155,7 +156,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
           <div>
             <Input
               label="Poids accepté en tonnes"
-              className="fr-col-md-6"
+              className="fr-col-md-6 fr-mb-4v"
               disabled={destination?.reception?.acceptationStatus === "REFUSED"}
               nativeInputProps={{
                 ...register("destination.reception.weight"),
@@ -170,10 +171,10 @@ const DestinationBsvhu = ({ isDisabled }) => {
               <>
                 {destination?.type === BsvhuDestinationType.Demolisseur && (
                   <>
-                    <h4 className="fr-h4">Identification</h4>
+                    <h4 className="fr-h4 fr-mt-4w">Identification</h4>
                     <IdentificationNumber
-                      title="Identification des numeros entrant des lots ou de véhicules hors d'usage (livre de police)"
-                      disabled={isDisabled}
+                      title="Identification des numéros entrants des lots ou de véhicules hors d'usage (livre de police)"
+                      disabled={false}
                       name="destination.reception.identification.numbers"
                       defaultValue={identificationNumbers}
                     />
