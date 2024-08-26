@@ -1087,6 +1087,7 @@ model Bsdasri {
   destinationReceptionWasteRefusalReason      String?
   destinationReceptionWasteRefusedWeightValue Decimal?                @db.Decimal(65, 30)
   destinationReceptionWasteWeightValue        Decimal?                @db.Decimal(65, 30)
+  // cached value to avoid computing it each time the dasri is accessed
   destinationReceptionWasteVolume             Float?
   destinationReceptionDate                    DateTime?               @db.Timestamptz(6)
   destinationOperationCode                    String?

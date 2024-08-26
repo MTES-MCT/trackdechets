@@ -141,7 +141,7 @@ type BsdasriEmission {
 
 "Informations relatives à la réception du Bsdasri"
 type BsdasriReception {
-  "Volume reçu"
+  "Volume reçu calculé en effectuant la somme des volumes de packagings"
   volume: Float
   "Conditionnement"
   packagings: [BsdasriPackaging!]

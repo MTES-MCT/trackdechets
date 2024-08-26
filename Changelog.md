@@ -25,6 +25,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Rendre BSDAs en brouillon inaccessibles pour les entreprises dont l'auteur ne fait pas partie [PR 3503](https://github.com/MTES-MCT/trackdechets/pull/3503)
 - Ajout de la possibilité de réviser la quantité du destinataire d'un BSDD si un entreposage provisoire est présent [PR 3527](https://github.com/MTES-MCT/trackdechets/pull/3527)
 
+#### :boom: Breaking changes
+
+- Le champ volume de BsdasriReceptionInput est supprimé, BsdasriReception/volume étant calculé à partir des packagings [PR #3509](https://github.com/MTES-MCT/trackdechets/pull/3509)
+
 # [2024.7.2] 30/07/2024
 
 #### :rocket: Nouvelles fonctionnalités
