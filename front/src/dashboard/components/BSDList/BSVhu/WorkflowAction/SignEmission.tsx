@@ -52,7 +52,7 @@ export function SignEmission({
       displayActionButton={displayActionButton}
     >
       {({ bsvhu, onClose }) =>
-        bsvhu.metadata?.errors.some(
+        bsvhu.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Emission
         ) ? (
           <>
