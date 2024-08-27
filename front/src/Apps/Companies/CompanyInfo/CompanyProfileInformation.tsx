@@ -218,7 +218,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                         Broyeur VHU
                       </p>
                       <p className="companyFormWrapper__value-field">
-                        {"Numéro récepissé : "}
+                        {"Numéro récépissé : "}
                         <span data-testid="vhuAgrementBroyeur_agrementNumber">
                           {company.vhuAgrementBroyeur?.agrementNumber || " - "}
                         </span>
