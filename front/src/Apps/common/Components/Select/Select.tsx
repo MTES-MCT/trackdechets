@@ -80,8 +80,9 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       label,
       options,
       id,
-      // onChange, // TODO: investigate why infinite re-renders. Maybe useMemo not useful?
       isMultiple,
+      // Bug: uncommenting those values provokes infinite re-renders
+      // onChange,
       // selected,
       disableSearch,
       defaultValue,

@@ -116,7 +116,7 @@ export const onSelectChange = (
   else {
     // This code transforms the flat hierarchy array into all parent options paths:
     // ie: ["OPTION1", "OPTION1.1", "OPTION1.1.1"] becomes:
-    // ["OPTION1", "OPTION1.OPTION1.1", "OPTION1.OPTION1.1.1"]
+    // ["OPTION1", "OPTION1.OPTION1.1", "OPTION1.OPTION1.1.OPTION1.1.1"]
     const parentPathsCombinations: string[] = [];
     let path = "";
     parentPaths.forEach(parentPath => {
