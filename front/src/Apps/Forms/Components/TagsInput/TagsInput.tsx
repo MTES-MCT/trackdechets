@@ -18,7 +18,7 @@ export type TagsInputProps = {
  * Champ de formulaire permettant d'ajouter / supprimer des
  * valeurs à une liste de chaines de caractères.
  */
-const TagsInput: React.FC<TagsInputProps> = ({
+const TagsInput = ({
   label,
   tags,
   onAddTag,
@@ -27,7 +27,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
   disabled = false,
   errorMessage,
   hintText = ""
-}) => {
+}: TagsInputProps): React.JSX.Element => {
   const [tag, setTag] = useState("");
 
   const addButtonIsDisabled = maxTags ? tags.length >= maxTags : false;

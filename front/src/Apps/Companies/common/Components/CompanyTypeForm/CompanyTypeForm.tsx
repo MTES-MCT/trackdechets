@@ -109,12 +109,12 @@ type CompanyTypeFormProps = {
  * au niveau du composant parent via React Hook Form (voir <RhfCompanyTypeForm />)
  * ou Formik (voir <FormikCompanyTypeForm />).
  */
-const CompanyTypeForm: React.FC<CompanyTypeFormProps> = ({
+const CompanyTypeForm = ({
   inputValues,
   inputProps,
   inputErrors,
   handleToggle
-}) => {
+}: CompanyTypeFormProps): React.JSX.Element => {
   return (
     <div className="company-type-form">
       {COMPANY_TYPE_OPTIONS.map(option => {

@@ -44,12 +44,12 @@ type RhfCompanyTypeFormProps = Pick<
  * Implémentation de <CompanyTypeForm /> contrôlé par
  * React Hook Form
  */
-const RhfCompanyTypeForm: React.FC<RhfCompanyTypeFormProps> = ({
+const RhfCompanyTypeForm = ({
   watch,
   register,
   setValue,
   formState
-}) => {
+}: RhfCompanyTypeFormProps): React.JSX.Element => {
   const companyTypes = watch("companyTypes");
   const collectorTypes = watch("collectorTypes");
   const wasteProcessorTypes = watch("wasteProcessorTypes");

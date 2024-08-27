@@ -4,7 +4,7 @@ import CompanyTypeForm from "./CompanyTypeForm";
 import { useState } from "react";
 import { AllCompanyType } from "../../utils";
 
-const SimpleCompanyTypeForm: React.FC = () => {
+const SimpleCompanyTypeForm = () => {
   const [companyTypes, setCompanyTypes] = useState<AllCompanyType[]>([]);
   const [ecoOrganismeAgreements, setEcoOrganismeAgreements] = useState<
     string[]

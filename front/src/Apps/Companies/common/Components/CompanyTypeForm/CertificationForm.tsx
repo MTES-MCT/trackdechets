@@ -25,12 +25,12 @@ type CertificationFormProps = {
  * Permet d'afficher le formulaire récépissé, agrément, etc
  * correspondant au type d'entreprise sélectionné.
  */
-const CertificationForm: React.FC<CertificationFormProps> = ({
+const CertificationForm = ({
   companyType,
   inputProps,
   inputValues,
   inputErrors
-}) => {
+}: CertificationFormProps) => {
   if (companyType === CompanyType.Broker) {
     return (
       <Highlight className="fr-mb-8v">

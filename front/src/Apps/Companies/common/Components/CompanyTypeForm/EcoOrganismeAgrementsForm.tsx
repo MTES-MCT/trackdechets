@@ -13,11 +13,11 @@ type EcoOrganismeAgrementForm = {
   inputErrors?: Pick<CompanyTypeInputErrors, "ecoOrganismeAgreements">;
 };
 
-const EcoOrganismeAgrementsForm: React.FC<EcoOrganismeAgrementForm> = ({
+const EcoOrganismeAgrementsForm = ({
   inputValues,
   inputProps,
   inputErrors
-}) => {
+}: EcoOrganismeAgrementForm): React.JSX.Element => {
   const { ecoOrganismeAgreements } = inputValues;
 
   const { value, push, remove } = inputProps?.ecoOrganismeAgreements ?? {};

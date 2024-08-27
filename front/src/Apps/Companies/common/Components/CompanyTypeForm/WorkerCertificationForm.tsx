@@ -16,11 +16,11 @@ type WorkerCategoryFormProps = {
   inputErrors?: Pick<CompanyTypeInputErrors, "workerCertification">;
 };
 
-const WorkerCertificationForm: React.FC<WorkerCategoryFormProps> = ({
+const WorkerCertificationForm = ({
   inputValues,
   inputProps,
   inputErrors
-}) => {
+}: WorkerCategoryFormProps): React.JSX.Element => {
   return (
     <div className="fr-container" style={{ paddingTop: "4px" }}>
       <div className="fr-grid-row fr-grid-row--gutters">

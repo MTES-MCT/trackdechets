@@ -45,14 +45,14 @@ type FormikCompanyTypeFormProps = Pick<
   | "touched"
 >;
 
-const FormikCompanyTypeForm: React.FC<FormikCompanyTypeFormProps> = ({
+const FormikCompanyTypeForm = ({
   values,
   handleChange,
   handleBlur,
   setFieldValue,
   errors,
   touched
-}) => {
+}: FormikCompanyTypeFormProps): React.JSX.Element => {
   const companyTypes = values.companyTypes;
   const collectorTypes = values.collectorTypes;
   const wasteProcessorTypes = values.wasteProcessorTypes;

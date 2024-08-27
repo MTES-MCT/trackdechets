@@ -10,10 +10,10 @@ type TraderRecepisseFormProps = {
   inputErrors: Pick<CompanyTypeInputErrors, "traderReceipt">;
 };
 
-const TraderRecepisseForm: React.FC<TraderRecepisseFormProps> = ({
+const TraderRecepisseForm = ({
   inputProps,
   inputErrors
-}) => {
+}: TraderRecepisseFormProps): React.JSX.Element => {
   return (
     <RecepisseForm
       title="Récépissé Négociant"

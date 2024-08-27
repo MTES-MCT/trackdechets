@@ -11,10 +11,10 @@ type TransporteurRecepisseFormProps = {
   inputErrors: Pick<CompanyTypeInputErrors, "transporterReceipt">;
 };
 
-const TransporteurRecepisseForm: React.FC<TransporteurRecepisseFormProps> = ({
+const TransporteurRecepisseForm = ({
   inputProps,
   inputErrors
-}) => {
+}: TransporteurRecepisseFormProps): React.JSX.Element => {
   return (
     <div>
       <div className="fr-grid-row fr-mb-2w">

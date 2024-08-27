@@ -23,7 +23,7 @@ type CompanyTypeCheckboxProps = {
   inputValues: CompanyTypeInputValues;
 };
 
-const CompanyTypeCheckbox: React.FC<CompanyTypeCheckboxProps> = ({
+const CompanyTypeCheckbox = ({
   label,
   value,
   helpText,
@@ -32,7 +32,7 @@ const CompanyTypeCheckbox: React.FC<CompanyTypeCheckboxProps> = ({
   inputValues,
   inputProps,
   inputErrors
-}) => {
+}: CompanyTypeCheckboxProps): React.JSX.Element => {
   const companyTypeChecked = React.useMemo(
     () => inputValues.companyTypes.includes(value),
     [value, inputValues.companyTypes]

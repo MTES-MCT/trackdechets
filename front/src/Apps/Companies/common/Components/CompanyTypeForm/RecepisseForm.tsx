@@ -15,11 +15,11 @@ type RecepisseFormProps = {
   };
 };
 
-const RecepisseForm: React.FC<RecepisseFormProps> = ({
+const RecepisseForm = ({
   title,
   inputProps,
   inputErrors
-}) => {
+}: RecepisseFormProps): React.JSX.Element => {
   return (
     <div>
       <div className="fr-grid-row">

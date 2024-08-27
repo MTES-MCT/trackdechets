@@ -13,11 +13,11 @@ type VhuAgrementFormProps = {
   };
 };
 
-const VhuAgrementForm: React.FC<VhuAgrementFormProps> = ({
+const VhuAgrementForm = ({
   title,
   inputProps,
   inputErrors
-}) => {
+}: VhuAgrementFormProps): React.JSX.Element => {
   return (
     <div>
       <div className="fr-grid-row">
