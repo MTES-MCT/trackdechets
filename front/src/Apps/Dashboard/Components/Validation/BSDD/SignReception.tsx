@@ -185,64 +185,73 @@ function SignReceptionModal({
       refusedWeight
     } = data;
 
+    let formStatus: FormStatus | undefined = form.status;
     if (isReception) {
-      isTempStorage && form.status === FormStatus.Sent
-        ? await markAsTempStored({
-            variables: {
-              id: form.id,
-              tempStoredInfos: {
-                quantityReceived: receivedWeight,
-                quantityType: quantityType,
-                receivedAt: signedAt,
-                receivedBy: signedBy,
-                signedAt: signedAt
-              }
+      if (isTempStorage && form.status === FormStatus.Sent) {
+        const res = await markAsTempStored({
+          variables: {
+            id: form.id,
+            tempStoredInfos: {
+              quantityReceived: receivedWeight,
+              quantityType: quantityType,
+              receivedAt: signedAt,
+              receivedBy: signedBy,
+              signedAt: signedAt
             }
-          })
-        : await markAsReceived({
-            variables: {
-              id: form.id,
-              receivedInfo: {
-                quantityReceived: receivedWeight,
-                receivedAt: signedAt,
-                receivedBy: signedBy,
-                signedAt: signedAt
-              }
+          }
+        });
+
+        formStatus = res.data?.markAsTempStored.status;
+      } else {
+        const res = await markAsReceived({
+          variables: {
+            id: form.id,
+            receivedInfo: {
+              quantityReceived: receivedWeight,
+              receivedAt: signedAt,
+              receivedBy: signedBy,
+              signedAt: signedAt
             }
-          });
+          }
+        });
+
+        formStatus = res.data?.markAsReceived.status;
+      }
     }
 
     if (
       ["ACCEPTED", "REFUSED", "PARTIALLY_REFUSED"].includes(acceptationStatus)
     ) {
-      isTempStorage && form.status === FormStatus.TempStored
-        ? await markAsTempStorerAccepted({
-            variables: {
-              id: form.id,
-              tempStorerAcceptedInfo: {
-                quantityReceived: receivedWeight,
-                quantityRefused: refusedWeight,
-                quantityType: quantityType,
-                signedAt: signedAt,
-                signedBy: signedBy,
-                wasteAcceptationStatus: wasteAcceptationStatus,
-                wasteRefusalReason: wasteRefusalReason
-              }
+      if (isTempStorage && formStatus === FormStatus.TempStored) {
+        await markAsTempStorerAccepted({
+          variables: {
+            id: form.id,
+            tempStorerAcceptedInfo: {
+              quantityReceived: receivedWeight,
+              quantityRefused: refusedWeight,
+              quantityType: quantityType,
+              signedAt: signedAt,
+              signedBy: signedBy,
+              wasteAcceptationStatus: wasteAcceptationStatus,
+              wasteRefusalReason: wasteRefusalReason
             }
-          })
-        : await markAsAccepted({
-            variables: {
-              id: form.id,
-              acceptedInfo: {
-                quantityReceived: receivedWeight,
-                quantityRefused: refusedWeight,
-                signedAt: signedAt,
-                signedBy: signedBy,
-                wasteAcceptationStatus: wasteAcceptationStatus,
-                wasteRefusalReason: wasteRefusalReason
-              }
+          }
+        });
+      } else {
+        await markAsAccepted({
+          variables: {
+            id: form.id,
+            acceptedInfo: {
+              quantityReceived: receivedWeight,
+              quantityRefused: refusedWeight,
+              signedAt: signedAt,
+              signedBy: signedBy,
+              wasteAcceptationStatus: wasteAcceptationStatus,
+              wasteRefusalReason: wasteRefusalReason
             }
-          });
+          }
+        });
+      }
     }
 
     onCancel();
