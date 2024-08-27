@@ -13,8 +13,8 @@ import { SealedFieldsContext } from "../context";
 
 const actor = "destination";
 
-export function Destination() {
-  const { register, setValue } = useFormContext(); // retrieve all hook methods
+export function Destination({ errors }) {
+  const { register, setValue, formState, setError } = useFormContext(); // retrieve all hook methods
   const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
@@ -28,6 +28,101 @@ export function Destination() {
     register(`${actor}.company.phone`);
     register(`${actor}.company.mail`);
   }, [register]);
+
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      const siretError = errors?.find(
+        error => error.name === `${actor}.company.siret`
+      )?.message;
+
+      if (
+        siretError &&
+        !!formState.errors?.[actor]?.["company"]?.siret === false
+      ) {
+        setError(`${actor}.company.siret`, {
+          type: "custom",
+          message: siretError
+        });
+      }
+
+      const contactError = errors?.find(
+        error => error.name === `${actor}.company.contact`
+      )?.message;
+      if (
+        contactError &&
+        !!formState.errors?.[actor]?.["company"]?.contact === false
+      ) {
+        console.log(
+          "errors cont ",
+          errors?.find(error => error.name === `${actor}.company.contact`)
+        );
+
+        setError(`${actor}.company.contact`, {
+          type: "custom",
+          message: contactError
+        });
+      }
+
+      const adressError = errors?.find(
+        error => error.name === `${actor}.company.address`
+      )?.message;
+      if (
+        adressError &&
+        !!formState.errors?.[actor]?.["company"]?.address === false
+      ) {
+        setError(`${actor}.company.address`, {
+          type: "custom",
+          message: adressError
+        });
+      }
+      const phoneError = errors?.find(
+        error => error.name === `${actor}.company.phone`
+      )?.message;
+      if (
+        phoneError &&
+        !!formState.errors?.[actor]?.["company"]?.phone === false
+      ) {
+        setError(`${actor}.company.phone`, {
+          type: "custom",
+          message: phoneError
+        });
+      }
+      const mailError = errors?.find(
+        error => error.name === `${actor}.company.mail`
+      )?.message;
+      if (
+        mailError &&
+        !!formState.errors?.[actor]?.["company"]?.mail === false
+      ) {
+        setError(`${actor}.company.mail`, {
+          type: "custom",
+          message: mailError
+        });
+      }
+
+      const vatNumberError = errors?.find(
+        error => error.name === `${actor}.company.vatNumber`
+      )?.message;
+      if (
+        vatNumberError &&
+        !!formState.errors?.[actor]?.["company"]?.vatNumber === false
+      ) {
+        setError(`${actor}.company.vatNumber`, {
+          type: "custom",
+          message: vatNumberError
+        });
+      }
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState.errors,
+    formState.errors?.length,
+    setError
+  ]);
 
   const { siret } = useParams<{ siret: string }>();
 
@@ -82,9 +177,14 @@ export function Destination() {
           }
         }}
       />
+      {formState.errors?.destination?.["company"]?.siret && (
+        <p className="fr-text--sm fr-error-text fr-mb-4v">
+          {formState.errors?.destination?.["company"]?.siret?.message}
+        </p>
+      )}
 
       <CompanyContactInfo
-        fieldName={`${actor}.company`}
+        fieldName={`${actor}`}
         disabled={sealedFields.includes(`${actor}.company.siret`)}
         key={orgId}
       />

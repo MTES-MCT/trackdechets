@@ -38,9 +38,10 @@ export default function CompanyContactInfo({
           <Input
             label="Personne à contacter"
             disabled={disabled}
-            state={errors?.[`${fieldName}.contact`] && "error"}
+            state={errors?.[`${fieldName}`]?.["company"]?.contact && "error"}
             stateRelatedMessage={
-              (errors?.[`${fieldName}.contact`]?.message as string) ?? ""
+              (errors?.[`${fieldName}`]?.["company"]?.contact
+                ?.message as string) ?? ""
             }
             nativeInputProps={{ ...register(`${fieldName}.contact`) }}
           />
@@ -51,9 +52,10 @@ export default function CompanyContactInfo({
           <Input
             label="Téléphone"
             disabled={disabled}
-            state={errors?.[`${fieldName}.phoneError`] && "error"}
+            state={errors?.[`${fieldName}`]?.["company"]?.phone && "error"}
             stateRelatedMessage={
-              (errors?.[`${fieldName}.phoneError`]?.message as string) ?? ""
+              (errors?.[`${fieldName}`]?.["company"]?.phone
+                ?.message as string) ?? ""
             }
             nativeInputProps={{ ...register(`${fieldName}.phone`) }}
           />
@@ -62,9 +64,10 @@ export default function CompanyContactInfo({
           <Input
             label="Mail"
             disabled={disabled}
-            state={errors?.[`${fieldName}.mailError`] && "error"}
+            state={errors?.[`${fieldName}`]?.["company"]?.mail && "error"}
             stateRelatedMessage={
-              (errors?.[`${fieldName}.mailError`]?.message as string) ?? ""
+              (errors?.[`${fieldName}`]?.["company"]?.mail
+                ?.message as string) ?? ""
             }
             nativeInputProps={{
               ...register(`${fieldName}.mail`),

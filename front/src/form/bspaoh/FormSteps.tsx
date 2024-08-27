@@ -15,7 +15,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { getComputedState } from "../common/getComputedState";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toastApolloError } from "../common/stepper/toaster";
 import {
   CREATE_DRAFT_BSPAOH,
   CREATE_BSPAOH,
@@ -51,13 +50,6 @@ const getPrevTab = currentTabId => {
   return tabIds[idx - 1];
 };
 
-const tabsContent = {
-  waste: <Waste />,
-  emitter: <Emitter />,
-  transporter: <Transporter />,
-  destination: <Destination />
-};
-
 const paohToInput = (paoh: BspaohInput): BspaohInput => {
   return omitDeep(paoh, [
     "isDraft",
@@ -78,6 +70,14 @@ interface Props {
 }
 export function ControlledTabs(props: Readonly<Props>) {
   const [selectedTabId, setSelectedTabId] = useState("waste");
+  const [publishErrors, setPublishErrors] = useState<
+    | {
+        code: string;
+        path: string[];
+        message: string;
+      }[]
+    | undefined
+  >();
 
   const formQuery = useQuery<Pick<Query, "bspaoh">, QueryBspaohArgs>(
     GET_BSPAOH,
@@ -111,31 +111,58 @@ export function ControlledTabs(props: Readonly<Props>) {
     }
   });
 
+  const errorsFromPublishApi = publishErrors || props?.publishErrors;
   const publishErrorTabIds = [
     ...new Set(
-      props?.publishErrors?.map(publishError => {
+      errorsFromPublishApi?.map(publishError => {
         return tabIds.find(key => publishError.path[0].includes(key));
       })
     )
   ];
 
-  const publishErrorMessages = props?.publishErrors?.map(publishError => {
-    const tabId = publishError.path[0]
+  const publishErrorMessages = errorsFromPublishApi?.map(publishError => {
+    const formattedError = publishError.path[0]
       .split(/(?=[A-Z])/)
-      .map(s => s.toLowerCase())?.[0]; //camel case
+      .map(s => s.toLowerCase()); //camel case split : en attendant la normalistation coté back
+    const tabId = formattedError?.[0];
+    const name = formattedError.join(".");
     const message = publishError.message;
-
-    return { tabId, message };
+    return { tabId, name, message };
   });
 
+  const tabsContent = {
+    waste: <Waste />,
+    emitter: (
+      <Emitter
+        errors={publishErrorMessages?.filter(
+          error => error.tabId === "emitter"
+        )}
+      />
+    ),
+    transporter: (
+      <Transporter
+        errors={publishErrorMessages?.filter(
+          error => error.tabId === "transporter"
+        )}
+      />
+    ),
+    destination: (
+      <Destination
+        errors={publishErrorMessages?.filter(
+          error => error.tabId === "destination"
+        )}
+      />
+    )
+  };
+
+  const formStateErrorsKeys = Object.keys(methods?.formState?.errors);
   const errors = publishErrorTabIds.length
     ? publishErrorTabIds
-    : Object.keys(methods?.formState?.errors)?.length > 0
-    ? Object.keys(methods?.formState?.errors)
+    : formStateErrorsKeys?.length > 0
+    ? formStateErrorsKeys
     : [];
 
-  const formHasErrors = errors?.length > 0;
-  const errorTabIds = formHasErrors ? errors : [];
+  const errorTabIds = errors?.length > 0 ? errors : [];
 
   const [createDraftBspaoh, { loading: creatingDraft }] = useMutation<
     Pick<Mutation, "createDraftBspaoh">,
@@ -188,7 +215,25 @@ export function ControlledTabs(props: Readonly<Props>) {
       .then(_ => {
         navigate(-1);
       })
-      .catch(err => toastApolloError(err));
+      .catch(err => {
+        if (err.graphQLErrors?.length) {
+          const issues = err.graphQLErrors[0]?.extensions?.issues as {
+            code: string;
+            path: string[];
+            message: string;
+          }[];
+          const errorDetailList = issues?.map(error => {
+            return error;
+          });
+          setPublishErrors(
+            errorDetailList as {
+              code: string;
+              path: string[];
+              message: string;
+            }[]
+          );
+        }
+      });
   };
 
   const lastTabId = tabIds[tabIds.length - 1];
@@ -241,17 +286,6 @@ export function ControlledTabs(props: Readonly<Props>) {
               onNextTab={() => setSelectedTabId(getNextTab(selectedTabId))}
               onTabChange={onTabChange}
             >
-              {Boolean(publishErrorTabIds?.length) && (
-                <div className="fr-mb-5v">
-                  {publishErrorMessages?.map(publishError => {
-                    return selectedTabId === publishError.tabId ? (
-                      <p className="fr-text--sm fr-error-text">
-                        {publishError.message}
-                      </p>
-                    ) : null;
-                  })}
-                </div>
-              )}
               {tabsContent[selectedTabId] ?? <p></p>}
             </FormStepsTabs>
           )}

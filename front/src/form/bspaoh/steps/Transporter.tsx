@@ -16,8 +16,8 @@ import { SealedFieldsContext } from "../context";
 
 const actor = "transporter";
 
-export function Transporter() {
-  const { register, setValue, watch } = useFormContext(); // retrieve all hook methods
+export function Transporter({ errors }) {
+  const { register, setValue, watch, setError, formState } = useFormContext(); // retrieve all hook methods
   const [recepisse, setRecepisse] = useState<BspaohRecepisse>({});
   const sealedFields = useContext(SealedFieldsContext);
 
@@ -33,6 +33,113 @@ export function Transporter() {
   }, [register]);
 
   register(`${actor}.recepisse.isExempted`);
+
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      const siretError = errors?.find(
+        error => error.name === `${actor}.company.siret`
+      )?.message;
+
+      if (
+        siretError &&
+        !!formState.errors?.[actor]?.["company"]?.siret === false
+      ) {
+        setError(`${actor}.company.siret`, {
+          type: "custom",
+          message: siretError
+        });
+      }
+
+      const contactError = errors?.find(
+        error => error.name === `${actor}.company.contact`
+      )?.message;
+      if (
+        contactError &&
+        !!formState.errors?.[actor]?.["company"]?.contact === false
+      ) {
+        console.log(
+          "errors cont ",
+          errors?.find(error => error.name === `${actor}.company.contact`)
+        );
+
+        setError(`${actor}.company.contact`, {
+          type: "custom",
+          message: contactError
+        });
+      }
+
+      const adressError = errors?.find(
+        error => error.name === `${actor}.company.address`
+      )?.message;
+      if (
+        adressError &&
+        !!formState.errors?.[actor]?.["company"]?.address === false
+      ) {
+        setError(`${actor}.company.address`, {
+          type: "custom",
+          message: adressError
+        });
+      }
+      const phoneError = errors?.find(
+        error => error.name === `${actor}.company.phone`
+      )?.message;
+      if (
+        phoneError &&
+        !!formState.errors?.[actor]?.["company"]?.phone === false
+      ) {
+        setError(`${actor}.company.phone`, {
+          type: "custom",
+          message: phoneError
+        });
+      }
+      const mailError = errors?.find(
+        error => error.name === `${actor}.company.mail`
+      )?.message;
+      if (
+        mailError &&
+        !!formState.errors?.[actor]?.["company"]?.mail === false
+      ) {
+        setError(`${actor}.company.mail`, {
+          type: "custom",
+          message: mailError
+        });
+      }
+
+      const vatNumberError = errors?.find(
+        error => error.name === `${actor}.company.vatNumber`
+      )?.message;
+      if (
+        vatNumberError &&
+        !!formState.errors?.[actor]?.["company"]?.vatNumber === false
+      ) {
+        setError(`${actor}.company.vatNumber`, {
+          type: "custom",
+          message: vatNumberError
+        });
+      }
+      const platesError = errors?.find(
+        error => error.name === `${actor}.transport.plates`
+      )?.message;
+      if (
+        vatNumberError &&
+        !!formState.errors?.[actor]?.["transport"]?.plates === false
+      ) {
+        setError(`${actor}.transport.plates`, {
+          type: "custom",
+          message: platesError
+        });
+      }
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState.errors,
+    formState.errors?.length,
+    setError
+  ]);
 
   const { siret } = useParams<{ siret: string }>();
   const transporter = watch(actor) ?? {};
@@ -81,6 +188,12 @@ export function Transporter() {
           }
         }}
       />
+      {formState.errors?.transporter?.["company"]?.siret && (
+        <p className="fr-text--sm fr-error-text fr-mb-4v">
+          {formState.errors?.transporter?.["company"]?.siret?.message}
+        </p>
+      )}
+
       <CompanyContactInfo
         fieldName={`${actor}.company`}
         disabled={sealedFields.includes(`transporter.company.siret`)}
@@ -145,6 +258,11 @@ export function Transporter() {
             fieldName={`${actor}.transport.plates`}
             hintText="2 max : Véhicule, remorque"
           />
+          {formState.errors?.transporter?.["transport"]?.plates && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {formState.errors?.transporter?.["transport"]?.plates?.message}
+            </p>
+          )}
         </div>
       </div>
 
