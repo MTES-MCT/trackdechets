@@ -37,7 +37,7 @@ export interface RhfCompanyTypeFormField {
 
 type RhfCompanyTypeFormProps = Pick<
   UseFormReturn<RhfCompanyTypeFormField>,
-  "watch" | "register" | "setValue" | "formState"
+  "watch" | "register" | "setValue" | "formState" | "trigger"
 >;
 
 /**
@@ -48,7 +48,8 @@ const RhfCompanyTypeForm = ({
   watch,
   register,
   setValue,
-  formState
+  formState,
+  trigger
 }: RhfCompanyTypeFormProps): React.JSX.Element => {
   const companyTypes = watch("companyTypes");
   const collectorTypes = watch("collectorTypes");
@@ -203,8 +204,6 @@ const RhfCompanyTypeForm = ({
         transporterReceipt: {
           receiptNumber: register("transporterReceipt.receiptNumber", {
             validate: (value, { transporterReceipt, companyTypes }) => {
-              // FIXME utiliser `trigger`pour re-valider en cas de changement
-              // après un premier submit
               if (
                 companyTypes.includes(CompanyType.Transporter) &&
                 // Validation "tout un rien"
@@ -215,6 +214,13 @@ const RhfCompanyTypeForm = ({
                 return "Champ requis";
               }
               return true;
+            },
+            onChange: () => {
+              // handle dependant validation between transporter recepisse fields
+              trigger([
+                "transporterReceipt.department",
+                "transporterReceipt.validityLimit"
+              ]);
             }
           }),
           validityLimit: register("transporterReceipt.validityLimit", {
@@ -229,6 +235,13 @@ const RhfCompanyTypeForm = ({
                 return "Champ requis";
               }
               return true;
+            },
+            onChange: () => {
+              // handle dependant validation between transporter recepisse fields
+              trigger([
+                "transporterReceipt.receiptNumber",
+                "transporterReceipt.department"
+              ]);
             }
           }),
           department: register("transporterReceipt.department", {
@@ -243,6 +256,13 @@ const RhfCompanyTypeForm = ({
                 return "Champ requis";
               }
               return true;
+            },
+            onChange: () => {
+              // handle dependant validation between transporter recepisse fields
+              trigger([
+                "transporterReceipt.receiptNumber",
+                "transporterReceipt.validityLimit"
+              ]);
             }
           })
         },

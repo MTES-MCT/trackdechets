@@ -88,7 +88,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
     ecoOrganismeAgreements: company.ecoOrganismeAgreements
   };
 
-  const { handleSubmit, reset, formState, register, watch, setValue } =
+  const { handleSubmit, reset, formState, register, watch, setValue, trigger } =
     useForm<RhfCompanyTypeFormField>({
       defaultValues
     });
@@ -761,6 +761,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
               register={register}
               setValue={setValue}
               formState={formState}
+              trigger={trigger}
             />
             {loading && <Loader />}
             {error && <NotificationError apolloError={error} />}
