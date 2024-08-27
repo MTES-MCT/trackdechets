@@ -418,45 +418,36 @@ export default function AccountCompanyAdd() {
                   filledTransporterRecepisseFields.length > 0 &&
                   filledTransporterRecepisseFields.length < 3;
 
-                const isTrader_ = isTrader(values.companyTypes);
                 const missingTraderReceiptField =
-                  isTrader_ &&
+                  isTrader(values.companyTypes) &&
                   (!values.traderReceipt?.department ||
                     !values.traderReceipt?.validityLimit ||
                     !values.traderReceipt?.receiptNumber);
 
-                const isBroker_ = isBroker(values.companyTypes);
-
                 const missingBrokerReceiptField =
-                  isBroker_ &&
+                  isBroker(values.companyTypes) &&
                   (!values.brokerReceipt?.department ||
                     !values.brokerReceipt?.validityLimit ||
                     !values.brokerReceipt?.receiptNumber);
 
-                const isVhuBroyeur_ = isVhuBroyeur(
-                  values.companyTypes,
-                  values.wasteVehiclesTypes
-                );
-
                 const missingVhuBroyeurAgrementField =
-                  isVhuBroyeur_ &&
+                  isVhuBroyeur(
+                    values.companyTypes,
+                    values.wasteVehiclesTypes
+                  ) &&
                   (!values.vhuAgrementBroyeur?.agrementNumber ||
                     !values.vhuAgrementBroyeur?.department);
 
-                const isVhuDemolisseur_ = isVhuDemolisseur(
-                  values.companyTypes,
-                  values.wasteVehiclesTypes
-                );
-
                 const missingVhuDemolisseurAgrementField =
-                  isVhuDemolisseur_ &&
+                  isVhuDemolisseur(
+                    values.companyTypes,
+                    values.wasteVehiclesTypes
+                  ) &&
                   (!values.vhuAgrementDemolisseur?.agrementNumber ||
                     !values.vhuAgrementDemolisseur?.department);
 
-                const _isWorker = isWorker(values.companyTypes);
-
                 const missingCertification =
-                  _isWorker &&
+                  isWorker(values.companyTypes) &&
                   values.workerCertification?.hasSubSectionThree &&
                   (!values.workerCertification?.certificationNumber ||
                     !values.workerCertification?.validityLimit ||
@@ -605,7 +596,6 @@ export default function AccountCompanyAdd() {
                 touched,
                 handleSubmit
               }) => {
-                console.log(errors);
                 return (
                   <Form
                     className={styles.companyAddForm}

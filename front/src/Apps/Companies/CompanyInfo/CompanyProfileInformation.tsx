@@ -218,7 +218,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                         Broyeur VHU
                       </p>
                       <p className="companyFormWrapper__value-field">
-                        Numéro récepissé{" : "}
+                        {"Numéro récepissé : "}
                         <span data-testid="vhuAgrementBroyeur_agrementNumber">
                           {company.vhuAgrementBroyeur?.agrementNumber || " - "}
                         </span>
@@ -241,7 +241,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                         Casse automobile / démolisseur
                       </p>
                       <p className="companyFormWrapper__value-field">
-                        Numéro récépissé {" : "}
+                        {"Numéro récépissé  : "}
                         <span data-testid="vhuAgrementDemolisseur_agrementNumber">
                           {company.vhuAgrementDemolisseur?.agrementNumber ||
                             " - "}
