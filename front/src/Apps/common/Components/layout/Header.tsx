@@ -383,7 +383,7 @@ function MobileSubNav({ currentCompany }) {
                     <MenuLink
                       entry={{
                         navlink: true,
-                        caption: "Informations générales",
+                        caption: "Mes paramètres",
                         href: routes.account.info
                       }}
                     />
@@ -392,17 +392,8 @@ function MobileSubNav({ currentCompany }) {
                     <MenuLink
                       entry={{
                         navlink: true,
-                        caption: "Jetons d'accès API",
-                        href: routes.account.tokens.list
-                      }}
-                    />
-                  </li>
-                  <li>
-                    <MenuLink
-                      entry={{
-                        navlink: true,
                         caption: "Application autorisées",
-                        href: routes.account.authorizedApplications
+                        href: routes.account.applications
                       }}
                     />
                   </li>

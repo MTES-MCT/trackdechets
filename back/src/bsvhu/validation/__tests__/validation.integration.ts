@@ -10,7 +10,7 @@ import { searchCompany } from "../../../companies/search";
 import { bsvhuFactory } from "../../__tests__/factories.vhu";
 import { ZodBsvhu } from "../schema";
 import { BsvhuValidationContext } from "../types";
-import { prismaToZodBsvhu } from "../helpers";
+import { getCurrentSignatureType, prismaToZodBsvhu } from "../helpers";
 import { parseBsvhu, parseBsvhuAsync } from "..";
 import { ZodError } from "zod";
 
@@ -210,7 +210,7 @@ describe("BSVHU validation", () => {
               `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets` +
               " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
               " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
-              " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+              " l'établissement depuis l'interface Trackdéchets dans Mes établissements"
           })
         ]);
       }
@@ -241,7 +241,7 @@ describe("BSVHU validation", () => {
               `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets` +
               " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
               " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
-              " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+              " l'établissement depuis l'interface Trackdéchets dans Mes établissements"
           })
         ]);
       }
@@ -339,7 +339,7 @@ describe("BSVHU validation", () => {
             message:
               `L'installation de destination avec le SIRET \"${company.siret}\" n'est pas inscrite` +
               " sur Trackdéchets en tant qu'installation de traitement de VHU. Cette installation ne peut donc pas" +
-              " être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+              " être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements"
           })
         ]);
       }
@@ -432,7 +432,7 @@ describe("BSVHU validation", () => {
         } catch (err) {
           expect((err as ZodError).issues).toEqual([
             expect.objectContaining({
-              message: `Le transporteur saisi sur le bordereau (SIRET: ${bsvhu.emitterCompanySiret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+              message: `Le transporteur saisi sur le bordereau (SIRET: ${bsvhu.emitterCompanySiret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
             })
           ]);
         }
@@ -631,6 +631,35 @@ describe("BSVHU validation", () => {
           transporterRecepisseValidityLimit: null
         })
       );
+    });
+  });
+
+  describe("getCurrentSignatureType", () => {
+    it("getCurrentSignatureType should recursively checks the signature hierarchy", async () => {
+      const prismaBsvhu = await bsvhuFactory({
+        opt: { status: "INITIAL" }
+      });
+      const bsvhu = prismaToZodBsvhu(prismaBsvhu);
+      const currentSignature = getCurrentSignatureType(bsvhu);
+      expect(currentSignature).toEqual(undefined);
+      const afterEmission = {
+        ...bsvhu,
+        emitterEmissionSignatureDate: new Date()
+      };
+      const currentSignature2 = getCurrentSignatureType(afterEmission);
+      expect(currentSignature2).toEqual("EMISSION");
+      const afterTransport = {
+        ...afterEmission,
+        transporterTransportSignatureDate: new Date()
+      };
+      const currentSignature3 = getCurrentSignatureType(afterTransport);
+      expect(currentSignature3).toEqual("TRANSPORT");
+      const afterOperation = {
+        ...afterTransport,
+        destinationOperationSignatureDate: new Date()
+      };
+      const currentSignature4 = getCurrentSignatureType(afterOperation);
+      expect(currentSignature4).toEqual("OPERATION");
     });
   });
 });

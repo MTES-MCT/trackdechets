@@ -18,6 +18,20 @@ describe("Test Factories", () => {
     expect(dasri.isDraft).toEqual(false);
   });
 
+  test("should compute total volume", async () => {
+    const dasri = await bsdasriFactory({
+      opt: {
+        emitterCompanyName: "somecompany",
+        destinationWastePackagings: [
+          { type: "BOITE_CARTON", quantity: 2, volume: 3 },
+          { type: "FUT", quantity: 3, volume: 7 }
+        ]
+      }
+    });
+
+    expect(dasri.destinationReceptionWasteVolume).toEqual(27);
+  });
+
   test("should denormalize synthesis bsdasri", async () => {
     const { company: initialCompany } = await userWithCompanyFactory("MEMBER");
 

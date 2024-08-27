@@ -26,6 +26,23 @@ import {
 import { Bsvhu as PrismaVhuForm, WasteAcceptationStatus } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 
+export const getAddress = ({
+  address,
+  street,
+  city,
+  postalCode
+}: {
+  address?: string | null;
+  street?: string | null;
+  city?: string | null;
+  postalCode?: string | null;
+}): string | null => {
+  if (street && city && postalCode) {
+    return `${street} ${postalCode} ${city}`;
+  }
+  return address ?? null;
+};
+
 export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
   return {
     id: form.id,
@@ -35,10 +52,17 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
     status: form.status,
     emitter: nullIfNoValues<BsvhuEmitter>({
       agrementNumber: form.emitterAgrementNumber,
+      irregularSituation: form.emitterIrregularSituation,
+      noSiret: form.emitterNoSiret,
       company: nullIfNoValues<FormCompany>({
         name: form.emitterCompanyName,
         siret: form.emitterCompanySiret,
-        address: form.emitterCompanyAddress,
+        address: getAddress({
+          address: form.emitterCompanyAddress,
+          street: form.emitterCompanyStreet,
+          city: form.emitterCompanyCity,
+          postalCode: form.emitterCompanyPostalCode
+        }),
         contact: form.emitterCompanyContact,
         phone: form.emitterCompanyPhone,
         mail: form.emitterCompanyMail
@@ -151,10 +175,17 @@ export function flattenVhuInput(formInput: BsvhuInput) {
 function flattenVhuEmitterInput({ emitter }: Pick<BsvhuInput, "emitter">) {
   return {
     emitterAgrementNumber: chain(emitter, e => e.agrementNumber),
+    emitterIrregularSituation: chain(emitter, e => e.irregularSituation),
+    emitterNoSiret: chain(emitter, e => e.noSiret),
     emitterCompanyName: chain(emitter, e => chain(e.company, c => c.name)),
     emitterCompanySiret: chain(emitter, e => chain(e.company, c => c.siret)),
     emitterCompanyAddress: chain(emitter, e =>
       chain(e.company, c => c.address)
+    ),
+    emitterCompanyStreet: chain(emitter, e => chain(e.company, c => c.street)),
+    emitterCompanyCity: chain(emitter, e => chain(e.company, c => c.city)),
+    emitterCompanyPostalCode: chain(emitter, e =>
+      chain(e.company, c => c.postalCode)
     ),
     emitterCompanyContact: chain(emitter, e =>
       chain(e.company, c => c.contact)

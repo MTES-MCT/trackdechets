@@ -1,14 +1,19 @@
 import { inviteUserToJoin, notifyUserOfInvite, renderMail } from "@td/mail";
 import { siretify } from "../../../../__tests__/factories";
 import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompanyService";
+import { User } from "@prisma/client";
 
 const userMock = jest.fn();
 const companyMock = jest.fn();
+const membershipRequestMock = jest.fn();
 
 jest.mock("@td/prisma", () => ({
   prisma: {
     user: { findUnique: jest.fn((...args) => userMock(...args)) },
-    company: { findUnique: jest.fn((...args) => companyMock(...args)) }
+    company: { findUnique: jest.fn((...args) => companyMock(...args)) },
+    membershipRequest: {
+      updateMany: jest.fn((...args) => membershipRequestMock(...args))
+    }
   }
 }));
 
@@ -33,26 +38,49 @@ describe("inviteUserToCompany", () => {
   beforeEach(() => {
     userMock.mockReset();
     companyMock.mockReset();
+    membershipRequestMock.mockReset();
     sendMailMock.mockReset();
     associateUserToCompanyMock.mockReset();
     createUserAccountHashMock.mockReset();
   });
 
   it("should associate existing user to company if user exists", async () => {
+    const admin = {
+      id: "id",
+      name: "Sansa Stark",
+      email: "sansa.stark@trackdechets.fr"
+    };
+
     const user = { id: "id", name: "Arya Stark" };
     userMock.mockResolvedValueOnce(user);
     const siret = siretify(1);
-    const company = { siret, name: "Code en Stock" };
+    const company = { id: "companyId", siret, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
-    await inviteUserToCompany({
+    await inviteUserToCompany(admin as User, {
       email: "arya.stark@trackdechets.fr",
       siret,
       role: "MEMBER"
     });
 
-    expect(associateUserToCompanyMock).toBeCalledWith("id", siret, "MEMBER", {
-      automaticallyAccepted: true
+    expect(associateUserToCompanyMock).toHaveBeenCalledWith(
+      "id",
+      siret,
+      "MEMBER",
+      {
+        automaticallyAccepted: true
+      }
+    );
+
+    expect(membershipRequestMock).toHaveBeenCalledWith({
+      where: {
+        userId: "id",
+        companyId: "companyId"
+      },
+      data: {
+        status: "ACCEPTED",
+        statusUpdatedBy: "sansa.stark@trackdechets.fr"
+      }
     });
 
     expect(sendMailMock).toHaveBeenCalledWith(
@@ -64,6 +92,11 @@ describe("inviteUserToCompany", () => {
   });
 
   it("should create a temporary association if user does not exist", async () => {
+    const admin = {
+      id: "id",
+      name: "Sansa Stark",
+      email: "sansa.stark@trackdechets.fr"
+    };
     userMock.mockResolvedValueOnce(null);
     const userAccountHash = {
       email: "arya.stark@trackdechets.fr",
@@ -75,7 +108,7 @@ describe("inviteUserToCompany", () => {
     const company = { siret, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
-    await inviteUserToCompany({
+    await inviteUserToCompany(admin as User, {
       email: "arya.stark@trackdechets.fr",
       siret,
       role: "MEMBER"
@@ -105,6 +138,11 @@ describe("inviteUserToCompany", () => {
   });
 
   it("should sanitize email", async () => {
+    const admin = {
+      id: "id",
+      name: "Sansa Stark",
+      email: "sansa.stark@trackdechets.fr"
+    };
     userMock.mockResolvedValueOnce(null);
     const userAccountHash = {
       email: "Arya.Stark@trackdechets.fr",
@@ -116,7 +154,7 @@ describe("inviteUserToCompany", () => {
     const company = { siret, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
-    await inviteUserToCompany({
+    await inviteUserToCompany(admin as User, {
       email: "arya.stark@trackdechets.fr",
       siret,
       role: "MEMBER"

@@ -96,6 +96,7 @@ describe("Mutation.updateBsda", () => {
   it("should allow user to update a draft BSDA", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
+      userId: user.id,
       opt: {
         isDraft: true,
         status: "INITIAL",

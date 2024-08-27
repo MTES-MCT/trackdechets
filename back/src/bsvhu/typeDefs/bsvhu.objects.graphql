@@ -56,6 +56,10 @@ type Bsvhu {
 type BsvhuEmitter {
   "Numéro d'agrément émetteur"
   agrementNumber: String
+  "Indique si l'émetteur est en situation irrégulière"
+  irregularSituation: Boolean!
+  "Indique si l'émetteur est un particulier ou une entreprise sans SIRET"
+  noSiret: Boolean!
   "Coordonnées de l'entreprise émétrice"
   company: FormCompany
   "Déclaration générale de l'émetteur du bordereau"

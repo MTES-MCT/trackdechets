@@ -108,7 +108,7 @@ export default function buildSirenify<T>(
   };
 }
 
-type NextCompanyInputAccessor<T> = {
+export type NextCompanyInputAccessor<T> = {
   siret: string | null | undefined;
   skip: boolean;
   setter: (
@@ -116,6 +116,9 @@ type NextCompanyInputAccessor<T> = {
     data: {
       name: string | null | undefined;
       address: string | null | undefined;
+      street: string | null | undefined;
+      city: string | null | undefined;
+      postalCode: string | null | undefined;
     }
   ) => void;
 };
@@ -156,7 +159,10 @@ export function nextBuildSirenify<T>(
 
       setter(sirenifiedInput, {
         name: companySearchResult.name,
-        address: companySearchResult.address
+        address: companySearchResult.address,
+        city: companySearchResult.addressCity,
+        postalCode: companySearchResult.addressPostalCode,
+        street: companySearchResult.addressVoie
       });
     }
 

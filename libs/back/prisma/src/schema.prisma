@@ -864,6 +864,10 @@ model User {
 enum GovernmentPermission {
   // Accès en lecture au registre de tous les établissements
   REGISTRY_CAN_READ_ALL
+  // Accès en lecture à la recherche multi bsds (query bsds)
+  BSDS_CAN_READ_ALL
+  // Accès au téléchargement de tout bsd au format pdf
+  BSDS_PDF_CAN_DOWNLOAD_ALL
 }
 
 model GovernmentAccount {
@@ -940,10 +944,16 @@ model Bsvhu {
 
   status BsvhuStatus @default(INITIAL)
 
+  emitterIrregularSituation                           Boolean?
+  emitterNoSiret                                      Boolean?
   emitterAgrementNumber                               String?                  @db.VarChar(100)
   emitterCompanyName                                  String?
   emitterCompanySiret                                 String?                  @db.VarChar(17)
   emitterCompanyAddress                               String?
+  emitterCompanyStreet                                String?
+  emitterCompanyCity                                  String?
+  emitterCompanyPostalCode                            String?
+  emitterCompanyCountry                               String?
   emitterCompanyContact                               String?
   emitterCompanyPhone                                 String?
   emitterCompanyMail                                  String?
@@ -1077,6 +1087,7 @@ model Bsdasri {
   destinationReceptionWasteRefusalReason      String?
   destinationReceptionWasteRefusedWeightValue Decimal?                @db.Decimal(65, 30)
   destinationReceptionWasteWeightValue        Decimal?                @db.Decimal(65, 30)
+  // cached value to avoid computing it each time the dasri is accessed
   destinationReceptionWasteVolume             Float?
   destinationReceptionDate                    DateTime?               @db.Timestamptz(6)
   destinationOperationCode                    String?
@@ -1535,6 +1546,7 @@ model Bsda {
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
   transportersOrgIds   String[] @default([])
+  canAccessDraftOrgIds String[] @default([])
 
   // Relation vers les infos de traçabilité finales
   // Même si aujourd'hui il ne peut y avoir qu'une opération finale, on anticipe le fait 
@@ -1553,6 +1565,7 @@ model Bsda {
   @@index([updatedAt], map: "_BsdaUpdatedAtIdx")
   @@index([intermediariesOrgIds], map: "_BsdaIntermediariesOrgIdsIdx", type: Gin)
   @@index([transportersOrgIds], map: "_BsdaTransportersOrgIdsIdx", type: Gin)
+  @@index([canAccessDraftOrgIds], map: "_BsdaCanAccessDraftOrgIdsIdx", type: Gin)
 }
 
 model BsdaFinalOperation {

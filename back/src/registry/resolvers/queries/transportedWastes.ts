@@ -1,8 +1,12 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import getWasteConnection from "../../wastes";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { hasGovernmentRegistryPerm } from "../../permissions";
-import { Permission, checkUserPermissions } from "../../../permissions";
+
+import {
+  Permission,
+  checkUserPermissions,
+  hasGovernmentRegistryPerm
+} from "../../../permissions";
 
 const transportedWastesResolver: QueryResolvers["transportedWastes"] = async (
   _,

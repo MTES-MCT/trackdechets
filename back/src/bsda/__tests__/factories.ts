@@ -1,7 +1,12 @@
 import { BsdaConsistence, BsdaType, Prisma } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { prisma } from "@td/prisma";
-import { siretify, upsertBaseSiret } from "../../__tests__/factories";
+import {
+  siretify,
+  upsertBaseSiret,
+  userWithCompanyFactory
+} from "../../__tests__/factories";
+import { getUserCompanies } from "../../users/database";
 
 /**
  * Permet de créer un BSDA avec des données par défaut et
@@ -15,14 +20,25 @@ import { siretify, upsertBaseSiret } from "../../__tests__/factories";
  * grâce à `bsdaTransporterFactory`
  */
 export const bsdaFactory = async ({
+  userId,
   opt = {},
   transporterOpt = {}
 }: {
+  userId?: string;
   opt?: Partial<Prisma.BsdaCreateInput>;
   transporterOpt?: Partial<Prisma.BsdaTransporterCreateInput>;
 }) => {
   const bsdaObject = getBsdaObject();
-
+  const userAndCompany = userId
+    ? null
+    : await userWithCompanyFactory("ADMIN", {
+        siret: bsdaObject.emitterCompanySiret,
+        name: bsdaObject.emitterCompanyName ?? undefined,
+        address: bsdaObject.emitterCompanyAddress ?? undefined,
+        contact: bsdaObject.emitterCompanyContact ?? undefined,
+        contactPhone: bsdaObject.emitterCompanyPhone ?? undefined,
+        contactEmail: bsdaObject.emitterCompanyMail ?? undefined
+      });
   await upsertBaseSiret(
     (
       bsdaObject.transporters!
@@ -53,24 +69,57 @@ export const bsdaFactory = async ({
       transporters: true
     }
   });
-  if (created?.intermediaries) {
-    return prisma.bsda.update({
-      where: { id: created.id },
-      data: {
-        intermediariesOrgIds: created.intermediaries
-          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
-          .filter(Boolean)
-      },
-      include: {
-        intermediaries: true,
-        grouping: true,
-        forwarding: true,
-        transporters: true
-      }
-    });
+  const intermediariesOrgIds: string[] = created.intermediaries
+    ? created.intermediaries
+        .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+        .filter(Boolean)
+    : [];
+  const transportersOrgIds: string[] = created.transporters
+    ? created.transporters
+        .flatMap(t => [
+          t.transporterCompanySiret,
+          t.transporterCompanyVatNumber
+        ])
+        .filter(Boolean)
+    : [];
+  // For drafts, only the owner's sirets that appear on the bsd have access
+  const canAccessDraftOrgIds: string[] = [];
+  if (created.isDraft) {
+    const userCompanies = await getUserCompanies(
+      (userId || userAndCompany?.user?.id) as string
+    );
+    const userOrgIds = userCompanies.map(company => company.orgId);
+
+    const bsdaOrgIds = [
+      ...intermediariesOrgIds,
+      ...transportersOrgIds,
+      created.emitterCompanySiret,
+      created.ecoOrganismeSiret,
+      created.destinationCompanySiret,
+      created.destinationOperationNextDestinationCompanySiret,
+      created.workerCompanySiret,
+      created.brokerCompanySiret
+    ].filter(Boolean);
+    const userOrgIdsInForm = userOrgIds.filter(orgId =>
+      bsdaOrgIds.includes(orgId)
+    );
+    canAccessDraftOrgIds.push(...userOrgIdsInForm);
   }
 
-  return created;
+  return prisma.bsda.update({
+    where: { id: created.id },
+    data: {
+      ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {}),
+      ...(transportersOrgIds.length ? { transportersOrgIds } : {}),
+      ...(intermediariesOrgIds.length ? { intermediariesOrgIds } : {})
+    },
+    include: {
+      intermediaries: true,
+      grouping: true,
+      forwarding: true,
+      transporters: true
+    }
+  });
 };
 
 export const bsdaTransporterFactory = async ({

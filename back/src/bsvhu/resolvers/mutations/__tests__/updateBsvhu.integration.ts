@@ -184,7 +184,7 @@ describe("Mutation.Vhu.update", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le N° d'agrément de l'émetteur a été vérouillé via signature et ne peut pas être modifié.",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le N° d'agrément de l'émetteur",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })

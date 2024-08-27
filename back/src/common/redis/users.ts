@@ -1,5 +1,5 @@
 import { redisClient, generateKey } from "./redis";
-import { USER_ROLES_CACHE_KEY } from "../../permissions";
+import { USER_ROLES_CACHE_KEY } from "../../permissions/permissions";
 
 const CACHED_COMPANY_EXPIRATION = 10 * 60; // 10 minutes
 

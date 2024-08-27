@@ -54,6 +54,65 @@ function transporterCompanyOrgIdKey(transporter: BsdaTransporter) {
   return `transporter${transporter.number}CompanyOrgId`;
 }
 
+const getBsdaSirets = (
+  bsda: BsdaForElastic
+): Partial<
+  Record<keyof Bsda | "transporterCompanySiret", string | null | undefined>
+> => {
+  const intermediarySirets = bsda.intermediaries.reduce(
+    (sirets, intermediary) => {
+      if (intermediary.siret) {
+        const nbOfKeys = Object.keys(sirets).length;
+        return {
+          ...sirets,
+          [`intermediarySiret${nbOfKeys + 1}`]: intermediary.siret
+        };
+      }
+      return sirets;
+    },
+    {}
+  );
+
+  // build a mapping that looks like
+  // { transporter1CompanyOrgId: "SIRET1", transporter2CompanyOrgId: "SIRET2"}
+  const transporterOrgIds = (bsda.transporters ?? []).reduce(
+    (acc, transporter) => {
+      const orgId = getTransporterCompanyOrgId(transporter);
+      if (orgId) {
+        return {
+          ...acc,
+          [transporterCompanyOrgIdKey(transporter)]: orgId
+        };
+      }
+      return acc;
+    },
+    {}
+  );
+  const bsdaSirets: Partial<
+    Record<keyof Bsda | "transporterCompanySiret", string | null | undefined>
+  > = {
+    emitterCompanySiret: bsda.emitterCompanySiret,
+    ecoOrganismeSiret: bsda.ecoOrganismeSiret,
+    workerCompanySiret: bsda.workerCompanySiret,
+    destinationCompanySiret: bsda.destinationCompanySiret,
+    brokerCompanySiret: bsda.brokerCompanySiret,
+    destinationOperationNextDestinationCompanySiret:
+      bsda.destinationOperationNextDestinationCompanySiret,
+    ...intermediarySirets,
+    ...transporterOrgIds
+  };
+
+  // Drafts only appear in the dashboard for companies the bsda owner belongs to
+  if (bsda.isDraft) {
+    const draftFormSiretsEntries = Object.entries(bsdaSirets).filter(
+      ([, siret]) => siret && bsda.canAccessDraftOrgIds.includes(siret)
+    );
+    return Object.fromEntries(draftFormSiretsEntries);
+  }
+
+  return bsdaSirets;
+};
+
 type WhereKeys =
   | "isDraftFor"
   | "isForActionFor"
@@ -81,51 +140,9 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     isCollectedFor: []
   };
 
-  const intermediarySirets = bsda.intermediaries.reduce(
-    (sirets, intermediary) => {
-      if (intermediary.siret) {
-        const nbOfKeys = Object.keys(sirets).length;
-        return {
-          ...sirets,
-          [`intermediarySiret${nbOfKeys + 1}`]: intermediary.siret
-        };
-      }
-      return sirets;
-    },
-    {}
-  );
-
   const firstTransporter = getFirstTransporterSync(bsda);
 
-  // build a mapping that looks like
-  // { transporter1CompanyOrgId: "SIRET1", transporter2CompanyOrgId: "SIRET2"}
-  const transporterOrgIds = (bsda.transporters ?? []).reduce(
-    (acc, transporter) => {
-      const orgId = getTransporterCompanyOrgId(transporter);
-      if (orgId) {
-        return {
-          ...acc,
-          [transporterCompanyOrgIdKey(transporter)]: orgId
-        };
-      }
-      return acc;
-    },
-    {}
-  );
-
-  const bsdaSirets: Partial<
-    Record<keyof Bsda | "transporterCompanySiret", string | null | undefined>
-  > = {
-    emitterCompanySiret: bsda.emitterCompanySiret,
-    ecoOrganismeSiret: bsda.ecoOrganismeSiret,
-    workerCompanySiret: bsda.workerCompanySiret,
-    destinationCompanySiret: bsda.destinationCompanySiret,
-    brokerCompanySiret: bsda.brokerCompanySiret,
-    destinationOperationNextDestinationCompanySiret:
-      bsda.destinationOperationNextDestinationCompanySiret,
-    ...intermediarySirets,
-    ...transporterOrgIds
-  };
+  const bsdaSirets = getBsdaSirets(bsda);
 
   const siretsFilters = new Map<string, keyof typeof where>(
     Object.entries(bsdaSirets)

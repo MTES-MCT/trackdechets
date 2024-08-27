@@ -7,6 +7,7 @@ import { BsdaForPDFInclude, buildPdf } from "../../pdf/generator";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getReadonlyBsdaRepository } from "../../repository";
 import { checkCanReadPdf } from "../../permissions";
+import { hasGovernmentReadAllBsdsPermOrThrow } from "../../../permissions";
 
 export const bsdaPdfDownloadHandler: DownloadHandler<QueryBsdaPdfArgs> = {
   name: "bsdaPdf",
@@ -24,8 +25,12 @@ export default async function bsdaPdf(_, { id }: QueryBsdaPdfArgs, context) {
   const user = checkIsAuthenticated(context);
   const bsda = await getBsdaOrNotFound(id, { include: { transporters: true } });
 
-  await checkCanReadPdf(user, bsda);
-
+  if (!user.isAdmin && !user.governmentAccountId) {
+    await checkCanReadPdf(user, bsda);
+  }
+  if (user.governmentAccountId) {
+    await hasGovernmentReadAllBsdsPermOrThrow(user);
+  }
   return getFileDownload({
     handler: bsdaPdfDownloadHandler.name,
     params: { id }

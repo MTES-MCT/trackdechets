@@ -709,7 +709,7 @@ describe("Mutation.Bspaoh.create", () => {
         message:
           `L'entreprise avec le SIRET "${destinationCompany.siret}" n'est pas inscrite sur ` +
           `Trackdéchets en tant que crématorium. Cette installation ne peut donc pas être visée sur le bordereau. ` +
-          `Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`,
+          `Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

@@ -29,6 +29,36 @@ describe("toGenericWaste", () => {
     // Then
     expect(waste.destinationCompanyMail).toBe("destination@mail.com");
   });
+
+  it("should contain emitter's natively splitted address if available", async () => {
+    // Given
+    const emitter = await companyFactory({
+      name: "Emitter company name",
+      address: null
+    });
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        emitterCompanyName: emitter.name,
+        emitterCompanyStreet: "17 rue Robert Doisneau",
+        emitterCompanyPostalCode: "13370",
+        emitterCompanyCity: "Mallemort"
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id }
+    });
+
+    const waste = toGenericWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.emitterCompanyAddress).toBe("17 rue Robert Doisneau");
+    expect(waste.emitterCompanyPostalCode).toBe("13370");
+    expect(waste.emitterCompanyCity).toBe("Mallemort");
+    expect(waste.emitterCompanyCountry).toBe("FR");
+  });
 });
 
 describe("toIncomingWaste", () => {

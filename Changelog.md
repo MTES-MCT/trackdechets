@@ -5,6 +5,30 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.8.1] 27/08/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- BSVHU: Permettre de viser un émetteur en situation irrégulière avec ou sans SIRET [PR 3517](https://github.com/MTES-MCT/trackdechets/pull/3517)
+
+#### :bug: Corrections de bugs
+
+- Résolution d'un problème de resolver BsdaRevisionRequest qui empêchait l'ouverture de la modale de révision [PR 3513](https://github.com/MTES-MCT/trackdechets/pull/3513)
+- Une demande de rattachement est automatiquement acceptée si l'utilisateur est invité dans un établissement [PR 3526](https://github.com/MTES-MCT/trackdechets/pull/3526)
+
+#### :house: Interne
+
+- Modification des permissions pour la query Bsds et toutes les queries Pdf [PR 3519](https://github.com/MTES-MCT/trackdechets/pull/3519)
+
+#### :nail_care: Améliorations
+
+- Rendre BSDAs en brouillon inaccessibles pour les entreprises dont l'auteur ne fait pas partie [PR 3503](https://github.com/MTES-MCT/trackdechets/pull/3503)
+- Ajout de la possibilité de réviser la quantité du destinataire d'un BSDD si un entreposage provisoire est présent [PR 3527](https://github.com/MTES-MCT/trackdechets/pull/3527)
+
+#### :boom: Breaking changes
+
+- Le champ volume de BsdasriReceptionInput est supprimé, BsdasriReception/volume étant calculé à partir des packagings [PR #3509](https://github.com/MTES-MCT/trackdechets/pull/3509)
+
 # [2024.7.2] 30/07/2024
 
 #### :rocket: Nouvelles fonctionnalités
