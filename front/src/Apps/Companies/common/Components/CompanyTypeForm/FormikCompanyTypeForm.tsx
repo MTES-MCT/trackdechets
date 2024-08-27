@@ -37,7 +37,12 @@ export interface FormikCompanyTypeValues {
 
 type FormikCompanyTypeFormProps = Pick<
   FormikProps<FormikCompanyTypeValues>,
-  "values" | "handleChange" | "handleBlur" | "setFieldValue" | "errors"
+  | "values"
+  | "handleChange"
+  | "handleBlur"
+  | "setFieldValue"
+  | "errors"
+  | "touched"
 >;
 
 const FormikCompanyTypeForm: React.FC<FormikCompanyTypeFormProps> = ({
@@ -45,7 +50,8 @@ const FormikCompanyTypeForm: React.FC<FormikCompanyTypeFormProps> = ({
   handleChange,
   handleBlur,
   setFieldValue,
-  errors
+  errors,
+  touched
 }) => {
   const companyTypes = values.companyTypes;
   const collectorTypes = values.collectorTypes;
@@ -202,34 +208,64 @@ const FormikCompanyTypeForm: React.FC<FormikCompanyTypeFormProps> = ({
       }}
       inputErrors={{
         transporterReceipt: {
-          receiptNumber: (errors?.transporterReceipt as any)?.receiptNumber,
-          validityLimit: (errors?.transporterReceipt as any)?.validityLimit,
-          department: (errors?.transporterReceipt as any)?.department
+          receiptNumber: touched?.transporterReceipt
+            ? (errors?.transporterReceipt as any)?.receiptNumber
+            : null,
+          validityLimit: touched?.transporterReceipt
+            ? (errors?.transporterReceipt as any)?.validityLimit
+            : null,
+          department: touched?.transporterReceipt
+            ? (errors?.transporterReceipt as any)?.department
+            : null
         },
         brokerReceipt: {
-          receiptNumber: (errors?.brokerReceipt as any)?.receiptNumber,
-          validityLimit: (errors?.brokerReceipt as any)?.validityLimit,
-          department: (errors?.brokerReceipt as any)?.department
+          receiptNumber: touched?.brokerReceipt
+            ? (errors?.brokerReceipt as any)?.receiptNumber
+            : null,
+          validityLimit: touched?.brokerReceipt
+            ? (errors?.brokerReceipt as any)?.validityLimit
+            : null,
+          department: touched?.brokerReceipt
+            ? (errors?.brokerReceipt as any)?.department
+            : null
         },
         traderReceipt: {
-          receiptNumber: (errors?.traderReceipt as any)?.receiptNumber,
-          validityLimit: (errors?.traderReceipt as any)?.validityLimit,
-          department: (errors?.traderReceipt as any)?.department
+          receiptNumber: touched?.traderReceipt
+            ? (errors?.traderReceipt as any)?.receiptNumber
+            : null,
+          validityLimit: touched?.traderReceipt
+            ? (errors?.traderReceipt as any)?.validityLimit
+            : null,
+          department: touched?.traderReceipt
+            ? (errors?.traderReceipt as any)?.department
+            : null
         },
         vhuAgrementDemolisseur: {
-          agrementNumber: (errors?.vhuAgrementDemolisseur as any)
-            ?.agrementNumber,
-          department: (errors?.vhuAgrementDemolisseur as any)?.department
+          agrementNumber: touched?.vhuAgrementDemolisseur
+            ? (errors?.vhuAgrementDemolisseur as any)?.agrementNumber
+            : null,
+          department: touched?.vhuAgrementDemolisseur
+            ? (errors?.vhuAgrementDemolisseur as any)?.department
+            : null
         },
         vhuAgrementBroyeur: {
-          agrementNumber: (errors?.vhuAgrementBroyeur as any)?.agrementNumber,
-          department: (errors?.vhuAgrementBroyeur as any)?.department
+          agrementNumber: touched?.vhuAgrementBroyeur
+            ? (errors?.vhuAgrementBroyeur as any)?.agrementNumber
+            : null,
+          department: touched?.vhuAgrementBroyeur
+            ? (errors?.vhuAgrementBroyeur as any)?.department
+            : null
         },
         workerCertification: {
-          certificationNumber: (errors.workerCertification as any)
-            ?.certificationNumber,
-          validityLimit: (errors.workerCertification as any)?.validityLimit,
-          organisation: (errors.workerCertification as any)?.organisation
+          certificationNumber: touched?.workerCertification
+            ? (errors.workerCertification as any)?.certificationNumber
+            : null,
+          validityLimit: touched?.workerCertification
+            ? (errors.workerCertification as any)?.validityLimit
+            : null,
+          organisation: touched?.workerCertification
+            ? (errors.workerCertification as any)?.organisation
+            : null
         },
         ecoOrganismeAgreements: (errors?.ecoOrganismeAgreements ??
           []) as string[]

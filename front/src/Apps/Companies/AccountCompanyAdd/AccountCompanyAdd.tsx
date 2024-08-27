@@ -403,8 +403,6 @@ export default function AccountCompanyAdd() {
                 ecoOrganismeAgreements: []
               }}
               validate={values => {
-                const isTransporter_ = isTransporter(values.companyTypes);
-
                 const filledTransporterRecepisseFields = [
                   values.transporterReceipt?.receiptNumber,
                   values.transporterReceipt?.validityLimit,
@@ -414,7 +412,7 @@ export default function AccountCompanyAdd() {
                 // Les champs du récépissé transporteur doivent être
                 // soit tous nuls soit tous remplis.
                 const missingTransporterReceipField =
-                  isTransporter_ &&
+                  isTransporter(values.companyTypes) &&
                   filledTransporterRecepisseFields.length > 0 &&
                   filledTransporterRecepisseFields.length < 3;
 
@@ -593,14 +591,10 @@ export default function AccountCompanyAdd() {
                 handleBlur,
                 handleChange,
                 errors,
-                touched,
-                handleSubmit
+                touched
               }) => {
                 return (
-                  <Form
-                    className={styles.companyAddForm}
-                    onSubmit={handleSubmit}
-                  >
+                  <Form className={styles.companyAddForm}>
                     <Field name="givenName">
                       {({ field }) => {
                         return (
@@ -750,6 +744,7 @@ export default function AccountCompanyAdd() {
                             handleBlur={handleBlur}
                             handleChange={handleChange}
                             errors={errors}
+                            touched={touched}
                           />
                         )}
                         <RedErrorMessage name="companyTypes" />
