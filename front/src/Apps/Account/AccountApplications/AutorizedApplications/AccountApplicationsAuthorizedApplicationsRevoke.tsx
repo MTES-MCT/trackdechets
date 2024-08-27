@@ -32,6 +32,7 @@ export default function AccountApplicationsAuthorizedApplicationsRevoke({
       title="Révoquer une application"
       ariaLabel="Révoquer une application"
       onClose={onClose}
+      closeLabel="Ne pas révoquer"
       isOpen
     >
       <div>
@@ -39,9 +40,6 @@ export default function AccountApplicationsAuthorizedApplicationsRevoke({
         {authorizedApplication.name}" ?
       </div>
       <div className="td-modal-actions">
-        <button className="fr-btn" onClick={() => onClose()}>
-          Annuler
-        </button>
         <button
           className="fr-btn fr-btn--secondary"
           onClick={() =>
@@ -52,6 +50,9 @@ export default function AccountApplicationsAuthorizedApplicationsRevoke({
           disabled={loading}
         >
           {loading ? "Révocation..." : "Révoquer"}
+        </button>
+        <button className="fr-btn" onClick={() => onClose()}>
+          Ne pas révoquer
         </button>
       </div>
       {error && <NotificationError apolloError={error} />}
