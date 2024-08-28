@@ -297,7 +297,7 @@ const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
   ].includes(currentSiret);
 
 const hasWorker = (bsd: BsdDisplay): boolean =>
-  isBsda(bsd.type) && !!bsd.worker?.company?.siret;
+  isBsda(bsd.type) && !bsd.worker?.isDisabled && !!bsd.worker?.company?.siret;
 
 const isSameSiretTemporaryStorageTransporter = (
   currentSiret: string,
