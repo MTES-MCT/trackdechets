@@ -3,7 +3,7 @@ import { RedErrorMessage } from "../../../../../common/components";
 import routes from "../../../../../Apps/routes";
 import { UPDATE_BSDA } from "../../../../../Apps/common/queries/bsda/queries";
 import { WasteInfoWorker } from "../../../../../form/bsda/stepper/steps/WasteInfo";
-import { getComputedState } from "../../../../../form/common/getComputedState";
+import { getComputedState } from "../../../../../Apps/Dashboard/Creation/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   BsdaConsistence,

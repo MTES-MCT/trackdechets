@@ -85,7 +85,11 @@ const FormStepsTabs = ({
           </Button>
 
           {draftCtaLabel && (
-            <Button priority="secondary" id="id_save_draft">
+            <Button
+              priority="secondary"
+              id="id_save_draft"
+              nativeButtonProps={{ "data-testid": "draftBtn" }}
+            >
               {draftCtaLabel}
             </Button>
           )}
