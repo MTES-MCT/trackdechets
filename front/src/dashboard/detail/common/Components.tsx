@@ -142,11 +142,15 @@ export const TransporterReceiptDetails = ({
   ) : null;
 };
 
-export const Transporter: React.FC<{
+export const Transporter = ({
+  transporter,
+  isMultiModal,
+  numero
+}: {
   transporter: BsdaTransporter | BsffTransporter;
   isMultiModal: boolean;
   numero: number;
-}> = ({ transporter, isMultiModal, numero }) => {
+}): React.JSX.Element => {
   return (
     <>
       <div className={styles.detailGrid}>

@@ -2,7 +2,8 @@ import {
   User,
   TraderReceipt,
   BrokerReceipt,
-  WorkerCertification
+  WorkerCertification,
+  TransporterReceipt
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { VhuAgrement } from "../generated/graphql/types";
@@ -20,6 +21,12 @@ export async function checkCanReadUpdateDeleteTraderReceipt(
     .Company({ select: { orgId: true } });
 
   const orgIds = (companies ?? []).map(c => c.orgId);
+
+  if (orgIds.length === 0) {
+    // Permet de supprimer un récépissé après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
+    return true;
+  }
 
   await checkUserPermissions(
     user,
@@ -44,6 +51,12 @@ export async function checkCanReadUpdateDeleteBrokerReceipt(
 
   const orgIds = (companies ?? []).map(c => c.orgId);
 
+  if (orgIds.length === 0) {
+    // Permet de supprimer un récépissé après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
+    return true;
+  }
+
   await checkUserPermissions(
     user,
     orgIds,
@@ -56,7 +69,7 @@ export async function checkCanReadUpdateDeleteBrokerReceipt(
 
 export async function checkCanReadUpdateDeleteTransporterReceipt(
   user: User,
-  receipt: TraderReceipt
+  receipt: TransporterReceipt
 ) {
   // check associated company
   const companies = await prisma.transporterReceipt
@@ -66,6 +79,12 @@ export async function checkCanReadUpdateDeleteTransporterReceipt(
     .Company({ select: { orgId: true } });
 
   const orgIds = (companies ?? []).map(c => c.orgId);
+
+  if (orgIds.length === 0) {
+    // Permet de supprimer un récépissé après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
+    return true;
+  }
 
   await checkUserPermissions(
     user,
@@ -94,6 +113,12 @@ export async function checkCanReadUpdateDeleteVhuAgrement(
     c => c.orgId
   );
 
+  if (orgIds.length === 0) {
+    // Permet de supprimer un agrément après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
+    return true;
+  }
+
   await checkUserPermissions(
     user,
     orgIds,
@@ -115,6 +140,12 @@ export async function checkCanReadUpdateDeleteWorkerCertification(
     .Company({ select: { orgId: true } });
 
   const orgIds = (companies ?? []).map(c => c.orgId);
+
+  if (orgIds.length === 0) {
+    // Permet de supprimer une certification après l'avoir "déconnecter" d'un établissement
+    // via `updateCompany`
+    return true;
+  }
 
   await checkUserPermissions(
     user,
