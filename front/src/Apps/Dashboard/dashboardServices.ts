@@ -806,7 +806,6 @@ export const getSignByProducerBtnLabel = (
           isOtherCollection(bsd.bsdWorkflowType?.toString()) ||
           bsd.worker?.isDisabled) &&
         ((!hasWorker(bsd) &&
-          currentSiret === bsd.transporter?.company?.orgId &&
           permissions.includes(UserPermission.BsdCanSignTransport)) ||
           (hasWorker(bsd) &&
             currentSiret === bsd.worker?.company?.siret &&
@@ -826,10 +825,8 @@ export const getSignByProducerBtnLabel = (
     }
 
     if (
-      (currentSiret === bsd.worker?.company?.siret &&
-        permissions.includes(UserPermission.BsdCanSignWork)) ||
-      (currentSiret === bsd.transporter?.company?.orgId &&
-        permissions.includes(UserPermission.BsdCanSignTransport))
+      currentSiret === bsd.worker?.company?.siret &&
+      permissions.includes(UserPermission.BsdCanSignWork)
     ) {
       return SIGNER;
     }
