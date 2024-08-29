@@ -25,6 +25,7 @@ export type Nullable<T> = {
   [P in keyof T]: T[P] | null;
 };
 
+// utility types used by Paths and Leaves
 type Cons<H, T> = T extends readonly any[]
   ? ((h: H, ...t: T) => void) extends (...r: infer R) => void
     ? R
@@ -55,7 +56,20 @@ type Prev = [
   20,
   ...0[]
 ];
-
+/*
+Creates a type with all possible paths in an other object type, recursively,
+including all possible subpaths.
+For example:
+type obj = {
+  a: {
+    aa: number,
+    ab: string
+  },
+  c: number
+}
+Paths<obj>
+-> ["a"] | ["b"] | ["c"] | ["a", "aa"] | ["aa"] | ["a", "ab"] | ["ab"]
+*/
 export type Paths<T, D extends number = 3> = [D] extends [never]
   ? never
   : T extends object
@@ -70,6 +84,19 @@ export type Paths<T, D extends number = 3> = [D] extends [never]
     }[keyof T]
   : [];
 
+/*
+Creates a type with all possible paths in an other object type, recursively.
+For example:
+type obj = {
+  a: {
+    aa: number,
+    ab: string
+  },
+  c: number
+}
+Paths<obj>
+-> ["a"] | ["b"] | ["c"] | ["a", "aa"] | ["a", "ab"]
+*/
 export type Leaves<T, D extends number = 3> = [D] extends [never]
   ? never
   : T extends object
