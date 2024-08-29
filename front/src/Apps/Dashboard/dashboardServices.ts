@@ -296,6 +296,9 @@ const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
     bsd.temporaryStorageDetail?.transporter?.company?.orgId
   ].includes(currentSiret);
 
+const hasWorker = (bsd: BsdDisplay): boolean =>
+  isBsda(bsd.type) && !bsd.worker?.isDisabled && !!bsd.worker?.company?.siret;
+
 const isSameSiretTemporaryStorageTransporter = (
   currentSiret: string,
   bsd: BsdDisplay
@@ -802,8 +805,11 @@ export const getSignByProducerBtnLabel = (
           isReshipment(bsd.bsdWorkflowType?.toString()) ||
           isOtherCollection(bsd.bsdWorkflowType?.toString()) ||
           bsd.worker?.isDisabled) &&
-        (permissions.includes(UserPermission.BsdCanSignTransport) ||
-          permissions.includes(UserPermission.BsdCanSignWork))) ||
+        ((!hasWorker(bsd) &&
+          permissions.includes(UserPermission.BsdCanSignTransport)) ||
+          (hasWorker(bsd) &&
+            currentSiret === bsd.worker?.company?.siret &&
+            permissions.includes(UserPermission.BsdCanSignWork)))) ||
       isBsvhu(bsd.type)
     ) {
       return SIGNER;
@@ -819,10 +825,8 @@ export const getSignByProducerBtnLabel = (
     }
 
     if (
-      (currentSiret === bsd.worker?.company?.siret &&
-        permissions.includes(UserPermission.BsdCanSignWork)) ||
-      (currentSiret === bsd.transporter?.company?.orgId &&
-        permissions.includes(UserPermission.BsdCanSignTransport))
+      currentSiret === bsd.worker?.company?.siret &&
+      permissions.includes(UserPermission.BsdCanSignWork)
     ) {
       return SIGNER;
     }
