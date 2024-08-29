@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Ajouter deux sous-profils pour l'installation de traitement VHU [PR 3480](https://github.com/MTES-MCT/trackdechets/pull/3480)
+- Rendre les chemins d'erreur Zod BSVHU/BSPAOH plus explicite en les subdivisant [PR 3547](https://github.com/MTES-MCT/trackdechets/pull/3547)
 
 #### :boom: Breaking changes
 
