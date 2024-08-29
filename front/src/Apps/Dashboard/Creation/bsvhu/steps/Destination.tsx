@@ -115,7 +115,7 @@ const DestinationBsvhu = ({ isDisabled, errors }) => {
       }
 
       const agrementNumberError = errors?.find(
-        error => error.name === `${actor}.agrement.number` // FIXME  verify agrementNumber camel case ?
+        error => error.name === `${actor}.agrementNumber`
       )?.message;
       if (
         agrementNumberError &&

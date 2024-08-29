@@ -74,12 +74,10 @@ export const getPublishErrorTabIds = (apiErrors, tabIds) => {
 export const getPublishErrorMessages = apiErrors => {
   // return an array of messages with tabId, name (path) and the related message
   const publishErrorMessages = apiErrors?.map(apiError => {
-    const formattedError = apiError.path[0]
-      .split(/(?=[A-Z])/)
-      .map(s => s.toLowerCase()); // FIXME camel case split (waiting for zod path normalisation)
-    const pathPrefix = formattedError?.[0];
+    const errorPath = apiError?.path;
+    const pathPrefix = errorPath?.[0];
     const tabId = pathPrefix === "weight" ? "waste" : pathPrefix;
-    const name = formattedError.join("."); // FIXME after back normalisation
+    const name = errorPath.join(".");
     const message = apiError.message;
     return { tabId, name, message };
   });
@@ -125,8 +123,8 @@ export const handleGraphQlError = (err, setPublishErrors) => {
 };
 
 export const isVatNumberPath = (apiErrors, actor) =>
-  apiErrors?.find(error => error.name === `${actor}.company.vat.number`)
-    ?.message; // FIXME  verify vatNumber camel case ?
+  apiErrors?.find(error => error.name === `${actor}.company.vatNumber`)
+    ?.message;
 
 export const isCompanyMailPath = (apiErrors, actor) =>
   apiErrors?.find(error => error.name === `${actor}.company.mail`)?.message;
