@@ -48,7 +48,7 @@ type GetBsvhuSignatureTypeFn<T extends ZodBsvhu> = (
   ruleContext?: RuleContext<T>
 ) => SignatureTypeInput | undefined;
 
-export type EditionRulePath = Omit<Leaves<BsvhuInput, 5>, "id" | "metadata">;
+export type EditionRulePath = Leaves<BsvhuInput, 5>;
 
 // Règle d'édition qui permet de définir à partir de quelle signature
 // un champ est verrouillé / requis avec une config contenant un paramètre
