@@ -53,7 +53,7 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
           errors.issues?.map((e: ZodIssue) => {
             return {
               message: e.message,
-              path: `${e.path[0]}`, // e.path is an array, first element should be the path name
+              path: `${e.path.join(".")}`, // e.path is an array, first element should be the path name
               requiredFor
             };
           }) ?? []
