@@ -297,6 +297,7 @@ export type Bsdd = {
   destinationOperationNextDestinationCompanyContact: string | null;
   destinationOperationNextDestinationCompanyPhone: string | null;
   destinationOperationNextDestinationCompanyMail: string | null;
+  destinationHasCiterneBeenWashedOut: boolean | null;
   destinationOperationSignatureAuthor: string | null;
   destinationOperationDate: Date | null;
   destinationOperationSignatureDate: Date | null;

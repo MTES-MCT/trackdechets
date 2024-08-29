@@ -222,6 +222,7 @@ export function simpleFormToBsdd(
     destinationOperationSignatureDate: form.processedAt,
     destinationCap: form.recipientCap,
     destinationOperationNoTraceability: form.noTraceability,
+    destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
     destinationOperationNextDestinationCompanyName:
       form.nextDestinationCompanyName,
     destinationOperationNextDestinationCompanySiret:

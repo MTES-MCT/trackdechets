@@ -112,6 +112,14 @@ export const formatSubType = (subType?: BsdSubType) => {
   }
 };
 
+const formatHasCiterneBeenWashedOut = (
+  hasCiterneBeenWashedOut: boolean | null | undefined
+) => {
+  if (!isDefined(hasCiterneBeenWashedOut)) return "";
+
+  return hasCiterneBeenWashedOut ? "Effectué" : "Non effectué";
+};
+
 export const columns: Column[] = [
   // Dénomination, nature et quantité :
   { field: "id", label: "N° de bordereau" },
@@ -363,6 +371,11 @@ export const columns: Column[] = [
     field: "destinationOperationCode",
     label: "Code opération réalisé",
     format: formatOperationCode
+  },
+  {
+    field: "destinationHasCiterneBeenWashedOut",
+    label: "Rinçage citerne",
+    format: formatHasCiterneBeenWashedOut
   },
   {
     field: "destinationOperationNoTraceability",
