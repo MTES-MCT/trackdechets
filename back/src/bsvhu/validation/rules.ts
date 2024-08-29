@@ -1,6 +1,6 @@
 import { ZodBsvhu } from "./schema";
 import { BsvhuUserFunctions, BsvhuValidationContext } from "./types";
-import { SignatureTypeInput } from "../../generated/graphql/types";
+import { BsvhuInput, SignatureTypeInput } from "../../generated/graphql/types";
 import { WasteAcceptationStatus } from "@prisma/client";
 import { isForeignVat } from "@td/constants";
 import {
@@ -11,6 +11,7 @@ import {
 } from "./helpers";
 import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
+import { Leaves } from "../../types";
 
 // Liste des champs éditables sur l'objet Bsvhu
 export type BsvhuEditableFields = Required<
@@ -47,6 +48,8 @@ type GetBsvhuSignatureTypeFn<T extends ZodBsvhu> = (
   ruleContext?: RuleContext<T>
 ) => SignatureTypeInput | undefined;
 
+export type EditionRulePath = Omit<Leaves<BsvhuInput, 5>, "id" | "metadata">;
+
 // Règle d'édition qui permet de définir à partir de quelle signature
 // un champ est verrouillé / requis avec une config contenant un paramètre
 // optionnel `when`
@@ -66,6 +69,7 @@ export type EditionRules<T extends ZodBsvhu, E extends BsvhuEditableFields> = {
     // At what signature the field is required, and under which circumstances. If absent, field is never required
     required?: EditionRule<T>;
     readableFieldName?: string; // A custom field name for errors
+    path?: EditionRulePath;
   };
 };
 
@@ -91,25 +95,30 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   emitterAgrementNumber: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    readableFieldName: "Le N° d'agrément de l'émetteur"
+    readableFieldName: "Le N° d'agrément de l'émetteur",
+    path: ["emitter", "agrementNumber"]
   },
   emitterIrregularSituation: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    readableFieldName: "La situation (irrégulière ou non) de l'émetteur"
+    readableFieldName: "La situation (irrégulière ou non) de l'émetteur",
+    path: ["emitter", "irregularSituation"]
   },
   emitterNoSiret: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    readableFieldName: "La présence ou absence de N° SIRET de l'émetteur"
+    readableFieldName: "La présence ou absence de N° SIRET de l'émetteur",
+    path: ["emitter", "noSiret"]
   },
   emitterCompanyName: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "La raison sociale de l'émetteur"
+    readableFieldName: "La raison sociale de l'émetteur",
+    path: ["emitter", "company", "name"]
   },
   emitterCompanySiret: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterNoSiret },
-    readableFieldName: "Le N° SIRET de l'émetteur"
+    readableFieldName: "Le N° SIRET de l'émetteur",
+    path: ["emitter", "company", "siret"]
   },
   emitterCompanyAddress: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
@@ -120,22 +129,26 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
         !bsvhu.emitterCompanyCity ||
         !bsvhu.emitterCompanyPostalCode
     },
-    readableFieldName: "L'adresse de l'émetteur"
+    readableFieldName: "L'adresse de l'émetteur",
+    path: ["emitter", "company", "address"]
   },
   emitterCompanyStreet: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterCompanyAddress },
-    readableFieldName: "L'adresse de l'émetteur"
+    readableFieldName: "L'adresse de l'émetteur",
+    path: ["emitter", "company", "street"]
   },
   emitterCompanyCity: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterCompanyAddress },
-    readableFieldName: "L'adresse de l'émetteur"
+    readableFieldName: "L'adresse de l'émetteur",
+    path: ["emitter", "company", "city"]
   },
   emitterCompanyPostalCode: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterCompanyAddress },
-    readableFieldName: "L'adresse de l'émetteur"
+    readableFieldName: "L'adresse de l'émetteur",
+    path: ["emitter", "company", "postalCode"]
   },
   emitterCompanyContact: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
@@ -143,7 +156,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       from: "EMISSION",
       when: bsvhu => !bsvhu.emitterNoSiret
     },
-    readableFieldName: "La personne à contacter chez l'émetteur"
+    readableFieldName: "La personne à contacter chez l'émetteur",
+    path: ["emitter", "company", "contact"]
   },
   emitterCompanyPhone: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
@@ -151,7 +165,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       from: "EMISSION",
       when: bsvhu => !bsvhu.emitterIrregularSituation
     },
-    readableFieldName: "Le N° de téléphone de l'émetteur"
+    readableFieldName: "Le N° de téléphone de l'émetteur",
+    path: ["emitter", "company", "phone"]
   },
   emitterCompanyMail: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
@@ -159,72 +174,86 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       from: "EMISSION",
       when: bsvhu => !bsvhu.emitterIrregularSituation
     },
-    readableFieldName: "L'adresse e-mail de l'émetteur"
+    readableFieldName: "L'adresse e-mail de l'émetteur",
+    path: ["emitter", "company", "mail"]
   },
   destinationType: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le type de destination"
+    readableFieldName: "Le type de destination",
+    path: ["destination", "type"]
   },
   destinationPlannedOperationCode: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "L'opération prévue"
+    readableFieldName: "L'opération prévue",
+    path: ["destination", "plannedOperationCode"]
   },
   destinationAgrementNumber: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
-    readableFieldName: "Le N° d'agrément du destinataire"
+    readableFieldName: "Le N° d'agrément du destinataire",
+    path: ["destination", "agrementNumber"]
   },
   destinationCompanyName: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
-    readableFieldName: "La raison sociale du destinataire"
+    readableFieldName: "La raison sociale du destinataire",
+    path: ["destination", "company", "name"]
   },
   destinationCompanySiret: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
-    readableFieldName: "Le N° SIRET du destinataire"
+    readableFieldName: "Le N° SIRET du destinataire",
+    path: ["destination", "company", "siret"]
   },
   destinationCompanyAddress: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
-    readableFieldName: "L'adresse du destinataire"
+    readableFieldName: "L'adresse du destinataire",
+    path: ["destination", "company", "address"]
   },
   destinationCompanyContact: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
-    readableFieldName: "La personne à contacter chez le destinataire"
+    readableFieldName: "La personne à contacter chez le destinataire",
+    path: ["destination", "company", "contact"]
   },
   destinationCompanyPhone: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
-    readableFieldName: "Le N° de téléphone du destinataire"
+    readableFieldName: "Le N° de téléphone du destinataire",
+    path: ["destination", "company", "phone"]
   },
   destinationCompanyMail: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
-    readableFieldName: "L'adresse e-mail du destinataire"
+    readableFieldName: "L'adresse e-mail du destinataire",
+    path: ["destination", "company", "mail"]
   },
   destinationReceptionAcceptationStatus: {
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION" },
-    readableFieldName: "Le statut d'acceptation du destinataire"
+    readableFieldName: "Le statut d'acceptation du destinataire",
+    path: ["destination", "reception", "acceptationStatus"]
   },
   destinationReceptionRefusalReason: {
     sealed: { from: "OPERATION" },
     readableFieldName: "La raison du refus par le destinataire",
-    required: { from: "OPERATION", when: isRefusedOrPartiallyRefused }
+    required: { from: "OPERATION", when: isRefusedOrPartiallyRefused },
+    path: ["destination", "reception", "refusalReason"]
   },
   destinationReceptionIdentificationNumbers: {
     sealed: { from: "OPERATION" },
     readableFieldName:
-      "Les numéros d'identification à la réception par le destinataire"
+      "Les numéros d'identification à la réception par le destinataire",
+    path: ["destination", "reception", "identification", "numbers"]
   },
   destinationReceptionIdentificationType: {
     sealed: { from: "OPERATION" },
     readableFieldName:
-      "Le type de numéro d'identification à la réception par le destinataire"
+      "Le type de numéro d'identification à la réception par le destinataire",
+    path: ["destination", "reception", "identification", "type"]
   },
   destinationOperationCode: {
     sealed: { from: "OPERATION" },
@@ -232,7 +261,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       from: "OPERATION",
       when: isNotRefused
     },
-    readableFieldName: "L'opération réalisée par le destinataire"
+    readableFieldName: "L'opération réalisée par le destinataire",
+    path: ["destination", "operation", "code"]
   },
   destinationOperationMode: {
     sealed: { from: "OPERATION" },
@@ -240,20 +270,30 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     //   from: "OPERATION",
     //   when: isNotRefused // more precise check in checkOperationMode refinement
     // },
-    readableFieldName: "Le mode de traitement"
+    readableFieldName: "Le mode de traitement",
+    path: ["destination", "operation", "mode"]
   },
   destinationOperationDate: {
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION", when: isNotRefused },
-    readableFieldName: "la date de l'opération"
+    readableFieldName: "la date de l'opération",
+    path: ["destination", "operation", "date"]
   },
   destinationOperationNextDestinationCompanySiret: {
     sealed: { from: "OPERATION" },
-    readableFieldName: "Le N° SIRET de l'exutoire"
+    readableFieldName: "Le N° SIRET de l'exutoire",
+    path: ["destination", "operation", "nextDestination", "company", "siret"]
   },
   destinationOperationNextDestinationCompanyVatNumber: {
     sealed: { from: "OPERATION" },
-    readableFieldName: "Le N° de TVA de l'exutoire"
+    readableFieldName: "Le N° de TVA de l'exutoire",
+    path: [
+      "destination",
+      "operation",
+      "nextDestination",
+      "company",
+      "vatNumber"
+    ]
   },
   destinationOperationNextDestinationCompanyName: {
     sealed: { from: "OPERATION" },
@@ -262,7 +302,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
-    readableFieldName: "La raison sociale de l'exutoire"
+    readableFieldName: "La raison sociale de l'exutoire",
+    path: ["destination", "operation", "nextDestination", "company", "name"]
   },
   destinationOperationNextDestinationCompanyAddress: {
     sealed: { from: "OPERATION" },
@@ -271,7 +312,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
-    readableFieldName: "L'adresse de l'exutoire"
+    readableFieldName: "L'adresse de l'exutoire",
+    path: ["destination", "operation", "nextDestination", "company", "address"]
   },
   destinationOperationNextDestinationCompanyContact: {
     sealed: { from: "OPERATION" },
@@ -280,7 +322,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
-    readableFieldName: "La personne à contacter chez l'exutoire"
+    readableFieldName: "La personne à contacter chez l'exutoire",
+    path: ["destination", "operation", "nextDestination", "company", "contact"]
   },
   destinationOperationNextDestinationCompanyPhone: {
     sealed: { from: "OPERATION" },
@@ -289,7 +332,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
-    readableFieldName: "Le N° de téléphone de l'exutoire"
+    readableFieldName: "Le N° de téléphone de l'exutoire",
+    path: ["destination", "operation", "nextDestination", "company", "phone"]
   },
   destinationOperationNextDestinationCompanyMail: {
     sealed: { from: "OPERATION" },
@@ -298,20 +342,24 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
-    readableFieldName: "L'adresse e-mail de l'exutoire"
+    readableFieldName: "L'adresse e-mail de l'exutoire",
+    path: ["destination", "operation", "nextDestination", "company", "mail"]
   },
   destinationReceptionQuantity: {
     sealed: { from: "OPERATION" },
-    readableFieldName: "La quantité de VHUs reçue"
+    readableFieldName: "La quantité de VHUs reçue",
+    path: ["destination", "reception", "quantity"]
   },
   destinationReceptionWeight: {
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION" },
-    readableFieldName: "Le poids réel reçu"
+    readableFieldName: "Le poids réel reçu",
+    path: ["destination", "reception", "weight"]
   },
   destinationReceptionDate: {
     readableFieldName: "la date de réception",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["destination", "reception", "date"]
     // required: { from: "OPERATION" }
   },
   wasteCode: {
@@ -319,37 +367,44 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       from: sealedFromEmissionExceptForEmitter
     },
     required: { from: "EMISSION" },
-    readableFieldName: "Le code déchet"
+    readableFieldName: "Le code déchet",
+    path: ["wasteCode"]
   },
   packaging: {
     sealed: {
       from: sealedFromEmissionExceptForEmitter
     },
     required: { from: "EMISSION" },
-    readableFieldName: "Le type d'empaquetage"
+    readableFieldName: "Le type d'empaquetage",
+    path: ["packaging"]
   },
   identificationNumbers: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    readableFieldName: "Les numéros d'identification"
+    readableFieldName: "Les numéros d'identification",
+    path: ["identification", "numbers"]
   },
   identificationType: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le type de numéro d'identification"
+    readableFieldName: "Le type de numéro d'identification",
+    path: ["identification", "type"]
   },
   quantity: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "La quantité"
+    readableFieldName: "La quantité",
+    path: ["quantity"]
   },
   weightValue: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le poids"
+    readableFieldName: "Le poids",
+    path: ["weight", "value"]
   },
   weightIsEstimate: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    readableFieldName: "Le champ pour indiquer si le poids est estimé"
+    readableFieldName: "Le champ pour indiquer si le poids est estimé",
+    path: ["weight", "isEstimate"]
   },
   transporterCompanySiret: {
     readableFieldName: "le N° SIRET du transporteur",
@@ -357,7 +412,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     required: {
       from: "TRANSPORT",
       when: bsvhu => !bsvhu.transporterCompanyVatNumber
-    }
+    },
+    path: ["transporter", "company", "siret"]
   },
   transporterCompanyVatNumber: {
     readableFieldName: "Le N° de TVA du transporteur",
@@ -365,42 +421,48 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     required: {
       from: "TRANSPORT",
       when: bsvhu => !bsvhu.transporterCompanySiret
-    }
+    },
+    path: ["transporter", "company", "vatNumber"]
   },
   transporterCompanyName: {
     readableFieldName: "Le nom du transporteur",
     sealed: {
       from: "TRANSPORT"
     },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "name"]
   },
   transporterCompanyAddress: {
     readableFieldName: "L'adresse du transporteur",
     sealed: {
       from: "TRANSPORT"
     },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "address"]
   },
   transporterCompanyContact: {
     readableFieldName: "Le nom de contact du transporteur",
     sealed: {
       from: "TRANSPORT"
     },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "contact"]
   },
   transporterCompanyPhone: {
     readableFieldName: "Le téléphone du transporteur",
     sealed: {
       from: "TRANSPORT"
     },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "phone"]
   },
   transporterCompanyMail: {
     readableFieldName: "L'email du transporteur",
     sealed: {
       from: "TRANSPORT"
     },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "mail"]
   },
   transporterRecepisseNumber: {
     readableFieldName: "le numéro de récépissé du transporteur",
@@ -410,7 +472,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
+    },
+    path: ["transporter", "recepisse", "number"]
   },
   transporterRecepisseDepartment: {
     readableFieldName: "le département de récépissé du transporteur",
@@ -420,7 +483,8 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
+    },
+    path: ["transporter", "recepisse", "department"]
   },
   transporterRecepisseValidityLimit: {
     readableFieldName: "la date de validité du récépissé du transporteur",
@@ -430,15 +494,18 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
+    },
+    path: ["transporter", "recepisse", "validityLimit"]
   },
   transporterTransportTakenOverAt: {
     readableFieldName: "la date d'enlèvement du transporteur",
-    sealed: { from: "TRANSPORT" }
+    sealed: { from: "TRANSPORT" },
+    path: ["transporter", "transport", "takenOverAt"]
   },
   transporterRecepisseIsExempted: {
     readableFieldName: "l'exemption de récépissé du transporteur",
-    sealed: { from: "TRANSPORT" }
+    sealed: { from: "TRANSPORT" },
+    path: ["transporter", "recepisse", "isExempted"]
     // required: {
     //   from: "TRANSPORT"
     // }
