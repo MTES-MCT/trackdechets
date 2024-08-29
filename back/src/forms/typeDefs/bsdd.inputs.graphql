@@ -113,6 +113,12 @@ input AcceptedFormInput {
   - doit être égale à quantityReceived si le déchet est totalement refusé.
   """
   quantityRefused: Float
+
+  "Charte citerne - Est-ce que la citerne a été rincée ou non?"
+  hasCiterneBeenWashedOut: Boolean
+
+  "Charte citerne - Raison pour laquelle la citerne n'a pas été rincée"
+  citerneNotWashedOutReason: CiterneNotWashedOutReason
 }
 
 "Payload de réception d'un BSD"

@@ -23,7 +23,10 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsAccepted(user, form);
 
-  await acceptedInfoSchema.validate(acceptedInfo);
+  await acceptedInfoSchema.validate({
+    wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
+    ...acceptedInfo
+  });
 
   const formUpdateInput = form.forwardedInId
     ? {
