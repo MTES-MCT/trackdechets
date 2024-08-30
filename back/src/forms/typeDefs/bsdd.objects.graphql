@@ -176,6 +176,9 @@ type Form {
 
   "Metadonnées associées au bordereau"
   metadata: FormMetadata!
+
+  "Retour à vide ADR"
+  emptyReturnADR: EmptyReturnADR
 }
 
 type FormMetadata {

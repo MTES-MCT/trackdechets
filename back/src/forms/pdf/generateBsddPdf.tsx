@@ -40,6 +40,7 @@ import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
 import { displayWasteQuantity } from "../../registry/utils";
 import { dateToXMonthAtHHMM, isDefined } from "../../common/helpers";
 import { getReasonLabel } from "../helpers/citerneNotWashedOutReason";
+import { getEmptyReturnADRLabel } from "../helpers/emptyReturnADR";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -691,7 +692,16 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                 échéant) :
               </strong>
             </p>
-            <p>{form.wasteDetails?.onuCode}</p>
+            <p>
+              {isDefined(form.emptyReturnADR) ? (
+                <>
+                  {getEmptyReturnADRLabel(form.emptyReturnADR)?.toUpperCase()}:{" "}
+                  {form.wasteDetails?.onuCode}
+                </>
+              ) : (
+                <>{form.wasteDetails?.onuCode}</>
+              )}
+            </p>
           </div>
         </div>
 
