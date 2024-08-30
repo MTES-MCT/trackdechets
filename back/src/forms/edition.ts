@@ -78,6 +78,7 @@ type EditableBsddFields = Required<
     | "quantityGrouped"
     | "finalOperations"
     | "FinalOperationToFinalForm"
+    | "emptyReturnADR"
   >
 >;
 
