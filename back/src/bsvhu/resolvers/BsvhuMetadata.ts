@@ -1,7 +1,7 @@
 import { getTransporterReceipt } from "../../companies/recipify";
 import {
   BsvhuError,
-  BsvhuFieldsMetadata,
+  BsvhuMetadataFields,
   BsvhuMetadata,
   BsvhuMetadataResolvers
 } from "../../generated/graphql/types";
@@ -32,10 +32,6 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
     const nextSignature = getNextSignatureType(currentSignature);
 
     try {
-      console.log(currentSignature);
-
-      console.log(nextSignature);
-
       parseBsvhu(zodBsvhu, {
         currentSignatureType: nextSignature
       });
@@ -56,7 +52,7 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
     metadata: BsvhuMetadata & { id: string },
     _,
     context
-  ): Promise<BsvhuFieldsMetadata> => {
+  ): Promise<BsvhuMetadataFields> => {
     const bsvhu = await context.dataloaders.bsvhus.load(metadata.id);
 
     // import transporterReceipt that will be completed after transporter signature
