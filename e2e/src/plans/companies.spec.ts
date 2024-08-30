@@ -152,7 +152,7 @@ test.describe
         company: {
           name: "006 - Déchetterie",
           roles: [
-            "Installation de collecte de déchets apportés par le producteur initial"
+            "Installation de collecte de déchets apportés par le producteur initial (Rubrique 2710)"
           ]
         },
         contact: {
@@ -294,7 +294,7 @@ test.describe
         company: {
           name: "013 - Crématorium",
           roles: ["Installation de traitement"],
-          subRoles: ["Crématorium (et cimetières pour la Guyane)"]
+          subRoles: ["Crémation"]
         },
         contact: {
           name: "Crématorium 013",

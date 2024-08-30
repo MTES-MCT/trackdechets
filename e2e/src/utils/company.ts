@@ -5,7 +5,7 @@ import { toYYYYMMDD, toDDMMYYYY } from "../utils/time";
 type CompanyRole =
   | "Producteur de déchets : producteurs de déchets, y compris T&S"
   | "Transporteur"
-  | "Installation de collecte de déchets apportés par le producteur initial"
+  | "Installation de collecte de déchets apportés par le producteur initial (Rubrique 2710)"
   | "Installation de traitement de VHU"
   | "Installation de Tri, transit regroupement de déchets y compris non classée"
   | "Installation de traitement"
@@ -17,7 +17,7 @@ type CompanyRole =
   | "Installation dans laquelle les déchets perdent leur statut de déchet";
 
 type CompanySubRole =
-  | "Crématorium (et cimetières pour la Guyane)"
+  | "Crémation"
   | "Broyeur VHU"
   | "Casse automobile / démolisseur";
 
@@ -69,7 +69,7 @@ export const getCreateButtonName = (roles: CompanyRole[]) => {
   for (const role of roles) {
     if (
       [
-        "Installation de collecte de déchets apportés par le producteur initial",
+        "Installation de collecte de déchets apportés par le producteur initial (Rubrique 2710)",
         "Installation de traitement de VHU",
         "Installation de Tri, transit regroupement de déchets y compris non classée",
         "Transporteur",
