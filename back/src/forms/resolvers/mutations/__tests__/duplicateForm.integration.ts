@@ -294,7 +294,8 @@ describe("Mutation.duplicateForm", () => {
       "destinationOperationMode",
       "quantityGrouped",
       "citerneNotWashedOutReason",
-      "hasCiterneBeenWashedOut"
+      "hasCiterneBeenWashedOut",
+      "emptyReturnADR"
     ];
 
     const expectedSkippedTransporter = [
@@ -620,7 +621,8 @@ describe("Mutation.duplicateForm", () => {
       "destinationOperationMode",
       "quantityGrouped",
       "citerneNotWashedOutReason",
-      "hasCiterneBeenWashedOut"
+      "hasCiterneBeenWashedOut",
+      "emptyReturnADR"
     ];
 
     // make sure this test breaks when a new field is added to the Form model
