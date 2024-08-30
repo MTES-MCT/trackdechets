@@ -1,4 +1,4 @@
-import { Prisma, WasteAcceptationStatus } from "@prisma/client";
+import { Prisma, User, WasteAcceptationStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
 import {
   BspaohInput,
@@ -8,8 +8,9 @@ import { capitalize } from "../../common/strings";
 import { ZodFullBspaoh } from "./schema";
 import { isForeignVat } from "@td/constants";
 import { UnparsedInputs } from ".";
-import { getUserFunctions, getSignatureAncestors } from "./helpers";
+import { getUserFunctions } from "./helpers";
 import { Leaves } from "../../types";
+import { BspaohForParsing } from "../types";
 
 type EditableBspaohTransporterFields = Required<
   Omit<
@@ -607,6 +608,59 @@ export function checkSealedAndRequiredFields(
     }
   }
 }
+
+export const getRequiredAndSealedFieldPaths = async (
+  bspaoh: BspaohForParsing,
+  currentSignatures: BspaohSignatureType[],
+  nextSignature: BspaohSignatureType | undefined,
+  user: User | undefined
+): Promise<{
+  requiredForNextSignature: string[];
+  sealed: string[];
+}> => {
+  const nextSignatures = nextSignature
+    ? currentSignatures.concat([nextSignature])
+    : currentSignatures;
+  const requiredFields: string[] = [];
+  const sealedFields: string[] = [];
+  const userFunctions = await getUserFunctions(user, bspaoh);
+  for (const bspaohField of Object.keys(editionRules)) {
+    const { required, sealed, path } =
+      editionRules[bspaohField as keyof BspaohRulesEntries];
+    // Apply default values to rules
+    const sealedRule = {
+      from: sealed?.from,
+      when: sealed?.when ?? (() => true) // Default to true
+    };
+    const requiredRule = {
+      from: required?.from ?? "NO_CHECK_RULE",
+      when: required?.when ?? (() => true) // Default to true
+    };
+    if (path) {
+      if (required) {
+        const isRequired =
+          nextSignatures.includes(requiredRule.from) &&
+          requiredRule.when(bspaoh, bspaoh, userFunctions);
+        if (isRequired) {
+          requiredFields.push(path.join("."));
+        }
+      }
+      if (sealed) {
+        const isSealed =
+          currentSignatures.includes(sealedRule.from) &&
+          sealedRule.when(bspaoh, bspaoh, userFunctions);
+        if (isSealed) {
+          sealedFields.push(path.join("."));
+        }
+      }
+    }
+  }
+  return {
+    requiredForNextSignature: requiredFields,
+    sealed: sealedFields
+  };
+};
+
 /**
  * Util to print a digest of edition rules.
  * Must be called after initalization
@@ -616,7 +670,7 @@ export function printVerboseRules() {
     console.log({
       "nom technique": k,
       "nom verbeux": v?.readableFieldName ?? "",
-      "path gql": prismaFieldsToGqlPaths[k],
+      "path gql": v?.path?.join("."),
       "requis à partir de": v?.required?.from ?? "",
       "condition requis": v?.required?.when?.toString() ?? "",
       "scellé à partir de": v?.sealed?.from ?? "",
@@ -624,105 +678,3 @@ export function printVerboseRules() {
     });
   }
 }
-
-export function getSealedFieldsForSignature(signature?: BspaohSignatureType) {
-  const res: string[] = [];
-  if (!signature) {
-    return res;
-  }
-
-  const ancestors = getSignatureAncestors(signature);
-
-  for (const [k, v] of Object.entries(editionRules)) {
-    if (ancestors.includes(v?.sealed?.from)) {
-      res.push(k);
-    }
-  }
-  return res;
-}
-
-/**
- * Transform a camel-cased string to a dotted path
- * emitterCompanySiret -> emitter.company.siret
- */
-const prismaFieldToGqlPath = (field: string) => ({
-  [field]: field
-    .split(/(?=[A-Z])/)
-    .map(el => el.toLowerCase())
-    .join(".")
-});
-
-const CompanyFieldToGqlPath = prefix => ({
-  ...prismaFieldToGqlPath(`${prefix}CompanyName`),
-  ...prismaFieldToGqlPath(`${prefix}CompanySiret`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyName`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyAddress`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyContact`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyPhone`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyMail`)
-});
-
-/**
- * Map prisma fields to their gql input path.
- * Allows to configure frontend by setting which fields are sealed
- */
-export const prismaFieldsToGqlPaths = {
-  ...prismaFieldToGqlPath("wasteCode"),
-  ...prismaFieldToGqlPath("wasteAdr"),
-  ...prismaFieldToGqlPath("wasteType"),
-  ...prismaFieldToGqlPath("wastePackagings"),
-
-  ...CompanyFieldToGqlPath("emitter"),
-
-  emitterCustomInfo: "emitter.customInfo",
-
-  emitterPickupSiteName: "emitter.pickupSite.name",
-  emitterPickupSiteAddress: "emitter.pickupSite.address",
-  emitterPickupSiteCity: "emitter.pickupSite.city",
-  emitterPickupSitePostalCode: "emitter.pickupSite.postalCode",
-  emitterPickupSiteInfos: "emitter.pickupSite.infos",
-
-  emitterWasteQuantityValue: "emitter.emission.detail.quantity",
-  emitterWasteWeightValue: "emitter.emission.detail.weight.value",
-  emitterWasteWeightIsEstimate: "emitter.emission.detail.weight.isEstimate",
-  ...CompanyFieldToGqlPath("destination"),
-  ...prismaFieldToGqlPath("destinationCap"),
-
-  ...prismaFieldToGqlPath("destinationReceptionAcceptationStatus"),
-  destinationReceptionWasteRefusalReason: "destination.reception.refusalReason",
-
-  ...prismaFieldToGqlPath("destinationReceptionWasteQuantityValue"),
-  ...prismaFieldToGqlPath("destinationReceptionWasteReceivedWeightValue"),
-  ...prismaFieldToGqlPath("destinationReceptionWasteAcceptedWeightValue"),
-  ...prismaFieldToGqlPath("destinationReceptionWasteRefusedWeightValue"),
-  ...prismaFieldToGqlPath("destinationReceptionDate"),
-
-  destinationReceptionWasteWeightValue:
-    "destination.reception.detail.weight.value",
-
-  destinationReceptionWasteQuantityValue:
-    "destination.reception.detail.quantity",
-
-  destinationReceptionWastePackagingsAcceptation:
-    "destination.reception.acceptation.packagings",
-
-  ...prismaFieldToGqlPath("destinationOperationCode"),
-  ...prismaFieldToGqlPath("destinationOperationDate"),
-
-  destinationCustomInfo: "destination.customInfo",
-
-  ...CompanyFieldToGqlPath("transporter"),
-  transporterCompanyVatNumber: "transporter.company.vatNumber",
-
-  transporterRecepisseIsExempted: "transporter.recepisse.isExempted",
-  ...prismaFieldToGqlPath("transporterRecepisseDepartment"),
-  ...prismaFieldToGqlPath("transporterRecepisseNumber"),
-
-  transporterRecepisseValidityLimit: "transporter.recepisse.validityLimit",
-  ...prismaFieldToGqlPath("transporterTransportMode"),
-  ...prismaFieldToGqlPath("transporterTransportPlates"),
-
-  transporterTakenOverAt: "transporter.takenOverAt",
-
-  transporterCustomInfo: "transporter.customInfo"
-};
