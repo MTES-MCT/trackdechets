@@ -73,24 +73,6 @@ export function getUpdatedFields<T extends ZodBsvhu>(
   return Object.keys(diff);
 }
 
-/**
- * Gets all the signatures prior to the target signature in the signature hierarchy.
- */
-export function getSignatureAncestors(
-  targetSignature: SignatureTypeInput | undefined | null
-): SignatureTypeInput[] {
-  if (!targetSignature) return [];
-
-  const parent = Object.entries(BSVHU_SIGNATURES_HIERARCHY).find(
-    ([_, details]) => details.next === targetSignature
-  )?.[0];
-
-  return [
-    targetSignature,
-    ...getSignatureAncestors(parent as SignatureTypeInput)
-  ];
-}
-
 export async function getBsvhuUserFunctions(
   user: User | undefined,
   bsvhu: ZodBsvhu
@@ -110,6 +92,37 @@ export async function getBsvhuUserFunctions(
       (bsvhu.transporterCompanyVatNumber != null &&
         orgIds.includes(bsvhu.transporterCompanyVatNumber))
   };
+}
+
+/**
+ * Gets all the signatures prior to the target signature in the signature hierarchy.
+ */
+export function getSignatureAncestors(
+  targetSignature: SignatureTypeInput | undefined | null
+): SignatureTypeInput[] {
+  if (!targetSignature) return [];
+
+  const parent = Object.entries(BSVHU_SIGNATURES_HIERARCHY).find(
+    ([_, details]) => details.next === targetSignature
+  )?.[0];
+
+  return [
+    targetSignature,
+    ...getSignatureAncestors(parent as SignatureTypeInput)
+  ];
+}
+
+export function getNextSignatureType(
+  currentSignature: SignatureTypeInput | undefined | null
+): SignatureTypeInput | undefined {
+  if (!currentSignature) {
+    return "EMISSION";
+  }
+  const signature = BSVHU_SIGNATURES_HIERARCHY[currentSignature];
+  if (signature.next) {
+    return signature.next;
+  }
+  return undefined;
 }
 
 /**
