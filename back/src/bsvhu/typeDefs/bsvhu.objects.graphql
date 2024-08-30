@@ -9,8 +9,14 @@ type BsvhuEdge {
   node: Bsvhu!
 }
 
+type BsvhuFieldsMetadata {
+  requiredForNextSignature: [String!]!
+  sealed: [String!]!
+}
+
 type BsvhuMetadata {
-  errors: [BsvhuError!]
+  errors: [BsvhuError!]!
+  fields: BsvhuFieldsMetadata!
 }
 
 type BsvhuError {

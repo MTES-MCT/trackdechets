@@ -1,65 +1,79 @@
 import { getTransporterReceipt } from "../../companies/recipify";
 import {
+  BsvhuError,
+  BsvhuFieldsMetadata,
   BsvhuMetadata,
-  BsvhuMetadataResolvers,
-  BsvhuStatus
+  BsvhuMetadataResolvers
 } from "../../generated/graphql/types";
-import { getBsvhuOrNotFound } from "../database";
 import { parseBsvhu } from "../validation";
-import { prismaToZodBsvhu } from "../validation/helpers";
-import { SignatureTypeInput } from "../../generated/graphql/types";
+import {
+  getCurrentSignatureType,
+  getNextSignatureType,
+  getSignatureAncestors,
+  prismaToZodBsvhu
+} from "../validation/helpers";
 import { ZodIssue } from "zod";
+import { getRequiredAndSealedFieldPaths } from "../validation/rules";
 
 const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
   errors: async (
-    metadata: BsvhuMetadata & { id: string; status: BsvhuStatus }
-  ) => {
-    const prismaBsvhu = await getBsvhuOrNotFound(metadata.id);
-
-    const validationMatrix = [
-      {
-        skip: metadata.status !== "INITIAL",
-        requiredFor: "EMISSION"
-      },
-      {
-        skip: ["PROCESSED", "REFUSED", "SENT"].includes(metadata.status),
-        requiredFor: "TRANSPORT"
-      },
-      {
-        skip: ["PROCESSED", "REFUSED"].includes(metadata.status),
-        requiredFor: "OPERATION"
-      }
-    ];
-
-    const filteredValidationMatrix = validationMatrix.filter(
-      matrix => !matrix.skip
-    );
-
+    metadata: BsvhuMetadata & { id: string },
+    _,
+    context
+  ): Promise<BsvhuError[]> => {
+    const bsvhu = await context.dataloaders.bsvhus.load(metadata.id);
     // import transporterReceipt that will be completed after transporter signature
-    const transporterReceipt = await getTransporterReceipt(prismaBsvhu);
+    const transporterReceipt = await getTransporterReceipt(bsvhu);
     const zodBsvhu = prismaToZodBsvhu({
-      ...prismaBsvhu,
+      ...bsvhu,
       ...transporterReceipt
     });
+    const currentSignature = getCurrentSignatureType(zodBsvhu);
+    const nextSignature = getNextSignatureType(currentSignature);
 
-    for (const { requiredFor } of filteredValidationMatrix) {
-      try {
-        parseBsvhu(zodBsvhu, {
-          currentSignatureType: requiredFor as SignatureTypeInput
-        });
-        return [];
-      } catch (errors) {
-        return (
-          errors.issues?.map((e: ZodIssue) => {
-            return {
-              message: e.message,
-              path: `${e.path.join(".")}`, // e.path is an array, first element should be the path name
-              requiredFor
-            };
-          }) ?? []
-        );
-      }
+    try {
+      console.log(currentSignature);
+
+      console.log(nextSignature);
+
+      parseBsvhu(zodBsvhu, {
+        currentSignatureType: nextSignature
+      });
+      return [];
+    } catch (errors) {
+      return (
+        errors.issues?.map((e: ZodIssue) => {
+          return {
+            message: e.message,
+            path: `${e.path.join(".")}`, // e.path is an array, first element should be the path name
+            requiredFor: nextSignature
+          };
+        }) ?? []
+      );
     }
+  },
+  fields: async (
+    metadata: BsvhuMetadata & { id: string },
+    _,
+    context
+  ): Promise<BsvhuFieldsMetadata> => {
+    const bsvhu = await context.dataloaders.bsvhus.load(metadata.id);
+
+    // import transporterReceipt that will be completed after transporter signature
+    const transporterReceipt = await getTransporterReceipt(bsvhu);
+    const zodBsvhu = prismaToZodBsvhu({
+      ...bsvhu,
+      ...transporterReceipt
+    });
+    const currentSignature = getCurrentSignatureType(zodBsvhu);
+    const nextSignature = getNextSignatureType(currentSignature);
+    const currentSignatureAncestors = getSignatureAncestors(currentSignature);
+    return getRequiredAndSealedFieldPaths(
+      zodBsvhu,
+      currentSignatureAncestors,
+      nextSignature,
+      context.user ?? undefined
+    );
   }
 };
 
