@@ -42,14 +42,20 @@ const CompanyTypeCheckbox = ({
     [companyTypeChecked, subTypeOptions]
   );
 
+  const labelWithHelp = (
+    <>
+      {label} <TdTooltip msg={helpText} />
+    </>
+  );
+
   return (
     <div key={value}>
-      <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-11">
+      <div>
+        <div>
           <Checkbox
             options={[
               {
-                label: label,
+                label: labelWithHelp,
                 nativeInputProps: {
                   value: value,
                   checked: companyTypeChecked,
@@ -63,11 +69,6 @@ const CompanyTypeCheckbox = ({
             ]}
           />
         </div>
-        {helpText && (
-          <div className="fr-col-1">
-            <TdTooltip msg={helpText} />
-          </div>
-        )}
       </div>
       {companyTypeChecked && (
         <CertificationForm
