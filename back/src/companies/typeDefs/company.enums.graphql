@@ -37,7 +37,7 @@ enum CompanyType {
   "Intermédiaire : établissement qui peut être ajouté à une traçabilité, sans responsabilité réglementaire (y compris entreprises de travaux hors amiante)"
   INTERMEDIARY
 
-  "Installation de valorisation de T&S"
+  "Installation de valorisation de terres et sédiments"
   DISPOSAL_FACILITY
 
   "Installation dans laquelle les déchets perdent leur statut de déchet"

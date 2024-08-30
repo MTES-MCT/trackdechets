@@ -3,7 +3,7 @@ import { goTo } from "./navigation";
 import { toYYYYMMDD, toDDMMYYYY } from "../utils/time";
 
 type CompanyRole =
-  | "Producteur de déchets : producteurs de déchets, y compris T&S"
+  | "Producteurs de déchets, y compris terres et sédiments"
   | "Transporteur"
   | "Installation de collecte de déchets apportés par le producteur initial (Rubrique 2710)"
   | "Installation de traitement de VHU"
@@ -13,7 +13,7 @@ type CompanyRole =
   | "Courtier"
   | "Entreprise de travaux amiante"
   | "Intermédiaire : établissement qui peut être ajouté à une traçabilité, sans responsabilité réglementaire (y compris entreprises de travaux hors amiante)"
-  | "Installation de valorisation de T&S"
+  | "Installation de valorisation de terres et sédiments"
   | "Installation dans laquelle les déchets perdent leur statut de déchet";
 
 type CompanySubRole =
@@ -57,7 +57,7 @@ interface AmianteCertification {
 const isOnlyWasteProducter = (roles: CompanyRole[]): boolean => {
   return (
     roles.length === 1 &&
-    roles[0] === "Producteur de déchets : producteurs de déchets, y compris T&S"
+    roles[0] === "Producteurs de déchets, y compris terres et sédiments"
   );
 };
 
@@ -86,9 +86,7 @@ export const getCreateButtonName = (roles: CompanyRole[]) => {
   // "Vous produisez des déchets dans le cadre de votre activité"
   for (const role of roles) {
     if (
-      [
-        "Producteur de déchets : producteurs de déchets, y compris T&S"
-      ].includes(role)
+      ["Producteurs de déchets, y compris terres et sédiments"].includes(role)
     ) {
       return "Créer votre établissement producteur";
     }

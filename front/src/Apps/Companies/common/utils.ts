@@ -115,7 +115,7 @@ export const WASTE_VEHICLES_TYPE_VALUES = WASTE_VEHICLES_TYPE_OPTIONS.map(
 export const COMPANY_TYPE_OPTIONS: CompanyTypeOption[] = [
   {
     value: CompanyType.Producer,
-    label: "Producteur de déchets : producteurs de déchets, y compris T&S",
+    label: "Producteurs de déchets, y compris terres et sédiments",
     helpText:
       "Tous les établissements produisant des déchets et producteurs subséquents. Exemples: Ateliers de réparation véhicules, laboratoires, ateliers de traitement de surfaces, détenteurs d'équipements contenant des fluides frigorigènes et les opérateurs, producteurs de DASRI (hôpitaux, EHPAD, médecin, infirmier(e), tatoueurs, dentiste, etc.), maitre ouvrage amiante, etc. Les ménages sont exclus de la traçabilité. Un intermédiaire est un établissement qui a besoin d'avoir accès au bordereau, avec l'accord des parties prenantes dudit BSD (exemple : un maître d'oeuvre ou un intervenant tiers)."
   },
@@ -144,7 +144,7 @@ export const COMPANY_TYPE_OPTIONS: CompanyTypeOption[] = [
   },
   {
     value: CompanyType.DisposalFacility,
-    label: "Installation de valorisation de T&S",
+    label: "Installation de valorisation de terres et sédiments",
     helpText: ""
   },
   {

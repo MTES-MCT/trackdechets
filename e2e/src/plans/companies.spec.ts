@@ -78,9 +78,7 @@ test.describe
         const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "003 - Producteur avec signature et emport autorisé",
-            roles: [
-              "Producteur de déchets : producteurs de déchets, y compris T&S"
-            ],
+            roles: ["Producteurs de déchets, y compris terres et sédiments"],
             producesDASRI: true
           }
         });
@@ -103,9 +101,7 @@ test.describe
         const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "004 - Producteur avec informations de contact",
-            roles: [
-              "Producteur de déchets : producteurs de déchets, y compris T&S"
-            ]
+            roles: ["Producteurs de déchets, y compris terres et sédiments"]
           }
         });
 
@@ -275,9 +271,7 @@ test.describe
         const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "Établissement à supprimer",
-            roles: [
-              "Producteur de déchets : producteurs de déchets, y compris T&S"
-            ]
+            roles: ["Producteurs de déchets, y compris terres et sédiments"]
           }
         });
 
@@ -309,7 +303,7 @@ test.describe
         company: {
           name: "014 - Producteur + Transporteur",
           roles: [
-            "Producteur de déchets : producteurs de déchets, y compris T&S",
+            "Producteurs de déchets, y compris terres et sédiments",
             "Transporteur"
           ],
           producesDASRI: true
