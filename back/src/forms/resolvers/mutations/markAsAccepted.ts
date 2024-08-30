@@ -25,6 +25,10 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
 
   await acceptedInfoSchema.validate({
     wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
+    wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
+    wasteDetailsPop: form.wasteDetailsPop,
+    wasteDetailsCode: form.wasteDetailsCode,
+    // TODO: mode transport!!!
     ...acceptedInfo
   });
 

@@ -119,6 +119,9 @@ input AcceptedFormInput {
 
   "Charte citerne - Raison pour laquelle la citerne n'a pas été rincée"
   citerneNotWashedOutReason: CiterneNotWashedOutReason
+
+  "Retour à vide ADR"
+  emptyReturnADR: EmptyReturnADR
 }
 
 "Payload de réception d'un BSD"
