@@ -13,6 +13,7 @@ import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 import { getDefaultOrgId } from "../CompanySwitcher/CompanySwitcher";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import Exports from "../../../../dashboard/exports/Registry";
+import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -46,8 +47,6 @@ const PasswordResetRequest = lazy(
 );
 const PasswordReset = lazy(() => import("../../../../login/PasswordReset"));
 const Signup = lazy(() => import("../../../../login/Signup"));
-const OauthDialog = lazy(() => import("../../../../oauth/Oauth2Dialog"));
-const OidcDialog = lazy(() => import("../../../../oauth/OidcDialog"));
 const Company = lazy(() => import("../../../../company/Company"));
 const WasteTree = lazy(() => import("../search/WasteTree"));
 
@@ -94,7 +93,7 @@ export default function LayoutContainer() {
           path="/oauth2/authorize/dialog"
           element={
             <RequireAuth isAuthenticated={isAuthenticated}>
-              <OauthDialog />
+              <Oauth2Dialog />
             </RequireAuth>
           }
         />
