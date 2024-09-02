@@ -1457,7 +1457,23 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
         return wasteIsDangerous;
       }
     )
-  // TODO: mode de transport
+    .test(
+      "not-defined-if-transport-mode-not-road-nor-null",
+      "Vous ne pouvez préciser de retour à vide ADR que si le mode de transport est route (ROAD) ou null",
+      (value, context) => {
+        const { transporters } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        const lastTransportMode =
+          transporters[transporters.length - 1]?.transporterTransportMode;
+
+        // Tolerate null for legacy BSDs
+        return (
+          lastTransportMode === TransportMode.ROAD || lastTransportMode === null
+        );
+      }
+    )
 });
 
 const withNextDestination = (required: boolean) =>

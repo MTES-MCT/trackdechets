@@ -4,6 +4,7 @@ import {
   EmitterType,
   EmptyReturnADR,
   Status,
+  TransportMode,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -1042,6 +1043,57 @@ describe("Test Form reception", () => {
       expect(form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_CITERNE);
     });
 
-    // TODO: transport mode
+    it.each([TransportMode.ROAD, null])(
+      "can accept a waste and specify empty return if transporter mode is ROAD or null (value = %p)",
+      async transporterTransportMode => {
+        // When
+        const { company: transporter } = await userWithCompanyFactory("MEMBER");
+        const { errors, form } = await createAndAcceptForm(
+          {
+            transporters: {
+              create: {
+                transporterCompanySiret: transporter.siret,
+                transporterTransportMode,
+                number: 1
+              }
+            }
+          },
+          {
+            emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(form.status).toBe("ACCEPTED");
+        expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+        expect(form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_CITERNE);
+      }
+    );
+  });
+
+  it("can NOT accept a waste and specify empty return if transporter mode is not ROAD nor null", async () => {
+    // When
+    const { company: transporter } = await userWithCompanyFactory("MEMBER");
+    const { errors } = await createAndAcceptForm(
+      {
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret,
+            transporterTransportMode: TransportMode.AIR,
+            number: 1
+          }
+        }
+      },
+      {
+        emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Vous ne pouvez préciser de retour à vide ADR que si le mode de transport est route (ROAD) ou null"
+    );
   });
 });
