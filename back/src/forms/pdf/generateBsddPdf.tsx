@@ -173,7 +173,7 @@ function CharteCiterne({
   if (hasCiterneBeenWashedOut) {
     return (
       <>
-        Charte "Rinçage des citernes": Rinçage effectué
+        Charte "Rinçage des citernes": <b>Rinçage effectué</b>
         <br />
         <br />
       </>
@@ -181,7 +181,7 @@ function CharteCiterne({
   } else {
     return (
       <>
-        Charte "Rinçage des citernes":{" "}
+        Charte "Rinçage des citernes": <b>Rinçage non effectué</b>,{" "}
         {getCiterneNotWashedOutReasonLabel(citerneNotWashedOutReason)}
         <br />
         <br />
