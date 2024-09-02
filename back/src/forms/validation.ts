@@ -1118,7 +1118,25 @@ export const transporterSchemaFn: FactorySchemaOf<
             )
         }
       ),
-    transporterTransportMode: yup.mixed<TransportMode>()
+    transporterTransportMode: yup
+      .mixed<TransportMode>()
+      .nullable()
+      .test((transporterTransportMode, ctx) => {
+        const { transporterCompanySiret, transporterCompanyVatNumber } =
+          ctx.parent;
+
+        if (
+          context.signingTransporterOrgId &&
+          [transporterCompanySiret, transporterCompanyVatNumber].includes(
+            context.signingTransporterOrgId
+          ) &&
+          !transporterTransportMode
+        ) {
+          return new yup.ValidationError("Le mode de transport est requis");
+        }
+
+        return true;
+      })
   });
 
 export const traderSchemaFn: FactorySchemaOf<FormValidationContext, Trader> = ({

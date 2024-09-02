@@ -1,4 +1,9 @@
-import { CompanyType, EmitterType, Status } from "@prisma/client";
+import {
+  CompanyType,
+  EmitterType,
+  Status,
+  TransportMode
+} from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -1322,6 +1327,125 @@ describe("signTransportForm", () => {
         "Le nombre de contenants doit être supérieur à 0"
       );
       expect(errors[0].message).toContain("Le poids doit être supérieur à 0");
+    });
+  });
+
+  // Transport mode is now required at transporter signature step
+  describe("transporterTransportMode", () => {
+    const prepareFormAndSignTransport = async (formTransporterOpt, signOpt) => {
+      // Create form
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const transporter = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({ company: transporter.company });
+      const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+      const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+      const form = await formFactory({
+        ownerId: emitter.user.id,
+        opt: {
+          status: "SIGNED_BY_PRODUCER",
+          emitterCompanySiret: emitter.company.siret,
+          emitterCompanyName: emitter.company.name,
+          signedByTransporter: null,
+          sentAt: null,
+          sentBy: null,
+          emittedAt: emittedAt,
+          emittedBy: emitter.user.name,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterCompanyName: transporter.company.name,
+              transporterNumberPlate: "NBR-PLATE-00",
+              transporterTransportMode: undefined,
+              ...formTransporterOpt,
+              number: 1
+            }
+          }
+        }
+      });
+
+      // Sign it
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: form.id,
+          input: {
+            takenOverAt: takenOverAt.toISOString() as unknown as Date,
+            takenOverBy: transporter.user.name,
+            ...signOpt
+          }
+        }
+      });
+
+      const updatedForm = await prisma.form.findFirst({
+        where: {
+          id: form.id
+        },
+        include: {
+          transporters: true
+        }
+      });
+
+      return { errors, form: updatedForm };
+    };
+
+    it("should throw error if transport mode is not defined", async () => {
+      // When
+      const { errors } = await prepareFormAndSignTransport({}, {});
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Le mode de transport est requis");
+    });
+
+    it("should work if transport mode is in initial BSD", async () => {
+      // When
+      const { errors, form } = await prepareFormAndSignTransport(
+        {
+          transporterTransportMode: TransportMode.ROAD
+        },
+        {}
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form?.transporters[0].transporterTransportMode).toBe(
+        TransportMode.ROAD
+      );
+    });
+
+    it("should work if transport mode is given at transporter signature", async () => {
+      // When
+      const { errors, form } = await prepareFormAndSignTransport(
+        {},
+        {
+          transporterTransportMode: TransportMode.ROAD
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form?.transporters[0].transporterTransportMode).toBe(
+        TransportMode.ROAD
+      );
+    });
+
+    it("should throw error if transport mode is unset at signature", async () => {
+      // When
+      const { errors } = await prepareFormAndSignTransport(
+        {
+          transporterTransportMode: TransportMode.AIR
+        },
+        {
+          transporterTransportMode: null
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Le mode de transport est requis");
     });
   });
 });

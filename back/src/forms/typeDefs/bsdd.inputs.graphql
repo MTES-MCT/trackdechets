@@ -34,6 +34,9 @@ input SignTransportFormInput {
 
   "Numéro de la plaque d'immatriculation transporteur"
   transporterNumberPlate: String
+
+  "Le mode de transport utilisé par le transporteur"
+  transporterTransportMode: TransportMode
 }
 
 "Payload de signature d'un BSD par un transporteur"
