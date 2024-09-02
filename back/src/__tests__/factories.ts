@@ -376,6 +376,7 @@ export const upsertBaseSiret = async siret => {
           name: `company_${siret}`,
           securityCode: 1234,
           verificationCode: "34567",
+          verificationStatus: "VERIFIED",
           address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
           contactEmail: `contact_${siret}@gmail.com`,
           contactPhone: `+${siret}`
