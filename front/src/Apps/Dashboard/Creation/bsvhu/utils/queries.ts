@@ -12,7 +12,6 @@ export const GET_VHU_FORM = gql`
           requiredFor
         }
         fields {
-          requiredForNextSignature
           sealed
         }
       }
