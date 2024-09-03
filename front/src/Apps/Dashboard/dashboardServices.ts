@@ -1327,8 +1327,10 @@ const canReviewBsdasri = (bsd, siret) => {
 export const canReviewBsdd = (bsd, siret) => {
   const isSentStatus = BsdStatusCode.Sent === bsd.status;
 
-  const isMultimodal =
-    Boolean(bsd.transporters) && bsd.transporters?.length > 1;
+  const isMultimodalTransporter =
+    !!bsd.transporters &&
+    bsd.transporters.length > 1 &&
+    (bsd.transporters as Transporter[]).some(t => t.company?.orgId === siret);
 
   return (
     bsd.type === BsdType.Bsdd &&
@@ -1355,7 +1357,7 @@ export const canReviewBsdd = (bsd, siret) => {
       canUpdateBsd(bsd, siret) &&
       bsd.status === BsdStatusCode.SignedByProducer
     ) &&
-    !isMultimodal
+    !isMultimodalTransporter
   );
 };
 
