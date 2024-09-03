@@ -101,7 +101,7 @@ export default function BsffPackagings({
 
                       <div className="tw-px-2 tw-flex-shrink">
                         <label>
-                          Volume du contenant en L (optionnel)
+                          Volume du contenant en L
                           <Field
                             component={NumberInput}
                             className="td-input td-input--small"
