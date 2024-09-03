@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import {
   CompanyTypeInputErrors,
   CompanyTypeInputProps,
@@ -13,6 +13,24 @@ type EcoOrganismeAgrementForm = {
   inputErrors?: Pick<CompanyTypeInputErrors, "ecoOrganismeAgreements">;
 };
 
+const titleStyle: CSSProperties = {
+  marginBottom: "1em"
+};
+
+const inputContainerStyle = (isError: boolean): CSSProperties => ({
+  display: "flex",
+  alignItems: isError ? "center" : "flex-end",
+  marginBottom: "1em"
+});
+
+const inputStyle: CSSProperties = {
+  marginBottom: 0,
+  marginRight: "1em",
+  minWidth: 400
+};
+
+const deleteButtonStyle: CSSProperties = { marginRight: "1em" };
+
 const EcoOrganismeAgrementsForm = ({
   inputValues,
   inputProps,
@@ -25,62 +43,54 @@ const EcoOrganismeAgrementsForm = ({
   return (
     <div className="fr-container">
       <div className="fr-grid-row">
-        <div className="fr-col-12">
+        <div className="fr-col-12" style={titleStyle}>
           <p className="fr-text--bold">Agréments éco-organisme</p>
         </div>
       </div>
 
       {ecoOrganismeAgreements.map((_url, index) => (
-        <div className="fr-grid-row fr-grid-row--gutters" key="index">
-          <div className="fr-col-1">
-            <span className="fr-text">URL</span>
-          </div>
-          <div className="fr-col-8">
-            <Input
-              label=""
-              nativeInputProps={{
-                type: "text",
-                placeholder: "https://",
-                ...(value && value(index))
-              }}
-              state={
-                inputErrors?.ecoOrganismeAgreements?.[index]
-                  ? "error"
-                  : "default"
+        <div
+          style={inputContainerStyle(
+            Boolean(inputErrors?.ecoOrganismeAgreements?.[index])
+          )}
+          key="index"
+        >
+          <Input
+            label="URL"
+            style={inputStyle}
+            nativeInputProps={{
+              type: "url",
+              ...(value && value(index))
+            }}
+            state={
+              inputErrors?.ecoOrganismeAgreements?.[index] ? "error" : "default"
+            }
+            stateRelatedMessage={inputErrors?.ecoOrganismeAgreements?.[index]}
+          />
+          <Button
+            iconId="ri-delete-bin-fill"
+            priority="secondary"
+            title="Supprimer"
+            style={deleteButtonStyle}
+            disabled={index === 0}
+            onClick={() => {
+              if (remove) {
+                remove(index);
               }
-              stateRelatedMessage={inputErrors?.ecoOrganismeAgreements?.[index]}
-            />
-          </div>
-          <div className="fr-col-3">
-            <Button
-              iconId="ri-delete-bin-line"
-              disabled={index === 0}
-              onClick={() => {
-                if (remove) {
-                  remove(index);
-                }
-              }}
-            >
-              Supprimer
-            </Button>
-          </div>
-        </div>
-      ))}
-      <div className="fr-grid-row fr-pt-1w">
-        <div className="fr-col-12">
+            }}
+          />
           <Button
             iconId="ri-add-line"
+            title="Ajouter"
             onClick={e => {
               e.preventDefault();
               if (push) {
                 push("");
               }
             }}
-          >
-            Ajouter un agrément
-          </Button>
+          />
         </div>
-      </div>
+      ))}
     </div>
   );
 };

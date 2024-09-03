@@ -20,6 +20,7 @@ import {
   WasteVehiclesType,
   WorkerCertification
 } from "@td/codegen-ui";
+import { isValidWebsite } from "@td/constants";
 
 export interface RhfCompanyTypeFormField {
   companyTypes: CompanyType[];
@@ -337,7 +338,14 @@ const RhfCompanyTypeForm = ({
         ecoOrganismeAgreements: {
           value: index =>
             register(`ecoOrganismeAgreements.${index}`, {
-              required: "Champ requis"
+              validate: v => {
+                if (!v || v === "") {
+                  return "Champ requis";
+                }
+                if (!isValidWebsite(v)) {
+                  return "Invalide URL";
+                }
+              }
             }),
           push: (v: string) => {
             setValue("ecoOrganismeAgreements", [...ecoOrganismeAgreements, v]);
