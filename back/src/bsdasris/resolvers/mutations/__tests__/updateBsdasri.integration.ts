@@ -21,7 +21,7 @@ import { sirenify } from "../../../sirenify";
 jest.mock("../../../sirenify");
 (sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
 
-const UPDATE_DASRI = gql`
+export const UPDATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
   mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
     updateBsdasri(id: $id, input: $input) {

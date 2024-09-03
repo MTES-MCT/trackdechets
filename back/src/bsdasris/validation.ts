@@ -1,4 +1,9 @@
-import { WasteAcceptationStatus, Prisma, BsdasriType } from "@prisma/client";
+import {
+  WasteAcceptationStatus,
+  Prisma,
+  BsdasriType,
+  TransportMode
+} from "@prisma/client";
 import { isCollector } from "../companies/validation";
 import * as yup from "yup";
 import {
@@ -445,14 +450,12 @@ export const transportSchema: FactorySchemaOf<
             : true;
         }
       ),
-
     transporterWastePackagings: yup
       .array()
       .requiredIf(
         context.transportSignature,
         "Le détail du conditionnement est obligatoire"
       )
-
       .test(
         "packaging-info-required",
         "Le détail du conditionnement transporté est obligatoire",
@@ -470,11 +473,17 @@ export const transportSchema: FactorySchemaOf<
         "Le date de prise en charge du déchet est obligatoire"
       ),
     handedOverToRecipientAt: yup.date().nullable(), // optional field
-
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any,
+    transporterTransportMode: yup
+      .mixed<TransportMode>()
+      .nullable()
+      .requiredIf(
+        context.transportSignature,
+        "Le mode de transport est obligatoire."
+      )
   });
 
 export const recipientSchema: FactorySchemaOf<
