@@ -24,7 +24,7 @@ jest.mock("../../../validation/sirenify");
   Promise.resolve(input)
 );
 
-const UPDATE_BSPAOH = gql`
+export const UPDATE_BSPAOH = gql`
   mutation UpdateBspaoh($id: ID!, $input: BspaohInput!) {
     updateBspaoh(id: $id, input: $input) {
       ...FullBspaoh
