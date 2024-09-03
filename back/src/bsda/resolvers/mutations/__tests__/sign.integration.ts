@@ -883,13 +883,8 @@ describe("Mutation.Bsda.sign", () => {
       ]);
     });
 
-    // TODO
-    // TODO
-    // TODO
-    // TODO
-    // TODO
     // Transport mode is now required at transporter signature step
-    describe.only("transporterTransportMode", () => {
+    describe("transporterTransportMode", () => {
       const prepareBsdaAndSignTransport = async (
         transporterOpt,
         updateOpt?
@@ -911,7 +906,7 @@ describe("Mutation.Bsda.sign", () => {
           transporterOpt: {
             transporterCompanySiret: transporter.company.siret,
             transporterRecepisseIsExempted: true,
-            transporterTransportMode: undefined,
+            transporterTransportMode: null,
             transporterTransportPlates: ["AA-00-XX"],
             ...transporterOpt
           }
@@ -951,6 +946,7 @@ describe("Mutation.Bsda.sign", () => {
           where: { id: bsda.id },
           include: { transporters: true }
         });
+
         return { errors, bsda: updatedBsda };
       };
 
@@ -960,7 +956,9 @@ describe("Mutation.Bsda.sign", () => {
 
         // Then
         expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe("Le mode de transport est requis");
+        expect(errors[0].message).toBe(
+          "Le mode de transport n° 1 est obligatoire."
+        );
       });
 
       it("should work if transport mode is in initial BSD", async () => {
@@ -976,12 +974,16 @@ describe("Mutation.Bsda.sign", () => {
         );
       });
 
-      it("should work if transport mode is given at transporter signature", async () => {
+      it("should work if transport mode is given before transporter signature", async () => {
         // When
         const { errors, bsda } = await prepareBsdaAndSignTransport(
           {},
           {
-            transporterTransportMode: TransportMode.ROAD
+            transporter: {
+              transport: {
+                mode: TransportMode.ROAD
+              }
+            }
           }
         );
 
@@ -992,20 +994,26 @@ describe("Mutation.Bsda.sign", () => {
         );
       });
 
-      it("should throw error if transport mode is unset at signature", async () => {
+      it("should throw error if transport mode is unset before signature", async () => {
         // When
         const { errors } = await prepareBsdaAndSignTransport(
           {
             transporterTransportMode: TransportMode.AIR
           },
           {
-            transporterTransportMode: null
+            transporter: {
+              transport: {
+                mode: null
+              }
+            }
           }
         );
 
         // Then
         expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe("Le mode de transport est requis");
+        expect(errors[0].message).toBe(
+          "Le mode de transport n° 1 est obligatoire."
+        );
       });
     });
   });
