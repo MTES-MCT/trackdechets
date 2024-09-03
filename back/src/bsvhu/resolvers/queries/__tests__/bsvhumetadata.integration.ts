@@ -16,9 +16,12 @@ const GET_BSVHU = gql`
       id
       status
       metadata {
+        errors {
+          message
+          path
+        }
         fields {
           sealed
-          requiredForNextSignature
         }
       }
     }
@@ -44,11 +47,31 @@ describe("Query.Bsvhu", () => {
     const { data } = await query<Pick<Query, "bsvhu">>(GET_BSVHU, {
       variables: { id: bsd.id }
     });
-
     expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(0);
-    expect(data.bsvhu.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      20
+  });
+
+  it("should return missing fields in error metadata", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      UserRole.ADMIN
     );
+    const bsd = await bsvhuFactory({
+      opt: {
+        status: BsvhuStatus.INITIAL,
+        emitterCompanySiret: emitterCompany.siret,
+        destinationCompanyPhone: null
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsvhu">>(GET_BSVHU, {
+      variables: { id: bsd.id }
+    });
+    expect(data.bsvhu.metadata?.errors?.[0]?.path).toStrictEqual([
+      "destination",
+      "company",
+      "phone"
+    ]);
   });
 
   it("should return EMISSION signed bsvhu sealed fields", async () => {
@@ -70,9 +93,6 @@ describe("Query.Bsvhu", () => {
     });
 
     expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(0);
-    expect(data.bsvhu.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      29
-    );
   });
 
   it("should return EMISSION signed bsvhu sealed fields with emitter fields sealed", async () => {
@@ -96,9 +116,6 @@ describe("Query.Bsvhu", () => {
     });
 
     expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(21);
-    expect(data.bsvhu.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      29
-    );
   });
 
   it("should return TRANSPORTER signed bsvhu sealed fields", async () => {
@@ -123,9 +140,6 @@ describe("Query.Bsvhu", () => {
     });
 
     expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(33);
-    expect(data.bsvhu.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      33
-    );
   });
 
   it("should return OPERATION signed bsvhu sealed fields", async () => {
@@ -148,8 +162,5 @@ describe("Query.Bsvhu", () => {
     });
 
     expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(57);
-    expect(data.bsvhu.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      33
-    );
   });
 });

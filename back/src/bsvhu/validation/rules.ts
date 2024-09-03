@@ -515,45 +515,26 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
 export const getRequiredAndSealedFieldPaths = async (
   bsvhu: ZodBsvhu,
   currentSignatures: SignatureTypeInput[],
-  nextSignature: SignatureTypeInput | undefined,
   user: User | undefined
 ): Promise<{
-  requiredForNextSignature: string[];
-  sealed: string[];
+  sealed: string[][];
 }> => {
-  const nextSignatures = nextSignature
-    ? currentSignatures.concat([nextSignature])
-    : currentSignatures;
-  const requiredFields: string[] = [];
-  const sealedFields: string[] = [];
+  const sealedFields: string[][] = [];
   const userFunctions = await getBsvhuUserFunctions(user, bsvhu);
   for (const bsvhuField of Object.keys(bsvhuEditionRules)) {
-    const { required, sealed, path } =
+    const { sealed, path } =
       bsvhuEditionRules[bsvhuField as keyof BsvhuEditableFields];
-    if (path) {
-      if (required) {
-        const isRequired = isBsvhuFieldRequired(
-          required,
-          bsvhu,
-          nextSignatures
-        );
-        if (isRequired) {
-          requiredFields.push(path.join("."));
-        }
-      }
-      if (sealed) {
-        const isSealed = isBsvhuFieldSealed(sealed, bsvhu, currentSignatures, {
-          persisted: bsvhu,
-          userFunctions
-        });
-        if (isSealed) {
-          sealedFields.push(path.join("."));
-        }
+    if (path && sealed) {
+      const isSealed = isBsvhuFieldSealed(sealed, bsvhu, currentSignatures, {
+        persisted: bsvhu,
+        userFunctions
+      });
+      if (isSealed) {
+        sealedFields.push(path);
       }
     }
   }
   return {
-    requiredForNextSignature: requiredFields,
     sealed: sealedFields
   };
 };

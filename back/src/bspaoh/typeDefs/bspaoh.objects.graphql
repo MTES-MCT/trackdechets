@@ -44,15 +44,13 @@ type BspaohMetadata {
 }
 
 type BspaohMetadataFields {
-  "liste des champs qui seront requis pour la prochaine signature"
-  requiredForNextSignature: [String!]!
   "Liste des champs scellés"
-  sealed: [String!]!
+  sealed: [[String!]!]!
 }
 
 type BspaohError {
   message: String!
-  path: String!
+  path: [String!]!
   requiredFor: BspaohSignatureType!
 }
 

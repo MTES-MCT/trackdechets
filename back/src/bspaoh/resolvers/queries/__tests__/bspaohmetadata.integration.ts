@@ -16,9 +16,12 @@ const GET_BSPAOH = gql`
       id
       status
       metadata {
+        errors {
+          message
+          path
+        }
         fields {
           sealed
-          requiredForNextSignature
         }
       }
     }
@@ -46,9 +49,31 @@ describe("Query.Bspaoh", () => {
     });
 
     expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(0);
-    expect(data.bspaoh.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      17
+  });
+
+  it("should return missing fields in error metadata", async () => {
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      UserRole.ADMIN
     );
+    const bsd = await bspaohFactory({
+      opt: {
+        status: BspaohStatus.INITIAL,
+        emitterCompanySiret: emitterCompany.siret,
+        destinationCompanyPhone: null
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bspaoh">>(GET_BSPAOH, {
+      variables: { id: bsd.id }
+    });
+
+    expect(data.bspaoh.metadata?.errors?.[0]?.path).toStrictEqual([
+      "destination",
+      "company",
+      "phone"
+    ]);
   });
 
   it("should return EMISSION signed bspaoh sealed fields", async () => {
@@ -70,9 +95,6 @@ describe("Query.Bspaoh", () => {
     });
 
     expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(19);
-    expect(data.bspaoh.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      29
-    );
   });
 
   it("should return EMISSION signed bspaoh sealed fields with destination sealed", async () => {
@@ -101,9 +123,6 @@ describe("Query.Bspaoh", () => {
     });
 
     expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(25);
-    expect(data.bspaoh.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      29
-    );
   });
 
   it("should return TRANSPORTER signed bspaoh sealed fields", async () => {
@@ -133,9 +152,6 @@ describe("Query.Bspaoh", () => {
     });
 
     expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(41);
-    expect(data.bspaoh.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      32
-    );
   });
 
   it("should return RECEPTION signed bspaoh sealed fields", async () => {
@@ -165,9 +181,6 @@ describe("Query.Bspaoh", () => {
     });
 
     expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(49);
-    expect(data.bspaoh.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      34
-    );
   });
 
   it("should return OPERATION signed bspaoh sealed fields", async () => {
@@ -198,8 +211,5 @@ describe("Query.Bspaoh", () => {
     });
 
     expect(data.bspaoh.metadata?.fields?.sealed?.length).toBe(52);
-    expect(data.bspaoh.metadata?.fields?.requiredForNextSignature?.length).toBe(
-      34
-    );
   });
 });

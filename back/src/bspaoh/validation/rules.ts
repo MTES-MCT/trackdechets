@@ -612,51 +612,30 @@ export function checkSealedAndRequiredFields(
 export const getRequiredAndSealedFieldPaths = async (
   bspaoh: BspaohForParsing,
   currentSignatures: BspaohSignatureType[],
-  nextSignature: BspaohSignatureType | undefined,
   user: User | undefined
 ): Promise<{
-  requiredForNextSignature: string[];
-  sealed: string[];
+  sealed: string[][];
 }> => {
-  const nextSignatures = nextSignature
-    ? currentSignatures.concat([nextSignature])
-    : currentSignatures;
-  const requiredFields: string[] = [];
-  const sealedFields: string[] = [];
+  const sealedFields: string[][] = [];
   const userFunctions = await getUserFunctions(user, bspaoh);
   for (const bspaohField of Object.keys(editionRules)) {
-    const { required, sealed, path } =
+    const { sealed, path } =
       editionRules[bspaohField as keyof BspaohRulesEntries];
     // Apply default values to rules
     const sealedRule = {
       from: sealed?.from,
       when: sealed?.when ?? (() => true) // Default to true
     };
-    const requiredRule = {
-      from: required?.from ?? "NO_CHECK_RULE",
-      when: required?.when ?? (() => true) // Default to true
-    };
-    if (path) {
-      if (required) {
-        const isRequired =
-          nextSignatures.includes(requiredRule.from) &&
-          requiredRule.when(bspaoh, bspaoh, userFunctions);
-        if (isRequired) {
-          requiredFields.push(path.join("."));
-        }
-      }
-      if (sealed) {
-        const isSealed =
-          currentSignatures.includes(sealedRule.from) &&
-          sealedRule.when(bspaoh, bspaoh, userFunctions);
-        if (isSealed) {
-          sealedFields.push(path.join("."));
-        }
+    if (path && sealed) {
+      const isSealed =
+        currentSignatures.includes(sealedRule.from) &&
+        sealedRule.when(bspaoh, bspaoh, userFunctions);
+      if (isSealed) {
+        sealedFields.push(path);
       }
     }
   }
   return {
-    requiredForNextSignature: requiredFields,
     sealed: sealedFields
   };
 };
