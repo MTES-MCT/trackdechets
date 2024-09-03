@@ -7,7 +7,7 @@ const LABELS = {
   NOT_BY_DRIVER: "Rinçage non réalisé par le chauffeur"
 };
 
-export const getReasonLabel = (
+export const getCiterneNotWashedOutReasonLabel = (
   reason: CiterneNotWashedOutReason | null | undefined
 ) => {
   if (!reason) {

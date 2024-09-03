@@ -1043,7 +1043,7 @@ describe("Test Form reception", () => {
       expect(form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_CITERNE);
     });
 
-    it.each([TransportMode.ROAD, null])(
+    it.each([TransportMode.ROAD, null, undefined])(
       "can accept a waste and specify empty return if transporter mode is ROAD or null (value = %p)",
       async transporterTransportMode => {
         // When

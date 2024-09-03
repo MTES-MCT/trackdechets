@@ -39,8 +39,8 @@ import { isFrenchCompany } from "../../companies/validation";
 import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
 import { displayWasteQuantity } from "../../registry/utils";
 import { dateToXMonthAtHHMM, isDefined } from "../../common/helpers";
-import { getReasonLabel } from "../helpers/citerneNotWashedOutReason";
 import { getEmptyReturnADRLabel } from "../helpers/emptyReturnADR";
+import { getCiterneNotWashedOutReasonLabel } from "../helpers/citerneNotWashedOutReason";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -174,7 +174,7 @@ function CharteCiterne({
   if (hasCiterneBeenWashedOut) {
     return (
       <>
-        Charte "Rinçage des citernes": Rinçage effectué
+        Charte "Rinçage des citernes": <b>Rinçage effectué</b>
         <br />
         <br />
       </>
@@ -182,8 +182,8 @@ function CharteCiterne({
   } else {
     return (
       <>
-        Charte "Rinçage des citernes":{" "}
-        {getReasonLabel(citerneNotWashedOutReason)}
+        Charte "Rinçage des citernes": <b>Rinçage non effectué</b>,{" "}
+        {getCiterneNotWashedOutReasonLabel(citerneNotWashedOutReason)}
         <br />
         <br />
       </>
