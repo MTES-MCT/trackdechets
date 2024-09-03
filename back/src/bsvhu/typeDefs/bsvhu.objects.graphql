@@ -10,10 +10,8 @@ type BsvhuEdge {
 }
 
 type BsvhuMetadataFields {
-  "liste des champs qui seront requis pour la prochaine signature"
-  requiredForNextSignature: [String!]!
   "Liste des champs scellés"
-  sealed: [String!]!
+  sealed: [[String!]!]!
 }
 
 type BsvhuMetadata {
@@ -24,7 +22,7 @@ type BsvhuMetadata {
 
 type BsvhuError {
   message: String!
-  path: String!
+  path: [String!]!
   requiredFor: SignatureTypeInput!
 }
 

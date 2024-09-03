@@ -41,7 +41,7 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
         errors.issues?.map((e: ZodIssue) => {
           return {
             message: e.message,
-            path: `${e.path.join(".")}`, // e.path is an array, first element should be the path name
+            path: e.path,
             requiredFor: nextSignature
           };
         }) ?? []
@@ -62,12 +62,10 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
       ...transporterReceipt
     });
     const currentSignature = getCurrentSignatureType(zodBsvhu);
-    const nextSignature = getNextSignatureType(currentSignature);
     const currentSignatureAncestors = getSignatureAncestors(currentSignature);
     return getRequiredAndSealedFieldPaths(
       zodBsvhu,
       currentSignatureAncestors,
-      nextSignature,
       context.user ?? undefined
     );
   }

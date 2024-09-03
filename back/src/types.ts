@@ -5,6 +5,7 @@ import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
 import { createBsdaDataLoaders } from "./bsda/dataloader";
 import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
+import { createBspaohDataLoaders } from "./bspaoh/dataloader";
 import { createUserDataLoaders } from "./users/dataloaders";
 import "express-session";
 
@@ -13,6 +14,7 @@ export type AppDataloaders = ReturnType<typeof createUserDataLoaders> &
   ReturnType<typeof createFormDataLoaders> &
   ReturnType<typeof createBsdaDataLoaders> &
   ReturnType<typeof createBsvhuDataLoaders> &
+  ReturnType<typeof createBspaohDataLoaders> &
   ReturnType<typeof createEventsDataLoaders>;
 
 export type GraphQLContext = {
@@ -74,7 +76,7 @@ Paths<obj>
 */
 export type Paths<T, D extends number = 3> = [D] extends [never]
   ? never
-  : T extends object
+  : T extends Record<string, unknown>
   ? {
       [K in keyof T]-?:
         | [K]
@@ -101,7 +103,7 @@ Paths<obj>
 */
 export type Leaves<T, D extends number = 3> = [D] extends [never]
   ? never
-  : T extends object
+  : T extends Record<string, unknown>
   ? { [K in keyof T]-?: Cons<K, Leaves<T[K], Prev[D]>> }[keyof T]
   : [];
 

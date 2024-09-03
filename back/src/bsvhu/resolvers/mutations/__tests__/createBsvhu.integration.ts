@@ -362,6 +362,10 @@ describe("Mutation.Vhu.create", () => {
     expect(errors[0].message).toBe(
       "Le N° d'agrément du destinataire est un champ requis."
     );
+    expect(errors[0].extensions!.issues![0].path).toStrictEqual([
+      "destination",
+      "agrementNumber"
+    ]);
   });
 
   it("should create a bsvhu with split address input and get a composite address output", async () => {
