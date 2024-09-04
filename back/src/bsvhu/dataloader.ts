@@ -1,23 +1,28 @@
 import DataLoader from "dataloader";
 import { prisma } from "@td/prisma";
-import { Bsvhu } from "@prisma/client";
+import {
+  BsvhuWithIntermediaries,
+  BsvhuWithIntermediariesInclude
+} from "./types";
 
 export function createBsvhuDataLoaders() {
   return {
-    bsvhus: new DataLoader((bsvhuIds: string[]) => getBsvhus(bsvhuIds))
+    bsvhus: new DataLoader<string, BsvhuWithIntermediaries>(
+      (bsvhuIds: string[]) => getBsvhus(bsvhuIds)
+    )
   };
 }
 
-async function getBsvhus(bsvhuIds: string[]) {
+async function getBsvhus(
+  bsvhuIds: string[]
+): Promise<BsvhuWithIntermediaries[]> {
   const bsvhus = await prisma.bsvhu.findMany({
     where: { id: { in: bsvhuIds } },
-    include: {
-      intermediaries: true
-    }
+    include: BsvhuWithIntermediariesInclude
   });
 
   const dict = Object.fromEntries(
-    bsvhus.map((bsvhu: Bsvhu) => [bsvhu.id, bsvhu])
+    bsvhus.map((bsvhu: BsvhuWithIntermediaries) => [bsvhu.id, bsvhu])
   );
 
   return bsvhuIds.map(bsdaId => dict[bsdaId]);

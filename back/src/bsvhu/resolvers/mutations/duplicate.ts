@@ -1,4 +1,4 @@
-import { Prisma, BsvhuStatus, Bsvhu, User } from "@prisma/client";
+import { Prisma, BsvhuStatus, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsvhuArgs } from "../../../generated/graphql/types";
@@ -9,6 +9,10 @@ import { checkCanDuplicate } from "../../permissions";
 import { prisma } from "@td/prisma";
 import { prismaToZodBsvhu } from "../../validation/helpers";
 import { parseBsvhuAsync } from "../../validation";
+import {
+  BsvhuForParsingInclude,
+  PrismaBsvhuForParsing
+} from "../../validation/types";
 
 export default async function duplicate(
   _,
@@ -17,7 +21,9 @@ export default async function duplicate(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaBsvhu = await getBsvhuOrNotFound(id);
+  const prismaBsvhu = await getBsvhuOrNotFound(id, {
+    include: BsvhuForParsingInclude
+  });
 
   await checkCanDuplicate(user, prismaBsvhu);
   const bsvhuRepository = getBsvhuRepository(user);
@@ -30,7 +36,7 @@ export default async function duplicate(
 }
 
 async function getDuplicateData(
-  bsvhu: Bsvhu,
+  bsvhu: PrismaBsvhuForParsing,
   user: User
 ): Promise<Prisma.BsvhuCreateInput> {
   const {
@@ -51,10 +57,11 @@ async function getDuplicateData(
     destinationOperationMode,
     destinationOperationSignatureAuthor,
     destinationOperationSignatureDate,
+    intermediariesOrgIds,
     ...zodBsvhu
   } = prismaToZodBsvhu(bsvhu);
 
-  const parsedBsvhu = await parseBsvhuAsync(zodBsvhu, {
+  const { intermediaries, ...parsedBsvhu } = await parseBsvhuAsync(zodBsvhu, {
     user
   });
 
@@ -87,7 +94,7 @@ async function getDuplicateData(
   };
 }
 
-async function getBsvhuCompanies(bsvhu: Bsvhu) {
+async function getBsvhuCompanies(bsvhu: PrismaBsvhuForParsing) {
   const companiesOrgIds = [
     bsvhu.emitterCompanySiret,
     bsvhu.transporterCompanySiret,

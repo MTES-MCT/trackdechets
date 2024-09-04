@@ -1,12 +1,15 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsvhuArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import { expandVhuFormFromDb } from "../../converter";
+import {
+  companyToIntermediaryInput,
+  expandVhuFormFromDb
+} from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
 import { mergeInputAndParseBsvhuAsync } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
-import { Prisma } from "@prisma/client";
+import { BsvhuForParsingInclude } from "../../validation/types";
 
 export default async function edit(
   _,
@@ -15,7 +18,9 @@ export default async function edit(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const existingBsvhu = await getBsvhuOrNotFound(id);
+  const existingBsvhu = await getBsvhuOrNotFound(id, {
+    include: BsvhuForParsingInclude
+  });
 
   await checkCanUpdate(user, existingBsvhu, input);
 
@@ -31,12 +36,27 @@ export default async function edit(
     return expandVhuFormFromDb(existingBsvhu);
   }
 
+  const intermediaries = parsedBsvhu.intermediaries
+    ? {
+        deleteMany: {},
+        ...(parsedBsvhu.intermediaries.length > 0 && {
+          createMany: {
+            data: companyToIntermediaryInput(parsedBsvhu.intermediaries)
+          }
+        })
+      }
+    : undefined;
+
   const { update } = getBsvhuRepository(user);
   const { createdAt, ...bsvhu } = parsedBsvhu;
 
-  const data: Prisma.BsvhuUpdateInput = { ...bsvhu };
-
-  const updatedBsvhu = await update({ id }, data);
+  const updatedBsvhu = await update(
+    { id },
+    {
+      ...bsvhu,
+      intermediaries
+    }
+  );
 
   return expandVhuFormFromDb(updatedBsvhu);
 }
