@@ -10,7 +10,10 @@ export function createBsvhuDataLoaders() {
 
 async function getBsvhus(bsvhuIds: string[]) {
   const bsvhus = await prisma.bsvhu.findMany({
-    where: { id: { in: bsvhuIds } }
+    where: { id: { in: bsvhuIds } },
+    include: {
+      intermediaries: true
+    }
   });
 
   const dict = Object.fromEntries(

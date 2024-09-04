@@ -3,6 +3,7 @@ import { transactionWrapper } from "../../common/repository/helper";
 import { BsvhuActions } from "./types";
 import { buildFindUniqueBsvhu } from "./bsvhu/findUnique";
 import { buildFindManyBsvhu } from "./bsvhu/findMany";
+import { buildFindRelatedBsvhuEntity } from "./bsvhu/findRelatedEntity";
 import { buildCountBsvhus } from "./bsvhu/count";
 
 import { buildCreateBsvhu } from "./bsvhu/create";
@@ -19,7 +20,8 @@ export function getReadonlyBsvhuRepository() {
   return {
     count: buildCountBsvhus({ prisma }),
     findUnique: buildFindUniqueBsvhu({ prisma }),
-    findMany: buildFindManyBsvhu({ prisma })
+    findMany: buildFindManyBsvhu({ prisma }),
+    findRelatedEntity: buildFindRelatedBsvhuEntity({ prisma })
   };
 }
 

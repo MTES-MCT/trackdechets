@@ -56,6 +56,11 @@ type Bsvhu {
   destination: BsvhuDestination
   "Transporteur"
   transporter: BsvhuTransporter
+  """
+  Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
+  mais pas à la responsabilité de la traçabilité. Il pourra lire ce bordereau, sans étape de signature.
+  """
+  intermediaries: [FormCompany!]
 
   metadata: BsvhuMetadata!
 }
