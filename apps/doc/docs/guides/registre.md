@@ -13,7 +13,7 @@ Les `queries` permettant d'exporter les données registre sont les suivantes :
 - [`managedWastes`](../reference/api-reference/registre/queries#managedwastes) : registre de déchets gérés (courtage ou négoce)
 - [`allWastes`](../reference/api-reference/registre/queries#allwastes) : registre permettant d'exporter toutes les données de bordereaux pour un ou plusieurs établissements
 
-Des filtres avancés peuvent être appliqués pour restreindre les données exportés par code déchet, quantité, date d'expédition, etc, et son décrits dans l'objet [RegisterWhere](../reference/api-reference/registre/inputObjects#wasteregisterwhere).
+Des filtres avancés peuvent être appliqués pour restreindre les données exportés par code déchet, quantité, date d'expédition, etc, et son décrits dans l'objet [RegisterWhere](../reference/api-reference/registre/inputObjects#wasteregistrywhere).
 
 Exemple de requête :
 
@@ -102,12 +102,11 @@ Les résultats sont paginés. Pour récupérer tous les déchets :
 
 Les données peuvent également être téléchargées au format `CSV` ou Excel (`XLXS`).
 
-Pour ce faire vous devez utiliser la query [`wastesDownloadLink`](../reference/api-reference/registre/queries#wastesdownloadlink) de la façon suivante :
+Pour ce faire vous devez utiliser la query [`wastesRegistryCsv`](../reference/api-reference/registre/queries#wastesregistrycsv) ou [`wastesRegistryXls`](../reference/api-reference/registre/queries#wastesregistryxls) de la façon suivante :
 
 ```graphql
 query {
-  wastesDownloadLink(
-    fileType: CSV
+  wastesRegistryCsv(
     registerType: OUTGOING
     sirets: ["53070853600038"]
   ) {
@@ -129,7 +128,7 @@ Vous recevrez en réponse un lien de téléchargement à utiliser pour télécha
 }
 ```
 
-Ce lien n'est valide que 10 secondes, il est donc nécessaire d'enchainer dans votre code client l'appel à la query GraphQL `wastesDownloadLink` puis une requête `GET` classique sur le lien de téléchargement.
+Ce lien n'est valide que 10 secondes, il est donc nécessaire d'enchainer dans votre code client l'appel à la query GraphQL `wastesRegistryCsv` `wastesRegistryXls` puis une requête `GET` classique sur le lien de téléchargement.
 
 
 
