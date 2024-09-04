@@ -16,6 +16,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Rendre obligatoire le volume du contenant à la publication sur le BSFF [PR 3555](https://github.com/MTES-MCT/trackdechets/pull/3555)
 
+#### :house: Interne
+
+- Génération de modèles de bsds videsf [PR 3556](https://github.com/MTES-MCT/trackdechets/pull/3556)
+
 # [2024.8.1] 27/08/2024
 
 #### :rocket: Nouvelles fonctionnalités

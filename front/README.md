@@ -28,4 +28,4 @@ Your app is ready to be deployed!
 
 ### `npm run start`
 
-After building the production bundle, this starts a simple Express.js node server of the statif files.
+After building the production bundle, this starts a simple Express.js node server of the static files.

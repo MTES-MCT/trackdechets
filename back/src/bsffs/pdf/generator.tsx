@@ -20,6 +20,7 @@ import {
 } from "../types";
 import { prisma } from "@td/prisma";
 import { getReadonlyBsffPackagingRepository } from "../repository";
+import { emptyValues } from "../../common/pdf/emptypdf";
 
 export type BsffForBuildPdf = Bsff &
   BsffWithPackagings &
@@ -60,23 +61,28 @@ export async function getBsffForBuildPdf({
   return { ...bsff, previousBsffs };
 }
 
-export async function buildPdf(bsff: BsffForBuildPdf) {
-  const qrCode = await QRCode.toString(bsff.id, { type: "svg" });
+export async function buildPdf(bsff: BsffForBuildPdf, renderEmpty?: boolean) {
+  const qrCode = renderEmpty
+    ? ""
+    : await QRCode.toString(bsff.id, { type: "svg" });
+
+  let bsffForPdf = {
+    ...expandBsffFromDB(bsff),
+    packagings: bsff.packagings.map(expandBsffPackagingFromDB),
+    ficheInterventions: bsff.ficheInterventions.map(
+      expandFicheInterventionBsffFromDB
+    ),
+    previousBsffs: bsff.previousBsffs.map(previous => ({
+      ...expandBsffFromDB(previous),
+      packagings: previous.packagings.map(expandBsffPackagingFromDB)
+    }))
+  };
+
+  if (renderEmpty) {
+    bsffForPdf = emptyValues(bsffForPdf);
+  }
   const html = ReactDOMServer.renderToStaticMarkup(
-    <BsffPdf
-      bsff={{
-        ...expandBsffFromDB(bsff),
-        packagings: bsff.packagings.map(expandBsffPackagingFromDB),
-        ficheInterventions: bsff.ficheInterventions.map(
-          expandFicheInterventionBsffFromDB
-        ),
-        previousBsffs: bsff.previousBsffs.map(previous => ({
-          ...expandBsffFromDB(previous),
-          packagings: previous.packagings.map(expandBsffPackagingFromDB)
-        }))
-      }}
-      qrCode={qrCode}
-    />
+    <BsffPdf bsff={bsffForPdf} qrCode={qrCode} renderEmpty={true} />
   );
   return generatePdf(html);
 }

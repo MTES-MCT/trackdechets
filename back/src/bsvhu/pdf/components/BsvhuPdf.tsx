@@ -20,9 +20,10 @@ const removeSpaces = (val: string | null | undefined): string => {
 type Props = {
   bsvhu: Bsvhu;
   qrCode: string;
+  renderEmpty?: boolean;
 };
 
-export function BsvhuPdf({ bsvhu, qrCode }: Props) {
+export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
   return (
     <Document title={bsvhu.id}>
       <div className="Page">
@@ -48,7 +49,7 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
               dangerouslySetInnerHTML={{ __html: qrCode }}
             />
             <div>
-              <b>Document édité le {dateToXMonthAtHHMM()}</b>
+              <b>Document édité le {renderEmpty ? "" : dateToXMonthAtHHMM()}</b>
             </div>
           </div>
         </div>
