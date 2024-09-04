@@ -31,8 +31,8 @@ export default function BsffPackagings({
 
   const { setFieldValue } = useFormikContext<BsffPackagingInput>();
 
-  const canEdit =
-    !disabled && ![BsffType.Reexpedition, BsffType.Groupement].includes(type);
+  const fieldIsDisabled =
+    disabled || [BsffType.Reexpedition, BsffType.Groupement].includes(type);
 
   const maxPackagings = type === BsffType.Reconditionnement ? 1 : Infinity;
 
@@ -44,6 +44,14 @@ export default function BsffPackagings({
           <div>
             {value.map((p, idx) => {
               const fieldName = `${name}.${idx}`;
+
+              const volumeIsDisabled =
+                disabled ||
+                ([BsffType.Reexpedition, BsffType.Groupement].includes(type) &&
+                  // Cas spécial pour le volume qui est rendu obligatoire à partir de la
+                  // 2024.09.1 : on permet d'éditer le volume sur un bordereau de groupement ou réexpédition
+                  // qui aurait un bordereau initial dont le packaging a un volume `null` ou `undefined`.
+                  !!p.volume);
 
               return (
                 <div
@@ -59,7 +67,7 @@ export default function BsffPackagings({
                             as="select"
                             className="td-select"
                             name={`${fieldName}.type`}
-                            disabled={!canEdit}
+                            disabled={fieldIsDisabled}
                             onChange={(v: ChangeEvent<HTMLInputElement>) => {
                               setFieldValue(
                                 `${fieldName}.type`,
@@ -83,7 +91,7 @@ export default function BsffPackagings({
                           <Field
                             className="td-input"
                             name={`${fieldName}.other`}
-                            disabled={!canEdit || p.type !== "AUTRE"}
+                            disabled={fieldIsDisabled || p.type !== "AUTRE"}
                           />
                         </label>
                       </div>
@@ -94,7 +102,7 @@ export default function BsffPackagings({
                           <Field
                             className="td-input"
                             name={`${fieldName}.numero`}
-                            disabled={!canEdit}
+                            disabled={fieldIsDisabled}
                           />
                         </label>
                       </div>
@@ -106,7 +114,7 @@ export default function BsffPackagings({
                             component={NumberInput}
                             className="td-input td-input--small"
                             name={`${fieldName}.volume`}
-                            disabled={!canEdit}
+                            disabled={volumeIsDisabled}
                           />
                         </label>
                       </div>
@@ -118,12 +126,12 @@ export default function BsffPackagings({
                             component={NumberInput}
                             className="td-input td-input--small"
                             name={`${fieldName}.weight`}
-                            disabled={!canEdit}
+                            disabled={fieldIsDisabled}
                           />
                         </label>
                       </div>
                     </div>
-                    {canEdit && (
+                    {!fieldIsDisabled && (
                       <div
                         className="tw-px-2"
                         onClick={() => arrayHelpers.remove(idx)}
@@ -149,7 +157,7 @@ export default function BsffPackagings({
                 </div>
               );
             })}
-            {canEdit && value.length < maxPackagings && (
+            {!fieldIsDisabled && value.length < maxPackagings && (
               <button
                 type="button"
                 className="btn btn--outline-primary"
