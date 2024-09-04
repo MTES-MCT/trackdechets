@@ -36,8 +36,8 @@
   "dependencies": {
     "@apollo/client": "^3.7.16",
     "@apollo/server": "^4.9.1",
-    "@aws-sdk/client-s3": "^3.359.0",
-    "@aws-sdk/lib-storage": "^3.359.0",
+    "@aws-sdk/client-s3": "^3.637.0",
+    "@aws-sdk/lib-storage": "^3.637.0",
     "@bull-board/api": "^4.12.2",
     "@bull-board/express": "^4.12.2",
     "@codegouvfr/react-dsfr": "^1.10.11",
