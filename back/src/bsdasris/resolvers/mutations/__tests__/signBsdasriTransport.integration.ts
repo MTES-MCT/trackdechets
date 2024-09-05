@@ -243,7 +243,7 @@ describe("Mutation.signBsdasri transport", () => {
 
       // Then
       expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe("Le mode de transport est obligatoire.");
+      expect(errors[0].message).toBe("Le mode de transport est requis.");
     });
 
     it("should work if transport mode is in initial BSD", async () => {
@@ -292,7 +292,7 @@ describe("Mutation.signBsdasri transport", () => {
 
       // Then
       expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe("Le mode de transport est obligatoire.");
+      expect(errors[0].message).toBe("Le mode de transport est requis.");
     });
   });
 });

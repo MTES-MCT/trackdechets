@@ -482,7 +482,7 @@ export const transportSchema: FactorySchemaOf<
       .nullable()
       .requiredIf(
         context.transportSignature,
-        "Le mode de transport est obligatoire."
+        "Le mode de transport est requis."
       )
   });
 
