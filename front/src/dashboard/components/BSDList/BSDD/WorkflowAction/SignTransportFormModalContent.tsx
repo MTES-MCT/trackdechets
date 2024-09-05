@@ -136,7 +136,7 @@ export default function SignTransportFormModalContent({
         takenOverAt: TODAY.toISOString(),
         securityCode: "",
         transporterNumberPlate: signingTransporter?.numberPlate ?? "",
-        transporterTransportMode: signingTransporter?.mode ?? "",
+        transporterTransportMode: signingTransporter?.mode ?? null,
         emitter: { type: form?.emitter?.type },
         update: {
           quantity: form.wasteDetails?.quantity ?? 0,

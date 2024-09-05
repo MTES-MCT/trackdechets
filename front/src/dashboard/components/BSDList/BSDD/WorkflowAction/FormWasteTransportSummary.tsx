@@ -6,6 +6,7 @@ import {
   FormStatus,
   QuantityType,
   SignTransportFormInput,
+  TransportMode,
   WasteDetailsInput
 } from "@td/codegen-ui";
 import {
@@ -20,6 +21,7 @@ import NumberInput from "../../../../../form/common/components/custom-inputs/Num
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import { useEffect } from "react";
+import { getTransportModeLabel } from "../../../../constants";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
@@ -105,7 +107,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
 export function FormWasteTransportSummary({
   form
 }: FormWasteTransportSummaryProps) {
-  const { values } = useFormikContext<FormValues>();
+  const { values, setFieldValue } = useFormikContext<FormValues>();
   const [fields, setFields] = React.useState<FormKeys[]>([]);
   const addField = (name: FormKeys) =>
     setFields(currentFields =>
@@ -227,10 +229,14 @@ export function FormWasteTransportSummary({
         <DataListItem>
           <DataListTerm>Mode de transport</DataListTerm>
           <DataListDescription>
-            {values.transporterTransportMode}
+            {getTransportModeLabel(values.transporterTransportMode)}
             <button
               type="button"
-              onClick={() => addField("transporterTransportMode")}
+              onClick={() => {
+                addField("transporterTransportMode");
+                // Set default value to ROAD
+                setFieldValue("transporterTransportMode", TransportMode.Road);
+              }}
               className="tw-ml-2"
             >
               <IconPaperWrite color="blue" />
