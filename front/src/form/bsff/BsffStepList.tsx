@@ -3,7 +3,7 @@ import React, { ReactElement, useMemo, lazy } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "../../Apps/common/Components";
 import { IStepContainerProps } from "../common/stepper/Step";
-import { toastApolloError } from "../common/stepper/toaster";
+import { toastApolloError } from "../../Apps/Dashboard/Creation/toaster";
 import {
   Mutation,
   MutationCreateDraftBsffArgs,

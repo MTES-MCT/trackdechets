@@ -12,12 +12,11 @@ type TagsInputWrapperProps = {
  * Wrapper autour de TagsInput qui permet de contrôler son
  * état via Formik
  */
-const TagsInputWrapper: React.FC<TagsInputWrapperProps> = ({
+const TagsInputWrapper = ({
   fieldName,
   label,
-
   maxTags
-}) => {
+}: TagsInputWrapperProps): React.JSX.Element => {
   const [tags] = useField<string[]>(fieldName);
 
   return (
@@ -43,12 +42,12 @@ type RhfTagsInputWrapperProps = TagsInputWrapperProps;
  * Wrapper autour de TagsInput adapté à rhf.
  * Doit être placé au sein d'un FormProvider
  */
-export const RhfTagsInputWrapper: React.FC<RhfTagsInputWrapperProps> = ({
+export const RhfTagsInputWrapper = ({
   fieldName,
   label,
   maxTags,
   hintText
-}) => {
+}: RhfTagsInputWrapperProps): React.JSX.Element => {
   const { setValue, watch, getFieldState } = useFormContext();
 
   const tags = watch(fieldName);

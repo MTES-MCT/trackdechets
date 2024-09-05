@@ -26,7 +26,7 @@ import {
   UPDATE_BSDASRI
 } from "../../../../../Apps/common/queries/bsdasri/queries";
 
-import { getComputedState } from "../../../../../form/common/getComputedState";
+import { getComputedState } from "../../../../../Apps/Dashboard/Creation/getComputedState";
 import getInitialState from "../../../../../form/bsdasri/utils/initial-state";
 import { signatureValidationSchema, prefillWasteDetails } from "./utils";
 import {

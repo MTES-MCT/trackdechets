@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Meta, StoryFn } from "@storybook/react";
 import TagsInput, { TagsInputProps } from "./TagsInput";
 
-const Comonent: React.FC<Pick<TagsInputProps, "label" | "maxTags">> = ({
+const Component = ({
   label,
   maxTags
-}) => {
+}: Pick<TagsInputProps, "label" | "maxTags">) => {
   const [tags, setTags] = useState<string[]>([]);
 
   return (
@@ -30,9 +30,9 @@ export default {
     type: "figma",
     url: "https://www.figma.com/file/TZbRaWgchdAv8o7IxJWrKE/Trackd%C3%A9chets?type=design&node-id=9815%3A197969&mode=design&t=aipTGRtMXjPGwdhY-1"
   }
-} as Meta<typeof Comonent>;
+} as Meta<typeof Component>;
 
-const Template: StoryFn<typeof Comonent> = args => <Comonent {...args} />;
+const Template: StoryFn<typeof Component> = args => <Component {...args} />;
 
 export const TagsInputExample = Template.bind({});
 
