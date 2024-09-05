@@ -2,7 +2,8 @@ import {
   BsddTransporter,
   EmitterType,
   Form,
-  OperationMode
+  OperationMode,
+  TransportMode
 } from "@prisma/client";
 import {
   draftFormSchema,
@@ -75,6 +76,7 @@ const transporterData: Partial<BsddTransporter> = {
   transporterCompanyContact: "Transporteur",
   transporterCompanyPhone: "03",
   transporterCompanyMail: "t@t.fr",
+  transporterTransportMode: TransportMode.AIR,
   number: 1
 };
 
@@ -2065,7 +2067,8 @@ describe("processedInfoSchema", () => {
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanyMail: "contact@laposte.com",
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: true,
+      transporterTransportMode: "RAIL"
     };
     const validateFn = () =>
       transporterSchemaFn({
@@ -2079,7 +2082,8 @@ describe("processedInfoSchema", () => {
       transporterCompanyName: "la poste",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanySiret: "35600000040773",
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: true,
+      transporterTransportMode: "RAIL"
     });
   });
 
@@ -2095,7 +2099,8 @@ describe("processedInfoSchema", () => {
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanyMail: "contact@laposte.com",
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: true,
+      transporterTransportMode: "RAIL"
     };
     const validateFn = () =>
       transporterSchemaFn({
@@ -2109,7 +2114,8 @@ describe("processedInfoSchema", () => {
       transporterCompanyName: "la poste siege",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanySiret: transporterCompany.siret,
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: true,
+      transporterTransportMode: "RAIL"
     });
   });
 

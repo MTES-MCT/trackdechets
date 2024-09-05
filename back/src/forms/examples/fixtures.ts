@@ -2,6 +2,8 @@
  * Fixtures used as building blocks of mutations inputs
  */
 
+import { TransportMode } from "@prisma/client";
+
 function emitterCompanyInput(siret: string) {
   return {
     siret,
@@ -127,7 +129,9 @@ function signEmissionFormInput() {
 function signTransportFormInput() {
   return {
     takenOverAt: "2020-04-03T14:48:00",
-    takenOverBy: "Isabelle Guichard"
+    takenOverBy: "Isabelle Guichard",
+    transporterNumberPlate: "AA-123456-BB",
+    transporterTransportMode: TransportMode.ROAD
   };
 }
 

@@ -4,7 +4,8 @@ import {
   WasteAcceptationStatus,
   Prisma,
   BsdasriType,
-  OperationMode
+  OperationMode,
+  TransportMode
 } from "@prisma/client";
 import { BsdasriPackagingsInput } from "../../generated/graphql/types";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
@@ -101,6 +102,7 @@ export const readyToTakeOverData = company => ({
   transporterRecepisseDepartment: "83",
   transporterRecepisseValidityLimit: new Date(),
   transporterTransportPlates: ["TRANSPORTER-PLATE"],
+  transporterTransportMode: TransportMode.ROAD,
   transporterWastePackagings: [
     { type: "BOITE_CARTON", volume: 22, quantity: 3 }
   ],
