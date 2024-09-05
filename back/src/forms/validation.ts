@@ -1132,7 +1132,9 @@ export const transporterSchemaFn: FactorySchemaOf<
           ) &&
           !transporterTransportMode
         ) {
-          return new yup.ValidationError("Le mode de transport est requis");
+          return new yup.ValidationError(
+            "Le mode de transport est obligatoire"
+          );
         }
 
         return true;
