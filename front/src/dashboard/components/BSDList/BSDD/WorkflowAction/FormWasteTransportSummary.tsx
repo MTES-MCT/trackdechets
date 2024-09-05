@@ -13,6 +13,7 @@ import {
   DataListDescription,
   DataListItem,
   DataListTerm,
+  FieldTransportModeSelect,
   RedErrorMessage
 } from "../../../../../common/components";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
@@ -24,13 +25,19 @@ interface FormWasteTransportSummaryProps {
   form: Form;
 }
 
-type FormValues = Pick<SignTransportFormInput, "transporterNumberPlate"> & {
+type FormValues = Pick<
+  SignTransportFormInput,
+  "transporterNumberPlate" | "transporterTransportMode"
+> & {
   update: Pick<
     WasteDetailsInput,
     "quantity" | "packagingInfos" | "sampleNumber"
   >;
 };
-type FormKeys = "transporterNumberPlate" | keyof FormValues["update"];
+type FormKeys =
+  | "transporterNumberPlate"
+  | "transporterTransportMode"
+  | keyof FormValues["update"];
 
 const SAMPLE_NUMBER_WASTE_CODES = [
   "13 02 05*",
@@ -50,6 +57,19 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
         <Field name="transporterNumberPlate" className="td-input" />
       </label>
       <RedErrorMessage name="transporterNumberPlate" />
+    </div>
+  ),
+  transporterTransportMode: () => (
+    <div className="form__row">
+      <label>
+        Mode de transport{" "}
+        <Field
+          id="id_mode"
+          name="transporterTransportMode"
+          component={FieldTransportModeSelect}
+        ></Field>
+      </label>
+      <RedErrorMessage name="transporterTransportMode" />
     </div>
   ),
   quantity: () => (
@@ -204,6 +224,19 @@ export function FormWasteTransportSummary({
               </DataListDescription>
             </DataListItem>
           )}
+        <DataListItem>
+          <DataListTerm>Mode de transport</DataListTerm>
+          <DataListDescription>
+            {values.transporterTransportMode}
+            <button
+              type="button"
+              onClick={() => addField("transporterTransportMode")}
+              className="tw-ml-2"
+            >
+              <IconPaperWrite color="blue" />
+            </button>
+          </DataListDescription>
+        </DataListItem>
         <DataListItem>
           <DataListTerm>Plaque d'immatriculation</DataListTerm>
           <DataListDescription>
