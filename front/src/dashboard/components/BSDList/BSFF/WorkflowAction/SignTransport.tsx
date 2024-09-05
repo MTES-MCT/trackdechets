@@ -22,6 +22,7 @@ import TransporterRecepisseWrapper from "../../../../../form/common/components/c
 import { subMonths } from "date-fns";
 import { UPDATE_BSFF_TRANSPORTER } from "../../../../../Apps/Forms/Components/query";
 import TransportPlates from "../../../../../Apps/Forms/Components/TransportPlates/TransportPlates";
+import Select from "@codegouvfr/react-dsfr/Select";
 
 const validationSchema = yup.object({
   transport: yup.object({
@@ -114,7 +115,7 @@ function SignTransportForm({
         onClose();
       }}
     >
-      {() => (
+      {values => (
         <Form>
           <p>
             En qualité de <strong>transporteur du déchet</strong>, j'atteste que
@@ -123,15 +124,32 @@ function SignTransportForm({
           </p>
           <TransporterRecepisseWrapper transporter={signingTransporter} />
 
-          {!signingTransporter.transport?.mode ||
-            (signingTransporter.transport?.mode === TransportMode.Road && (
-              <div style={{ width: "300px" }}>
-                <TransportPlates
-                  bsdType={BsdType.Bsff}
-                  fieldName={"transport.plates"}
-                />
-              </div>
-            ))}
+          <div className="form__row">
+            <div className={"fr-mb-2w"} style={{ width: "300px" }}>
+              <Field name={"transport.mode"}>
+                {({ field }) => (
+                  <Select label="Mode de transport" nativeSelectProps={field}>
+                    <option value="ROAD">Route</option>
+                    <option value="AIR">Voie aérienne</option>
+                    <option value="RAIL">Voie ferrée</option>
+                    <option value="RIVER">Voie fluviale</option>
+                    <option value="SEA">Voie maritime</option>
+                  </Select>
+                )}
+              </Field>
+            </div>
+            <RedErrorMessage name="transport.takenOverAt" />
+          </div>
+
+          {(!values.values.transport?.mode ||
+            values.values.transport?.mode === TransportMode.Road) && (
+            <div style={{ width: "300px" }}>
+              <TransportPlates
+                bsdType={BsdType.Bsff}
+                fieldName={"transport.plates"}
+              />
+            </div>
+          )}
 
           <div className="form__row">
             <label>
