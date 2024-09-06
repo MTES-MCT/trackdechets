@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2024.9.1] 24/09/2024
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'intermédiaires sur les BSVHU [PR 3560](https://github.com/MTES-MCT/trackdechets/pull/3560)
+
 #### :nail_care: Améliorations
 
 - Ajouter deux sous-profils pour l'installation de traitement VHU [PR 3480](https://github.com/MTES-MCT/trackdechets/pull/3480)
