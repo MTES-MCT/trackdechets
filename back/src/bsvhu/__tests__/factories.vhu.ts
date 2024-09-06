@@ -1,6 +1,7 @@
 import {
   BsvhuIdentificationType,
   BsvhuPackaging,
+  Company,
   Prisma
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
@@ -18,12 +19,29 @@ export const bsvhuFactory = async ({
   const destinationCompany = await companyFactory({
     companyTypes: ["WASTE_VEHICLES"]
   });
-  return prisma.bsvhu.create({
+  const created = await prisma.bsvhu.create({
     data: {
       ...getVhuFormdata(),
       transporterCompanySiret: transporterCompany.siret,
       destinationCompanySiret: destinationCompany.siret,
       ...opt
+    },
+    include: {
+      intermediaries: true
+    }
+  });
+  const intermediariesOrgIds: string[] = created.intermediaries
+    ? created.intermediaries
+        .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+        .filter(Boolean)
+    : [];
+  return prisma.bsvhu.update({
+    where: { id: created.id },
+    data: {
+      ...(intermediariesOrgIds.length ? { intermediariesOrgIds } : {})
+    },
+    include: {
+      intermediaries: true
     }
   });
 };
@@ -69,4 +87,11 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   destinationReceptionAcceptationStatus: null,
   destinationReceptionRefusalReason: null,
   destinationOperationCode: null
+});
+
+export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
+  siret: company.siret!,
+  name: company.name,
+  address: company.address,
+  contact
 });

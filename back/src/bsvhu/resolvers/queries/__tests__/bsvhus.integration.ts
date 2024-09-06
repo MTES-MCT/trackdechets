@@ -2,10 +2,15 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query } from "../../../../generated/graphql/types";
 import {
   companyAssociatedToExistingUserFactory,
+  companyFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { bsvhuFactory } from "../../../__tests__/factories.vhu";
+import {
+  bsvhuFactory,
+  toIntermediaryCompany
+} from "../../../__tests__/factories.vhu";
+import { UserRole } from "@prisma/client";
 
 const GET_BSVHUS = `
   query GetBsvhus($where: BsvhuWhere) {
@@ -73,6 +78,24 @@ describe("Query.Bsvhus", () => {
     const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
 
     expect(data.bsvhus.edges.length).toBe(4);
+  });
+
+  it("should return bsvhus where user company is an intermediary", async () => {
+    const otherCompany = await companyFactory();
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: otherCompany.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(company)]
+        }
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
+
+    expect(data.bsvhus.edges.length).toBe(1);
   });
 
   it("should return paging infos", async () => {

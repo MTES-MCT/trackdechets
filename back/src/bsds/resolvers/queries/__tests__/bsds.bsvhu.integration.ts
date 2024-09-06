@@ -21,7 +21,7 @@ import {
 } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { indexBsvhu } from "../../../../bsvhu/elastic";
+import { BsvhuForElasticInclude, indexBsvhu } from "../../../../bsvhu/elastic";
 import {
   transporterReceiptFactory,
   userWithCompanyFactory
@@ -536,7 +536,10 @@ describe("Query.bsds.vhus base workflow", () => {
     beforeAll(async () => {
       const refusedVhu = await prisma.bsvhu.update({
         where: { id: vhuId },
-        data: { status: "REFUSED" }
+        data: { status: "REFUSED" },
+        include: {
+          ...BsvhuForElasticInclude
+        }
       });
       await indexBsvhu(refusedVhu);
       await refreshElasticSearch();

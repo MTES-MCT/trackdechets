@@ -67,7 +67,7 @@ async function getDuplicateData(
 
   const { emitter, transporter, destination } = await getBsvhuCompanies(bsvhu);
 
-  return {
+  let data: Prisma.BsvhuCreateInput = {
     ...parsedBsvhu,
     id: getReadableId(ReadableIdPrefix.VHU),
     status: BsvhuStatus.INITIAL,
@@ -92,6 +92,26 @@ async function getDuplicateData(
       transporter?.contactEmail ?? parsedBsvhu.transporterCompanyMail,
     transporterCompanyVatNumber: parsedBsvhu.transporterCompanyVatNumber
   };
+  if (intermediaries) {
+    data = {
+      ...data,
+      intermediaries: {
+        createMany: {
+          data: intermediaries.map(intermediary => ({
+            siret: intermediary.siret!,
+            address: intermediary.address,
+            vatNumber: intermediary.vatNumber,
+            name: intermediary.name!,
+            contact: intermediary.contact!,
+            phone: intermediary.phone,
+            mail: intermediary.mail
+          }))
+        }
+      },
+      intermediariesOrgIds
+    };
+  }
+  return data;
 }
 
 async function getBsvhuCompanies(bsvhu: PrismaBsvhuForParsing) {

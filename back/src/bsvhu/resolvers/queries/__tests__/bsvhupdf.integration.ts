@@ -1,11 +1,15 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
-  userWithAccessTokenFactory
+  userWithAccessTokenFactory,
+  companyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { bsvhuFactory } from "../../../__tests__/factories.vhu";
+import {
+  bsvhuFactory,
+  toIntermediaryCompany
+} from "../../../__tests__/factories.vhu";
 
 import { Query } from "../../../../generated/graphql/types";
 import { GovernmentPermission } from "@prisma/client";
@@ -69,6 +73,27 @@ describe("Query.BsvhuPdf", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsvhuPdf">>(BSVHU_PDF, {
+      variables: { id: bsvhu.id }
+    });
+
+    expect(data.bsvhuPdf.token).toBeTruthy();
+  });
+
+  it("should return a token for requested id if current user is an intermediary", async () => {
+    const otherCompany = await companyFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: otherCompany.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(company)]
+        }
       }
     });
 

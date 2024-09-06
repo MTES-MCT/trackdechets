@@ -48,9 +48,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
   const intermediaries =
     parsedZodBsvhu.intermediaries && parsedZodBsvhu.intermediaries.length > 0
       ? {
-          createMany: {
-            data: companyToIntermediaryInput(parsedZodBsvhu.intermediaries)
-          }
+          create: companyToIntermediaryInput(parsedZodBsvhu.intermediaries)
         }
       : undefined;
 

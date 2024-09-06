@@ -180,8 +180,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsvhu1, bsvhu2, bsvhu3].map(async bsda => {
-        return indexBsvhu(bsda);
+      [bsvhu1, bsvhu2, bsvhu3].map(async bsvhu => {
+        return indexBsvhu(bsvhu);
       })
     );
     await refreshElasticSearch();
@@ -369,8 +369,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsvhu1, bsvhu2, bsvhu3].map(async bsda => {
-        return indexBsvhu(bsda);
+      [bsvhu1, bsvhu2, bsvhu3].map(async bsvhu => {
+        return indexBsvhu(bsvhu);
       })
     );
     await refreshElasticSearch();
@@ -547,8 +547,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsvhu1, bsvhu2, bsvhu3].map(async bsda => {
-        return indexBsvhu(bsda);
+      [bsvhu1, bsvhu2, bsvhu3].map(async bsvhu => {
+        return indexBsvhu(bsvhu);
       })
     );
     await refreshElasticSearch();

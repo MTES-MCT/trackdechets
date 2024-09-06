@@ -9,45 +9,50 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
+import { UserRole } from "@prisma/client";
+import gql from "graphql-tag";
 
-const UPDATE_VHU_FORM = `
-mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
-  updateBsvhu(id: $id, input: $input) {
-    id
-    isDraft
-    destination {
-      company {
+const UPDATE_VHU_FORM = gql`
+  mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
+    updateBsvhu(id: $id, input: $input) {
+      id
+      isDraft
+      destination {
+        company {
+          siret
+        }
+      }
+      emitter {
+        agrementNumber
+        company {
+          siret
+        }
+      }
+      transporter {
+        company {
+          siret
+          name
+          address
+          contact
+          mail
+          phone
+          vatNumber
+        }
+        recepisse {
+          number
+          department
+          validityLimit
+          isExempted
+        }
+      }
+      intermediaries {
         siret
       }
-    }
-    emitter {
-      agrementNumber
-      company {
-        siret
+      weight {
+        value
       }
-    }
-    transporter {
-      company {
-        siret
-        name
-        address
-        contact
-        mail
-        phone
-        vatNumber
-      }
-      recepisse {
-        number
-        department
-        validityLimit
-        isExempted
-      }
-    }
-    weight {
-      value
     }
   }
-}
 `;
 
 describe("Mutation.Vhu.update", () => {
@@ -305,5 +310,141 @@ describe("Mutation.Vhu.update", () => {
       validityLimit: null,
       isExempted: false
     });
+  });
+
+  it("should allow updating intermediaries", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: otherCompany } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: {
+            siret: company.siret!,
+            name: company.name,
+            address: company.address,
+            contact: "John Doe"
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      intermediaries: [
+        {
+          siret: otherCompany.siret,
+          name: otherCompany.name,
+          address: otherCompany.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(data.updateBsvhu.intermediaries!.length).toBe(1);
+    expect(data.updateBsvhu.intermediaries![0].siret).toBe(otherCompany.siret);
+  });
+
+  it("should ignore intermediaries update if the value hasn't changed", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        transporterTransportSignatureDate: new Date(),
+        intermediaries: {
+          create: {
+            siret: company.siret!,
+            name: company.name,
+            address: company.address,
+            contact: "John Doe"
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    // We pass an update with the same value as before.
+    // Even if the field is locked, this should be ignored
+    const input = {
+      intermediaries: [
+        {
+          siret: company.siret,
+          name: company.name,
+          address: company.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+    const { data, errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+
+    expect(data.updateBsvhu.intermediaries!.length).toBe(1);
+  });
+
+  it("should reject if updating intermediaries when its value is locked", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const { company: otherCompany } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        destinationCompanySiret: company.siret,
+        transporterTransportSignatureDate: new Date(),
+        intermediaries: {
+          create: {
+            siret: company.siret!,
+            name: company.name,
+            address: company.address,
+            contact: "John Doe"
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    // We pass an update with the same value as before.
+    // Even if the field is locked, this should be ignored
+    const input = {
+      intermediaries: [
+        {
+          siret: otherCompany.siret,
+          name: otherCompany.name,
+          address: otherCompany.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
+        "Les intermédiaires"
+    );
   });
 });

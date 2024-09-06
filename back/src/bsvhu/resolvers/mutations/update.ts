@@ -40,9 +40,7 @@ export default async function edit(
     ? {
         deleteMany: {},
         ...(parsedBsvhu.intermediaries.length > 0 && {
-          createMany: {
-            data: companyToIntermediaryInput(parsedBsvhu.intermediaries)
-          }
+          create: companyToIntermediaryInput(parsedBsvhu.intermediaries)
         })
       }
     : undefined;

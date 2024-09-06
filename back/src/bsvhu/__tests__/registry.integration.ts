@@ -7,9 +7,10 @@ import {
   toOutgoingWaste,
   toTransportedWaste
 } from "../registry";
-import { bsvhuFactory } from "./factories.vhu";
+import { bsvhuFactory, toIntermediaryCompany } from "./factories.vhu";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
+import { RegistryBsvhuInclude } from "../../registry/elastic";
 
 describe("toGenericWaste", () => {
   afterAll(resetDatabase);
@@ -22,7 +23,8 @@ describe("toGenericWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const waste = toGenericWaste(bsvhuForRegistry);
 
@@ -48,7 +50,8 @@ describe("toGenericWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
 
     const waste = toGenericWaste(bsvhuForRegistry);
@@ -76,7 +79,8 @@ describe("toIncomingWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const wasteRegistry = toIncomingWaste(bsvhuForRegistry);
 
@@ -95,7 +99,8 @@ describe("toIncomingWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const waste = toIncomingWaste(bsvhuForRegistry);
 
@@ -124,7 +129,8 @@ describe("toIncomingWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const waste = toIncomingWaste(bsvhuForRegistry);
 
@@ -153,7 +159,8 @@ describe("toOutgoingWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const wasteRegistry = toOutgoingWaste(bsvhuForRegistry);
 
@@ -170,7 +177,8 @@ describe("toOutgoingWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const waste = toOutgoingWaste(bsvhuForRegistry);
 
@@ -199,7 +207,8 @@ describe("toTransportedWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const wasteRegistry = toTransportedWaste(bsvhuForRegistry);
 
@@ -219,7 +228,8 @@ describe("toTransportedWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const waste = toTransportedWaste(bsvhuForRegistry);
 
@@ -260,7 +270,8 @@ describe("toManagedWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const wasteRegistry = toManagedWaste(bsvhuForRegistry);
 
@@ -279,7 +290,8 @@ describe("toManagedWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const waste = toManagedWaste(bsvhuForRegistry);
 
@@ -312,7 +324,8 @@ describe("toAllWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const waste = toAllWaste(bsvhuForRegistry);
 
@@ -337,7 +350,8 @@ describe("toAllWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const wasteRegistry = toAllWaste(bsvhuForRegistry);
 
@@ -359,7 +373,8 @@ describe("toAllWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const waste = toAllWaste(bsvhuForRegistry);
 
@@ -400,9 +415,10 @@ describe("toAllWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
-    const waste = toGenericWaste(bsvhuForRegistry);
+    const waste = toAllWaste(bsvhuForRegistry);
 
     // Then
     expect(waste.destinationCompanyAddress).toBe("4 Boulevard Pasteur");
@@ -430,9 +446,10 @@ describe("toAllWaste", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
-    const waste = toGenericWaste(bsvhuForRegistry);
+    const waste = toAllWaste(bsvhuForRegistry);
 
     // Then
     expect(waste.emitterCompanyName).toBe(emitter.name);
@@ -441,6 +458,106 @@ describe("toAllWaste", () => {
     expect(waste.emitterCompanyPostalCode).toBe("44100");
     expect(waste.emitterCompanyCity).toBe("Nantes");
     expect(waste.emitterCompanyCountry).toBe("FR");
+  });
+  it("should contain all 3 intermediaries", async () => {
+    // Given
+    const intermediary1 = await companyFactory({});
+    const intermediary2 = await companyFactory({});
+    const intermediary3 = await companyFactory({});
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        intermediaries: {
+          createMany: {
+            data: [
+              toIntermediaryCompany(intermediary1),
+              toIntermediaryCompany(intermediary2),
+              toIntermediaryCompany(intermediary3)
+            ]
+          }
+        }
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+
+    const waste = toAllWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.siret);
+    expect(waste.intermediary3CompanyName).toBe(intermediary3.name);
+    expect(waste.intermediary3CompanySiret).toBe(intermediary3.siret);
+  });
+  it("should work with 1 intermediary", async () => {
+    // Given
+    const intermediary1 = await companyFactory({});
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        intermediaries: {
+          createMany: {
+            data: [toIntermediaryCompany(intermediary1)]
+          }
+        }
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toAllWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
+    expect(waste.intermediary2CompanyName).toBe(null);
+    expect(waste.intermediary2CompanySiret).toBe(null);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+  it("should work with 2 intermediaries", async () => {
+    // Given
+    const intermediary1 = await companyFactory({});
+    const intermediary2 = await companyFactory({});
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        intermediaries: {
+          createMany: {
+            data: [
+              toIntermediaryCompany(intermediary1),
+              toIntermediaryCompany(intermediary2)
+            ]
+          }
+        }
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toAllWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.intermediary1CompanyName).toBe(intermediary1.name);
+    expect(waste.intermediary1CompanySiret).toBe(intermediary1.siret);
+    expect(waste.intermediary2CompanyName).toBe(intermediary2.name);
+    expect(waste.intermediary2CompanySiret).toBe(intermediary2.siret);
+    expect(waste.intermediary3CompanyName).toBe(null);
+    expect(waste.intermediary3CompanySiret).toBe(null);
   });
 });
 
@@ -458,7 +575,8 @@ describe("getTransportersData", () => {
 
     // When
     const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu.id }
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
     });
     const waste = toTransportedWaste(bsvhuForRegistry);
 

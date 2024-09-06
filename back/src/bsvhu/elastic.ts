@@ -1,4 +1,5 @@
 import { BsvhuStatus, Bsvhu, BsdType } from "@prisma/client";
+import { prisma } from "@td/prisma";
 import {
   getIntermediaryCompanyOrgId,
   getTransporterCompanyOrgId
@@ -7,7 +8,23 @@ import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { getAddress } from "./converter";
-import { BsvhuWithIntermediaries } from "./types";
+import {
+  BsvhuWithIntermediaries,
+  BsvhuWithIntermediariesInclude
+} from "./types";
+
+export const BsvhuForElasticInclude = {
+  ...BsvhuWithIntermediariesInclude
+};
+
+export async function getBsvhuForElastic(
+  bsda: Pick<Bsvhu, "id">
+): Promise<BsvhuForElastic> {
+  return prisma.bsvhu.findUniqueOrThrow({
+    where: { id: bsda.id },
+    include: BsvhuForElasticInclude
+  });
+}
 
 type ElasticSirets = {
   emitterCompanySiret: string | null | undefined;

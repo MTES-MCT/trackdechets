@@ -25,7 +25,10 @@ import {
   FormForElasticInclude,
   toBsdElastic as formToBsdElastic
 } from "../../forms/elastic";
-import { toBsdElastic as bsvhuToBsdElastic } from "../../bsvhu/elastic";
+import {
+  BsvhuForElasticInclude,
+  toBsdElastic as bsvhuToBsdElastic
+} from "../../bsvhu/elastic";
 import { toBsdElastic as bspaohToBsdElastic } from "../../bspaoh/elastic";
 import { bulkIndexQueue } from "../../queue/producers/elastic";
 import { IndexAllFnSignature, FindManyAndIndexBsdsFnSignature } from "./types";
@@ -64,7 +67,9 @@ const prismaFindManyOptions = {
   bsff: {
     include: BsffForElasticInclude
   },
-  bsvhu: {},
+  bsvhu: {
+    include: BsvhuForElasticInclude
+  },
   bsda: {
     include: BsdaForElasticInclude
   },

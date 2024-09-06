@@ -84,11 +84,11 @@ const getIntermediariesData = (bsda: RegistryBsvhu) => ({
     : null,
   intermediary2CompanyName: bsda.intermediaries?.[1]?.name ?? null,
   intermediary2CompanySiret: bsda.intermediaries?.[1]
-    ? getIntermediaryCompanyOrgId(bsda.intermediaries[0])
+    ? getIntermediaryCompanyOrgId(bsda.intermediaries[1])
     : null,
   intermediary3CompanyName: bsda.intermediaries?.[2]?.name ?? null,
   intermediary3CompanySiret: bsda.intermediaries?.[2]
-    ? getIntermediaryCompanyOrgId(bsda.intermediaries[0])
+    ? getIntermediaryCompanyOrgId(bsda.intermediaries[2])
     : null
 });
 
