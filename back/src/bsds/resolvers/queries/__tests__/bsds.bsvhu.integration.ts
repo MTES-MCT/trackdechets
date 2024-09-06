@@ -21,7 +21,11 @@ import {
 } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { BsvhuForElasticInclude, indexBsvhu } from "../../../../bsvhu/elastic";
+import {
+  BsvhuForElasticInclude,
+  getBsvhuForElastic,
+  indexBsvhu
+} from "../../../../bsvhu/elastic";
 import {
   transporterReceiptFactory,
   userWithCompanyFactory
@@ -541,7 +545,9 @@ describe("Query.bsds.vhus base workflow", () => {
           ...BsvhuForElasticInclude
         }
       });
-      await indexBsvhu(refusedVhu);
+      const bsvhuForElastic = await getBsvhuForElastic(refusedVhu);
+      await indexBsvhu(bsvhuForElastic);
+
       await refreshElasticSearch();
     });
 
@@ -617,7 +623,8 @@ describe("Query.bsds.vhus mutations", () => {
       }
     });
 
-    await indexBsvhu(vhu);
+    const bsvhuForElastic = await getBsvhuForElastic(vhu);
+    await indexBsvhu(bsvhuForElastic);
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);
@@ -666,7 +673,8 @@ describe("Query.bsds.vhus mutations", () => {
         emitterCompanySiret: emitter.company.siret
       }
     });
-    await indexBsvhu(vhu);
+    const bsvhuForElastic = await getBsvhuForElastic(vhu);
+    await indexBsvhu(bsvhuForElastic);
 
     //duplicate vhu
     const { mutate } = makeClient(emitter.user);
@@ -692,7 +700,7 @@ describe("Query.bsds.vhus mutations", () => {
       }
     });
 
-    await indexBsvhu(vhu);
+    await indexBsvhu(bsvhuForElastic);
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);

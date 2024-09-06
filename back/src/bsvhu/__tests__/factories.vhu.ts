@@ -7,12 +7,13 @@ import {
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { prisma } from "@td/prisma";
 import { companyFactory, siretify } from "../../__tests__/factories";
+import { BsvhuForElastic, BsvhuForElasticInclude } from "../elastic";
 
 export const bsvhuFactory = async ({
   opt = {}
 }: {
   opt?: Partial<Prisma.BsvhuCreateInput>;
-}) => {
+}): Promise<BsvhuForElastic> => {
   const transporterCompany = await companyFactory({
     companyTypes: ["TRANSPORTER"]
   });
@@ -40,9 +41,7 @@ export const bsvhuFactory = async ({
     data: {
       ...(intermediariesOrgIds.length ? { intermediariesOrgIds } : {})
     },
-    include: {
-      intermediaries: true
-    }
+    include: BsvhuForElasticInclude
   });
 };
 

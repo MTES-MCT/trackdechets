@@ -4,7 +4,6 @@ import {
   Bsdasri,
   BsdaStatus,
   Bsff,
-  Bsvhu,
   BsvhuStatus,
   Bspaoh,
   BspaohStatus,
@@ -13,7 +12,8 @@ import {
   User,
   UserRole,
   BsdasriStatus,
-  GovernmentPermission
+  GovernmentPermission,
+  Bsvhu
 } from "@prisma/client";
 import {
   refreshElasticSearch,
@@ -29,7 +29,7 @@ import {
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
 import { getBsffForElastic, indexBsff } from "../../../../bsffs/elastic";
 import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories";
-import { indexBsvhu } from "../../../../bsvhu/elastic";
+import { getBsvhuForElastic, indexBsvhu } from "../../../../bsvhu/elastic";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
@@ -209,7 +209,7 @@ describe("Transported wastes registry", () => {
       indexForm(await getFormForElastic(bsd1)),
       indexBsda(await getBsdaForElastic(bsd2)),
       indexBsdasri(await getBsdasriForElastic(bsd3)),
-      indexBsvhu(bsd4),
+      indexBsvhu(await getBsvhuForElastic(bsd4)),
       indexBsff(await getBsffForElastic(bsd5)),
       indexBspaoh(await getBspaohForElastic(bsd6))
     ]);
