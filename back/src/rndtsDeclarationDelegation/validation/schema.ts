@@ -2,7 +2,7 @@ import { z } from "zod";
 import { siretSchema } from "../../common/validation/zod/schema";
 import { todayAtMidnight } from "../../utils";
 
-export const rndtsDeclarationDelegationSchema = z
+export const createRndtsDeclarationDelegationInputSchema = z
   .object({
     delegateOrgId: siretSchema(),
     delegatorOrgId: siretSchema(),
@@ -39,3 +39,7 @@ export const rndtsDeclarationDelegationSchema = z
       message: "La date de début de validité doit être avant la date de fin."
     }
   );
+
+export const queryRndtsDeclarationDelegationArgsSchema = z.object({
+  id: z.coerce.string().length(25, "L'id doit faire 25 caractères.")
+});

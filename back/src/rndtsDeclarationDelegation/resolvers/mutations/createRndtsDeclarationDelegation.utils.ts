@@ -1,52 +1,30 @@
-import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
-import { CreateRndtsDeclarationDelegationInput } from "../../../generated/graphql/types";
 import { getRndtsDeclarationDelegationRepository } from "../../repository";
-import { ParsedDeclarationDelegation } from "../../validation";
-
-export const getDelegateAndDelegatorOrThrow = async (
-  input: CreateRndtsDeclarationDelegationInput
-) => {
-  const companies = await prisma.company.findMany({
-    where: {
-      orgId: { in: [input.delegatorOrgId, input.delegateOrgId] }
-    }
-  });
-
-  const delegator = companies.find(
-    company => company.orgId === input.delegatorOrgId
-  );
-  const delegate = companies.find(
-    company => company.orgId === input.delegateOrgId
-  );
-
-  if (!delegator) {
-    throw new UserInputError(
-      `L'entreprise ${input.delegatorOrgId} visée comme délégante n'existe pas`
-    );
-  }
-
-  if (!delegate) {
-    throw new UserInputError(
-      `L'entreprise ${input.delegateOrgId} visée comme délégataire n'existe pas`
-    );
-  }
-
-  return { delegator, delegate };
-};
+import { ParsedCreateRndtsDeclarationDelegationInput } from "../../validation";
 
 export const createDelegation = async (
   user: Express.User,
-  input: ParsedDeclarationDelegation
+  input: ParsedCreateRndtsDeclarationDelegationInput
 ) => {
   const delegationRepository = getRndtsDeclarationDelegationRepository(user);
   return delegationRepository.create(input);
 };
 
-export const checkNoExistingActiveDelegation = async (
+/**
+ * Check for overlaps in delegations.
+ *
+ * We don't authorize already having an accepted delegation (isAccepted=true) that has
+ * not yet expired.
+ *
+ * That means that if the company has a delegation that only takes effect in the future,
+ * it cannot create a new one for the meantime. Users would have to delete the delegation
+ * in the future and create a new one.
+ */
+export const checkNoOverlappingDelegation = async (
   user: Express.User,
-  input: ParsedDeclarationDelegation
+  input: ParsedCreateRndtsDeclarationDelegationInput
 ) => {
+  // TODO: fix
   const delegationRepository = getRndtsDeclarationDelegationRepository(user);
   const activeDelegation = await delegationRepository.findActive(input);
 

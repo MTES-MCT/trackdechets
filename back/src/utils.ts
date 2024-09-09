@@ -62,6 +62,12 @@ export function todayAtMidnight(): Date {
   return sameDayMidnight(new Date());
 }
 
+export const nowPlusXHours = (hours: number) => {
+  const NOW_PLUS_X_HOURS = new Date();
+  NOW_PLUS_X_HOURS.setHours(NOW_PLUS_X_HOURS.getHours() + hours);
+  return NOW_PLUS_X_HOURS;
+};
+
 /**
  * Number of days between two dates
  */

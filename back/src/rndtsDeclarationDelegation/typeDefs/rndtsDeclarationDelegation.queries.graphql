@@ -1,0 +1,9 @@
+type Query {
+  "Renvoie une délégation, séléctionnée par son ID"
+  rndtsDeclarationDelegation(
+    """
+    Identifiant de la délégation
+    """
+    id: ID
+  ): RndtsDeclarationDelegation!
+}

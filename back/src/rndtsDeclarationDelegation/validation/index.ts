@@ -1,15 +1,27 @@
-import { CreateRndtsDeclarationDelegationInput } from "../../generated/graphql/types";
-import { rndtsDeclarationDelegationSchema } from "./schema";
+import {
+  CreateRndtsDeclarationDelegationInput,
+  QueryRndtsDeclarationDelegationArgs
+} from "../../generated/graphql/types";
+import {
+  queryRndtsDeclarationDelegationArgsSchema,
+  createRndtsDeclarationDelegationInputSchema
+} from "./schema";
 
 /*
  * Vérification synchrone de l'input de création d'une rndtsDeclarationDelegation
  */
-export function parseRndtsDeclarationDelegation(
+export function parseCreateRndtsDeclarationDelegationInput(
   input: CreateRndtsDeclarationDelegationInput
 ) {
-  return rndtsDeclarationDelegationSchema.parse(input);
+  return createRndtsDeclarationDelegationInputSchema.parse(input);
 }
 
-export type ParsedDeclarationDelegation = ReturnType<
-  typeof parseRndtsDeclarationDelegation
+export type ParsedCreateRndtsDeclarationDelegationInput = ReturnType<
+  typeof parseCreateRndtsDeclarationDelegationInput
 >;
+
+export function parseQueryRndtsDeclarationDelegationArgs(
+  args: QueryRndtsDeclarationDelegationArgs
+) {
+  return queryRndtsDeclarationDelegationArgsSchema.parse(args);
+}

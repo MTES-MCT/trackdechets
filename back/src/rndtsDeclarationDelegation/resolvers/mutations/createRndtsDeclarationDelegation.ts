@@ -5,11 +5,11 @@ import {
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { checkCanCreate } from "../../permissions";
-import { parseRndtsDeclarationDelegation } from "../../validation";
+import { parseCreateRndtsDeclarationDelegationInput } from "../../validation";
+import { findDelegateAndDelegatorOrThrow } from "../utils";
 import {
-  getDelegateAndDelegatorOrThrow,
   createDelegation,
-  checkNoExistingActiveDelegation
+  checkNoOverlappingDelegation
 } from "./createRndtsDeclarationDelegation.utils";
 
 const createRndtsDeclarationDelegation = async (
@@ -21,16 +21,16 @@ const createRndtsDeclarationDelegation = async (
   const user = checkIsAuthenticated(context);
 
   // Sync validation of creation input
-  const delegationInput = parseRndtsDeclarationDelegation(input);
+  const delegationInput = parseCreateRndtsDeclarationDelegationInput(input);
 
   // Fetch companies
-  const { delegator } = await getDelegateAndDelegatorOrThrow(delegationInput);
+  const { delegator } = await findDelegateAndDelegatorOrThrow(delegationInput);
 
   // Make sure user can create delegation
   await checkCanCreate(user, delegator);
 
   // Check there's not already an active delegation
-  await checkNoExistingActiveDelegation(user, delegationInput);
+  await checkNoOverlappingDelegation(user, delegationInput);
 
   // Create delegation
   const delegation = await createDelegation(user, delegationInput);

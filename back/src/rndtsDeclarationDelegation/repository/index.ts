@@ -7,13 +7,15 @@ import {
 } from "../../common/repository/types";
 import { RndtsDeclarationDelegationActions } from "./types";
 import { buildFindActiveRndtsDeclarationDelegation } from "./rndtsDeclarationDelegation/findActive";
+import buildFindFirstRndtsDeclarationDelegation from "./rndtsDeclarationDelegation/findFirst";
 
 export type RndtsDeclarationDelegationRepository =
   RndtsDeclarationDelegationActions;
 
 export function getReadonlyRndtsDeclarationDelegationRepository() {
   return {
-    findActive: buildFindActiveRndtsDeclarationDelegation({ prisma })
+    findActive: buildFindActiveRndtsDeclarationDelegation({ prisma }),
+    findFirst: buildFindFirstRndtsDeclarationDelegation({ prisma })
   };
 }
 

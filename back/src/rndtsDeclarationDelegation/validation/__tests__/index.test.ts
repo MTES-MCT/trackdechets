@@ -1,8 +1,11 @@
-import { parseRndtsDeclarationDelegation } from "..";
+import {
+  parseCreateRndtsDeclarationDelegationInput,
+  parseQueryRndtsDeclarationDelegationArgs
+} from "..";
 import { CreateRndtsDeclarationDelegationInput } from "../../../generated/graphql/types";
 
 describe("index", () => {
-  describe("parseRndtsDeclarationDelegation", () => {
+  describe("parseCreateRndtsDeclarationDelegationInput", () => {
     it("declaration with minimal info should be valid", () => {
       // Given
       const input: CreateRndtsDeclarationDelegationInput = {
@@ -11,7 +14,7 @@ describe("index", () => {
       };
 
       // When
-      const delegation = parseRndtsDeclarationDelegation(input);
+      const delegation = parseCreateRndtsDeclarationDelegationInput(input);
 
       // Then
       expect(delegation).toMatchObject({
@@ -30,7 +33,7 @@ describe("index", () => {
       // When
       expect.assertions(1);
       try {
-        parseRndtsDeclarationDelegation(input);
+        parseCreateRndtsDeclarationDelegationInput(input);
       } catch (error) {
         // Then
         expect(error.errors[0]).toMatchObject({
@@ -50,7 +53,7 @@ describe("index", () => {
       // When
       expect.assertions(1);
       try {
-        parseRndtsDeclarationDelegation(input);
+        parseCreateRndtsDeclarationDelegationInput(input);
       } catch (error) {
         // Then
         expect(error.errors[0]).toMatchObject({
@@ -71,7 +74,7 @@ describe("index", () => {
       // When
       expect.assertions(1);
       try {
-        parseRndtsDeclarationDelegation(input);
+        parseCreateRndtsDeclarationDelegationInput(input);
       } catch (error) {
         // Then
         expect(error.errors[0]).toMatchObject({
@@ -93,7 +96,7 @@ describe("index", () => {
       // When
       expect.assertions(1);
       try {
-        parseRndtsDeclarationDelegation(input);
+        parseCreateRndtsDeclarationDelegationInput(input);
       } catch (error) {
         // Then
         expect(error.errors[0]).toMatchObject({
@@ -115,7 +118,7 @@ describe("index", () => {
       // When
       expect.assertions(1);
       try {
-        parseRndtsDeclarationDelegation(input);
+        parseCreateRndtsDeclarationDelegationInput(input);
       } catch (error) {
         // Then
         expect(error.errors[0]).toMatchObject({
@@ -124,6 +127,38 @@ describe("index", () => {
             "La date de début de validité doit être avant la date de fin."
         });
       }
+    });
+  });
+
+  describe("parseQueryRndtsDeclarationDelegationArgs", () => {
+    it.each([null, undefined, 100, "no", "morethan25caracterssoitsinvalid"])(
+      "should throw if id is invalid (value = %p)",
+      id => {
+        // Given
+
+        // When
+        expect.assertions(1);
+        try {
+          parseQueryRndtsDeclarationDelegationArgs({ id: id as string });
+        } catch (error) {
+          // Then
+          expect(error.errors[0]).toMatchObject({
+            path: ["id"],
+            message: "L'id doit faire 25 caractères."
+          });
+        }
+      }
+    );
+
+    it("should return valid id", () => {
+      // Given
+      const id = "cl81ooom5138122w9sbznzdkg";
+
+      // When
+      const result = parseQueryRndtsDeclarationDelegationArgs({ id });
+
+      // Then
+      expect(result.id).toBe(id);
     });
   });
 });

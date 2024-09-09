@@ -37,7 +37,7 @@ interface CreateDelegation {
   data: Pick<Mutation, "createRndtsDeclarationDelegation">;
   delegation?: RndtsDeclarationDelegation;
 }
-const createDelegation = async (
+export const createDelegation = async (
   user: User | null,
   input: CreateRndtsDeclarationDelegationInput
 ): Promise<CreateDelegation> => {
@@ -61,12 +61,6 @@ const createDelegation = async (
   });
 
   return { errors, data, delegation };
-};
-
-const nowPlusXHours = (hours: number) => {
-  const NOW_PLUS_X_HOURS = new Date();
-  NOW_PLUS_X_HOURS.setHours(NOW_PLUS_X_HOURS.getHours() + hours);
-  return NOW_PLUS_X_HOURS;
 };
 
 describe("mutation createRndtsDeclarationDelegation", () => {
@@ -307,78 +301,6 @@ describe("mutation createRndtsDeclarationDelegation", () => {
     //   expect(errors2[0].message).toBe(
     //     `Une délégation est déjà active pour ce délégataire et ce délégant (id ${delegation?.id})`
     //   );
-    // });
-  });
-
-  // TODO: move in query and test isActive
-  describe("isActive sub-resolver", () => {
-    it("should return true", async () => {
-      // Given
-      const delegate = await companyFactory();
-      const { user, company: delegator } = await userWithCompanyFactory();
-
-      // When
-      const { errors, data } = await createDelegation(user, {
-        delegateOrgId: delegate.orgId,
-        delegatorOrgId: delegator.orgId
-      });
-
-      // Then
-      expect(errors).toBeUndefined();
-      expect(data.createRndtsDeclarationDelegation.isActive).toBeTruthy();
-    });
-
-    it("should return false because validityStartDate is in the future", async () => {
-      // Given
-      const delegate = await companyFactory();
-      const { user, company: delegator } = await userWithCompanyFactory();
-
-      // When
-      const { errors, data } = await createDelegation(user, {
-        delegateOrgId: delegate.orgId,
-        delegatorOrgId: delegator.orgId,
-        validityStartDate: nowPlusXHours(1).toISOString() as any
-      });
-
-      // Then
-      expect(errors).toBeUndefined();
-      expect(data.createRndtsDeclarationDelegation.isActive).toBeFalsy();
-    });
-
-    // TODO: how to test this?
-    // it("should return false because validityEndDate is in the past", async () => {
-    //   // Given
-    //   const delegate = await companyFactory();
-    //   const { user, company: delegator } = await userWithCompanyFactory();
-
-    //   // When
-    //   const { errors, data } = await createDelegation(user, {
-    //     delegateOrgId: delegate.orgId,
-    //     delegatorOrgId: delegator.orgId,
-    //     validityStartDate: nowPlusXHours(-2).toISOString() as any,
-    //     validityEndDate: new Date().toISOString() as any,
-    //   });
-
-    //   // Then
-    //   expect(errors).toBeUndefined();
-    //   expect(data.createRndtsDeclarationDelegation.isActive).toBeFalsy();
-    // });
-
-    // TODO: how to test this?
-    // it("should return false because isAccepted is false", async () => {
-    //   // Given
-    //   const delegate = await companyFactory();
-    //   const { user, company: delegator } = await userWithCompanyFactory();
-
-    //   // When
-    //   const { errors, data } = await createDelegation(user, {
-    //     delegateOrgId: delegate.orgId,
-    //     delegatorOrgId: delegator.orgId
-    //   });
-
-    //   // Then
-    //   expect(errors).toBeUndefined();
-    //   expect(data.createRndtsDeclarationDelegation.isActive).toBeTruthy();
     // });
   });
 });
