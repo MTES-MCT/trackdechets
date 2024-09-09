@@ -14,6 +14,7 @@ import registerResolvers from "./registry/resolvers";
 import applicationResolvers from "./applications/resolvers";
 import webhookResolvers from "./webhooks/resolvers";
 import companyDigestResolvers from "./companydigest/resolvers";
+import rndtsDeclarationDelegationResolvers from "./rndtsDeclarationDelegation/resolvers";
 
 // Merge GraphQL schema by merging types definitions and resolvers
 // from differents modules
@@ -32,7 +33,8 @@ const repositories = [
   "registry",
   "applications",
   "webhooks",
-  "companydigest"
+  "companydigest",
+  "rndtsDeclarationDelegation"
 ];
 
 const typeDefsPath = repositories.map(
@@ -57,7 +59,8 @@ const resolvers = [
   registerResolvers,
   applicationResolvers,
   webhookResolvers,
-  companyDigestResolvers
+  companyDigestResolvers,
+  rndtsDeclarationDelegationResolvers
 ];
 
 export { typeDefs, resolvers };

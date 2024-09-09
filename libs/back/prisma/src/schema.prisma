@@ -1032,6 +1032,29 @@ model Bsvhu {
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
 }
 
+model RndtsDeclarationDelegation {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  // Délégataire
+  delegateOrgId String @db.VarChar(30)
+
+  // Délégant
+  delegatorOrgId String @db.VarChar(30)
+
+  validityStartDate DateTime  @default(now()) @db.Timestamptz(6)
+  validityEndDate   DateTime?
+
+  comment String? @db.VarChar(500)
+
+  isAccepted Boolean @default(true)
+
+  @@index([delegateOrgId], map: "_RndtsDeclarationDelegationDelegateOrgIdIdx")
+  @@index([delegatorOrgId], map: "_RndtsDeclarationDelegationDelegatorOrgIdIdx")
+}
+
 model Bsdasri {
   id        String        @id
   type      BsdasriType   @default(SIMPLE)

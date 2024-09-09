@@ -58,6 +58,10 @@ export function sameDayMidnight(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+export function todayAtMidnight(): Date {
+  return sameDayMidnight(new Date());
+}
+
 /**
  * Number of days between two dates
  */

@@ -1,0 +1,41 @@
+import { z } from "zod";
+import { siretSchema } from "../../common/validation/zod/schema";
+import { todayAtMidnight } from "../../utils";
+
+export const rndtsDeclarationDelegationSchema = z
+  .object({
+    delegateOrgId: siretSchema(),
+    delegatorOrgId: siretSchema(),
+    validityStartDate: z.coerce
+      .date()
+      .optional()
+      // Validate that the start date is not in the past. Technically we
+      // authorize dates in the past as long as they are after midnight of current day.
+      // Else if front sends { validityStartDate: new Date() }, they will always get an
+      // error because with network latency, set date will be inferior to now() on the server
+      .refine(val => !val || val >= todayAtMidnight(), {
+        message: "La date de début de validité ne peut pas être dans le passé."
+      }),
+    validityEndDate: z.coerce
+      .date()
+      .optional()
+      .refine(val => !val || val > new Date(), {
+        message: "La date de fin de validité ne peut pas être dans le passé."
+      }),
+    comment: z.string().max(500).optional()
+  })
+  .refine(
+    data => {
+      const { validityStartDate, validityEndDate } = data;
+
+      if (validityStartDate && validityEndDate) {
+        return validityStartDate < validityEndDate;
+      }
+
+      return true;
+    },
+    {
+      path: ["validityEndDate"],
+      message: "La date de début de validité doit être avant la date de fin."
+    }
+  );

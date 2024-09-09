@@ -1,0 +1,9 @@
+type Mutation {
+  """
+  Permet de créer une demande de délégation pour déléguer les déclarations propres aux
+  registres RNDTS à un établissement.
+  """
+  createRndtsDeclarationDelegation(
+    input: CreateRndtsDeclarationDelegationInput!
+  ): RndtsDeclarationDelegation!
+}
