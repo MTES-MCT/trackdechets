@@ -1312,6 +1312,87 @@ describe("mutation.markAsProcessed", () => {
     });
     expect(updatedGroupedForm2.status).toEqual("PROCESSED");
   });
+
+  it("should mark appendix2 forms as processed recursively", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const groupedForm1 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        quantityReceived: 1
+      }
+    });
+
+    // Regroupement
+    const groupedForm2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        emitterType: "APPENDIX2",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        quantityReceived: 1,
+        grouping: {
+          create: [
+            {
+              initialFormId: groupedForm1.id,
+              quantity: groupedForm1.quantityReceived!.toNumber()
+            }
+          ]
+        }
+      }
+    });
+
+    // Regroupement de regroupement
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        emitterType: "APPENDIX2",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        grouping: {
+          create: [
+            {
+              initialFormId: groupedForm2.id,
+              quantity: groupedForm2.quantityReceived!.toNumber()
+            }
+          ]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 1",
+          destinationOperationMode: OperationMode.ELIMINATION,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
+      }
+    });
+
+    await new Promise(resolve => {
+      updateAppendix2Queue.once("global:drained", () => resolve(true));
+    });
+
+    const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm1.id }
+    });
+    expect(updatedGroupedForm1.status).toEqual("PROCESSED");
+
+    const updatedGroupedForm2 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm1.id }
+    });
+    expect(updatedGroupedForm2.status).toEqual("PROCESSED");
+  });
+
   it("should mark appendix2 forms as processed  despite rogue decimal digits", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 

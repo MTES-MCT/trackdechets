@@ -34,7 +34,7 @@ export type SetAppendix2Fn = (args: SetAppendix2Args) => Promise<void>;
  * than that has been received at the TTR site.
  */
 const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
-  ({ prisma, user }) =>
+  ({ prisma }) =>
   async ({ form, appendix2, currentAppendix2Forms }) => {
     // delete existing appendix2 not present in input
     await prisma.formGroupement.deleteMany({

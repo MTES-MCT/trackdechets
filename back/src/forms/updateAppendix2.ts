@@ -38,11 +38,11 @@ export async function updateAppendix2Hook(
 }
 
 /**
- * Cette fonction permet de recalculer les champs `statut` et `quantityGrouped`
+ * Cette fonction permet de recalculer les champs `status` et `quantityGrouped`
  * d'un bordereau annexé à un bordereau de groupement en fonction de l'état des
  * différents bordereaux dans lesquels il est regoupé. Si le bordereau sur lequel
  * s'applique la fonction est lui même un bordereau de groupement, la fonction sera
- * appelée en récursif via un nouvel appel à `updateGroupementFormHook`.
+ * appelée en récursif via un appel à `updateAppendix2Hook`.
  *
  * Cette fonction doit être appelée sur un BSDD dès qu'il y a une création / modification /
  * suppression / annulation / traitement sur un des bordereaux de groupement auquel le
