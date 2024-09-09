@@ -23,6 +23,7 @@ import {
   PROCESSING_OPERATIONS
 } from "@td/constants";
 import { operationHook } from "../../operationHook";
+import { updateAppendix2Hook } from "../../updateAppendix2";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -107,8 +108,10 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   );
 
   const processedForm = await runInTransaction(async transaction => {
-    const { updateAppendix1Forms, updateAppendix2Forms, update } =
-      getFormRepository(user, transaction);
+    const { updateAppendix1Forms, update } = getFormRepository(
+      user,
+      transaction
+    );
 
     const processedForm = await update(
       { id: form.id, status: form.status },
@@ -123,7 +126,9 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
     // mark appendix2Forms as PROCESSED
     if (form.emitterType === EmitterType.APPENDIX2) {
-      await updateAppendix2Forms(groupedForms);
+      transaction.addAfterCommitCallback(async () => {
+        await updateAppendix2Hook(form.id);
+      });
     }
 
     if (form.emitterType === EmitterType.APPENDIX1) {

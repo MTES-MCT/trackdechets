@@ -10,7 +10,9 @@ import {
   operationHooksQueue,
   operationHookJob,
   administrativeTransferQueue,
-  processAdministrativeTransferJob
+  processAdministrativeTransferJob,
+  updateAppendix2Queue,
+  updateAppendix2Job
 } from "back";
 
 import { schema } from "@td/env";
@@ -32,6 +34,7 @@ function startConsumers() {
   syncEventsQueue.process(syncEventsJob);
   operationHooksQueue.process(operationHookJob);
   administrativeTransferQueue.process(processAdministrativeTransferJob);
+  updateAppendix2Queue.process(updateAppendix2Job);
 }
 
 startConsumers();

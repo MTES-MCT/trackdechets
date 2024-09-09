@@ -22,9 +22,11 @@ export { sendMail } from "./mailer/mailing";
 export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";
 export { operationHooksQueue } from "./queue/producers/operationHook";
 export { administrativeTransferQueue } from "./queue/producers/administrativeTransfer";
+export { updateAppendix2Queue } from "./queue/producers/updateAppendix2";
 export {
   indexBsdJob,
   operationHookJob,
+  updateAppendix2Job,
   sendMailJob,
   postGericoJob,
   processAdministrativeTransferJob

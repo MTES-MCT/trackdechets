@@ -1,8 +1,6 @@
 import { Form } from "@prisma/client";
 import { RepositoryFnDeps } from "../../../common/repository/types";
-import buildUpdateAppendix2Forms, {
-  FormForUpdateAppendix2FormsInclude
-} from "./updateAppendix2Forms";
+import { enqueueUpdateAppendix2Job } from "../../../queue/producers/updateAppendix2";
 
 class FormFraction {
   form: Form;
@@ -114,13 +112,14 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
       ])
     ];
 
-    const dirtyForms = await prisma.form.findMany({
-      where: { id: { in: dirtyFormIds } },
-      include: FormForUpdateAppendix2FormsInclude
-    });
-
-    const updateAppendix2Forms = buildUpdateAppendix2Forms({ prisma, user });
-    await updateAppendix2Forms(dirtyForms);
+    for (const formId of dirtyFormIds) {
+      prisma.addAfterCommitCallback(async () => {
+        // met à jour les champs `status` et `quantityGrouped`
+        // des bordereaux initiaux (annexes 2) dont les
+        // informations de groupement viennent d'être modifiées
+        await enqueueUpdateAppendix2Job({ formId });
+      });
+    }
   };
 
 export default buildSetAppendix2;

@@ -30,6 +30,7 @@ import {
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -1293,6 +1294,10 @@ describe("Mutation.createForm", () => {
       variables: { createFormInput }
     });
 
+    await new Promise(resolve => {
+      updateAppendix2Queue.once("global:drained", () => resolve(true));
+    });
+
     expect(errors).toEqual(undefined);
     expect(data.createForm.appendix2Forms![0].id).toBe(appendix2.id);
 
@@ -1338,6 +1343,10 @@ describe("Mutation.createForm", () => {
     expect(data.createForm.grouping).toEqual([
       { form: { id: appendix2.id }, quantity: 0.5 }
     ]);
+
+    await new Promise(resolve => {
+      updateAppendix2Queue.once("global:drained", () => resolve(true));
+    });
 
     const updatedAppendix2 = await prisma.form.findUniqueOrThrow({
       where: { id: appendix2.id }
@@ -2541,6 +2550,10 @@ describe("Mutation.createForm", () => {
       // Then
       expect(errors).toBeUndefined();
 
+      await new Promise(resolve => {
+        updateAppendix2Queue.once("global:drained", () => resolve(true));
+      });
+
       const updatedAppendix2_1 = await prisma.form.findFirstOrThrow({
         where: { id: appendix2_1.id }
       });
@@ -2642,6 +2655,10 @@ describe("Mutation.createForm", () => {
 
       // Then
       expect(errors).toBeUndefined();
+
+      await new Promise(resolve => {
+        updateAppendix2Queue.once("global:drained", () => resolve(true));
+      });
 
       const updatedAppendix2_1 = await prisma.form.findFirstOrThrow({
         where: { id: appendix2_1.id }

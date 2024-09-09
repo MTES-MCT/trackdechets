@@ -10,6 +10,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { Status } from "@prisma/client";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 const DELETE_FORM = `
 mutation DeleteForm($id: ID!) {
@@ -199,7 +200,7 @@ describe("Mutation.deleteForm", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived!
+            quantity: appendix2.quantityReceived!.toNumber()
           }
         }
       }
@@ -213,6 +214,10 @@ describe("Mutation.deleteForm", () => {
     const { mutate } = makeClient(ttrUser);
     const { data } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
       variables: { id: form.id }
+    });
+
+    await new Promise(resolve => {
+      updateAppendix2Queue.once("global:drained", () => resolve(true));
     });
 
     expect(data.deleteForm.id).toBeTruthy();

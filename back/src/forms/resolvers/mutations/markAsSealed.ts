@@ -17,6 +17,7 @@ import {
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import { enqueueUpdateAppendix2Job } from "../../../queue/producers/updateAppendix2";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   parent,
@@ -80,9 +81,15 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
           "Veuillez sélectionner des bordereaux à regrouper afin de pouvoir publier ce bordereau de regroupement (Annexe 2)."
         );
       }
-      // mark appendix2Forms as GROUPED if all its grouping forms are sealed
-      // and quantityGrouped is equal to quantityReceived
-      await formRepository.updateAppendix2Forms(groupedForms);
+
+      for (const formId of groupedForms.map(f => f.id)) {
+        transaction.addAfterCommitCallback(async () => {
+          // permet de faire passer le statut d'un bordereau annexé à "GROUPED"
+          // si tous les bordereaux dans lesquelle ils est regroupé sont au statut
+          // "SEALED" et qu'il a été regroupé en totalité
+          await enqueueUpdateAppendix2Job({ formId });
+        });
+      }
     }
 
     // send welcome email to emitter if it is not registered in TD

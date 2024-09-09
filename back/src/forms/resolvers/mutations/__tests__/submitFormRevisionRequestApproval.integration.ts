@@ -26,6 +26,7 @@ import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 
 import getReadableId from "../../../readableId";
 import { operationHook } from "../../../operationHook";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {

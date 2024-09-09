@@ -25,6 +25,7 @@ import { sirenifyFormInput } from "../../../sirenify";
 import { sub } from "date-fns";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
 import { getStream } from "../../../../activity-events";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -1538,6 +1539,10 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    await new Promise(resolve => {
+      updateAppendix2Queue.once("global:drained", () => resolve(true));
+    });
+
     // Old appendix form is back to AWAITING_GROUP
     const oldAppendix2Form = await prisma.form.findUniqueOrThrow({
       where: { id: appendixForm.id }
@@ -2140,6 +2145,7 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
+
     expect(data3.updateForm.grouping).toHaveLength(1);
 
     const updatedAppendixForm = await prisma.form.findFirstOrThrow({

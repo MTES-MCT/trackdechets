@@ -18,6 +18,7 @@ import {
 } from "../../../../generated/graphql/types";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { ErrorCode } from "../../../../common/errors";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 jest.mock("axios", () => ({
   default: {
@@ -1297,6 +1298,10 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
+    await new Promise(resolve => {
+      updateAppendix2Queue.once("global:drained", () => resolve(true));
+    });
+
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
     });
@@ -1362,6 +1367,10 @@ describe("mutation.markAsProcessed", () => {
           processedAt: "2018-12-11T00:00:00.000Z"
         }
       }
+    });
+
+    await new Promise(resolve => {
+      updateAppendix2Queue.once("global:drained", () => resolve(true));
     });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({

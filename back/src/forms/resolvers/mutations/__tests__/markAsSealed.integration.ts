@@ -30,6 +30,7 @@ jest.mock("../../../../mailer/mailing");
 
 // Mock external search services
 import { MARK_AS_SEALED } from "./mutations";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 const mockSearchCompany = jest.fn();
 jest.mock("../../../../companies/sirene/searchCompany", () => ({
@@ -301,7 +302,7 @@ describe("Mutation.markAsSealed", () => {
           create: [
             {
               initialFormId: groupedForm1.id,
-              quantity: groupedForm1.quantityReceived!
+              quantity: groupedForm1.quantityReceived!.toNumber()
             }
           ]
         }
@@ -700,11 +701,11 @@ describe("Mutation.markAsSealed", () => {
           create: [
             {
               initialFormId: groupedForm1.id,
-              quantity: groupedForm1.quantityReceived!
+              quantity: groupedForm1.quantityReceived!.toNumber()
             },
             {
               initialFormId: groupedForm2.id,
-              quantity: groupedForm2.forwardedIn!.quantityReceived!
+              quantity: groupedForm2.forwardedIn!.quantityReceived!.toNumber()
             }
           ]
         }
@@ -715,6 +716,10 @@ describe("Mutation.markAsSealed", () => {
 
     await mutate(MARK_AS_SEALED, {
       variables: { id: form.id }
+    });
+
+    await new Promise(resolve => {
+      updateAppendix2Queue.once("global:drained", () => resolve(true));
     });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
@@ -738,7 +743,7 @@ describe("Mutation.markAsSealed", () => {
     const groupedForm2 = await formWithTempStorageFactory({
       ownerId: user.id,
       opt: {
-        status: "GROUPED",
+        status: "AWAITING_GROUP",
         quantityReceived: 0.02
       }
     });
@@ -758,7 +763,7 @@ describe("Mutation.markAsSealed", () => {
             },
             {
               initialFormId: groupedForm2.id,
-              quantity: groupedForm2.forwardedIn!.quantityReceived!
+              quantity: groupedForm2.forwardedIn!.quantityReceived!.toNumber()
             }
           ]
         }
@@ -769,6 +774,10 @@ describe("Mutation.markAsSealed", () => {
 
     await mutate(MARK_AS_SEALED, {
       variables: { id: form.id }
+    });
+
+    await new Promise(resolve => {
+      updateAppendix2Queue.once("global:drained", () => resolve(true));
     });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({

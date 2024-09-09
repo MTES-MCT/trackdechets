@@ -36,7 +36,6 @@ export type FormActions = {
   setAppendix1: SetAppendix1Fn;
   setAppendix2: SetAppendix2Fn;
   updateAppendix1Forms: UpdateAppendix1Forms;
-  updateAppendix2Forms: UpdateAppendix2Forms;
   deleteStaleSegments: DeleteFormStaleSegmentsFn;
 };
 
