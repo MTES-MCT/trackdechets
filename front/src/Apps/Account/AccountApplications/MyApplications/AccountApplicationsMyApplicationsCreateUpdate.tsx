@@ -27,8 +27,8 @@ import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 
 export const validationApplicationSchema = z.object({
   name: z.string(),
-  redirectUris: z.array(z.string()).nullish(),
-  logoUrl: z.string().nullish(),
+  redirectUris: z.array(z.string()),
+  logoUrl: z.string(),
   goal: z.enum(["PERSONNAL", "CLIENTS"])
 });
 
@@ -93,9 +93,9 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
     });
 
   const { fields, append, remove } = useFieldArray({
-    name: "redirectUris",
-    control: control
-  });
+    control,
+    name: "redirectUris"
+  } as never);
 
   const onSubmit: SubmitHandler<ValidationSchema> = async data => {
     if (application?.id) {
@@ -129,7 +129,7 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
       )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="fr-container--fluid">
+        <div className="fr-container--fluid fr-pb-2w">
           <div className="fr-grid-row">
             <div className="fr-col-6">
               <Input
@@ -223,7 +223,8 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
               <RedErrorMessage name="redirectUris" />
             )}
         </div>
-        <div className="td-modal-actions">
+        <hr className="fr-mt-2w" />
+        <div className="td-modal-actions fr-mt-0">
           <button
             className="fr-btn fr-btn--secondary"
             onClick={() => onClose()}

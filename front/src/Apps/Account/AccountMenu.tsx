@@ -27,18 +27,6 @@ export const AccountMenuContent = () => (
       <ul>
         <li>
           <NavLink
-            to={routes.account.oauth2.list}
-            className={({ isActive }) =>
-              isActive
-                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-                : "sidebarv2__item sidebarv2__item--indented"
-            }
-          >
-            Mes applications
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
             to={routes.account.applications}
             className={({ isActive }) =>
               isActive
