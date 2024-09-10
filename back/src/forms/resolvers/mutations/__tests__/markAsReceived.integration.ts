@@ -22,6 +22,7 @@ import {
 import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
 import getReadableId from "../../../readableId";
 import { getFirstTransporter } from "../../../database";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -690,6 +691,8 @@ describe("Test Form reception", () => {
         }
       }
     );
+
+    await updateAppendix2Queue.whenCurrentJobsFinished();
 
     const updatedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: form1.id }

@@ -18,7 +18,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { renderMail, contentAwaitsGuest } from "@td/mail";
 import { MARK_AS_SEALED } from "./mutations";
-import { waitForUpdateAppendix2QueueToBeEmpty } from "../../../../queue/producers/updateAppendix2";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 jest.mock("axios", () => ({
   default: {
@@ -717,7 +717,7 @@ describe("Mutation.markAsSealed", () => {
       variables: { id: form.id }
     });
 
-    await waitForUpdateAppendix2QueueToBeEmpty();
+    await updateAppendix2Queue.whenCurrentJobsFinished();
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
@@ -773,7 +773,7 @@ describe("Mutation.markAsSealed", () => {
       variables: { id: form.id }
     });
 
-    await waitForUpdateAppendix2QueueToBeEmpty();
+    await updateAppendix2Queue.whenCurrentJobsFinished();
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }

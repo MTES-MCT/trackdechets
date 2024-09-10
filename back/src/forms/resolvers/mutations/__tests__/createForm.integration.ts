@@ -30,10 +30,7 @@ import {
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
-import {
-  updateAppendix2Queue,
-  waitForUpdateAppendix2QueueToBeEmpty
-} from "../../../../queue/producers/updateAppendix2";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -1297,7 +1294,7 @@ describe("Mutation.createForm", () => {
       variables: { createFormInput }
     });
 
-    await waitForUpdateAppendix2QueueToBeEmpty();
+    await updateAppendix2Queue.whenCurrentJobsFinished();
 
     expect(errors).toEqual(undefined);
     expect(data.createForm.appendix2Forms![0].id).toBe(appendix2.id);
@@ -1345,7 +1342,7 @@ describe("Mutation.createForm", () => {
       { form: { id: appendix2.id }, quantity: 0.5 }
     ]);
 
-    await waitForUpdateAppendix2QueueToBeEmpty();
+    await updateAppendix2Queue.whenCurrentJobsFinished();
 
     const updatedAppendix2 = await prisma.form.findUniqueOrThrow({
       where: { id: appendix2.id }

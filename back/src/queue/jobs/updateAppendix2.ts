@@ -1,5 +1,6 @@
 import { Job } from "bull";
 import { updateAppendix2Fn } from "../../forms/updateAppendix2";
+import { logger } from "@td/logger";
 
 export type UpdateAppendix2JobArgs = {
   // Identifiant du bordereau initial annexé à un bordereau de regroupement
@@ -16,5 +17,6 @@ export type UpdateAppendix2JobArgs = {
 export async function updateAppendix2Job(
   job: Job<UpdateAppendix2JobArgs>
 ): Promise<void> {
+  logger.info(`Updating appendix2 ${job.data.formId}`);
   await updateAppendix2Fn(job.data);
 }

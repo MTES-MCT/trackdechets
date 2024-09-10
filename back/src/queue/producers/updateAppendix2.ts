@@ -23,9 +23,3 @@ export function enqueueUpdateAppendix2Job(
   logger.info(`Enqueuing update appendix2 job form ${args.formId}`);
   return updateAppendix2Queue.add(args, options);
 }
-
-export async function waitForUpdateAppendix2QueueToBeEmpty() {
-  return new Promise(resolve => {
-    updateAppendix2Queue.on("drained", resolve);
-  });
-}

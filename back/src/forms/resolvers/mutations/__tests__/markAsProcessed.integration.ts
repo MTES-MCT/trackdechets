@@ -18,7 +18,7 @@ import {
 } from "../../../../generated/graphql/types";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { ErrorCode } from "../../../../common/errors";
-import { waitForUpdateAppendix2QueueToBeEmpty } from "../../../../queue/producers/updateAppendix2";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 jest.mock("axios", () => ({
   default: {
@@ -1298,7 +1298,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    await waitForUpdateAppendix2QueueToBeEmpty();
+    await updateAppendix2Queue.whenCurrentJobsFinished();
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
@@ -1376,7 +1376,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    await waitForUpdateAppendix2QueueToBeEmpty();
+    await updateAppendix2Queue.whenCurrentJobsFinished();
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
@@ -1446,7 +1446,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    await waitForUpdateAppendix2QueueToBeEmpty();
+    await updateAppendix2Queue.whenCurrentJobsFinished();
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
