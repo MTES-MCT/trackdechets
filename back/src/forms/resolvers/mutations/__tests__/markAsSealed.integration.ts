@@ -733,7 +733,7 @@ describe("Mutation.markAsSealed", () => {
       where: { id: groupedForm2.id }
     });
     expect(updatedGroupedForm2.status).toEqual("GROUPED");
-  }, 30000);
+  });
 
   it("should mark appendix2 forms as grouped despite rogue decimal digits", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -794,7 +794,7 @@ describe("Mutation.markAsSealed", () => {
       where: { id: groupedForm2.id }
     });
     expect(updatedGroupedForm2.status).toEqual("GROUPED");
-  }, 30000);
+  });
 
   it.each([0.1, 1])(
     "should not mark appendix2 forms as grouped if they are partially grouped - quantity grouped:  %p",
