@@ -1,6 +1,7 @@
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../common/errors";
 import { CreateRndtsDeclarationDelegationInput } from "../../generated/graphql/types";
+import { getRndtsDeclarationDelegationRepository } from "../repository";
 
 export const findDelegateAndDelegatorOrThrow = async (
   input: CreateRndtsDeclarationDelegationInput
@@ -31,4 +32,18 @@ export const findDelegateAndDelegatorOrThrow = async (
   }
 
   return { delegator, delegate };
+};
+
+export const findDelegationByIdOrThrow = async (
+  user: Express.User,
+  id: string
+) => {
+  const delegationRepository = getRndtsDeclarationDelegationRepository(user);
+  const delegation = await delegationRepository.findFirst({ id });
+
+  if (!delegation) {
+    throw new UserInputError(`La demande de délégation ${id} n'existe pas.`);
+  }
+
+  return delegation;
 };

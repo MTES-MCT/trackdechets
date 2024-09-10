@@ -2,7 +2,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkCanAccess } from "../../permissions";
 import { parseQueryRndtsDeclarationDelegationArgs } from "../../validation";
-import { findDelegationByIdOrThrow } from "./rndtsDeclarationDelegation.utils";
+import { findDelegationByIdOrThrow } from "../utils";
 
 const rndtsDeclarationDelegationResolver: QueryResolvers["rndtsDeclarationDelegation"] =
   async (_, args, context) => {

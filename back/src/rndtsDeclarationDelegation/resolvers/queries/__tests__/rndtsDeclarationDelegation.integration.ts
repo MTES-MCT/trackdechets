@@ -84,4 +84,23 @@ describe("query rndtsDeclarationDelegation", () => {
       );
     });
   });
+
+  describe("async validation", () => {
+    it("should throw if delegation id does not exist", async () => {
+      // Given
+      const { delegatorUser } = await rndtsDeclarationDelegationFactory();
+
+      // When
+      const { errors } = await getDelegation(
+        delegatorUser,
+        "cxxxxxxxxxxxxxxxxxxxxxxxx"
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La demande de délégation cxxxxxxxxxxxxxxxxxxxxxxxx n'existe pas."
+      );
+    });
+  });
 });

@@ -3,7 +3,7 @@ import { rndtsDeclarationDelegationFactory } from "../../__tests__/factories";
 import { getDelegation } from "../queries/__tests__/rndtsDeclarationDelegation.integration";
 
 describe("isActive", () => {
-  it("should return true if (no validityEndDate)", async () => {
+  it("should return true if no validityEndDate", async () => {
     // Given
     const { delegation, delegateUser } =
       await rndtsDeclarationDelegationFactory();
@@ -16,7 +16,7 @@ describe("isActive", () => {
     expect(data.rndtsDeclarationDelegation.isActive).toBeTruthy();
   });
 
-  it("should return true (validityEndDate in the future)", async () => {
+  it("should return true if validityEndDate in the future", async () => {
     // Given
     const { delegation, delegateUser } =
       await rndtsDeclarationDelegationFactory({
