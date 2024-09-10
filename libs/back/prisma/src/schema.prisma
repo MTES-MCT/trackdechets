@@ -299,15 +299,18 @@ model Company {
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   allowAppendix1SignatureAutomation    Boolean                   @default(false)
   featureFlags                         String[]                  @default([])
+  isDormantSince                       DateTime?                 @db.Timestamptz(6)
   MembershipRequest                    MembershipRequest[]
   // Révisions
   bsdaRevisionRequests                 BsdaRevisionRequest[]
   bsddRevisionRequests                 BsddRevisionRequest[]
   bsdasriRevisionRequests              BsdasriRevisionRequest[]
 
-  givenSignatureAutomations    SignatureAutomation[] @relation("SignatureAutomationFrom")
-  receivedSignatureAutomations SignatureAutomation[] @relation("SignatureAutomationTo")
-  webhookSettingsLimit         Int                   @default(1)
+  givenSignatureAutomations       SignatureAutomation[]    @relation("SignatureAutomationFrom")
+  receivedSignatureAutomations    SignatureAutomation[]    @relation("SignatureAutomationTo")
+  givenAdministrativeTransfers    AdministrativeTransfer[] @relation("AdministrativeTransferFrom")
+  receivedAdministrativeTransfers AdministrativeTransfer[] @relation("AdministrativeTransferTo")
+  webhookSettingsLimit            Int                      @default(1)
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -1876,6 +1879,24 @@ model CompanyDigest {
   @@index([year], map: "_CompanyDigestYearIdx")
   @@index([state], map: "_CompanyDigestStatedIdx")
   @@index([distantId], map: "_CompanyDigestdDistantIdIdx")
+}
+
+model AdministrativeTransfer {
+  id         String                       @id @default(cuid())
+  createdAt  DateTime                     @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime                     @updatedAt @db.Timestamptz(6)
+  fromId     String
+  from       Company?                     @relation("AdministrativeTransferFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId       String
+  to         Company?                     @relation("AdministrativeTransferTo", fields: [toId], references: [id], onDelete: Cascade)
+  approvedAt DateTime?                    @db.Timestamptz(6)
+  status     AdministrativeTransferStatus @default(PENDING)
+}
+
+enum AdministrativeTransferStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
 }
 
 enum CompanyDigestStatus {

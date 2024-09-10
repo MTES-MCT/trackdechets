@@ -177,10 +177,16 @@ type CompanySearchPrivate implements CompanySearchPrivateCommon {
   Liste des automatisations de signature reçues par l'entreprise
   """
   receivedSignatureAutomations: [SignatureAutomation!]!
+
   """
   Certification entreprise de travaux
   """
   workerCertification: WorkerCertification
+
+  """
+  Indique si l'entreprise est en sommeil sur Trackdéchets
+  """
+  isDormant: Boolean!
 }
 
 type CompanyExhaustiveInfo {
@@ -199,4 +205,13 @@ type CompanyExhaustive {
   dbCompany: CompanyExhaustiveInfo!
   esCompany: CompanyExhaustiveInfo!
   sireneCompany: CompanyExhaustiveInfo!
+}
+
+type AdministrativeTransfer {
+  id: ID!
+  from: CompanyPrivate!
+  to: CompanyPrivate!
+  createdAt: DateTime!
+  approvedAt: DateTime
+  status: AdministrativeTransferStatus
 }

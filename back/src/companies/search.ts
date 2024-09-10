@@ -62,6 +62,7 @@ export const mergeCompanyToCompanySearchResult = (
   // specific data for CompanySearchResult
   isRegistered: trackdechetsCompanyInfo != null,
   trackdechetsId: trackdechetsCompanyInfo?.id,
+  isDormant: trackdechetsCompanyInfo?.isDormantSince != null,
   // override database infos with Sirene or VAT search
   ...companyInfo
 });
@@ -273,7 +274,8 @@ export const makeSearchCompanies =
             : {
                 ...companyInsee,
                 orgId: companyInsee.siret!,
-                isRegistered: false
+                isRegistered: false,
+                isDormant: false
               })
         }));
       }

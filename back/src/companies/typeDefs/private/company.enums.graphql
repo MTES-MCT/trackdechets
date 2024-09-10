@@ -16,3 +16,9 @@ enum CompanyVerificationMode {
   LETTER
   MANUAL
 }
+
+enum AdministrativeTransferStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}

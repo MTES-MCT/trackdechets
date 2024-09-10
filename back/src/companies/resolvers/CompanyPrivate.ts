@@ -79,6 +79,16 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     return automations.filter(
       a => a.from.allowAppendix1SignatureAutomation
     ) as any;
+  },
+  givenAdministrativeTransfers: parent => {
+    return prisma.company
+      .findUnique({ where: { id: parent.id } })
+      .givenAdministrativeTransfers() as any;
+  },
+  receivedAdministrativeTransfers: parent => {
+    return prisma.company
+      .findUnique({ where: { id: parent.id } })
+      .receivedAdministrativeTransfers() as any;
   }
 };
 
