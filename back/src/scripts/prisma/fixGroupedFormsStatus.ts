@@ -1,7 +1,6 @@
 import { processDbIdentifiersByChunk } from "../../bsds/indexation/bulkIndexBsds";
-import { getFormRepository } from "../../forms/repository";
-import { FormForUpdateAppendix2FormsInclude } from "../../forms/repository/form/updateAppendix2Forms";
 import { prisma } from "@td/prisma";
+import { updateAppendix2Fn } from "../../forms/updateAppendix2";
 
 export async function fixedGroupedFormsStatus() {
   const formIds = await prisma.form.findMany({
@@ -22,16 +21,9 @@ export async function fixedGroupedFormsStatus() {
   await processDbIdentifiersByChunk(
     formIds.map(f => f.id),
     async ids => {
-      const forms = await prisma.form.findMany({
-        where: { id: { in: ids } },
-        include: FormForUpdateAppendix2FormsInclude
-      });
-
-      const { updateAppendix2Forms } = getFormRepository({
-        id: "support_tech"
-      } as Express.User);
-
-      await updateAppendix2Forms(forms);
+      for (const id of ids) {
+        await updateAppendix2Fn({ formId: id }, true);
+      }
     },
     100 // process les bordereaux 100 par 100
   );

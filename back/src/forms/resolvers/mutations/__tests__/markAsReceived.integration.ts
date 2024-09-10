@@ -23,6 +23,7 @@ import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
 import getReadableId from "../../../readableId";
 import { getFirstTransporter } from "../../../database";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -676,23 +677,28 @@ describe("Test Form reception", () => {
 
     const { mutate } = makeClient(destinationUser);
 
-    await mutate<Pick<Mutation, "markAsReceived">, MutationMarkAsReceivedArgs>(
-      MARK_AS_RECEIVED,
-      {
-        variables: {
-          id: groupementForm.id,
-          receivedInfo: {
-            wasteAcceptationStatus: "REFUSED",
-            wasteRefusalReason: "Parce que",
-            receivedAt: "2019-01-18" as any,
-            receivedBy: "John",
-            quantityReceived: 0
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "markAsReceived">, MutationMarkAsReceivedArgs>(
+        MARK_AS_RECEIVED,
+        {
+          variables: {
+            id: groupementForm.id,
+            receivedInfo: {
+              wasteAcceptationStatus: "REFUSED",
+              wasteRefusalReason: "Parce que",
+              receivedAt: "2019-01-18" as any,
+              receivedBy: "John",
+              quantityReceived: 0
+            }
           }
         }
-      }
-    );
+      );
 
-    await updateAppendix2Queue.whenCurrentJobsFinished();
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
 
     const updatedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: form1.id }

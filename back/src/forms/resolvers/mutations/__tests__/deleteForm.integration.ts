@@ -11,6 +11,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { Status } from "@prisma/client";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 const DELETE_FORM = `
 mutation DeleteForm($id: ID!) {
@@ -212,11 +213,16 @@ describe("Mutation.deleteForm", () => {
     });
 
     const { mutate } = makeClient(ttrUser);
-    const { data } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
-      variables: { id: form.id }
-    });
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
+        variables: { id: form.id }
+      });
 
-    await updateAppendix2Queue.whenCurrentJobsFinished();
+    const { data } = await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 1
+    });
 
     expect(data.deleteForm.id).toBeTruthy();
 

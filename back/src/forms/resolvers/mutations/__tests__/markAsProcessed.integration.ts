@@ -19,6 +19,7 @@ import {
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { ErrorCode } from "../../../../common/errors";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 jest.mock("axios", () => ({
   default: {
@@ -1285,20 +1286,25 @@ describe("mutation.markAsProcessed", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_PROCESSED, {
-      variables: {
-        id: form.id,
-        processedInfo: {
-          processingOperationDescription: "Une description",
-          processingOperationDone: "D 1",
-          destinationOperationMode: OperationMode.ELIMINATION,
-          processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z"
+    const mutateFn = () =>
+      mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 1",
+            destinationOperationMode: OperationMode.ELIMINATION,
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z"
+          }
         }
-      }
-    });
+      });
 
-    await updateAppendix2Queue.whenCurrentJobsFinished();
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
@@ -1363,20 +1369,25 @@ describe("mutation.markAsProcessed", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_PROCESSED, {
-      variables: {
-        id: form.id,
-        processedInfo: {
-          processingOperationDescription: "Une description",
-          processingOperationDone: "D 1",
-          destinationOperationMode: OperationMode.ELIMINATION,
-          processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z"
+    const mutateFn = () =>
+      mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 1",
+            destinationOperationMode: OperationMode.ELIMINATION,
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z"
+          }
         }
-      }
-    });
+      });
 
-    await updateAppendix2Queue.whenCurrentJobsFinished();
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
@@ -1433,20 +1444,25 @@ describe("mutation.markAsProcessed", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_PROCESSED, {
-      variables: {
-        id: form.id,
-        processedInfo: {
-          processingOperationDescription: "Une description",
-          processingOperationDone: "D 1",
-          destinationOperationMode: OperationMode.ELIMINATION,
-          processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z"
+    const mutateFn = () =>
+      mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 1",
+            destinationOperationMode: OperationMode.ELIMINATION,
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z"
+          }
         }
-      }
-    });
+      });
 
-    await updateAppendix2Queue.whenCurrentJobsFinished();
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }

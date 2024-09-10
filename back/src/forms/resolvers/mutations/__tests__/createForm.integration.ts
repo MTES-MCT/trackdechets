@@ -31,6 +31,7 @@ import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -1287,14 +1288,19 @@ describe("Mutation.createForm", () => {
       appendix2Forms: [{ id: appendix2.id }]
     };
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
-      Pick<Mutation, "createForm">,
-      MutationCreateFormArgs
-    >(CREATE_FORM, {
-      variables: { createFormInput }
-    });
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+        CREATE_FORM,
+        {
+          variables: { createFormInput }
+        }
+      );
 
-    await updateAppendix2Queue.whenCurrentJobsFinished();
+    const { data, errors } = await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 1
+    });
 
     expect(errors).toEqual(undefined);
     expect(data.createForm.appendix2Forms![0].id).toBe(appendix2.id);
@@ -1330,19 +1336,24 @@ describe("Mutation.createForm", () => {
       grouping: [{ form: { id: appendix2.id }, quantity: 0.5 }]
     };
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
-      Pick<Mutation, "createForm">,
-      MutationCreateFormArgs
-    >(CREATE_FORM, {
-      variables: { createFormInput }
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+        CREATE_FORM,
+        {
+          variables: { createFormInput }
+        }
+      );
+
+    const { data, errors } = await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 1
     });
 
     expect(errors).toEqual(undefined);
     expect(data.createForm.grouping).toEqual([
       { form: { id: appendix2.id }, quantity: 0.5 }
     ]);
-
-    await updateAppendix2Queue.whenCurrentJobsFinished();
 
     const updatedAppendix2 = await prisma.form.findUniqueOrThrow({
       where: { id: appendix2.id }

@@ -19,6 +19,7 @@ import { sendMail } from "../../../../mailer/mailing";
 import { renderMail, contentAwaitsGuest } from "@td/mail";
 import { MARK_AS_SEALED } from "./mutations";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 jest.mock("axios", () => ({
   default: {
@@ -713,11 +714,16 @@ describe("Mutation.markAsSealed", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_SEALED, {
-      variables: { id: form.id }
-    });
+    const mutateFn = () =>
+      mutate(MARK_AS_SEALED, {
+        variables: { id: form.id }
+      });
 
-    await updateAppendix2Queue.whenCurrentJobsFinished();
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
@@ -769,11 +775,16 @@ describe("Mutation.markAsSealed", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_SEALED, {
-      variables: { id: form.id }
-    });
+    const mutateFn = () =>
+      mutate(MARK_AS_SEALED, {
+        variables: { id: form.id }
+      });
 
-    await updateAppendix2Queue.whenCurrentJobsFinished();
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }

@@ -26,6 +26,7 @@ import { sub } from "date-fns";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
 import { getStream } from "../../../../activity-events";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -1533,13 +1534,18 @@ describe("Mutation.updateForm", () => {
       appendix2Forms: [{ id: toBeAppendixForm.id }]
     };
     const { mutate } = makeClient(user);
-    await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
-      variables: {
-        updateFormInput
-      }
-    });
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+        variables: {
+          updateFormInput
+        }
+      });
 
-    await updateAppendix2Queue.whenCurrentJobsFinished();
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
 
     // Old appendix form is back to AWAITING_GROUP
     const oldAppendix2Form = await prisma.form.findUniqueOrThrow({
