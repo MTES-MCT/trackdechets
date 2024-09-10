@@ -17,9 +17,19 @@ import {
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 import { Mutation } from "../../../../generated/graphql/types";
+import { fullGroupingBsdasriFragment } from "../../../fragments";
+import { gql } from "graphql-tag";
 
 import { SIGN_DASRI } from "./signUtils";
-import { UPDATE_DASRI } from "./updateBsdasri.integration";
+
+const UPDATE_DASRI = gql`
+  ${fullGroupingBsdasriFragment}
+  mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
+    updateBsdasri(id: $id, input: $input) {
+      ...FullGroupingBsdasriFragment
+    }
+  }
+`;
 
 describe("Mutation.signBsdasri transport", () => {
   afterEach(resetDatabase);
