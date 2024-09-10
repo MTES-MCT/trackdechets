@@ -10,7 +10,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { Status } from "@prisma/client";
-import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForUpdateAppendix2QueueToBeEmpty } from "../../../../queue/producers/updateAppendix2";
 
 const DELETE_FORM = `
 mutation DeleteForm($id: ID!) {
@@ -216,9 +216,7 @@ describe("Mutation.deleteForm", () => {
       variables: { id: form.id }
     });
 
-    await new Promise(resolve => {
-      updateAppendix2Queue.once("global:drained", () => resolve(true));
-    });
+    await waitForUpdateAppendix2QueueToBeEmpty();
 
     expect(data.deleteForm.id).toBeTruthy();
 

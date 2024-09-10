@@ -1298,9 +1298,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    await new Promise(resolve => {
-      updateAppendix2Queue.once("global:drained", () => resolve(true));
-    });
+    await waitForUpdateAppendix2QueueToBeEmpty();
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
@@ -1378,9 +1376,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    await new Promise(resolve => {
-      updateAppendix2Queue.once("global:drained", () => resolve(true));
-    });
+    await waitForUpdateAppendix2QueueToBeEmpty();
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
@@ -1450,9 +1446,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    await new Promise(resolve => {
-      updateAppendix2Queue.once("global:drained", () => resolve(true));
-    });
+    await waitForUpdateAppendix2QueueToBeEmpty();
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: groupedForm1.id }
