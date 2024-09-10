@@ -130,5 +130,13 @@ type Mutation {
   createAnonymousCompany(input: AnonymousCompanyInput!): AnonymousCompany!
 
   addSignatureAutomation(input: SignatureAutomationInput!): SignatureAutomation!
+
   removeSignatureAutomation(id: ID!): SignatureAutomation!
+
+  """
+  USAGE INTERNE
+  """
+  massUpdateCompaniesProfiles(
+    input: MassUpdateCompaniesProfilesInput!
+  ): [MassUpdatedCompaniesProfile]!
 }

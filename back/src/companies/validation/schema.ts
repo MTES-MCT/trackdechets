@@ -90,3 +90,13 @@ export const companySchema = rawCompanySchema
   .superRefine(checkEcoOrganisme)
   .superRefine(checkSubTypes)
   .superRefine(checkRecepisses);
+
+const rawMassUpdateCompanySchema = rawCompanySchema.pick({
+  companyTypes: true,
+  wasteProcessorTypes: true,
+  collectorTypes: true,
+  wasteVehiclesTypes: true
+});
+
+export const massUpdateCompanySchema =
+  rawMassUpdateCompanySchema.superRefine(checkSubTypes);
