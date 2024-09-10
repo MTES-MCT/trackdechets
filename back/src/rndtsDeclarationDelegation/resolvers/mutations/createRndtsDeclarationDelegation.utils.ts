@@ -11,7 +11,7 @@ export const createDelegation = async (
 };
 
 /**
- * Check for overlaps in delegations.
+ * Check to prevent having multiple active delegations at the same time.
  *
  * We don't authorize already having an accepted delegation (isAccepted=true) that has
  * not yet expired.
@@ -20,17 +20,23 @@ export const createDelegation = async (
  * it cannot create a new one for the meantime. Users would have to delete the delegation
  * in the future and create a new one.
  */
-export const checkNoOverlappingDelegation = async (
+export const checkNoAcceptedandNotExpiredDelegation = async (
   user: Express.User,
   input: ParsedCreateRndtsDeclarationDelegationInput
 ) => {
-  // TODO: fix
+  const NOW = new Date();
+
   const delegationRepository = getRndtsDeclarationDelegationRepository(user);
-  const activeDelegation = await delegationRepository.findActive(input);
+  const activeDelegation = await delegationRepository.findFirst({
+    delegatorOrgId: input.delegatorOrgId,
+    delegateOrgId: input.delegateOrgId,
+    isAccepted: true,
+    OR: [{ validityEndDate: null }, { validityEndDate: { gt: NOW } }]
+  });
 
   if (activeDelegation) {
     throw new UserInputError(
-      `Une délégation est déjà active pour ce délégataire et ce délégant (id ${activeDelegation.id})`
+      `Une délégation existe déjà pour ce délégataire et ce délégant (id ${activeDelegation.id})`
     );
   }
 };

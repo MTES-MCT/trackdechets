@@ -6,7 +6,6 @@ import {
   RepositoryTransaction
 } from "../../common/repository/types";
 import { RndtsDeclarationDelegationActions } from "./types";
-import { buildFindActiveRndtsDeclarationDelegation } from "./rndtsDeclarationDelegation/findActive";
 import buildFindFirstRndtsDeclarationDelegation from "./rndtsDeclarationDelegation/findFirst";
 
 export type RndtsDeclarationDelegationRepository =
@@ -14,7 +13,6 @@ export type RndtsDeclarationDelegationRepository =
 
 export function getReadonlyRndtsDeclarationDelegationRepository() {
   return {
-    findActive: buildFindActiveRndtsDeclarationDelegation({ prisma }),
     findFirst: buildFindFirstRndtsDeclarationDelegation({ prisma })
   };
 }

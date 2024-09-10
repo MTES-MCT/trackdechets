@@ -9,7 +9,7 @@ import { parseCreateRndtsDeclarationDelegationInput } from "../../validation";
 import { findDelegateAndDelegatorOrThrow } from "../utils";
 import {
   createDelegation,
-  checkNoOverlappingDelegation
+  checkNoAcceptedandNotExpiredDelegation
 } from "./createRndtsDeclarationDelegation.utils";
 
 const createRndtsDeclarationDelegation = async (
@@ -29,8 +29,8 @@ const createRndtsDeclarationDelegation = async (
   // Make sure user can create delegation
   await checkCanCreate(user, delegator);
 
-  // Check there's not already an active delegation
-  await checkNoOverlappingDelegation(user, delegationInput);
+  // Check there's not already an existing delegation
+  await checkNoAcceptedandNotExpiredDelegation(user, delegationInput);
 
   // Create delegation
   const delegation = await createDelegation(user, delegationInput);

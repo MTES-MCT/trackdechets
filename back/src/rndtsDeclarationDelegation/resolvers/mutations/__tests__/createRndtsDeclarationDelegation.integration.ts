@@ -12,6 +12,7 @@ import { User, RndtsDeclarationDelegation } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { GraphQLFormattedError } from "graphql";
+import { nowPlusXHours } from "../../../../utils";
 
 const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
   mutation createRndtsDeclarationDelegation(
@@ -245,8 +246,8 @@ describe("mutation createRndtsDeclarationDelegation", () => {
     });
   });
 
-  describe("prevent duplicates", () => {
-    it("should throw if there is already an active delegation for those companies (no end date)", async () => {
+  describe("prevent simultaneous valid delegations", () => {
+    it("should throw if there is already an active delegation for those companies (no start date, no end date)", async () => {
       // Given
       const delegate = await companyFactory();
       const { user, company: delegator } = await userWithCompanyFactory();
@@ -269,38 +270,157 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Then
       expect(errors2).not.toBeUndefined();
       expect(errors2[0].message).toBe(
-        `Une délégation est déjà active pour ce délégataire et ce délégant (id ${delegation?.id})`
+        `Une délégation existe déjà pour ce délégataire et ce délégant (id ${delegation?.id})`
       );
     });
 
-    // TODO: solve issue with multiple delegation with overlapping dates
-    // it("should throw if there is already an active delegation for those companies (end date)", async () => {
-    //   // Given
-    //   const delegate = await companyFactory();
-    //   const { user, company: delegator } = await userWithCompanyFactory();
+    it("should throw if there is already an active delegation for those companies (no start date, end date)", async () => {
+      // Given
+      const delegate = await companyFactory();
+      const { user, company: delegator } = await userWithCompanyFactory();
 
-    //   // When: create first delegation
-    //   const { errors, delegation } = await createDelegation(user, {
-    //     delegateOrgId: delegate.orgId,
-    //     delegatorOrgId: delegator.orgId,
-    //     validityStartDate: new Date() as any,
-    //     validityEndDate: nowPlusXHours(1).toISOString() as any
-    //   });
+      // When: create first delegation
+      const { errors, delegation } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId,
+        validityEndDate: nowPlusXHours(2).toISOString() as any
+      });
 
-    //   // Then
-    //   expect(errors).toBeUndefined();
+      // Then
+      expect(errors).toBeUndefined();
 
-    //   // When: create second delegation
-    //   const { errors: errors2 } = await createDelegation(user, {
-    //     delegateOrgId: delegate.orgId,
-    //     delegatorOrgId: delegator.orgId
-    //   });
+      // When: create second delegation
+      const { errors: errors2 } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
 
-    //   // Then
-    //   expect(errors2).not.toBeUndefined();
-    //   expect(errors2[0].message).toBe(
-    //     `Une délégation est déjà active pour ce délégataire et ce délégant (id ${delegation?.id})`
-    //   );
-    // });
+      // Then
+      expect(errors2).not.toBeUndefined();
+      expect(errors2[0].message).toBe(
+        `Une délégation existe déjà pour ce délégataire et ce délégant (id ${delegation?.id})`
+      );
+    });
+
+    it("should throw if there is already an active delegation for those companies (start date, end date)", async () => {
+      // Given
+      const delegate = await companyFactory();
+      const { user, company: delegator } = await userWithCompanyFactory();
+
+      // When: create first delegation
+      const { errors, delegation } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId,
+        validityStartDate: new Date().toISOString() as any,
+        validityEndDate: nowPlusXHours(2).toISOString() as any
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // When: create second delegation
+      const { errors: errors2 } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
+
+      // Then
+      expect(errors2).not.toBeUndefined();
+      expect(errors2[0].message).toBe(
+        `Une délégation existe déjà pour ce délégataire et ce délégant (id ${delegation?.id})`
+      );
+    });
+
+    it("should throw if there is already an existing delegation programmed in the future", async () => {
+      // Given
+      const delegate = await companyFactory();
+      const { user, company: delegator } = await userWithCompanyFactory();
+
+      // When: create first delegation
+      const { errors, delegation } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId,
+        validityStartDate: nowPlusXHours(2).toISOString() as any,
+        validityEndDate: nowPlusXHours(3).toISOString() as any
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // When: create second delegation
+      const { errors: errors2 } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
+
+      // Then
+      expect(errors2).not.toBeUndefined();
+      expect(errors2[0].message).toBe(
+        `Une délégation existe déjà pour ce délégataire et ce délégant (id ${delegation?.id})`
+      );
+    });
+
+    it("should not throw if there is an overlapping delegation but it's been refused", async () => {
+      // Given
+      const delegate = await companyFactory();
+      const { user, company: delegator } = await userWithCompanyFactory();
+
+      // When: create first delegation
+      const { errors, delegation } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId,
+        validityEndDate: nowPlusXHours(3).toISOString() as any
+      });
+
+      // Refuse the delegation
+      await prisma.rndtsDeclarationDelegation.update({
+        where: { id: delegation?.id },
+        data: { isAccepted: false }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // When: create second delegation
+      const { errors: errors2 } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
+
+      // Then
+      expect(errors2).toBeUndefined();
+    });
+
+    it("should not throw if there is an existing delegation in the future but it's been refused", async () => {
+      // Given
+      const delegate = await companyFactory();
+      const { user, company: delegator } = await userWithCompanyFactory();
+
+      // When: create first delegation
+      const { errors, delegation } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId,
+        validityStartDate: nowPlusXHours(2).toISOString() as any,
+        validityEndDate: nowPlusXHours(3).toISOString() as any
+      });
+
+      // Refuse the delegation
+      await prisma.rndtsDeclarationDelegation.update({
+        where: { id: delegation?.id },
+        data: { isAccepted: false }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // When: create second delegation
+      const { errors: errors2 } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
+
+      // Then
+      expect(errors2).toBeUndefined();
+    });
   });
 });
