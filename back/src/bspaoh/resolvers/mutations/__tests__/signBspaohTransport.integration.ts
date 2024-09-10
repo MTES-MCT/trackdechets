@@ -17,11 +17,19 @@ import { bspaohFactory } from "../../../__tests__/factories";
 import { gql } from "graphql-tag";
 import { fullBspaoh } from "../../../fragments";
 import { prisma } from "@td/prisma";
-import { UPDATE_BSPAOH } from "./updateBspaoh.integration";
 
 const SIGN_BSPAOH = gql`
   mutation SignBspaoh($id: ID!, $input: BspaohSignatureInput!) {
     signBspaoh(id: $id, input: $input) {
+      ...FullBspaoh
+    }
+  }
+  ${fullBspaoh}
+`;
+
+const UPDATE_BSPAOH = gql`
+  mutation UpdateBspaoh($id: ID!, $input: BspaohInput!) {
+    updateBspaoh(id: $id, input: $input) {
       ...FullBspaoh
     }
   }
