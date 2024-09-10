@@ -76,7 +76,8 @@ const transporterData: Partial<BsddTransporter> = {
   transporterCompanyContact: "Transporteur",
   transporterCompanyPhone: "03",
   transporterCompanyMail: "t@t.fr",
-  transporterTransportMode: TransportMode.AIR,
+  transporterTransportMode: TransportMode.ROAD,
+  transporterNumberPlate: "NBR-PLATE",
   number: 1
 };
 
