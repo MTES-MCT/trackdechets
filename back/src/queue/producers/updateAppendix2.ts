@@ -5,7 +5,6 @@ import { UpdateAppendix2JobArgs } from "../jobs/updateAppendix2";
 
 export const UPDATE_APPENDIX2_QUEUE_NAME = `queue_update_appendix2_${NODE_ENV}`;
 
-// Updates queue, used by the notifier. Items are enqueued once indexation is done
 export const updateAppendix2Queue = new Queue<UpdateAppendix2JobArgs>(
   UPDATE_APPENDIX2_QUEUE_NAME,
   REDIS_URL!,
