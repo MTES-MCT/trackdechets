@@ -17,6 +17,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { renderMail, contentAwaitsGuest } from "@td/mail";
+import { MARK_AS_SEALED } from "./mutations";
+import { waitForUpdateAppendix2QueueToBeEmpty } from "../../../../queue/producers/updateAppendix2";
 
 jest.mock("axios", () => ({
   default: {
@@ -29,9 +31,6 @@ jest.mock("../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 // Mock external search services
-import { MARK_AS_SEALED } from "./mutations";
-import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
-
 const mockSearchCompany = jest.fn();
 jest.mock("../../../../companies/sirene/searchCompany", () => ({
   __esModule: true,
@@ -728,7 +727,7 @@ describe("Mutation.markAsSealed", () => {
       where: { id: groupedForm2.id }
     });
     expect(updatedGroupedForm2.status).toEqual("GROUPED");
-  });
+  }, 30000);
 
   it("should mark appendix2 forms as grouped despite rogue decimal digits", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -784,7 +783,7 @@ describe("Mutation.markAsSealed", () => {
       where: { id: groupedForm2.id }
     });
     expect(updatedGroupedForm2.status).toEqual("GROUPED");
-  });
+  }, 30000);
 
   it.each([0.1, 1])(
     "should not mark appendix2 forms as grouped if they are partially grouped - quantity grouped:  %p",

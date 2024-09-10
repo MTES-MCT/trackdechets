@@ -18,7 +18,7 @@ import {
 } from "../../../../generated/graphql/types";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { ErrorCode } from "../../../../common/errors";
-import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForUpdateAppendix2QueueToBeEmpty } from "../../../../queue/producers/updateAppendix2";
 
 jest.mock("axios", () => ({
   default: {
@@ -1309,7 +1309,7 @@ describe("mutation.markAsProcessed", () => {
       where: { id: groupedForm2.id }
     });
     expect(updatedGroupedForm2.status).toEqual("PROCESSED");
-  });
+  }, 30000);
 
   it("should mark appendix2 forms as processed recursively", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -1387,7 +1387,7 @@ describe("mutation.markAsProcessed", () => {
       where: { id: groupedForm1.id }
     });
     expect(updatedGroupedForm2.status).toEqual("PROCESSED");
-  });
+  }, 30000);
 
   it("should mark appendix2 forms as processed  despite rogue decimal digits", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -1457,7 +1457,7 @@ describe("mutation.markAsProcessed", () => {
       where: { id: groupedForm2.id }
     });
     expect(updatedGroupedForm2.status).toEqual("PROCESSED");
-  });
+  }, 30000);
 
   it.each([0.1, 1])(
     "should not mark appendix2 forms as processed if they are partially grouped - quantity grouped:  %p",

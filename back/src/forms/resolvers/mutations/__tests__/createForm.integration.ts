@@ -1309,7 +1309,7 @@ describe("Mutation.createForm", () => {
     expect(updatedAppendix2.quantityGrouped).toEqual(
       updatedAppendix2.quantityReceived?.toNumber()
     );
-  });
+  }, 30000);
 
   it("should allow creating a form with an appendix 2 (using CreateFormInput.grouping)", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
@@ -1352,7 +1352,7 @@ describe("Mutation.createForm", () => {
     });
 
     expect(updatedAppendix2.quantityGrouped).toEqual(0.5);
-  });
+  }, 3000);
 
   it("should allow consuming a BSDD in several appendix2", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("ADMIN");

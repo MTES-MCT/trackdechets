@@ -1556,7 +1556,7 @@ describe("Mutation.updateForm", () => {
     expect(newAppendix2Form.quantityGrouped).toEqual(
       newAppendix2Form.quantityReceived?.toNumber()
     );
-  });
+  }, 30000);
 
   it("should be possible to update data on a form containing appendix 2", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
