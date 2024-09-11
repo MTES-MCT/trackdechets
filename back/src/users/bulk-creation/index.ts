@@ -16,7 +16,10 @@ import { templateIds } from "@td/mail";
 import {
   CompanyType,
   CompanyVerificationMode,
-  CompanyVerificationStatus
+  CompanyVerificationStatus,
+  CollectorType,
+  WasteProcessorType,
+  WasteVehiclesType
 } from "@prisma/client";
 import { CompanyInfo, CompanyRow, RoleRow } from "./types";
 import { UserInputError } from "../../common/errors";
@@ -168,6 +171,15 @@ export async function bulkCreate(opts: Opts): Promise<void> {
           name: company.name!,
           companyTypes: {
             set: company.companyTypes as CompanyType[]
+          },
+          collectorTypes: {
+            set: company.collectorTypes as CollectorType[]
+          },
+          wasteProcessorTypes: {
+            set: company.wasteProcessorTypes as WasteProcessorType[]
+          },
+          wasteVehiclesTypes: {
+            set: company.wasteVehiclesTypes as WasteVehiclesType[]
           },
           securityCode: randomNumber(4),
           givenName: company.givenName,

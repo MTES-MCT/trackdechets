@@ -31,6 +31,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Permettre la mise à jour en masse des profils et sous-profils d'établissements via l'interface d'administration [PR 3565](https://github.com/MTES-MCT/trackdechets/pull/3565)
 
+#### :house: Interne
+
+- Ajout des colonnes de sous-type au script d'import en masse [PR 3568](https://github.com/MTES-MCT/trackdechets/pull/3568)
+
 # [2024.8.1] 27/08/2024
 
 #### :rocket: Nouvelles fonctionnalités
