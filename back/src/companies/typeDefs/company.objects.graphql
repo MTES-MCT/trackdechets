@@ -732,3 +732,20 @@ type SignatureAutomation {
   "Date de création de l'automatisation de signature"
   createdAt: DateTime!
 }
+
+"""
+Informations sur un transfert administratif entre deux entreprises
+"""
+type AdministrativeTransfer {
+  id: ID!
+  "Entreprise qui initie le transfert"
+  from: CompanyPrivate!
+  "Entreprise qui reçoit le transfert"
+  to: CompanyPrivate!
+  "Date de création du transfert"
+  createdAt: DateTime!
+  "Date de validation du transfert"
+  approvedAt: DateTime
+  "Statut du transfert"
+  status: AdministrativeTransferStatus
+}

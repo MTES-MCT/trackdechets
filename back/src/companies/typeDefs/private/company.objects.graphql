@@ -206,12 +206,3 @@ type CompanyExhaustive {
   esCompany: CompanyExhaustiveInfo!
   sireneCompany: CompanyExhaustiveInfo!
 }
-
-type AdministrativeTransfer {
-  id: ID!
-  from: CompanyPrivate!
-  to: CompanyPrivate!
-  createdAt: DateTime!
-  approvedAt: DateTime
-  status: AdministrativeTransferStatus
-}

@@ -4,7 +4,7 @@ import {
   AdministrativeTransferResolvers
 } from "../../generated/graphql/types";
 
-const AdministrativeTransferResolvers: AdministrativeTransferResolvers = {
+const administrativeTransferResolver: AdministrativeTransferResolvers = {
   from: async (parent: AdministrativeTransfer & { fromId: string }) => {
     return prisma.company.findUniqueOrThrow({
       where: { id: parent.fromId }
@@ -17,4 +17,4 @@ const AdministrativeTransferResolvers: AdministrativeTransferResolvers = {
   }
 };
 
-export default AdministrativeTransferResolvers;
+export default administrativeTransferResolver;
