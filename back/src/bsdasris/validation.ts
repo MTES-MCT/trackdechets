@@ -337,7 +337,8 @@ export const transporterSchema: FactorySchemaOf<
         `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
       )
       .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
-      .test(siretTests.isRegistered("TRANSPORTER")),
+      .test(siretTests.isRegistered("TRANSPORTER"))
+      .test(siretTests.isNotDormant),
     transporterCompanyVatNumber: foreignVatNumber
       .label("Transporteur")
       .test(vatNumberTests.isRegisteredTransporter),
@@ -497,7 +498,8 @@ export const recipientSchema: FactorySchemaOf<
     destinationCompanySiret: siret
       .label("Destination")
       .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`)
-      .test(siretTests.isRegistered("DESTINATION")),
+      .test(siretTests.isRegistered("DESTINATION"))
+      .test(siretTests.isNotDormant),
     destinationCompanyAddress: yup
       .string()
       .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_ADDRESS}`),
