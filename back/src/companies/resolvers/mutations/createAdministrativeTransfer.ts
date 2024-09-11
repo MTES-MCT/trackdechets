@@ -68,17 +68,23 @@ export const createAdministrativeTransfer: MutationResolvers["createAdministrati
       toId: toCompany.id
     };
 
-    await prisma.event.create({
-      data: {
-        streamId: fromCompany.orgId,
-        actor: user.id,
-        type: companyEventTypes.administrativeTransferCreated,
-        data,
-        metadata: { authType: user.auth }
-      }
-    });
+    const administrativeTransfer = await prisma.$transaction(
+      async transaction => {
+        await transaction.event.create({
+          data: {
+            streamId: fromCompany.orgId,
+            actor: user.id,
+            type: companyEventTypes.administrativeTransferCreated,
+            data,
+            metadata: { authType: user.auth }
+          }
+        });
 
-    return prisma.administrativeTransfer.create({
-      data
-    }) as any;
+        return transaction.administrativeTransfer.create({
+          data
+        });
+      }
+    );
+
+    return administrativeTransfer as any;
   };

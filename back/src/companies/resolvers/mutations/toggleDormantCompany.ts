@@ -24,19 +24,22 @@ const toggleDormantCompanyResolver: MutationResolvers["toggleDormantCompany"] =
     );
 
     const isDormantSince = company.isDormantSince ? null : new Date();
-    await prisma.event.create({
-      data: {
-        streamId: company.orgId,
-        actor: user.id,
-        type: companyEventTypes.toggleDormantCompany,
-        data: { isDormantSince },
-        metadata: { authType: user.auth }
-      }
-    });
 
-    await prisma.company.update({
-      where: { id },
-      data: { isDormantSince }
+    await prisma.$transaction(async transaction => {
+      await transaction.event.create({
+        data: {
+          streamId: company.orgId,
+          actor: user.id,
+          type: companyEventTypes.toggleDormantCompany,
+          data: { isDormantSince },
+          metadata: { authType: user.auth }
+        }
+      });
+
+      await transaction.company.update({
+        where: { id },
+        data: { isDormantSince }
+      });
     });
 
     return true;

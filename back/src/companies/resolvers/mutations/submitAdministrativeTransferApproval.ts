@@ -66,21 +66,27 @@ export const submitAdministrativeTransferApproval: MutationResolvers["submitAdmi
       ? AdministrativeTransferStatus.ACCEPTED
       : AdministrativeTransferStatus.REFUSED;
 
-    await prisma.event.create({
-      data: {
-        streamId: administrativeTransfer.fromId,
-        actor: user.id,
-        type: companyEventTypes.administrativeTransferApproval,
-        data: { status },
-        metadata: { authType: user.auth }
-      }
-    });
+    const administrtiveTransfer = await prisma.$transaction(
+      async transaction => {
+        await transaction.event.create({
+          data: {
+            streamId: administrativeTransfer.fromId,
+            actor: user.id,
+            type: companyEventTypes.administrativeTransferApproval,
+            data: { status },
+            metadata: { authType: user.auth }
+          }
+        });
 
-    return prisma.administrativeTransfer.update({
-      where: { id: administrativeTransfer.id },
-      data: {
-        approvedAt: new Date(),
-        status
+        return transaction.administrativeTransfer.update({
+          where: { id: administrativeTransfer.id },
+          data: {
+            approvedAt: new Date(),
+            status
+          }
+        });
       }
-    }) as any;
+    );
+
+    return administrtiveTransfer as any;
   };
