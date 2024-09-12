@@ -84,7 +84,10 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
   return {
     statusLogs: edges.map(({ node }) => node),
     count: totalCount,
-    pageInfo
+    hasNextPage: pageInfo.hasNextPage,
+    hasPreviousPage: pageInfo.hasPreviousPage,
+    startCursor: pageInfo.startCursor,
+    endCursor: pageInfo.endCursor
   };
 };
 
