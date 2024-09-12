@@ -295,7 +295,8 @@ describe("simpleFormToBsdd", () => {
       parcelCoordinates: null,
       parcelNumbers: null,
       parcelPostalCodes: null,
-      destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut
+      destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
+      destinationCiterneNotWashedOutReason: form.citerneNotWashedOutReason
     });
   });
 
@@ -629,6 +630,7 @@ describe("simpleFormToBsdd", () => {
       destinationOperationNextDestinationCompanyPhone: null,
       destinationOperationNextDestinationCompanyMail: null,
       destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
+      destinationCiterneNotWashedOutReason: form.citerneNotWashedOutReason,
       grouping: [],
       intermediaries: [],
       finalOperations: [],
@@ -824,7 +826,8 @@ describe("simpleFormToBsdd", () => {
         nextDestinationNotificationNumber: null,
         nextDestinationProcessingOperation: null,
         grouping: [],
-        destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut
+        destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
+        destinationCiterneNotWashedOutReason: form.citerneNotWashedOutReason
       }
     });
   });
