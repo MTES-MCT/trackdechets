@@ -13,6 +13,9 @@ export async function checkCanCreate(user: User, delegator: Company) {
     where: {
       userId: user.id,
       companyId: delegator.id
+    },
+    select: {
+      role: true
     }
   });
 
@@ -41,6 +44,9 @@ export async function checkCanAccess(
     where: {
       userId: user.id,
       companyId: { in: [delegate.id, delegator.id] }
+    },
+    select: {
+      id: true
     }
   });
 
