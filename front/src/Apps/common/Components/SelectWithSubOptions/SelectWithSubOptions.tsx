@@ -32,19 +32,20 @@ const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
   }, [selectedOptionsValues, onChange]);
 
   // Close select if user clicks elsewhere in the page
+  const handleClickInPage = (e: MouseEvent) => {
+    if (ref.current && !ref.current.contains(e.target as Node)) {
+      if (isOpen) setIsOpen(false);
+    }
+  };
   useEffect(() => {
-    const handleClickInPage = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        if (isOpen) setIsOpen(false);
-      }
-    };
+    if (isOpen) {
+      window.addEventListener("click", handleClickInPage);
 
-    window.addEventListener("click", handleClickInPage);
-
-    return () => {
-      window.removeEventListener("click", handleClickInPage);
-    };
-  }, [isOpen, ref]);
+      return () => {
+        window.removeEventListener("click", handleClickInPage);
+      };
+    }
+  }, [isOpen]);
 
   const mapOptions = (options, parentPaths: string[] = [], ml = 0) => (
     <>

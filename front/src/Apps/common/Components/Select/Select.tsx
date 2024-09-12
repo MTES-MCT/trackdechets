@@ -39,12 +39,24 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     ref
   ) => {
     const select: ReactNode = useMemo(() => {
-      const hasSubOptions = options.find(o => o.options?.length);
+      const hasSubOptions = options.some(o => o.options?.length);
 
-      const selectWithSubOptions = (
-        <SelectWithSubOptions options={options} onChange={onChange} />
-      );
-      const regularSelect = (
+      if (hasSubOptions) {
+        return <SelectWithSubOptions options={options} onChange={onChange} />;
+      } else if (isMultiple) {
+        return (
+          <MultiSelectWrapper
+            options={options}
+            selected={selected}
+            onChange={onChange}
+            placeholder={placeholder}
+            disableSearch={disableSearch}
+            showRendererText={showRendererText}
+          />
+        );
+      }
+
+      return (
         <select
           ref={ref}
           id={id}
@@ -62,20 +74,6 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           ))}
         </select>
       );
-      const multipleSelect = (
-        <MultiSelectWrapper
-          options={options}
-          selected={selected}
-          onChange={onChange}
-          placeholder={placeholder}
-          disableSearch={disableSearch}
-          showRendererText={showRendererText}
-        />
-      );
-
-      if (hasSubOptions) return selectWithSubOptions;
-      else if (isMultiple) return multipleSelect;
-      return regularSelect;
     }, [
       label,
       options,
