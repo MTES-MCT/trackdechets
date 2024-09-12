@@ -1003,10 +1003,7 @@ describe("dashboardServices", () => {
         }
       },
       worker: {
-        isDisabled: true,
-        company: {
-          siret: "currentSiret"
-        }
+        isDisabled: true
       }
     } as BsdDisplay;
 
@@ -1047,9 +1044,56 @@ describe("dashboardServices", () => {
       expect(result).toEqual(SIGNER);
     });
 
-    it("should return SIGNER when currentSiret is same as transporter, bsd type is bsda, and bsd workflow type is gathering", () => {
+    it("should return SIGNER when currentSiret is same as transporter, bsd type is bsda, there is no worker and bsd workflow type is gathering", () => {
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignTransport
+      ];
+      const result = getSignByProducerBtnLabel(
+        "currentSiret",
+        {
+          ...bsd,
+          type: BsdType.Bsda,
+          bsdWorkflowType: BsdaType.Gathering,
+          transporter: {
+            company: { siret: "currentSiret", orgId: "currentSiret" }
+          }
+        },
+        permissions,
+        "actTab"
+      );
+      expect(result).toEqual(SIGNER);
+    });
+
+    it("should return SIGNER when currentSiret is same as worker, bsd type is bsda, and bsd workflow type is gathering", () => {
+      const permissions: UserPermission[] = [UserPermission.BsdCanSignWork];
+      const result = getSignByProducerBtnLabel(
+        "currentSiret",
+        {
+          ...bsd,
+          type: BsdType.Bsda,
+          bsdWorkflowType: BsdaType.Gathering,
+          transporter: {
+            company: { siret: "otherSiret", orgId: "otherSiret" }
+          },
+
+          worker: {
+            ...bsd.worker,
+            isDisabled: false,
+            company: {
+              siret: "currentSiret"
+            }
+          }
+        },
+        permissions,
+        "actTab"
+      );
+      expect(result).toEqual(SIGNER);
+    });
+
+    it("should return SIGNER when currentSiret is same as worker and transporter, bsd type is bsda, and bsd workflow type is gathering", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignTransport,
+        UserPermission.BsdCanSignWork
       ];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
@@ -1063,7 +1107,36 @@ describe("dashboardServices", () => {
 
           worker: {
             ...bsd.worker,
-            isDisabled: true,
+            isDisabled: false,
+            company: {
+              siret: "currentSiret"
+            }
+          }
+        },
+        permissions,
+        "actTab"
+      );
+      expect(result).toEqual(SIGNER);
+    });
+
+    it("should return an empty string when currentSiret is same as transporter, bsd type is bsda, there is a worker, and bsd workflow type is gathering", () => {
+      const permissions: UserPermission[] = [
+        UserPermission.BsdCanSignTransport,
+        UserPermission.BsdCanSignWork
+      ];
+      const result = getSignByProducerBtnLabel(
+        "currentSiret",
+        {
+          ...bsd,
+          type: BsdType.Bsda,
+          bsdWorkflowType: BsdaType.Gathering,
+          transporter: {
+            company: { siret: "currentSiret", orgId: "currentSiret" }
+          },
+
+          worker: {
+            ...bsd.worker,
+            isDisabled: false,
             company: {
               siret: "otherSiret"
             }
@@ -1072,7 +1145,7 @@ describe("dashboardServices", () => {
         permissions,
         "actTab"
       );
-      expect(result).toEqual(SIGNER);
+      expect(result).toEqual("");
     });
 
     it("should return SIGNER when bsd type is bsvhu", () => {
@@ -1112,7 +1185,17 @@ describe("dashboardServices", () => {
       const permissions: UserPermission[] = [UserPermission.BsdCanSignWork];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
-        bsd,
+        {
+          ...bsd,
+          type: BsdType.Bsda,
+          worker: {
+            ...bsd.worker,
+            isDisabled: false,
+            company: {
+              siret: "currentSiret"
+            }
+          }
+        },
         permissions,
         "toCollectTab"
       );

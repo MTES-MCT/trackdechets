@@ -13,10 +13,10 @@ type TransporterProps = {
   frameNumber: number;
 };
 
-const Transporter: React.FC<TransporterProps> = ({
+const Transporter = ({
   transporter,
   frameNumber
-}) => {
+}: TransporterProps): React.JSX.Element => {
   return (
     <div className="BoxRow">
       <div className="BoxCol">

@@ -579,6 +579,7 @@ export const dropdownCreateLinks = (siret, location) => [
   {
     title: dropdown_create_bsvhu,
     route: generatePath(routes.dashboard.bsvhus.create, { siret }),
+    state: { background: location },
     icon: <IconBSVhu />
   },
   {

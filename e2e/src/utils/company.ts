@@ -6,7 +6,7 @@ type CompanyRole =
   | "Producteur de déchets : producteurs de déchets, y compris T&S"
   | "Transporteur"
   | "Installation de collecte de déchets apportés par le producteur initial"
-  | "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)"
+  | "Installation de traitement de VHU"
   | "Installation de Tri, transit regroupement de déchets y compris non classée"
   | "Installation de traitement"
   | "Négociant"
@@ -16,7 +16,10 @@ type CompanyRole =
   | "Installation de valorisation de T&S"
   | "Installation dans laquelle les déchets perdent leur statut de déchet";
 
-type CompanySubRole = "Crématorium (et cimetières pour la Guyane)";
+type CompanySubRole =
+  | "Crématorium (et cimetières pour la Guyane)"
+  | "Broyeur VHU"
+  | "Casse automobile / démolisseur";
 
 interface Company {
   name: string;
@@ -67,7 +70,7 @@ export const getCreateButtonName = (roles: CompanyRole[]) => {
     if (
       [
         "Installation de collecte de déchets apportés par le producteur initial",
-        "Installation de traitement de VHU (casse automobile et/ou broyeur agréé)",
+        "Installation de traitement de VHU",
         "Installation de Tri, transit regroupement de déchets y compris non classée",
         "Transporteur",
         "Installation de traitement",
@@ -229,9 +232,11 @@ export const fillInGenericCompanyInfo = async (
     await page.getByText(role, { exact: true }).click();
 
   // Select the subRole
-  company.subRoles?.forEach(
-    async subRole => await page.getByText(subRole, { exact: true }).click()
-  );
+  if (company.subRoles) {
+    for (const subRole of company.subRoles) {
+      await page.getByText(subRole, { exact: true }).click();
+    }
+  }
 };
 
 /**
@@ -302,10 +307,10 @@ export const fillInVHUAgrement = async (
   { agrement }: { agrement: VHUAgrement }
 ) => {
   await page
-    .locator(`input[name="vhuAgrement${agrement.type}Number"]`)
+    .locator(`input[name="vhuAgrement${agrement.type}.agrementNumber"]`)
     .fill(agrement.number);
   await page
-    .locator(`input[name="vhuAgrement${agrement.type}Department"]`)
+    .locator(`input[name="vhuAgrement${agrement.type}.department"]`)
     .fill(agrement.department);
 };
 
@@ -350,9 +355,12 @@ export const submitAndVerifyGenericInfo = async (
   for (const role of company.roles) {
     await expect(rolesDiv.getByText(role)).toBeVisible();
   }
-  company.subRoles?.forEach(async subRole => {
-    await expect(rolesDiv.getByText(subRole)).toBeVisible();
-  });
+  if (company.subRoles) {
+    for (const subRole of company.subRoles) {
+      await expect(rolesDiv.getByText(subRole)).toBeVisible();
+    }
+  }
+
   await expect(companyDiv.getByText(`Nom Usuel${company.name}`)).toBeVisible();
   await expect(companyDiv.getByText("AdresseAdresse test")).toBeVisible();
   await expect(companyDiv.getByText("Code NAFXXXXX -")).toBeVisible();

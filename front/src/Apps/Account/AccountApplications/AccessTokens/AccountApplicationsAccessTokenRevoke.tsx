@@ -29,6 +29,7 @@ export default function AccountApplicationsAccessTokenRevoke({
       title="Révoquer un jeton d'accès"
       ariaLabel="Révoquer un jeton d'accès"
       onClose={onClose}
+      closeLabel="Ne pas révoquer"
       isOpen
     >
       <div>Êtes vous certain.e de vouloir révoquer ce jeton d'accès ? </div>
@@ -37,9 +38,6 @@ export default function AccountApplicationsAccessTokenRevoke({
         d'accès ne pourront plus accéder à l'API Trackdéchets
       </div>
       <div className="td-modal-actions">
-        <button className="fr-btn" onClick={() => onClose()}>
-          Annuler
-        </button>
         <button
           className="fr-btn fr-btn--secondary"
           onClick={() =>
@@ -47,9 +45,10 @@ export default function AccountApplicationsAccessTokenRevoke({
           }
           disabled={loading}
         >
-          {loading
-            ? "Révocation..."
-            : "J'ai compris, révoquer ce jeton d'accès"}
+          {loading ? "Révocation..." : "Révoquer"}
+        </button>
+        <button className="fr-btn" onClick={() => onClose()}>
+          Ne pas révoquer
         </button>
       </div>
       {error && <NotificationError apolloError={error} />}

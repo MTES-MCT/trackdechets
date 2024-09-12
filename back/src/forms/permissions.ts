@@ -561,11 +561,17 @@ export async function checkCanImportForm(
 
 export async function checkCanRequestRevision(user: User, form: Form) {
   const fullForm = await getFullForm(form);
+
+  const transporterIsAuthorized =
+    fullForm.emitterType === EmitterType.APPENDIX1_PRODUCER &&
+    fullForm.takenOverAt;
+
   const authorizedOrgIds = [
     fullForm.emitterCompanySiret,
     fullForm.recipientCompanySiret,
     fullForm.ecoOrganismeSiret,
-    fullForm.forwardedIn?.recipientCompanySiret
+    fullForm.forwardedIn?.recipientCompanySiret,
+    ...(transporterIsAuthorized ? form.transportersSirets : [])
   ].filter(Boolean);
 
   return checkUserPermissions(

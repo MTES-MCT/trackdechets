@@ -25,14 +25,14 @@ import {
   getRevisionPath,
   getUpdatePath
 } from "../../dashboardUtils";
-import DraftValidation from "../Validation/Draft/DraftValidation";
+import DraftValidation from "../../Validation/workflow/Draft/DraftValidation";
 import routes from "../../../routes";
-import ActBsddValidation from "../Validation/Act/ActBsddValidation";
-import ActBsdSuiteValidation from "../Validation/Act/ActBsdSuiteValidation";
-import ActBsdaValidation from "../Validation/Act/ActBsdaValidation";
-import ActBsffValidation from "../Validation/Act/ActBsffValidation";
-import ActBsvhuValidation from "../Validation/Act/ActBsvhuValidation";
-import ActBspaohValidation from "../Validation/Act/ActBspaohValidation";
+import ActBsddValidation from "../../Validation/workflow/Act/ActBsddValidation";
+import ActBsdSuiteValidation from "../../Validation/workflow/Act/ActBsdSuiteValidation";
+import ActBsdaValidation from "../../Validation/workflow/Act/ActBsdaValidation";
+import ActBsffValidation from "../../Validation/workflow/Act/ActBsffValidation";
+import ActBsvhuValidation from "../../Validation/workflow/Act/ActBsvhuValidation";
+import ActBspaohValidation from "../../Validation/workflow/Act/ActBspaohValidation";
 import { BsdDisplay } from "../../../common/types/bsdTypes";
 import {
   canApproveOrRefuseReview,

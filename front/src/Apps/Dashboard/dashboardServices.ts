@@ -296,6 +296,9 @@ const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
     bsd.temporaryStorageDetail?.transporter?.company?.orgId
   ].includes(currentSiret);
 
+const hasWorker = (bsd: BsdDisplay): boolean =>
+  isBsda(bsd.type) && !bsd.worker?.isDisabled && !!bsd.worker?.company?.siret;
+
 const isSameSiretTemporaryStorageTransporter = (
   currentSiret: string,
   bsd: BsdDisplay
@@ -802,8 +805,11 @@ export const getSignByProducerBtnLabel = (
           isReshipment(bsd.bsdWorkflowType?.toString()) ||
           isOtherCollection(bsd.bsdWorkflowType?.toString()) ||
           bsd.worker?.isDisabled) &&
-        (permissions.includes(UserPermission.BsdCanSignTransport) ||
-          permissions.includes(UserPermission.BsdCanSignWork))) ||
+        ((!hasWorker(bsd) &&
+          permissions.includes(UserPermission.BsdCanSignTransport)) ||
+          (hasWorker(bsd) &&
+            currentSiret === bsd.worker?.company?.siret &&
+            permissions.includes(UserPermission.BsdCanSignWork)))) ||
       isBsvhu(bsd.type)
     ) {
       return SIGNER;
@@ -819,10 +825,8 @@ export const getSignByProducerBtnLabel = (
     }
 
     if (
-      (currentSiret === bsd.worker?.company?.siret &&
-        permissions.includes(UserPermission.BsdCanSignWork)) ||
-      (currentSiret === bsd.transporter?.company?.orgId &&
-        permissions.includes(UserPermission.BsdCanSignTransport))
+      currentSiret === bsd.worker?.company?.siret &&
+      permissions.includes(UserPermission.BsdCanSignWork)
     ) {
       return SIGNER;
     }
@@ -1323,8 +1327,10 @@ const canReviewBsdasri = (bsd, siret) => {
 export const canReviewBsdd = (bsd, siret) => {
   const isSentStatus = BsdStatusCode.Sent === bsd.status;
 
-  const isMultimodal =
-    Boolean(bsd.transporters) && bsd.transporters?.length > 1;
+  const isMultimodalTransporter =
+    !!bsd.transporters &&
+    bsd.transporters.length > 1 &&
+    (bsd.transporters as Transporter[]).some(t => t.company?.orgId === siret);
 
   return (
     bsd.type === BsdType.Bsdd &&
@@ -1351,7 +1357,7 @@ export const canReviewBsdd = (bsd, siret) => {
       canUpdateBsd(bsd, siret) &&
       bsd.status === BsdStatusCode.SignedByProducer
     ) &&
-    !isMultimodal
+    !isMultimodalTransporter
   );
 };
 

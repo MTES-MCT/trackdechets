@@ -9,10 +9,10 @@ type TransporterTransportPlatesProps = {
   readonly fieldName: string;
 };
 
-const TransportPlates: React.FC<TransporterTransportPlatesProps> = ({
+const TransportPlates = ({
   bsdType,
   fieldName
-}) => {
+}: TransporterTransportPlatesProps): React.JSX.Element => {
   if (bsdType === BsdType.Bsdd) {
     return (
       <Field name={fieldName}>

@@ -8,7 +8,7 @@ import SignTransportForm from "./SignTransportForm";
 import routes from "../../../../../Apps/routes";
 import { useMatch } from "react-router-dom";
 import { usePermissions } from "../../../../../common/contexts/PermissionsContext";
-import { SignReception } from "../../../../../Apps/Dashboard/Components/Validation/BSDD/SignReception";
+import { SignReception } from "../../../../../Apps/Dashboard/Validation/BSDD/SignReception";
 
 export interface WorkflowActionProps {
   form: Form;

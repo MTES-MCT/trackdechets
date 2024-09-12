@@ -1856,7 +1856,8 @@ describe("processedInfoSchema", () => {
     }
   ];
 
-  it.each(testMatrix)(
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  it.skip.each(testMatrix)(
     "should throw when `nextDestinationNotificationNumber` is missing %o",
     async ({
       noTraceability,
@@ -1895,7 +1896,8 @@ describe("processedInfoSchema", () => {
     }
   );
 
-  it("should also throw when `nextDestinationNotificationNumber` is null", async () => {
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  it.skip("should also throw when `nextDestinationNotificationNumber` is null", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1926,7 +1928,7 @@ describe("processedInfoSchema", () => {
   });
 
   it.each(testMatrix)(
-    "should pas when `nextDestinationNotificationNumber` is provided %o",
+    "should pass when `nextDestinationNotificationNumber` is provided %o",
     async ({
       wasteDetailsCode,
       wasteDetailsPop,

@@ -26,6 +26,7 @@ export default function AccountApplicationsAccessTokenRevokeAll({
       title="Révoquer tous les jetons d'accès"
       ariaLabel="Supprimer tous les jetons d'accès ?"
       onClose={onClose}
+      closeLabel="Ne pas révoquer"
       isOpen
     >
       <div>
@@ -39,15 +40,15 @@ export default function AccountApplicationsAccessTokenRevokeAll({
         accès.
       </div>
       <div className="td-modal-actions">
-        <button className="fr-btn" onClick={() => onClose()}>
-          Annuler
-        </button>
         <button
           className="fr-btn fr-btn--secondary"
           onClick={() => revokeAllAccessTokens()}
           disabled={loading}
         >
           {loading ? "Suppression..." : "Révoquer"}
+        </button>
+        <button className="fr-btn" onClick={() => onClose()}>
+          Ne pas révoquer
         </button>
       </div>
       {error && <NotificationError apolloError={error} />}

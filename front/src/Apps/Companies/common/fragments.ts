@@ -8,6 +8,7 @@ const AccountFieldCompanyTypesFragment = {
       companyTypes
       collectorTypes
       wasteProcessorTypes
+      wasteVehiclesTypes
       userRole
       workerCertification {
         id
