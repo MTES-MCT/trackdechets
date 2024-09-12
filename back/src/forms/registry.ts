@@ -406,7 +406,8 @@ export function toGenericWaste(
     emitterCompanyCity,
     emitterCompanyCountry,
     emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret
+    emitterCompanySiret: bsdd.emitterCompanySiret,
+    destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut
   };
 }
 

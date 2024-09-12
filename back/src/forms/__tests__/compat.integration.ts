@@ -294,7 +294,9 @@ describe("simpleFormToBsdd", () => {
       parcelCities: null,
       parcelCoordinates: null,
       parcelNumbers: null,
-      parcelPostalCodes: null
+      parcelPostalCodes: null,
+      destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
+      destinationCiterneNotWashedOutReason: form.citerneNotWashedOutReason
     });
   });
 
@@ -627,6 +629,8 @@ describe("simpleFormToBsdd", () => {
       destinationOperationNextDestinationCompanyContact: null,
       destinationOperationNextDestinationCompanyPhone: null,
       destinationOperationNextDestinationCompanyMail: null,
+      destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
+      destinationCiterneNotWashedOutReason: form.citerneNotWashedOutReason,
       grouping: [],
       intermediaries: [],
       finalOperations: [],
@@ -821,7 +825,9 @@ describe("simpleFormToBsdd", () => {
         forwardedInId: fullForwardedInForm.id,
         nextDestinationNotificationNumber: null,
         nextDestinationProcessingOperation: null,
-        grouping: []
+        grouping: [],
+        destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
+        destinationCiterneNotWashedOutReason: form.citerneNotWashedOutReason
       }
     });
   });

@@ -292,7 +292,9 @@ describe("Mutation.duplicateForm", () => {
       "canAccessDraftSirets",
       "forwardedIn",
       "destinationOperationMode",
-      "quantityGrouped"
+      "quantityGrouped",
+      "citerneNotWashedOutReason",
+      "hasCiterneBeenWashedOut"
     ];
 
     const expectedSkippedTransporter = [
@@ -616,7 +618,9 @@ describe("Mutation.duplicateForm", () => {
       "ecoOrganismeSiret",
       "transporters",
       "destinationOperationMode",
-      "quantityGrouped"
+      "quantityGrouped",
+      "citerneNotWashedOutReason",
+      "hasCiterneBeenWashedOut"
     ];
 
     // make sure this test breaks when a new field is added to the Form model

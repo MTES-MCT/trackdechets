@@ -7,7 +7,8 @@ import {
   WasteAcceptationStatus,
   EmitterType,
   Status,
-  OperationMode
+  OperationMode,
+  CiterneNotWashedOutReason
 } from "@prisma/client";
 import * as QRCode from "qrcode";
 import concatStream from "concat-stream";
@@ -37,7 +38,8 @@ import { FormCompanyDetails } from "../../common/pdf/components/FormCompanyDetai
 import { isFrenchCompany } from "../../companies/validation";
 import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
 import { displayWasteQuantity } from "../../registry/utils";
-import { dateToXMonthAtHHMM } from "../../common/helpers";
+import { dateToXMonthAtHHMM, isDefined } from "../../common/helpers";
+import { getCiterneNotWashedOutReasonLabel } from "../helpers/citerneNotWashedOutReason";
 
 type ReceiptFieldsProps = Partial<
   Pick<
@@ -104,8 +106,10 @@ function AcceptationFields({
   wasteRefusalReason,
   signedAt,
   quantityReceived,
-  quantityRefused
-}: AcceptationFieldsProps) {
+  quantityRefused,
+  hasCiterneBeenWashedOut,
+  citerneNotWashedOutReason
+}: AcceptationFieldsProps & CharteCiterneProps) {
   const wasteQuantities = bsddWasteQuantities({
     wasteAcceptationStatus,
     quantityReceived,
@@ -145,10 +149,45 @@ function AcceptationFields({
       Motif de refus (même partiel) :<br />
       {wasteRefusalReason}
       <br />
+      <CharteCiterne
+        hasCiterneBeenWashedOut={hasCiterneBeenWashedOut}
+        citerneNotWashedOutReason={citerneNotWashedOutReason}
+      />
       Date de signature : {formatDate(signedAt)}
       <br />
     </p>
   );
+}
+
+type CharteCiterneProps = {
+  hasCiterneBeenWashedOut?: boolean | null;
+  citerneNotWashedOutReason?: CiterneNotWashedOutReason | null;
+};
+
+function CharteCiterne({
+  hasCiterneBeenWashedOut,
+  citerneNotWashedOutReason
+}: CharteCiterneProps) {
+  if (!isDefined(hasCiterneBeenWashedOut)) return null;
+
+  if (hasCiterneBeenWashedOut) {
+    return (
+      <>
+        Charte "Rinçage des citernes": <b>Rinçage effectué</b>
+        <br />
+        <br />
+      </>
+    );
+  } else {
+    return (
+      <>
+        Charte "Rinçage des citernes": <b>Rinçage non effectué</b>,{" "}
+        {getCiterneNotWashedOutReasonLabel(citerneNotWashedOutReason)}
+        <br />
+        <br />
+      </>
+    );
+  }
 }
 
 type RecipientFormCompanyFieldsProps = {

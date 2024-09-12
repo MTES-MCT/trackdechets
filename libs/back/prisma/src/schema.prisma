@@ -523,6 +523,8 @@ model Form {
   noTraceability                        Boolean?
   destinationOperationMode              OperationMode?
   currentTransporterOrgId               String?
+  hasCiterneBeenWashedOut               Boolean?
+  citerneNotWashedOutReason             CiterneNotWashedOutReason?
 
   transporters BsddTransporter[]
   groupedIn    FormGroupement[]  @relation("GroupedIn")
@@ -2007,4 +2009,11 @@ enum BspaohStatus {
 enum BspaohType {
   PAOH
   FOETUS
+}
+
+enum CiterneNotWashedOutReason {
+  EXEMPTED
+  INCOMPATIBLE
+  UNAVAILABLE
+  NOT_BY_DRIVER
 }

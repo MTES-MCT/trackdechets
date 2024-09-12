@@ -44,6 +44,7 @@ import {
 } from "../common/validation";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
+  CiterneNotWashedOutReason,
   CompanyInput,
   InitialFormFractionInput,
   PackagingInfo,
@@ -73,6 +74,7 @@ import { getOperationModesFromOperationCode } from "../common/operationModes";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
+import { isDefined } from "../common/helpers";
 
 // set yup default error messages
 configureYup();
@@ -1346,6 +1348,66 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
               "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
               v => !v
             )
+    ),
+  hasCiterneBeenWashedOut: yup
+    .boolean()
+    .notRequired()
+    .nullable()
+    .test(
+      "not-defined-if-not-citerne",
+      "Vous ne pouvez préciser si la citerne a été rincée si le conditionnement du déchet n'est pas une citerne",
+      (value, context) => {
+        const { wasteDetailsPackagingInfos } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        const hasCiterne = wasteDetailsPackagingInfos.some(
+          info => info.type === "CITERNE"
+        );
+
+        return hasCiterne;
+      }
+    )
+    .test(
+      "not-defined-if-waste-not-accepted",
+      "Vous ne pouvez préciser si la citerne a été rincée que si le déchet a été totalement accepté",
+      (value, context) => {
+        const { wasteAcceptationStatus } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        return Boolean(wasteAcceptationStatus === "ACCEPTED");
+      }
+    ),
+  citerneNotWashedOutReason: yup
+    .mixed<CiterneNotWashedOutReason>()
+    .notRequired()
+    .nullable()
+    .test(
+      "reason-if-not-washed",
+      "Vous devez préciser la raison pour laquelle la citerne n'a pas été rincée",
+      (value, context) => {
+        const { hasCiterneBeenWashedOut } = context.parent;
+
+        if (hasCiterneBeenWashedOut === false) {
+          return isDefined(value);
+        }
+
+        return true;
+      }
+    )
+    .test(
+      "no-reason-if-washed-or-undefined",
+      "Vous ne pouvez préciser de raison pour l'absence de rinçage que si la citerne n'a pas été rincée",
+      (value, context) => {
+        const { hasCiterneBeenWashedOut } = context.parent;
+
+        if (hasCiterneBeenWashedOut !== false) {
+          return !isDefined(value);
+        }
+
+        return true;
+      }
     )
 });
 

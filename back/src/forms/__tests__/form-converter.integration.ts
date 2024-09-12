@@ -36,6 +36,8 @@ describe("expandFormFromDb", () => {
       customId: null,
       isImportedFromPaper: false,
       metadata: undefined,
+      citerneNotWashedOutReason: null,
+      hasCiterneBeenWashedOut: null,
       emitter: {
         type: form.emitterType,
         workSite: null,

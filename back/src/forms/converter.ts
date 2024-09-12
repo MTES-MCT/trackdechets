@@ -738,6 +738,8 @@ export function expandFormFromDb(
     wasteRefusalReason: forwardedIn
       ? forwardedIn.wasteRefusalReason
       : form.wasteRefusalReason,
+    hasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
+    citerneNotWashedOutReason: form.citerneNotWashedOutReason,
     receivedBy: forwardedIn ? forwardedIn.receivedBy : form.receivedBy,
     receivedAt: processDate(
       forwardedIn ? forwardedIn.receivedAt : form.receivedAt

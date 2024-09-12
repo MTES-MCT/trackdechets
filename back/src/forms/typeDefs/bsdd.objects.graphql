@@ -91,6 +91,12 @@ type Form {
   "Raison du refus (case 10)"
   wasteRefusalReason: String
 
+  "Charte citerne - Est-ce que la citerne a été rincée ou non?"
+  hasCiterneBeenWashedOut: Boolean
+
+  "Charte citerne - Raison pour laquelle la citerne n'a pas été rincée"
+  citerneNotWashedOutReason: CiterneNotWashedOutReason
+
   "Nom de la personne en charge de la réception du déchet (case 10)"
   receivedBy: String
 
