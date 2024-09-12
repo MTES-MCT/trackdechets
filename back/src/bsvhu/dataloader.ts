@@ -17,5 +17,5 @@ async function getBsvhus(bsvhuIds: string[]) {
     bsvhus.map((bsvhu: Bsvhu) => [bsvhu.id, bsvhu])
   );
 
-  return bsvhuIds.map(bsdaId => dict[bsdaId]);
+  return bsvhuIds.map(bsvhuId => dict[bsvhuId]);
 }

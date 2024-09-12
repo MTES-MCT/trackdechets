@@ -18,5 +18,5 @@ async function getBspaohs(bspaohIds: string[]) {
     bspaohs.map((bspaoh: PrismaBspaohWithTransporters) => [bspaoh.id, bspaoh])
   );
 
-  return bspaohIds.map(bsdaId => dict[bsdaId]);
+  return bspaohIds.map(bspaohId => dict[bspaohId]);
 }
