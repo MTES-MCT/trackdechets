@@ -7,9 +7,6 @@ import {
   createRndtsDeclarationDelegationInputSchema
 } from "./schema";
 
-/*
- * Vérification synchrone de l'input de création d'une rndtsDeclarationDelegation
- */
 export function parseCreateRndtsDeclarationDelegationInput(
   input: CreateRndtsDeclarationDelegationInput
 ) {

@@ -1,3 +1,4 @@
+import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationCreateRndtsDeclarationDelegationArgs,
@@ -17,6 +18,9 @@ const createRndtsDeclarationDelegation = async (
   { input }: MutationCreateRndtsDeclarationDelegationArgs,
   context: GraphQLContext
 ) => {
+  // Browser only
+  applyAuthStrategies(context, [AuthType.Session]);
+
   // User must be authenticated
   const user = checkIsAuthenticated(context);
 
