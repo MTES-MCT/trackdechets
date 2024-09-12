@@ -26,9 +26,7 @@ const AccountMembershipRequest = lazy(
   () => import("../../../Account/AccountMembershipRequest")
 );
 const FormContainer = lazy(() => import("../../../../form/bsdd/FormContainer"));
-const BsvhuFormContainer = lazy(
-  () => import("../../../../form/bsvhu/FormContainer")
-);
+
 const BsffFormContainer = lazy(
   () => import("../../../../form/bsff/FormContainer")
 );
@@ -191,24 +189,6 @@ export default function LayoutContainer() {
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <FormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboard.bsvhus.create}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsvhuFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboard.bsvhus.edit}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <BsvhuFormContainer />
               </RequireAuth>
             }
           />

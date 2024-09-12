@@ -1,10 +1,5 @@
 import * as yup from "yup";
-import {
-  CollectorType,
-  Company,
-  CompanyType,
-  WasteProcessorType
-} from "@prisma/client";
+import { Company, CompanyType, WasteProcessorType } from "@prisma/client";
 import {
   cleanClue,
   isForeignVat,
@@ -61,63 +56,6 @@ export function isWorker(company: Company) {
 export function hasCremationProfile(company: Company) {
   return company.wasteProcessorTypes.includes(WasteProcessorType.CREMATION);
 }
-
-const toSet = (_, value) => [...new Set(value?.filter(Boolean))];
-
-export const companyTypesValidationSchema = yup.object({
-  companyTypes: yup
-    .array()
-    .of(yup.string().oneOf(Object.values(CompanyType)))
-    .ensure()
-    .compact()
-    .transform(toSet)
-    .required()
-    .min(1),
-  collectorTypes: yup
-    .array()
-    .of(yup.string().oneOf(Object.values(CollectorType)))
-    // .ensure()
-    .compact()
-    .transform(toSet)
-    .test(
-      "collectorTypes",
-      "Your company needs to be a Collector to have collectorTypes",
-      async (collectorTypes, ctx) => {
-        const { companyTypes } = ctx.parent;
-
-        if (
-          collectorTypes?.length &&
-          !companyTypes.includes(CompanyType.COLLECTOR)
-        ) {
-          return false;
-        }
-
-        return true;
-      }
-    ),
-  wasteProcessorTypes: yup
-    .array()
-    .of(yup.string().oneOf(Object.values(WasteProcessorType)))
-    // .ensure()
-    .compact()
-    .transform(toSet)
-    .test(
-      "wasteProcessorTypes",
-      "Your company needs to be a WasteProcessor to have wasteProcessorTypes",
-      async (wasteProcessorTypes, ctx) => {
-        const { companyTypes } = ctx.parent;
-
-        if (
-          wasteProcessorTypes?.length &&
-          !companyTypes.includes(CompanyType.WASTEPROCESSOR)
-        ) {
-          return false;
-        }
-
-        return true;
-      }
-    )
-});
 
 const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
 export const getcompanyCountry = (

@@ -10,7 +10,10 @@ import {
 import Tooltip from "./Tooltip";
 
 const OperationModeSelect = ({ operationCode, name }) => {
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue, values } = useFormikContext();
+
+  const modeValue = values?.["destination"]?.operation?.mode;
+
   const modes = useMemo(
     () => getOperationModesFromOperationCode(operationCode),
     [operationCode]
@@ -24,11 +27,11 @@ const OperationModeSelect = ({ operationCode, name }) => {
     // If the available modes change, and only ONE option is available,
     // select it by default. Else, reset the selection
     else if (modes.length > 1) {
-      setFieldValue(name, undefined);
+      setFieldValue(name, modeValue);
     } else {
       setFieldValue(name, modes[0]);
     }
-  }, [modes, name, setFieldValue]);
+  }, [modes, name, setFieldValue, modeValue]);
 
   if (!modes.length) return null;
 

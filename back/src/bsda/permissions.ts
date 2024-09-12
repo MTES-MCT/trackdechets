@@ -290,11 +290,13 @@ export async function checkCanUpdateBsdaTransporter(
 }
 
 export async function checkCanDelete(user: User, bsda: BsdaWithTransporters) {
-  const authorizedOrgIds = bsda.isDraft
-    ? await contributors(bsda)
-    : bsda.status === BsdaStatus.SIGNED_BY_PRODUCER && bsda.emitterCompanySiret
-    ? [bsda.emitterCompanySiret]
-    : [];
+  const authorizedOrgIds =
+    bsda.status === BsdaStatus.INITIAL
+      ? await contributors(bsda)
+      : bsda.status === BsdaStatus.SIGNED_BY_PRODUCER &&
+        bsda.emitterCompanySiret
+      ? [bsda.emitterCompanySiret]
+      : [];
 
   const errorMsg = bsda.isDraft
     ? "Vous n'êtes pas autorisé à supprimer ce bordereau."

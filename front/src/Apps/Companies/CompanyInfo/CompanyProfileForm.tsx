@@ -1,26 +1,34 @@
 import React from "react";
 import CompanyFormWrapper from "../common/Components/CompanyFormWrapper";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import {
-  BrokerReceipt,
-  CollectorType,
   CompanyPrivate,
   CompanyType,
-  TraderReceipt,
-  TransporterReceipt,
+  Mutation,
+  MutationCreateBrokerReceiptArgs,
+  MutationCreateTraderReceiptArgs,
+  MutationCreateTransporterReceiptArgs,
+  MutationCreateVhuAgrementArgs,
+  MutationCreateWorkerCertificationArgs,
+  MutationDeleteBrokerReceiptArgs,
+  MutationDeleteTraderReceiptArgs,
+  MutationDeleteTransporterReceiptArgs,
+  MutationDeleteWorkerCertificationArgs,
+  MutationUpdateBrokerReceiptArgs,
+  MutationUpdateCompanyArgs,
+  MutationUpdateTraderReceiptArgs,
+  MutationUpdateTransporterReceiptArgs,
+  MutationUpdateVhuAgrementArgs,
+  MutationUpdateWorkerCertificationArgs,
   UserRole,
-  VhuAgrement,
-  WasteProcessorType,
-  WorkerCertification
+  WasteVehiclesType
 } from "@td/codegen-ui";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-import { COMPANY_CONSTANTS, formatDate } from "../common/utils";
-import TdTooltip from "../../../common/components/Tooltip";
+import { formatDate } from "../common/utils";
 import {
-  CREATE_BROKER_RECEIPT_,
-  CREATE_TRADER_RECEIPT_,
-  CREATE_TRANSPORTER_RECEIPT_,
-  CREATE_VHU_AGREMENT_,
+  CREATE_BROKER_RECEIPT,
+  CREATE_TRADER_RECEIPT,
+  CREATE_TRANSPORTER_RECEIPT,
+  CREATE_VHU_AGREMENT,
   CREATE_WORKER_CERTIFICATION,
   DELETE_BROKER_RECEIPT,
   DELETE_TRADER_RECEIPT,
@@ -28,695 +36,705 @@ import {
   DELETE_VHU_AGREMENT,
   DELETE_WORKER_CERTIFICATION,
   UPDATE_BROKER_RECEIPT,
-  UPDATE_COMPANY_BROKER_RECEIPT,
-  UPDATE_COMPANY_COLLECTOR_TYPES,
-  UPDATE_COMPANY_TRADER_RECEIPT,
-  UPDATE_COMPANY_TRANSPORTER_RECEIPT,
-  UPDATE_COMPANY_TYPES,
-  UPDATE_COMPANY_VHU_AGREMENT,
-  UPDATE_COMPANY_VHU_AGREMENT_DEMOLISSEUR,
-  UPDATE_COMPANY_WASTE_PROCESSOR_TYPES,
-  UPDATE_COMPANY_WORKER_CERTIFICATION,
+  UPDATE_COMPANY_PROFILE,
   UPDATE_TRADER_RECEIPT,
   UPDATE_TRANSPORTER_RECEIPT,
   UPDATE_VHU_AGREMENT,
   UPDATE_WORKER_CERTIFICATION
 } from "../common/queries";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Loader } from "../../common/Components";
-import CompanyProfileSubForm from "./CompanyProfileSubForm";
 import { NotificationError } from "../../common/Components/Error/Error";
 import CompanyProfileInformation from "./CompanyProfileInformation";
+import RhfCompanyTypeForm, {
+  RhfCompanyTypeFormField
+} from "../common/Components/CompanyTypeForm/RhfCompanyTypeForm";
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
 }
-interface CompanyProfileFormFields {
-  companyTypes: {
-    label: string | undefined;
-    value: CompanyType | undefined;
-    helpText?: string;
-    isChecked: boolean;
-  }[];
-  workerCertification?: WorkerCertification;
-  transporterReceipt?: TransporterReceipt;
-  brokerReceipt?: BrokerReceipt;
-  traderReceipt?: TraderReceipt;
-  vhuAgrementBroyeur?: VhuAgrement;
-  vhuAgrementDemolisseur?: VhuAgrement;
-  collectorTypes: CollectorType[];
-  wasteProcessorTypes: WasteProcessorType[];
-}
 
 const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
   const [
-    updateCompanyTypes,
-    {
-      data: dataUpdateCompanyType,
-      loading: LoadingCompanyTypes,
-      error: errorCompanyTypes
-    }
-  ] = useMutation(UPDATE_COMPANY_TYPES);
+    updateCompany,
+    { loading: loadingCompanyUpdate, error: errorCompanyUpdate }
+  ] = useMutation<Pick<Mutation, "updateCompany">, MutationUpdateCompanyArgs>(
+    UPDATE_COMPANY_PROFILE
+  );
 
-  const getFormattedComapnyTypes = companyTypes => {
-    const companyTypesFormatted = companyTypes?.map(companyType => {
-      const companyTypeObj = COMPANY_CONSTANTS.find(
-        constant => constant.value === companyType
-      );
-      return {
-        label: companyTypeObj?.label,
-        isChecked: true,
-        value: companyTypeObj?.value,
-        helpText: companyTypeObj?.helpText
-      };
-    });
-
-    const companyTypesAllValues = COMPANY_CONSTANTS.map(companyType => {
-      const companyTypeInitial = companyTypesFormatted?.find(
-        c => c.value === companyType.value
-      );
-      if (companyTypeInitial) {
-        return companyTypeInitial;
-      }
-      return { ...companyType, isChecked: false };
-    });
-
-    return companyTypesAllValues;
-  };
-  const companyTypesFormatted = getFormattedComapnyTypes(company.companyTypes);
-
-  const defaultValues: CompanyProfileFormFields = {
-    companyTypes: companyTypesFormatted || [],
-    vhuAgrementBroyeur: company.vhuAgrementBroyeur as VhuAgrement,
-    vhuAgrementDemolisseur: company.vhuAgrementDemolisseur as VhuAgrement,
-    transporterReceipt: {
+  const defaultValues: RhfCompanyTypeFormField = {
+    companyTypes: company.companyTypes,
+    vhuAgrementBroyeur: company.vhuAgrementBroyeur,
+    vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
+    transporterReceipt: company.transporterReceipt && {
       ...company.transporterReceipt,
       validityLimit: formatDate(company.transporterReceipt?.validityLimit)
-    } as TransporterReceipt,
-    brokerReceipt: {
+    },
+    brokerReceipt: company.brokerReceipt && {
       ...company.brokerReceipt,
       validityLimit: formatDate(company.brokerReceipt?.validityLimit)
-    } as BrokerReceipt,
-    traderReceipt: {
+    },
+    traderReceipt: company.traderReceipt && {
       ...company.traderReceipt,
       validityLimit: formatDate(company.traderReceipt?.validityLimit)
-    } as TraderReceipt,
-    workerCertification: {
+    },
+    workerCertification: company.workerCertification && {
       ...company.workerCertification,
       validityLimit: formatDate(company.workerCertification?.validityLimit)
-    } as WorkerCertification,
+    },
     collectorTypes: company.collectorTypes,
-    wasteProcessorTypes: company.wasteProcessorTypes
+    wasteProcessorTypes: company.wasteProcessorTypes,
+    wasteVehiclesTypes: company.wasteVehiclesTypes,
+    ecoOrganismeAgreements: company.ecoOrganismeAgreements
   };
 
-  const { handleSubmit, reset, formState, register, control, watch } =
-    useForm<CompanyProfileFormFields>({
-      defaultValues,
-      values: dataUpdateCompanyType?.updateCompany && {
-        ...defaultValues,
-        ...dataUpdateCompanyType?.updateCompany,
-        companyTypes: getFormattedComapnyTypes(
-          dataUpdateCompanyType?.updateCompany?.companyTypes
-        )
-      }
+  const { handleSubmit, reset, formState, register, watch, setValue, trigger } =
+    useForm<RhfCompanyTypeFormField>({
+      defaultValues
     });
 
-  const { fields } = useFieldArray<CompanyProfileFormFields>({
-    control, // control props comes from useForm (optional: if you are using FormProvider)
-    name: "companyTypes"
-  });
-
   const [
-    createOrUpdateTransporterReceipt,
-    { loading: LoadingTransportReceipt, error: errorTransportReceipt }
-  ] = useMutation(
-    company.transporterReceipt
-      ? UPDATE_TRANSPORTER_RECEIPT
-      : CREATE_TRANSPORTER_RECEIPT_
-  );
-
-  const [
-    updateCompanyTransporterReceipt,
+    createTransporterReceipt,
     {
-      loading: LoadingUpdateCompanyTransportReceipt,
-      error: errorUpdateCompanyTransportReceipt
+      loading: loadingCreateTransporterReceipt,
+      error: errorCreateTransporterReceipt
     }
-  ] = useMutation(UPDATE_COMPANY_TRANSPORTER_RECEIPT);
-
-  const [deleteTransporterReceipt] = useMutation(DELETE_TRANSPORTER_RECEIPT, {
-    update(cache) {
-      cache.writeFragment({
-        id: `CompanyPrivate:${company.id}`,
-        fragment: gql`
-          fragment TransporterReceiptCompanyFragment on CompanyPrivate {
-            id
-            transporterReceipt {
-              id
-            }
-          }
-        `,
-        data: { transporterReceipt: null }
-      });
-    }
-  });
+  ] = useMutation<
+    Pick<Mutation, "createTransporterReceipt">,
+    MutationCreateTransporterReceiptArgs
+  >(CREATE_TRANSPORTER_RECEIPT);
 
   const [
-    createOrUpdateVhuAgrementBroyeur,
-    { loading: LoadingVhuBroyeur, error: errorVhuBroyeur }
-  ] = useMutation(
-    company.vhuAgrementBroyeur ? UPDATE_VHU_AGREMENT : CREATE_VHU_AGREMENT_
-  );
-
-  const [
-    createOrUpdateVhuAgrementDemolisseur,
-    { loading: LoadingVhuDemolisseur, error: errorVhuDemolisseur }
-  ] = useMutation(
-    company.vhuAgrementDemolisseur ? UPDATE_VHU_AGREMENT : CREATE_VHU_AGREMENT_
-  );
-
-  const [
-    updateCompanyVhuAgrementBroyeur,
+    updateTransporterReceipt,
     {
-      loading: loadingUpdateCompanyVhuBroyeur,
-      error: errorUpdateCompanyVhuBroyeur
+      loading: loadingUpdateTransporterReceipt,
+      error: errorUpdateTransporterReceipt
     }
-  ] = useMutation(UPDATE_COMPANY_VHU_AGREMENT);
+  ] = useMutation<
+    Pick<Mutation, "updateTransporterReceipt">,
+    MutationUpdateTransporterReceiptArgs
+  >(UPDATE_TRANSPORTER_RECEIPT);
+
+  const loadingTransportReceipt =
+    loadingCreateTransporterReceipt || loadingUpdateTransporterReceipt;
+  const errorTransportReceipt =
+    errorCreateTransporterReceipt || errorUpdateTransporterReceipt;
+
+  const [deleteTransporterReceipt] = useMutation<
+    Pick<Mutation, "deleteTransporterReceipt">,
+    MutationDeleteTransporterReceiptArgs
+  >(DELETE_TRANSPORTER_RECEIPT);
 
   const [
-    deleteVhuAgrementBroyeur,
-    { loading: loadingDeleteVhuBroyeur, error: errorDeleteVhuBroyeur }
-  ] = useMutation(DELETE_VHU_AGREMENT, {
-    update(cache) {
-      cache.writeFragment({
-        id: `CompanyPrivate:${company.id}`,
-        fragment: gql`
-          fragment VhuAgrementBroyeurCompanyFragment on CompanyPrivate {
-            id
-            vhuAgrementBroyeur {
-              id
-            }
-          }
-        `,
-        data: { vhuAgrementBroyeur: null }
-      });
-    }
-  });
+    createVhuAgrement,
+    { loading: loadingCreateVhuAgrement, error: errorCreateVhuAgrement }
+  ] = useMutation<
+    Pick<Mutation, "createVhuAgrement">,
+    MutationCreateVhuAgrementArgs
+  >(CREATE_VHU_AGREMENT);
 
   const [
-    updateCompanyVhuAgrementDemolisseur,
-    {
-      loading: loadingUpdateCompanyVhuDemolisseur,
-      error: errorUpdateCompanyVhuDemolisseur
-    }
-  ] = useMutation(UPDATE_COMPANY_VHU_AGREMENT_DEMOLISSEUR);
+    updateVhuAgrement,
+    { loading: loadingUpdateVhuAgrement, error: errorUpdateVhuAgrement }
+  ] = useMutation<
+    Pick<Mutation, "updateVhuAgrement">,
+    MutationUpdateVhuAgrementArgs
+  >(UPDATE_VHU_AGREMENT);
+
+  const loadingVhuAgrement =
+    loadingCreateVhuAgrement || loadingUpdateVhuAgrement;
+  const errorVhuAgrement = errorCreateVhuAgrement || errorUpdateVhuAgrement;
 
   const [
-    deleteVhuAgrementDemolisseur,
-    { loading: loadingDeleteVhuDemolisseur, error: errorDeleteVhuDemolisseur }
-  ] = useMutation(DELETE_VHU_AGREMENT, {
-    update(cache) {
-      cache.writeFragment({
-        id: `CompanyPrivate:${company.id}`,
-        fragment: gql`
-          fragment VhuAgrementDemolisseurCompanyFragment on CompanyPrivate {
-            id
-            vhuAgrementDemolisseur {
-              id
-            }
-          }
-        `,
-        data: { vhuAgrementDemolisseur: null }
-      });
-    }
-  });
+    deleteVhuAgrement,
+    { loading: loadingDeleteVhuAgrement, error: errorDeleteVhuAgrement }
+  ] = useMutation(DELETE_VHU_AGREMENT);
 
   const [
-    createOrUpdateTraderReceipt,
-    {
-      loading: updateOrCreateLoadingTraderReceipt,
-      error: updateOrCreateErrorTraderReceipt
-    }
-  ] = useMutation(
-    company.traderReceipt ? UPDATE_TRADER_RECEIPT : CREATE_TRADER_RECEIPT_
-  );
+    createTraderReceipt,
+    { loading: loadingCreateTraderReceipt, error: errorCreateTraderReceipt }
+  ] = useMutation<
+    Pick<Mutation, "createTraderReceipt">,
+    MutationCreateTraderReceiptArgs
+  >(CREATE_TRADER_RECEIPT);
 
   const [
-    updateCompanyTraderReceipt,
-    {
-      loading: updateCompanyLoadingTraderReceipt,
-      error: updateCompanyErrorTraderReceipt
-    }
-  ] = useMutation(UPDATE_COMPANY_TRADER_RECEIPT);
+    updateTraderReceipt,
+    { loading: loadingUpdateTraderReceipt, error: errorUpdateTraderReceipt }
+  ] = useMutation<
+    Pick<Mutation, "updateTraderReceipt">,
+    MutationUpdateTraderReceiptArgs
+  >(UPDATE_TRADER_RECEIPT);
+
+  const loadingTraderReceipt =
+    loadingCreateTraderReceipt || loadingUpdateTraderReceipt;
+  const errorTraderReceipt =
+    errorCreateTraderReceipt || errorUpdateTraderReceipt;
 
   const [
     deleteTraderReceipt,
     { loading: deleteLoadingTraderReceipt, error: deleteErrorTraderReceipt }
-  ] = useMutation(DELETE_TRADER_RECEIPT, {
-    update(cache) {
-      cache.writeFragment({
-        id: `CompanyPrivate:${company.id}`,
-        fragment: gql`
-          fragment TraderReceiptCompanyFragment on CompanyPrivate {
-            id
-            traderReceipt {
-              id
-            }
-          }
-        `,
-        data: { traderReceipt: null }
-      });
-    }
-  });
+  ] = useMutation<
+    Pick<Mutation, "deleteTraderReceipt">,
+    MutationDeleteTraderReceiptArgs
+  >(DELETE_TRADER_RECEIPT);
 
   const [
-    createOrUpdateBrokerReceipt,
-    {
-      loading: updateOrCreateLoadingBrokerReceipt,
-      error: updateOrCreateErrorBrokerReceipt
-    }
-  ] = useMutation(
-    company.brokerReceipt ? UPDATE_BROKER_RECEIPT : CREATE_BROKER_RECEIPT_
-  );
+    createBrokerReceipt,
+    { loading: loadingCreateBrokerReceipt, error: errorCreateBrokerReceipt }
+  ] = useMutation<
+    Pick<Mutation, "createBrokerReceipt">,
+    MutationCreateBrokerReceiptArgs
+  >(CREATE_BROKER_RECEIPT);
 
   const [
-    updateCompanyBrokerReceipt,
-    {
-      loading: updateCompanyLoadingBrokerReceipt,
-      error: updateCompanyErrorBrokerReceipt
-    }
-  ] = useMutation(UPDATE_COMPANY_BROKER_RECEIPT);
+    updateBrokerReceipt,
+    { loading: loadingUpdateBrokerReceipt, error: errorUpdateBrokerReceipt }
+  ] = useMutation<
+    Pick<Mutation, "updateBrokerReceipt">,
+    MutationUpdateBrokerReceiptArgs
+  >(UPDATE_BROKER_RECEIPT);
+
+  const loadingBrokerReceipt =
+    loadingCreateBrokerReceipt || loadingUpdateBrokerReceipt;
+  const errorBrokerReceipt =
+    errorCreateBrokerReceipt || errorUpdateBrokerReceipt;
 
   const [
     deleteBrokerReceipt,
     { loading: deleteLoadingBrokerReceipt, error: deleteErrorBrokerReceipt }
-  ] = useMutation(DELETE_BROKER_RECEIPT, {
-    update(cache) {
-      cache.writeFragment({
-        id: `CompanyPrivate:${company.id}`,
-        fragment: gql`
-          fragment BrokerReceiptCompanyFragment on CompanyPrivate {
-            brokerReceipt {
-              id
-            }
-          }
-        `,
-        data: { brokerReceipt: null }
-      });
-    }
-  });
+  ] = useMutation<
+    Pick<Mutation, "deleteBrokerReceipt">,
+    MutationDeleteBrokerReceiptArgs
+  >(DELETE_BROKER_RECEIPT);
 
   const [
-    createOrUpdateWorkerCertification,
+    createWorkerCertification,
     {
-      loading: updateOrCreateLoadingWorkerCertif,
-      error: updateOrCreateErrorWorkerCertif
+      loading: loadingCreateWorkerCertification,
+      error: errorCreateWorkerCertification
     }
-  ] = useMutation(
-    company.workerCertification
-      ? UPDATE_WORKER_CERTIFICATION
-      : CREATE_WORKER_CERTIFICATION
-  );
+  ] = useMutation<
+    Pick<Mutation, "createWorkerCertification">,
+    MutationCreateWorkerCertificationArgs
+  >(CREATE_WORKER_CERTIFICATION);
 
   const [
-    updateCompanyWorkerCertification,
+    updateWorkerCertification,
     {
-      loading: updateCompanyWorkerCertifLoading,
-      error: updateCompanyWorkerCertifError
+      loading: loadingUpdateWorkerCertification,
+      error: errorUpdateWorkerCertification
     }
-  ] = useMutation(UPDATE_COMPANY_WORKER_CERTIFICATION);
+  ] = useMutation<
+    Pick<Mutation, "updateWorkerCertification">,
+    MutationUpdateWorkerCertificationArgs
+  >(UPDATE_WORKER_CERTIFICATION);
+
+  const loadingWorkerCertification =
+    loadingCreateWorkerCertification || loadingUpdateWorkerCertification;
+  const errorWorkerCertification =
+    errorCreateWorkerCertification || errorUpdateWorkerCertification;
 
   const [
     deleteWorkerCertification,
     { loading: deleteLoadingWorkerCertif, error: deleteErrorWorkerCertif }
-  ] = useMutation(DELETE_WORKER_CERTIFICATION, {
-    update(cache) {
-      cache.writeFragment({
-        id: `CompanyPrivate:${company.id}`,
-        fragment: gql`
-          fragment WorkerCertificationCompanyFragment on CompanyPrivate {
-            id
-            workerCertification {
-              id
+  ] = useMutation<
+    Pick<Mutation, "deleteWorkerCertification">,
+    MutationDeleteWorkerCertificationArgs
+  >(DELETE_WORKER_CERTIFICATION);
+
+  const handleTransporterReceiptUpdate = async (
+    data: RhfCompanyTypeFormField
+  ) => {
+    let transporterReceiptId: string | null | undefined = undefined;
+    let shouldDeleteTransporterReceipt = false;
+
+    if (data.companyTypes.includes(CompanyType.Transporter)) {
+      if (!!formState.dirtyFields.transporterReceipt) {
+        if (
+          !!data.transporterReceipt?.receiptNumber &&
+          !!data.transporterReceipt?.validityLimit &&
+          !!data.transporterReceipt?.department
+        ) {
+          const transporterReceiptData = {
+            receiptNumber: data.transporterReceipt?.receiptNumber,
+            validityLimit: data.transporterReceipt?.validityLimit as any,
+            department: data.transporterReceipt?.department
+          };
+
+          if (company.transporterReceipt) {
+            // Un récépissé transporteur existe déjà, il suffit de le mettre à jour
+            await updateTransporterReceipt({
+              variables: {
+                input: {
+                  id: company.transporterReceipt.id,
+                  ...transporterReceiptData
+                }
+              }
+            });
+          } else {
+            // L'établissement ne possède pas encore de récépissé transporteur,
+            // il est nécessaire de le créer est de l'associer à l'établissement
+            // en passant le paramètre `transporterReceiptId` à `updateCompany`
+            const { data: newReceiptData } = await createTransporterReceipt({
+              variables: { input: transporterReceiptData }
+            });
+            if (newReceiptData) {
+              transporterReceiptId = newReceiptData.createTransporterReceipt.id;
             }
           }
-        `,
-        data: { workerCertification: null }
-      });
-    }
-  });
-
-  const [
-    updateCompanyCollectorTypes,
-    {
-      loading: updateCompanyCollectorTypesLoading,
-      error: updateCompanyCollectorTypesError
-    }
-  ] = useMutation(UPDATE_COMPANY_COLLECTOR_TYPES);
-
-  const [
-    updateCompanyWasteProcessorTypes,
-    {
-      loading: updateCompanyWasteProcessorTypesLoading,
-      error: updateCompanyWasteProcessorTypesError
-    }
-  ] = useMutation(UPDATE_COMPANY_WASTE_PROCESSOR_TYPES);
-
-  const handleCreateOrUpdateBrokerReceipt = async dataToUpdate => {
-    const input = {
-      ...(company.brokerReceipt?.id ? { id: company.brokerReceipt.id } : {}),
-      receiptNumber: dataToUpdate.brokerReceipt.receiptNumber,
-      validityLimit: dataToUpdate.brokerReceipt.validityLimit,
-      department: dataToUpdate.brokerReceipt.department
-    };
-    const { data } = await createOrUpdateBrokerReceipt({
-      variables: { input }
-    });
-    if (data.createBrokerReceipt) {
-      await updateCompanyBrokerReceipt({
-        variables: {
-          id: company.id,
-          brokerReceiptId: data.createBrokerReceipt.id
+        } else {
+          // on supprime le récépissé
+          transporterReceiptId = null;
+          shouldDeleteTransporterReceipt = true;
         }
-      });
-    }
-  };
-  const handleCreateOrUpdateWorkerCertification = async dataToUpdate => {
-    let input = {
-      ...(company.workerCertification?.id
-        ? { id: company.workerCertification.id }
-        : {}),
-      hasSubSectionFour: dataToUpdate.workerCertification.hasSubSectionFour,
-      hasSubSectionThree: dataToUpdate.workerCertification.hasSubSectionThree
-    };
-
-    if (dataToUpdate.workerCertification.hasSubSectionThree) {
-      input = {
-        ...input,
-        hasSubSectionThree: dataToUpdate.workerCertification.hasSubSectionThree,
-        certificationNumber:
-          dataToUpdate.workerCertification.certificationNumber,
-        validityLimit: dataToUpdate.workerCertification.validityLimit ?? null,
-        organisation: dataToUpdate.workerCertification.organisation
-      } as WorkerCertification;
-    }
-    const { data } = await createOrUpdateWorkerCertification({
-      variables: { input }
-    });
-    if (data.createWorkerCertification) {
-      await updateCompanyWorkerCertification({
-        variables: {
-          id: company.id,
-          workerCertificationId: data.createWorkerCertification.id
-        }
-      });
-    }
-  };
-  const handleCreateOrUpdateTraderReceipt = async dataToUpdate => {
-    const input = {
-      ...(company.traderReceipt?.id ? { id: company.traderReceipt.id } : {}),
-      receiptNumber: dataToUpdate.traderReceipt.receiptNumber,
-      validityLimit: dataToUpdate.traderReceipt.validityLimit,
-      department: dataToUpdate.traderReceipt.department
-    };
-    const { data } = await createOrUpdateTraderReceipt({
-      variables: { input }
-    });
-    if (data.createTraderReceipt) {
-      await updateCompanyTraderReceipt({
-        variables: {
-          id: company.id,
-          traderReceiptId: data.createTraderReceipt.id
-        }
-      });
-    }
-  };
-
-  const handleCreateOrUpdateTransporterReceipt = async dataToUpdate => {
-    const input = {
-      ...(company.transporterReceipt?.id
-        ? { id: company.transporterReceipt.id }
-        : {}),
-      receiptNumber: dataToUpdate.transporterReceipt.receiptNumber,
-      validityLimit: dataToUpdate.transporterReceipt.validityLimit,
-      department: dataToUpdate.transporterReceipt.department
-    };
-    const { data } = await createOrUpdateTransporterReceipt({
-      variables: { input }
-    });
-    if (data.createTransporterReceipt) {
-      await updateCompanyTransporterReceipt({
-        variables: {
-          id: company.id,
-          transporterReceiptId: data.createTransporterReceipt.id
-        }
-      });
-    }
-  };
-
-  const handleCreateOrUpdateVhuAgrementBroyeur = async dataToUpdate => {
-    const inputBroyeur = {
-      ...(company.vhuAgrementBroyeur?.id
-        ? { id: company.vhuAgrementBroyeur.id }
-        : {}),
-
-      agrementNumber: dataToUpdate.vhuAgrementBroyeur.agrementNumber,
-      department: dataToUpdate.vhuAgrementBroyeur.department
-    };
-    const { data: dataBroyeur } = await createOrUpdateVhuAgrementBroyeur({
-      variables: { input: inputBroyeur }
-    });
-    if (dataBroyeur.createVhuAgrement) {
-      await updateCompanyVhuAgrementBroyeur({
-        variables: {
-          id: company.id,
-          vhuAgrementBroyeurId: dataBroyeur.createVhuAgrement.id
-        }
-      });
-    }
-  };
-
-  const handleCreateOrUpdateVhuAgrementDemolisseur = async dataToUpdate => {
-    const inputDemolisseur = {
-      ...(company.vhuAgrementDemolisseur?.id
-        ? { id: company.vhuAgrementDemolisseur.id }
-        : {}),
-
-      agrementNumber: dataToUpdate.vhuAgrementDemolisseur.agrementNumber,
-      department: dataToUpdate.vhuAgrementDemolisseur.department
-    };
-    const { data: dataDemolisseur } =
-      await createOrUpdateVhuAgrementDemolisseur({
-        variables: { input: inputDemolisseur }
-      });
-    if (dataDemolisseur.createVhuAgrement) {
-      await updateCompanyVhuAgrementDemolisseur({
-        variables: {
-          id: company.id,
-          vhuAgrementDemolisseurId: dataDemolisseur.createVhuAgrement.id
-        }
-      });
-    }
-  };
-
-  const handleSubTypesDeletes = async companyTypesToUpdate => {
-    const shouldDeleteWorkerCertification =
-      !companyTypesToUpdate.includes(CompanyType.Worker) &&
-      company.workerCertification;
-    const shouldDeleteTransporterReceipt =
-      !companyTypesToUpdate.includes(CompanyType.Transporter) &&
-      company.transporterReceipt;
-    const shouldDeleteBrokerReceipt =
-      !companyTypesToUpdate.includes(CompanyType.Broker) &&
-      company.brokerReceipt;
-    const shouldDeleteTraderReceipt =
-      !companyTypesToUpdate.includes(CompanyType.Trader) &&
-      company.traderReceipt;
-    const shouldDeleteVhuAgrementBroyeur =
-      !companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
-      company.vhuAgrementBroyeur;
-    const shouldDeleteVhuAgrementDemolisseur =
-      !companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
-      company.vhuAgrementDemolisseur;
-
-    if (shouldDeleteWorkerCertification) {
-      await deleteWorkerCertification({
-        variables: {
-          input: { id: company.workerCertification?.id }
-        }
-      });
-    }
-    if (shouldDeleteBrokerReceipt) {
-      await deleteBrokerReceipt({
-        variables: {
-          input: { id: company.brokerReceipt?.id }
-        }
-      });
-    }
-    if (shouldDeleteTraderReceipt) {
-      await deleteTraderReceipt({
-        variables: {
-          input: { id: company.traderReceipt?.id }
-        }
-      });
-    }
-    if (shouldDeleteTransporterReceipt) {
-      await deleteTransporterReceipt({
-        variables: {
-          input: { id: company.transporterReceipt?.id }
-        }
-      });
-    }
-    if (shouldDeleteVhuAgrementBroyeur) {
-      await deleteVhuAgrementBroyeur({
-        variables: {
-          input: { id: company.vhuAgrementBroyeur?.id }
-        }
-      });
-    }
-    if (shouldDeleteVhuAgrementDemolisseur) {
-      await deleteVhuAgrementDemolisseur({
-        variables: {
-          input: { id: company.vhuAgrementDemolisseur?.id }
-        }
-      });
-    }
-  };
-
-  const handleSubTypesUpdates = async (data, companyTypesToUpdate) => {
-    const shouldCreateOrUpdateWorkerCertification =
-      companyTypesToUpdate.includes(CompanyType.Worker);
-    const shouldCreateOrUpdateTransporterReceipt =
-      companyTypesToUpdate.includes(CompanyType.Transporter) &&
-      data.transporterReceipt.receiptNumber;
-    const shouldCreateOrUpdateBrokerReceipt =
-      companyTypesToUpdate.includes(CompanyType.Broker) &&
-      data.brokerReceipt.receiptNumber;
-    const shouldCreateOrUpdateTraderReceipt =
-      companyTypesToUpdate.includes(CompanyType.Trader) &&
-      data.traderReceipt.receiptNumber;
-    const shouldCreateOrUpdateVhuAgrementBroyeur =
-      companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
-      data.vhuAgrementBroyeur.agrementNumber;
-    const shouldCreateOrUpdateVhuAgrementDemolisseur =
-      companyTypesToUpdate.includes(CompanyType.WasteVehicles) &&
-      data.vhuAgrementDemolisseur.agrementNumber;
-    const hasCollectorType = companyTypesToUpdate.includes(
-      CompanyType.Collector
-    );
-    const hasWasteProcessorType = companyTypesToUpdate.includes(
-      CompanyType.Wasteprocessor
-    );
-    const shouldUpdateCollectorTypes =
-      hasCollectorType || (!hasCollectorType && data.collectorTypes);
-    const shouldUpdateWasteProcessorTypes =
-      hasWasteProcessorType ||
-      (!hasWasteProcessorType && data.wasteProcessorTypes);
-
-    if (shouldUpdateCollectorTypes) {
-      await updateCompanyCollectorTypes({
-        variables: {
-          id: company.id,
-          collectorTypes: hasCollectorType ? data.collectorTypes : []
-        }
-      });
-    }
-    if (shouldUpdateWasteProcessorTypes) {
-      await updateCompanyWasteProcessorTypes({
-        variables: {
-          id: company.id,
-          wasteProcessorTypes: hasWasteProcessorType
-            ? data.wasteProcessorTypes
-            : []
-        }
-      });
-    }
-
-    if (shouldCreateOrUpdateWorkerCertification) {
-      await handleCreateOrUpdateWorkerCertification(data);
-    }
-    if (shouldCreateOrUpdateBrokerReceipt) {
-      await handleCreateOrUpdateBrokerReceipt(data);
-    }
-    if (shouldCreateOrUpdateTraderReceipt) {
-      await handleCreateOrUpdateTraderReceipt(data);
-    }
-    if (shouldCreateOrUpdateTransporterReceipt) {
-      await handleCreateOrUpdateTransporterReceipt(data);
-    }
-    if (shouldCreateOrUpdateVhuAgrementBroyeur) {
-      await handleCreateOrUpdateVhuAgrementBroyeur(data);
-    }
-    if (shouldCreateOrUpdateVhuAgrementDemolisseur) {
-      await handleCreateOrUpdateVhuAgrementDemolisseur(data);
-    }
-  };
-
-  const handleUpdateCompanyTypes = async data => {
-    const companyTypesToUpdate = data.companyTypes
-      .map(type => {
-        if (type.isChecked) {
-          return type.value;
-        }
-        return null;
-      })
-      .filter(f => f !== null);
-
-    await updateCompanyTypes({
-      variables: {
-        id: company.id,
-        companyTypes: companyTypesToUpdate
       }
+    } else if (company.transporterReceipt) {
+      // L'établissement possédait un récépissé transporteur mais le profil TRANSPORTEUR
+      // a été dé-sélectionné. On supprime donc le récépissé correspondant.
+
+      // Permet de dissocier le récépissé de l'établissement
+      transporterReceiptId = null;
+
+      // Permet de supprimer le récépissé après l'avoir dissocié
+      shouldDeleteTransporterReceipt = true;
+    }
+
+    return { transporterReceiptId, shouldDeleteTransporterReceipt };
+  };
+
+  const handleTraderReceiptUpdate = async (data: RhfCompanyTypeFormField) => {
+    let traderReceiptId: string | null | undefined = undefined;
+    let shouldDeleteTraderReceipt = false;
+
+    if (data.companyTypes.includes(CompanyType.Trader)) {
+      if (!!formState.dirtyFields.traderReceipt) {
+        if (
+          !!data.traderReceipt?.receiptNumber &&
+          !!data.traderReceipt?.validityLimit &&
+          !!data.traderReceipt?.department
+        ) {
+          const traderReceiptData = {
+            receiptNumber: data.traderReceipt?.receiptNumber,
+            validityLimit: data.traderReceipt?.validityLimit as any,
+            department: data.traderReceipt?.department
+          };
+
+          if (company.traderReceipt) {
+            // Un récépissé négociant existe déjà, il suffit de le mettre à jour
+            await updateTraderReceipt({
+              variables: {
+                input: {
+                  id: company.traderReceipt.id,
+                  ...traderReceiptData
+                }
+              }
+            });
+          } else {
+            // L'établissement ne possède pas encore de récépissé négociant,
+            // il est nécessaire de le créer est de l'associer à l'établissement
+            // en passant le paramètre `traderReceiptId` à `updateCompany`
+            const { data: newReceiptData } = await createTraderReceipt({
+              variables: { input: traderReceiptData }
+            });
+            if (newReceiptData) {
+              traderReceiptId = newReceiptData.createTraderReceipt.id;
+            }
+          }
+        } else {
+          // do nothing, la validation ne le permet pas normalement
+        }
+      }
+    } else if (company.traderReceipt) {
+      // L'établissement possédait un récépissé négociant mais le profil TRADER
+      // a été dé-sélectionné. On supprime donc le récépissé correspondant.
+
+      // Permet de dissocier le récépissé de l'établissement
+      traderReceiptId = null;
+
+      // Permet de supprimer le récépissé après l'avoir dissocié
+      shouldDeleteTraderReceipt = true;
+    }
+
+    return {
+      traderReceiptId,
+      shouldDeleteTraderReceipt
+    };
+  };
+
+  const handleBrokerReceiptUpdate = async (data: RhfCompanyTypeFormField) => {
+    let brokerReceiptId: string | null | undefined = undefined;
+    let shouldDeleteBrokerReceipt = false;
+
+    if (data.companyTypes.includes(CompanyType.Broker)) {
+      if (!!formState.dirtyFields.brokerReceipt) {
+        if (
+          !!data.brokerReceipt?.receiptNumber &&
+          !!data.brokerReceipt?.validityLimit &&
+          !!data.brokerReceipt?.department
+        ) {
+          const brokerReceiptData = {
+            receiptNumber: data.brokerReceipt?.receiptNumber,
+            validityLimit: data.brokerReceipt?.validityLimit as any,
+            department: data.brokerReceipt?.department
+          };
+
+          if (company.brokerReceipt) {
+            // Un récépissé courtier existe déjà, il suffit de le mettre à jour
+            await updateBrokerReceipt({
+              variables: {
+                input: {
+                  id: company.brokerReceipt.id,
+                  ...brokerReceiptData
+                }
+              }
+            });
+          } else {
+            // L'établissement ne possède pas encore de récépissé courier,
+            // il est nécessaire de le créer est de l'associer à l'établissement
+            // en passant le paramètre `brokerReceiptId` à `updateCompany`
+            const { data: newReceiptData } = await createBrokerReceipt({
+              variables: { input: brokerReceiptData }
+            });
+            if (newReceiptData) {
+              brokerReceiptId = newReceiptData.createBrokerReceipt.id;
+            }
+          }
+        } else {
+          // do nothing, la validation ne le permet pas normalement
+        }
+      }
+    } else if (company.brokerReceipt) {
+      // L'établissement possédait un récépissé courtier mais le profil COURTIER
+      // a été dé-sélectionné. On supprime donc le récépissé correspondant.
+
+      // Permet de dissocier le récépissé de l'établissement
+      brokerReceiptId = null;
+
+      // Permet de supprimer le récépissé après l'avoir dissocié
+      shouldDeleteBrokerReceipt = true;
+    }
+
+    return {
+      brokerReceiptId,
+      shouldDeleteBrokerReceipt
+    };
+  };
+
+  const handleWorkerCertificationUpdate = async (
+    data: RhfCompanyTypeFormField
+  ) => {
+    let workerCertificationId: string | null | undefined = undefined;
+    let shouldDeleteWorkerCertification = false;
+
+    if (data.companyTypes.includes(CompanyType.Worker)) {
+      if (!!formState.dirtyFields.workerCertification) {
+        const workerCertificationData = {
+          hasSubSectionFour:
+            data.workerCertification?.hasSubSectionFour ?? false,
+          hasSubSectionThree:
+            data.workerCertification?.hasSubSectionThree ?? false,
+          certificationNumber: data.workerCertification?.certificationNumber,
+          validityLimit: data.workerCertification?.validityLimit,
+          organisation: data.workerCertification?.organisation
+        };
+
+        if (company.workerCertification) {
+          // Une certification existe déjà, il suffit de la mettre à jour
+          await updateWorkerCertification({
+            variables: {
+              input: {
+                id: company.workerCertification.id,
+                ...workerCertificationData
+              }
+            }
+          });
+        } else {
+          // L'établissement ne possède pas encore de certification,
+          // il est nécessaire de la créer est de l'associer à l'établissement
+          // en passant le paramètre `workerCertificationId` à `updateCompany`
+          const { data: newCertificationData } =
+            await createWorkerCertification({
+              variables: { input: workerCertificationData }
+            });
+          if (newCertificationData) {
+            workerCertificationId =
+              newCertificationData.createWorkerCertification.id;
+          }
+        }
+      }
+    } else if (company.workerCertification) {
+      // L'établissement possédait une certification mais le profil WORKER
+      // a été dé-sélectionné. On supprime donc la certification correspondante.
+
+      // Permet de dissocier la certification de l'établissement
+      workerCertificationId = null;
+
+      // Permet de supprimer la certification après l'avoir dissocié
+      shouldDeleteWorkerCertification = true;
+    }
+
+    return {
+      workerCertificationId,
+      shouldDeleteWorkerCertification
+    };
+  };
+
+  const handleVhuAgrementBroyeurUpdate = async (
+    data: RhfCompanyTypeFormField
+  ) => {
+    let vhuAgrementBroyeurId: string | null | undefined = undefined;
+    let shouldDeleteVhuBroyeurAgrement = false;
+
+    if (
+      data.companyTypes.includes(CompanyType.WasteVehicles) &&
+      data.wasteVehiclesTypes.includes(WasteVehiclesType.Broyeur)
+    ) {
+      if (!!formState.dirtyFields.vhuAgrementBroyeur) {
+        if (
+          !!data?.vhuAgrementBroyeur?.agrementNumber &&
+          !!data?.vhuAgrementBroyeur?.department
+        ) {
+          const vhuAgrementBroyeurData = {
+            agrementNumber: data?.vhuAgrementBroyeur?.agrementNumber,
+            department: data?.vhuAgrementBroyeur?.department
+          };
+
+          if (company.vhuAgrementBroyeur) {
+            // Un agrément existe déjà, il suffit de le mettre à jour
+            await updateVhuAgrement({
+              variables: {
+                input: {
+                  id: company.vhuAgrementBroyeur.id,
+                  ...vhuAgrementBroyeurData
+                }
+              }
+            });
+          } else {
+            // L'établissement ne possède pas encore d'agrément broyeur,
+            // il est nécessaire de le créer est de l'associer à l'établissement
+            // en passant le paramètre `vhuBroyeurAgrementId` à `updateCompany`
+            const { data: newAgrementData } = await createVhuAgrement({
+              variables: { input: vhuAgrementBroyeurData }
+            });
+            if (newAgrementData) {
+              vhuAgrementBroyeurId = newAgrementData.createVhuAgrement.id;
+            }
+          }
+        } else {
+          // do nothing, la validation ne le permet pas normalement
+        }
+      }
+    } else if (company.vhuAgrementBroyeur) {
+      // L'établissement possédait un agrément mais le profil BROYEUR
+      // a été dé-sélectionné. On supprime donc l'agrément correspondant.
+
+      // Permet de dissocier l'agrément de l'établissement
+      vhuAgrementBroyeurId = null;
+
+      // Permet de supprimer l'agrément après l'avoir dissocié
+      shouldDeleteVhuBroyeurAgrement = true;
+    }
+
+    return {
+      vhuAgrementBroyeurId,
+      shouldDeleteVhuBroyeurAgrement
+    };
+  };
+
+  const handleVhuAgrementDemolisseurUpdate = async (
+    data: RhfCompanyTypeFormField
+  ) => {
+    let vhuAgrementDemolisseurId: string | null | undefined = undefined;
+    let shouldDeleteVhuDemolisseurAgrement = false;
+
+    if (
+      data.companyTypes.includes(CompanyType.WasteVehicles) &&
+      data.wasteVehiclesTypes.includes(WasteVehiclesType.Demolisseur)
+    ) {
+      if (!!formState.dirtyFields.vhuAgrementDemolisseur) {
+        if (
+          !!data?.vhuAgrementDemolisseur?.agrementNumber &&
+          !!data?.vhuAgrementDemolisseur?.department
+        ) {
+          const vhuAgrementDemolisseurData = {
+            agrementNumber: data?.vhuAgrementDemolisseur?.agrementNumber,
+            department: data?.vhuAgrementDemolisseur?.department
+          };
+
+          if (company.vhuAgrementDemolisseur) {
+            // Un agrément existe déjà, il suffit de le mettre à jour
+            await updateVhuAgrement({
+              variables: {
+                input: {
+                  id: company.vhuAgrementDemolisseur.id,
+                  ...vhuAgrementDemolisseurData
+                }
+              }
+            });
+          } else {
+            // L'établissement ne possède pas encore d'agrément démolisseur,
+            // il est nécessaire de le créer est de l'associer à l'établissement
+            // en passant le paramètre `vhuAgrementDemolisseurId` à `updateCompany`
+            const { data: newAgrementData } = await createVhuAgrement({
+              variables: { input: vhuAgrementDemolisseurData }
+            });
+            if (newAgrementData) {
+              vhuAgrementDemolisseurId = newAgrementData.createVhuAgrement.id;
+            }
+          }
+        } else {
+          // do nothing, la validation ne le permet pas normalement
+        }
+      }
+    } else if (company.vhuAgrementDemolisseur) {
+      // L'établissement possédait un agrément mais le profil DEMOLISSEUR
+      // a été dé-sélectionné. On supprime donc l'agrément correspondant.
+
+      // Permet de dissocier l'agrément de l'établissement
+      vhuAgrementDemolisseurId = null;
+
+      // Permet de supprimer l'agrément après l'avoir dissocié
+      shouldDeleteVhuDemolisseurAgrement = true;
+    }
+
+    return {
+      vhuAgrementDemolisseurId,
+      shouldDeleteVhuDemolisseurAgrement
+    };
+  };
+
+  const handleCompanyUpdate = async (data: RhfCompanyTypeFormField) => {
+    const args: MutationUpdateCompanyArgs = {
+      id: company.id,
+      companyTypes: data.companyTypes,
+      ecoOrganismeAgreements: data.companyTypes.includes(
+        CompanyType.EcoOrganisme
+      )
+        ? data.ecoOrganismeAgreements
+        : [],
+      collectorTypes: data.companyTypes.includes(CompanyType.Collector)
+        ? data.collectorTypes
+        : [],
+      wasteProcessorTypes: data.companyTypes.includes(
+        CompanyType.Wasteprocessor
+      )
+        ? data.wasteProcessorTypes
+        : [],
+      wasteVehiclesTypes: data.companyTypes.includes(CompanyType.WasteVehicles)
+        ? data.wasteVehiclesTypes
+        : []
+    };
+
+    const { transporterReceiptId, shouldDeleteTransporterReceipt } =
+      await handleTransporterReceiptUpdate(data);
+
+    if (transporterReceiptId !== undefined) {
+      args.transporterReceiptId = transporterReceiptId;
+    }
+
+    const { traderReceiptId, shouldDeleteTraderReceipt } =
+      await handleTraderReceiptUpdate(data);
+
+    if (traderReceiptId !== undefined) {
+      args.traderReceiptId = traderReceiptId;
+    }
+
+    const { brokerReceiptId, shouldDeleteBrokerReceipt } =
+      await handleBrokerReceiptUpdate(data);
+
+    if (brokerReceiptId !== undefined) {
+      args.brokerReceiptId = brokerReceiptId;
+    }
+
+    const { workerCertificationId, shouldDeleteWorkerCertification } =
+      await handleWorkerCertificationUpdate(data);
+
+    if (workerCertificationId !== undefined) {
+      args.workerCertificationId = workerCertificationId;
+    }
+
+    const { vhuAgrementBroyeurId, shouldDeleteVhuBroyeurAgrement } =
+      await handleVhuAgrementBroyeurUpdate(data);
+
+    if (vhuAgrementBroyeurId !== undefined) {
+      args.vhuAgrementBroyeurId = vhuAgrementBroyeurId;
+    }
+
+    const { vhuAgrementDemolisseurId, shouldDeleteVhuDemolisseurAgrement } =
+      await handleVhuAgrementDemolisseurUpdate(data);
+
+    if (vhuAgrementDemolisseurId !== undefined) {
+      args.vhuAgrementDemolisseurId = vhuAgrementDemolisseurId;
+    }
+
+    await updateCompany({
+      variables: args
     });
 
-    //updates
-    handleSubTypesUpdates(data, companyTypesToUpdate);
+    if (shouldDeleteTransporterReceipt && company.transporterReceipt?.id) {
+      await deleteTransporterReceipt({
+        variables: { input: { id: company.transporterReceipt?.id } }
+      });
+    }
 
-    //deletes
-    handleSubTypesDeletes(companyTypesToUpdate);
+    if (shouldDeleteTraderReceipt && company.traderReceipt?.id) {
+      await deleteTraderReceipt({
+        variables: { input: { id: company.traderReceipt?.id } }
+      });
+    }
+
+    if (shouldDeleteBrokerReceipt && company.brokerReceipt?.id) {
+      await deleteBrokerReceipt({
+        variables: { input: { id: company.brokerReceipt?.id } }
+      });
+    }
+
+    if (shouldDeleteWorkerCertification && company.workerCertification?.id) {
+      await deleteWorkerCertification({
+        variables: { input: { id: company.workerCertification?.id } }
+      });
+    }
+
+    if (shouldDeleteVhuBroyeurAgrement && company.vhuAgrementBroyeur?.id) {
+      await deleteVhuAgrement({
+        variables: { input: { id: company.vhuAgrementBroyeur?.id } }
+      });
+    }
+
+    if (
+      shouldDeleteVhuDemolisseurAgrement &&
+      company.vhuAgrementDemolisseur?.id
+    ) {
+      await deleteVhuAgrement({
+        variables: { input: { id: company.vhuAgrementDemolisseur?.id } }
+      });
+    }
   };
 
   const loading =
-    LoadingCompanyTypes ||
-    LoadingTransportReceipt ||
-    LoadingUpdateCompanyTransportReceipt ||
-    LoadingVhuBroyeur ||
-    LoadingVhuDemolisseur ||
-    loadingUpdateCompanyVhuBroyeur ||
-    loadingDeleteVhuBroyeur ||
-    loadingUpdateCompanyVhuDemolisseur ||
-    loadingDeleteVhuDemolisseur ||
-    updateOrCreateLoadingTraderReceipt ||
-    updateCompanyLoadingTraderReceipt ||
+    loadingCompanyUpdate ||
+    loadingTransportReceipt ||
+    loadingVhuAgrement ||
+    loadingDeleteVhuAgrement ||
+    loadingTraderReceipt ||
     deleteLoadingTraderReceipt ||
-    updateOrCreateLoadingBrokerReceipt ||
-    updateCompanyLoadingBrokerReceipt ||
+    loadingBrokerReceipt ||
     deleteLoadingBrokerReceipt ||
-    updateOrCreateLoadingWorkerCertif ||
-    updateCompanyWorkerCertifLoading ||
-    deleteLoadingWorkerCertif ||
-    updateCompanyCollectorTypesLoading ||
-    updateCompanyWasteProcessorTypesLoading;
+    loadingWorkerCertification ||
+    deleteLoadingWorkerCertif;
+
   const error =
-    errorCompanyTypes ||
+    errorCompanyUpdate ||
     errorTransportReceipt ||
-    errorUpdateCompanyTransportReceipt ||
-    errorVhuBroyeur ||
-    errorVhuDemolisseur ||
-    errorUpdateCompanyVhuBroyeur ||
-    errorDeleteVhuBroyeur ||
-    errorUpdateCompanyVhuDemolisseur ||
-    errorDeleteVhuDemolisseur ||
-    updateOrCreateErrorTraderReceipt ||
-    updateCompanyErrorTraderReceipt ||
+    errorVhuAgrement ||
+    errorDeleteVhuAgrement ||
+    errorTraderReceipt ||
     deleteErrorTraderReceipt ||
-    updateOrCreateErrorBrokerReceipt ||
-    updateCompanyErrorBrokerReceipt ||
+    errorBrokerReceipt ||
     deleteErrorBrokerReceipt ||
-    updateOrCreateErrorWorkerCertif ||
-    updateCompanyWorkerCertifError ||
-    deleteErrorWorkerCertif ||
-    updateCompanyCollectorTypesError ||
-    updateCompanyWasteProcessorTypesError;
+    errorWorkerCertification ||
+    deleteErrorWorkerCertif;
 
   return (
     <CompanyFormWrapper
@@ -732,49 +750,24 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
           <form
             ref={formRef}
             onSubmit={handleSubmit(async data => {
-              await handleUpdateCompanyTypes(data);
+              await handleCompanyUpdate(data);
               if (!error) {
                 onClose();
               }
             })}
           >
-            {fields.map((field, index) => {
-              return (
-                <div key={field.id}>
-                  <div className="fr-grid-row fr-grid-row--gutters">
-                    <div className="fr-col-11">
-                      <Checkbox
-                        options={[
-                          {
-                            label: field.label,
-                            nativeInputProps: {
-                              ...register(`companyTypes.${index}.isChecked`)
-                            }
-                          }
-                        ]}
-                      />
-                    </div>
-                    <div className="fr-col-1">
-                      <TdTooltip msg={field.helpText} />
-                    </div>
-                  </div>
-                  <CompanyProfileSubForm
-                    register={register}
-                    field={field}
-                    watch={watch}
-                    formState={formState}
-                  />
-                </div>
-              );
-            })}
+            <RhfCompanyTypeForm
+              watch={watch}
+              register={register}
+              setValue={setValue}
+              formState={formState}
+              trigger={trigger}
+            />
             {loading && <Loader />}
             {error && <NotificationError apolloError={error} />}
           </form>
         ) : (
-          <CompanyProfileInformation
-            company={company}
-            companyTypesFormatted={companyTypesFormatted}
-          />
+          <CompanyProfileInformation company={company} />
         )
       }
     </CompanyFormWrapper>
