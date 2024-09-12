@@ -63,6 +63,26 @@ describe("index", () => {
       }
     });
 
+    it("delegateOrgId must be different from delegatorOrgId", () => {
+      // Given
+      const input: CreateRndtsDeclarationDelegationInput = {
+        delegatorOrgId: "40081510600010",
+        delegateOrgId: "40081510600010"
+      };
+
+      // When
+      expect.assertions(1);
+      try {
+        parseCreateRndtsDeclarationDelegationInput(input);
+      } catch (error) {
+        // Then
+        expect(error.errors[0]).toMatchObject({
+          path: ["delegatorOrgId"],
+          message: "Le délégant et le délégataire doivent être différents."
+        });
+      }
+    });
+
     it("validity start date cannot be in the past", () => {
       // Given
       const input: CreateRndtsDeclarationDelegationInput = {

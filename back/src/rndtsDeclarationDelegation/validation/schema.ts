@@ -25,6 +25,13 @@ export const createRndtsDeclarationDelegationInputSchema = z
     comment: z.string().max(500).optional()
   })
   .refine(
+    ({ delegateOrgId, delegatorOrgId }) => delegateOrgId !== delegatorOrgId,
+    {
+      path: ["delegatorOrgId"],
+      message: "Le délégant et le délégataire doivent être différents."
+    }
+  )
+  .refine(
     data => {
       const { validityStartDate, validityEndDate } = data;
 
