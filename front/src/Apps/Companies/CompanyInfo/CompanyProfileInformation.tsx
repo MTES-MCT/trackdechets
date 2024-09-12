@@ -1,26 +1,45 @@
 import { Highlight } from "@codegouvfr/react-dsfr/Highlight";
-import { CompanyPrivate, CompanyType } from "@td/codegen-ui";
+import { CompanyPrivate, CompanyType, WasteVehiclesType } from "@td/codegen-ui";
 import React from "react";
 import {
-  COLLECTOR_OPTIONS,
-  WASTE_PROCESSOR_OPTIONS,
+  COLLECTOR_TYPE_OPTIONS,
+  COMPANY_TYPE_OPTIONS,
+  WASTE_PROCESSOR_TYPE_OPTIONS,
   formatDateViewDisplay
 } from "../common/utils";
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
-  companyTypesFormatted: {
-    label: string | undefined;
-    value: CompanyType | undefined;
-    helpText?: string;
-    isChecked: boolean;
-  }[];
 }
 
-const CompanyProfileInformation = ({
-  company,
-  companyTypesFormatted
-}: CompanyProfileFormProps) => {
+function getFormattedCompanyTypes(companyTypes: CompanyType[]) {
+  const companyTypesFormatted = companyTypes.map(companyType => {
+    const companyTypeObj = COMPANY_TYPE_OPTIONS.find(
+      constant => constant.value === companyType
+    );
+    return {
+      label: companyTypeObj?.label,
+      isChecked: true,
+      value: companyTypeObj?.value,
+      helpText: companyTypeObj?.helpText
+    };
+  });
+
+  const companyTypesAllValues = COMPANY_TYPE_OPTIONS.map(companyType => {
+    const companyTypeInitial = companyTypesFormatted?.find(
+      c => c.value === companyType.value
+    );
+    if (companyTypeInitial) {
+      return companyTypeInitial;
+    }
+    return { ...companyType, isChecked: false };
+  });
+
+  return companyTypesAllValues;
+}
+
+const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
+  const companyTypesFormatted = getFormattedCompanyTypes(company.companyTypes);
   return (
     <ul data-testid="company-types">
       {companyTypesFormatted.map(companyType => {
@@ -189,48 +208,60 @@ const CompanyProfileInformation = ({
                   </Highlight>
                 </div>
               )}
-              {companyType.value === CompanyType.WasteVehicles && (
-                <div data-testid="wasteVehiculesReceipt">
-                  <Highlight>
-                    <p className="companyFormWrapper__title-field">
-                      Numéro de récépissé
-                    </p>
-                    <p className="companyFormWrapper__value-field">
-                      Récépissé broyeur{" : "}
-                      <span data-testid="vhuAgrementBroyeur_agrementNumber">
-                        {company.vhuAgrementBroyeur?.agrementNumber || " - "}
-                      </span>
-                      <br />
-                      Récépissé Démolisseur{" : "}
-                      <span data-testid="vhuAgrementDemolisseur_agrementNumber">
-                        {company.vhuAgrementDemolisseur?.agrementNumber ||
-                          " - "}
-                      </span>
-                    </p>
-
-                    <p className="companyFormWrapper__title-field">
-                      Département
-                    </p>
-                    <p className="companyFormWrapper__value-field">
-                      Département broyeur{" : "}
-                      <span data-testid="vhuAgrementBroyeur_department">
-                        {company.vhuAgrementBroyeur?.department || " - "}
-                      </span>
-                      <br />
-                      Département démolisseur{" : "}
-                      <span data-testid="vhuAgrementDemolisseur_department">
-                        {company.vhuAgrementDemolisseur?.department || " - "}
-                      </span>
-                    </p>
-                  </Highlight>
-                </div>
-              )}
+              {companyType.value === CompanyType.WasteVehicles &&
+                company.wasteVehiclesTypes.includes(
+                  WasteVehiclesType.Broyeur
+                ) && (
+                  <div data-testid="wasteVehiculesReceipt">
+                    <Highlight>
+                      <p className="companyFormWrapper__title-field">
+                        Broyeur VHU
+                      </p>
+                      <p className="companyFormWrapper__value-field">
+                        {"Numéro récépissé : "}
+                        <span data-testid="vhuAgrementBroyeur_agrementNumber">
+                          {company.vhuAgrementBroyeur?.agrementNumber || " - "}
+                        </span>
+                        <br />
+                        Département {" : "}
+                        <span data-testid="vhuAgrementBroyeur_department">
+                          {company.vhuAgrementBroyeur?.department || " - "}
+                        </span>
+                      </p>
+                    </Highlight>
+                  </div>
+                )}
+              {companyType.value === CompanyType.WasteVehicles &&
+                company.wasteVehiclesTypes.includes(
+                  WasteVehiclesType.Demolisseur
+                ) && (
+                  <div data-testid="wasteVehiculesReceipt">
+                    <Highlight>
+                      <p className="companyFormWrapper__title-field">
+                        Casse automobile / démolisseur
+                      </p>
+                      <p className="companyFormWrapper__value-field">
+                        {"Numéro récépissé  : "}
+                        <span data-testid="vhuAgrementDemolisseur_agrementNumber">
+                          {company.vhuAgrementDemolisseur?.agrementNumber ||
+                            " - "}
+                        </span>
+                        <br />
+                        Département {" : "}
+                        <span data-testid="vhuAgrementDemolisseur_department">
+                          {company.vhuAgrementDemolisseur?.department || " - "}
+                        </span>
+                      </p>
+                    </Highlight>
+                  </div>
+                )}
               {companyType.value === CompanyType.Wasteprocessor && (
                 <Highlight>
                   {company.wasteProcessorTypes?.map(wasteProcessorType => {
-                    const wasteProcessorFound = WASTE_PROCESSOR_OPTIONS.find(
-                      option => option.value === wasteProcessorType
-                    );
+                    const wasteProcessorFound =
+                      WASTE_PROCESSOR_TYPE_OPTIONS.find(
+                        option => option.value === wasteProcessorType
+                      );
                     if (wasteProcessorFound) {
                       return (
                         <p key={wasteProcessorFound.value}>
@@ -245,7 +276,7 @@ const CompanyProfileInformation = ({
               {companyType.value === CompanyType.Collector && (
                 <Highlight>
                   {company.collectorTypes?.map(collector => {
-                    const collectorFound = COLLECTOR_OPTIONS.find(
+                    const collectorFound = COLLECTOR_TYPE_OPTIONS.find(
                       option => option.value === collector
                     );
                     if (collectorFound) {

@@ -25,6 +25,8 @@ type Mutation {
     collectorTypes: [CollectorType!]
     "Sous-types d'entreprises pour les installation de traitement de déchets"
     wasteProcessorTypes: [WasteProcessorType!]
+    "Sous-types d'installation de traitement VHU"
+    wasteVehiclesTypes: [WasteVehiclesType!]
     "Nom d'usage de l'établissement"
     givenName: String
     "Identifiant d'un récépissé transporteur"

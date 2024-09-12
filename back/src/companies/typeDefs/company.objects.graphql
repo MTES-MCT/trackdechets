@@ -12,6 +12,9 @@ type CompanyPrivate {
   "Sous-types d'entreprises pour les installation de traitement de déchets"
   wasteProcessorTypes: [WasteProcessorType!]!
 
+  "Sous-types d'entreprises pour les installation de traitement VHU"
+  wasteVehiclesTypes: [WasteVehiclesType!]!
+
   "Identifiant GEREP"
   gerepId: String
 
@@ -198,6 +201,9 @@ type CompanyPublic {
 
   "Sous-types d'entreprises pour les installation de traitement de déchets"
   wasteProcessorTypes: [WasteProcessorType!]
+
+  "Sous-types d'installation de traitement VHU"
+  wasteVehiclesTypes: [WasteVehiclesType!]
 
   """
   Liste des agréments de l'éco-organisme
@@ -390,6 +396,9 @@ type CompanySearchResult implements CompanySearchPrivateCommon {
 
   "Sous-types d'entreprises pour les installation de traitement de déchets"
   wasteProcessorTypes: [WasteProcessorType!]
+
+  "Sous-types d'installation de traitement VHU"
+  wasteVehiclesTypes: [WasteVehiclesType!]
 
   """
   Liste des agréments de l'éco-organisme

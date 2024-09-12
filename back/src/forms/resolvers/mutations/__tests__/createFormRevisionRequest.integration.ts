@@ -321,6 +321,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     expect(data.createFormRevisionRequest.approvals[0].status).toBe("PENDING");
     expect(data.createFormRevisionRequest.approvals[1].status).toBe("PENDING");
   });
+
   it("should create a revisionRequest and identifying current user as the requester (temporary storage) ", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
@@ -378,6 +379,57 @@ describe("Mutation.createFormRevisionRequest", () => {
       company.siret
     );
   });
+
+  it(
+    "should create a revisionRequest and identifying current user" +
+      " as the requester (transporter when emitterType=APPENIDX_PRODUCER) ",
+    async () => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          transportersSirets: [company.siret!],
+          wasteDetailsQuantity: 1,
+          status: "SENT",
+          takenOverAt: new Date(),
+          transporters: {
+            create: { number: 1, transporterCompanySiret: company.siret }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { wasteDetails: { quantity: 10 } },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+        company.siret
+      );
+      // one approval is created
+      expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+        { approverSiret: emitterCompany.siret, status: "PENDING" }
+      ]);
+    }
+  );
 
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");

@@ -4,10 +4,10 @@ import omitDeep from "omit-deep-lodash";
 import React, { lazy, ReactElement, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "../../Apps/common/Components";
-import { getComputedState } from "../common/getComputedState";
+import { getComputedState } from "../../Apps/Dashboard/Creation/getComputedState";
 
 import { IStepContainerProps } from "../common/stepper/Step";
-import { toastApolloError } from "../common/stepper/toaster";
+import { toastApolloError } from "../../Apps/Dashboard/Creation/toaster";
 import {
   Mutation,
   MutationCreateBsdasriArgs,

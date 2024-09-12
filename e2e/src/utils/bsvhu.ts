@@ -86,7 +86,7 @@ export const fillWasteTab = async (page: Page) => {
   ).toBeVisible();
   await expect(
     page.getByText(
-      "16 01 04* - véhicules hors d’usage non dépollués par un centre agréé"
+      "16 01 04* - véhicules hors d'usage non dépollués par un centre agréé"
     )
   ).toBeVisible();
 
@@ -119,35 +119,30 @@ export const fillWasteTab = async (page: Page) => {
 
   // Détail des identifications
   const fillIdentificationsInput = async (value: string) => {
-    // Doesn't seem that we can be more precise than that
-    const identificationsInput = await page.getByRole("textbox");
+    const identificationsInput = await page.getByTestId(
+      "identificationNumberInput"
+    );
     await identificationsInput.fill(value);
     await identificationsInput.press("Enter");
   };
 
-  const nbrInput = await page.getByLabel(
-    "En nombre (correspond au nombre d'identifications saisies)"
-  );
+  const nbrInput = await page.getByTestId("tagInputIdentificationNumber");
 
   // Fill in a 1st value
   await fillIdentificationsInput("LOTVHU001");
-  expect(await nbrInput.inputValue()).toEqual("1");
+  expect(await nbrInput).toHaveCount(1);
 
   // Fill in a 2nd value
   await fillIdentificationsInput("LOTVHU002");
-  expect(await nbrInput.inputValue()).toEqual("2");
+  expect(await nbrInput).toHaveCount(2);
 
   // Fill in a 3nd value
   await fillIdentificationsInput("LOTVHU003");
-  expect(await nbrInput.inputValue()).toEqual("3");
+  expect(await nbrInput).toHaveCount(3);
 
   // Remove 2nd value
-  await page
-    .locator("li")
-    .filter({ hasText: "LOTVHU002+" })
-    .getByRole("button")
-    .click();
-  expect(await nbrInput.inputValue()).toEqual("2");
+  await page.getByRole("button", { name: "LOTVHU002" }).click();
+  expect(await nbrInput).toHaveCount(2);
 
   // Go to next step
   await page.getByRole("button", { name: "Suivant" }).click();
@@ -157,24 +152,18 @@ export const fillWasteTab = async (page: Page) => {
  * Fill third tab info, "Transporteur du déchet"
  */
 export const fillTransporterTab = async (page: Page, transporter) => {
-  // Warning should be visible if no company is selected
-  await expect(
-    page.getByText("La sélection d'un établissement est obligatoire")
-  ).toBeVisible();
+  await page.getByLabel("N°SIRET ou raison sociale").click();
+  await expect(page.getByText("Aucune entreprise sélectionnée")).toBeVisible();
 
-  // Fill in transporter orgId
+  // Then, fill siret and select company
+  await page.getByLabel("N°SIRET ou raison sociale").fill(transporter.orgId);
   await page
-    .getByLabel("Nom ou numéro de SIRET de l'établissement")
-    .fill(transporter.orgId);
-
-  // Transporter should be selected automatically
-  await expect(
-    page.locator("li").filter({ hasText: transporter.orgId })
-  ).toBeVisible();
+    .getByRole("button", { name: `${transporter.name} - ${transporter.orgId}` })
+    .click();
 
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", transporter.contact);
-  await expectInputValue(page, "Téléphone ou Fax", transporter.contactPhone);
+  await expectInputValue(page, "Téléphone", transporter.contactPhone);
   await expectInputValue(page, "Mail", transporter.contactEmail);
 
   // Not exempt of recepisse
@@ -210,37 +199,39 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   ).toBeVisible();
 
   // Change waste code then come back
-  await page.getByRole("button", { name: "Détail du déchet" }).click();
+  await page
+    .getByRole("tablist")
+    .locator("button")
+    .filter({ hasText: "Déchet" })
+    .click();
   await page.getByText("16 01 06").click();
-  await page.getByRole("button", { name: "Destination du déchet" }).click();
+  await page
+    .getByRole("tablist")
+    .locator("button")
+    .filter({ hasText: "Destination finale" })
+    .click();
 
   // Options should have changed
   await expect(page.getByLabel("Broyeur agréé")).not.toBeDisabled();
   await expect(page.getByLabel("Démolisseur agréé")).toBeChecked();
-
   // Select broyeur
-  await page.getByLabel("Broyeur agréé").check();
+  await page.getByText("Broyeur agréé").click();
 
   // Select company
-  await page
-    .getByRole("main")
-    .locator("form div")
-    .filter({ hasText: "Installation de destination" })
-    .getByLabel("Nom ou numéro de SIRET de l'établissement")
-    .fill(destination.orgId);
+  await page.getByLabel("N°SIRET ou raison sociale").fill(destination.orgId);
 
   await expect(
     page.getByRole("heading", { name: "Installation de broyage prévisionelle" })
   ).not.toBeVisible();
 
   // Transporter should be selected automatically
-  await expect(
-    page.locator("li").filter({ hasText: destination.orgId })
-  ).toBeVisible();
+  await page
+    .getByRole("button", { name: `${destination.name} - ${destination.orgId}` })
+    .click();
 
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", destination.contact);
-  await expectInputValue(page, "Téléphone ou Fax", destination.contactPhone);
+  await expectInputValue(page, "Téléphone", destination.contactPhone);
   await expectInputValue(page, "Mail", destination.contactEmail);
   await expectInputValue(
     page,
@@ -253,7 +244,7 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
 
   // Company info should not change except agrement
   await expectInputValue(page, "Personne à contacter", destination.contact);
-  await expectInputValue(page, "Téléphone ou Fax", destination.contactPhone);
+  await expectInputValue(page, "Téléphone", destination.contactPhone);
   await expectInputValue(page, "Mail", destination.contactEmail);
   await expectInputValue(
     page,
@@ -266,22 +257,27 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
     page.getByRole("heading", { name: "Installation de broyage prévisionelle" })
   ).toBeVisible();
 
-  const broyeurDiv = page
-    .getByRole("main")
-    .locator("form div")
-    .filter({ hasText: "Installation de broyage prévisionelle" });
+  // Select company
+  await page.getByLabel("N°SIRET ou raison sociale").nth(1).fill(broyeur.orgId);
 
-  await broyeurDiv
-    .getByLabel("Nom ou numéro de SIRET de l'établissement")
-    .fill(broyeur.orgId);
+  await page
+    .getByRole("button", { name: `${broyeur.name} - ${broyeur.orgId}` })
+    .click();
 
-  await expect(
-    broyeurDiv.locator("li").filter({ hasText: broyeur.orgId })
-  ).toBeVisible();
+  const contactValue = await page
+    .getByLabel("Personne à contacter")
+    .nth(1)
+    .inputValue();
+  expect(contactValue).toEqual(broyeur.contact);
 
-  await expectInputValue(broyeurDiv, "Personne à contacter", broyeur.contact);
-  await expectInputValue(broyeurDiv, "Téléphone ou Fax", broyeur.contactPhone);
-  await expectInputValue(broyeurDiv, "Mail", broyeur.contactEmail);
+  const contactPhoneValue = await page
+    .getByLabel("Téléphone")
+    .nth(1)
+    .inputValue();
+  expect(contactPhoneValue).toEqual(broyeur.contactPhone);
+
+  const contactMailValue = await page.getByLabel("Mail").nth(1).inputValue();
+  expect(contactMailValue).toEqual(broyeur.contactEmail);
 
   // Fill destination agrement
   await page
@@ -295,7 +291,7 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   const responsePromise = page.waitForResponse(async response => {
     return (await response.text()).includes("createDraftBsvhu");
   });
-  await page.getByRole("button", { name: "Créer" }).click();
+  await page.getByTestId("draftBtn").click();
   const response = await responsePromise;
   const id = (await response.json()).data?.createDraftBsvhu?.id;
 
@@ -313,8 +309,8 @@ export const createBsvhu = async (
   await clickCreateVhuButton(page);
 
   // Fill the steps
-  await fillEmitterTab(page, emitter);
   await fillWasteTab(page);
+  await fillEmitterTab(page, emitter);
   await fillTransporterTab(page, transporter);
   const id = await fillDestinationTab(page, destination, broyeur);
 
@@ -478,9 +474,17 @@ export const fixAndPublishBsvhu = async (page: Page, { id }) => {
 
   // Edit VHU and add weight
   await page.getByRole("link", { name: "Mettre le bordereau à jour" }).click();
-  await page.getByRole("button", { name: "Détail du déchet" }).click();
-  await page.getByLabel("En tonnes").fill("10");
-  await page.getByRole("button", { name: "Destination du déchet" }).click();
+  await page
+    .getByRole("tablist")
+    .locator("button")
+    .filter({ hasText: "Déchet" })
+    .click();
+  await page.getByLabel("Poids total en tonnes").fill("10");
+  await page
+    .getByRole("tablist")
+    .locator("button")
+    .filter({ hasText: "Destination finale" })
+    .click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
 
   // Weight should appear on VHU card
