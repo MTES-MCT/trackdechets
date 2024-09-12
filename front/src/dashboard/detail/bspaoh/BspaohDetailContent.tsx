@@ -1,6 +1,6 @@
 import React from "react";
-import { useBspaohDuplicate } from "../../components/BSDList/BSPaoh/BSPaohActions/useDuplicate";
-import { useDownloadPdf } from "../../components/BSDList/BSPaoh/BSPaohActions/useDownloadPdf";
+import { useBspaohDuplicate } from "../../../Apps/Dashboard/Components/Duplicate/useDuplicate";
+import { useDownloadPdf } from "../../../Apps/Dashboard/Validation/BSPaoh/BSPaohActions/useDownloadPdf";
 
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { getTransportModeLabel } from "../../constants";
@@ -37,7 +37,8 @@ import {
   getVerbosePackagingType,
   getVerbosePaohPackagingsAcceptationStatus,
   getVerboseConsistence
-} from "../../components/BSDList/BSPaoh/paohUtils";
+} from "../../../Apps/Dashboard/Validation/BSPaoh/paohUtils";
+
 import QRCodeIcon from "react-qr-code";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
 

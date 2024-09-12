@@ -8,7 +8,7 @@ import {
   SignatureTypeInput
 } from "@td/codegen-ui";
 import React from "react";
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link, useLocation } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
@@ -42,6 +42,7 @@ export function SignEmission({
   >(SIGN_BSVHU);
 
   const TODAY = new Date();
+  const location = useLocation();
 
   return (
     <SignBsvhu
@@ -52,7 +53,7 @@ export function SignEmission({
       displayActionButton={displayActionButton}
     >
       {({ bsvhu, onClose }) =>
-        bsvhu.metadata?.errors.some(
+        bsvhu.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Emission
         ) ? (
           <>
@@ -71,6 +72,7 @@ export function SignEmission({
                 id: bsvhu.id
               })}
               className="btn btn--primary"
+              state={{ background: location }}
             >
               Mettre le bordereau à jour pour le signer
             </Link>

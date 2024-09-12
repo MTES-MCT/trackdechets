@@ -103,3 +103,11 @@ enum WasteProcessorType {
   "Autres traitement de déchets non dangereux"
   OTHER_NON_DANGEROUS_WASTES
 }
+
+# Sous-type pour les installations de traitement VHU
+enum WasteVehiclesType {
+  # Broyeur VHU
+  BROYEUR
+  # Casse automobile / démolisseur
+  DEMOLISSEUR
+}

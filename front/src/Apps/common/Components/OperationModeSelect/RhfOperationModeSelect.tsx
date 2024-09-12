@@ -24,11 +24,11 @@ const RhfOperationModeSelect = ({ operationCode, path }) => {
     // If the available modes change, and only ONE option is available,
     // select it by default. Else, reset the selection
     else if (modes.length > 1) {
-      setValue(path, undefined);
+      setValue(path, fieldValue);
     } else {
       setValue(path, modes[0]);
     }
-  }, [modes, path, setValue]);
+  }, [modes, path, setValue, fieldValue]);
 
   if (!modes.length) return null;
 

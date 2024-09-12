@@ -19,7 +19,7 @@ import {
   MutationUpdateBsdasriArgs,
   BsdasriSignatureType
 } from "@td/codegen-ui";
-import { getComputedState } from "../../../../../form/common/getComputedState";
+import { getComputedState } from "../../../../../Apps/Dashboard/Creation/getComputedState";
 import getInitialState, {
   getInitialWeightFn
 } from "../../../../../form/bsdasri/utils/initial-state";

@@ -1,4 +1,5 @@
 import { MongoClient } from "mongodb";
+import Queue, { JobOptions } from "bull";
 import { Company, Event, Prisma, User } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
@@ -10,8 +11,26 @@ type EventLike = Omit<Event, "metadata" | "data"> & {
 
 type EventCollection = { _id: string } & Omit<EventLike, "id">;
 
-const { MONGO_URL } = process.env;
+const { MONGO_URL, REDIS_URL, NODE_ENV } = process.env;
 const EVENTS_COLLECTION = "events";
+const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
+
+const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: { type: "fixed", delay: 100 },
+    removeOnComplete: 10_000,
+    timeout: 10000
+  }
+});
+
+async function enqueueUpdatedBsdToIndex(
+  bsdId: string,
+  options?: JobOptions
+): Promise<void> {
+  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
+  await indexQueue.add("index_updated", bsdId, options);
+}
 
 async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.companyAssociation.findMany({
@@ -165,6 +184,7 @@ export async function run() {
           id: true
         }
       });
+      enqueueUpdatedBsdToIndex(bsda.id);
       logger.info(`updated ${bsda.id}`);
     }
   }

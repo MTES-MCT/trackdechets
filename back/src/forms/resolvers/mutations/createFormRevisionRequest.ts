@@ -145,14 +145,18 @@ async function getAuthoringCompany(
     bsdd.id
   );
 
-  if (
-    ![
-      bsdd.emitterCompanySiret,
-      bsdd.recipientCompanySiret,
-      bsdd.ecoOrganismeSiret,
-      forwardedIn?.recipientCompanySiret
-    ].includes(authoringCompanySiret)
-  ) {
+  const transporterCanBeAuthor =
+    bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER && bsdd.takenOverAt;
+
+  const canBeAuthorCompany = [
+    bsdd.emitterCompanySiret,
+    bsdd.recipientCompanySiret,
+    bsdd.ecoOrganismeSiret,
+    forwardedIn?.recipientCompanySiret,
+    ...(transporterCanBeAuthor ? bsdd.transportersSirets : [])
+  ].filter(Boolean);
+
+  if (!canBeAuthorCompany.includes(authoringCompanySiret)) {
     throw new UserInputError(
       `Le SIRET "${authoringCompanySiret}" ne peut pas être auteur de la révision.`
     );
