@@ -1,4 +1,9 @@
-import { Form as PrismaForm, Prisma, UserRole } from "@prisma/client";
+import {
+  Form as PrismaForm,
+  Prisma,
+  UserRole,
+  CiterneNotWashedOutReason
+} from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query } from "../../../../generated/graphql/types";
 import {
@@ -15,6 +20,16 @@ const GET_FORM_QUERY = `
   query GetForm($id: ID, $readableId: String) {
     form(id: $id, readableId: $readableId) {
       id
+    }
+  }
+`;
+
+const GET_FORM_WITH_CITERNE_INFO_QUERY = `
+  query GetForm($id: ID, $readableId: String) {
+    form(id: $id, readableId: $readableId) {
+      id
+      hasCiterneBeenWashedOut
+      citerneNotWashedOutReason
     }
   }
 `;
@@ -312,6 +327,38 @@ describe("Query.form", () => {
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
       "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
+  });
+
+  it("should return citerne info", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "RECEIVED",
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name,
+        hasCiterneBeenWashedOut: false,
+        citerneNotWashedOutReason: CiterneNotWashedOutReason.INCOMPATIBLE
+      }
+    });
+
+    // When
+    const { query } = makeClient(user);
+    const { errors, data } = await query<Pick<Query, "form">>(
+      GET_FORM_WITH_CITERNE_INFO_QUERY,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+    expect(data.form.hasCiterneBeenWashedOut).toBeFalsy();
+    expect(data.form.citerneNotWashedOutReason).toBe(
+      CiterneNotWashedOutReason.INCOMPATIBLE
     );
   });
 });
