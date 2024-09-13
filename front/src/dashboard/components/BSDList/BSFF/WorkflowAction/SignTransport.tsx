@@ -23,6 +23,7 @@ import { subMonths } from "date-fns";
 import { UPDATE_BSFF_TRANSPORTER } from "../../../../../Apps/Forms/Components/query";
 import TransportPlates from "../../../../../Apps/Forms/Components/TransportPlates/TransportPlates";
 import Select from "@codegouvfr/react-dsfr/Select";
+import { transportModeLabels } from "../../../../constants";
 
 const validationSchema = yup.object({
   transport: yup.object({
@@ -129,11 +130,21 @@ function SignTransportForm({
               <Field name={"transport.mode"}>
                 {({ field }) => (
                   <Select label="Mode de transport" nativeSelectProps={field}>
-                    <option value="ROAD">Route</option>
-                    <option value="AIR">Voie aérienne</option>
-                    <option value="RAIL">Voie ferrée</option>
-                    <option value="RIVER">Voie fluviale</option>
-                    <option value="SEA">Voie maritime</option>
+                    <option value="ROAD">
+                      {transportModeLabels[TransportMode.Road]}
+                    </option>
+                    <option value="AIR">
+                      {transportModeLabels[TransportMode.Air]}
+                    </option>
+                    <option value="RAIL">
+                      {transportModeLabels[TransportMode.Rail]}
+                    </option>
+                    <option value="RIVER">
+                      {transportModeLabels[TransportMode.River]}
+                    </option>
+                    <option value="SEA">
+                      {transportModeLabels[TransportMode.Sea]}
+                    </option>
                   </Select>
                 )}
               </Field>
