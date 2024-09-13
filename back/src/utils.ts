@@ -58,6 +58,16 @@ export function sameDayMidnight(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+export function startOfDay(date: Date): Date {
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+export function endOfDay(date: Date): Date {
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
 export function todayAtMidnight(): Date {
   return sameDayMidnight(new Date());
 }

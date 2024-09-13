@@ -20,7 +20,7 @@ export const createDelegation = async (
  * it cannot create a new one for the meantime. Users would have to delete the delegation
  * in the future and create a new one.
  */
-export const checkNoNotRevokedandNotExpiredDelegation = async (
+export const checkNoExistingNotRevokedAndNotExpiredDelegation = async (
   user: Express.User,
   input: ParsedCreateRndtsDeclarationDelegationInput
 ) => {

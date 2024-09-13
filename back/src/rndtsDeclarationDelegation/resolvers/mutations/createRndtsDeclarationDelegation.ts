@@ -10,7 +10,7 @@ import { parseCreateRndtsDeclarationDelegationInput } from "../../validation";
 import { findDelegateAndDelegatorOrThrow } from "../utils";
 import {
   createDelegation,
-  checkNoNotRevokedandNotExpiredDelegation
+  checkNoExistingNotRevokedAndNotExpiredDelegation
 } from "./createRndtsDeclarationDelegation.utils";
 
 const createRndtsDeclarationDelegation = async (
@@ -34,7 +34,7 @@ const createRndtsDeclarationDelegation = async (
   await checkCanCreate(user, delegator);
 
   // Check there's not already an existing delegation
-  await checkNoNotRevokedandNotExpiredDelegation(user, delegationInput);
+  await checkNoExistingNotRevokedAndNotExpiredDelegation(user, delegationInput);
 
   // Create delegation
   const delegation = await createDelegation(user, delegationInput);
