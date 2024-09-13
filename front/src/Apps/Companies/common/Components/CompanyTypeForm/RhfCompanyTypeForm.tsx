@@ -339,7 +339,7 @@ const RhfCompanyTypeForm = ({
           value: index =>
             register(`ecoOrganismeAgreements.${index}`, {
               validate: v => {
-                if (!v || v === "") {
+                if (!v) {
                   return "Champ requis";
                 }
                 if (!isValidWebsite(v)) {

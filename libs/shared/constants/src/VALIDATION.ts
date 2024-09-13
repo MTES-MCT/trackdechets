@@ -7,7 +7,7 @@ export function isValidWebsite(s: string): boolean {
       return true;
     }
     return false;
-  } catch (err) {
+  } catch (_) {
     return false;
   }
 }
