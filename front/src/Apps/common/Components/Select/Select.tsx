@@ -6,7 +6,8 @@ import SelectWithSubOptions from "../SelectWithSubOptions/SelectWithSubOptions";
 export interface Option {
   value: string;
   label: string;
-  options?: Option[];
+  // value of parent Option
+  parent?: string;
 }
 
 interface SelectProps {
@@ -39,10 +40,16 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     ref
   ) => {
     const select: ReactNode = useMemo(() => {
-      const hasSubOptions = options.some(o => o.options?.length);
+      const hasSubOptions = options.some(o => !!o.parent);
 
       if (hasSubOptions) {
-        return <SelectWithSubOptions options={options} onChange={onChange} />;
+        return (
+          <SelectWithSubOptions
+            options={options}
+            selected={selected}
+            onChange={onChange}
+          />
+        );
       } else if (isMultiple) {
         return (
           <MultiSelectWrapper

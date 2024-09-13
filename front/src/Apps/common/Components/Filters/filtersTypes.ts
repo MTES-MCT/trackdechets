@@ -13,6 +13,7 @@ export type Filter = {
   isActive: boolean;
   options?: { value: string; label: string }[];
   isMultiple?: boolean;
+  isNested?: boolean;
   placeholder?: string;
 };
 

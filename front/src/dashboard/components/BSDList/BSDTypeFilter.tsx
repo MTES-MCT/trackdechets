@@ -36,6 +36,8 @@ export function BSDTypeFilter({
 }: FilterProps<Bsd>) {
   const [selected, setSelected] = React.useState(filterValue);
 
+  console.log(selected);
+
   const handleChange = selectedList => {
     setSelected(selectedList);
     setFilter(selectedList.map(({ value }) => value));

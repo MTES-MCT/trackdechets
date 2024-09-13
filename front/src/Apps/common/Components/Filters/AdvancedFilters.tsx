@@ -6,7 +6,6 @@ import { inputType } from "../../types/commonTypes";
 import Select, { Option } from "../Select/Select";
 import DatePickerWrapper from "../DatePicker/DatePickerWrapper";
 import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
-
 import "./filters.scss";
 import usePrevious from "../../../../common/hooks/usePrevious";
 import { getValuesFromOptions } from "../SelectWithSubOptions/SelectWithSubOptions.utils";
@@ -22,7 +21,7 @@ const AdvancedFilters = ({
   const [filterValues, setFilterValues] = useState({});
   const [hasReachMaxFilter, setHasReachMaxFilter] = useState(false);
   const [selectMultipleValueArray, setSelectMultipleValueArray] = useState<
-    { value: string; label: string }[]
+    Option[]
   >([]);
   const [error, setError] = useState({});
 
@@ -145,6 +144,13 @@ const AdvancedFilters = ({
     setFilterValues(newFilterValues);
   };
 
+  const onFilterSelectNestedValueChange = (
+    option: Option,
+    filterName: string
+  ) => {
+    // TODO ajouter l'option sélectionner et ses possibles parents à selectMultipleValueArray
+  };
+
   const onDateChange = (
     date: string,
     filterName: string,
@@ -201,14 +207,21 @@ const AdvancedFilters = ({
         <Select
           ref={newSelectElementRef}
           id={`${filter.name}_filter`}
-          onChange={e =>
-            !filter.isMultiple
-              ? onFilterValueChange(e, filter.name)
-              : onFilterSelectMultipleValueChange(
-                  e as unknown as Option[],
-                  filter.name
-                )
-          }
+          onChange={e => {
+            if (filter.isMultiple) {
+              onFilterSelectMultipleValueChange(
+                e as unknown as Option[],
+                filter.name
+              );
+            } else if (filter.isNested) {
+              onFilterSelectNestedValueChange(
+                e as unknown as Option,
+                filter.name
+              );
+            } else {
+              onFilterValueChange(e, filter.name);
+            }
+          }}
           defaultValue=""
           label={filter.label}
           isMultiple={filter.isMultiple}

@@ -1,5 +1,19 @@
 import { Option } from "../Select/Select";
 
+export type OptionWithChildren = Option & { children?: Option[] };
+
+export function buildHierarchy(options: Option[]): OptionWithChildren[] {
+  function addChildren(option: Option): OptionWithChildren {
+    return {
+      ...option,
+      children: options
+        .filter(o => o.parent === option.value)
+        .map(child => addChildren(child))
+    };
+  }
+  return options.filter(option => !option.parent).map(addChildren);
+}
+
 /**
  * Builds the label of the select (that is, a string with the labels of the corresponding
  * selected values) based on the original options map, and the actually selected values.
@@ -12,49 +26,56 @@ import { Option } from "../Select/Select";
  * @selectedOptionsValues the actually selected options values (array of values, flat)
  * @parentValue (in recursive iterations) the value of parent option
  */
-export const getLabel = (
-  options: Option[],
-  selectedOptionsValues: string[],
-  parentValue: string | null = null
-) => {
+export const getLabel = (selectedOptions: Option[]) => {
   // Nothing has been selected yet
-  if (!selectedOptionsValues.length) {
+  if (!selectedOptions.length) {
     return "Sélectionner une option";
   }
 
-  const optionsLabels = options.map(option => {
-    let optionPath = option.value;
-    if (parentValue) optionPath = `${parentValue}.${option.value}`;
+  const optionsWithChildren = buildHierarchy(selectedOptions);
 
-    const optionIsSelected = selectedOptionsValues.some(
-      selectedOption => selectedOption === optionPath
-    );
-
-    if (optionIsSelected) {
-      // Option has sub-options
-      if (option.options) {
-        // Recursive call to get potential sub-options labels (if selected)
-        const subOptionsLabels = getLabel(
-          option.options,
-          selectedOptionsValues,
-          optionPath
-        );
-
-        // Some sub-options are indeed selected
-        if (Boolean(subOptionsLabels)) {
-          return `${option.label} (${subOptionsLabels})`;
-        }
-
-        return `${option.label}`;
-      } else {
-        return option.label;
-      }
+  function inner(option: OptionWithChildren): string {
+    if (option.children?.length) {
+      return `${option.label} (${option.children
+        .map(o => inner(o))
+        .join(", ")})`;
     }
+    return option.label;
+  }
 
-    return null;
-  });
+  return optionsWithChildren.map(inner).join(", ");
 
-  return optionsLabels.filter(Boolean).join(", ");
+  // const optionsLabels = options.map(option => {
+  //   let optionPath = option.value;
+  //   if (parentValue) optionPath = `${parentValue}.${option.value}`;
+
+  //   const optionIsSelected = selectedOptionsValues.some(
+  //     selectedOption => selectedOption === optionPath
+  //   );
+
+  //   if (optionIsSelected) {
+  //     // Option has sub-options
+  //     if (option.options) {
+  //       // Recursive call to get potential sub-options labels (if selected)
+  //       const subOptionsLabels = getLabel(
+  //         option.options,
+  //         selectedOptionsValues,
+  //         optionPath
+  //       );
+
+  //       // Some sub-options are indeed selected
+  //       if (Boolean(subOptionsLabels)) {
+  //         return `${option.label} (${subOptionsLabels})`;
+  //       }
+
+  //       return `${option.label}`;
+  //     } else {
+  //       return option.label;
+  //     }
+  //   }
+
+  //   return null;
+  // });
 };
 
 /**
