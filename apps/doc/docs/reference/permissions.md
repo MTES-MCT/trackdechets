@@ -13,7 +13,7 @@ Il existe actuellement **4 rôles utilisateurs** : Administrateur, Collaborateur
 La première personne qui rattache un établissement à son compte utilisateur Trackdéchets prend automatiquement le rôle d'administrateur de l'établissement. Il peut par la suite inviter d'autres utilisateurs en choisissant leur rôle parmi les quatre existants. Les droits attachés à chaque rôle sont listés ci-dessous : 
 
 | Droits | ADMINISTRATEUR | COLLABORATEUR | CHAUFFEUR | LECTEUR |
-|---|---|---|---|---|
+|---:|:---:|:---:|:---:|:---:|
 | Lecture des bordereaux | ✅ | ✅ | ✅ (seuls les bordereaux présents dans les onglets "À collecter" et "Collecté" apparaissent sur le tableau de bord Trackdéchets) | ✅ |
 | Export du registre | ✅ | ✅ | ✅ | ✅ |
 | Édition, suppression, duplication des bordereaux | ✅ | ✅ | ✅ | 🔴 |
