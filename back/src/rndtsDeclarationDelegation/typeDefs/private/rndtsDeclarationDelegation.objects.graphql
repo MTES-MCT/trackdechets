@@ -33,12 +33,12 @@ type RndtsDeclarationDelegation {
   """
   Date de début de la délégation
   """
-  validityStartDate: DateTime!
+  startDate: DateTime!
 
   """
   Date de fin de la délégation
   """
-  validityEndDate: DateTime
+  endDate: DateTime
 
   """
   Objet de la délégation
@@ -46,12 +46,12 @@ type RndtsDeclarationDelegation {
   comment: String
 
   """
-  Si la demande de délégation a été acceptée ou non par le délégataire
+  Si la demande de délégation a été révoquée (par le délégataire ou le délégant)
   """
-  isAccepted: Boolean!
+  isRevoked: Boolean!
 
   """
-  Si la demande de délégation est valide et active
+  Statut de la délégation
   """
-  isActive: Boolean!
+  status: RndtsDeclarationDelegationStatus
 }

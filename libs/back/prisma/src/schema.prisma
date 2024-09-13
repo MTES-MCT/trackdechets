@@ -1044,12 +1044,12 @@ model RndtsDeclarationDelegation {
   // Délégant
   delegatorOrgId String @db.VarChar(30)
 
-  validityStartDate DateTime  @default(now()) @db.Timestamptz(6)
-  validityEndDate   DateTime?
+  startDate DateTime  @default(now()) @db.Timestamptz(6)
+  endDate   DateTime?
 
   comment String? @db.VarChar(500)
 
-  isAccepted Boolean @default(true)
+  isRevoked Boolean @default(false)
 
   @@index([delegateOrgId], map: "_RndtsDeclarationDelegationDelegateOrgIdIdx")
   @@index([delegatorOrgId], map: "_RndtsDeclarationDelegationDelegatorOrgIdIdx")

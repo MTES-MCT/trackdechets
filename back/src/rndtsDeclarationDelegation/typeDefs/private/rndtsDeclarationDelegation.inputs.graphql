@@ -17,12 +17,12 @@ input CreateRndtsDeclarationDelegationInput {
   """
   Date de début de la délégation. Par défaut, la date du jour
   """
-  validityStartDate: DateTime
+  startDate: DateTime
 
   """
   Date de fin de la délégation. Si absente, la délégation est valable indéfiniment
   """
-  validityEndDate: DateTime
+  endDate: DateTime
 
   """
   Objet de la délégation

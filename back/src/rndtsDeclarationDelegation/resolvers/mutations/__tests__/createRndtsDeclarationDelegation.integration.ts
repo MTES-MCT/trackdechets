@@ -24,11 +24,10 @@ const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
       updatedAt
       delegateOrgId
       delegatorOrgId
-      validityStartDate
-      validityEndDate
+      startDate
+      endDate
       comment
-      isAccepted
-      isActive
+      isRevoked
     }
   }
 `;
@@ -113,20 +112,18 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Can't really do better for dates: https://github.com/prisma/prisma/issues/16719
       expect(data.createRndtsDeclarationDelegation.createdAt).not.toBeNull();
       expect(data.createRndtsDeclarationDelegation.updatedAt).not.toBeNull();
-      expect(
-        data.createRndtsDeclarationDelegation.validityStartDate
-      ).not.toBeNull();
-      expect(data.createRndtsDeclarationDelegation.validityEndDate).toBeNull();
+      expect(data.createRndtsDeclarationDelegation.startDate).not.toBeNull();
+      expect(data.createRndtsDeclarationDelegation.endDate).toBeNull();
       expect(data.createRndtsDeclarationDelegation.comment).toBeNull();
-      expect(data.createRndtsDeclarationDelegation.isAccepted).toBeTruthy();
+      expect(data.createRndtsDeclarationDelegation.isRevoked).toBeFalsy();
 
       // Persisted value should be OK
       expect(delegation?.createdAt).not.toBeNull();
       expect(delegation?.updatedAt).not.toBeNull();
-      expect(delegation?.validityStartDate).not.toBeNull();
-      expect(delegation?.validityEndDate).toBeNull();
+      expect(delegation?.startDate).not.toBeNull();
+      expect(delegation?.endDate).toBeNull();
       expect(delegation?.comment).toBeNull();
-      expect(delegation?.isAccepted).toBeTruthy();
+      expect(delegation?.isRevoked).toBeFalsy();
     });
 
     it("user can add a comment", async () => {
@@ -283,7 +280,7 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       const { errors, delegation } = await createDelegation(user, {
         delegateOrgId: delegate.orgId,
         delegatorOrgId: delegator.orgId,
-        validityEndDate: nowPlusXHours(2).toISOString() as any
+        endDate: nowPlusXHours(2).toISOString() as any
       });
 
       // Then
@@ -311,8 +308,8 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       const { errors, delegation } = await createDelegation(user, {
         delegateOrgId: delegate.orgId,
         delegatorOrgId: delegator.orgId,
-        validityStartDate: new Date().toISOString() as any,
-        validityEndDate: nowPlusXHours(2).toISOString() as any
+        startDate: new Date().toISOString() as any,
+        endDate: nowPlusXHours(2).toISOString() as any
       });
 
       // Then
@@ -340,8 +337,8 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       const { errors, delegation } = await createDelegation(user, {
         delegateOrgId: delegate.orgId,
         delegatorOrgId: delegator.orgId,
-        validityStartDate: nowPlusXHours(2).toISOString() as any,
-        validityEndDate: nowPlusXHours(3).toISOString() as any
+        startDate: nowPlusXHours(2).toISOString() as any,
+        endDate: nowPlusXHours(3).toISOString() as any
       });
 
       // Then
@@ -369,13 +366,13 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       const { errors, delegation } = await createDelegation(user, {
         delegateOrgId: delegate.orgId,
         delegatorOrgId: delegator.orgId,
-        validityEndDate: nowPlusXHours(3).toISOString() as any
+        endDate: nowPlusXHours(3).toISOString() as any
       });
 
       // Refuse the delegation
       await prisma.rndtsDeclarationDelegation.update({
         where: { id: delegation?.id },
-        data: { isAccepted: false }
+        data: { isRevoked: true }
       });
 
       // Then
@@ -400,14 +397,14 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       const { errors, delegation } = await createDelegation(user, {
         delegateOrgId: delegate.orgId,
         delegatorOrgId: delegator.orgId,
-        validityStartDate: nowPlusXHours(2).toISOString() as any,
-        validityEndDate: nowPlusXHours(3).toISOString() as any
+        startDate: nowPlusXHours(2).toISOString() as any,
+        endDate: nowPlusXHours(3).toISOString() as any
       });
 
       // Refuse the delegation
       await prisma.rndtsDeclarationDelegation.update({
         where: { id: delegation?.id },
-        data: { isAccepted: false }
+        data: { isRevoked: true }
       });
 
       // Then

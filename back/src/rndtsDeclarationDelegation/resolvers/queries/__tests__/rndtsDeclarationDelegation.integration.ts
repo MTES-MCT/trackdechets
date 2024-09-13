@@ -14,11 +14,11 @@ const RNDTS_DECLARATION_DELEGATION = gql`
       updatedAt
       delegateOrgId
       delegatorOrgId
-      validityStartDate
-      validityEndDate
+      startDate
+      endDate
       comment
-      isAccepted
-      isActive
+      isRevoked
+      status
     }
   }
 `;

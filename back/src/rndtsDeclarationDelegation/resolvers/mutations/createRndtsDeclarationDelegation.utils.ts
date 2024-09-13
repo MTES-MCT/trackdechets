@@ -13,14 +13,14 @@ export const createDelegation = async (
 /**
  * Check to prevent having multiple active delegations at the same time.
  *
- * We don't authorize already having an accepted delegation (isAccepted=true) that has
+ * We don't authorize already having a non-revoked delegation (isRevoked=false) that has
  * not yet expired.
  *
  * That means that if the company has a delegation that only takes effect in the future,
  * it cannot create a new one for the meantime. Users would have to delete the delegation
  * in the future and create a new one.
  */
-export const checkNoAcceptedandNotExpiredDelegation = async (
+export const checkNoNotRevokedandNotExpiredDelegation = async (
   user: Express.User,
   input: ParsedCreateRndtsDeclarationDelegationInput
 ) => {
@@ -30,8 +30,8 @@ export const checkNoAcceptedandNotExpiredDelegation = async (
   const activeDelegation = await delegationRepository.findFirst({
     delegatorOrgId: input.delegatorOrgId,
     delegateOrgId: input.delegateOrgId,
-    isAccepted: true,
-    OR: [{ validityEndDate: null }, { validityEndDate: { gt: NOW } }]
+    isRevoked: false,
+    OR: [{ endDate: null }, { endDate: { gt: NOW } }]
   });
 
   if (activeDelegation) {

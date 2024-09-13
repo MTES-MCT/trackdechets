@@ -1,9 +1,9 @@
 import { RndtsDeclarationDelegationResolvers } from "../../generated/graphql/types";
-import { isActiveResolver } from "./isActive";
+import { statusResolver } from "./status";
 
 const rndtsDeclarationDelegationResolvers: RndtsDeclarationDelegationResolvers =
   {
-    isActive: isActiveResolver
+    status: statusResolver
   };
 
 export default rndtsDeclarationDelegationResolvers;

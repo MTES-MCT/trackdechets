@@ -88,7 +88,7 @@ describe("index", () => {
       const input: CreateRndtsDeclarationDelegationInput = {
         delegatorOrgId: "40081510600010",
         delegateOrgId: "39070205800012",
-        validityStartDate: new Date("2000-01-01")
+        startDate: new Date("2000-01-01")
       };
 
       // When
@@ -98,7 +98,7 @@ describe("index", () => {
       } catch (error) {
         // Then
         expect(error.errors[0]).toMatchObject({
-          path: ["validityStartDate"],
+          path: ["startDate"],
           message:
             "La date de début de validité ne peut pas être dans le passé."
         });
@@ -110,7 +110,7 @@ describe("index", () => {
       const input: CreateRndtsDeclarationDelegationInput = {
         delegatorOrgId: "40081510600010",
         delegateOrgId: "39070205800012",
-        validityEndDate: new Date("2000-01-01")
+        endDate: new Date("2000-01-01")
       };
 
       // When
@@ -120,7 +120,7 @@ describe("index", () => {
       } catch (error) {
         // Then
         expect(error.errors[0]).toMatchObject({
-          path: ["validityEndDate"],
+          path: ["endDate"],
           message: "La date de fin de validité ne peut pas être dans le passé."
         });
       }
@@ -131,8 +131,8 @@ describe("index", () => {
       const input: CreateRndtsDeclarationDelegationInput = {
         delegatorOrgId: "40081510600010",
         delegateOrgId: "39070205800012",
-        validityStartDate: new Date("2030-01-05"),
-        validityEndDate: new Date("2030-01-01")
+        startDate: new Date("2030-01-05"),
+        endDate: new Date("2030-01-01")
       };
 
       // When
@@ -142,7 +142,7 @@ describe("index", () => {
       } catch (error) {
         // Then
         expect(error.errors[0]).toMatchObject({
-          path: ["validityEndDate"],
+          path: ["endDate"],
           message:
             "La date de début de validité doit être avant la date de fin."
         });

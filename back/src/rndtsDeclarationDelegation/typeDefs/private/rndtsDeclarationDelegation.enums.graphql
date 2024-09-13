@@ -1,0 +1,19 @@
+"""
+Statut d'une demande de délégation
+"""
+enum RndtsDeclarationDelegationStatus {
+  """
+  À venir
+  """
+  INCOMING
+
+  """
+  En cours
+  """
+  ONGOING
+
+  """
+  Clôturée
+  """
+  CLOSED
+}
