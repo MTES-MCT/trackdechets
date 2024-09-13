@@ -1064,14 +1064,38 @@ model Bsvhu {
   transporterTransportPlates                          String[]
   transporterRecepisseIsExempted                      Boolean?
 
+  intermediaries IntermediaryBsvhuAssociation[]
+
+  // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
+  intermediariesOrgIds String[] @default([])
+
   // partial indices _BsvhuIsDeletedIdx,_BsvhuIsDraftIdx  see migration82_missing_indices.sql
 
   @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterCompanyVatNumberIdx")
+  @@index([intermediariesOrgIds], map: "_BsvhuIntermediariesOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
+}
+
+model IntermediaryBsvhuAssociation {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  siret     String
+  contact   String
+  vatNumber String?
+  address   String?
+  phone     String?
+  mail      String?
+  bsvhuId   String
+  bsvhu     Bsvhu    @relation(fields: [bsvhuId], references: [id])
+
+  @@index([bsvhuId], map: "_IntermediaryBsvhuAssociationBsvhuIdIdx")
+  @@index([siret], map: "IntermediaryBsvhuAssociationSiretIdx")
+  @@index([vatNumber], map: "IntermediaryBsvhuAssociationVatNumberIdx")
 }
 
 model Bsdasri {

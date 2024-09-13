@@ -6,7 +6,7 @@ import {
   WasteRegistryWhere
 } from "../generated/graphql/types";
 import { toElasticFilter } from "./where";
-import { Bsvhu, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@td/prisma";
 
 export function buildQuery(
@@ -153,7 +153,13 @@ export type RegistryBsff = Prisma.BsffGetPayload<{
   include: typeof RegistryBsffInclude;
 }>;
 
-type RegistryBsvhu = Bsvhu;
+export const RegistryBsvhuInclude = Prisma.validator<Prisma.BsvhuInclude>()({
+  intermediaries: true
+});
+
+export type RegistryBsvhu = Prisma.BsvhuGetPayload<{
+  include: typeof RegistryBsvhuInclude;
+}>;
 
 export type RegistryBsdMap = {
   bsdds: RegistryForm[];
@@ -197,7 +203,8 @@ export async function toPrismaBsds(
         id: {
           in: BSVHU.map(bsvhu => bsvhu.id)
         }
-      }
+      },
+      include: RegistryBsvhuInclude
     }),
     prisma.bsda.findMany({
       where: {

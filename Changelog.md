@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - ETQ destinataire, je peux spécifier le statut de rinçage de la citerne pour son retour à vide (back) [PR 3546](https://github.com/MTES-MCT/trackdechets/pull/3546)
 - ETQ destinataire, je peux indiquer que mon véhicule est rincé ou non pour son retour à vide (back) [PR 3548](https://github.com/MTES-MCT/trackdechets/pull/3548)
+- Ajout d'intermédiaires sur les BSVHU [PR 3560](https://github.com/MTES-MCT/trackdechets/pull/3560)
 
 #### :nail_care: Améliorations
 

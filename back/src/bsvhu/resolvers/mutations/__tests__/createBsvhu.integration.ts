@@ -9,44 +9,48 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import gql from "graphql-tag";
 
-const CREATE_VHU_FORM = `
-mutation CreateVhuForm($input: BsvhuInput!) {
-  createBsvhu(input: $input) {
-    id
-    destination {
-      company {
+const CREATE_VHU_FORM = gql`
+  mutation CreateVhuForm($input: BsvhuInput!) {
+    createBsvhu(input: $input) {
+      id
+      destination {
+        company {
           siret
+        }
       }
-    }
-    emitter {
-      company {
+      emitter {
+        company {
           siret
           name
           address
           contact
+        }
       }
-    }
-    transporter {
-      company {
+      transporter {
+        company {
+          siret
+          name
+          address
+          contact
+          mail
+          phone
+        }
+        recepisse {
+          number
+          department
+          validityLimit
+        }
+      }
+      intermediaries {
         siret
-        name
-        address
-        contact
-        mail
-        phone
       }
-      recepisse {
-        number
-        department
-        validityLimit
+      weight {
+        value
       }
-    }
-    weight {
-      value
     }
   }
-}
 `;
 
 describe("Mutation.Vhu.create", () => {
@@ -304,6 +308,245 @@ describe("Mutation.Vhu.create", () => {
     expect(data.createBsvhu.transporter!.recepisse!.department).toEqual("83");
     expect(data.createBsvhu.transporter!.recepisse!.validityLimit).toEqual(
       "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("should create a bsvhu with intermediary", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"]
+    });
+
+    const intermediary = await companyFactory({
+      companyTypes: ["INTERMEDIARY"]
+    });
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      },
+      intermediaries: [
+        {
+          siret: intermediary.siret,
+          name: intermediary.name,
+          address: intermediary.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsvhu.id).toBeDefined();
+    expect(data.createBsvhu.intermediaries!.length).toBe(1);
+  });
+
+  it("should fail if creating a bsvhu with the same intermediary several times", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"]
+    });
+
+    const intermediary = await companyFactory({
+      companyTypes: ["INTERMEDIARY"]
+    });
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      },
+      intermediaries: [
+        {
+          siret: intermediary.siret,
+          name: intermediary.name,
+          address: intermediary.address,
+          contact: "John Doe"
+        },
+        {
+          siret: intermediary.siret,
+          name: intermediary.name,
+          address: intermediary.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(errors[0].message).toBe(
+      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
+    );
+  });
+
+  it("should fail if creating a bsvhu with more than 3 intermediaries", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"]
+    });
+
+    const intermediary1 = await companyFactory({
+      companyTypes: ["INTERMEDIARY"]
+    });
+    const intermediary2 = await companyFactory({
+      companyTypes: ["INTERMEDIARY"]
+    });
+    const intermediary3 = await companyFactory({
+      companyTypes: ["INTERMEDIARY"]
+    });
+    const intermediary4 = await companyFactory({
+      companyTypes: ["INTERMEDIARY"]
+    });
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      },
+      intermediaries: [
+        {
+          siret: intermediary1.siret,
+          name: intermediary1.name,
+          address: intermediary1.address,
+          contact: "John Doe"
+        },
+        {
+          siret: intermediary2.siret,
+          name: intermediary2.name,
+          address: intermediary2.address,
+          contact: "John Doe"
+        },
+        {
+          siret: intermediary3.siret,
+          name: intermediary3.name,
+          address: intermediary3.address,
+          contact: "John Doe"
+        },
+        {
+          siret: intermediary4.siret,
+          name: intermediary4.name,
+          address: intermediary4.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(errors[0].message).toBe(
+      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires"
     );
   });
 
