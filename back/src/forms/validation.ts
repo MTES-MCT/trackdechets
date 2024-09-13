@@ -7,7 +7,8 @@ import {
   Status,
   TransportMode,
   WasteAcceptationStatus,
-  OperationMode
+  OperationMode,
+  EmptyReturnADR
 } from "@prisma/client";
 import { Decimal } from "decimal.js";
 import { checkVAT } from "jsvat";
@@ -1407,6 +1408,70 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
         }
 
         return true;
+      }
+    ),
+  emptyReturnADR: yup
+    .mixed<EmptyReturnADR>()
+    .notRequired()
+    .nullable()
+    .test(
+      "not-defined-if-not-citerne-or-benne",
+      "Vous ne pouvez pas préciser de retour à vide ADR si le conditionnement du déchet n'est pas une citerne ou une benne",
+      (value, context) => {
+        const { wasteDetailsPackagingInfos } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        const hasCiterneOrBenne = wasteDetailsPackagingInfos.some(info =>
+          ["BENNE", "CITERNE"].includes(info.type)
+        );
+
+        return hasCiterneOrBenne;
+      }
+    )
+    .test(
+      "not-defined-if-waste-not-accepted",
+      "Vous ne pouvez préciser de retour à vide ADR que si le déchet a été totalement accepté",
+      (value, context) => {
+        const { wasteAcceptationStatus } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        return Boolean(wasteAcceptationStatus === "ACCEPTED");
+      }
+    )
+    .test(
+      "not-defined-if-waste-not-dangerous",
+      "Vous ne pouvez préciser de retour à vide ADR que si le déchet est dangereux",
+      (value, context) => {
+        const { wasteDetailsIsDangerous, wasteDetailsPop, wasteDetailsCode } =
+          context.parent;
+
+        if (!isDefined(value)) return true;
+
+        const wasteIsDangerous =
+          wasteDetailsIsDangerous ||
+          wasteDetailsPop ||
+          isDangerous(wasteDetailsCode);
+
+        return wasteIsDangerous;
+      }
+    )
+    .test(
+      "not-defined-if-transport-mode-not-road-nor-null",
+      "Vous ne pouvez préciser de retour à vide ADR que si le mode de transport est route (ROAD) ou null",
+      (value, context) => {
+        const { transporters } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        const lastTransportMode =
+          transporters[transporters.length - 1]?.transporterTransportMode;
+
+        // Tolerate null for legacy BSDs
+        return (
+          lastTransportMode === TransportMode.ROAD || lastTransportMode === null
+        );
       }
     )
 });

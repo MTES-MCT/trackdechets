@@ -39,6 +39,7 @@ import { isFrenchCompany } from "../../companies/validation";
 import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
 import { displayWasteQuantity } from "../../registry/utils";
 import { dateToXMonthAtHHMM, isDefined } from "../../common/helpers";
+import { getEmptyReturnADRLabel } from "../helpers/emptyReturnADR";
 import { getCiterneNotWashedOutReasonLabel } from "../helpers/citerneNotWashedOutReason";
 
 type ReceiptFieldsProps = Partial<
@@ -691,7 +692,16 @@ export async function generateBsddPdf(id: PrismaForm["id"]) {
                 échéant) :
               </strong>
             </p>
-            <p>{form.wasteDetails?.onuCode}</p>
+            <p>
+              {isDefined(form.emptyReturnADR) ? (
+                <>
+                  {getEmptyReturnADRLabel(form.emptyReturnADR)?.toUpperCase()}:{" "}
+                  {form.wasteDetails?.onuCode}
+                </>
+              ) : (
+                <>{form.wasteDetails?.onuCode}</>
+              )}
+            </p>
           </div>
         </div>
 

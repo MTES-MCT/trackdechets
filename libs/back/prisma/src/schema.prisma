@@ -525,6 +525,7 @@ model Form {
   currentTransporterOrgId               String?
   hasCiterneBeenWashedOut               Boolean?
   citerneNotWashedOutReason             CiterneNotWashedOutReason?
+  emptyReturnADR                        EmptyReturnADR?
 
   transporters BsddTransporter[]
   groupedIn    FormGroupement[]  @relation("GroupedIn")
@@ -2016,4 +2017,11 @@ enum CiterneNotWashedOutReason {
   INCOMPATIBLE
   UNAVAILABLE
   NOT_BY_DRIVER
+}
+
+enum EmptyReturnADR {
+  EMPTY_NOT_WASHED
+  EMPTY_RETURN_NOT_WASHED
+  EMPTY_VEHICLE
+  EMPTY_CITERNE
 }

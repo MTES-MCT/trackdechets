@@ -57,7 +57,6 @@ import { NON_RENSEIGNE } from "../../../common/wordings/dashboard/wordingsDashbo
 
 import "./bsdCard.scss";
 import { getCurrentTransporterInfos } from "../../bsdMapper";
-import { isDefined } from "../../../../common/helper";
 
 function BsdCard({
   bsd,
@@ -418,7 +417,7 @@ function BsdCard({
                   code={bsdDisplay.wasteDetails.code!}
                   name={bsdDisplay.wasteDetails.name!}
                   weight={
-                    isDefined(bsdDisplay.wasteDetails?.weight)
+                    Boolean(bsdDisplay.wasteDetails?.weight)
                       ? `${bsdDisplay.wasteDetails.weight} ${unitOfMeasure}`
                       : ""
                   }

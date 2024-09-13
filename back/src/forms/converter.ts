@@ -772,6 +772,7 @@ export function expandFormFromDb(
     noTraceability: forwardedIn
       ? forwardedIn.noTraceability
       : form.noTraceability,
+    emptyReturnADR: form.emptyReturnADR,
     nextDestination: forwardedIn
       ? nullIfNoValues<NextDestination>({
           processingOperation: forwardedIn.nextDestinationProcessingOperation,

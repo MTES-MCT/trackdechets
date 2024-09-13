@@ -205,3 +205,18 @@ enum CiterneNotWashedOutReason {
   "Rinçage non réalisé par le chauffeur"
   NOT_BY_DRIVER
 }
+
+"Retour à vide ADR"
+enum EmptyReturnADR {
+  "Vide, non nettoyé"
+  EMPTY_NOT_WASHED
+
+  "Retour à vide, non nettoyé"
+  EMPTY_RETURN_NOT_WASHED
+
+  "Véhicule vide, dernière marchandise chargée"
+  EMPTY_VEHICLE
+
+  "Véhicule-Citerne vide, dernière marchandise chargée"
+  EMPTY_CITERNE
+}

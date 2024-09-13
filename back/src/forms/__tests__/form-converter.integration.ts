@@ -54,6 +54,7 @@ describe("expandFormFromDb", () => {
         isForeignShip: false,
         isPrivateIndividual: false
       },
+      emptyReturnADR: form.emptyReturnADR,
       recipient: {
         cap: form.recipientCap,
         processingOperation: form.recipientProcessingOperation,
