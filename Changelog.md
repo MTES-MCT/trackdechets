@@ -34,7 +34,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Rendre BSDAs en brouillon inaccessibles pour les entreprises dont l'auteur ne fait pas partie [PR 3503](https://github.com/MTES-MCT/trackdechets/pull/3503)
 - Ajout de la possibilité de réviser la quantité du destinataire d'un BSDD si un entreposage provisoire est présent [PR 3527](https://github.com/MTES-MCT/trackdechets/pull/3527)
-- Rendre obligatoire le volume du contenant à la publication sur le BSFF
 
 #### :boom: Breaking changes
 
