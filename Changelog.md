@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajouter deux sous-profils pour l'installation de traitement VHU [PR 3480](https://github.com/MTES-MCT/trackdechets/pull/3480)
 
+#### :boom: Breaking changes
+
+- Rendre obligatoire le volume du contenant à la publication sur le BSFF [PR 3555](https://github.com/MTES-MCT/trackdechets/pull/3555)
+
 # [2024.8.1] 27/08/2024
 
 #### :rocket: Nouvelles fonctionnalités
