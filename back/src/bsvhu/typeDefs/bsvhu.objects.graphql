@@ -9,13 +9,20 @@ type BsvhuEdge {
   node: Bsvhu!
 }
 
+type BsvhuMetadataFields {
+  "Liste des champs scellés"
+  sealed: [[String!]!]!
+}
+
 type BsvhuMetadata {
-  errors: [BsvhuError!]
+  errors: [BsvhuError!]!
+  "Informations sur les champs"
+  fields: BsvhuMetadataFields!
 }
 
 type BsvhuError {
   message: String!
-  path: String!
+  path: [String!]!
   requiredFor: SignatureTypeInput!
 }
 

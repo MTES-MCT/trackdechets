@@ -4,7 +4,8 @@ import { ParsedZodBsvhu, ZodBsvhu } from "./schema";
 import {
   bsvhuEditionRules,
   BsvhuEditableFields,
-  isBsvhuFieldRequired
+  isBsvhuFieldRequired,
+  EditionRulePath
 } from "./rules";
 import { getSignatureAncestors } from "./helpers";
 import { isArray } from "../../common/dataTypes";
@@ -133,6 +134,7 @@ type CheckFieldIsDefinedArgs<T extends ZodBsvhu> = {
   field: string;
   rule: EditionRule<T>;
   readableFieldName?: string;
+  path?: EditionRulePath;
   ctx: RefinementCtx;
   errorMsg?: (fieldDescription: string) => string;
 };
@@ -140,7 +142,8 @@ type CheckFieldIsDefinedArgs<T extends ZodBsvhu> = {
 function checkFieldIsDefined<T extends ZodBsvhu>(
   args: CheckFieldIsDefinedArgs<T>
 ) {
-  const { resource, field, rule, ctx, readableFieldName, errorMsg } = args;
+  const { resource, field, rule, ctx, readableFieldName, path, errorMsg } =
+    args;
   const value = resource[field];
   if (value == null || (isArray(value) && (value as any[]).length === 0)) {
     const fieldDescription = readableFieldName
@@ -149,7 +152,7 @@ function checkFieldIsDefined<T extends ZodBsvhu>(
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: [field],
+      path: path ?? [field],
       message: [
         errorMsg
           ? errorMsg(fieldDescription)
@@ -172,7 +175,7 @@ export const checkRequiredFields: (
 
   return (bsvhu, zodContext) => {
     for (const bsvhuField of Object.keys(bsvhuEditionRules)) {
-      const { required, readableFieldName } =
+      const { required, readableFieldName, path } =
         bsvhuEditionRules[bsvhuField as keyof BsvhuEditableFields];
 
       if (required) {
@@ -186,6 +189,7 @@ export const checkRequiredFields: (
             resource: bsvhu,
             field: bsvhuField,
             rule: required,
+            path,
             readableFieldName,
             ctx: zodContext
           });

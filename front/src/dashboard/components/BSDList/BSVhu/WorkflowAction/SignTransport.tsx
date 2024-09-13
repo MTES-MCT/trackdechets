@@ -66,7 +66,7 @@ export function SignTransport({
           error =>
             error.requiredFor === SignatureTypeInput.Transport &&
             // Transporter Receipt will be auto-completed by the transporter
-            !error.path.startsWith("transporterRecepisse")
+            !error.path.startsWith("transporter.recepisse")
         ) ? (
           <>
             <p className="tw-mt-2 tw-text-red-700">

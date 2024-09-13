@@ -38,23 +38,19 @@ type BspaohReceptionWasteDetail {
 }
 
 type BspaohMetadata {
-  errors: [BspaohError]
+  errors: [BspaohError!]!
   "Informations sur les champs"
-  fields: BspaohMetadataFields
+  fields: BspaohMetadataFields!
 }
 
 type BspaohMetadataFields {
   "Liste des champs scellés"
-  sealed: [BspaohMetadataField]
-}
-
-type BspaohMetadataField {
-  name: String!
+  sealed: [[String!]!]!
 }
 
 type BspaohError {
   message: String!
-  path: String!
+  path: [String!]!
   requiredFor: BspaohSignatureType!
 }
 

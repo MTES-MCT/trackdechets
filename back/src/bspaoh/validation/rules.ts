@@ -1,11 +1,16 @@
-import { Prisma, WasteAcceptationStatus } from "@prisma/client";
+import { Prisma, User, WasteAcceptationStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
-import { BspaohSignatureType } from "../../generated/graphql/types";
+import {
+  BspaohInput,
+  BspaohSignatureType
+} from "../../generated/graphql/types";
 import { capitalize } from "../../common/strings";
 import { ZodFullBspaoh } from "./schema";
 import { isForeignVat } from "@td/constants";
 import { UnparsedInputs } from ".";
-import { getUserFunctions, getSignatureAncestors } from "./helpers";
+import { getUserFunctions } from "./helpers";
+import { Leaves } from "../../types";
+import { BspaohForParsing } from "../types";
 
 type EditableBspaohTransporterFields = Required<
   Omit<
@@ -64,6 +69,8 @@ export type FieldCheck<Key extends keyof EditableFullBspaohFields> = {
   suffix?: string; // A custom message at the end of the error
 };
 
+export type EditionRulePath = Leaves<BspaohInput, 5>;
+
 export type BspaohEditionRules = {
   [Key in keyof EditableFullBspaohFields]: {
     // At what signature the field is sealed, and under which circumstances
@@ -71,23 +78,27 @@ export type BspaohEditionRules = {
     // At what signature the field is required, and under which circumstances. If absent, field is never required
     required?: FieldCheck<Key>;
     readableFieldName?: string; // A custom field name for errors
+    path?: EditionRulePath;
   };
 };
 
 export const editionRules: BspaohEditionRules = {
   wasteAdr: {
     sealed: { from: "EMISSION" },
-    readableFieldName: "le code adr"
+    readableFieldName: "le code adr",
+    path: ["waste", "adr"]
   },
   wasteType: {
     readableFieldName: "le type de déchet",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["waste", "type"]
   },
   wasteCode: {
     sealed: { from: "EMISSION" },
     required: { from: "EMISSION" },
-    readableFieldName: "le code famille"
+    readableFieldName: "le code famille",
+    path: ["waste", "code"]
   },
 
   wastePackagings: {
@@ -106,63 +117,75 @@ export const editionRules: BspaohEditionRules = {
           });
         }
       }
-    }
+    },
+    path: ["waste", "packagings"]
   },
   emitterCompanyName: {
     readableFieldName: "le nom de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["emitter", "company", "name"]
   },
   emitterCompanySiret: {
     readableFieldName: "le SIRET de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["emitter", "company", "siret"]
   },
   emitterCompanyAddress: {
     readableFieldName: "l'adresse de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["emitter", "company", "address"]
   },
   emitterCompanyContact: {
     readableFieldName: "le nom de contact de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["emitter", "company", "contact"]
   },
   emitterCompanyPhone: {
     readableFieldName: "le téléphone de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["emitter", "company", "phone"]
   },
   emitterCompanyMail: {
     readableFieldName: "l'email de l'entreprise émettrice",
-
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["emitter", "company", "mail"]
   },
   emitterCustomInfo: {
     readableFieldName:
       "les champs d'informations complémentaires de l'entreprise émettrice",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION" },
+    path: ["emitter", "customInfo"]
   },
   emitterPickupSiteName: {
     readableFieldName: "le nom de l'adresse de chantier ou de collecte",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION" },
+    path: ["emitter", "pickupSite", "name"]
   },
   emitterPickupSiteAddress: {
     readableFieldName: "l'adresse de collecte ou de chantier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION" },
+    path: ["emitter", "pickupSite", "address"]
   },
   emitterPickupSiteCity: {
     readableFieldName: "la ville de l'adresse de collecte ou de chantier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION" },
+    path: ["emitter", "pickupSite", "city"]
   },
   emitterPickupSitePostalCode: {
     readableFieldName: "le code postal de l'adresse de collecte ou de chantier",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION" },
+    path: ["emitter", "pickupSite", "postalCode"]
   },
   emitterPickupSiteInfos: {
     readableFieldName: "les informations de l'adresse de collecte",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION" },
+    path: ["emitter", "pickupSite", "infos"]
   },
   emitterWasteWeightValue: {
     readableFieldName: "le poids du déchet émis",
@@ -172,11 +195,13 @@ export const editionRules: BspaohEditionRules = {
       when: bspaoh =>
         bspaoh.emitterWasteWeightIsEstimate !== null &&
         bspaoh.emitterWasteWeightIsEstimate !== undefined
-    }
+    },
+    path: ["emitter", "emission", "detail", "weight", "value"]
   },
   emitterWasteWeightIsEstimate: {
     readableFieldName: "la quantité émise",
-    sealed: { from: "EMISSION" }
+    sealed: { from: "EMISSION" },
+    path: ["emitter", "emission", "detail", "weight", "isEstimate"]
   },
   emitterWasteQuantityValue: {
     readableFieldName: "la quantité émise (nombre)",
@@ -184,7 +209,8 @@ export const editionRules: BspaohEditionRules = {
     required: {
       from: "EMISSION",
       when: bspaoh => !bspaoh.emitterWasteWeightValue
-    }
+    },
+    path: ["emitter", "emission", "detail", "quantity"]
   },
 
   destinationCompanyName: {
@@ -193,7 +219,8 @@ export const editionRules: BspaohEditionRules = {
       from: "EMISSION",
       when: isDestinationSealed
     },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "name"]
   },
   destinationCompanySiret: {
     readableFieldName: "le SIRET de l'entreprise de destination",
@@ -201,7 +228,8 @@ export const editionRules: BspaohEditionRules = {
       from: "EMISSION",
       when: isDestinationSealed
     },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "siret"]
   },
   destinationCompanyAddress: {
     readableFieldName: "l'adresse de l'entreprise de destination",
@@ -210,7 +238,8 @@ export const editionRules: BspaohEditionRules = {
       from: "EMISSION",
       when: isDestinationSealed
     },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "address"]
   },
   destinationCompanyContact: {
     readableFieldName: "le nom de contact de l'entreprise de destination",
@@ -218,7 +247,8 @@ export const editionRules: BspaohEditionRules = {
       from: "EMISSION",
       when: isDestinationSealed
     },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "contact"]
   },
   destinationCompanyPhone: {
     readableFieldName: "le téléphone de l'entreprise de destination",
@@ -226,7 +256,8 @@ export const editionRules: BspaohEditionRules = {
       from: "EMISSION",
       when: isDestinationSealed
     },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "phone"]
   },
   destinationCompanyMail: {
     readableFieldName: "l'email de l'entreprise de destination",
@@ -234,71 +265,85 @@ export const editionRules: BspaohEditionRules = {
       from: "EMISSION",
       when: isDestinationSealed
     },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "mail"]
   },
   destinationCustomInfo: {
     readableFieldName:
       "les champs d'informations complémentaires de l'entreprise de destination",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["destination", "customInfo"]
   },
   destinationCap: {
     readableFieldName: "le CAP du destinataire",
-    sealed: { from: "TRANSPORT" }
+    sealed: { from: "TRANSPORT" },
+    path: ["destination", "cap"]
   },
 
   destinationReceptionWasteReceivedWeightValue: {
     readableFieldName: "le poids du déchet reçu",
-    sealed: { from: "RECEPTION" }
+    sealed: { from: "RECEPTION" },
+    path: ["destination", "reception", "detail", "receivedWeight"]
   },
   destinationReceptionWasteAcceptedWeightValue: {
     readableFieldName: "le poids du déchet accepté",
-    sealed: { from: "RECEPTION" }
+    sealed: { from: "RECEPTION" },
+    path: ["destination", "reception", "detail", "receivedWeight"]
   },
   destinationReceptionWasteRefusedWeightValue: {
     readableFieldName: "le poids du déchet refusé",
-    sealed: { from: "RECEPTION" }
+    sealed: { from: "RECEPTION" },
+    path: ["destination", "reception", "detail", "refusedWeight"]
   },
 
   destinationReceptionWasteQuantityValue: {
     readableFieldName: "la quantité remise (nombre)",
     sealed: {
       from: "RECEPTION"
-    }
+    },
+    path: ["destination", "reception", "detail", "quantity"]
   },
 
   destinationReceptionAcceptationStatus: {
     readableFieldName: "le champ d'acceptation du déchet",
     sealed: { from: "RECEPTION" },
-    required: { from: "RECEPTION" }
+    required: { from: "RECEPTION" },
+    path: ["destination", "reception", "acceptation", "status"]
   },
   destinationReceptionWasteRefusalReason: {
     readableFieldName: "la raison du refus",
     sealed: { from: "RECEPTION" },
-    required: { from: "RECEPTION", when: isRefusedOrPartiallyRefused }
+    required: { from: "RECEPTION", when: isRefusedOrPartiallyRefused },
+    path: ["destination", "reception", "acceptation", "refusalReason"]
   },
   destinationReceptionDate: {
     readableFieldName: "la date de réception",
     sealed: { from: "RECEPTION" },
-    required: { from: "RECEPTION" }
+    required: { from: "RECEPTION" },
+    path: ["destination", "reception", "date"]
   },
   destinationReceptionWastePackagingsAcceptation: {
     readableFieldName: "le detail des conditionnements reçus",
     sealed: { from: "RECEPTION" },
-    required: { from: "RECEPTION" }
+    required: { from: "RECEPTION" },
+    path: ["destination", "reception", "acceptation", "packagings"]
   },
   destinationOperationCode: {
     readableFieldName: "le code d'opération de la destination",
     sealed: { from: "OPERATION" },
-    required: { from: "OPERATION" }
+    required: { from: "OPERATION" },
+    path: ["destination", "operation", "code"]
   },
   destinationOperationDate: {
     sealed: { from: "OPERATION" },
-    required: { from: "OPERATION", when: isNotRefused }
+    required: { from: "OPERATION", when: isNotRefused },
+    path: ["destination", "operation", "date"]
   },
   transporterCompanyName: {
     readableFieldName: "le nom du transporteur",
     sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "name"]
   },
   transporterCompanySiret: {
     readableFieldName: "le SIRET du transporteur",
@@ -306,32 +351,38 @@ export const editionRules: BspaohEditionRules = {
     required: {
       from: "EMISSION",
       when: bspaoh => !bspaoh.transporterCompanyVatNumber
-    }
+    },
+    path: ["transporter", "company", "siret"]
   },
   transporterTakenOverAt: {
     readableFieldName: "la date de prise en charge par le transporteur",
     sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "transport", "takenOverAt"]
   },
   transporterCompanyAddress: {
     readableFieldName: "l'adresse du transporteur",
     sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "address"]
   },
   transporterCompanyContact: {
     readableFieldName: "le nom de contact du transporteur",
     sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "contact"]
   },
   transporterCompanyPhone: {
     readableFieldName: "le téléphone du transporteur",
     sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "phone"]
   },
   transporterCompanyMail: {
     readableFieldName: "l'email du transporteur",
     sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "company", "mail"]
   },
   transporterCompanyVatNumber: {
     readableFieldName: "le numéro de TVA du transporteur",
@@ -339,17 +390,20 @@ export const editionRules: BspaohEditionRules = {
     required: {
       from: "TRANSPORT",
       when: bspaoh => !bspaoh.transporterCompanySiret
-    }
+    },
+    path: ["transporter", "company", "vatNumber"]
   },
   transporterCustomInfo: {
     readableFieldName:
       "les champs d'informations complémentaires du transporteur",
-    sealed: { from: "TRANSPORT" }
+    sealed: { from: "TRANSPORT" },
+    path: ["transporter", "customInfo"]
   },
   transporterRecepisseIsExempted: {
     readableFieldName: "l'exemption de récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
-    required: { from: "TRANSPORT" }
+    required: { from: "TRANSPORT" },
+    path: ["transporter", "recepisse", "isExempted"]
   },
   transporterRecepisseNumber: {
     readableFieldName: "le numéro de récépissé du transporteur",
@@ -358,7 +412,8 @@ export const editionRules: BspaohEditionRules = {
       from: "TRANSPORT",
       when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
+    },
+    path: ["transporter", "recepisse"]
   },
   transporterRecepisseDepartment: {
     readableFieldName: "le département de récépissé du transporteur",
@@ -367,7 +422,8 @@ export const editionRules: BspaohEditionRules = {
       from: "TRANSPORT",
       when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
+    },
+    path: ["transporter", "recepisse"]
   },
   transporterRecepisseValidityLimit: {
     readableFieldName: "la date de validaté du récépissé du transporteur",
@@ -376,14 +432,16 @@ export const editionRules: BspaohEditionRules = {
       from: "TRANSPORT",
       when: requireTransporterRecepisse,
       suffix: "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
+    },
+    path: ["transporter", "recepisse"]
   },
   transporterTransportMode: {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT"
     },
-    readableFieldName: "le mode de transport"
+    readableFieldName: "le mode de transport",
+    path: ["transporter", "transport", "mode"]
   },
   transporterTransportPlates: {
     sealed: { from: "TRANSPORT" },
@@ -400,7 +458,8 @@ export const editionRules: BspaohEditionRules = {
           });
         }
       }
-    }
+    },
+    path: ["transporter", "transport", "plates"]
   }
 };
 
@@ -517,7 +576,7 @@ export function checkSealedAndRequiredFields(
       if (updatedFields.includes(field)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: [field],
+          path: rule.path ?? [field],
           message: [
             `${fieldDescription} a été verrouillé via signature et ne peut pas être modifié.`,
             sealedRule.suffix
@@ -538,7 +597,7 @@ export function checkSealedAndRequiredFields(
       if (bspaoh[field] == null) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: [field],
+          path: rule.path ?? [field],
           message: [`${fieldDescription} est obligatoire.`, requiredRule.suffix]
             .filter(Boolean)
             .join(" ")
@@ -549,6 +608,38 @@ export function checkSealedAndRequiredFields(
     }
   }
 }
+
+export const getRequiredAndSealedFieldPaths = async (
+  bspaoh: BspaohForParsing,
+  currentSignatures: BspaohSignatureType[],
+  user: User | undefined
+): Promise<{
+  sealed: string[][];
+}> => {
+  const sealedFields: string[][] = [];
+  const userFunctions = await getUserFunctions(user, bspaoh);
+  for (const bspaohField of Object.keys(editionRules)) {
+    const { sealed, path } =
+      editionRules[bspaohField as keyof BspaohRulesEntries];
+    // Apply default values to rules
+    const sealedRule = {
+      from: sealed?.from,
+      when: sealed?.when ?? (() => true) // Default to true
+    };
+    if (path && sealed) {
+      const isSealed =
+        currentSignatures.includes(sealedRule.from) &&
+        sealedRule.when(bspaoh, bspaoh, userFunctions);
+      if (isSealed) {
+        sealedFields.push(path);
+      }
+    }
+  }
+  return {
+    sealed: sealedFields
+  };
+};
+
 /**
  * Util to print a digest of edition rules.
  * Must be called after initalization
@@ -558,7 +649,7 @@ export function printVerboseRules() {
     console.log({
       "nom technique": k,
       "nom verbeux": v?.readableFieldName ?? "",
-      "path gql": prismaFieldsToGqlPaths[k],
+      "path gql": v?.path?.join("."),
       "requis à partir de": v?.required?.from ?? "",
       "condition requis": v?.required?.when?.toString() ?? "",
       "scellé à partir de": v?.sealed?.from ?? "",
@@ -566,105 +657,3 @@ export function printVerboseRules() {
     });
   }
 }
-
-export function getSealedFieldsForSignature(signature?: BspaohSignatureType) {
-  const res: string[] = [];
-  if (!signature) {
-    return res;
-  }
-
-  const ancestors = getSignatureAncestors(signature);
-
-  for (const [k, v] of Object.entries(editionRules)) {
-    if (ancestors.includes(v?.sealed?.from)) {
-      res.push(k);
-    }
-  }
-  return res;
-}
-
-/**
- * Transform a camel-cased string to a dotted path
- * emitterCompanySiret -> emitter.company.siret
- */
-const prismaFieldToGqlPath = (field: string) => ({
-  [field]: field
-    .split(/(?=[A-Z])/)
-    .map(el => el.toLowerCase())
-    .join(".")
-});
-
-const CompanyFieldToGqlPath = prefix => ({
-  ...prismaFieldToGqlPath(`${prefix}CompanyName`),
-  ...prismaFieldToGqlPath(`${prefix}CompanySiret`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyName`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyAddress`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyContact`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyPhone`),
-  ...prismaFieldToGqlPath(`${prefix}CompanyMail`)
-});
-
-/**
- * Map prisma fields to their gql input path.
- * Allows to configure frontend by setting which fields are sealed
- */
-export const prismaFieldsToGqlPaths = {
-  ...prismaFieldToGqlPath("wasteCode"),
-  ...prismaFieldToGqlPath("wasteAdr"),
-  ...prismaFieldToGqlPath("wasteType"),
-  ...prismaFieldToGqlPath("wastePackagings"),
-
-  ...CompanyFieldToGqlPath("emitter"),
-
-  emitterCustomInfo: "emitter.customInfo",
-
-  emitterPickupSiteName: "emitter.pickupSite.name",
-  emitterPickupSiteAddress: "emitter.pickupSite.address",
-  emitterPickupSiteCity: "emitter.pickupSite.city",
-  emitterPickupSitePostalCode: "emitter.pickupSite.postalCode",
-  emitterPickupSiteInfos: "emitter.pickupSite.infos",
-
-  emitterWasteQuantityValue: "emitter.emission.detail.quantity",
-  emitterWasteWeightValue: "emitter.emission.detail.weight.value",
-  emitterWasteWeightIsEstimate: "emitter.emission.detail.weight.isEstimate",
-  ...CompanyFieldToGqlPath("destination"),
-  ...prismaFieldToGqlPath("destinationCap"),
-
-  ...prismaFieldToGqlPath("destinationReceptionAcceptationStatus"),
-  destinationReceptionWasteRefusalReason: "destination.reception.refusalReason",
-
-  ...prismaFieldToGqlPath("destinationReceptionWasteQuantityValue"),
-  ...prismaFieldToGqlPath("destinationReceptionWasteReceivedWeightValue"),
-  ...prismaFieldToGqlPath("destinationReceptionWasteAcceptedWeightValue"),
-  ...prismaFieldToGqlPath("destinationReceptionWasteRefusedWeightValue"),
-  ...prismaFieldToGqlPath("destinationReceptionDate"),
-
-  destinationReceptionWasteWeightValue:
-    "destination.reception.detail.weight.value",
-
-  destinationReceptionWasteQuantityValue:
-    "destination.reception.detail.quantity",
-
-  destinationReceptionWastePackagingsAcceptation:
-    "destination.reception.acceptation.packagings",
-
-  ...prismaFieldToGqlPath("destinationOperationCode"),
-  ...prismaFieldToGqlPath("destinationOperationDate"),
-
-  destinationCustomInfo: "destination.customInfo",
-
-  ...CompanyFieldToGqlPath("transporter"),
-  transporterCompanyVatNumber: "transporter.company.vatNumber",
-
-  transporterRecepisseIsExempted: "transporter.recepisse.isExempted",
-  ...prismaFieldToGqlPath("transporterRecepisseDepartment"),
-  ...prismaFieldToGqlPath("transporterRecepisseNumber"),
-
-  transporterRecepisseValidityLimit: "transporter.recepisse.validityLimit",
-  ...prismaFieldToGqlPath("transporterTransportMode"),
-  ...prismaFieldToGqlPath("transporterTransportPlates"),
-
-  transporterTakenOverAt: "transporter.takenOverAt",
-
-  transporterCustomInfo: "transporter.customInfo"
-};
