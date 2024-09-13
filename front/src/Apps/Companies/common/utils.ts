@@ -59,36 +59,39 @@ export const COLLECTOR_TYPE_VALUES = COLLECTOR_TYPE_OPTIONS.map(
 
 export const WASTE_PROCESSOR_TYPE_OPTIONS: CompanySubTypeOption[] = [
   {
-    label: "Incinération de déchets dangereux",
+    label: "Incinération de déchets dangereux (Rubrique 2770)",
     value: WasteProcessorType.DangerousWastesIncineration
   },
   {
-    label: "Incinération de déchets non dangereux",
+    label: "Incinération de déchets non dangereux (Rubriques 2771, 2740)",
     value: WasteProcessorType.NonDangerousWastesIncineration
   },
   {
-    label: "Crématorium (et cimetières pour la Guyane)",
+    label: "Crémation",
     value: WasteProcessorType.Cremation
   },
   {
-    label: "Installation de stockage de déchets dangereux",
+    label:
+      "Installation de stockage de déchets dangereux (Rubriques 2720-1, 2760-1, 2760-4, 2797-2)",
     value: WasteProcessorType.DangerousWastesStorage
   },
   {
     label:
-      "Installation de stockage de déchets non dangereux (y compris casiers dédiés amiante, plâtre)",
+      "Installation de stockage de déchets non dangereux, y compris casiers dédiés amiante, plâtre (Rubriques 2720-2, 2760-2-a, 2760-2-b)",
     value: WasteProcessorType.NonDangerousWastesStorage
   },
   {
-    label: "Installation de stockage de déchets inertes",
+    label: "Installation de stockage de déchets inertes (Rubrique 2760-3)",
     value: WasteProcessorType.InertWastesStorage
   },
   {
-    label: "Autres traitement de déchets non dangereux",
+    label:
+      "Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780)",
     value: WasteProcessorType.OtherNonDangerousWastes
   },
   {
-    label: "Autres traitements de déchets dangereux",
+    label:
+      "Autres traitements de déchets dangereux (Rubriques 2790, 2792-2, 2793-3)",
     value: WasteProcessorType.OtherDangerousWastes
   }
 ];
@@ -112,7 +115,7 @@ export const WASTE_VEHICLES_TYPE_VALUES = WASTE_VEHICLES_TYPE_OPTIONS.map(
 export const COMPANY_TYPE_OPTIONS: CompanyTypeOption[] = [
   {
     value: CompanyType.Producer,
-    label: "Producteur de déchets : producteurs de déchets, y compris T&S",
+    label: "Producteurs de déchets, y compris terres et sédiments",
     helpText:
       "Tous les établissements produisant des déchets et producteurs subséquents. Exemples: Ateliers de réparation véhicules, laboratoires, ateliers de traitement de surfaces, détenteurs d'équipements contenant des fluides frigorigènes et les opérateurs, producteurs de DASRI (hôpitaux, EHPAD, médecin, infirmier(e), tatoueurs, dentiste, etc.), maitre ouvrage amiante, etc. Les ménages sont exclus de la traçabilité. Un intermédiaire est un établissement qui a besoin d'avoir accès au bordereau, avec l'accord des parties prenantes dudit BSD (exemple : un maître d'oeuvre ou un intervenant tiers)."
   },
@@ -141,13 +144,13 @@ export const COMPANY_TYPE_OPTIONS: CompanyTypeOption[] = [
   },
   {
     value: CompanyType.DisposalFacility,
-    label: "Installation de valorisation de T&S",
+    label: "Installation de valorisation de terres et sédiments",
     helpText: ""
   },
   {
     value: CompanyType.WasteCenter,
     label:
-      "Installation de collecte de déchets apportés par le producteur initial",
+      "Installation de collecte de déchets apportés par le producteur initial (Rubrique 2710)",
     helpText:
       "Déchetteries et installations relevant de la rubrique 2710 de la nomenclature ICPE"
   },

@@ -22,9 +22,9 @@ const WorkerCertificationForm = ({
   inputErrors
 }: WorkerCategoryFormProps): React.JSX.Element => {
   return (
-    <div className="fr-container" style={{ paddingTop: "4px" }}>
-      <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-12">
+    <div style={{ paddingTop: "4px" }}>
+      <div>
+        <div>
           <Checkbox
             options={[
               {
@@ -37,21 +37,23 @@ const WorkerCertificationForm = ({
           />
         </div>
       </div>
-      <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-6">
+      <div>
+        <div>
           <Checkbox
             options={[
               {
-                label: "Travaux relevant de la sous-section 3",
+                label: (
+                  <>
+                    Travaux relevant de la sous-section 3{" "}
+                    <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
+                  </>
+                ),
                 nativeInputProps: {
                   ...inputProps?.workerCertification?.hasSubSectionThree
                 }
               }
             ]}
           />
-        </div>
-        <div className="fr-col-1">
-          <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
         </div>
       </div>
       {inputValues.workerCertification.hasSubSectionThree && (
@@ -71,8 +73,6 @@ const WorkerCertificationForm = ({
                 inputErrors?.workerCertification?.certificationNumber
               }
             ></Input>
-
-            {/* <RedErrorMessage name="certificationNumber" /> */}
           </div>
           <div className="fr-col-4">
             <Input
@@ -91,13 +91,11 @@ const WorkerCertificationForm = ({
                 inputErrors?.workerCertification?.validityLimit
               }
             ></Input>
-
-            {/* <RedErrorMessage name="validityLimit" /> */}
           </div>
           <div className="fr-col-4">
             <Select
               label="Organisme"
-              placeholder="Organisme"
+              placeholder="Sélectionner un organisme"
               nativeSelectProps={{
                 ...inputProps?.workerCertification?.organisation
               }}
@@ -111,7 +109,6 @@ const WorkerCertificationForm = ({
                 inputErrors?.workerCertification?.organisation
               }
             />
-            {/* <RedErrorMessage name="organisation" /> */}
           </div>
         </div>
       )}

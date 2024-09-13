@@ -46,7 +46,7 @@ export function Destination() {
       } else if (
         !company.wasteProcessorTypes?.includes(WasteProcessorType.Cremation)
       ) {
-        return "Cet établissement n'a pas le profil Crématorium (et cimetières pour la Guyane).";
+        return "Cet établissement n'a pas le profil Crémation.";
       }
     }
     return null;

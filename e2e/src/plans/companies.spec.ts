@@ -78,9 +78,7 @@ test.describe
         const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "003 - Producteur avec signature et emport autorisé",
-            roles: [
-              "Producteur de déchets : producteurs de déchets, y compris T&S"
-            ],
+            roles: ["Producteurs de déchets, y compris terres et sédiments"],
             producesDASRI: true
           }
         });
@@ -103,9 +101,7 @@ test.describe
         const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "004 - Producteur avec informations de contact",
-            roles: [
-              "Producteur de déchets : producteurs de déchets, y compris T&S"
-            ]
+            roles: ["Producteurs de déchets, y compris terres et sédiments"]
           }
         });
 
@@ -152,7 +148,7 @@ test.describe
         company: {
           name: "006 - Déchetterie",
           roles: [
-            "Installation de collecte de déchets apportés par le producteur initial"
+            "Installation de collecte de déchets apportés par le producteur initial (Rubrique 2710)"
           ]
         },
         contact: {
@@ -275,9 +271,7 @@ test.describe
         const { siret } = await createWasteProducerCompany(page, {
           company: {
             name: "Établissement à supprimer",
-            roles: [
-              "Producteur de déchets : producteurs de déchets, y compris T&S"
-            ]
+            roles: ["Producteurs de déchets, y compris terres et sédiments"]
           }
         });
 
@@ -294,7 +288,7 @@ test.describe
         company: {
           name: "013 - Crématorium",
           roles: ["Installation de traitement"],
-          subRoles: ["Crématorium (et cimetières pour la Guyane)"]
+          subRoles: ["Crémation"]
         },
         contact: {
           name: "Crématorium 013",
@@ -309,7 +303,7 @@ test.describe
         company: {
           name: "014 - Producteur + Transporteur",
           roles: [
-            "Producteur de déchets : producteurs de déchets, y compris T&S",
+            "Producteurs de déchets, y compris terres et sédiments",
             "Transporteur"
           ],
           producesDASRI: true

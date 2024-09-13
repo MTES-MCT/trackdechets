@@ -14,9 +14,9 @@ import {
   checkEcoOrganisme,
   checkForeignTransporter,
   checkRecepisses,
-  checkSubTypes,
-  isValidWebsite
+  checkSubTypes
 } from "./refinements";
+import { isValidWebsite } from "@td/constants";
 
 function toSet(arr: any[]) {
   return arr ? [...new Set(arr)] : arr;
