@@ -92,7 +92,7 @@ export function ApproveAdministrativeTransfer({ company }: Props) {
         <h4 className="company-advanced__modal-title">Valider le transfert</h4>
 
         <p className="company-advanced__modal-description">
-          Êtes vous sur de vouloir valider le transfert des BSDs sur lesquels
+          Êtes vous sûr de vouloir valider le transfert des BSDs sur lesquels
           l'établissement {administrativeTranfer.from.name} -{" "}
           {administrativeTranfer.from.orgId} était destinataire pour les
           affecter à votre établissement ?

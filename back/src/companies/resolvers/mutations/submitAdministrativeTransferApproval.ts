@@ -8,7 +8,7 @@ import { AdministrativeTransferStatus } from "@prisma/client";
 import { companyEventTypes } from "../../types";
 
 export const submitAdministrativeTransferApproval: MutationResolvers["submitAdministrativeTransferApproval"] =
-  async (parent, { input }, context) => {
+  async (_, { input }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
 
@@ -23,8 +23,7 @@ export const submitAdministrativeTransferApproval: MutationResolvers["submitAdmi
     });
 
     const toCompany = await prisma.company.findUniqueOrThrow({
-      where: { id: administrativeTransfer.toId },
-      select: { orgId: true }
+      where: { id: administrativeTransfer.toId }
     });
 
     await checkUserPermissions(
@@ -33,10 +32,6 @@ export const submitAdministrativeTransferApproval: MutationResolvers["submitAdmi
       Permission.CompanyCanRenewSecurityCode,
       NotCompanyAdminErrorMsg(toCompany.orgId)
     );
-
-    const destinationInfos = await prisma.company.findUniqueOrThrow({
-      where: { orgId: toCompany.orgId }
-    });
 
     if (input.isApproved) {
       const bsddsToTransfer = await prisma.form.findMany({
@@ -53,11 +48,11 @@ export const submitAdministrativeTransferApproval: MutationResolvers["submitAdmi
         where: { id: { in: bsddsToTransfer.map(bsdd => bsdd.id) } },
         data: {
           recipientCompanySiret: toCompany.orgId,
-          recipientCompanyName: destinationInfos.name,
-          recipientCompanyAddress: destinationInfos.address,
-          recipientCompanyContact: destinationInfos.contact,
-          recipientCompanyMail: destinationInfos.contactEmail,
-          recipientCompanyPhone: destinationInfos.contactPhone
+          recipientCompanyName: toCompany.name,
+          recipientCompanyAddress: toCompany.address,
+          recipientCompanyContact: toCompany.contact,
+          recipientCompanyMail: toCompany.contactEmail,
+          recipientCompanyPhone: toCompany.contactPhone
         }
       });
     }

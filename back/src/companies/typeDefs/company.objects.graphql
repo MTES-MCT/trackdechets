@@ -739,9 +739,9 @@ Informations sur un transfert administratif entre deux entreprises
 type AdministrativeTransfer {
   id: ID!
   "Entreprise qui initie le transfert"
-  from: CompanyPrivate!
+  from: CompanyPublic!
   "Entreprise qui reçoit le transfert"
-  to: CompanyPrivate!
+  to: CompanyPublic!
   "Date de création du transfert"
   createdAt: DateTime!
   "Date de validation du transfert"

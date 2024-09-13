@@ -28,7 +28,7 @@ const STEPS = [
   { title: "Conditions à respecter" },
   { title: "Établissement d'arrivée" },
   { title: "Confirmer le transfert" },
-  { title: "Confirmer le transfert" },
+  { title: "Attente d'approbation" },
   { title: "Transfert finalisé" }
 ];
 
@@ -123,8 +123,8 @@ export function RequestAdministrativeTranfer({ company }: Props) {
       </h4>
       <p className="company-advanced__description">
         Le transfert administratif de bordereaux concerne uniquement certains
-        cas exceptionnels. Les déchets sont transféré à un nouvel établissement
-        lors de la fermeture de l’ancien établissement sans que sans que les
+        cas exceptionnels. Les déchets sont transférés à un nouvel établissement
+        lors de la fermeture de l'ancien établissement sans que sans que les
         déchets soient déplacés ou modifiés.
       </p>
 
@@ -153,10 +153,6 @@ export function RequestAdministrativeTranfer({ company }: Props) {
               bordereaux à transférer.
             </li>
             <li>L'établissement d'arrivée doit valider le transfert.</li>
-            <li>
-              Autres conditions de transfères qu'on a pas encore prises en
-              compte.
-            </li>
           </ul>
         </div>
       )}
