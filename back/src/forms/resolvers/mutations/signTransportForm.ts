@@ -102,8 +102,9 @@ const signTransportFn = async (
   const receiptFields = await getFormReceiptField(signingTransporter!);
 
   const transportersForValidation = [...transporters];
-  // Prend en compte la plaque d'immatriculation envoyée dans l'input de signature
-  // pour la validation des données
+  // Prend en compte la plaque d'immatriculation et le mode
+  // de transport envoyés dans l'input de signature pour
+  // la validation des données
   transportersForValidation[signingTransporterIdx] = {
     ...transportersForValidation[signingTransporterIdx],
     ...(receiptFields as any) // FIXME fix typing of getFormReceiptField
@@ -111,6 +112,10 @@ const signTransportFn = async (
   if (args.input?.transporterNumberPlate) {
     transportersForValidation[signingTransporterIdx].transporterNumberPlate =
       args.input?.transporterNumberPlate;
+  }
+  if (args.input?.transporterTransportMode !== undefined) {
+    transportersForValidation[signingTransporterIdx].transporterTransportMode =
+      args.input?.transporterTransportMode;
   }
 
   await validateBeforeTransport(
@@ -140,6 +145,11 @@ const signTransportFn = async (
     ...(args.input.transporterNumberPlate
       ? {
           transporterNumberPlate: args.input.transporterNumberPlate
+        }
+      : {}),
+    ...(args.input.transporterTransportMode
+      ? {
+          transporterTransportMode: args.input.transporterTransportMode
         }
       : {}),
     ...receiptFields

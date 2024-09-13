@@ -20,7 +20,7 @@ import {
 import { getFirstTransporter, getTransportersSync } from "../../../database";
 import { getStream } from "../../../../activity-events";
 
-const UPDATE_BSDA = `
+export const UPDATE_BSDA = `
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
     updateBsda(id: $id, input: $input) {
       id
