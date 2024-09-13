@@ -116,7 +116,7 @@ function SignTransportForm({
         onClose();
       }}
     >
-      {values => (
+      {({ values }) => (
         <Form>
           <p>
             En qualité de <strong>transporteur du déchet</strong>, j'atteste que
@@ -152,8 +152,8 @@ function SignTransportForm({
             <RedErrorMessage name="transport.takenOverAt" />
           </div>
 
-          {(!values.values.transport?.mode ||
-            values.values.transport?.mode === TransportMode.Road) && (
+          {(!values.transport?.mode ||
+            values.transport?.mode === TransportMode.Road) && (
             <div style={{ width: "300px" }}>
               <TransportPlates
                 bsdType={BsdType.Bsff}

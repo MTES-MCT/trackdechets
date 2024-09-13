@@ -234,8 +234,10 @@ export function FormWasteTransportSummary({
               type="button"
               onClick={() => {
                 addField("transporterTransportMode");
-                // Set default value to ROAD
-                setFieldValue("transporterTransportMode", TransportMode.Road);
+                setFieldValue(
+                  "transporterTransportMode",
+                  values.transporterTransportMode
+                );
               }}
               className="tw-ml-2"
             >
