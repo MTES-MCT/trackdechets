@@ -1,5 +1,6 @@
 import { CreateRndtsDeclarationDelegationFn } from "./rndtsDeclarationDelegation/create";
 import { FindFirstRndtsDeclarationDelegationFn } from "./rndtsDeclarationDelegation/findFirst";
+import { UpdateRndtsDeclarationDelegationFn } from "./rndtsDeclarationDelegation/update";
 
 export type RndtsDeclarationDelegationActions = {
   // Read
@@ -7,4 +8,5 @@ export type RndtsDeclarationDelegationActions = {
 
   // Write
   create: CreateRndtsDeclarationDelegationFn;
+  update: UpdateRndtsDeclarationDelegationFn;
 };

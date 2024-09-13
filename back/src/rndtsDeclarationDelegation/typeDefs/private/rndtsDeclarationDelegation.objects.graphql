@@ -19,16 +19,16 @@ type RndtsDeclarationDelegation {
   updatedAt: DateTime!
 
   """
-  OrgId du délégataire, c'est-à-dire l'entreprise qui fera les déclarations
+  Délégataire, c'est-à-dire l'entreprise qui fera les déclarations
   à la place du délégant
   """
-  delegateOrgId: String!
+  delegate: CompanyPrivate!
 
   """
-  OrgId du délégant, c'est-à-dire l'entreprise qui délègue ses déclarations
+  Délégant, c'est-à-dire l'entreprise qui délègue ses déclarations
   aux délégataire
   """
-  delegatorOrgId: String!
+  delegator: CompanyPrivate!
 
   """
   Date de début de la délégation
@@ -53,5 +53,5 @@ type RndtsDeclarationDelegation {
   """
   Statut de la délégation
   """
-  status: RndtsDeclarationDelegationStatus
+  status: RndtsDeclarationDelegationStatus!
 }

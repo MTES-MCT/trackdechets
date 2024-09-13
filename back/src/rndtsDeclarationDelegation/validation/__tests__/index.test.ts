@@ -174,32 +174,34 @@ describe("index", () => {
   describe("parseQueryRndtsDeclarationDelegationArgs", () => {
     it.each([null, undefined, 100, "no", "morethan25caracterssoitsinvalid"])(
       "should throw if id is invalid (value = %p)",
-      id => {
+      delegationId => {
         // Given
 
         // When
         expect.assertions(1);
         try {
-          parseQueryRndtsDeclarationDelegationArgs({ id: id as string });
+          parseQueryRndtsDeclarationDelegationArgs({
+            delegationId: delegationId as string
+          });
         } catch (error) {
           // Then
           expect(error.errors[0]).toMatchObject({
-            path: ["id"],
+            path: ["delegationId"],
             message: "L'id doit faire 25 caractères."
           });
         }
       }
     );
 
-    it("should return valid id", () => {
+    it("should return valid delegationId", () => {
       // Given
-      const id = "cl81ooom5138122w9sbznzdkg";
+      const delegationId = "cl81ooom5138122w9sbznzdkg";
 
       // When
-      const result = parseQueryRndtsDeclarationDelegationArgs({ id });
+      const result = parseQueryRndtsDeclarationDelegationArgs({ delegationId });
 
       // Then
-      expect(result.id).toBe(id);
+      expect(result.delegationId).toBe(delegationId);
     });
   });
 });

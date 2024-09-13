@@ -12,7 +12,7 @@ import { User, RndtsDeclarationDelegation } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { GraphQLFormattedError } from "graphql";
-import { nowPlusXHours } from "../../../../utils";
+import { nowPlusXHours, todayAtMidnight } from "../../../../utils";
 
 const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
   mutation createRndtsDeclarationDelegation(
@@ -22,8 +22,14 @@ const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
       id
       createdAt
       updatedAt
-      delegateOrgId
-      delegatorOrgId
+      delegate {
+        id
+        orgId
+      }
+      delegator {
+        id
+        orgId
+      }
       startDate
       endDate
       comment
@@ -82,16 +88,16 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       expect(errors).toBeUndefined();
 
       // Mutation return value should be OK
-      expect(data.createRndtsDeclarationDelegation.delegatorOrgId).toBe(
+      expect(data.createRndtsDeclarationDelegation.delegator.orgId).toBe(
         delegator.orgId
       );
-      expect(data.createRndtsDeclarationDelegation.delegateOrgId).toBe(
+      expect(data.createRndtsDeclarationDelegation.delegate.orgId).toBe(
         delegate.orgId
       );
 
       // Persisted value should be OK
-      expect(delegation?.delegatorOrgId).toBe(delegator.orgId);
-      expect(delegation?.delegateOrgId).toBe(delegate.orgId);
+      expect(delegation?.delegatorId).toBe(delegator.id);
+      expect(delegation?.delegateId).toBe(delegate.id);
     });
 
     it("should populate default values", async () => {
@@ -112,7 +118,9 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Can't really do better for dates: https://github.com/prisma/prisma/issues/16719
       expect(data.createRndtsDeclarationDelegation.createdAt).not.toBeNull();
       expect(data.createRndtsDeclarationDelegation.updatedAt).not.toBeNull();
-      expect(data.createRndtsDeclarationDelegation.startDate).not.toBeNull();
+      expect(data.createRndtsDeclarationDelegation.startDate).toBe(
+        todayAtMidnight().toISOString()
+      );
       expect(data.createRndtsDeclarationDelegation.endDate).toBeNull();
       expect(data.createRndtsDeclarationDelegation.comment).toBeNull();
       expect(data.createRndtsDeclarationDelegation.isRevoked).toBeFalsy();
@@ -120,7 +128,9 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Persisted value should be OK
       expect(delegation?.createdAt).not.toBeNull();
       expect(delegation?.updatedAt).not.toBeNull();
-      expect(delegation?.startDate).not.toBeNull();
+      expect(delegation?.startDate.toISOString()).toBe(
+        todayAtMidnight().toISOString()
+      );
       expect(delegation?.endDate).toBeNull();
       expect(delegation?.comment).toBeNull();
       expect(delegation?.isRevoked).toBeFalsy();
@@ -221,7 +231,7 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "L'entreprise 40081510600010 visée comme délégataire n'existe pas"
+        "L'entreprise 40081510600010 visée comme délégataire n'existe pas dans Trackdéchets"
       );
     });
 
@@ -238,7 +248,7 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "L'entreprise 40081510600010 visée comme délégante n'existe pas"
+        "L'entreprise 40081510600010 visée comme délégante n'existe pas dans Trackdéchets"
       );
     });
   });
@@ -369,14 +379,14 @@ describe("mutation createRndtsDeclarationDelegation", () => {
         endDate: nowPlusXHours(3).toISOString() as any
       });
 
+      // Then
+      expect(errors).toBeUndefined();
+
       // Refuse the delegation
       await prisma.rndtsDeclarationDelegation.update({
         where: { id: delegation?.id },
         data: { isRevoked: true }
       });
-
-      // Then
-      expect(errors).toBeUndefined();
 
       // When: create second delegation
       const { errors: errors2 } = await createDelegation(user, {
@@ -401,14 +411,14 @@ describe("mutation createRndtsDeclarationDelegation", () => {
         endDate: nowPlusXHours(3).toISOString() as any
       });
 
+      // Then
+      expect(errors).toBeUndefined();
+
       // Refuse the delegation
       await prisma.rndtsDeclarationDelegation.update({
         where: { id: delegation?.id },
         data: { isRevoked: true }
       });
-
-      // Then
-      expect(errors).toBeUndefined();
 
       // When: create second delegation
       const { errors: errors2 } = await createDelegation(user, {

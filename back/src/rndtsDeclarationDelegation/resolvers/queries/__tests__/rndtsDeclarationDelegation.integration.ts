@@ -7,13 +7,19 @@ import { User } from "@prisma/client";
 import { userFactory } from "../../../../__tests__/factories";
 
 const RNDTS_DECLARATION_DELEGATION = gql`
-  query rndtsDeclarationDelegation($id: ID) {
-    rndtsDeclarationDelegation(id: $id) {
+  query rndtsDeclarationDelegation($delegationId: ID!) {
+    rndtsDeclarationDelegation(delegationId: $delegationId) {
       id
       createdAt
       updatedAt
-      delegateOrgId
-      delegatorOrgId
+      delegate {
+        id
+        orgId
+      }
+      delegator {
+        id
+        orgId
+      }
       startDate
       endDate
       comment
@@ -23,13 +29,16 @@ const RNDTS_DECLARATION_DELEGATION = gql`
   }
 `;
 
-export const getDelegation = async (user: User | null, id: string) => {
+export const getDelegation = async (
+  user: User | null,
+  delegationId: string
+) => {
   const { query } = makeClient(user);
   return query<Pick<Query, "rndtsDeclarationDelegation">>(
     RNDTS_DECLARATION_DELEGATION,
     {
       variables: {
-        id
+        delegationId
       }
     }
   );

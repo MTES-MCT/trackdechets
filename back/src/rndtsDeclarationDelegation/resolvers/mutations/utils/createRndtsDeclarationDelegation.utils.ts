@@ -1,13 +1,30 @@
-import { UserInputError } from "../../../common/errors";
-import { getRndtsDeclarationDelegationRepository } from "../../repository";
-import { ParsedCreateRndtsDeclarationDelegationInput } from "../../validation";
+import { Company } from "@prisma/client";
+import { UserInputError } from "../../../../common/errors";
+import { getRndtsDeclarationDelegationRepository } from "../../../repository";
+import { ParsedCreateRndtsDeclarationDelegationInput } from "../../../validation";
 
 export const createDelegation = async (
   user: Express.User,
-  input: ParsedCreateRndtsDeclarationDelegationInput
+  input: ParsedCreateRndtsDeclarationDelegationInput,
+  delegator: Company,
+  delegate: Company
 ) => {
   const delegationRepository = getRndtsDeclarationDelegationRepository(user);
-  return delegationRepository.create(input);
+  return delegationRepository.create({
+    startDate: input.startDate,
+    endDate: input.endDate,
+    comment: input.comment,
+    delegate: {
+      connect: {
+        id: delegate.id
+      }
+    },
+    delegator: {
+      connect: {
+        id: delegator.id
+      }
+    }
+  });
 };
 
 /**
@@ -22,14 +39,15 @@ export const createDelegation = async (
  */
 export const checkNoExistingNotRevokedAndNotExpiredDelegation = async (
   user: Express.User,
-  input: ParsedCreateRndtsDeclarationDelegationInput
+  delegator: Company,
+  delegate: Company
 ) => {
   const NOW = new Date();
 
   const delegationRepository = getRndtsDeclarationDelegationRepository(user);
   const activeDelegation = await delegationRepository.findFirst({
-    delegatorOrgId: input.delegatorOrgId,
-    delegateOrgId: input.delegateOrgId,
+    delegatorId: delegator.id,
+    delegateId: delegate.id,
     isRevoked: false,
     OR: [{ endDate: null }, { endDate: { gt: NOW } }]
   });

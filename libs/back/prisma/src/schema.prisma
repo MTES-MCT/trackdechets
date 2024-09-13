@@ -309,6 +309,9 @@ model Company {
   receivedSignatureAutomations SignatureAutomation[] @relation("SignatureAutomationTo")
   webhookSettingsLimit         Int                   @default(1)
 
+  delegatorRndtsDeclarationDelegations RndtsDeclarationDelegation[] @relation("RndtsDeclarationDelegationDelegator")
+  delegateRndtsDeclarationDelegations RndtsDeclarationDelegation[] @relation("RndtsDeclarationDelegationDelegate")
+
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
   @@index([createdAt], map: "_CompanyCreatedAtIdx")
@@ -1038,21 +1041,24 @@ model RndtsDeclarationDelegation {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  // Délégataire
-  delegateOrgId String @db.VarChar(30)
+  // Entreprise délégataire
+  delegateId String @db.VarChar(30)
+  delegate Company  @relation("RndtsDeclarationDelegationDelegate", fields: [delegateId], references: [id])
 
-  // Délégant
-  delegatorOrgId String @db.VarChar(30)
+  // Entreprise délégante
+  delegatorId String @db.VarChar(30)
+  delegator Company  @relation("RndtsDeclarationDelegationDelegator", fields: [delegatorId], references: [id])
 
-  startDate DateTime  @default(now()) @db.Timestamptz(6)
-  endDate   DateTime?
+  // Dates de validité
+  startDate DateTime  @db.Timestamptz(6)
+  endDate   DateTime? @db.Timestamptz(6)
 
   comment String? @db.VarChar(500)
 
   isRevoked Boolean @default(false)
 
-  @@index([delegateOrgId], map: "_RndtsDeclarationDelegationDelegateOrgIdIdx")
-  @@index([delegatorOrgId], map: "_RndtsDeclarationDelegationDelegatorOrgIdIdx")
+  @@index([delegateId], map: "_RndtsDeclarationDelegationDelegateIdIdx")
+  @@index([delegatorId], map: "_RndtsDeclarationDelegationDelegatorIdIdx")
 }
 
 model Bsdasri {

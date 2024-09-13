@@ -7,11 +7,14 @@ import {
 import { GraphQLContext } from "../../../types";
 import { checkCanCreate } from "../../permissions";
 import { parseCreateRndtsDeclarationDelegationInput } from "../../validation";
-import { findDelegateAndDelegatorOrThrow } from "../utils";
+import {
+  findDelegateAndDelegatorOrThrow,
+  findDelegationByIdOrThrow
+} from "../utils";
 import {
   createDelegation,
   checkNoExistingNotRevokedAndNotExpiredDelegation
-} from "./createRndtsDeclarationDelegation.utils";
+} from "./utils/createRndtsDeclarationDelegation.utils";
 
 const createRndtsDeclarationDelegation = async (
   _: ResolversParentTypes["Mutation"],
@@ -24,24 +27,37 @@ const createRndtsDeclarationDelegation = async (
   // User must be authenticated
   const user = checkIsAuthenticated(context);
 
-  // Sync validation of creation input
+  // Sync validation of input
   const delegationInput = parseCreateRndtsDeclarationDelegationInput(input);
 
   // Fetch companies
-  const { delegator } = await findDelegateAndDelegatorOrThrow(delegationInput);
+  const { delegator, delegate } = await findDelegateAndDelegatorOrThrow(
+    delegationInput.delegateOrgId,
+    delegationInput.delegatorOrgId
+  );
 
   // Make sure user can create delegation
   await checkCanCreate(user, delegator);
 
   // Check there's not already an existing delegation
-  await checkNoExistingNotRevokedAndNotExpiredDelegation(user, delegationInput);
+  await checkNoExistingNotRevokedAndNotExpiredDelegation(
+    user,
+    delegator,
+    delegate
+  );
 
   // Create delegation
-  const delegation = await createDelegation(user, delegationInput);
+  const delegation = await createDelegation(
+    user,
+    delegationInput,
+    delegator,
+    delegate
+  );
 
-  // TODO: send mail
-
-  return delegation;
+  // Return full object
+  return findDelegationByIdOrThrow(user, delegation.id, {
+    include: { delegate: true, delegator: true }
+  });
 };
 
 export default createRndtsDeclarationDelegation;

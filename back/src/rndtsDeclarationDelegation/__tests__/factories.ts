@@ -12,8 +12,9 @@ export const rndtsDeclarationDelegationFactory = async (
 
   const delegation = await prisma.rndtsDeclarationDelegation.create({
     data: {
-      delegateOrgId: delegateCompany.orgId,
-      delegatorOrgId: delegatorCompany.orgId,
+      startDate: new Date(),
+      delegate: { connect: { id: delegateCompany.id } },
+      delegator: { connect: { id: delegatorCompany.id } },
       ...opt
     }
   });

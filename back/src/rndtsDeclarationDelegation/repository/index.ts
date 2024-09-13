@@ -7,6 +7,7 @@ import {
 } from "../../common/repository/types";
 import { RndtsDeclarationDelegationActions } from "./types";
 import buildFindFirstRndtsDeclarationDelegation from "./rndtsDeclarationDelegation/findFirst";
+import { buildUpdateRndtsDeclarationDelegation } from "./rndtsDeclarationDelegation/update";
 
 export type RndtsDeclarationDelegationRepository =
   RndtsDeclarationDelegationActions;
@@ -27,6 +28,7 @@ export function getRndtsDeclarationDelegationRepository(
 
   return {
     ...getReadonlyRndtsDeclarationDelegationRepository(),
-    create: useTransaction(buildCreateRndtsDeclarationDelegation)
+    create: useTransaction(buildCreateRndtsDeclarationDelegation),
+    update: useTransaction(buildUpdateRndtsDeclarationDelegation)
   };
 }

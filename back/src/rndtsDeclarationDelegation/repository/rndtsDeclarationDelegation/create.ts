@@ -3,9 +3,12 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
+import { todayAtMidnight } from "../../../utils";
+
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 export type CreateRndtsDeclarationDelegationFn = (
-  data: Prisma.RndtsDeclarationDelegationCreateInput,
+  data: Optional<Prisma.RndtsDeclarationDelegationCreateInput, "startDate">,
   logMetadata?: LogMetadata
 ) => Promise<RndtsDeclarationDelegation>;
 
@@ -16,7 +19,12 @@ export const buildCreateRndtsDeclarationDelegation = (
     const { prisma } = deps;
 
     const delegation = await prisma.rndtsDeclarationDelegation.create({
-      data
+      data: {
+        // Set default start date to midnight
+        // TODO: good idea? Better than DB?
+        startDate: todayAtMidnight(),
+        ...data
+      }
     });
 
     return delegation;

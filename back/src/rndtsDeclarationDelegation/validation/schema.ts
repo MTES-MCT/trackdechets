@@ -9,8 +9,10 @@ export const createRndtsDeclarationDelegationInputSchema = z
     startDate: z.coerce
       .date()
       .optional()
-      .transform(date => {
+      .transform((date): Date | undefined => {
+        // By default, today
         if (!date) return date;
+        // Else, chosen date at midnight
         return startOfDay(date);
       })
       .refine(val => !val || val >= todayAtMidnight(), {
@@ -51,6 +53,6 @@ export const createRndtsDeclarationDelegationInputSchema = z
     }
   );
 
-export const queryRndtsDeclarationDelegationArgsSchema = z.object({
-  id: z.coerce.string().length(25, "L'id doit faire 25 caractères.")
+export const delegationIdSchema = z.object({
+  delegationId: z.coerce.string().length(25, "L'id doit faire 25 caractères.")
 });

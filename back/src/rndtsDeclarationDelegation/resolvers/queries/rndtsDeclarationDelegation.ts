@@ -14,10 +14,10 @@ const rndtsDeclarationDelegationResolver: QueryResolvers["rndtsDeclarationDelega
     const user = checkIsAuthenticated(context);
 
     // Sync validation of args
-    const { id } = parseQueryRndtsDeclarationDelegationArgs(args);
+    const { delegationId } = parseQueryRndtsDeclarationDelegationArgs(args);
 
     // Fetch delegation
-    const delegation = await findDelegationByIdOrThrow(user, id);
+    const delegation = await findDelegationByIdOrThrow(user, delegationId);
 
     // Make sure user can access delegation
     await checkCanAccess(user, delegation);
