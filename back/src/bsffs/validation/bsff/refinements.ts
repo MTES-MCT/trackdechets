@@ -44,8 +44,7 @@ const v2024071 = new Date("2024-07-03");
 
 // Date de la MAJ 2024.9.1 qui rend obligatoire
 // le volume sur les contenants
-//const v2024091 = new Date("2024-09-24");
-const v2024091 = new Date("2024-09-01");
+const v2024091 = new Date("2024-09-24");
 
 /**
  * Ce refinement permet de vérifier que les établissements présents sur le
