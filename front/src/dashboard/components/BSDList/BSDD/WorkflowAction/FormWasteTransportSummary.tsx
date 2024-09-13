@@ -6,7 +6,6 @@ import {
   FormStatus,
   QuantityType,
   SignTransportFormInput,
-  TransportMode,
   WasteDetailsInput
 } from "@td/codegen-ui";
 import {
