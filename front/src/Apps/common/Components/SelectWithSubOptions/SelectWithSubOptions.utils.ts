@@ -8,12 +8,12 @@ import { Option } from "../Select/Select";
  *
  * Because there can be any number of nested options, this is a recursive method.
  *
- * @options the original array of possible options (including nested)
+ * @allOptions the original array of possible options (including nested)
  * @selectedOptionsValues the actually selected options values (array of values, flat)
  * @parentValue (in recursive iterations) the value of parent option
  */
 export const getLabel = (
-  options: Option[],
+  allOptions: Option[],
   selectedOptionsValues: string[],
   parentValue: string | null = null
 ) => {
@@ -22,7 +22,7 @@ export const getLabel = (
     return "Sélectionner une option";
   }
 
-  const optionsLabels = options.map(option => {
+  const optionsLabels = allOptions.map(option => {
     let optionPath = option.value;
     if (parentValue) optionPath = `${parentValue}.${option.value}`;
 
@@ -63,54 +63,59 @@ export const getLabel = (
  * A bit tricky because of infinite nested options. Uses recursive functions.
  *
  * @param option the option that was clicked on
+ * @param allOptions all possible options in the select list
  * @param parentPaths an array of all the values of parent options, like ["OPTION1", "OPTION1.1", ...]
  * @param optionPath the path of the option, like OPTION1.OPTION1.1.OPTION1.1.1
- * @param selectedOptionsValues the values of currently selected options, like ["OPTION1", "OPTION2", ...]
- * @param setSelectedOptionsValues the method to change the state with newly selected options
+ * @param selected the already selected options
+ * @param onChange the method to call the newly selected options with
  */
-type SetOptionsFn = (optionsValues: string[]) => string[];
 export const onSelectChange = (
   option: Option,
+  allOptions: Option[],
   parentPaths: string[],
   optionPath: string,
-  selectedOptionsValues: string[],
-  setSelectedOptionsValues: (fn: SetOptionsFn) => void
+  selected: Option[],
+  onChange: (e: any) => void
 ) => {
-  const optionIsAlreadySelected = selectedOptionsValues.some(
+  const optionsValues = getValuesFromOptions(selected);
+
+  const optionIsAlreadySelected = optionsValues.some(
     optionValue => optionValue === optionPath
   );
 
   // Deselect. If we de-select an option, we must de-select all its children
   if (optionIsAlreadySelected) {
-    setSelectedOptionsValues((selectedOptions: string[]) => {
-      // Remove option
-      let newSelectedOptions = [
-        ...selectedOptions.filter(o => o !== optionPath)
-      ];
+    // Remove option
+    let newSelectedOptionValues = [
+      ...optionsValues.filter(o => o !== optionPath)
+    ];
 
-      // Recursive function to de-select all sub-options from option
-      const removeOptionsFromArray = (
-        options,
-        parent: string | null = null
-      ) => {
-        options.forEach(option => {
-          newSelectedOptions = [
-            ...newSelectedOptions.filter(o => o !== `${parent}.${option.value}`)
-          ];
+    // Recursive function to de-select all sub-options from option
+    const removeOptionsFromArray = (options, parent: string | null = null) => {
+      options.forEach(option => {
+        newSelectedOptionValues = [
+          ...newSelectedOptionValues.filter(
+            o => o !== `${parent}.${option.value}`
+          )
+        ];
 
-          if (option.options) {
-            removeOptionsFromArray(option.options, `${parent}.${option.value}`);
-          }
-        });
-      };
+        if (option.options) {
+          removeOptionsFromArray(option.options, `${parent}.${option.value}`);
+        }
+      });
+    };
 
-      // Option has sub-options. Remove them as well
-      if (option.options) {
-        removeOptionsFromArray(option.options, optionPath);
-      }
+    // Option has sub-options. Remove them as well
+    if (option.options) {
+      removeOptionsFromArray(option.options, optionPath);
+    }
 
-      return newSelectedOptions.filter(Boolean);
-    });
+    const newSelectedOptions = getOptionsFromValues(
+      newSelectedOptionValues.filter(Boolean),
+      allOptions
+    );
+
+    onChange(newSelectedOptions);
   }
   // Select. If we select an option, we must select its parents
   else {
@@ -126,15 +131,17 @@ export const onSelectChange = (
     });
 
     // Now that we have all possible parent options' paths, select them
-    setSelectedOptionsValues((selectedOptionsValues: string[]) =>
-      Array.from(
-        new Set([
-          ...selectedOptionsValues, // Already selected options
-          optionPath, // Targeted option
-          ...parentPathsCombinations // Parents from targeted option
-        ])
-      ).filter(Boolean)
-    );
+    const newValues = Array.from(
+      new Set([
+        ...optionsValues, // Already selected options
+        optionPath, // Targeted option
+        ...parentPathsCombinations // Parents from targeted option
+      ])
+    ).filter(Boolean);
+
+    const newOptions = getOptionsFromValues(newValues, allOptions);
+
+    onChange(newOptions);
   }
 };
 
@@ -145,16 +152,16 @@ export const onSelectChange = (
  * [{ value: "OPTION1", label: "Option 1"}, {value: "OPTION2", label: etc. }]
  *
  * @param optionsValues the options values
- * @param options the options corresponding to the values
+ * @param allOptions all possible options in the select list
  */
 export const getOptionsFromValues = (
   optionsValues: string[],
-  options: Option[],
+  allOptions: Option[],
   parentPaths: string[] = []
 ): Option[] => {
   const res: Option[] = [];
 
-  options.forEach(option => {
+  allOptions.forEach(option => {
     const optionPath = parentPaths.length
       ? [...parentPaths, option.value].join(".")
       : option.value;

@@ -90,33 +90,51 @@ describe("onSelectChange", () => {
   it("Should update selected options, adding latest selected value", () => {
     // Given
     let selectedOptions = [];
-    const setSelectedOptionsMock = newSelectedOptionsFn => {
-      selectedOptions = newSelectedOptionsFn(selectedOptions);
+    const onChangeMock = newSelectedOptions => {
+      selectedOptions = newSelectedOptions;
     };
 
     // When
     onSelectChange(
-      OPTIONS[0],
+      {
+        value: "OPTION1",
+        label: "Option 1"
+      },
+      OPTIONS,
       [],
       OPTIONS[0].value,
       selectedOptions,
-      setSelectedOptionsMock
+      onChangeMock
     );
 
     // Then
-    expect(selectedOptions).toStrictEqual(["OPTION1"]);
+    expect(selectedOptions).toStrictEqual([
+      {
+        value: "OPTION1",
+        label: "Option 1"
+      }
+    ]);
   });
 
   it("Should update selected options, removing latest selected value", () => {
     // Given
-    let selectedOptions = ["OPTION1"];
-    const setSelectedOptionsMock = newSelectedOptionsFn => {
-      selectedOptions = newSelectedOptionsFn(selectedOptions);
+    let selectedOptions = [
+      {
+        value: "OPTION1",
+        label: "Option 1"
+      }
+    ];
+    const setSelectedOptionsMock = newSelectedOptions => {
+      selectedOptions = newSelectedOptions;
     };
 
     // When
     onSelectChange(
-      OPTIONS[0],
+      {
+        value: "OPTION1",
+        label: "Option 1"
+      },
+      OPTIONS,
       [],
       OPTIONS[0].value,
       selectedOptions,
@@ -130,13 +148,17 @@ describe("onSelectChange", () => {
   it("If selecting nested value, should also select all parents", () => {
     // Given
     let selectedOptions = [];
-    const setSelectedOptionsMock = newSelectedOptionsFn => {
-      selectedOptions = newSelectedOptionsFn(selectedOptions);
+    const setSelectedOptionsMock = newSelectedOptions => {
+      selectedOptions = newSelectedOptions;
     };
 
     // When
     onSelectChange(
-      OPTIONS[2].options?.[1].options?.[0]!,
+      {
+        value: "OPTION3.2.1",
+        label: "Option 3.2.1"
+      },
+      OPTIONS,
       ["OPTION3", "OPTION3.2"],
       "OPTION3.OPTION3.2.OPTION3.2.1",
       selectedOptions,
@@ -145,26 +167,56 @@ describe("onSelectChange", () => {
 
     // Then
     expect(selectedOptions).toEqual([
-      "OPTION3.OPTION3.2.OPTION3.2.1",
-      "OPTION3",
-      "OPTION3.OPTION3.2"
+      {
+        value: "OPTION3",
+        label: "Option 3",
+        options: [
+          {
+            value: "OPTION3.2",
+            label: "Option 3.2",
+            options: [
+              {
+                value: "OPTION3.2.1",
+                label: "Option 3.2.1"
+              }
+            ]
+          }
+        ]
+      }
     ]);
   });
 
   it("If de-selecting parent value, should also de-select all children", () => {
     // Given
     let selectedOptions = [
-      "OPTION3.OPTION3.2.OPTION3.2.1",
-      "OPTION3",
-      "OPTION3.OPTION3.2"
+      {
+        value: "OPTION3",
+        label: "Option 3",
+        options: [
+          {
+            value: "OPTION3.2",
+            label: "Option 3.2",
+            options: [
+              {
+                value: "OPTION3.2.1",
+                label: "Option 3.2.1"
+              }
+            ]
+          }
+        ]
+      }
     ];
-    const setSelectedOptionsMock = newSelectedOptionsFn => {
-      selectedOptions = newSelectedOptionsFn(selectedOptions);
+    const setSelectedOptionsMock = newSelectedOptions => {
+      selectedOptions = newSelectedOptions;
     };
 
     // When
     onSelectChange(
-      OPTIONS[2],
+      {
+        value: "OPTION3",
+        label: "Option 3"
+      },
+      OPTIONS,
       [],
       "OPTION3",
       selectedOptions,

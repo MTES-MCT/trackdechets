@@ -42,7 +42,13 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       const hasSubOptions = options.some(o => o.options?.length);
 
       if (hasSubOptions) {
-        return <SelectWithSubOptions options={options} onChange={onChange} />;
+        return (
+          <SelectWithSubOptions
+            options={options}
+            selected={selected}
+            onChange={onChange}
+          />
+        );
       } else if (isMultiple) {
         return (
           <MultiSelectWrapper
@@ -79,9 +85,8 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       options,
       id,
       isMultiple,
-      // Bug: uncommenting those values provokes infinite re-renders
-      // onChange,
-      // selected,
+      onChange,
+      selected,
       disableSearch,
       defaultValue,
       placeholder,

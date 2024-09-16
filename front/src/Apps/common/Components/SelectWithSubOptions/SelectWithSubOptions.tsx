@@ -3,33 +3,24 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import "./selectWithSubOptions.scss";
 import {
   getLabel,
-  getOptionsFromValues,
+  getValuesFromOptions,
   onSelectChange
 } from "./SelectWithSubOptions.utils";
 import { Option } from "../Select/Select";
 
 interface SelectWithSubOptions {
+  selected: Option[];
   options: Option[];
   onChange: (e: any) => void;
 }
 
-const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
-  const [selectedOptionsValues, setSelectedOptionsValues] = useState<string[]>(
-    []
-  );
+const SelectWithSubOptions = ({
+  options: allOptions,
+  selected,
+  onChange
+}: SelectWithSubOptions) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const ref = useRef<React.ElementRef<"div"> | null>(null);
-
-  // Trigger the 'onChange' method
-  useEffect(() => {
-    // Transform back values array into options array
-    const optionsFromValues = getOptionsFromValues(
-      selectedOptionsValues,
-      options
-    );
-
-    onChange(optionsFromValues);
-  }, [selectedOptionsValues, onChange]);
 
   // Close select if user clicks elsewhere in the page
   const handleClickInPage = (e: MouseEvent) => {
@@ -45,7 +36,7 @@ const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
         window.removeEventListener("click", handleClickInPage);
       };
     }
-  }, [isOpen]);
+  }, [isOpen, handleClickInPage]);
 
   const mapOptions = (options, parentPaths: string[] = [], ml = 0) => (
     <>
@@ -54,7 +45,7 @@ const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
           ? [...parentPaths, option.value].join(".")
           : option.value;
 
-        const optionIsAlreadySelected = selectedOptionsValues.some(
+        const optionIsAlreadySelected = getValuesFromOptions(selected).some(
           o => o === optionPath
         );
 
@@ -72,10 +63,11 @@ const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
                       onChange: () =>
                         onSelectChange(
                           option,
+                          allOptions,
                           parentPaths,
                           optionPath,
-                          selectedOptionsValues,
-                          setSelectedOptionsValues
+                          selected,
+                          onChange
                         )
                     }
                   }
@@ -111,12 +103,12 @@ const SelectWithSubOptions = ({ options, onChange }: SelectWithSubOptions) => {
         onClick={() => setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
       >
-        {getLabel(options, selectedOptionsValues)}
+        {getLabel(allOptions, getValuesFromOptions(selected))}
       </div>
 
       {isOpen && (
         <div className="dropDownWrapper">
-          <div className="fr-container-fluid">{mapOptions(options)}</div>
+          <div className="fr-container-fluid">{mapOptions(allOptions)}</div>
         </div>
       )}
     </div>
