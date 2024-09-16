@@ -6,6 +6,7 @@ import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 import { AdministrativeTransferStatus } from "@prisma/client";
 import { companyEventTypes } from "../../types";
+import { enqueueProcessAdministrativeTransferJob } from "../../../queue/producers/administrativeTransfer";
 
 export const submitAdministrativeTransferApproval: MutationResolvers["submitAdministrativeTransferApproval"] =
   async (_, { input }, context) => {
@@ -34,26 +35,9 @@ export const submitAdministrativeTransferApproval: MutationResolvers["submitAdmi
     );
 
     if (input.isApproved) {
-      const bsddsToTransfer = await prisma.form.findMany({
-        where: {
-          recipientCompanySiret: fromCompany.orgId,
-          status: {
-            in: ["AWAITING_GROUP"]
-          }
-        },
-        select: { id: true }
-      });
-
-      await prisma.form.updateMany({
-        where: { id: { in: bsddsToTransfer.map(bsdd => bsdd.id) } },
-        data: {
-          recipientCompanySiret: toCompany.orgId,
-          recipientCompanyName: toCompany.name,
-          recipientCompanyAddress: toCompany.address,
-          recipientCompanyContact: toCompany.contact,
-          recipientCompanyMail: toCompany.contactEmail,
-          recipientCompanyPhone: toCompany.contactPhone
-        }
+      await enqueueProcessAdministrativeTransferJob({
+        fromOrgId: fromCompany.orgId,
+        toOrgId: toCompany.orgId
       });
     }
 

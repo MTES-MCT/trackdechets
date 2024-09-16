@@ -4,3 +4,4 @@ export { operationHookJob } from "./operationHook";
 export { sendHookJob } from "./sendHook";
 export { sirenifyBsdJob } from "./sirenifyBsd";
 export { postGericoJob } from "./gerico";
+export { processAdministrativeTransferJob } from "./administrativeTransfer";
