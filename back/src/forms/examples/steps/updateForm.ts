@@ -24,11 +24,13 @@ export function groupAppendix1Producer(company: string): WorkflowStep {
     variables: ({ bsd, chapeau }) => ({
       updateFormInput: {
         id: chapeau.id,
-        grouping: {
-          form: {
-            id: bsd.id
+        grouping: [
+          {
+            form: {
+              id: bsd.id
+            }
           }
-        }
+        ]
       }
     }),
     expected: { status: "SEALED" },
