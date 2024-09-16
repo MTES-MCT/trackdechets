@@ -74,7 +74,7 @@ export const companyValidationSchema = yup.object({
     .min(1)
     .test(
       "noCrematorium",
-      "Le type CREAMTORIUM est déprécié",
+      "Le type CREMATORIUM est déprécié",
       function (value) {
         return !value?.includes(CompanyType.CREMATORIUM);
       }
