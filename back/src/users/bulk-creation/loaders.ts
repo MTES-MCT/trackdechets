@@ -26,6 +26,8 @@ export function readCsv<Row>(
   });
 }
 
+const splitRow = (row, field: string) =>
+  row[field] ? row[field].split(",") : [];
 /**
  * load companies from csv
  * companyTypes entry like "PRODUCER,WASTE_PROCESSOR" is transformed
@@ -36,7 +38,13 @@ export function loadCompanies(
 ): Promise<CompanyRow[]> {
   const csvPath = `${csvDir}/etablissements.csv`;
   return readCsv<CompanyRow>(csvPath, row => {
-    return { ...row, companyTypes: row.companyTypes.split(",") };
+    return {
+      ...row,
+      companyTypes: splitRow(row, "companyTypes"),
+      collectorTypes: splitRow(row, "collectorTypes"),
+      wasteProcessorTypes: splitRow(row, "wasteProcessorTypes"),
+      wasteVehiclesTypes: splitRow(row, "wasteVehiclesTypes")
+    };
   });
 }
 
