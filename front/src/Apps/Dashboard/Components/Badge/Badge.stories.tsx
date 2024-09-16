@@ -1,10 +1,8 @@
-import React from "react";
-import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 import Badge from "./Badge";
 import { BsdStatusCode } from "../../../common/types/bsdTypes";
 
-export default {
-  title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/Badge",
+const meta: Meta<typeof Badge> = {
   component: Badge,
   argTypes: {
     status: {
@@ -12,49 +10,58 @@ export default {
       options: Object.values(BsdStatusCode)
     }
   }
-} as ComponentMeta<typeof Badge>;
+};
+export default meta;
 
-const Template: ComponentStory<typeof Badge> = args => <Badge {...args} />;
+type Story = StoryObj<typeof Badge>;
 
-export const DraftBsdd = Template.bind({});
-export const Initial = Template.bind({});
-export const InitialNotDraft = Template.bind({});
-export const InitialDasriNotDraft = Template.bind({});
-export const Received = Template.bind({});
-export const Processed = Template.bind({});
-export const Sealed = Template.bind({});
-export const Refused = Template.bind({});
-
-DraftBsdd.args = {
-  status: BsdStatusCode.Draft
+export const DraftBsdd: Story = {
+  args: {
+    status: BsdStatusCode.Draft
+  }
 };
 
-Initial.args = {
-  status: BsdStatusCode.Initial,
-  isDraft: true
+export const Initial: Story = {
+  args: {
+    status: BsdStatusCode.Initial,
+    isDraft: true
+  }
 };
 
-InitialNotDraft.args = {
-  status: BsdStatusCode.Initial,
-  isDraft: false
-};
-InitialDasriNotDraft.args = {
-  status: BsdStatusCode.Initial,
-  isDraft: false
+export const InitialNotDraft: Story = {
+  args: {
+    status: BsdStatusCode.Initial,
+    isDraft: false
+  }
 };
 
-Received.args = {
-  status: BsdStatusCode.Received
+export const InitialDasriNotDraft: Story = {
+  args: {
+    status: BsdStatusCode.Initial,
+    isDraft: false
+  }
 };
 
-Processed.args = {
-  status: BsdStatusCode.Processed
+export const Received: Story = {
+  args: {
+    status: BsdStatusCode.Received
+  }
 };
 
-Sealed.args = {
-  status: BsdStatusCode.Sealed
+export const Processed: Story = {
+  args: {
+    status: BsdStatusCode.Processed
+  }
 };
 
-Refused.args = {
-  status: BsdStatusCode.Refused
+export const Sealed: Story = {
+  args: {
+    status: BsdStatusCode.Sealed
+  }
+};
+
+export const Refused: Story = {
+  args: {
+    status: BsdStatusCode.Refused
+  }
 };
