@@ -7,14 +7,25 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2024.9.1] 24/09/2024
 
+#### :rocket: Nouvelles fonctionnalités
+
+- ETQ destinataire, je peux spécifier le statut de rinçage de la citerne pour son retour à vide (back) [PR 3546](https://github.com/MTES-MCT/trackdechets/pull/3546)
+- ETQ destinataire, je peux indiquer que mon véhicule est rincé ou non pour son retour à vide (back) [PR 3548](https://github.com/MTES-MCT/trackdechets/pull/3548)
+
 #### :nail_care: Améliorations
 
 - Ajouter deux sous-profils pour l'installation de traitement VHU [PR 3480](https://github.com/MTES-MCT/trackdechets/pull/3480)
 - Rendre les chemins d'erreur Zod BSVHU/BSPAOH plus explicite en les subdivisant [PR 3547](https://github.com/MTES-MCT/trackdechets/pull/3547)
+- Ajout d'un filtre par sous-type de bordereau [PR 3476](https://github.com/MTES-MCT/trackdechets/pull/3476)
 
 #### :boom: Breaking changes
 
 - Rendre obligatoire le volume du contenant à la publication sur le BSFF [PR 3555](https://github.com/MTES-MCT/trackdechets/pull/3555)
+- Le mode de transport est désormais obligatoire à la signature transporteur [PR 3551](https://github.com/MTES-MCT/trackdechets/pull/3551)
+
+#### :bug: Corrections de bugs
+
+- Correction du poids affiché sur le tableau de bord en cas de refus total pour les BSDD [PR 3536](https://github.com/MTES-MCT/trackdechets/pull/3536)
 
 # [2024.8.1] 27/08/2024
 
