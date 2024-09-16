@@ -200,11 +200,3 @@ type CompanyExhaustive {
   esCompany: CompanyExhaustiveInfo!
   sireneCompany: CompanyExhaustiveInfo!
 }
-
-type MassUpdatedCompaniesProfile {
-  siret: String!
-  companyTypes: [CompanyType]!
-  collectorTypes: [CollectorType]!
-  wasteProcessorTypes: [WasteProcessorType]!
-  wasteVehiclesTypes: [WasteVehiclesType]!
-}

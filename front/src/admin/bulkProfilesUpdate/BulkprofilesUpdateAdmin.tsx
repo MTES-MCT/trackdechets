@@ -10,7 +10,7 @@ import React from "react";
 import {
   Mutation,
   CompanyUpdateRow,
-  MassUpdatedCompaniesProfile,
+  CompanyPrivate,
   CollectorType,
   CompanyType,
   WasteProcessorType,
@@ -19,7 +19,7 @@ import {
 
 const validationSchema = z.object({
   adminEmail: z.string({
-    required_error: "Le siret est requis"
+    required_error: "L'eamil de l'administrateur des établissments est requis"
   }),
   companyUpdateRows: z
     .string()
@@ -39,7 +39,7 @@ const validationSchema = z.object({
     .pipe(
       z.array(
         z.object({
-          siret: z.string(),
+          orgId: z.string(),
           companyTypes: z.array(
             z.enum([
               CompanyType.Broker,
@@ -88,14 +88,14 @@ const validationSchema = z.object({
 });
 
 export const MASS_UPDATE_COMPANIES_PROFILES = gql`
-  mutation massUpdateCompaniesProfiles(
+  mutation bulkUpdateCompaniesProfiles(
     $adminEmail: String!
     $companyUpdateRows: [companyUpdateRow!]!
   ) {
-    massUpdateCompaniesProfiles(
+    bulkUpdateCompaniesProfiles(
       input: { adminEmail: $adminEmail, companyUpdateRows: $companyUpdateRows }
     ) {
-      siret
+      orgId
       companyTypes
       collectorTypes
       wasteProcessorTypes
@@ -104,9 +104,9 @@ export const MASS_UPDATE_COMPANIES_PROFILES = gql`
   }
 `;
 
-export function MassProfileUpdateAdmin() {
-  const [massUpdateCompaniesProfiles, { loading, error, data }] = useMutation<
-    Pick<Mutation, "massUpdateCompaniesProfiles">,
+export function BulkProfileUpdateAdmin() {
+  const [bulkUpdateCompaniesProfiles, { loading, error, data }] = useMutation<
+    Pick<Mutation, "bulkUpdateCompaniesProfiles">,
     { adminEmail: String; companyUpdateRows: CompanyUpdateRow[] }
   >(MASS_UPDATE_COMPANIES_PROFILES);
 
@@ -115,7 +115,7 @@ export function MassProfileUpdateAdmin() {
   > = async data => {
     const { adminEmail, companyUpdateRows } = data;
 
-    massUpdateCompaniesProfiles({
+    bulkUpdateCompaniesProfiles({
       variables: { adminEmail, companyUpdateRows }
     });
   };
@@ -151,7 +151,7 @@ export function MassProfileUpdateAdmin() {
               <Input
                 label="Fichier xls validé et converti en json"
                 className="fr-col-12 fr-mb-5v"
-                hintText='[{"siret": "xxx", "companyTypes": […], "collectorTypes": […], "wasteProcessorTypes": […], "wasteVehiclesTypes": […]},…]'
+                hintText='[{"orgId": "xxx", "companyTypes": […], "collectorTypes": […], "wasteProcessorTypes": […], "wasteVehiclesTypes": […]},…]'
                 textArea
                 nativeTextAreaProps={{
                   required: true,
@@ -177,9 +177,9 @@ export function MassProfileUpdateAdmin() {
           severity="error"
         />
       )}
-      {data?.massUpdateCompaniesProfiles && (
-        <MassUpdateCompaniesProfilesDigest
-          data={data?.massUpdateCompaniesProfiles?.filter(Boolean)}
+      {data?.bulkUpdateCompaniesProfiles && (
+        <BulkUpdateCompaniesProfilesDigest
+          data={data?.bulkUpdateCompaniesProfiles?.filter(Boolean)}
         />
       )}
     </div>
@@ -187,12 +187,12 @@ export function MassProfileUpdateAdmin() {
 }
 
 type Props = {
-  data?: (MassUpdatedCompaniesProfile | null)[];
+  data?: (CompanyPrivate | null)[];
 };
 
-const MassUpdateCompaniesProfilesDigest = ({ data }: Props) => {
+const BulkUpdateCompaniesProfilesDigest = ({ data }: Props) => {
   const tableHeaders = [
-    "Siret",
+    "Orgid",
     "companyTypes",
     "collectorTypes",
     "wasteProcessorTypes",
@@ -200,7 +200,7 @@ const MassUpdateCompaniesProfilesDigest = ({ data }: Props) => {
   ];
   const tableData =
     data?.map(row => [
-      row?.siret,
+      row?.orgId,
       row?.companyTypes.join(","),
       row?.collectorTypes.join(","),
       row?.wasteProcessorTypes.join(","),

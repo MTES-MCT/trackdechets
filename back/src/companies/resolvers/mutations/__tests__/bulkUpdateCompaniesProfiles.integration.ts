@@ -9,11 +9,11 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-export const MASS_UPDATE_COMPANIES_PROFILES = gql`
-  mutation massUpdateCompaniesProfiles(
-    $input: MassUpdateCompaniesProfilesInput!
+export const BULK_UPDATE_COMPANIES_PROFILES = gql`
+  mutation bulkUpdateCompaniesProfiles(
+    $input: BulkUpdateCompaniesProfilesInput!
   ) {
-    massUpdateCompaniesProfiles(input: $input) {
+    bulkUpdateCompaniesProfiles(input: $input) {
       siret
       companyTypes
       collectorTypes
@@ -23,7 +23,7 @@ export const MASS_UPDATE_COMPANIES_PROFILES = gql`
   }
 `;
 
-describe("mutation massUpdateCompaniesProfiles", () => {
+describe("mutation bulkUpdateCompaniesProfiles", () => {
   afterAll(resetDatabase);
 
   it("should deny access to non admin users", async () => {
@@ -37,13 +37,13 @@ describe("mutation massUpdateCompaniesProfiles", () => {
 
     const { mutate } = makeClient(nonAdmin);
 
-    const { errors } = await mutate(MASS_UPDATE_COMPANIES_PROFILES, {
+    const { errors } = await mutate(BULK_UPDATE_COMPANIES_PROFILES, {
       variables: {
         input: {
           adminEmail: user.email,
           companyUpdateRows: [
             {
-              siret: company.siret,
+              orgId: company.siret,
               companyTypes: ["WASTEPROCESSOR", "COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],
@@ -75,20 +75,20 @@ describe("mutation massUpdateCompaniesProfiles", () => {
 
     const fakeSiret = siretify(1);
 
-    const { errors } = await mutate(MASS_UPDATE_COMPANIES_PROFILES, {
+    const { errors } = await mutate(BULK_UPDATE_COMPANIES_PROFILES, {
       variables: {
         input: {
           adminEmail: user.email,
           companyUpdateRows: [
             {
-              siret: company.siret,
+              orgId: company.siret,
               companyTypes: ["WASTEPROCESSOR", "COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],
               wasteVehiclesTypes: []
             },
             {
-              siret: fakeSiret, // fake company
+              orgId: fakeSiret, // fake company
               companyTypes: ["WASTEPROCESSOR", "COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],
@@ -101,7 +101,7 @@ describe("mutation massUpdateCompaniesProfiles", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Certains sirets n'existent pas dans Trackdéchets ou l'email renseigné n'est pas celui de leur administrateur: ${fakeSiret}`
+        message: `Certains établissements n'existent pas dans Trackdéchets ou l'email renseigné n'est pas celui de leur administrateur: ${fakeSiret}`
       })
     ]);
   });
@@ -130,20 +130,20 @@ describe("mutation massUpdateCompaniesProfiles", () => {
     );
     const { mutate } = makeClient(admin);
 
-    const { errors } = await mutate(MASS_UPDATE_COMPANIES_PROFILES, {
+    const { errors } = await mutate(BULK_UPDATE_COMPANIES_PROFILES, {
       variables: {
         input: {
           adminEmail: user.email,
           companyUpdateRows: [
             {
-              siret: company.siret,
+              orgId: company.siret,
               companyTypes: ["WASTEPROCESSOR", "COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],
               wasteVehiclesTypes: []
             },
             {
-              siret: otherCompany.siret,
+              orgId: otherCompany.siret,
               companyTypes: ["WASTEPROCESSOR", "COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],
@@ -156,7 +156,7 @@ describe("mutation massUpdateCompaniesProfiles", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Certains sirets n'existent pas dans Trackdéchets ou l'email renseigné n'est pas celui de leur administrateur: ${otherCompany.siret}`
+        message: `Certains établissements n'existent pas dans Trackdéchets ou l'email renseigné n'est pas celui de leur administrateur: ${otherCompany.siret}`
       })
     ]);
   });
@@ -176,20 +176,20 @@ describe("mutation massUpdateCompaniesProfiles", () => {
 
     const { mutate } = makeClient(admin);
 
-    const { errors } = await mutate(MASS_UPDATE_COMPANIES_PROFILES, {
+    const { errors } = await mutate(BULK_UPDATE_COMPANIES_PROFILES, {
       variables: {
         input: {
           adminEmail: user.email,
           companyUpdateRows: [
             {
-              siret: company.siret,
+              orgId: company.siret,
               companyTypes: ["WASTEPROCESSOR", "COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],
               wasteVehiclesTypes: []
             },
             {
-              siret: company.siret,
+              orgId: company.siret,
               companyTypes: ["WASTEPROCESSOR", "COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],
@@ -221,13 +221,13 @@ describe("mutation massUpdateCompaniesProfiles", () => {
 
     const { mutate } = makeClient(admin);
 
-    const { errors } = await mutate(MASS_UPDATE_COMPANIES_PROFILES, {
+    const { errors } = await mutate(BULK_UPDATE_COMPANIES_PROFILES, {
       variables: {
         input: {
           adminEmail: user.email,
           companyUpdateRows: [
             {
-              siret: company.siret,
+              orgId: company.siret,
               companyTypes: ["WASTEPROCESSOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],
@@ -259,13 +259,13 @@ describe("mutation massUpdateCompaniesProfiles", () => {
 
     const { mutate } = makeClient(admin);
 
-    const { errors } = await mutate(MASS_UPDATE_COMPANIES_PROFILES, {
+    const { errors } = await mutate(BULK_UPDATE_COMPANIES_PROFILES, {
       variables: {
         input: {
           adminEmail: user.email,
           companyUpdateRows: [
             {
-              siret: company.siret,
+              orgId: company.siret,
               companyTypes: ["COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: ["DANGEROUS_WASTES_STORAGE"],
@@ -297,13 +297,13 @@ describe("mutation massUpdateCompaniesProfiles", () => {
 
     const { mutate } = makeClient(admin);
 
-    const { errors } = await mutate(MASS_UPDATE_COMPANIES_PROFILES, {
+    const { errors } = await mutate(BULK_UPDATE_COMPANIES_PROFILES, {
       variables: {
         input: {
           adminEmail: user.email,
           companyUpdateRows: [
             {
-              siret: company.siret,
+              orgId: company.siret,
               companyTypes: ["COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],
@@ -335,13 +335,13 @@ describe("mutation massUpdateCompaniesProfiles", () => {
 
     const { mutate } = makeClient(admin);
 
-    const { errors } = await mutate(MASS_UPDATE_COMPANIES_PROFILES, {
+    const { errors } = await mutate(BULK_UPDATE_COMPANIES_PROFILES, {
       variables: {
         input: {
           adminEmail: user.email,
           companyUpdateRows: [
             {
-              siret: company.siret,
+              orgId: company.siret,
               companyTypes: ["WASTEPROCESSOR", "COLLECTOR"],
               collectorTypes: ["DANGEROUS_WASTES"],
               wasteProcessorTypes: [],

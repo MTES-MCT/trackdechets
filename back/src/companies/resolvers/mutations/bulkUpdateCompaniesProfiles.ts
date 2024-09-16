@@ -1,20 +1,20 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import {
-  MutationMassUpdateCompaniesProfilesArgs,
-  MassUpdatedCompaniesProfile
+  MutationBulkUpdateCompaniesProfilesArgs,
+  CompanyPrivate
 } from "../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import { UserRole } from "@prisma/client";
-import { massUpdateCompanySchema } from "../../validation/schema";
+import { bulkUpdateCompanySchema } from "../../validation/schema";
 import { UserInputError } from "../../../common/errors";
-
-export async function massUpdateCompaniesProfiles(
+import { convertUrls } from "../../../companies/database";
+export async function bulkUpdateCompaniesProfiles(
   _,
-  { input }: MutationMassUpdateCompaniesProfilesArgs,
+  { input }: MutationBulkUpdateCompaniesProfilesArgs,
   context: GraphQLContext
-): Promise<MassUpdatedCompaniesProfile[]> {
+): Promise<CompanyPrivate[]> {
   // restrict to UI
   applyAuthStrategies(context, [AuthType.Session]);
   checkIsAdmin(context);
@@ -33,34 +33,34 @@ export async function massUpdateCompaniesProfiles(
   });
 
   // build siret arrays
-  const adminSirets = adminCompanies.map(row => row.company.siret);
+  const adminOrgIds = adminCompanies.map(row => row.company.orgId);
 
-  if (!adminSirets.length) {
+  if (!adminOrgIds.length) {
     throw new Error("La liste est vide");
   }
 
   // any duplicates ?
-  const inputSirets = companyUpdateRows.map(row => row.siret);
-  if (inputSirets.length !== new Set(inputSirets).size) {
+  const inputOrgids = companyUpdateRows.map(row => row.orgId);
+  if (inputOrgids.length !== new Set(inputOrgids).size) {
     throw new UserInputError(
       "La liste des établissements à mettre à jour comporte des doublons."
     );
   }
   // verification
   // iterate over each row
-  const incorrectSirets: string[] = [];
+  const incorrectOrgids: string[] = [];
 
   for (const row of companyUpdateRows) {
-    if (!adminSirets.includes(row.siret)) {
-      incorrectSirets.push(row.siret);
+    if (!adminOrgIds.includes(row.orgId)) {
+      incorrectOrgids.push(row.orgId);
     }
     // are the types and subtypes coherent ?
-    await massUpdateCompanySchema.parseAsync(row);
+    await bulkUpdateCompanySchema.parseAsync(row);
   }
 
-  if (incorrectSirets.length) {
+  if (incorrectOrgids.length) {
     throw new UserInputError(
-      `Certains sirets n'existent pas dans Trackdéchets ou l'email renseigné n'est pas celui de leur administrateur: ${incorrectSirets.join(
+      `Certains établissements n'existent pas dans Trackdéchets ou l'email renseigné n'est pas celui de leur administrateur: ${incorrectOrgids.join(
         ","
       )}`
     );
@@ -69,28 +69,16 @@ export async function massUpdateCompaniesProfiles(
   // if all rows ok perform update
   const updatedCompanies: any[] = [];
   for (const row of companyUpdateRows) {
-    const {
-      siret,
-      companyTypes,
-      collectorTypes,
-      wasteProcessorTypes,
-      wasteVehiclesTypes
-    } = await prisma.company.update({
+    const updatedCompany = await prisma.company.update({
       data: {
         companyTypes: row.companyTypes,
         collectorTypes: row.collectorTypes.filter(Boolean),
         wasteProcessorTypes: row.wasteProcessorTypes.filter(Boolean),
         wasteVehiclesTypes: row.wasteVehiclesTypes.filter(Boolean)
       },
-      where: { siret: row.siret }
+      where: { orgId: row.orgId }
     });
-    updatedCompanies.push({
-      siret,
-      companyTypes,
-      collectorTypes,
-      wasteProcessorTypes,
-      wasteVehiclesTypes
-    });
+    updatedCompanies.push(convertUrls(updatedCompany));
   }
 
   return updatedCompanies;

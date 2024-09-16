@@ -13,7 +13,7 @@ import { Registry } from "./registry/Registry";
 import { MembersAdmin } from "./company/MembersAdmin";
 import { CompaniesDashboard } from "./companies/CompaniesDashboard";
 import { BsdAdmin } from "./bsd/BsdAdmin";
-import { MassProfileUpdateAdmin } from "./massProfilesUpdate/MassprofileUpdateAdmin";
+import { BulkProfileUpdateAdmin } from "./bulkProfilesUpdate/BulkprofilesUpdateAdmin";
 
 const toRelative = route => {
   return getRelativeRoute(routes.admin.index, route);
@@ -196,7 +196,7 @@ export default function Admin() {
 
           <Route
             path={toRelative(routes.admin.massProfilesAdmin)}
-            element={<MassProfileUpdateAdmin />}
+            element={<BulkProfileUpdateAdmin />}
           />
 
           <Route

@@ -370,14 +370,14 @@ input SignatureAutomationInput {
 }
 
 input companyUpdateRow {
-  siret: String!
+  orgId: String!
   companyTypes: [CompanyType!]!
   collectorTypes: [CollectorType]!
   wasteProcessorTypes: [WasteProcessorType]!
   wasteVehiclesTypes: [WasteVehiclesType]!
 }
 
-input MassUpdateCompaniesProfilesInput {
+input BulkUpdateCompaniesProfilesInput {
   adminEmail: String!
   companyUpdateRows: [companyUpdateRow!]!
 }
