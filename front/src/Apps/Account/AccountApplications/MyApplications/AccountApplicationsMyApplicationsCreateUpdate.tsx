@@ -29,7 +29,7 @@ export const validationApplicationSchema = z.object({
   name: z.string(),
   redirectUris: z.array(z.string()),
   logoUrl: z.string(),
-  goal: z.enum(["PERSONNAL", "CLIENTS"])
+  goal: z.nativeEnum(ApplicationGoal)
 });
 
 type AccountApplicationsMyApplicationCreateUpdateProps = {
@@ -124,7 +124,7 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
     >
       {isCreating && (
         <div className="fr-mb-2w">
-          <CreateAlert></CreateAlert>
+          <CreateAlert />
         </div>
       )}
 

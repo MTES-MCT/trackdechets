@@ -17,7 +17,9 @@ function AccountApplicationMyApplicationsRow({
   const redirectUris = uris => {
     const count = uris.length;
 
-    return `${uris[0]}${count > 1 && " et " + (count - 1) + " autre(s)"}`;
+    return `${uris[0]}${
+      count > 1 ? `${count - 1} autre${count > 2 ? "s" : ""}` : ""
+    }`;
   };
 
   return (
@@ -30,7 +32,7 @@ function AccountApplicationMyApplicationsRow({
                 ? "fr-icon-arrow-down-s-line"
                 : "fr-icon-arrow-right-s-line"
             }`}
-            onClick={__ => {
+            onClick={() => {
               setIsRowOpen(previousState => !previousState);
             }}
           ></button>
