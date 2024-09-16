@@ -55,3 +55,17 @@ type RndtsDeclarationDelegation {
   """
   status: RndtsDeclarationDelegationStatus!
 }
+
+type RndtsDeclarationDelegationEdge {
+  cursor: String!
+  node: RndtsDeclarationDelegation!
+}
+
+"""
+List paginée de délégations
+"""
+type RndtsDeclarationDelegationConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [RndtsDeclarationDelegationEdge!]!
+}

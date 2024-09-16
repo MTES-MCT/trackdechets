@@ -1,4 +1,33 @@
 type Query {
-  "Renvoie une délégation, séléctionnée par son ID"
+  """
+  Renvoie une délégation, séléctionnée par son ID
+  """
   rndtsDeclarationDelegation(delegationId: ID!): RndtsDeclarationDelegation!
+
+  """
+  Renvoie une liste de délégations (triée par updatedAt)
+  """
+  rndtsDeclarationDelegations(
+    where: RndtsDeclarationDelegationWhere
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des délégations les plus récentes aux délégations les plus ancienness)
+    Curseur après lequel les délégations doivent être retournées
+    Attend un identifiant (propriété `id`) de révision
+    Défaut à vide, pour retourner les délégations les plus récentes
+    La révision précisée dans le curseur ne fait pas partie du résultat
+    """
+    after: ID
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `after` de paginer "en avant"
+    (des délégations les plus récentes aux délégations les plus anciennes)
+    Nombre de délégations retournées après le `after`
+    Défaut à 50
+    """
+    first: Int
+  ): RndtsDeclarationDelegationConnection!
 }

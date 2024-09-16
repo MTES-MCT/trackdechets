@@ -1,13 +1,15 @@
 import { QueryResolvers } from "../../generated/graphql/types";
 import rndtsDeclarationDelegation from "./queries/rndtsDeclarationDelegation";
+import rndtsDeclarationDelegations from "./queries/rndtsDeclarationDelegations";
 
 export type RndtsDeclarationDelegationQueryResolvers = Pick<
   QueryResolvers,
-  "rndtsDeclarationDelegation"
+  "rndtsDeclarationDelegation" | "rndtsDeclarationDelegations"
 >;
 
 const Query: RndtsDeclarationDelegationQueryResolvers = {
-  rndtsDeclarationDelegation
+  rndtsDeclarationDelegation,
+  rndtsDeclarationDelegations
 };
 
 export default Query;

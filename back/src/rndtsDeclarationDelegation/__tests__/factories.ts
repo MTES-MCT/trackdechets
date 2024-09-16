@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Company, Prisma } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 
@@ -26,4 +26,21 @@ export const rndtsDeclarationDelegationFactory = async (
     delegatorUser,
     delegatorCompany
   };
+};
+
+export const rndtsDeclarationDelegationFactoryWithExistingCompanies = async (
+  delegate: Company,
+  delegator: Company,
+  opt?: Partial<Prisma.RndtsDeclarationDelegationCreateInput>
+) => {
+  const delegation = await prisma.rndtsDeclarationDelegation.create({
+    data: {
+      startDate: new Date(),
+      delegate: { connect: { id: delegate.id } },
+      delegator: { connect: { id: delegator.id } },
+      ...opt
+    }
+  });
+
+  return delegation;
 };

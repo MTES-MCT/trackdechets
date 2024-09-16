@@ -1,11 +1,13 @@
 import {
   CreateRndtsDeclarationDelegationInput,
   MutationRevokeRndtsDeclarationDelegationArgs,
-  QueryRndtsDeclarationDelegationArgs
+  QueryRndtsDeclarationDelegationArgs,
+  QueryRndtsDeclarationDelegationsArgs
 } from "../../generated/graphql/types";
 import {
   delegationIdSchema,
-  createRndtsDeclarationDelegationInputSchema
+  createRndtsDeclarationDelegationInputSchema,
+  queryRndtsDeclarationDelegationsArgsSchema
 } from "./schema";
 
 export function parseCreateRndtsDeclarationDelegationInput(
@@ -29,3 +31,13 @@ export function parseMutationRevokeRndtsDeclarationDelegationArgs(
 ) {
   return delegationIdSchema.parse(args);
 }
+
+export function parseQueryRndtsDeclarationDelegationsArgs(
+  args: QueryRndtsDeclarationDelegationsArgs
+) {
+  return queryRndtsDeclarationDelegationsArgsSchema.parse(args);
+}
+
+export type ParsedQueryRndtsDeclarationDelegationsArgs = ReturnType<
+  typeof parseQueryRndtsDeclarationDelegationsArgs
+>;

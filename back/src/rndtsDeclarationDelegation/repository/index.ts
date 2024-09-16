@@ -8,13 +8,17 @@ import {
 import { RndtsDeclarationDelegationActions } from "./types";
 import buildFindFirstRndtsDeclarationDelegation from "./rndtsDeclarationDelegation/findFirst";
 import { buildUpdateRndtsDeclarationDelegation } from "./rndtsDeclarationDelegation/update";
+import { buildCountRndtsDeclarationDelegations } from "./rndtsDeclarationDelegation/count";
+import { buildFindManyRndtsDeclarationDelegation } from "./rndtsDeclarationDelegation/findMany";
 
 export type RndtsDeclarationDelegationRepository =
   RndtsDeclarationDelegationActions;
 
 export function getReadonlyRndtsDeclarationDelegationRepository() {
   return {
-    findFirst: buildFindFirstRndtsDeclarationDelegation({ prisma })
+    findFirst: buildFindFirstRndtsDeclarationDelegation({ prisma }),
+    count: buildCountRndtsDeclarationDelegations({ prisma }),
+    findMany: buildFindManyRndtsDeclarationDelegation({ prisma })
   };
 }
 

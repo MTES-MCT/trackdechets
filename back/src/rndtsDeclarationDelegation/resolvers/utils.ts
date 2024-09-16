@@ -45,3 +45,21 @@ export const findDelegationByIdOrThrow = async (
 
   return delegation;
 };
+
+export const checkUserBelongsToCompany = async (
+  user: Express.User,
+  companyId: string
+) => {
+  const companyAssociation = await prisma.companyAssociation.findFirst({
+    where: {
+      companyId,
+      userId: user.id
+    }
+  });
+
+  if (!companyAssociation) {
+    throw new UserInputError(
+      `L'entreprise ${companyId} n'existe pas ou l'utilisateur n'en fait pas partie`
+    );
+  }
+};

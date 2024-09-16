@@ -1,6 +1,7 @@
 import {
   parseCreateRndtsDeclarationDelegationInput,
-  parseQueryRndtsDeclarationDelegationArgs
+  parseQueryRndtsDeclarationDelegationArgs,
+  parseQueryRndtsDeclarationDelegationsArgs
 } from "..";
 import { CreateRndtsDeclarationDelegationInput } from "../../../generated/graphql/types";
 
@@ -202,6 +203,67 @@ describe("index", () => {
 
       // Then
       expect(result.delegationId).toBe(delegationId);
+    });
+  });
+
+  describe("parseQueryRndtsDeclarationDelegationsArgs", () => {
+    it("should not allow passing where.delegator & where.delegate", () => {
+      // Given
+      const args = {
+        where: {
+          delegatorId: "cl81ooom5138122w9sbznzdkg",
+          delegateId: "cl81ooom5138122w9sbznzdop"
+        }
+      };
+
+      // When
+      expect.assertions(1);
+      try {
+        parseQueryRndtsDeclarationDelegationsArgs(args);
+      } catch (error) {
+        // Then
+        expect(error.errors[0]).toMatchObject({
+          path: ["where"],
+          message:
+            "Vous ne pouvez pas renseigner les deux champs (delegatorId et delegateId)."
+        });
+      }
+    });
+
+    it("should not allow empty where.delegator & where.delegate", () => {
+      // Given
+      const args = { where: {} };
+
+      // When
+      expect.assertions(1);
+      try {
+        parseQueryRndtsDeclarationDelegationsArgs(args);
+      } catch (error) {
+        // Then
+        expect(error.errors[0]).toMatchObject({
+          path: ["where"],
+          message:
+            "Vous devez renseigner un des deux champs (delegatorId ou delegateId)."
+        });
+      }
+    });
+
+    it("should return valid args", () => {
+      // Given
+      const args = {
+        where: { delegatorId: "cl81ooom5138122w9sbznzdkg" },
+        after: "cl81ooom5138122w9sbznzdop",
+        first: 10
+      };
+
+      // When
+      const { where, after, first } =
+        parseQueryRndtsDeclarationDelegationsArgs(args);
+
+      // Then
+      expect(where).toMatchObject({ delegatorId: "cl81ooom5138122w9sbznzdkg" });
+      expect(after).toBe("cl81ooom5138122w9sbznzdop");
+      expect(first).toBe(10);
     });
   });
 });

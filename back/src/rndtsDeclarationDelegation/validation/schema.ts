@@ -2,6 +2,8 @@ import { z } from "zod";
 import { siretSchema } from "../../common/validation/zod/schema";
 import { endOfDay, startOfDay, todayAtMidnight } from "../../utils";
 
+const idSchema = z.coerce.string().length(25, "L'id doit faire 25 caractères.");
+
 export const createRndtsDeclarationDelegationInputSchema = z
   .object({
     delegateOrgId: siretSchema(),
@@ -56,5 +58,23 @@ export const createRndtsDeclarationDelegationInputSchema = z
   );
 
 export const delegationIdSchema = z.object({
-  delegationId: z.coerce.string().length(25, "L'id doit faire 25 caractères.")
+  delegationId: idSchema
+});
+
+export const queryRndtsDeclarationDelegationsArgsSchema = z.object({
+  where: z
+    .object({
+      delegatorId: idSchema.optional().nullable(),
+      delegateId: idSchema.optional().nullable()
+    })
+    .refine(
+      data => Boolean(data.delegatorId) || Boolean(data.delegateId),
+      "Vous devez renseigner un des deux champs (delegatorId ou delegateId)."
+    )
+    .refine(
+      data => !(Boolean(data.delegatorId) && Boolean(data.delegateId)),
+      "Vous ne pouvez pas renseigner les deux champs (delegatorId et delegateId)."
+    ),
+  after: idSchema.optional().nullable(),
+  first: z.number().min(10).max(50).optional().nullable()
 });
