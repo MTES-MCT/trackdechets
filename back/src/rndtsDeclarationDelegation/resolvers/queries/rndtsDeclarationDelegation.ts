@@ -17,7 +17,10 @@ const rndtsDeclarationDelegationResolver: QueryResolvers["rndtsDeclarationDelega
     const { delegationId } = parseQueryRndtsDeclarationDelegationArgs(args);
 
     // Fetch delegation
-    const delegation = await findDelegationByIdOrThrow(user, delegationId);
+    // TODO: include or rather in sub-resolvers?
+    const delegation = await findDelegationByIdOrThrow(user, delegationId, {
+      include: { delegate: true, delegator: true }
+    });
 
     // Make sure user can access delegation
     await checkCanAccess(user, delegation);
