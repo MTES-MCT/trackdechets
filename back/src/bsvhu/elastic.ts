@@ -3,6 +3,7 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getBsvhuSubType } from "../common/subTypes";
 import { getAddress } from "./converter";
 
 type WhereKeys =
@@ -106,6 +107,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
 
   return {
     type: BsdType.BSVHU,
+    bsdSubType: getBsvhuSubType(bsvhu),
     createdAt: bsvhu.createdAt?.getTime(),
     updatedAt: bsvhu.updatedAt?.getTime(),
     id: bsvhu.id,

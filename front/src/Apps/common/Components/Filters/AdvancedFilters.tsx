@@ -3,12 +3,13 @@ import { AdvancedFiltersProps, Filter, FilterType } from "./filtersTypes";
 import FilterLine from "./FilterLine";
 import Input from "../Input/Input";
 import { inputType } from "../../types/commonTypes";
-import Select from "../Select/Select";
+import Select, { Option } from "../Select/Select";
 import DatePickerWrapper from "../DatePicker/DatePickerWrapper";
 import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
 
 import "./filters.scss";
 import usePrevious from "../../../../common/hooks/usePrevious";
+import { getValuesFromOptions } from "../SelectWithSubOptions/SelectWithSubOptions.utils";
 
 const AdvancedFilters = ({
   open = false,
@@ -127,12 +128,12 @@ const AdvancedFilters = ({
   };
 
   const onFilterSelectMultipleValueChange = (
-    selectList: { value: string; label: string }[],
+    selectList: Option[],
     filterName: string
   ) => {
     setSelectMultipleValueArray(selectList);
     const newFilterValues = { ...filterValues };
-    const newFilterValue = selectList.map(selected => selected.value!);
+    const newFilterValue = getValuesFromOptions(selectList);
 
     // If there are no values in the list, just completely remove the filter
     if (!newFilterValue.length) {
@@ -204,7 +205,7 @@ const AdvancedFilters = ({
             !filter.isMultiple
               ? onFilterValueChange(e, filter.name)
               : onFilterSelectMultipleValueChange(
-                  e as unknown as { value: string; label: string }[],
+                  e as unknown as Option[],
                   filter.name
                 )
           }

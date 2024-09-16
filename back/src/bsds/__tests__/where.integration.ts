@@ -684,16 +684,16 @@ describe("Compound filter to elastic query", () => {
     expect(hits.map(h => h._source.id).sort()).toEqual(["1", "4"]);
   });
 
-  it("should not be possible to nest _and and _or more than two levels deep", () => {
+  it("should not be possible to nest _and and _or more than three levels deep", () => {
     const where: BsdWhere = {
       _or: [
         {
-          _and: [{ _or: [{ waste: { code: { _eq: "02 02 02" } } }] }]
+          _or: [{ _and: [{ _or: [{ waste: { code: { _eq: "02 02 02" } } }] }] }]
         }
       ]
     };
     expect(() => toElasticQuery(where)).toThrow(
-      "Vous ne pouvez pas imbriquer des opérations _and et _or sur plus de 2 niveaux"
+      "Vous ne pouvez pas imbriquer des opérations _and et _or sur plus de 3 niveaux"
     );
   });
 

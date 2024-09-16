@@ -1,11 +1,18 @@
-import React from "react";
+import React, { ReactNode, useMemo } from "react";
 import { filter_type_select_option_placeholder } from "../../wordings/dashboard/wordingsDashboard";
 import MultiSelectWrapper from "../MultiSelect/MultiSelect";
+import SelectWithSubOptions from "../SelectWithSubOptions/SelectWithSubOptions";
+
+export interface Option {
+  value: string;
+  label: string;
+  options?: Option[];
+}
 
 interface SelectProps {
   label?: string;
   id?: string;
-  options: { value: string; label: string }[];
+  options: Option[];
   selected?: any;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   placeholder?: string;
@@ -31,31 +38,19 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     },
     ref
   ) => {
-    return (
-      <div className="fr-select-group">
-        {label && (
-          <label className="fr-label" htmlFor={id}>
-            {label}
-          </label>
-        )}
-        {!isMultiple ? (
-          <select
-            ref={ref}
-            id={id}
-            className="fr-select"
+    const select: ReactNode = useMemo(() => {
+      const hasSubOptions = options.some(o => o.options?.length);
+
+      if (hasSubOptions) {
+        return (
+          <SelectWithSubOptions
+            options={options}
+            selected={selected}
             onChange={onChange}
-            defaultValue={defaultValue}
-          >
-            <option value="" disabled hidden>
-              {placeholder}
-            </option>
-            {options?.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        ) : (
+          />
+        );
+      } else if (isMultiple) {
+        return (
           <MultiSelectWrapper
             options={options}
             selected={selected}
@@ -64,7 +59,50 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             disableSearch={disableSearch}
             showRendererText={showRendererText}
           />
+        );
+      }
+
+      return (
+        <select
+          ref={ref}
+          id={id}
+          className="fr-select"
+          onChange={onChange}
+          defaultValue={defaultValue}
+        >
+          <option value="" disabled hidden>
+            {placeholder}
+          </option>
+          {options?.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      );
+    }, [
+      label,
+      options,
+      id,
+      isMultiple,
+      onChange,
+      selected,
+      disableSearch,
+      defaultValue,
+      placeholder,
+      showRendererText,
+      ref
+    ]);
+
+    return (
+      <div className="fr-select-group">
+        {label && (
+          <label className="fr-label" htmlFor={id}>
+            {label}
+          </label>
         )}
+
+        {select}
       </div>
     );
   }
