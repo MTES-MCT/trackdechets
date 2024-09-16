@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import SelectWithSubOptions from "./SelectWithSubOptions";
 import { Option } from "../Select/Select";
@@ -53,13 +53,24 @@ export default {
   component: SelectWithSubOptions
 } as ComponentMeta<typeof SelectWithSubOptions>;
 
+const Wrapper = args => {
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+
+  return (
+    <SelectWithSubOptions
+      {...args}
+      selected={selectedOptions}
+      onChange={setSelectedOptions}
+    />
+  );
+};
+
 const Template: ComponentStory<typeof SelectWithSubOptions> = args => (
-  <SelectWithSubOptions {...args} />
+  <Wrapper {...args} />
 );
 
 export const Primary = Template.bind({});
 
 Primary.args = {
-  options: OPTIONS,
-  onChange: () => {}
+  options: OPTIONS
 };
