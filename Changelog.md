@@ -27,6 +27,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correction du poids affiché sur le tableau de bord en cas de refus total pour les BSDD [PR 3536](https://github.com/MTES-MCT/trackdechets/pull/3536)
 
+#### :house: Interne
+
+- Permettre la mise à jour en masse des profils et sous-profils d'établissements via l'interface d'administration [PR 3565](https://github.com/MTES-MCT/trackdechets/pull/3565)
+
 # [2024.8.1] 27/08/2024
 
 #### :rocket: Nouvelles fonctionnalités

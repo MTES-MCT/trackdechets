@@ -368,3 +368,16 @@ input SignatureAutomationInput {
   "ID de l'entreprise qui a délégation"
   to: ID!
 }
+
+input companyUpdateRow {
+  orgId: String!
+  companyTypes: [CompanyType!]!
+  collectorTypes: [CollectorType]!
+  wasteProcessorTypes: [WasteProcessorType]!
+  wasteVehiclesTypes: [WasteVehiclesType]!
+}
+
+input BulkUpdateCompaniesProfilesInput {
+  adminEmail: String!
+  companyUpdateRows: [companyUpdateRow!]!
+}
