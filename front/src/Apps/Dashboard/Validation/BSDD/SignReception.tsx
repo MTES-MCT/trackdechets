@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import {
   EmptyReturnAdr,
+  CiterneNotWashedOutReason,
   Form,
   FormStatus,
   Mutation,
@@ -32,6 +33,7 @@ import {
 } from "../../../common/queries/bsdd/queries";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { EMPTY_RETURN_ADR_REASON } from "../../../common/utils/adrBsddSummary";
+import { CITERNE_NOT_WASHED_OUT_REASON } from "../../../common/utils/citerneBsddSummary";
 
 const getSchema = () =>
   z
@@ -54,7 +56,7 @@ const getSchema = () =>
 
       hasCiterneBeenWashedOut: z.boolean().nullish(),
       citerneNotWashedOutReason: z
-        .enum(["EXEMPTED", "INCOMPATIBLE", "UNAVAILABLE", "NOT_BY_DRIVER"], {
+        .nativeEnum(CiterneNotWashedOutReason, {
           invalid_type_error: "Vous devez préciser le motif"
         })
         .nullish(),
@@ -659,36 +661,50 @@ function SignReceptionModal({
                     }
                     options={[
                       {
-                        label: "2 A - Exemptions de rinçage (citerne dédiée)",
+                        label: `2 A - ${
+                          CITERNE_NOT_WASHED_OUT_REASON[
+                            CiterneNotWashedOutReason.Exempted
+                          ]
+                        }`,
                         nativeInputProps: {
                           ...register("citerneNotWashedOutReason", {}),
-                          value: "EXEMPTED",
+                          value: CiterneNotWashedOutReason.Exempted,
                           defaultChecked: false
                         }
                       },
                       {
-                        label:
-                          "2 B - Incompatibilité avec l'opération de rinçage à l'eau",
+                        label: `2 B - ${
+                          CITERNE_NOT_WASHED_OUT_REASON[
+                            CiterneNotWashedOutReason.Incompatible
+                          ]
+                        }`,
                         nativeInputProps: {
                           ...register("citerneNotWashedOutReason", {}),
-                          value: "INCOMPATIBLE",
+                          value: CiterneNotWashedOutReason.Incompatible,
                           defaultChecked: false
                         }
                       },
                       {
-                        label:
-                          "2 C - Incompatiblité de l'installation de rinçage",
+                        label: `2 C - ${
+                          CITERNE_NOT_WASHED_OUT_REASON[
+                            CiterneNotWashedOutReason.Unavailable
+                          ]
+                        }`,
                         nativeInputProps: {
                           ...register("citerneNotWashedOutReason", {}),
-                          value: "UNAVAILABLE",
+                          value: CiterneNotWashedOutReason.Unavailable,
                           defaultChecked: false
                         }
                       },
                       {
-                        label: "2 D - Rinçage non réalisé par le chauffeur",
+                        label: `2 D - ${
+                          CITERNE_NOT_WASHED_OUT_REASON[
+                            CiterneNotWashedOutReason.NotByDriver
+                          ]
+                        }`,
                         nativeInputProps: {
                           ...register("citerneNotWashedOutReason", {}),
-                          value: "NOT_BY_DRIVER",
+                          value: CiterneNotWashedOutReason.NotByDriver,
                           defaultChecked: false
                         }
                       }

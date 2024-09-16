@@ -23,7 +23,8 @@ import {
   OperationMode,
   QuerySearchCompaniesArgs,
   CompanyType,
-  UserPermission
+  UserPermission,
+  Packagings
 } from "@td/codegen-ui";
 import { emitterTypeLabels, getTransportModeLabel } from "../../constants";
 import {
@@ -79,6 +80,7 @@ import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import { isDefined } from "../../../common/helper";
 import { BSD_DETAILS_QTY_TOOLTIP } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
+import { CITERNE_NOT_WASHED_OUT_REASON } from "../../../Apps/common/utils/citerneBsddSummary";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -411,6 +413,24 @@ const Recipient = ({
           showEmpty={true}
         />
         <DetailRow value={form.wasteRefusalReason} label="Motif de refus" />
+        {form.stateSummary?.packagingInfos.some(
+          p => p.type === Packagings.Citerne
+        ) && (
+          <>
+            <dt>Charte "Rinçage des citernes"</dt>{" "}
+            <dd>
+              {form.hasCiterneBeenWashedOut
+                ? "Rinçage effectué"
+                : `Rinçage non effectué, ${
+                    form.citerneNotWashedOutReason
+                      ? CITERNE_NOT_WASHED_OUT_REASON[
+                          form.citerneNotWashedOutReason
+                        ]
+                      : ""
+                  }`}
+            </dd>
+          </>
+        )}
       </div>
       <div className={styles.detailGrid}>
         <QuantityRow
