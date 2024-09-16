@@ -35,6 +35,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout des colonnes de sous-type au script d'import en masse [PR 3568](https://github.com/MTES-MCT/trackdechets/pull/3568)
 
+#### :house: Interne
+
+- Génération de modèles de bsds vides [PR 3556](https://github.com/MTES-MCT/trackdechets/pull/3556)
+
 # [2024.8.1] 27/08/2024
 
 #### :rocket: Nouvelles fonctionnalités

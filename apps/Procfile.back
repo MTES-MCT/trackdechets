@@ -6,3 +6,6 @@ bulkindexqueue: node dist/apps/queues-bulk-indexation/main.js
 bulkindexqueuemaster: node dist/apps/queues-bulk-indexation-master/main.js
 webhooksqueue: node dist/apps/queues-webhooks/main.js
 gericoqueue: node dist/apps/queues-gerico/main.js
+
+# post-deploy tasks
+postdeploy: npx nx run back:generate-bsds-templates
