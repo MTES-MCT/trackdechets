@@ -18,7 +18,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
-- Génération de modèles de bsds videsf [PR 3556](https://github.com/MTES-MCT/trackdechets/pull/3556)
+- Génération de modèles de bsds vides [PR 3556](https://github.com/MTES-MCT/trackdechets/pull/3556)
 
 # [2024.8.1] 27/08/2024
 
