@@ -1,7 +1,7 @@
 import { Queue } from "bull";
 
 type WaitJobsCompletionOpts<T> = {
-  fn: () => T;
+  fn: () => Promise<T>;
   queue: Queue;
   expectedJobCount: number;
 };
