@@ -20,12 +20,14 @@ describe("index", () => {
       const delegation = parseCreateRndtsDeclarationDelegationInput(input);
 
       // Then
-      expect(delegation).toMatchObject({
-        delegatorOrgId: "40081510600010",
-        delegateOrgId: "39070205800012",
-        startDate: new Date("2040-09-29T22:00:00.000Z"),
-        endDate: new Date("2050-09-30T21:59:59.999Z")
-      });
+      expect(delegation.delegatorOrgId).toBe("40081510600010");
+      expect(delegation.delegateOrgId).toBe("39070205800012");
+      expect(delegation.startDate?.toISOString()).toBe(
+        new Date("2040-09-29T22:00:00.000Z").toISOString()
+      );
+      expect(delegation.endDate?.toISOString()).toBe(
+        new Date("2050-09-30T21:59:59.999Z").toISOString()
+      );
     });
 
     it("declaration with minimal info should be valid", () => {
