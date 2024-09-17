@@ -133,14 +133,14 @@ describe("Test appendixForms", () => {
       }
     });
 
-    await updateAppendix2Fn(
-      { formId: initialForm1.id },
-      { ...emitter, auth: AuthType.Bearer }
-    );
-    await updateAppendix2Fn(
-      { formId: initialForm2.id },
-      { ...emitter, auth: AuthType.Bearer }
-    );
+    await updateAppendix2Fn({
+      formId: initialForm1.id,
+      user: { ...emitter, auth: AuthType.Bearer }
+    });
+    await updateAppendix2Fn({
+      formId: initialForm2.id,
+      user: { ...emitter, auth: AuthType.Bearer }
+    });
 
     const { query } = makeClient(ttr);
     const {
@@ -303,14 +303,14 @@ describe("Test appendixForms", () => {
         }
       });
 
-      await updateAppendix2Fn(
-        { formId: totallyGrouped.id },
-        { ...emitter, auth: AuthType.Bearer }
-      );
-      await updateAppendix2Fn(
-        { formId: partiallyGrouped.id },
-        { ...emitter, auth: AuthType.Bearer }
-      );
+      await updateAppendix2Fn({
+        formId: totallyGrouped.id,
+        user: { ...emitter, auth: AuthType.Bearer }
+      });
+      await updateAppendix2Fn({
+        formId: partiallyGrouped.id,
+        user: { ...emitter, auth: AuthType.Bearer }
+      });
 
       const { query } = makeClient(ttr);
       const {
@@ -428,14 +428,14 @@ describe("Test appendixForms", () => {
         }
       });
 
-      await updateAppendix2Fn(
-        { formId: totallyGrouped.id },
-        { ...emitter, auth: AuthType.Bearer }
-      );
-      await updateAppendix2Fn(
-        { formId: partiallyGrouped.id },
-        { ...emitter, auth: AuthType.Bearer }
-      );
+      await updateAppendix2Fn({
+        formId: totallyGrouped.id,
+        user: { ...emitter, auth: AuthType.Bearer }
+      });
+      await updateAppendix2Fn({
+        formId: partiallyGrouped.id,
+        user: { ...emitter, auth: AuthType.Bearer }
+      });
 
       const { query } = makeClient(ttr);
       const {

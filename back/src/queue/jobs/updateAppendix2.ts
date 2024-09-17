@@ -27,8 +27,8 @@ export async function updateAppendix2Job(
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: job.data.userId }
   });
-  await updateAppendix2Fn(job.data, {
-    ...user,
-    auth: job.data.auth
+  await updateAppendix2Fn({
+    formId: job.data.formId,
+    user: { ...user, auth: job.data.auth }
   });
 }

@@ -1,19 +1,17 @@
 import { prisma } from "@td/prisma";
-import { UpdateAppendix2JobArgs } from "../queue/jobs/updateAppendix2";
 import { EmitterType, Status } from "@prisma/client";
 import Decimal from "decimal.js";
 import { enqueueUpdateAppendix2Job } from "../queue/producers/updateAppendix2";
 import { getFormRepository } from "./repository";
 
-export type UpdateAppendix2FormsOpts = {
-  // Identifiant du BSDD de groupement dont on souhaite mettre à jour
-  // les informations des annexes 2
-  formId: string;
-  // Permet de jouer la récursion des hooks en synchrone
-  runSync: boolean;
-};
-
 const DECIMAL_WEIGHT_PRECISION = 6; // gramme
+
+type UpdateAppendix2FnArgs = {
+  // Identifiant du bordereau annexé
+  formId: string;
+  // Utilisateur à l'origine de la modification
+  user: Express.User;
+};
 
 /**
  * Cette fonction permet de recalculer les champs `status` et `quantityGrouped`
@@ -26,11 +24,8 @@ const DECIMAL_WEIGHT_PRECISION = 6; // gramme
  * suppression / annulation / traitement sur un des bordereaux de groupement auquel le
  * bordereau appartient.
  */
-export async function updateAppendix2Fn(
-  args: UpdateAppendix2JobArgs,
-  user: Express.User
-) {
-  const { formId } = args;
+export async function updateAppendix2Fn(args: UpdateAppendix2FnArgs) {
+  const { formId, user } = args;
 
   const form = await prisma.form.findUniqueOrThrow({
     where: { id: formId },
