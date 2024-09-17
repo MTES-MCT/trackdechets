@@ -7,7 +7,10 @@ import {
   toBsdElastic as toBsdasriElastic,
   getBsdasriForElastic
 } from "../../bsdasris/elastic";
-import { toBsdElastic as toBsvhuElastic } from "../../bsvhu/elastic";
+import {
+  getBsvhuForElastic,
+  toBsdElastic as toBsvhuElastic
+} from "../../bsvhu/elastic";
 import { toBsdElastic as toBsffElastic } from "../../bsffs/elastic";
 import { toBsdElastic as toBspaohElastic } from "../../bspaoh/elastic";
 import { BsdElastic, indexBsd, getElasticBsdById } from "../../common/elastic";
@@ -49,9 +52,7 @@ export async function indexBsdJob(
   }
 
   if (bsdId.startsWith("VHU-")) {
-    const bsvhu = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsdId }
-    });
+    const bsvhu = await getBsvhuForElastic({ id: bsdId });
 
     const elasticBsvhu = toBsvhuElastic(bsvhu);
     await indexBsd(elasticBsvhu);

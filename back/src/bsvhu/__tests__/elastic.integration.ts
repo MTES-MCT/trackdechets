@@ -3,7 +3,7 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { BsdElastic } from "../../common/elastic";
 import { getWhere, toBsdElastic } from "../elastic";
-import { bsvhuFactory } from "./factories.vhu";
+import { bsvhuFactory, toIntermediaryCompany } from "./factories.vhu";
 
 describe("getWhere", () => {
   test("if emitter publishes VHU > transporter should see it in 'follow' tab", async () => {
@@ -28,6 +28,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
   let destination: Company;
   let bsvhu: any;
   let elasticBsvhu: BsdElastic;
+  let intermediary1: Company;
+  let intermediary2: Company;
 
   beforeAll(async () => {
     // Given
@@ -39,6 +41,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     destination = await companyFactory({
       name: "Destination"
     });
+    intermediary1 = await companyFactory({ name: "Intermediaire 1" });
+    intermediary2 = await companyFactory({ name: "Intermediaire 2" });
 
     bsvhu = await bsvhuFactory({
       opt: {
@@ -48,7 +52,15 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         transporterCompanySiret: transporter.siret,
         transporterCompanyVatNumber: transporter.vatNumber,
         destinationCompanyName: destination.name,
-        destinationCompanySiret: destination.siret
+        destinationCompanySiret: destination.siret,
+        intermediaries: {
+          createMany: {
+            data: [
+              toIntermediaryCompany(intermediary1),
+              toIntermediaryCompany(intermediary2)
+            ]
+          }
+        }
       }
     });
 
@@ -61,6 +73,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyNames).toContain(emitter.name);
     expect(elasticBsvhu.companyNames).toContain(transporter.name);
     expect(elasticBsvhu.companyNames).toContain(destination.name);
+    expect(elasticBsvhu.companyNames).toContain(intermediary1.name);
+    expect(elasticBsvhu.companyNames).toContain(intermediary2.name);
   });
 
   test("companyOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {
@@ -68,5 +82,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyOrgIds).toContain(emitter.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(transporter.vatNumber);
     expect(elasticBsvhu.companyOrgIds).toContain(destination.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(intermediary1.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(intermediary2.siret);
   });
 });

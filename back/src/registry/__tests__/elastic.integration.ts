@@ -29,7 +29,7 @@ import {
   createBsffBeforeEmission,
   createFicheIntervention
 } from "../../bsffs/__tests__/factories";
-import { indexBsvhu } from "../../bsvhu/elastic";
+import { getBsvhuForElastic, indexBsvhu } from "../../bsvhu/elastic";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { client, index } from "../../common/elastic";
 import {
@@ -325,7 +325,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           destinationOperationSignatureDate: new Date()
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
       const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
       expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
@@ -337,7 +337,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           destinationOperationSignatureDate: null
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
       const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
       expect(bsds).toEqual([]);
@@ -614,7 +614,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           transporterTransportSignatureDate: new Date()
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
       const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
       expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
@@ -627,7 +627,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           transporterTransportSignatureDate: null
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
       const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
       expect(bsds).toEqual([]);
@@ -931,7 +931,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           transporterTransportSignatureDate: new Date()
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
       const bsds = await searchBsds("TRANSPORTED", [
         transporter.company.siret!
@@ -946,7 +946,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           transporterTransportSignatureDate: null
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
       const bsds = await searchBsds("TRANSPORTED", [
         transporter.company.siret!
@@ -1453,7 +1453,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           transporterTransportSignatureDate: new Date()
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
 
       // When
@@ -1472,7 +1472,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           transporterTransportSignatureDate: null
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
 
       // When
@@ -1489,7 +1489,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           transporterTransportSignatureDate: new Date()
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
       const bsds = await searchBsds("ALL", [emitter.company.siret!]);
       expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
@@ -1502,7 +1502,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           transporterTransportSignatureDate: new Date()
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
       const bsds = await searchBsds("ALL", [transporter.company.siret!]);
       expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
@@ -1516,7 +1516,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
           destinationOperationSignatureDate: new Date()
         }
       });
-      await indexBsvhu(bsvhu);
+      await indexBsvhu(await getBsvhuForElastic(bsvhu));
       await refreshElasticSearch();
       const bsds = await searchBsds("ALL", [destination.company.siret!]);
       expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);

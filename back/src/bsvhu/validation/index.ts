@@ -1,4 +1,3 @@
-import { Bsvhu } from "@prisma/client";
 import { BsvhuInput } from "../../generated/graphql/types";
 import {
   getCurrentSignatureType,
@@ -7,11 +6,12 @@ import {
 } from "./helpers";
 import { checkBsvhuSealedFields } from "./rules";
 import {
+  ParsedZodBsvhu,
   ZodBsvhu,
   contextualBsvhuSchema,
   contextualBsvhuSchemaAsync
 } from "./schema";
-import { BsvhuValidationContext } from "./types";
+import { BsvhuValidationContext, PrismaBsvhuForParsing } from "./types";
 
 /**
  * Wrapper autour de `parseBsvhuAsync` qui peut être appelé
@@ -22,7 +22,7 @@ import { BsvhuValidationContext } from "./types";
  */
 export async function mergeInputAndParseBsvhuAsync(
   // BSFF déjà stockée en base de données.
-  persisted: Bsvhu,
+  persisted: PrismaBsvhuForParsing,
   // Données entrantes provenant de la couche GraphQL.
   input: BsvhuInput,
   context: BsvhuValidationContext
@@ -66,7 +66,7 @@ export async function mergeInputAndParseBsvhuAsync(
 export async function parseBsvhuAsync(
   bsvhu: ZodBsvhu,
   context: BsvhuValidationContext = {}
-) {
+): Promise<ParsedZodBsvhu> {
   const schema = contextualBsvhuSchemaAsync(context);
   return schema.parseAsync(bsvhu);
 }
@@ -78,7 +78,7 @@ export async function parseBsvhuAsync(
 export function parseBsvhu(
   bsvhu: ZodBsvhu,
   context: BsvhuValidationContext = {}
-) {
+): ParsedZodBsvhu {
   const schema = contextualBsvhuSchema(context);
   return schema.parse(bsvhu);
 }

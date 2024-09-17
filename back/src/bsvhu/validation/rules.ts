@@ -30,6 +30,7 @@ export type BsvhuEditableFields = Required<
     | "transporterTransportSignatureAuthor"
     | "destinationOperationSignatureDate"
     | "destinationOperationSignatureAuthor"
+    | "intermediariesOrgIds"
   >
 >;
 
@@ -509,6 +510,11 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     // required: {
     //   from: "TRANSPORT"
     // }
+  },
+  intermediaries: {
+    readableFieldName: "les intermédiaires",
+    sealed: { from: "TRANSPORT" },
+    path: ["intermediaries"]
   }
 };
 

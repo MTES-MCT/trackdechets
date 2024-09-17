@@ -21,9 +21,14 @@ import {
   BsvhuOperation,
   BsvhuNextDestination,
   BsvhuTransport,
-  BsvhuTransportInput
+  BsvhuTransportInput,
+  CompanyInput
 } from "../generated/graphql/types";
-import { Bsvhu as PrismaVhuForm, WasteAcceptationStatus } from "@prisma/client";
+import {
+  Prisma,
+  Bsvhu as PrismaVhuForm,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 
 export const getAddress = ({
@@ -168,7 +173,8 @@ export function flattenVhuInput(formInput: BsvhuInput) {
     wasteCode: chain(formInput, f => f.wasteCode),
     quantity: chain(formInput, f => f.quantity),
     ...flattenVhuIdentificationInput(formInput),
-    ...flattenVhuWeightInput(formInput)
+    ...flattenVhuWeightInput(formInput),
+    intermediaries: formInput.intermediaries
   });
 }
 
@@ -369,4 +375,22 @@ function flattenVhuWeightInput({ weight }: Pick<BsvhuInput, "weight">) {
     weightValue: chain(weight, q => (q.value ? q.value * 1000 : q.value)),
     weightIsEstimate: chain(weight, q => q.isEstimate)
   };
+}
+
+export function companyToIntermediaryInput(
+  companies: CompanyInput[]
+): Prisma.IntermediaryBsvhuAssociationCreateManyBsvhuInput[] {
+  if (!companies) return [];
+
+  return companies.map(company => {
+    return {
+      name: company.name!,
+      siret: company.siret!,
+      vatNumber: company.vatNumber,
+      address: company.address,
+      contact: company.contact!,
+      phone: company.phone,
+      mail: company.mail
+    };
+  });
 }
