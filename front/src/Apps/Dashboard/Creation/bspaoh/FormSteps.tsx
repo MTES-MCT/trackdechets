@@ -66,8 +66,8 @@ export function ControlledTabs(props: Readonly<Props>) {
   const sealedFields = useMemo(
     () =>
       (formQuery?.data?.bspaoh?.metadata?.fields?.sealed ?? [])
-        ?.filter(Boolean)
-        .map(sealedField => sealedField.join(".")),
+        .map(sealedField => sealedField.join("."))
+        ?.filter(Boolean),
     [formQuery.data]
   );
 
