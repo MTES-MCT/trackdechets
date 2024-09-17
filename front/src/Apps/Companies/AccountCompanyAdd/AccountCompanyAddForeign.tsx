@@ -105,7 +105,8 @@ const localizedStrings = {
           En tant qu'administrateur de l'établissement, j'ai pris connaissance
           des{" "}
           <a
-            href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
+            className="fr-link"
+            href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement"
             target="_blank"
             rel="noreferrer"
           >
