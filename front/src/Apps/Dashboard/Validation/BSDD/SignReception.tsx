@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import {
+  EmptyReturnAdr,
   Form,
   FormStatus,
   Mutation,
@@ -8,7 +9,9 @@ import {
   MutationMarkAsReceivedArgs,
   MutationMarkAsTempStoredArgs,
   MutationMarkAsTempStorerAcceptedArgs,
-  QuantityType
+  Packagings,
+  QuantityType,
+  TransportMode
 } from "@td/codegen-ui";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -27,6 +30,8 @@ import {
   MARK_AS_TEMP_STORED,
   MARK_TEMP_STORER_ACCEPTED
 } from "../../../common/queries/bsdd/queries";
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { EMPTY_RETURN_ADR_REASON } from "../../../common/utils/adrBsddSummary";
 
 const getSchema = () =>
   z
@@ -44,6 +49,8 @@ const getSchema = () =>
       acceptedWeight: z.coerce.number().nonnegative().nullish(),
 
       quantityType: z.coerce.string().nullish(),
+
+      emptyReturnAdr: z.nativeEnum(EmptyReturnAdr).nullish(),
 
       signedAt: z.coerce
         .date({
@@ -133,6 +140,8 @@ function SignReceptionModal({
   form,
   onCancel
 }: Readonly<SignReceptionModalProps>) {
+  const [emptyReturnStatus, setEmptyReturnStatus] = useState(false);
+
   const [
     markAsReceived,
     { loading: loadingMarkAsReceived, error: errorMarkAsReceived }
@@ -179,7 +188,8 @@ function SignReceptionModal({
       signedAt,
       signedBy,
       quantityType,
-      refusedWeight
+      refusedWeight,
+      emptyReturnAdr
     } = data;
 
     let formStatus: FormStatus | undefined = form.status;
@@ -230,7 +240,12 @@ function SignReceptionModal({
               signedAt: signedAt,
               signedBy: signedBy,
               wasteAcceptationStatus: wasteAcceptationStatus,
-              wasteRefusalReason: wasteRefusalReason
+              wasteRefusalReason: wasteRefusalReason,
+              ...(emptyReturnStatus
+                ? {
+                    emptyReturnAdr: emptyReturnAdr
+                  }
+                : {})
             }
           }
         });
@@ -244,7 +259,12 @@ function SignReceptionModal({
               signedAt: signedAt,
               signedBy: signedBy,
               wasteAcceptationStatus: wasteAcceptationStatus,
-              wasteRefusalReason: wasteRefusalReason
+              wasteRefusalReason: wasteRefusalReason,
+              ...(emptyReturnStatus
+                ? {
+                    emptyReturnAdr: emptyReturnAdr
+                  }
+                : {})
             }
           }
         });
@@ -325,9 +345,13 @@ function SignReceptionModal({
       return;
     }
 
+    if (!emptyReturnStatus) {
+      setValue("emptyReturnAdr", undefined);
+    }
+
     // manually set values do not trigger re-validation
     trigger("refusedWeight");
-  }, [acceptationStatus, receivedWeight, setValue, trigger]);
+  }, [acceptationStatus, receivedWeight, emptyReturnStatus, setValue, trigger]);
 
   const receptionRadioOption = [
     {
@@ -370,6 +394,18 @@ function SignReceptionModal({
       }
     }
   ];
+
+  const shouldDisplayAdrStatus =
+    ["ACCEPTED"].includes(acceptationStatus) &&
+    form.stateSummary?.packagingInfos.some(
+      p => p.type === Packagings.Citerne || p.type === Packagings.Benne
+    ) &&
+    [TransportMode.Road, TransportMode.Other].includes(
+      form.transporters.find(
+        t => t.company?.orgId === form.currentTransporterSiret
+      )?.mode as TransportMode
+    ) &&
+    (form.wasteDetails?.isDangerous || form.wasteDetails?.pop);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -507,6 +543,76 @@ function SignReceptionModal({
                 ...register("wasteRefusalReason")
               }}
             />
+          )}
+        </>
+      )}
+
+      {shouldDisplayAdrStatus && (
+        <>
+          <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+            <div className="fr-col-12">
+              <ToggleSwitch
+                inputTitle="emptyReturnStatus"
+                label={`Je décide de renseigner les informations en lien avec le Retour à vide ADR`}
+                labelPosition="right"
+                showCheckedHint={false}
+                checked={emptyReturnStatus}
+                onChange={checked => setEmptyReturnStatus(checked)}
+              />
+            </div>
+          </div>
+
+          {emptyReturnStatus && (
+            <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+              <div className="fr-col-12 fr-pl-4w">
+                <RadioButtons
+                  state={errors?.emptyReturnAdr && "error"}
+                  stateRelatedMessage={
+                    (errors?.emptyReturnAdr?.message as string) ?? ""
+                  }
+                  options={[
+                    {
+                      label:
+                        EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyNotWashed],
+                      nativeInputProps: {
+                        ...register("emptyReturnAdr", {}),
+                        value: EmptyReturnAdr.EmptyNotWashed,
+                        defaultChecked: false
+                      }
+                    },
+                    {
+                      label:
+                        EMPTY_RETURN_ADR_REASON[
+                          EmptyReturnAdr.EmptyReturnNotWashed
+                        ],
+                      nativeInputProps: {
+                        ...register("emptyReturnAdr", {}),
+                        value: EmptyReturnAdr.EmptyReturnNotWashed,
+                        defaultChecked: false
+                      }
+                    },
+                    {
+                      label:
+                        EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyVehicle],
+                      nativeInputProps: {
+                        ...register("emptyReturnAdr", {}),
+                        value: EmptyReturnAdr.EmptyVehicle,
+                        defaultChecked: false
+                      }
+                    },
+                    {
+                      label:
+                        EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyCiterne],
+                      nativeInputProps: {
+                        ...register("emptyReturnAdr", {}),
+                        value: EmptyReturnAdr.EmptyCiterne,
+                        defaultChecked: false
+                      }
+                    }
+                  ]}
+                />
+              </div>
+            </div>
           )}
         </>
       )}
