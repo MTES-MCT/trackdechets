@@ -17,6 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajouter deux sous-profils pour l'installation de traitement VHU [PR 3480](https://github.com/MTES-MCT/trackdechets/pull/3480)
 - Rendre les chemins d'erreur Zod BSVHU/BSPAOH plus explicite en les subdivisant [PR 3547](https://github.com/MTES-MCT/trackdechets/pull/3547)
 - Ajout d'un filtre par sous-type de bordereau [PR 3476](https://github.com/MTES-MCT/trackdechets/pull/3476)
+- Amélioration des pages de connexion oauth / oidc avec leur passage au DSFR [PR 3550](https://github.com/MTES-MCT/trackdechets/pull/3550)
 
 #### :boom: Breaking changes
 
