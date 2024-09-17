@@ -187,7 +187,8 @@ const getPipelines = (
         data: {
           ...revisionRequest,
           wasteDetailsPackagingInfos:
-            revisionRequest.wasteDetailsPackagingInfos ?? Prisma.JsonNull
+            revisionRequest.wasteDetailsPackagingInfos ?? Prisma.JsonNull,
+          initialWasteDetailsPackagingInfos: []
         }
       })
   },
@@ -341,7 +342,9 @@ const getPipelines = (
         data: {
           ...bsdasriRevisionRequest,
           destinationWastePackagings:
-            bsdasriRevisionRequest.destinationWastePackagings ?? Prisma.JsonNull
+            bsdasriRevisionRequest.destinationWastePackagings ??
+            Prisma.JsonNull,
+          initialDestinationWastePackagings: []
         }
       })
   },
@@ -394,7 +397,8 @@ const getPipelines = (
       prismaLocal.bsdaRevisionRequest.create({
         data: {
           ...bsdaRevisionRequest,
-          packagings: bsdaRevisionRequest.packagings ?? Prisma.JsonNull
+          packagings: bsdaRevisionRequest.packagings ?? Prisma.JsonNull,
+          initialPackagings: []
         }
       })
   },
