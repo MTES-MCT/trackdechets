@@ -7,7 +7,7 @@ import { enqueueUpdateAppendix2Job } from "../../../queue/producers/updateAppend
 export type RemoveAppendix2Fn = (id: string) => Promise<Form>;
 
 const buildRemoveAppendix2: (deps: RepositoryFnDeps) => RemoveAppendix2Fn =
-  ({ prisma }) =>
+  ({ prisma, user }) =>
   async id => {
     const findGroupedFormsById = buildFindGroupedFormsById({
       prisma
@@ -20,7 +20,11 @@ const buildRemoveAppendix2: (deps: RepositoryFnDeps) => RemoveAppendix2Fn =
 
       for (const formId of appendix2Forms.map(f => f.id)) {
         prisma.addAfterCommitCallback(async () => {
-          await enqueueUpdateAppendix2Job({ formId });
+          await enqueueUpdateAppendix2Job({
+            formId,
+            userId: user.id,
+            auth: user.auth
+          });
         });
       }
     }

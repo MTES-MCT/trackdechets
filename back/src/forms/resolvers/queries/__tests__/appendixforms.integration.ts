@@ -10,6 +10,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { gql } from "graphql-tag";
 import { prisma } from "@td/prisma";
 import { updateAppendix2Fn } from "../../../updateAppendix2";
+import { AuthType } from "../../../../auth";
 
 const APPENDIX_FORMS = gql`
   query AppendixForm($siret: String!) {
@@ -132,8 +133,14 @@ describe("Test appendixForms", () => {
       }
     });
 
-    await updateAppendix2Fn({ formId: initialForm1.id }, true);
-    await updateAppendix2Fn({ formId: initialForm2.id }, true);
+    await updateAppendix2Fn(
+      { formId: initialForm1.id },
+      { ...emitter, auth: AuthType.Bearer }
+    );
+    await updateAppendix2Fn(
+      { formId: initialForm2.id },
+      { ...emitter, auth: AuthType.Bearer }
+    );
 
     const { query } = makeClient(ttr);
     const {
@@ -296,8 +303,14 @@ describe("Test appendixForms", () => {
         }
       });
 
-      await updateAppendix2Fn({ formId: totallyGrouped.id }, true);
-      await updateAppendix2Fn({ formId: partiallyGrouped.id }, true);
+      await updateAppendix2Fn(
+        { formId: totallyGrouped.id },
+        { ...emitter, auth: AuthType.Bearer }
+      );
+      await updateAppendix2Fn(
+        { formId: partiallyGrouped.id },
+        { ...emitter, auth: AuthType.Bearer }
+      );
 
       const { query } = makeClient(ttr);
       const {
@@ -415,8 +428,14 @@ describe("Test appendixForms", () => {
         }
       });
 
-      await updateAppendix2Fn({ formId: totallyGrouped.id }, true);
-      await updateAppendix2Fn({ formId: partiallyGrouped.id }, true);
+      await updateAppendix2Fn(
+        { formId: totallyGrouped.id },
+        { ...emitter, auth: AuthType.Bearer }
+      );
+      await updateAppendix2Fn(
+        { formId: partiallyGrouped.id },
+        { ...emitter, auth: AuthType.Bearer }
+      );
 
       const { query } = makeClient(ttr);
       const {

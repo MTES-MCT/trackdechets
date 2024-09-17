@@ -87,7 +87,11 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
           // permet de faire passer le statut d'un bordereau annexé à "GROUPED"
           // si tous les bordereaux dans lesquelle ils est regroupé sont au statut
           // "SEALED" et qu'il a été regroupé en totalité
-          await enqueueUpdateAppendix2Job({ formId });
+          await enqueueUpdateAppendix2Job({
+            formId,
+            userId: user.id,
+            auth: user.auth
+          });
         });
       }
     }

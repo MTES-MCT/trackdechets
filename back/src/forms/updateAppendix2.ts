@@ -3,6 +3,7 @@ import { UpdateAppendix2JobArgs } from "../queue/jobs/updateAppendix2";
 import { EmitterType, Status } from "@prisma/client";
 import Decimal from "decimal.js";
 import { enqueueUpdateAppendix2Job } from "../queue/producers/updateAppendix2";
+import { getFormRepository } from "./repository";
 
 export type UpdateAppendix2FormsOpts = {
   // Identifiant du BSDD de groupement dont on souhaite mettre à jour
@@ -13,29 +14,6 @@ export type UpdateAppendix2FormsOpts = {
 };
 
 const DECIMAL_WEIGHT_PRECISION = 6; // gramme
-
-/**
- * Hook permettant de mettre à jour les champs `status` et `quantityGrouped`
- * sur l'ensemble des bordereaux annexés à un bordereau de groupement.
- */
-export async function updateAppendix2Hook(
-  // Identifiant du bordereau de groupement dont on souhaite mettre
-  // à jour les informations des annexes 2.
-  formId: string,
-  runSync = false
-) {
-  const groupements = await prisma.formGroupement.findMany({
-    where: { nextFormId: formId },
-    select: { initialFormId: true }
-  });
-  for (const initialFormId of groupements.map(g => g.initialFormId)) {
-    if (runSync) {
-      await updateAppendix2Fn({ formId: initialFormId }, runSync);
-    } else {
-      await enqueueUpdateAppendix2Job({ formId: initialFormId });
-    }
-  }
-}
 
 /**
  * Cette fonction permet de recalculer les champs `status` et `quantityGrouped`
@@ -50,7 +28,7 @@ export async function updateAppendix2Hook(
  */
 export async function updateAppendix2Fn(
   args: UpdateAppendix2JobArgs,
-  runSync = false
+  user: Express.User
 ) {
   const { formId } = args;
 
@@ -128,12 +106,21 @@ export async function updateAppendix2Fn(
     ? Status.GROUPED
     : Status.AWAITING_GROUP;
 
-  await prisma.form.update({
-    where: { id: form.id },
-    data: { quantityGrouped: quantityGrouped.toNumber(), status: nextStatus }
-  });
+  const { update: updateForm, findGroupedFormsById } = getFormRepository(user);
+
+  await updateForm(
+    { id: form.id },
+    { quantityGrouped: quantityGrouped.toNumber(), status: nextStatus }
+  );
 
   if (form.emitterType === EmitterType.APPENDIX2) {
-    await updateAppendix2Hook(form.id, runSync);
+    const groupedForms = await findGroupedFormsById(form.id);
+    for (const formId of groupedForms.map(f => f.id)) {
+      await enqueueUpdateAppendix2Job({
+        formId,
+        userId: user.id,
+        auth: user.auth
+      });
+    }
   }
 }

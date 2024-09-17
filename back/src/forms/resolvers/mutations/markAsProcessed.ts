@@ -23,7 +23,7 @@ import {
   PROCESSING_OPERATIONS
 } from "@td/constants";
 import { operationHook } from "../../operationHook";
-import { updateAppendix2Hook } from "../../updateAppendix2";
+import { enqueueUpdateAppendix2Job } from "../../../queue/producers/updateAppendix2";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -126,9 +126,18 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
     // mark appendix2Forms as PROCESSED
     if (form.emitterType === EmitterType.APPENDIX2) {
-      transaction.addAfterCommitCallback(async () => {
-        await updateAppendix2Hook(form.id);
-      });
+      for (const formId of groupedForms.map(f => f.id)) {
+        transaction.addAfterCommitCallback(async () => {
+          // permet de faire passer le statut d'un bordereau annexé à "PROCESSED"
+          // si tous les bordereaux dans lesquelle ils est regroupé sont au statut
+          // "PROCESSED" et qu'il a été regroupé en totalité
+          await enqueueUpdateAppendix2Job({
+            formId,
+            userId: user.id,
+            auth: user.auth
+          });
+        });
+      }
     }
 
     if (form.emitterType === EmitterType.APPENDIX1) {

@@ -34,7 +34,7 @@ export type SetAppendix2Fn = (args: SetAppendix2Args) => Promise<void>;
  * than that has been received at the TTR site.
  */
 const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
-  ({ prisma }) =>
+  ({ prisma, user }) =>
   async ({ form, appendix2, currentAppendix2Forms }) => {
     // delete existing appendix2 not present in input
     await prisma.formGroupement.deleteMany({
@@ -117,7 +117,11 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
         // met à jour les champs `status` et `quantityGrouped`
         // des bordereaux initiaux (annexes 2) dont les
         // informations de groupement viennent d'être modifiées
-        await enqueueUpdateAppendix2Job({ formId });
+        await enqueueUpdateAppendix2Job({
+          formId,
+          userId: user.id,
+          auth: user.auth
+        });
       });
     }
   };
