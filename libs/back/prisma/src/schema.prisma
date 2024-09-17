@@ -663,6 +663,42 @@ model BsddRevisionRequest {
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
 
+  initialRecipientCap                                    String?
+  initialWasteDetailsCode                                String?
+  initialWasteDetailsName                                String?
+  initialWasteDetailsPop                                 Boolean?
+  initialWasteDetailsPackagingInfos                      Json?
+  initialWasteAcceptationStatus                          WasteAcceptationStatus?
+  initialWasteRefusalReason                              String?
+  initialWasteDetailsSampleNumber                        String?
+  initialWasteDetailsQuantity                            Decimal?                @db.Decimal(65, 30)
+  initialQuantityReceived                                Decimal?
+  initialQuantityRefused                                 Decimal?
+  initialProcessingOperationDone                         String?
+  initialDestinationOperationMode                        OperationMode?
+  initialProcessingOperationDescription                  String?
+  initialBrokerCompanyName                               String?
+  initialBrokerCompanySiret                              String?
+  initialBrokerCompanyAddress                            String?
+  initialBrokerCompanyContact                            String?
+  initialBrokerCompanyPhone                              String?
+  initialBrokerCompanyMail                               String?
+  initialBrokerReceipt                                   String?
+  initialBrokerDepartment                                String?
+  initialBrokerValidityLimit                             DateTime?               @db.Timestamptz(6)
+  initialTraderCompanyName                               String?
+  initialTraderCompanySiret                              String?
+  initialTraderCompanyAddress                            String?
+  initialTraderCompanyContact                            String?
+  initialTraderCompanyPhone                              String?
+  initialTraderCompanyMail                               String?
+  initialTraderReceipt                                   String?
+  initialTraderDepartment                                String?
+  initialTraderValidityLimit                             DateTime?               @db.Timestamptz(6)
+  initialTemporaryStorageDestinationCap                  String?
+  initialTemporaryStorageDestinationProcessingOperation  String?
+  initialTemporaryStorageTemporaryStorerQuantityReceived Decimal?
+
   @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")
   @@index([status], map: "_BsddRevisionRequestStatusIdx")
@@ -1224,6 +1260,17 @@ model BsdasriRevisionRequest {
   emitterPickupSitePostalCode String?
   emitterPickupSiteInfos      String?
 
+  initialWasteCode                            String?
+  initialDestinationWastePackagings           Json?
+  initialDestinationReceptionWasteWeightValue Decimal?
+  initialDestinationOperationCode             String?
+  initialDestinationOperationMode             OperationMode?
+  initialEmitterPickupSiteName                String?
+  initialEmitterPickupSiteAddress             String?
+  initialEmitterPickupSiteCity                String?
+  initialEmitterPickupSitePostalCode          String?
+  initialEmitterPickupSiteInfos               String?
+
   @@index([authoringCompanyId], map: "_BsdasriRevisionRequestAuthoringCompanyIdIdx")
   @@index([status], map: "_BsdasriRevisionRequestStatusIdx")
   @@index([bsdasriId], map: "_BsdasriRevisionRequestBsdaIdIdx")
@@ -1672,6 +1719,31 @@ model BsdaRevisionRequest {
   emitterPickupSiteCity           String?
   emitterPickupSitePostalCode     String?
   emitterPickupSiteInfos          String?
+
+  initialWasteCode                       String?
+  initialWastePop                        Boolean?
+  initialPackagings                      Json?
+  initialWasteSealNumbers                String[]
+  initialWasteMaterialName               String?
+  initialDestinationCap                  String?
+  initialDestinationReceptionWeight      Decimal?
+  initialDestinationOperationCode        String?
+  initialDestinationOperationDescription String?
+  initialDestinationOperationMode        OperationMode?
+  initialBrokerCompanyName               String?
+  initialBrokerCompanySiret              String?
+  initialBrokerCompanyAddress            String?
+  initialBrokerCompanyContact            String?
+  initialBrokerCompanyPhone              String?
+  initialBrokerCompanyMail               String?
+  initialBrokerRecepisseNumber           String?
+  initialBrokerRecepisseDepartment       String?
+  initialBrokerRecepisseValidityLimit    DateTime?      @db.Timestamptz(6)
+  initialEmitterPickupSiteName           String?
+  initialEmitterPickupSiteAddress        String?
+  initialEmitterPickupSiteCity           String?
+  initialEmitterPickupSitePostalCode     String?
+  initialEmitterPickupSiteInfos          String?
 
   @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
   @@index([status], map: "_BsdaRevisionRequestStatusIdx")
