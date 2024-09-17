@@ -23,7 +23,13 @@ export function WasteDetails({ waste, weight }: Props) {
         Consistance : {waste?.consistence ? CONSISTANCE[waste.consistence] : ""}
         <br />
         Quantité en tonnes : {weight?.value} <br />
-        <input type="checkbox" checked={!weight?.isEstimate} readOnly /> Réelle
+        {/* intentional strict equality for empy templates */}
+        <input
+          type="checkbox"
+          checked={weight?.isEstimate === false}
+          readOnly
+        />{" "}
+        Réelle
         <br />
         <input
           type="checkbox"
