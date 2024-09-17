@@ -45,7 +45,7 @@ export function ApproveAdministrativeTransfer({ company }: Props) {
   return (
     <div className="company-advanced__section">
       <h4 className="company-advanced__title">
-        Réception d'un transfert administratif de bordereau
+        Réception d'un transfert administratif de bordereaux
       </h4>
       <p className="company-advanced__description">
         Vous vous apprêtez à valider la modification des BSDs sur lesquels

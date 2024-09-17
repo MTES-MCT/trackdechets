@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
+import Badge from "@codegouvfr/react-dsfr/Badge";
 import CompanyInfo from "./CompanyInfo/CompanyInfo";
 import CompanyContactForm from "./CompanyContact/CompanyContactForm";
 import CompanyAdvanced from "./CompanyAdvanced/CompanyAdvanced";
@@ -126,7 +127,14 @@ export default function CompanyDetails() {
         company.givenName ? " - " + company.givenName : ""
       }`}
       subtitle={company.orgId}
-      additional={userRole(company.userRole!)}
+      additional={
+        <>
+          {company.isDormantSince && (
+            <Badge severity="warning">Établissement en sommeil</Badge>
+          )}
+          {userRole(company.userRole!)}
+        </>
+      }
     >
       <Tabs
         selectedTabId={selectedTabId}

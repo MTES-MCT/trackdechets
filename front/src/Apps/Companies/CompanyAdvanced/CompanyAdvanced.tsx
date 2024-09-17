@@ -101,7 +101,7 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
 
         {company.isDormantSince ? (
           <>
-            <p>
+            <p className="tw-font-bold tw-text-sm">
               Etablissement mis en sommeil le{" "}
               {format(new Date(company.isDormantSince), "dd/MM/yyyy")}
             </p>

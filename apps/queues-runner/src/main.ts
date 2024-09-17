@@ -8,7 +8,9 @@ import {
   setDepartementJob,
   syncEventsJob,
   operationHooksQueue,
-  operationHookJob
+  operationHookJob,
+  administrativeTransferQueue,
+  processAdministrativeTransferJob
 } from "back";
 
 import { schema } from "@td/env";
@@ -29,6 +31,7 @@ function startConsumers() {
   setCompanyDepartementQueue.process(setDepartementJob);
   syncEventsQueue.process(syncEventsJob);
   operationHooksQueue.process(operationHookJob);
+  administrativeTransferQueue.process(processAdministrativeTransferJob);
 }
 
 startConsumers();

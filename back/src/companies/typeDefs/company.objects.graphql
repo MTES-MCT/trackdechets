@@ -142,7 +142,14 @@ type CompanyPrivate {
   """
   isDormantSince: DateTime
 
+  """
+  Liste des transferts administratifs initiés par l'établissement
+  """
   givenAdministrativeTransfers: [AdministrativeTransfer!]
+
+  """
+  Liste des transferts administratifs reçus par l'établissement
+  """
   receivedAdministrativeTransfers: [AdministrativeTransfer!]
 }
 
