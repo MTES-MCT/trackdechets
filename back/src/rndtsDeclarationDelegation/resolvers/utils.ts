@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../common/errors";
 import { getRndtsDeclarationDelegationRepository } from "../repository";
-import { Prisma } from "@prisma/client";
+import { Company, Prisma } from "@prisma/client";
 
 export const findDelegateAndDelegatorOrThrow = async (
   delegateOrgId: string,
@@ -31,6 +31,18 @@ export const findDelegateAndDelegatorOrThrow = async (
   return { delegator, delegate };
 };
 
+export const findCompanyByOrgIdOrThrow = async (companyOrgId: string) => {
+  const company = await prisma.company.findFirst({
+    where: { orgId: companyOrgId }
+  });
+
+  if (!company) {
+    throw new UserInputError(`L'entreprise ${companyOrgId} n'existe pas.`);
+  }
+
+  return company;
+};
+
 export const findDelegationByIdOrThrow = async (
   user: Express.User,
   id: string,
@@ -46,20 +58,19 @@ export const findDelegationByIdOrThrow = async (
   return delegation;
 };
 
-export const checkUserBelongsToCompany = async (
-  user: Express.User,
-  companyId: string
-) => {
-  const companyAssociation = await prisma.companyAssociation.findFirst({
-    where: {
-      companyId,
-      userId: user.id
-    }
-  });
+export const findDelegateOrDelegatorOrThrow = async (
+  delegateOrgId?: string | null,
+  delegatorOrgId?: string | null
+): Promise<{ delegate?: Company; delegator?: Company }> => {
+  let delegate, delegator;
 
-  if (!companyAssociation) {
-    throw new UserInputError(
-      `L'entreprise ${companyId} n'existe pas ou l'utilisateur n'en fait pas partie`
-    );
+  if (delegatorOrgId) {
+    delegator = await findCompanyByOrgIdOrThrow(delegatorOrgId);
   }
+
+  if (delegateOrgId) {
+    delegate = await findCompanyByOrgIdOrThrow(delegateOrgId);
+  }
+
+  return { delegator, delegate };
 };

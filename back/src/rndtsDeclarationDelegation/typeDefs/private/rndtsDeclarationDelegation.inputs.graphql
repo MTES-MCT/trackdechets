@@ -34,6 +34,6 @@ input RndtsDeclarationDelegationWhere {
   """
   Delegate or delegator id. Specify exactly one of them
   """
-  delegatorId: ID
-  delegateId: ID
+  delegatorOrgId: ID
+  delegateOrgId: ID
 }

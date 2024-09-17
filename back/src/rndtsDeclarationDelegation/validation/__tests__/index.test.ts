@@ -233,8 +233,8 @@ describe("index", () => {
       // Given
       const args = {
         where: {
-          delegatorId: "cl81ooom5138122w9sbznzdkg",
-          delegateId: "cl81ooom5138122w9sbznzdop"
+          delegatorOrgId: "39070205800012",
+          delegateOrgId: "39070205800012"
         }
       };
 
@@ -247,7 +247,7 @@ describe("index", () => {
         expect(error.errors[0]).toMatchObject({
           path: ["where"],
           message:
-            "Vous ne pouvez pas renseigner les deux champs (delegatorId et delegateId)."
+            "Vous ne pouvez pas renseigner les deux champs (delegatorOrgId et delegateOrgId)."
         });
       }
     });
@@ -265,7 +265,7 @@ describe("index", () => {
         expect(error.errors[0]).toMatchObject({
           path: ["where"],
           message:
-            "Vous devez renseigner un des deux champs (delegatorId ou delegateId)."
+            "Vous devez renseigner un des deux champs (delegatorOrgId ou delegateOrgId)."
         });
       }
     });
@@ -273,7 +273,7 @@ describe("index", () => {
     it("should return valid args", () => {
       // Given
       const args = {
-        where: { delegatorId: "cl81ooom5138122w9sbznzdkg" },
+        where: { delegatorOrgId: "39070205800012" },
         after: "cl81ooom5138122w9sbznzdop",
         first: 10
       };
@@ -283,7 +283,7 @@ describe("index", () => {
         parseQueryRndtsDeclarationDelegationsArgs(args);
 
       // Then
-      expect(where).toMatchObject({ delegatorId: "cl81ooom5138122w9sbznzdkg" });
+      expect(where).toMatchObject({ delegatorOrgId: "39070205800012" });
       expect(after).toBe("cl81ooom5138122w9sbznzdop");
       expect(first).toBe(10);
     });

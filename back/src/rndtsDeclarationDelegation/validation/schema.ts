@@ -62,16 +62,16 @@ export const delegationIdSchema = z.object({
 export const queryRndtsDeclarationDelegationsArgsSchema = z.object({
   where: z
     .object({
-      delegatorId: idSchema.optional().nullable(),
-      delegateId: idSchema.optional().nullable()
+      delegatorOrgId: siretSchema().optional().nullable(),
+      delegateOrgId: siretSchema().optional().nullable()
     })
     .refine(
-      data => Boolean(data.delegatorId) || Boolean(data.delegateId),
-      "Vous devez renseigner un des deux champs (delegatorId ou delegateId)."
+      data => Boolean(data.delegatorOrgId) || Boolean(data.delegateOrgId),
+      "Vous devez renseigner un des deux champs (delegatorOrgId ou delegateOrgId)."
     )
     .refine(
-      data => !(Boolean(data.delegatorId) && Boolean(data.delegateId)),
-      "Vous ne pouvez pas renseigner les deux champs (delegatorId et delegateId)."
+      data => !(Boolean(data.delegatorOrgId) && Boolean(data.delegateOrgId)),
+      "Vous ne pouvez pas renseigner les deux champs (delegatorOrgId et delegateOrgId)."
     ),
   after: idSchema.optional().nullable(),
   first: z.number().min(10).max(50).optional().nullable()

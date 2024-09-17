@@ -82,3 +82,18 @@ export async function checkCanRevoke(
     );
   }
 }
+
+export async function checkBelongsTo(user: User, company: Company) {
+  const companyAssociation = await prisma.companyAssociation.findFirst({
+    where: {
+      userId: user.id,
+      companyId: company.id
+    }
+  });
+
+  if (!companyAssociation) {
+    throw new ForbiddenError(
+      `L'utilisateur ne fait pas partie de l'entreprise ${company.orgId}.`
+    );
+  }
+}

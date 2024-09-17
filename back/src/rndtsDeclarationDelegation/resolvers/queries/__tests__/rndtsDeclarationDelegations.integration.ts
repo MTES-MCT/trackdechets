@@ -74,7 +74,7 @@ describe("query rndtsDeclarationDelegations", () => {
 
       // When
       const { errors, data } = await getDelegations(delegatorUser, {
-        where: { delegatorId: delegatorCompany.id }
+        where: { delegatorOrgId: delegatorCompany.orgId }
       });
 
       // Then
@@ -98,7 +98,7 @@ describe("query rndtsDeclarationDelegations", () => {
 
       // When
       const { errors, data } = await getDelegations(delegateUser, {
-        where: { delegateId: delegateCompany.id }
+        where: { delegateOrgId: delegateCompany.orgId }
       });
 
       // Then
@@ -116,7 +116,7 @@ describe("query rndtsDeclarationDelegations", () => {
 
       // When
       const { errors, data } = await getDelegations(delegatorUser, {
-        where: { delegatorId: delegatorCompany.id }
+        where: { delegatorOrgId: delegatorCompany.orgId }
       });
 
       // Then
@@ -135,7 +135,7 @@ describe("query rndtsDeclarationDelegations", () => {
 
       // When
       const { errors } = await getDelegations(null, {
-        where: { delegatorId: delegatorCompany.id }
+        where: { delegatorOrgId: delegatorCompany.orgId }
       });
 
       // Then
@@ -150,13 +150,13 @@ describe("query rndtsDeclarationDelegations", () => {
 
       // When
       const { errors } = await getDelegations(delegatorUser, {
-        where: { delegateId: delegateCompany.id }
+        where: { delegateOrgId: delegateCompany.orgId }
       });
 
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        `L'entreprise ${delegateCompany.id} n'existe pas ou l'utilisateur n'en fait pas partie`
+        `L'utilisateur ne fait pas partie de l'entreprise ${delegateCompany.orgId}.`
       );
     });
 
@@ -167,13 +167,13 @@ describe("query rndtsDeclarationDelegations", () => {
 
       // When
       const { errors } = await getDelegations(delegateUser, {
-        where: { delegateId: delegatorCompany.id }
+        where: { delegateOrgId: delegatorCompany.orgId }
       });
 
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        `L'entreprise ${delegatorCompany.id} n'existe pas ou l'utilisateur n'en fait pas partie`
+        `L'utilisateur ne fait pas partie de l'entreprise ${delegatorCompany.orgId}.`
       );
     });
   });
@@ -185,13 +185,13 @@ describe("query rndtsDeclarationDelegations", () => {
 
       // When
       const { errors } = await getDelegations(delegateUser, {
-        where: { delegateId: "cl81ooom5138122w9sbznzdkg" }
+        where: { delegateOrgId: "39070205800012" }
       });
 
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        `L'entreprise cl81ooom5138122w9sbznzdkg n'existe pas ou l'utilisateur n'en fait pas partie`
+        `L'entreprise 39070205800012 n'existe pas.`
       );
     });
 
@@ -201,13 +201,13 @@ describe("query rndtsDeclarationDelegations", () => {
 
       // When
       const { errors } = await getDelegations(delegatorUser, {
-        where: { delegatorId: "cl81ooom5138122w9sbznzdkg" }
+        where: { delegateOrgId: "39070205800012" }
       });
 
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        `L'entreprise cl81ooom5138122w9sbznzdkg n'existe pas ou l'utilisateur n'en fait pas partie`
+        `L'entreprise 39070205800012 n'existe pas.`
       );
     });
   });
@@ -230,7 +230,7 @@ describe("query rndtsDeclarationDelegations", () => {
     const { errors: errors1, data: data1 } = await getDelegations(
       delegatorUser,
       {
-        where: { delegatorId: delegatorCompany.id }
+        where: { delegatorOrgId: delegatorCompany.orgId }
       }
     );
 
@@ -252,7 +252,7 @@ describe("query rndtsDeclarationDelegations", () => {
     const { errors: errors2, data: data2 } = await getDelegations(
       delegatorUser,
       {
-        where: { delegatorId: delegatorCompany.id }
+        where: { delegatorOrgId: delegatorCompany.orgId }
       }
     );
 

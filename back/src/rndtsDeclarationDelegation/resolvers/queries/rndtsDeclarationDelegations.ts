@@ -1,8 +1,9 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
+import { checkBelongsTo } from "../../permissions";
 import { parseQueryRndtsDeclarationDelegationsArgs } from "../../validation";
-import { checkUserBelongsToCompany } from "../utils";
+import { findDelegateOrDelegatorOrThrow } from "../utils";
 import { getPaginatedDelegations } from "./utils/rndtsDeclarationDelegations.utils";
 
 const rndtsDeclarationDelegationsResolver: QueryResolvers["rndtsDeclarationDelegations"] =
@@ -16,17 +17,25 @@ const rndtsDeclarationDelegationsResolver: QueryResolvers["rndtsDeclarationDeleg
     // Sync validation of args
     const paginationArgs = parseQueryRndtsDeclarationDelegationsArgs(args);
 
-    // Make sure user belongs to target companies
-    if (paginationArgs.where?.delegateId)
-      await checkUserBelongsToCompany(user, paginationArgs.where.delegateId);
-    if (paginationArgs.where?.delegatorId)
-      await checkUserBelongsToCompany(user, paginationArgs.where.delegatorId);
+    const { delegateOrgId, delegatorOrgId } = paginationArgs.where;
+
+    // Find targeted company
+    const { delegate, delegator } = await findDelegateOrDelegatorOrThrow(
+      delegateOrgId,
+      delegatorOrgId
+    );
+
+    // Check that user belongs to company
+    if (delegate) await checkBelongsTo(user, delegate);
+    if (delegator) await checkBelongsTo(user, delegator);
 
     // Get paginated delegations
-    const paginatedDelegations = await getPaginatedDelegations(
-      user,
-      paginationArgs
-    );
+    const paginatedDelegations = await getPaginatedDelegations(user, {
+      delegate,
+      delegator,
+      after: paginationArgs.after,
+      first: paginationArgs.first
+    });
 
     return paginatedDelegations;
   };
