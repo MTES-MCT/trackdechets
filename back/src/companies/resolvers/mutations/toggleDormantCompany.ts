@@ -19,7 +19,7 @@ const toggleDormantCompanyResolver: MutationResolvers["toggleDormantCompany"] =
     await checkUserPermissions(
       user,
       company.orgId,
-      Permission.CompanyCanRenewSecurityCode,
+      Permission.CompanyCanUpdate,
       NotCompanyAdminErrorMsg(company.orgId)
     );
 

@@ -21,11 +21,13 @@ export { formatDate } from "./common/pdf";
 export { sendMail } from "./mailer/mailing";
 export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";
 export { operationHooksQueue } from "./queue/producers/operationHook";
+export { administrativeTransferQueue } from "./queue/producers/administrativeTransfer";
 export {
   indexBsdJob,
   operationHookJob,
   sendMailJob,
-  postGericoJob
+  postGericoJob,
+  processAdministrativeTransferJob
 } from "./queue/jobs";
 
 export {

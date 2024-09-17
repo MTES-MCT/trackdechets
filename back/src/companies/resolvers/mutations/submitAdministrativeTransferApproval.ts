@@ -30,7 +30,7 @@ export const submitAdministrativeTransferApproval: MutationResolvers["submitAdmi
     await checkUserPermissions(
       user,
       toCompany.orgId,
-      Permission.CompanyCanRenewSecurityCode,
+      Permission.CompanyCanUpdate,
       NotCompanyAdminErrorMsg(toCompany.orgId)
     );
 
