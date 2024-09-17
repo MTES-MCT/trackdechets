@@ -392,17 +392,8 @@ function MobileSubNav({ currentCompany }) {
                     <MenuLink
                       entry={{
                         navlink: true,
-                        caption: "Application autorisées",
+                        caption: "Applications et API",
                         href: routes.account.applications
-                      }}
-                    />
-                  </li>
-                  <li>
-                    <MenuLink
-                      entry={{
-                        navlink: true,
-                        caption: "Mes applications",
-                        href: routes.account.oauth2.list
                       }}
                     />
                   </li>
