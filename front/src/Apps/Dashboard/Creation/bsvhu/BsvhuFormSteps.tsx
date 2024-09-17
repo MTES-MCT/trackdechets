@@ -12,7 +12,6 @@ import {
 import omitDeep from "omit-deep-lodash";
 import React, { useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { useParams } from "react-router-dom";
 import { Loader } from "../../../common/Components";
 import FormStepsContent from "../FormStepsContent";
 import { getComputedState } from "../getComputedState";
@@ -21,7 +20,6 @@ import DestinationBsvhu from "./steps/Destination";
 import EmitterBsvhu from "./steps/Emitter";
 import TransporterBsvhu from "./steps/Transporter";
 import WasteBsvhu from "./steps/Waste";
-import { isStepDisabled } from "./steps/isStepDisabled";
 import initialState from "./utils/initial-state";
 import {
   CREATE_BSVHU,
@@ -44,8 +42,6 @@ interface Props {
   bsdId?: string;
 }
 const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
-  const { siret, id } = useParams<{ id?: string; siret: string }>();
-
   const formQuery = useQuery<Pick<Query, "bsvhu">, QueryBsvhuArgs>(
     GET_VHU_FORM,
     {
@@ -55,6 +51,14 @@ const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
       skip: !bsdId,
       fetchPolicy: "network-only"
     }
+  );
+
+  const sealedFields = useMemo(
+    () =>
+      (formQuery?.data?.bsvhu?.metadata?.fields?.sealed ?? [])
+        ?.map(f => f)
+        .filter(Boolean),
+    [formQuery.data]
   );
 
   const formState = useMemo(
@@ -107,15 +111,11 @@ const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
     }
   };
 
-  const emitter = formState?.emitter;
-  const transporter = formState?.transporter;
-  const isDisabled = isStepDisabled(emitter, transporter, siret, id);
-
   const tabsContent = {
-    waste: <WasteBsvhu isDisabled={isDisabled} />,
-    emitter: <EmitterBsvhu isDisabled={isDisabled} />,
-    transporter: <TransporterBsvhu isDisabled={isDisabled} />,
-    destination: <DestinationBsvhu isDisabled={isDisabled} />
+    waste: <WasteBsvhu />,
+    emitter: <EmitterBsvhu />,
+    transporter: <TransporterBsvhu />,
+    destination: <DestinationBsvhu />
   };
 
   return (
@@ -127,6 +127,7 @@ const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
         saveForm={saveForm}
         useformMethods={methods}
         tabsContent={tabsContent}
+        sealedFields={sealedFields}
       />
       {loading && <Loader />}
     </>

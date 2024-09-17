@@ -7,7 +7,7 @@ import {
   FavoriteType
 } from "@td/codegen-ui";
 import subMonths from "date-fns/subMonths";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useContext } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
@@ -17,8 +17,9 @@ import RhfOperationModeSelect from "../../../../common/Components/OperationModeS
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import format from "date-fns/format";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 
-const DestinationBsvhu = ({ isDisabled }) => {
+const DestinationBsvhu = () => {
   const { siret } = useParams<{ siret: string }>();
   const [selectedDestination, setSelectedDestination] =
     useState<CompanySearchResult | null>(null);
@@ -30,6 +31,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
   const identificationNumbers =
     formState.defaultValues?.destination?.reception?.identification?.numbers;
   const agrementNumber = watch("destination.agrementNumber");
+  const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
     if (isDangerousWasteCode) {
@@ -87,7 +89,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
 
   return (
     <>
-      {isDisabled && (
+      {!!sealedFields.length && (
         <>
           <h4 className="fr-h4">Réception</h4>
           <Input
@@ -250,7 +252,9 @@ const DestinationBsvhu = ({ isDisabled }) => {
       <div className="fr-col-12 fr-col-md-6">
         <RadioButtons
           legend="L'installation de destination est un"
-          disabled={isDangerousWasteCode || isDisabled}
+          disabled={
+            isDangerousWasteCode || sealedFields.includes("destination.type")
+          }
           options={[
             {
               label: "Broyeur agréé",
@@ -276,7 +280,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
         <CompanySelectorWrapper
           orgId={siret}
           favoriteType={FavoriteType.Destination}
-          disabled={isDisabled}
+          disabled={sealedFields.includes(`${actor}.company.siret`)}
           selectedCompanyOrgId={orgId}
           onCompanySelected={company => {
             if (company) {
@@ -306,7 +310,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
         />
         <CompanyContactInfo
           fieldName={`${actor}.company`}
-          disabled={isDisabled}
+          disabled={sealedFields.includes(`${actor}.company.siret`)}
           key={orgId}
         />
       </div>
@@ -314,7 +318,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
       <div className="fr-col-md-8 fr-mt-4w">
         <Input
           label="Numéro d'agrément"
-          disabled={isDisabled}
+          disabled={sealedFields.includes(`${actor}.agrementNumber`)}
           nativeInputProps={{
             ...register(`${actor}.agrementNumber`),
             value: agrementNumber
@@ -327,7 +331,7 @@ const DestinationBsvhu = ({ isDisabled }) => {
           nativeSelectProps={{
             ...register("destination.plannedOperationCode")
           }}
-          disabled={isDisabled}
+          disabled={sealedFields.includes("destination.plannedOperationCode")}
         >
           <option value="R 4">
             R 4 - Recyclage ou récupération des métaux et des composés
@@ -347,7 +351,9 @@ const DestinationBsvhu = ({ isDisabled }) => {
           <CompanySelectorWrapper
             orgId={siret}
             favoriteType={FavoriteType.Destination}
-            disabled={isDisabled}
+            disabled={sealedFields.includes(
+              `${actor}.operation.nextDestination.company.siret`
+            )}
             selectedCompanyOrgId={orgIdNextDestination}
             onCompanySelected={company => {
               if (company) {
@@ -378,7 +384,9 @@ const DestinationBsvhu = ({ isDisabled }) => {
           />
           <CompanyContactInfo
             fieldName={`${actor}.operation.nextDestination.company`}
-            disabled={isDisabled}
+            disabled={sealedFields.includes(
+              `${actor}.operation.nextDestination.company.siret`
+            )}
             key={orgIdNextDestination}
           />
         </div>
