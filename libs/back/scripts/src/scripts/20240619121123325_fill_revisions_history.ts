@@ -147,12 +147,8 @@ export async function run(tx: Prisma.TransactionClient) {
   });
 
   for (const revision of bsdasrisRevisionsToFill) {
-    const currentBsdasri = await tx.form.findUniqueOrThrow({
-      where: { id: revision.bsdasriId },
-      include: {
-        forwardedIn: { include: { transporters: true } },
-        transporters: true
-      }
+    const currentBsdasri = await tx.bsdasri.findUniqueOrThrow({
+      where: { id: revision.bsdasriId }
     });
 
     const bsdasriFromEvents = await getBsdasriFromActivityEvents({
