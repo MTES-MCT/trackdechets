@@ -23,9 +23,10 @@ import {
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../createFormRevisionRequest";
 import { MARK_AS_SEALED, SIGN_EMISSION_FORM } from "./mutations";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
-
 import getReadableId from "../../../readableId";
 import { operationHook } from "../../../operationHook";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -812,14 +813,21 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       }
     });
 
-    await mutate<
-      Pick<Mutation, "submitFormRevisionRequestApproval">,
-      MutationSubmitFormRevisionRequestApprovalArgs
-    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
-      variables: {
-        id: revisionRequest.id,
-        isApproved: true
-      }
+    const mutateFn = () =>
+      mutate<
+        Pick<Mutation, "submitFormRevisionRequestApproval">,
+        MutationSubmitFormRevisionRequestApprovalArgs
+      >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 1
     });
 
     const updatedBsdd = await prisma.form.findUniqueOrThrow({

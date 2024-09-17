@@ -177,8 +177,10 @@ const signTransportFn = async (
   }
 
   const updatedForm = await runInTransaction(async transaction => {
-    const { update, updateAppendix2Forms, findGroupedFormsById, findUnique } =
-      getFormRepository(user, transaction);
+    const { update, findGroupedFormsById, findUnique } = getFormRepository(
+      user,
+      transaction
+    );
 
     const updatedForm = await update(
       { id: existingForm.id, status: existingForm.status },
@@ -190,11 +192,6 @@ const signTransportFn = async (
         ...formUpdateInput
       }
     );
-
-    if (existingForm.emitterType === EmitterType.APPENDIX2) {
-      const appendix2Forms = await findGroupedFormsById(existingForm.id);
-      await updateAppendix2Forms(appendix2Forms);
-    }
 
     if (existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER) {
       const include = {

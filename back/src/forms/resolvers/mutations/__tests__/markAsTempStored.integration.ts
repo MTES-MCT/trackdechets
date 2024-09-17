@@ -19,6 +19,8 @@ import getReadableId from "../../../readableId";
 import { sendMail } from "../../../../mailer/mailing";
 import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
 import gql from "graphql-tag";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -442,21 +444,28 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     const { mutate } = makeClient(destinationUser);
 
-    await mutate<
-      Pick<Mutation, "markAsReceived">,
-      MutationMarkAsTempStoredArgs
-    >(MARK_AS_TEMP_STORED, {
-      variables: {
-        id: groupementForm.id,
-        tempStoredInfos: {
-          wasteAcceptationStatus: "REFUSED",
-          wasteRefusalReason: "Parce que",
-          receivedAt: "2019-01-18" as any,
-          receivedBy: "John",
-          quantityType: "REAL",
-          quantityReceived: 0
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "markAsReceived">, MutationMarkAsTempStoredArgs>(
+        MARK_AS_TEMP_STORED,
+        {
+          variables: {
+            id: groupementForm.id,
+            tempStoredInfos: {
+              wasteAcceptationStatus: "REFUSED",
+              wasteRefusalReason: "Parce que",
+              receivedAt: "2019-01-18" as any,
+              receivedBy: "John",
+              quantityType: "REAL",
+              quantityReceived: 0
+            }
+          }
         }
-      }
+      );
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
     });
 
     const updatedForm1 = await prisma.form.findUniqueOrThrow({

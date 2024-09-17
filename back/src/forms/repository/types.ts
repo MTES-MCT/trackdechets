@@ -11,7 +11,6 @@ import { RemoveAppendix2Fn } from "./form/removeAppendix2";
 import { SetAppendix1Fn } from "./form/setAppendix1";
 import { SetAppendix2Fn } from "./form/setAppendix2";
 import { UpdateFormFn } from "./form/update";
-import { UpdateAppendix2Forms } from "./form/updateAppendix2Forms";
 import { UpdateManyFormFn } from "./form/updateMany";
 import { AcceptRevisionRequestApprovalFn } from "./formRevisionRequest/acceptRevisionRequestApproval";
 import { CancelRevisionRequestFn } from "./formRevisionRequest/cancelRevisionRequest";
@@ -36,7 +35,6 @@ export type FormActions = {
   setAppendix1: SetAppendix1Fn;
   setAppendix2: SetAppendix2Fn;
   updateAppendix1Forms: UpdateAppendix1Forms;
-  updateAppendix2Forms: UpdateAppendix2Forms;
   deleteStaleSegments: DeleteFormStaleSegmentsFn;
 };
 

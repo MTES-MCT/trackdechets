@@ -22,6 +22,8 @@ import {
 import getReadableId from "../../../readableId";
 import { sendMail } from "../../../../mailer/mailing";
 import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -291,8 +293,14 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         grouping: {
           createMany: {
             data: [
-              { initialFormId: form1.id, quantity: form1.quantityReceived! },
-              { initialFormId: form2.id, quantity: form2.quantityReceived! }
+              {
+                initialFormId: form1.id,
+                quantity: form1.quantityReceived!.toNumber()
+              },
+              {
+                initialFormId: form2.id,
+                quantity: form2.quantityReceived!.toNumber()
+              }
             ]
           }
         }
@@ -301,21 +309,28 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
 
     const { mutate } = makeClient(destinationUser);
 
-    await mutate<
-      Pick<Mutation, "markAsReceived">,
-      MutationMarkAsTempStorerAcceptedArgs
-    >(MARK_AS_TEMP_STORER_ACCEPTED, {
-      variables: {
-        id: groupementForm.id,
-        tempStorerAcceptedInfo: {
-          wasteAcceptationStatus: "REFUSED",
-          wasteRefusalReason: "Parce que",
-          signedAt: "2019-01-18" as any,
-          signedBy: "John",
-          quantityType: "REAL",
-          quantityReceived: 0
+    const mutateFn = () =>
+      mutate<
+        Pick<Mutation, "markAsReceived">,
+        MutationMarkAsTempStorerAcceptedArgs
+      >(MARK_AS_TEMP_STORER_ACCEPTED, {
+        variables: {
+          id: groupementForm.id,
+          tempStorerAcceptedInfo: {
+            wasteAcceptationStatus: "REFUSED",
+            wasteRefusalReason: "Parce que",
+            signedAt: "2019-01-18" as any,
+            signedBy: "John",
+            quantityType: "REAL",
+            quantityReceived: 0
+          }
         }
-      }
+      });
+
+    await waitForJobsCompletion({
+      queue: updateAppendix2Queue,
+      fn: mutateFn,
+      expectedJobCount: 2
     });
 
     const updatedForm1 = await prisma.form.findUniqueOrThrow({
