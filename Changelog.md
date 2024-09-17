@@ -20,6 +20,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Amélioration des pages de connexion oauth / oidc avec leur passage au DSFR [PR 3550](https://github.com/MTES-MCT/trackdechets/pull/3550)
 - Amélioration de la page Mes applications avec le passage au DSFR [PR 3562](https://github.com/MTES-MCT/trackdechets/pull/3562)
 - ETQ destinataire, je peux indiquer que mon véhicule est rincé ou non pour son retour à vide [PR 3576](https://github.com/MTES-MCT/trackdechets/pull/3576)
+- ETQ destinataire, je peux indiquer que la citerne est rincée pour son retour à vide [PR 3573](https://github.com/MTES-MCT/trackdechets/pull/3573)
 
 #### :boom: Breaking changes
 

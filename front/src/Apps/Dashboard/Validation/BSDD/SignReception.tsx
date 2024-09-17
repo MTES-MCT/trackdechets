@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import {
   EmptyReturnAdr,
+  CiterneNotWashedOutReason,
   Form,
   FormStatus,
   Mutation,
@@ -14,7 +15,7 @@ import {
   TransportMode
 } from "@td/codegen-ui";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignForm } from "./SignForm";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
@@ -32,6 +33,7 @@ import {
 } from "../../../common/queries/bsdd/queries";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { EMPTY_RETURN_ADR_REASON } from "../../../common/utils/adrBsddSummary";
+import { CITERNE_NOT_WASHED_OUT_REASON } from "../../../common/utils/citerneBsddSummary";
 
 const getSchema = () =>
   z
@@ -51,6 +53,13 @@ const getSchema = () =>
       quantityType: z.coerce.string().nullish(),
 
       emptyReturnAdr: z.nativeEnum(EmptyReturnAdr).nullish(),
+
+      hasCiterneBeenWashedOut: z.boolean().nullish(),
+      citerneNotWashedOutReason: z
+        .nativeEnum(CiterneNotWashedOutReason, {
+          invalid_type_error: "Vous devez préciser le motif"
+        })
+        .nullish(),
 
       signedAt: z.coerce
         .date({
@@ -141,6 +150,7 @@ function SignReceptionModal({
   onCancel
 }: Readonly<SignReceptionModalProps>) {
   const [emptyReturnStatus, setEmptyReturnStatus] = useState(false);
+  const [citerneWashedOutStatus, setCiterneWashedOutStatus] = useState(false);
 
   const [
     markAsReceived,
@@ -189,7 +199,9 @@ function SignReceptionModal({
       signedBy,
       quantityType,
       refusedWeight,
-      emptyReturnAdr
+      emptyReturnAdr,
+      hasCiterneBeenWashedOut,
+      citerneNotWashedOutReason
     } = data;
 
     let formStatus: FormStatus | undefined = form.status;
@@ -245,6 +257,12 @@ function SignReceptionModal({
                 ? {
                     emptyReturnAdr: emptyReturnAdr
                   }
+                : {}),
+              ...(citerneWashedOutStatus
+                ? {
+                    hasCiterneBeenWashedOut: hasCiterneBeenWashedOut,
+                    citerneNotWashedOutReason: citerneNotWashedOutReason
+                  }
                 : {})
             }
           }
@@ -264,6 +282,12 @@ function SignReceptionModal({
                 ? {
                     emptyReturnAdr: emptyReturnAdr
                   }
+                : {}),
+              ...(citerneWashedOutStatus
+                ? {
+                    hasCiterneBeenWashedOut: hasCiterneBeenWashedOut,
+                    citerneNotWashedOutReason: citerneNotWashedOutReason
+                  }
                 : {})
             }
           }
@@ -282,6 +306,7 @@ function SignReceptionModal({
     setValue,
     trigger,
     watch,
+    control,
     formState: { errors, isSubmitting }
   } = useForm<z.infer<typeof validationSchema>>({
     mode: "onTouched",
@@ -306,6 +331,7 @@ function SignReceptionModal({
   const acceptationStatus = watch("wasteAcceptationStatus");
   const receivedWeight = watch("receivedWeight");
   const refusedWeight = watch("refusedWeight");
+  const hasCiterneBeenWashedOut = watch("hasCiterneBeenWashedOut");
 
   const refusedWeightDisabled =
     !receivedWeight || ["ACCEPTED", "REFUSED"].includes(acceptationStatus);
@@ -349,9 +375,26 @@ function SignReceptionModal({
       setValue("emptyReturnAdr", undefined);
     }
 
+    if (!citerneWashedOutStatus) {
+      setValue("hasCiterneBeenWashedOut", undefined);
+      setValue("citerneNotWashedOutReason", undefined);
+    }
+
+    if (!hasCiterneBeenWashedOut) {
+      setValue("citerneNotWashedOutReason", undefined);
+    }
+
     // manually set values do not trigger re-validation
     trigger("refusedWeight");
-  }, [acceptationStatus, receivedWeight, emptyReturnStatus, setValue, trigger]);
+  }, [
+    acceptationStatus,
+    receivedWeight,
+    citerneWashedOutStatus,
+    hasCiterneBeenWashedOut,
+    emptyReturnStatus,
+    setValue,
+    trigger
+  ]);
 
   const receptionRadioOption = [
     {
@@ -394,6 +437,10 @@ function SignReceptionModal({
       }
     }
   ];
+
+  const shouldDisplayCiterneStatus =
+    ["ACCEPTED"].includes(acceptationStatus) &&
+    form.stateSummary?.packagingInfos.some(p => p.type === Packagings.Citerne);
 
   const shouldDisplayAdrStatus =
     ["ACCEPTED"].includes(acceptationStatus) &&
@@ -546,6 +593,131 @@ function SignReceptionModal({
           )}
         </>
       )}
+
+      {shouldDisplayCiterneStatus && (
+        <>
+          <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+            <div className="fr-col-12">
+              <ToggleSwitch
+                inputTitle="citerneWashedOutStatus"
+                label={`Je décide de renseigner les informations de la Charte "Rinçage des citernes"`}
+                labelPosition="right"
+                showCheckedHint={false}
+                checked={citerneWashedOutStatus}
+                onChange={checked => setCiterneWashedOutStatus(checked)}
+              />
+            </div>
+          </div>
+
+          {citerneWashedOutStatus && (
+            <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+              <div className="fr-col-12 fr-pl-4w">
+                <Controller
+                  control={control}
+                  name={"hasCiterneBeenWashedOut"}
+                  render={({ field: { onChange, onBlur, value, ref } }) => (
+                    <RadioButtons
+                      state={errors?.hasCiterneBeenWashedOut && "error"}
+                      stateRelatedMessage={
+                        (errors?.hasCiterneBeenWashedOut?.message as string) ??
+                        ""
+                      }
+                      ref={ref}
+                      options={[
+                        {
+                          label:
+                            "Le chauffeur a indiqué avoir rincé la citerne",
+                          nativeInputProps: {
+                            ...register("hasCiterneBeenWashedOut", {}),
+                            checked: value === true,
+                            onBlur: onBlur,
+                            onChange: () => onChange(true)
+                          }
+                        },
+
+                        {
+                          label:
+                            "Le chauffeur a indiqué ne pas avoir rincé la citerne",
+                          nativeInputProps: {
+                            ...register("hasCiterneBeenWashedOut", {}),
+                            checked: value === false,
+                            onBlur: onBlur,
+                            onChange: () => onChange(false)
+                          }
+                        }
+                      ]}
+                    />
+                  )}
+                />
+
+                {hasCiterneBeenWashedOut === false && (
+                  <RadioButtons
+                    style={{ marginTop: "-16px" }}
+                    className="fr-pl-4w"
+                    state={errors?.citerneNotWashedOutReason && "error"}
+                    stateRelatedMessage={
+                      (errors?.citerneNotWashedOutReason?.message as string) ??
+                      ""
+                    }
+                    options={[
+                      {
+                        label: `2 A - ${
+                          CITERNE_NOT_WASHED_OUT_REASON[
+                            CiterneNotWashedOutReason.Exempted
+                          ]
+                        }`,
+                        nativeInputProps: {
+                          ...register("citerneNotWashedOutReason", {}),
+                          value: CiterneNotWashedOutReason.Exempted,
+                          defaultChecked: false
+                        }
+                      },
+                      {
+                        label: `2 B - ${
+                          CITERNE_NOT_WASHED_OUT_REASON[
+                            CiterneNotWashedOutReason.Incompatible
+                          ]
+                        }`,
+                        nativeInputProps: {
+                          ...register("citerneNotWashedOutReason", {}),
+                          value: CiterneNotWashedOutReason.Incompatible,
+                          defaultChecked: false
+                        }
+                      },
+                      {
+                        label: `2 C - ${
+                          CITERNE_NOT_WASHED_OUT_REASON[
+                            CiterneNotWashedOutReason.Unavailable
+                          ]
+                        }`,
+                        nativeInputProps: {
+                          ...register("citerneNotWashedOutReason", {}),
+                          value: CiterneNotWashedOutReason.Unavailable,
+                          defaultChecked: false
+                        }
+                      },
+                      {
+                        label: `2 D - ${
+                          CITERNE_NOT_WASHED_OUT_REASON[
+                            CiterneNotWashedOutReason.NotByDriver
+                          ]
+                        }`,
+                        nativeInputProps: {
+                          ...register("citerneNotWashedOutReason", {}),
+                          value: CiterneNotWashedOutReason.NotByDriver,
+                          defaultChecked: false
+                        }
+                      }
+                    ]}
+                  />
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {shouldDisplayAdrStatus && shouldDisplayCiterneStatus && <hr />}
 
       {shouldDisplayAdrStatus && (
         <>
