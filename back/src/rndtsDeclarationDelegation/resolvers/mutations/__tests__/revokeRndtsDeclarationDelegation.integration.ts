@@ -14,7 +14,7 @@ const REVOKE_RNDTS_DECLARATION_DELEGATION = gql`
       isRevoked
       status
       delegate {
-        id
+        orgId
       }
     }
   }
@@ -43,7 +43,7 @@ describe("mutation revokeRndtsDeclarationDelegation", () => {
   describe("successful use-cases", () => {
     it("should revoke delegation", async () => {
       // Given
-      const { delegation, delegatorUser } =
+      const { delegation, delegatorUser, delegateCompany } =
         await rndtsDeclarationDelegationFactory();
 
       // When
@@ -57,6 +57,9 @@ describe("mutation revokeRndtsDeclarationDelegation", () => {
       expect(errors).toBeUndefined();
       expect(data.revokeRndtsDeclarationDelegation.isRevoked).toBeTruthy();
       expect(data.revokeRndtsDeclarationDelegation.status).toBe("CLOSED");
+      expect(data.revokeRndtsDeclarationDelegation.delegate.orgId).toBe(
+        delegateCompany.orgId
+      );
       expect(updatedDelegation?.isRevoked).toBeTruthy();
     });
 

@@ -13,11 +13,9 @@ const RNDTS_DECLARATION_DELEGATION = gql`
       createdAt
       updatedAt
       delegate {
-        id
         orgId
       }
       delegator {
-        id
         orgId
       }
       startDate
@@ -50,7 +48,7 @@ describe("query rndtsDeclarationDelegation", () => {
   describe("successful use-cases", () => {
     it("should return delegation", async () => {
       // Given
-      const { delegation, delegatorUser } =
+      const { delegation, delegatorUser, delegateCompany, delegatorCompany } =
         await rndtsDeclarationDelegationFactory();
 
       // When
@@ -62,6 +60,12 @@ describe("query rndtsDeclarationDelegation", () => {
       // Then
       expect(errors).toBeUndefined();
       expect(data.rndtsDeclarationDelegation.id).toBe(delegation.id);
+      expect(data.rndtsDeclarationDelegation.delegate.orgId).toBe(
+        delegateCompany.orgId
+      );
+      expect(data.rndtsDeclarationDelegation.delegator.orgId).toBe(
+        delegatorCompany.orgId
+      );
     });
   });
 

@@ -9,7 +9,7 @@ import { checkCanCreate } from "../../permissions";
 import { parseCreateRndtsDeclarationDelegationInput } from "../../validation";
 import {
   findDelegateAndDelegatorOrThrow,
-  findDelegationWithCompaniesByIdOrThrow
+  findDelegationByIdOrThrow
 } from "../utils";
 import {
   createDelegation,
@@ -55,7 +55,7 @@ const createRndtsDeclarationDelegation = async (
   );
 
   // Return full object
-  return findDelegationWithCompaniesByIdOrThrow(user, delegation.id);
+  return findDelegationByIdOrThrow(user, delegation.id);
 };
 
 export default createRndtsDeclarationDelegation;

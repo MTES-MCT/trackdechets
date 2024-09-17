@@ -22,13 +22,13 @@ type RndtsDeclarationDelegation {
   Délégataire, c'est-à-dire l'entreprise qui fera les déclarations
   à la place du délégant
   """
-  delegate: CompanyPrivate!
+  delegate: CompanyPublic!
 
   """
   Délégant, c'est-à-dire l'entreprise qui délègue ses déclarations
   aux délégataire
   """
-  delegator: CompanyPrivate!
+  delegator: CompanyPublic!
 
   """
   Date de début de la délégation

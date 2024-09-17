@@ -23,11 +23,9 @@ const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
       createdAt
       updatedAt
       delegate {
-        id
         orgId
       }
       delegator {
-        id
         orgId
       }
       startDate

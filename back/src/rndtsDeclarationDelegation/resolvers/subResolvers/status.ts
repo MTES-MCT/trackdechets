@@ -2,7 +2,7 @@ import {
   RndtsDeclarationDelegation,
   RndtsDeclarationDelegationResolvers,
   RndtsDeclarationDelegationStatus
-} from "../../generated/graphql/types";
+} from "../../../generated/graphql/types";
 
 /**
  * For frontend's convenience, we compute the status here

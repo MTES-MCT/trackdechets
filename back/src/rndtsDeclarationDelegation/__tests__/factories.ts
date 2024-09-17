@@ -1,6 +1,7 @@
 import { Company, Prisma } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../__tests__/factories";
+import { startOfDay } from "../../utils";
 
 export const rndtsDeclarationDelegationFactory = async (
   opt?: Partial<Prisma.RndtsDeclarationDelegationCreateInput>
@@ -12,7 +13,7 @@ export const rndtsDeclarationDelegationFactory = async (
 
   const delegation = await prisma.rndtsDeclarationDelegation.create({
     data: {
-      startDate: new Date(),
+      startDate: startOfDay(new Date()),
       delegate: { connect: { id: delegateCompany.id } },
       delegator: { connect: { id: delegatorCompany.id } },
       ...opt
@@ -35,7 +36,7 @@ export const rndtsDeclarationDelegationFactoryWithExistingCompanies = async (
 ) => {
   const delegation = await prisma.rndtsDeclarationDelegation.create({
     data: {
-      startDate: new Date(),
+      startDate: startOfDay(new Date()),
       delegate: { connect: { id: delegate.id } },
       delegator: { connect: { id: delegator.id } },
       ...opt

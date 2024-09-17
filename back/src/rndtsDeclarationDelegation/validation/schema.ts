@@ -11,10 +11,9 @@ export const createRndtsDeclarationDelegationInputSchema = z
     startDate: z.coerce
       .date()
       .optional()
-      // TODO: do here or in repository?
-      .transform((date): Date | undefined => {
+      .transform<Date>((date): Date => {
         // By default, today
-        if (!date) return date;
+        if (!date) return todayAtMidnight();
         // Else, chosen date at midnight
         return startOfDay(date);
       })
@@ -24,7 +23,6 @@ export const createRndtsDeclarationDelegationInputSchema = z
     endDate: z.coerce
       .date()
       .optional()
-      // TODO: do here or in repository?
       .transform(date => {
         if (!date) return date;
         return endOfDay(date);

@@ -4,10 +4,30 @@ import {
   parseQueryRndtsDeclarationDelegationsArgs
 } from "..";
 import { CreateRndtsDeclarationDelegationInput } from "../../../generated/graphql/types";
+import { startOfDay } from "../../../utils";
 
 describe("index", () => {
   describe("parseCreateRndtsDeclarationDelegationInput", () => {
-    it("should clean up dates", () => {
+    it("if no start date > default to today at midnight", () => {
+      // Given
+      const input: CreateRndtsDeclarationDelegationInput = {
+        delegatorOrgId: "40081510600010",
+        delegateOrgId: "39070205800012"
+      };
+
+      // When
+      const delegation = parseCreateRndtsDeclarationDelegationInput(input);
+
+      // Then
+      expect(delegation.delegatorOrgId).toBe("40081510600010");
+      expect(delegation.delegateOrgId).toBe("39070205800012");
+      expect(delegation.startDate?.toISOString()).toBe(
+        startOfDay(new Date()).toISOString()
+      );
+      expect(delegation.endDate).toBeUndefined();
+    });
+
+    it("should fix dates to midnight", () => {
       // Given
       const input: CreateRndtsDeclarationDelegationInput = {
         delegatorOrgId: "40081510600010",
