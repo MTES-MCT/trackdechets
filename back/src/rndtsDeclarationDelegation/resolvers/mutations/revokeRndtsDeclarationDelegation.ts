@@ -7,7 +7,10 @@ import {
 import { GraphQLContext } from "../../../types";
 import { checkCanRevoke } from "../../permissions";
 import { parseMutationRevokeRndtsDeclarationDelegationArgs } from "../../validation";
-import { findDelegationByIdOrThrow } from "../utils";
+import {
+  findDelegationByIdOrThrow,
+  findDelegationWithCompaniesByIdOrThrow
+} from "../utils";
 import { revokeDelegation } from "./utils/revokeRndtsDeclarationDelegation.utils";
 
 const revokeRndtsDeclarationDelegation = async (
@@ -32,7 +35,9 @@ const revokeRndtsDeclarationDelegation = async (
   await checkCanRevoke(user, delegation);
 
   // Revoke delegation
-  return revokeDelegation(user, delegation);
+  await revokeDelegation(user, delegation);
+
+  return findDelegationWithCompaniesByIdOrThrow(user, delegationId);
 };
 
 export default revokeRndtsDeclarationDelegation;

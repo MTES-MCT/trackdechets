@@ -13,6 +13,9 @@ const REVOKE_RNDTS_DECLARATION_DELEGATION = gql`
       id
       isRevoked
       status
+      delegate {
+        id
+      }
     }
   }
 `;

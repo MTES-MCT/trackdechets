@@ -31,6 +31,14 @@ describe("status", () => {
       },
       "CLOSED" as RndtsDeclarationDelegationStatus
     ],
+    [
+      {
+        isRevoked: false,
+        startDate: nowPlusXHours(-4),
+        endDate: nowPlusXHours(-3)
+      },
+      "CLOSED" as RndtsDeclarationDelegationStatus
+    ],
     // INCOMING
     [
       { startDate: nowPlusXHours(2) },

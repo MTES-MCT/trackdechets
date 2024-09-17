@@ -46,6 +46,17 @@ export const findDelegationByIdOrThrow = async (
   return delegation;
 };
 
+export const findDelegationWithCompaniesByIdOrThrow = async (
+  user: Express.User,
+  id: string,
+  options?: Omit<Prisma.RndtsDeclarationDelegationFindFirstArgs, "where">
+) => {
+  return findDelegationByIdOrThrow(user, id, {
+    include: { delegate: true, delegator: true },
+    ...options
+  });
+};
+
 export const checkUserBelongsToCompany = async (
   user: Express.User,
   companyId: string

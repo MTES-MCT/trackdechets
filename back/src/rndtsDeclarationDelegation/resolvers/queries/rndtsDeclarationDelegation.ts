@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkCanAccess } from "../../permissions";
 import { parseQueryRndtsDeclarationDelegationArgs } from "../../validation";
-import { findDelegationByIdOrThrow } from "../utils";
+import { findDelegationWithCompaniesByIdOrThrow } from "../utils";
 
 const rndtsDeclarationDelegationResolver: QueryResolvers["rndtsDeclarationDelegation"] =
   async (_, args, context) => {
@@ -18,9 +18,10 @@ const rndtsDeclarationDelegationResolver: QueryResolvers["rndtsDeclarationDelega
 
     // Fetch delegation
     // TODO: include or rather in sub-resolvers?
-    const delegation = await findDelegationByIdOrThrow(user, delegationId, {
-      include: { delegate: true, delegator: true }
-    });
+    const delegation = await findDelegationWithCompaniesByIdOrThrow(
+      user,
+      delegationId
+    );
 
     // Make sure user can access delegation
     await checkCanAccess(user, delegation);
