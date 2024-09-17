@@ -56,7 +56,7 @@ const BsvhuFormSteps = ({ bsdId }: Readonly<Props>) => {
   const sealedFields = useMemo(
     () =>
       (formQuery?.data?.bsvhu?.metadata?.fields?.sealed ?? [])
-        ?.map(f => f)
+        ?.map(f => f.join("."))
         .filter(Boolean),
     [formQuery.data]
   );
