@@ -111,3 +111,12 @@ enum WasteVehiclesType {
   # Casse automobile / démolisseur
   DEMOLISSEUR
 }
+
+enum AdministrativeTransferStatus {
+  "En attente de validation"
+  PENDING
+  "Accepté"
+  ACCEPTED
+  "Refusé"
+  REFUSED
+}

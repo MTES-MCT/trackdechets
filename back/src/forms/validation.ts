@@ -618,6 +618,7 @@ const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
     recipientCompanySiret: siret
       .label("Destinataire")
       .test(siretTests.isRegistered("DESTINATION"))
+      .test(siretTests.isNotDormant)
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`),
     recipientCompanyAddress: yup
       .string()
@@ -1009,7 +1010,8 @@ export const transporterSchemaFn: FactorySchemaOf<
     // or VAT number.
     transporterCompanySiret: siret
       .label("Transporteur")
-      .test(siretTests.isRegistered("TRANSPORTER")),
+      .test(siretTests.isRegistered("TRANSPORTER"))
+      .test(siretTests.isNotDormant),
     transporterCompanyVatNumber: foreignVatNumber
       .label("Transporteur")
       .test(vatNumberTests.isRegisteredTransporter),
@@ -1540,7 +1542,10 @@ const withNextDestination = (required: boolean) =>
 
               return wasteIsDangerous && hasNoTraceabilityBreak;
             },
-            then: schema => schema.test(siretTests.isRegistered("DESTINATION"))
+            then: schema =>
+              schema
+                .test(siretTests.isRegistered("DESTINATION"))
+                .test(siretTests.isNotDormant)
           }
         ),
 
@@ -1988,6 +1993,7 @@ export async function validateForwardedInCompanies(
     await siret
       .label("Destination finale")
       .test(siretTests.isRegistered("DESTINATION"))
+      .test(siretTests.isNotDormant)
       .validate(forwardedIn.recipientCompanySiret);
   }
   if (transporter?.transporterCompanySiret) {

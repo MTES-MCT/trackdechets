@@ -140,4 +140,13 @@ type Mutation {
   bulkUpdateCompaniesProfiles(
     input: BulkUpdateCompaniesProfilesInput!
   ): [CompanyPrivate]!
+
+  toggleDormantCompany(id: ID!): Boolean!
+  createAdministrativeTransfer(
+    input: CreateAdministrativeTransferInput!
+  ): AdministrativeTransfer!
+  cancelAdministrativeTransfer(id: ID!): Boolean!
+  submitAdministrativeTransferApproval(
+    input: SubmitAdministrativeTransferApprovalInput!
+  ): AdministrativeTransfer!
 }

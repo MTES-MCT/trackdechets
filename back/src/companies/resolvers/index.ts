@@ -7,6 +7,7 @@ import CompanyPrivate from "./CompanyPrivate";
 import CompanySearchResult from "./CompanySearchResult";
 import CompanyForVerification from "./CompanyForVerification";
 import CompanySearchPrivate from "./CompanySearchPrivate";
+import AdministrativeTransfer from "./AdministrativeTransfer";
 
 export default {
   Query,
@@ -17,5 +18,6 @@ export default {
   CompanyPrivate,
   CompanySearchResult,
   CompanyForVerification,
-  CompanySearchPrivate
+  CompanySearchPrivate,
+  AdministrativeTransfer
 };

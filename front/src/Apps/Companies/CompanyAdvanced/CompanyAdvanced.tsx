@@ -1,18 +1,27 @@
-import React, { useState } from "react";
+import { useMutation } from "@apollo/client";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import {
   CompanyPrivate,
   Mutation,
-  MutationDeleteCompanyArgs
+  MutationDeleteCompanyArgs,
+  MutationToggleDormantCompanyArgs
 } from "@td/codegen-ui";
-import { DELETE_COMPANY, MY_COMPANIES, GET_ME } from "../common/queries";
-import { useMutation } from "@apollo/client";
+import { format } from "date-fns";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import routes from "../../routes";
 import { Modal } from "../../../common/components";
-import "./advanced.scss";
 import { NotificationError } from "../../common/Components/Error/Error";
-import { Input } from "@codegouvfr/react-dsfr/Input";
+import routes from "../../routes";
+import {
+  DELETE_COMPANY,
+  GET_ME,
+  MY_COMPANIES,
+  TOGGLE_DORMANT_COMPANY
+} from "../common/queries";
+import { RequestAdministrativeTranfer } from "./RequestAdministrativeTransfer";
+import "./advanced.scss";
+import { ApproveAdministrativeTransfer } from "./ApproveAdministrativeTransfer";
 
 interface AdvancedProps {
   company: CompanyPrivate;
@@ -22,6 +31,26 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
   const [isModalOpened, setIsModalOpened] = useState<boolean>(false);
   const [siretOrOrgId, setSiretOrOrgId] = useState<string>("");
   const [hasSiretError, setHasSiretError] = useState<boolean>(false);
+
+  const [
+    toggleDormantCompany,
+    { loading: loadingIsDormant, error: errorIsDormant }
+  ] = useMutation<
+    Pick<Mutation, "toggleDormantCompany">,
+    MutationToggleDormantCompanyArgs
+  >(TOGGLE_DORMANT_COMPANY, {
+    variables: { id: company.id },
+    update(cache) {
+      cache.modify({
+        id: `CompanyPrivate:${company.id}`,
+        fields: {
+          isDormantSince() {
+            return company.isDormantSince ? null : new Date();
+          }
+        }
+      });
+    }
+  });
 
   const [deleteCompany, { loading, error }] = useMutation<
     Pick<Mutation, "deleteCompany">,
@@ -34,7 +63,9 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
       navigate(routes.companies.index);
     }
   });
-  const companyFullname = `${company?.name} - ${company?.givenName}`;
+  const companyFullname = [company?.name, company?.givenName]
+    .filter(Boolean)
+    .join(" - ");
 
   const onClick = () => {
     setIsModalOpened(true);
@@ -58,6 +89,59 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
 
   return (
     <div className="company-advanced">
+      <div className="company-advanced__section">
+        <h4 className="company-advanced__title">
+          Mise en sommeil de l'établissement
+        </h4>
+        <p className="company-advanced__description">
+          La mise en sommeil de votre établissement ne permet plus de viser son
+          SIRET sur de nouveaux bordereaux. Il permet de gérer les bordereaux
+          résiduels, et de consulter les registres.
+        </p>
+
+        {company.isDormantSince ? (
+          <>
+            <p>
+              Etablissement mis en sommeil le{" "}
+              {format(new Date(company.isDormantSince), "dd/MM/yyyy")}
+            </p>
+            <Button
+              size="small"
+              onClick={() => toggleDormantCompany()}
+              disabled={loadingIsDormant}
+            >
+              Réveiller
+            </Button>
+          </>
+        ) : (
+          <Button
+            size="small"
+            onClick={() => {
+              if (
+                !window.confirm(
+                  `Souhaitez-vous mettre l'établissement ${companyFullname} en sommeil ?`
+                )
+              ) {
+                return;
+              }
+
+              toggleDormantCompany();
+            }}
+            disabled={loadingIsDormant}
+          >
+            Mettre en sommeil
+          </Button>
+        )}
+
+        {errorIsDormant && <NotificationError apolloError={errorIsDormant} />}
+      </div>
+
+      {company.isDormantSince && (
+        <RequestAdministrativeTranfer company={company} />
+      )}
+
+      <ApproveAdministrativeTransfer company={company} />
+
       <h4 className="company-advanced__title">
         Suppression de l'établissement
       </h4>
@@ -66,7 +150,6 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
         administrateurs et collaborateurs et vous ne pourrez plus accéder ni au
         suivi des bordereaux, ni au registre.
       </p>
-
       <Button
         size="small"
         onClick={onClick}
