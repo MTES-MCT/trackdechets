@@ -661,11 +661,10 @@ function SignReceptionModal({
                     }
                     options={[
                       {
-                        label: `2 A - ${
+                        label:
                           CITERNE_NOT_WASHED_OUT_REASON[
                             CiterneNotWashedOutReason.Exempted
-                          ]
-                        }`,
+                          ],
                         nativeInputProps: {
                           ...register("citerneNotWashedOutReason", {}),
                           value: CiterneNotWashedOutReason.Exempted,
@@ -673,11 +672,10 @@ function SignReceptionModal({
                         }
                       },
                       {
-                        label: `2 B - ${
+                        label:
                           CITERNE_NOT_WASHED_OUT_REASON[
                             CiterneNotWashedOutReason.Incompatible
-                          ]
-                        }`,
+                          ],
                         nativeInputProps: {
                           ...register("citerneNotWashedOutReason", {}),
                           value: CiterneNotWashedOutReason.Incompatible,
@@ -685,11 +683,10 @@ function SignReceptionModal({
                         }
                       },
                       {
-                        label: `2 C - ${
+                        label:
                           CITERNE_NOT_WASHED_OUT_REASON[
                             CiterneNotWashedOutReason.Unavailable
-                          ]
-                        }`,
+                          ],
                         nativeInputProps: {
                           ...register("citerneNotWashedOutReason", {}),
                           value: CiterneNotWashedOutReason.Unavailable,
@@ -697,11 +694,10 @@ function SignReceptionModal({
                         }
                       },
                       {
-                        label: `2 D - ${
+                        label:
                           CITERNE_NOT_WASHED_OUT_REASON[
                             CiterneNotWashedOutReason.NotByDriver
-                          ]
-                        }`,
+                          ],
                         nativeInputProps: {
                           ...register("citerneNotWashedOutReason", {}),
                           value: CiterneNotWashedOutReason.NotByDriver,

@@ -422,7 +422,7 @@ const Recipient = ({
               {form.hasCiterneBeenWashedOut
                 ? "Rinçage effectué"
                 : `Rinçage non effectué, ${
-                    form.citerneNotWashedOutReason
+                    !!form.citerneNotWashedOutReason
                       ? CITERNE_NOT_WASHED_OUT_REASON[
                           form.citerneNotWashedOutReason
                         ]
