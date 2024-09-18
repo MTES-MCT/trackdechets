@@ -7,10 +7,11 @@ import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactIn
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
+import { setFieldError } from "../../utils";
 
-const TransporterBsvhu = () => {
+const TransporterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch } = useFormContext(); // retrieve all hook methods
+  const { register, setValue, watch, formState, setError } = useFormContext(); // retrieve all hook methods
   const actor = "transporter";
   const transporter = watch("transporter") ?? {};
   const sealedFields = useContext(SealedFieldsContext);
@@ -26,6 +27,61 @@ const TransporterBsvhu = () => {
   }, [register]);
 
   register(`${actor}.recepisse.isExempted`);
+
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.contact`,
+        formState.errors?.[actor]?.["company"]?.contact,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.address`,
+        formState.errors?.[actor]?.["company"]?.address,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.phone`,
+        formState.errors?.[actor]?.["company"]?.phone,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.mail`,
+        formState.errors?.[actor]?.["company"]?.mail,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.vatNumber`,
+        formState.errors?.[actor]?.["company"]?.vatNumber,
+        setError
+      );
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState.errors,
+    formState.errors?.length,
+    setError
+  ]);
 
   const orgId = useMemo(
     () => transporter?.company?.orgId ?? transporter?.company?.siret ?? null,
@@ -67,6 +123,7 @@ const TransporterBsvhu = () => {
         />
         <CompanyContactInfo
           fieldName={`${actor}.company`}
+          name={actor}
           disabled={sealedFields.includes(`${actor}.company.siret`)}
           key={orgId}
         />

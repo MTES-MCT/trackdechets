@@ -9,10 +9,12 @@ import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
+import { setFieldError } from "../../utils";
 
-const EmitterBsvhu = () => {
+const EmitterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch } = useFormContext();
+  const { register, setValue, watch, formState, setError } = useFormContext();
+
   const emitter = watch("emitter") ?? {};
   const sealedFields = useContext(SealedFieldsContext);
 
@@ -24,6 +26,62 @@ const EmitterBsvhu = () => {
     register("emitter.company.vatNumber");
     register("emitter.company.address");
   }, [register]);
+
+  useEffect(() => {
+    const actor = "emitter";
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.contact`,
+        formState.errors?.[actor]?.["company"]?.contact,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.address`,
+        formState.errors?.[actor]?.["company"]?.address,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.phone`,
+        formState.errors?.[actor]?.["company"]?.phone,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.mail`,
+        formState.errors?.[actor]?.["company"]?.mail,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.vatNumber`,
+        formState.errors?.[actor]?.["company"]?.vatNumber,
+        setError
+      );
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState.errors,
+    formState.errors?.length,
+    setError
+  ]);
 
   const orgId = useMemo(
     () => emitter?.company?.orgId ?? emitter?.company?.siret ?? null,
@@ -90,8 +148,22 @@ const EmitterBsvhu = () => {
             }
           }}
         />
+        {formState.errors?.emitter?.["company"]?.orgId?.message && (
+          <p
+            id="text-input-error-desc-error"
+            className="fr-mb-4v fr-error-text"
+          >
+            {formState.errors?.emitter?.["company"]?.orgId?.message}
+          </p>
+        )}
+        {formState.errors?.emitter?.["company"]?.siret && (
+          <p className="fr-mb-4v fr-error-text">
+            {formState.errors?.emitter?.["company"]?.siret?.message}
+          </p>
+        )}
         <CompanyContactInfo
           fieldName={"emitter.company"}
+          name="emitter"
           disabled={sealedFields.includes(`emitter.company.siret`)}
           key={orgId}
         />

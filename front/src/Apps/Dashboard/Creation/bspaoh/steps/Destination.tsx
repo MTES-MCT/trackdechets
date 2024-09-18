@@ -10,11 +10,12 @@ import CompanySelectorWrapper from "../../../../common/Components/CompanySelecto
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
+import { setFieldError } from "../../utils";
 
 const actor = "destination";
 
-export function Destination() {
-  const { register, setValue } = useFormContext(); // retrieve all hook methods
+export function Destination({ errors }) {
+  const { register, setValue, formState, setError } = useFormContext(); // retrieve all hook methods
   const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
@@ -28,6 +29,61 @@ export function Destination() {
     register(`${actor}.company.phone`);
     register(`${actor}.company.mail`);
   }, [register]);
+
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.contact`,
+        formState.errors?.[actor]?.["company"]?.contact,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.address`,
+        formState.errors?.[actor]?.["company"]?.address,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.phone`,
+        formState.errors?.[actor]?.["company"]?.phone,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.mail`,
+        formState.errors?.[actor]?.["company"]?.mail,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.vatNumber`,
+        formState.errors?.[actor]?.["company"]?.vatNumber,
+        setError
+      );
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState.errors,
+    formState.errors?.length,
+    setError
+  ]);
 
   const { siret } = useParams<{ siret: string }>();
 
@@ -82,9 +138,15 @@ export function Destination() {
           }
         }}
       />
+      {formState.errors?.destination?.["company"]?.siret && (
+        <p className="fr-text--sm fr-error-text fr-mb-4v">
+          {formState.errors?.destination?.["company"]?.siret?.message}
+        </p>
+      )}
 
       <CompanyContactInfo
         fieldName={`${actor}.company`}
+        name={actor}
         disabled={sealedFields.includes(`${actor}.company.siret`)}
         key={orgId}
       />

@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 import { FormProvider, UseFormReturn } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { toastApolloError } from "./toaster";
-import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
-import Alert from "@codegouvfr/react-dsfr/Alert";
 import FormStepsTabs from "../../Forms/Components/FormStepsTabs/FormStepsTabs";
 import { Loader } from "../../common/Components";
 import { SealedFieldsContext } from "./context";
-import { TabsName, getNextTab, getPrevTab, getTabs } from "./utils";
+import {
+  TabsName,
+  getNextTab,
+  getPrevTab,
+  getTabs,
+  handleGraphQlError
+} from "./utils";
 
 interface FormStepsContentProps {
-  tabList?: {
-    tabId: string;
-    label: React.ReactNode;
-    iconId: FrIconClassName | RiIconClassName;
-  }[];
+  isCrematorium?: boolean;
   sealedFields?: string[];
   isLoading: boolean;
   useformMethods: UseFormReturn<any>;
@@ -27,19 +26,24 @@ interface FormStepsContentProps {
     transporter: React.JSX.Element;
     destination: React.JSX.Element;
   };
+  setPublishErrors: Function;
+  errorTabIds?: string[] | (TabsName | undefined)[];
 }
 const FormStepsContent = ({
-  tabList = getTabs(),
+  isCrematorium = false,
   tabsContent,
   sealedFields = [],
   isLoading,
   useformMethods,
   draftCtaLabel,
   mainCtaLabel,
-  saveForm
+  saveForm,
+  setPublishErrors,
+  errorTabIds
 }: FormStepsContentProps) => {
   const [selectedTabId, setSelectedTabId] = useState<TabsName>("waste");
   const navigate = useNavigate();
+  const tabList = getTabs(isCrematorium, errorTabIds);
   const tabIds = tabList.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
@@ -52,15 +56,14 @@ const FormStepsContent = ({
       .then(_ => {
         navigate(-1);
       })
-      .catch(err => toastApolloError(err));
+      .catch(err => {
+        handleGraphQlError(err, setPublishErrors);
+      });
   };
 
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
   };
-
-  const errors = useformMethods?.formState?.errors;
-  const formHasErrors = Object.keys(errors)?.length > 0;
 
   return (
     <>
@@ -68,15 +71,13 @@ const FormStepsContent = ({
         <FormProvider {...useformMethods}>
           {!isLoading && (
             <FormStepsTabs
+              //@ts-ignore
               tabList={tabList}
               draftCtaLabel={draftCtaLabel}
               mainCtaLabel={mainCtaLabel}
               selectedTabId={selectedTabId}
               isPrevStepDisabled={selectedTabId === firstTabId}
               isNextStepDisabled={selectedTabId === lastTabId}
-              isSaveDisabled={
-                mainCtaLabel !== "Publier" && selectedTabId !== lastTabId
-              }
               onSubmit={useformMethods.handleSubmit((data, e) =>
                 onSubmit(data, e)
               )}
@@ -90,14 +91,6 @@ const FormStepsContent = ({
               onTabChange={onTabChange}
             >
               {tabsContent[selectedTabId] ?? <p></p>}
-              {formHasErrors && (
-                <Alert
-                  severity="error"
-                  title="Erreur"
-                  className="fr-mt-5v"
-                  description="Le formulaire comporte des erreurs"
-                />
-              )}
             </FormStepsTabs>
           )}
         </FormProvider>

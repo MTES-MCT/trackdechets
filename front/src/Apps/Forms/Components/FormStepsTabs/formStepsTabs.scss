@@ -20,7 +20,38 @@
     }
   }
   .tabError {
-    background-color: #fb8f8f;
-    color: #ce0500;
+    background-color: var(--light-background-contrast-error, #ffe9e9);
+    &[aria-selected="true"]:not(:disabled) {
+      color: var(--text-action-high-grey);
+      background-image: linear-gradient(
+          0deg,
+          var(--background-flat-error),
+          var(--background-flat-error)
+        ),
+        linear-gradient(
+          0deg,
+          var(--border-default-grey),
+          var(--border-default-grey)
+        ),
+        linear-gradient(
+          0deg,
+          var(--border-default-grey),
+          var(--border-default-grey)
+        ),
+        linear-gradient(
+          0deg,
+          var(--border-default-grey),
+          var(--border-default-grey)
+        );
+    }
+    &[aria-selected="true"]:not(:disabled):hover {
+      background-color: var(--hover-tint);
+    }
+    &:not(:disabled):hover {
+      background-color: var(
+        --light-primary-red-marianne-850-red-marianne-850-hover,
+        #fb8f8f
+      );
+    }
   }
 }
