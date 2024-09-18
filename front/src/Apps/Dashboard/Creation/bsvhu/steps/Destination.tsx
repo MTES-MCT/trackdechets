@@ -1,35 +1,25 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/Select";
-import {
-  BsvhuDestinationType,
-  CompanySearchResult,
-  FavoriteType
-} from "@td/codegen-ui";
-import subMonths from "date-fns/subMonths";
+import { CompanySearchResult, FavoriteType } from "@td/codegen-ui";
 import React, { useEffect, useMemo, useState, useContext } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
-import RhfOperationModeSelect from "../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
-import DisabledParagraphStep from "../../DisabledParagraphStep";
-import format from "date-fns/format";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
+import DisabledParagraphStep from "../../DisabledParagraphStep";
 
 const DestinationBsvhu = () => {
   const { siret } = useParams<{ siret: string }>();
   const [selectedDestination, setSelectedDestination] =
     useState<CompanySearchResult | null>(null);
-  const { register, setValue, watch, formState } = useFormContext(); // retrieve all hook methods
+  const { register, setValue, watch } = useFormContext(); // retrieve all hook methods
   const actor = "destination";
   const wasteCode = watch("wasteCode");
   const isDangerousWasteCode = wasteCode === "16 01 04*";
   const destination = watch(actor) ?? {};
-  const identificationNumbers =
-    formState.defaultValues?.destination?.reception?.identification?.numbers;
   const agrementNumber = watch("destination.agrementNumber");
   const sealedFields = useContext(SealedFieldsContext);
 
@@ -85,161 +75,10 @@ const DestinationBsvhu = () => {
       destination?.operation?.nextDestination.company.siret
     ]
   );
-  const TODAY = new Date();
 
   return (
     <>
-      {!!sealedFields.length && (
-        <>
-          <h4 className="fr-h4">Réception</h4>
-          <Input
-            className="fr-col-md-6"
-            label="Date de réception"
-            //@ts-ignore
-            state={formState.errors?.destination?.reception?.date && "error"}
-            stateRelatedMessage={
-              //@ts-ignore
-              formState.errors?.destination?.reception?.date?.message as string
-            }
-            nativeInputProps={{
-              type: "date",
-              min: format(subMonths(TODAY, 2), "yyyy-MM-dd"),
-              max: format(TODAY, "yyyy-MM-dd"),
-              required: true,
-              ...register("destination.reception.date"),
-              onChange: e =>
-                setValue("destination.reception.date", e.target.value),
-              value: destination?.reception?.date
-                ? format(new Date(destination?.reception?.date), "yyyy-MM-dd")
-                : ""
-            }}
-          />
-          <div className="fr-col-12 fr-col-md-6">
-            <RadioButtons
-              legend="Lot accepté"
-              options={[
-                {
-                  label: "Accepté en totalité",
-                  nativeInputProps: {
-                    ...register("destination.reception.acceptationStatus"),
-                    value: "ACCEPTED"
-                  }
-                },
-                {
-                  label: "Refusé",
-                  nativeInputProps: {
-                    ...register("destination.reception.acceptationStatus"),
-                    value: "REFUSED"
-                  }
-                },
-                {
-                  label: "Refus partiel",
-                  nativeInputProps: {
-                    ...register("destination.reception.acceptationStatus"),
-                    value: "PARTIALLY_REFUSED"
-                  }
-                }
-              ]}
-            />
-
-            {!!["REFUSED", "PARTIALLY_REFUSED"].includes(
-              destination?.reception?.acceptationStatus
-            ) && (
-              <Input
-                className="fr-mb-4v"
-                textArea
-                label="Motif de refus"
-                nativeTextAreaProps={{
-                  ...register("destination.reception.refusalReason")
-                }}
-              />
-            )}
-          </div>
-          <div>
-            <Input
-              label="Poids accepté en tonnes"
-              className="fr-col-md-6 fr-mb-4v"
-              disabled={destination?.reception?.acceptationStatus === "REFUSED"}
-              nativeInputProps={{
-                ...register("destination.reception.weight"),
-                type: "number",
-                inputMode: "decimal",
-                step: "1"
-              }}
-            />
-          </div>
-          <div>
-            {destination?.reception?.acceptationStatus !== "REFUSED" && (
-              <>
-                {destination?.type === BsvhuDestinationType.Demolisseur && (
-                  <>
-                    <h4 className="fr-h4 fr-mt-4w">Identification</h4>
-                    <IdentificationNumber
-                      title="Identification des numéros entrants des lots ou de véhicules hors d'usage (livre de police)"
-                      disabled={false}
-                      name="destination.reception.identification.numbers"
-                      defaultValue={identificationNumbers}
-                    />
-                  </>
-                )}
-                <h4 className="fr-h4 fr-mt-4w">Opération</h4>
-                <Input
-                  className="fr-col-md-6"
-                  label="Date de l'opération"
-                  state={
-                    //@ts-ignore
-                    formState.errors?.destination?.operation?.date && "error"
-                  }
-                  stateRelatedMessage={
-                    //@ts-ignore
-                    formState.errors?.destination?.operation?.date
-                      ?.message as string
-                  }
-                  nativeInputProps={{
-                    type: "date",
-                    min: format(subMonths(TODAY, 2), "yyyy-MM-dd"),
-                    max: format(TODAY, "yyyy-MM-dd"),
-                    ...register("destination.operation.date"),
-                    onChange: e =>
-                      setValue("destination.operation.date", e.target.value),
-                    required: true,
-                    value: destination?.operation?.date
-                      ? format(
-                          new Date(destination?.operation?.date),
-                          "yyyy-MM-dd"
-                        )
-                      : ""
-                  }}
-                />
-
-                <div className="fr-col-md-8 fr-pb-4w">
-                  <Select
-                    label="Opération d'élimination / valorisation effectuée"
-                    nativeSelectProps={{
-                      ...register("destination.operation.code")
-                    }}
-                  >
-                    <option value="...">Sélectionnez une valeur...</option>
-                    <option value="R 4">
-                      R 4 - Recyclage ou récupération des métaux et des composés
-                      métalliques
-                    </option>
-                    <option value="R 12">
-                      R 12 - Échange de déchets en vue de les soumettre à l'une
-                      des opérations numérotées R1 à R11
-                    </option>
-                  </Select>
-                </div>
-                <RhfOperationModeSelect
-                  path="destination.operation.mode"
-                  operationCode={destination?.operation?.code}
-                />
-              </>
-            )}
-          </div>
-          <DisabledParagraphStep />
-        </>
-      )}
+      {!!sealedFields.length && <DisabledParagraphStep />}
       {isDangerousWasteCode && (
         <Alert
           description=" Vous avez saisi le code déchet dangereux 16 01 04*. Le destinataire est obligatoirement un démolisseur agréé."
