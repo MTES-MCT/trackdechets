@@ -9,12 +9,14 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - id: 'reviews'
-        uses: './libs/shared/gh-actions/reviewCounter.yml'
+        uses: actions/github-script@v7
         with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |
+            const script = require('./scripts/gh-get-review-counts.js')
+            await script({github, context, core})
       - name: Add Label if 2 Approvals
         if: 'steps.reviews.outputs.approved >= 2 && steps.reviews.outputs.changes_requested == 0'
-        uses: actions/github-script@v4
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
