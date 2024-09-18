@@ -16,7 +16,12 @@ export default function AccountApplicationsMyApplicationDelete({
 }: AccountApplicationsMyApplicationDeleteProps) {
   const [deleteApplication, { loading, error }] = useMutation(
     DELETE_APPLICATION,
-    { refetchQueries: [MY_APPLICATIONS] }
+    {
+      refetchQueries: [MY_APPLICATIONS],
+      onCompleted: () => {
+        onClose();
+      }
+    }
   );
 
   return (
