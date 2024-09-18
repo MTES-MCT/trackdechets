@@ -1,13 +1,14 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { useFormContext } from "react-hook-form";
 import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
 import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { ZodBsvhu } from "../schema";
+import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 
-const WasteBsvhu = ({ isDisabled }) => {
+const WasteBsvhu = () => {
   const { register, watch, setValue, formState } = useFormContext<ZodBsvhu>(); // retrieve all hook methods
   const { errors } = formState;
 
@@ -17,6 +18,7 @@ const WasteBsvhu = ({ isDisabled }) => {
   const identificationNumbersDefaultValue =
     formState.defaultValues?.identification?.numbers;
   const identificationNumbers = watch("identification.numbers");
+  const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
     setValue("quantity", identificationNumbers?.length);
@@ -24,11 +26,11 @@ const WasteBsvhu = ({ isDisabled }) => {
 
   return (
     <>
-      {isDisabled && <DisabledParagraphStep />}
+      {!!sealedFields.length && <DisabledParagraphStep />}
 
       <WasteRadioGroup
         title="Déchet"
-        disabled={isDisabled}
+        disabled={sealedFields.includes("wasteCode")}
         options={[
           {
             label:
@@ -50,7 +52,7 @@ const WasteBsvhu = ({ isDisabled }) => {
       />
       <h4 className="fr-h4">Conditionnement</h4>
       <RadioButtons
-        disabled={isDisabled}
+        disabled={sealedFields.includes("packaging")}
         className="fr-col-sm-10"
         options={[
           {
@@ -70,7 +72,7 @@ const WasteBsvhu = ({ isDisabled }) => {
         ]}
       />
       <RadioButtons
-        disabled={isDisabled}
+        disabled={sealedFields.includes("identification.type")}
         className="fr-col-sm-10"
         legend="Identification par N° d'ordre"
         options={[
@@ -93,7 +95,7 @@ const WasteBsvhu = ({ isDisabled }) => {
 
       <div className="fr-col-md-12 fr-mb-4w">
         <IdentificationNumber
-          disabled={isDisabled}
+          disabled={sealedFields.includes("identification.numbers")}
           name="identification.numbers"
           defaultValue={identificationNumbersDefaultValue}
         />
@@ -123,7 +125,7 @@ const WasteBsvhu = ({ isDisabled }) => {
         <div className="fr-col-12 fr-col-md-6">
           <Input
             label="Poids total en tonnes"
-            disabled={isDisabled}
+            disabled={sealedFields.includes("weight.value")}
             state={errors?.weight?.value && "error"}
             stateRelatedMessage={
               (errors?.weight?.value?.message as string) ?? ""
@@ -144,7 +146,7 @@ const WasteBsvhu = ({ isDisabled }) => {
         <div className="fr-col-12 fr-col-md-6">
           <RadioButtons
             legend="Cette quantité est"
-            disabled={isDisabled}
+            disabled={sealedFields.includes("weight.isEstimate")}
             orientation="horizontal"
             state={errors?.weight?.isEstimate && "error"}
             stateRelatedMessage={
