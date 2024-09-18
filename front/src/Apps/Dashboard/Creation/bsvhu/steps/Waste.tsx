@@ -7,6 +7,7 @@ import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRa
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { ZodBsvhu } from "../schema";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
+import { setFieldError } from "../../utils";
 
 const WasteBsvhu = ({ errors }) => {
   const { register, watch, setValue, formState, setError } =
@@ -29,16 +30,12 @@ const WasteBsvhu = ({ errors }) => {
       errors?.length &&
       errors?.length !== Object.keys(formState.errors)?.length
     ) {
-      const weightError = errors?.find(
-        error => error.name === "weight.value"
-      )?.message;
-
-      if (weightError && !!formState.errors?.weight?.value === false) {
-        setError("weight.value", {
-          type: "custom",
-          message: weightError
-        });
-      }
+      setFieldError(
+        errors,
+        "weight.value",
+        formState.errors?.weight?.value,
+        setError
+      );
     }
   }, [
     errors,

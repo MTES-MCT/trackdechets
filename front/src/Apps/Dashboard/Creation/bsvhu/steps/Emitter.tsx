@@ -9,14 +9,7 @@ import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import {
-  isCompanyAddressPath,
-  isCompanyContactPath,
-  isCompanyMailPath,
-  isCompanyPhonePath,
-  isCompanySiretPath,
-  isVatNumberPath
-} from "../../utils";
+import { setFieldError } from "../../utils";
 
 const EmitterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
@@ -40,69 +33,47 @@ const EmitterBsvhu = ({ errors }) => {
       errors?.length &&
       errors?.length !== Object.keys(formState.errors)?.length
     ) {
-      const siretError = isCompanySiretPath(errors, actor);
-      if (
-        siretError &&
-        !!formState.errors?.[actor]?.["company"]?.siret === false
-      ) {
-        setError(`${actor}.company.siret`, {
-          type: "custom",
-          message: siretError
-        });
-      }
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
 
-      const contactError = isCompanyContactPath(errors, actor);
-      if (
-        contactError &&
-        !!formState.errors?.[actor]?.["company"]?.contact === false
-      ) {
-        setError(`${actor}.company.contact`, {
-          type: "custom",
-          message: contactError
-        });
-      }
+      setFieldError(
+        errors,
+        `${actor}.company.contact`,
+        formState.errors?.[actor]?.["company"]?.contact,
+        setError
+      );
 
-      const adressError = isCompanyAddressPath(errors, actor);
-      if (
-        adressError &&
-        !!formState.errors?.[actor]?.["company"]?.address === false
-      ) {
-        setError(`${actor}.company.address`, {
-          type: "custom",
-          message: adressError
-        });
-      }
-      const phoneError = isCompanyPhonePath(errors, actor);
-      if (
-        phoneError &&
-        !!formState.errors?.[actor]?.["company"]?.phone === false
-      ) {
-        setError(`${actor}.company.phone`, {
-          type: "custom",
-          message: phoneError
-        });
-      }
-      const mailError = isCompanyMailPath(errors, actor);
-      if (
-        mailError &&
-        !!formState.errors?.[actor]?.["company"]?.mail === false
-      ) {
-        setError(`${actor}.company.mail`, {
-          type: "custom",
-          message: mailError
-        });
-      }
+      setFieldError(
+        errors,
+        `${actor}.company.address`,
+        formState.errors?.[actor]?.["company"]?.address,
+        setError
+      );
 
-      const vatNumberError = isVatNumberPath(errors, actor);
-      if (
-        vatNumberError &&
-        !!formState.errors?.[actor]?.["company"]?.vatNumber === false
-      ) {
-        setError(`${actor}.company.vatNumber`, {
-          type: "custom",
-          message: vatNumberError
-        });
-      }
+      setFieldError(
+        errors,
+        `${actor}.company.phone`,
+        formState.errors?.[actor]?.["company"]?.phone,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.mail`,
+        formState.errors?.[actor]?.["company"]?.mail,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.vatNumber`,
+        formState.errors?.[actor]?.["company"]?.vatNumber,
+        setError
+      );
     }
   }, [
     errors,
@@ -185,8 +156,14 @@ const EmitterBsvhu = ({ errors }) => {
             {formState.errors?.emitter?.["company"]?.orgId?.message}
           </p>
         )}
+        {formState.errors?.emitter?.["company"]?.siret && (
+          <p className="fr-mb-4v fr-error-text">
+            {formState.errors?.emitter?.["company"]?.siret?.message}
+          </p>
+        )}
         <CompanyContactInfo
           fieldName={"emitter.company"}
+          name="emitter"
           disabled={sealedFields.includes(`emitter.company.siret`)}
           key={orgId}
         />

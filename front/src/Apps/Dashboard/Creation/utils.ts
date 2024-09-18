@@ -122,21 +122,13 @@ export const handleGraphQlError = (err, setPublishErrors) => {
   }
 };
 
-export const isVatNumberPath = (apiErrors, actor) =>
-  apiErrors?.find(error => error.name === `${actor}.company.vatNumber`)
-    ?.message;
+export const setFieldError = (errors, errorPath, stateError, setError) => {
+  const error = errors?.find(error => error.name === errorPath)?.message;
 
-export const isCompanyMailPath = (apiErrors, actor) =>
-  apiErrors?.find(error => error.name === `${actor}.company.mail`)?.message;
-
-export const isCompanyPhonePath = (apiErrors, actor) =>
-  apiErrors?.find(error => error.name === `${actor}.company.phone`)?.message;
-
-export const isCompanyAddressPath = (apiErrors, actor) =>
-  apiErrors?.find(error => error.name === `${actor}.company.address`)?.message;
-
-export const isCompanyContactPath = (apiErrors, actor) =>
-  apiErrors?.find(error => error.name === `${actor}.company.contact`)?.message;
-
-export const isCompanySiretPath = (apiErrors, actor) =>
-  apiErrors?.find(error => error.name === `${actor}.company.siret`)?.message;
+  if (error && !!stateError === false) {
+    setError(errorPath, {
+      type: "custom",
+      message: error
+    });
+  }
+};
