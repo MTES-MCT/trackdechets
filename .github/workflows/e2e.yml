@@ -47,45 +47,45 @@ jobs:
           npx nx run notifier:serve >> /tmp/td-notifier.log &
           sleep 1s
           npx nx run front:serve >> /tmp/td-front.log &
-          sleep 1s
+          sleep 20s
 
       # Wait
-      - name: Wait until the API starts
-        run: |
-          until [ "$(curl -s -w '%{http_code}' -o /dev/null "api.trackdechets.local")" -eq 400 ]
-          do
-            printf 'Waiting for the API to start...\n'
-            sleep 1
-          done
+      # - name: Wait until the API starts
+      #   run: |
+      #     until [ "$(curl -s -w '%{http_code}' -o /dev/null "api.trackdechets.local")" -eq 400 ]
+      #     do
+      #       printf 'Waiting for the API to start...\n'
+      #       sleep 1
+      #     done
 
       # Debug
-      # - name: Testing API resolution
-      #   run: |
-      #     ping -c 2 api.trackdechets.local
-      #     curl api.trackdechets.local
-      # - name: Testing UI resolution
-      #   run: |
-      #     ping -c 2 trackdechets.local
-      #     curl trackdechets.local/login
-      #     curl trackdechets.local/src/index.tsx
-      # - name: Testing ES resolution
-      #   run: |
-      #     ping -c 2 es.trackdechets.local
-      #     curl es.trackdechets.local
-      # - name: Testing Notifier resolution
-      #   run: |
-      #     ping -c 2 notifier.trackdechets.local
-      #     curl notifier.trackdechets.local
+      - name: Testing API resolution
+        run: |
+          ping -c 2 api.trackdechets.local
+          curl api.trackdechets.local
+      - name: Testing UI resolution
+        run: |
+          ping -c 2 trackdechets.local
+          curl trackdechets.local/login
+          curl trackdechets.local/src/index.tsx
+      - name: Testing ES resolution
+        run: |
+          ping -c 2 es.trackdechets.local
+          curl es.trackdechets.local
+      - name: Testing Notifier resolution
+        run: |
+          ping -c 2 notifier.trackdechets.local
+          curl notifier.trackdechets.local
 
       # Show logs
-      # - name: Show logs
-      # run: |
-      #   cat /tmp/td-api.log
-      #   cat /tmp/td-queues-indexation.log
-      #   cat /tmp/td-queues-webhooks.log
-      #   cat /tmp/td-queues-runner.log
-      #   cat /tmp/td-notifier.log
-      #   cat /tmp/td-front.log
+      - name: Show logs
+        run: |
+          cat /tmp/td-api.log
+          cat /tmp/td-queues-indexation.log
+          cat /tmp/td-queues-webhooks.log
+          cat /tmp/td-queues-runner.log
+          cat /tmp/td-notifier.log
+          cat /tmp/td-front.log
 
       # Playwright
       - name: Install Playwright Browsers
@@ -157,11 +157,13 @@ env:
   TRELLO_ALERTS_LIST_ID: unset
 
   # S3
-  S3_ENDPOINT: unset
-  S3_REGION: unset
-  S3_ACCESS_KEY_ID: unset
-  S3_SECRET_ACCESS_KEY: unset
+  S3_ENDPOINT: http://localhost:9000
+  S3_REGION: fr-par
   S3_BUCKET: unset
+  S3_ACCESS_KEY_ID: trackdechets
+  S3_SECRET_ACCESS_KEY: password
+  S3_REGISTRY_ERRORS_BUCKET: registry-errors-integration
+  S3_REGISTRY_IMPORTS_BUCKET: registry-imports-integration
 
   S3_BSD_TEMPLATES_ACCESS_KEY_ID: unset
   S3_BSD_TEMPLATES_SECRET_ACCESS_KEY: unset

@@ -313,7 +313,7 @@ model Company {
   webhookSettingsLimit            Int                      @default(1)
 
   delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
-  delegateRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegate")
+  delegateRegistryDelegations  RegistryDelegation[] @relation("RegistryDelegationDelegate")
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -930,6 +930,8 @@ model User {
   Form                       Form[]
   UserActivationHash         UserActivationHash[]
   CompanyDigest              CompanyDigest[]
+  registryImports            RegistryImport[]
+  registrySsdDeclarations    RegistrySsd[]
 }
 
 enum GovernmentPermission {
@@ -1135,12 +1137,12 @@ model RegistryDelegation {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   // Entreprise délégataire
-  delegateId String @db.VarChar(30)
-  delegate Company  @relation("RegistryDelegationDelegate", fields: [delegateId], references: [id])
+  delegateId String  @db.VarChar(30)
+  delegate   Company @relation("RegistryDelegationDelegate", fields: [delegateId], references: [id])
 
   // Entreprise délégante
-  delegatorId String @db.VarChar(30)
-  delegator Company  @relation("RegistryDelegationDelegator", fields: [delegatorId], references: [id])
+  delegatorId String  @db.VarChar(30)
+  delegator   Company @relation("RegistryDelegationDelegator", fields: [delegatorId], references: [id])
 
   // Dates de validité
   startDate DateTime  @db.Timestamptz(6)
@@ -1148,7 +1150,7 @@ model RegistryDelegation {
 
   comment String? @db.VarChar(500)
 
-  revokedBy String? @db.VarChar(30)
+  revokedBy   String? @db.VarChar(30)
   cancelledBy String? @db.VarChar(30)
 
   @@index([delegateId], map: "_RegistryDelegationDelegateIdIdx")
@@ -2217,4 +2219,95 @@ enum EmptyReturnADR {
   EMPTY_RETURN_NOT_WASHED
   EMPTY_VEHICLE
   EMPTY_CITERNE
+}
+
+model RegistryImport {
+  id               String               @id @default(cuid())
+  createdAt        DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime             @updatedAt @db.Timestamptz(6)
+  status           RegistryImportStatus @default(PENDING)
+  type             RegistryImportType
+  s3FileKey        String
+  originalFileName String
+
+  numberOfErrors        Int @default(0)
+  numberOfInsertions    Int @default(0)
+  numberOfEdits         Int @default(0)
+  numberOfCancellations Int @default(0)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  associations RegistryImportAssociation[]
+
+  @@index([createdById], map: "_RegistryImportCreatedByIdIdx")
+}
+
+model RegistryImportAssociation {
+  importId    String
+  reportedFor String
+  reportedAs  String
+
+  import RegistryImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  @@id([importId, reportedFor, reportedAs])
+}
+
+enum RegistryImportStatus {
+  PENDING
+  STARTED
+  SUCCESSFUL
+  PARTIALLY_SUCCESSFUL
+  FAILED
+  CANCELED
+}
+
+enum RegistryImportType {
+  SSD
+}
+
+model RegistrySsd {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  importId  String?
+
+  isActive    Boolean @default(true)
+  isCancelled Boolean @default(false)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  publicId                   String
+  reportForSiret             String
+  reportForName              String
+  reportForAddress           String
+  reportForCity              String
+  reportForPostalCode        String
+  reportAsSiret              String?
+  weightValue                Float
+  weightIsEstimate           Boolean
+  volume                     Float?
+  wasteCode                  String
+  wasteCodeBale              String?
+  wasteDescription           String
+  secondaryWasteCodes        String[]      @default([])
+  secondaryWasteDescriptions String[]      @default([])
+  dispatchDate               DateTime?     @db.Timestamptz(6)
+  useDate                    DateTime?     @db.Timestamptz(6)
+  processingDate             DateTime      @db.Timestamptz(6)
+  processingEndDate          DateTime?     @db.Timestamptz(6)
+  operationCode              String
+  operationMode              OperationMode
+  product                    String
+  administrativeActReference String
+  destinationType            String
+  destinationOrgId           String?
+  destinationName            String?
+  destinationAddress         String?
+  destinationCity            String?
+  destinationPostalCode      String?
+  destinationCountryCode     String?
+
+  @@index([importId], map: "_RegistrySsdImportIdIdx")
+  @@index([publicId], map: "_RegistrySsdPublicIdIdx")
 }
