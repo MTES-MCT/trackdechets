@@ -25,13 +25,11 @@ const validationSchema = z.object({
     .string()
     .transform((val, ctx) => {
       try {
-        const parsed = JSON.parse(val);
-
-        return parsed;
+        return JSON.parse(val);
       } catch (error) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "invalid json"
+          message: "Le json est invalide"
         });
         return z.never;
       }
@@ -64,7 +62,7 @@ const validationSchema = z.object({
               CollectorType.DeeeWastes,
               CollectorType.OtherDangerousWastes,
               CollectorType.OtherNonDangerousWastes,
-              CollectorType.DangerousWastes
+              CollectorType.NonDangerousWastes
             ])
           ),
           wasteProcessorTypes: z.array(
@@ -103,7 +101,13 @@ export const MASS_UPDATE_COMPANIES_PROFILES = gql`
     }
   }
 `;
-
+const formatRowErrors = jsonObject => {
+  try {
+    return JSON.stringify(jsonObject);
+  } catch (e) {
+    return jsonObject?.message ?? "Erreur";
+  }
+};
 export function BulkProfileUpdateAdmin() {
   const [bulkUpdateCompaniesProfiles, { loading, error, data }] = useMutation<
     Pick<Mutation, "bulkUpdateCompaniesProfiles">,
@@ -120,9 +124,13 @@ export function BulkProfileUpdateAdmin() {
     });
   };
 
-  const { handleSubmit, formState, register } = useForm<
-    z.infer<typeof validationSchema>
-  >({ resolver: zodResolver(validationSchema) });
+  const {
+    handleSubmit,
+    formState: { errors },
+    register
+  } = useForm<z.infer<typeof validationSchema>>({
+    resolver: zodResolver(validationSchema)
+  });
 
   return (
     <div>
@@ -143,8 +151,9 @@ export function BulkProfileUpdateAdmin() {
                   type: "email",
                   ...register("adminEmail", { required: true })
                 }}
+                state={errors?.adminEmail && "error"}
                 stateRelatedMessage={
-                  (formState?.errors?.adminEmail?.message as string) ?? ""
+                  (errors?.adminEmail?.message as string) ?? ""
                 }
               />
 
@@ -158,10 +167,8 @@ export function BulkProfileUpdateAdmin() {
                   rows: 10,
                   ...register("companyUpdateRows", { required: true })
                 }}
-                stateRelatedMessage={
-                  (formState?.errors?.companyUpdateRows?.message as string) ??
-                  ""
-                }
+                state={errors?.companyUpdateRows && "error"}
+                stateRelatedMessage={formatRowErrors(errors?.companyUpdateRows)}
               />
             </div>
             <Button disabled={loading}>Effectuer la mise à jour</Button>
