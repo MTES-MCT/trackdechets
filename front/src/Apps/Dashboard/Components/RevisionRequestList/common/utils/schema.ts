@@ -98,22 +98,24 @@ export const getDasriSchema = () =>
       .min(3, "Le commentaire doit faire au moins 3 caractères")
   });
 
-const broker_trader_Schema = z.object({
+const company_schema = z.object({
+  orgId: z.string().nullish(),
+  siret: z.string().nullish(),
+  name: z.string().nullish(),
+  address: z.string().nullish(),
+  contact: z.string().nullish(),
+  mail: z.string().nullish(),
+  phone: z.string().nullish(),
+  vatNumber: z.string().nullish(),
+  country: z.string().nullish(),
+  omiNumber: z.string().nullish()
+});
+
+const bsdd_broker_trader_Schema = z.object({
   receipt: z.string().nullish(),
   department: z.string().nullish(),
   validityLimit: z.string().nullish(),
-  company: z.object({
-    orgId: z.string().nullish(),
-    siret: z.string().nullish(),
-    name: z.string().nullish(),
-    address: z.string().nullish(),
-    contact: z.string().nullish(),
-    mail: z.string().nullish(),
-    phone: z.string().nullish(),
-    vatNumber: z.string().nullish(),
-    country: z.string().nullish(),
-    omiNumber: z.string().nullish()
-  })
+  company: company_schema
 });
 
 export const initialBsddReview = {
@@ -217,8 +219,8 @@ export const validationBsddSchema = z.object({
     sampleNumber: z.string().nullish(),
     quantity: z.number().nullish()
   }),
-  trader: broker_trader_Schema,
-  broker: broker_trader_Schema,
+  trader: bsdd_broker_trader_Schema,
+  broker: bsdd_broker_trader_Schema,
   recipient: z.object({
     cap: z.string().nullish()
   }),
@@ -331,7 +333,14 @@ export const validationBsdaSchema = z.object({
         })
     )
     .nullish(),
-  broker: broker_trader_Schema,
+  broker: z.object({
+    company: company_schema,
+    recepisse: z.object({
+      number: z.string().nullish(),
+      department: z.string().nullish(),
+      validityLimit: z.string().nullish()
+    })
+  }),
   destination: z
     .object({
       cap: z.string().nullish(),
