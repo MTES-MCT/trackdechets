@@ -1,5 +1,10 @@
 import React from "react";
-import { CompanyPrivate } from "@td/codegen-ui";
+import {
+  CompanyPrivate,
+  Mutation,
+  MutationCreateRndtsDeclarationDelegationArgs,
+  MutationMarkAsAcceptedArgs
+} from "@td/codegen-ui";
 import { FieldError, useForm } from "react-hook-form";
 import { Modal } from "../../../common/components";
 import CompanySelectorWrapper from "../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
@@ -10,6 +15,9 @@ import { z } from "zod";
 import { isSiret } from "@td/constants";
 import { datetimeToYYYYMMDD } from "../../Dashboard/Validation/BSPaoh/paohUtils";
 import { startOfDay } from "date-fns";
+import { useMutation } from "@apollo/client";
+import { CREATE_RNDTS_DECLARATION_DELEGATION } from "../../common/queries/rndtsDeclarationDelegation/queries";
+import toast from "react-hot-toast";
 
 const displayError = (error: FieldError | undefined) => {
   return error ? <>{error.message}</> : null;
@@ -18,11 +26,7 @@ const displayError = (error: FieldError | undefined) => {
 const getSchema = () =>
   z
     .object({
-      delegateOrgId: z.string().refine(val => {
-        const ok = isSiret(val);
-        console.log("ok", ok);
-        return ok;
-      }),
+      delegateOrgId: z.string().refine(isSiret, "Siret non valide"),
       startDate: z.coerce
         .date({
           required_error: "La date de début est requise",
@@ -33,28 +37,27 @@ const getSchema = () =>
         })
         .transform(val => val.toISOString())
         .nullish(),
-      endDate: z.coerce
-        .date({
-          invalid_type_error: "La date de fin est invalide"
-        })
-        .min(new Date(), {
-          message: "La date de fin ne peut pas être dans le passé"
-        })
-        .transform(val => {
-          if (val) return val.toISOString();
-          return val;
-        })
-        .nullish()
-        .optional(),
+      // Date & "" hack: https://github.com/colinhacks/zod/issues/1721
+      endDate: z.preprocess(
+        arg => (arg === "" ? null : arg),
+        z.coerce
+          .date({
+            invalid_type_error: "La date de fin est invalide"
+          })
+          .min(new Date(), {
+            message: "La date de fin ne peut pas être dans le passé"
+          })
+          .transform(val => {
+            if (val) return val.toISOString();
+            return val;
+          })
+          .nullish()
+      ),
       comment: z.string().max(500).optional()
     })
     .refine(
       data => {
         const { startDate, endDate } = data;
-
-        console.log(">> REFINE!!!");
-        console.log("startDate", startDate);
-        console.log("endDate", endDate);
 
         if (startDate && endDate) {
           return new Date(startDate) < new Date(endDate);
@@ -79,18 +82,26 @@ export const CreateRndtsDeclarationDelegationModal = ({
   onClose,
   isOpen
 }: Props) => {
-  const onSubmit = async obj => {
-    console.log("onSubmit!");
-    console.log("obj", obj);
-    // await signBspaoh({
-    //   variables: {
-    //     id: bspaoh.id,
-    //     input: {
-    //       ...sign,
-    //       type: BspaohSignatureType.Emission
-    //     }
-    //   }
-    // });
+  const [createRndtsDeclarationDelegation, { loading, error }] = useMutation<
+    Pick<Mutation, "createRndtsDeclarationDelegation">,
+    MutationCreateRndtsDeclarationDelegationArgs
+  >(CREATE_RNDTS_DECLARATION_DELEGATION);
+
+  const onSubmit = async input => {
+    console.log(">> onSubmit!");
+    console.log("input", input);
+
+    await createRndtsDeclarationDelegation({
+      variables: {
+        input: {
+          ...input,
+          delegatorOrgId: company.orgId
+        }
+      },
+      onCompleted: data => toast.success("Délégation créée!"),
+      onError: err => toast.error(err.message)
+    });
+
     onClose();
   };
 
@@ -103,18 +114,14 @@ export const CreateRndtsDeclarationDelegationModal = ({
     formState: { errors, isSubmitting }
   } = useForm<z.infer<typeof validationSchema>>({
     defaultValues: {
-      startDate: datetimeToYYYYMMDD(new Date()),
-      endDate: undefined,
-      delegateOrgId: undefined,
-      comment: undefined
+      startDate: datetimeToYYYYMMDD(new Date())
     },
     resolver: zodResolver(validationSchema)
   });
 
-  console.log("errors", errors);
-
   const delegateOrgId = watch("delegateOrgId") ?? {};
-  console.log("delegateOrgId", delegateOrgId);
+
+  const isLoading = loading || isSubmitting;
 
   return (
     <Modal
@@ -129,9 +136,14 @@ export const CreateRndtsDeclarationDelegationModal = ({
 
           <CompanySelectorWrapper
             orgId={company.orgId}
-            disabled={isSubmitting}
+            disabled={isLoading}
             selectedCompanyOrgId={delegateOrgId}
-            selectedCompanyError={() => errors?.delegateOrgId?.message ?? null}
+            selectedCompanyError={selectedCompany => {
+              if (selectedCompany?.orgId === company.orgId) {
+                return "Le délégant et le délégataire doivent être différents";
+              }
+              return null;
+            }}
             onCompanySelected={company => {
               if (company) {
                 setValue("delegateOrgId", company.orgId);
@@ -146,10 +158,11 @@ export const CreateRndtsDeclarationDelegationModal = ({
                   label="Date de début"
                   state={errors?.startDate && "error"}
                   stateRelatedMessage={displayError(errors?.startDate)}
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                   nativeInputProps={{
                     type: "date",
                     min: datetimeToYYYYMMDD(new Date()),
+                    max: datetimeToYYYYMMDD(new Date("2050-12-31")),
                     ...register("startDate")
                   }}
                 />
@@ -160,7 +173,7 @@ export const CreateRndtsDeclarationDelegationModal = ({
                   hintText="Illimité s'il n'y a pas de date renseignée"
                   state={errors?.endDate && "error"}
                   stateRelatedMessage={displayError(errors?.endDate)}
-                  disabled={isSubmitting}
+                  disabled={isLoading}
                   nativeInputProps={{
                     type: "date",
                     max: datetimeToYYYYMMDD(new Date("2050-12-31")),
@@ -175,7 +188,7 @@ export const CreateRndtsDeclarationDelegationModal = ({
             label="Objet"
             state={errors?.comment && "error"}
             stateRelatedMessage={displayError(errors?.comment)}
-            disabled={isSubmitting}
+            disabled={isLoading}
             nativeInputProps={{
               ...register("comment")
             }}
@@ -183,14 +196,14 @@ export const CreateRndtsDeclarationDelegationModal = ({
 
           <div className="dsfr-modal-actions fr-mt-3w">
             <Button
-              disabled={isSubmitting}
+              disabled={isLoading}
               priority="secondary"
               onClick={onClose}
               type="button"
             >
               Annuler
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isLoading}>
               Créer
             </Button>
           </div>
