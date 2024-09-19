@@ -14,7 +14,7 @@ type EcoOrganismeAgrementForm = {
 };
 
 const titleStyle: CSSProperties = {
-  marginBottom: "1em"
+  marginBottom: 12
 };
 
 const inputContainerStyle = (isError: boolean): CSSProperties => ({
@@ -41,11 +41,9 @@ const EcoOrganismeAgrementsForm = ({
   const { value, push, remove } = inputProps?.ecoOrganismeAgreements ?? {};
 
   return (
-    <div className="fr-container">
-      <div className="fr-grid-row">
-        <div className="fr-col-12" style={titleStyle}>
-          <p className="fr-text--bold">Agréments éco-organisme</p>
-        </div>
+    <div>
+      <div style={titleStyle}>
+        <p className="fr-text--bold">Agréments éco-organisme</p>
       </div>
 
       {ecoOrganismeAgreements.map((_url, index) => (
@@ -53,13 +51,13 @@ const EcoOrganismeAgrementsForm = ({
           style={inputContainerStyle(
             Boolean(inputErrors?.ecoOrganismeAgreements?.[index])
           )}
-          key="index"
+          key={index}
         >
           <Input
             label="URL"
             style={inputStyle}
             nativeInputProps={{
-              type: "url",
+              key: index,
               ...(value && value(index))
             }}
             state={
@@ -72,8 +70,9 @@ const EcoOrganismeAgrementsForm = ({
             priority="secondary"
             title="Supprimer"
             style={deleteButtonStyle}
-            disabled={index === 0}
-            onClick={() => {
+            disabled={ecoOrganismeAgreements.length === 1}
+            onClick={e => {
+              e.preventDefault();
               if (remove) {
                 remove(index);
               }
