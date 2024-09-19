@@ -5,7 +5,6 @@ import { useOIDC } from "./use-oidc";
 import { localAuthService } from "../login/auth.service";
 import { useLocation } from "react-router-dom";
 import * as queryString from "query-string";
-import Header from "@codegouvfr/react-dsfr/Header";
 import Button from "@codegouvfr/react-dsfr/Button";
 
 export function Oauth2Dialog() {
@@ -70,49 +69,133 @@ function AuthDialog({
 
   return (
     <>
-      <Header
-        brandTop={
-          <>
-            Ministère
-            <br />
-            de la transition
-            <br />
-            écologique
-          </>
-        }
-        homeLinkProps={{
-          href: "/",
-          title: "Accueil - Trackdéchets"
-        }}
+      <header
+        role="banner"
         id="fr-header-with-horizontal-operator-logo"
-        operatorLogo={{
-          alt: "Trackdéchets",
-          imgUrl: "../../trackdechets-small.png",
-          orientation: "horizontal"
-        }}
-        quickAccessItems={[
-          <form
-            name="logout"
-            action={`${VITE_API_ENDPOINT}/logout`}
-            method="post"
-          >
-            <Button
-              iconId="fr-icon-account-circle-line"
-              onClick={() => {
-                localAuthService.locallySignOut();
-                document.forms["logout"].submit();
-                return false;
-              }}
-              priority="secondary"
-              title="Se déconnecter"
+        className="fr-header"
+      >
+        <div className="fr-header__body">
+          <div className="fr-container">
+            <div className="fr-header__body-row">
+              <div className="fr-header__brand fr-enlarge-link">
+                <div className="fr-header__brand-top">
+                  <div className="fr-header__logo">
+                    <p className="fr-logo">
+                      Ministère
+                      <br />
+                      de la transition
+                      <br />
+                      écologique
+                    </p>
+                  </div>
+                  <div className="fr-header__operator">
+                    <img
+                      className="fr-responsive-img"
+                      style={{ width: "70px", height: "70px" }}
+                      src="../../trackdechets.png"
+                      alt="Trackdéchets"
+                      data-fr-js-ratio="true"
+                    />
+                  </div>
+                  <div className="fr-header__navbar">
+                    <button
+                      className="fr-btn--menu fr-btn"
+                      data-fr-opened="false"
+                      aria-controls="header-menu-modal-fr-header-with-horizontal-operator-logo"
+                      aria-haspopup="menu"
+                      id="fr-header-with-horizontal-operator-logo-menu-button"
+                      title="Menu"
+                      data-fr-js-modal-button="true"
+                    >
+                      Menu
+                    </button>
+                  </div>
+                </div>
+                <div className="fr-header__service">
+                  <a href="/" title="Accueil - Trackdéchets">
+                    <p className="fr-header__service-title">Trackdéchets</p>
+                  </a>
+                  <p className="fr-header__service-tagline">
+                    Gérer la traçabilité des déchets en toute sécurité
+                  </p>
+                </div>
+              </div>
+              <div className="fr-header__tools">
+                <div
+                  className="fr-header__tools-links"
+                  data-fr-js-header-links="true"
+                >
+                  <ul className="fr-btns-group">
+                    <li>
+                      <form
+                        name="logout"
+                        action={`${VITE_API_ENDPOINT}/logout`}
+                        method="post"
+                      >
+                        <Button
+                          iconId="fr-icon-account-circle-line"
+                          onClick={() => {
+                            localAuthService.locallySignOut();
+                            document.forms["logout"].submit();
+                            return false;
+                          }}
+                          priority="secondary"
+                          title="Se déconnecter"
+                        >
+                          Se déconnecter
+                        </Button>
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="fr-header__menu fr-modal"
+          id="header-menu-modal-fr-header-with-horizontal-operator-logo"
+          aria-labelledby="fr-header-with-horizontal-operator-logo-menu-button"
+          data-fr-js-modal="true"
+          data-fr-js-header-modal="true"
+        >
+          <div className="fr-container">
+            <button
+              id="fr-header-with-horizontal-operator-logo-mobile-overlay-button-close"
+              className="fr-btn--close fr-btn"
+              aria-controls="header-menu-modal-fr-header-with-horizontal-operator-logo"
+              title="Fermer"
+              data-fr-js-modal-button="true"
             >
-              Se déconnecter
-            </Button>
-          </form>
-        ]}
-        serviceTagline="Gérer la traçabilité des déchets en toute sécurité"
-        serviceTitle="Trackdéchets"
-      />
+              Fermer
+            </button>
+            <div className="fr-header__menu-links">
+              <ul className="fr-btns-group">
+                <li>
+                  <form
+                    name="logout"
+                    action={`${VITE_API_ENDPOINT}/logout`}
+                    method="post"
+                  >
+                    <Button
+                      iconId="fr-icon-account-circle-line"
+                      onClick={() => {
+                        localAuthService.locallySignOut();
+                        document.forms["logout"].submit();
+                        return false;
+                      }}
+                      priority="secondary"
+                      title="Se déconnecter"
+                    >
+                      Se déconnecter
+                    </Button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </header>
 
       <div
         className="fr-container fr-mt-8w fr-p-4w"
@@ -143,14 +226,15 @@ function AuthDialog({
             >
               <li>
                 <b>
-                  Accéder à tous les établissements dont vous faites partie.
+                  Accéder en lecture à votre nom, email et aux établissements
+                  dont vous êtes membres.
                 </b>
               </li>
               <li>
                 <b>Créer et signer des bordereaux de suivi de déchets.</b>
               </li>
             </ul>
-            <p>{`Vous pourrez révoquer cet accès depuis Mon compte > Application et API dans l'onglet Applications autorisées.`}</p>
+            <p>{`Vous pourrez révoquer cet accès depuis Mon compte > Applications et API.`}</p>
             <p>Vous serez redirigé vers : {redirectURI}</p>
           </div>
         </div>
