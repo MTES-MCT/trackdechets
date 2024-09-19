@@ -6,6 +6,7 @@ import {
   FormStatus,
   QuantityType,
   SignTransportFormInput,
+  TransportMode,
   WasteDetailsInput
 } from "@td/codegen-ui";
 import {
@@ -115,9 +116,25 @@ export function FormWasteTransportSummary({
         .filter((name, index, fields) => fields.indexOf(name) === index)
     );
 
+  const showTransportModeInput = () => {
+    addField("transporterTransportMode");
+    setFieldValue(
+      "transporterTransportMode",
+      values.transporterTransportMode ?? TransportMode.Road
+    );
+    addField("transporterNumberPlate");
+  };
+
   useEffect(() => {
-    if (form.transporter?.mode === "ROAD") {
+    if (
+      form.transporter?.mode === "ROAD" ||
+      values.transporterTransportMode === "ROAD"
+    ) {
       addField("transporterNumberPlate");
+    }
+
+    if (!form.transporter?.mode && !values.transporterTransportMode) {
+      showTransportModeInput();
     }
   }, [form]);
 
@@ -232,11 +249,7 @@ export function FormWasteTransportSummary({
             <button
               type="button"
               onClick={() => {
-                addField("transporterTransportMode");
-                setFieldValue(
-                  "transporterTransportMode",
-                  values.transporterTransportMode
-                );
+                showTransportModeInput();
               }}
               className="tw-ml-2"
             >
