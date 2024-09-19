@@ -156,6 +156,35 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Persisted value should be OK
       expect(delegation?.comment).toBe(COMMENT);
     });
+
+    it("test with null values", async () => {
+      // Given
+      const delegate = await companyFactory();
+      const { user, company: delegator } = await userWithCompanyFactory();
+
+      // When
+      const { errors, data, delegation } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId,
+        startDate: null,
+        endDate: null
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Mutation return value should be OK
+      expect(data.createRndtsDeclarationDelegation.delegator.orgId).toBe(
+        delegator.orgId
+      );
+      expect(data.createRndtsDeclarationDelegation.delegate.orgId).toBe(
+        delegate.orgId
+      );
+
+      // Persisted value should be OK
+      expect(delegation?.delegatorId).toBe(delegator.id);
+      expect(delegation?.delegateId).toBe(delegate.id);
+    });
   });
 
   describe("authentication & roles", () => {

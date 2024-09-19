@@ -10,7 +10,7 @@ export const createRndtsDeclarationDelegationInputSchema = z
     delegatorOrgId: siretSchema(),
     startDate: z.coerce
       .date()
-      .optional()
+      .nullish()
       .transform<Date>((date): Date => {
         // By default, today
         if (!date) return todayAtMidnight();
@@ -22,7 +22,7 @@ export const createRndtsDeclarationDelegationInputSchema = z
       }),
     endDate: z.coerce
       .date()
-      .optional()
+      .nullish()
       .transform(date => {
         if (!date) return date;
         return endOfDay(date);
@@ -62,8 +62,8 @@ export const delegationIdSchema = z.object({
 export const queryRndtsDeclarationDelegationsArgsSchema = z.object({
   where: z
     .object({
-      delegatorOrgId: siretSchema().optional().nullable(),
-      delegateOrgId: siretSchema().optional().nullable()
+      delegatorOrgId: siretSchema().nullish(),
+      delegateOrgId: siretSchema().nullish()
     })
     .refine(
       data => Boolean(data.delegatorOrgId) || Boolean(data.delegateOrgId),
@@ -73,6 +73,6 @@ export const queryRndtsDeclarationDelegationsArgsSchema = z.object({
       data => !(Boolean(data.delegatorOrgId) && Boolean(data.delegateOrgId)),
       "Vous ne pouvez pas renseigner les deux champs (delegatorOrgId et delegateOrgId)."
     ),
-  after: idSchema.optional().nullable(),
-  first: z.number().min(10).max(50).optional().nullable()
+  after: idSchema.nullish(),
+  first: z.number().min(10).max(50).nullish()
 });
