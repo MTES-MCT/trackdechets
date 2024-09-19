@@ -52,7 +52,7 @@ const getSchema = () =>
 
       quantityType: z.coerce.string().nullish(),
 
-      emptyReturnAdr: z.nativeEnum(EmptyReturnAdr).nullish(),
+      emptyReturnADR: z.nativeEnum(EmptyReturnAdr).nullish(),
 
       hasCiterneBeenWashedOut: z.boolean().nullish(),
       citerneNotWashedOutReason: z
@@ -199,7 +199,7 @@ function SignReceptionModal({
       signedBy,
       quantityType,
       refusedWeight,
-      emptyReturnAdr,
+      emptyReturnADR,
       hasCiterneBeenWashedOut,
       citerneNotWashedOutReason
     } = data;
@@ -255,7 +255,7 @@ function SignReceptionModal({
               wasteRefusalReason: wasteRefusalReason,
               ...(emptyReturnStatus
                 ? {
-                    emptyReturnAdr: emptyReturnAdr
+                    emptyReturnADR: emptyReturnADR
                   }
                 : {}),
               ...(citerneWashedOutStatus
@@ -280,7 +280,7 @@ function SignReceptionModal({
               wasteRefusalReason: wasteRefusalReason,
               ...(emptyReturnStatus
                 ? {
-                    emptyReturnAdr: emptyReturnAdr
+                    emptyReturnADR: emptyReturnADR
                   }
                 : {}),
               ...(citerneWashedOutStatus
@@ -372,7 +372,7 @@ function SignReceptionModal({
     }
 
     if (!emptyReturnStatus) {
-      setValue("emptyReturnAdr", undefined);
+      setValue("emptyReturnADR", undefined);
     }
 
     if (!citerneWashedOutStatus) {
@@ -738,16 +738,16 @@ function SignReceptionModal({
             <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
               <div className="fr-col-12 fr-pl-4w">
                 <RadioButtons
-                  state={errors?.emptyReturnAdr && "error"}
+                  state={errors?.emptyReturnADR && "error"}
                   stateRelatedMessage={
-                    (errors?.emptyReturnAdr?.message as string) ?? ""
+                    (errors?.emptyReturnADR?.message as string) ?? ""
                   }
                   options={[
                     {
                       label:
                         EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyNotWashed],
                       nativeInputProps: {
-                        ...register("emptyReturnAdr", {}),
+                        ...register("emptyReturnADR", {}),
                         value: EmptyReturnAdr.EmptyNotWashed,
                         defaultChecked: false
                       }
@@ -758,7 +758,7 @@ function SignReceptionModal({
                           EmptyReturnAdr.EmptyReturnNotWashed
                         ],
                       nativeInputProps: {
-                        ...register("emptyReturnAdr", {}),
+                        ...register("emptyReturnADR", {}),
                         value: EmptyReturnAdr.EmptyReturnNotWashed,
                         defaultChecked: false
                       }
@@ -767,7 +767,7 @@ function SignReceptionModal({
                       label:
                         EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyVehicle],
                       nativeInputProps: {
-                        ...register("emptyReturnAdr", {}),
+                        ...register("emptyReturnADR", {}),
                         value: EmptyReturnAdr.EmptyVehicle,
                         defaultChecked: false
                       }
@@ -776,7 +776,7 @@ function SignReceptionModal({
                       label:
                         EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyCiterne],
                       nativeInputProps: {
-                        ...register("emptyReturnAdr", {}),
+                        ...register("emptyReturnADR", {}),
                         value: EmptyReturnAdr.EmptyCiterne,
                         defaultChecked: false
                       }
