@@ -51,7 +51,7 @@ const EcoOrganismeAgrementsForm = ({
           style={inputContainerStyle(
             Boolean(inputErrors?.ecoOrganismeAgreements?.[index])
           )}
-          key="index"
+          key={index}
         >
           <Input
             label="URL"
@@ -69,8 +69,9 @@ const EcoOrganismeAgrementsForm = ({
             priority="secondary"
             title="Supprimer"
             style={deleteButtonStyle}
-            disabled={index === 0}
-            onClick={() => {
+            disabled={ecoOrganismeAgreements.length === 1}
+            onClick={e => {
+              e.preventDefault();
               if (remove) {
                 remove(index);
               }
