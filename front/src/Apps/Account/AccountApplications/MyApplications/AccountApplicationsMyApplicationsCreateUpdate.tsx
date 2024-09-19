@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Modal, RedErrorMessage } from "../../../../common/components";
+import { Modal } from "../../../../common/components";
 import {
   Application,
   ApplicationGoal,
@@ -27,7 +27,11 @@ import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 
 export const validationApplicationSchema = z.object({
   name: z.string(),
-  redirectUris: z.array(z.string()),
+  redirectUris: z.array(
+    z.string().url({
+      message: "Vous devez spécifier une URL valide"
+    })
+  ),
   logoUrl: z.string(),
   goal: z.nativeEnum(ApplicationGoal)
 });
@@ -130,8 +134,8 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="fr-container--fluid fr-pb-2w">
-          <div className="fr-grid-row">
-            <div className="fr-col-6">
+          <div className="fr-grid-row fr-grid-row--gutters">
+            <div className="fr-col-10 fr-col-md-6">
               <Input
                 label="Nom"
                 state={formState.errors?.name && "error"}
@@ -142,34 +146,36 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
               />
             </div>
           </div>
-          <div className="fr-grid-row fr-mt-2w">
-            <div className="fr-col">
-              <RadioButtons
-                legend="Cette application gère les données de :"
-                name="radio"
-                state={formState.errors?.goal && "error"}
-                stateRelatedMessage={formState.errors?.goal?.message}
-                options={[
-                  {
-                    label: "Votre entreprise",
-                    nativeInputProps: {
-                      value: ApplicationGoal.Personnal,
-                      ...register("goal")
+          {isCreating && (
+            <div className="fr-grid-row fr-mt-2w">
+              <div className="fr-col">
+                <RadioButtons
+                  legend="Cette application gère les données de :"
+                  name="radio"
+                  state={formState.errors?.goal && "error"}
+                  stateRelatedMessage={formState.errors?.goal?.message}
+                  options={[
+                    {
+                      label: "Votre entreprise",
+                      nativeInputProps: {
+                        value: ApplicationGoal.Personnal,
+                        ...register("goal")
+                      }
+                    },
+                    {
+                      label: "Vos clients",
+                      nativeInputProps: {
+                        value: ApplicationGoal.Clients,
+                        ...register("goal")
+                      }
                     }
-                  },
-                  {
-                    label: "Vos clients",
-                    nativeInputProps: {
-                      value: ApplicationGoal.Clients,
-                      ...register("goal")
-                    }
-                  }
-                ]}
-              />
+                  ]}
+                />
+              </div>
             </div>
-          </div>
+          )}
           <div className="fr-grid-row fr-grid-row--gutters">
-            <div className="fr-col-9">
+            <div className="fr-col-10 fr-col-md-9">
               <Input
                 label="URL du logo"
                 state={formState.errors?.logoUrl && "error"}
@@ -180,31 +186,44 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
               />
             </div>
           </div>
-          <div className="fr-grid-row fr-mt-2w fr-grid-row--bottom fr-grid-row--gutters">
-            {fields.map((field, index) => {
-              return (
-                <React.Fragment key={field.id}>
-                  <div className="fr-col-9">
+
+          <label className="fr-label fr-mt-2w fr-pb-1w">
+            URL(s) de redirection
+          </label>
+
+          {fields.map((field, index) => {
+            return (
+              <React.Fragment key={field.id}>
+                <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+                  <div className="fr-col-8 fr-col-md-9">
                     <Input
-                      label={index === 0 ? "URL(s) de redirection" : ""}
+                      state={
+                        formState.errors?.redirectUris &&
+                        formState.errors?.redirectUris[index] &&
+                        "error"
+                      }
+                      stateRelatedMessage={
+                        formState.errors?.redirectUris &&
+                        formState.errors?.redirectUris[index]?.message
+                      }
+                      label={""}
                       nativeInputProps={{
                         ...register(`redirectUris.${index}`)
                       }}
                     />
                   </div>
-                  {index === fields.length - 1 && (
-                    <div className="fr-col-1">
+
+                  <div className="fr-col-4 fr-col-md-3">
+                    {index === fields.length - 1 && (
                       <button
-                        className="fr-btn fr-icon-add-line fr-btn--secondary"
+                        className="fr-btn fr-icon-add-line fr-btn--secondary fr-mr-2w"
                         title="Ajouter une URL de redirection"
                         onClick={_ => append("https://")}
                       >
                         Ajouter une URL de redirection
                       </button>
-                    </div>
-                  )}
-                  {index !== 0 && (
-                    <div className="fr-col-1">
+                    )}
+                    {index !== 0 && (
                       <button
                         className="fr-btn fr-icon-delete-line fr-btn--secondary"
                         title="Supprimer une URL de redirection"
@@ -212,16 +231,12 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
                       >
                         Supprimer une URL de redirection
                       </button>
-                    </div>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </div>
-          {formState.errors.redirectUris &&
-            !Array.isArray(formState.errors.redirectUris) && (
-              <RedErrorMessage name="redirectUris" />
-            )}
+                    )}
+                  </div>
+                </div>
+              </React.Fragment>
+            );
+          })}
         </div>
         <hr className="fr-mt-2w" />
         <div className="td-modal-actions fr-mt-0">

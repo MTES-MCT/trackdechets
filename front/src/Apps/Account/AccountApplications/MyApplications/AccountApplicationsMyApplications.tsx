@@ -18,7 +18,7 @@ function AccountApplicationMyApplicationsRow({
     const count = uris.length;
 
     return `${uris[0]}${
-      count > 1 ? `${count - 1} autre${count > 2 ? "s" : ""}` : ""
+      count > 1 ? ` et ${count - 1} autre${count > 2 ? "s" : ""}` : ""
     }`;
   };
 
