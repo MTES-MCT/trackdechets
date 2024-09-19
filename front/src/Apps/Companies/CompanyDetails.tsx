@@ -21,6 +21,7 @@ import CompanyMembers from "./CompanyMembers/CompanyMembers";
 import CompanyDigestSheetForm from "./CompanyDigestSheet/CompanyDigestSheet";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import { FrIconClassName } from "@codegouvfr/react-dsfr";
+import { CompanyRndtsDeclarationDelegation } from "./CompanyRndtsDeclarationDelegation/CompanyRndtsDeclarationDelegation";
 
 export type TabContentProps = {
   company: CompanyPrivate;
@@ -60,29 +61,35 @@ const buildTabs = (
       tabId: "tab4",
       label: "Contact",
       iconId
+    },
+    {
+      tabId: "tab5",
+      label: "Délégations RNDTS",
+      iconId
     }
   ];
   const tabsContent = {
     tab1: CompanyInfo,
     tab2: CompanySignature,
     tab3: CompanyMembers,
-    tab4: CompanyContactForm
+    tab4: CompanyContactForm,
+    tab5: CompanyRndtsDeclarationDelegation
   };
   if (canViewCompanyDigestTab) {
     tabs.push({
-      tabId: "tab5",
+      tabId: "tab6",
       label: "Fiche",
       iconId
     });
-    tabsContent["tab5"] = CompanyDigestSheetForm;
+    tabsContent["tab6"] = CompanyDigestSheetForm;
   }
   if (isAdmin) {
     tabs.push({
-      tabId: "tab6",
+      tabId: "tab7",
       label: "Avancé",
       iconId
     });
-    tabsContent["tab6"] = CompanyAdvanced;
+    tabsContent["tab7"] = CompanyAdvanced;
   }
 
   return { tabs, tabsContent };
