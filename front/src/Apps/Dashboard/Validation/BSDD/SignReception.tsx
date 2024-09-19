@@ -34,6 +34,7 @@ import {
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { EMPTY_RETURN_ADR_REASON } from "../../../common/utils/adrBsddSummary";
 import { CITERNE_NOT_WASHED_OUT_REASON } from "../../../common/utils/citerneBsddSummary";
+import { isDangerous } from "@td/constants";
 
 const getSchema = () =>
   z
@@ -442,17 +443,22 @@ function SignReceptionModal({
     ["ACCEPTED"].includes(acceptationStatus) &&
     form.stateSummary?.packagingInfos.some(p => p.type === Packagings.Citerne);
 
+  const wasteIsDangerous =
+    Boolean(form.wasteDetails?.isDangerous) ||
+    isDangerous(form.wasteDetails?.code) ||
+    Boolean(form.wasteDetails?.pop);
+
   const shouldDisplayAdrStatus =
     ["ACCEPTED"].includes(acceptationStatus) &&
     form.stateSummary?.packagingInfos.some(
       p => p.type === Packagings.Citerne || p.type === Packagings.Benne
     ) &&
-    [TransportMode.Road, TransportMode.Other].includes(
+    [TransportMode.Road, undefined].includes(
       form.transporters.find(
         t => t.company?.orgId === form.currentTransporterSiret
       )?.mode as TransportMode
     ) &&
-    (form.wasteDetails?.isDangerous || form.wasteDetails?.pop);
+    wasteIsDangerous;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
