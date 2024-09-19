@@ -779,8 +779,15 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_SEALED, {
-      variables: { id: form.id }
+    const mutateFn1 = () =>
+      mutate(MARK_AS_SEALED, {
+        variables: { id: form.id }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn1,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 1
     });
 
     // Sign by producer, cause can't cancel a draft BSD
@@ -813,7 +820,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       }
     });
 
-    const mutateFn = () =>
+    const mutateFn2 = () =>
       mutate<
         Pick<Mutation, "submitFormRevisionRequestApproval">,
         MutationSubmitFormRevisionRequestApprovalArgs
@@ -825,7 +832,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       });
 
     await waitForJobsCompletion({
-      fn: mutateFn,
+      fn: mutateFn2,
       queue: updateAppendix2Queue,
       expectedJobCount: 1
     });
