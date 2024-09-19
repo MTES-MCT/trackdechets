@@ -14,7 +14,7 @@ type EcoOrganismeAgrementForm = {
 };
 
 const titleStyle: CSSProperties = {
-  marginBottom: "1em"
+  marginBottom: 12
 };
 
 const inputContainerStyle = (isError: boolean): CSSProperties => ({
@@ -41,11 +41,9 @@ const EcoOrganismeAgrementsForm = ({
   const { value, push, remove } = inputProps?.ecoOrganismeAgreements ?? {};
 
   return (
-    <div className="fr-container">
-      <div className="fr-grid-row">
-        <div className="fr-col-12" style={titleStyle}>
-          <p className="fr-text--bold">Agréments éco-organisme</p>
-        </div>
+    <div>
+      <div style={titleStyle}>
+        <p className="fr-text--bold">Agréments éco-organisme</p>
       </div>
 
       {ecoOrganismeAgreements.map((_url, index) => (
@@ -59,7 +57,6 @@ const EcoOrganismeAgrementsForm = ({
             label="URL"
             style={inputStyle}
             nativeInputProps={{
-              type: "url",
               ...(value && value(index))
             }}
             state={
