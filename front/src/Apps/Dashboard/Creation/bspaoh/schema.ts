@@ -4,8 +4,7 @@ import { BSPAOH_WASTE_CODES, BSPAOH_WASTE_TYPES } from "@td/constants";
 
 const bspaohPackagingSchema = z.object({
   type: z.enum(["LITTLE_BOX", "BIG_BOX", "RELIQUAIRE"], {
-    required_error: "Ce champ est requis",
-    invalid_type_error: "Ce champ est requis"
+    errorMap: () => ({ message: "Ce champ est requis" })
   }),
   volume: z.coerce.number().nullish(),
   containerNumber: z.string().nullish(),
