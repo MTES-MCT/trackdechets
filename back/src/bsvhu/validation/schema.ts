@@ -51,7 +51,7 @@ export const ZodWasteCodeEnum = z
 export type ZodWasteCodeEnum = z.infer<typeof ZodWasteCodeEnum>;
 
 export const ZodOperationEnum = z
-  .enum(PROCESSING_OPERATIONS_CODES as [string, ...string[]], {
+  .enum(PROCESSING_OPERATIONS_CODES, {
     errorMap: (issue, ctx) => {
       if (issue.code === z.ZodIssueCode.invalid_enum_value) {
         return {

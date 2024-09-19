@@ -1,0 +1,6 @@
+type Mutation {
+  importFile(
+    importType: RegistryImportType!
+    s3FileKey: String!
+  ): RegistryImport!
+}

@@ -422,14 +422,14 @@ model BsddFinalOperation {
 }
 
 model Form {
-  id                                    String                  @id @default(cuid()) @db.VarChar(30)
-  rowNumber                             Int                     @unique(map: "Form_rowNumber_ukey") @default(autoincrement())
-  createdAt                             DateTime                @default(now()) @db.Timestamptz(6)
-  updatedAt                             DateTime                @updatedAt @db.Timestamptz(6)
-  readableId                            String                  @unique(map: "Form.readableId._UNIQUE")
+  id                                    String                     @id @default(cuid()) @db.VarChar(30)
+  rowNumber                             Int                        @unique(map: "Form_rowNumber_ukey") @default(autoincrement())
+  createdAt                             DateTime                   @default(now()) @db.Timestamptz(6)
+  updatedAt                             DateTime                   @updatedAt @db.Timestamptz(6)
+  readableId                            String                     @unique(map: "Form.readableId._UNIQUE")
   customId                              String?
-  isDeleted                             Boolean?                @default(false)
-  status                                Status                  @default(DRAFT)
+  isDeleted                             Boolean?                   @default(false)
+  status                                Status                     @default(DRAFT)
   emitterType                           EmitterType?
   emitterPickupSite                     String?
   emitterCompanyName                    String?
@@ -443,8 +443,8 @@ model Form {
   emitterWorkSiteCity                   String?
   emitterWorkSitePostalCode             String?
   emitterWorkSiteInfos                  String?
-  emitterIsPrivateIndividual            Boolean?                @default(false)
-  emitterIsForeignShip                  Boolean?                @default(false)
+  emitterIsPrivateIndividual            Boolean?                   @default(false)
+  emitterIsForeignShip                  Boolean?                   @default(false)
   emitterCompanyOmiNumber               String?
   recipientCap                          String?
   recipientProcessingOperation          String?
@@ -454,18 +454,18 @@ model Form {
   recipientCompanyContact               String?
   recipientCompanyPhone                 String?
   recipientCompanyMail                  String?
-  recipientIsTempStorage                Boolean?                @default(false)
+  recipientIsTempStorage                Boolean?                   @default(false)
   wasteDetailsCode                      String?
   wasteDetailsName                      String?
   wasteDetailsOnuCode                   String?
-  wasteDetailsQuantity                  Decimal?                @db.Decimal(65, 30)
+  wasteDetailsQuantity                  Decimal?                   @db.Decimal(65, 30)
   wasteDetailsQuantityType              QuantityType?
   wasteDetailsConsistence               Consistence?
-  wasteDetailsPackagingInfos            Json                    @default("[]")
-  wasteDetailsPop                       Boolean                 @default(false)
+  wasteDetailsPackagingInfos            Json                       @default("[]")
+  wasteDetailsPop                       Boolean                    @default(false)
   wasteDetailsSampleNumber              String?
-  wasteDetailsIsDangerous               Boolean                 @default(false)
-  wasteDetailsParcelNumbers             Json?                   @default("[]")
+  wasteDetailsIsDangerous               Boolean                    @default(false)
+  wasteDetailsParcelNumbers             Json?                      @default("[]")
   wasteDetailsAnalysisReferences        String[]
   wasteDetailsLandIdentifiers           String[]
   traderCompanyName                     String?
@@ -476,7 +476,7 @@ model Form {
   traderCompanyMail                     String?
   traderReceipt                         String?
   traderDepartment                      String?
-  traderValidityLimit                   DateTime?               @db.Timestamptz(6)
+  traderValidityLimit                   DateTime?                  @db.Timestamptz(6)
   ecoOrganismeName                      String?
   ecoOrganismeSiret                     String?
   brokerCompanyName                     String?
@@ -487,7 +487,7 @@ model Form {
   brokerCompanyMail                     String?
   brokerReceipt                         String?
   brokerDepartment                      String?
-  brokerValidityLimit                   DateTime?               @db.Timestamptz(6)
+  brokerValidityLimit                   DateTime?                  @db.Timestamptz(6)
   nextDestinationProcessingOperation    String?
   nextDestinationCompanyName            String?
   nextDestinationCompanySiret           String?
@@ -496,31 +496,31 @@ model Form {
   nextDestinationCompanyPhone           String?
   nextDestinationCompanyMail            String?
   nextDestinationCompanyCountry         String?
-  nextDestinationCompanyVatNumber       String?                 @db.VarChar(30)
+  nextDestinationCompanyVatNumber       String?                    @db.VarChar(30)
   nextDestinationNotificationNumber     String?
   nextDestinationCompanyExtraEuropeanId String?
   nextTransporterOrgId                  String?
-  emittedAt                             DateTime?               @db.Timestamptz(6)
+  emittedAt                             DateTime?                  @db.Timestamptz(6)
   emittedBy                             String?
   emittedByEcoOrganisme                 Boolean?
-  takenOverAt                           DateTime?               @db.Timestamptz(6)
+  takenOverAt                           DateTime?                  @db.Timestamptz(6)
   takenOverBy                           String?
-  signedAt                              DateTime?               @db.Timestamptz(6)
+  signedAt                              DateTime?                  @db.Timestamptz(6)
   signedBy                              String?
-  isImportedFromPaper                   Boolean                 @default(false)
+  isImportedFromPaper                   Boolean                    @default(false)
   quantityReceivedType                  QuantityType?
   signedByTransporter                   Boolean?
-  sentAt                                DateTime?               @db.Timestamptz(6)
+  sentAt                                DateTime?                  @db.Timestamptz(6)
   sentBy                                String?
-  isAccepted                            Boolean?                @default(false)
+  isAccepted                            Boolean?                   @default(false)
   wasteAcceptationStatus                WasteAcceptationStatus?
   wasteRefusalReason                    String?
   receivedBy                            String?
-  receivedAt                            DateTime?               @db.Timestamptz(6)
-  quantityReceived                      Decimal?                @db.Decimal(65, 30)
-  quantityRefused                       Decimal?                @db.Decimal(65, 30)
+  receivedAt                            DateTime?                  @db.Timestamptz(6)
+  quantityReceived                      Decimal?                   @db.Decimal(65, 30)
+  quantityRefused                       Decimal?                   @db.Decimal(65, 30)
   processedBy                           String?
-  processedAt                           DateTime?               @db.Timestamptz(6)
+  processedAt                           DateTime?                  @db.Timestamptz(6)
   processingOperationDone               String?
   processingOperationDescription        String?
   noTraceability                        Boolean?
@@ -910,6 +910,8 @@ model User {
   Form                       Form[]
   UserActivationHash         UserActivationHash[]
   CompanyDigest              CompanyDigest[]
+  registryImports            RegistryImport[]
+  registrySsdDeclarations    RegistrySsd[]
 }
 
 enum GovernmentPermission {
@@ -2141,4 +2143,93 @@ enum EmptyReturnADR {
   EMPTY_RETURN_NOT_WASHED
   EMPTY_VEHICLE
   EMPTY_CITERNE
+}
+
+model RegistryImport {
+  id        String               @id @default(cuid())
+  createdAt DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime             @updatedAt @db.Timestamptz(6)
+  status    RegistryImportStatus @default(PENDING)
+  type      RegistryImportType
+  s3FileKey String
+
+  numberOfErrors        Int @default(0)
+  numberOfInsertions    Int @default(0)
+  numberOfEdits         Int @default(0)
+  numberOfCancellations Int @default(0)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  sirets RegistryImportSiret[]
+}
+
+model RegistryImportSiret {
+  importId    String
+  reportedFor String
+  reportedAs  String?
+
+  import RegistryImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  @@id([importId, reportedFor])
+}
+
+enum RegistryImportStatus {
+  PENDING
+  STARTED
+  SUCCESSFUL
+  PARTIALLY_SUCCESSFUL
+  FAILED
+  CANCELED
+}
+
+enum RegistryImportType {
+  SSD
+}
+
+enum RegistryUnit {
+  M3
+  T
+}
+
+model RegistrySsd {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  importId  String?
+
+  isActive    Boolean @default(true)
+  isCancelled Boolean @default(false)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  publicId                   String
+  reportForSiret             String
+  reportForName              String
+  reportForAddress           String
+  reportForCity              String
+  reportForPostalCode        String
+  reportAsSiret              String?
+  quantity                   Float
+  unit                       RegistryUnit
+  wasteCode                  String
+  wasteCodeBale              String?
+  wasteDescription           String
+  secondaryWasteCodes        String[]      @default([])
+  secondaryWasteDescriptions String[]      @default([])
+  dispatchDate               DateTime?     @db.Timestamptz(6)
+  useDate                    DateTime?     @db.Timestamptz(6)
+  processingDate             DateTime      @db.Timestamptz(6)
+  processingEndDate          DateTime?     @db.Timestamptz(6)
+  operationCode              String
+  operationMode              OperationMode
+  product                    String
+  administrativeActReference String
+  destinationType            String
+  destinationOrgId           String?
+  destinationName            String?
+  destinationAddress         String?
+  destinationCity            String?
+  destinationPostalCode      String?
+  destinationCountryCode     String?
 }

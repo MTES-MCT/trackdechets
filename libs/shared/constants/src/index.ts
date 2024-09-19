@@ -13,3 +13,4 @@ export * from "./statuses";
 export * from "./VALIDATION";
 export * from "./WASTES";
 export * from "./emailHelpers";
+export * from "./BALE";

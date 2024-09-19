@@ -12,7 +12,9 @@ import {
   administrativeTransferQueue,
   processAdministrativeTransferJob,
   updateAppendix2Queue,
-  updateAppendix2Job
+  updateAppendix2Job,
+  registryImportQueue,
+  processRegistryImportJob
 } from "back";
 
 import { schema } from "@td/env";
@@ -35,6 +37,7 @@ function startConsumers() {
   operationHooksQueue.process(operationHookJob);
   administrativeTransferQueue.process(processAdministrativeTransferJob);
   updateAppendix2Queue.process(updateAppendix2Job);
+  registryImportQueue.process(processRegistryImportJob);
 }
 
 startConsumers();

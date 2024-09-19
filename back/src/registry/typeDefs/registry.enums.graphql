@@ -74,3 +74,17 @@ enum BsdSubType {
   "Synthèse"
   SYNTHESIS
 }
+
+enum RegistryImportType {
+  "Sortie de statut de déchet"
+  SSD
+}
+
+enum RegistryImportStatus {
+  PENDING
+  STARTED
+  SUCCESSFUL
+  PARTIALLY_SUCCESSFUL
+  FAILED
+  CANCELED
+}

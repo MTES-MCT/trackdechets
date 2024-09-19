@@ -28,6 +28,7 @@
       "@td/mail": ["libs/back/mail/src/index.ts"],
       "@td/prisma": ["libs/back/prisma/src/index.ts"],
       "@td/queues": ["lib/back/queues/src/index.ts"],
+      "@td/registry": ["libs/back/registry/src/index.ts"],
       "@td/scripts": ["lib/back/scripts/src/index.ts"],
       "@td/tracer": ["libs/back/tracer/src/index.ts"],
       "back": ["back/src/index.ts"],
