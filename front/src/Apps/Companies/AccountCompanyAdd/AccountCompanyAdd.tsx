@@ -457,6 +457,25 @@ export default function AccountCompanyAdd() {
                     !values.workerCertification?.validityLimit ||
                     !values?.workerCertification?.organisation);
 
+                let ecoOrganismeAgreementsErrors: string[] = [];
+
+                if (isEcoOrganisme(values.companyTypes)) {
+                  ecoOrganismeAgreementsErrors = (
+                    values.ecoOrganismeAgreements ?? []
+                  ).map(a => {
+                    if (!a) {
+                      return "Champ requis";
+                    }
+                    if (!isValidWebsite(a)) {
+                      return "Invalide URL";
+                    }
+                    return "";
+                  });
+                }
+
+                const hasEcoOrganismeAgreementsErrors =
+                  ecoOrganismeAgreementsErrors.filter(Boolean).length > 0;
+
                 return {
                   ...(!values.companyName && {
                     companyName: "Champ obligatoire"
@@ -559,17 +578,9 @@ export default function AccountCompanyAdd() {
                         }
                       }
                     : {}),
-                  ecoOrganismeAgreements: (
-                    values.ecoOrganismeAgreements ?? []
-                  ).map(a => {
-                    if (!a) {
-                      return "Champ requis";
-                    }
-                    if (!isValidWebsite(a)) {
-                      return "Invalide URL";
-                    }
-                    return null;
-                  }),
+                  ...(hasEcoOrganismeAgreementsErrors
+                    ? { ecoOrganismeAgreements: ecoOrganismeAgreementsErrors }
+                    : {}),
                   ...(missingCertification
                     ? {
                         workerCertification: {

@@ -137,12 +137,20 @@ const FormikCompanyTypeForm = ({
     ...wasteVehiclesTypes
   ];
 
-  function fieldProps(name: string) {
+  function fieldProps(name: string, index?: number) {
+    let value = values[name];
+    let fieldName = name;
+
+    if (index !== undefined) {
+      value = value[index];
+      fieldName = `${fieldName}[${index}]`;
+    }
+
     return {
-      name,
+      name: fieldName,
       onChange: handleChange,
       onBlur: handleBlur,
-      value: values[name]
+      value
     };
   }
 
@@ -195,7 +203,7 @@ const FormikCompanyTypeForm = ({
           organisation: fieldProps("workerCertification.organisation")
         },
         ecoOrganismeAgreements: {
-          value: index => fieldProps(`ecoOrganismeAgreements[${index}]`),
+          value: index => fieldProps(`ecoOrganismeAgreements`, index),
           push: (v: string) => {
             setFieldValue("ecoOrganismeAgreements", [
               ...ecoOrganismeAgreements,

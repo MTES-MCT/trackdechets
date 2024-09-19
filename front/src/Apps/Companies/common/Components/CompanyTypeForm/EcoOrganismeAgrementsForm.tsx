@@ -57,6 +57,7 @@ const EcoOrganismeAgrementsForm = ({
             label="URL"
             style={inputStyle}
             nativeInputProps={{
+              key: index,
               ...(value && value(index))
             }}
             state={
