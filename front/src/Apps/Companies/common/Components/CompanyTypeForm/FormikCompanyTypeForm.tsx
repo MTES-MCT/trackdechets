@@ -43,6 +43,7 @@ type FormikCompanyTypeFormProps = Pick<
   | "setFieldValue"
   | "errors"
   | "touched"
+  | "submitCount"
 >;
 
 const FormikCompanyTypeForm = ({
@@ -51,13 +52,16 @@ const FormikCompanyTypeForm = ({
   handleBlur,
   setFieldValue,
   errors,
-  touched
+  touched,
+  submitCount
 }: FormikCompanyTypeFormProps): React.JSX.Element => {
   const companyTypes = values.companyTypes;
   const collectorTypes = values.collectorTypes;
   const wasteProcessorTypes = values.wasteProcessorTypes;
   const wasteVehiclesTypes = values.wasteVehiclesTypes;
   const ecoOrganismeAgreements = values.ecoOrganismeAgreements;
+
+  const isSubmitted = submitCount > 0;
 
   // La couche d'affichage des données au niveau de <CompanyTypeForm /> ne fait
   // pas de différence entre type et sous-type d'établissement. La correspondance
@@ -208,67 +212,85 @@ const FormikCompanyTypeForm = ({
       }}
       inputErrors={{
         transporterReceipt: {
-          receiptNumber: touched?.transporterReceipt
-            ? (errors?.transporterReceipt as any)?.receiptNumber
-            : null,
-          validityLimit: touched?.transporterReceipt
-            ? (errors?.transporterReceipt as any)?.validityLimit
-            : null,
-          department: touched?.transporterReceipt
-            ? (errors?.transporterReceipt as any)?.department
-            : null
+          receiptNumber:
+            isSubmitted && touched?.transporterReceipt
+              ? (errors?.transporterReceipt as any)?.receiptNumber
+              : null,
+          validityLimit:
+            isSubmitted && touched?.transporterReceipt
+              ? (errors?.transporterReceipt as any)?.validityLimit
+              : null,
+          department:
+            isSubmitted && touched?.transporterReceipt
+              ? (errors?.transporterReceipt as any)?.department
+              : null
         },
         brokerReceipt: {
-          receiptNumber: touched?.brokerReceipt
-            ? (errors?.brokerReceipt as any)?.receiptNumber
-            : null,
-          validityLimit: touched?.brokerReceipt
-            ? (errors?.brokerReceipt as any)?.validityLimit
-            : null,
-          department: touched?.brokerReceipt
-            ? (errors?.brokerReceipt as any)?.department
-            : null
+          receiptNumber:
+            isSubmitted && touched?.brokerReceipt
+              ? (errors?.brokerReceipt as any)?.receiptNumber
+              : null,
+          validityLimit:
+            isSubmitted && touched?.brokerReceipt
+              ? (errors?.brokerReceipt as any)?.validityLimit
+              : null,
+          department:
+            isSubmitted && touched?.brokerReceipt
+              ? (errors?.brokerReceipt as any)?.department
+              : null
         },
         traderReceipt: {
-          receiptNumber: touched?.traderReceipt
-            ? (errors?.traderReceipt as any)?.receiptNumber
-            : null,
-          validityLimit: touched?.traderReceipt
-            ? (errors?.traderReceipt as any)?.validityLimit
-            : null,
-          department: touched?.traderReceipt
-            ? (errors?.traderReceipt as any)?.department
-            : null
+          receiptNumber:
+            isSubmitted && touched?.traderReceipt
+              ? (errors?.traderReceipt as any)?.receiptNumber
+              : null,
+          validityLimit:
+            isSubmitted && touched?.traderReceipt
+              ? (errors?.traderReceipt as any)?.validityLimit
+              : null,
+          department:
+            isSubmitted && touched?.traderReceipt
+              ? (errors?.traderReceipt as any)?.department
+              : null
         },
         vhuAgrementDemolisseur: {
-          agrementNumber: touched?.vhuAgrementDemolisseur
-            ? (errors?.vhuAgrementDemolisseur as any)?.agrementNumber
-            : null,
-          department: touched?.vhuAgrementDemolisseur
-            ? (errors?.vhuAgrementDemolisseur as any)?.department
-            : null
+          agrementNumber:
+            isSubmitted && touched?.vhuAgrementDemolisseur
+              ? (errors?.vhuAgrementDemolisseur as any)?.agrementNumber
+              : null,
+          department:
+            isSubmitted && touched?.vhuAgrementDemolisseur
+              ? (errors?.vhuAgrementDemolisseur as any)?.department
+              : null
         },
         vhuAgrementBroyeur: {
-          agrementNumber: touched?.vhuAgrementBroyeur
-            ? (errors?.vhuAgrementBroyeur as any)?.agrementNumber
-            : null,
-          department: touched?.vhuAgrementBroyeur
-            ? (errors?.vhuAgrementBroyeur as any)?.department
-            : null
+          agrementNumber:
+            isSubmitted && touched?.vhuAgrementBroyeur
+              ? (errors?.vhuAgrementBroyeur as any)?.agrementNumber
+              : null,
+          department:
+            isSubmitted && touched?.vhuAgrementBroyeur
+              ? (errors?.vhuAgrementBroyeur as any)?.department
+              : null
         },
         workerCertification: {
-          certificationNumber: touched?.workerCertification
-            ? (errors.workerCertification as any)?.certificationNumber
-            : null,
-          validityLimit: touched?.workerCertification
-            ? (errors.workerCertification as any)?.validityLimit
-            : null,
-          organisation: touched?.workerCertification
-            ? (errors.workerCertification as any)?.organisation
-            : null
+          certificationNumber:
+            isSubmitted && touched?.workerCertification
+              ? (errors.workerCertification as any)?.certificationNumber
+              : null,
+          validityLimit:
+            isSubmitted && touched?.workerCertification
+              ? (errors.workerCertification as any)?.validityLimit
+              : null,
+          organisation:
+            isSubmitted && touched?.workerCertification
+              ? (errors.workerCertification as any)?.organisation
+              : null
         },
-        ecoOrganismeAgreements: (errors?.ecoOrganismeAgreements ??
-          []) as string[]
+        ecoOrganismeAgreements:
+          isSubmitted && touched?.ecoOrganismeAgreements
+            ? ((errors?.ecoOrganismeAgreements ?? []) as string[])
+            : []
       }}
     />
   );
