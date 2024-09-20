@@ -119,7 +119,7 @@ export const bsd_type_option_bsvhu = "Véhicules Hors d'Usage";
 export const bsd_type_option_bsff = "Déchets de Fluides Frigorigènes";
 export const bsd_type_option_bsda = "Déchets d'Amiante";
 export const bsd_type_option_bsdasri =
-  "Déchets d'Activités de Soins à Risque Infectieux";
+  "Déchets d'Activités de Soins à Risques Infectieux";
 export const bsd_type_option_bspaoh = "Pièces Anatomiques d'Origine Humaine";
 export const bsd_sub_type_option_initial = "Initial";
 export const bsd_sub_type_option_tournee = "Tournée dédiée";

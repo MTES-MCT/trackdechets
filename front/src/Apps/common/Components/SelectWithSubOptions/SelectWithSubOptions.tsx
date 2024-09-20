@@ -50,10 +50,10 @@ const SelectWithSubOptions = ({
         );
 
         return (
-          <div key={optionPath}>
+          <div className="fr-grid-row--gutters" key={optionPath}>
             <div>
               <Checkbox
-                className={`optionCheckbox fr-ml-${ml * 4}v`}
+                className={`optionCheckbox fr-ml-${ml * 8}v`}
                 options={[
                   {
                     label: option.label,

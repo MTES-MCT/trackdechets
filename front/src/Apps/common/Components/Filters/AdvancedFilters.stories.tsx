@@ -30,7 +30,7 @@ export const Primary: Story = {
             },
             {
               value: "bsdasri",
-              label: "Déchets d'Activités de Soins à Risque Infectieux"
+              label: "Déchets d'Activités de Soins à Risques Infectieux"
             }
           ]
         },
