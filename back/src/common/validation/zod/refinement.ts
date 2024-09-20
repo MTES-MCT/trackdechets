@@ -9,7 +9,7 @@ import {
 import { prisma } from "@td/prisma";
 import { Company, CompanyVerificationStatus } from "@prisma/client";
 import { getOperationModesFromOperationCode } from "../../operationModes";
-import { CompanyRole } from "./schema";
+import { CompanyRole, pathFromCompanyRole } from "./schema";
 
 const { VERIFY_COMPANY } = process.env;
 
@@ -34,6 +34,7 @@ export async function isTransporterRefinement(
   if (company && !isTransporter(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Transporter),
       message:
         `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
         ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
@@ -55,6 +56,7 @@ export async function refineSiretAndGetCompany(
   if (company === null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(companyRole),
       message: `${
         companyRole ? `${companyRole} : ` : ""
       }L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
@@ -64,6 +66,7 @@ export async function refineSiretAndGetCompany(
   if (company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(companyRole),
       message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
     });
   }
@@ -81,12 +84,14 @@ export const isRegisteredVatNumberRefinement = async (
   if (company === null) {
     return ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Transporter),
       message: `Le transporteur avec le n°de TVA ${vatNumber} n'est pas inscrit sur Trackdéchets`
     });
   }
   if (!isTransporter(company)) {
     return ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Transporter),
       message:
         `Le transporteur saisi sur le bordereau (numéro de TVA: ${vatNumber}) n'est pas inscrit sur Trackdéchets` +
         ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
@@ -110,6 +115,7 @@ export async function isDestinationRefinement(
   if (company && role === "WASTE_VEHICLES" && !isWasteVehicles(company)) {
     return ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Destination),
       message:
         `L'installation de destination avec le SIRET "${siret}" n'est pas inscrite` +
         ` sur Trackdéchets en tant qu'installation de traitement de VHU. Cette installation ne peut` +
@@ -125,6 +131,7 @@ export async function isDestinationRefinement(
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Destination),
       message:
         `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
         ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
@@ -144,6 +151,7 @@ export async function isDestinationRefinement(
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Destination),
       message:
         `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
         ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
@@ -162,6 +170,7 @@ export function destinationOperationModeRefinement(
     if (modes.length && !destinationOperationMode) {
       return ctx.addIssue({
         code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole(CompanyRole.Destination),
         message: "Vous devez préciser un mode de traitement"
       });
     } else if (
@@ -172,6 +181,7 @@ export function destinationOperationModeRefinement(
     ) {
       return ctx.addIssue({
         code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole(CompanyRole.Destination),
         message:
           "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
       });

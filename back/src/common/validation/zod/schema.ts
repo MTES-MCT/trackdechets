@@ -13,6 +13,29 @@ export enum CompanyRole {
   NextDestination = "Éxutoire"
 }
 
+export const pathFromCompanyRole = (companyRole?: CompanyRole): string[] => {
+  switch (companyRole) {
+    case CompanyRole.Emitter:
+      return ["emitter"];
+    case CompanyRole.Transporter:
+      return ["transporter"];
+    case CompanyRole.Destination:
+      return ["destination"];
+    case CompanyRole.EcoOrganisme:
+      return ["ecoOrganisme"];
+    case CompanyRole.Broker:
+      return ["broker"];
+    case CompanyRole.Worker:
+      return ["worker"];
+    case CompanyRole.Intermediary:
+      return ["intermediaries"];
+    case CompanyRole.NextDestination:
+      return ["nextDestination"];
+    default:
+      return [];
+  }
+};
+
 export const siretSchema = (expectedCompanyRole?: CompanyRole) =>
   z
     .string({
@@ -28,6 +51,7 @@ export const siretSchema = (expectedCompanyRole?: CompanyRole) =>
         return isSiret(value);
       },
       val => ({
+        path: pathFromCompanyRole(expectedCompanyRole),
         message: `${
           expectedCompanyRole ? `${expectedCompanyRole} : ` : ""
         }${val} n'est pas un numéro de SIRET valide`
@@ -43,10 +67,18 @@ export const vatNumberSchema = z.string().refine(
   val => ({ message: `${val} n'est pas un numéro de TVA valide` })
 );
 export const foreignVatNumberSchema = (expectedCompanyRole?: CompanyRole) =>
-  vatNumberSchema.refine(value => {
-    if (!value) return true;
-    return isForeignVat(value);
-  }, `${expectedCompanyRole ? `${expectedCompanyRole} : ` : ""}Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement`);
+  vatNumberSchema.refine(
+    value => {
+      if (!value) return true;
+      return isForeignVat(value);
+    },
+    {
+      path: pathFromCompanyRole(expectedCompanyRole),
+      message: `${
+        expectedCompanyRole ? `${expectedCompanyRole} : ` : ""
+      }Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement`
+    }
+  );
 
 export const rawTransporterSchema = z.object({
   id: z.string().nullish(),
