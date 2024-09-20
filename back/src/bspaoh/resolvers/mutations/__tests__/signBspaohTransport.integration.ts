@@ -1,9 +1,10 @@
-import { BspaohStatus, UserRole } from "@prisma/client";
+import { BspaohStatus, TransportMode, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 
 import {
   Mutation,
-  MutationSignBspaohArgs
+  MutationSignBspaohArgs,
+  MutationUpdateBspaohArgs
 } from "../../../../generated/graphql/types";
 
 import {
@@ -15,10 +16,20 @@ import { bspaohFactory } from "../../../__tests__/factories";
 
 import { gql } from "graphql-tag";
 import { fullBspaoh } from "../../../fragments";
+import { prisma } from "@td/prisma";
 
 const SIGN_BSPAOH = gql`
   mutation SignBspaoh($id: ID!, $input: BspaohSignatureInput!) {
     signBspaoh(id: $id, input: $input) {
+      ...FullBspaoh
+    }
+  }
+  ${fullBspaoh}
+`;
+
+const UPDATE_BSPAOH = gql`
+  mutation UpdateBspaoh($id: ID!, $input: BspaohInput!) {
+    updateBspaoh(id: $id, input: $input) {
       ...FullBspaoh
     }
   }
@@ -304,6 +315,136 @@ describe("Mutation.Bspaoh.sign", () => {
           }
         })
       ]);
+    });
+  });
+
+  // Transport mode is now required at transporter signature step
+  describe("transporterTransportMode", () => {
+    const prepareBspaohAndSignTransport = async (
+      transporterOpt,
+      updateOpt?
+    ) => {
+      // Create PAOH
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const bspaoh = await bspaohFactory({
+        opt: {
+          status: BspaohStatus.SIGNED_BY_PRODUCER,
+          emitterEmissionSignatureAuthor: "Emetteur",
+          emitterEmissionSignatureDate: new Date(),
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterRecepisseIsExempted: true,
+              transporterTransportMode: null,
+              transporterTransportPlates: ["AA-00-XX"],
+              transporterTakenOverAt: new Date(),
+              ...transporterOpt,
+              number: 1
+            }
+          }
+        }
+      });
+
+      // Update ?
+      const { mutate } = makeClient(transporter.user);
+      if (updateOpt) {
+        if (updateOpt) {
+          await mutate<
+            Pick<Mutation, "updateBspaoh">,
+            MutationUpdateBspaohArgs
+          >(UPDATE_BSPAOH, {
+            variables: {
+              id: bspaoh.id,
+              input: {
+                ...updateOpt
+              }
+            }
+          });
+        }
+      }
+
+      // Sign transport
+      const { errors } = await mutate<
+        Pick<Mutation, "signBspaoh">,
+        MutationSignBspaohArgs
+      >(SIGN_BSPAOH, {
+        variables: {
+          id: bspaoh.id,
+          input: {
+            type: "TRANSPORT",
+            author: transporter.user.name
+          }
+        }
+      });
+
+      const updatedBspaoh = await prisma.bspaoh.findFirst({
+        where: { id: bspaoh.id },
+        include: { transporters: true }
+      });
+
+      return { errors, bspaoh: updatedBspaoh };
+    };
+
+    it("should throw error if transport mode is not defined", async () => {
+      // When
+      const { errors } = await prepareBspaohAndSignTransport({});
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Le mode de transport est obligatoire.");
+    });
+
+    it("should work if transport mode is in initial BSD", async () => {
+      // When
+      const { errors, bspaoh } = await prepareBspaohAndSignTransport({
+        transporterTransportMode: TransportMode.ROAD
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(bspaoh?.transporters[0].transporterTransportMode).toBe(
+        TransportMode.ROAD
+      );
+    });
+
+    it("should work if transport mode is given before transporter signature", async () => {
+      // When
+      const { errors, bspaoh } = await prepareBspaohAndSignTransport(
+        {},
+        {
+          transporter: {
+            transport: {
+              mode: TransportMode.ROAD
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(bspaoh?.transporters[0].transporterTransportMode).toBe(
+        TransportMode.ROAD
+      );
+    });
+
+    it("should throw error if transport mode is unset before signature", async () => {
+      // When
+      const { errors } = await prepareBspaohAndSignTransport(
+        {
+          transporterTransportMode: TransportMode.AIR
+        },
+        {
+          transporter: {
+            transport: {
+              mode: null
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Le mode de transport est obligatoire.");
     });
   });
 });

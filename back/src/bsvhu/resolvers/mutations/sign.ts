@@ -21,6 +21,7 @@ import {
 } from "../../../companies/recipify";
 import { prismaToZodBsvhu } from "../../validation/helpers";
 import { prisma } from "@td/prisma";
+import { BsvhuForParsingInclude } from "../../validation/types";
 
 export default async function sign(
   _,
@@ -29,7 +30,9 @@ export default async function sign(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const bsvhu = await getBsvhuOrNotFound(id);
+  const bsvhu = await getBsvhuOrNotFound(id, {
+    include: BsvhuForParsingInclude
+  });
   const authorizedOrgIds = getAuthorizedOrgIds(bsvhu, input.type);
 
   // To sign a form for a company, you must either:

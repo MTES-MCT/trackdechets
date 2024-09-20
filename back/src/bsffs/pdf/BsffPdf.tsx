@@ -29,16 +29,17 @@ type Props = {
     ficheInterventions: BsffFicheIntervention[];
   } & { previousBsffs: (Bsff & { packagings: BsffPackaging[] })[] };
   qrCode: string;
+  renderEmpty?: boolean;
 };
 
-export function BsffPdf({ bsff, qrCode }: Props) {
+export function BsffPdf({ bsff, qrCode, renderEmpty = false }: Props) {
   const hasFicheInterventions = bsff.ficheInterventions?.length > 0;
   const hasPreviousBsffs = bsff.previousBsffs?.length > 0;
 
   return (
     <Document title={bsff.id}>
       <div className="Page">
-        <Header qrCode={qrCode} />
+        <Header qrCode={qrCode} renderEmpty={renderEmpty} />
         <BsffId bsff={bsff} />
         <BsffEmitterType bsff={bsff} />
         <div className="BoxRow">
@@ -48,7 +49,7 @@ export function BsffPdf({ bsff, qrCode }: Props) {
         <BsffPackagings bsff={bsff} />
         <div className="BoxRow">
           <BsffWasteCode bsff={bsff} />
-          <BsffQuantity bsff={bsff} />
+          <BsffQuantity bsff={bsff} renderEmpty={renderEmpty} />
         </div>
         <BsffEmission bsff={bsff} />
         {bsff?.transporter && (
@@ -105,7 +106,10 @@ export function BsffPdf({ bsff, qrCode }: Props) {
   );
 }
 
-function Header({ qrCode }: Pick<Props, "qrCode">) {
+function Header({
+  qrCode,
+  renderEmpty = false
+}: Pick<Props, "qrCode" | "renderEmpty">) {
   return (
     <div className="BoxRow">
       {/* 3-parts header */}
@@ -128,7 +132,7 @@ function Header({ qrCode }: Pick<Props, "qrCode">) {
       <div className="BoxCol TextAlignCenter">
         <div className="QrCode" dangerouslySetInnerHTML={{ __html: qrCode }} />
         <div>
-          <b>Document édité le {dateToXMonthAtHHMM()}</b>
+          <b>Document édité le {renderEmpty ? "" : dateToXMonthAtHHMM()}</b>
         </div>
       </div>
       {/* End 3-parts header */}
@@ -306,7 +310,11 @@ function BsffWasteCode({ bsff }: Pick<Props, "bsff">) {
   );
 }
 
-function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
+function BsffQuantity({
+  bsff,
+  renderEmpty
+}: Pick<Props, "bsff" | "renderEmpty">) {
+  const renderCheckboxState = !renderEmpty;
   return (
     <div className="BoxCol">
       <p>
@@ -318,7 +326,7 @@ function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
             <span>
               <input
                 type="checkbox"
-                defaultChecked={!bsff.weight?.isEstimate}
+                defaultChecked={!bsff.weight?.isEstimate && renderCheckboxState}
                 readOnly
               />{" "}
               Réelle
@@ -327,7 +335,7 @@ function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
             <span>
               <input
                 type="checkbox"
-                defaultChecked={bsff.weight?.isEstimate}
+                defaultChecked={bsff.weight?.isEstimate && renderCheckboxState}
                 readOnly
               />{" "}
               Estimée

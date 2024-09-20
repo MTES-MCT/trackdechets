@@ -235,6 +235,9 @@ type IncomingWaste {
   "La quantité de déchet entrant refusée exprimée en tonne"
   destinationReceptionRefusedWeight: Float
 
+  "Charte citerne - Est-ce que la citerne a été rincée ou non?"
+  destinationHasCiterneBeenWashedOut: Boolean
+
   "N° de notification / déclaration"
   nextDestinationNotificationNumber: String
   "Code d'opération ultérieure prévue"
@@ -645,6 +648,9 @@ type OutgoingWaste {
   "Extra - La quantité de déchet entrant refusée exprimée en tonne"
   destinationReceptionRefusedWeight: Float
 
+  "Charte citerne - Est-ce que la citerne a été rincée ou non?"
+  destinationHasCiterneBeenWashedOut: Boolean
+
   "N° de notification / déclaration"
   nextDestinationNotificationNumber: String
   "Code d'opération ultérieure prévue"
@@ -1008,6 +1014,9 @@ type TransportedWaste {
   "Extra - La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
   destinationReceptionWeight: Float
 
+  "Charte citerne - Est-ce que la citerne a été rincée ou non?"
+  destinationHasCiterneBeenWashedOut: Boolean
+
   ###########################################################
   # Champs additionnels non mentionnés dans l'arrêté registre
   ###########################################################
@@ -1347,6 +1356,9 @@ type ManagedWaste {
   destinationReceptionAcceptedWeight: Float
   "La quantité de déchet entrant refusée exprimée en tonne"
   destinationReceptionRefusedWeight: Float
+
+  "Charte citerne - Est-ce que la citerne a été rincée ou non?"
+  destinationHasCiterneBeenWashedOut: Boolean
 
   "N° de notification / déclaration"
   nextDestinationNotificationNumber: String
@@ -1758,6 +1770,9 @@ type AllWaste {
   destinationPlannedOperationMode: OperationMode
   "Extra - Date de réalisation de l'opération"
   destinationOperationDate: DateTime
+
+  "Charte citerne - Est-ce que la citerne a été rincée ou non?"
+  destinationHasCiterneBeenWashedOut: Boolean
 
   "N° de notification / déclaration"
   nextDestinationNotificationNumber: String

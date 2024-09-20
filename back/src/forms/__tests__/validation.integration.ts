@@ -2,7 +2,8 @@ import {
   BsddTransporter,
   EmitterType,
   Form,
-  OperationMode
+  OperationMode,
+  TransportMode
 } from "@prisma/client";
 import {
   draftFormSchema,
@@ -75,6 +76,8 @@ const transporterData: Partial<BsddTransporter> = {
   transporterCompanyContact: "Transporteur",
   transporterCompanyPhone: "03",
   transporterCompanyMail: "t@t.fr",
+  transporterTransportMode: TransportMode.ROAD,
+  transporterNumberPlate: "NBR-PLATE",
   number: 1
 };
 
@@ -1856,7 +1859,8 @@ describe("processedInfoSchema", () => {
     }
   ];
 
-  it.each(testMatrix)(
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  it.skip.each(testMatrix)(
     "should throw when `nextDestinationNotificationNumber` is missing %o",
     async ({
       noTraceability,
@@ -1895,7 +1899,8 @@ describe("processedInfoSchema", () => {
     }
   );
 
-  it("should also throw when `nextDestinationNotificationNumber` is null", async () => {
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  it.skip("should also throw when `nextDestinationNotificationNumber` is null", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1926,7 +1931,7 @@ describe("processedInfoSchema", () => {
   });
 
   it.each(testMatrix)(
-    "should pas when `nextDestinationNotificationNumber` is provided %o",
+    "should pass when `nextDestinationNotificationNumber` is provided %o",
     async ({
       wasteDetailsCode,
       wasteDetailsPop,
@@ -2065,7 +2070,8 @@ describe("processedInfoSchema", () => {
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanyMail: "contact@laposte.com",
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: true,
+      transporterTransportMode: "RAIL"
     };
     const validateFn = () =>
       transporterSchemaFn({
@@ -2079,7 +2085,8 @@ describe("processedInfoSchema", () => {
       transporterCompanyName: "la poste",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanySiret: "35600000040773",
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: true,
+      transporterTransportMode: "RAIL"
     });
   });
 
@@ -2095,7 +2102,8 @@ describe("processedInfoSchema", () => {
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanyMail: "contact@laposte.com",
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: true,
+      transporterTransportMode: "RAIL"
     };
     const validateFn = () =>
       transporterSchemaFn({
@@ -2109,7 +2117,8 @@ describe("processedInfoSchema", () => {
       transporterCompanyName: "la poste siege",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanySiret: transporterCompany.siret,
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: true,
+      transporterTransportMode: "RAIL"
     });
   });
 

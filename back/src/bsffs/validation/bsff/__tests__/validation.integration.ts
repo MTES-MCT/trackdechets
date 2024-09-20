@@ -297,6 +297,57 @@ describe("validation > parseBsff", () => {
       }
     );
 
+    it.each([null, undefined])(
+      "should parse correctly if packaging volume is %p" +
+        " and bsff is created before MEP 2024.09.1",
+      v => {
+        const zodBsff: ZodBsff = {
+          isDraft: false,
+          createdAt: new Date("2024-09-23"),
+          packagings: [
+            {
+              weight: 1,
+              volume: v,
+              numero: "1",
+              emissionNumero: "1",
+              type: "BOUTEILLE"
+            }
+          ]
+        };
+        expect(parseBsff(zodBsff)).toBeDefined();
+      }
+    );
+
+    it.each([null, undefined])(
+      "should throw if packaging volume is %p " +
+        "and bsff is created after MEP 2024.09.1",
+      v => {
+        const zodBsff: ZodBsff = {
+          createdAt: new Date("2024-09-24T08:00:00"),
+          isDraft: false,
+          packagings: [
+            {
+              weight: 1,
+              volume: v,
+              numero: "1",
+              emissionNumero: "1",
+              type: "BOUTEILLE"
+            }
+          ]
+        };
+        expect.assertions(1);
+        try {
+          parseBsff(zodBsff);
+        } catch (e) {
+          expect(e.errors).toEqual([
+            expect.objectContaining({
+              message: "Conditionnements : le volume est requis"
+            })
+          ]);
+        }
+      }
+    );
+
     it("should throw if weight value is negative", () => {
       const zodBsff: ZodBsff = {
         weightValue: -1

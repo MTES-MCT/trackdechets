@@ -20,10 +20,17 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
   const { id, acceptedInfo } = args;
-  const form = await getFormOrFormNotFound({ id });
+  const form = await getFormOrFormNotFound({ id }, { transporters: true });
   await checkCanMarkAsAccepted(user, form);
 
-  await acceptedInfoSchema.validate(acceptedInfo);
+  await acceptedInfoSchema.validate({
+    wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
+    wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
+    wasteDetailsPop: form.wasteDetailsPop,
+    wasteDetailsCode: form.wasteDetailsCode,
+    transporters: form.transporters,
+    ...acceptedInfo
+  });
 
   const formUpdateInput = form.forwardedInId
     ? {

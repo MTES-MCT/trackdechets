@@ -45,28 +45,28 @@ enum CollectorType {
 
 // Sous-types d'entreprises pour les installation de traitement de déchets
 enum WasteProcessorType {
-  // Incinération de déchets dangereux
+  // Incinération de déchets dangereux (Rubrique 2770)
   DANGEROUS_WASTES_INCINERATION
 
-  // Incinération de déchets non dangereux
+  // Incinération de déchets non dangereux (Rubriques 2771, 2740)
   NON_DANGEROUS_WASTES_INCINERATION
 
   // Crémation
   CREMATION
 
-  // Installation de stockage de déchets dangereux
+  // Installation de stockage de déchets dangereux (Rubriques 2720-1, 2760-1, 2760-4, 2797-2)
   DANGEROUS_WASTES_STORAGE
 
-  // Installation de stockage de déchets non dangereux (y compris casiers dédiés amiante, plâtre)
+  // Installation de stockage de déchets non dangereux, y compris casiers dédiés amiante, plâtre (Rubriques 2720-2, 2760-2-a, 2760-2-b)
   NON_DANGEROUS_WASTES_STORAGE
 
-  // Installation de stockage de déchets inertes
+  // Installation de stockage de déchets inertes (Rubrique 2760-3)
   INERT_WASTES_STORAGE
 
-  // Autres traitements de déchets dangereux
+  // Autres traitements de déchets dangereux (Rubriques 2790, 2792-2, 2793-3)
   OTHER_DANGEROUS_WASTES
 
-  // Autres traitement de déchets non dangereux
+  // Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780)
   OTHER_NON_DANGEROUS_WASTES
 }
 
@@ -299,15 +299,18 @@ model Company {
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   allowAppendix1SignatureAutomation    Boolean                   @default(false)
   featureFlags                         String[]                  @default([])
+  isDormantSince                       DateTime?                 @db.Timestamptz(6)
   MembershipRequest                    MembershipRequest[]
   // Révisions
   bsdaRevisionRequests                 BsdaRevisionRequest[]
   bsddRevisionRequests                 BsddRevisionRequest[]
   bsdasriRevisionRequests              BsdasriRevisionRequest[]
 
-  givenSignatureAutomations    SignatureAutomation[] @relation("SignatureAutomationFrom")
-  receivedSignatureAutomations SignatureAutomation[] @relation("SignatureAutomationTo")
-  webhookSettingsLimit         Int                   @default(1)
+  givenSignatureAutomations       SignatureAutomation[]    @relation("SignatureAutomationFrom")
+  receivedSignatureAutomations    SignatureAutomation[]    @relation("SignatureAutomationTo")
+  givenAdministrativeTransfers    AdministrativeTransfer[] @relation("AdministrativeTransferFrom")
+  receivedAdministrativeTransfers AdministrativeTransfer[] @relation("AdministrativeTransferTo")
+  webhookSettingsLimit            Int                      @default(1)
 
   delegatorRndtsDeclarationDelegations RndtsDeclarationDelegation[] @relation("RndtsDeclarationDelegationDelegator")
   delegateRndtsDeclarationDelegations RndtsDeclarationDelegation[] @relation("RndtsDeclarationDelegationDelegate")
@@ -526,6 +529,9 @@ model Form {
   noTraceability                        Boolean?
   destinationOperationMode              OperationMode?
   currentTransporterOrgId               String?
+  hasCiterneBeenWashedOut               Boolean?
+  citerneNotWashedOutReason             CiterneNotWashedOutReason?
+  emptyReturnADR                        EmptyReturnADR?
 
   transporters BsddTransporter[]
   groupedIn    FormGroupement[]  @relation("GroupedIn")
@@ -659,6 +665,42 @@ model BsddRevisionRequest {
   temporaryStorageDestinationCap                  String?
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
+
+  initialRecipientCap                                    String?
+  initialWasteDetailsCode                                String?
+  initialWasteDetailsName                                String?
+  initialWasteDetailsPop                                 Boolean?
+  initialWasteDetailsPackagingInfos                      Json?
+  initialWasteAcceptationStatus                          WasteAcceptationStatus?
+  initialWasteRefusalReason                              String?
+  initialWasteDetailsSampleNumber                        String?
+  initialWasteDetailsQuantity                            Decimal?                @db.Decimal(65, 30)
+  initialQuantityReceived                                Decimal?
+  initialQuantityRefused                                 Decimal?
+  initialProcessingOperationDone                         String?
+  initialDestinationOperationMode                        OperationMode?
+  initialProcessingOperationDescription                  String?
+  initialBrokerCompanyName                               String?
+  initialBrokerCompanySiret                              String?
+  initialBrokerCompanyAddress                            String?
+  initialBrokerCompanyContact                            String?
+  initialBrokerCompanyPhone                              String?
+  initialBrokerCompanyMail                               String?
+  initialBrokerReceipt                                   String?
+  initialBrokerDepartment                                String?
+  initialBrokerValidityLimit                             DateTime?               @db.Timestamptz(6)
+  initialTraderCompanyName                               String?
+  initialTraderCompanySiret                              String?
+  initialTraderCompanyAddress                            String?
+  initialTraderCompanyContact                            String?
+  initialTraderCompanyPhone                              String?
+  initialTraderCompanyMail                               String?
+  initialTraderReceipt                                   String?
+  initialTraderDepartment                                String?
+  initialTraderValidityLimit                             DateTime?               @db.Timestamptz(6)
+  initialTemporaryStorageDestinationCap                  String?
+  initialTemporaryStorageDestinationProcessingOperation  String?
+  initialTemporaryStorageTemporaryStorerQuantityReceived Decimal?
 
   @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")
@@ -1025,12 +1067,18 @@ model Bsvhu {
   transporterTransportPlates                          String[]
   transporterRecepisseIsExempted                      Boolean?
 
+  intermediaries IntermediaryBsvhuAssociation[]
+
+  // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
+  intermediariesOrgIds String[] @default([])
+
   // partial indices _BsvhuIsDeletedIdx,_BsvhuIsDraftIdx  see migration82_missing_indices.sql
 
   @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterCompanyVatNumberIdx")
+  @@index([intermediariesOrgIds], map: "_BsvhuIntermediariesOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
 }
@@ -1059,6 +1107,24 @@ model RndtsDeclarationDelegation {
 
   @@index([delegateId], map: "_RndtsDeclarationDelegationDelegateIdIdx")
   @@index([delegatorId], map: "_RndtsDeclarationDelegationDelegatorIdIdx")
+}
+
+model IntermediaryBsvhuAssociation {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  siret     String
+  contact   String
+  vatNumber String?
+  address   String?
+  phone     String?
+  mail      String?
+  bsvhuId   String
+  bsvhu     Bsvhu    @relation(fields: [bsvhuId], references: [id])
+
+  @@index([bsvhuId], map: "_IntermediaryBsvhuAssociationBsvhuIdIdx")
+  @@index([siret], map: "IntermediaryBsvhuAssociationSiretIdx")
+  @@index([vatNumber], map: "IntermediaryBsvhuAssociationVatNumberIdx")
 }
 
 model Bsdasri {
@@ -1246,6 +1312,17 @@ model BsdasriRevisionRequest {
   emitterPickupSiteCity       String?
   emitterPickupSitePostalCode String?
   emitterPickupSiteInfos      String?
+
+  initialWasteCode                            String?
+  initialDestinationWastePackagings           Json?
+  initialDestinationReceptionWasteWeightValue Decimal?
+  initialDestinationOperationCode             String?
+  initialDestinationOperationMode             OperationMode?
+  initialEmitterPickupSiteName                String?
+  initialEmitterPickupSiteAddress             String?
+  initialEmitterPickupSiteCity                String?
+  initialEmitterPickupSitePostalCode          String?
+  initialEmitterPickupSiteInfos               String?
 
   @@index([authoringCompanyId], map: "_BsdasriRevisionRequestAuthoringCompanyIdIdx")
   @@index([status], map: "_BsdasriRevisionRequestStatusIdx")
@@ -1696,6 +1773,31 @@ model BsdaRevisionRequest {
   emitterPickupSitePostalCode     String?
   emitterPickupSiteInfos          String?
 
+  initialWasteCode                       String?
+  initialWastePop                        Boolean?
+  initialPackagings                      Json?
+  initialWasteSealNumbers                String[]
+  initialWasteMaterialName               String?
+  initialDestinationCap                  String?
+  initialDestinationReceptionWeight      Decimal?
+  initialDestinationOperationCode        String?
+  initialDestinationOperationDescription String?
+  initialDestinationOperationMode        OperationMode?
+  initialBrokerCompanyName               String?
+  initialBrokerCompanySiret              String?
+  initialBrokerCompanyAddress            String?
+  initialBrokerCompanyContact            String?
+  initialBrokerCompanyPhone              String?
+  initialBrokerCompanyMail               String?
+  initialBrokerRecepisseNumber           String?
+  initialBrokerRecepisseDepartment       String?
+  initialBrokerRecepisseValidityLimit    DateTime?      @db.Timestamptz(6)
+  initialEmitterPickupSiteName           String?
+  initialEmitterPickupSiteAddress        String?
+  initialEmitterPickupSiteCity           String?
+  initialEmitterPickupSitePostalCode     String?
+  initialEmitterPickupSiteInfos          String?
+
   @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
   @@index([status], map: "_BsdaRevisionRequestStatusIdx")
   @@index([bsdaId], map: "_BsdaRevisionRequestBsdaIdIdx")
@@ -1904,6 +2006,24 @@ model CompanyDigest {
   @@index([distantId], map: "_CompanyDigestdDistantIdIdx")
 }
 
+model AdministrativeTransfer {
+  id         String                       @id @default(cuid())
+  createdAt  DateTime                     @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime                     @updatedAt @db.Timestamptz(6)
+  fromId     String
+  from       Company?                     @relation("AdministrativeTransferFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  toId       String
+  to         Company?                     @relation("AdministrativeTransferTo", fields: [toId], references: [id], onDelete: Cascade)
+  approvedAt DateTime?                    @db.Timestamptz(6)
+  status     AdministrativeTransferStatus @default(PENDING)
+}
+
+enum AdministrativeTransferStatus {
+  PENDING
+  ACCEPTED
+  REFUSED
+}
+
 enum CompanyDigestStatus {
   INITIAL
   PENDING
@@ -2036,4 +2156,18 @@ enum BspaohStatus {
 enum BspaohType {
   PAOH
   FOETUS
+}
+
+enum CiterneNotWashedOutReason {
+  EXEMPTED
+  INCOMPATIBLE
+  UNAVAILABLE
+  NOT_BY_DRIVER
+}
+
+enum EmptyReturnADR {
+  EMPTY_NOT_WASHED
+  EMPTY_RETURN_NOT_WASHED
+  EMPTY_VEHICLE
+  EMPTY_CITERNE
 }

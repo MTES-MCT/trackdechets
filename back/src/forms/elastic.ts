@@ -23,6 +23,7 @@ import {
 import { buildAddress } from "../companies/sirene/utils";
 import { getFirstTransporterSync } from "./database";
 import { prisma } from "@td/prisma";
+import { getBsddSubType } from "../common/subTypes";
 
 export type FormForElastic = Form &
   FormWithTransporters &
@@ -60,6 +61,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
 
   return {
     type: "BSDD",
+    bsdSubType: getBsddSubType(form),
     createdAt: form.createdAt?.getTime(),
     updatedAt: form.updatedAt?.getTime(),
     id: form.id,

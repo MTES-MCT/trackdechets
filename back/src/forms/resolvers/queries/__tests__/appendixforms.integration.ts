@@ -9,7 +9,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { gql } from "graphql-tag";
 import { prisma } from "@td/prisma";
-import { getFormRepository } from "../../../repository";
+import { updateAppendix2Fn } from "../../../updateAppendix2";
 import { AuthType } from "../../../../auth";
 
 const APPENDIX_FORMS = gql`
@@ -38,11 +38,6 @@ describe("Test appendixForms", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "ADMIN"
     );
-
-    const { updateAppendix2Forms } = getFormRepository({
-      ...ttr,
-      auth: AuthType.Session
-    });
 
     // This form is in AWAITING_GROUP and should be returned
     const awaitingGroupForm = await formFactory({
@@ -138,7 +133,14 @@ describe("Test appendixForms", () => {
       }
     });
 
-    await updateAppendix2Forms([initialForm1, initialForm2]);
+    await updateAppendix2Fn({
+      formId: initialForm1.id,
+      user: { ...emitter, auth: AuthType.Bearer }
+    });
+    await updateAppendix2Fn({
+      formId: initialForm2.id,
+      user: { ...emitter, auth: AuthType.Bearer }
+    });
 
     const { query } = makeClient(ttr);
     const {
@@ -223,11 +225,6 @@ describe("Test appendixForms", () => {
         "ADMIN"
       );
 
-      const { updateAppendix2Forms } = getFormRepository({
-        ...ttr,
-        auth: AuthType.Session
-      });
-
       // This form is in AWAITING_GROUP and should be returned
       const awaitingGroupForm = await formFactory({
         ownerId: emitter.id,
@@ -306,7 +303,14 @@ describe("Test appendixForms", () => {
         }
       });
 
-      await updateAppendix2Forms([totallyGrouped, partiallyGrouped]);
+      await updateAppendix2Fn({
+        formId: totallyGrouped.id,
+        user: { ...emitter, auth: AuthType.Bearer }
+      });
+      await updateAppendix2Fn({
+        formId: partiallyGrouped.id,
+        user: { ...emitter, auth: AuthType.Bearer }
+      });
 
       const { query } = makeClient(ttr);
       const {
@@ -334,11 +338,6 @@ describe("Test appendixForms", () => {
       const { company: destinationCompany } = await userWithCompanyFactory(
         "ADMIN"
       );
-
-      const { updateAppendix2Forms } = getFormRepository({
-        ...ttr,
-        auth: AuthType.Session
-      });
 
       // This form is in AWAITING_GROUP and should be returned
       const awaitingGroupForm = await formFactory({
@@ -429,7 +428,14 @@ describe("Test appendixForms", () => {
         }
       });
 
-      await updateAppendix2Forms([totallyGrouped, partiallyGrouped]);
+      await updateAppendix2Fn({
+        formId: totallyGrouped.id,
+        user: { ...emitter, auth: AuthType.Bearer }
+      });
+      await updateAppendix2Fn({
+        formId: partiallyGrouped.id,
+        user: { ...emitter, auth: AuthType.Bearer }
+      });
 
       const { query } = makeClient(ttr);
       const {

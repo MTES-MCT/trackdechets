@@ -1,4 +1,9 @@
-import { WasteAcceptationStatus, Prisma, BsdasriType } from "@prisma/client";
+import {
+  WasteAcceptationStatus,
+  Prisma,
+  BsdasriType,
+  TransportMode
+} from "@prisma/client";
 import { isCollector } from "../companies/validation";
 import * as yup from "yup";
 import {
@@ -332,7 +337,8 @@ export const transporterSchema: FactorySchemaOf<
         `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
       )
       .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
-      .test(siretTests.isRegistered("TRANSPORTER")),
+      .test(siretTests.isRegistered("TRANSPORTER"))
+      .test(siretTests.isNotDormant),
     transporterCompanyVatNumber: foreignVatNumber
       .label("Transporteur")
       .test(vatNumberTests.isRegisteredTransporter),
@@ -445,14 +451,12 @@ export const transportSchema: FactorySchemaOf<
             : true;
         }
       ),
-
     transporterWastePackagings: yup
       .array()
       .requiredIf(
         context.transportSignature,
         "Le détail du conditionnement est obligatoire"
       )
-
       .test(
         "packaging-info-required",
         "Le détail du conditionnement transporté est obligatoire",
@@ -470,11 +474,17 @@ export const transportSchema: FactorySchemaOf<
         "Le date de prise en charge du déchet est obligatoire"
       ),
     handedOverToRecipientAt: yup.date().nullable(), // optional field
-
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any,
+    transporterTransportMode: yup
+      .mixed<TransportMode>()
+      .nullable()
+      .requiredIf(
+        context.transportSignature,
+        "Le mode de transport est obligatoire."
+      )
   });
 
 export const recipientSchema: FactorySchemaOf<
@@ -488,7 +498,8 @@ export const recipientSchema: FactorySchemaOf<
     destinationCompanySiret: siret
       .label("Destination")
       .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`)
-      .test(siretTests.isRegistered("DESTINATION")),
+      .test(siretTests.isRegistered("DESTINATION"))
+      .test(siretTests.isNotDormant),
     destinationCompanyAddress: yup
       .string()
       .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_ADDRESS}`),

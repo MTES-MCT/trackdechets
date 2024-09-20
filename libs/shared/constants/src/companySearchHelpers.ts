@@ -199,6 +199,20 @@ export const getTransporterCompanyOrgId = (
     : form.transporterCompanyVatNumber;
 };
 
+export type PartialIntermediaryCompany = {
+  siret: string | null;
+  vatNumber: string | null;
+};
+
+export const getIntermediaryCompanyOrgId = (
+  intermediary: PartialIntermediaryCompany | null
+): string | null => {
+  if (!intermediary) return null;
+  return intermediary.siret?.length
+    ? intermediary.siret
+    : intermediary.vatNumber;
+};
+
 /**
  * Check for etatAdministratif
  */

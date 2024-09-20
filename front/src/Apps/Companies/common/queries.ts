@@ -64,6 +64,40 @@ export const DELETE_COMPANY = gql`
   }
 `;
 
+export const TOGGLE_DORMANT_COMPANY = gql`
+  mutation toggleDormantCompany($id: ID!) {
+    toggleDormantCompany(id: $id)
+  }
+`;
+
+export const CREATE_ADMINISTRATIVE_TRANSFER = gql`
+  mutation CreateAdministrativeTransfer(
+    $input: CreateAdministrativeTransferInput!
+  ) {
+    createAdministrativeTransfer(input: $input) {
+      id
+      status
+    }
+  }
+`;
+
+export const CANCEL_ADMINISTRATIVE_TRANSFER = gql`
+  mutation CancelAdministrativeTransfer($id: ID!) {
+    cancelAdministrativeTransfer(id: $id)
+  }
+`;
+
+export const SUBMIT_ADMINISTRATIVE_TRANSFER_APPROVAL = gql`
+  mutation SubmitAdministrativeTransferApproval(
+    $input: SubmitAdministrativeTransferApprovalInput!
+  ) {
+    submitAdministrativeTransferApproval(input: $input) {
+      id
+      status
+    }
+  }
+`;
+
 export const MY_COMPANIES = gql`
   query MyCompanies($first: Int, $after: ID, $search: String) {
     myCompanies(first: $first, after: $after, search: $search) {

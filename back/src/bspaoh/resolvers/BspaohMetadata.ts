@@ -1,26 +1,27 @@
 import { ZodIssue } from "zod";
 import {
+  BspaohError,
   BspaohMetadata,
+  BspaohMetadataFields,
   BspaohMetadataResolvers,
   BspaohStatus
 } from "../../generated/graphql/types";
-import { getBspaohOrNotFound } from "../database";
 import { parseBspaohInContext } from "../validation";
 import {
   prepareBspaohForParsing,
   getNextSignatureType,
   getCurrentSignatureType
 } from "./mutations/utils";
-import {
-  getSealedFieldsForSignature,
-  prismaFieldsToGqlPaths
-} from "../validation/rules";
+import { getRequiredAndSealedFieldPaths } from "../validation/rules";
+import { getSignatureAncestors } from "../validation/helpers";
 
 export const Metadata: BspaohMetadataResolvers = {
   errors: async (
-    metadata: BspaohMetadata & { id: string; status: BspaohStatus }
-  ) => {
-    const bspaoh = await getBspaohOrNotFound({ id: metadata.id });
+    metadata: BspaohMetadata & { id: string; status: BspaohStatus },
+    _,
+    context
+  ): Promise<BspaohError[]> => {
+    const bspaoh = await context.dataloaders.bspaohs.load(metadata.id);
     const { preparedExistingBspaoh } = prepareBspaohForParsing(bspaoh);
     const nextSignatureType = getNextSignatureType(bspaoh);
     try {
@@ -35,18 +36,26 @@ export const Metadata: BspaohMetadataResolvers = {
       return errors.issues?.map((e: ZodIssue) => {
         return {
           message: e.message,
-          path: `${e.path[0]}`, // e.path is an array, first element should be the path name
+          path: e.path,
           requiredFor: nextSignatureType
         };
       });
     }
   },
-  fields: async (metadata: BspaohMetadata & { id: string }) => {
-    const bspaoh = await getBspaohOrNotFound({ id: metadata.id });
-    const signatureType = getCurrentSignatureType(bspaoh);
-    const fields = getSealedFieldsForSignature(signatureType);
-    return {
-      sealed: fields.map(f => ({ name: prismaFieldsToGqlPaths[f] ?? f }))
-    };
+  fields: async (
+    metadata: BspaohMetadata & { id: string },
+    _,
+    context
+  ): Promise<BspaohMetadataFields> => {
+    const bspaoh = await context.dataloaders.bspaohs.load(metadata.id);
+    const { preparedExistingBspaoh } = prepareBspaohForParsing(bspaoh);
+
+    const currentSignature = getCurrentSignatureType(bspaoh);
+    const currentSignatureAncestors = getSignatureAncestors(currentSignature);
+    return getRequiredAndSealedFieldPaths(
+      preparedExistingBspaoh,
+      currentSignatureAncestors,
+      context.user ?? undefined
+    );
   }
 };

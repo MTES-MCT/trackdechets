@@ -1,5 +1,5 @@
 import Input, { InputProps } from "@codegouvfr/react-dsfr/Input";
-import React from "react";
+import React, { CSSProperties } from "react";
 
 type VhuAgrementFormProps = {
   title: string;
@@ -13,6 +13,10 @@ type VhuAgrementFormProps = {
   };
 };
 
+const titleStyle: CSSProperties = {
+  marginBottom: 12
+};
+
 const VhuAgrementForm = ({
   title,
   inputProps,
@@ -20,10 +24,8 @@ const VhuAgrementForm = ({
 }: VhuAgrementFormProps): React.JSX.Element => {
   return (
     <div>
-      <div className="fr-grid-row">
-        <div className="fr-col-12">
-          <p className="fr-text--bold">{title}</p>
-        </div>
+      <div style={titleStyle}>
+        <p className="fr-text--bold">{title}</p>
       </div>
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-6">

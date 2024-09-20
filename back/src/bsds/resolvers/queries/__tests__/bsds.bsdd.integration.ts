@@ -141,7 +141,8 @@ describe("Query.bsds workflow", () => {
             contact: "Jean-Michel",
             mail: "jean.michel@gmaiL.com",
             phone: "06"
-          }
+          },
+          mode: "AIR"
         },
         recipient: {
           company: {

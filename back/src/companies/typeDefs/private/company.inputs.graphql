@@ -368,3 +368,30 @@ input SignatureAutomationInput {
   "ID de l'entreprise qui a délégation"
   to: ID!
 }
+
+input companyUpdateRow {
+  orgId: String!
+  companyTypes: [CompanyType!]!
+  collectorTypes: [CollectorType]!
+  wasteProcessorTypes: [WasteProcessorType]!
+  wasteVehiclesTypes: [WasteVehiclesType]!
+}
+
+input BulkUpdateCompaniesProfilesInput {
+  adminEmail: String!
+  companyUpdateRows: [companyUpdateRow!]!
+}
+
+input CreateAdministrativeTransferInput {
+  "ID de l'établissement source"
+  from: ID!
+  "ID de l'établissement cible"
+  to: ID!
+}
+
+input SubmitAdministrativeTransferApprovalInput {
+  "ID du transfert administratif"
+  id: ID!
+  "Approuvé ou non"
+  isApproved: Boolean!
+}

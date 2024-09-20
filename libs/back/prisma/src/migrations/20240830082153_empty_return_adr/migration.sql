@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "EmptyReturnADR" AS ENUM ('EMPTY_NOT_WASHED', 'EMPTY_RETURN_NOT_WASHED', 'EMPTY_VEHICLE', 'EMPTY_CITERNE');
+
+-- AlterTable
+ALTER TABLE "Form" ADD COLUMN     "emptyReturnADR" "EmptyReturnADR";

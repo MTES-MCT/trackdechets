@@ -25,7 +25,13 @@ import {
   CREATE_BROKER_RECEIPT,
   CREATE_VHU_AGREMENT
 } from "../common/queries";
-import { isFRVat, isSiret, isVat, isForeignVat } from "@td/constants";
+import {
+  isFRVat,
+  isSiret,
+  isVat,
+  isForeignVat,
+  isValidWebsite
+} from "@td/constants";
 import { CREATE_WORKER_CERTIFICATION } from "../../Account/fields/forms/AccountFormCompanyWorkerCertification";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
@@ -451,9 +457,24 @@ export default function AccountCompanyAdd() {
                     !values.workerCertification?.validityLimit ||
                     !values?.workerCertification?.organisation);
 
-                const missingEcoOrganismeAgreeemnts =
-                  isEcoOrganisme(values.companyTypes) &&
-                  (values.ecoOrganismeAgreements ?? []).some(a => !a);
+                let ecoOrganismeAgreementsErrors: string[] = [];
+
+                if (isEcoOrganisme(values.companyTypes)) {
+                  ecoOrganismeAgreementsErrors = (
+                    values.ecoOrganismeAgreements ?? []
+                  ).map(a => {
+                    if (!a) {
+                      return "Champ requis";
+                    }
+                    if (!isValidWebsite(a)) {
+                      return "Invalide URL";
+                    }
+                    return "";
+                  });
+                }
+
+                const hasEcoOrganismeAgreementsErrors =
+                  ecoOrganismeAgreementsErrors.filter(Boolean).length > 0;
 
                 return {
                   ...(!values.companyName && {
@@ -557,11 +578,9 @@ export default function AccountCompanyAdd() {
                         }
                       }
                     : {}),
-                  ...(missingEcoOrganismeAgreeemnts && {
-                    ecoOrganismeAgreements: (
-                      values.ecoOrganismeAgreements ?? []
-                    ).map(a => (!a ? "Champ requis" : null))
-                  }),
+                  ...(hasEcoOrganismeAgreementsErrors
+                    ? { ecoOrganismeAgreements: ecoOrganismeAgreementsErrors }
+                    : {}),
                   ...(missingCertification
                     ? {
                         workerCertification: {
@@ -591,7 +610,8 @@ export default function AccountCompanyAdd() {
                 handleBlur,
                 handleChange,
                 errors,
-                touched
+                touched,
+                submitCount
               }) => {
                 return (
                   <Form className={styles.companyAddForm}>
@@ -745,6 +765,7 @@ export default function AccountCompanyAdd() {
                             handleChange={handleChange}
                             errors={errors}
                             touched={touched}
+                            submitCount={submitCount}
                           />
                         )}
                         <RedErrorMessage name="companyTypes" />
@@ -828,7 +849,8 @@ export default function AccountCompanyAdd() {
                             En tant qu'administrateur de l'établissement, j'ai
                             pris connaissance des{" "}
                             <a
-                              href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
+                              className="fr-link"
+                              href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement"
                               target="_blank"
                               rel="noreferrer"
                             >

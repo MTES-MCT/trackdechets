@@ -87,6 +87,12 @@ export default function buildSirenify<T>(
           );
         }
 
+        if (companySearchResult.isDormant) {
+          throw new UserInputError(
+            `L'établissement ${companySearchResult.siret} est en sommeil sur Trackdéchets. Il n'est pas possible de le mentionner dans un BSD.`
+          );
+        }
+
         if (
           companySearchResult.statutDiffusionEtablissement === "O" ||
           // auto-complète aussi nom et adresse si l'établissement est non diffusible
@@ -152,6 +158,12 @@ export function nextBuildSirenify<T>(
       if (companySearchResult.etatAdministratif === "F") {
         throw new UserInputError(
           `L'établissement ${companySearchResult.siret} est fermé selon le répertoire SIRENE`
+        );
+      }
+
+      if (companySearchResult.isDormant) {
+        throw new UserInputError(
+          `L'établissement ${companySearchResult.siret} est en sommeil sur Trackdéchets. Il n'est pas possible de le mentionner dans un BSD.`
         );
       }
 

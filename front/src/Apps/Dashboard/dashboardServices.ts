@@ -879,8 +879,9 @@ const getAcceptedBtnLabel = (
     return "";
   }
   if (
-    (isSameSiretDestination(currentSiret, bsd) ||
-      isSameSiretTemporaryStorageDestination(currentSiret, bsd)) &&
+    ((!bsd.isTempStorage && isSameSiretDestination(currentSiret, bsd)) ||
+      (bsd.isTempStorage &&
+        isSameSiretTemporaryStorageDestination(currentSiret, bsd))) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     return VALIDER_TRAITEMENT;

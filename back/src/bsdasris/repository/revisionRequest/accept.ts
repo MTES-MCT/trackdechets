@@ -85,39 +85,34 @@ async function getUpdateFromRevisionRequest(
   revisionRequest: BsdasriRevisionRequest,
   prisma: PrismaTransaction
 ) {
-  const {
-    bsdasriId,
-    comment,
-    updatedAt,
-    authoringCompanyId,
-    createdAt,
-    id,
-    status,
-    isCanceled,
-    ...bsdasriUpdate
-  } = revisionRequest;
-
   const { status: currentStatus } = await prisma.bsdasri.findUniqueOrThrow({
-    where: { id: bsdasriId },
+    where: { id: revisionRequest.bsdasriId },
     select: { status: true }
   });
-  const newStatus = getNewStatus(
-    currentStatus,
-
-    isCanceled
-  );
+  const newStatus = getNewStatus(currentStatus, revisionRequest.isCanceled);
 
   const result = removeEmpty({
-    ...bsdasriUpdate,
-    destinationReceptionWasteVolume: getTotalVolume(bsdasriUpdate),
+    wasteCode: revisionRequest.wasteCode,
+    destinationWastePackagings: revisionRequest.destinationWastePackagings,
+    destinationReceptionWasteWeightValue:
+      revisionRequest.destinationReceptionWasteWeightValue,
+    destinationOperationCode: revisionRequest.destinationOperationCode,
+    destinationOperationMode: revisionRequest.destinationOperationMode,
+    emitterPickupSiteName: revisionRequest.emitterPickupSiteName,
+    emitterPickupSiteAddress: revisionRequest.emitterPickupSiteAddress,
+    emitterPickupSiteCity: revisionRequest.emitterPickupSiteCity,
+    emitterPickupSitePostalCode: revisionRequest.emitterPickupSitePostalCode,
+    emitterPickupSiteInfos: revisionRequest.emitterPickupSiteInfos,
+
+    destinationReceptionWasteVolume: getTotalVolume(revisionRequest),
 
     status: newStatus
   });
 
   // Careful. Some operation codes explicitely need a null operation mode (ex: D15)
   if (
-    bsdasriUpdate.destinationOperationCode &&
-    !bsdasriUpdate.destinationOperationMode
+    revisionRequest.destinationOperationCode &&
+    !revisionRequest.destinationOperationMode
   ) {
     return {
       ...result,

@@ -1,9 +1,15 @@
-import { BsdaStatus, UserRole, WasteAcceptationStatus } from "@prisma/client";
+import {
+  BsdaStatus,
+  TransportMode,
+  UserRole,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
   Mutation,
-  MutationSignBsdaArgs
+  MutationSignBsdaArgs,
+  MutationUpdateBsdaArgs
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
@@ -18,6 +24,7 @@ import {
 import { buildPdfAsBase64 } from "../../../pdf/generator";
 import { getTransportersSync } from "../../../database";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
+import { UPDATE_BSDA } from "./update.integration";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
@@ -874,6 +881,140 @@ describe("Mutation.Bsda.sign", () => {
           message: "Vous ne pouvez pas signer ce bordereau"
         })
       ]);
+    });
+
+    // Transport mode is now required at transporter signature step
+    describe("transporterTransportMode", () => {
+      const prepareBsdaAndSignTransport = async (
+        transporterOpt,
+        updateOpt?
+      ) => {
+        // Create BSDA
+        const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+        await transporterReceiptFactory({
+          company: transporter.company
+        });
+
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SIGNED_BY_WORKER",
+            emitterEmissionSignatureAuthor: "Emétteur",
+            emitterEmissionSignatureDate: new Date(),
+            workerWorkSignatureAuthor: "worker",
+            workerWorkSignatureDate: new Date()
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterRecepisseIsExempted: true,
+            transporterTransportMode: null,
+            transporterTransportPlates: ["AA-00-XX"],
+            ...transporterOpt
+          }
+        });
+
+        // Update?
+        const { mutate } = makeClient(transporter.user);
+        if (updateOpt) {
+          await mutate<Pick<Mutation, "updateBsda">, MutationUpdateBsdaArgs>(
+            UPDATE_BSDA,
+            {
+              variables: {
+                id: bsda.id,
+                input: {
+                  ...updateOpt
+                }
+              }
+            }
+          );
+        }
+
+        // Sign transport
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsda">,
+          MutationSignBsdaArgs
+        >(SIGN_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              type: "TRANSPORT",
+              author: transporter.user.name
+            }
+          }
+        });
+
+        const updatedBsda = await prisma.bsda.findFirst({
+          where: { id: bsda.id },
+          include: { transporters: true }
+        });
+
+        return { errors, bsda: updatedBsda };
+      };
+
+      it("should throw error if transport mode is not defined", async () => {
+        // When
+        const { errors } = await prepareBsdaAndSignTransport({});
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Le mode de transport n° 1 est obligatoire."
+        );
+      });
+
+      it("should work if transport mode is in initial BSD", async () => {
+        // When
+        const { errors, bsda } = await prepareBsdaAndSignTransport({
+          transporterTransportMode: TransportMode.ROAD
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(bsda?.transporters[0].transporterTransportMode).toBe(
+          TransportMode.ROAD
+        );
+      });
+
+      it("should work if transport mode is given before transporter signature", async () => {
+        // When
+        const { errors, bsda } = await prepareBsdaAndSignTransport(
+          {},
+          {
+            transporter: {
+              transport: {
+                mode: TransportMode.ROAD
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(bsda?.transporters[0].transporterTransportMode).toBe(
+          TransportMode.ROAD
+        );
+      });
+
+      it("should throw error if transport mode is unset before signature", async () => {
+        // When
+        const { errors } = await prepareBsdaAndSignTransport(
+          {
+            transporterTransportMode: TransportMode.AIR
+          },
+          {
+            transporter: {
+              transport: {
+                mode: null
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Le mode de transport n° 1 est obligatoire."
+        );
+      });
     });
   });
 

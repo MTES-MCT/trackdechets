@@ -7,7 +7,10 @@ import {
 import { CompanySearchResult } from "../../../companies/types";
 import { searchCompany } from "../../../companies/search";
 
-import { bsvhuFactory } from "../../__tests__/factories.vhu";
+import {
+  bsvhuFactory,
+  toIntermediaryCompany
+} from "../../__tests__/factories.vhu";
 import { ZodBsvhu } from "../schema";
 import { BsvhuValidationContext } from "../types";
 import { getCurrentSignatureType, prismaToZodBsvhu } from "../helpers";
@@ -31,6 +34,7 @@ describe("BSVHU validation", () => {
   let context: BsvhuValidationContext;
   let foreignTransporter: Company;
   let transporterCompany: Company;
+  let intermediaryCompany: Company;
   beforeAll(async () => {
     const emitterCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
     transporterCompany = await companyFactory({
@@ -44,12 +48,18 @@ describe("BSVHU validation", () => {
       orgId: "IT13029381004",
       vatNumber: "IT13029381004"
     });
+    intermediaryCompany = await companyFactory({
+      companyTypes: ["INTERMEDIARY"]
+    });
 
     const prismaBsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitterCompany.siret,
         transporterCompanySiret: transporterCompany.siret,
-        destinationCompanySiret: destinationCompany.siret
+        destinationCompanySiret: destinationCompany.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediaryCompany)]
+        }
       }
     });
     bsvhu = prismaToZodBsvhu(prismaBsvhu);
@@ -566,7 +576,8 @@ describe("BSVHU validation", () => {
       const searchResults = {
         [bsvhu.emitterCompanySiret!]: searchResult("émetteur"),
         [bsvhu.transporterCompanySiret!]: searchResult("transporteur"),
-        [bsvhu.destinationCompanySiret!]: searchResult("destinataire")
+        [bsvhu.destinationCompanySiret!]: searchResult("destinataire"),
+        [intermediaryCompany.siret!]: searchResult("intermédiaire")
       };
       (searchCompany as jest.Mock).mockImplementation((clue: string) => {
         return Promise.resolve(searchResults[clue]);
@@ -593,6 +604,57 @@ describe("BSVHU validation", () => {
       );
       expect(sirenified.destinationCompanyAddress).toEqual(
         searchResults[bsvhu.destinationCompanySiret!].address
+      );
+      expect(sirenified.intermediaries![0].name).toEqual(
+        searchResults[intermediaryCompany.siret!].name
+      );
+      expect(sirenified.intermediaries![0].address).toEqual(
+        searchResults[intermediaryCompany.siret!].address
+      );
+    });
+    it("should not overwrite `name` and `address` based on SIRENE data for sealed fields", async () => {
+      const searchResults = {
+        [bsvhu.emitterCompanySiret!]: searchResult("émetteur"),
+        [bsvhu.transporterCompanySiret!]: searchResult("transporteur"),
+        [bsvhu.destinationCompanySiret!]: searchResult("destinataire"),
+        [intermediaryCompany.siret!]: searchResult("intermédiaire")
+      };
+      (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+        return Promise.resolve(searchResults[clue]);
+      });
+
+      const sirenified = await parseBsvhuAsync(
+        {
+          ...bsvhu,
+          emitterEmissionSignatureDate: new Date(),
+          transporterTransportSignatureDate: new Date()
+        },
+        {
+          ...context
+        }
+      );
+
+      expect(sirenified.emitterCompanyName).toEqual(bsvhu.emitterCompanyName);
+      expect(sirenified.emitterCompanyAddress).toEqual(
+        bsvhu.emitterCompanyAddress
+      );
+      expect(sirenified.transporterCompanyName).toEqual(
+        bsvhu.transporterCompanyName
+      );
+      expect(sirenified.transporterCompanyAddress).toEqual(
+        bsvhu.transporterCompanyAddress
+      );
+      expect(sirenified.destinationCompanyName).toEqual(
+        searchResults[bsvhu.destinationCompanySiret!].name
+      );
+      expect(sirenified.destinationCompanyAddress).toEqual(
+        searchResults[bsvhu.destinationCompanySiret!].address
+      );
+      expect(sirenified.intermediaries![0].name).toEqual(
+        bsvhu.intermediaries![0].name
+      );
+      expect(sirenified.intermediaries![0].address).toEqual(
+        bsvhu.intermediaries![0].address
       );
     });
   });

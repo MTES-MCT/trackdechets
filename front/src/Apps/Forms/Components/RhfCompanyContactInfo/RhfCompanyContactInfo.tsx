@@ -5,6 +5,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 interface CompanyContactInfoProps {
   fieldName: string;
   disabled?: boolean;
+  name?: string;
 }
 
 /**
@@ -24,7 +25,8 @@ interface CompanyContactInfoProps {
  */
 export default function CompanyContactInfo({
   fieldName,
-  disabled = false
+  disabled = false,
+  name
 }: Readonly<CompanyContactInfoProps>) {
   const {
     register,
@@ -38,9 +40,10 @@ export default function CompanyContactInfo({
           <Input
             label="Personne à contacter"
             disabled={disabled}
-            state={errors?.[`${fieldName}.contact`] && "error"}
+            state={errors?.[`${name}`]?.["company"]?.contact && "error"}
             stateRelatedMessage={
-              (errors?.[`${fieldName}.contact`]?.message as string) ?? ""
+              (errors?.[`${name}`]?.["company"]?.contact?.message as string) ??
+              ""
             }
             nativeInputProps={{ ...register(`${fieldName}.contact`) }}
           />
@@ -51,9 +54,9 @@ export default function CompanyContactInfo({
           <Input
             label="Téléphone"
             disabled={disabled}
-            state={errors?.[`${fieldName}.phoneError`] && "error"}
+            state={errors?.[`${name}`]?.["company"]?.phone && "error"}
             stateRelatedMessage={
-              (errors?.[`${fieldName}.phoneError`]?.message as string) ?? ""
+              (errors?.[`${name}`]?.["company"]?.phone?.message as string) ?? ""
             }
             nativeInputProps={{ ...register(`${fieldName}.phone`) }}
           />
@@ -62,9 +65,9 @@ export default function CompanyContactInfo({
           <Input
             label="Mail"
             disabled={disabled}
-            state={errors?.[`${fieldName}.mailError`] && "error"}
+            state={errors?.[`${name}`]?.["company"]?.mail && "error"}
             stateRelatedMessage={
-              (errors?.[`${fieldName}.mailError`]?.message as string) ?? ""
+              (errors?.[`${name}`]?.["company"]?.mail?.message as string) ?? ""
             }
             nativeInputProps={{
               ...register(`${fieldName}.mail`),

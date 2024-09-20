@@ -7,6 +7,7 @@ input BsdWhere {
   customId: StringFilter
 
   type: BsdTypeFilter
+  bsdSubType: BsdSubTypeFilter
   status: StringFilter
 
   packagingNumbers: StringNullableListFilter
@@ -157,4 +158,9 @@ input WasteAcceptationStatusFilter {
 input BsdTypeFilter {
   _eq: BsdType
   _in: [BsdType!]
+}
+
+input BsdSubTypeFilter {
+  _eq: BsdSubType
+  _in: [BsdSubType!]
 }

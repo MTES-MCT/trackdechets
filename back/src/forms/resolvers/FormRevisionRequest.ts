@@ -1,4 +1,3 @@
-import { getBsddFromActivityEvents } from "../../activity-events/bsdd";
 import {
   FormRevisionRequest,
   FormRevisionRequestResolvers
@@ -6,9 +5,11 @@ import {
 import { prisma } from "@td/prisma";
 import {
   expandBsddRevisionRequestContent,
-  expandableFormIncludes,
-  expandFormFromDb
+  expandFormFromDb,
+  expandableFormIncludes
 } from "../converter";
+import { BsddRevisionRequest } from "@prisma/client";
+import { removeEmptyKeys } from "../../common/converter";
 
 const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   approvals: async parent => {
@@ -33,11 +34,7 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
     }
     return authoringCompany;
   },
-  form: async (
-    parent: FormRevisionRequest & { bsddId: string },
-    _,
-    { dataloaders }
-  ) => {
+  form: async (parent: FormRevisionRequest & BsddRevisionRequest) => {
     const fullBsdd = await prisma.bsddRevisionRequest
       .findUnique({ where: { id: parent.id } })
       .bsdd({ include: expandableFormIncludes });
@@ -45,19 +42,56 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
     if (!fullBsdd) {
       throw new Error(`FormRevisionRequest ${parent.id} has no form.`);
     }
-    const bsdd = await getBsddFromActivityEvents(
-      {
-        bsddId: parent.bsddId,
-        at: parent.createdAt
-      },
-      { dataloader: dataloaders.events }
-    );
+
+    const historicForm = removeEmptyKeys({
+      recipientCap: parent.initialRecipientCap,
+      wasteDetailsCode: parent.initialWasteDetailsCode,
+      wasteDetailsName: parent.initialWasteDetailsName,
+      wasteDetailsPop: parent.initialWasteDetailsPop,
+      wasteDetailsPackagingInfos: parent.initialWasteDetailsPackagingInfos,
+      wasteAcceptationStatus: parent.initialWasteAcceptationStatus,
+      wasteRefusalReason: parent.initialWasteRefusalReason,
+      wasteDetailsSampleNumber: parent.initialWasteDetailsSampleNumber,
+      wasteDetailsQuantity: parent.initialWasteDetailsQuantity,
+      quantityReceived: parent.initialQuantityReceived,
+      quantityRefused: parent.initialQuantityRefused,
+      processingOperationDone: parent.initialProcessingOperationDone,
+      destinationOperationMode: parent.initialDestinationOperationMode,
+      processingOperationDescription:
+        parent.initialProcessingOperationDescription,
+      brokerCompanyName: parent.initialBrokerCompanyName,
+      brokerCompanySiret: parent.initialBrokerCompanySiret,
+      brokerCompanyAddress: parent.initialBrokerCompanyAddress,
+      brokerCompanyContact: parent.initialBrokerCompanyContact,
+      brokerCompanyPhone: parent.initialBrokerCompanyPhone,
+      brokerCompanyMail: parent.initialBrokerCompanyMail,
+      brokerReceipt: parent.initialBrokerReceipt,
+      brokerDepartment: parent.initialBrokerDepartment,
+      brokerValidityLimit: parent.initialBrokerValidityLimit,
+      traderCompanyName: parent.initialTraderCompanyName,
+      traderCompanySiret: parent.initialTraderCompanySiret,
+      traderCompanyAddress: parent.initialTraderCompanyAddress,
+      traderCompanyContact: parent.initialTraderCompanyContact,
+      traderCompanyPhone: parent.initialTraderCompanyPhone,
+      traderCompanyMail: parent.initialTraderCompanyMail,
+      traderReceipt: parent.initialTraderReceipt,
+      traderDepartment: parent.initialTraderDepartment,
+      traderValidityLimit: parent.initialTraderValidityLimit
+    });
 
     return expandFormFromDb({
       ...fullBsdd,
-      ...bsdd,
-      forwardedIn: fullBsdd.forwardedIn,
-      transporters: fullBsdd.transporters
+      forwardedIn: fullBsdd.forwardedIn
+        ? {
+            ...fullBsdd.forwardedIn,
+            recipientCap: parent.initialTemporaryStorageDestinationCap,
+            processingOperationDone:
+              parent.initialTemporaryStorageDestinationProcessingOperation,
+            quantityReceived:
+              parent.initialTemporaryStorageTemporaryStorerQuantityReceived
+          }
+        : null,
+      ...historicForm
     });
   }
 };

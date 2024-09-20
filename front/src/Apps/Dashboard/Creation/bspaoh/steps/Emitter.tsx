@@ -8,11 +8,12 @@ import { FavoriteType } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import { SealedFieldsContext } from "../../context";
+import { setFieldError } from "../../utils";
 
 const actor = "emitter";
 
-export function Emitter() {
-  const { register, setValue, watch } = useFormContext();
+export function Emitter({ errors }) {
+  const { register, setValue, watch, formState, setError } = useFormContext();
   const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
@@ -23,6 +24,61 @@ export function Emitter() {
     register(`${actor}.company.vatNumber`);
     register(`${actor}.company.address`);
   }, [register]);
+
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.contact`,
+        formState.errors?.[actor]?.["company"]?.contact,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.address`,
+        formState.errors?.[actor]?.["company"]?.address,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.phone`,
+        formState.errors?.[actor]?.["company"]?.phone,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.mail`,
+        formState.errors?.[actor]?.["company"]?.mail,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.vatNumber`,
+        formState.errors?.[actor]?.["company"]?.vatNumber,
+        setError
+      );
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState.errors,
+    formState.errors?.length,
+    setError
+  ]);
 
   const { siret } = useParams<{ siret: string }>();
   const emitter = watch(actor) ?? {};
@@ -64,8 +120,21 @@ export function Emitter() {
           }
         }}
       />
+
+      {formState.errors?.emitter?.["company"]?.orgId?.message && (
+        <p id="text-input-error-desc-error" className="fr-mb-4v fr-error-text">
+          {formState.errors?.emitter?.["company"]?.orgId?.message}
+        </p>
+      )}
+      {formState.errors?.emitter?.["company"]?.siret && (
+        <p className="fr-mb-4v fr-error-text">
+          {formState.errors?.emitter?.["company"]?.siret?.message}
+        </p>
+      )}
+
       <CompanyContactInfo
         fieldName={`${actor}.company`}
+        name={actor}
         disabled={sealedFields.includes(`emitter.company.siret`)}
         key={orgId}
       />

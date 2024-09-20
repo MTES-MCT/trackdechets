@@ -77,9 +77,7 @@ const metadataFragment = gql`
         requiredFor
       }
       fields {
-        sealed {
-          name
-        }
+        sealed
       }
     }
   }

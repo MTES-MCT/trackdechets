@@ -8,7 +8,10 @@ import {
   OperationMode,
   EmitterType
 } from "@prisma/client";
-import { FormStatus } from "../generated/graphql/types";
+import {
+  CiterneNotWashedOutReason,
+  FormStatus
+} from "../generated/graphql/types";
 
 export const FormWithTransportersInclude =
   Prisma.validator<Prisma.FormInclude>()({
@@ -297,6 +300,8 @@ export type Bsdd = {
   destinationOperationNextDestinationCompanyContact: string | null;
   destinationOperationNextDestinationCompanyPhone: string | null;
   destinationOperationNextDestinationCompanyMail: string | null;
+  destinationHasCiterneBeenWashedOut: boolean | null;
+  destinationCiterneNotWashedOutReason: CiterneNotWashedOutReason | null;
   destinationOperationSignatureAuthor: string | null;
   destinationOperationDate: Date | null;
   destinationOperationSignatureDate: Date | null;

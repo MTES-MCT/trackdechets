@@ -25,6 +25,8 @@ import { sirenifyFormInput } from "../../../sirenify";
 import { sub } from "date-fns";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
 import { getStream } from "../../../../activity-events";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -1532,10 +1534,17 @@ describe("Mutation.updateForm", () => {
       appendix2Forms: [{ id: toBeAppendixForm.id }]
     };
     const { mutate } = makeClient(user);
-    await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
-      variables: {
-        updateFormInput
-      }
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+        variables: {
+          updateFormInput
+        }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
     });
 
     // Old appendix form is back to AWAITING_GROUP
@@ -2140,13 +2149,14 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
+
     expect(data3.updateForm.grouping).toHaveLength(1);
 
     const updatedAppendixForm = await prisma.form.findFirstOrThrow({
       where: { id: appendixForm.id }
     });
     expect(updatedAppendixForm.quantityGrouped).toEqual(1);
-  }, 30000);
+  });
 
   it("should default to quantity left when no quantity is specified in grouping", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");

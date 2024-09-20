@@ -34,6 +34,8 @@ type EditableBsddFields = Required<
     | "quantityReceived"
     | "quantityRefused"
     | "quantityReceivedType"
+    | "hasCiterneBeenWashedOut"
+    | "citerneNotWashedOutReason"
     | "processingOperationDone"
     | "destinationOperationMode"
     | "isDeleted"
@@ -76,6 +78,7 @@ type EditableBsddFields = Required<
     | "quantityGrouped"
     | "finalOperations"
     | "FinalOperationToFinalForm"
+    | "emptyReturnADR"
   >
 >;
 

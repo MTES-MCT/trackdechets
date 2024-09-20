@@ -14,6 +14,7 @@ import {
 } from "./types";
 import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
+import { getBsdasriSubType } from "../common/subTypes";
 
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &
@@ -149,6 +150,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
 
   return {
     type: BsdType.BSDASRI,
+    bsdSubType: getBsdasriSubType(bsdasri),
     createdAt: bsdasri.createdAt?.getTime(),
     updatedAt: bsdasri.updatedAt?.getTime(),
     id: bsdasri.id,

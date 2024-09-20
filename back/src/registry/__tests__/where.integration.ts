@@ -8,7 +8,7 @@ import { getBsdasriForElastic, indexBsdasri } from "../../bsdasris/elastic";
 import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
 import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 import { createBsff } from "../../bsffs/__tests__/factories";
-import { indexBsvhu } from "../../bsvhu/elastic";
+import { getBsvhuForElastic, indexBsvhu } from "../../bsvhu/elastic";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { bspaohFactory } from "../../bspaoh/__tests__/factories";
 import { getBspaohForElastic, indexBspaoh } from "../../bspaoh/elastic";
@@ -38,7 +38,7 @@ describe("toElasticFilter", () => {
       BSDD: await getFormForElastic(await formFactory({ ownerId: user.id })),
       BSDA: await getBsdaForElastic(await bsdaFactory({})),
       BSDASRI: await getBsdasriForElastic(await bsdasriFactory({})),
-      BSVHU: await bsvhuFactory({}),
+      BSVHU: await getBsvhuForElastic(await bsvhuFactory({})),
       BSFF: await getBsffForElastic(await createBsff()),
       BSPAOH: await getBspaohForElastic(await bspaohFactory({}))
     };
@@ -85,7 +85,7 @@ describe("toElasticFilter", () => {
         BSDD: await getFormForElastic(await formFactory({ ownerId: user.id })),
         BSDA: await getBsdaForElastic(await bsdaFactory({})),
         BSDASRI: await getBsdasriForElastic(await bsdasriFactory({})),
-        BSVHU: await bsvhuFactory({}),
+        BSVHU: await getBsvhuForElastic(await bsvhuFactory({})),
         BSFF: await getBsffForElastic(await createBsff()),
         BSPAOH: await getBspaohForElastic(await bspaohFactory({}))
       };
@@ -116,7 +116,7 @@ describe("toElasticFilter", () => {
       BSDD: await getFormForElastic(await formFactory({ ownerId: user.id })),
       BSDA: await getBsdaForElastic(await bsdaFactory({})),
       BSDASRI: await getBsdasriForElastic(await bsdasriFactory({})),
-      BSVHU: await bsvhuFactory({}),
+      BSVHU: await getBsvhuForElastic(await bsvhuFactory({})),
       BSFF: await getBsffForElastic(await createBsff()),
       BSPAOH: await getBspaohForElastic(await bspaohFactory({}))
     };

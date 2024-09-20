@@ -1,4 +1,3 @@
-import { getBsdaFromActivityEvents } from "../../activity-events/bsda";
 import {
   BsdaRevisionRequest,
   BsdaRevisionRequestResolvers
@@ -8,7 +7,7 @@ import {
   expandBsdaRevisionRequestContent,
   expandBsdaFromDb
 } from "../converter";
-import { BsdaWithTransporters } from "../types";
+import { BsdaRevisionRequest as PrismaBsdaRevisionRequest } from "@prisma/client";
 
 const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
   approvals: async parent => {
@@ -32,22 +31,43 @@ const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
     }
     return authoringCompany;
   },
-  bsda: async (
-    parent: BsdaRevisionRequest & { bsdaId: string },
-    _,
-    { dataloaders }
-  ) => {
+  bsda: async (parent: BsdaRevisionRequest & PrismaBsdaRevisionRequest) => {
     const actualBsda = await prisma.bsdaRevisionRequest
       .findUnique({ where: { id: parent.id } })
       .bsda({ include: { transporters: true } });
-    const bsdaFromEvents = await getBsdaFromActivityEvents(
-      { bsdaId: parent.bsdaId, at: parent.createdAt },
-      { dataloader: dataloaders.events }
-    );
+
+    if (!actualBsda) {
+      throw new Error(`BsdaRevisionRequest ${parent.id} has no Bsda.`);
+    }
+
     return expandBsdaFromDb({
       ...actualBsda,
-      ...bsdaFromEvents
-    } as BsdaWithTransporters);
+      wasteCode: parent.initialWasteCode,
+      wastePop: parent.initialWastePop,
+      packagings: parent.initialPackagings,
+      wasteSealNumbers: parent.initialWasteSealNumbers,
+      wasteMaterialName: parent.initialWasteMaterialName,
+      destinationCap: parent.initialDestinationCap,
+      destinationReceptionWeight: parent.initialDestinationReceptionWeight,
+      destinationOperationCode: parent.initialDestinationOperationCode,
+      destinationOperationDescription:
+        parent.initialDestinationOperationDescription,
+      destinationOperationMode: parent.initialDestinationOperationMode,
+      brokerCompanyName: parent.initialBrokerCompanyName,
+      brokerCompanySiret: parent.initialBrokerCompanySiret,
+      brokerCompanyAddress: parent.initialBrokerCompanyAddress,
+      brokerCompanyContact: parent.initialBrokerCompanyContact,
+      brokerCompanyPhone: parent.initialBrokerCompanyPhone,
+      brokerCompanyMail: parent.initialBrokerCompanyMail,
+      brokerRecepisseNumber: parent.initialBrokerRecepisseNumber,
+      brokerRecepisseDepartment: parent.initialBrokerRecepisseDepartment,
+      brokerRecepisseValidityLimit: parent.initialBrokerRecepisseValidityLimit,
+      emitterPickupSiteName: parent.initialEmitterPickupSiteName,
+      emitterPickupSiteAddress: parent.initialEmitterPickupSiteAddress,
+      emitterPickupSiteCity: parent.initialEmitterPickupSiteCity,
+      emitterPickupSitePostalCode: parent.initialEmitterPickupSitePostalCode,
+      emitterPickupSiteInfos: parent.initialEmitterPickupSiteInfos
+    });
   }
 };
 

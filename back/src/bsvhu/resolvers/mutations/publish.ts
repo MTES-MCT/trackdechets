@@ -8,6 +8,7 @@ import { getBsvhuRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
 import { ForbiddenError } from "../../../common/errors";
 import { prismaToZodBsvhu } from "../../validation/helpers";
+import { BsvhuForParsingInclude } from "../../validation/types";
 
 export default async function publish(
   _,
@@ -16,7 +17,9 @@ export default async function publish(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const existingBsvhu = await getBsvhuOrNotFound(id);
+  const existingBsvhu = await getBsvhuOrNotFound(id, {
+    include: BsvhuForParsingInclude
+  });
 
   await checkCanUpdate(user, existingBsvhu);
 

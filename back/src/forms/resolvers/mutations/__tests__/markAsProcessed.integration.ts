@@ -18,6 +18,8 @@ import {
 } from "../../../../generated/graphql/types";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { ErrorCode } from "../../../../common/errors";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 jest.mock("axios", () => ({
   default: {
@@ -208,7 +210,8 @@ describe("mutation.markAsProcessed", () => {
     expect(updatedForm.status).toEqual("AWAITING_GROUP");
   });
 
-  it("should fail to mark a form with temporary storage as FOLLOWED_WITH_PNTTD if notification number is missing", async () => {
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  it.skip("should fail to mark a form with temporary storage as FOLLOWED_WITH_PNTTD if notification number is missing", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formWithTempStorageFactory({
       ownerId: user.id,
@@ -551,7 +554,8 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it.each([
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  it.skip.each([
     {
       wasteDetailsCode: "05 01 12*",
       wasteDetailsPop: false,
@@ -1282,17 +1286,24 @@ describe("mutation.markAsProcessed", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_PROCESSED, {
-      variables: {
-        id: form.id,
-        processedInfo: {
-          processingOperationDescription: "Une description",
-          processingOperationDone: "D 1",
-          destinationOperationMode: OperationMode.ELIMINATION,
-          processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z"
+    const mutateFn = () =>
+      mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 1",
+            destinationOperationMode: OperationMode.ELIMINATION,
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z"
+          }
         }
-      }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
     });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
@@ -1305,6 +1316,90 @@ describe("mutation.markAsProcessed", () => {
     });
     expect(updatedGroupedForm2.status).toEqual("PROCESSED");
   });
+
+  it("should mark appendix2 forms as processed recursively", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const groupedForm1 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        quantityReceived: 1
+      }
+    });
+
+    // Regroupement
+    const groupedForm2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        emitterType: "APPENDIX2",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        quantityReceived: 1,
+        grouping: {
+          create: [
+            {
+              initialFormId: groupedForm1.id,
+              quantity: groupedForm1.quantityReceived!.toNumber()
+            }
+          ]
+        }
+      }
+    });
+
+    // Regroupement de regroupement
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        emitterType: "APPENDIX2",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        grouping: {
+          create: [
+            {
+              initialFormId: groupedForm2.id,
+              quantity: groupedForm2.quantityReceived!.toNumber()
+            }
+          ]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const mutateFn = () =>
+      mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 1",
+            destinationOperationMode: OperationMode.ELIMINATION,
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z"
+          }
+        }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
+
+    const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm1.id }
+    });
+    expect(updatedGroupedForm1.status).toEqual("PROCESSED");
+
+    const updatedGroupedForm2 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm1.id }
+    });
+    expect(updatedGroupedForm2.status).toEqual("PROCESSED");
+  });
+
   it("should mark appendix2 forms as processed  despite rogue decimal digits", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
@@ -1349,17 +1444,24 @@ describe("mutation.markAsProcessed", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_PROCESSED, {
-      variables: {
-        id: form.id,
-        processedInfo: {
-          processingOperationDescription: "Une description",
-          processingOperationDone: "D 1",
-          destinationOperationMode: OperationMode.ELIMINATION,
-          processedBy: "A simple bot",
-          processedAt: "2018-12-11T00:00:00.000Z"
+    const mutateFn = () =>
+      mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 1",
+            destinationOperationMode: OperationMode.ELIMINATION,
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z"
+          }
         }
-      }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
     });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
@@ -1564,7 +1666,8 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  test("nextDestinationNotificationNumber should be mandatory when noTraceability is true and wasteCode is dangerous", async () => {
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  test.skip("nextDestinationNotificationNumber should be mandatory when noTraceability is true and wasteCode is dangerous", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -1607,7 +1710,8 @@ describe("mutation.markAsProcessed", () => {
     ]);
   });
 
-  it.each([
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  it.skip.each([
     {
       wasteDetailsCode: "07 07 07*",
       wasteDetailsPop: false,
@@ -1716,7 +1820,7 @@ describe("mutation.markAsProcessed", () => {
     ]);
   });
 
-  test("nextDestinationNotificationNumber should not be mandatory when wasteCode is not conisdered as dangerous", async () => {
+  test("nextDestinationNotificationNumber should not be mandatory when wasteCode is not considered as dangerous", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -1757,7 +1861,8 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toBeUndefined();
   });
 
-  test("nextDestinationNotificationNumber should not be mandatory when nextDestination.company is foreign when noTraceability is false", async () => {
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  test.skip("nextDestinationNotificationNumber should be mandatory when nextDestination.company is foreign when noTraceability is false", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -1929,7 +2034,8 @@ describe("mutation.markAsProcessed", () => {
     ]);
   });
 
-  test("nextDestination.company and notificationNumber should be mandatory when company is extra-EU and when noTraceability is false", async () => {
+  // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
+  test.skip("nextDestination.company and notificationNumber should be mandatory when company is extra-EU and when noTraceability is false", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,

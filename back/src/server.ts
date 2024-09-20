@@ -20,6 +20,8 @@ import { ZodError } from "zod";
 import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { passportBearerMiddleware } from "./auth";
 import { createBsdaDataLoaders } from "./bsda/dataloader";
+import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
+import { createBspaohDataLoaders } from "./bspaoh/dataloader";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
 import { ErrorCode, UserInputError } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
@@ -369,6 +371,8 @@ export const getServerDataloaders = () => ({
   ...createCompanyDataLoaders(),
   ...createFormDataLoaders(),
   ...createBsdaDataLoaders(),
+  ...createBsvhuDataLoaders(),
+  ...createBspaohDataLoaders(),
   ...createEventsDataLoaders()
 });
 
