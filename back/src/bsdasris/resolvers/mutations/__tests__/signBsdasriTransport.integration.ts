@@ -1,11 +1,13 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
+  companyFactory,
   transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
   BsdasriStatus,
+  BsdasriType,
   TransportMode,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -32,7 +34,7 @@ const UPDATE_DASRI = gql`
 `;
 
 describe("Mutation.signBsdasri transport", () => {
-  afterEach(resetDatabase);
+  afterAll(resetDatabase);
 
   it("should put transport signature on a SIGNED_BY_PRODUCER dasri", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
@@ -219,14 +221,19 @@ describe("Mutation.signBsdasri transport", () => {
       // Update ?
       const { mutate } = makeClient(transporter);
       if (updateOpt) {
-        await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
-          variables: {
-            id: dasri.id,
-            input: {
-              ...updateOpt
+        const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+          UPDATE_DASRI,
+          {
+            variables: {
+              id: dasri.id,
+              input: {
+                ...updateOpt
+              }
             }
           }
-        });
+        );
+
+        expect(errors).toBeUndefined();
       }
 
       // Sign transport
@@ -303,6 +310,51 @@ describe("Mutation.signBsdasri transport", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe("Le mode de transport est obligatoire.");
+    });
+
+    it("transport mode is not required for synthesis DASRI", async () => {
+      // Given
+      const { company: initialCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user: transporter, company: transporterCompany } =
+        await userWithCompanyFactory("MEMBER");
+      await transporterReceiptFactory({ company: transporterCompany });
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const mainCompany = await companyFactory();
+      const initialBsdasri = await bsdasriFactory({
+        opt: {
+          ...initialData(initialCompany)
+        }
+      });
+      const synthesisBsdasri = await bsdasriFactory({
+        opt: {
+          type: BsdasriType.SYNTHESIS,
+          ...initialData(mainCompany),
+          ...readyToPublishData(destinationCompany),
+          ...readyToTakeOverData(transporterCompany),
+          status: BsdasriStatus.SIGNED_BY_PRODUCER,
+          synthesizing: { connect: [{ id: initialBsdasri.id }] },
+          transporterTransportMode: null
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(transporter);
+      const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(
+        SIGN_DASRI,
+        {
+          variables: {
+            id: synthesisBsdasri.id,
+            input: { type: "TRANSPORT", author: "Jimmy" }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
     });
   });
 });
