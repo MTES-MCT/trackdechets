@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import {
   AdministrativeTransfer,
+  AdministrativeTransferStatus,
   CompanyPrivate,
   Mutation,
   MutationSubmitAdministrativeTransferApprovalArgs
@@ -16,7 +17,9 @@ type Props = {
 };
 
 export function ApproveAdministrativeTransfer({ company }: Props) {
-  const administrativeTranfer = company.receivedAdministrativeTransfers?.[0];
+  const administrativeTranfer = company.receivedAdministrativeTransfers?.find(
+    at => at.status === AdministrativeTransferStatus.Pending
+  );
   const [isModalOpened, setIsModalOpened] = useState<boolean>(false);
 
   const [
@@ -50,9 +53,9 @@ export function ApproveAdministrativeTransfer({ company }: Props) {
       <p className="company-advanced__description">
         Vous vous apprêtez à valider la modification des BSDs sur lesquels
         l'établissement {administrativeTranfer.from.name} -{" "}
-        {administrativeTranfer.from.orgId} était destinataire (statut reçu, ou
-        en traitement intermédiaire) pour les affecter au nouveau SIRET de votre
-        établissement.
+        {administrativeTranfer.from.orgId} était initialement indiqué comme
+        destinataire (statut "en attente de regroupement") pour les affecter au
+        SIRET de votre établissement.
       </p>
       <p className="company-advanced__description">
         Attention, cette action est définitive.
