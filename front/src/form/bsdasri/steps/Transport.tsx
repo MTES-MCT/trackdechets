@@ -1,5 +1,5 @@
 import { Field, useFormikContext } from "formik";
-import React, { lazy } from "react";
+import React, { lazy, useEffect } from "react";
 import classNames from "classnames";
 import Tooltip from "../../../common/components/Tooltip";
 import WeightWidget from "../components/Weight";
@@ -7,7 +7,12 @@ import { FieldTransportModeSelect } from "../../../common/components";
 import Packagings from "../components/packagings/Packagings";
 import { getInitialWeightFn } from "../utils/initial-state";
 import DateInput from "../../common/components/custom-inputs/DateInput";
-import { BsdasriStatus, Bsdasri, BsdasriType } from "@td/codegen-ui";
+import {
+  BsdasriStatus,
+  Bsdasri,
+  BsdasriType,
+  TransportMode
+} from "@td/codegen-ui";
 import Acceptation from "../components/acceptation/Acceptation";
 import { customInfoToolTip } from "./Emitter";
 import { subMonths } from "date-fns";
@@ -23,6 +28,13 @@ export default function Transport({ status, editionDisabled = false }) {
     }
   }
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
+
+  useEffect(() => {
+    // If no transport mode selected, default to ROAD
+    if (!values.transporter?.transport?.mode) {
+      setFieldValue("transporter.transport.mode", TransportMode.Road);
+    }
+  });
 
   const showTransportFields =
     [
