@@ -18,7 +18,7 @@ export const CompanyRndtsDeclarationDelegationAsDelegator = ({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data, loading } = useQuery<
+  const { data, refetch, loading } = useQuery<
     Pick<Query, "rndtsDeclarationDelegations">
   >(RNDTS_DECLARATION_DELEGATIONS, {
     skip: !company?.orgId,
@@ -27,6 +27,7 @@ export const CompanyRndtsDeclarationDelegationAsDelegator = ({
     }
   });
 
+  const totalCount = data?.rndtsDeclarationDelegations.totalCount;
   const delegations =
     data?.rndtsDeclarationDelegations.edges.map(edge => edge.node) ?? [];
 
@@ -58,14 +59,20 @@ export const CompanyRndtsDeclarationDelegationAsDelegator = ({
 
       <div>
         <RndtsDeclarationDelegationsTable
+          as="delegator"
           loading={loading}
+          totalCount={totalCount}
           delegations={delegations}
+          refetch={args =>
+            refetch({ ...args, where: { delegatorOrgId: company.orgId } })
+          }
         />
       </div>
 
       <CreateRndtsDeclarationDelegationModal
         company={company}
         isOpen={isModalOpen}
+        onCreate={refetch}
         onClose={() => setIsModalOpen(false)}
       />
     </>

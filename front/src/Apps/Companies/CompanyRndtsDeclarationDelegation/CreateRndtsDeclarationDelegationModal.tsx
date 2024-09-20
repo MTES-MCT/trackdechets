@@ -74,23 +74,22 @@ const getSchema = () =>
 interface Props {
   company: CompanyPrivate;
   isOpen: boolean;
+  onCreate: () => void;
   onClose: () => void;
 }
 
 export const CreateRndtsDeclarationDelegationModal = ({
   company,
   onClose,
+  onCreate,
   isOpen
 }: Props) => {
-  const [createRndtsDeclarationDelegation, { loading, error }] = useMutation<
+  const [createRndtsDeclarationDelegation, { loading }] = useMutation<
     Pick<Mutation, "createRndtsDeclarationDelegation">,
     MutationCreateRndtsDeclarationDelegationArgs
   >(CREATE_RNDTS_DECLARATION_DELEGATION);
 
   const onSubmit = async input => {
-    console.log(">> onSubmit!");
-    console.log("input", input);
-
     await createRndtsDeclarationDelegation({
       variables: {
         input: {
@@ -98,10 +97,11 @@ export const CreateRndtsDeclarationDelegationModal = ({
           delegatorOrgId: company.orgId
         }
       },
-      onCompleted: data => toast.success("Délégation créée!"),
+      onCompleted: () => toast.success("Délégation créée!"),
       onError: err => toast.error(err.message)
     });
 
+    onCreate();
     onClose();
   };
 
@@ -141,6 +141,9 @@ export const CreateRndtsDeclarationDelegationModal = ({
             selectedCompanyError={selectedCompany => {
               if (selectedCompany?.orgId === company.orgId) {
                 return "Le délégant et le délégataire doivent être différents";
+              }
+              if (!selectedCompany?.siret) {
+                return "L'entreprise doit avoir un n° de SIRET";
               }
               return null;
             }}

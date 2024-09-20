@@ -33,6 +33,7 @@ export const CompanyRndtsDeclarationDelegationAsDelegate = ({
       </div>
       <div>
         <RndtsDeclarationDelegationsTable
+          as="delegate"
           loading={loading}
           delegations={delegations}
         />
