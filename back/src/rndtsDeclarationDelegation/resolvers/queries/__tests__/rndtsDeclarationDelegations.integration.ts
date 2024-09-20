@@ -14,11 +14,11 @@ import { prisma } from "@td/prisma";
 
 const RNDTS_DECLARATION_DELEGATIONS = gql`
   query rndtsDeclarationDelegations(
-    $after: ID
+    $skip: Int
     $first: Int
     $where: RndtsDeclarationDelegationWhere
   ) {
-    rndtsDeclarationDelegations(after: $after, first: $first, where: $where) {
+    rndtsDeclarationDelegations(skip: $skip, first: $first, where: $where) {
       totalCount
       pageInfo {
         startCursor
@@ -264,6 +264,61 @@ describe("query rndtsDeclarationDelegations", () => {
     );
     expect(data2.rndtsDeclarationDelegations.edges[1].node.id).toBe(
       delegation2.id
+    );
+  });
+
+  it("should return paginated results", async () => {
+    // Given
+    const { delegation, delegatorUser, delegatorCompany, delegateCompany } =
+      await rndtsDeclarationDelegationFactory();
+    const delegation2 =
+      await rndtsDeclarationDelegationFactoryWithExistingCompanies(
+        delegateCompany,
+        delegatorCompany
+      );
+    const delegation3 =
+      await rndtsDeclarationDelegationFactoryWithExistingCompanies(
+        delegateCompany,
+        delegatorCompany
+      );
+
+    // When (1st page)
+    const { errors: errors1, data: data1 } = await getDelegations(
+      delegatorUser,
+      {
+        where: { delegatorOrgId: delegatorCompany.orgId },
+        first: 2,
+        skip: 0
+      }
+    );
+
+    // Then
+    expect(errors1).toBeUndefined();
+    expect(data1.rndtsDeclarationDelegations.totalCount).toBe(3);
+    expect(data1.rndtsDeclarationDelegations.edges.length).toBe(2);
+    expect(data1.rndtsDeclarationDelegations.edges[0].node.id).toBe(
+      delegation3.id
+    );
+    expect(data1.rndtsDeclarationDelegations.edges[1].node.id).toBe(
+      delegation2.id
+    );
+
+    // When (second page)
+    const { errors: errors2, data: data2 } = await getDelegations(
+      delegatorUser,
+      {
+        where: { delegatorOrgId: delegatorCompany.orgId },
+        first: 2,
+        skip: 2
+      }
+    );
+
+    // Then
+    expect(errors2).toBeUndefined();
+    expect(data2.rndtsDeclarationDelegations.totalCount).toBe(3);
+    expect(data2.rndtsDeclarationDelegations.edges.length).toBe(1);
+    expect(data2.rndtsDeclarationDelegations.edges[0].node.id).toBe(
+      delegation.id
     );
   });
 });

@@ -1,18 +1,21 @@
 import { Company } from "@prisma/client";
-import { getConnection } from "../../../../common/pagination";
+import {
+  getConnection,
+  getPrismaPaginationArgs
+} from "../../../../common/pagination";
 import { getRndtsDeclarationDelegationRepository } from "../../../repository";
 import { UserInputError } from "../../../../common/errors";
 
 interface Args {
   delegate?: Company;
   delegator?: Company;
-  after?: string | null | undefined;
+  skip?: number | null | undefined;
   first?: number | null | undefined;
 }
 
 export const getPaginatedDelegations = async (
   user: Express.User,
-  { delegate, delegator, after, first }: Args
+  { delegate, delegator, skip, first }: Args
 ) => {
   if (!delegate && !delegator) {
     throw new UserInputError(
@@ -27,20 +30,22 @@ export const getPaginatedDelegations = async (
     delegatorId: delegator?.id
   };
 
-  const pageSize = Math.max(Math.min(first ?? 0, 50), 10);
-
   const totalCount = await delegationRepository.count(fixedWhere);
+
+  const paginationArgs = getPrismaPaginationArgs({
+    skip: skip ?? 0,
+    first: first ?? 10
+  });
 
   const result = await getConnection({
     totalCount,
-    findMany: prismaPaginationArgs =>
+    findMany: () =>
       delegationRepository.findMany(fixedWhere, {
-        ...prismaPaginationArgs,
+        ...paginationArgs,
         orderBy: { updatedAt: "desc" },
         include: { delegator: true, delegate: true }
       }),
-    formatNode: node => ({ ...node }),
-    ...{ after, first: pageSize }
+    formatNode: node => ({ ...node })
   });
 
   return result;
