@@ -20,7 +20,6 @@ module.exports = async ({ github, context, core }) => {
       pull_number,
       per_page: 100
     });
-    debug(JSON.stringify(res.data, null, 2));
     const userIds = {};
     const reviews = res.data.reverse().filter(review => {
       if (
