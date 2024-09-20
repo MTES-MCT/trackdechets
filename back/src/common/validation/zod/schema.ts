@@ -16,21 +16,21 @@ export enum CompanyRole {
 export const pathFromCompanyRole = (companyRole?: CompanyRole): string[] => {
   switch (companyRole) {
     case CompanyRole.Emitter:
-      return ["emitter"];
+      return ["emitter", "company", "siret"];
     case CompanyRole.Transporter:
-      return ["transporter"];
+      return ["transporter", "company", "siret"];
     case CompanyRole.Destination:
-      return ["destination"];
+      return ["destination", "company", "siret"];
     case CompanyRole.EcoOrganisme:
-      return ["ecoOrganisme"];
+      return ["ecoOrganisme", "company", "siret"];
     case CompanyRole.Broker:
-      return ["broker"];
+      return ["broker", "company", "siret"];
     case CompanyRole.Worker:
-      return ["worker"];
+      return ["worker", "company", "siret"];
     case CompanyRole.Intermediary:
-      return ["intermediaries"];
+      return ["intermediaries", "company", "siret"];
     case CompanyRole.NextDestination:
-      return ["nextDestination"];
+      return ["nextDestination", "company", "siret"];
     default:
       return [];
   }
