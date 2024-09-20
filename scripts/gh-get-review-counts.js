@@ -14,7 +14,7 @@ module.exports = async ({ github, context, core }) => {
     const { owner, repo } = context.repo;
     const pull_number = prData.number;
 
-    const data = await github.pulls.listReviews({
+    const data = await github.rest.pulls.listReviews({
       owner,
       repo,
       pull_number,
