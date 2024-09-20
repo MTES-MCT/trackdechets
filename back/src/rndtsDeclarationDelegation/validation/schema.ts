@@ -73,6 +73,6 @@ export const queryRndtsDeclarationDelegationsArgsSchema = z.object({
       data => !(Boolean(data.delegatorOrgId) && Boolean(data.delegateOrgId)),
       "Vous ne pouvez pas renseigner les deux champs (delegatorOrgId et delegateOrgId)."
     ),
-  after: idSchema.nullish(),
-  first: z.number().min(10).max(50).nullish()
+  skip: z.number().nonnegative().nullish(),
+  first: z.number().min(1).max(50).nullish()
 });

@@ -33,7 +33,7 @@ const rndtsDeclarationDelegationsResolver: QueryResolvers["rndtsDeclarationDeleg
     const paginatedDelegations = await getPaginatedDelegations(user, {
       delegate,
       delegator,
-      after: paginationArgs.after,
+      skip: paginationArgs.skip,
       first: paginationArgs.first
     });
 
