@@ -91,30 +91,24 @@ const bsdTypeFilterSelectOptions = [
     ]
   },
   {
-    value: BsdType.Bsdasri,
-    label: bsd_type_option_bsdasri,
+    value: BsdType.Bsda,
+    label: bsd_type_option_bsda,
     options: [
       {
         value: BsdSubType.Initial,
         label: bsd_sub_type_option_initial
-      },
-      {
-        value: BsdSubType.Synthesis,
-        label: bsd_sub_type_option_synthesis
       },
       {
         value: BsdSubType.Gathering,
         label: bsd_sub_type_option_gathering
-      }
-    ]
-  },
-  {
-    value: BsdType.Bsvhu,
-    label: bsd_type_option_bsvhu,
-    options: [
+      },
       {
-        value: BsdSubType.Initial,
-        label: bsd_sub_type_option_initial
+        value: BsdSubType.Reshipment,
+        label: bsd_sub_type_option_reshipment
+      },
+      {
+        value: BsdSubType.Collection_2710,
+        label: bsd_sub_type_option_collection_2710
       }
     ]
   },
@@ -141,36 +135,30 @@ const bsdTypeFilterSelectOptions = [
     ]
   },
   {
-    value: BsdType.Bsda,
-    label: bsd_type_option_bsda,
+    value: BsdType.Bsvhu,
+    label: bsd_type_option_bsvhu
+  },
+  {
+    value: BsdType.Bsdasri,
+    label: bsd_type_option_bsdasri,
     options: [
       {
         value: BsdSubType.Initial,
         label: bsd_sub_type_option_initial
       },
       {
+        value: BsdSubType.Synthesis,
+        label: bsd_sub_type_option_synthesis
+      },
+      {
         value: BsdSubType.Gathering,
         label: bsd_sub_type_option_gathering
-      },
-      {
-        value: BsdSubType.Reshipment,
-        label: bsd_sub_type_option_reshipment
-      },
-      {
-        value: BsdSubType.Collection_2710,
-        label: bsd_sub_type_option_collection_2710
       }
     ]
   },
   {
     value: BsdType.Bspaoh,
-    label: bsd_type_option_bspaoh,
-    options: [
-      {
-        value: BsdSubType.Initial,
-        label: bsd_sub_type_option_initial
-      }
-    ]
+    label: bsd_type_option_bspaoh
   }
 ];
 

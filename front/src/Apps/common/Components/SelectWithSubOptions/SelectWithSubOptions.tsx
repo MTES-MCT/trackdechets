@@ -77,6 +77,7 @@ const SelectWithSubOptions = ({
 
             {/* Option's potential sub-options */}
             {option.options &&
+              optionIsAlreadySelected &&
               mapOptions(
                 option.options,
                 [...parentPaths, option.value],
