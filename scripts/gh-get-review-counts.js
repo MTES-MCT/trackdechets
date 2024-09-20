@@ -20,7 +20,7 @@ module.exports = async ({ github, context, core }) => {
       pull_number,
       per_page: 100
     });
-
+    debug(data);
     const reviews = data.filter(review =>
       ["COLLABORATOR", "MEMBER", "OWNER"].includes(review.author_association)
     );
