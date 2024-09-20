@@ -60,10 +60,10 @@ export const getPublishErrorTabIds = (apiErrors, tabIds) => {
   const publishErrorTabIds = [
     ...new Set(
       apiErrors?.map(apiError => {
-        if (apiError.path[0].includes("weight")) {
+        if (apiError.path[0]?.includes("weight")) {
           return tabIds.find(key => key === "waste");
         }
-        return tabIds.find(key => apiError.path[0].includes(key));
+        return tabIds.find(key => apiError.path[0]?.includes(key));
       })
     )
   ];
@@ -104,6 +104,10 @@ export const handleGraphQlError = (err, setPublishErrors) => {
       message: string;
     }[];
     if (issues?.length) {
+      const errorsWithEmptyPath = issues.filter(f => !f.path.length);
+      if (errorsWithEmptyPath.length) {
+        toastApolloError(err);
+      }
       const errorDetailList = issues?.map(error => {
         return error;
       });
