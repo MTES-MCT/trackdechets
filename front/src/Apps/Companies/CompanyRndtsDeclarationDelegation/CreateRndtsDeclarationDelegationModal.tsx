@@ -74,14 +74,12 @@ const getSchema = () =>
 interface Props {
   company: CompanyPrivate;
   isOpen: boolean;
-  onCreate: () => void;
   onClose: () => void;
 }
 
 export const CreateRndtsDeclarationDelegationModal = ({
   company,
   onClose,
-  onCreate,
   isOpen
 }: Props) => {
   const [createRndtsDeclarationDelegation, { loading }] = useMutation<
@@ -101,7 +99,7 @@ export const CreateRndtsDeclarationDelegationModal = ({
       onError: err => toast.error(err.message)
     });
 
-    onCreate();
+    // TODO: add created delegation to Table cache
     onClose();
   };
 

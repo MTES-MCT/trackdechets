@@ -1,24 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Query,
-  RndtsDeclarationDelegation,
   RndtsDeclarationDelegationStatus
 } from "../../../../../libs/front/codegen-ui/src";
 import { isDefinedStrict } from "../../../common/helper";
 import { formatDateViewDisplay } from "../common/utils";
 import classnames from "classnames";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
-import { ApolloQueryResult, OperationVariables } from "@apollo/client";
+import "./companyRndtsDeclarationDelegation.scss";
+import { useQuery } from "@apollo/client";
+import { RNDTS_DECLARATION_DELEGATIONS } from "../../common/queries/rndtsDeclarationDelegation/queries";
+import Button from "@codegouvfr/react-dsfr/Button";
 
-interface Props {
-  delegations: RndtsDeclarationDelegation[];
-  loading: boolean;
-  totalCount: number;
-  as: "delegator" | "delegate";
-  refetch: (
-    variables?: Partial<OperationVariables> | undefined
-  ) => Promise<ApolloQueryResult<Pick<Query, "rndtsDeclarationDelegations">>>;
-}
+const getStatusLabel = (status: RndtsDeclarationDelegationStatus) => {
+  switch (status) {
+    case RndtsDeclarationDelegationStatus.Ongoing:
+      return "À VENIR";
+    case RndtsDeclarationDelegationStatus.Incoming:
+      return "EN COURS";
+    case RndtsDeclarationDelegationStatus.Closed:
+      return "CLÔTURÉE";
+  }
+};
 
 const getStatusBadge = (status: RndtsDeclarationDelegationStatus) => {
   return (
@@ -30,24 +33,46 @@ const getStatusBadge = (status: RndtsDeclarationDelegationStatus) => {
         "fr-badge--error": status === RndtsDeclarationDelegationStatus.Closed
       })}
     >
-      {status}
+      {getStatusLabel(status)}
     </p>
   );
 };
 
+interface Props {
+  as: "delegator" | "delegate";
+  companyOrgId: string;
+}
+
 export const RndtsDeclarationDelegationsTable = ({
   as,
-  delegations = [],
-  totalCount = 0,
-  loading = true,
-  refetch
+  companyOrgId
 }: Props) => {
+  const [pageIndex, setPageIndex] = useState(0);
+
+  const { data, loading, refetch } = useQuery<
+    Pick<Query, "rndtsDeclarationDelegations">
+  >(RNDTS_DECLARATION_DELEGATIONS, {
+    skip: !companyOrgId,
+    variables: {
+      where:
+        as === "delegate"
+          ? { delegateOrgId: companyOrgId }
+          : { delegatorOrgId: companyOrgId }
+    }
+  });
+
+  const totalCount = data?.rndtsDeclarationDelegations.totalCount;
+  const delegations =
+    data?.rndtsDeclarationDelegations.edges.map(edge => edge.node) ?? [];
+
   const PAGE_SIZE = 10;
   const pageCount = totalCount ? Math.ceil(totalCount / PAGE_SIZE) : 0;
-  const pageIndex = 0;
+
   const gotoPage = (page: number) => {
+    setPageIndex(page);
+
     refetch({
-      after: delegations[delegations.length - 1].id,
+      skip: page * PAGE_SIZE,
       first: PAGE_SIZE
     });
   };
@@ -97,7 +122,25 @@ export const RndtsDeclarationDelegationsTable = ({
                           {endDate ? formatDateViewDisplay(endDate) : "-"}
                         </td>
                         <td>{getStatusBadge(status)}</td>
-                        <td>[X]</td>
+                        <td>
+                          {status !==
+                            RndtsDeclarationDelegationStatus.Closed && (
+                            <Button
+                              priority="primary"
+                              size="small"
+                              className="fr-my-4v"
+                              nativeButtonProps={{
+                                type: "button",
+                                "data-testid":
+                                  "company-revoke-rndtsDeclarationDelegation"
+                              }}
+                              disabled={false}
+                              onClick={() => {}}
+                            >
+                              Révoquer
+                            </Button>
+                          )}
+                        </td>
                       </tr>
                     );
                   }

@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import "./companyRndtsDeclarationDelegation.scss";
-import { CompanyPrivate, Query, UserRole } from "@td/codegen-ui";
+import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { CreateRndtsDeclarationDelegationModal } from "./CreateRndtsDeclarationDelegationModal";
 import { RndtsDeclarationDelegationsTable } from "./RndtsDeclarationDelegationsTable";
-import { useQuery } from "@apollo/client";
-import { RNDTS_DECLARATION_DELEGATIONS } from "../../common/queries/rndtsDeclarationDelegation/queries";
 
 interface Props {
   company: CompanyPrivate;
@@ -17,19 +15,6 @@ export const CompanyRndtsDeclarationDelegationAsDelegator = ({
   const isAdmin = company.userRole === UserRole.Admin;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { data, refetch, loading } = useQuery<
-    Pick<Query, "rndtsDeclarationDelegations">
-  >(RNDTS_DECLARATION_DELEGATIONS, {
-    skip: !company?.orgId,
-    variables: {
-      where: { delegatorOrgId: company.orgId }
-    }
-  });
-
-  const totalCount = data?.rndtsDeclarationDelegations.totalCount;
-  const delegations =
-    data?.rndtsDeclarationDelegations.edges.map(edge => edge.node) ?? [];
 
   return (
     <>
@@ -49,7 +34,7 @@ export const CompanyRndtsDeclarationDelegationAsDelegator = ({
               type: "button",
               "data-testid": "company-add-rndtsDeclarationDelegation"
             }}
-            disabled={false}
+            disabled={isModalOpen}
             onClick={() => setIsModalOpen(true)}
           >
             Créer une délégation
@@ -60,19 +45,13 @@ export const CompanyRndtsDeclarationDelegationAsDelegator = ({
       <div>
         <RndtsDeclarationDelegationsTable
           as="delegator"
-          loading={loading}
-          totalCount={totalCount}
-          delegations={delegations}
-          refetch={args =>
-            refetch({ ...args, where: { delegatorOrgId: company.orgId } })
-          }
+          companyOrgId={company.orgId}
         />
       </div>
 
       <CreateRndtsDeclarationDelegationModal
         company={company}
         isOpen={isModalOpen}
-        onCreate={refetch}
         onClose={() => setIsModalOpen(false)}
       />
     </>

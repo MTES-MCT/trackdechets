@@ -23,11 +23,11 @@ export const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
 
 export const RNDTS_DECLARATION_DELEGATIONS = gql`
   query rndtsDeclarationDelegations(
-    $after: ID
+    $skip: Int
     $first: Int
     $where: RndtsDeclarationDelegationWhere
   ) {
-    rndtsDeclarationDelegations(after: $after, first: $first, where: $where) {
+    rndtsDeclarationDelegations(skip: $skip, first: $first, where: $where) {
       totalCount
       pageInfo {
         startCursor
