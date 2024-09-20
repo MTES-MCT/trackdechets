@@ -1,3 +1,5 @@
+name: Add Ready to merge label
+
 on:
   pull_request_review:
     types:

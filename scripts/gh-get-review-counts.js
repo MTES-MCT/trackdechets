@@ -14,14 +14,14 @@ module.exports = async ({ github, context, core }) => {
     const { owner, repo } = context.repo;
     const pull_number = prData.number;
 
-    const data = await github.rest.pulls.listReviews({
+    const res = await github.rest.pulls.listReviews({
       owner,
       repo,
       pull_number,
       per_page: 100
     });
-    debug(data);
-    const reviews = data.filter(review =>
+    debug(JSON.stringify(res.data, null, 2));
+    const reviews = res.data.filter(review =>
       ["COLLABORATOR", "MEMBER", "OWNER"].includes(review.author_association)
     );
 
