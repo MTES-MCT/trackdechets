@@ -148,11 +148,14 @@ export const emitterSchema: FactorySchemaOf<
       context.emissionSignature && !context?.isSynthesis,
       `Émetteur: ${MISSING_COMPANY_NAME}`
     ),
-    emitterCompanySiret: siret.label("Émetteur").requiredIf(
-      // field copied from transporter returning an error message would be confusing
-      context.emissionSignature && !context?.isSynthesis,
-      `Émetteur: ${MISSING_COMPANY_SIRET}`
-    ),
+    emitterCompanySiret: siret
+      .label("Émetteur")
+      .requiredIf(
+        // field copied from transporter returning an error message would be confusing
+        context.emissionSignature && !context?.isSynthesis,
+        `Émetteur: ${MISSING_COMPANY_SIRET}`
+      )
+      .test(siretTests.isNotDormant),
     emitterCompanyAddress: yup.string().requiredIf(
       // field copied from transporter returning an error message would be confusing
       context.emissionSignature && !context?.isSynthesis,

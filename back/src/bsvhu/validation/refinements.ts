@@ -14,6 +14,7 @@ import { WasteAcceptationStatus } from "@prisma/client";
 import {
   destinationOperationModeRefinement,
   isDestinationRefinement,
+  isNotDormantRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
 } from "../../common/validation/zod/refinement";
@@ -32,6 +33,7 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
   bsvhu,
   zodContext
 ) => {
+  await isNotDormantRefinement(bsvhu.emitterCompanySiret, zodContext);
   await isDestinationRefinement(
     bsvhu.destinationCompanySiret,
     zodContext,

@@ -151,6 +151,23 @@ export async function isDestinationRefinement(
   }
 }
 
+export async function isNotDormantRefinement(
+  siret: string | null | undefined,
+  ctx: RefinementCtx
+) {
+  if (!siret) return null;
+  const company = await prisma.company.findUnique({
+    where: { siret }
+  });
+
+  if (company?.isDormantSince) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+    });
+  }
+}
+
 export function destinationOperationModeRefinement(
   destinationOperationCode: string | null | undefined,
   destinationOperationMode: string | null | undefined,
