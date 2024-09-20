@@ -20,6 +20,7 @@ export function toElasticSimpleQuery(where: BsdWhere) {
     bool: {
       must: [
         toElasticStringQuery("type", where.type),
+        toElasticStringQuery("bsdSubType", where.bsdSubType),
         toElasticStringQuery("id", where.id, GET_BSDS_READABLE_ID_MAX_LENGTH),
         toElasticStringQuery(
           "readableId",
@@ -189,10 +190,11 @@ export function toElasticSimpleQuery(where: BsdWhere) {
   };
 }
 
+const MAX_DEPTH = 3;
 export function toElasticQuery(where: BsdWhere): estypes.QueryContainer {
   function inner(where: BsdWhere, depth = 0) {
-    if (depth > 2) {
-      throw new NestingWhereError(2);
+    if (depth > MAX_DEPTH) {
+      throw new NestingWhereError(MAX_DEPTH);
     }
 
     const { _and, _or, ...rest } = where;

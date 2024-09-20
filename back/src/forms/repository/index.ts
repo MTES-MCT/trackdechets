@@ -18,7 +18,6 @@ import { buildSetAppendix1 } from "./form/setAppendix1";
 import buildSetAppendix2 from "./form/setAppendix2";
 import buildUpdateForm from "./form/update";
 import { buildUpdateAppendix1Forms } from "./form/updateAppendix1Forms";
-import buildUpdateAppendix2Forms from "./form/updateAppendix2Forms";
 import buildUpdateManyForms from "./form/updateMany";
 import buildAcceptRevisionRequestApproval from "./formRevisionRequest/acceptRevisionRequestApproval";
 import buildCancelRevisionRequest from "./formRevisionRequest/cancelRevisionRequest";
@@ -61,7 +60,6 @@ export function getFormRepository(
     setAppendix1: useTransaction(buildSetAppendix1),
     setAppendix2: useTransaction(buildSetAppendix2),
     updateAppendix1Forms: useTransaction(buildUpdateAppendix1Forms),
-    updateAppendix2Forms: useTransaction(buildUpdateAppendix2Forms),
     deleteStaleSegments: useTransaction(buildDeleteFormStaleSegments)
   };
 

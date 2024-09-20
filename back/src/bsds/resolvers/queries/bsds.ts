@@ -347,8 +347,6 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
 
   const user = checkIsAuthenticated(context);
 
-  // check if user
-
   const MIN_SIZE = 0;
   const MAX_SIZE = 100;
   const { first = MAX_SIZE } = args;

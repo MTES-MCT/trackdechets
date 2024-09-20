@@ -7,9 +7,42 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2024.9.1] 24/09/2024
 
+#### :rocket: Nouvelles fonctionnalités
+
+- ETQ destinataire, je peux spécifier le statut de rinçage de la citerne pour son retour à vide (back) [PR 3546](https://github.com/MTES-MCT/trackdechets/pull/3546)
+- ETQ destinataire, je peux indiquer que mon véhicule est rincé ou non pour son retour à vide (back) [PR 3548](https://github.com/MTES-MCT/trackdechets/pull/3548)
+- Ajout d'intermédiaires sur les BSVHU [PR 3560](https://github.com/MTES-MCT/trackdechets/pull/3560)
+
 #### :nail_care: Améliorations
 
 - Ajouter deux sous-profils pour l'installation de traitement VHU [PR 3480](https://github.com/MTES-MCT/trackdechets/pull/3480)
+- Rendre les chemins d'erreur Zod BSVHU/BSPAOH plus explicite en les subdivisant [PR 3547](https://github.com/MTES-MCT/trackdechets/pull/3547)
+- Ajout d'un filtre par sous-type de bordereau [PR 3476](https://github.com/MTES-MCT/trackdechets/pull/3476)
+- Amélioration des pages de connexion oauth / oidc avec leur passage au DSFR [PR 3550](https://github.com/MTES-MCT/trackdechets/pull/3550)
+- Amélioration de la page Mes applications avec le passage au DSFR [PR 3562](https://github.com/MTES-MCT/trackdechets/pull/3562)
+- ETQ destinataire, je peux indiquer que mon véhicule est rincé ou non pour son retour à vide [PR 3576](https://github.com/MTES-MCT/trackdechets/pull/3576)
+- ETQ destinataire, je peux indiquer que la citerne est rincée pour son retour à vide [PR 3573](https://github.com/MTES-MCT/trackdechets/pull/3573)
+
+#### :boom: Breaking changes
+
+- Rendre obligatoire le volume du contenant à la publication sur le BSFF [PR 3555](https://github.com/MTES-MCT/trackdechets/pull/3555)
+- Le mode de transport est désormais obligatoire à la signature transporteur [PR 3551](https://github.com/MTES-MCT/trackdechets/pull/3551)
+
+#### :bug: Corrections de bugs
+
+- Correction du poids affiché sur le tableau de bord en cas de refus total pour les BSDD [PR 3536](https://github.com/MTES-MCT/trackdechets/pull/3536)
+
+#### :house: Interne
+
+- Permettre la mise à jour en masse des profils et sous-profils d'établissements via l'interface d'administration [PR 3565](https://github.com/MTES-MCT/trackdechets/pull/3565)
+
+#### :house: Interne
+
+- Ajout des colonnes de sous-type au script d'import en masse [PR 3568](https://github.com/MTES-MCT/trackdechets/pull/3568)
+
+#### :house: Interne
+
+- Génération de modèles de bsds vides [PR 3556](https://github.com/MTES-MCT/trackdechets/pull/3556)
 
 # [2024.8.1] 27/08/2024
 

@@ -5,12 +5,13 @@ import { Permission, checkUserPermissions } from "../permissions";
 /**
  * Retrieves organisations allowed to read a BSVHU
  */
-function readers(bsda: Bsvhu): string[] {
+function readers(bsvhu: Bsvhu): string[] {
   return [
-    bsda.emitterCompanySiret,
-    bsda.destinationCompanySiret,
-    bsda.transporterCompanySiret,
-    bsda.transporterCompanyVatNumber
+    bsvhu.emitterCompanySiret,
+    bsvhu.destinationCompanySiret,
+    bsvhu.transporterCompanySiret,
+    bsvhu.transporterCompanyVatNumber,
+    ...bsvhu.intermediariesOrgIds
   ].filter(Boolean);
 }
 
@@ -20,38 +21,48 @@ function readers(bsda: Bsvhu): string[] {
  * parameter to pre-compute the form contributors after the update, hence verifying
  * a user is not removing his own company from the BSVHU
  */
-function contributors(bsda: Bsvhu, input?: BsvhuInput): string[] {
+function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateDestinationCompanySiret = input?.destination?.company?.siret;
   const updateTransporterCompanySiret = input?.transporter?.company?.siret;
   const updateTransporterCompanyVatNumber =
     input?.transporter?.company?.vatNumber;
+  const updateIntermediaries = (input?.intermediaries ?? []).flatMap(i => [
+    i.siret,
+    i.vatNumber
+  ]);
 
   const emitterCompanySiret =
     updateEmitterCompanySiret !== undefined
       ? updateEmitterCompanySiret
-      : bsda.emitterCompanySiret;
+      : bsvhu.emitterCompanySiret;
 
   const destinationCompanySiret =
     updateDestinationCompanySiret !== undefined
       ? updateDestinationCompanySiret
-      : bsda.destinationCompanySiret;
+      : bsvhu.destinationCompanySiret;
 
   const transporterCompanySiret =
     updateTransporterCompanySiret !== undefined
       ? updateTransporterCompanySiret
-      : bsda.transporterCompanySiret;
+      : bsvhu.transporterCompanySiret;
 
   const transporterCompanyVatNumber =
     updateTransporterCompanyVatNumber !== undefined
       ? updateTransporterCompanyVatNumber
-      : bsda.transporterCompanyVatNumber;
+      : bsvhu.transporterCompanyVatNumber;
+
+  const intermediariesOrgIds =
+    input?.intermediaries !== undefined
+      ? updateIntermediaries
+      : bsvhu.intermediariesOrgIds;
 
   return [
     emitterCompanySiret,
     destinationCompanySiret,
     transporterCompanySiret,
-    transporterCompanyVatNumber
+    transporterCompanyVatNumber,
+    ...intermediariesOrgIds
   ].filter(Boolean);
 }
 
@@ -67,8 +78,8 @@ function creators(input: BsvhuInput) {
   ].filter(Boolean);
 }
 
-export async function checkCanRead(user: User, bsda: Bsvhu) {
-  const authorizedOrgIds = readers(bsda);
+export async function checkCanRead(user: User, bsvhu: Bsvhu) {
+  const authorizedOrgIds = readers(bsvhu);
 
   return checkUserPermissions(
     user,

@@ -738,6 +738,8 @@ export function expandFormFromDb(
     wasteRefusalReason: forwardedIn
       ? forwardedIn.wasteRefusalReason
       : form.wasteRefusalReason,
+    hasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
+    citerneNotWashedOutReason: form.citerneNotWashedOutReason,
     receivedBy: forwardedIn ? forwardedIn.receivedBy : form.receivedBy,
     receivedAt: processDate(
       forwardedIn ? forwardedIn.receivedAt : form.receivedAt
@@ -770,6 +772,7 @@ export function expandFormFromDb(
     noTraceability: forwardedIn
       ? forwardedIn.noTraceability
       : form.noTraceability,
+    emptyReturnADR: form.emptyReturnADR,
     nextDestination: forwardedIn
       ? nullIfNoValues<NextDestination>({
           processingOperation: forwardedIn.nextDestinationProcessingOperation,

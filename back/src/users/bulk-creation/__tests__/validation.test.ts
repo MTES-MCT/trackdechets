@@ -32,7 +32,10 @@ describe("company validation", () => {
   test("valid company", async () => {
     const company = {
       siret: siretify(1),
-      companyTypes: ["PRODUCER"]
+      companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: []
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
       company
@@ -43,13 +46,19 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret: null,
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
 
     await expect(
       companyValidationSchema.validate({
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
   });
@@ -58,7 +67,10 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret: "123",
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
   });
@@ -67,7 +79,10 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret: "123456789 234",
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
   });
@@ -79,7 +94,10 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret: siretify(1),
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
   });
@@ -89,7 +107,10 @@ describe("company validation", () => {
     console.warn = jest.fn();
     await companyValidationSchema.validate({
       siret: siretify(1),
-      companyTypes: ["PRODUCER"]
+      companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: []
     });
     // a warning must be emitted
     expect(console.warn).toBeCalled();
@@ -128,9 +149,84 @@ describe("company validation", () => {
         companyTypes: [
           "PRODUCE", // typo here
           "WASTE_PROCESSOR"
-        ]
+        ],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
+  });
+  test("companyTypes includes deprecated CREMATORIUM value", async () => {
+    await expect(
+      companyValidationSchema.validate({
+        siret: siretify(1),
+        companyTypes: [
+          "CREMATORIUM" // deprecated
+        ],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
+      })
+    ).rejects.toThrow(ValidationError);
+  });
+  test("wasteProcessorTypes wihtout WASTEPROCESSOR", async () => {
+    await expect(
+      companyValidationSchema.validate({
+        siret: siretify(1),
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: ["DANGEROUS_WASTES_INCINERATION"],
+        wasteVehiclesTypes: []
+      })
+    ).rejects.toThrow(ValidationError);
+  });
+
+  test("collectorTypes wihtout COLLECTOR", async () => {
+    await expect(
+      companyValidationSchema.validate({
+        siret: siretify(1),
+        companyTypes: ["PRODUCER"],
+        collectorTypes: ["DEEE_WASTES"],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
+      })
+    ).rejects.toThrow(ValidationError);
+  });
+
+  test("wasteVehiclesType wihtout WASTE_VEHICLES", async () => {
+    await expect(
+      companyValidationSchema.validate({
+        siret: siretify(1),
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: ["DEMOLISSEUR"]
+      })
+    ).rejects.toThrow(ValidationError);
+  });
+
+  test("full subtypes", async () => {
+    // valid subtypes
+    const company = {
+      siret: siretify(1),
+      companyTypes: ["COLLECTOR", "WASTE_VEHICLES", "WASTEPROCESSOR"],
+      collectorTypes: [
+        "NON_DANGEROUS_WASTES",
+        "DANGEROUS_WASTES",
+        "DEEE_WASTES"
+      ],
+      wasteProcessorTypes: [
+        "DANGEROUS_WASTES_INCINERATION",
+        "CREMATION",
+        "DANGEROUS_WASTES_STORAGE",
+        "INERT_WASTES_STORAGE"
+      ],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"],
+      contactEmail: "john.snow@trackdechets.fr"
+    };
+    await expect(companyValidationSchema.validate(company)).resolves.toEqual(
+      company
+    );
   });
 
   test("contactEmail format", async () => {
@@ -138,6 +234,9 @@ describe("company validation", () => {
     const company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       contactEmail: "john.snow@trackdechets.fr"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -148,6 +247,9 @@ describe("company validation", () => {
       companyValidationSchema.validate({
         siret: siretify(1),
         companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: [],
         contactEmail: "azerty"
       })
     ).rejects.toThrow(ValidationError);
@@ -158,6 +260,9 @@ describe("company validation", () => {
     const company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       website: "https://trackdechets.beta.gouv.fr"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -178,6 +283,9 @@ describe("company validation", () => {
     let company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       contactPhone: "0100000000"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -186,6 +294,9 @@ describe("company validation", () => {
     company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       contactPhone: "01 00 00 00 00"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -195,6 +306,9 @@ describe("company validation", () => {
     company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       contactPhone: "01-00-00-00-00"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -205,6 +319,9 @@ describe("company validation", () => {
       companyValidationSchema.validate({
         siret: siretify(1),
         companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: [],
         contactPhone: "01-00-00-00" // missing two digits
       })
     ).rejects.toThrow(ValidationError);
@@ -218,7 +335,10 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret,
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(
       `Siret ${siret} was not found in SIRENE database or company is closed`

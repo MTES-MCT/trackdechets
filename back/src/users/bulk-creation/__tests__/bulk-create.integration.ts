@@ -120,6 +120,9 @@ describe("bulk create users and companies from csv files", () => {
     expect(codeEnStock.name).toEqual("NAME FROM SIRENE");
     expect(codeEnStock.givenName).toEqual("Code en Stock");
     expect(codeEnStock.companyTypes).toEqual(["PRODUCER"]);
+    expect(codeEnStock.wasteProcessorTypes).toEqual([]);
+    expect(codeEnStock.wasteVehiclesTypes).toEqual([]);
+    expect(codeEnStock.collectorTypes).toEqual([]);
     expect(codeEnStock.codeNaf).toEqual("62.01Z");
     expect(codeEnStock.website).toEqual("https://codeenstock.trackdechets.fr");
     expect(codeEnStock.gerepId).toEqual("1234");
@@ -130,6 +133,10 @@ describe("bulk create users and companies from csv files", () => {
     const frontier = await prisma.company.findUniqueOrThrow({
       where: { siret: "81343950200028" }
     });
+    expect(frontier.companyTypes).toEqual(["PRODUCER", "WASTEPROCESSOR"]);
+    expect(frontier.wasteProcessorTypes).toEqual(["OTHER_DANGEROUS_WASTES"]);
+    expect(frontier.wasteVehiclesTypes).toEqual([]);
+    expect(frontier.collectorTypes).toEqual([]);
     expect(frontier.name).toEqual("NAME FROM SIRENE");
     expect(frontier.givenName).toEqual("Frontier SAS");
     // empty contact cell
@@ -200,7 +207,6 @@ describe("bulk create users and companies from csv files", () => {
     expect(
       await prisma.user.findUnique({ where: { email: john.email } })
     ).toEqual(john);
-
     // Code en Stock should be untouched
     expect(
       await prisma.company.findUnique({ where: { siret: codeEnStock.siret! } })

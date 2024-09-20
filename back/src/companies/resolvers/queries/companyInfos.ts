@@ -55,7 +55,8 @@ export async function getCompanyInfos(
     traderReceipt: searchResult.traderReceipt,
     brokerReceipt: searchResult.brokerReceipt,
     vhuAgrementDemolisseur: searchResult.vhuAgrementDemolisseur,
-    vhuAgrementBroyeur: searchResult.vhuAgrementBroyeur
+    vhuAgrementBroyeur: searchResult.vhuAgrementBroyeur,
+    isDormant: searchResult.isDormant
   };
 }
 
@@ -91,7 +92,8 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
       statutDiffusionEtablissement: companyInfos.statutDiffusionEtablissement,
       etatAdministratif: companyInfos.etatAdministratif,
       allowBsdasriTakeOverWithoutSignature:
-        companyInfos.allowBsdasriTakeOverWithoutSignature
+        companyInfos.allowBsdasriTakeOverWithoutSignature,
+      isDormant: companyInfos.isDormant
     };
   }
 };

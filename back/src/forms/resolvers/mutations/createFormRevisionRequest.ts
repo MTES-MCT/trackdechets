@@ -26,7 +26,10 @@ import {
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound } from "../../database";
-import { flattenBsddRevisionRequestInput } from "../../converter";
+import {
+  expandableFormIncludes,
+  flattenBsddRevisionRequestInput
+} from "../../converter";
 import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
@@ -104,7 +107,7 @@ export default async function createFormRevisionRequest(
   const user = checkIsAuthenticated(context);
   const existingBsdd = await getFormOrFormNotFound(
     { id: formId },
-    { transporters: true }
+    expandableFormIncludes
   );
 
   const formRepository = getFormRepository(user);
@@ -112,6 +115,7 @@ export default async function createFormRevisionRequest(
   await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd);
 
   const flatContent = await getFlatContent(content, existingBsdd);
+  const history = getBsddHistory(existingBsdd);
 
   const authoringCompany = await getAuthoringCompany(
     user,
@@ -132,7 +136,8 @@ export default async function createFormRevisionRequest(
     approvals: {
       create: approversSirets.map(approverSiret => ({ approverSiret }))
     },
-    comment
+    comment,
+    ...history
   });
 }
 
@@ -534,3 +539,46 @@ const appendix1ProducerRevisionRequestSchema = yup
     true,
     "Révision impossible, certains champs saisis ne sont pas modifiables"
   );
+
+function getBsddHistory(bsdd: Form & { forwardedIn: Form | null }) {
+  return {
+    initialRecipientCap: bsdd.recipientCap,
+    initialWasteDetailsCode: bsdd.wasteDetailsCode,
+    initialWasteDetailsName: bsdd.wasteDetailsName,
+    initialWasteDetailsPop: bsdd.wasteDetailsPop,
+    initialWasteDetailsPackagingInfos:
+      bsdd.wasteDetailsPackagingInfos as Prisma.InputJsonValue,
+    initialWasteAcceptationStatus: bsdd.wasteAcceptationStatus,
+    initialWasteRefusalReason: bsdd.wasteRefusalReason,
+    initialWasteDetailsSampleNumber: bsdd.wasteDetailsSampleNumber,
+    initialWasteDetailsQuantity: bsdd.wasteDetailsQuantity,
+    initialQuantityReceived: bsdd.quantityReceived,
+    initialQuantityRefused: bsdd.quantityRefused,
+    initialProcessingOperationDone: bsdd.processingOperationDone,
+    initialDestinationOperationMode: bsdd.destinationOperationMode,
+    initialProcessingOperationDescription: bsdd.processingOperationDescription,
+    initialBrokerCompanyName: bsdd.brokerCompanyName,
+    initialBrokerCompanySiret: bsdd.brokerCompanySiret,
+    initialBrokerCompanyAddress: bsdd.brokerCompanyAddress,
+    initialBrokerCompanyContact: bsdd.brokerCompanyContact,
+    initialBrokerCompanyPhone: bsdd.brokerCompanyPhone,
+    initialBrokerCompanyMail: bsdd.brokerCompanyMail,
+    initialBrokerReceipt: bsdd.brokerReceipt,
+    initialBrokerDepartment: bsdd.brokerDepartment,
+    initialBrokerValidityLimit: bsdd.brokerValidityLimit,
+    initialTraderCompanyName: bsdd.traderCompanyName,
+    initialTraderCompanySiret: bsdd.traderCompanySiret,
+    initialTraderCompanyAddress: bsdd.traderCompanyAddress,
+    initialTraderCompanyContact: bsdd.traderCompanyContact,
+    initialTraderCompanyPhone: bsdd.traderCompanyPhone,
+    initialTraderCompanyMail: bsdd.traderCompanyMail,
+    initialTraderReceipt: bsdd.traderReceipt,
+    initialTraderDepartment: bsdd.traderDepartment,
+    initialTraderValidityLimit: bsdd.traderValidityLimit,
+    initialTemporaryStorageDestinationCap: bsdd.forwardedIn?.recipientCap,
+    initialTemporaryStorageDestinationProcessingOperation:
+      bsdd.forwardedIn?.processingOperationDone,
+    initialTemporaryStorageTemporaryStorerQuantityReceived:
+      bsdd.forwardedIn?.quantityReceived
+  };
+}

@@ -17,8 +17,12 @@ import {
   emptyTransportedWaste
 } from "../registry/types";
 import { getWasteDescription } from "./utils";
+import { getBsvhuSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import Decimal from "decimal.js";
+import { RegistryBsvhu } from "../registry/elastic";
+import { getIntermediaryCompanyOrgId } from "@td/constants";
+import { BsvhuForElastic } from "./elastic";
 
 const getOperationData = (bsvhu: Bsvhu) => ({
   destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
@@ -74,8 +78,23 @@ export const getTransporterData = (bsvhu: Bsvhu, includePlates = false) => {
   return data;
 };
 
+const getIntermediariesData = (bsda: RegistryBsvhu) => ({
+  intermediary1CompanyName: bsda.intermediaries?.[0]?.name ?? null,
+  intermediary1CompanySiret: bsda.intermediaries?.[0]
+    ? getIntermediaryCompanyOrgId(bsda.intermediaries[0])
+    : null,
+  intermediary2CompanyName: bsda.intermediaries?.[1]?.name ?? null,
+  intermediary2CompanySiret: bsda.intermediaries?.[1]
+    ? getIntermediaryCompanyOrgId(bsda.intermediaries[1])
+    : null,
+  intermediary3CompanyName: bsda.intermediaries?.[2]?.name ?? null,
+  intermediary3CompanySiret: bsda.intermediaries?.[2]
+    ? getIntermediaryCompanyOrgId(bsda.intermediaries[2])
+    : null
+});
+
 export function getRegistryFields(
-  bsvhu: Bsvhu
+  bsvhu: BsvhuForElastic
 ): Pick<BsdElastic, RegistryFields> {
   const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
@@ -100,6 +119,15 @@ export function getRegistryFields(
       registryFields.isTransportedWasteFor.push(bsvhu.transporterCompanySiret);
       registryFields.isAllWasteFor.push(bsvhu.transporterCompanySiret);
     }
+    if (bsvhu.intermediaries?.length) {
+      for (const intermediary of bsvhu.intermediaries) {
+        const intermediaryOrgId = getIntermediaryCompanyOrgId(intermediary);
+        if (intermediaryOrgId) {
+          registryFields.isManagedWasteFor.push(intermediaryOrgId);
+          registryFields.isAllWasteFor.push(intermediaryOrgId);
+        }
+      }
+    }
   }
 
   if (
@@ -112,7 +140,7 @@ export function getRegistryFields(
   return registryFields;
 }
 
-export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
+export function toGenericWaste(bsvhu: RegistryBsvhu): GenericWaste {
   const {
     street: destinationCompanyAddress,
     postalCode: destinationCompanyPostalCode,
@@ -147,7 +175,7 @@ export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSVHU",
-    bsdSubType: "INITIAL",
+    bsdSubType: getBsvhuSubType(bsvhu),
     status: bsvhu.status,
     customId: null,
     destinationCap: null,
@@ -197,7 +225,7 @@ export function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
   };
 }
 
-export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
+export function toIncomingWaste(bsvhu: RegistryBsvhu): Required<IncomingWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
@@ -218,7 +246,7 @@ export function toIncomingWaste(bsvhu: Bsvhu): Required<IncomingWaste> {
   };
 }
 
-export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
+export function toOutgoingWaste(bsvhu: RegistryBsvhu): Required<OutgoingWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
@@ -240,7 +268,9 @@ export function toOutgoingWaste(bsvhu: Bsvhu): Required<OutgoingWaste> {
   };
 }
 
-export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
+export function toTransportedWaste(
+  bsvhu: RegistryBsvhu
+): Required<TransportedWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
@@ -264,7 +294,7 @@ export function toTransportedWaste(bsvhu: Bsvhu): Required<TransportedWaste> {
  * BSVHU has no trader or broker so this function should not
  * be called. We implement it anyway in case it is added later on
  */
-export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
+export function toManagedWaste(bsvhu: RegistryBsvhu): Required<ManagedWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
@@ -281,7 +311,7 @@ export function toManagedWaste(bsvhu: Bsvhu): Required<ManagedWaste> {
   };
 }
 
-export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
+export function toAllWaste(bsvhu: RegistryBsvhu): Required<AllWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsvhu);
 
   return {
@@ -301,6 +331,7 @@ export function toAllWaste(bsvhu: Bsvhu): Required<AllWaste> {
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     ...getOperationData(bsvhu),
     ...getTransporterData(bsvhu, true),
-    ...getInitialEmitterData()
+    ...getInitialEmitterData(),
+    ...getIntermediariesData(bsvhu)
   };
 }

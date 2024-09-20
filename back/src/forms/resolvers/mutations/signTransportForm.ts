@@ -102,8 +102,9 @@ const signTransportFn = async (
   const receiptFields = await getFormReceiptField(signingTransporter!);
 
   const transportersForValidation = [...transporters];
-  // Prend en compte la plaque d'immatriculation envoyée dans l'input de signature
-  // pour la validation des données
+  // Prend en compte la plaque d'immatriculation et le mode
+  // de transport envoyés dans l'input de signature pour
+  // la validation des données
   transportersForValidation[signingTransporterIdx] = {
     ...transportersForValidation[signingTransporterIdx],
     ...(receiptFields as any) // FIXME fix typing of getFormReceiptField
@@ -111,6 +112,10 @@ const signTransportFn = async (
   if (args.input?.transporterNumberPlate) {
     transportersForValidation[signingTransporterIdx].transporterNumberPlate =
       args.input?.transporterNumberPlate;
+  }
+  if (args.input?.transporterTransportMode !== undefined) {
+    transportersForValidation[signingTransporterIdx].transporterTransportMode =
+      args.input?.transporterTransportMode;
   }
 
   await validateBeforeTransport(
@@ -142,6 +147,11 @@ const signTransportFn = async (
           transporterNumberPlate: args.input.transporterNumberPlate
         }
       : {}),
+    ...(args.input.transporterTransportMode
+      ? {
+          transporterTransportMode: args.input.transporterTransportMode
+        }
+      : {}),
     ...receiptFields
   };
 
@@ -167,8 +177,10 @@ const signTransportFn = async (
   }
 
   const updatedForm = await runInTransaction(async transaction => {
-    const { update, updateAppendix2Forms, findGroupedFormsById, findUnique } =
-      getFormRepository(user, transaction);
+    const { update, findGroupedFormsById, findUnique } = getFormRepository(
+      user,
+      transaction
+    );
 
     const updatedForm = await update(
       { id: existingForm.id, status: existingForm.status },
@@ -180,11 +192,6 @@ const signTransportFn = async (
         ...formUpdateInput
       }
     );
-
-    if (existingForm.emitterType === EmitterType.APPENDIX2) {
-      const appendix2Forms = await findGroupedFormsById(existingForm.id);
-      await updateAppendix2Forms(appendix2Forms);
-    }
 
     if (existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER) {
       const include = {

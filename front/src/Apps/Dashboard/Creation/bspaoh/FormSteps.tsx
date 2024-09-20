@@ -10,7 +10,7 @@ import {
   QueryBspaohArgs
 } from "@td/codegen-ui";
 import omitDeep from "omit-deep-lodash";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import FormStepsContent from "../../../Dashboard/Creation/FormStepsContent";
 import { Loader } from "../../../common/Components";
@@ -31,7 +31,12 @@ import { Waste } from "./steps/Waste";
 import { Emitter } from "./steps/Emitter";
 import { Transporter } from "./steps/Transporter";
 import { Destination } from "./steps/Destination";
-import { getTabs } from "../utils";
+import {
+  getErrorTabIds,
+  getPublishErrorMessages,
+  getPublishErrorTabIds,
+  getTabs
+} from "../utils";
 
 const paohToInput = (paoh: BspaohInput): BspaohInput => {
   return omitDeep(paoh, [
@@ -45,8 +50,21 @@ const paohToInput = (paoh: BspaohInput): BspaohInput => {
 };
 interface Props {
   bsdId?: string;
+  publishErrorsFromRedirect?: {
+    code: string;
+    path: string[];
+    message: string;
+  }[];
 }
 export function ControlledTabs(props: Readonly<Props>) {
+  const [publishErrors, setPublishErrors] = useState<
+    | {
+        code: string;
+        path: string[];
+        message: string;
+      }[]
+    | undefined
+  >();
   const formQuery = useQuery<Pick<Query, "bspaoh">, QueryBspaohArgs>(
     GET_BSPAOH,
     {
@@ -66,8 +84,8 @@ export function ControlledTabs(props: Readonly<Props>) {
   const sealedFields = useMemo(
     () =>
       (formQuery?.data?.bspaoh?.metadata?.fields?.sealed ?? [])
-        ?.map(f => f?.name!)
-        .filter(Boolean),
+        ?.filter(Boolean)
+        .map(sealedField => sealedField.join(".")),
     [formQuery.data]
   );
 
@@ -120,12 +138,44 @@ export function ControlledTabs(props: Readonly<Props>) {
       }
     }
   }
+
+  const tabIds = getTabs().map(tab => tab.tabId);
+  const errorsFromPublishApi =
+    publishErrors || props?.publishErrorsFromRedirect;
+  const publishErrorTabIds = getPublishErrorTabIds(
+    errorsFromPublishApi,
+    tabIds
+  );
+  const formStateErrorsKeys = Object.keys(methods?.formState?.errors);
+  const errorTabIds = getErrorTabIds(publishErrorTabIds, formStateErrorsKeys);
+
+  const publishErrorMessages = getPublishErrorMessages(errorsFromPublishApi);
+
   const tabsContent = {
     waste: <Waste />,
-    emitter: <Emitter />,
-    transporter: <Transporter />,
-    destination: <Destination />
+    emitter: (
+      <Emitter
+        errors={publishErrorMessages?.filter(
+          error => error.tabId === "emitter"
+        )}
+      />
+    ),
+    transporter: (
+      <Transporter
+        errors={publishErrorMessages?.filter(
+          error => error.tabId === "transporter"
+        )}
+      />
+    ),
+    destination: (
+      <Destination
+        errors={publishErrorMessages?.filter(
+          error => error.tabId === "destination"
+        )}
+      />
+    )
   };
+
   return (
     <>
       <FormStepsContent
@@ -135,8 +185,10 @@ export function ControlledTabs(props: Readonly<Props>) {
         saveForm={saveForm}
         sealedFields={sealedFields}
         useformMethods={methods}
-        tabList={getTabs(true)}
+        isCrematorium={true}
         tabsContent={tabsContent}
+        setPublishErrors={setPublishErrors}
+        errorTabIds={errorTabIds}
       />
       {loading && <Loader />}
     </>

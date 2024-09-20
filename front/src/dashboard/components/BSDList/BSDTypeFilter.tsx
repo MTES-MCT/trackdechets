@@ -11,7 +11,7 @@ const OPTIONS = [
   },
   {
     value: BsdType.Bsdasri,
-    label: "Déchets d'Activités de Soins à Risque Infectieux"
+    label: "Déchets d'Activités de Soins à Risques Infectieux"
   },
   {
     value: BsdType.Bsvhu,

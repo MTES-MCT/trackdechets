@@ -6,6 +6,7 @@ import {
   FormStatus,
   QuantityType,
   SignTransportFormInput,
+  TransportMode,
   WasteDetailsInput
 } from "@td/codegen-ui";
 import {
@@ -13,24 +14,32 @@ import {
   DataListDescription,
   DataListItem,
   DataListTerm,
+  FieldTransportModeSelect,
   RedErrorMessage
 } from "../../../../../common/components";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import { useEffect } from "react";
+import { getTransportModeLabel } from "../../../../constants";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
 }
 
-type FormValues = Pick<SignTransportFormInput, "transporterNumberPlate"> & {
+type FormValues = Pick<
+  SignTransportFormInput,
+  "transporterNumberPlate" | "transporterTransportMode"
+> & {
   update: Pick<
     WasteDetailsInput,
     "quantity" | "packagingInfos" | "sampleNumber"
   >;
 };
-type FormKeys = "transporterNumberPlate" | keyof FormValues["update"];
+type FormKeys =
+  | "transporterNumberPlate"
+  | "transporterTransportMode"
+  | keyof FormValues["update"];
 
 const SAMPLE_NUMBER_WASTE_CODES = [
   "13 02 05*",
@@ -50,6 +59,19 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
         <Field name="transporterNumberPlate" className="td-input" />
       </label>
       <RedErrorMessage name="transporterNumberPlate" />
+    </div>
+  ),
+  transporterTransportMode: () => (
+    <div className="form__row">
+      <label>
+        Mode de transport{" "}
+        <Field
+          id="id_mode"
+          name="transporterTransportMode"
+          component={FieldTransportModeSelect}
+        ></Field>
+      </label>
+      <RedErrorMessage name="transporterTransportMode" />
     </div>
   ),
   quantity: () => (
@@ -85,7 +107,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
 export function FormWasteTransportSummary({
   form
 }: FormWasteTransportSummaryProps) {
-  const { values } = useFormikContext<FormValues>();
+  const { values, setFieldValue } = useFormikContext<FormValues>();
   const [fields, setFields] = React.useState<FormKeys[]>([]);
   const addField = (name: FormKeys) =>
     setFields(currentFields =>
@@ -94,9 +116,25 @@ export function FormWasteTransportSummary({
         .filter((name, index, fields) => fields.indexOf(name) === index)
     );
 
+  const showTransportModeInput = () => {
+    addField("transporterTransportMode");
+    setFieldValue(
+      "transporterTransportMode",
+      values.transporterTransportMode ?? TransportMode.Road
+    );
+    addField("transporterNumberPlate");
+  };
+
   useEffect(() => {
-    if (form.transporter?.mode === "ROAD") {
+    if (
+      form.transporter?.mode === "ROAD" ||
+      values.transporterTransportMode === "ROAD"
+    ) {
       addField("transporterNumberPlate");
+    }
+
+    if (!form.transporter?.mode && !values.transporterTransportMode) {
+      showTransportModeInput();
     }
   }, [form]);
 
@@ -204,6 +242,21 @@ export function FormWasteTransportSummary({
               </DataListDescription>
             </DataListItem>
           )}
+        <DataListItem>
+          <DataListTerm>Mode de transport</DataListTerm>
+          <DataListDescription>
+            {getTransportModeLabel(values.transporterTransportMode)}
+            <button
+              type="button"
+              onClick={() => {
+                showTransportModeInput();
+              }}
+              className="tw-ml-2"
+            >
+              <IconPaperWrite color="blue" />
+            </button>
+          </DataListDescription>
+        </DataListItem>
         <DataListItem>
           <DataListTerm>Plaque d'immatriculation</DataListTerm>
           <DataListDescription>

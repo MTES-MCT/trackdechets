@@ -30,6 +30,8 @@ import {
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -1286,11 +1288,18 @@ describe("Mutation.createForm", () => {
       appendix2Forms: [{ id: appendix2.id }]
     };
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
-      Pick<Mutation, "createForm">,
-      MutationCreateFormArgs
-    >(CREATE_FORM, {
-      variables: { createFormInput }
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+        CREATE_FORM,
+        {
+          variables: { createFormInput }
+        }
+      );
+
+    const { data, errors } = await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 1
     });
 
     expect(errors).toEqual(undefined);
@@ -1327,11 +1336,18 @@ describe("Mutation.createForm", () => {
       grouping: [{ form: { id: appendix2.id }, quantity: 0.5 }]
     };
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
-      Pick<Mutation, "createForm">,
-      MutationCreateFormArgs
-    >(CREATE_FORM, {
-      variables: { createFormInput }
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+        CREATE_FORM,
+        {
+          variables: { createFormInput }
+        }
+      );
+
+    const { data, errors } = await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 1
     });
 
     expect(errors).toEqual(undefined);
@@ -2401,26 +2417,6 @@ describe("Mutation.createForm", () => {
       });
     };
 
-    const createAppendix2GroupingForm = async (
-      user,
-      companySiret,
-      grouping
-    ) => {
-      const createFormInput = {
-        emitter: {
-          type: EmitterType.APPENDIX2,
-          company: {
-            siret: companySiret
-          }
-        },
-        grouping
-      };
-      const { mutate } = makeClient(user);
-      return mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
-        variables: { createFormInput }
-      });
-    };
-
     it("can create annexe2 because quantityAccepted is equal to quantity", async () => {
       // Given
       const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
@@ -2432,9 +2428,30 @@ describe("Mutation.createForm", () => {
       });
 
       // When
-      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
-        { form: { id: appendix2.id }, quantity: 3 }
-      ]);
+      const { mutate } = makeClient(user);
+      const mutateFn = () =>
+        mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+          CREATE_FORM,
+          {
+            variables: {
+              createFormInput: {
+                emitter: {
+                  type: EmitterType.APPENDIX2,
+                  company: {
+                    siret: ttr.siret
+                  }
+                },
+                grouping: [{ form: { id: appendix2.id }, quantity: 3 }]
+              }
+            }
+          }
+        );
+
+      const { errors } = await waitForJobsCompletion({
+        queue: updateAppendix2Queue,
+        fn: mutateFn,
+        expectedJobCount: 1
+      });
 
       // Then
       expect(errors).toBeUndefined();
@@ -2456,9 +2473,23 @@ describe("Mutation.createForm", () => {
       });
 
       // When
-      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
-        { form: { id: appendix2.id }, quantity: 6 }
-      ]);
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: EmitterType.APPENDIX2,
+              company: {
+                siret: ttr.siret
+              }
+            },
+            grouping: [{ form: { id: appendix2.id }, quantity: 6 }]
+          }
+        }
+      });
 
       // Then
       expect(errors).not.toBeUndefined();
@@ -2490,11 +2521,27 @@ describe("Mutation.createForm", () => {
       });
 
       // When
-      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
-        { form: { id: appendix2_1.id }, quantity: 3.5 },
-        { form: { id: appendix2_2.id }, quantity: 11 },
-        { form: { id: appendix2_3.id }, quantity: 13.7 }
-      ]);
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: EmitterType.APPENDIX2,
+              company: {
+                siret: ttr.siret
+              }
+            },
+            grouping: [
+              { form: { id: appendix2_1.id }, quantity: 3.5 },
+              { form: { id: appendix2_2.id }, quantity: 11 },
+              { form: { id: appendix2_3.id }, quantity: 13.7 }
+            ]
+          }
+        }
+      });
 
       // Then
       expect(errors).not.toBeUndefined();
@@ -2532,11 +2579,35 @@ describe("Mutation.createForm", () => {
       });
 
       // When
-      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
-        { form: { id: appendix2_1.id }, quantity: 3 },
-        { form: { id: appendix2_2.id }, quantity: 10 },
-        { form: { id: appendix2_3.id }, quantity: 10 }
-      ]);
+      const { mutate } = makeClient(user);
+
+      const mutateFn = () =>
+        mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+          CREATE_FORM,
+          {
+            variables: {
+              createFormInput: {
+                emitter: {
+                  type: EmitterType.APPENDIX2,
+                  company: {
+                    siret: ttr.siret
+                  }
+                },
+                grouping: [
+                  { form: { id: appendix2_1.id }, quantity: 3 },
+                  { form: { id: appendix2_2.id }, quantity: 10 },
+                  { form: { id: appendix2_3.id }, quantity: 10 }
+                ]
+              }
+            }
+          }
+        );
+
+      const { errors } = await waitForJobsCompletion({
+        queue: updateAppendix2Queue,
+        fn: mutateFn,
+        expectedJobCount: 3
+      });
 
       // Then
       expect(errors).toBeUndefined();
@@ -2568,11 +2639,29 @@ describe("Mutation.createForm", () => {
       });
 
       // When
-      const { errors: errors1 } = await createAppendix2GroupingForm(
-        user,
-        ttr.siret,
-        [{ form: { id: appendix2.id }, quantity: 1.5 }]
-      );
+      const { mutate } = makeClient(user);
+      const mutateFn1 = () =>
+        mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+          CREATE_FORM,
+          {
+            variables: {
+              createFormInput: {
+                emitter: {
+                  type: EmitterType.APPENDIX2,
+                  company: {
+                    siret: ttr.siret
+                  }
+                },
+                grouping: [{ form: { id: appendix2.id }, quantity: 1.5 }]
+              }
+            }
+          }
+        );
+      const { errors: errors1 } = await waitForJobsCompletion({
+        queue: updateAppendix2Queue,
+        fn: mutateFn1,
+        expectedJobCount: 1
+      });
 
       // Then
       expect(errors1).toBeUndefined();
@@ -2583,11 +2672,29 @@ describe("Mutation.createForm", () => {
       expect(updatedAppendix2_1.quantityGrouped).toEqual(1.5);
 
       // When
-      const { errors: errors2 } = await createAppendix2GroupingForm(
-        user,
-        ttr.siret,
-        [{ form: { id: appendix2.id }, quantity: 1 }]
-      );
+      const mutateFn2 = () =>
+        mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+          CREATE_FORM,
+          {
+            variables: {
+              createFormInput: {
+                emitter: {
+                  type: EmitterType.APPENDIX2,
+                  company: {
+                    siret: ttr.siret
+                  }
+                },
+                grouping: [{ form: { id: appendix2.id }, quantity: 1 }]
+              }
+            }
+          }
+        );
+
+      const { errors: errors2 } = await waitForJobsCompletion({
+        queue: updateAppendix2Queue,
+        fn: mutateFn2,
+        expectedJobCount: 1
+      });
 
       // Then
       expect(errors2).toBeUndefined();
@@ -2598,11 +2705,22 @@ describe("Mutation.createForm", () => {
       expect(updatedAppendix2_2.quantityGrouped).toEqual(2.5);
 
       // When
-      const { errors: errors3 } = await createAppendix2GroupingForm(
-        user,
-        ttr.siret,
-        [{ form: { id: appendix2.id }, quantity: 1 }]
-      );
+      const { errors: errors3 } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: EmitterType.APPENDIX2,
+              company: {
+                siret: ttr.siret
+              }
+            },
+            grouping: [{ form: { id: appendix2.id }, quantity: 1 }]
+          }
+        }
+      });
 
       // Then
       expect(errors3).not.toBeUndefined();
@@ -2634,11 +2752,34 @@ describe("Mutation.createForm", () => {
       });
 
       // When
-      const { errors } = await createAppendix2GroupingForm(user, ttr.siret, [
-        { form: { id: appendix2_1.id }, quantity: 3 },
-        { form: { id: appendix2_2.id }, quantity: 10 },
-        { form: { id: appendix2_3.id }, quantity: 10 }
-      ]);
+      const { mutate } = makeClient(user);
+      const mutateFn = () =>
+        mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+          CREATE_FORM,
+          {
+            variables: {
+              createFormInput: {
+                emitter: {
+                  type: EmitterType.APPENDIX2,
+                  company: {
+                    siret: ttr.siret
+                  }
+                },
+                grouping: [
+                  { form: { id: appendix2_1.id }, quantity: 3 },
+                  { form: { id: appendix2_2.id }, quantity: 10 },
+                  { form: { id: appendix2_3.id }, quantity: 10 }
+                ]
+              }
+            }
+          }
+        );
+
+      const { errors } = await waitForJobsCompletion({
+        queue: updateAppendix2Queue,
+        fn: mutateFn,
+        expectedJobCount: 3
+      });
 
       // Then
       expect(errors).toBeUndefined();

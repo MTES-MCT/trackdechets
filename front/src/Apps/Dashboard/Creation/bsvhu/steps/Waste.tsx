@@ -1,15 +1,17 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { useFormContext } from "react-hook-form";
 import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
 import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { ZodBsvhu } from "../schema";
+import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
+import { setFieldError } from "../../utils";
 
-const WasteBsvhu = ({ isDisabled }) => {
-  const { register, watch, setValue, formState } = useFormContext<ZodBsvhu>(); // retrieve all hook methods
-  const { errors } = formState;
+const WasteBsvhu = ({ errors }) => {
+  const { register, watch, setValue, formState, setError } =
+    useFormContext<ZodBsvhu>(); // retrieve all hook methods
 
   const weight = watch("weight.value");
   const quantity = watch("quantity") ?? 0;
@@ -17,18 +19,39 @@ const WasteBsvhu = ({ isDisabled }) => {
   const identificationNumbersDefaultValue =
     formState.defaultValues?.identification?.numbers;
   const identificationNumbers = watch("identification.numbers");
+  const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
     setValue("quantity", identificationNumbers?.length);
   }, [setValue, identificationNumbers]);
 
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      setFieldError(
+        errors,
+        "weight.value",
+        formState.errors?.weight?.value,
+        setError
+      );
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState?.errors,
+    formState.errors?.weight?.value,
+    setError
+  ]);
+
   return (
     <>
-      {isDisabled && <DisabledParagraphStep />}
+      {!!sealedFields.length && <DisabledParagraphStep />}
 
       <WasteRadioGroup
         title="Déchet"
-        disabled={isDisabled}
+        disabled={sealedFields.includes("wasteCode")}
         options={[
           {
             label:
@@ -50,7 +73,7 @@ const WasteBsvhu = ({ isDisabled }) => {
       />
       <h4 className="fr-h4">Conditionnement</h4>
       <RadioButtons
-        disabled={isDisabled}
+        disabled={sealedFields.includes("packaging")}
         className="fr-col-sm-10"
         options={[
           {
@@ -70,7 +93,7 @@ const WasteBsvhu = ({ isDisabled }) => {
         ]}
       />
       <RadioButtons
-        disabled={isDisabled}
+        disabled={sealedFields.includes("identification.type")}
         className="fr-col-sm-10"
         legend="Identification par N° d'ordre"
         options={[
@@ -93,7 +116,7 @@ const WasteBsvhu = ({ isDisabled }) => {
 
       <div className="fr-col-md-12 fr-mb-4w">
         <IdentificationNumber
-          disabled={isDisabled}
+          disabled={sealedFields.includes("identification.numbers")}
           name="identification.numbers"
           defaultValue={identificationNumbersDefaultValue}
         />
@@ -123,10 +146,10 @@ const WasteBsvhu = ({ isDisabled }) => {
         <div className="fr-col-12 fr-col-md-6">
           <Input
             label="Poids total en tonnes"
-            disabled={isDisabled}
-            state={errors?.weight?.value && "error"}
+            disabled={sealedFields.includes("weight.value")}
+            state={formState.errors?.weight?.value && "error"}
             stateRelatedMessage={
-              (errors?.weight?.value?.message as string) ?? ""
+              (formState.errors?.weight?.value?.message as string) ?? ""
             }
             nativeInputProps={{
               inputMode: "decimal",
@@ -144,11 +167,11 @@ const WasteBsvhu = ({ isDisabled }) => {
         <div className="fr-col-12 fr-col-md-6">
           <RadioButtons
             legend="Cette quantité est"
-            disabled={isDisabled}
+            disabled={sealedFields.includes("weight.isEstimate")}
             orientation="horizontal"
-            state={errors?.weight?.isEstimate && "error"}
+            state={formState.errors?.weight?.isEstimate && "error"}
             stateRelatedMessage={
-              (errors?.weight?.isEstimate?.message as string) ?? ""
+              (formState.errors?.weight?.isEstimate?.message as string) ?? ""
             }
             options={[
               {

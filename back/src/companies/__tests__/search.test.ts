@@ -325,6 +325,7 @@ describe("searchCompanies", () => {
       contactPhone: undefined,
       ecoOrganismeAgreements: [],
       etatAdministratif: "A",
+      isDormant: false,
       isRegistered: true,
       collectorTypes: [],
       wasteProcessorTypes: [],

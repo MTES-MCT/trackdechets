@@ -13,6 +13,7 @@ import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 import { getDefaultOrgId } from "../CompanySwitcher/CompanySwitcher";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import Exports from "../../../../dashboard/exports/Registry";
+import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -46,8 +47,6 @@ const PasswordResetRequest = lazy(
 );
 const PasswordReset = lazy(() => import("../../../../login/PasswordReset"));
 const Signup = lazy(() => import("../../../../login/Signup"));
-const OauthDialog = lazy(() => import("../../../../oauth/Oauth2Dialog"));
-const OidcDialog = lazy(() => import("../../../../oauth/OidcDialog"));
 const Company = lazy(() => import("../../../../company/Company"));
 const WasteTree = lazy(() => import("../search/WasteTree"));
 
@@ -94,7 +93,7 @@ export default function LayoutContainer() {
           path="/oauth2/authorize/dialog"
           element={
             <RequireAuth isAuthenticated={isAuthenticated}>
-              <OauthDialog />
+              <Oauth2Dialog />
             </RequireAuth>
           }
         />
@@ -114,12 +113,12 @@ export default function LayoutContainer() {
               isAdmin={isAdmin}
               v2banner={
                 <SurveyBanner
-                  message="Merci d'anticiper dès à présent vos congés d'été en vous assurant que vos collaborateurs possèdent un accès aux établissements nécessaires sur Trackdéchets (Mes établissements > Membres)."
+                  message="La fiche établissement est désormais disponible pour tous les utilisateurs Trackdéchets. Rendez-vous dans Mes établissements, sélectionnez l'établissement souhaité, puis cliquez sur l'onglet Fiche."
                   button={{
-                    title: "Voir la FAQ",
-                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement#les-responsabilites-des-administrateurs-trackdechets"
+                    title: "Plus d'informations",
+                    href: "https://faq.trackdechets.fr/les-bases-interface/la-fiche-entreprise"
                   }}
-                  persistedSurveyName="td-20240702"
+                  persistedSurveyName="td-20240924"
                 />
               }
               defaultOrgId={defaultOrgId}

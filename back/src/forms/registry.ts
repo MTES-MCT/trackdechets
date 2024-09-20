@@ -2,7 +2,6 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,
-  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -20,6 +19,7 @@ import {
 import { Bsdd } from "./types";
 import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
+import { getBsddSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import { isFinalOperationCode } from "../common/operationCodes";
 
@@ -320,22 +320,6 @@ const getFinalOperationsData = (
   };
 };
 
-export const getSubType = (bsdd: Bsdd): BsdSubType => {
-  if (bsdd.forwardedInId || bsdd.id.endsWith("-suite")) {
-    return "TEMP_STORED";
-  }
-
-  if (bsdd.emitterType === "APPENDIX1") {
-    return "TOURNEE";
-  } else if (bsdd.emitterType === "APPENDIX1_PRODUCER") {
-    return "APPENDIX1";
-  } else if (bsdd.emitterType === "APPENDIX2") {
-    return "APPENDIX2";
-  }
-
-  return "INITIAL";
-};
-
 export function toGenericWaste(
   bsdd: ReturnType<typeof formToBsdd>
 ): GenericWaste {
@@ -364,7 +348,7 @@ export function toGenericWaste(
     ecoOrganismeName: bsdd.ecoOrganismeName,
     ecoOrganismeSiren: bsdd.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDD",
-    bsdSubType: getSubType(bsdd),
+    bsdSubType: getBsddSubType(bsdd),
     status: bsdd.status,
     customId: bsdd.customId,
     destinationCap: bsdd.destinationCap,
@@ -406,7 +390,8 @@ export function toGenericWaste(
     emitterCompanyCity,
     emitterCompanyCountry,
     emitterCompanyName: bsdd.emitterCompanyName,
-    emitterCompanySiret: bsdd.emitterCompanySiret
+    emitterCompanySiret: bsdd.emitterCompanySiret,
+    destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut
   };
 }
 

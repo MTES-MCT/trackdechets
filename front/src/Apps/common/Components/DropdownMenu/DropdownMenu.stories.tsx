@@ -1,10 +1,9 @@
 import React from "react";
-import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react";
 import DropdownMenu from "./DropdownMenu";
 import { MemoryRouter, Route } from "react-router-dom";
 
-export default {
-  title: "COMPONENTS/COMMON/DropdownMenu",
+const meta: Meta<typeof DropdownMenu> = {
   component: DropdownMenu,
   decorators: [
     Story => (
@@ -12,18 +11,11 @@ export default {
         <Route element={<Story />} />
       </MemoryRouter>
     )
-  ],
-  design: {
-    type: "figma",
-    url: "https://www.figma.com/file/TZbRaWgchdAv8o7IxJWrKE/Trackd%C3%A9chets?node-id=2864%3A543748&t=AnkIpzoWgu1o8Cbc-4"
-  }
-} as ComponentMeta<typeof DropdownMenu>;
+  ]
+};
+export default meta;
 
-const Template: ComponentStory<typeof DropdownMenu> = args => (
-  <DropdownMenu {...args} />
-);
-
-export const Primary = Template.bind({});
+type Story = StoryObj<typeof DropdownMenu>;
 
 const links = [
   {
@@ -36,7 +28,6 @@ const links = [
   }
 ];
 
-Primary.args = {
-  links,
-  menuTitle: "the title"
+export const Primary: Story = {
+  args: { links, menuTitle: "the title" }
 };

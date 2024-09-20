@@ -61,6 +61,13 @@ export async function refineSiretAndGetCompany(
     });
   }
 
+  if (company?.isDormantSince) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+    });
+  }
+
   return company;
 }
 export const isRegisteredVatNumberRefinement = async (

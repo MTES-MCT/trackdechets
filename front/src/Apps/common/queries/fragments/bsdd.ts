@@ -368,6 +368,8 @@ export const detailFormFragment = gql`
       }
     }
     quantityGrouped
+    hasCiterneBeenWashedOut
+    citerneNotWashedOutReason
     intermediaries {
       ...CompanyFragment
     }

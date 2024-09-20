@@ -134,6 +134,7 @@ module.exports = {
         "reference/environments/environments",
         "reference/authentification",
         "reference/permissions",
+        "reference/profils-etablissement",
         "reference/identifiants",
         "reference/validation",
         "reference/operationModes",

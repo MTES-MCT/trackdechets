@@ -65,19 +65,243 @@ describe("mutaion.duplicateBsvhu", () => {
 
   it("should duplicate a BSVHU", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory({
+      transporterReceipt: {
+        create: {
+          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const transporterReceipt =
+      await prisma.transporterReceipt.findUniqueOrThrow({
+        where: { id: transporter.transporterReceiptId! }
+      });
+    const destination = await companyFactory();
+
+    const intermediary = await companyFactory();
+
     const bsvhu = await bsvhuFactory({
-      opt: { emitterCompanySiret: emitter.company.siret }
+      opt: {
+        emitterIrregularSituation: false,
+        emitterNoSiret: false,
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        emitterCompanyAddress: emitter.company.address,
+        emitterCompanyContact: emitter.company.contact,
+        emitterCompanyPhone: emitter.company.contactPhone,
+        emitterCompanyMail: emitter.company.contactEmail,
+        destinationCompanySiret: destination.siret,
+        destinationCompanyName: destination.name,
+        destinationCompanyAddress: destination.address,
+        destinationCompanyContact: destination.contact,
+        destinationCompanyPhone: destination.contactPhone,
+        destinationCompanyMail: destination.contactEmail,
+        transporterCompanySiret: transporter.siret,
+        transporterCompanyName: transporter.name,
+        transporterCompanyAddress: transporter.address,
+        transporterCompanyContact: transporter.contact,
+        transporterCompanyPhone: transporter.contactPhone,
+        transporterCompanyMail: transporter.contactEmail,
+        transporterRecepisseIsExempted: false,
+        transporterRecepisseNumber: transporterReceipt.receiptNumber,
+        transporterRecepisseDepartment: transporterReceipt.department,
+        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureAuthor: "John",
+        transporterTransportSignatureDate: new Date(),
+        transporterTransportSignatureAuthor: "John",
+        destinationOperationSignatureDate: new Date(),
+        destinationOperationSignatureAuthor: "John",
+        intermediaries: {
+          createMany: {
+            data: [
+              {
+                siret: intermediary.siret ?? "",
+                contact: "Mr intermédiaire 1",
+                name: intermediary.name,
+                address: "Nawak"
+              }
+            ]
+          }
+        }
+      }
     });
     const { mutate } = makeClient(emitter.user);
 
-    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+    const { errors, data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
       DUPLICATE_BVHU,
       {
         variables: { id: bsvhu.id }
       }
     );
+    expect(errors).toBeUndefined();
+    const duplicatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: data.duplicateBsvhu.id },
+      include: { intermediaries: true }
+    });
 
-    expect(data.duplicateBsvhu.status).toEqual("INITIAL");
+    const {
+      emitterIrregularSituation,
+      emitterNoSiret,
+      emitterAgrementNumber,
+      emitterCompanyName,
+      emitterCompanySiret,
+      emitterCompanyAddress,
+      emitterCompanyStreet,
+      emitterCompanyCity,
+      emitterCompanyPostalCode,
+      emitterCompanyCountry,
+      emitterCompanyContact,
+      emitterCompanyPhone,
+      emitterCompanyMail,
+      emitterCustomInfo,
+      destinationType,
+      destinationPlannedOperationCode,
+      destinationAgrementNumber,
+      destinationCompanyName,
+      destinationCompanySiret,
+      destinationCompanyAddress,
+      destinationCompanyContact,
+      destinationCompanyPhone,
+      destinationCompanyMail,
+      destinationOperationNextDestinationCompanyName,
+      destinationOperationNextDestinationCompanySiret,
+      destinationOperationNextDestinationCompanyAddress,
+      destinationOperationNextDestinationCompanyContact,
+      destinationOperationNextDestinationCompanyPhone,
+      destinationOperationNextDestinationCompanyMail,
+      destinationOperationNextDestinationCompanyVatNumber,
+      destinationCustomInfo,
+      wasteCode,
+      packaging,
+      identificationNumbers,
+      identificationType,
+      quantity,
+      weightValue,
+      weightIsEstimate,
+      transporterCompanyName,
+      transporterCompanySiret,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterCompanyVatNumber,
+      transporterTransportTakenOverAt,
+      transporterCustomInfo,
+      transporterTransportPlates,
+      transporterRecepisseIsExempted,
+      ...rest
+    } = bsvhu;
+
+    const expectedSkipped = [
+      "id",
+      "createdAt",
+      "updatedAt",
+      "rowNumber",
+      "isDraft",
+      "isDeleted",
+      "status",
+
+      "emitterEmissionSignatureAuthor",
+      "emitterEmissionSignatureDate",
+      "transporterTransportSignatureAuthor",
+      "transporterTransportSignatureDate",
+      "destinationReceptionQuantity",
+      "destinationReceptionWeight",
+      "destinationReceptionAcceptationStatus",
+      "destinationReceptionRefusalReason",
+      "destinationReceptionIdentificationNumbers",
+      "destinationReceptionIdentificationType",
+      "destinationReceptionDate",
+      "destinationOperationDate",
+      "destinationOperationCode",
+      "destinationOperationMode",
+      "destinationOperationSignatureAuthor",
+      "destinationOperationSignatureDate",
+
+      "intermediaries",
+      "intermediariesOrgIds"
+    ];
+
+    expect(duplicatedBsvhu.status).toEqual("INITIAL");
+    expect(duplicatedBsvhu.isDraft).toBe(true);
+
+    expect(duplicatedBsvhu).toMatchObject({
+      emitterIrregularSituation,
+      emitterNoSiret,
+      emitterAgrementNumber,
+      emitterCompanyName,
+      emitterCompanySiret,
+      emitterCompanyAddress,
+      emitterCompanyStreet,
+      emitterCompanyCity,
+      emitterCompanyPostalCode,
+      emitterCompanyCountry,
+      emitterCompanyContact,
+      emitterCompanyPhone,
+      emitterCompanyMail,
+      emitterCustomInfo,
+      destinationType,
+      destinationPlannedOperationCode,
+      destinationAgrementNumber,
+      destinationCompanyName,
+      destinationCompanySiret,
+      destinationCompanyAddress,
+      destinationCompanyContact,
+      destinationCompanyPhone,
+      destinationCompanyMail,
+      destinationOperationNextDestinationCompanyName,
+      destinationOperationNextDestinationCompanySiret,
+      destinationOperationNextDestinationCompanyAddress,
+      destinationOperationNextDestinationCompanyContact,
+      destinationOperationNextDestinationCompanyPhone,
+      destinationOperationNextDestinationCompanyMail,
+      destinationOperationNextDestinationCompanyVatNumber,
+      destinationCustomInfo,
+      wasteCode,
+      packaging,
+      identificationNumbers,
+      identificationType,
+      quantity,
+      weightValue,
+      weightIsEstimate,
+      transporterCompanyName,
+      transporterCompanySiret,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterCompanyVatNumber,
+      transporterTransportTakenOverAt,
+      transporterCustomInfo,
+      transporterTransportPlates,
+      transporterRecepisseIsExempted
+    });
+
+    // make sure this test breaks when a new field is added to the Bsvhu model
+    // it will ensure we think of adding necessary fields to the duplicate input
+    const sortFn = (a: string, b: string) => a.localeCompare(b);
+    expect(Object.keys(rest).sort(sortFn)).toEqual(
+      expectedSkipped.sort(sortFn)
+    );
+
+    expect(duplicatedBsvhu.intermediaries[0].siret).toEqual(intermediary.siret);
+
+    // Vérifie que les champs signatures ne sont pas dupliqués
+    expect(duplicatedBsvhu.emitterEmissionSignatureDate).toBeNull();
+    expect(duplicatedBsvhu.emitterEmissionSignatureAuthor).toBeNull();
+    expect(duplicatedBsvhu.destinationOperationSignatureDate).toBeNull();
+    expect(duplicatedBsvhu.destinationOperationSignatureAuthor).toBeNull();
+    expect(duplicatedBsvhu.transporterTransportSignatureDate).toBeNull();
+    expect(duplicatedBsvhu.transporterTransportSignatureAuthor).toBeNull();
   });
 
   it("should duplicate without the transporter receipt when it was emptied", async () => {
@@ -341,6 +565,10 @@ describe("mutaion.duplicateBsvhu", () => {
         }
       }
     });
+
+    const intermediary1 = await userWithCompanyFactory("MEMBER");
+    const intermediary2 = await userWithCompanyFactory("MEMBER");
+
     const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
@@ -363,7 +591,25 @@ describe("mutaion.duplicateBsvhu", () => {
         destinationCompanyAddress: destinationCompany.address,
         destinationCompanyContact: destinationCompany.contact,
         destinationCompanyMail: destinationCompany.contactEmail,
-        destinationCompanyPhone: destinationCompany.contactPhone
+        destinationCompanyPhone: destinationCompany.contactPhone,
+        intermediaries: {
+          createMany: {
+            data: [
+              {
+                siret: intermediary1.company.siret ?? "",
+                contact: "Mr intermédiaire 1",
+                name: intermediary1.company.name,
+                address: "Nawak"
+              },
+              {
+                siret: intermediary2.company.siret ?? "",
+                contact: "Mr intermédiaire 2",
+                name: intermediary1.company.name,
+                address: "Nawak"
+              }
+            ]
+          }
+        }
       }
     });
 
@@ -380,7 +626,9 @@ describe("mutaion.duplicateBsvhu", () => {
     const searchResults = {
       [emitter.company.siret!]: searchResult("emitter"),
       [transporterCompany.siret!]: searchResult("transporter"),
-      [destinationCompany.siret!]: searchResult("destination")
+      [destinationCompany.siret!]: searchResult("destination"),
+      [intermediary1.company.siret!]: searchResult("intermediary1"),
+      [intermediary2.company.siret!]: searchResult("intermediary2")
     };
 
     (searchCompany as jest.Mock).mockImplementation((clue: string) => {
@@ -397,7 +645,10 @@ describe("mutaion.duplicateBsvhu", () => {
     );
 
     const duplicatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: data.duplicateBsvhu.id }
+      where: { id: data.duplicateBsvhu.id },
+      include: {
+        intermediaries: true
+      }
     });
 
     // Emitter
@@ -420,6 +671,19 @@ describe("mutaion.duplicateBsvhu", () => {
     );
     expect(duplicatedBsvhu.destinationCompanyAddress).toEqual(
       "updated destination address"
+    );
+    // Intermediaries
+    expect(duplicatedBsvhu.intermediaries[0].name).toEqual(
+      "updated intermediary1 name"
+    );
+    expect(duplicatedBsvhu.intermediaries[0].address).toEqual(
+      "updated intermediary1 address"
+    );
+    expect(duplicatedBsvhu.intermediaries[1].name).toEqual(
+      "updated intermediary2 name"
+    );
+    expect(duplicatedBsvhu.intermediaries[1].address).toEqual(
+      "updated intermediary2 address"
     );
   });
 

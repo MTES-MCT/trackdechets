@@ -13,6 +13,7 @@ import { Registry } from "./registry/Registry";
 import { MembersAdmin } from "./company/MembersAdmin";
 import { CompaniesDashboard } from "./companies/CompaniesDashboard";
 import { BsdAdmin } from "./bsd/BsdAdmin";
+import { BulkProfileUpdateAdmin } from "./bulkProfilesUpdate/BulkprofilesUpdateAdmin";
 
 const toRelative = route => {
   return getRelativeRoute(routes.admin.index, route);
@@ -125,6 +126,18 @@ export default function Admin() {
             </li>
             <li className="tw-mb-1">
               <NavLink
+                to={routes.admin.massProfilesAdmin}
+                className={({ isActive }) =>
+                  isActive
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
+                }
+              >
+                Maj profils en masse
+              </NavLink>
+            </li>
+            <li className="tw-mb-1">
+              <NavLink
                 to={routes.admin.bsdAdmin}
                 className={({ isActive }) =>
                   isActive
@@ -182,10 +195,14 @@ export default function Admin() {
           />
 
           <Route
+            path={toRelative(routes.admin.massProfilesAdmin)}
+            element={<BulkProfileUpdateAdmin />}
+          />
+
+          <Route
             path={toRelative(routes.admin.bsdAdmin)}
             element={<BsdAdmin />}
           />
-
           <Route
             path={`${routes.admin.index}/*`}
             element={<Navigate to={routes.admin.verification} replace />}

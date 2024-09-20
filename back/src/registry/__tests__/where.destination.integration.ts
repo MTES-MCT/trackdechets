@@ -8,7 +8,7 @@ import { getBsdasriForElastic, indexBsdasri } from "../../bsdasris/elastic";
 import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
 import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 import { createBsff } from "../../bsffs/__tests__/factories";
-import { indexBsvhu } from "../../bsvhu/elastic";
+import { getBsvhuForElastic, indexBsvhu } from "../../bsvhu/elastic";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { bspaohFactory } from "../../bspaoh/__tests__/factories";
 import { getBspaohForElastic, indexBspaoh } from "../../bspaoh/elastic";
@@ -141,8 +141,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsvhu1, bsvhu2, bsvhu3].map(async bsda => {
-        return indexBsvhu(bsda);
+      [bsvhu1, bsvhu2, bsvhu3].map(async bsvhu => {
+        return indexBsvhu(await getBsvhuForElastic(bsvhu));
       })
     );
     await refreshElasticSearch();
@@ -367,8 +367,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsvhu1, bsvhu2, bsvhu3].map(async bsda => {
-        return indexBsvhu(bsda);
+      [bsvhu1, bsvhu2, bsvhu3].map(async bsvhu => {
+        return indexBsvhu(await getBsvhuForElastic(bsvhu));
       })
     );
     await refreshElasticSearch();
@@ -546,8 +546,8 @@ describe("toElasticFilter", () => {
     });
 
     await Promise.all(
-      [bsvhu1, bsvhu2, bsvhu3].map(async bsda => {
-        return indexBsvhu(bsda);
+      [bsvhu1, bsvhu2, bsvhu3].map(async bsvhu => {
+        return indexBsvhu(await getBsvhuForElastic(bsvhu));
       })
     );
     await refreshElasticSearch();

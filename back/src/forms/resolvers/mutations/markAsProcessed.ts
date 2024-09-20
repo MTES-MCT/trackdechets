@@ -23,6 +23,7 @@ import {
   PROCESSING_OPERATIONS
 } from "@td/constants";
 import { operationHook } from "../../operationHook";
+import { enqueueUpdateAppendix2Job } from "../../../queue/producers/updateAppendix2";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -107,8 +108,10 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   );
 
   const processedForm = await runInTransaction(async transaction => {
-    const { updateAppendix1Forms, updateAppendix2Forms, update } =
-      getFormRepository(user, transaction);
+    const { updateAppendix1Forms, update } = getFormRepository(
+      user,
+      transaction
+    );
 
     const processedForm = await update(
       { id: form.id, status: form.status },
@@ -123,7 +126,18 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
     // mark appendix2Forms as PROCESSED
     if (form.emitterType === EmitterType.APPENDIX2) {
-      await updateAppendix2Forms(groupedForms);
+      for (const formId of groupedForms.map(f => f.id)) {
+        transaction.addAfterCommitCallback(async () => {
+          // permet de faire passer le statut d'un bordereau annexé à "PROCESSED"
+          // si tous les bordereaux dans lesquelle ils est regroupé sont au statut
+          // "PROCESSED" et qu'il a été regroupé en totalité
+          await enqueueUpdateAppendix2Job({
+            formId,
+            userId: user.id,
+            auth: user.auth
+          });
+        });
+      }
     }
 
     if (form.emitterType === EmitterType.APPENDIX1) {

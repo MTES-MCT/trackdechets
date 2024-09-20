@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { gql, useMutation } from "@apollo/client";
 import {
@@ -27,9 +27,19 @@ import { generatePath, Link, useLocation } from "react-router-dom";
 import routes from "../../../../routes";
 import { TOAST_DURATION } from "../../../../../common/config";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { handleGraphQlError } from "../../../Creation/utils";
 
 const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
   const location = useLocation();
+
+  const [publishErrors, setPublishErrors] = useState<
+    | {
+        code: string;
+        path: string[];
+        message: string;
+      }[]
+    | undefined
+  >();
 
   const MARK_AS_SEALED = gql`
     mutation MarkAsSealed($id: ID!) {
@@ -131,10 +141,12 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             duration: TOAST_DURATION
           });
         },
-        onError: () =>
+        onError: err => {
           toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
             duration: TOAST_DURATION
-          })
+          });
+          handleGraphQlError(err, setPublishErrors);
+        }
       }
     );
 
@@ -149,10 +161,12 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             duration: TOAST_DURATION
           });
         },
-        onError: () =>
+        onError: err => {
           toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
             duration: TOAST_DURATION
-          })
+          });
+          handleGraphQlError(err, setPublishErrors);
+        }
       }
     );
 
@@ -323,7 +337,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                 })}
                 className="btn btn--primary"
                 onClick={onClose}
-                state={{ background: location }}
+                state={{ background: location, publishErrors: publishErrors }}
               >
                 Mettre le bordereau à jour pour le publier
               </Link>
@@ -372,7 +386,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                   id: bsd.id
                 })}
                 onClick={onClose}
-                state={{ background: location }}
+                state={{ background: location, publishErrors: publishErrors }}
               >
                 <Button priority="primary">
                   Mettre le bordereau à jour pour le publier

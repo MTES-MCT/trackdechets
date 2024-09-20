@@ -7,8 +7,6 @@ import { InlineError } from "../common/Components/Error/Error";
 import { Redirect } from "../utils/routerUtils";
 import AccountInfo from "./AccountInfo/AccountInfo";
 import AccountContentWrapper from "./AccountContentWrapper";
-import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
-import AccountOAuth2AppCreateUpdate from "./oauth2/AccountOauth2AppCreateUpdate";
 import { Query } from "@td/codegen-ui";
 import routes, { getRelativeRoute } from "../routes";
 import AccountApplications from "./AccountApplications/AccountApplications";
@@ -61,29 +59,6 @@ export default function Account() {
               element={
                 <AccountContentWrapper title="Applications et API">
                   <AccountApplications />
-                </AccountContentWrapper>
-              }
-            />
-
-            <Route
-              path={toRelative(routes.account.oauth2.list)}
-              element={<AccountOauth2AppList />}
-            />
-
-            <Route
-              path={toRelative(routes.account.oauth2.create)}
-              element={
-                <AccountContentWrapper title="Créer une application tierce sur la plateforme Trackdéchets">
-                  <AccountOAuth2AppCreateUpdate />
-                </AccountContentWrapper>
-              }
-            />
-
-            <Route
-              path={toRelative(routes.account.oauth2.edit)}
-              element={
-                <AccountContentWrapper title="Modifier une application OAuth2">
-                  <AccountOAuth2AppCreateUpdate />
                 </AccountContentWrapper>
               }
             />

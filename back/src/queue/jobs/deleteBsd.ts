@@ -4,14 +4,17 @@ import {
   toBsdElastic as toBsddElastic
 } from "../../forms/elastic";
 import {
-  BsdaForElasticInclude,
+  getBsdaForElastic,
   toBsdElastic as toBsdaElastic
 } from "../../bsda/elastic";
 import {
   BsdasriForElasticInclude,
   toBsdElastic as toBsdasriElastic
 } from "../../bsdasris/elastic";
-import { toBsdElastic as toBsvhuElastic } from "../../bsvhu/elastic";
+import {
+  getBsvhuForElastic,
+  toBsdElastic as toBsvhuElastic
+} from "../../bsvhu/elastic";
 import {
   BsffForElasticInclude,
   toBsdElastic as toBsffElastic
@@ -30,10 +33,7 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   await deleteBsd({ id: bsdId });
 
   if (bsdId.startsWith("BSDA-")) {
-    const bsda = await prisma.bsda.findUniqueOrThrow({
-      where: { id: bsdId },
-      include: BsdaForElasticInclude
-    });
+    const bsda = await getBsdaForElastic({ id: bsdId });
 
     return toBsdaElastic(bsda);
   }
@@ -48,9 +48,7 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   }
 
   if (bsdId.startsWith("VHU-")) {
-    const bsvhu = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsdId }
-    });
+    const bsvhu = await getBsvhuForElastic({ id: bsdId });
 
     return toBsvhuElastic(bsvhu);
   }

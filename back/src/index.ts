@@ -21,11 +21,15 @@ export { formatDate } from "./common/pdf";
 export { sendMail } from "./mailer/mailing";
 export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";
 export { operationHooksQueue } from "./queue/producers/operationHook";
+export { administrativeTransferQueue } from "./queue/producers/administrativeTransfer";
+export { updateAppendix2Queue } from "./queue/producers/updateAppendix2";
 export {
   indexBsdJob,
   operationHookJob,
+  updateAppendix2Job,
   sendMailJob,
-  postGericoJob
+  postGericoJob,
+  processAdministrativeTransferJob
 } from "./queue/jobs";
 
 export {
@@ -75,3 +79,6 @@ export { createUser } from "./users/database";
 export { default as getReadableId, ReadableIdPrefix } from "./forms/readableId";
 export { reindex } from "./bsds/indexation/reindexBsdHelpers";
 export { gericoQueue } from "./queue/producers/gerico";
+export { getBsdasriFromActivityEvents } from "./activity-events/bsdasri";
+export { getBsdaFromActivityEvents } from "./activity-events/bsda";
+export { getBsddFromActivityEvents } from "./activity-events/bsdd";

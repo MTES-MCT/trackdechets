@@ -9,7 +9,8 @@ import {
   MutationSignTransportFormArgs,
   MutationUpdateFormArgs,
   Query,
-  QueryFormArgs
+  QueryFormArgs,
+  TransportMode
 } from "@td/codegen-ui";
 import { RedErrorMessage } from "../../../../../common/components";
 import { Loader } from "../../../../../Apps/common/Components";
@@ -135,6 +136,7 @@ export default function SignTransportFormModalContent({
         takenOverAt: TODAY.toISOString(),
         securityCode: "",
         transporterNumberPlate: signingTransporter?.numberPlate ?? "",
+        transporterTransportMode: signingTransporter?.mode ?? null,
         emitter: { type: form?.emitter?.type },
         update: {
           quantity: form.wasteDetails?.quantity ?? 0,
@@ -175,7 +177,9 @@ export default function SignTransportFormModalContent({
               input: {
                 takenOverAt: values.takenOverAt,
                 takenOverBy: values.takenOverBy,
-                transporterNumberPlate: values.transporterNumberPlate
+                transporterNumberPlate: values.transporterNumberPlate,
+                transporterTransportMode:
+                  values.transporterTransportMode as TransportMode
               },
               securityCode: values.securityCode
                 ? Number(values.securityCode)

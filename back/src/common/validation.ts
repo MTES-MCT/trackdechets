@@ -171,6 +171,7 @@ type SiretTests = {
   isRegistered: (
     role?: "DESTINATION" | "TRANSPORTER" | "WASTE_VEHICLES"
   ) => yup.TestConfig<string>;
+  isNotDormant: yup.TestConfig<string>;
 };
 
 export const siretConditions: SiretConditions = {
@@ -282,7 +283,22 @@ export const siretTests: SiretTests = {
       }
       return true;
     }
-  })
+  }),
+  isNotDormant: {
+    name: "is-not-dormant",
+    message: ({ path, value }) =>
+      `${path} : l'établissement avec le SIRET ${value} est en sommeil`,
+    test: async siret => {
+      if (!siret) return true;
+      const company = await prisma.company.findUnique({
+        where: { siret }
+      });
+      if (company === null) {
+        return true;
+      }
+      return company.isDormantSince == null;
+    }
+  }
 };
 
 // Different tests that can be applied to a vat number

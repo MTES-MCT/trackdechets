@@ -41,7 +41,7 @@ import {
   getTransportersSync
 } from "../../../database";
 
-const UPDATE_BSFF = gql`
+export const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
     updateBsff(id: $id, input: $input) {
       ...FullBsff

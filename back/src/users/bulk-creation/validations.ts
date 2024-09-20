@@ -1,4 +1,10 @@
-import { CompanyType, UserRole } from "@prisma/client";
+import {
+  CompanyType,
+  UserRole,
+  WasteProcessorType,
+  WasteVehiclesType,
+  CollectorType
+} from "@prisma/client";
 import * as yup from "yup";
 import { prisma } from "@td/prisma";
 import { CompanyRow } from "./types";
@@ -66,6 +72,73 @@ export const companyValidationSchema = yup.object({
     .transform(toSet)
     .required()
     .min(1)
+    .test(
+      "noCrematorium",
+      "Le type CREMATORIUM est déprécié",
+      function (value) {
+        return !value?.includes(CompanyType.CREMATORIUM);
+      }
+    ),
+  collectorTypes: yup
+    .array()
+    .of(yup.string().oneOf(Object.values(CollectorType)))
+    .ensure()
+    .compact()
+    .transform(toSet)
+    .required()
+    .test(
+      "collectorTypes",
+      "Impossible de sélectionner un sous-type d'installation de tri, transit, regroupement si le profil Installation de Tri, transit regroupement de déchets n'est pas sélectionné",
+      function (value, context) {
+        if (
+          value?.length &&
+          !context.parent.companyTypes.includes(CompanyType.COLLECTOR)
+        ) {
+          return false;
+        }
+        return true;
+      }
+    ),
+  wasteProcessorTypes: yup
+    .array()
+    .of(yup.string().oneOf(Object.values(WasteProcessorType)))
+    .ensure()
+    .compact()
+    .transform(toSet)
+    .required()
+    .test(
+      "wasteProcessorTypes",
+      "Impossible de sélectionner un sous-type d'installation de traitement si le profil Installation de traitement n'est pas sélectionné",
+      function (value, context) {
+        if (
+          value?.length &&
+          !context.parent.companyTypes.includes(CompanyType.WASTEPROCESSOR)
+        ) {
+          return false;
+        }
+        return true;
+      }
+    ),
+  wasteVehiclesTypes: yup
+    .array()
+    .of(yup.string().oneOf(Object.values(WasteVehiclesType)))
+    .ensure()
+    .compact()
+    .transform(toSet)
+    .required()
+    .test(
+      "wasteVehiclesTypes",
+      "Impossible de sélectionner un sous-type d'installation de traitement VHU si le profil Installation de traitement VHU n'est pas sélectionné",
+      function (value, context) {
+        if (
+          value?.length &&
+          !context.parent.companyTypes.includes(CompanyType.WASTE_VEHICLES)
+        ) {
+          return false;
+        }
+        return true;
+      }
+    )
 });
 
 /**

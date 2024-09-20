@@ -591,6 +591,16 @@ Si les données de raison sociale et d'adresses enregistrés sur les bordereaux 
 
 Les jobs de "sirenification" sont dépilés par le worker `bulkindexqueue` qui doit donc être démarré sur Scalingo avant de lancer le script.
 
+### Génération de modèles de bsds vierges
+
+Une commande permet de générer et téléverser sur un bucket S3 les modèles vierges des bsds BSDD, BSDA, BSVHU et BSFF.
+
+Les variables d'environnement `S3_BSD_TEMPLATES_*` doivent être renseignées.
+
+Lancer la commande
+
+`npx nx run back:generate-bsds-templates`
+
 ## Guides
 
 ### Mettre à jour le changelog

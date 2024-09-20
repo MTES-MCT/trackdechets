@@ -358,6 +358,22 @@ export const CompanyDetailsfragment = {
       vatNumber
       userRole
       featureFlags
+      isDormantSince
+      givenAdministrativeTransfers {
+        id
+        status
+        createdAt
+        approvedAt
+      }
+      receivedAdministrativeTransfers {
+        id
+        status
+        approvedAt
+        from {
+          orgId
+          name
+        }
+      }
       ...AccountCompanyInfoFragment
       ...AccountCompanySecurityFragment
       ...AccountCompanyMemberListFragment

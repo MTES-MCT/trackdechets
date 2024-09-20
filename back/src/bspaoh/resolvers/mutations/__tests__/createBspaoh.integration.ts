@@ -13,6 +13,7 @@ import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { sirenify as sirenifyBspaohInput } from "../../../validation/sirenify";
 import { crematoriumFactory } from "../../../__tests__/factories";
+import { BspaohType } from "@prisma/client";
 
 jest.mock("../../../validation/sirenify");
 (sirenifyBspaohInput as jest.Mock).mockImplementation(input =>
@@ -85,7 +86,7 @@ describe("Mutation.Bspaoh.create", () => {
 
   it.each(["FOETUS", "PAOH"])(
     "should allow bspaoh creation",
-    async bspaohType => {
+    async (bspaohType: BspaohType) => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const destinationCompany = await crematoriumFactory();
 
@@ -629,7 +630,12 @@ describe("Mutation.Bspaoh.create", () => {
       expect.objectContaining({
         message: "Le SIRET du transporteur est obligatoire.",
         extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+          code: ErrorCode.BAD_USER_INPUT,
+          issues: expect.arrayContaining([
+            expect.objectContaining({
+              path: ["transporter", "company", "siret"]
+            })
+          ])
         })
       })
     ]);

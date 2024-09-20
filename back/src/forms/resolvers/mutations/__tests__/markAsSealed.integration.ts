@@ -17,6 +17,9 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { renderMail, contentAwaitsGuest } from "@td/mail";
+import { MARK_AS_SEALED } from "./mutations";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 jest.mock("axios", () => ({
   default: {
@@ -29,8 +32,6 @@ jest.mock("../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 // Mock external search services
-import { MARK_AS_SEALED } from "./mutations";
-
 const mockSearchCompany = jest.fn();
 jest.mock("../../../../companies/sirene/searchCompany", () => ({
   __esModule: true,
@@ -301,7 +302,7 @@ describe("Mutation.markAsSealed", () => {
           create: [
             {
               initialFormId: groupedForm1.id,
-              quantity: groupedForm1.quantityReceived!
+              quantity: groupedForm1.quantityReceived!.toNumber()
             }
           ]
         }
@@ -700,11 +701,11 @@ describe("Mutation.markAsSealed", () => {
           create: [
             {
               initialFormId: groupedForm1.id,
-              quantity: groupedForm1.quantityReceived!
+              quantity: groupedForm1.quantityReceived!.toNumber()
             },
             {
               initialFormId: groupedForm2.id,
-              quantity: groupedForm2.forwardedIn!.quantityReceived!
+              quantity: groupedForm2.forwardedIn!.quantityReceived!.toNumber()
             }
           ]
         }
@@ -713,8 +714,15 @@ describe("Mutation.markAsSealed", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_SEALED, {
-      variables: { id: form.id }
+    const mutateFn = () =>
+      mutate(MARK_AS_SEALED, {
+        variables: { id: form.id }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
     });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
@@ -738,7 +746,7 @@ describe("Mutation.markAsSealed", () => {
     const groupedForm2 = await formWithTempStorageFactory({
       ownerId: user.id,
       opt: {
-        status: "GROUPED",
+        status: "AWAITING_GROUP",
         quantityReceived: 0.02
       }
     });
@@ -758,7 +766,7 @@ describe("Mutation.markAsSealed", () => {
             },
             {
               initialFormId: groupedForm2.id,
-              quantity: groupedForm2.forwardedIn!.quantityReceived!
+              quantity: groupedForm2.forwardedIn!.quantityReceived!.toNumber()
             }
           ]
         }
@@ -767,8 +775,15 @@ describe("Mutation.markAsSealed", () => {
 
     const { mutate } = makeClient(user);
 
-    await mutate(MARK_AS_SEALED, {
-      variables: { id: form.id }
+    const mutateFn = () =>
+      mutate(MARK_AS_SEALED, {
+        variables: { id: form.id }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
     });
 
     const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({

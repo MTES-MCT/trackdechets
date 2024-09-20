@@ -1,18 +1,20 @@
 import { FavoriteType } from "@td/codegen-ui";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useContext } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import RecepisseExemption from "../../../../Forms/Components/RecepisseExemption/RecepiceExemption";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
+import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
+import { setFieldError } from "../../utils";
 
-const TransporterBsvhu = ({ isDisabled }) => {
+const TransporterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch } = useFormContext(); // retrieve all hook methods
+  const { register, setValue, watch, formState, setError } = useFormContext(); // retrieve all hook methods
   const actor = "transporter";
-
   const transporter = watch("transporter") ?? {};
+  const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
     // register fields managed under the hood by company selector
@@ -26,6 +28,61 @@ const TransporterBsvhu = ({ isDisabled }) => {
 
   register(`${actor}.recepisse.isExempted`);
 
+  useEffect(() => {
+    if (
+      errors?.length &&
+      errors?.length !== Object.keys(formState.errors)?.length
+    ) {
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.contact`,
+        formState.errors?.[actor]?.["company"]?.contact,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.address`,
+        formState.errors?.[actor]?.["company"]?.address,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.phone`,
+        formState.errors?.[actor]?.["company"]?.phone,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.mail`,
+        formState.errors?.[actor]?.["company"]?.mail,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.vatNumber`,
+        formState.errors?.[actor]?.["company"]?.vatNumber,
+        setError
+      );
+    }
+  }, [
+    errors,
+    errors?.length,
+    formState.errors,
+    formState.errors?.length,
+    setError
+  ]);
+
   const orgId = useMemo(
     () => transporter?.company?.orgId ?? transporter?.company?.siret ?? null,
     [transporter?.company?.orgId, transporter?.company?.siret]
@@ -33,13 +90,13 @@ const TransporterBsvhu = ({ isDisabled }) => {
 
   return (
     <>
-      {isDisabled && <DisabledParagraphStep />}
+      {!!sealedFields.length && <DisabledParagraphStep />}
       <div className="fr-col-md-10 fr-mt-4w">
         <h4 className="fr-h4">Entreprise</h4>
         <CompanySelectorWrapper
           orgId={siret}
           favoriteType={FavoriteType.Transporter}
-          disabled={isDisabled}
+          disabled={sealedFields.includes(`${actor}.company.siret`)}
           selectedCompanyOrgId={orgId}
           onCompanySelected={company => {
             if (company) {
@@ -66,7 +123,8 @@ const TransporterBsvhu = ({ isDisabled }) => {
         />
         <CompanyContactInfo
           fieldName={`${actor}.company`}
-          disabled={isDisabled}
+          name={actor}
+          disabled={sealedFields.includes(`${actor}.company.siret`)}
           key={orgId}
         />
       </div>
@@ -74,7 +132,7 @@ const TransporterBsvhu = ({ isDisabled }) => {
         <RecepisseExemption
           onChange={v => setValue(`${actor}.recepisse.isExempted`, v)}
           checked={transporter.recepisse?.isExempted}
-          disabled={isDisabled}
+          disabled={sealedFields.includes(`${actor}.recepisse.isExempted`)}
         />
       </div>
     </>

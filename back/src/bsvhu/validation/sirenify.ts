@@ -48,7 +48,23 @@ const sirenifyBsvhuAccessors = (
       input.transporterCompanyName = companyInput.name;
       input.transporterCompanyAddress = companyInput.address;
     }
-  }
+  },
+  ...(bsvhu.intermediaries ?? []).map(
+    (_, idx) =>
+      ({
+        siret: bsvhu.intermediaries![idx].siret,
+        skip: sealedFields.includes("intermediaries"),
+        setter: (input, companyInput) => {
+          const intermediary = input.intermediaries![idx];
+          if (companyInput.name) {
+            intermediary!.name = companyInput.name;
+          }
+          if (companyInput.address) {
+            intermediary!.address = companyInput.address;
+          }
+        }
+      } as NextCompanyInputAccessor<ParsedZodBsvhu>)
+  )
 ];
 
 export const sirenifyBsvhu: (

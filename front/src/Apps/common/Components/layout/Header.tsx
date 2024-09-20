@@ -32,8 +32,6 @@ import {
 
 import routes from "../../../routes";
 import styles from "./Header.module.scss";
-import { Header as HeaderDSFR } from "@codegouvfr/react-dsfr/Header";
-import { MainNavigation } from "@codegouvfr/react-dsfr/MainNavigation";
 import CompanySwitcher from "../CompanySwitcher/CompanySwitcher";
 
 export const GET_ME = gql`
@@ -392,17 +390,8 @@ function MobileSubNav({ currentCompany }) {
                     <MenuLink
                       entry={{
                         navlink: true,
-                        caption: "Application autorisées",
+                        caption: "Applications et API",
                         href: routes.account.applications
-                      }}
-                    />
-                  </li>
-                  <li>
-                    <MenuLink
-                      entry={{
-                        navlink: true,
-                        caption: "Mes applications",
-                        href: routes.account.oauth2.list
                       }}
                     />
                   </li>
@@ -577,81 +566,180 @@ export default function Header({
   );
 
   return !isAuthenticated ? (
-    <HeaderDSFR
-      brandTop={
-        <>
-          Ministère
-          <br />
-          de la transition
-          <br />
-          écologique
-        </>
-      }
-      homeLinkProps={{
-        href: "/",
-        title: "Accueil - Trackdéchets"
-      }}
+    <header
+      role="banner"
       id="fr-header-with-horizontal-operator-logo"
-      operatorLogo={{
-        alt: "Trackdéchets",
-        imgUrl: "./trackdechets-small.png",
-        orientation: "horizontal"
-      }}
-      quickAccessItems={[
-        {
-          iconId: "fr-icon-arrow-right-line",
-          linkProps: {
-            href: routes.signup.index
-          },
-          text: "Créer mon compte"
-        },
-        {
-          iconId: "fr-icon-account-circle-line",
-          linkProps: {
-            href: routes.login,
-            className: "fr-btn fr-btn--secondary fr-btn--sm  fr-btn--icon-right"
-          },
-          text: "Se connecter"
-        }
-      ]}
-      serviceTagline="Gérer la traçabilité des déchets en toute sécurité"
-      serviceTitle="Trackdéchets"
-      navigation={
-        <MainNavigation
-          items={[
-            {
-              text: "Aide",
-              menuLinks: [
-                {
-                  linkProps: {
-                    href: "https://faq.trackdechets.fr/",
-                    target: "_blank",
-                    rel: "noreferrer"
-                  },
-                  text: "Foire aux questions"
-                },
-                {
-                  linkProps: {
-                    href: "https://sandbox.trackdechets.beta.gouv.fr/",
-                    target: "_blank",
-                    rel: "noreferrer"
-                  },
-                  text: "Site de démonstration"
-                },
-                {
-                  linkProps: {
-                    href: "https://trackdechets.beta.gouv.fr/",
-                    target: "_blank",
-                    rel: "noreferrer"
-                  },
-                  text: "Page d'accueil / Formations"
-                }
-              ]
-            }
-          ]}
-        />
-      }
-    />
+      className="fr-header"
+    >
+      <div className="fr-header__body">
+        <div className="fr-container">
+          <div className="fr-header__body-row">
+            <div className="fr-header__brand fr-enlarge-link">
+              <div className="fr-header__brand-top">
+                <div className="fr-header__logo">
+                  <p className="fr-logo">
+                    Ministère
+                    <br />
+                    de la transition
+                    <br />
+                    écologique
+                  </p>
+                </div>
+                <div className="fr-header__operator">
+                  <img
+                    className="fr-responsive-img"
+                    style={{ width: "70px", height: "70px" }}
+                    src="./trackdechets.png"
+                    alt="Trackdéchets"
+                    data-fr-js-ratio="true"
+                  />
+                </div>
+                <div className="fr-header__navbar">
+                  <button
+                    className="fr-btn--menu fr-btn"
+                    data-fr-opened="false"
+                    aria-controls="header-menu-modal-fr-header-with-horizontal-operator-logo"
+                    aria-haspopup="menu"
+                    id="fr-header-with-horizontal-operator-logo-menu-button"
+                    title="Menu"
+                    data-fr-js-modal-button="true"
+                  >
+                    Menu
+                  </button>
+                </div>
+              </div>
+              <div className="fr-header__service">
+                <a href="/" title="Accueil - Trackdéchets">
+                  <p className="fr-header__service-title">Trackdéchets</p>
+                </a>
+                <p className="fr-header__service-tagline">
+                  Gérer la traçabilité des déchets en toute sécurité
+                </p>
+              </div>
+            </div>
+            <div className="fr-header__tools">
+              <div
+                className="fr-header__tools-links"
+                data-fr-js-header-links="true"
+              >
+                <ul className="fr-btns-group">
+                  <li>
+                    <a
+                      href="/signup"
+                      className="fr-btn fr-icon-arrow-right-line"
+                    >
+                      Créer mon compte
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href="/login"
+                      className="fr-btn fr-icon-account-circle-line fr-btn fr-btn--secondary fr-btn--sm fr-btn--icon-right"
+                    >
+                      Se connecter
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="fr-header__menu fr-modal"
+        id="header-menu-modal-fr-header-with-horizontal-operator-logo"
+        aria-labelledby="fr-header-with-horizontal-operator-logo-menu-button"
+        data-fr-js-modal="true"
+        data-fr-js-header-modal="true"
+      >
+        <div className="fr-container">
+          <button
+            id="fr-header-with-horizontal-operator-logo-mobile-overlay-button-close"
+            className="fr-btn--close fr-btn"
+            aria-controls="header-menu-modal-fr-header-with-horizontal-operator-logo"
+            title="Fermer"
+            data-fr-js-modal-button="true"
+          >
+            Fermer
+          </button>
+          <div className="fr-header__menu-links">
+            <ul className="fr-btns-group">
+              <li>
+                <a href="/signup" className="fr-btn fr-icon-arrow-right-line">
+                  Créer mon compte
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/login"
+                  className="fr-btn fr-icon-account-circle-line fr-btn fr-btn--secondary fr-btn--sm  fr-btn--icon-right"
+                >
+                  Se connecter
+                </a>
+              </li>
+            </ul>
+          </div>
+          <nav
+            id="main-navigation"
+            className="fr-nav"
+            role="navigation"
+            aria-label="Menu principal"
+            data-fr-js-navigation="true"
+          >
+            <ul className="fr-nav__list">
+              <li className="fr-nav__item" data-fr-js-navigation-item="true">
+                <button
+                  className="fr-nav__btn"
+                  aria-expanded="false"
+                  aria-controls="main-navigation-menu-aide"
+                  data-fr-js-collapse-button="true"
+                >
+                  Aide
+                </button>
+                <div
+                  className="fr-menu fr-collapse"
+                  id="main-navigation-menu-aide"
+                  data-fr-js-collapse="true"
+                >
+                  <ul className="fr-menu__list">
+                    <li>
+                      <a
+                        href="https://faq.trackdechets.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="fr-nav__link"
+                      >
+                        Foire aux questions
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="https://sandbox.trackdechets.beta.gouv.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="fr-nav__link"
+                      >
+                        Site de démonstration
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="https://trackdechets.beta.gouv.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="fr-nav__link"
+                      >
+                        Page d'accueil / Formations
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
   ) : (
     <>
       <div id="header" className={`fr-header ${styles.header}`}>

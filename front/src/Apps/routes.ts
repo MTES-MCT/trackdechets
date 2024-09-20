@@ -9,7 +9,8 @@ const routes = {
     impersonate: "/admin/impersonate",
     registry: "/admin/registry",
     membersAdmin: "admin/members",
-    bsdAdmin: "admin/bsd"
+    bsdAdmin: "admin/bsd",
+    massProfilesAdmin: "admin/mass-profile"
   },
   login: "/login",
   invite: "/invite",

@@ -1,17 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-
-export interface AuthorizePayload {
-  transactionID: string;
-  redirectURI: string;
-  user: {
-    name: string;
-  };
-  client: {
-    name: string;
-    logoUrl: string;
-  };
-}
+import { AuthorizePayload } from "./use-oauth2";
 
 /**
  * Retrieves authorization info from /oauth2/authorize

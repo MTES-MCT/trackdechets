@@ -6,7 +6,10 @@ import {
 } from "../../../generated/graphql/types";
 
 import { GraphQLContext } from "../../../types";
-import { expandVhuFormFromDb } from "../../converter";
+import {
+  companyToIntermediaryInput,
+  expandVhuFormFromDb
+} from "../../converter";
 import { parseBsvhuAsync } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 
@@ -42,12 +45,20 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
     }
   );
 
+  const intermediaries =
+    parsedZodBsvhu.intermediaries && parsedZodBsvhu.intermediaries.length > 0
+      ? {
+          create: companyToIntermediaryInput(parsedZodBsvhu.intermediaries)
+        }
+      : undefined;
+
   const bsvhuRepository = getBsvhuRepository(user);
 
   const newForm = await bsvhuRepository.create({
     ...parsedZodBsvhu,
     id: getReadableId(ReadableIdPrefix.VHU),
-    isDraft
+    isDraft,
+    intermediaries
   });
 
   return expandVhuFormFromDb(newForm);
