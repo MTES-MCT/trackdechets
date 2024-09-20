@@ -29,3 +29,15 @@ jobs:
               repo: context.repo.repo,
               labels: ["ready to merge"]
             })
+      - name: Remove Label if less than 2 approvals or change requested
+        if: 'steps.reviews.outputs.approved < 2 || steps.reviews.outputs.changes_requested > 0'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: "ready to merge"
+            })

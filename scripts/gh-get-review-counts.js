@@ -21,9 +21,20 @@ module.exports = async ({ github, context, core }) => {
       per_page: 100
     });
     debug(JSON.stringify(res.data, null, 2));
-    const reviews = res.data.filter(review =>
-      ["COLLABORATOR", "MEMBER", "OWNER"].includes(review.author_association)
-    );
+    const userIds = {};
+    const reviews = res.data.reverse().filter(review => {
+      if (
+        !["COLLABORATOR", "MEMBER", "OWNER"].includes(review.author_association)
+      ) {
+        return false;
+      }
+      const userId = review.user.id;
+      if (userIds[userId]) {
+        return false; // only use the last review of a user
+      }
+      userIds[userId] = true;
+      return true;
+    });
 
     debug(`${reviews.length} total valid reviews`);
     [
