@@ -10,7 +10,7 @@ import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { setFieldError } from "../../utils";
 
 const WasteBsvhu = ({ errors }) => {
-  const { register, watch, setValue, formState, setError } =
+  const { register, watch, setValue, formState, setError, clearErrors } =
     useFormContext<ZodBsvhu>(); // retrieve all hook methods
 
   const weight = watch("weight.value");
@@ -28,7 +28,8 @@ const WasteBsvhu = ({ errors }) => {
   useEffect(() => {
     if (
       errors?.length &&
-      errors?.length !== Object.keys(formState.errors)?.length
+      errors?.length !== Object.keys(formState.errors)?.length &&
+      !weight
     ) {
       setFieldError(
         errors,
@@ -37,12 +38,17 @@ const WasteBsvhu = ({ errors }) => {
         setError
       );
     }
+    if (errors?.length && weight) {
+      clearErrors("weight.value");
+    }
   }, [
     errors,
     errors?.length,
     formState?.errors,
     formState.errors?.weight?.value,
-    setError
+    setError,
+    weight,
+    clearErrors
   ]);
 
   return (

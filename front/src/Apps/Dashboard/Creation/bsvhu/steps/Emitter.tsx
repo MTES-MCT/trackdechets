@@ -13,7 +13,8 @@ import { setFieldError } from "../../utils";
 
 const EmitterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch, formState, setError } = useFormContext();
+  const { register, setValue, watch, formState, setError, clearErrors } =
+    useFormContext();
 
   const emitter = watch("emitter") ?? {};
   const sealedFields = useContext(SealedFieldsContext);
@@ -31,7 +32,8 @@ const EmitterBsvhu = ({ errors }) => {
     const actor = "emitter";
     if (
       errors?.length &&
-      errors?.length !== Object.keys(formState.errors)?.length
+      errors?.length !== Object.keys(formState.errors)?.length &&
+      (!emitter?.company?.siret || !emitter?.company?.orgId)
     ) {
       setFieldError(
         errors,
@@ -75,12 +77,23 @@ const EmitterBsvhu = ({ errors }) => {
         setError
       );
     }
+
+    if (
+      (formState.errors?.emitter?.["company"]?.orgId?.message ||
+        formState.errors?.emitter?.["company"]?.siret?.message) &&
+      emitter?.company?.siret
+    ) {
+      clearErrors(`${actor}.company.orgId`);
+    }
   }, [
     errors,
     errors?.length,
     formState.errors,
     formState.errors?.length,
-    setError
+    setError,
+    emitter?.company?.siret,
+    emitter?.company?.orgId,
+    clearErrors
   ]);
 
   const orgId = useMemo(

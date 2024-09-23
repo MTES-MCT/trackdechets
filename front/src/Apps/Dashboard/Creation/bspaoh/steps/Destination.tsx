@@ -10,12 +10,13 @@ import CompanySelectorWrapper from "../../../../common/Components/CompanySelecto
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import { setFieldError } from "../../utils";
+import { clearCompanyError, setFieldError } from "../../utils";
 
 const actor = "destination";
 
 export function Destination({ errors }) {
-  const { register, setValue, formState, setError } = useFormContext(); // retrieve all hook methods
+  const { register, setValue, formState, setError, clearErrors } =
+    useFormContext(); // retrieve all hook methods
   const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
@@ -30,10 +31,13 @@ export function Destination({ errors }) {
     register(`${actor}.company.mail`);
   }, [register]);
 
+  const destination = useWatch({ name: actor }) ?? {};
+
   useEffect(() => {
     if (
       errors?.length &&
-      errors?.length !== Object.keys(formState.errors)?.length
+      errors?.length !== Object.keys(formState.errors)?.length &&
+      !destination.company.siret
     ) {
       setFieldError(
         errors,
@@ -82,12 +86,12 @@ export function Destination({ errors }) {
     errors?.length,
     formState.errors,
     formState.errors?.length,
-    setError
+    setError,
+    destination?.company?.siret
   ]);
 
   const { siret } = useParams<{ siret: string }>();
 
-  const destination = useWatch({ name: actor }) ?? {};
   const orgId = useMemo(
     () => destination?.company?.orgId ?? destination?.company?.siret ?? null,
     [destination?.company?.orgId, destination?.company?.siret]
@@ -135,6 +139,11 @@ export function Destination({ errors }) {
               `${actor}.company.mail`,
               company.contactEmail || destination?.company?.mail
             );
+
+            if (errors?.length) {
+              // server errors
+              clearCompanyError(destination, actor, clearErrors);
+            }
           }
         }}
       />

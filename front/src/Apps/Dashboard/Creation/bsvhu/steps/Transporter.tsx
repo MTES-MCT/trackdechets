@@ -7,11 +7,12 @@ import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactIn
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import { setFieldError } from "../../utils";
+import { clearCompanyError, setFieldError } from "../../utils";
 
 const TransporterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch, formState, setError } = useFormContext(); // retrieve all hook methods
+  const { register, setValue, watch, formState, setError, clearErrors } =
+    useFormContext(); // retrieve all hook methods
   const actor = "transporter";
   const transporter = watch("transporter") ?? {};
   const sealedFields = useContext(SealedFieldsContext);
@@ -118,6 +119,11 @@ const TransporterBsvhu = ({ errors }) => {
                 `${actor}.company.mail`,
                 company.contactEmail || transporter?.company?.mail
               );
+
+              if (errors?.length) {
+                // server errors
+                clearCompanyError(transporter, actor, clearErrors);
+              }
             }
           }}
         />
