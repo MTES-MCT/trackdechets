@@ -253,18 +253,7 @@ function SignReceptionModal({
               signedAt: signedAt,
               signedBy: signedBy,
               wasteAcceptationStatus: wasteAcceptationStatus,
-              wasteRefusalReason: wasteRefusalReason,
-              ...(emptyReturnStatus
-                ? {
-                    emptyReturnADR: emptyReturnADR
-                  }
-                : {}),
-              ...(citerneWashedOutStatus
-                ? {
-                    hasCiterneBeenWashedOut: hasCiterneBeenWashedOut,
-                    citerneNotWashedOutReason: citerneNotWashedOutReason
-                  }
-                : {})
+              wasteRefusalReason: wasteRefusalReason
             }
           }
         });
@@ -440,6 +429,10 @@ function SignReceptionModal({
   ];
 
   const shouldDisplayCiterneStatus =
+    !(
+      isTempStorage &&
+      [FormStatus.TempStored, FormStatus.Sent].includes(form.status)
+    ) &&
     ["ACCEPTED"].includes(acceptationStatus) &&
     form.stateSummary?.packagingInfos.some(p => p.type === Packagings.Citerne);
 
@@ -449,6 +442,10 @@ function SignReceptionModal({
     Boolean(form.wasteDetails?.pop);
 
   const shouldDisplayAdrStatus =
+    !(
+      isTempStorage &&
+      [FormStatus.TempStored, FormStatus.Sent].includes(form.status)
+    ) &&
     ["ACCEPTED"].includes(acceptationStatus) &&
     form.stateSummary?.packagingInfos.some(
       p => p.type === Packagings.Citerne || p.type === Packagings.Benne

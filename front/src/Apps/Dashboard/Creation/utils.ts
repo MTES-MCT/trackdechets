@@ -136,3 +136,27 @@ export const setFieldError = (errors, errorPath, stateError, setError) => {
     });
   }
 };
+
+export const clearCompanyError = (actor, actorName, clearErrors) => {
+  if (actor?.["company"]?.siret) {
+    clearErrors([`${actorName}.company.siret`]);
+  }
+  if (actor?.["company"]?.orgId) {
+    clearErrors([`${actorName}.company.orgId`]);
+  }
+  if (actor?.["company"]?.contact) {
+    clearErrors([`${actorName}.company.contact`]);
+  }
+  if (actor?.["company"]?.address) {
+    clearErrors([`${actorName}.company.address`]);
+  }
+  if (actor?.["company"]?.phone) {
+    clearErrors([`${actorName}.company.phone`]);
+  }
+  if (actor?.["company"]?.mail) {
+    clearErrors([`${actorName}.company.mail`]);
+  }
+  if (actor?.["company"]?.vatNumber) {
+    clearErrors([`${actorName}.company.vatNumber`]);
+  }
+};

@@ -34,6 +34,7 @@ import {
   transporterRecepisseSchema
 } from "../common/validation";
 import { destinationOperationModeValidation } from "../common/validation/operationMode";
+import { isDefined } from "../common/helpers";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
@@ -484,9 +485,20 @@ export const transportSchema: FactorySchemaOf<
     transporterTransportMode: yup
       .mixed<TransportMode>()
       .nullable()
-      .requiredIf(
-        context.transportSignature,
-        "Le mode de transport est obligatoire."
+      .test(
+        "transport-mode",
+        "Le mode de transport est obligatoire.",
+        function (value) {
+          // Required only at transport signature
+          if (!context.transportSignature) return true;
+
+          // Not required for synthesis DASRI
+          if (this.parent.type === BsdasriType.SYNTHESIS) {
+            return true;
+          }
+
+          return isDefined(value);
+        }
       )
   });
 
