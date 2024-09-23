@@ -119,6 +119,7 @@ const DestinationBsvhu = ({ errors }) => {
     register(`${actor}.company.orgId`);
     register(`${actor}.company.siret`);
     register(`${actor}.company.name`);
+    register(`${actor}.company.contact`);
     register(`${actor}.company.vatNumber`);
     register(`${actor}.company.address`);
     register(`${actor}.company.mail`);
@@ -197,16 +198,16 @@ const DestinationBsvhu = ({ errors }) => {
               setValue(`${actor}.company.address`, company.address);
               setValue(
                 `${actor}.company.contact`,
-                company.contact || destination?.company?.contact
+                destination?.company?.contact || company.contact
               );
               setValue(
                 `${actor}.company.phone`,
-                company.contactPhone || destination?.company?.phone
+                destination?.company?.phone || company.contactPhone
               );
 
               setValue(
                 `${actor}.company.mail`,
-                company.contactEmail || destination?.company?.mail
+                destination?.company?.mail || company.contactEmail
               );
 
               setSelectedDestination(company);
@@ -286,10 +287,22 @@ const DestinationBsvhu = ({ errors }) => {
                 setValue(`${name}.name`, company.name);
                 setValue(`${name}.vatNumber`, company.vatNumber);
                 setValue(`${name}.address`, company.address);
-                setValue(`${name}.contact`, company.contact);
-                setValue(`${name}.phone`, company.contactPhone);
+                setValue(
+                  `${name}.contact`,
+                  destination?.operation?.nextDestinationcompany?.contact ||
+                    company.contact
+                );
+                setValue(
+                  `${name}.phone`,
+                  destination?.operation?.nextDestinationcompany
+                    ?.contactPhone || company.contactPhone
+                );
 
-                setValue(`${name}.mail`, company.contactEmail);
+                setValue(
+                  `${name}.mail`,
+                  destination?.operation?.nextDestinationcompany
+                    ?.contactEmail || company.contactEmail
+                );
 
                 const agrementNumber =
                   company?.vhuAgrementBroyeur?.agrementNumber;

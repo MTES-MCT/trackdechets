@@ -128,16 +128,16 @@ export function Destination({ errors }) {
             setValue(`${actor}.company.address`, company.address);
             setValue(
               `${actor}.company.contact`,
-              company.contact || destination?.company?.contact
+              destination?.company?.contact || company.contact
             );
             setValue(
               `${actor}.company.phone`,
-              company.contactPhone || destination?.company?.phone
+              destination?.company?.phone || company.contactPhone
             );
 
             setValue(
               `${actor}.company.mail`,
-              company.contactEmail || destination?.company?.mail
+              destination?.company?.mail || company.contactEmail
             );
 
             if (errors?.length) {
