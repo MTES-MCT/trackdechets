@@ -257,10 +257,12 @@ const DestinationBsvhu = ({ errors }) => {
           }}
           disabled={sealedFields.includes("destination.plannedOperationCode")}
         >
-          <option value="R 4">
-            R 4 - Recyclage ou récupération des métaux et des composés
-            métalliques
-          </option>
+          {!isDangerousWasteCode && (
+            <option value="R 4">
+              R 4 - Recyclage ou récupération des métaux et des composés
+              métalliques
+            </option>
+          )}
           <option value="R 12">
             R 12 - Échange de déchets en vue de les soumettre à l'une des
             opérations numérotées R1 à R11
