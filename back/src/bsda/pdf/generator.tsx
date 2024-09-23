@@ -34,6 +34,7 @@ export async function buildPdf(bsda: BsdaForPDF, renderEmptyPdf?: boolean) {
       bsda={expandedBsda}
       qrCode={qrCode}
       previousBsdas={previousBsdas}
+      renderEmpty={renderEmptyPdf}
     />
   );
   return generatePdf(html);
