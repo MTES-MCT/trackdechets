@@ -29,13 +29,6 @@ export default function Transport({ status, editionDisabled = false }) {
   }
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
-  useEffect(() => {
-    // If no transport mode selected, default to ROAD
-    if (!values.transporter?.transport?.mode) {
-      setFieldValue("transporter.transport.mode", TransportMode.Road);
-    }
-  });
-
   const showTransportFields =
     [
       BsdasriStatus.SignedByProducer,
