@@ -43,7 +43,7 @@ describe("index", () => {
       expect(delegation.delegatorOrgId).toBe("40081510600010");
       expect(delegation.delegateOrgId).toBe("39070205800012");
       expect(delegation.startDate?.toISOString()).toBe(
-        new Date("2040-09-29T22:00:00.000Z").toISOString()
+        new Date("2040-09-30T00:00:00.000Z").toISOString()
       );
       expect(delegation.endDate?.toISOString()).toBe(
         new Date("2050-09-30T21:59:59.999Z").toISOString()
@@ -274,17 +274,17 @@ describe("index", () => {
       // Given
       const args = {
         where: { delegatorOrgId: "39070205800012" },
-        after: "cl81ooom5138122w9sbznzdop",
+        skip: 0,
         first: 10
       };
 
       // When
-      const { where, after, first } =
+      const { where, skip, first } =
         parseQueryRndtsDeclarationDelegationsArgs(args);
 
       // Then
       expect(where).toMatchObject({ delegatorOrgId: "39070205800012" });
-      expect(after).toBe("cl81ooom5138122w9sbznzdop");
+      expect(skip).toBe(0);
       expect(first).toBe(10);
     });
   });
