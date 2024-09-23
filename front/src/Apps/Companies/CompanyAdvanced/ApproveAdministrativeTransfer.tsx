@@ -127,6 +127,7 @@ export function ApproveAdministrativeTransfer({ company }: Props) {
             disabled={loadingApprove}
             iconId="fr-icon-error-line"
             iconPosition="left"
+            priority="secondary"
           >
             Ne pas valider
           </Button>

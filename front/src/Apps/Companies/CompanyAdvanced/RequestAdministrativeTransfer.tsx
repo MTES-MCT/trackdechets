@@ -146,9 +146,11 @@ export function RequestAdministrativeTranfer({ company }: Props) {
               L'établissement de départ doit être mis en sommeil au préalable.
             </li>
             <li>
-              L'établissement de départ et celui d'arrivée doivent avoir
-              strictement les mêmes sous-profils TTR (Tri-Transit-Regroupement
-              dans l'onglet "Informations" de vos établissements).
+              L'établissement de départ et celui d'arrivée doivent avoir les
+              mêmes sous-profils TTR de cochés (Tri-Transit-Regroupement dans
+              l'onglet "Informations" de vos établissements) - l'établissement
+              d'arrivée peut avoir plus de sous-profil TTR cochés, mais pas
+              moins.
             </li>
             <li>L'ensemble des bordereaux en attente est transféré.</li>
             <li>
