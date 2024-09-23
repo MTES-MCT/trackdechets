@@ -56,3 +56,13 @@ export const RNDTS_DECLARATION_DELEGATIONS = gql`
     }
   }
 `;
+
+export const REVOKE_RNDTS_DECLARATION_DELEGATION = gql`
+  mutation revokeRndtsDeclarationDelegation($delegationId: ID!) {
+    revokeRndtsDeclarationDelegation(delegationId: $delegationId) {
+      id
+      isRevoked
+      status
+    }
+  }
+`;

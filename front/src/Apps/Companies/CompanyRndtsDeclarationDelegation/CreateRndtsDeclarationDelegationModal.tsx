@@ -130,7 +130,7 @@ export const CreateRndtsDeclarationDelegationModal = ({
     >
       <div>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <h4> Créer une délégation</h4>
+          <h4>Créer une délégation</h4>
 
           <CompanySelectorWrapper
             orgId={company.orgId}
