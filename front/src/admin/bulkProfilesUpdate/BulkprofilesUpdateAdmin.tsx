@@ -101,13 +101,7 @@ export const MASS_UPDATE_COMPANIES_PROFILES = gql`
     }
   }
 `;
-const formatRowErrors = jsonObject => {
-  try {
-    return JSON.stringify(jsonObject);
-  } catch (e) {
-    return jsonObject?.message ?? "Erreur";
-  }
-};
+
 export function BulkProfileUpdateAdmin() {
   const [bulkUpdateCompaniesProfiles, { loading, error, data }] = useMutation<
     Pick<Mutation, "bulkUpdateCompaniesProfiles">,
@@ -168,7 +162,7 @@ export function BulkProfileUpdateAdmin() {
                   ...register("companyUpdateRows", { required: true })
                 }}
                 state={errors?.companyUpdateRows && "error"}
-                stateRelatedMessage={formatRowErrors(errors?.companyUpdateRows)}
+                stateRelatedMessage="Veuillez vous référer au tableau d'erreurs"
               />
             </div>
             <Button disabled={loading}>Effectuer la mise à jour</Button>
@@ -176,6 +170,7 @@ export function BulkProfileUpdateAdmin() {
         )}
       </div>
       {loading && <div>Mise à jour des établissements en cours...</div>}
+      {errors?.companyUpdateRows && <ErrorsTable errors={errors} />}
       {error && (
         <Alert
           className="fr-mt-3w"
@@ -195,6 +190,67 @@ export function BulkProfileUpdateAdmin() {
 
 type Props = {
   data?: (CompanyPrivate | null)[];
+};
+
+const formatErrorMessage = (row, field) => {
+  const errorField = row?.[field];
+  if (!errorField) {
+    return null;
+  }
+
+  if (Array.isArray(errorField)) {
+    return errorField.map(err => err?.message).join(",");
+  }
+  return errorField?.message;
+};
+const formatRowErrors = errors => {
+  const ret: any[] = [];
+
+  errors?.companyUpdateRows?.forEach((row, index) => {
+    try {
+      ret.push([
+        index + 1,
+        formatErrorMessage(row, "companyTypes"),
+        formatErrorMessage(row, "collectorTypes"),
+        formatErrorMessage(row, "wasteProcessorTypes"),
+        formatErrorMessage(row, "wasteVehiclesTypes")
+      ]);
+    } catch {
+      //continue
+    }
+  });
+
+  return ret;
+};
+
+const ErrorsTable = ({ errors }) => {
+  const tableHeaders = [
+    "index",
+    "companyTypes",
+    "collectorTypes",
+    "wasteProcessorTypes",
+    "wasteVehiclesTypes"
+  ];
+  if (!errors?.companyUpdateRows || !Object.keys(errors?.companyUpdateRows)) {
+    return null;
+  }
+
+  if (Array.isArray(errors?.companyUpdateRows)) {
+    const f = formatRowErrors(errors) || [];
+
+    return (
+      <>
+        <h3 className="fr-h3 fr-mt-3w">Erreurs</h3>
+        <Table
+          colorVariant="pink-tuile"
+          headers={tableHeaders}
+          data={f}
+          fixed
+        />
+      </>
+    );
+  }
+  return <h3 className="fr-h3 fr-mt-3w">Erreur - Json invalide</h3>;
 };
 
 const BulkUpdateCompaniesProfilesDigest = ({ data }: Props) => {
@@ -217,7 +273,7 @@ const BulkUpdateCompaniesProfilesDigest = ({ data }: Props) => {
   return (
     <div>
       <h3 className="fr-h3">Établissements mis à jour</h3>
-      <Table headers={tableHeaders} data={tableData} fixed />{" "}
+      <Table headers={tableHeaders} data={tableData} fixed />
     </div>
   );
 };
