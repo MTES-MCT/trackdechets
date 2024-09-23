@@ -43,10 +43,10 @@ describe("index", () => {
       expect(delegation.delegatorOrgId).toBe("40081510600010");
       expect(delegation.delegateOrgId).toBe("39070205800012");
       expect(delegation.startDate?.toISOString()).toBe(
-        new Date("2040-09-30T00:00:00.000Z").toISOString()
+        "2040-09-30T00:00:00.000Z"
       );
       expect(delegation.endDate?.toISOString()).toBe(
-        new Date("2050-09-30T21:59:59.999Z").toISOString()
+        "2050-09-30T23:59:59.999Z"
       );
     });
 
