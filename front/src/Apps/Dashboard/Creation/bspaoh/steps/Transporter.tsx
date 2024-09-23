@@ -128,16 +128,16 @@ export function Transporter({ errors }) {
             setValue(`${actor}.company.address`, company.address);
             setValue(
               `${actor}.company.contact`,
-              company.contact || transporter?.company?.contact
+              transporter?.company?.contact || company.contact
             );
             setValue(
               `${actor}.company.phone`,
-              company.contactPhone || transporter?.company?.phone
+              transporter?.company?.phone || company.contactPhone
             );
 
             setValue(
               `${actor}.company.mail`,
-              company.contactEmail || transporter?.company?.mail
+              transporter?.company?.mail || company.contactEmail
             );
             setRecepisse({
               number: company.transporterReceipt?.receiptNumber,
