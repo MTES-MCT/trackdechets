@@ -94,9 +94,9 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
           Mise en sommeil de l'établissement
         </h4>
         <p className="company-advanced__description">
-          La mise en sommeil de votre établissement ne permet plus de viser son
-          SIRET sur de nouveaux bordereaux. Il permet de gérer les bordereaux
-          résiduels, et de consulter les registres.
+          La mise en sommeil de votre établissement ne permettra plus de viser
+          son SIRET sur de nouveaux bordereaux. Elle permettra de gérer les
+          bordereaux résiduels, et de consulter les registres.
         </p>
 
         {company.isDormantSince ? (
@@ -146,9 +146,9 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
         Suppression de l'établissement
       </h4>
       <p className="company-advanced__description">
-        En supprimant cet établissement, vous supprimez les accès de tous les
-        administrateurs et collaborateurs et vous ne pourrez plus accéder ni au
-        suivi des bordereaux, ni au registre.
+        En supprimant cet établissement, vous supprimez les accès de tous ses
+        membres et vous ne pourrez plus accéder, ni au suivi des bordereaux, ni
+        au registre.
       </p>
       <Button
         size="small"

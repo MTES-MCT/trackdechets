@@ -34,6 +34,7 @@ import {
   transporterRecepisseSchema
 } from "../common/validation";
 import { destinationOperationModeValidation } from "../common/validation/operationMode";
+import { isDefined } from "../common/helpers";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
@@ -148,11 +149,14 @@ export const emitterSchema: FactorySchemaOf<
       context.emissionSignature && !context?.isSynthesis,
       `Émetteur: ${MISSING_COMPANY_NAME}`
     ),
-    emitterCompanySiret: siret.label("Émetteur").requiredIf(
-      // field copied from transporter returning an error message would be confusing
-      context.emissionSignature && !context?.isSynthesis,
-      `Émetteur: ${MISSING_COMPANY_SIRET}`
-    ),
+    emitterCompanySiret: siret
+      .label("Émetteur")
+      .requiredIf(
+        // field copied from transporter returning an error message would be confusing
+        context.emissionSignature && !context?.isSynthesis,
+        `Émetteur: ${MISSING_COMPANY_SIRET}`
+      )
+      .test(siretTests.isNotDormant),
     emitterCompanyAddress: yup.string().requiredIf(
       // field copied from transporter returning an error message would be confusing
       context.emissionSignature && !context?.isSynthesis,
@@ -481,9 +485,20 @@ export const transportSchema: FactorySchemaOf<
     transporterTransportMode: yup
       .mixed<TransportMode>()
       .nullable()
-      .requiredIf(
-        context.transportSignature,
-        "Le mode de transport est obligatoire."
+      .test(
+        "transport-mode",
+        "Le mode de transport est obligatoire.",
+        function (value) {
+          // Required only at transport signature
+          if (!context.transportSignature) return true;
+
+          // Not required for synthesis DASRI
+          if (this.parent.type === BsdasriType.SYNTHESIS) {
+            return true;
+          }
+
+          return isDefined(value);
+        }
       )
   });
 

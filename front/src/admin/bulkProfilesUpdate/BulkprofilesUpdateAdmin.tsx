@@ -25,13 +25,11 @@ const validationSchema = z.object({
     .string()
     .transform((val, ctx) => {
       try {
-        const parsed = JSON.parse(val);
-
-        return parsed;
+        return JSON.parse(val);
       } catch (error) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "invalid json"
+          message: "Le json est invalide"
         });
         return z.never;
       }
@@ -64,7 +62,7 @@ const validationSchema = z.object({
               CollectorType.DeeeWastes,
               CollectorType.OtherDangerousWastes,
               CollectorType.OtherNonDangerousWastes,
-              CollectorType.DangerousWastes
+              CollectorType.NonDangerousWastes
             ])
           ),
           wasteProcessorTypes: z.array(
@@ -120,9 +118,13 @@ export function BulkProfileUpdateAdmin() {
     });
   };
 
-  const { handleSubmit, formState, register } = useForm<
-    z.infer<typeof validationSchema>
-  >({ resolver: zodResolver(validationSchema) });
+  const {
+    handleSubmit,
+    formState: { errors },
+    register
+  } = useForm<z.infer<typeof validationSchema>>({
+    resolver: zodResolver(validationSchema)
+  });
 
   return (
     <div>
@@ -143,8 +145,9 @@ export function BulkProfileUpdateAdmin() {
                   type: "email",
                   ...register("adminEmail", { required: true })
                 }}
+                state={errors?.adminEmail && "error"}
                 stateRelatedMessage={
-                  (formState?.errors?.adminEmail?.message as string) ?? ""
+                  (errors?.adminEmail?.message as string) ?? ""
                 }
               />
 
@@ -158,10 +161,8 @@ export function BulkProfileUpdateAdmin() {
                   rows: 10,
                   ...register("companyUpdateRows", { required: true })
                 }}
-                stateRelatedMessage={
-                  (formState?.errors?.companyUpdateRows?.message as string) ??
-                  ""
-                }
+                state={errors?.companyUpdateRows && "error"}
+                stateRelatedMessage="Veuillez vous référer au tableau d'erreurs"
               />
             </div>
             <Button disabled={loading}>Effectuer la mise à jour</Button>
@@ -169,6 +170,7 @@ export function BulkProfileUpdateAdmin() {
         )}
       </div>
       {loading && <div>Mise à jour des établissements en cours...</div>}
+      {errors?.companyUpdateRows && <ErrorsTable errors={errors} />}
       {error && (
         <Alert
           className="fr-mt-3w"
@@ -188,6 +190,67 @@ export function BulkProfileUpdateAdmin() {
 
 type Props = {
   data?: (CompanyPrivate | null)[];
+};
+
+const formatErrorMessage = (row, field) => {
+  const errorField = row?.[field];
+  if (!errorField) {
+    return null;
+  }
+
+  if (Array.isArray(errorField)) {
+    return errorField.map(err => err?.message).join(",");
+  }
+  return errorField?.message;
+};
+const formatRowErrors = errors => {
+  const ret: any[] = [];
+
+  errors?.companyUpdateRows?.forEach((row, index) => {
+    try {
+      ret.push([
+        index + 1,
+        formatErrorMessage(row, "companyTypes"),
+        formatErrorMessage(row, "collectorTypes"),
+        formatErrorMessage(row, "wasteProcessorTypes"),
+        formatErrorMessage(row, "wasteVehiclesTypes")
+      ]);
+    } catch {
+      //continue
+    }
+  });
+
+  return ret;
+};
+
+const ErrorsTable = ({ errors }) => {
+  const tableHeaders = [
+    "index",
+    "companyTypes",
+    "collectorTypes",
+    "wasteProcessorTypes",
+    "wasteVehiclesTypes"
+  ];
+  if (!errors?.companyUpdateRows || !Object.keys(errors?.companyUpdateRows)) {
+    return null;
+  }
+
+  if (Array.isArray(errors?.companyUpdateRows)) {
+    const f = formatRowErrors(errors) || [];
+
+    return (
+      <>
+        <h3 className="fr-h3 fr-mt-3w">Erreurs</h3>
+        <Table
+          colorVariant="pink-tuile"
+          headers={tableHeaders}
+          data={f}
+          fixed
+        />
+      </>
+    );
+  }
+  return <h3 className="fr-h3 fr-mt-3w">Erreur - Json invalide</h3>;
 };
 
 const BulkUpdateCompaniesProfilesDigest = ({ data }: Props) => {
@@ -210,7 +273,7 @@ const BulkUpdateCompaniesProfilesDigest = ({ data }: Props) => {
   return (
     <div>
       <h3 className="fr-h3">Établissements mis à jour</h3>
-      <Table headers={tableHeaders} data={tableData} fixed />{" "}
+      <Table headers={tableHeaders} data={tableData} fixed />
     </div>
   );
 };

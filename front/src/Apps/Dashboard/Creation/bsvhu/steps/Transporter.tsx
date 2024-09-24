@@ -7,11 +7,12 @@ import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactIn
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import { setFieldError } from "../../utils";
+import { clearCompanyError, setFieldError } from "../../utils";
 
 const TransporterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch, formState, setError } = useFormContext(); // retrieve all hook methods
+  const { register, setValue, watch, formState, setError, clearErrors } =
+    useFormContext(); // retrieve all hook methods
   const actor = "transporter";
   const transporter = watch("transporter") ?? {};
   const sealedFields = useContext(SealedFieldsContext);
@@ -21,6 +22,7 @@ const TransporterBsvhu = ({ errors }) => {
     register(`${actor}.company.orgId`);
     register(`${actor}.company.siret`);
     register(`${actor}.company.name`);
+    register(`${actor}.company.contact`);
     register(`${actor}.company.vatNumber`);
     register(`${actor}.company.address`);
     register(`${actor}.company.mail`);
@@ -107,17 +109,22 @@ const TransporterBsvhu = ({ errors }) => {
               setValue(`${actor}.company.address`, company.address);
               setValue(
                 `${actor}.company.contact`,
-                company.contact || transporter?.company?.contact
+                transporter?.company?.contact || company.contact
               );
               setValue(
                 `${actor}.company.phone`,
-                company.contactPhone || transporter?.company?.phone
+                transporter?.company?.phone || company.contactPhone
               );
 
               setValue(
                 `${actor}.company.mail`,
-                company.contactEmail || transporter?.company?.mail
+                transporter?.company?.mail || company.contactEmail
               );
+
+              if (errors?.length) {
+                // server errors
+                clearCompanyError(transporter, actor, clearErrors);
+              }
             }
           }}
         />

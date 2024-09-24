@@ -419,7 +419,9 @@ const Recipient = ({
           <>
             <dt>Charte "Rinçage des citernes"</dt>{" "}
             <dd>
-              {form.hasCiterneBeenWashedOut
+              {form.hasCiterneBeenWashedOut === null
+                ? "Non renseignée"
+                : !!form.hasCiterneBeenWashedOut
                 ? "Rinçage effectué"
                 : `Rinçage non effectué, ${
                     !!form.citerneNotWashedOutReason

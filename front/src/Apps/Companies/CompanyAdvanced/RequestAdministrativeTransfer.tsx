@@ -4,6 +4,7 @@ import {
   AdministrativeTransfer,
   CompanyPrivate,
   CompanySearchResult,
+  CompanyType,
   Mutation,
   MutationCancelAdministrativeTransferArgs,
   MutationCreateAdministrativeTransferArgs
@@ -64,11 +65,9 @@ export function RequestAdministrativeTranfer({ company }: Props) {
       if (!selectedCompany.isRegistered) {
         return "Cet établissement n'est pas inscrit sur Trackdéchets.";
       } else if (
-        !company.companyTypes?.every(type =>
-          selectedCompany.companyTypes?.includes(type)
-        )
+        !selectedCompany.companyTypes?.includes(CompanyType.Collector)
       ) {
-        return "L'établissement d'arrivée n'a pas les mêmes profils que l'établissement de départ. Impossible de réaliser le transfert.";
+        return "L'établissement d'arrivée doit être une Installation de collecte de déchets. Impossible de réaliser le transfert.";
       }
     }
 
@@ -122,10 +121,12 @@ export function RequestAdministrativeTranfer({ company }: Props) {
         Transfert administratif de bordereaux
       </h4>
       <p className="company-advanced__description">
-        Le transfert administratif de bordereaux concerne uniquement certains
-        cas exceptionnels. Les déchets sont transférés à un nouvel établissement
-        lors de la fermeture de l'ancien établissement sans que sans que les
-        déchets soient déplacés ou modifiés.
+        La fonctionnalité de transfert de bordereaux concerne les établissements
+        qui changent de SIRET mais conservent leurs activités. Elle permet de
+        transférer uniquement des bordereaux au statut "en attente de
+        regroupement" vers le nouveau SIRET de façon à ce que le nouvel
+        établissement puisse établir les bordereaux suites (annexes 2) et
+        poursuivre l'activité.
       </p>
 
       <Stepper
@@ -137,22 +138,31 @@ export function RequestAdministrativeTranfer({ company }: Props) {
 
       {currentStepIdx === 0 && (
         <div className="company-advanced__description">
-          <p className="tw-mb-2">Conditions à respecter :</p>
+          <p className="tw-mb-2">
+            Conditions de transfert de bordereaux vers un nouvel établissement :
+          </p>
           <ul className="tw-list-disc">
-            <li>
-              L'établissement de départ et d'arrivée doivent avoir les même
-              profils et les même autorisations.
-            </li>
-            <li>L'opération est irréversible.</li>
-            <li>L'ensemble des bordereaux en attente est transféré.</li>
             <li>
               L'établissement de départ doit être mis en sommeil au préalable.
             </li>
             <li>
-              La mise en sommeil doit permettre de réduire le nombre de
-              bordereaux à transférer.
+              L'établissement de départ et celui d'arrivée doivent avoir les
+              mêmes sous-profils TTR de cochés (Tri-Transit-Regroupement dans
+              l'onglet "Informations" de vos établissements) - l'établissement
+              d'arrivée peut avoir plus de sous-profil TTR cochés, mais pas
+              moins.
             </li>
-            <li>L'établissement d'arrivée doit valider le transfert.</li>
+            <li>L'ensemble des bordereaux en attente est transféré.</li>
+            <li>
+              L'établissement d'arrivée devra valider le transfert depuis
+              l'onglet "avancé de son établissement
+            </li>
+            <li>
+              L'ensemble des bordereaux (BSDD) au statut "awaiting-group" (En
+              attente de regroupement) sera transféré. (pas de sélection
+              possible)
+            </li>
+            <li>L'opération est irréversible.</li>
           </ul>
         </div>
       )}

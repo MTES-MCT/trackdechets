@@ -11,13 +11,14 @@
   background: rgba(0, 0, 0, 0.5);
   overflow: auto;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tdModalInner {
   position: relative;
-  top: 50%;
-  right: 50%;
-  transform: translate(50%, -50%);
+  flex: auto;
 }
 
 .fr-modal__header.close-btn-override {

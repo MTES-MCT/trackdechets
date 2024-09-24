@@ -114,16 +114,18 @@ describe("createAdministrativeTransfer", () => {
     );
   });
 
-  it("should throw an error if the to company does not have the same profiles as the from company", async () => {
+  it("should throw an error if the to company does not have the same collector sub-profiles as the from company", async () => {
     const { company: fromCompany, user } = await userWithCompanyFactory(
       UserRole.ADMIN,
       {
         isDormantSince: new Date(),
-        companyTypes: ["WASTEPROCESSOR", "COLLECTOR"]
+        companyTypes: ["WASTEPROCESSOR", "COLLECTOR"],
+        collectorTypes: ["DANGEROUS_WASTES", "OTHER_NON_DANGEROUS_WASTES"]
       }
     );
     const toCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["COLLECTOR"],
+      collectorTypes: ["OTHER_NON_DANGEROUS_WASTES"]
     });
     const { mutate } = makeClient(user);
 
@@ -137,17 +139,22 @@ describe("createAdministrativeTransfer", () => {
     expect(errors).toBeDefined();
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
-      "L'établissement d'arrivée n'a pas les mêmes profils que l'établissement de départ. Impossible de réaliser le transfert."
+      "L'établissement d'arrivée n'a pas les mêmes sous-profils d'installation de tri, transit regroupement que l'établissement de départ. Impossible de réaliser le transfert."
     );
   });
 
   it("should create an administrative transfer if all conditions are met", async () => {
     const { company: fromCompany, user } = await userWithCompanyFactory(
       UserRole.ADMIN,
-      { isDormantSince: new Date(), companyTypes: ["WASTEPROCESSOR"] }
+      {
+        isDormantSince: new Date(),
+        companyTypes: ["COLLECTOR"],
+        collectorTypes: ["DANGEROUS_WASTES"]
+      }
     );
     const toCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["COLLECTOR"],
+      collectorTypes: ["DANGEROUS_WASTES"]
     });
     const { mutate } = makeClient(user);
 

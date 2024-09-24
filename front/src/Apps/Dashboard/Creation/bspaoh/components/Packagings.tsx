@@ -8,7 +8,7 @@ import { emptyPackaging } from "../initial-state";
 import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
 
 const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
-  const { register, getFieldState } = useFormContext();
+  const { register, getFieldState, watch } = useFormContext();
   const name = `waste.packagings.${idx}`;
 
   const { error: typeError } = getFieldState(`${name}.type`);
@@ -16,6 +16,7 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
   const { error: identificationCodesError } = getFieldState(
     `${name}.identificationCodes`
   );
+  const identificationCodes = watch(`${name}.identificationCodes`);
 
   return (
     <div>
@@ -89,7 +90,7 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
           <IdentificationNumber
             disabled={disabled}
             name={`${name}.identificationCodes`}
-            error={identificationCodesError}
+            error={identificationCodesError && !identificationCodes.length}
             type={paohType}
           />
         </div>

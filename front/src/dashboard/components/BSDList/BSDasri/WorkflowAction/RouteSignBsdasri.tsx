@@ -7,7 +7,8 @@ import {
   QueryBsdasriArgs,
   BsdasriSignatureType,
   MutationUpdateBsdasriArgs,
-  Bsdasri
+  Bsdasri,
+  TransportMode
 } from "@td/codegen-ui";
 import {
   NotificationError,
@@ -164,6 +165,13 @@ export function RouteSignBsdasri({
   const formState = prefillWasteDetails(
     getComputedState(getInitialState(), bsdasri)
   );
+
+  // DASRI can be created via API with a null transport mode.
+  // getComputedState() will not fix it because it doesn't override null values,
+  // so fix it here manually
+  if (!formState.transporter.transport.mode) {
+    formState.transporter.transport.mode = TransportMode.Road;
+  }
 
   const TODAY = new Date();
 
