@@ -3,7 +3,6 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,
-  BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -21,6 +20,7 @@ import {
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { RegistryBsda } from "../registry/elastic";
 import { BsdaForElastic } from "./elastic";
+import { getBsdaSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import { isFinalOperationCode } from "../common/operationCodes";
 
@@ -325,14 +325,6 @@ export function getRegistryFields(
   return registryFields;
 }
 
-export const getSubType = (bsda: RegistryBsda): BsdSubType => {
-  if (bsda.type === "OTHER_COLLECTIONS") {
-    return "INITIAL";
-  }
-
-  return bsda.type;
-};
-
 export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
   const {
     street: destinationCompanyAddress,
@@ -366,7 +358,7 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     ecoOrganismeName: bsda.ecoOrganismeName,
     ecoOrganismeSiren: bsda.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDA",
-    bsdSubType: getSubType(bsda),
+    bsdSubType: getBsdaSubType(bsda),
     status: bsda.status,
     customId: null,
     destinationCap: bsda.destinationCap,

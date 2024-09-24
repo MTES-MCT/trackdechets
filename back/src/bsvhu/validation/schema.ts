@@ -19,6 +19,10 @@ import {
   foreignVatNumberSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
+import {
+  intermediariesRefinement,
+  intermediarySchema
+} from "../../common/validation/intermediaries";
 import { BSVHU_WASTE_CODES, PROCESSING_OPERATIONS_CODES } from "@td/constants";
 import {
   BsvhuDestinationType,
@@ -27,6 +31,7 @@ import {
   OperationMode,
   WasteAcceptationStatus
 } from "@prisma/client";
+import { fillIntermediariesOrgIds } from "./transformers";
 
 export const ZodWasteCodeEnum = z
   .enum(BSVHU_WASTE_CODES, {
@@ -176,7 +181,12 @@ const rawBsvhuSchema = z.object({
   transporterRecepisseIsExempted: z
     .boolean()
     .nullish()
-    .transform(v => Boolean(v))
+    .transform(v => Boolean(v)),
+  intermediaries: z
+    .array(intermediarySchema)
+    .nullish()
+    .superRefine(intermediariesRefinement),
+  intermediariesOrgIds: z.array(z.string()).optional()
 });
 
 // Type inféré par Zod - avant parsing
@@ -196,6 +206,12 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkOperationMode)
   .superRefine(checkEmitterSituation);
 
+// Transformations synchrones qui sont toujours
+// joués même si `enableCompletionTransformers=false`
+const transformedBsvhuSyncSchema = refinedBsvhuSchema.transform(
+  fillIntermediariesOrgIds
+);
+
 /**
  * Modification du schéma Zod pour appliquer des tranformations et
  * des vérifications **synchrones** qui nécessite de connaitre le contexte d'appel.
@@ -204,7 +220,7 @@ const refinedBsvhuSchema = rawBsvhuSchema
  * je dois connaitre le type de signature.
  */
 export const contextualBsvhuSchema = (context: BsvhuValidationContext) => {
-  return refinedBsvhuSchema.superRefine(checkRequiredFields(context));
+  return transformedBsvhuSyncSchema.superRefine(checkRequiredFields(context));
 };
 
 /**
@@ -212,7 +228,7 @@ export const contextualBsvhuSchema = (context: BsvhuValidationContext) => {
  * des vérifications **asynchrones** qui nécessite de connaitre le contexte d'appel.
  */
 export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
-  return refinedBsvhuSchema
+  return transformedBsvhuSyncSchema
     .superRefine(checkCompanies)
     .transform(sirenifyBsvhu(context))
     .transform(recipifyBsdTransporter)

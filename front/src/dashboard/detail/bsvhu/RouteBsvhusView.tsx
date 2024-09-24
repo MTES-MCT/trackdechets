@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/client";
 
 import { Query, QueryBsvhuArgs } from "@td/codegen-ui";
 import Loader from "../../../Apps/common/Components/Loader/Loaders";
-import { GET_VHU_FORM } from "../../../form/bsvhu/utils/queries";
+import { GET_VHU_FORM } from "../../../Apps/Dashboard/Creation/bsvhu/utils/queries";
 import { InlineError } from "../../../Apps/common/Components/Error/Error";
 import EmptyDetail from "../common/EmptyDetailView";
 

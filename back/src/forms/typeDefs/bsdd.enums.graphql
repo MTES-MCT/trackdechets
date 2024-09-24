@@ -190,3 +190,33 @@ enum FormsRegisterExportFormat {
   """
   XLSX
 }
+
+"Charte citerne - Raison pour laquelle la citerne n'a pas été rincée"
+enum CiterneNotWashedOutReason {
+  "Exemptions de rinçage (citerne dédiée)"
+  EXEMPTED
+
+  "Incompatibilité avec l'opération de rinçage à l'eau"
+  INCOMPATIBLE
+
+  "Indisponibilité de l'installation de rinçage"
+  UNAVAILABLE
+
+  "Rinçage non réalisé par le chauffeur"
+  NOT_BY_DRIVER
+}
+
+"Retour à vide ADR"
+enum EmptyReturnADR {
+  "Vide, non nettoyé"
+  EMPTY_NOT_WASHED
+
+  "Retour à vide, non nettoyé"
+  EMPTY_RETURN_NOT_WASHED
+
+  "Véhicule vide, dernière marchandise chargée"
+  EMPTY_VEHICLE
+
+  "Véhicule-Citerne vide, dernière marchandise chargée"
+  EMPTY_CITERNE
+}

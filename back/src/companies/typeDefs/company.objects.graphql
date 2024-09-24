@@ -12,6 +12,9 @@ type CompanyPrivate {
   "Sous-types d'entreprises pour les installation de traitement de déchets"
   wasteProcessorTypes: [WasteProcessorType!]!
 
+  "Sous-types d'entreprises pour les installation de traitement VHU"
+  wasteVehiclesTypes: [WasteVehiclesType!]!
+
   "Identifiant GEREP"
   gerepId: String
 
@@ -132,6 +135,22 @@ type CompanyPrivate {
   Liste des featureFlags
   """
   featureFlags: [String]!
+
+  """
+  Date depuis partir de laquelle l'entreprise est en sommeil sur Trackdéchets.
+  Vide si l'entreprise n'est pas en sommeil.
+  """
+  isDormantSince: DateTime
+
+  """
+  Liste des transferts administratifs initiés par l'établissement
+  """
+  givenAdministrativeTransfers: [AdministrativeTransfer!]
+
+  """
+  Liste des transferts administratifs reçus par l'établissement
+  """
+  receivedAdministrativeTransfers: [AdministrativeTransfer!]
 }
 
 type CompanyPrivateEdge {
@@ -199,6 +218,9 @@ type CompanyPublic {
   "Sous-types d'entreprises pour les installation de traitement de déchets"
   wasteProcessorTypes: [WasteProcessorType!]
 
+  "Sous-types d'installation de traitement VHU"
+  wasteVehiclesTypes: [WasteVehiclesType!]
+
   """
   Liste des agréments de l'éco-organisme
   """
@@ -235,6 +257,11 @@ type CompanyPublic {
   Certification entreprise de travaux
   """
   workerCertification: WorkerCertification
+
+  """
+  Indique si l'entreprise est en sommeil sur Trackdéchets
+  """
+  isDormant: Boolean!
 }
 
 interface CompanySearchPrivateCommon {
@@ -326,6 +353,11 @@ interface CompanySearchPrivateCommon {
   Certification entreprise de travaux
   """
   workerCertification: WorkerCertification
+
+  """
+  Indique si l'entreprise est en sommeil sur Trackdéchets
+  """
+  isDormant: Boolean!
 }
 
 "Information sur un établissement accessible publiquement en recherche floue"
@@ -391,6 +423,9 @@ type CompanySearchResult implements CompanySearchPrivateCommon {
   "Sous-types d'entreprises pour les installation de traitement de déchets"
   wasteProcessorTypes: [WasteProcessorType!]
 
+  "Sous-types d'installation de traitement VHU"
+  wasteVehiclesTypes: [WasteVehiclesType!]
+
   """
   Liste des agréments de l'éco-organisme
   """
@@ -423,6 +458,7 @@ type CompanySearchResult implements CompanySearchPrivateCommon {
   Agrément VHU broyeur (le cas échéant, pour les profils VHU)
   """
   vhuAgrementBroyeur: VhuAgrement
+
   """
   Statut de diffusion des informations de l'établisement selon l'INSEE. O = Oui, P = Non ou Partiel
   """
@@ -432,6 +468,11 @@ type CompanySearchResult implements CompanySearchPrivateCommon {
   Certification entreprise de travaux
   """
   workerCertification: WorkerCertification
+
+  """
+  Indique si l'entreprise est en sommeil sur Trackdéchets
+  """
+  isDormant: Boolean!
 }
 
 """
@@ -697,4 +738,21 @@ type SignatureAutomation {
   to: CompanyPublic!
   "Date de création de l'automatisation de signature"
   createdAt: DateTime!
+}
+
+"""
+Informations sur un transfert administratif entre deux entreprises
+"""
+type AdministrativeTransfer {
+  id: ID!
+  "Entreprise qui initie le transfert"
+  from: CompanyPublic!
+  "Entreprise qui reçoit le transfert"
+  to: CompanyPublic!
+  "Date de création du transfert"
+  createdAt: DateTime!
+  "Date de validation du transfert"
+  approvedAt: DateTime
+  "Statut du transfert"
+  status: AdministrativeTransferStatus
 }

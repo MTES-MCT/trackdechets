@@ -3,6 +3,7 @@ import {
   BsffType,
   OperationMode,
   TransporterReceipt,
+  TransportMode,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -10,7 +11,8 @@ import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
-  MutationSignBsffArgs
+  MutationSignBsffArgs,
+  MutationUpdateBsffArgs
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
@@ -36,6 +38,7 @@ import {
 } from "../../../__tests__/factories";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { getTransportersSync } from "../../../database";
+import { UPDATE_BSFF } from "./updateBsff.integration";
 
 const SIGN = gql`
   mutation Sign($id: ID!, $input: BsffSignatureInput!) {
@@ -589,6 +592,133 @@ describe("Mutation.signBsff", () => {
           message: "Vous ne pouvez pas signer ce bordereau"
         })
       ]);
+    });
+
+    // Transport mode is now required at transporter signature step
+    describe("transporterTransportMode", () => {
+      const prepareBsdffAndSignTransport = async (
+        transporterOpt,
+        updateOpt?
+      ) => {
+        // Create BSFF
+        const bsff = await createBsffBeforeTransport(
+          {
+            emitter,
+            transporter,
+            destination
+          },
+          {
+            transporterData: {
+              transporterTransportMode: null,
+              ...transporterOpt
+            }
+          }
+        );
+
+        // Update BSFF?
+        const { mutate } = makeClient(transporter.user);
+        if (updateOpt) {
+          await mutate<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
+            UPDATE_BSFF,
+            {
+              variables: {
+                id: bsff.id,
+                input: {
+                  ...updateOpt
+                }
+              }
+            }
+          );
+        }
+
+        // Sign BSFF
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsff">,
+          MutationSignBsffArgs
+        >(SIGN, {
+          variables: {
+            id: bsff.id,
+            input: {
+              type: "TRANSPORT",
+              date: new Date().toISOString() as any,
+              author: transporter.user.name
+            }
+          }
+        });
+
+        const updatedBsff = await prisma.bsff.findFirst({
+          where: { id: bsff.id },
+          include: { transporters: true }
+        });
+
+        return { errors, bsff: updatedBsff };
+      };
+
+      it("should throw error if transport mode is not defined", async () => {
+        // When
+        const { errors } = await prepareBsdffAndSignTransport({});
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Le mode de transport n° 1 est obligatoire."
+        );
+      });
+
+      it("should work if transport mode is in initial BSD", async () => {
+        // When
+        const { errors, bsff } = await prepareBsdffAndSignTransport({
+          transporterTransportMode: TransportMode.ROAD
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(bsff?.transporters[0].transporterTransportMode).toBe(
+          TransportMode.ROAD
+        );
+      });
+
+      it("should work if transport mode is given before transporter signature", async () => {
+        // When
+        const { errors, bsff } = await prepareBsdffAndSignTransport(
+          {},
+          {
+            transporter: {
+              transport: {
+                mode: TransportMode.ROAD
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(bsff?.transporters[0].transporterTransportMode).toBe(
+          TransportMode.ROAD
+        );
+      });
+
+      it("should throw error if transport mode is unset before signature", async () => {
+        // When
+        const { errors } = await prepareBsdffAndSignTransport(
+          {
+            transporterTransportMode: TransportMode.AIR
+          },
+          {
+            transporter: {
+              transport: {
+                mode: null
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Le mode de transport n° 1 est obligatoire."
+        );
+      });
     });
   });
 

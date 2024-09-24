@@ -1,9 +1,9 @@
-import { getBsdasriFromActivityEvents } from "../../activity-events/bsdasri";
 import {
   BsdasriRevisionRequest,
   BsdasriRevisionRequestResolvers
 } from "../../generated/graphql/types";
 import { prisma } from "@td/prisma";
+import { BsdasriRevisionRequest as PrismaBsdasriRevisionRequest } from "@prisma/client";
 import {
   expandBsdasriRevisionRequestContent,
   expandBsdasriFromDB
@@ -32,20 +32,29 @@ const bsdasriRevisionRequestResolvers: BsdasriRevisionRequestResolvers = {
     return authoringCompany;
   },
   bsdasri: async (
-    parent: BsdasriRevisionRequest & { bsdasriId: string },
-    _,
-    { dataloaders }
+    parent: BsdasriRevisionRequest & PrismaBsdasriRevisionRequest
   ) => {
     const actualBsdasri = await prisma.bsdasriRevisionRequest
       .findUnique({ where: { id: parent.id } })
       .bsdasri();
-    const bsdasriFromEvents = await getBsdasriFromActivityEvents(
-      { bsdasriId: parent.bsdasriId, at: parent.createdAt },
-      { dataloader: dataloaders.events }
-    );
+
+    if (!actualBsdasri) {
+      throw new Error(`BsdasriRevisionRequest ${parent.id} has no Bsdasri.`);
+    }
+
     return expandBsdasriFromDB({
       ...actualBsdasri,
-      ...bsdasriFromEvents
+      wasteCode: parent.initialWasteCode,
+      destinationWastePackagings: parent.initialDestinationWastePackagings,
+      destinationReceptionWasteWeightValue:
+        parent.initialDestinationReceptionWasteWeightValue,
+      destinationOperationCode: parent.initialDestinationOperationCode,
+      destinationOperationMode: parent.initialDestinationOperationMode,
+      emitterPickupSiteName: parent.initialEmitterPickupSiteName,
+      emitterPickupSiteAddress: parent.initialEmitterPickupSiteAddress,
+      emitterPickupSiteCity: parent.initialEmitterPickupSiteCity,
+      emitterPickupSitePostalCode: parent.initialEmitterPickupSitePostalCode,
+      emitterPickupSiteInfos: parent.initialEmitterPickupSiteInfos
     });
   }
 };

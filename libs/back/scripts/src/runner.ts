@@ -47,7 +47,7 @@ async function runScripts() {
     console.info("ℹ️ No new migration script to run.");
     return;
   }
-  console.info(`ℹ️ Found ${newScripts.length} to run...`);
+  console.info(`ℹ️ Found ${newScripts.length} script to run...`);
 
   for (const file of newScripts) {
     const scriptFilePath = join(scriptsDirectory, file);

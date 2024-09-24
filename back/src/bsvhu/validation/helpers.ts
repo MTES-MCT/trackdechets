@@ -1,8 +1,8 @@
-import { Bsvhu, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { BsvhuInput, SignatureTypeInput } from "../../generated/graphql/types";
 import { BSVHU_SIGNATURES_HIERARCHY } from "./constants";
 import { ZodBsvhu, ZodOperationEnum, ZodWasteCodeEnum } from "./schema";
-import { BsvhuUserFunctions } from "./types";
+import { BsvhuUserFunctions, PrismaBsvhuForParsing } from "./types";
 import { getUserCompanies } from "../../users/database";
 import { flattenVhuInput } from "../converter";
 import { safeInput } from "../../common/converter";
@@ -21,6 +21,7 @@ export function graphQlInputToZodBsvhu(input: BsvhuInput): ZodBsvhu {
     wasteCode,
     destinationPlannedOperationCode,
     destinationOperationCode,
+    intermediaries,
     ...flatBsvhuInput
   } = flattenVhuInput(bsvhuInput);
 
@@ -29,7 +30,24 @@ export function graphQlInputToZodBsvhu(input: BsvhuInput): ZodBsvhu {
     destinationPlannedOperationCode:
       destinationPlannedOperationCode as ZodOperationEnum,
     destinationOperationCode: destinationOperationCode as ZodOperationEnum,
-    wasteCode: wasteCode as ZodWasteCodeEnum
+    wasteCode: wasteCode as ZodWasteCodeEnum,
+    intermediaries: intermediaries?.map(i =>
+      safeInput({
+        // FIXME : Les règles d'édition (fichier rules.ts) ne permettent
+        // pas à ce jour de définir les règles de champ requis pour les intermédiaire.
+        // Le schéma zod des intermédiaires enforce donc des champs requis dès le début
+        // (contrairement aux autres champs du BSVHU), ce qui est incohérent avec le typage
+        // côté input GraphQL. On force donc le typage ici, quitte à lever des erreurs
+        // de validation Zod dans le process de parsing.
+        siret: i.siret!,
+        vatNumber: i.vatNumber,
+        address: i.address!,
+        name: i.name!,
+        contact: i.contact!,
+        phone: i.phone,
+        mail: i.mail
+      })
+    )
   });
 }
 
@@ -39,11 +57,12 @@ export function graphQlInputToZodBsvhu(input: BsvhuInput): ZodBsvhu {
  * typés en string côté Prisma mais en enum côté Zod ce qui nous oblige
  * à faire un casting de type.
  */
-export function prismaToZodBsvhu(bsvhu: Bsvhu): ZodBsvhu {
+export function prismaToZodBsvhu(bsvhu: PrismaBsvhuForParsing): ZodBsvhu {
   const {
     wasteCode,
     destinationPlannedOperationCode,
     destinationOperationCode,
+    intermediaries,
     ...data
   } = bsvhu;
 
@@ -52,7 +71,11 @@ export function prismaToZodBsvhu(bsvhu: Bsvhu): ZodBsvhu {
     wasteCode: wasteCode as ZodWasteCodeEnum,
     destinationPlannedOperationCode:
       destinationPlannedOperationCode as ZodOperationEnum,
-    destinationOperationCode: destinationOperationCode as ZodOperationEnum
+    destinationOperationCode: destinationOperationCode as ZodOperationEnum,
+    intermediaries: intermediaries.map(i => {
+      const { bsvhuId, id, createdAt, ...intermediaryData } = i;
+      return { ...intermediaryData, address: intermediaryData.address! };
+    })
   };
 }
 
@@ -71,24 +94,6 @@ export function getUpdatedFields<T extends ZodBsvhu>(
   const diff = objectDiff(update, compareTo);
 
   return Object.keys(diff);
-}
-
-/**
- * Gets all the signatures prior to the target signature in the signature hierarchy.
- */
-export function getSignatureAncestors(
-  targetSignature: SignatureTypeInput | undefined | null
-): SignatureTypeInput[] {
-  if (!targetSignature) return [];
-
-  const parent = Object.entries(BSVHU_SIGNATURES_HIERARCHY).find(
-    ([_, details]) => details.next === targetSignature
-  )?.[0];
-
-  return [
-    targetSignature,
-    ...getSignatureAncestors(parent as SignatureTypeInput)
-  ];
 }
 
 export async function getBsvhuUserFunctions(
@@ -110,6 +115,37 @@ export async function getBsvhuUserFunctions(
       (bsvhu.transporterCompanyVatNumber != null &&
         orgIds.includes(bsvhu.transporterCompanyVatNumber))
   };
+}
+
+/**
+ * Gets all the signatures prior to the target signature in the signature hierarchy.
+ */
+export function getSignatureAncestors(
+  targetSignature: SignatureTypeInput | undefined | null
+): SignatureTypeInput[] {
+  if (!targetSignature) return [];
+
+  const parent = Object.entries(BSVHU_SIGNATURES_HIERARCHY).find(
+    ([_, details]) => details.next === targetSignature
+  )?.[0];
+
+  return [
+    targetSignature,
+    ...getSignatureAncestors(parent as SignatureTypeInput)
+  ];
+}
+
+export function getNextSignatureType(
+  currentSignature: SignatureTypeInput | undefined | null
+): SignatureTypeInput | undefined {
+  if (!currentSignature) {
+    return "EMISSION";
+  }
+  const signature = BSVHU_SIGNATURES_HIERARCHY[currentSignature];
+  if (signature.next) {
+    return signature.next;
+  }
+  return undefined;
 }
 
 /**

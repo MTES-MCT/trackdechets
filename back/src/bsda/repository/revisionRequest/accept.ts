@@ -74,39 +74,50 @@ async function getUpdateFromRevisionRequest(
   revisionRequest: BsdaRevisionRequest,
   prisma: PrismaTransaction
 ) {
-  const {
-    bsdaId,
-    comment,
-    updatedAt,
-    authoringCompanyId,
-    createdAt,
-    id,
-    status,
-    isCanceled,
-    ...bsdaUpdate
-  } = revisionRequest;
-
   const { status: currentStatus } = await prisma.bsda.findUniqueOrThrow({
-    where: { id: bsdaId },
+    where: { id: revisionRequest.bsdaId },
     select: { status: true }
   });
   const newStatus = getNewStatus(
     currentStatus,
-    bsdaUpdate.destinationOperationCode,
-    isCanceled
+    revisionRequest.destinationOperationCode,
+    revisionRequest.isCanceled
   );
 
   const result = removeEmpty({
-    ...bsdaUpdate,
-    status: newStatus,
+    wasteCode: revisionRequest.wasteCode,
+    wastePop: revisionRequest.wastePop,
+    packagings: revisionRequest.packagings,
+    wasteSealNumbers: revisionRequest.wasteSealNumbers,
+    wasteMaterialName: revisionRequest.wasteMaterialName,
+    destinationCap: revisionRequest.destinationCap,
+    destinationReceptionWeight: revisionRequest.destinationReceptionWeight,
+    destinationOperationCode: revisionRequest.destinationOperationCode,
+    destinationOperationDescription:
+      revisionRequest.destinationOperationDescription,
+    destinationOperationMode: revisionRequest.destinationOperationMode,
+    brokerCompanyName: revisionRequest.brokerCompanyName,
+    brokerCompanySiret: revisionRequest.brokerCompanySiret,
+    brokerCompanyAddress: revisionRequest.brokerCompanyAddress,
+    brokerCompanyContact: revisionRequest.brokerCompanyContact,
+    brokerCompanyPhone: revisionRequest.brokerCompanyPhone,
+    brokerCompanyMail: revisionRequest.brokerCompanyMail,
+    brokerRecepisseNumber: revisionRequest.brokerRecepisseNumber,
+    brokerRecepisseDepartment: revisionRequest.brokerRecepisseDepartment,
     brokerRecepisseValidityLimit:
-      bsdaUpdate.brokerRecepisseValidityLimit?.toISOString()
+      revisionRequest.brokerRecepisseValidityLimit?.toISOString(),
+    emitterPickupSiteName: revisionRequest.emitterPickupSiteName,
+    emitterPickupSiteAddress: revisionRequest.emitterPickupSiteAddress,
+    emitterPickupSiteCity: revisionRequest.emitterPickupSiteCity,
+    emitterPickupSitePostalCode: revisionRequest.emitterPickupSitePostalCode,
+    emitterPickupSiteInfos: revisionRequest.emitterPickupSiteInfos,
+    status: newStatus
   });
 
   // Careful. Some operation codes explicitely need a null operation mode (ex: D15)
   if (
-    bsdaUpdate.destinationOperationCode &&
-    !bsdaUpdate.destinationOperationMode
+    revisionRequest.destinationOperationCode &&
+    !revisionRequest.destinationOperationMode
   ) {
     return {
       ...result,

@@ -7,7 +7,8 @@ import {
   Status,
   TransportMode,
   WasteAcceptationStatus,
-  OperationMode
+  OperationMode,
+  EmptyReturnADR
 } from "@prisma/client";
 import { Decimal } from "decimal.js";
 import { checkVAT } from "jsvat";
@@ -44,6 +45,7 @@ import {
 } from "../common/validation";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
+  CiterneNotWashedOutReason,
   CompanyInput,
   InitialFormFractionInput,
   PackagingInfo,
@@ -73,6 +75,7 @@ import { getOperationModesFromOperationCode } from "../common/operationModes";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
+import { isDefined } from "../common/helpers";
 
 // set yup default error messages
 configureYup();
@@ -405,6 +408,7 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
           return !ecoOrganisme;
         }
       )
+      .test(siretTests.isNotDormant)
       .when(["emitterIsForeignShip", "emitterIsPrivateIndividual"], {
         is: (isForeignShip: boolean, isPrivateIndividual: boolean) =>
           !isForeignShip && !isPrivateIndividual,
@@ -615,6 +619,7 @@ const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
     recipientCompanySiret: siret
       .label("Destinataire")
       .test(siretTests.isRegistered("DESTINATION"))
+      .test(siretTests.isNotDormant)
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`),
     recipientCompanyAddress: yup
       .string()
@@ -1006,7 +1011,8 @@ export const transporterSchemaFn: FactorySchemaOf<
     // or VAT number.
     transporterCompanySiret: siret
       .label("Transporteur")
-      .test(siretTests.isRegistered("TRANSPORTER")),
+      .test(siretTests.isRegistered("TRANSPORTER"))
+      .test(siretTests.isNotDormant),
     transporterCompanyVatNumber: foreignVatNumber
       .label("Transporteur")
       .test(vatNumberTests.isRegisteredTransporter),
@@ -1118,7 +1124,27 @@ export const transporterSchemaFn: FactorySchemaOf<
             )
         }
       ),
-    transporterTransportMode: yup.mixed<TransportMode>()
+    transporterTransportMode: yup
+      .mixed<TransportMode>()
+      .nullable()
+      .test((transporterTransportMode, ctx) => {
+        const { transporterCompanySiret, transporterCompanyVatNumber } =
+          ctx.parent;
+
+        if (
+          context.signingTransporterOrgId &&
+          [transporterCompanySiret, transporterCompanyVatNumber].includes(
+            context.signingTransporterOrgId
+          ) &&
+          !transporterTransportMode
+        ) {
+          return new yup.ValidationError(
+            "Le mode de transport est obligatoire"
+          );
+        }
+
+        return true;
+      })
   });
 
 export const traderSchemaFn: FactorySchemaOf<FormValidationContext, Trader> = ({
@@ -1346,6 +1372,130 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
               "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
               v => !v
             )
+    ),
+  hasCiterneBeenWashedOut: yup
+    .boolean()
+    .notRequired()
+    .nullable()
+    .test(
+      "not-defined-if-not-citerne",
+      "Vous ne pouvez préciser si la citerne a été rincée si le conditionnement du déchet n'est pas une citerne",
+      (value, context) => {
+        const { wasteDetailsPackagingInfos } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        const hasCiterne = wasteDetailsPackagingInfos.some(
+          info => info.type === "CITERNE"
+        );
+
+        return hasCiterne;
+      }
+    )
+    .test(
+      "not-defined-if-waste-not-accepted",
+      "Vous ne pouvez préciser si la citerne a été rincée que si le déchet a été totalement accepté",
+      (value, context) => {
+        const { wasteAcceptationStatus } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        return Boolean(wasteAcceptationStatus === "ACCEPTED");
+      }
+    ),
+  citerneNotWashedOutReason: yup
+    .mixed<CiterneNotWashedOutReason>()
+    .notRequired()
+    .nullable()
+    .test(
+      "reason-if-not-washed",
+      "Vous devez préciser la raison pour laquelle la citerne n'a pas été rincée",
+      (value, context) => {
+        const { hasCiterneBeenWashedOut } = context.parent;
+
+        if (hasCiterneBeenWashedOut === false) {
+          return isDefined(value);
+        }
+
+        return true;
+      }
+    )
+    .test(
+      "no-reason-if-washed-or-undefined",
+      "Vous ne pouvez préciser de raison pour l'absence de rinçage que si la citerne n'a pas été rincée",
+      (value, context) => {
+        const { hasCiterneBeenWashedOut } = context.parent;
+
+        if (hasCiterneBeenWashedOut !== false) {
+          return !isDefined(value);
+        }
+
+        return true;
+      }
+    ),
+  emptyReturnADR: yup
+    .mixed<EmptyReturnADR>()
+    .notRequired()
+    .nullable()
+    .test(
+      "not-defined-if-not-citerne-or-benne",
+      "Vous ne pouvez pas préciser de retour à vide ADR si le conditionnement du déchet n'est pas une citerne ou une benne",
+      (value, context) => {
+        const { wasteDetailsPackagingInfos } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        const hasCiterneOrBenne = wasteDetailsPackagingInfos.some(info =>
+          ["BENNE", "CITERNE"].includes(info.type)
+        );
+
+        return hasCiterneOrBenne;
+      }
+    )
+    .test(
+      "not-defined-if-waste-not-accepted",
+      "Vous ne pouvez préciser de retour à vide ADR que si le déchet a été totalement accepté",
+      (value, context) => {
+        const { wasteAcceptationStatus } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        return Boolean(wasteAcceptationStatus === "ACCEPTED");
+      }
+    )
+    .test(
+      "not-defined-if-waste-not-dangerous",
+      "Vous ne pouvez préciser de retour à vide ADR que si le déchet est dangereux",
+      (value, context) => {
+        const { wasteDetailsIsDangerous, wasteDetailsPop, wasteDetailsCode } =
+          context.parent;
+
+        if (!isDefined(value)) return true;
+
+        const wasteIsDangerous =
+          wasteDetailsIsDangerous ||
+          wasteDetailsPop ||
+          isDangerous(wasteDetailsCode);
+
+        return wasteIsDangerous;
+      }
+    )
+    .test(
+      "not-defined-if-transport-mode-not-road-nor-null",
+      "Vous ne pouvez préciser de retour à vide ADR que si le mode de transport est route (ROAD) ou null",
+      (value, context) => {
+        const { transporters } = context.parent;
+
+        if (!isDefined(value)) return true;
+
+        const lastTransportMode =
+          transporters[transporters.length - 1]?.transporterTransportMode;
+
+        // Tolerate null for legacy BSDs
+        return (
+          lastTransportMode === TransportMode.ROAD || lastTransportMode === null
+        );
+      }
     )
 });
 
@@ -1393,7 +1543,10 @@ const withNextDestination = (required: boolean) =>
 
               return wasteIsDangerous && hasNoTraceabilityBreak;
             },
-            then: schema => schema.test(siretTests.isRegistered("DESTINATION"))
+            then: schema =>
+              schema
+                .test(siretTests.isRegistered("DESTINATION"))
+                .test(siretTests.isNotDormant)
           }
         ),
 
@@ -1841,6 +1994,7 @@ export async function validateForwardedInCompanies(
     await siret
       .label("Destination finale")
       .test(siretTests.isRegistered("DESTINATION"))
+      .test(siretTests.isNotDormant)
       .validate(forwardedIn.recipientCompanySiret);
   }
   if (transporter?.transporterCompanySiret) {

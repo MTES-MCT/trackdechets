@@ -325,9 +325,11 @@ describe("searchCompanies", () => {
       contactPhone: undefined,
       ecoOrganismeAgreements: [],
       etatAdministratif: "A",
+      isDormant: false,
       isRegistered: true,
       collectorTypes: [],
       wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       website: undefined
     };
     expect(companiesSearched[0]).toEqual(expected);

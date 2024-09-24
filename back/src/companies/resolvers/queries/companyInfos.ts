@@ -46,6 +46,7 @@ export async function getCompanyInfos(
     isRegistered: searchResult.isRegistered,
     companyTypes: searchResult.companyTypes ?? [],
     wasteProcessorTypes: searchResult.wasteProcessorTypes ?? [],
+    wasteVehiclesTypes: searchResult.wasteVehiclesTypes ?? [],
     collectorTypes: searchResult.collectorTypes ?? [],
     ecoOrganismeAgreements: searchResult.ecoOrganismeAgreements ?? [],
     allowBsdasriTakeOverWithoutSignature:
@@ -54,7 +55,8 @@ export async function getCompanyInfos(
     traderReceipt: searchResult.traderReceipt,
     brokerReceipt: searchResult.brokerReceipt,
     vhuAgrementDemolisseur: searchResult.vhuAgrementDemolisseur,
-    vhuAgrementBroyeur: searchResult.vhuAgrementBroyeur
+    vhuAgrementBroyeur: searchResult.vhuAgrementBroyeur,
+    isDormant: searchResult.isDormant
   };
 }
 
@@ -90,7 +92,8 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
       statutDiffusionEtablissement: companyInfos.statutDiffusionEtablissement,
       etatAdministratif: companyInfos.etatAdministratif,
       allowBsdasriTakeOverWithoutSignature:
-        companyInfos.allowBsdasriTakeOverWithoutSignature
+        companyInfos.allowBsdasriTakeOverWithoutSignature,
+      isDormant: companyInfos.isDormant
     };
   }
 };

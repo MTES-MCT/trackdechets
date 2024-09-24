@@ -1,7 +1,10 @@
 import {
+  CiterneNotWashedOutReason,
   CompanyType,
   EmitterType,
+  EmptyReturnADR,
   Status,
+  TransportMode,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -24,6 +27,8 @@ import { prepareDB, prepareRedis } from "../../../__tests__/helpers";
 import { sendMail } from "../../../../mailer/mailing";
 import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
 import getReadableId from "../../../readableId";
+import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
+import { waitForJobsCompletion } from "../../../../queue/helpers";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -40,6 +45,55 @@ const MARK_AS_ACCEPTED = `
     }
   }
 `;
+
+const createAndAcceptForm = async (createOpt, acceptOpt) => {
+  // Create form
+  const {
+    emitterCompany,
+    recipient,
+    recipientCompany,
+    form: initialForm
+  } = await prepareDB();
+  const form = await prisma.form.update({
+    where: { id: initialForm.id },
+    data: {
+      status: "RECEIVED",
+      receivedBy: "Bill",
+      receivedAt: new Date("2019-01-17T10:22:00+0100"),
+      wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
+      ...createOpt
+    }
+  });
+  await prepareRedis({
+    emitterCompany,
+    recipientCompany
+  });
+
+  // When
+  const { mutate } = makeClient(recipient);
+  const { errors, data } = await mutate(MARK_AS_ACCEPTED, {
+    variables: {
+      id: form.id,
+      acceptedInfo: {
+        signedAt: "2019-01-17T10:22:00+0100",
+        signedBy: "Bill",
+        wasteAcceptationStatus: "ACCEPTED",
+        quantityReceived: 11,
+        ...acceptOpt
+      }
+    }
+  });
+
+  const acceptedForm = await prisma.form.findUniqueOrThrow({
+    where: { id: form.id }
+  });
+
+  return {
+    form: acceptedForm,
+    errors,
+    data
+  };
+};
 
 describe("Test Form reception", () => {
   afterEach(async () => {
@@ -399,21 +453,28 @@ describe("Test Form reception", () => {
 
     const { mutate } = makeClient(destinationUser);
 
-    await mutate<Pick<Mutation, "markAsAccepted">, MutationMarkAsAcceptedArgs>(
-      MARK_AS_ACCEPTED,
-      {
-        variables: {
-          id: groupementForm.id,
-          acceptedInfo: {
-            wasteAcceptationStatus: "REFUSED",
-            wasteRefusalReason: "Parce que",
-            signedAt: "2019-01-18" as any,
-            signedBy: "John",
-            quantityReceived: 0
+    const mutateFn = () =>
+      mutate<Pick<Mutation, "markAsAccepted">, MutationMarkAsAcceptedArgs>(
+        MARK_AS_ACCEPTED,
+        {
+          variables: {
+            id: groupementForm.id,
+            acceptedInfo: {
+              wasteAcceptationStatus: "REFUSED",
+              wasteRefusalReason: "Parce que",
+              signedAt: "2019-01-18" as any,
+              signedBy: "John",
+              quantityReceived: 0
+            }
           }
         }
-      }
-    );
+      );
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
 
     const updatedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: form1.id }
@@ -682,5 +743,366 @@ describe("Test Form reception", () => {
     expect(errors).toBeUndefined();
     expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
     expect(data.markAsAccepted.status).toBe("ACCEPTED");
+  });
+
+  describe("Charte citerne", () => {
+    it.each(["BENNE", "FUT", "GRV", "PIPELINE", "AUTRE"])(
+      "cannot clean citerne if packaging is not citerne (hasCiterneBeenWashedOut = true, type = %p)",
+      async type => {
+        // When
+        const { errors } = await createAndAcceptForm(
+          {
+            wasteDetailsPackagingInfos: [{ type, quantity: 1 }]
+          },
+          {
+            hasCiterneBeenWashedOut: true
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Vous ne pouvez préciser si la citerne a été rincée si le conditionnement du déchet n'est pas une citerne"
+        );
+      }
+    );
+
+    it.each(["BENNE", "FUT", "GRV", "PIPELINE", "AUTRE"])(
+      "cannot clean citerne if packaging is not citerne (hasCiterneBeenWashedOut = false, type = %p)",
+      async type => {
+        // When
+        const { errors } = await createAndAcceptForm(
+          {
+            wasteDetailsPackagingInfos: [{ type, quantity: 1 }]
+          },
+          {
+            hasCiterneBeenWashedOut: false,
+            citerneNotWashedOutReason: CiterneNotWashedOutReason.NOT_BY_DRIVER
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Vous ne pouvez préciser si la citerne a été rincée si le conditionnement du déchet n'est pas une citerne"
+        );
+      }
+    );
+
+    it.each([
+      WasteAcceptationStatus.PARTIALLY_REFUSED,
+      WasteAcceptationStatus.REFUSED
+    ])(
+      "cannot clean citerne if waste acceptation status is not ACCEPTED (status = %p)",
+      async wasteAcceptationStatus => {
+        // When
+        const { errors } = await createAndAcceptForm(
+          {},
+          {
+            hasCiterneBeenWashedOut: true,
+            wasteAcceptationStatus,
+            wasteRefusalReason: "Parce que"
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Vous ne pouvez préciser si la citerne a été rincée que si le déchet a été totalement accepté"
+        );
+      }
+    );
+
+    it("can accept a waste without specifying citerne washing status", async () => {
+      // When
+      const { errors, form } = await createAndAcceptForm({}, {});
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form.status).toBe("ACCEPTED");
+      expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+      expect(form.hasCiterneBeenWashedOut).toBeNull();
+      expect(form.citerneNotWashedOutReason).toBeNull();
+    });
+
+    it("can accept a waste and wash out citerne", async () => {
+      // When
+      const { errors, form } = await createAndAcceptForm(
+        {},
+        {
+          hasCiterneBeenWashedOut: true
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form.status).toBe("ACCEPTED");
+      expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+      expect(form.hasCiterneBeenWashedOut).toBe(true);
+      expect(form.citerneNotWashedOutReason).toBeNull();
+    });
+
+    it.each([true, undefined, null])(
+      "cannot only give a reason for not washing if citerne has not been washed out (hasCiterneBeenWashedOut = %p)",
+      async hasCiterneBeenWashedOut => {
+        // When
+        const { errors } = await createAndAcceptForm(
+          {},
+          {
+            hasCiterneBeenWashedOut,
+            citerneNotWashedOutReason: CiterneNotWashedOutReason.EXEMPTED
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Vous ne pouvez préciser de raison pour l'absence de rinçage que si la citerne n'a pas été rincée"
+        );
+      }
+    );
+
+    it("if didn't wash out citerne, must give a reason why", async () => {
+      // When
+      const { errors } = await createAndAcceptForm(
+        {},
+        {
+          hasCiterneBeenWashedOut: false
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Vous devez préciser la raison pour laquelle la citerne n'a pas été rincée"
+      );
+    });
+
+    it("can accept a waste and not wash out citerne, if providing a reason", async () => {
+      // When
+      const { errors, form } = await createAndAcceptForm(
+        {},
+        {
+          hasCiterneBeenWashedOut: false,
+          citerneNotWashedOutReason: CiterneNotWashedOutReason.EXEMPTED
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form.status).toBe("ACCEPTED");
+      expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+      expect(form.hasCiterneBeenWashedOut).toBe(false);
+      expect(form.citerneNotWashedOutReason).toBe(
+        CiterneNotWashedOutReason.EXEMPTED
+      );
+    });
+  });
+
+  describe("Empty return ADR", () => {
+    it.each(["FUT", "GRV", "PIPELINE", "AUTRE"])(
+      "cannot specify empty return if packaging is not citerne or benne (type = %p)",
+      async type => {
+        // When
+        const { errors } = await createAndAcceptForm(
+          {
+            wasteDetailsPackagingInfos: [{ type, quantity: 1 }]
+          },
+          {
+            emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Vous ne pouvez pas préciser de retour à vide ADR si le conditionnement du déchet n'est pas une citerne ou une benne"
+        );
+      }
+    );
+
+    it.each([
+      WasteAcceptationStatus.PARTIALLY_REFUSED,
+      WasteAcceptationStatus.REFUSED
+    ])(
+      "cannot specify empty return if wasteStatus is not ACCEPTED (status = %p)",
+      async wasteAcceptationStatus => {
+        // When
+        const { errors } = await createAndAcceptForm(
+          {},
+          {
+            emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE,
+            wasteAcceptationStatus,
+            wasteRefusalReason: "Parce que"
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Vous ne pouvez préciser de retour à vide ADR que si le déchet a été totalement accepté"
+        );
+      }
+    );
+
+    it("cannot specify empty return if waste is not dangerous", async () => {
+      // When
+      const { errors } = await createAndAcceptForm(
+        {
+          wasteDetailsCode: "05 01 04",
+          wasteDetailsPop: false,
+          wasteDetailsIsDangerous: false
+        },
+        {
+          emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Vous ne pouvez préciser de retour à vide ADR que si le déchet est dangereux"
+      );
+    });
+
+    it("can specify empty return if waste is dangerous (wasteDetailsCode)", async () => {
+      // When
+      const { errors, form } = await createAndAcceptForm(
+        {
+          wasteDetailsCode: "05 01 04*",
+          wasteDetailsPop: false,
+          wasteDetailsIsDangerous: false
+        },
+        {
+          emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form.status).toBe("ACCEPTED");
+      expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+      expect(form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_CITERNE);
+    });
+
+    it("can specify empty return if waste is dangerous (wasteDetailsPop)", async () => {
+      // When
+      const { errors, form } = await createAndAcceptForm(
+        {
+          wasteDetailsCode: "05 01 04",
+          wasteDetailsPop: true,
+          wasteDetailsIsDangerous: false
+        },
+        {
+          emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form.status).toBe("ACCEPTED");
+      expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+      expect(form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_CITERNE);
+    });
+
+    it("can specify empty return if waste is dangerous (wasteDetailsIsDangerous)", async () => {
+      // When
+      const { errors, form } = await createAndAcceptForm(
+        {
+          wasteDetailsCode: "05 01 04",
+          wasteDetailsPop: false,
+          wasteDetailsIsDangerous: true
+        },
+        {
+          emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form.status).toBe("ACCEPTED");
+      expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+      expect(form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_CITERNE);
+    });
+
+    it("can accept a waste without specifying empty return ADR", async () => {
+      // When
+      const { errors, form } = await createAndAcceptForm({}, {});
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form.status).toBe("ACCEPTED");
+      expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+      expect(form.emptyReturnADR).toBeNull();
+    });
+
+    it("can accept a waste and specify empty return", async () => {
+      // When
+      const { errors, form } = await createAndAcceptForm(
+        {},
+        {
+          emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(form.status).toBe("ACCEPTED");
+      expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+      expect(form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_CITERNE);
+    });
+
+    it.each([TransportMode.ROAD, null, undefined])(
+      "can accept a waste and specify empty return if transporter mode is ROAD or null (value = %p)",
+      async transporterTransportMode => {
+        // When
+        const { company: transporter } = await userWithCompanyFactory("MEMBER");
+        const { errors, form } = await createAndAcceptForm(
+          {
+            transporters: {
+              create: {
+                transporterCompanySiret: transporter.siret,
+                transporterTransportMode,
+                number: 1
+              }
+            }
+          },
+          {
+            emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(form.status).toBe("ACCEPTED");
+        expect(form.wasteAcceptationStatus).toBe("ACCEPTED");
+        expect(form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_CITERNE);
+      }
+    );
+  });
+
+  it("can NOT accept a waste and specify empty return if transporter mode is not ROAD nor null", async () => {
+    // When
+    const { company: transporter } = await userWithCompanyFactory("MEMBER");
+    const { errors } = await createAndAcceptForm(
+      {
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret,
+            transporterTransportMode: TransportMode.AIR,
+            number: 1
+          }
+        }
+      },
+      {
+        emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Vous ne pouvez préciser de retour à vide ADR que si le mode de transport est route (ROAD) ou null"
+    );
   });
 });

@@ -1,9 +1,65 @@
 import { BsvhuStatus, Bsvhu, BsdType } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "@td/constants";
+import { prisma } from "@td/prisma";
+import {
+  getIntermediaryCompanyOrgId,
+  getTransporterCompanyOrgId
+} from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getBsvhuSubType } from "../common/subTypes";
 import { getAddress } from "./converter";
+import {
+  BsvhuWithIntermediaries,
+  BsvhuWithIntermediariesInclude
+} from "./types";
+
+export const BsvhuForElasticInclude = {
+  ...BsvhuWithIntermediariesInclude
+};
+
+export async function getBsvhuForElastic(
+  bsda: Pick<Bsvhu, "id">
+): Promise<BsvhuForElastic> {
+  return prisma.bsvhu.findUniqueOrThrow({
+    where: { id: bsda.id },
+    include: BsvhuForElasticInclude
+  });
+}
+
+type ElasticSirets = {
+  emitterCompanySiret: string | null | undefined;
+  destinationCompanySiret: string | null | undefined;
+  transporterCompanySiret: string | null | undefined;
+  intermediarySiret1?: string | null | undefined;
+  intermediarySiret2?: string | null | undefined;
+  intermediarySiret3?: string | null | undefined;
+};
+const getBsvhuSirets = (bsvhu: BsvhuForElastic): ElasticSirets => {
+  const intermediarySirets = bsvhu.intermediaries.reduce(
+    (sirets, intermediary) => {
+      const orgId = getIntermediaryCompanyOrgId(intermediary);
+      if (orgId) {
+        const nbOfKeys = Object.keys(sirets).length;
+        return {
+          ...sirets,
+          [`intermediarySiret${nbOfKeys + 1}`]: orgId
+        };
+      }
+      return sirets;
+    },
+    {}
+  );
+
+  const bsvhuSirets: ElasticSirets = {
+    emitterCompanySiret: bsvhu.emitterCompanySiret,
+    destinationCompanySiret: bsvhu.destinationCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsvhu),
+    ...intermediarySirets
+  };
+
+  return bsvhuSirets;
+};
 
 type WhereKeys =
   | "isDraftFor"
@@ -13,16 +69,16 @@ type WhereKeys =
   | "isToCollectFor"
   | "isCollectedFor";
 
-// | state              | emitter | transporter | destination |
-// |--------------------|---------|-------------|-------------|
-// | initial (draft)    | draft   | draft       | draft       |
-// | initial            | action  | follow      | follow      |
-// | signed_by_producer | follow  | to collect  | follow      |
-// | sent               | follow  | collected   | action      |
-// | processed          | archive | archive     | archive     |
-// | refused            | archive | archive     | archive     |
+// | state              | emitter | transporter | destination | intermediary |
+// |--------------------|---------|-------------|-------------|--------------|
+// | initial (draft)    | draft   | draft       | draft       | follow       |
+// | initial            | action  | follow      | follow      | follow       |
+// | signed_by_producer | follow  | to collect  | follow      | follow       |
+// | sent               | follow  | collected   | action      | follow       |
+// | processed          | archive | archive     | archive     | archive      |
+// | refused            | archive | archive     | archive     | archive      |
 
-export function getWhere(bsvhu: Bsvhu): Pick<BsdElastic, WhereKeys> {
+export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
   const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],
     isForActionFor: [],
@@ -32,11 +88,7 @@ export function getWhere(bsvhu: Bsvhu): Pick<BsdElastic, WhereKeys> {
     isCollectedFor: []
   };
 
-  const formSirets: Partial<Record<keyof Bsvhu, string | null | undefined>> = {
-    emitterCompanySiret: bsvhu.emitterCompanySiret,
-    destinationCompanySiret: bsvhu.destinationCompanySiret,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsvhu)
-  };
+  const formSirets = getBsvhuSirets(bsvhu);
 
   const siretsFilters = new Map<string, keyof typeof where>(
     Object.entries(formSirets)
@@ -96,7 +148,7 @@ export function getWhere(bsvhu: Bsvhu): Pick<BsdElastic, WhereKeys> {
   return where;
 }
 
-export type BsvhuForElastic = Bsvhu;
+export type BsvhuForElastic = Bsvhu & BsvhuWithIntermediaries;
 
 /**
  * Convert a bsvhu from the bsvhu table to Elastic Search's BSD model.
@@ -106,6 +158,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
 
   return {
     type: BsdType.BSVHU,
+    bsdSubType: getBsvhuSubType(bsvhu),
     createdAt: bsvhu.createdAt?.getTime(),
     updatedAt: bsvhu.updatedAt?.getTime(),
     id: bsvhu.id,
@@ -187,12 +240,14 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     ...getRegistryFields(bsvhu),
     rawBsd: bsvhu,
     revisionRequests: [],
+    intermediaries: bsvhu.intermediaries,
 
     // ALL actors from the BSVHU, for quick search
     companyNames: [
       bsvhu.emitterCompanyName,
       bsvhu.transporterCompanyName,
-      bsvhu.destinationCompanyName
+      bsvhu.destinationCompanyName,
+      ...bsvhu.intermediaries.map(intermediary => intermediary.name)
     ]
       .filter(Boolean)
       .join(" "),
@@ -200,11 +255,13 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
       bsvhu.emitterCompanySiret,
       bsvhu.transporterCompanySiret,
       bsvhu.transporterCompanyVatNumber,
-      bsvhu.destinationCompanySiret
+      bsvhu.destinationCompanySiret,
+      ...bsvhu.intermediaries.map(intermediary => intermediary.siret),
+      ...bsvhu.intermediaries.map(intermediary => intermediary.vatNumber)
     ].filter(Boolean)
   };
 }
 
-export function indexBsvhu(bsvhu: Bsvhu, ctx?: GraphQLContext) {
+export function indexBsvhu(bsvhu: BsvhuForElastic, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsvhu), ctx);
 }

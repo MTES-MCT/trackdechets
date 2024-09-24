@@ -1,4 +1,9 @@
-import { WasteAcceptationStatus, Prisma, BsdasriType } from "@prisma/client";
+import {
+  WasteAcceptationStatus,
+  Prisma,
+  BsdasriType,
+  TransportMode
+} from "@prisma/client";
 import { isCollector } from "../companies/validation";
 import * as yup from "yup";
 import {
@@ -29,6 +34,7 @@ import {
   transporterRecepisseSchema
 } from "../common/validation";
 import { destinationOperationModeValidation } from "../common/validation/operationMode";
+import { isDefined } from "../common/helpers";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
@@ -143,11 +149,14 @@ export const emitterSchema: FactorySchemaOf<
       context.emissionSignature && !context?.isSynthesis,
       `Émetteur: ${MISSING_COMPANY_NAME}`
     ),
-    emitterCompanySiret: siret.label("Émetteur").requiredIf(
-      // field copied from transporter returning an error message would be confusing
-      context.emissionSignature && !context?.isSynthesis,
-      `Émetteur: ${MISSING_COMPANY_SIRET}`
-    ),
+    emitterCompanySiret: siret
+      .label("Émetteur")
+      .requiredIf(
+        // field copied from transporter returning an error message would be confusing
+        context.emissionSignature && !context?.isSynthesis,
+        `Émetteur: ${MISSING_COMPANY_SIRET}`
+      )
+      .test(siretTests.isNotDormant),
     emitterCompanyAddress: yup.string().requiredIf(
       // field copied from transporter returning an error message would be confusing
       context.emissionSignature && !context?.isSynthesis,
@@ -332,7 +341,8 @@ export const transporterSchema: FactorySchemaOf<
         `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
       )
       .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
-      .test(siretTests.isRegistered("TRANSPORTER")),
+      .test(siretTests.isRegistered("TRANSPORTER"))
+      .test(siretTests.isNotDormant),
     transporterCompanyVatNumber: foreignVatNumber
       .label("Transporteur")
       .test(vatNumberTests.isRegisteredTransporter),
@@ -445,14 +455,12 @@ export const transportSchema: FactorySchemaOf<
             : true;
         }
       ),
-
     transporterWastePackagings: yup
       .array()
       .requiredIf(
         context.transportSignature,
         "Le détail du conditionnement est obligatoire"
       )
-
       .test(
         "packaging-info-required",
         "Le détail du conditionnement transporté est obligatoire",
@@ -470,11 +478,28 @@ export const transportSchema: FactorySchemaOf<
         "Le date de prise en charge du déchet est obligatoire"
       ),
     handedOverToRecipientAt: yup.date().nullable(), // optional field
-
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any,
+    transporterTransportMode: yup
+      .mixed<TransportMode>()
+      .nullable()
+      .test(
+        "transport-mode",
+        "Le mode de transport est obligatoire.",
+        function (value) {
+          // Required only at transport signature
+          if (!context.transportSignature) return true;
+
+          // Not required for synthesis DASRI
+          if (this.parent.type === BsdasriType.SYNTHESIS) {
+            return true;
+          }
+
+          return isDefined(value);
+        }
+      )
   });
 
 export const recipientSchema: FactorySchemaOf<
@@ -488,7 +513,8 @@ export const recipientSchema: FactorySchemaOf<
     destinationCompanySiret: siret
       .label("Destination")
       .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`)
-      .test(siretTests.isRegistered("DESTINATION")),
+      .test(siretTests.isRegistered("DESTINATION"))
+      .test(siretTests.isNotDormant),
     destinationCompanyAddress: yup
       .string()
       .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_ADDRESS}`),

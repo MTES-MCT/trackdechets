@@ -180,7 +180,8 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   emitterPickupsitePostalCode: null,
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
-  emitterCompanyPostalCode: null
+  emitterCompanyPostalCode: null,
+  destinationHasCiterneBeenWashedOut: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -322,7 +323,8 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   emitterPickupsitePostalCode: null,
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
-  emitterCompanyPostalCode: null
+  emitterCompanyPostalCode: null,
+  destinationHasCiterneBeenWashedOut: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -449,7 +451,8 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   emitterPickupsitePostalCode: null,
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
-  emitterCompanyPostalCode: null
+  emitterCompanyPostalCode: null,
+  destinationHasCiterneBeenWashedOut: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -572,7 +575,8 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   emitterCompanyPostalCode: null,
   destinationReceptionAcceptedWeight: null,
   destinationReceptionRefusedWeight: null,
-  weight: null
+  weight: null,
+  destinationHasCiterneBeenWashedOut: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -732,5 +736,6 @@ export const emptyAllWaste: Required<AllWaste> = {
   emitterPickupsitePostalCode: null,
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
-  emitterCompanyPostalCode: null
+  emitterCompanyPostalCode: null,
+  destinationHasCiterneBeenWashedOut: null
 };

@@ -18,7 +18,6 @@ interface Props {
   onPrevTab: () => void;
   isPrevStepDisabled: boolean;
   isNextStepDisabled: boolean;
-  isSaveDisabled: boolean;
   draftCtaLabel: string;
   mainCtaLabel: string;
   children: React.ReactNode;
@@ -28,7 +27,6 @@ const FormStepsTabs = ({
   tabList,
   isPrevStepDisabled,
   isNextStepDisabled,
-  isSaveDisabled,
   onTabChange,
   onSubmit,
   onNextTab,
@@ -85,12 +83,16 @@ const FormStepsTabs = ({
           </Button>
 
           {draftCtaLabel && (
-            <Button priority="secondary" id="id_save_draft">
+            <Button
+              priority="secondary"
+              id="id_save_draft"
+              nativeButtonProps={{ "data-testid": "draftBtn" }}
+            >
               {draftCtaLabel}
             </Button>
           )}
 
-          <Button id="id_save" priority="primary" disabled={isSaveDisabled}>
+          <Button id="id_save" priority="primary">
             {mainCtaLabel}
           </Button>
         </div>

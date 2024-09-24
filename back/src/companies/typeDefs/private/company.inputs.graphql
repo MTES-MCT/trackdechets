@@ -258,6 +258,9 @@ input PrivateCompanyInput {
   "Sous-types d'entreprises pour les installation de traitement de déchets"
   wasteProcessorTypes: [WasteProcessorType!]
 
+  "Sous-type d'installation de traitement VHU"
+  wasteVehiclesTypes: [WasteVehiclesType!]
+
   "Code NAF"
   codeNaf: String
 
@@ -284,6 +287,11 @@ input PrivateCompanyInput {
   Récipissé courtier (le cas échéant, pour les profils courtier)
   """
   brokerReceiptId: String
+
+  """
+  Certification d'entreprise de travaux amiante (le cas échéant, pour les profils entreprises de travaux amiante)
+  """
+  workerCertificationId: String
 
   """
   Agrément VHU démolisseur (le cas échéant, pour les profils VHU)
@@ -318,6 +326,9 @@ input PrivateCompanyInput {
 
   "Numéro de téléphone de contact"
   contactPhone: String
+
+  "Site web"
+  website: String
 }
 
 input CompanyForVerificationWhere {
@@ -356,4 +367,31 @@ input SignatureAutomationInput {
   from: ID!
   "ID de l'entreprise qui a délégation"
   to: ID!
+}
+
+input companyUpdateRow {
+  orgId: String!
+  companyTypes: [CompanyType!]!
+  collectorTypes: [CollectorType]!
+  wasteProcessorTypes: [WasteProcessorType]!
+  wasteVehiclesTypes: [WasteVehiclesType]!
+}
+
+input BulkUpdateCompaniesProfilesInput {
+  adminEmail: String!
+  companyUpdateRows: [companyUpdateRow!]!
+}
+
+input CreateAdministrativeTransferInput {
+  "ID de l'établissement source"
+  from: ID!
+  "ID de l'établissement cible"
+  to: ID!
+}
+
+input SubmitAdministrativeTransferApprovalInput {
+  "ID du transfert administratif"
+  id: ID!
+  "Approuvé ou non"
+  isApproved: Boolean!
 }

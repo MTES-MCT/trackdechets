@@ -15,7 +15,7 @@ export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
   name: "bsffPdf",
   handler: async (_, res, { id }) => {
     const bsff = await getBsffForBuildPdf({ id });
-    const readableStream = await buildPdf(bsff);
+    const readableStream = await buildPdf(bsff, false);
     readableStream.pipe(createPDFResponse(res, bsff.id));
   }
 };

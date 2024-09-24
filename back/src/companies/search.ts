@@ -50,6 +50,7 @@ export const mergeCompanyToCompanySearchResult = (
   companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
   wasteProcessorTypes: trackdechetsCompanyInfo?.wasteProcessorTypes ?? [],
   collectorTypes: trackdechetsCompanyInfo?.collectorTypes ?? [],
+  wasteVehiclesTypes: trackdechetsCompanyInfo?.wasteVehiclesTypes ?? [],
   contact: trackdechetsCompanyInfo?.contact,
   contactEmail: trackdechetsCompanyInfo?.contactEmail,
   contactPhone: trackdechetsCompanyInfo?.contactPhone,
@@ -61,6 +62,7 @@ export const mergeCompanyToCompanySearchResult = (
   // specific data for CompanySearchResult
   isRegistered: trackdechetsCompanyInfo != null,
   trackdechetsId: trackdechetsCompanyInfo?.id,
+  isDormant: trackdechetsCompanyInfo?.isDormantSince != null,
   // override database infos with Sirene or VAT search
   ...companyInfo
 });
@@ -75,6 +77,7 @@ const companySelectedFields = {
   companyTypes: true,
   collectorTypes: true,
   wasteProcessorTypes: true,
+  wasteVehiclesTypes: true,
   contact: true,
   contactEmail: true,
   contactPhone: true,
@@ -271,7 +274,8 @@ export const makeSearchCompanies =
             : {
                 ...companyInsee,
                 orgId: companyInsee.siret!,
-                isRegistered: false
+                isRegistered: false,
+                isDormant: false
               })
         }));
       }

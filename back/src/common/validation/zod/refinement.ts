@@ -61,6 +61,13 @@ export async function refineSiretAndGetCompany(
     });
   }
 
+  if (company?.isDormantSince) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+    });
+  }
+
   return company;
 }
 export const isRegisteredVatNumberRefinement = async (
@@ -140,6 +147,23 @@ export async function isDestinationRefinement(
       message:
         `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
         ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
+    });
+  }
+}
+
+export async function isNotDormantRefinement(
+  siret: string | null | undefined,
+  ctx: RefinementCtx
+) {
+  if (!siret) return null;
+  const company = await prisma.company.findUnique({
+    where: { siret }
+  });
+
+  if (company?.isDormantSince) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
     });
   }
 }

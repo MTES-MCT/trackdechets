@@ -120,6 +120,11 @@ export const schema = z.object({
   S3_SECRET_ACCESS_KEY: z.string(),
   S3_BUCKET: z.string(),
   // -------
+  // S3 for empty bsds templates
+  S3_BSD_TEMPLATES_ACCESS_KEY_ID: z.string().optional(),
+  S3_BSD_TEMPLATES_SECRET_ACCESS_KEY: z.string().optional(),
+  S3_BSD_TEMPLATES_BUCKET: z.string().optional(),
+  // -------
   // Queues
   QUEUE_MONITOR_TOKEN: z.string().optional(),
   QUEUE_NAME_COMPANY: z.string().optional(),

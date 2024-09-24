@@ -233,7 +233,6 @@ describe("Mutation.deleteBsda", () => {
         status: BsdaStatus.SIGNED_BY_PRODUCER
       }
     });
-    console.log(bsda);
 
     const { errors } = await mutate<
       Pick<Mutation, "deleteBsda">,

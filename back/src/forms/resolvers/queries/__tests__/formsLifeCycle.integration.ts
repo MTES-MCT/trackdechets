@@ -11,6 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, storeRedisCompanyInfo } from "../../../__tests__/helpers";
 import { Query } from "../../../../generated/graphql/types";
+import { StatusLog } from "@prisma/client";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -296,5 +297,42 @@ describe("Test formsLifeCycle query", () => {
     expect(statusLogs[0].updatedFields.lorem).toBe("ipsum");
     expect(statusLogs[0].form!.id).toBe(form.id);
     expect(statusLogs[0].user!.id).toBe(owner.id);
+  });
+
+  it("should return pagination info", async () => {
+    const { emitter, recipient, form } = await prepareDB();
+
+    const statusLogsData: StatusLog[] = [];
+
+    for (let i = 0; i < 60; i++) {
+      statusLogsData.push(
+        await statusLogFactory({
+          status: "SENT",
+          formId: form.id,
+          userId: emitter.id,
+          updatedFields: { lorem: "ipsum" }
+        })
+      );
+    }
+
+    const { query } = makeClient(recipient);
+
+    const { data } = (await query(FORMS_LIFECYCLE)) as any;
+    const {
+      statusLogs,
+      count,
+      hasNextPage,
+      hasPreviousPage,
+      startCursor,
+      endCursor
+    } = data.formsLifeCycle;
+    // 50 items par page
+    expect(statusLogs.length).toBe(50);
+    // sur un total de 60
+    expect(count).toEqual(60);
+    expect(hasPreviousPage).toEqual(false);
+    expect(hasNextPage).toEqual(true);
+    expect(endCursor).toEqual([...statusLogsData].reverse()[50 - 1].id);
+    expect(startCursor).toEqual([...statusLogsData].reverse()[0].id);
   });
 });

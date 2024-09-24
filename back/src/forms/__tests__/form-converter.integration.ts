@@ -36,6 +36,8 @@ describe("expandFormFromDb", () => {
       customId: null,
       isImportedFromPaper: false,
       metadata: undefined,
+      citerneNotWashedOutReason: null,
+      hasCiterneBeenWashedOut: null,
       emitter: {
         type: form.emitterType,
         workSite: null,
@@ -52,6 +54,7 @@ describe("expandFormFromDb", () => {
         isForeignShip: false,
         isPrivateIndividual: false
       },
+      emptyReturnADR: form.emptyReturnADR,
       recipient: {
         cap: form.recipientCap,
         processingOperation: form.recipientProcessingOperation,

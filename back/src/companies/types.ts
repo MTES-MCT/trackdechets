@@ -1,5 +1,4 @@
 import { FavoriteType } from "../generated/graphql/types";
-
 export { CompanySearchResult } from "../generated/graphql/types";
 
 /**
@@ -22,3 +21,10 @@ export const allFavoriteTypes: FavoriteType[] = [
   "TRANSPORTER",
   "WORKER"
 ];
+
+export const companyEventTypes = {
+  toggleDormantCompany: "CompanyToggleDormantCompany",
+  administrativeTransferCreated: "CompanyAdministrativeTransferCreated",
+  administrativeTransferCancelled: "CompanyAdministrativeTransferCancelled",
+  administrativeTransferApproval: "CompanyAdministrativeTransferApproval"
+};

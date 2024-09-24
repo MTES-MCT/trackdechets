@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
 import routes from "../../../../../Apps/routes";
-import { UPDATE_VHU_FORM } from "../../../../../form/bsvhu/utils/queries";
+import { UPDATE_VHU_FORM } from "../../../../../Apps/Dashboard/Creation/bsvhu/utils/queries";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { Field, Form, Formik } from "formik";
@@ -12,7 +12,7 @@ import {
   SignatureTypeInput
 } from "@td/codegen-ui";
 import React from "react";
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link, useLocation } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 import { subMonths } from "date-fns";
@@ -49,6 +49,8 @@ export function SignTransport({
 
   const loading = loadingUpdate || loadingSign;
 
+  const location = useLocation();
+
   return (
     <SignBsvhu
       title="Signer l'enlèvement"
@@ -64,7 +66,7 @@ export function SignTransport({
           error =>
             error.requiredFor === SignatureTypeInput.Transport &&
             // Transporter Receipt will be auto-completed by the transporter
-            !error.path.startsWith("transporterRecepisse")
+            !error.path.startsWith("transporter.recepisse")
         ) ? (
           <>
             <p className="tw-mt-2 tw-text-red-700">
@@ -82,6 +84,7 @@ export function SignTransport({
                 id: bsvhu.id
               })}
               className="btn btn--primary"
+              state={{ background: location }}
             >
               Mettre le bordereau à jour pour le signer
             </Link>

@@ -24,13 +24,13 @@ import { CREATE_COMPANY } from "../common/queries";
 import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotice";
 
 interface Values extends FormikValues {
-  siret: string;
-  vatNumber: string;
+  siret?: string | null;
+  vatNumber?: string | null;
   companyName: string;
-  givenName: string;
+  givenName?: string | null;
   address: string;
   companyTypes: _CompanyType[];
-  codeNaf: string;
+  codeNaf?: string | null;
   isAllowed: boolean;
   willManageDasris: boolean;
 }
@@ -87,13 +87,13 @@ export default function AccountCompanyAddProducer() {
           <div className="fr-col-12">
             <Formik<Values>
               initialValues={{
-                siret: companyInfos?.siret ?? "",
-                vatNumber: companyInfos?.vatNumber ?? "",
+                siret: companyInfos?.siret,
+                vatNumber: companyInfos?.vatNumber,
                 companyName: companyInfos?.name ?? "",
                 companyTypes: [_CompanyType.Producer],
-                givenName: "",
+                givenName: null,
                 address: companyInfos?.address ?? "",
-                codeNaf: companyInfos?.naf ?? "",
+                codeNaf: companyInfos?.naf,
                 isAllowed: false,
                 willManageDasris: false
               }}
@@ -241,7 +241,8 @@ export default function AccountCompanyAddProducer() {
                           En tant qu'administrateur de l'établissement, j'ai
                           pris connaissance des{" "}
                           <a
-                            href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
+                            className="fr-link"
+                            href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement"
                             target="_blank"
                             rel="noreferrer"
                           >

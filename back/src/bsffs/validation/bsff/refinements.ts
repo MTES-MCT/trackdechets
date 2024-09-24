@@ -32,6 +32,7 @@ import { OPERATION } from "../../constants";
 import { BsffOperationCode } from "../../../generated/graphql/types";
 import {
   isDestinationRefinement,
+  isNotDormantRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
 } from "../../../common/validation/zod/refinement";
@@ -42,6 +43,10 @@ import { MAX_WEIGHT_BY_ROAD_TONNES } from "../../../common/validation";
 // désormais être strictement > 0
 const v2024071 = new Date("2024-07-03");
 
+// Date de la MAJ 2024.9.1 qui rend obligatoire
+// le volume sur les contenants
+const v2024091 = new Date("2024-09-24");
+
 /**
  * Ce refinement permet de vérifier que les établissements présents sur le
  * BSFF sont bien inscrits sur Trackdéchets avec le bon profil
@@ -50,6 +55,7 @@ export const checkCompanies: Refinement<ParsedZodBsff> = async (
   bsff,
   zodContext
 ) => {
+  await isNotDormantRefinement(bsff.emitterCompanySiret, zodContext);
   await isDestinationRefinement(bsff.destinationCompanySiret, zodContext);
 
   for (const transporter of bsff.transporters ?? []) {
@@ -75,6 +81,22 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
   for (const packaging of bsff.packagings ?? []) {
     const isCreatedAfterV2024071 =
       bsff.createdAt && bsff.createdAt.getTime() - v2024071.getTime() > 0;
+
+    const isCreatedAfterV2024091 =
+      bsff.createdAt && bsff.createdAt.getTime() - v2024091.getTime() > 0;
+
+    if (
+      (packaging.volume === null || packaging.volume === undefined) &&
+      !bsff.isDraft &&
+      isCreatedAfterV2024091
+    ) {
+      // TRA-14567 Le volume est rendu obligatoire sur les contenants BSFF
+      // à partir de la v2024091
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Conditionnements : le volume est requis"
+      });
+    }
 
     if (packaging.volume === 0 && isCreatedAfterV2024071) {
       // Changement de règle de validation dans la MAJ 2024.07.1. Il était possible

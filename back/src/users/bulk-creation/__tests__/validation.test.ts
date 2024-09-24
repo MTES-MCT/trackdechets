@@ -1,6 +1,6 @@
 import { ValidationError } from "yup";
 import { companyValidationSchema, validateRoleGenerator } from "../validations";
-import { CollectorType, CompanyType, WasteProcessorType } from "@prisma/client";
+import { CompanyType } from "@prisma/client";
 import { siretify } from "../../../__tests__/factories";
 
 const mockCompanyExists = jest.fn();
@@ -32,7 +32,10 @@ describe("company validation", () => {
   test("valid company", async () => {
     const company = {
       siret: siretify(1),
-      companyTypes: ["PRODUCER"]
+      companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: []
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
       company
@@ -43,13 +46,19 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret: null,
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
 
     await expect(
       companyValidationSchema.validate({
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
   });
@@ -58,7 +67,10 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret: "123",
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
   });
@@ -67,7 +79,10 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret: "123456789 234",
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
   });
@@ -79,7 +94,10 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret: siretify(1),
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
   });
@@ -89,7 +107,10 @@ describe("company validation", () => {
     console.warn = jest.fn();
     await companyValidationSchema.validate({
       siret: siretify(1),
-      companyTypes: ["PRODUCER"]
+      companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: []
     });
     // a warning must be emitted
     expect(console.warn).toBeCalled();
@@ -128,9 +149,84 @@ describe("company validation", () => {
         companyTypes: [
           "PRODUCE", // typo here
           "WASTE_PROCESSOR"
-        ]
+        ],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(ValidationError);
+  });
+  test("companyTypes includes deprecated CREMATORIUM value", async () => {
+    await expect(
+      companyValidationSchema.validate({
+        siret: siretify(1),
+        companyTypes: [
+          "CREMATORIUM" // deprecated
+        ],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
+      })
+    ).rejects.toThrow(ValidationError);
+  });
+  test("wasteProcessorTypes wihtout WASTEPROCESSOR", async () => {
+    await expect(
+      companyValidationSchema.validate({
+        siret: siretify(1),
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: ["DANGEROUS_WASTES_INCINERATION"],
+        wasteVehiclesTypes: []
+      })
+    ).rejects.toThrow(ValidationError);
+  });
+
+  test("collectorTypes wihtout COLLECTOR", async () => {
+    await expect(
+      companyValidationSchema.validate({
+        siret: siretify(1),
+        companyTypes: ["PRODUCER"],
+        collectorTypes: ["DEEE_WASTES"],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
+      })
+    ).rejects.toThrow(ValidationError);
+  });
+
+  test("wasteVehiclesType wihtout WASTE_VEHICLES", async () => {
+    await expect(
+      companyValidationSchema.validate({
+        siret: siretify(1),
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: ["DEMOLISSEUR"]
+      })
+    ).rejects.toThrow(ValidationError);
+  });
+
+  test("full subtypes", async () => {
+    // valid subtypes
+    const company = {
+      siret: siretify(1),
+      companyTypes: ["COLLECTOR", "WASTE_VEHICLES", "WASTEPROCESSOR"],
+      collectorTypes: [
+        "NON_DANGEROUS_WASTES",
+        "DANGEROUS_WASTES",
+        "DEEE_WASTES"
+      ],
+      wasteProcessorTypes: [
+        "DANGEROUS_WASTES_INCINERATION",
+        "CREMATION",
+        "DANGEROUS_WASTES_STORAGE",
+        "INERT_WASTES_STORAGE"
+      ],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"],
+      contactEmail: "john.snow@trackdechets.fr"
+    };
+    await expect(companyValidationSchema.validate(company)).resolves.toEqual(
+      company
+    );
   });
 
   test("contactEmail format", async () => {
@@ -138,6 +234,9 @@ describe("company validation", () => {
     const company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       contactEmail: "john.snow@trackdechets.fr"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -148,6 +247,9 @@ describe("company validation", () => {
       companyValidationSchema.validate({
         siret: siretify(1),
         companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: [],
         contactEmail: "azerty"
       })
     ).rejects.toThrow(ValidationError);
@@ -158,6 +260,9 @@ describe("company validation", () => {
     const company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       website: "https://trackdechets.beta.gouv.fr"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -178,6 +283,9 @@ describe("company validation", () => {
     let company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       contactPhone: "0100000000"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -186,6 +294,9 @@ describe("company validation", () => {
     company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       contactPhone: "01 00 00 00 00"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -195,6 +306,9 @@ describe("company validation", () => {
     company = {
       siret: siretify(1),
       companyTypes: ["PRODUCER"],
+      collectorTypes: [],
+      wasteProcessorTypes: [],
+      wasteVehiclesTypes: [],
       contactPhone: "01-00-00-00-00"
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -205,6 +319,9 @@ describe("company validation", () => {
       companyValidationSchema.validate({
         siret: siretify(1),
         companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: [],
         contactPhone: "01-00-00-00" // missing two digits
       })
     ).rejects.toThrow(ValidationError);
@@ -218,296 +335,15 @@ describe("company validation", () => {
     await expect(
       companyValidationSchema.validate({
         siret,
-        companyTypes: ["PRODUCER"]
+        companyTypes: ["PRODUCER"],
+        collectorTypes: [],
+        wasteProcessorTypes: [],
+        wasteVehiclesTypes: []
       })
     ).rejects.toThrow(
       `Siret ${siret} was not found in SIRENE database or company is closed`
     );
   });
-
-  it("collector should be able to chose collector types", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    // When
-    const { companyTypes, collectorTypes } =
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["COLLECTOR"],
-        collectorTypes: [
-          CollectorType.DANGEROUS_WASTES,
-          CollectorType.DEEE_WASTES
-        ]
-      });
-
-    // Then
-    expect(companyTypes).toEqual(["COLLECTOR"]);
-    expect(collectorTypes).toEqual([
-      CollectorType.DANGEROUS_WASTES,
-      CollectorType.DEEE_WASTES
-    ]);
-  });
-
-  it("cannot chose collector types if not collector", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    expect.assertions(1);
-
-    // When
-    try {
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["PRODUCER"],
-        collectorTypes: [
-          CollectorType.DANGEROUS_WASTES,
-          CollectorType.DEEE_WASTES
-        ]
-      });
-    } catch (e) {
-      // Then
-      expect(e.message).toEqual(
-        "Your company needs to be a Collector to have collectorTypes"
-      );
-    }
-  });
-
-  it("collectorTypes must be valid CollectorType", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    expect.assertions(1);
-
-    // When
-    try {
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["COLLECTOR"],
-        collectorTypes: [WasteProcessorType.CREMATION]
-      });
-    } catch (e) {
-      // Then
-      expect(e.message).toEqual(
-        `collectorTypes[0] must be one of the following values: NON_DANGEROUS_WASTES, DANGEROUS_WASTES, DEEE_WASTES, OTHER_NON_DANGEROUS_WASTES, OTHER_DANGEROUS_WASTES`
-      );
-    }
-  });
-
-  it("collector types should not be duplicated", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    // When
-    const { companyTypes, collectorTypes } =
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["COLLECTOR"],
-        collectorTypes: [
-          CollectorType.DANGEROUS_WASTES,
-          CollectorType.DANGEROUS_WASTES
-        ]
-      });
-
-    // Then
-    expect(companyTypes).toEqual(["COLLECTOR"]);
-    expect(collectorTypes).toEqual([CollectorType.DANGEROUS_WASTES]);
-  });
-
-  it("collector types are optional", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    // When
-    const { companyTypes, collectorTypes } =
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["COLLECTOR"]
-      });
-
-    // Then
-    expect(companyTypes).toEqual(["COLLECTOR"]);
-    expect(collectorTypes).toBeUndefined();
-  });
-
-  it.each([null, []])(
-    "collector types can be nullified > value '%p'",
-    async collectorTypesArg => {
-      // Given
-      mockSirene.mockImplementationOnce(() =>
-        Promise.resolve({ etatAdministratif: "A" })
-      );
-      const siret = siretify(1);
-
-      // When
-      const { companyTypes, collectorTypes } =
-        await companyValidationSchema.validate({
-          siret,
-          companyTypes: ["COLLECTOR"],
-          collectorTypes: collectorTypesArg
-        });
-
-      // Then
-      expect(companyTypes).toEqual(["COLLECTOR"]);
-      expect(collectorTypes).toEqual([]);
-    }
-  );
-
-  it("waste processor should be able to chose waste processor types", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    // When
-    const { companyTypes, wasteProcessorTypes } =
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["WASTEPROCESSOR"],
-        wasteProcessorTypes: [
-          WasteProcessorType.CREMATION,
-          WasteProcessorType.INERT_WASTES_STORAGE
-        ]
-      });
-
-    // Then
-    expect(companyTypes).toEqual(["WASTEPROCESSOR"]);
-    expect(wasteProcessorTypes).toEqual([
-      WasteProcessorType.CREMATION,
-      WasteProcessorType.INERT_WASTES_STORAGE
-    ]);
-  });
-
-  it("cannot chose wasteProcessorTypes if not waste processor", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    expect.assertions(1);
-
-    // When
-    try {
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["PRODUCER"],
-        wasteProcessorTypes: [
-          WasteProcessorType.CREMATION,
-          WasteProcessorType.INERT_WASTES_STORAGE
-        ]
-      });
-    } catch (e) {
-      // Then
-      expect(e.message).toEqual(
-        "Your company needs to be a WasteProcessor to have wasteProcessorTypes"
-      );
-    }
-  });
-
-  it("wasteProcessorTypes must be valid WasteProcessorTypes", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    expect.assertions(1);
-
-    // When
-    try {
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["WASTEPROCESSOR"],
-        wasteProcessorTypes: [CollectorType.DANGEROUS_WASTES]
-      });
-    } catch (e) {
-      // Then
-      expect(e.message).toEqual(
-        `wasteProcessorTypes[0] must be one of the following values: DANGEROUS_WASTES_INCINERATION, NON_DANGEROUS_WASTES_INCINERATION, CREMATION, DANGEROUS_WASTES_STORAGE, NON_DANGEROUS_WASTES_STORAGE, INERT_WASTES_STORAGE, OTHER_DANGEROUS_WASTES, OTHER_NON_DANGEROUS_WASTES`
-      );
-    }
-  });
-
-  it("wasteProcessorTypes should not be duplicated", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    // When
-    const { companyTypes, wasteProcessorTypes } =
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["WASTEPROCESSOR"],
-        wasteProcessorTypes: [
-          WasteProcessorType.CREMATION,
-          WasteProcessorType.CREMATION
-        ]
-      });
-
-    // Then
-    expect(companyTypes).toEqual(["WASTEPROCESSOR"]);
-    expect(wasteProcessorTypes).toEqual([WasteProcessorType.CREMATION]);
-  });
-
-  it("wasteProcessorTypes are optional", async () => {
-    // Given
-    mockSirene.mockImplementationOnce(() =>
-      Promise.resolve({ etatAdministratif: "A" })
-    );
-    const siret = siretify(1);
-
-    // When
-    const { companyTypes, wasteProcessorTypes } =
-      await companyValidationSchema.validate({
-        siret,
-        companyTypes: ["WASTEPROCESSOR"]
-      });
-
-    // Then
-    expect(companyTypes).toEqual(["WASTEPROCESSOR"]);
-    expect(wasteProcessorTypes).toBeUndefined();
-  });
-
-  it.each([null, []])(
-    "wasteProcessorTypes can be nullified > value '%p'",
-    async wasteProcessorTypesArg => {
-      // Given
-      mockSirene.mockImplementationOnce(() =>
-        Promise.resolve({ etatAdministratif: "A" })
-      );
-      const siret = siretify(1);
-
-      // When
-      const { companyTypes, wasteProcessorTypes } =
-        await companyValidationSchema.validate({
-          siret,
-          companyTypes: ["WASTEPROCESSOR"],
-          wasteProcessorTypes: wasteProcessorTypesArg
-        });
-
-      // Then
-      expect(companyTypes).toEqual(["WASTEPROCESSOR"]);
-      expect(wasteProcessorTypes).toEqual([]);
-    }
-  );
 });
 
 describe("role validation", () => {

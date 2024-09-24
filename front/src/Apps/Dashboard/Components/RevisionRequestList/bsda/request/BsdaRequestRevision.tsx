@@ -122,13 +122,13 @@ export function BsdaRequestRevision({ bsda }: Props) {
     }
     const receipt = company?.brokerReceipt;
     if (receipt) {
-      setValue(`${field}.receipt`, receipt.receiptNumber);
-      setValue(`${field}.validityLimit`, receipt.validityLimit);
-      setValue(`${field}.department`, receipt.department);
+      setValue(`${field}.recepisse.number`, receipt.receiptNumber);
+      setValue(`${field}.recepisse.validityLimit`, receipt.validityLimit);
+      setValue(`${field}.recepisse.department`, receipt.department);
     } else {
-      setValue(`${field}.receipt`, "");
-      setValue(`${field}.validityLimit`, null);
-      setValue(`${field}.department`, "");
+      setValue(`${field}.recepisse.number`, "");
+      setValue(`${field}.recepisse.validityLimit`, null);
+      setValue(`${field}.recepisse.department`, "");
     }
   };
 
@@ -191,9 +191,9 @@ export function BsdaRequestRevision({ bsda }: Props) {
 
               <RhfReviewableField
                 title="Nom usuel du déchet"
-                path="waste.sealNumbers"
-                value={bsda.waste?.sealNumbers}
-                defaultValue={initialBsdaReview.waste.sealNumbers}
+                path="waste.materialName"
+                value={bsda.waste?.materialName}
+                defaultValue={initialBsdaReview.waste.materialName}
               >
                 <Input
                   label="Nom usuel du déchet"
@@ -382,14 +382,14 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 <Input
                   label="Numéro de récépissé"
                   nativeInputProps={{
-                    ...register("broker.receipt")
+                    ...register("broker.recepisse.number")
                   }}
                   className="fr-col-6"
                 />
                 <Input
                   label="Département"
                   nativeInputProps={{
-                    ...register("broker.department")
+                    ...register("broker.recepisse.department")
                   }}
                   className="fr-col-6"
                 />
@@ -397,7 +397,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                   label="Limite de validité"
                   nativeInputProps={{
                     type: "date",
-                    ...register("broker.validityLimit")
+                    ...register("broker.recepisse.validityLimit")
                   }}
                 />
               </RhfReviewableField>

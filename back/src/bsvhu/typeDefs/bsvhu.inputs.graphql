@@ -89,6 +89,13 @@ input BsvhuInput {
   destination: BsvhuDestinationInput
   "Détails sur le transporteur"
   transporter: BsvhuTransporterInput
+  """
+  Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
+  mais pas à la responsabilité de la traçabilité. Il pourra lire ce bordereau, sans étape de signature.
+
+  Le nombre maximal d'intermédiaires sur un bordereau est de 3.
+  """
+  intermediaries: [CompanyInput!]
 }
 
 input BsvhuEmitterInput {
