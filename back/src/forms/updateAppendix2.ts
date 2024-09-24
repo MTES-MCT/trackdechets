@@ -117,7 +117,10 @@ export async function updateAppendix2Fn(args: UpdateAppendix2FnArgs) {
       { id: form.id },
       { quantityGrouped: quantityGrouped.toNumber(), status: nextStatus }
     );
-    if (form.emitterType === EmitterType.APPENDIX2) {
+    if (
+      form.emitterType === EmitterType.APPENDIX2 &&
+      nextStatus === "PROCESSED"
+    ) {
       const groupedForms = await findGroupedFormsById(form.id);
       for (const formId of groupedForms.map(f => f.id)) {
         await enqueueUpdateAppendix2Job({
