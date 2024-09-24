@@ -3,6 +3,7 @@ import { EmitterType, Status } from "@prisma/client";
 import Decimal from "decimal.js";
 import { enqueueUpdateAppendix2Job } from "../queue/producers/updateAppendix2";
 import { getFormRepository } from "./repository";
+import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 
 const DECIMAL_WEIGHT_PRECISION = 6; // gramme
 
@@ -55,9 +56,14 @@ export async function updateAppendix2Fn(args: UpdateAppendix2FnArgs) {
     .filter(grp => grp.initialFormId === form.id)
     .map(g => g.nextForm);
 
+  const wasteQuantities = bsddWasteQuantities(form.forwardedIn ?? form);
+
   const quantityReceived = form.forwardedIn
     ? form.forwardedIn.quantityReceived
     : form.quantityReceived;
+
+  const quantityAccepted =
+    wasteQuantities?.quantityAccepted ?? quantityReceived;
 
   const quantityGrouped = new Decimal(
     groupements
@@ -68,9 +74,9 @@ export async function updateAppendix2Fn(args: UpdateAppendix2FnArgs) {
 
   // on a quelques quantityReceived avec des décimales au delà du gramme
   const groupedInTotality =
-    quantityReceived &&
+    quantityAccepted &&
     quantityGrouped.greaterThanOrEqualTo(
-      new Decimal(quantityReceived).toDecimalPlaces(DECIMAL_WEIGHT_PRECISION) // limit precision to circumvent rogue decimal digits
+      quantityAccepted.toDecimalPlaces(DECIMAL_WEIGHT_PRECISION) // limit precision to circumvent rogue decimal digits
     ); // case > should not happen
 
   const allSealed =
