@@ -103,10 +103,15 @@ export async function updateAppendix2Fn(args: UpdateAppendix2FnArgs) {
 
   const { update: updateForm, findGroupedFormsById } = getFormRepository(user);
 
-  await updateForm(
-    { id: form.id },
-    { quantityGrouped: quantityGrouped.toNumber(), status: nextStatus }
-  );
+  if (
+    nextStatus !== form.status ||
+    !quantityGrouped.equals(new Decimal(form.quantityGrouped))
+  ) {
+    await updateForm(
+      { id: form.id },
+      { quantityGrouped: quantityGrouped.toNumber(), status: nextStatus }
+    );
+  }
 
   if (form.emitterType === EmitterType.APPENDIX2) {
     const groupedForms = await findGroupedFormsById(form.id);
