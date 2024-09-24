@@ -1,4 +1,9 @@
-import { BsddTransporter, CompanyVerificationMode, Form } from "@prisma/client";
+import {
+  BsddTransporter,
+  Company,
+  CompanyVerificationMode,
+  Form
+} from "@prisma/client";
 import { cleanupSpecialChars, toFrFormat } from "../helpers";
 import { MailTemplate } from "../types";
 import { templateIds } from "./provider/templateIds";
@@ -242,5 +247,15 @@ export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
 }> = {
   subject: "Votre action est attendue sur une demande de révision",
   body: mustacheRenderer("pending-revision-request-admin-details.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const rndtsDeclarationDelegationCreation: MailTemplate<{
+  delegator: Company;
+  delegate: Company;
+}> = {
+  subject: ({ delegator, delegate }) =>
+    `${delegator.givenName} délègue ses déclarations RNDTS à ${delegate.givenName}`,
+  body: mustacheRenderer("rndts-declaration-delegation-creation.html"),
   templateId: templateIds.LAYOUT
 };

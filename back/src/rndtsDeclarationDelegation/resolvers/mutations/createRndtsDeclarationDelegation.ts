@@ -12,7 +12,8 @@ import { fixTyping } from "../typing";
 import { findDelegateAndDelegatorOrThrow } from "../utils";
 import {
   createDelegation,
-  checkNoExistingNotRevokedAndNotExpiredDelegation
+  checkNoExistingNotRevokedAndNotExpiredDelegation,
+  sendRndtsDeclarationDelegationCreationEmail
 } from "./utils/createRndtsDeclarationDelegation.utils";
 
 const createRndtsDeclarationDelegation = async (
@@ -52,6 +53,9 @@ const createRndtsDeclarationDelegation = async (
     delegator,
     delegate
   );
+
+  // Send email
+  await sendRndtsDeclarationDelegationCreationEmail(delegator, delegate);
 
   return fixTyping(delegation);
 };

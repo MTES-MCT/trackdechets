@@ -6,6 +6,7 @@ import {
 } from "../../../../generated/graphql/types";
 import {
   companyFactory,
+  userInCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import { User, RndtsDeclarationDelegation } from "@prisma/client";
@@ -13,6 +14,12 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { GraphQLFormattedError } from "graphql";
 import { nowPlusXHours, todayAtMidnight } from "../../../../utils";
+import { sendMail } from "../../../../mailer/mailing";
+import { renderMail, rndtsDeclarationDelegationCreation } from "@td/mail";
+
+// Mock emails
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
   mutation createRndtsDeclarationDelegation(
@@ -70,6 +77,10 @@ export const createDelegation = async (
 
 describe("mutation createRndtsDeclarationDelegation", () => {
   afterAll(resetDatabase);
+
+  afterEach(async () => {
+    jest.resetAllMocks();
+  });
 
   describe("successful use-cases", () => {
     it("should create a delegation declaration", async () => {
@@ -188,6 +199,47 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Persisted value should be OK
       expect(delegation?.delegatorId).toBe(delegator.id);
       expect(delegation?.delegateId).toBe(delegate.id);
+    });
+
+    it("should send an email to companies admins", async () => {
+      // Given
+      const delegate = await companyFactory({ givenName: "Some given name" });
+      const { user: delegatorAdmin, company: delegator } =
+        await userWithCompanyFactory();
+      await userInCompany("MEMBER", delegator.id); // Not an admin, shoud not receive mail
+      await userInCompany("MEMBER", delegate.id); // Not an admin, shoud not receive mail
+      const delegateAdmin = await userInCompany("ADMIN", delegate.id); // Admin, should receive mail
+      await userWithCompanyFactory("ADMIN"); // Not part of the delegation, should not receive mail
+
+      // When
+      const { errors } = await createDelegation(delegatorAdmin, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Email
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+      // Onboarding email
+      expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+        renderMail(rndtsDeclarationDelegationCreation, {
+          variables: { delegator, delegate },
+          messageVersions: [
+            {
+              to: expect.arrayContaining([
+                { email: delegatorAdmin.email, name: delegatorAdmin.name },
+                { email: delegateAdmin.email, name: delegateAdmin.name }
+              ])
+            }
+          ]
+        })
+      );
     });
   });
 
