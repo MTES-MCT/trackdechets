@@ -511,6 +511,20 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     //   from: "TRANSPORT"
     // }
   },
+  ecoOrganismeName: {
+    readableFieldName: "le nom de l'éco-organisme",
+    sealed: { from: "OPERATION" },
+    path: ["ecoOrganisme", "name"],
+    required: {
+      from: "TRANSPORT",
+      when: bsda => !!bsda.ecoOrganismeSiret
+    }
+  },
+  ecoOrganismeSiret: {
+    readableFieldName: "le SIRET de l'éco-organisme",
+    sealed: { from: "OPERATION" },
+    path: ["ecoOrganisme", "siret"]
+  },
   intermediaries: {
     readableFieldName: "les intermédiaires",
     sealed: { from: "TRANSPORT" },

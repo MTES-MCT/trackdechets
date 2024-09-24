@@ -10,10 +10,11 @@ import {
 import { getSignatureAncestors } from "./helpers";
 import { isArray } from "../../common/dataTypes";
 import { capitalize } from "../../common/strings";
-import { WasteAcceptationStatus } from "@prisma/client";
+import { BsdType, WasteAcceptationStatus } from "@prisma/client";
 import {
   destinationOperationModeRefinement,
   isDestinationRefinement,
+  isEcoOrganismeRefinement,
   isNotDormantRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
@@ -49,6 +50,11 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
   );
   await isRegisteredVatNumberRefinement(
     bsvhu.transporterCompanyVatNumber,
+    zodContext
+  );
+  await isEcoOrganismeRefinement(
+    bsvhu.ecoOrganismeSiret,
+    BsdType.BSVHU,
     zodContext
   );
 };

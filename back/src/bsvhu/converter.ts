@@ -22,7 +22,8 @@ import {
   BsvhuNextDestination,
   BsvhuTransport,
   BsvhuTransportInput,
-  CompanyInput
+  CompanyInput,
+  BsvhuEcoOrganisme
 } from "../generated/graphql/types";
 import {
   Prisma,
@@ -160,6 +161,10 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         takenOverAt: processDate(form.transporterTransportTakenOverAt)
       })
     }),
+    ecoOrganisme: nullIfNoValues<BsvhuEcoOrganisme>({
+      name: form.ecoOrganismeName,
+      siret: form.ecoOrganismeSiret
+    }),
     metadata: null as any
   };
 }
@@ -169,6 +174,7 @@ export function flattenVhuInput(formInput: BsvhuInput) {
     ...flattenVhuEmitterInput(formInput),
     ...flattenVhuDestinationInput(formInput),
     ...flattenVhuTransporterInput(formInput),
+    ...flattenVhuEcoOrganismeInput(formInput),
     packaging: chain(formInput, f => f.packaging),
     wasteCode: chain(formInput, f => f.wasteCode),
     quantity: chain(formInput, f => f.quantity),
@@ -338,6 +344,15 @@ function flattenVhuTransporterInput({
       chain(t.recepisse, r => r.isExempted)
     ),
     ...flattenTransporterTransportInput(transporter)
+  };
+}
+
+function flattenVhuEcoOrganismeInput({
+  ecoOrganisme
+}: Pick<BsvhuInput, "ecoOrganisme">) {
+  return {
+    ecoOrganismeName: chain(ecoOrganisme, e => e.name),
+    ecoOrganismeSiret: chain(ecoOrganisme, e => e.siret)
   };
 }
 
