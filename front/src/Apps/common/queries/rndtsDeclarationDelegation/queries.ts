@@ -41,10 +41,12 @@ export const RNDTS_DECLARATION_DELEGATIONS = gql`
           updatedAt
           delegate {
             name
+            givenName
             orgId
           }
           delegator {
             name
+            givenName
             orgId
           }
           startDate

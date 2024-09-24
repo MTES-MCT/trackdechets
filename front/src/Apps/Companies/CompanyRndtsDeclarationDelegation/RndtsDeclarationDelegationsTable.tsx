@@ -128,27 +128,34 @@ export const RndtsDeclarationDelegationsTable = ({
 
                   const company = as === "delegate" ? delegator : delegate;
 
+                  const name = isDefinedStrict(company.givenName)
+                    ? company.givenName
+                    : company.name;
+
                   return (
                     <tr key={id}>
                       <td
                         className="fr-py-4v"
-                        aria-describedby={`company-name-${company.orgId}`}
+                        aria-describedby={`company-name-${company.orgId}-${as}`}
                       >
-                        {/* TODO: givenName is not in CompanyPublic yet */}
-                        {company?.name}
+                        {name}
 
                         {getTextTooltip(
-                          `company-name-${company.orgId}`,
-                          company?.name
+                          `company-name-${company.orgId}-${as}`,
+                          `${name} ${
+                            company.givenName ? `(${company.name})` : ""
+                          }`
                         )}
                       </td>
                       <td>{company?.orgId}</td>
-                      <td aria-describedby={`company-comment-${company.orgId}`}>
+                      <td
+                        aria-describedby={`company-comment-${company.orgId}-${as}`}
+                      >
                         {isDefinedStrict(comment) ? (
                           <>
                             {comment}
                             {getTextTooltip(
-                              `company-comment-${company.orgId}`,
+                              `company-comment-${company.orgId}-${as}`,
                               comment
                             )}
                           </>
