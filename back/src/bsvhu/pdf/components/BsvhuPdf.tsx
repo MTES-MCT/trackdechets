@@ -107,6 +107,16 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             <p className="mb-3">
               Nom de la personne à contacter : {bsvhu.emitter?.company?.contact}
             </p>
+            {bsvhu?.ecoOrganisme?.siret && (
+              <p>
+                <strong>Eco-organisme désigné :</strong>{" "}
+                <p>
+                  Raison sociale : {bsvhu.ecoOrganisme?.name}
+                  <br />
+                  SIREN : {bsvhu.ecoOrganisme?.siret?.substring(0, 9)}
+                </p>
+              </p>
+            )}
           </div>
           {/* End Emitter */}
           {/* Recipient */}

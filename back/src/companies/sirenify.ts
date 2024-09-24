@@ -6,10 +6,12 @@ import {
   CompanyInput,
   StatutDiffusionEtablissement
 } from "../generated/graphql/types";
+import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
 import { SireneSearchResult } from "./sirene/types";
 import { searchCompany as searchCompanyTD } from "./sirene/trackdechets/client";
+import { EcoOrganisme } from "@prisma/client";
 
 /**
  * List of emails or regular expressions of email of API
@@ -117,6 +119,7 @@ export default function buildSirenify<T>(
 export type NextCompanyInputAccessor<T> = {
   siret: string | null | undefined;
   skip: boolean;
+  isEcoOrganisme?: boolean;
   setter: (
     input: T,
     data: {
@@ -140,41 +143,59 @@ export function nextBuildSirenify<T>(
 
     // check if we found a corresponding companySearchResult based on siret
     const companySearchResults = await Promise.all(
-      accessors.map(({ siret, skip }) =>
-        !skip && siret ? searchCompanyFailFast(siret) : null
-      )
+      accessors.map(({ siret, skip, isEcoOrganisme }) => {
+        if (skip || !siret) {
+          return null;
+        }
+        if (isEcoOrganisme) {
+          return searchEcoOrganismeFailFast(siret);
+        }
+        return searchCompanyFailFast(siret);
+      })
     );
 
     // make a copy to avoid mutating initial data
     const sirenifiedInput = { ...input };
 
     for (const [idx, companySearchResult] of companySearchResults.entries()) {
-      if (
-        !companySearchResult ||
-        companySearchResult.statutDiffusionEtablissement ===
-          ("P" as StatutDiffusionEtablissement)
-      )
+      const { setter, isEcoOrganisme } = accessors[idx];
+      if (!companySearchResult) {
         continue;
-      if (companySearchResult.etatAdministratif === "F") {
+      }
+      if (isEcoOrganisme) {
+        setter(sirenifiedInput, {
+          name: companySearchResult.name,
+          address: companySearchResult.address,
+          city: undefined,
+          postalCode: undefined,
+          street: undefined
+        });
+      }
+      const company = companySearchResult as CompanySearchResult;
+      if (
+        company.statutDiffusionEtablissement ===
+        ("P" as StatutDiffusionEtablissement)
+      ) {
+        continue;
+      }
+      if (company.etatAdministratif === "F") {
         throw new UserInputError(
-          `L'établissement ${companySearchResult.siret} est fermé selon le répertoire SIRENE`
+          `L'établissement ${company.siret} est fermé selon le répertoire SIRENE`
         );
       }
 
-      if (companySearchResult.isDormant) {
+      if (company.isDormant) {
         throw new UserInputError(
-          `L'établissement ${companySearchResult.siret} est en sommeil sur Trackdéchets. Il n'est pas possible de le mentionner dans un BSD.`
+          `L'établissement ${company.siret} est en sommeil sur Trackdéchets. Il n'est pas possible de le mentionner dans un BSD.`
         );
       }
-
-      const { setter } = accessors[idx];
 
       setter(sirenifiedInput, {
-        name: companySearchResult.name,
-        address: companySearchResult.address,
-        city: companySearchResult.addressCity,
-        postalCode: companySearchResult.addressPostalCode,
-        street: companySearchResult.addressVoie
+        name: company.name,
+        address: company.address,
+        city: company.addressCity,
+        postalCode: company.addressPostalCode,
+        street: company.addressVoie
       });
     }
 
@@ -201,6 +222,27 @@ export async function searchCompanyFailFast(
     return null;
   }
 }
+
+export const searchEcoOrganismeFailFast = async (
+  siret: string
+): Promise<EcoOrganisme | null> => {
+  const raceWith = new Promise<null>(resolve =>
+    setTimeout(resolve, 1000, null)
+  );
+
+  try {
+    const ecoOrganismeSeachResult = await Promise.race([
+      prisma.ecoOrganisme.findUnique({
+        where: { siret }
+      }),
+      raceWith
+    ]);
+    return ecoOrganismeSeachResult;
+  } catch (e) {
+    logger.info(`Sirenify failed for siret ${siret}. Reason : ${e.message}`);
+    return null;
+  }
+};
 
 /**
  * Narrow search for Trackdéchets Sirene index

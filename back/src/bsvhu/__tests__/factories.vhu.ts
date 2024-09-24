@@ -85,7 +85,10 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   destinationReceptionWeight: null,
   destinationReceptionAcceptationStatus: null,
   destinationReceptionRefusalReason: null,
-  destinationOperationCode: null
+  destinationOperationCode: null,
+
+  ecoOrganismeSiret: siretify(4),
+  ecoOrganismeName: "Eco-Organisme"
 });
 
 export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
