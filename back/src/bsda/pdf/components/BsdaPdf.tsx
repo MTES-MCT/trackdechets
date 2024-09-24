@@ -25,9 +25,19 @@ const PACKAGINGS_NAMES = {
   OTHER: "Autre - "
 };
 
-type Props = { bsda: Bsda; qrCode: string; previousBsdas: Bsda[] };
+type Props = {
+  bsda: Bsda;
+  qrCode: string;
+  previousBsdas: Bsda[];
+  renderEmpty?: boolean;
+};
 
-export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
+export function BsdaPdf({
+  bsda,
+  qrCode,
+  previousBsdas,
+  renderEmpty = false
+}: Props) {
   return (
     <Document title={bsda.id}>
       <div className="Page">
@@ -49,7 +59,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
               dangerouslySetInnerHTML={{ __html: qrCode }}
             />
             <div>
-              <b>Document édité le {dateToXMonthAtHHMM()}</b>
+              <b>Document édité le {renderEmpty ? "" : dateToXMonthAtHHMM()}</b>
             </div>
           </div>
         </div>

@@ -11,12 +11,13 @@ import { RhfTagsInputWrapper } from "../../../../Forms/Components/TagsInput/Tags
 import TransporterRecepisse from "../../../../Forms/Components/TransporterRecepisse/TransporterRecepisse";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 import { SealedFieldsContext } from "../../context";
-import { setFieldError } from "../../utils";
+import { clearCompanyError, setFieldError } from "../../utils";
 
 const actor = "transporter";
 
 export function Transporter({ errors }) {
-  const { register, setValue, watch, setError, formState } = useFormContext(); // retrieve all hook methods
+  const { register, setValue, watch, setError, formState, clearErrors } =
+    useFormContext(); // retrieve all hook methods
   const [recepisse, setRecepisse] = useState<BspaohRecepisse>({});
   const sealedFields = useContext(SealedFieldsContext);
 
@@ -128,16 +129,16 @@ export function Transporter({ errors }) {
             setValue(`${actor}.company.address`, company.address);
             setValue(
               `${actor}.company.contact`,
-              company.contact || transporter?.company?.contact
+              transporter?.company?.contact || company.contact
             );
             setValue(
               `${actor}.company.phone`,
-              company.contactPhone || transporter?.company?.phone
+              transporter?.company?.phone || company.contactPhone
             );
 
             setValue(
               `${actor}.company.mail`,
-              company.contactEmail || transporter?.company?.mail
+              transporter?.company?.mail || company.contactEmail
             );
             setRecepisse({
               number: company.transporterReceipt?.receiptNumber,
@@ -146,6 +147,11 @@ export function Transporter({ errors }) {
             });
 
             // country: company.codePaysEtrangerEtablissement
+
+            if (errors?.length) {
+              // server errors
+              clearCompanyError(transporter, actor, clearErrors);
+            }
           }
         }}
       />

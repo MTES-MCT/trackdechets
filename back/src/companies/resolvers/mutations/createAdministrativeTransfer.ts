@@ -54,12 +54,13 @@ export const createAdministrativeTransfer: MutationResolvers["createAdministrati
     });
 
     if (
-      !fromCompany.companyTypes.every(type =>
-        toCompany.companyTypes.includes(type)
+      !toCompany.companyTypes.includes("COLLECTOR") ||
+      !fromCompany.collectorTypes.every(type =>
+        toCompany.collectorTypes.includes(type)
       )
     ) {
       throw new UserInputError(
-        "L'établissement d'arrivée n'a pas les mêmes profils que l'établissement de départ. Impossible de réaliser le transfert."
+        "L'établissement d'arrivée n'a pas les mêmes sous-profils d'installation de tri, transit regroupement que l'établissement de départ. Impossible de réaliser le transfert."
       );
     }
 

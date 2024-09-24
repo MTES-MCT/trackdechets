@@ -3,6 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkBelongsTo } from "../../permissions";
 import { parseQueryRndtsDeclarationDelegationsArgs } from "../../validation";
+import { fixPaginatedTyping } from "../typing";
 import { findDelegateOrDelegatorOrThrow } from "../utils";
 import { getPaginatedDelegations } from "./utils/rndtsDeclarationDelegations.utils";
 
@@ -37,7 +38,7 @@ const rndtsDeclarationDelegationsResolver: QueryResolvers["rndtsDeclarationDeleg
       first: paginationArgs.first
     });
 
-    return paginatedDelegations;
+    return fixPaginatedTyping(paginatedDelegations);
   };
 
 export default rndtsDeclarationDelegationsResolver;

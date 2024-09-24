@@ -408,6 +408,7 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
           return !ecoOrganisme;
         }
       )
+      .test(siretTests.isNotDormant)
       .when(["emitterIsForeignShip", "emitterIsPrivateIndividual"], {
         is: (isForeignShip: boolean, isPrivateIndividual: boolean) =>
           !isForeignShip && !isPrivateIndividual,

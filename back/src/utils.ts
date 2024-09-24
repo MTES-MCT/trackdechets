@@ -75,9 +75,9 @@ export function todayAtMidnight(): Date {
 }
 
 export const nowPlusXHours = (hours: number) => {
-  const NOW_PLUS_X_HOURS = new Date();
-  NOW_PLUS_X_HOURS.setHours(NOW_PLUS_X_HOURS.getHours() + hours);
-  return NOW_PLUS_X_HOURS;
+  const res = new Date();
+  res.setHours(res.getHours() + hours);
+  return res;
 };
 
 /**

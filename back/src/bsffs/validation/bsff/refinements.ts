@@ -32,6 +32,7 @@ import { OPERATION } from "../../constants";
 import { BsffOperationCode } from "../../../generated/graphql/types";
 import {
   isDestinationRefinement,
+  isNotDormantRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
 } from "../../../common/validation/zod/refinement";
@@ -54,6 +55,7 @@ export const checkCompanies: Refinement<ParsedZodBsff> = async (
   bsff,
   zodContext
 ) => {
+  await isNotDormantRefinement(bsff.emitterCompanySiret, zodContext);
   await isDestinationRefinement(bsff.destinationCompanySiret, zodContext);
 
   for (const transporter of bsff.transporters ?? []) {

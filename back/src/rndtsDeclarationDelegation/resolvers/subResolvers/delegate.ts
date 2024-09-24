@@ -16,4 +16,4 @@ const getDelegate = async (delegation: RndtsDeclarationDelegation) => {
 };
 
 export const delegateResolver: RndtsDeclarationDelegationResolvers["delegate"] =
-  delegation => getDelegate(delegation);
+  delegation => getDelegate(delegation) as any;

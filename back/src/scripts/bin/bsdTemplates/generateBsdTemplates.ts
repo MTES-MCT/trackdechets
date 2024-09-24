@@ -90,16 +90,18 @@ const getBsds = async () => {
       S3_BSD_TEMPLATES_BUCKET
     ].some(el => !el)
   ) {
-    console.log("no templates");
+    // Script not run when env variables are missing
+    console.log("Skip empty templates generation");
     process.exit(0);
   }
+
   const folder = "bsds/";
   const client = new S3Client({
-    endpoint: S3_ENDPOINT,
-    region: S3_REGION,
+    endpoint: S3_ENDPOINT ?? "",
+    region: S3_REGION ?? "",
     credentials: {
-      accessKeyId: S3_BSD_TEMPLATES_ACCESS_KEY_ID,
-      secretAccessKey: S3_BSD_TEMPLATES_SECRET_ACCESS_KEY
+      accessKeyId: S3_BSD_TEMPLATES_ACCESS_KEY_ID ?? "",
+      secretAccessKey: S3_BSD_TEMPLATES_SECRET_ACCESS_KEY ?? ""
     }
   });
 

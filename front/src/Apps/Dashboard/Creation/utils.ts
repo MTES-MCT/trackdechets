@@ -60,10 +60,10 @@ export const getPublishErrorTabIds = (apiErrors, tabIds) => {
   const publishErrorTabIds = [
     ...new Set(
       apiErrors?.map(apiError => {
-        if (apiError.path[0].includes("weight")) {
+        if (apiError.path[0]?.includes("weight")) {
           return tabIds.find(key => key === "waste");
         }
-        return tabIds.find(key => apiError.path[0].includes(key));
+        return tabIds.find(key => apiError.path[0]?.includes(key));
       })
     )
   ];
@@ -104,6 +104,10 @@ export const handleGraphQlError = (err, setPublishErrors) => {
       message: string;
     }[];
     if (issues?.length) {
+      const errorsWithEmptyPath = issues.filter(f => !f.path.length);
+      if (errorsWithEmptyPath.length) {
+        toastApolloError(err);
+      }
       const errorDetailList = issues?.map(error => {
         return error;
       });
@@ -130,5 +134,29 @@ export const setFieldError = (errors, errorPath, stateError, setError) => {
       type: "custom",
       message: error
     });
+  }
+};
+
+export const clearCompanyError = (actor, actorName, clearErrors) => {
+  if (actor?.["company"]?.siret) {
+    clearErrors([`${actorName}.company.siret`]);
+  }
+  if (actor?.["company"]?.orgId) {
+    clearErrors([`${actorName}.company.orgId`]);
+  }
+  if (actor?.["company"]?.contact) {
+    clearErrors([`${actorName}.company.contact`]);
+  }
+  if (actor?.["company"]?.address) {
+    clearErrors([`${actorName}.company.address`]);
+  }
+  if (actor?.["company"]?.phone) {
+    clearErrors([`${actorName}.company.phone`]);
+  }
+  if (actor?.["company"]?.mail) {
+    clearErrors([`${actorName}.company.mail`]);
+  }
+  if (actor?.["company"]?.vatNumber) {
+    clearErrors([`${actorName}.company.vatNumber`]);
   }
 };

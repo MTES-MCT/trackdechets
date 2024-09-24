@@ -67,7 +67,7 @@ const RevisionModal = ({
       Pick<Query, "formRevisionRequests">,
       QueryFormRevisionRequestsArgs
     >(GET_FORM_REVISION_REQUESTS, {
-      fetchPolicy: "cache-and-network",
+      fetchPolicy: "no-cache", // If we use the cache and have several revisions on a single bsdd the linked bsdd that is returned is the cached one instead of the previous version
       variables: { siret: siret!, where: { bsddId: { _eq: bsdId } } }
     });
 
@@ -76,7 +76,7 @@ const RevisionModal = ({
       Pick<Query, "bsdaRevisionRequests">,
       QueryBsdaRevisionRequestsArgs
     >(GET_BSDA_REVISION_REQUESTS, {
-      fetchPolicy: "cache-and-network",
+      fetchPolicy: "no-cache",
       variables: { siret: siret!, where: { bsdaId: { _eq: bsdId } } }
     });
 
@@ -87,7 +87,7 @@ const RevisionModal = ({
     Pick<Query, "bsdasriRevisionRequests">,
     QueryBsdasriRevisionRequestsArgs
   >(GET_BSDASRI_REVISION_REQUESTS, {
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "no-cache",
     variables: { siret: siret!, where: { bsdasriId: { _eq: bsdId } } }
   });
 
