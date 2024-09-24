@@ -2,6 +2,9 @@ import { Company } from "@prisma/client";
 import { UserInputError } from "../../../../common/errors";
 import { getRndtsDeclarationDelegationRepository } from "../../../repository";
 import { ParsedCreateRndtsDeclarationDelegationInput } from "../../../validation";
+import { prisma } from "@td/prisma";
+import { renderMail, rndtsDeclarationDelegationCreation } from "@td/mail";
+import { sendMail } from "../../../../mailer/mailing";
 
 export const createDelegation = async (
   user: Express.User,
@@ -57,4 +60,44 @@ export const checkNoExistingNotRevokedAndNotExpiredDelegation = async (
       `Une délégation existe déjà pour ce délégataire et ce délégant (id ${activeDelegation.id})`
     );
   }
+};
+
+/**
+ * Send a creation email to admin of both companies (delegate & delegator)
+ */
+export const sendRndtsDeclarationDelegationCreationEmail = async (
+  delegator: Company,
+  delegate: Company
+) => {
+  // Find admins from both delegator & delegate companies
+  const companyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      companyId: { in: [delegator.id, delegate.id] },
+      role: "ADMIN"
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true
+        }
+      }
+    }
+  });
+
+  // Prepare mail template
+  const payload = renderMail(rndtsDeclarationDelegationCreation, {
+    variables: { delegator, delegate },
+    messageVersions: [
+      {
+        to: companyAssociations.map(companyAssociation => ({
+          email: companyAssociation.user.email,
+          name: companyAssociation.user.name
+        }))
+      }
+    ]
+  });
+
+  await sendMail(payload);
 };
