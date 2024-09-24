@@ -28,7 +28,9 @@ const displayError = (error: FieldError | undefined) => {
 const getSchema = () =>
   z
     .object({
-      delegateOrgId: z.string().refine(isSiret, "Siret non valide"),
+      delegateOrgId: z
+        .string({ required_error: "Ce champ est requis" })
+        .refine(isSiret, "Siret non valide"),
       startDate: z.coerce
         .date({
           required_error: "La date de début est requise",
@@ -91,6 +93,21 @@ export const CreateRndtsDeclarationDelegationModal = ({
     refetchQueries: [RNDTS_DECLARATION_DELEGATIONS]
   });
 
+  const validationSchema = getSchema();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors, isSubmitting }
+  } = useForm<z.infer<typeof validationSchema>>({
+    defaultValues: {
+      startDate: datetimeToYYYYMMDD(new Date())
+    },
+    resolver: zodResolver(validationSchema)
+  });
+
   const onSubmit = async input => {
     await createRndtsDeclarationDelegation({
       variables: {
@@ -103,22 +120,11 @@ export const CreateRndtsDeclarationDelegationModal = ({
       onError: err => toast.error(err.message)
     });
 
+    // Reset the form
+    reset();
+
     onClose();
   };
-
-  const validationSchema = getSchema();
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting }
-  } = useForm<z.infer<typeof validationSchema>>({
-    defaultValues: {
-      startDate: datetimeToYYYYMMDD(new Date())
-    },
-    resolver: zodResolver(validationSchema)
-  });
 
   const delegateOrgId = watch("delegateOrgId") ?? {};
 
@@ -154,6 +160,11 @@ export const CreateRndtsDeclarationDelegationModal = ({
               }
             }}
           />
+          {errors.delegateOrgId && (
+            <span className="fr-error-text">
+              {errors.delegateOrgId.message}
+            </span>
+          )}
 
           <div className="fr-container--fluid fr-mb-8v">
             <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
