@@ -24,6 +24,7 @@ const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
       updatedAt
       delegate {
         orgId
+        givenName
       }
       delegator {
         orgId
@@ -73,7 +74,7 @@ describe("mutation createRndtsDeclarationDelegation", () => {
   describe("successful use-cases", () => {
     it("should create a delegation declaration", async () => {
       // Given
-      const delegate = await companyFactory();
+      const delegate = await companyFactory({ givenName: "Some given name" });
       const { user, company: delegator } = await userWithCompanyFactory();
 
       // When
@@ -91,6 +92,9 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       );
       expect(data.createRndtsDeclarationDelegation.delegate.orgId).toBe(
         delegate.orgId
+      );
+      expect(data.createRndtsDeclarationDelegation.delegate.givenName).toBe(
+        "Some given name"
       );
 
       // Persisted value should be OK
