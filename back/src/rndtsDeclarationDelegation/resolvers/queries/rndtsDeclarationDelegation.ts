@@ -1,12 +1,16 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import {
+  QueryResolvers,
+  RndtsDeclarationDelegation
+} from "../../../generated/graphql/types";
 import { checkCanAccess } from "../../permissions";
 import { parseQueryRndtsDeclarationDelegationArgs } from "../../validation";
+import { fixTyping } from "../typing";
 import { findDelegationByIdOrThrow } from "../utils";
 
 const rndtsDeclarationDelegationResolver: QueryResolvers["rndtsDeclarationDelegation"] =
-  async (_, args, context) => {
+  async (_, args, context): Promise<RndtsDeclarationDelegation> => {
     // Browser only
     applyAuthStrategies(context, [AuthType.Session]);
 
@@ -22,7 +26,7 @@ const rndtsDeclarationDelegationResolver: QueryResolvers["rndtsDeclarationDelega
     // Make sure user can access delegation
     await checkCanAccess(user, delegation);
 
-    return delegation;
+    return fixTyping(delegation);
   };
 
 export default rndtsDeclarationDelegationResolver;

@@ -2,15 +2,14 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationCreateRndtsDeclarationDelegationArgs,
-  ResolversParentTypes
+  ResolversParentTypes,
+  RndtsDeclarationDelegation
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { checkCanCreate } from "../../permissions";
 import { parseCreateRndtsDeclarationDelegationInput } from "../../validation";
-import {
-  findDelegateAndDelegatorOrThrow,
-  findDelegationByIdOrThrow
-} from "../utils";
+import { fixTyping } from "../typing";
+import { findDelegateAndDelegatorOrThrow } from "../utils";
 import {
   createDelegation,
   checkNoExistingNotRevokedAndNotExpiredDelegation
@@ -20,7 +19,7 @@ const createRndtsDeclarationDelegation = async (
   _: ResolversParentTypes["Mutation"],
   { input }: MutationCreateRndtsDeclarationDelegationArgs,
   context: GraphQLContext
-) => {
+): Promise<RndtsDeclarationDelegation> => {
   // Browser only
   applyAuthStrategies(context, [AuthType.Session]);
 
@@ -54,8 +53,7 @@ const createRndtsDeclarationDelegation = async (
     delegate
   );
 
-  // Return full object
-  return findDelegationByIdOrThrow(user, delegation.id);
+  return fixTyping(delegation);
 };
 
 export default createRndtsDeclarationDelegation;

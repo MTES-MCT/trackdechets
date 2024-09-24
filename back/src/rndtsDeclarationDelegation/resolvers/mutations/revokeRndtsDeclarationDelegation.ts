@@ -2,11 +2,13 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationRevokeRndtsDeclarationDelegationArgs,
-  ResolversParentTypes
+  ResolversParentTypes,
+  RndtsDeclarationDelegation
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { checkCanRevoke } from "../../permissions";
 import { parseMutationRevokeRndtsDeclarationDelegationArgs } from "../../validation";
+import { fixTyping } from "../typing";
 import { findDelegationByIdOrThrow } from "../utils";
 import { revokeDelegation } from "./utils/revokeRndtsDeclarationDelegation.utils";
 
@@ -14,7 +16,7 @@ const revokeRndtsDeclarationDelegation = async (
   _: ResolversParentTypes["Mutation"],
   args: MutationRevokeRndtsDeclarationDelegationArgs,
   context: GraphQLContext
-) => {
+): Promise<RndtsDeclarationDelegation> => {
   // Browser only
   applyAuthStrategies(context, [AuthType.Session]);
 
@@ -32,7 +34,9 @@ const revokeRndtsDeclarationDelegation = async (
   await checkCanRevoke(user, delegation);
 
   // Revoke delegation
-  return revokeDelegation(user, delegation);
+  const revokedDelegation = await revokeDelegation(user, delegation);
+
+  return fixTyping(revokedDelegation);
 };
 
 export default revokeRndtsDeclarationDelegation;
