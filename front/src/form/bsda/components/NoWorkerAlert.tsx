@@ -17,11 +17,12 @@ const description = (
     lorsque vous faites appel à une entreprise SS3 pour des travaux de retrait
     ou d’encapsulage de MPCA ou à une entreprise SS4 pour une intervention
     susceptible d’émettre des fibres d’amiante, de mentionner cette entreprise
-    sur la traçabilité. Un particulier (ou un agriculteur réalisant des travaux
-    dans ses propres locaux d’habitation) à l’origine d’une opération du BTP ne
-    peut prendre en charge personnellement le conditionnement de MPCA déposés à
-    cette occasion que si aucun professionnel n’a participé d’une quelconque
-    façon à la réalisation de ce chantier. Cas décrits en{" "}
+    sur la traçabilité.
+    <br /> Un particulier (ou un agriculteur réalisant des travaux dans ses
+    propres locaux d’habitation) à l’origine d’une opération du BTP ne peut
+    prendre en charge personnellement le conditionnement de MPCA déposés à cette
+    occasion que si aucun professionnel n’a participé d’une quelconque façon à
+    la réalisation de ce chantier. Cas décrits en{" "}
     <a
       target="_blank"
       rel="noopener noreferrer"
@@ -30,6 +31,9 @@ const description = (
     >
       FAQ
     </a>
+    <br />
+    <br />
+    En continuant, vous confirmez remplir les conditions de l'exemption.
   </div>
 );
 
