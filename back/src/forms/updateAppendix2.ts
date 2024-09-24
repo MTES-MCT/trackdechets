@@ -109,19 +109,23 @@ export async function updateAppendix2Fn(args: UpdateAppendix2FnArgs) {
 
   const { update: updateForm, findGroupedFormsById } = getFormRepository(user);
 
-  await updateForm(
-    { id: form.id },
-    { quantityGrouped: quantityGrouped.toNumber(), status: nextStatus }
-  );
-
-  if (form.emitterType === EmitterType.APPENDIX2) {
-    const groupedForms = await findGroupedFormsById(form.id);
-    for (const formId of groupedForms.map(f => f.id)) {
-      await enqueueUpdateAppendix2Job({
-        formId,
-        userId: user.id,
-        auth: user.auth
-      });
+  if (
+    nextStatus !== form.status ||
+    !quantityGrouped.equals(new Decimal(form.quantityGrouped))
+  ) {
+    await updateForm(
+      { id: form.id },
+      { quantityGrouped: quantityGrouped.toNumber(), status: nextStatus }
+    );
+    if (form.emitterType === EmitterType.APPENDIX2) {
+      const groupedForms = await findGroupedFormsById(form.id);
+      for (const formId of groupedForms.map(f => f.id)) {
+        await enqueueUpdateAppendix2Job({
+          formId,
+          userId: user.id,
+          auth: user.auth
+        });
+      }
     }
   }
 }
