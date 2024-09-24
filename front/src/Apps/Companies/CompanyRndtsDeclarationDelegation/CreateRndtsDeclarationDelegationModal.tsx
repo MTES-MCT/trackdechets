@@ -2,8 +2,7 @@ import React from "react";
 import {
   CompanyPrivate,
   Mutation,
-  MutationCreateRndtsDeclarationDelegationArgs,
-  MutationMarkAsAcceptedArgs
+  MutationCreateRndtsDeclarationDelegationArgs
 } from "@td/codegen-ui";
 import { FieldError, useForm } from "react-hook-form";
 import { Modal } from "../../../common/components";
@@ -16,7 +15,10 @@ import { isSiret } from "@td/constants";
 import { datetimeToYYYYMMDD } from "../../Dashboard/Validation/BSPaoh/paohUtils";
 import { startOfDay } from "date-fns";
 import { useMutation } from "@apollo/client";
-import { CREATE_RNDTS_DECLARATION_DELEGATION } from "../../common/queries/rndtsDeclarationDelegation/queries";
+import {
+  CREATE_RNDTS_DECLARATION_DELEGATION,
+  RNDTS_DECLARATION_DELEGATIONS
+} from "../../common/queries/rndtsDeclarationDelegation/queries";
 import toast from "react-hot-toast";
 
 const displayError = (error: FieldError | undefined) => {
@@ -85,7 +87,9 @@ export const CreateRndtsDeclarationDelegationModal = ({
   const [createRndtsDeclarationDelegation, { loading }] = useMutation<
     Pick<Mutation, "createRndtsDeclarationDelegation">,
     MutationCreateRndtsDeclarationDelegationArgs
-  >(CREATE_RNDTS_DECLARATION_DELEGATION);
+  >(CREATE_RNDTS_DECLARATION_DELEGATION, {
+    refetchQueries: [RNDTS_DECLARATION_DELEGATIONS]
+  });
 
   const onSubmit = async input => {
     await createRndtsDeclarationDelegation({
@@ -99,7 +103,6 @@ export const CreateRndtsDeclarationDelegationModal = ({
       onError: err => toast.error(err.message)
     });
 
-    // TODO: add created delegation to Table cache
     onClose();
   };
 
