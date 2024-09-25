@@ -6,12 +6,10 @@ import {
   CompanyInput,
   StatutDiffusionEtablissement
 } from "../generated/graphql/types";
-import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
 import { SireneSearchResult } from "./sirene/types";
 import { searchCompany as searchCompanyTD } from "./sirene/trackdechets/client";
-import { EcoOrganisme } from "@prisma/client";
 
 /**
  * List of emails or regular expressions of email of API
@@ -119,7 +117,6 @@ export default function buildSirenify<T>(
 export type NextCompanyInputAccessor<T> = {
   siret: string | null | undefined;
   skip: boolean;
-  isEcoOrganisme?: boolean;
   setter: (
     input: T,
     data: {
@@ -143,12 +140,9 @@ export function nextBuildSirenify<T>(
 
     // check if we found a corresponding companySearchResult based on siret
     const companySearchResults = await Promise.all(
-      accessors.map(({ siret, skip, isEcoOrganisme }) => {
+      accessors.map(({ siret, skip }) => {
         if (skip || !siret) {
           return null;
-        }
-        if (isEcoOrganisme) {
-          return searchEcoOrganismeFailFast(siret);
         }
         return searchCompanyFailFast(siret);
       })
@@ -158,18 +152,9 @@ export function nextBuildSirenify<T>(
     const sirenifiedInput = { ...input };
 
     for (const [idx, companySearchResult] of companySearchResults.entries()) {
-      const { setter, isEcoOrganisme } = accessors[idx];
+      const { setter } = accessors[idx];
       if (!companySearchResult) {
         continue;
-      }
-      if (isEcoOrganisme) {
-        setter(sirenifiedInput, {
-          name: companySearchResult.name,
-          address: companySearchResult.address,
-          city: undefined,
-          postalCode: undefined,
-          street: undefined
-        });
       }
       const company = companySearchResult as CompanySearchResult;
       if (
@@ -222,27 +207,6 @@ export async function searchCompanyFailFast(
     return null;
   }
 }
-
-export const searchEcoOrganismeFailFast = async (
-  siret: string
-): Promise<EcoOrganisme | null> => {
-  const raceWith = new Promise<null>(resolve =>
-    setTimeout(resolve, 1000, null)
-  );
-
-  try {
-    const ecoOrganismeSeachResult = await Promise.race([
-      prisma.ecoOrganisme.findUnique({
-        where: { siret }
-      }),
-      raceWith
-    ]);
-    return ecoOrganismeSeachResult;
-  } catch (e) {
-    logger.info(`Sirenify failed for siret ${siret}. Reason : ${e.message}`);
-    return null;
-  }
-};
 
 /**
  * Narrow search for Trackdéchets Sirene index

@@ -6,7 +6,11 @@ import {
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { prisma } from "@td/prisma";
-import { companyFactory, siretify } from "../../__tests__/factories";
+import {
+  companyFactory,
+  ecoOrganismeFactory,
+  siretify
+} from "../../__tests__/factories";
 import { BsvhuForElastic, BsvhuForElasticInclude } from "../elastic";
 
 export const bsvhuFactory = async ({
@@ -20,11 +24,15 @@ export const bsvhuFactory = async ({
   const destinationCompany = await companyFactory({
     companyTypes: ["WASTE_VEHICLES"]
   });
+  const ecoOrganisme = await ecoOrganismeFactory({
+    handle: { handleBsvhu: true }
+  });
   const created = await prisma.bsvhu.create({
     data: {
       ...getVhuFormdata(),
       transporterCompanySiret: transporterCompany.siret,
       destinationCompanySiret: destinationCompany.siret,
+      ecoOrganismeSiret: ecoOrganisme.siret,
       ...opt
     },
     include: {

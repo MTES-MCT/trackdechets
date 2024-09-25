@@ -1,7 +1,8 @@
-import { Company, OperationMode } from "@prisma/client";
+import { Company, EcoOrganisme, OperationMode } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,
+  ecoOrganismeFactory,
   transporterReceiptFactory
 } from "../../../__tests__/factories";
 import { CompanySearchResult } from "../../../companies/types";
@@ -35,6 +36,7 @@ describe("BSVHU validation", () => {
   let foreignTransporter: Company;
   let transporterCompany: Company;
   let intermediaryCompany: Company;
+  let ecoOrganisme: EcoOrganisme;
   beforeAll(async () => {
     const emitterCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
     transporterCompany = await companyFactory({
@@ -51,18 +53,20 @@ describe("BSVHU validation", () => {
     intermediaryCompany = await companyFactory({
       companyTypes: ["INTERMEDIARY"]
     });
-
+    ecoOrganisme = await ecoOrganismeFactory({ handle: { handleBsvhu: true } });
     const prismaBsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitterCompany.siret,
         transporterCompanySiret: transporterCompany.siret,
         destinationCompanySiret: destinationCompany.siret,
+        ecoOrganismeSiret: ecoOrganisme.siret,
         intermediaries: {
           create: [toIntermediaryCompany(intermediaryCompany)]
         }
       }
     });
     bsvhu = prismaToZodBsvhu(prismaBsvhu);
+    console.log(bsvhu);
     context = {
       currentSignatureType: undefined
     };
@@ -408,6 +412,30 @@ describe("BSVHU validation", () => {
       }
     });
 
+    test("when ecoOrganisme isn't authorized for BSVHU", async () => {
+      const ecoOrg = await ecoOrganismeFactory({
+        handle: { handleBsda: true }
+      });
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        ecoOrganismeSiret: ecoOrg.siret
+      };
+      expect.assertions(1);
+
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: `L'éco-organisme avec le SIRET ${ecoOrg.siret} n'est pas autorisé à apparaitre sur un BSVHU`
+          })
+        ]);
+      }
+    });
+
     describe("Emitter transports own waste", () => {
       it("allowed if exemption", async () => {
         const data: ZodBsvhu = {
@@ -611,6 +639,7 @@ describe("BSVHU validation", () => {
       expect(sirenified.intermediaries![0].address).toEqual(
         searchResults[intermediaryCompany.siret!].address
       );
+      expect(sirenified.ecoOrganismeName).toEqual(ecoOrganisme.name);
     });
     it("should not overwrite `name` and `address` based on SIRENE data for sealed fields", async () => {
       const searchResults = {

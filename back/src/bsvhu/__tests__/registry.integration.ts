@@ -9,7 +9,7 @@ import {
 } from "../registry";
 import { bsvhuFactory, toIntermediaryCompany } from "./factories.vhu";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { companyFactory } from "../../__tests__/factories";
+import { companyFactory, ecoOrganismeFactory } from "../../__tests__/factories";
 import { RegistryBsvhuInclude } from "../../registry/elastic";
 
 describe("toGenericWaste", () => {
@@ -558,6 +558,32 @@ describe("toAllWaste", () => {
     expect(waste.intermediary2CompanySiret).toBe(intermediary2.siret);
     expect(waste.intermediary3CompanyName).toBe(null);
     expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+
+  it("should contain ecoOrganisme infos", async () => {
+    // Given
+    const ecoOrganisme = await ecoOrganismeFactory({
+      handle: { handleBsvhu: true }
+    });
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        ecoOrganismeName: ecoOrganisme.name
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toAllWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.ecoOrganismeSiren).toBe(ecoOrganisme.siret.substring(0, 9));
+    expect(waste.ecoOrganismeName).toBe(ecoOrganisme.name);
   });
 });
 

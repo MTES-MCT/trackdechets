@@ -51,7 +51,6 @@ const sirenifyBsvhuAccessors = (
   },
   {
     siret: bsvhu?.ecoOrganismeSiret,
-    isEcoOrganisme: true,
     skip: sealedFields.includes("ecoOrganismeSiret"),
     setter: (input, companyInput) => {
       input.ecoOrganismeName = companyInput.name;
