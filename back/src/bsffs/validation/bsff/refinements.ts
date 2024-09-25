@@ -88,10 +88,13 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
     if (
       (packaging.volume === null || packaging.volume === undefined) &&
       !bsff.isDraft &&
-      isCreatedAfterV2024091
+      isCreatedAfterV2024091 &&
+      bsff.type !== BsffType.GROUPEMENT
     ) {
       // TRA-14567 Le volume est rendu obligatoire sur les contenants BSFF
       // à partir de la v2024091
+      // Néanmoins les bsffs pre v2024091 doivent pouvoir être regroupés, aussi on ajoute une exception sur le groupement
+      //
       addIssue({
         code: z.ZodIssueCode.custom,
         message: "Conditionnements : le volume est requis"
