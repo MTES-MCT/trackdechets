@@ -192,6 +192,7 @@ export async function isNotDormantRefinement(
   if (company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Emitter),
       message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
     });
   }
@@ -238,13 +239,13 @@ export async function isEcoOrganismeRefinement(
     if (bsdType === BsdType.BSDA && !ecoOrganisme.handleBsda) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["ecoOrganisme", "siret"],
+        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
         message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSDA`
       });
     } else if (bsdType === BsdType.BSVHU && !ecoOrganisme.handleBsvhu) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["ecoOrganisme", "siret"],
+        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
         message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSVHU`
       });
     }

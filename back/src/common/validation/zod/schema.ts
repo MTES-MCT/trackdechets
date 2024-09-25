@@ -22,7 +22,7 @@ export const pathFromCompanyRole = (companyRole?: CompanyRole): string[] => {
     case CompanyRole.Destination:
       return ["destination", "company", "siret"];
     case CompanyRole.EcoOrganisme:
-      return ["ecoOrganisme", "company", "siret"];
+      return ["ecoOrganisme", "siret"];
     case CompanyRole.Broker:
       return ["broker", "company", "siret"];
     case CompanyRole.Worker:
