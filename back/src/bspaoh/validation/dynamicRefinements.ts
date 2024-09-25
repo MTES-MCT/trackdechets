@@ -10,6 +10,10 @@ import {
   isTransporterRefinement,
   refineSiretAndGetCompany
 } from "../../common/validation/zod/refinement";
+import {
+  CompanyRole,
+  pathFromCompanyRole
+} from "../../common/validation/zod/schema";
 
 const { VERIFY_COMPANY } = process.env;
 
@@ -72,6 +76,7 @@ function validatePackagingsReception(
   if (!!receptionPackagingsIds.length && duplicateReceptionIds) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "acceptation", "packagings"],
       message: `Les informations d'acceptation de packagings comportent des identifiants en doublon`
     });
   }
@@ -83,6 +88,7 @@ function validatePackagingsReception(
   if (!!receptionPackagingsIds.length && !allReceptionPackagingsIdsExists) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "acceptation", "packagings"],
       message: `Les informations d'acceptation de packagings ne correspondent pas aux packagings`
     });
   }
@@ -97,6 +103,7 @@ function validatePackagingsReception(
   if (receptionPackagingsIds.length > packagingsIds.length) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "acceptation", "packagings"],
       message: `Les informations d'acceptation de packagings ne correspondent pas aux packagings`
     });
   }
@@ -110,6 +117,7 @@ function validatePackagingsReception(
   if (!allIdsPresents || remainingPending) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "acceptation", "status"],
       message: `Le statut d'acceptation de tous les packagings doit être précisé`
     });
     return;
@@ -125,6 +133,7 @@ function validatePackagingsReception(
   if (destinationReceptionAcceptationStatus === "ACCEPTED" && !allAccepted) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "acceptation", "status"],
       message: `Le bordereau ne peut être accepté que si tous les packagings sont acceptés`
     });
     return;
@@ -132,6 +141,7 @@ function validatePackagingsReception(
   if (destinationReceptionAcceptationStatus === "REFUSED" && !allRefused) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "acceptation", "status"],
       message: `Le bordereau ne peut être refusé si tous les packagings ne sont pas refusés`
     });
     return;
@@ -142,6 +152,7 @@ function validatePackagingsReception(
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "acceptation", "status"],
       message: `Le bordereau ne peut être partiellement refusé si tous les packagings sont refusés ou acceptés`
     });
   }
@@ -159,6 +170,7 @@ function validateWeightFields(
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "detail", "receivedWeight"],
       message: `Le poids reçu est requis pour renseigner le poid refusé`
     });
   }
@@ -169,6 +181,7 @@ function validateWeightFields(
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "detail", "refusedWeight"],
       message: `Le poids refusé ne eut être supérieur au poids accepté`
     });
   }
@@ -180,6 +193,7 @@ function validateWeightFields(
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "reception", "detail", "refusedWeight"],
       message: `Le poids refusé ne peut être renseigné si le PAOH est accepté`
     });
   }
@@ -189,6 +203,7 @@ export async function isCrematoriumRefinement(siret: string, ctx) {
   if (company && !hasCremationProfile(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Destination),
       message:
         `L'entreprise avec le SIRET "${siret}" n'est pas inscrite` +
         ` sur Trackdéchets en tant que crématorium. Cette installation ne peut` +
@@ -203,6 +218,7 @@ export async function isCrematoriumRefinement(siret: string, ctx) {
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Destination),
       message:
         `Le compte de l'installation du crématorium` +
         ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`

@@ -69,6 +69,7 @@ export const checkWeights: Refinement<ParsedZodBsvhu> = (
     // On pourra à terme passer de .nonnegative à .positive directement dans le schéma zod.}
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["weight", "value"],
       message: "Le poids doit être supérieur à 0"
     });
   }
@@ -97,6 +98,7 @@ export const checkReceptionWeight: Refinement<ParsedZodBsvhu> = (
     ) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: ["destination", "reception", "weight"],
         message:
           "destinationReceptionWeight : le poids doit être égal à 0 lorsque le déchet est refusé"
       });
@@ -110,6 +112,7 @@ export const checkReceptionWeight: Refinement<ParsedZodBsvhu> = (
     ) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: ["destination", "reception", "weight"],
         message:
           "destinationReceptionWeight : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
       });
@@ -125,6 +128,7 @@ export const checkEmitterSituation: Refinement<ParsedZodBsvhu> = (
     // Le seul cas où l'émetteur peut ne pas avoir de SIRET est si il est en situation irrégulière
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["emitter", "irregularSituation"],
       message:
         "emitterIrregularSituation : L'émetteur doit obligatoirement avoir un numéro de SIRET si il n'est pas en situation irrégulière"
     });
