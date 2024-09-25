@@ -542,6 +542,11 @@ export const ecoOrganismeFactory = async ({
       handleBsvhu
     }
   });
+  // create the related company so sirenify works as expected
+  await companyFactory({
+    siret: ecoOrganisme.siret,
+    name: `Eco-Organisme ${ecoOrganismeIndex}`
+  });
 
   return ecoOrganisme;
 };

@@ -323,7 +323,9 @@ describe("Mutation.updateBsdasri", () => {
 
   it("should allow eco organisme fields update for INITIAL bsdasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({
+      handle: { handleBsdasri: true }
+    });
     const { company: ecoOrgCompany } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -355,7 +357,9 @@ describe("Mutation.updateBsdasri", () => {
 
   it("should allow eco organisme fields nulling for INITIAL bsdasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({
+      handle: { handleBsdasri: true }
+    });
     const { company: ecoOrgCompany } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -430,7 +434,9 @@ describe("Mutation.updateBsdasri", () => {
   });
   it("should disallow eco organisme fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({
+      handle: { handleBsdasri: true }
+    });
     const destination = await userWithCompanyFactory("MEMBER");
 
     await userWithCompanyFactory("MEMBER", {

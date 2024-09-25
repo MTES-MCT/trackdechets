@@ -517,7 +517,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["ecoOrganisme", "name"],
     required: {
       from: "TRANSPORT",
-      when: bsda => !!bsda.ecoOrganismeSiret
+      when: bsvhu => !!bsvhu.ecoOrganismeSiret
     }
   },
   ecoOrganismeSiret: {
