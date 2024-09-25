@@ -167,7 +167,9 @@ const formCreateInputAccessors = (
     siret: formCreateInput?.ecoOrganismeSiret,
     skip: sealedFields.includes("ecoOrganismeSiret"),
     setter: (formCreateInput, companyInput: CompanyInput) => {
-      formCreateInput.ecoOrganismeName = companyInput.name;
+      if (companyInput.name) {
+        formCreateInput.ecoOrganismeName = companyInput.name;
+      }
     }
   },
   ...(

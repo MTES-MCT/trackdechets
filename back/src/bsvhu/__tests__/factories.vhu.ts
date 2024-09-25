@@ -25,7 +25,8 @@ export const bsvhuFactory = async ({
     companyTypes: ["WASTE_VEHICLES"]
   });
   const ecoOrganisme = await ecoOrganismeFactory({
-    handle: { handleBsvhu: true }
+    handle: { handleBsvhu: true },
+    createAssociatedCompany: true
   });
   const created = await prisma.bsvhu.create({
     data: {

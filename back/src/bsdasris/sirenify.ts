@@ -63,7 +63,9 @@ const bsdasriCreateInputAccessors = (
     siret: input?.ecoOrganismeSiret,
     skip: sealedFields.includes("ecoOrganismeSiret"),
     setter: (input, companyInput) => {
-      input.ecoOrganismeName = companyInput.name;
+      if (companyInput.name) {
+        input.ecoOrganismeName = companyInput.name;
+      }
     }
   }
 ];

@@ -323,7 +323,8 @@ describe("Mutation.Vhu.create", () => {
     });
 
     const ecoOrganisme = await ecoOrganismeFactory({
-      handle: { handleBsvhu: true }
+      handle: { handleBsvhu: true },
+      createAssociatedCompany: true
     });
 
     const input = {

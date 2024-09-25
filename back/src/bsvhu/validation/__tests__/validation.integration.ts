@@ -53,7 +53,10 @@ describe("BSVHU validation", () => {
     intermediaryCompany = await companyFactory({
       companyTypes: ["INTERMEDIARY"]
     });
-    ecoOrganisme = await ecoOrganismeFactory({ handle: { handleBsvhu: true } });
+    ecoOrganisme = await ecoOrganismeFactory({
+      handle: { handleBsvhu: true },
+      createAssociatedCompany: true
+    });
     const prismaBsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitterCompany.siret,
@@ -66,7 +69,6 @@ describe("BSVHU validation", () => {
       }
     });
     bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    console.log(bsvhu);
     context = {
       currentSignatureType: undefined
     };

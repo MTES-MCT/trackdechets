@@ -521,7 +521,8 @@ export const applicationFactory = async (openIdEnabled?: boolean) => {
 
 export const ecoOrganismeFactory = async ({
   siret,
-  handle
+  handle,
+  createAssociatedCompany
 }: {
   siret?: string;
   handle?: {
@@ -529,6 +530,7 @@ export const ecoOrganismeFactory = async ({
     handleBsda?: boolean;
     handleBsvhu?: boolean;
   };
+  createAssociatedCompany?: boolean;
 }) => {
   const { handleBsdasri, handleBsda, handleBsvhu } = handle ?? {};
   const ecoOrganismeIndex = (await prisma.ecoOrganisme.count()) + 1;
@@ -536,17 +538,19 @@ export const ecoOrganismeFactory = async ({
     data: {
       address: "",
       name: `Eco-Organisme ${ecoOrganismeIndex}`,
-      siret: siret ?? siretify(ecoOrganismeIndex),
+      siret: siret ?? siretify(),
       handleBsdasri,
       handleBsda,
       handleBsvhu
     }
   });
-  // create the related company so sirenify works as expected
-  await companyFactory({
-    siret: ecoOrganisme.siret,
-    name: `Eco-Organisme ${ecoOrganismeIndex}`
-  });
+  if (createAssociatedCompany) {
+    // create the related company so sirenify works as expected
+    await companyFactory({
+      siret: ecoOrganisme.siret,
+      name: `Eco-Organisme ${ecoOrganismeIndex}`
+    });
+  }
 
   return ecoOrganisme;
 };
