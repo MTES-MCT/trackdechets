@@ -180,7 +180,7 @@ export async function isDestinationRefinement(
   }
 }
 
-export async function isNotDormantRefinement(
+export async function isEmitterNotDormantRefinement(
   siret: string | null | undefined,
   ctx: RefinementCtx
 ) {

@@ -15,7 +15,7 @@ import {
   destinationOperationModeRefinement,
   isDestinationRefinement,
   isEcoOrganismeRefinement,
-  isNotDormantRefinement,
+  isEmitterNotDormantRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
 } from "../../common/validation/zod/refinement";
@@ -34,7 +34,7 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
   bsvhu,
   zodContext
 ) => {
-  await isNotDormantRefinement(bsvhu.emitterCompanySiret, zodContext);
+  await isEmitterNotDormantRefinement(bsvhu.emitterCompanySiret, zodContext);
   await isDestinationRefinement(
     bsvhu.destinationCompanySiret,
     zodContext,

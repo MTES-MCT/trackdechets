@@ -28,7 +28,7 @@ import { isWorker } from "../../companies/validation";
 import {
   isDestinationRefinement,
   isEcoOrganismeRefinement,
-  isNotDormantRefinement,
+  isEmitterNotDormantRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement,
   refineSiretAndGetCompany
@@ -299,7 +299,7 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
     );
   };
 
-  await isNotDormantRefinement(bsda.emitterCompanySiret, zodContext);
+  await isEmitterNotDormantRefinement(bsda.emitterCompanySiret, zodContext);
   await isDestinationRefinement(
     bsda.destinationCompanySiret,
     zodContext,
