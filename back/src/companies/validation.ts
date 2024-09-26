@@ -53,6 +53,14 @@ export function isWorker(company: Company) {
   return company.companyTypes.includes(CompanyType.WORKER);
 }
 
+export function isBroker(company: Company) {
+  return company.companyTypes.includes(CompanyType.BROKER);
+}
+
+export function isTrader(company: Company) {
+  return company.companyTypes.includes(CompanyType.TRADER);
+}
+
 export function hasCremationProfile(company: Company) {
   return company.wasteProcessorTypes.includes(WasteProcessorType.CREMATION);
 }

@@ -1,6 +1,8 @@
 import { RefinementCtx, z } from "zod";
 import {
+  isBroker,
   isCollector,
+  isTrader,
   isTransporter,
   isWasteCenter,
   isWasteProcessor,
@@ -249,5 +251,51 @@ export async function isEcoOrganismeRefinement(
         message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSVHU`
       });
     }
+  }
+}
+
+export async function isBrokerRefinement(
+  siret: string | null | undefined,
+  ctx: RefinementCtx
+) {
+  const company = await refineSiretAndGetCompany(
+    siret,
+    ctx,
+    CompanyRole.Broker
+  );
+
+  if (company && !isBroker(company)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Broker),
+      message:
+        `Le courtier saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets` +
+        ` en tant que courtier. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+        ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+        ` de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
+    });
+  }
+}
+
+export async function isTraderRefinement(
+  siret: string | null | undefined,
+  ctx: RefinementCtx
+) {
+  const company = await refineSiretAndGetCompany(
+    siret,
+    ctx,
+    CompanyRole.Trader
+  );
+
+  if (company && !isTrader(company)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Trader),
+      message:
+        `Le courtier saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets` +
+        ` en tant que négociant. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+        ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+        ` de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
+    });
   }
 }

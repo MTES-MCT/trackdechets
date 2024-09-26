@@ -13,10 +13,12 @@ import { capitalize } from "../../common/strings";
 import { BsdType, WasteAcceptationStatus } from "@prisma/client";
 import {
   destinationOperationModeRefinement,
+  isBrokerRefinement,
   isDestinationRefinement,
   isEcoOrganismeRefinement,
   isEmitterNotDormantRefinement,
   isRegisteredVatNumberRefinement,
+  isTraderRefinement,
   isTransporterRefinement
 } from "../../common/validation/zod/refinement";
 import { EditionRule } from "./rules";
@@ -57,6 +59,8 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
     BsdType.BSVHU,
     zodContext
   );
+  await isBrokerRefinement(bsvhu.brokerCompanySiret, zodContext);
+  await isTraderRefinement(bsvhu.traderCompanySiret, zodContext);
 };
 
 export const checkWeights: Refinement<ParsedZodBsvhu> = (
