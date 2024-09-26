@@ -19,6 +19,13 @@ module.exports = {
     colorMode: {
       disableSwitch: true
     },
+    algolia: {
+     // L'ID de l'application fourni par Algolia
+     appId: '2UK4UF9U8K',
+     // Clé d'API publique : il est possible de la committer en toute sécurité
+     apiKey: 'cd706026bcf0dd0df345c4a4f450f844',
+     indexName: 'trackdechets',
+    },
     navbar: {
       title: "Trackdéchets",
       logo: {
