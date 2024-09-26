@@ -607,7 +607,8 @@ describe("BSVHU validation", () => {
         [bsvhu.emitterCompanySiret!]: searchResult("émetteur"),
         [bsvhu.transporterCompanySiret!]: searchResult("transporteur"),
         [bsvhu.destinationCompanySiret!]: searchResult("destinataire"),
-        [intermediaryCompany.siret!]: searchResult("intermédiaire")
+        [intermediaryCompany.siret!]: searchResult("intermédiaire"),
+        [ecoOrganisme.siret!]: searchResult("ecoOrganisme")
       };
       (searchCompany as jest.Mock).mockImplementation((clue: string) => {
         return Promise.resolve(searchResults[clue]);
@@ -641,7 +642,9 @@ describe("BSVHU validation", () => {
       expect(sirenified.intermediaries![0].address).toEqual(
         searchResults[intermediaryCompany.siret!].address
       );
-      expect(sirenified.ecoOrganismeName).toEqual(ecoOrganisme.name);
+      expect(sirenified.ecoOrganismeName).toEqual(
+        searchResults[ecoOrganisme.siret!].name
+      );
     });
     it("should not overwrite `name` and `address` based on SIRENE data for sealed fields", async () => {
       const searchResults = {
