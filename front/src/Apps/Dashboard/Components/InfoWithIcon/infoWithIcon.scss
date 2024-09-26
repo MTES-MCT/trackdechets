@@ -96,7 +96,8 @@
       flex-shrink: 0;
     }
   }
-  &__CustomId {
+  &__CustomId,
+  &__Cap {
     &:before {
       display: inline-block;
       content: "";
