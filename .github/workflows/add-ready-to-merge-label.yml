@@ -40,4 +40,10 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               name: "ready to merge"
+            }).catch(function(error) {
+              if (error.status === 404) {
+                return;
+              } else {
+                throw error;
+              }
             })
