@@ -45,14 +45,6 @@ export default function BsffPackagings({
             {value.map((p, idx) => {
               const fieldName = `${name}.${idx}`;
 
-              const volumeIsDisabled =
-                disabled ||
-                ([BsffType.Reexpedition, BsffType.Groupement].includes(type) &&
-                  // Cas spécial pour le volume qui est rendu obligatoire à partir de la
-                  // 2024.09.1 : on permet d'éditer le volume sur un bordereau de groupement ou réexpédition
-                  // qui aurait un bordereau initial dont le packaging a un volume `null` ou `undefined`.
-                  !!p.volume);
-
               return (
                 <div
                   key={idx}
@@ -114,7 +106,7 @@ export default function BsffPackagings({
                             component={NumberInput}
                             className="td-input td-input--small"
                             name={`${fieldName}.volume`}
-                            disabled={volumeIsDisabled}
+                            disabled={fieldIsDisabled}
                           />
                         </label>
                       </div>
