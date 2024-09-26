@@ -11,7 +11,7 @@ L'utilisation des Webhooks permet aux Systèmes d'Information de réduire la né
 
 Pour recevoir des Webhooks, vous devez suivre ces étapes :
 
-1. Configurer les Webhooks en utilisant l'API des ["WebhookSettings"](../reference/api-reference/webhooks/mutations#createwebhooksetting).
+1. Configurer les Webhooks en utilisant l'API des ["WebhookSettings"](../reference/api-reference/webhooks/mutations.md#createwebhooksetting).
 2. Autoriser votre SI à recevoir des requêtes HTTP de Trackdéchets.
 3. Effectuer des modifications sur les bordereaux contenant les établissements correspondants aux "WebhookSettings" ou attendre que d'autres acteurs le fassent.
 4. Recevez la requête de notification de mise à jour sur l'URL de votre SI configuré comme Webhook.
@@ -21,7 +21,7 @@ Pour recevoir des Webhooks, vous devez suivre ces étapes :
 L'API des "WebhookSettings" vous permet de configurer l'envoi des Webhooks avec les principes suivants :
 
 - L'API est accessible uniquement aux utilisateurs ADMIN.
-- Un seul Webhook est autorisé par établissement (identifié par [`companyId`](../reference/api-reference/webhooks/inputObjects#webhooksettingcreateinput)).
+- Un seul Webhook est autorisé par établissement (identifié par [`companyId`](../reference/api-reference/webhooks/inputObjects.md#webhooksettingcreateinput)).
 - Une URL de notification sur votre SI est associée à chaque Webhook.
 - Un token d'au moins 20 caractères est requis lors de la création du "WebhookSetting" et sera transmis en tant qu'en-tête de la requête du Webhook (Authorization: Bearer: token).
 - Le token n'est pas visible dans les requêtes, mais vous pouvez le mettre à jour à tout moment.

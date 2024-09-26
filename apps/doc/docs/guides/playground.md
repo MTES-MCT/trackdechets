@@ -23,7 +23,7 @@ Le playground GraphQL est composé de différentes zones :
 
 ## Renseigner son token
 
-Le token (voir [Authentification](../reference/authentification)) doit être renseigné dans l'onglet "HTTP Headers" de la façon suivante :
+Le token (voir [Authentification](../reference/authentification.md)) doit être renseigné dans l'onglet "HTTP Headers" de la façon suivante :
 
 ![playground-token](../../static/img/playground-token.png)
 ## Exécuter une requête GraphQL
@@ -44,7 +44,7 @@ Vous pouvez également utiliser l'onglet "Variables" pour injecter les variables
 
 ## Parcourir la documentation de l'API
 
-L'onglet de droite "Docs" vous permet de parcourir la référence de l'API. Vous y retrouverez les différentes Query et Mutation disponibles ainsi que les variables et les types de retours. La référence de l'API est également disponible dans la section [Référence API](../reference/api-reference/bsdd/queries)
+L'onglet de droite "Docs" vous permet de parcourir la référence de l'API. Vous y retrouverez les différentes Query et Mutation disponibles ainsi que les variables et les types de retours. La référence de l'API est également disponible dans la section [Référence API](../reference/api-reference/bsdd/queries.md)
 
 ![playground-docs](../../static/img/playground-docs.png)
 
