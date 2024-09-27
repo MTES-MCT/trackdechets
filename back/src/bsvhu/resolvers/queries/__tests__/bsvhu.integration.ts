@@ -44,6 +44,22 @@ query GetBsvhu($id: ID!) {
       name
       siret
     }
+    broker {
+      company {
+        siret
+      }
+      recepisse {
+        number
+      }
+    }
+    trader {
+      company {
+        siret
+      }
+      recepisse {
+        number
+      }
+    }
     weight {
       value
     }
