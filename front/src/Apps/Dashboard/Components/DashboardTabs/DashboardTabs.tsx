@@ -115,7 +115,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
 
   return (
     <div className="dashboard-tabs">
-      <div className="company-select">
+      <div id="company-dashboard-select" className="company-select">
         <CompanySwitcher
           currentOrgId={currentCompany.orgId}
           companies={companies}

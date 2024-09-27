@@ -134,7 +134,7 @@ export default function CompaniesList() {
       additional={
         <>
           <Link className="fr-btn fr-mr-1w" to={routes.companies.orientation}>
-            Créer un établissement
+            <span id="create-company-link">Créer un établissement</span>
           </Link>
           <DropdownMenu
             menuTitle="Exporter la liste"
