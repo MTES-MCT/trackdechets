@@ -381,6 +381,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   identificationNumbers: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
+    required: { from: "EMISSION" },
     readableFieldName: "Les numéros d'identification",
     path: ["identification", "numbers"]
   },
