@@ -679,10 +679,10 @@ describe("BSVHU validation", () => {
         bsvhu.transporterCompanyAddress
       );
       expect(sirenified.destinationCompanyName).toEqual(
-        searchResults[bsvhu.destinationCompanySiret!].name
+        bsvhu.destinationCompanyName
       );
       expect(sirenified.destinationCompanyAddress).toEqual(
-        searchResults[bsvhu.destinationCompanySiret!].address
+        bsvhu.destinationCompanyAddress
       );
       expect(sirenified.intermediaries![0].name).toEqual(
         bsvhu.intermediaries![0].name
