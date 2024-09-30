@@ -26,6 +26,8 @@ import { distinct } from "../../../common/arrays";
 import { ForbiddenError } from "../../../common/errors";
 import { isFinalOperationCode } from "../../../common/operationCodes";
 import { operationHook } from "../../operationHook";
+import { isDefined } from "../../../common/helpers";
+import Decimal from "decimal.js";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -176,6 +178,7 @@ async function getUpdateFromFormRevisionRequest(
     ...(revisionRequest.wasteDetailsPop !== null && {
       wasteDetailsPop: revisionRequest.wasteDetailsPop
     }),
+    wasteDetailsQuantity: revisionRequest.wasteDetailsQuantity,
     ...(revisionRequest.wasteDetailsPackagingInfos && {
       wasteDetailsPackagingInfos: revisionRequest.wasteDetailsPackagingInfos
     }),
@@ -359,6 +362,42 @@ export async function approveAndApplyRevisionRequest(
     } else if (!updatedOperationIsFinal && beforeRevisionOperationIsFinal) {
       await prisma.bsddFinalOperation.deleteMany({
         where: { finalFormId: updatedBsdd.id }
+      });
+    }
+  }
+
+  // Revision targeted an ANNEXE_1 (child). We need to update its parent
+  if (updatedBsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+    // Quantity changed. We need to fix parent's quantity as well
+    if (isDefined(revisionRequest.wasteDetailsQuantity)) {
+      // Calculate revision diff
+      const diff =
+        bsddBeforeRevision.wasteDetailsQuantity
+          ?.minus(revisionRequest.wasteDetailsQuantity ?? 0)
+          .toDecimalPlaces(6) ?? new Decimal(0);
+      const { nextForm: parent } = await prisma.formGroupement.findFirstOrThrow(
+        {
+          where: { initialFormId: bsddBeforeRevision.id },
+          include: {
+            nextForm: true
+          }
+        }
+      );
+
+      // Calculate parent new quantity using diff
+      const parentNewQuantity = parent.wasteDetailsQuantity
+        ?.minus(diff)
+        .toDecimalPlaces(6);
+
+      // Update & re-index parent
+      await prisma.form.update({
+        where: { id: parent.id },
+        data: {
+          wasteDetailsQuantity: parentNewQuantity
+        }
+      });
+      prisma.addAfterCommitCallback?.(() => {
+        enqueueUpdatedBsdToIndex(parent.readableId);
       });
     }
   }
