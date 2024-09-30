@@ -27,6 +27,7 @@ export type Tabs = {
   isAllBsdsTab;
   isToReviewTab;
   isReviewedTab;
+  isReturnTab;
 };
 
 export const getRoutePredicate = (props: Tabs & { siret }) => {
@@ -40,7 +41,8 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
     isCollectedTab,
     isAllBsdsTab,
     isToReviewTab,
-    isReviewedTab
+    isReviewedTab,
+    isReturnTab
   } = props;
 
   if (isActTab) {
@@ -91,6 +93,11 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
       isRevisedFor: [siret]
     };
   }
+  if (isReturnTab) {
+    return {
+      isReturnFor: [siret]
+    };
+  }
 };
 
 export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
@@ -118,6 +125,7 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
   if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_title;
   }
+  // TODO: blankstate for returns
   return blankstate_default_title;
 };
 
@@ -151,6 +159,7 @@ export const getBlankslateDescription = ({
   if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_desc;
   }
+  // TODO: blankstate for returns
   return blankstate_default_desc;
 };
 

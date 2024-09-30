@@ -26,7 +26,8 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor";
+  | "isCollectedFor"
+  | "isReturnFor";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -45,7 +46,8 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: []
+    isCollectedFor: [],
+    isReturnFor: []
   };
 
   const bsdSirets: Record<string, string | null | undefined> = {

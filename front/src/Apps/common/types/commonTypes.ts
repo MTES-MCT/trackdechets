@@ -11,4 +11,5 @@ export type BsdCurrentTab =
   | "reviewedTab"
   | "toReviewTab"
   | "collectedTab"
+  | "returnsTab"
   | "allBsdsTab";

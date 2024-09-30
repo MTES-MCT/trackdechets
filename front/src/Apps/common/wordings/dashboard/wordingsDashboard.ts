@@ -190,6 +190,7 @@ export const COLLECTED = "Collectés";
 export const REGISTER = "Registre";
 export const TO_REVIEW = "En cours";
 export const REVIEWED = "Révisés";
+export const RETURNS = "Retours";
 
 // Reviews
 export const GERER_REVISION = "Gérer la révision";

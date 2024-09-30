@@ -42,7 +42,8 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor";
+  | "isCollectedFor"
+  | "isReturnFor";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -63,7 +64,8 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: []
+    isCollectedFor: [],
+    isReturnFor: []
   };
 
   const formSirets: Record<string, string | null | undefined> = {

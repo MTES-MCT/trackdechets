@@ -19,6 +19,7 @@ export const bsdSearchSchema: yup.SchemaOf<
     | "isFollowFor"
     | "isForActionFor"
     | "isToCollectFor"
+    | "isReturnFor"
   >
 > = yup.object({
   isArchivedFor: yup

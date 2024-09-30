@@ -27,7 +27,8 @@ import {
   TO_COLLECT,
   TRANSPORT,
   TO_REVIEW,
-  REVIEWED
+  REVIEWED,
+  RETURNS
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import routes from "../../../routes";
@@ -276,6 +277,17 @@ function DashboardSubNav({ currentCompany }) {
                     navlink: true,
                     caption: COLLECTED,
                     href: generatePath(routes.dashboard.transport.collected, {
+                      siret: currentCompany.orgId
+                    })
+                  }}
+                />
+              </li>
+              <li>
+                <MenuLink
+                  entry={{
+                    navlink: true,
+                    caption: RETURNS,
+                    href: generatePath(routes.dashboard.transport.returns, {
                       siret: currentCompany.orgId
                     })
                   }}
