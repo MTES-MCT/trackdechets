@@ -76,7 +76,7 @@ import {
 import { formTransportIsPipeline } from "../../../Apps/common/utils/packagingsBsddSummary";
 import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
-import { canAddAppendix1 } from "../../../Apps/Dashboard/dashboardServices";
+import { hasAppendix1Cta } from "../../../Apps/Dashboard/dashboardServices";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import { isDefined } from "../../../common/helper";
 import { BSD_DETAILS_QTY_TOOLTIP } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
@@ -622,7 +622,7 @@ const Appendix1 = ({
       {[FormStatus.Sealed, FormStatus.Sent].some(
         status => status === container.status
       ) &&
-        canAddAppendix1(formToBsdDisplay) &&
+        hasAppendix1Cta(formToBsdDisplay, siret) &&
         permissions.includes(UserPermission.BsdCanUpdate) && (
           <div className="tw-pb-2 tw-flex tw-justify-end">
             <button
