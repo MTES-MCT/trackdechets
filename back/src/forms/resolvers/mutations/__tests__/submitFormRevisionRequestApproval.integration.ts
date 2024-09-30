@@ -16,6 +16,7 @@ import makeClient from "../../../../__tests__/testClient";
 import {
   CompanyType,
   EmitterType,
+  RevisionRequestStatus,
   Status,
   UserRole,
   WasteAcceptationStatus
@@ -958,6 +959,203 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       where: { id: appendix1_item.id }
     });
     expect(updatedAppendix1.wasteDetailsCode).toBe(newWasteCode);
+  });
+
+  it("should udate appendix 1 parent's quantity if revision modified child's quantity", async () => {
+    // Given
+    const { company: childAppendixEmitter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user: parentAppendixUser, company: parentAppendixEmitter } =
+      await userWithCompanyFactory("ADMIN");
+    const { company: transporter } = await userWithCompanyFactory("ADMIN");
+
+    const appendix1Child = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.RECEIVED,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: childAppendixEmitter.siret,
+        wasteDetailsCode: "15 01 10*",
+        wasteDetailsQuantity: 10,
+        owner: { connect: { id: parentAppendixUser.id } },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.siret
+          }
+        }
+      }
+    });
+
+    const appendix1Parent = await formFactory({
+      ownerId: parentAppendixUser.id,
+      opt: {
+        status: Status.SENT,
+        emitterType: EmitterType.APPENDIX1,
+        emitterCompanySiret: parentAppendixEmitter.siret,
+        emitterCompanyName: parentAppendixEmitter.name,
+        recipientCompanySiret: parentAppendixEmitter.siret,
+        wasteDetailsQuantity: 10,
+        grouping: {
+          create: { initialFormId: appendix1Child.id, quantity: 0 }
+        },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.siret
+          }
+        }
+      }
+    });
+
+    // When
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: appendix1Child.id,
+        authoringCompanyId: childAppendixEmitter.id,
+        approvals: { create: { approverSiret: parentAppendixEmitter.siret! } },
+        wasteDetailsQuantity: 6.8,
+        comment: "Changing quantity from 10 to 6.8"
+      }
+    });
+
+    const { mutate } = makeClient(parentAppendixUser);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.submitFormRevisionRequestApproval.status).toBe(
+      RevisionRequestStatus.ACCEPTED
+    );
+
+    const updatedAppendix1Child = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix1Child.id }
+    });
+    expect(updatedAppendix1Child.wasteDetailsQuantity?.toNumber()).toEqual(6.8);
+
+    const updatedAppendix1Parent = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix1Parent.id }
+    });
+    expect(updatedAppendix1Parent.wasteDetailsQuantity?.toNumber()).toEqual(
+      6.8
+    );
+  });
+
+  it("should udate appendix 1 parent's quantity if revision modified child's quantity (multiple children)", async () => {
+    // Given
+    const { company: childAppendixEmitter } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user: parentAppendixUser, company: parentAppendixEmitter } =
+      await userWithCompanyFactory("ADMIN");
+    const { company: transporter } = await userWithCompanyFactory("ADMIN");
+
+    const appendix1Child1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.RECEIVED,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: childAppendixEmitter.siret,
+        wasteDetailsCode: "15 01 10*",
+        wasteDetailsQuantity: 10,
+        owner: { connect: { id: parentAppendixUser.id } },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.siret
+          }
+        }
+      }
+    });
+
+    const appendix1Child2 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.RECEIVED,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: childAppendixEmitter.siret,
+        wasteDetailsCode: "15 01 10*",
+        wasteDetailsQuantity: 5.5,
+        owner: { connect: { id: parentAppendixUser.id } },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.siret
+          }
+        }
+      }
+    });
+
+    const appendix1Parent = await formFactory({
+      ownerId: parentAppendixUser.id,
+      opt: {
+        status: Status.SENT,
+        emitterType: EmitterType.APPENDIX1,
+        emitterCompanySiret: parentAppendixEmitter.siret,
+        emitterCompanyName: parentAppendixEmitter.name,
+        recipientCompanySiret: parentAppendixEmitter.siret,
+        wasteDetailsQuantity: 15.5,
+        grouping: {
+          create: [
+            { initialFormId: appendix1Child1.id, quantity: 0 },
+            { initialFormId: appendix1Child2.id, quantity: 0 }
+          ]
+        },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.siret
+          }
+        }
+      }
+    });
+
+    // When
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: appendix1Child1.id,
+        authoringCompanyId: childAppendixEmitter.id,
+        approvals: { create: { approverSiret: parentAppendixEmitter.siret! } },
+        wasteDetailsQuantity: 6.8,
+        comment: "Changing quantity from 10 to 6.8"
+      }
+    });
+
+    const { mutate } = makeClient(parentAppendixUser);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.submitFormRevisionRequestApproval.status).toBe(
+      RevisionRequestStatus.ACCEPTED
+    );
+
+    const updatedAppendix1Child = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix1Child1.id }
+    });
+    expect(updatedAppendix1Child.wasteDetailsQuantity?.toNumber()).toBe(6.8);
+
+    const updatedAppendix1Parent = await prisma.form.findUniqueOrThrow({
+      where: { id: appendix1Parent.id }
+    });
+    expect(updatedAppendix1Parent.wasteDetailsQuantity?.toNumber()).toBe(12.3);
   });
 
   it("should change the operation code & mode", async () => {
