@@ -34,3 +34,10 @@ input CreatePasswordResetRequestInput {
   email: String!
   captcha: CaptchaInput!
 }
+
+input UpdateEmailNotificationsInput {
+  "Identifiant de l'établissement"
+  companyOrgId: String!
+  "Notifications auxquelles l'utilisateur souhaite être abonné"
+  emailNotifications: [UserNotification!]!
+}
