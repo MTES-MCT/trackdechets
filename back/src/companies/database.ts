@@ -9,7 +9,8 @@ import {
   Company,
   CompanyAssociation,
   UserAccountHash,
-  UserNotification
+  UserNotification,
+  UserRole
 } from "@prisma/client";
 import {
   CompanyNotFound,
@@ -32,6 +33,7 @@ import {
   searchVatFrOnlyOrNotFoundFailFast
 } from "./search";
 import { SireneSearchResult } from "./sirene/types";
+import { ALL_NOTIFICATIONS } from "../users/notifications";
 
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error
@@ -186,22 +188,23 @@ export const userNameDisplay = (
 
 /**
  * map a user's company association to a CompanyMember
- * @param companyAssociations
+ * @param companyAssociation
  * @param company
  * @param isTDAdmin
  */
 export const userAssociationToCompanyMember = (
-  companyAssociations: CompanyAssociation & { user: User },
+  companyAssociation: CompanyAssociation & { user: User },
   orgId: string,
   requestingUserId?: string,
   isTDAdmin = false
-) => {
+): CompanyMember => {
   return {
-    ...companyAssociations.user,
+    ...companyAssociation.user,
     orgId: orgId,
-    name: userNameDisplay(companyAssociations, requestingUserId, isTDAdmin),
-    role: companyAssociations.role,
-    isPendingInvitation: false
+    name: userNameDisplay(companyAssociation, requestingUserId, isTDAdmin),
+    role: companyAssociation.role,
+    isPendingInvitation: false,
+    emailNotifications: companyAssociation.emailNotifications
   };
 };
 
@@ -214,7 +217,7 @@ export const userAssociationToCompanyMember = (
 export const userAccountHashToCompanyMember = (
   userAccountHash: UserAccountHash,
   orgId: string
-) => {
+): CompanyMember => {
   return {
     id: userAccountHash.id,
     orgId: orgId,
@@ -222,7 +225,9 @@ export const userAccountHashToCompanyMember = (
     email: userAccountHash.email,
     role: userAccountHash.role,
     isActive: false,
-    isPendingInvitation: true
+    isPendingInvitation: true,
+    emailNotifications:
+      userAccountHash.role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
   };
 };
 

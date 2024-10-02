@@ -348,7 +348,7 @@ model AnonymousCompany {
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
 
-// Liste des notifications auxquelles un utilisateur peut s'abonner pour 
+// Notifications auxquelles un utilisateur peut s'abonner pour 
 // un établissement donné
 enum UserNotification {
   // Notification de demande de rattachement
@@ -360,7 +360,7 @@ enum UserNotification {
   // Notification lors de la modification de la destination finale amiante
   BSDA_FINAL_DESTINATION_UPDATE
   // Notification lors d'une demande de révision
-  REVSION_REQUEST
+  REVISION_REQUEST
 }
 
 model CompanyAssociation {

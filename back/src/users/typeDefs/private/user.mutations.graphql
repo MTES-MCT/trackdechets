@@ -117,4 +117,13 @@ type Mutation {
   Change le rôle d'un utilisateur de l'entreprise
   """
   changeUserRole(userId: ID!, orgId: ID!, role: UserRole!): CompanyMember!
+
+  """
+  USAGE INTERNE
+  Modifie les préfèrences d'abonnement d'un utilisateur aux notifications par e-mail
+  pour un établissement donné
+  """
+  updateEmailNotifications(
+    input: UpdateEmailNotificationsInput!
+  ): CompanyMember!
 }

@@ -641,6 +641,9 @@ type CompanyMember {
 
   "Si oui ou non cet utilisateur correspond à l'utilisateur authentifié"
   isMe: Boolean
+
+  "Liste des notifications auxquelles l'utilisateur est abonné pour cet établissement"
+  emailNotifications: [UserNotification!]!
 }
 
 """

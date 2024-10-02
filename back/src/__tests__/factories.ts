@@ -141,7 +141,7 @@ export const userWithCompanyFactory = async (
     role === "ADMIN"
       ? [
           UserNotification.MEMBERSHIP_REQUEST,
-          UserNotification.REVSION_REQUEST,
+          UserNotification.REVISION_REQUEST,
           UserNotification.BSD_REFUSAL,
           UserNotification.SIGNATURE_CODE_RENEWAL,
           UserNotification.BSDA_FINAL_DESTINATION_UPDATE

@@ -408,7 +408,7 @@ export const addPendingApprovalsCompanySubscribers = async (
   const companiesAndAdminsByOrgIds =
     await getCompaniesAndSubscribersByCompanyOrgIds(
       companySirets,
-      UserNotification.REVSION_REQUEST
+      UserNotification.REVISION_REQUEST
     );
 
   // Add mail subscribers to requests
