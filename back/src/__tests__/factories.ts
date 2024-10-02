@@ -137,7 +137,7 @@ export const userWithCompanyFactory = async (
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
-  const emailNotificationSubscriptions =
+  const emailNotifications =
     role === "ADMIN"
       ? [
           UserNotification.MEMBERSHIP_REQUEST,
@@ -153,7 +153,7 @@ export const userWithCompanyFactory = async (
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
-        emailNotificationSubscriptions,
+        emailNotifications,
         role: role,
         ...companyAssociationOpts
       }

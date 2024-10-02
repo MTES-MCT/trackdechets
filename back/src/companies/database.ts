@@ -324,7 +324,7 @@ export const getCompaniesAndSubscribersByCompanyOrgIds = async (
     include: {
       companyAssociations: {
         where: {
-          emailNotificationSubscriptions: { has: notification },
+          emailNotifications: { has: notification },
           user: {
             isActive: true
           }

@@ -289,7 +289,7 @@ export const getPendingMembershipRequestsAndAssociatedMailSubscribers = async (
         include: {
           companyAssociations: {
             where: {
-              emailNotificationSubscriptions: {
+              emailNotifications: {
                 has: UserNotification.MEMBERSHIP_REQUEST
               },
               user: {

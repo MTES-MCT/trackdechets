@@ -11,13 +11,13 @@ CREATE TYPE "UserNotification" AS ENUM (
 ALTER TABLE
   "CompanyAssociation"
 ADD
-  COLUMN "emailNotificationSubscriptions" "UserNotification" [];
+  COLUMN "emailNotifications" "UserNotification" [];
 
 -- Subscribe admins to all notifications
 UPDATE
   "CompanyAssociation"
 SET
-  "emailNotificationSubscriptions" = ARRAY(
+  "emailNotifications" = ARRAY(
     SELECT
       enum_range(NULL :: "UserNotification")
   )

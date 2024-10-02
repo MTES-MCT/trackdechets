@@ -375,7 +375,7 @@ model CompanyAssociation {
   automaticallyAccepted Boolean   @default(false)
 
   // Abonnements aux notifications par e-mails 
-  emailNotificationSubscriptions UserNotification[]
+  emailNotifications UserNotification[]
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
