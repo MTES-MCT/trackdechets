@@ -8,7 +8,8 @@ import {
   Prisma,
   Company,
   CompanyAssociation,
-  UserAccountHash
+  UserAccountHash,
+  UserNotification
 } from "@prisma/client";
 import {
   CompanyNotFound,
@@ -308,31 +309,37 @@ export async function getActiveAdminsByCompanyIds(
 }
 
 /**
- * Get all the companies and admins from companies, by companyOrgIds
+ * Get all the companies and subscribers to notification from companies, by companyOrgIds
  * Will return an object like:
  * {
- *   [ordId]: { ...company, admins: user[] }
+ *   [ordId]: { ...company, subscribers: user[] }
  * }
  */
-export const getCompaniesAndActiveAdminsByCompanyOrgIds = async (
-  orgIds: string[]
-): Promise<Record<string, Company & { admins: User[] }>> => {
+export const getCompaniesAndSubscribersByCompanyOrgIds = async (
+  orgIds: string[],
+  notification: UserNotification
+): Promise<Record<string, Company & { subscribers: User[] }>> => {
   const companies = await prisma.company.findMany({
     where: { orgId: { in: orgIds } },
     include: {
       companyAssociations: {
-        where: { role: "ADMIN", user: { isActive: true } },
+        where: {
+          emailNotificationSubscriptions: { has: notification },
+          user: {
+            isActive: true
+          }
+        },
         include: { user: true, company: true }
       }
     }
   });
 
-  return companies.reduce<Record<string, Company & { admins: User[] }>>(
+  return companies.reduce<Record<string, Company & { subscribers: User[] }>>(
     (companiesAndAdminsByOrgId, { companyAssociations, ...company }) => ({
       ...companiesAndAdminsByOrgId,
       [company.orgId]: {
         ...company,
-        admins: companyAssociations.map(({ user }) => user)
+        subscribers: companyAssociations.map(({ user }) => user)
       }
     }),
     {}

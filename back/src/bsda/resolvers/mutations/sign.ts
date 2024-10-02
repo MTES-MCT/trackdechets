@@ -3,6 +3,7 @@ import {
   BsdaStatus,
   BsdaType,
   Prisma,
+  UserNotification,
   WasteAcceptationStatus
 } from "@prisma/client";
 
@@ -41,6 +42,7 @@ import { parseBsdaAsync } from "../../validation";
 import { prismaToZodBsda } from "../../validation/helpers";
 import { AlreadySignedError } from "../../../bsvhu/errors";
 import { operationHook } from "../../operationHook";
+import { getMailNotificationSubscribers } from "../../../users/notifications";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -391,19 +393,19 @@ async function sendAlertIfFollowingBsdaChangedPlannedDestination(bsda: Bsda) {
   }
 
   const previousBsdas = await getBsdaHistory(bsda);
+
   for (const previousBsda of previousBsdas) {
     if (
       previousBsda.destinationOperationNextDestinationCompanySiret &&
       previousBsda.destinationOperationNextDestinationCompanySiret !==
         bsda.destinationCompanySiret
     ) {
+      const subscribers = await getMailNotificationSubscribers(
+        UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
+        [previousBsda.emitterCompanySiret].filter(Boolean)
+      );
       const mail = renderMail(finalDestinationModified, {
-        to: [
-          {
-            email: previousBsda.emitterCompanyMail!,
-            name: previousBsda.emitterCompanyName!
-          }
-        ],
+        to: subscribers,
         variables: {
           id: previousBsda.id,
           emitter: {

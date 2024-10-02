@@ -1,6 +1,5 @@
-import { BsddTransporter, Form } from "@prisma/client";
+import { BsddTransporter, Form, UserNotification } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { getCompanyAdminUsers } from "../../companies/database";
 import { generateBsddPdfToBase64 } from "../pdf";
 import {
   Mail,
@@ -11,6 +10,7 @@ import {
 import { getTransporterCompanyOrgId, Dreals } from "@td/constants";
 import { getFirstTransporter } from "../database";
 import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
+import { getMailNotificationSubscribers } from "../../users/notifications";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -42,14 +42,6 @@ export async function renderFormRefusedEmail(
     name: `${filename}.pdf`
   };
 
-  const emitterCompanyAdmins = await getCompanyAdminUsers(
-    form.emitterCompanySiret!
-  );
-  const destinationCompanyAdmins = await getCompanyAdminUsers(destinationSiret);
-  const tempStorerCompanyAdmins = isFinalDestinationRefusal
-    ? await getCompanyAdminUsers(form.recipientCompanySiret!)
-    : [];
-
   let drealsRecipients: typeof Dreals = [];
 
   if (notifyDreal) {
@@ -66,17 +58,22 @@ export async function renderFormRefusedEmail(
     drealsRecipients = Dreals.filter(d => formDepartments.includes(d.Dept));
   }
 
-  const to = emitterCompanyAdmins.map(admin => ({
-    email: admin.email,
-    name: admin.name ?? ""
-  }));
+  const to = await getMailNotificationSubscribers(
+    UserNotification.BSD_REFUSAL,
+    [form.emitterCompanySiret].filter(Boolean)
+  );
+
+  const destinationCC = await getMailNotificationSubscribers(
+    UserNotification.BSD_REFUSAL,
+    [form.recipientCompanySiret, forwardedIn?.recipientCompanySiret].filter(
+      Boolean
+    )
+  );
 
   // include drealsRecipients if settings says so
-  const cc = [
-    ...destinationCompanyAdmins,
-    ...tempStorerCompanyAdmins,
-    ...(notifyDreal ? drealsRecipients : [])
-  ].map(admin => ({ email: admin.email, name: admin.name ?? "" }));
+  const cc = [...destinationCC, ...(notifyDreal ? drealsRecipients : [])].map(
+    admin => ({ email: admin.email, name: admin.name ?? "" })
+  );
 
   // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value
   const mailTemplate = {

@@ -14,6 +14,8 @@ import {
 } from "@td/mail";
 import { getEmailDomain, canSeeEmail } from "../../utils";
 import { UserInputError } from "../../../common/errors";
+import { getMailNotificationSubscribers } from "../../notifications";
+import { UserNotification } from "@prisma/client";
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] =
   async (parent, { siret }, context) => {
@@ -49,22 +51,22 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
       );
     }
 
-    const emails = admins.map(a => a.email);
+    const subscribers = await getMailNotificationSubscribers(
+      UserNotification.MEMBERSHIP_REQUEST,
+      [siret]
+    );
 
     const membershipRequest = await prisma.membershipRequest.create({
       data: {
         user: { connect: { id: user.id } },
         company: { connect: { id: company.id } },
-        sentTo: emails
+        sentTo: subscribers.map(r => r.email)
       }
     });
 
-    // send membership request to all admins of the company
-    const recipients = admins.map(a => ({ email: a.email, name: a.name! }));
-
     await sendMail(
       renderMail(membershipRequestMail, {
-        to: recipients,
+        to: subscribers,
         variables: {
           userEmail: user.email,
           companyName: company.name,
