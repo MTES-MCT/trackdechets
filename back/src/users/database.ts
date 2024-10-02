@@ -9,7 +9,8 @@ import {
   UserRole,
   Prisma,
   Company,
-  UserAccountHash
+  UserAccountHash,
+  UserNotification
 } from "@prisma/client";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
@@ -17,6 +18,7 @@ import { deleteCachedUserRoles } from "../common/redis/users";
 import { hashPassword, passwordVersion } from "./utils";
 import { UserInputError } from "../common/errors";
 import { PrismaTransaction } from "../common/repository/types";
+import { ALL_NOTIFICATIONS } from "./notifications";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.companyAssociation.findMany({
@@ -87,9 +89,9 @@ export async function deleteUserAccountHash(
  * @param role
  */
 export async function associateUserToCompany(
-  userId,
-  orgId,
-  role,
+  userId: string,
+  orgId: string,
+  role: UserRole,
   opt: Partial<Prisma.CompanyAssociationCreateInput> = {}
 ) {
   // check for current associations
@@ -110,11 +112,14 @@ export async function associateUserToCompany(
     );
   }
 
+  const emailNotifications = role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
+
   const association = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: userId } },
       role,
       company: { connect: { orgId } },
+      emailNotifications,
       ...opt
     }
   });
@@ -203,7 +208,9 @@ export async function acceptNewUserCompanyInvitations(user: User) {
         data: {
           company: { connect: { orgId: existingHash.companySiret } },
           user: { connect: { id: user.id } },
-          role: existingHash.role
+          role: existingHash.role,
+          emailNotifications:
+            existingHash.role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
         }
       })
     )
