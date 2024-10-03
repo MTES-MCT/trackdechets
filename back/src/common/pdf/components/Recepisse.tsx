@@ -4,9 +4,9 @@ import { formatDate } from "../../../common/pdf";
 type Props = {
   recepisse:
     | {
-        number?: string;
-        department?: string;
-        validityLimit?: Date;
+        number?: string | number | null;
+        department?: string | null;
+        validityLimit?: Date | null;
       }
     | null
     | undefined;
@@ -15,9 +15,9 @@ type Props = {
 export function Recepisse({ recepisse }: Readonly<Props>) {
   return (
     <p>
-      Récépissé n° : {recepisse?.number}
+      Récépissé n° : {recepisse?.number ?? "-"}
       <br />
-      Département : {recepisse?.department}
+      Département : {recepisse?.department ?? "-"}
       <br />
       Limite de validité : {formatDate(recepisse?.validityLimit)}
     </p>
