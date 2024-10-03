@@ -438,6 +438,7 @@ export const dashboardFormFragment = gql`
         name
       }
       isTempStorage
+      cap
     }
     transporter {
       id

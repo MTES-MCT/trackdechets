@@ -11,9 +11,11 @@ export const getLabelValue = (code: InfoIconCode): InfoIconValue => {
     case InfoIconCode.CustomInfo:
       return InfoIconValue.CustomInfo;
     case InfoIconCode.TransporterNumberPlate:
-      return InfoIconValue.TransporterNumberPlate;
+      return InfoIconValue.default;
     case InfoIconCode.CustomId:
       return InfoIconValue.CustomId;
+    case InfoIconCode.Cap:
+      return InfoIconValue.Cap;
     default:
       return InfoIconValue.default;
   }
