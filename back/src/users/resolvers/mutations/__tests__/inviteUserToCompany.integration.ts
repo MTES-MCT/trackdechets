@@ -10,7 +10,7 @@ import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth";
 import { Mutation } from "../../../../generated/graphql/types";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
-import { UserNotification, UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import { templateIds } from "@td/mail";
 import { ALL_NOTIFICATIONS } from "../../../notifications";
 

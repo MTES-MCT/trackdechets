@@ -25,7 +25,6 @@ import {
   updateCompanyAssociation,
   updateUserAccountHash
 } from "../../database";
-import { UserRole } from "@prisma/client";
 import { ALL_NOTIFICATIONS } from "../../notifications";
 
 const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (

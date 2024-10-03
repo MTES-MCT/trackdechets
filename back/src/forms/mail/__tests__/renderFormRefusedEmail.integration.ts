@@ -345,8 +345,8 @@ describe("renderFormRefusedEmail", () => {
       { email: emitter.user.email, name: emitter.user.name }
     ]);
     expect(email!.cc).toEqual([
-      { email: destination.user.email, name: destination.user.name },
-      { email: ttr.user.email, name: ttr.user.name }
+      { email: ttr.user.email, name: ttr.user.name },
+      { email: destination.user.email, name: destination.user.name }
     ]);
     expect(email!.body).toContain(`<p>
   Nous vous informons que la société ${destination.company.name}
