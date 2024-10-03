@@ -735,6 +735,80 @@ describe("Mutation.markAsSealed", () => {
     expect(updatedGroupedForm2.status).toEqual("GROUPED");
   });
 
+  it("should mark partially accepted appendix2 forms as grouped", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await destinationFactory();
+    const groupedForm1 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        // quantité acceptée = 0.52
+        quantityReceived: 1,
+        quantityRefused: 0.48,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED"
+      }
+    });
+
+    // it should also work for BSD with temporary storage
+    const groupedForm2 = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        quantityReceived: 0.02
+      },
+      forwardedInOpts: {
+        // quantité acceptée = 0.52
+        quantityReceived: 1,
+        quantityRefused: 0.48,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED"
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterType: "APPENDIX2",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
+        grouping: {
+          create: [
+            {
+              initialFormId: groupedForm1.id,
+              quantity: 0.52
+            },
+            {
+              initialFormId: groupedForm2.id,
+              quantity: 0.52
+            }
+          ]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const mutateFn = () =>
+      mutate(MARK_AS_SEALED, {
+        variables: { id: form.id }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
+
+    const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm1.id }
+    });
+    expect(updatedGroupedForm1.status).toEqual("GROUPED");
+    const updatedGroupedForm2 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm2.id }
+    });
+    expect(updatedGroupedForm2.status).toEqual("GROUPED");
+  });
+
   it("should mark appendix2 forms as grouped despite rogue decimal digits", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destination = await destinationFactory();
