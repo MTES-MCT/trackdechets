@@ -65,9 +65,10 @@ export async function renderFormRefusedEmail(
 
   const destinationCC = await getMailNotificationSubscribers(
     UserNotification.BSD_REFUSAL,
-    [form.recipientCompanySiret, forwardedIn?.recipientCompanySiret].filter(
-      Boolean
-    )
+    [
+      form.recipientCompanySiret,
+      isFinalDestinationRefusal ? forwardedIn?.recipientCompanySiret : null
+    ].filter(Boolean)
   );
 
   // include drealsRecipients if settings says so

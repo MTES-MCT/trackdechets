@@ -9,8 +9,7 @@ import {
   UserRole,
   Prisma,
   Company,
-  UserAccountHash,
-  UserNotification
+  UserAccountHash
 } from "@prisma/client";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
