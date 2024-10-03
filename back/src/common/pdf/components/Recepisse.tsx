@@ -1,12 +1,15 @@
 import * as React from "react";
 import { formatDate } from "../../../common/pdf";
-import {
-  BsdaRecepisse,
-  BsffTransporterRecepisse
-} from "../../../generated/graphql/types";
 
 type Props = {
-  recepisse: BsdaRecepisse | BsffTransporterRecepisse | null | undefined;
+  recepisse:
+    | {
+        number?: string;
+        department?: string;
+        validityLimit?: Date;
+      }
+    | null
+    | undefined;
 };
 
 export function Recepisse({ recepisse }: Readonly<Props>) {
