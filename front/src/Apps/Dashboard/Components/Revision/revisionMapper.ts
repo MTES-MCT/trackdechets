@@ -235,12 +235,12 @@ export const mapRevision = (
       },
       {
         dataName: DataNameEnum.QTY_ESTIMATED,
-        dataOldValue: review?.[bsdName]?.content?.wasteDetails?.quantity,
+        dataOldValue: review?.[bsdName].wasteDetails.quantity,
         dataNewValue: review?.content?.wasteDetails?.quantity
       },
       {
         dataName: DataNameEnum.SAMPLE_NUMBER,
-        dataOldValue: review?.[bsdName]?.content?.wasteDetails?.sampleNumber,
+        dataOldValue: review?.[bsdName]?.wasteDetails?.sampleNumber,
         dataNewValue: review?.content?.wasteDetails?.sampleNumber
       },
       {
