@@ -58,6 +58,7 @@ import { NON_RENSEIGNE } from "../../../common/wordings/dashboard/wordingsDashbo
 import "./bsdCard.scss";
 import { getCurrentTransporterInfos } from "../../bsdMapper";
 import { isDefined } from "../../../../common/helper";
+import { useCloneBsd } from "../Clone/useCloneBsd";
 
 function BsdCard({
   bsd,
@@ -115,6 +116,9 @@ function BsdCard({
       ...options
     });
   const [duplicateBsff, { loading: isDuplicatingBsff }] = useBsffDuplicate({
+    ...options
+  });
+  const [cloneBsd, { loading: isCloningBsd }] = useCloneBsd({
     ...options
   });
   const [duplicateBsvhu, { loading: isDuplicatingBsvhu }] = useBsvhuDuplicate({
@@ -256,6 +260,10 @@ function BsdCard({
       downloadBspaohPdf
     ]
   );
+
+  const onClone = useCallback(() => {
+    cloneBsd();
+  }, [cloneBsd]);
 
   const onDuplicate = useCallback(
     (bsd: BsdDisplay) => {
@@ -489,6 +497,7 @@ function BsdCard({
                     onDuplicate,
                     onUpdate,
                     onRevision,
+                    onClone,
                     onPdf,
                     onAppendix1,
                     onBsdSuite,
@@ -513,7 +522,7 @@ function BsdCard({
           </>
         )}
       </div>
-      {isDuplicating && <Loader />}
+      {(isDuplicating || isCloningBsd) && <Loader />}
 
       <TransporterInfoEditModal
         bsd={bsdDisplay!}
