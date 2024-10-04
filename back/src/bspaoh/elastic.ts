@@ -3,7 +3,8 @@ import {
   Bspaoh,
   BsdType,
   Prisma,
-  OperationMode
+  OperationMode,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
@@ -15,6 +16,8 @@ import { prisma } from "@td/prisma";
 import { distinct } from "../common/arrays";
 import { BspaohIncludes } from "./types";
 import { getBspaohSubType } from "../common/subTypes";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export const BspaohForElasticInclude = {
   ...BspaohIncludes
@@ -108,6 +111,11 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
     }
     default:
       break;
+  }
+
+  // Return tab
+  if (belongsToIsReturnForTab(bspaoh)) {
+    setTab(siretsFilters, "transporterCompanySiret", "isReturnFor");
   }
 
   for (const [fieldName, filter] of siretsFilters.entries()) {
@@ -256,3 +264,22 @@ export async function getBspaohForElastic(
     include: { transporters: true }
   });
 }
+
+/**
+ * BSPAOH belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste hasn't been fully accepted at reception
+ */
+export const belongsToIsReturnForTab = (bspaoh: Bspaoh) => {
+  const hasBeenReceivedLately =
+    isDefined(bspaoh.destinationReceptionDate) &&
+    bspaoh.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted =
+    bspaoh.destinationReceptionAcceptationStatus !==
+    WasteAcceptationStatus.ACCEPTED;
+
+  return hasNotBeenFullyAccepted;
+};

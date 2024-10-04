@@ -228,7 +228,7 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
     const transporters = getTransportersSync(form);
     const lastTransporter = transporters[transporters.length - 1];
 
-    setFieldTab(transporterCompanyOrgIdKey(lastTransporter), "isCollectedFor");
+    setFieldTab(transporterCompanyOrgIdKey(lastTransporter), "isReturnFor");
   }
 
   for (const [field, tab] of fieldTabs.entries()) {
@@ -246,20 +246,18 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
  * - waste has citerne business (emptyReturnADR or citerne washed) OR waste hasn't been fully accepted
  */
 const belongsToIsReturnForTab = (form: FullForm) => {
-  // Waste must have been received in the last 48 hours
   const hasBeenReceivedLately =
     isDefined(form.receivedAt) && form.receivedAt! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
 
   const hasCiterneBusiness =
     isDefined(form.emptyReturnADR) || isDefined(form.hasCiterneBeenWashedOut);
 
   const hasNotBeenFullyAccepted =
-    form.wasteAcceptationStatus === WasteAcceptationStatus.PARTIALLY_REFUSED ||
-    form.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED;
+    form.wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED;
 
-  return (
-    hasBeenReceivedLately && (hasCiterneBusiness || hasNotBeenFullyAccepted)
-  );
+  return hasCiterneBusiness || hasNotBeenFullyAccepted;
 };
 
 function getFormSirets(form: FullForm) {

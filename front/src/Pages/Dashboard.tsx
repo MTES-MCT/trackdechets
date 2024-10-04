@@ -53,7 +53,7 @@ const DashboardPage = () => {
   const isReviewedTab = !!useMatch(routes.dashboard.bsds.reviewed);
   const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
   const isCollectedTab = !!useMatch(routes.dashboard.transport.collected);
-  const isReturnTab = !!useMatch(routes.dashboard.transport.returns);
+  const isReturnTab = !!useMatch(routes.dashboard.transport.return);
   const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
   const location = useLocation();
 

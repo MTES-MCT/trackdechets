@@ -1,4 +1,10 @@
-import { Bsff, BsffStatus, BsdType, BsffTransporter } from "@prisma/client";
+import {
+  Bsff,
+  BsffStatus,
+  BsdType,
+  BsffTransporter,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -19,6 +25,8 @@ import {
   getTransportersSync
 } from "./database";
 import { getBsffSubType } from "../common/subTypes";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export type BsffForElastic = Bsff &
   BsffWithPackagings &
@@ -210,6 +218,14 @@ export function getOrgIdsByTab(
       break;
   }
 
+  // Return tab
+  if (belongsToIsReturnForTab(bsff)) {
+    const transporters = getTransportersSync(bsff);
+    const lastTransporter = transporters[transporters.length - 1];
+
+    setTab(transporterCompanyRole(lastTransporter), "isReturnFor");
+  }
+
   for (const role of roles) {
     const tab = tabsByRole[role];
     if (tab) {
@@ -330,3 +346,22 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
 export async function indexBsff(bsff: BsffForElastic, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsff), ctx);
 }
+
+/**
+ * BSFF belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - at least one packaging hasn't been fully accepted
+ */
+export const belongsToIsReturnForTab = (bsff: BsffForElastic) => {
+  const hasBeenReceivedLately =
+    isDefined(bsff.destinationReceptionDate) &&
+    bsff.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted = bsff.packagings.some(
+    packaging => packaging.acceptationStatus !== WasteAcceptationStatus.ACCEPTED
+  );
+
+  return hasNotBeenFullyAccepted;
+};

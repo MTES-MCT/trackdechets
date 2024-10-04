@@ -1,4 +1,10 @@
-import { BsdasriStatus, Bsdasri, BsdasriType, BsdType } from "@prisma/client";
+import {
+  BsdasriStatus,
+  Bsdasri,
+  BsdasriType,
+  BsdType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -15,6 +21,8 @@ import {
 import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
 import { getBsdasriSubType } from "../common/subTypes";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &
@@ -132,6 +140,11 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
     }
     default:
       break;
+  }
+
+  // Return tab
+  if (belongsToIsReturnForTab(bsdasri)) {
+    setTab(siretsFilters, "transporterCompanySiret", "isReturnFor");
   }
 
   for (const [fieldName, filter] of siretsFilters.entries()) {
@@ -262,3 +275,22 @@ export function getBsdasriRevisionOrgIds(
 ): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
   return getRevisionOrgIds(bsdasri.bsdasriRevisionRequests);
 }
+
+/**
+ * BSDASRI belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste hasn't been fully accepted at reception
+ */
+export const belongsToIsReturnForTab = (bsdasri: Bsdasri) => {
+  const hasBeenReceivedLately =
+    isDefined(bsdasri.destinationReceptionDate) &&
+    bsdasri.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted =
+    bsdasri.destinationReceptionAcceptationStatus !==
+    WasteAcceptationStatus.ACCEPTED;
+
+  return hasNotBeenFullyAccepted;
+};

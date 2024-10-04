@@ -28,7 +28,7 @@ import {
   TRANSPORT,
   TO_REVIEW,
   REVIEWED,
-  RETURNS
+  RETURN
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import routes from "../../../routes";
@@ -286,8 +286,8 @@ function DashboardSubNav({ currentCompany }) {
                 <MenuLink
                   entry={{
                     navlink: true,
-                    caption: RETURNS,
-                    href: generatePath(routes.dashboard.transport.returns, {
+                    caption: RETURN,
+                    href: generatePath(routes.dashboard.transport.return, {
                       siret: currentCompany.orgId
                     })
                   }}

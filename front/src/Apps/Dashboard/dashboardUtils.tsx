@@ -676,7 +676,7 @@ export const getBsdCurrentTab = ({
     return "collectedTab";
   }
   if (isReturnTab) {
-    return "returnsTab";
+    return "returnTab";
   }
   // default tab
   return "allBsdsTab";

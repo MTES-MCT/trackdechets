@@ -1,9 +1,10 @@
-import { Company } from "@prisma/client";
+import { Company, WasteAcceptationStatus } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { BsdElastic } from "../../common/elastic";
 import { getWhere, toBsdElastic } from "../elastic";
 import { bsvhuFactory, toIntermediaryCompany } from "./factories.vhu";
+import { xDaysAgo } from "../../utils";
 
 describe("getWhere", () => {
   test("if emitter publishes VHU > transporter should see it in 'follow' tab", async () => {
@@ -84,5 +85,76 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyOrgIds).toContain(destination.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(intermediary1.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(intermediary2.siret);
+  });
+
+  describe("isReturnFor", () => {
+    it.each([
+      WasteAcceptationStatus.REFUSED,
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+    ])(
+      "waste acceptation status is %p > bsvhu should belong to tab",
+      async destinationReceptionAcceptationStatus => {
+        // Given
+        const transporter = await companyFactory();
+        const bsvhu = await bsvhuFactory({
+          opt: {
+            emitterCompanyName: emitter.name,
+            emitterCompanySiret: emitter.siret,
+            transporterCompanyName: transporter.name,
+            transporterCompanySiret: transporter.siret,
+            destinationReceptionDate: new Date(),
+            destinationReceptionAcceptationStatus
+          }
+        });
+
+        // When
+        const { isReturnFor } = toBsdElastic(bsvhu);
+
+        // Then
+        expect(isReturnFor).toContain(transporter.siret);
+      }
+    );
+
+    it("waste acceptation status is ACCEPTED > bsvhu should not belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          emitterCompanyName: emitter.name,
+          emitterCompanySiret: emitter.siret,
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          destinationReceptionDate: new Date(),
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
+        }
+      });
+
+      // When
+      const { isReturnFor } = toBsdElastic(bsvhu);
+
+      // Then
+      expect(isReturnFor).toStrictEqual([]);
+    });
+
+    it("bsda has been received too long ago > should not belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          emitterCompanyName: emitter.name,
+          emitterCompanySiret: emitter.siret,
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          destinationReceptionDate: xDaysAgo(new Date(), 10),
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED
+        }
+      });
+
+      // When
+      const { isReturnFor } = toBsdElastic(bsvhu);
+
+      // Then
+      expect(isReturnFor).toStrictEqual([]);
+    });
   });
 });

@@ -24,7 +24,7 @@ import {
   TO_COLLECT,
   TO_REVIEW,
   TRANSPORT,
-  RETURNS
+  RETURN
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./DashboardTabs.scss";
@@ -284,7 +284,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             </li>
             <li>
               <NavLink
-                to={generatePath(routes.dashboard.transport.returns, {
+                to={generatePath(routes.dashboard.transport.return, {
                   siret: currentCompany.orgId
                 })}
                 className={({ isActive }) =>
@@ -293,7 +293,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                     : "sidebarv2__item sidebarv2__item--indented"
                 }
               >
-                {RETURNS}
+                {RETURN}
               </NavLink>
             </li>
           </ul>

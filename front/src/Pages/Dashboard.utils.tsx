@@ -125,7 +125,7 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
   if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_title;
   }
-  // TODO: blankstate for returns
+  // TODO: blankstate for return
   return blankstate_default_title;
 };
 
@@ -159,7 +159,7 @@ export const getBlankslateDescription = ({
   if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_desc;
   }
-  // TODO: blankstate for returns
+  // TODO: blankstate for return
   return blankstate_default_desc;
 };
 

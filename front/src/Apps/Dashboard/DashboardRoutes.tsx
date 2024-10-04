@@ -274,7 +274,7 @@ function DashboardRoutes() {
           />
 
           <Route
-            path={toRelative(routes.dashboard.transport.returns)}
+            path={toRelative(routes.dashboard.transport.return)}
             element={<DashboardPage />}
           />
 
