@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import {
+  CompanyPrivate,
   Query,
   RndtsDeclarationDelegation,
-  RndtsDeclarationDelegationStatus
+  RndtsDeclarationDelegationStatus,
+  UserRole
 } from "@td/codegen-ui";
 import { isDefinedStrict } from "../../../common/helper";
 import { formatDateViewDisplay } from "../common/utils";
@@ -55,27 +57,26 @@ const getTextTooltip = (id: string, value: string | undefined | null) => {
 
 interface Props {
   as: "delegator" | "delegate";
-  companyOrgId: string;
+  company: CompanyPrivate;
 }
 
-export const RndtsDeclarationDelegationsTable = ({
-  as,
-  companyOrgId
-}: Props) => {
+export const RndtsDeclarationDelegationsTable = ({ as, company }: Props) => {
   const [pageIndex, setPageIndex] = useState(0);
   const [delegationToRevoke, setDelegationToRevoke] =
     useState<RndtsDeclarationDelegation | null>(null);
 
+  const isAdmin = company.userRole === UserRole.Admin;
+
   const { data, loading, refetch } = useQuery<
     Pick<Query, "rndtsDeclarationDelegations">
   >(RNDTS_DECLARATION_DELEGATIONS, {
-    skip: !companyOrgId,
+    skip: !company.orgId,
     fetchPolicy: "network-only",
     variables: {
       where:
         as === "delegate"
-          ? { delegateOrgId: companyOrgId }
-          : { delegatorOrgId: companyOrgId }
+          ? { delegateOrgId: company.orgId }
+          : { delegatorOrgId: company.orgId }
     }
   });
 
@@ -111,7 +112,7 @@ export const RndtsDeclarationDelegationsTable = ({
                   <th scope="col">Début</th>
                   <th scope="col">Fin</th>
                   <th scope="col">Statut</th>
-                  <th scope="col">Révoquer</th>
+                  {isAdmin && <th scope="col">Révoquer</th>}
                 </tr>
               </thead>
               <tbody>
@@ -168,24 +169,27 @@ export const RndtsDeclarationDelegationsTable = ({
                         {endDate ? formatDateViewDisplay(endDate) : "N/A"}
                       </td>
                       <td>{getStatusBadge(status)}</td>
-                      <td>
-                        {status !== RndtsDeclarationDelegationStatus.Closed && (
-                          <Button
-                            priority="primary"
-                            size="small"
-                            className="fr-my-4v"
-                            nativeButtonProps={{
-                              type: "button",
-                              "data-testid":
-                                "company-revoke-rndtsDeclarationDelegation"
-                            }}
-                            disabled={false}
-                            onClick={() => setDelegationToRevoke(delegation)}
-                          >
-                            Révoquer
-                          </Button>
-                        )}
-                      </td>
+                      {isAdmin && (
+                        <td>
+                          {status !==
+                            RndtsDeclarationDelegationStatus.Closed && (
+                            <Button
+                              priority="primary"
+                              size="small"
+                              className="fr-my-4v"
+                              nativeButtonProps={{
+                                type: "button",
+                                "data-testid":
+                                  "company-revoke-rndtsDeclarationDelegation"
+                              }}
+                              disabled={false}
+                              onClick={() => setDelegationToRevoke(delegation)}
+                            >
+                              Révoquer
+                            </Button>
+                          )}
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

@@ -43,10 +43,7 @@ export const CompanyRndtsDeclarationDelegationAsDelegator = ({
       )}
 
       <div>
-        <RndtsDeclarationDelegationsTable
-          as="delegator"
-          companyOrgId={company.orgId}
-        />
+        <RndtsDeclarationDelegationsTable as="delegator" company={company} />
       </div>
 
       <CreateRndtsDeclarationDelegationModal

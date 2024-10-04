@@ -18,10 +18,7 @@ export const CompanyRndtsDeclarationDelegationAsDelegate = ({
         registres RNDTS
       </div>
       <div>
-        <RndtsDeclarationDelegationsTable
-          as="delegate"
-          companyOrgId={company.orgId}
-        />
+        <RndtsDeclarationDelegationsTable as="delegate" company={company} />
       </div>
     </>
   );
