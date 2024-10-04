@@ -29,6 +29,7 @@ export type TabContentProps = {
 };
 
 const COMPANY_DIGEST_FLAG = "COMPANY_DIGEST";
+const RNDTS_FLAG = "REGISTRY_V2";
 
 const buildTabs = (
   company: CompanyPrivate
@@ -41,6 +42,9 @@ const buildTabs = (
   // Admin and member can access the gerico tab
   const canViewCompanyDigestTab =
     company.featureFlags.includes(COMPANY_DIGEST_FLAG) && (isAdmin || isMember);
+  // RNDTS features protected by feature flag
+  const canViewRndtsFeatures =
+    company.featureFlags.includes(RNDTS_FLAG) && isAdmin;
   const iconId = "fr-icon-checkbox-line" as FrIconClassName;
   const tabs = [
     {
@@ -62,20 +66,22 @@ const buildTabs = (
       tabId: "tab4",
       label: "Contact",
       iconId
-    },
-    {
-      tabId: "tab5",
-      label: "Délégations RNDTS",
-      iconId
     }
   ];
   const tabsContent = {
     tab1: CompanyInfo,
     tab2: CompanySignature,
     tab3: CompanyMembers,
-    tab4: CompanyContactForm,
-    tab5: CompanyRndtsDeclarationDelegation
+    tab4: CompanyContactForm
   };
+  if (canViewRndtsFeatures) {
+    tabs.push({
+      tabId: "tab5",
+      label: "Délégations RNDTS",
+      iconId
+    });
+    tabsContent["tab5"] = CompanyRndtsDeclarationDelegation;
+  }
   if (canViewCompanyDigestTab) {
     tabs.push({
       tabId: "tab6",
