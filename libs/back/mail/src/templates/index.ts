@@ -256,7 +256,7 @@ export const rndtsDeclarationDelegationCreation: MailTemplate<{
   delegate: Company;
 }> = {
   subject: ({ delegator }) =>
-    `Émission d'une demande de délégation de l'établissement ${delegator.name} (${delegator.siret})`,
+    `Émission d'une demande de délégation de l'établissement ${delegator.name} (${delegator.siret})`,
   body: mustacheRenderer("rndts-declaration-delegation-creation.html"),
   templateId: templateIds.LAYOUT
 };
