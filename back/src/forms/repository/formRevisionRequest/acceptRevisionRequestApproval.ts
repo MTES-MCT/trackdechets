@@ -26,8 +26,7 @@ import { distinct } from "../../../common/arrays";
 import { ForbiddenError } from "../../../common/errors";
 import { isFinalOperationCode } from "../../../common/operationCodes";
 import { operationHook } from "../../operationHook";
-import { isDefined } from "../../../common/helpers";
-import Decimal from "decimal.js";
+import { areDefined } from "../../../common/helpers";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -179,6 +178,7 @@ async function getUpdateFromFormRevisionRequest(
       wasteDetailsPop: revisionRequest.wasteDetailsPop
     }),
     wasteDetailsQuantity: revisionRequest.wasteDetailsQuantity,
+    wasteDetailsSampleNumber: revisionRequest.wasteDetailsSampleNumber,
     ...(revisionRequest.wasteDetailsPackagingInfos && {
       wasteDetailsPackagingInfos: revisionRequest.wasteDetailsPackagingInfos
     }),
@@ -369,12 +369,16 @@ export async function approveAndApplyRevisionRequest(
   // Revision targeted an ANNEXE_1 (child). We need to update its parent
   if (updatedBsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
     // Quantity changed. We need to fix parent's quantity as well
-    if (isDefined(revisionRequest.wasteDetailsQuantity)) {
+    if (
+      areDefined(
+        bsddBeforeRevision.wasteDetailsQuantity,
+        revisionRequest.wasteDetailsQuantity
+      )
+    ) {
       // Calculate revision diff
-      const diff =
-        bsddBeforeRevision.wasteDetailsQuantity
-          ?.minus(revisionRequest.wasteDetailsQuantity ?? 0)
-          .toDecimalPlaces(6) ?? new Decimal(0);
+      const diff = bsddBeforeRevision
+        .wasteDetailsQuantity!.minus(revisionRequest.wasteDetailsQuantity!)
+        .toDecimalPlaces(6);
       const { nextForm: parent } = await prisma.formGroupement.findFirstOrThrow(
         {
           where: { initialFormId: bsddBeforeRevision.id },

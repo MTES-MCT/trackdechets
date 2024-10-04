@@ -1158,6 +1158,124 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedAppendix1Parent.wasteDetailsQuantity?.toNumber()).toBe(12.3);
   });
 
+  it("should udate bsdd sample number", async () => {
+    // Given
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.RECEIVED,
+        emitterCompanySiret: emitterCompany.siret,
+        wasteDetailsCode: "15 01 10*",
+        wasteDetailsSampleNumber: "sample number 1",
+        owner: { connect: { id: user.id } },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporterCompany.siret
+          }
+        }
+      }
+    });
+
+    // When
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: emitterCompany.id,
+        approvals: { create: { approverSiret: transporterCompany.siret! } },
+        wasteDetailsSampleNumber: "sample number 2",
+        comment: "Changing sample number from 1 to 2"
+      }
+    });
+
+    const { mutate } = makeClient(transporter);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.submitFormRevisionRequestApproval.status).toBe(
+      RevisionRequestStatus.ACCEPTED
+    );
+
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id }
+    });
+    expect(updatedBsdd.wasteDetailsSampleNumber).toEqual("sample number 2");
+  });
+
+  it("should udate bsdd wasteDetailsQuantity", async () => {
+    // Given
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.RECEIVED,
+        emitterCompanySiret: emitterCompany.siret,
+        wasteDetailsCode: "15 01 10*",
+        wasteDetailsQuantity: 10,
+        owner: { connect: { id: user.id } },
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporterCompany.siret
+          }
+        }
+      }
+    });
+
+    // When
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: emitterCompany.id,
+        approvals: { create: { approverSiret: transporterCompany.siret! } },
+        wasteDetailsQuantity: 6.5,
+        comment: "Changing wasteDetailsQuantity from 10 to 6.5"
+      }
+    });
+
+    const { mutate } = makeClient(transporter);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.submitFormRevisionRequestApproval.status).toBe(
+      RevisionRequestStatus.ACCEPTED
+    );
+
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id }
+    });
+    expect(updatedBsdd.wasteDetailsQuantity?.toNumber()).toEqual(6.5);
+  });
+
   it("should change the operation code & mode", async () => {
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
