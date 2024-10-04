@@ -8,6 +8,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
 import { REVOKE_RNDTS_DECLARATION_DELEGATION } from "../../common/queries/rndtsDeclarationDelegation/queries";
 import toast from "react-hot-toast";
+import { isDefined } from "../../../common/helper";
 
 const WarningIcon = () => (
   <span
@@ -48,25 +49,35 @@ export const RevokeRndtsDeclarationDelegationModal = ({
     onClose();
   };
 
-  const companyName = to ? `pour ${to}` : `de ${from}`;
+  // Wording changes if delegator or delegate
+  let title = "Révoquer la délégation";
+  let content = `Vous vous apprêtez à révoquer la délégation pour ${to}.`;
+  let acceptLabel = "Révoquer";
+  let refuseLabel = "Ne pas révoquer";
+  let closeModalLabel = "Ne pas révoquer";
+
+  if (isDefined(from)) {
+    title = "Annuler la délégation";
+    content = `Vous vous apprêtez à annuler la délégation de ${from}.`;
+    acceptLabel = "Annuler";
+    refuseLabel = "Ne pas annuler";
+    closeModalLabel = "Ne pas annuler";
+  }
 
   return (
     <Modal
       onClose={onClose}
-      ariaLabel="Refuser la délégation"
-      closeLabel="Ne pas refuser"
+      ariaLabel={title}
+      closeLabel={closeModalLabel}
       size="M"
       isOpen
     >
       <div>
         <h4>
-          <WarningIcon /> Refuser la délégation
+          <WarningIcon /> {title}
         </h4>
 
-        <p>
-          Vouez-vous réellement refuser la délégation {companyName}? Vous ne
-          pourrez pas la rétablir.
-        </p>
+        <p>{content}</p>
 
         <div className="dsfr-modal-actions fr-mt-3w">
           <Button
@@ -75,10 +86,10 @@ export const RevokeRndtsDeclarationDelegationModal = ({
             onClick={onRevoke}
             type="button"
           >
-            Refuser
+            {acceptLabel}
           </Button>
           <Button type="submit" disabled={loading} onClick={onClose}>
-            Ne pas refuser
+            {refuseLabel}
           </Button>
         </div>
       </div>

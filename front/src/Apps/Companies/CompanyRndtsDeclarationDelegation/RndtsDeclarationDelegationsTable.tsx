@@ -161,12 +161,12 @@ export const RndtsDeclarationDelegationsTable = ({ as, company }: Props) => {
                             )}
                           </>
                         ) : (
-                          "N/A"
+                          "-"
                         )}
                       </td>
                       <td>{formatDateViewDisplay(startDate)}</td>
                       <td>
-                        {endDate ? formatDateViewDisplay(endDate) : "N/A"}
+                        {endDate ? formatDateViewDisplay(endDate) : "Illimité"}
                       </td>
                       <td>{getStatusBadge(status)}</td>
                       {isAdmin && (
@@ -185,7 +185,7 @@ export const RndtsDeclarationDelegationsTable = ({ as, company }: Props) => {
                               disabled={false}
                               onClick={() => setDelegationToRevoke(delegation)}
                             >
-                              Révoquer
+                              {as === "delegator" ? "Révoquer" : "Annuler"}
                             </Button>
                           )}
                         </td>

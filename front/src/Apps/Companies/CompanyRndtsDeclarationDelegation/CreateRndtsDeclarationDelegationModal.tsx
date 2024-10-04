@@ -108,6 +108,11 @@ export const CreateRndtsDeclarationDelegationModal = ({
     resolver: zodResolver(validationSchema)
   });
 
+  const closeModal = () => {
+    reset();
+    onClose();
+  };
+
   const onSubmit = async input => {
     await createRndtsDeclarationDelegation({
       variables: {
@@ -120,10 +125,7 @@ export const CreateRndtsDeclarationDelegationModal = ({
       onError: err => toast.error(err.message)
     });
 
-    // Reset the form
-    reset();
-
-    onClose();
+    closeModal();
   };
 
   const delegateOrgId = watch("delegateOrgId") ?? {};
@@ -132,7 +134,7 @@ export const CreateRndtsDeclarationDelegationModal = ({
 
   return (
     <Modal
-      onClose={onClose}
+      onClose={closeModal}
       ariaLabel="Créer une délégation"
       isOpen={isOpen}
       size="L"
