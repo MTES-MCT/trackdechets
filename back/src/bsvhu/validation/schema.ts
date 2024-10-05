@@ -13,7 +13,6 @@ import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
 import { sirenifyBsvhu } from "./sirenify";
-import { recipifyBsdTransporter } from "../../common/validation/zod/transformers";
 import {
   CompanyRole,
   foreignVatNumberSchema,
@@ -32,6 +31,7 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { fillIntermediariesOrgIds } from "./transformers";
+import { recipifyBsvhu } from "./recipify";
 
 export const ZodWasteCodeEnum = z
   .enum(BSVHU_WASTE_CODES, {
@@ -251,7 +251,7 @@ export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
   return transformedBsvhuSyncSchema
     .superRefine(checkCompanies)
     .transform(sirenifyBsvhu(context))
-    .transform(recipifyBsdTransporter)
+    .transform(recipifyBsvhu(context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où des transformations auto-complète certains champs
