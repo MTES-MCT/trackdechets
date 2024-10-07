@@ -1,4 +1,3 @@
-import { convertUrls } from "../../../companies/database";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
@@ -12,6 +11,7 @@ import {
 import { renderMail, membershipRequestRefused } from "@td/mail";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
+import { toGqlCompanyPrivate } from "../../../companies/converters";
 
 const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipRequest"] =
   async (parent, { id }, context) => {
@@ -74,7 +74,7 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
     const dbCompany = await prisma.company.findUnique({
       where: { id: company.id }
     });
-    return convertUrls(dbCompany!);
+    return toGqlCompanyPrivate(dbCompany!);
   };
 
 export default refuseMembershipRequestResolver;

@@ -5,12 +5,12 @@ import { sendMail } from "../../../mailer/mailing";
 import { CompanyPrivate } from "../../../generated/graphql/types";
 
 import { randomNumber } from "../../../utils";
-import { convertUrls } from "../../database";
 import { renderMail, securityCodeRenewal } from "@td/mail";
 import { isSiret, isVat } from "@td/constants";
 import { UserInputError } from "../../../common/errors";
 import { getMailNotificationSubscribers } from "../../../users/notifications";
 import { UserNotification } from "@prisma/client";
+import { toGqlCompanyPrivate } from "../../converters";
 
 /**
  * This function is used to renew the security code
@@ -65,5 +65,5 @@ export async function renewSecurityCodeFn(
   });
   await sendMail(mail);
 
-  return convertUrls(updatedCompany);
+  return toGqlCompanyPrivate(updatedCompany);
 }
