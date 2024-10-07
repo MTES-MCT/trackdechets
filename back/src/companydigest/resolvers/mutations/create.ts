@@ -11,7 +11,6 @@ import { prisma } from "@td/prisma";
 import { sendGericoApiRequest } from "../../../queue/producers/gerico";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { CompanyDigestStatus } from "@prisma/client";
-const COMPANY_DIGEST_FLAG = "COMPANY_DIGEST";
 
 const createCompanyDigestResolver = async (
   _: ResolversParentTypes["Mutation"],
@@ -54,16 +53,6 @@ const createCompanyDigestResolver = async (
     );
   }
 
-  const companyHasFeatureFlag = await prisma.company.findFirst({
-    where: { orgId, featureFlags: { has: COMPANY_DIGEST_FLAG } },
-    select: { id: true }
-  });
-
-  if (!companyHasFeatureFlag) {
-    throw new UserInputError(
-      "Vous nêtes pas autorisé à utiliser cette fonctionalité sur cet établissement."
-    );
-  }
   const companyDigest = await prisma.companyDigest.create({
     data: {
       orgId,
