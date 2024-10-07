@@ -35,7 +35,7 @@ const cloneBsdResolver: MutationResolvers["cloneBsd"] = async (
   } else if (id.startsWith("PAOH-")) {
     await cloneBspaoh(id);
   } else {
-    await cloneBsdd(id);
+    await cloneBsdd(user, id);
   }
 
   return true;
