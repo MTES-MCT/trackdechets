@@ -11,6 +11,8 @@ import {
   blankstate_follow_title,
   blankstate_history_desc,
   blankstate_history_title,
+  blankstate_return_desc,
+  blankstate_return_title,
   blankstate_reviews_desc,
   blankstate_reviews_title
 } from "../Apps/common/wordings/dashboard/wordingsDashboard";
@@ -107,7 +109,8 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
     isFollowTab,
     isArchivesTab,
     isReviewedTab,
-    isToReviewTab
+    isToReviewTab,
+    isReturnTab
   } = tabs;
 
   if (isActTab) {
@@ -125,7 +128,9 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
   if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_title;
   }
-  // TODO: blankstate for return
+  if (isReturnTab) {
+    return blankstate_return_title;
+  }
   return blankstate_default_title;
 };
 
@@ -135,7 +140,8 @@ export const getBlankslateDescription = ({
   isFollowTab,
   isArchivesTab,
   isReviewedTab,
-  isToReviewTab
+  isToReviewTab,
+  isReturnTab
 }: Tabs) => {
   if (isActTab) {
     return blankstate_action_desc;
@@ -159,7 +165,9 @@ export const getBlankslateDescription = ({
   if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_desc;
   }
-  // TODO: blankstate for return
+  if (isReturnTab) {
+    return blankstate_return_desc;
+  }
   return blankstate_default_desc;
 };
 
