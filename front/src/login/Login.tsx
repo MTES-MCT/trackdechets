@@ -38,10 +38,6 @@ function displayCaptcha(errorCode?: string) {
 export default function Login() {
   const location = useLocation();
 
-  useEffect(() => {
-    document.title = `Se connecter | ${document.title}`;
-  }, []);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captchaInput, setCaptchaInput] = useState("");

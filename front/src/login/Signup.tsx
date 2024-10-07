@@ -36,10 +36,6 @@ export default function Signup() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    document.title = `Créer un compte | ${document.title}`;
-  }, []);
-
   const handleSubmit = event => {
     event?.preventDefault();
 

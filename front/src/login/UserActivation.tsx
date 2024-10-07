@@ -1,4 +1,4 @@
-import React, { createRef, useEffect } from "react";
+import React, { createRef } from "react";
 import * as queryString from "query-string";
 import { useLocation, Navigate } from "react-router-dom";
 import routes from "../Apps/routes";
@@ -17,10 +17,6 @@ function getErrorMessage(errorCode: string) {
 
 export default function UserActivation() {
   const location = useLocation();
-
-  useEffect(() => {
-    document.title = `Activation du compte | ${document.title}`;
-  }, []);
 
   const queries = queryString.parse(location.search);
 
