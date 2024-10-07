@@ -35,9 +35,16 @@ const recipifyBsvhuAccessors = (
       return bsd.brokerCompanySiret ?? null;
     },
     setter: async (bsvhu: ParsedZodBsvhu, receipt) => {
-      bsvhu.brokerRecepisseNumber = receipt?.receiptNumber ?? null;
-      bsvhu.brokerRecepisseValidityLimit = receipt?.validityLimit ?? null;
-      bsvhu.brokerRecepisseDepartment = receipt?.department ?? null;
+      // don't overwrite user input because there are still those inputs in BSVHU forms
+      if (!bsvhu.brokerRecepisseNumber && receipt?.receiptNumber) {
+        bsvhu.brokerRecepisseNumber = receipt.receiptNumber;
+      }
+      if (!bsvhu.brokerRecepisseValidityLimit && receipt?.validityLimit) {
+        bsvhu.brokerRecepisseValidityLimit = receipt.validityLimit;
+      }
+      if (!bsvhu.brokerRecepisseDepartment && receipt?.department) {
+        bsvhu.brokerRecepisseDepartment = receipt.department;
+      }
     }
   },
   {
@@ -47,9 +54,16 @@ const recipifyBsvhuAccessors = (
       return bsd.traderCompanySiret ?? null;
     },
     setter: async (bsvhu: ParsedZodBsvhu, receipt) => {
-      bsvhu.traderRecepisseNumber = receipt?.receiptNumber ?? null;
-      bsvhu.traderRecepisseValidityLimit = receipt?.validityLimit ?? null;
-      bsvhu.traderRecepisseDepartment = receipt?.department ?? null;
+      // don't overwrite user input because there are still those inputs in BSVHU forms
+      if (!bsvhu.traderRecepisseNumber && receipt?.receiptNumber) {
+        bsvhu.traderRecepisseNumber = receipt.receiptNumber;
+      }
+      if (!bsvhu.traderRecepisseValidityLimit && receipt?.validityLimit) {
+        bsvhu.traderRecepisseValidityLimit = receipt.validityLimit;
+      }
+      if (!bsvhu.traderRecepisseDepartment && receipt?.department) {
+        bsvhu.traderRecepisseDepartment = receipt.department;
+      }
     }
   }
 ];

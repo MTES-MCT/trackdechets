@@ -44,9 +44,15 @@ const recipifyBsdaAccessors = (
       return bsd.brokerCompanySiret ?? null;
     },
     setter: async (bsda: ParsedZodBsda, receipt) => {
-      bsda.brokerRecepisseNumber = receipt?.receiptNumber ?? null;
-      bsda.brokerRecepisseValidityLimit = receipt?.validityLimit ?? null;
-      bsda.brokerRecepisseDepartment = receipt?.department ?? null;
+      if (!bsda.brokerRecepisseNumber && receipt?.receiptNumber) {
+        bsda.brokerRecepisseNumber = receipt.receiptNumber;
+      }
+      if (!bsda.brokerRecepisseValidityLimit && receipt?.validityLimit) {
+        bsda.brokerRecepisseValidityLimit = receipt.validityLimit;
+      }
+      if (!bsda.brokerRecepisseDepartment && receipt?.department) {
+        bsda.brokerRecepisseDepartment = receipt.department;
+      }
     }
   }
 ];

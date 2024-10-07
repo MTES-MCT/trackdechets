@@ -1,5 +1,10 @@
 import * as yup from "yup";
-import { Company, CompanyType, WasteProcessorType } from "@prisma/client";
+import {
+  Company,
+  CompanyType,
+  WasteProcessorType,
+  WasteVehiclesType
+} from "@prisma/client";
 import {
   cleanClue,
   isForeignVat,
@@ -29,6 +34,14 @@ export function isWasteCenter(company: Company) {
 
 export function isWasteVehicles(company: Company) {
   return company.companyTypes.includes(CompanyType.WASTE_VEHICLES);
+}
+
+export function isBroyeur(company: Company) {
+  return company.wasteVehiclesTypes.includes(WasteVehiclesType.BROYEUR);
+}
+
+export function isDemolisseur(company: Company) {
+  return company.wasteVehiclesTypes.includes(WasteVehiclesType.DEMOLISSEUR);
 }
 
 export function isTransporter({
