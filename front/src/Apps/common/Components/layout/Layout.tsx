@@ -7,6 +7,7 @@ import Header from "./Header";
 import { Toaster } from "react-hot-toast";
 import sandboxIcon from "./assets/code-sandbox.svg";
 import downtimeIcon from "./assets/code-downtime.svg";
+import PageTitle from "../PageTitle/PageTitle";
 
 interface AuthProps {
   isAuthenticated: boolean;
@@ -107,6 +108,7 @@ export default function Layout({
         defaultOrgId={defaultOrgId}
       />
       <Outlet />
+      <PageTitle />
     </>
   );
 }
