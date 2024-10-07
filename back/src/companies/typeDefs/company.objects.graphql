@@ -45,6 +45,9 @@ type CompanyPrivate {
   "Liste des permissions de l'utilisateur authentifié au sein de cet établissement"
   userPermissions: [UserPermission!]!
 
+  "Liste des notifications auquels l'utilisateur est abonné pour cet établissement"
+  userNotifications: [UserNotification!]!
+
   """
   Nom d'usage de l'entreprise qui permet de différencier
   différents établissements ayant le même nom

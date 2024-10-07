@@ -2,7 +2,6 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
-  convertUrls,
   getCompanyOrCompanyNotFound,
   getUpdatedCompanyNameAndAddress,
   updateFavorites
@@ -10,14 +9,14 @@ import {
 
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
-import { libelleFromCodeNaf } from "../../sirene/utils";
-import { Company, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { ZodCompany } from "../../validation/schema";
 import { safeInput } from "../../../common/converter";
 import { parseCompanyAsync } from "../../validation/index";
 import { SiretNotFoundError } from "../../sirene/errors";
 import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
+import { toGqlCompanyPrivate } from "../../converters";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -155,14 +154,7 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   });
   await updateFavorites([existingCompany.orgId]);
 
-  // conversion to CompanyPrivate type
-  const naf = (updatedCompany as Company).codeNaf ?? existingCompany.codeNaf;
-  const libelleNaf = libelleFromCodeNaf(naf!);
-  return {
-    ...convertUrls(updatedCompany),
-    naf,
-    libelleNaf
-  };
+  return toGqlCompanyPrivate(updatedCompany);
 };
 
 export default updateCompanyResolver;

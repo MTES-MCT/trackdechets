@@ -15,13 +15,14 @@ import {
   verifiedForeignTransporterCompany
 } from "@td/mail";
 import { prisma } from "@td/prisma";
-import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
+import { getCompanyOrCompanyNotFound } from "../../database";
 import { isForeignTransporter } from "../../validation";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import {
   NotCompanyAdminErrorMsg,
   UserInputError
 } from "../../../common/errors";
+import { toGqlCompanyPrivate } from "../../converters";
 
 export const sendFirstOnboardingEmail = async (
   {
@@ -94,7 +95,7 @@ const verifyCompanyResolver: MutationResolvers["verifyCompany"] = async (
   // Potential onboarding email
   await sendFirstOnboardingEmail(verifiedCompany, user);
 
-  return convertUrls(verifiedCompany);
+  return toGqlCompanyPrivate(verifiedCompany);
 };
 
 export default verifyCompanyResolver;

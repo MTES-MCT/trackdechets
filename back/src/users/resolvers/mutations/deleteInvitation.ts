@@ -1,10 +1,7 @@
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  convertUrls,
-  getCompanyOrCompanyNotFound
-} from "../../../companies/database";
+import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getUserAccountHashOrNotFound } from "../../database";
 import {
@@ -12,6 +9,7 @@ import {
   Permission
 } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
+import { toGqlCompanyPrivate } from "../../../companies/converters";
 
 const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
   parent,
@@ -36,7 +34,7 @@ const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
   const dbCompany = await prisma.company.findUnique({
     where: { orgId: siret }
   });
-  return convertUrls(dbCompany!);
+  return toGqlCompanyPrivate(dbCompany!);
 };
 
 export default deleteInvitationResolver;

@@ -13,10 +13,10 @@ import {
   indexFavorites,
   favoritesConstrutor
 } from "../../../../queue/jobs/indexFavorites";
-import { convertUrls } from "../../../database";
 import { searchCompany } from "../../../search";
 import { index, client as elasticSearch } from "../../../../common/elastic";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
+import { toGqlCompanyPrivate } from "../../../converters";
 
 const request = supertest(app);
 
@@ -82,7 +82,7 @@ describe("query favorites", () => {
     await refreshIndices();
 
     (searchCompany as jest.Mock).mockResolvedValueOnce({
-      ...convertUrls(company)
+      ...toGqlCompanyPrivate(company)
     });
     await indexFavorites(
       await favoritesConstrutor({ orgId: company.orgId, type: "RECIPIENT" }),
@@ -137,7 +137,7 @@ describe("query favorites", () => {
     await refreshIndices();
 
     (searchCompany as jest.Mock).mockResolvedValueOnce({
-      ...convertUrls(company)
+      ...toGqlCompanyPrivate(company)
     });
     await indexFavorites(
       await favoritesConstrutor({ orgId: company.orgId, type: "EMITTER" }),

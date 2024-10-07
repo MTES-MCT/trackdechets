@@ -1,7 +1,7 @@
 import { libelleFromCodeNaf } from "../../companies/sirene/utils";
-import { convertUrls } from "../../companies/database";
 import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
 import { prisma } from "@td/prisma";
+import { toGqlCompanyPrivate } from "../../companies/converters";
 
 const userResolvers: UserResolvers = {
   // Returns the list of companies a user belongs to
@@ -18,7 +18,7 @@ const userResolvers: UserResolvers = {
     }));
 
     return companies.map(async company => {
-      const companyPrivate: CompanyPrivate = convertUrls(company);
+      const companyPrivate: CompanyPrivate = toGqlCompanyPrivate(company);
 
       const { codeNaf: naf, address } = company;
       const libelleNaf = libelleFromCodeNaf(naf!);

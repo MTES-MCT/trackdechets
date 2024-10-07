@@ -1,11 +1,12 @@
 import { UserRole } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import { convertUrls, getCompanyActiveUsers } from "../../database";
+import { getCompanyActiveUsers } from "../../database";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import { UserInputError } from "../../../common/errors";
+import { toGqlCompanyPrivate } from "../../converters";
 
 const deleteCompanyResolver: MutationResolvers["deleteCompany"] = async (
   _,
@@ -39,7 +40,7 @@ const deleteCompanyResolver: MutationResolvers["deleteCompany"] = async (
   await prisma.membershipRequest.deleteMany({ where: { companyId: id } });
   await prisma.company.delete({ where: { id } });
 
-  return convertUrls(companyAssociation.company);
+  return toGqlCompanyPrivate(companyAssociation.company);
 };
 
 export default deleteCompanyResolver;

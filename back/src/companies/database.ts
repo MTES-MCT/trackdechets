@@ -403,24 +403,6 @@ export async function getWorkerCertificationOrNotFound({
   return agrement;
 }
 
-export function convertUrls<T extends Partial<Company>>(
-  company: T
-): T & {
-  ecoOrganismeAgreements: URL[];
-  signatureAutomations: [];
-  receivedSignatureAutomations: [];
-  userPermissions: [];
-} {
-  return {
-    ...company,
-    ecoOrganismeAgreements:
-      company.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
-    signatureAutomations: [],
-    receivedSignatureAutomations: [],
-    userPermissions: []
-  };
-}
-
 export async function updateFavorites(orgIds: string[]) {
   for (const favoriteType of allFavoriteTypes) {
     await favoritesCompanyQueue.addBulk(

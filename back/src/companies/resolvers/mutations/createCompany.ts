@@ -7,7 +7,6 @@ import {
   WasteProcessorType,
   WasteVehiclesType
 } from "@prisma/client";
-import { convertUrls } from "../../database";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
@@ -33,6 +32,7 @@ import { sendVerificationCodeLetter } from "../../../common/post";
 import { isGenericEmail } from "@td/constants";
 import { parseCompanyAsync } from "../../validation/index";
 import { companyInputToZodCompany } from "../../validation/helpers";
+import { toGqlCompanyPrivate } from "../../converters";
 
 /**
  * Create a new company and associate it to a user
@@ -252,7 +252,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   ) {
     await sendFirstOnboardingEmail(companyInput, user);
   }
-  return convertUrls(company);
+  return toGqlCompanyPrivate(company);
 };
 
 export default createCompanyResolver;
