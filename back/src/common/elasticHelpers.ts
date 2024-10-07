@@ -1,5 +1,9 @@
-import { BsdElastic } from "./elastic";
+import { ApiResponse } from "@elastic/elasticsearch";
+import { UpdateByQueryResponse } from "@elastic/elasticsearch/api/types";
+import { xDaysAgo } from "../utils";
+import { BsdElastic, client, index } from "./elastic";
 import { RevisionRequestStatus } from "@prisma/client";
+import { logger } from "@td/logger";
 
 type RevisionRequest = {
   status: RevisionRequestStatus;
@@ -61,3 +65,45 @@ export function getRevisionOrgIds(
     isRevisedFor: isRevisedFor.filter(orgId => !isInRevisionFor.includes(orgId))
   };
 }
+/**
+ * The "isReturnFor" tab contains BSDs with characteristics that make them valuable for
+ * transporters, but only for so long. That's why we need to regularly clean this tab up
+ */
+export const cleanUpIsReturnForTab = async (alias = index.alias) => {
+  const twoDaysAgo = xDaysAgo(new Date(), 2);
+
+  const { body }: ApiResponse<UpdateByQueryResponse> =
+    await client.updateByQuery({
+      index: alias,
+      refresh: true,
+      body: {
+        query: {
+          bool: {
+            filter: [
+              {
+                exists: {
+                  field: "isReturnFor"
+                }
+              },
+              {
+                range: {
+                  destinationReceptionDate: {
+                    lt: twoDaysAgo.toISOString()
+                  }
+                }
+              }
+            ]
+          }
+        },
+        script: {
+          source: "ctx._source.isReturnFor = []"
+        }
+      }
+    });
+
+  logger.info(
+    `[cleanUpIsReturnForTab] Update ended! ${body.updated} bsds updated in ${body.took}ms!`
+  );
+
+  return body;
+};

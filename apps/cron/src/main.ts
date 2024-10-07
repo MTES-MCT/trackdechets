@@ -1,6 +1,6 @@
 import * as cron from "cron";
 import cronValidator from "cron-validate";
-import { initSentry } from "back";
+import { cleanUpIsReturnForTab, initSentry } from "back";
 import {
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
@@ -64,6 +64,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
         await sendPendingRevisionRequestToAdminDetailsEmail();
+      },
+      timeZone: TZ
+    }),
+    // cleanup the isReturnFor tab
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await cleanUpIsReturnForTab();
       },
       timeZone: TZ
     })
