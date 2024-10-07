@@ -88,10 +88,15 @@ async function cleanOrphanAppendix1() {
     });
 
     cursor = orphansChunk[orphansChunk.length - 1].id;
+    const orphansChunkIds = orphansChunk.map(form => form.id);
 
     await prisma.form.updateMany({
-      where: { id: { in: orphansChunk.map(form => form.id) } },
+      where: { id: { in: orphansChunkIds } },
       data: { isDeleted: true }
     });
+
+    for (const id of orphansChunkIds) {
+      await deleteBsd({ id }, { user: { auth: AuthType.BEARER } } as any);
+    }
   }
 }
