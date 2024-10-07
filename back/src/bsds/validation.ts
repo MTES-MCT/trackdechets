@@ -39,5 +39,8 @@ export const bsdSearchSchema: yup.SchemaOf<
     .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()) as any,
   isToCollectFor: yup
     .array()
+    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()) as any,
+  isReturnFor: yup
+    .array()
     .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()) as any
 });
