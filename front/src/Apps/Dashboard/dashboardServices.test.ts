@@ -25,7 +25,9 @@ import {
   isEcoOrgSign,
   isEmetteurSign,
   isSignTransportCanSkipEmission,
-  getOperationCodesFromSearchString
+  getOperationCodesFromSearchString,
+  hasRoadControlButton,
+  getPrimaryActionsLabelFromBsdStatus
 } from "./dashboardServices";
 import {
   BsdType,
@@ -1474,6 +1476,31 @@ describe("dashboardServices", () => {
       const operationCodes = getOperationCodesFromSearchString(searchString);
 
       expect(operationCodes).toStrictEqual([]);
+    });
+  });
+
+  describe("hasRoadControlButton", () => {
+    it("should return true if isReturnTab", () => {
+      // When
+      const result = hasRoadControlButton({} as BsdDisplay, false, true);
+
+      // Then
+      expect(result).toBeTruthy();
+    });
+  });
+
+  describe("getPrimaryActionsLabelFromBsdStatus", () => {
+    it("should return ROAD_CONTROL if isReturnTab", () => {
+      // When
+      const result = getPrimaryActionsLabelFromBsdStatus(
+        {} as BsdDisplay,
+        "any-siret",
+        [],
+        "returnTab"
+      );
+
+      // Then
+      expect(result).toBe(ROAD_CONTROL);
     });
   });
 });

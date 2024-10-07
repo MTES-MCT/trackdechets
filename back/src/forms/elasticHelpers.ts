@@ -245,7 +245,7 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
  * - waste has been received in the last 48 hours
  * - waste has citerne business (emptyReturnADR or citerne washed) OR waste hasn't been fully accepted
  */
-const belongsToIsReturnForTab = (form: FullForm) => {
+export const belongsToIsReturnForTab = (form: FullForm) => {
   const hasBeenReceivedLately =
     isDefined(form.receivedAt) && form.receivedAt! > xDaysAgo(new Date(), 2);
 
