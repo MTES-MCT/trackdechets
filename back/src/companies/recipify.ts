@@ -153,8 +153,6 @@ export const buildRecipify = async <T>(
   accessors: RecipifyInputAccessor<T>[],
   bsd: T
 ): Promise<T> => {
-  console.log("build recipify");
-
   const recipifiedBsd = { ...bsd };
   for (const { role, skip, setter, orgIdGetter } of accessors) {
     if (skip) {
@@ -166,8 +164,6 @@ export const buildRecipify = async <T>(
       continue;
     }
     if (role === CompanyRole.Transporter) {
-      console.log("transporter");
-
       try {
         receipt = await prisma.company
           .findUnique({
@@ -180,8 +176,6 @@ export const buildRecipify = async <T>(
         // do nothing
       }
     } else if (role === CompanyRole.Broker) {
-      console.log("broker");
-
       try {
         receipt = await prisma.company
           .findUnique({
@@ -206,13 +200,8 @@ export const buildRecipify = async <T>(
         // do nothing
       }
     }
-    console.log("receipt");
-    console.log(receipt);
-
     setter(recipifiedBsd, receipt);
   }
-  console.log("RECEPIFIED");
-  console.log(recipifiedBsd);
 
   return recipifiedBsd;
 };
