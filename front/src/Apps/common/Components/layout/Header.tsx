@@ -426,6 +426,7 @@ function MobileSubNav({ currentCompany }) {
     </div>
   );
 }
+const allBsdsMenuEntryLbl = "Mes bordereaux";
 
 const getDesktopMenuEntries = (
   isAuthenticated,
@@ -448,10 +449,9 @@ const getDesktopMenuEntries = (
       navlink: true
     }
   ];
-
   const connected = [
     {
-      caption: "Mes bordereaux",
+      caption: allBsdsMenuEntryLbl,
       href: currentSiret
         ? generatePath(routes.dashboard.index, {
             siret: currentSiret
@@ -766,7 +766,15 @@ export default function Header({
               style={{ margin: "initial", maxWidth: "initial" }}
             >
               {menuEntries.map((e, idx) => (
-                <li className="fr-nav__item" key={idx}>
+                <li
+                  id={
+                    e.caption === allBsdsMenuEntryLbl
+                      ? "header-all-bsds-link"
+                      : ""
+                  }
+                  className="fr-nav__item"
+                  key={idx}
+                >
                   <MenuLink entry={e} />
                 </li>
               ))}

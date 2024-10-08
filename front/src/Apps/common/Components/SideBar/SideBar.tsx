@@ -6,6 +6,10 @@ interface SideBarProps {
 }
 
 const SideBar = ({ children }: SideBarProps) => {
-  return <aside className="sidebarv2">{children}</aside>;
+  return (
+    <aside id="td-sidebar" className="sidebarv2">
+      {children}
+    </aside>
+  );
 };
 export default React.memo(SideBar);
