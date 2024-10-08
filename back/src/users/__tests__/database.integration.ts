@@ -9,7 +9,7 @@ import {
 import { associateUserToCompany, createUserAccountHash } from "../database";
 import { getUserRoles } from "../../permissions";
 import { UserRole } from "@prisma/client";
-import { ALL_NOTIFICATIONS } from "../notifications";
+import { ALL_NOTIFICATIONS } from "@td/constants";
 
 describe("createUserAccountHash", () => {
   afterAll(resetDatabase);

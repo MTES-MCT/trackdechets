@@ -20,6 +20,18 @@ export const AccountMenuContent = () => (
             Mes paramètres
           </NavLink>
         </li>
+        <li className="tw-mb-1">
+          <NavLink
+            to={routes.account.notifications}
+            className={({ isActive }) =>
+              isActive
+                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                : "sidebarv2__item sidebarv2__item--indented"
+            }
+          >
+            Notifications
+          </NavLink>
+        </li>
       </ul>
     </Accordion>
 

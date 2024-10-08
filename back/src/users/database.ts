@@ -17,7 +17,7 @@ import { deleteCachedUserRoles } from "../common/redis/users";
 import { hashPassword, passwordVersion } from "./utils";
 import { UserInputError } from "../common/errors";
 import { PrismaTransaction } from "../common/repository/types";
-import { ALL_NOTIFICATIONS } from "./notifications";
+import { ALL_NOTIFICATIONS } from "@td/constants";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.companyAssociation.findMany({

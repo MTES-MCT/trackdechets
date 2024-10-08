@@ -1,6 +1,7 @@
 import {
   CollectorType,
   CompanyType,
+  UserRole,
   WasteProcessorType,
   WasteVehiclesType
 } from "@td/codegen-ui";
@@ -240,4 +241,16 @@ export const formatDateViewDisplay = date => {
         locale: fr
       })
     : "";
+};
+export const userRoleLabel = (role: UserRole) => {
+  switch (role) {
+    case UserRole.Admin:
+      return "Administrateur";
+    case UserRole.Member:
+      return "Collaborateur";
+    case UserRole.Driver:
+      return "Chauffeur";
+    case UserRole.Reader:
+      return "Lecteur";
+  }
 };

@@ -12,7 +12,7 @@ import { Mutation } from "../../../../generated/graphql/types";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
 import { templateIds } from "@td/mail";
-import { ALL_NOTIFICATIONS } from "../../../notifications";
+import { ALL_NOTIFICATIONS } from "@td/constants";
 
 const INVITE_USER_TO_COMPANY = `
   mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!){
