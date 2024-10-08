@@ -126,13 +126,12 @@ describe("Mutation.Vhu.update", () => {
         value: 4
       }
     };
-    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+    const { data, errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
       UPDATE_VHU_FORM,
       {
         variables: { id: form.id, input }
       }
     );
-
     expect(data.updateBsvhu.weight!.value).toBe(4);
   });
 
