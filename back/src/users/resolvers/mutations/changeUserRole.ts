@@ -25,7 +25,7 @@ import {
   updateCompanyAssociation,
   updateUserAccountHash
 } from "../../database";
-import { ALL_NOTIFICATIONS } from "../../notifications";
+import { ALL_NOTIFICATIONS } from "@td/constants";
 
 const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
   parent,

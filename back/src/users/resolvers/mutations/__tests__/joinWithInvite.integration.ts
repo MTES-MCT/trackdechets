@@ -5,7 +5,7 @@ import { getUserCompanies } from "../../../database";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { UserRole } from "@prisma/client";
-import { ALL_NOTIFICATIONS } from "../../../notifications";
+import { ALL_NOTIFICATIONS } from "@td/constants";
 
 const JOIN_WITH_INVITE = `
   mutation JoinWithInvite($inviteHash: String!, $name: String!, $password: String!){

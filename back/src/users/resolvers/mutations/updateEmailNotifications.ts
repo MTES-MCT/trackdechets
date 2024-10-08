@@ -12,7 +12,7 @@ import {
   MutationResolvers
 } from "../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
-import { authorizedNotifications } from "../../notifications";
+import { authorizedNotifications } from "@td/constants";
 
 const updateEmailNotificationsResolver: MutationResolvers["updateEmailNotifications"] =
   async (parent, args, context: GraphQLContext): Promise<CompanyMember> => {
