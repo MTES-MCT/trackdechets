@@ -7,6 +7,7 @@ export type BsvhuUserFunctions = {
   isEmitter: boolean;
   isDestination: boolean;
   isTransporter: boolean;
+  isEcoOrganisme: boolean;
 };
 
 export type BsvhuValidationContext = {

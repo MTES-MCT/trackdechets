@@ -740,6 +740,12 @@ Pour palier à ce problème, il est possible de nourrir la base de donnée Prism
    3.2 Dans le container `td-api`: `npx prisma db push --preview-feature` pour recréer les tables
 4. Dans le container `td-api`: `npx prisma db seed --preview-feature` pour nourrir la base de données.
 
+### Ajouter un objet spécifique dans la base de données
+
+Au cas où il serait nécessaire d'ajouter un objet à la base de données, vous pouvez utiliser le script "object-creator". Pour celà, modifiez le fichier `libs/back/object-creator/src/objects.ts` en ajoutant des objets en respectant le format démontré en exemple.
+
+Vous pouvez ensuite utiliser `npx nx run object-creator:run` et si tout se passe bien, les objets seront créés dans la base de donnée spécifiée dans la variable d'environnement "DATABASE_URL".
+
 ### Ajouter une nouvelle icône
 
 Les icônes utilisées dans l'application front viennent de https://streamlineicons.com/.
