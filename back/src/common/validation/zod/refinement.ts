@@ -141,24 +141,32 @@ export async function isDestinationRefinement(
     CompanyRole.Destination
   );
   if (company) {
-    if (role === "WASTE_VEHICLES" && !isWasteVehicles(company)) {
-      return ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.Destination),
-        message: `Cet établissement n'a pas le profil Installation de traitement de VHU.`
-      });
-    } else if (role === "BROYEUR" && !isBroyeur(company)) {
-      return ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.Destination),
-        message: `Cet établissement n'a pas le sous-profil Broyeur.`
-      });
-    } else if (role === "DEMOLISSEUR" && !isDemolisseur(company)) {
-      return ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.Destination),
-        message: `Cet établissement n'a pas le sous-profil Casse automobile / démolisseur.`
-      });
+    if (
+      role === "WASTE_VEHICLES" ||
+      role === "BROYEUR" ||
+      role === "DEMOLISSEUR"
+    ) {
+      if (!isWasteVehicles(company)) {
+        return ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: pathFromCompanyRole(CompanyRole.Destination),
+          message: `Cet établissement n'a pas le profil Installation de traitement de VHU.`
+        });
+      }
+      if (role === "BROYEUR" && !isBroyeur(company)) {
+        return ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: pathFromCompanyRole(CompanyRole.Destination),
+          message: `Cet établissement n'a pas le sous-profil Broyeur.`
+        });
+      }
+      if (role === "DEMOLISSEUR" && !isDemolisseur(company)) {
+        return ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: pathFromCompanyRole(CompanyRole.Destination),
+          message: `Cet établissement n'a pas le sous-profil Casse automobile / démolisseur.`
+        });
+      }
     } else if (
       !isCollector(company) &&
       !isWasteProcessor(company) &&

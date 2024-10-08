@@ -79,7 +79,10 @@ describe("mutaion.duplicateBsvhu", () => {
       await prisma.transporterReceipt.findUniqueOrThrow({
         where: { id: transporter.transporterReceiptId! }
       });
-    const destination = await companyFactory();
+    const destination = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
 
     const intermediary = await companyFactory();
 
@@ -467,6 +470,8 @@ describe("mutaion.duplicateBsvhu", () => {
         where: { id: transporterCompany.transporterReceiptId! }
       });
     const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"],
       vhuAgrementDemolisseur: {
         create: {
           agrementNumber: "UPDATED-AGREEMENT-NUMBER",
@@ -651,6 +656,8 @@ describe("mutaion.duplicateBsvhu", () => {
         where: { id: transporterCompany.transporterReceiptId! }
       });
     const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"],
       vhuAgrementDemolisseur: {
         create: {
           agrementNumber: "UPDATED-AGREEMENT-NUMBER",
