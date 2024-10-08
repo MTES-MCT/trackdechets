@@ -44,7 +44,11 @@ import {
   TemporaryStorageDetail,
   Transporter,
   TransportMode,
-  BsdasriMetadata
+  BsdasriMetadata,
+  Broker,
+  Trader,
+  BsdaBroker,
+  FormCompany
 } from "@td/codegen-ui";
 
 export enum BsdTypename {
@@ -117,6 +121,9 @@ export interface BsdDisplay {
   updatedAt?: Maybe<string> | Maybe<Scalars["DateTime"]>;
   emittedByEcoOrganisme?: Maybe<boolean> | Maybe<BsdaEcoOrganisme>;
   worker?: Maybe<BsdaWorker>;
+  trader?: Maybe<Trader>;
+  broker?: Maybe<Broker> | Maybe<BsdaBroker>;
+  intermediaries?: FormCompany[];
   bsdWorkflowType?:
     | Maybe<BsdaType>
     | BsdasriType
