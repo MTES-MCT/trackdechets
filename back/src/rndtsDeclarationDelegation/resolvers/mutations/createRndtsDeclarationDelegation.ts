@@ -55,7 +55,11 @@ const createRndtsDeclarationDelegation = async (
   );
 
   // Send email
-  await sendRndtsDeclarationDelegationCreationEmail(delegator, delegate);
+  await sendRndtsDeclarationDelegationCreationEmail(
+    delegation,
+    delegator,
+    delegate
+  );
 
   return fixTyping(delegation);
 };

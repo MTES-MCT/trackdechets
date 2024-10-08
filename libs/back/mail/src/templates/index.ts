@@ -251,11 +251,12 @@ export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
 };
 
 export const rndtsDeclarationDelegationCreation: MailTemplate<{
+  startDate: string;
   delegator: Company;
   delegate: Company;
 }> = {
-  subject: ({ delegator, delegate }) =>
-    `${delegator.givenName} délègue ses déclarations RNDTS à ${delegate.givenName}`,
+  subject: ({ delegator }) =>
+    `Émission d'une demande de délégation de l'établissement ${delegator.name} (${delegator.siret})`,
   body: mustacheRenderer("rndts-declaration-delegation-creation.html"),
   templateId: templateIds.LAYOUT
 };

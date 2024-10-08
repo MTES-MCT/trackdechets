@@ -1,10 +1,11 @@
-import { Company } from "@prisma/client";
+import { Company, RndtsDeclarationDelegation } from "@prisma/client";
 import { UserInputError } from "../../../../common/errors";
 import { getRndtsDeclarationDelegationRepository } from "../../../repository";
 import { ParsedCreateRndtsDeclarationDelegationInput } from "../../../validation";
 import { prisma } from "@td/prisma";
 import { renderMail, rndtsDeclarationDelegationCreation } from "@td/mail";
 import { sendMail } from "../../../../mailer/mailing";
+import { toddMMYYYY } from "../../../../utils";
 
 export const createDelegation = async (
   user: Express.User,
@@ -66,6 +67,7 @@ export const checkNoExistingNotRevokedAndNotExpiredDelegation = async (
  * Send a creation email to admin of both companies (delegate & delegator)
  */
 export const sendRndtsDeclarationDelegationCreationEmail = async (
+  delegation: RndtsDeclarationDelegation,
   delegator: Company,
   delegate: Company
 ) => {
@@ -88,7 +90,11 @@ export const sendRndtsDeclarationDelegationCreationEmail = async (
 
   // Prepare mail template
   const payload = renderMail(rndtsDeclarationDelegationCreation, {
-    variables: { delegator, delegate },
+    variables: {
+      startDate: toddMMYYYY(delegation.startDate),
+      delegator,
+      delegate
+    },
     messageVersions: [
       {
         to: companyAssociations.map(companyAssociation => ({

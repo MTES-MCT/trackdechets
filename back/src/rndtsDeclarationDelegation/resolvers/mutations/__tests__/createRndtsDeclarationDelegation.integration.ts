@@ -13,7 +13,7 @@ import { User, RndtsDeclarationDelegation } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { GraphQLFormattedError } from "graphql";
-import { nowPlusXHours, todayAtMidnight } from "../../../../utils";
+import { nowPlusXHours, todayAtMidnight, toddMMYYYY } from "../../../../utils";
 import { sendMail } from "../../../../mailer/mailing";
 import { renderMail, rndtsDeclarationDelegationCreation } from "@td/mail";
 
@@ -212,7 +212,7 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       await userWithCompanyFactory("ADMIN"); // Not part of the delegation, should not receive mail
 
       // When
-      const { errors } = await createDelegation(delegatorAdmin, {
+      const { errors, delegation } = await createDelegation(delegatorAdmin, {
         delegateOrgId: delegate.orgId,
         delegatorOrgId: delegator.orgId
       });
@@ -229,7 +229,11 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Onboarding email
       expect(sendMail as jest.Mock).toHaveBeenCalledWith(
         renderMail(rndtsDeclarationDelegationCreation, {
-          variables: { delegator, delegate },
+          variables: {
+            startDate: toddMMYYYY(delegation!.startDate!),
+            delegator,
+            delegate
+          },
           messageVersions: [
             {
               to: expect.arrayContaining([
