@@ -117,7 +117,7 @@ describe("Mutation.creatPdfAccessToken", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Seuls les bordereaux pris en charge par un transporteur peuvent être consulté via un accès temporaire.",
+          "Seuls les bordereaux pris en charge par un transporteur peuvent être consultés via un accès temporaire.",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -211,7 +211,7 @@ describe("Mutation.creatPdfAccessToken", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Seuls les bordereaux pris en charge par un transporteur peuvent être consulté via un accès temporaire.",
+          "Seuls les bordereaux pris en charge par un transporteur peuvent être consultés via un accès temporaire.",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -298,7 +298,7 @@ describe("Mutation.creatPdfAccessToken", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Seuls les bordereaux pris en charge par un transporteur peuvent être consulté via un accès temporaire.",
+          "Seuls les bordereaux pris en charge par un transporteur peuvent être consultés via un accès temporaire.",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -380,7 +380,7 @@ describe("Mutation.creatPdfAccessToken", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Seuls les bordereaux pris en charge par un transporteur peuvent être consulté via un accès temporaire.",
+          "Seuls les bordereaux pris en charge par un transporteur peuvent être consultés via un accès temporaire.",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -464,7 +464,7 @@ describe("Mutation.creatPdfAccessToken", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Seuls les bordereaux pris en charge par un transporteur peuvent être consulté via un accès temporaire.",
+          "Seuls les bordereaux pris en charge par un transporteur peuvent être consultés via un accès temporaire.",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
