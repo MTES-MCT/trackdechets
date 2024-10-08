@@ -126,7 +126,7 @@ describe("Mutation.Vhu.update", () => {
         value: 4
       }
     };
-    const { data, errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
       UPDATE_VHU_FORM,
       {
         variables: { id: form.id, input }

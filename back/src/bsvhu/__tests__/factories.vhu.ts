@@ -22,7 +22,8 @@ export const bsvhuFactory = async ({
     companyTypes: ["TRANSPORTER"]
   });
   const destinationCompany = await companyFactory({
-    companyTypes: ["WASTE_VEHICLES"]
+    companyTypes: ["WASTE_VEHICLES"],
+    wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
   });
   const brokerCompany = await companyFactory({
     companyTypes: ["BROKER"]
