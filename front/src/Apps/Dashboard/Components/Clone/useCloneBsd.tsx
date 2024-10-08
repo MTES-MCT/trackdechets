@@ -14,7 +14,7 @@ const CLONE_BSD = gql`
 `;
 
 const message = `Le bordereau a été cloné`;
-const startErrorMessage = "Impossible de cloner,";
+const startErrorMessage = "Une erreur inattendue s'est produite: ";
 export function useCloneBsd(
   options: MutationHookOptions<Pick<Mutation, "cloneBsd">, MutationCloneBsdArgs>
 ) {
