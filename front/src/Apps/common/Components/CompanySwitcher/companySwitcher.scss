@@ -85,6 +85,15 @@
     color: #666;
     font-size: 12px;
     margin-right: 16px;
+    min-width: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-wrap: normal;
+  }
+
+  &__code {
+    flex-basis: auto;
+    flex-shrink: 0;
   }
 
   &__arrow {

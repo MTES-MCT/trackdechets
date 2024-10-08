@@ -157,7 +157,7 @@ const CompanySwitcher = ({
         <div className="company-switcher-item__infos">
           <div className="company-switcher-item__siret">{company.orgId}</div>
           {current && (
-            <p className="fr-tag fr-tag--sm fr-icon-pen-nib-line fr-tag--icon-left">
+            <p className="company-switcher-item__code fr-tag fr-tag--sm fr-icon-pen-nib-line fr-tag--icon-left">
               {company.securityCode}
             </p>
           )}
