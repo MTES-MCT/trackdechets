@@ -725,8 +725,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
     sealed: { from: "OPERATION" }
   },
   brokerRecepisseValidityLimit: {
-    readableFieldName:
-      "la date de validité de la certification de l'entreprise de travaux",
+    readableFieldName: "la date de validité du récépissé du courtier",
     sealed: { from: "OPERATION" }
   },
   wasteCode: {

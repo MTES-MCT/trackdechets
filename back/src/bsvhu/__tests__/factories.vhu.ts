@@ -24,6 +24,12 @@ export const bsvhuFactory = async ({
   const destinationCompany = await companyFactory({
     companyTypes: ["WASTE_VEHICLES"]
   });
+  const brokerCompany = await companyFactory({
+    companyTypes: ["BROKER"]
+  });
+  const traderCompany = await companyFactory({
+    companyTypes: ["TRADER"]
+  });
   const ecoOrganisme = await ecoOrganismeFactory({
     handle: { handleBsvhu: true },
     createAssociatedCompany: true
@@ -34,6 +40,8 @@ export const bsvhuFactory = async ({
       transporterCompanySiret: transporterCompany.siret,
       destinationCompanySiret: destinationCompany.siret,
       ecoOrganismeSiret: ecoOrganisme.siret,
+      brokerCompanySiret: brokerCompany.siret,
+      traderCompanySiret: traderCompany.siret,
       ...opt
     },
     include: {
@@ -97,7 +105,26 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   destinationOperationCode: null,
 
   ecoOrganismeSiret: siretify(4),
-  ecoOrganismeName: "Eco-Organisme"
+  ecoOrganismeName: "Eco-Organisme",
+
+  brokerCompanyName: "Courtier efficace",
+  brokerCompanySiret: siretify(5),
+  brokerCompanyAddress: "15 Rue des Lilas, 33000 Lille",
+  brokerCompanyContact: "Anton Spencer",
+  brokerCompanyPhone: "06 67 78 89 91",
+  brokerCompanyMail: "a.spencer@goodbroker.com",
+  brokerRecepisseNumber: "receipt number",
+  brokerRecepisseDepartment: "33",
+  brokerRecepisseValidityLimit: "2026-11-27T00:00:00.000Z",
+  traderCompanyName: "Le Négoce QVB",
+  traderCompanySiret: siretify(6),
+  traderCompanyAddress: "32 Avenue des Azalées, 33700 Mérignac",
+  traderCompanyContact: "Benjamin Turner",
+  traderCompanyPhone: "06 68 35 64 34",
+  traderCompanyMail: "b.turner@tradingalright.com",
+  traderRecepisseNumber: "receipt of the firm",
+  traderRecepisseDepartment: "33",
+  traderRecepisseValidityLimit: "2026-11-28T00:00:00.000Z"
 });
 
 export const toIntermediaryCompany = (company: Company, contact = "toto") => ({

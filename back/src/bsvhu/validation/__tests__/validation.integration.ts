@@ -37,6 +37,8 @@ describe("BSVHU validation", () => {
   let transporterCompany: Company;
   let intermediaryCompany: Company;
   let ecoOrganisme: EcoOrganisme;
+  let brokerCompany: Company;
+  let traderCompany: Company;
   beforeAll(async () => {
     const emitterCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
     transporterCompany = await companyFactory({
@@ -57,12 +59,20 @@ describe("BSVHU validation", () => {
       handle: { handleBsvhu: true },
       createAssociatedCompany: true
     });
+    brokerCompany = await companyFactory({
+      companyTypes: ["BROKER"]
+    });
+    traderCompany = await companyFactory({
+      companyTypes: ["TRADER"]
+    });
     const prismaBsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitterCompany.siret,
         transporterCompanySiret: transporterCompany.siret,
         destinationCompanySiret: destinationCompany.siret,
         ecoOrganismeSiret: ecoOrganisme.siret,
+        brokerCompanySiret: brokerCompany.siret,
+        traderCompanySiret: traderCompany.siret,
         intermediaries: {
           create: [toIntermediaryCompany(intermediaryCompany)]
         }
@@ -608,7 +618,9 @@ describe("BSVHU validation", () => {
         [bsvhu.transporterCompanySiret!]: searchResult("transporteur"),
         [bsvhu.destinationCompanySiret!]: searchResult("destinataire"),
         [intermediaryCompany.siret!]: searchResult("intermédiaire"),
-        [ecoOrganisme.siret!]: searchResult("ecoOrganisme")
+        [ecoOrganisme.siret!]: searchResult("ecoOrganisme"),
+        [brokerCompany.siret!]: searchResult("broker"),
+        [traderCompany.siret!]: searchResult("trader")
       };
       (searchCompany as jest.Mock).mockImplementation((clue: string) => {
         return Promise.resolve(searchResults[clue]);
@@ -644,6 +656,12 @@ describe("BSVHU validation", () => {
       );
       expect(sirenified.ecoOrganismeName).toEqual(
         searchResults[ecoOrganisme.siret!].name
+      );
+      expect(sirenified.brokerCompanyName).toEqual(
+        searchResults[brokerCompany.siret!].name
+      );
+      expect(sirenified.traderCompanyName).toEqual(
+        searchResults[traderCompany.siret!].name
       );
     });
     it("should not overwrite `name` and `address` based on SIRENE data for sealed fields", async () => {
