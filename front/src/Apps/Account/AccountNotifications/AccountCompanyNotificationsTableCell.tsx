@@ -7,7 +7,7 @@ type AccountCompanyNotificationsProps = {
   company: CompanyPrivate;
 };
 
-export default function AccountCompany({
+export default function AccountCompanyNotificationsTableCell({
   company
 }: AccountCompanyNotificationsProps) {
   return (
