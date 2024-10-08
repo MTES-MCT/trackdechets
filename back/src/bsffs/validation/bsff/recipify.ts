@@ -14,9 +14,7 @@ const recipifyBsffAccessors = (
     (_, idx) =>
       ({
         role: CompanyRole.Transporter,
-        skip:
-          bsd.transporters![idx].transporterRecepisseIsExempted ||
-          bsd.transporters![idx].transporterTransportSignatureDate,
+        skip: !!bsd.transporters![idx].transporterTransportSignatureDate,
         orgIdGetter: () => {
           const orgId = getTransporterCompanyOrgId({
             transporterCompanySiret:
@@ -26,14 +24,20 @@ const recipifyBsffAccessors = (
           });
           return orgId ?? null;
         },
-        setter: async (bsda: ParsedZodBsff, receipt) => {
-          const transporter = bsda.transporters![idx];
-          transporter.transporterRecepisseNumber =
-            receipt?.receiptNumber ?? null;
-          transporter.transporterRecepisseValidityLimit =
-            receipt?.validityLimit ?? null;
-          transporter.transporterRecepisseDepartment =
-            receipt?.department ?? null;
+        setter: async (bsff: ParsedZodBsff, receipt) => {
+          const transporter = bsff.transporters![idx];
+          if (transporter.transporterRecepisseIsExempted) {
+            transporter.transporterRecepisseNumber = null;
+            transporter.transporterRecepisseValidityLimit = null;
+            transporter.transporterRecepisseDepartment = null;
+          } else {
+            transporter.transporterRecepisseNumber =
+              receipt?.receiptNumber ?? null;
+            transporter.transporterRecepisseValidityLimit =
+              receipt?.validityLimit ?? null;
+            transporter.transporterRecepisseDepartment =
+              receipt?.department ?? null;
+          }
         }
       } as RecipifyInputAccessor<ParsedZodBsff>)
   )

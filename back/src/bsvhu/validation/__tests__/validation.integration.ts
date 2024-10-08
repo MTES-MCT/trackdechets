@@ -45,7 +45,8 @@ describe("BSVHU validation", () => {
       companyTypes: ["TRANSPORTER"]
     });
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
     foreignTransporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -363,9 +364,7 @@ describe("BSVHU validation", () => {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message:
-              `L'installation de destination avec le SIRET \"${company.siret}\" n'est pas inscrite` +
-              " sur Trackdéchets en tant qu'installation de traitement de VHU. Cette installation ne peut donc pas" +
-              " être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements"
+              "Cet établissement n'a pas le profil Installation de traitement de VHU."
           })
         ]);
       }

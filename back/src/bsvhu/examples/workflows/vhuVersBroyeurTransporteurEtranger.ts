@@ -18,7 +18,11 @@ const workflow: Workflow = {
         siret: null
       }
     },
-    { name: "broyeur", companyTypes: ["WASTE_VEHICLES", "WASTEPROCESSOR"] }
+    {
+      name: "broyeur",
+      companyTypes: ["WASTE_VEHICLES", "WASTEPROCESSOR"],
+      opt: { wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"] }
+    }
   ],
   steps: [
     createBsvhu("producteur", fixtures as any),

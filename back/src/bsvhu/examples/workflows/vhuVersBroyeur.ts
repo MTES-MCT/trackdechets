@@ -11,7 +11,11 @@ const workflow: Workflow = {
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur", companyTypes: ["TRANSPORTER"] },
-    { name: "broyeur", companyTypes: ["WASTE_VEHICLES", "WASTEPROCESSOR"] }
+    {
+      name: "broyeur",
+      companyTypes: ["WASTE_VEHICLES", "WASTEPROCESSOR"],
+      opt: { wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"] }
+    }
   ],
   steps: [
     createBsvhu("producteur"),
