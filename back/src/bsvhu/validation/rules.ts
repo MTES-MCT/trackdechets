@@ -197,19 +197,19 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["destination", "agrementNumber"]
   },
   destinationCompanyName: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "La raison sociale du destinataire",
     path: ["destination", "company", "name"]
   },
   destinationCompanySiret: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "Le N° SIRET du destinataire",
     path: ["destination", "company", "siret"]
   },
   destinationCompanyAddress: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "L'adresse du destinataire",
     path: ["destination", "company", "address"]
@@ -381,6 +381,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   identificationNumbers: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
+    required: { from: "EMISSION" },
     readableFieldName: "Les numéros d'identification",
     path: ["identification", "numbers"]
   },
