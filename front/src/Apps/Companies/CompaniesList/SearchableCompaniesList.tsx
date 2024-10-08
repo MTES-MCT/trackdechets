@@ -19,7 +19,10 @@ import styles from "./CompaniesList.module.scss";
 import { MY_COMPANIES } from "../common/queries";
 
 type SearchableCompaniesListProps = {
-  renderCompanies: (companies: CompanyPrivate[]) => React.ReactNode;
+  renderCompanies: (
+    companies: CompanyPrivate[],
+    totalCount: number
+  ) => React.ReactNode;
   // ocallback qui est appelé à chaque fois que l'on obtient une réponse
   // de la query `myCompanies`
   onCompleted?: (data: CompanyPrivateConnection, isFiltered: boolean) => void;
@@ -109,7 +112,7 @@ export default function SearchableCompaniesList({
       <div className="fr-mt-4w">
         {isFiltered && <div className="fr-mb-2w">{searchTitle}</div>}
         {/* <div>{companies.map(company => renderCompanies(company))}</div> */}
-        {renderCompanies(companies)}
+        {renderCompanies(companies, totalCount)}
         {myCompanies.pageInfo.hasNextPage && (
           <div style={{ textAlign: "center" }}>
             <button

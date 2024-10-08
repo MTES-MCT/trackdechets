@@ -242,7 +242,7 @@ export const formatDateViewDisplay = date => {
       })
     : "";
 };
-export const userRoleLabel = (role: UserRole) => {
+export const userRoleLabel = (role?: UserRole | null) => {
   switch (role) {
     case UserRole.Admin:
       return "Administrateur";
@@ -252,5 +252,7 @@ export const userRoleLabel = (role: UserRole) => {
       return "Chauffeur";
     case UserRole.Reader:
       return "Lecteur";
+    default:
+      return "";
   }
 };

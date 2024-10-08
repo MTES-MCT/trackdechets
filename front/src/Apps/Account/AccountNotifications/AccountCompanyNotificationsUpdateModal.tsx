@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   CompanyPrivate,
   Mutation,
@@ -31,16 +31,21 @@ export default function AccountCompanyNotificationsUpdateModal({
 
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
-      MEMBERSHIP_REQUEST:
-        company.userNotifications.includes("MEMBERSHIP_REQUEST"),
+      MEMBERSHIP_REQUEST: company.userNotifications.includes(
+        UserNotification.MembershipRequest
+      ),
       SIGNATURE_CODE_RENEWAL: company.userNotifications.includes(
-        "SIGNATURE_CODE_RENEWAL"
+        UserNotification.SignatureCodeRenewal
       ),
-      BSD_REFUSAL: company.userNotifications.includes("BSD_REFUSAL"),
+      BSD_REFUSAL: company.userNotifications.includes(
+        UserNotification.BsdRefusal
+      ),
       BSDA_FINAL_DESTINATION_UPDATE: company.userNotifications.includes(
-        "BSDA_FINAL_DESTINATION_UPDATE"
+        UserNotification.BsdaFinalDestinationUpdate
       ),
-      REVISION_REQUEST: company.userNotifications.includes("REVISION_REQUEST")
+      REVISION_REQUEST: company.userNotifications.includes(
+        UserNotification.RevisionRequest
+      )
     }
   });
 
