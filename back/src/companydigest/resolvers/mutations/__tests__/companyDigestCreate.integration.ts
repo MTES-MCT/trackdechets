@@ -70,34 +70,8 @@ describe("Mutation.createCompanyDigest", () => {
     ]);
   });
 
-  it("should raise an error if company has no relevant featureFlag", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "createCompanyDigest">>(
-      CREATE_COMPANY_DIGEST,
-      {
-        variables: {
-          input: { orgId: company.siret, year: new Date().getFullYear() }
-        }
-      }
-    );
-
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Vous nêtes pas autorisé à utiliser cette fonctionalité sur cet établissement.",
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
-        })
-      })
-    ]);
-  });
-
   it("should raise an error if year is too old", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER", {
-      featureFlags: ["COMPANY_DIGEST"]
-    });
+    const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const { mutate } = makeClient(user);
     const year = new Date().getFullYear() - 2;
@@ -122,9 +96,7 @@ describe("Mutation.createCompanyDigest", () => {
   });
 
   it("should create a companyDigest for current year", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER", {
-      featureFlags: ["COMPANY_DIGEST"]
-    });
+    const { user, company } = await userWithCompanyFactory("MEMBER");
     const year = new Date().getFullYear();
 
     const { mutate } = makeClient(user);
@@ -142,9 +114,7 @@ describe("Mutation.createCompanyDigest", () => {
   });
 
   it("should create a companyDigest for last year", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER", {
-      featureFlags: ["COMPANY_DIGEST"]
-    });
+    const { user, company } = await userWithCompanyFactory("MEMBER");
     const year = new Date().getFullYear() - 1;
 
     const { mutate } = makeClient(user);
