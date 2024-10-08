@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { generateUniqueTestSiret, randomNbrChain } from "back";
-import { CompanyType, Prisma } from "@prisma/client";
+import { CompanyType, Prisma, WasteVehiclesType } from "@prisma/client";
 
 interface VhuAgrement {
   agrementNumber: string;
@@ -162,6 +162,10 @@ export const seedDefaultCompanies = async () => {
     {
       name: "I - Broyeur / casse automobile",
       companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [
+        WasteVehiclesType.BROYEUR,
+        WasteVehiclesType.DEMOLISSEUR
+      ],
       contact: "Monsieur Démolisseur et Broyeur",
       contactPhone: "0458758956",
       contactEmail: "monsieurbroyeuretdemolisseur@gmail.com"
@@ -202,6 +206,7 @@ export const seedDefaultCompanies = async () => {
     {
       name: "N - Démolisseur",
       companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.DEMOLISSEUR],
       contact: "Monsieur Démolisseur",
       contactPhone: "0473625689",
       contactEmail: "monsieurdemolisseur@gmail.com"
@@ -218,6 +223,7 @@ export const seedDefaultCompanies = async () => {
     {
       name: "O - Broyeur",
       companyTypes: [CompanyType.WASTE_VEHICLES],
+      wasteVehiclesTypes: [WasteVehiclesType.BROYEUR],
       contact: "Monsieur Broyeur",
       contactPhone: "0475875695",
       contactEmail: "monsieurbroyeur@gmail.com"
