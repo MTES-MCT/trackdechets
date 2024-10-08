@@ -40,7 +40,7 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
   await isDestinationRefinement(
     bsvhu.destinationCompanySiret,
     zodContext,
-    "WASTE_VEHICLES"
+    bsvhu.destinationType ?? "WASTE_VEHICLES"
   );
   await isTransporterRefinement(
     {
