@@ -12,9 +12,7 @@ const recipifyBsvhuAccessors = (
 ): RecipifyInputAccessor<ParsedZodBsvhu>[] => [
   {
     role: CompanyRole.Transporter,
-    skip:
-      bsd.transporterRecepisseIsExempted ||
-      sealedFields.includes("transporterRecepisseNumber"),
+    skip: sealedFields.includes("transporterRecepisseNumber"),
     orgIdGetter: () => {
       const orgId = getTransporterCompanyOrgId({
         transporterCompanySiret: bsd.transporterCompanySiret ?? null,
@@ -23,9 +21,16 @@ const recipifyBsvhuAccessors = (
       return orgId ?? null;
     },
     setter: async (bsvhu: ParsedZodBsvhu, receipt) => {
-      bsvhu.transporterRecepisseNumber = receipt?.receiptNumber ?? null;
-      bsvhu.transporterRecepisseValidityLimit = receipt?.validityLimit ?? null;
-      bsvhu.transporterRecepisseDepartment = receipt?.department ?? null;
+      if (bsvhu.transporterRecepisseIsExempted) {
+        bsvhu.transporterRecepisseNumber = null;
+        bsvhu.transporterRecepisseValidityLimit = null;
+        bsvhu.transporterRecepisseDepartment = null;
+      } else {
+        bsvhu.transporterRecepisseNumber = receipt?.receiptNumber ?? null;
+        bsvhu.transporterRecepisseValidityLimit =
+          receipt?.validityLimit ?? null;
+        bsvhu.transporterRecepisseDepartment = receipt?.department ?? null;
+      }
     }
   },
   {

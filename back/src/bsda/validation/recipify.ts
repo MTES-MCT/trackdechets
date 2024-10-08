@@ -14,9 +14,7 @@ const recipifyBsdaAccessors = (
     (_, idx) =>
       ({
         role: CompanyRole.Transporter,
-        skip:
-          bsd.transporters![idx].transporterRecepisseIsExempted ||
-          bsd.transporters![idx].transporterTransportSignatureDate,
+        skip: !!bsd.transporters![idx].transporterTransportSignatureDate,
         orgIdGetter: () => {
           const orgId = getTransporterCompanyOrgId({
             transporterCompanySiret:
@@ -28,12 +26,18 @@ const recipifyBsdaAccessors = (
         },
         setter: async (bsda: ParsedZodBsda, receipt) => {
           const transporter = bsda.transporters![idx];
-          transporter.transporterRecepisseNumber =
-            receipt?.receiptNumber ?? null;
-          transporter.transporterRecepisseValidityLimit =
-            receipt?.validityLimit ?? null;
-          transporter.transporterRecepisseDepartment =
-            receipt?.department ?? null;
+          if (transporter.transporterRecepisseIsExempted) {
+            transporter.transporterRecepisseNumber = null;
+            transporter.transporterRecepisseValidityLimit = null;
+            transporter.transporterRecepisseDepartment = null;
+          } else {
+            transporter.transporterRecepisseNumber =
+              receipt?.receiptNumber ?? null;
+            transporter.transporterRecepisseValidityLimit =
+              receipt?.validityLimit ?? null;
+            transporter.transporterRecepisseDepartment =
+              receipt?.department ?? null;
+          }
         }
       } as RecipifyInputAccessor<ParsedZodBsda>)
   ),
