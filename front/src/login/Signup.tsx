@@ -119,7 +119,8 @@ export default function Signup() {
               label="Nom et prénom"
               nativeInputProps={{
                 required: true,
-                onChange: e => setNameValue(e.target.value)
+                onChange: e => setNameValue(e.target.value),
+                id: "fullnameSignUp"
               }}
             />
             <Input

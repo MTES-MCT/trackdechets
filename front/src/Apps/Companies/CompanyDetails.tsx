@@ -136,13 +136,15 @@ export default function CompanyDetails() {
         </>
       }
     >
-      <Tabs
-        selectedTabId={selectedTabId}
-        tabs={tabs}
-        onTabChange={setSelectedTabId}
-      >
-        <CurrenComponent company={company} />
-      </Tabs>
+      <div id="company-tab-content" tabIndex={-1}>
+        <Tabs
+          selectedTabId={selectedTabId}
+          tabs={tabs}
+          onTabChange={setSelectedTabId}
+        >
+          <CurrenComponent company={company} />
+        </Tabs>
+      </div>
     </AccountContentWrapper>
   );
 }

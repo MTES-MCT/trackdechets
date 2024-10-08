@@ -60,6 +60,7 @@ export const bsdaFragment = gql`
           }
         }
       }
+      cap
     }
     worker {
       isDisabled

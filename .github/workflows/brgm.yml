@@ -1,0 +1,24 @@
+name: Push to the BRGM GitLab repository
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Run every day at 2 AM
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  push-to-gitlab:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Git
+        run: |
+          git config --global user.name "TD GH Action"
+          git config --global user.email "action@github.com"
+      
+      - name: Add remote & push
+        run: |
+          git remote add brgm ${{ secrets.BRGM_GITLAB_URL }}
+          git push brgm --all
