@@ -6,6 +6,8 @@ import managedWastes from "./queries/managedWastes";
 import allWastes from "./queries/allWastes";
 import wastesRegistryCsv from "./queries/wastesRegistryCsv";
 import wastesRegistryXls from "./queries/wastesRegistryXls";
+import { registrySignedUrl } from "./queries/registrySignedUrl";
+import { registryImports } from "./queries/registryImports";
 
 export const Query: QueryResolvers = {
   incomingWastes,
@@ -14,5 +16,7 @@ export const Query: QueryResolvers = {
   managedWastes,
   allWastes,
   wastesRegistryCsv,
-  wastesRegistryXls
+  wastesRegistryXls,
+  registrySignedUrl,
+  registryImports: registryImports as any
 };

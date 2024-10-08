@@ -107,4 +107,9 @@ env:
   WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
   GERICO_WEBHOOK_SLUG: secret-slug-lorem
   GERICO_WEBHOOK_TOKEN: wxcfdzr
-  
+  S3_ENDPOINT: http://localhost:9000
+  S3_REGION: fr-par
+  S3_ACCESS_KEY_ID: trackdechets
+  S3_SECRET_ACCESS_KEY: password
+  S3_REGISTRY_ERRORS_BUCKET: registry-errors-integration
+  S3_REGISTRY_IMPORTS_BUCKET: registry-imports-integration

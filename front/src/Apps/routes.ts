@@ -124,7 +124,8 @@ const routes = {
     join: "/companies/join",
     orientation: "/companies/create"
   },
-  registry: "/registre"
+  registry: "/registre",
+  registry_new: "/registre-v2"
 };
 
 export function getRelativeRoute(index, route) {

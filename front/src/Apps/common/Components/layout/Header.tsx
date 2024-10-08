@@ -296,6 +296,17 @@ function DashboardSubNav({ currentCompany }) {
           />
         </li>
       )}
+      {showRegistryTab && (
+        <li className="fr-nav__item">
+          <MenuLink
+            entry={{
+              navlink: true,
+              caption: "Mes registres (v2)",
+              href: routes.registry
+            }}
+          />
+        </li>
+      )}
     </>
   );
 }
@@ -446,6 +457,11 @@ const getDesktopMenuEntries = (
     {
       caption: "Mes registres",
       href: routes.registry,
+      navlink: true
+    },
+    {
+      caption: "Mes registres (v2)",
+      href: routes.registry_new,
       navlink: true
     }
   ];

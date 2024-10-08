@@ -20,6 +20,7 @@ import { mailQueue } from "./producers/mail";
 import { sirenifyQueue } from "./producers/sirenify";
 import { administrativeTransferQueue } from "./producers/administrativeTransfer";
 import { updateAppendix2Queue } from "./producers/updateAppendix2";
+import { registryImportQueue } from "./producers/registryImport";
 
 export const serverAdapter = new ExpressAdapter();
 export const bullBoardPath = `/queue/monitor/${process.env.QUEUE_MONITOR_TOKEN}`;
@@ -40,7 +41,8 @@ createBullBoard({
     new BullAdapter(sirenifyQueue),
     new BullAdapter(gericoQueue),
     new BullAdapter(administrativeTransferQueue),
-    new BullAdapter(updateAppendix2Queue)
+    new BullAdapter(updateAppendix2Queue),
+    new BullAdapter(registryImportQueue)
   ],
   serverAdapter: serverAdapter
 });
