@@ -13,7 +13,6 @@ import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
 import { sirenifyBsvhu } from "./sirenify";
-import { recipifyBsdTransporter } from "../../common/validation/zod/transformers";
 import {
   CompanyRole,
   foreignVatNumberSchema,
@@ -32,6 +31,7 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { fillIntermediariesOrgIds } from "./transformers";
+import { recipifyBsvhu } from "./recipify";
 
 export const ZodWasteCodeEnum = z
   .enum(BSVHU_WASTE_CODES, {
@@ -184,6 +184,24 @@ const rawBsvhuSchema = z.object({
     .transform(v => Boolean(v)),
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
+  brokerCompanyName: z.string().nullish(),
+  brokerCompanySiret: siretSchema(CompanyRole.Broker).nullish(),
+  brokerCompanyAddress: z.string().nullish(),
+  brokerCompanyContact: z.string().nullish(),
+  brokerCompanyPhone: z.string().nullish(),
+  brokerCompanyMail: z.string().nullish(),
+  brokerRecepisseNumber: z.string().nullish(),
+  brokerRecepisseDepartment: z.string().nullish(),
+  brokerRecepisseValidityLimit: z.coerce.date().nullish(),
+  traderCompanyName: z.string().nullish(),
+  traderCompanySiret: siretSchema(CompanyRole.Trader).nullish(),
+  traderCompanyAddress: z.string().nullish(),
+  traderCompanyContact: z.string().nullish(),
+  traderCompanyPhone: z.string().nullish(),
+  traderCompanyMail: z.string().nullish(),
+  traderRecepisseNumber: z.string().nullish(),
+  traderRecepisseDepartment: z.string().nullish(),
+  traderRecepisseValidityLimit: z.coerce.date().nullish(),
   intermediaries: z
     .array(intermediarySchema)
     .nullish()
@@ -233,7 +251,7 @@ export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
   return transformedBsvhuSyncSchema
     .superRefine(checkCompanies)
     .transform(sirenifyBsvhu(context))
-    .transform(recipifyBsdTransporter)
+    .transform(recipifyBsvhu(context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où des transformations auto-complète certains champs

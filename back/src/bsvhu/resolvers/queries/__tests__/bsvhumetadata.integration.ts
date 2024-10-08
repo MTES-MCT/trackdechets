@@ -161,6 +161,6 @@ describe("Query.Bsvhu", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(60);
+    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(78);
   });
 });

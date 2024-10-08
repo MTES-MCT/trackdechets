@@ -35,13 +35,13 @@ import {
   updateTransporterRecepisse
 } from "./transformers";
 import { sirenifyBsda, sirenifyBsdaTransporter } from "./sirenify";
-import { updateTransportersRecepisse } from "../../common/validation/zod/transformers";
 import {
   CompanyRole,
   foreignVatNumberSchema,
   rawTransporterSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
+import { recipifyBsda } from "./recipify";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -292,7 +292,7 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
       // `enableCompletionTransformers=false`;
       transformedSyncSchema
         .transform(sirenifyBsda(context))
-        .transform(updateTransportersRecepisse)
+        .transform(recipifyBsda(context))
         .transform(fillWasteConsistenceWhenForwarding)
     : transformedSyncSchema;
 
