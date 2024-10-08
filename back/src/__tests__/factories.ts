@@ -82,6 +82,7 @@ export const companyFactory = async (
           "WASTE_VEHICLES"
         ]
       },
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"],
       name: `company_${companyIndex}`,
       givenName: `Company Given Name`,
       contact: "Company Contact",

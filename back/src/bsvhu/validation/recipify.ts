@@ -72,7 +72,6 @@ export const recipifyBsvhu: (
   context: BsvhuValidationContext
 ) => ZodBsvhuTransformer = context => {
   return async bsvhu => {
-    console.log("RECIPIFY");
     const sealedFields = await getSealedFields(bsvhu, context);
     const accessors = recipifyBsvhuAccessors(bsvhu, sealedFields);
     return buildRecipify(accessors, bsvhu);
