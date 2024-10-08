@@ -32,7 +32,7 @@ const rawCompanySchema = z.object({
   gerepId: z.string().nullish(),
   codeNaf: z.string().nullish(),
   givenName: z.string().nullish(),
-  contactEmail: z.string().email().nullish(),
+  contactEmail: z.string().email().nullish().or(z.literal("")), // accept empty strings
   contactPhone: z.string().nullish(),
   contact: z.string().nullish(),
   website: z
