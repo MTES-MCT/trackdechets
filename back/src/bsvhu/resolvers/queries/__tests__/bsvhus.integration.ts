@@ -50,6 +50,22 @@ const GET_BSVHUS = `
               number
             }
           }
+          broker {
+            company {
+              siret
+            }
+            recepisse {
+              number
+            }
+          }
+          trader {
+            company {
+              siret
+            }
+            recepisse {
+              number
+            }
+          }
           weight {
             value
           }

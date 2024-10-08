@@ -27,6 +27,8 @@ export default async function bsvhus(
       { transporterCompanySiret: { in: orgIdsWithListPermission } },
       { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
       { destinationCompanySiret: { in: orgIdsWithListPermission } },
+      { brokerCompanySiret: { in: orgIdsWithListPermission } },
+      { traderCompanySiret: { in: orgIdsWithListPermission } },
       { intermediariesOrgIds: { hasSome: orgIdsWithListPermission } }
     ]
   };

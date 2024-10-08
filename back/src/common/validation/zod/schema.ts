@@ -8,6 +8,7 @@ export enum CompanyRole {
   Destination = "Destination",
   EcoOrganisme = "Éco-organisme",
   Broker = "Courtier",
+  Trader = "Trader",
   Worker = "Entreprise de travaux",
   Intermediary = "Intermédiaire",
   NextDestination = "Éxutoire"
@@ -25,6 +26,8 @@ export const pathFromCompanyRole = (companyRole?: CompanyRole): string[] => {
       return ["ecoOrganisme", "siret"];
     case CompanyRole.Broker:
       return ["broker", "company", "siret"];
+    case CompanyRole.Trader:
+      return ["trader", "company", "siret"];
     case CompanyRole.Worker:
       return ["worker", "company", "siret"];
     case CompanyRole.Intermediary:

@@ -1087,6 +1087,26 @@ model Bsvhu {
   ecoOrganismeName  String?
   ecoOrganismeSiret String?
 
+  brokerCompanyName            String?
+  brokerCompanySiret           String?
+  brokerCompanyAddress         String?
+  brokerCompanyContact         String?
+  brokerCompanyPhone           String?
+  brokerCompanyMail            String?
+  brokerRecepisseNumber        String?
+  brokerRecepisseDepartment    String?
+  brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
+  traderCompanyName            String?
+  traderCompanySiret           String?
+  traderCompanyAddress         String?
+  traderCompanyContact         String?
+  traderCompanyPhone           String?
+  traderCompanyMail            String?
+  traderRecepisseNumber        String?
+  traderRecepisseDepartment    String?
+  traderRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
   intermediaries IntermediaryBsvhuAssociation[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
@@ -1099,6 +1119,8 @@ model Bsvhu {
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterCompanyVatNumberIdx")
   @@index([ecoOrganismeSiret], map: "_BsvhuEcoOrganismeSiretIdx")
+  @@index([brokerCompanySiret], map: "_BsvhuBrokerCompanySiretIdx")
+  @@index([traderCompanySiret], map: "_BsvhuTraderCompanySiretIdx")
   @@index([intermediariesOrgIds], map: "_BsvhuIntermediariesOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")

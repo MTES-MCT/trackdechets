@@ -1,4 +1,5 @@
 import {
+  BsvhuBrokerInput,
   BsvhuDestinationInput,
   BsvhuDestinationType,
   BsvhuEcoOrganismeInput,
@@ -9,6 +10,7 @@ import {
   BsvhuOperationInput,
   BsvhuRecepisseInput,
   BsvhuReceptionInput,
+  BsvhuTraderInput,
   BsvhuTransporterInput,
   BsvhuTransportInput,
   BsvhuWeightInput,
@@ -102,6 +104,16 @@ describe("edition", () => {
       name: "yyy"
     };
 
+    const broker: Required<BsvhuBrokerInput> = {
+      company,
+      recepisse
+    };
+
+    const trader: Required<BsvhuTraderInput> = {
+      company,
+      recepisse
+    };
+
     const input: Required<BsvhuInput> = {
       emitter,
       wasteCode: "",
@@ -112,7 +124,9 @@ describe("edition", () => {
       transporter,
       destination,
       intermediaries: [company],
-      ecoOrganisme
+      ecoOrganisme,
+      broker,
+      trader
     };
     const flatInput = graphQlInputToZodBsvhu(input);
     for (const key of Object.keys(flatInput)) {

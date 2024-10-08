@@ -34,7 +34,9 @@ function toPrismaBsvhuWhereInput(where: BsvhuWhere): Prisma.BsvhuWhereInput {
     ),
     destinationOperationSignatureDate: toPrismaDateFilter(
       where.destination?.operation?.signature?.date
-    )
+    ),
+    brokerCompanySiret: toPrismaStringFilter(where.broker?.company?.siret),
+    traderCompanySiret: toPrismaStringFilter(where.trader?.company?.siret)
   });
 }
 

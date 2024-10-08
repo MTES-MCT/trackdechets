@@ -417,7 +417,7 @@ export function toIncomingWaste(bsda: RegistryBsda): Required<IncomingWaste> {
     traderRecepisseNumber: null,
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,
-    brokerRecepisseNumber: null,
+    brokerRecepisseNumber: bsda.brokerRecepisseNumber,
     emitterCompanyMail: bsda.emitterCompanyMail,
     ...getOperationData(bsda),
     nextDestinationProcessingOperation:
