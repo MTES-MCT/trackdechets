@@ -10,6 +10,7 @@ export default function AccountNotificationsUpdateAllModal({
 }: AccountNotificationsUpdateAllModalProps) {
   return (
     <div style={{ marginTop: 10 }}>
+      {/* TODO implémenter les actions en masse dans cette modale */}
       Mise à jour en masse de {totalCount} établissements
     </div>
   );
