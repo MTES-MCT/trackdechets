@@ -203,7 +203,7 @@ describe("Query.bsds.vhus base workflow", () => {
         expect.objectContaining({ node: { id: vhuId } })
       ]);
     });
-    it("draft vhu should be isDraftFor transporter", async () => {
+    it("draft vhu should not be isDraftFor transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -216,11 +216,9 @@ describe("Query.bsds.vhus base workflow", () => {
         }
       );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
-      ]);
+      expect(data.bsds.edges).toEqual([]);
     });
-    it("draft vhu should be isDraftFor destination", async () => {
+    it("draft vhu should not be isDraftFor destination", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -233,9 +231,7 @@ describe("Query.bsds.vhus base workflow", () => {
         }
       );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: vhuId } })
-      ]);
+      expect(data.bsds.edges).toEqual([]);
     });
   });
 

@@ -64,6 +64,14 @@ const getBsvhuSirets = (bsvhu: BsvhuForElastic): ElasticSirets => {
     ...intermediarySirets
   };
 
+  // Drafts only appear in the dashboard for companies the bsvhu owner belongs to
+  if (bsvhu.isDraft) {
+    const draftFormSiretsEntries = Object.entries(bsvhuSirets).filter(
+      ([, siret]) => siret && bsvhu.canAccessDraftOrgIds.includes(siret)
+    );
+    return Object.fromEntries(draftFormSiretsEntries) as ElasticSirets;
+  }
+
   return bsvhuSirets;
 };
 

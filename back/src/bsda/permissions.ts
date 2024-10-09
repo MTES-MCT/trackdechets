@@ -298,9 +298,10 @@ export async function checkCanDelete(user: User, bsda: BsdaWithTransporters) {
       ? [bsda.emitterCompanySiret]
       : [];
 
-  const errorMsg = bsda.isDraft
-    ? "Vous n'êtes pas autorisé à supprimer ce bordereau."
-    : "Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés";
+  const errorMsg =
+    bsda.status === BsdaStatus.INITIAL
+      ? "Vous n'êtes pas autorisé à supprimer ce bordereau."
+      : "Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés";
   return checkUserPermissions(
     user,
     authorizedOrgIds,
