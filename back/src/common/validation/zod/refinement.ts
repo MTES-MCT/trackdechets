@@ -289,11 +289,7 @@ export async function isBrokerRefinement(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: pathFromCompanyRole(CompanyRole.Broker),
-      message:
-        `Le courtier saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets` +
-        ` en tant que courtier. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
-        ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
-        ` de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
+      message: `Cet établissement n'a pas le profil Courtier.`
     });
   }
 }
@@ -312,11 +308,7 @@ export async function isTraderRefinement(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: pathFromCompanyRole(CompanyRole.Trader),
-      message:
-        `Le courtier saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets` +
-        ` en tant que négociant. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
-        ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
-        ` de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
+      message: `Cet établissement n'a pas le profil Négociant.`
     });
   }
 }
