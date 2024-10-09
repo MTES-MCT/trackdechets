@@ -15,6 +15,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Changer la référence du cerfa lors de l'ajout d'une fiche d'intervention [PR 3616](https://github.com/MTES-MCT/trackdechets/pull/3616)
+- ETQ membre d'un établissement, je peux gérer mes préférences de notifications (demandes de rattachement, demandes de révisions, renouvellement code signature, etc) en lien avec cet établissement [PR 3634](https://github.com/MTES-MCT/trackdechets/pull/3634)
 
 #### :bug: Corrections de bugs
 
