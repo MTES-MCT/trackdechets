@@ -14,7 +14,7 @@ import {
 import { prisma } from "@td/prisma";
 import { authorizedNotifications } from "@td/constants";
 
-const updateNotificationsResolver: MutationResolvers["updateNotifications"] =
+const setCompanyNotificationsResolver: MutationResolvers["setCompanyNotifications"] =
   async (parent, args, context: GraphQLContext): Promise<CompanyMember> => {
     applyAuthStrategies(context, [AuthType.Session]);
 
@@ -55,4 +55,4 @@ const updateNotificationsResolver: MutationResolvers["updateNotifications"] =
       company.orgId
     );
   };
-export default updateNotificationsResolver;
+export default setCompanyNotificationsResolver;

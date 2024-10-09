@@ -19,7 +19,7 @@ import revokeAllAccessTokens from "./mutations/revokeAllAccessTokens";
 import resetPassword from "./mutations/resetPassword";
 import anonymizeUser from "./mutations/anonymizeUser";
 import changeUserRole from "./mutations/changeUserRole";
-import updateNotifications from "./mutations/updateNotifications";
+import setCompanyNotifications from "./mutations/setCompanyNotifications";
 
 const Mutation: MutationResolvers = {
   signup,
@@ -42,7 +42,7 @@ const Mutation: MutationResolvers = {
   createAccessToken,
   revokeAllAccessTokens,
   changeUserRole,
-  updateNotifications
+  setCompanyNotifications
 };
 
 export default Mutation;

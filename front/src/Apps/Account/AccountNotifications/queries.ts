@@ -1,8 +1,8 @@
 import gql from "graphql-tag";
 
-export const UPDATE_NOTIFICATIONS = gql`
-  mutation UpdateNotifications($input: UpdateNotificationsInput!) {
-    updateNotifications(input: $input) {
+export const SET_COMPANY_NOTIFICATIONS = gql`
+  mutation SetCompanyNotifications($input: SetCompanyNotificationsInput!) {
+    setCompanyNotifications(input: $input) {
       id
       orgId
       notifications

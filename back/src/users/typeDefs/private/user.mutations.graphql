@@ -123,5 +123,5 @@ type Mutation {
   Modifie les préfèrences d'abonnement d'un utilisateur aux notifications
   pour un établissement donné
   """
-  updateNotifications(input: UpdateNotificationsInput!): CompanyMember!
+  setCompanyNotifications(input: SetCompanyNotificationsInput!): CompanyMember!
 }
