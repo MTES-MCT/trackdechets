@@ -6,7 +6,10 @@ import {
   UserNotification
 } from "@td/codegen-ui";
 import { useForm } from "react-hook-form";
-import { authorizedNotifications as authorizedNotificationsByUserRole } from "@td/constants";
+import {
+  ALL_NOTIFICATIONS,
+  authorizedNotifications as authorizedNotificationsByUserRole
+} from "@td/constants";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
@@ -20,7 +23,14 @@ type AccountCompanyNotificationsUpdateModalProps = {
 
 type FormValues = { [key in UserNotification]: boolean };
 
-export default function AccountCompanyNotificationsUpdateModal({
+// Ce texte s'affiche en texte d'informations quand une checkbox est
+// grisée parce que le rôle de l'utilisateur ne l'autorise pas à
+// s'abonner à un type d'alerte
+const disabledHintText =
+  "Votre rôle au sein de l'établissement ne vous permet pas " +
+  "de vous abonner à ce type d'alerte";
+
+export default function NotificationsUpdateModal({
   company,
   close
 }: AccountCompanyNotificationsUpdateModalProps) {
@@ -29,24 +39,33 @@ export default function AccountCompanyNotificationsUpdateModal({
     MutationUpdateEmailNotificationsArgs
   >(UPDATE_EMAIL_NOTIFICATIONS, { refetchQueries: [MY_COMPANIES] });
 
-  const { register, handleSubmit } = useForm<FormValues>({
-    defaultValues: {
-      MEMBERSHIP_REQUEST: company.userNotifications.includes(
-        UserNotification.MembershipRequest
-      ),
-      SIGNATURE_CODE_RENEWAL: company.userNotifications.includes(
-        UserNotification.SignatureCodeRenewal
-      ),
-      BSD_REFUSAL: company.userNotifications.includes(
-        UserNotification.BsdRefusal
-      ),
-      BSDA_FINAL_DESTINATION_UPDATE: company.userNotifications.includes(
-        UserNotification.BsdaFinalDestinationUpdate
-      ),
-      REVISION_REQUEST: company.userNotifications.includes(
-        UserNotification.RevisionRequest
+  const defaultValues: FormValues = ALL_NOTIFICATIONS.reduce(
+    (values, notification) => ({
+      ...values,
+      [notification]: company.userNotifications.includes(
+        notification as UserNotification
       )
-    }
+    }),
+    {} as FormValues
+  );
+
+  const authorizedNotifications = company.userRole
+    ? authorizedNotificationsByUserRole[company.userRole]
+    : [];
+
+  // L'abonnement à certaines notifications est restreinte
+  // en fonction du rôle de l'utilisateur au sein de l'établissement
+  const disabled: { [key in UserNotification]: boolean } =
+    ALL_NOTIFICATIONS.reduce(
+      (acc, notification) => ({
+        ...acc,
+        [notification]: !authorizedNotifications.includes(notification)
+      }),
+      {} as { [key in UserNotification]: boolean }
+    );
+
+  const { register, handleSubmit } = useForm<FormValues>({
+    defaultValues
   });
 
   const onSubmit = async (data: FormValues) => {
@@ -63,30 +82,6 @@ export default function AccountCompanyNotificationsUpdateModal({
       close();
     }
   };
-
-  const authorizedNotifications = company.userRole
-    ? authorizedNotificationsByUserRole[company.userRole]
-    : [];
-
-  const rattachementIsAuthorized =
-    authorizedNotifications.includes("MEMBERSHIP_REQUEST");
-
-  const signatureCodeRenewalIsAuthorized = authorizedNotifications.includes(
-    "SIGNATURE_CODE_RENEWAL"
-  );
-
-  const bsdRefusalIsAuthorized =
-    authorizedNotifications.includes("BSD_REFUSAL");
-
-  const bsdaFinalDestinationUpdateIsAuthorized =
-    authorizedNotifications.includes("BSDA_FINAL_DESTINATION_UPDATE");
-
-  const revisionRequestIsAuthorized =
-    authorizedNotifications.includes("REVISION_REQUEST");
-
-  const unauthorizedHintText =
-    "Votre rôle au sein de l'établissement ne vous permet pas " +
-    "de vous abonner à ce type d'alerte";
 
   let checkboxState: "default" | "error" | "success" = "default";
 
@@ -109,56 +104,57 @@ export default function AccountCompanyNotificationsUpdateModal({
           stateRelatedMessage={error?.message}
           options={[
             {
-              hintText: rattachementIsAuthorized
+              hintText: !disabled[UserNotification.MembershipRequest]
                 ? "Seuls les membres avec le rôle Administrateur sont en mesure de recevoir " +
                   "et d'accepter / refuser / effectuer des demandes de rattachement à leur établissement. " +
                   "Nous vous conseillons donc vivement, pour chaque établissement de conserver au moins un " +
                   "administrateur abonné à ce type de notification."
-                : unauthorizedHintText,
+                : disabledHintText,
               label: "aux demandes de rattachement",
               nativeInputProps: {
-                disabled: !rattachementIsAuthorized,
-                ...register("MEMBERSHIP_REQUEST")
+                disabled: disabled[UserNotification.MembershipRequest],
+                ...register(UserNotification.MembershipRequest)
               }
             },
             {
-              hintText: signatureCodeRenewalIsAuthorized
+              hintText: !disabled[UserNotification.SignatureCodeRenewal]
                 ? "Un courriel sera envoyé à chaque renouvellement du code de signature"
-                : unauthorizedHintText,
+                : disabledHintText,
               label: "au renouvellement du code de signature",
               nativeInputProps: {
-                disabled: !signatureCodeRenewalIsAuthorized,
-                ...register("SIGNATURE_CODE_RENEWAL")
+                disabled: disabled[UserNotification.SignatureCodeRenewal],
+                ...register(UserNotification.SignatureCodeRenewal)
               }
             },
             {
-              hintText: bsdRefusalIsAuthorized
+              hintText: !disabled[UserNotification.BsdRefusal]
                 ? "un courriel sera envoyé à chaque refus total ou partiel d'un bordereau"
-                : unauthorizedHintText,
+                : disabledHintText,
               label: "au refus total et partiel des bordereaux",
               nativeInputProps: {
-                disabled: !bsdRefusalIsAuthorized,
-                ...register("BSD_REFUSAL")
+                disabled: disabled[UserNotification.BsdRefusal],
+                ...register(UserNotification.BsdRefusal)
               }
             },
             {
-              hintText: bsdaFinalDestinationUpdateIsAuthorized
+              hintText: !disabled[UserNotification.BsdaFinalDestinationUpdate]
                 ? "Un courriel sera envoyé lorsque le BSDA est envoyé à un exutoire" +
                   " différent de celui prévu lors de la signature producteur"
-                : unauthorizedHintText,
+                : disabledHintText,
               label: "à la modification de la destination finale amiante",
               nativeInputProps: {
-                disabled: !bsdaFinalDestinationUpdateIsAuthorized,
-                ...register("BSDA_FINAL_DESTINATION_UPDATE")
+                disabled: disabled[UserNotification.BsdaFinalDestinationUpdate],
+                ...register(UserNotification.BsdaFinalDestinationUpdate)
               }
             },
             {
-              hintText:
-                "Un courriel sera envoyé à chaque fois qu'une révision sera restée sans réponse 14 jours après sa demande",
+              hintText: !disabled[UserNotification.RevisionRequest]
+                ? "Un courriel sera envoyé à chaque fois qu'une révision sera restée sans réponse 14 jours après sa demande"
+                : disabledHintText,
               label: "aux demandes de révision",
               nativeInputProps: {
-                disabled: !revisionRequestIsAuthorized,
-                ...register("REVISION_REQUEST")
+                disabled: disabled[UserNotification.RevisionRequest],
+                ...register(UserNotification.RevisionRequest)
               }
             }
           ]}

@@ -1,18 +1,18 @@
 import React from "react";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import AccountNotificationsUpdateAllModal from "./AccountNotificationsUpdateAllModal";
+import AccountNotificationsUpdateAllModal from "./NotificationsUpdateAllModal";
 
 type AccountNotificationsUpdateAllButtonProps = {
   // nombre total d'établissements
   totalCount: number;
 };
 
-export default function AccountNotificationsUpdateAllButton({
+export default function NotificationsUpdateAllButton({
   totalCount
 }: AccountNotificationsUpdateAllButtonProps) {
   const modal = createModal({
-    id: `update-all`,
+    id: `update-all-notifications`,
     isOpenedByDefault: false
   });
 

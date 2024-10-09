@@ -13,7 +13,7 @@ const notificationLabels: { [key in UserNotification]: string } = {
   [UserNotification.RevisionRequest]: "Révision"
 };
 
-export function AccountCompanyNotifications({
+export function NotificationsDisplay({
   company
 }: AccountCompanyNotificationsProps) {
   if (!company.userNotifications || company.userNotifications.length === 0) {

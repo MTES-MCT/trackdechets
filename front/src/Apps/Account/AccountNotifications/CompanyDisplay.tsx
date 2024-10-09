@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties } from "react";
 import { CompanyPrivate } from "@td/codegen-ui";
 import Tag from "@codegouvfr/react-dsfr/Tag";
 import { userRoleLabel } from "../../Companies/common/utils";
@@ -7,7 +7,12 @@ type AccountCompanyNotificationsProps = {
   company: CompanyPrivate;
 };
 
-export default function AccountCompanyNotificationsTableCell({
+const tagStyle: CSSProperties = {
+  color: "var(--text-action-high-blue-france)",
+  backgroundColor: "var(--background-action-low-blue-france)"
+};
+
+export default function CompanyDisplay({
   company
 }: AccountCompanyNotificationsProps) {
   return (
@@ -18,13 +23,7 @@ export default function AccountCompanyNotificationsTableCell({
           {company.givenName && ` - ${company.givenName}`}
         </div>
         <p className="fr-text">{company.orgId}</p>
-        <Tag
-          small
-          style={{
-            color: "var(--text-action-high-blue-france)",
-            backgroundColor: "var(--background-action-low-blue-france)"
-          }}
-        >
+        <Tag small style={tagStyle}>
           {userRoleLabel(company.userRole!)}
         </Tag>
       </div>
