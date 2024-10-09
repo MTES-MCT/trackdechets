@@ -106,12 +106,10 @@ describe("joinWithInvite mutation", () => {
       expect(companyAssociation).not.toBeNull();
       expect(companyAssociation?.role).toEqual(role);
 
-      const expectedEmailNotifications =
+      const expectedNotifications =
         role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
 
-      expect(companyAssociation?.emailNotifications).toEqual(
-        expectedEmailNotifications
-      );
+      expect(companyAssociation?.notifications).toEqual(expectedNotifications);
 
       const createdUser = await prisma.user.findUniqueOrThrow({
         where: { email: invitee }

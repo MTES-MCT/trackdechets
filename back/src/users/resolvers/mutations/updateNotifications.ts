@@ -14,11 +14,11 @@ import {
 import { prisma } from "@td/prisma";
 import { authorizedNotifications } from "@td/constants";
 
-const updateEmailNotificationsResolver: MutationResolvers["updateEmailNotifications"] =
+const updateNotificationsResolver: MutationResolvers["updateNotifications"] =
   async (parent, args, context: GraphQLContext): Promise<CompanyMember> => {
     applyAuthStrategies(context, [AuthType.Session]);
 
-    const { companyOrgId, emailNotifications } = args.input;
+    const { companyOrgId, notifications } = args.input;
 
     const user = checkIsAuthenticated(context);
 
@@ -32,7 +32,7 @@ const updateEmailNotificationsResolver: MutationResolvers["updateEmailNotificati
       throw new NotCompanyMember(company.orgId);
     }
 
-    const unauthorizedNotifications = emailNotifications.filter(
+    const unauthorizedNotifications = notifications.filter(
       notification =>
         !authorizedNotifications[companyAssociation.role].includes(notification)
     );
@@ -46,7 +46,7 @@ const updateEmailNotificationsResolver: MutationResolvers["updateEmailNotificati
 
     const updatedCompanyAssociation = await prisma.companyAssociation.update({
       where: { id: companyAssociation.id },
-      data: { emailNotifications },
+      data: { notifications },
       include: { user: true }
     });
 
@@ -55,4 +55,4 @@ const updateEmailNotificationsResolver: MutationResolvers["updateEmailNotificati
       company.orgId
     );
   };
-export default updateEmailNotificationsResolver;
+export default updateNotificationsResolver;

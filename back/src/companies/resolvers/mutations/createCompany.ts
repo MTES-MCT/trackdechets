@@ -18,7 +18,8 @@ import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   isClosedCompany,
   CLOSED_COMPANY_ERROR,
-  isProfessional
+  isProfessional,
+  ALL_NOTIFICATIONS
 } from "@td/constants";
 import { searchCompany } from "../../search";
 import {
@@ -185,7 +186,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       company: {
         create: companyCreateInput
       },
-      role: "ADMIN"
+      role: "ADMIN",
+      notifications: ALL_NOTIFICATIONS
     },
     include: { company: true }
   });

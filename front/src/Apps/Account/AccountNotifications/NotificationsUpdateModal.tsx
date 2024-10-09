@@ -2,7 +2,7 @@ import React from "react";
 import {
   CompanyPrivate,
   Mutation,
-  MutationUpdateEmailNotificationsArgs,
+  MutationUpdateNotificationsArgs,
   UserNotification
 } from "@td/codegen-ui";
 import { useForm } from "react-hook-form";
@@ -13,7 +13,7 @@ import {
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
-import { UPDATE_EMAIL_NOTIFICATIONS } from "./queries";
+import { UPDATE_NOTIFICATIONS } from "./queries";
 import { MY_COMPANIES } from "../../Companies/common/queries";
 
 type AccountCompanyNotificationsUpdateModalProps = {
@@ -34,10 +34,10 @@ export default function NotificationsUpdateModal({
   company,
   close
 }: AccountCompanyNotificationsUpdateModalProps) {
-  const [updateEmailNotifications, { loading, data, error }] = useMutation<
-    Pick<Mutation, "updateEmailNotifications">,
-    MutationUpdateEmailNotificationsArgs
-  >(UPDATE_EMAIL_NOTIFICATIONS, { refetchQueries: [MY_COMPANIES] });
+  const [updateNotifications, { loading, data, error }] = useMutation<
+    Pick<Mutation, "updateNotifications">,
+    MutationUpdateNotificationsArgs
+  >(UPDATE_NOTIFICATIONS, { refetchQueries: [MY_COMPANIES] });
 
   const defaultValues: FormValues = ALL_NOTIFICATIONS.reduce(
     (values, notification) => ({
@@ -70,11 +70,11 @@ export default function NotificationsUpdateModal({
 
   const onSubmit = async (data: FormValues) => {
     const notifications = Object.keys(data).filter(k => data[k]);
-    const { errors } = await updateEmailNotifications({
+    const { errors } = await updateNotifications({
       variables: {
         input: {
           companyOrgId: company.orgId,
-          emailNotifications: notifications as UserNotification[]
+          notifications: notifications as UserNotification[]
         }
       }
     });

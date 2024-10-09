@@ -644,7 +644,7 @@ type CompanyMember {
   isMe: Boolean
 
   "Liste des notifications auxquelles l'utilisateur est abonné pour cet établissement"
-  emailNotifications: [UserNotification!]!
+  notifications: [UserNotification!]!
 }
 
 """
