@@ -18,7 +18,7 @@ export const SET_COMPANY_NOTIFICATIONS = gql`
     setCompanyNotifications(input: $input) {
       id
       orgId
-      notifications
+      userNotifications
     }
   }
 `;
@@ -81,7 +81,7 @@ describe("Mutation { setCompanyNotifications }", () => {
 
       expect(errors).toBeUndefined();
 
-      expect(data.setCompanyNotifications.notifications).toEqual(
+      expect(data.setCompanyNotifications.userNotifications).toEqual(
         newNotifications
       );
 
@@ -128,7 +128,7 @@ describe("Mutation { setCompanyNotifications }", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.setCompanyNotifications.notifications).toEqual(
+      expect(data.setCompanyNotifications.userNotifications).toEqual(
         newNotifications
       );
 
@@ -175,7 +175,7 @@ describe("Mutation { setCompanyNotifications }", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.setCompanyNotifications.notifications).toEqual(
+      expect(data.setCompanyNotifications.userNotifications).toEqual(
         newNotifications
       );
 
@@ -221,7 +221,7 @@ describe("Mutation { setCompanyNotifications }", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.setCompanyNotifications.notifications).toEqual(
+      expect(data.setCompanyNotifications.userNotifications).toEqual(
         newNotifications
       );
 
