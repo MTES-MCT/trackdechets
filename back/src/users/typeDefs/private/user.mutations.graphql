@@ -120,8 +120,8 @@ type Mutation {
 
   """
   USAGE INTERNE
-  Modifie les préfèrences d'abonnement d'un utilisateur aux notifications
-  pour un établissement donné
+  Modifie les préfèrences d'abonnement de l'utilisateur connecté aux notifications
+  d'un établissement donné
   """
   setCompanyNotifications(input: SetCompanyNotificationsInput!): CompanyMember!
 }
