@@ -111,14 +111,14 @@ export async function associateUserToCompany(
     );
   }
 
-  const emailNotifications = role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
+  const notifications = role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
 
   const association = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: userId } },
       role,
       company: { connect: { orgId } },
-      emailNotifications,
+      notifications,
       ...opt
     }
   });
@@ -208,7 +208,7 @@ export async function acceptNewUserCompanyInvitations(user: User) {
           company: { connect: { orgId: existingHash.companySiret } },
           user: { connect: { id: user.id } },
           role: existingHash.role,
-          emailNotifications:
+          notifications:
             existingHash.role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
         }
       })

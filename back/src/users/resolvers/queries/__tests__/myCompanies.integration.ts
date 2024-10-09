@@ -472,13 +472,13 @@ describe("query { myCompanies }", () => {
     const company3 = await companyFactory();
 
     await associateUserToCompany(user.id, company1.orgId, "ADMIN", {
-      emailNotifications: ["MEMBERSHIP_REQUEST"]
+      notifications: ["MEMBERSHIP_REQUEST"]
     });
     await associateUserToCompany(user.id, company2.orgId, "ADMIN", {
-      emailNotifications: ["BSD_REFUSAL"]
+      notifications: ["BSD_REFUSAL"]
     });
     await associateUserToCompany(user.id, company3.orgId, "ADMIN", {
-      emailNotifications: ["SIGNATURE_CODE_RENEWAL", "REVISION_REQUEST"]
+      notifications: ["SIGNATURE_CODE_RENEWAL", "REVISION_REQUEST"]
     });
     const { query } = makeClient(user);
     const { data } = await query<Pick<Query, "myCompanies">>(MY_COMPANIES);

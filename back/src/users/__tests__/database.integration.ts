@@ -77,12 +77,10 @@ describe("associateUserToCompany", () => {
         });
       expect(companyAssociation.role).toEqual(role);
 
-      const expectedEmailNotifications =
+      const expectedNotifications =
         role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
 
-      expect(companyAssociation.emailNotifications).toEqual(
-        expectedEmailNotifications
-      );
+      expect(companyAssociation.notifications).toEqual(expectedNotifications);
 
       const userRoles = await getUserRoles(user.id);
       expect(userRoles).toEqual({ [company.orgId]: role });

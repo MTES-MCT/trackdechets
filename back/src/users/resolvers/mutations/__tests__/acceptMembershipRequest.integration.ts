@@ -153,11 +153,10 @@ describe("mutation acceptMembershipRequest", () => {
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
 
-      const expectedEmailNotifications =
-        role === "ADMIN" ? ALL_NOTIFICATIONS : [];
+      const expectedNotifications = role === "ADMIN" ? ALL_NOTIFICATIONS : [];
 
-      expect(companyAssociations[0].emailNotifications).toEqual(
-        expectedEmailNotifications
+      expect(companyAssociations[0].notifications).toEqual(
+        expectedNotifications
       );
 
       // when a new user is invited and accepts invitation, `automaticallyAccepted` is false

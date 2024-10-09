@@ -374,8 +374,8 @@ model CompanyAssociation {
   // Tell apart automatically accepted invitations from others
   automaticallyAccepted Boolean   @default(false)
 
-  // Abonnements aux notifications par e-mails 
-  emailNotifications UserNotification[]
+  // Abonnements aux notifications
+  notifications UserNotification[]
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")

@@ -13,7 +13,7 @@ export async function getMailNotificationSubscribers(
     include: {
       companyAssociations: {
         where: {
-          emailNotifications: { has: notification },
+          notifications: { has: notification },
           user: {
             isActive: true
           }

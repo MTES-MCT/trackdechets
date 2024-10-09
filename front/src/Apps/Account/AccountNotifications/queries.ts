@@ -1,11 +1,11 @@
 import gql from "graphql-tag";
 
-export const UPDATE_EMAIL_NOTIFICATIONS = gql`
-  mutation UpdateEmailNotifications($input: UpdateEmailNotificationsInput!) {
-    updateEmailNotifications(input: $input) {
+export const UPDATE_NOTIFICATIONS = gql`
+  mutation UpdateNotifications($input: UpdateNotificationsInput!) {
+    updateNotifications(input: $input) {
       id
       orgId
-      emailNotifications
+      notifications
     }
   }
 `;

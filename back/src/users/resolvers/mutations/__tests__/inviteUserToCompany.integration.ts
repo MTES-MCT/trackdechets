@@ -69,7 +69,7 @@ describe("mutation inviteUserToCompany", () => {
       const expectedEmailNotification =
         role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
 
-      expect(companyAssociations[0].emailNotifications).toEqual(
+      expect(companyAssociations[0].notifications).toEqual(
         expectedEmailNotification
       );
 

@@ -203,7 +203,7 @@ export const userAssociationToCompanyMember = (
     name: userNameDisplay(companyAssociation, requestingUserId, isTDAdmin),
     role: companyAssociation.role,
     isPendingInvitation: false,
-    emailNotifications: companyAssociation.emailNotifications
+    notifications: companyAssociation.notifications
   };
 };
 
@@ -225,7 +225,7 @@ export const userAccountHashToCompanyMember = (
     role: userAccountHash.role,
     isActive: false,
     isPendingInvitation: true,
-    emailNotifications:
+    notifications:
       userAccountHash.role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
   };
 };
@@ -328,7 +328,7 @@ export const getCompaniesAndSubscribersByCompanyOrgIds = async (
     include: {
       companyAssociations: {
         where: {
-          emailNotifications: { has: notification },
+          notifications: { has: notification },
           user: {
             isActive: true
           }

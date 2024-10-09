@@ -120,10 +120,8 @@ type Mutation {
 
   """
   USAGE INTERNE
-  Modifie les préfèrences d'abonnement d'un utilisateur aux notifications par e-mail
+  Modifie les préfèrences d'abonnement d'un utilisateur aux notifications
   pour un établissement donné
   """
-  updateEmailNotifications(
-    input: UpdateEmailNotificationsInput!
-  ): CompanyMember!
+  updateNotifications(input: UpdateNotificationsInput!): CompanyMember!
 }

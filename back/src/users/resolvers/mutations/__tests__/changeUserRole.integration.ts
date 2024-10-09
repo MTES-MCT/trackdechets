@@ -33,7 +33,7 @@ describe("mutation changeUserRole", () => {
           create: {
             company: { connect: { id: company.id } },
             role: UserRole.ADMIN,
-            emailNotifications: ALL_NOTIFICATIONS
+            notifications: ALL_NOTIFICATIONS
           }
         }
       });
@@ -56,7 +56,7 @@ describe("mutation changeUserRole", () => {
         .companyAssociations();
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
-      expect(companyAssociations[0].emailNotifications).toEqual([]);
+      expect(companyAssociations[0].notifications).toEqual([]);
     }
   );
 
@@ -69,7 +69,7 @@ describe("mutation changeUserRole", () => {
           create: {
             company: { connect: { id: company.id } },
             role: UserRole.MEMBER,
-            emailNotifications: []
+            notifications: []
           }
         }
       });
@@ -92,7 +92,7 @@ describe("mutation changeUserRole", () => {
         .companyAssociations();
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
-      expect(companyAssociations[0].emailNotifications).toEqual(
+      expect(companyAssociations[0].notifications).toEqual(
         role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
       );
     }
@@ -107,7 +107,7 @@ describe("mutation changeUserRole", () => {
           create: {
             company: { connect: { id: company.id } },
             role: UserRole.READER,
-            emailNotifications: []
+            notifications: []
           }
         }
       });
@@ -130,7 +130,7 @@ describe("mutation changeUserRole", () => {
         .companyAssociations();
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
-      expect(companyAssociations[0].emailNotifications).toEqual(
+      expect(companyAssociations[0].notifications).toEqual(
         role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
       );
     }
@@ -145,7 +145,7 @@ describe("mutation changeUserRole", () => {
           create: {
             company: { connect: { id: company.id } },
             role: UserRole.DRIVER,
-            emailNotifications: []
+            notifications: []
           }
         }
       });
@@ -168,7 +168,7 @@ describe("mutation changeUserRole", () => {
         .companyAssociations();
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
-      expect(companyAssociations[0].emailNotifications).toEqual(
+      expect(companyAssociations[0].notifications).toEqual(
         role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
       );
     }

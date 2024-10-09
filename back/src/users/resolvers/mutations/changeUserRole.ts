@@ -61,7 +61,7 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
       associationId: association.id,
       data: {
         role: args.role,
-        emailNotifications: args.role === "ADMIN" ? ALL_NOTIFICATIONS : []
+        notifications: args.role === "ADMIN" ? ALL_NOTIFICATIONS : []
       }
     });
 

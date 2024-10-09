@@ -36,7 +36,7 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       .companyAssociations({ where: { userId: context.user.id } });
 
     if (companyAssociations?.length) {
-      return companyAssociations[0].emailNotifications;
+      return companyAssociations[0].notifications;
     }
 
     return [];
