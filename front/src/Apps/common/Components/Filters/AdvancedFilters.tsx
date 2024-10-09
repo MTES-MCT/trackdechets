@@ -276,6 +276,7 @@ const AdvancedFilters = ({
                 onAddFilterType={onAddFilterType}
                 onRemoveFilterType={onRemoveFilterType}
                 value={filter.name}
+                srLabel={filter.label}
                 disabledSelect={true}
                 isMaxLine={hasReachMaxFilter}
                 isCurrentLine={i === filterSelectedList.length - 1}
