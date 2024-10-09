@@ -892,7 +892,7 @@ export function expandFormFromElastic(form: FormForElastic): GraphQLForm {
               (latestRevision, currentRevision) => {
                 if (
                   !latestRevision ||
-                  currentRevision.updatedAt > latestRevision.updatedAt
+                  currentRevision.createdAt > latestRevision.createdAt
                 ) {
                   return currentRevision;
                 }
