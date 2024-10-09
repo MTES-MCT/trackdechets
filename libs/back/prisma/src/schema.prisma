@@ -891,8 +891,6 @@ model User {
   firstAssociationDate  DateTime?               @db.Timestamptz(6)
   isActive              Boolean?                @default(false)
   isAdmin               Boolean                 @default(false)
-  // TODO champ à supprimer suite à la création des comptes gouvernementaux
-  isRegistreNational    Boolean                 @default(false)
   governmentAccountId   String?                 @unique
   governmentAccount     GovernmentAccount?      @relation(fields: [governmentAccountId], references: [id])
   AccessToken           AccessToken[]
