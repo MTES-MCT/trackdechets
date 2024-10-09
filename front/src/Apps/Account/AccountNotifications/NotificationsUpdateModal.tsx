@@ -14,7 +14,6 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
 import { SET_COMPANY_NOTIFICATIONS } from "./queries";
-import { MY_COMPANIES } from "../../Companies/common/queries";
 
 type AccountCompanyNotificationsUpdateModalProps = {
   company: CompanyPrivate;
@@ -37,7 +36,7 @@ export default function NotificationsUpdateModal({
   const [setCompanyNotifications, { loading, data, error }] = useMutation<
     Pick<Mutation, "setCompanyNotifications">,
     MutationSetCompanyNotificationsArgs
-  >(SET_COMPANY_NOTIFICATIONS, { refetchQueries: [MY_COMPANIES] });
+  >(SET_COMPANY_NOTIFICATIONS);
 
   const defaultValues: FormValues = ALL_NOTIFICATIONS.reduce(
     (values, notification) => ({

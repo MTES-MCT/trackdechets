@@ -3,19 +3,14 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { NotCompanyMember, UserInputError } from "../../../common/errors";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  getCompanyOrCompanyNotFound,
-  userAssociationToCompanyMember
-} from "../../../companies/database";
-import {
-  CompanyMember,
-  MutationResolvers
-} from "../../../generated/graphql/types";
+import { getCompanyOrCompanyNotFound } from "../../../companies/database";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { authorizedNotifications } from "@td/constants";
+import { toGqlCompanyPrivate } from "../../../companies/converters";
 
 const setCompanyNotificationsResolver: MutationResolvers["setCompanyNotifications"] =
-  async (parent, args, context: GraphQLContext): Promise<CompanyMember> => {
+  async (parent, args, context: GraphQLContext) => {
     applyAuthStrategies(context, [AuthType.Session]);
 
     const { companyOrgId, notifications } = args.input;
@@ -47,12 +42,9 @@ const setCompanyNotificationsResolver: MutationResolvers["setCompanyNotification
     const updatedCompanyAssociation = await prisma.companyAssociation.update({
       where: { id: companyAssociation.id },
       data: { notifications },
-      include: { user: true }
+      include: { company: true }
     });
 
-    return userAssociationToCompanyMember(
-      updatedCompanyAssociation,
-      company.orgId
-    );
+    return toGqlCompanyPrivate(updatedCompanyAssociation.company);
   };
 export default setCompanyNotificationsResolver;

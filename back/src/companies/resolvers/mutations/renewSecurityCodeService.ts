@@ -57,13 +57,15 @@ export async function renewSecurityCodeFn(
     [orgId]
   );
 
-  const mail = renderMail(securityCodeRenewal, {
-    to: subscribers,
-    variables: {
-      company: { orgId: company.orgId, name: company.name }
-    }
-  });
-  await sendMail(mail);
+  if (subscribers.length) {
+    const mail = renderMail(securityCodeRenewal, {
+      to: subscribers,
+      variables: {
+        company: { orgId: company.orgId, name: company.name }
+      }
+    });
+    await sendMail(mail);
+  }
 
   return toGqlCompanyPrivate(updatedCompany);
 }

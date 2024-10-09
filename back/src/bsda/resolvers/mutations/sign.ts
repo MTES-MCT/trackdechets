@@ -404,25 +404,29 @@ async function sendAlertIfFollowingBsdaChangedPlannedDestination(bsda: Bsda) {
         UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
         [previousBsda.emitterCompanySiret].filter(Boolean)
       );
-      const mail = renderMail(finalDestinationModified, {
-        to: subscribers,
-        variables: {
-          id: previousBsda.id,
-          emitter: {
-            siret: bsda.emitterCompanySiret!,
-            name: bsda.emitterCompanyName!
-          },
-          destination: {
-            siret: bsda.destinationCompanySiret!,
-            name: bsda.destinationCompanyName!
-          },
-          plannedDestination: {
-            siret: previousBsda.destinationOperationNextDestinationCompanySiret,
-            name: previousBsda.destinationOperationNextDestinationCompanyName!
+
+      if (subscribers.length) {
+        const mail = renderMail(finalDestinationModified, {
+          to: subscribers,
+          variables: {
+            id: previousBsda.id,
+            emitter: {
+              siret: bsda.emitterCompanySiret!,
+              name: bsda.emitterCompanyName!
+            },
+            destination: {
+              siret: bsda.destinationCompanySiret!,
+              name: bsda.destinationCompanyName!
+            },
+            plannedDestination: {
+              siret:
+                previousBsda.destinationOperationNextDestinationCompanySiret,
+              name: previousBsda.destinationOperationNextDestinationCompanyName!
+            }
           }
-        }
-      });
-      sendMail(mail);
+        });
+        sendMail(mail);
+      }
     }
   }
 }

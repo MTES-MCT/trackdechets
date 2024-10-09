@@ -64,18 +64,20 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
       }
     });
 
-    await sendMail(
-      renderMail(membershipRequestMail, {
-        to: subscribers,
-        variables: {
-          userEmail: user.email,
-          companyName: company.name,
-          companySiret: company.orgId,
-          companyGivenName: company.givenName,
-          membershipRequestId: membershipRequest.id
-        }
-      })
-    );
+    if (subscribers) {
+      await sendMail(
+        renderMail(membershipRequestMail, {
+          to: subscribers,
+          variables: {
+            userEmail: user.email,
+            companyName: company.name,
+            companySiret: company.orgId,
+            companyGivenName: company.givenName,
+            membershipRequestId: membershipRequest.id
+          }
+        })
+      );
+    }
 
     // send membership request confirmation to requester
     // Iot let him/her know about admin emails, we filter them (same domain name, no public email providers)

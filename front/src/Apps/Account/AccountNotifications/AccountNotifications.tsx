@@ -35,9 +35,11 @@ export default function AccountNotifications() {
           <Table
             fixed
             data={companies.map(company => [
-              CompanyDisplay({ company }),
-              NotificationsDisplay({ company }),
-              NotificationsUpdateButton({ company })
+              <CompanyDisplay company={company} />,
+              <NotificationsDisplay company={company} />,
+              <div style={{ display: "flex", justifyContent: "end" }}>
+                <NotificationsUpdateButton company={company} />
+              </div>
             ])}
             headers={["Établissements", "Notifications", ""]}
           />

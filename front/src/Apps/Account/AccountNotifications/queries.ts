@@ -5,7 +5,7 @@ export const SET_COMPANY_NOTIFICATIONS = gql`
     setCompanyNotifications(input: $input) {
       id
       orgId
-      notifications
+      userNotifications
     }
   }
 `;
