@@ -1,13 +1,13 @@
 import gql from "graphql-tag";
 
-const UPDATE_NOTIFICATIONS = gql`
-  mutation UpdateNotifications {
-    updateNotifications {
+const SET_COMPANY_NOTIFICATIONS = gql`
+  mutation SetCompanyNotifications {
+    setCompanyNotifications {
       notifications
     }
   }
 `;
 
-describe("Mutation { updateNotifications }", () => {
-  it("should update user e-mail notifications for a specific company", async () => {});
+describe("Mutation { setCompanyNotifications }", () => {
+  it("should set user e-mail notifications for a specific company", async () => {});
 });
