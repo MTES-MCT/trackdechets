@@ -115,7 +115,8 @@ describe("Mutation.Vhu.create", () => {
   it("should allow creating a valid form for the producer signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     const input = {
@@ -176,7 +177,8 @@ describe("Mutation.Vhu.create", () => {
   it("should create a bsvhu and autocomplete transporter recepisse", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     const transporter = await companyFactory({
@@ -244,7 +246,8 @@ describe("Mutation.Vhu.create", () => {
   it("should create a bsvhu and ignore recepisse input", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     const transporter = await companyFactory({
@@ -319,7 +322,8 @@ describe("Mutation.Vhu.create", () => {
   it("should create a bsvhu with eco-organisme", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     const ecoOrganisme = await ecoOrganismeFactory({
@@ -384,7 +388,8 @@ describe("Mutation.Vhu.create", () => {
   it("should create a bsvhu with intermediary", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     const intermediary = await companyFactory({
@@ -452,7 +457,8 @@ describe("Mutation.Vhu.create", () => {
   it("should fail if creating a bsvhu with the same intermediary several times", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     const intermediary = await companyFactory({
@@ -527,7 +533,8 @@ describe("Mutation.Vhu.create", () => {
   it("should fail if creating a bsvhu with more than 3 intermediaries", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     const intermediary1 = await companyFactory({
@@ -623,7 +630,8 @@ describe("Mutation.Vhu.create", () => {
   it("should fail if a required field like the recipient agrement is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     const input = {
@@ -689,7 +697,8 @@ describe("Mutation.Vhu.create", () => {
       }
     );
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     await transporterReceiptFactory({
@@ -757,7 +766,8 @@ describe("Mutation.Vhu.create", () => {
       }
     );
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     await transporterReceiptFactory({
@@ -822,7 +832,8 @@ describe("Mutation.Vhu.create", () => {
       }
     );
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
 
     await transporterReceiptFactory({

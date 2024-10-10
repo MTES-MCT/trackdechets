@@ -19,12 +19,12 @@ import {
   checkAndSetPreviousPackagings,
   updateTransporterRecepisse
 } from "./transformers";
-import { updateTransportersRecepisse } from "../../../common/validation/zod/transformers";
 import {
   CompanyRole,
   rawTransporterSchema,
   siretSchema
 } from "../../../common/validation/zod/schema";
+import { recipifyBsff } from "./recipify";
 
 export const ZodWasteCodeEnum = z
   .enum(BSFF_WASTE_CODES, {
@@ -195,7 +195,7 @@ export const contextualBsffSchemaAsync = (context: BsffValidationContext) => {
   return refinedBsffSchema
     .superRefine(checkCompanies)
     .transform(sirenifyBsff(context))
-    .transform(updateTransportersRecepisse)
+    .transform(recipifyBsff(context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où des transformations auto-complète certains champs

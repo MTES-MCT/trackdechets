@@ -1,9 +1,14 @@
 import * as React from "react";
-import { Document, formatDate, SignatureStamp } from "../../../common/pdf";
+import {
+  Document,
+  formatDate,
+  FormCompanyFields,
+  SignatureStamp
+} from "../../../common/pdf";
 import { Bsvhu, OperationMode } from "../../../generated/graphql/types";
-import { Recepisse } from "./Recepisse";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { dateToXMonthAtHHMM } from "../../../common/helpers";
+import { Recepisse } from "../../../common/pdf/components/Recepisse";
 
 const IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
@@ -270,7 +275,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
           </div>
         </div>
         {/* End Waste identification*/}
-        {/* Emitter signature*/}{" "}
+        {/* Emitter signature*/}
         <div className="BoxRow">
           <div className="BoxCol">
             <p className="mb-3">
@@ -295,12 +300,80 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
           </div>
           <div></div>
         </div>
-        {/* End Emitter signature*/}
+        {/* End Emitter signature */}
+        {/* Trader informations or broker information if no trader */}
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              <strong>
+                8.{bsvhu.trader && bsvhu.broker ? "1" : ""}{" "}
+                <input
+                  type="checkbox"
+                  checked={Boolean(bsvhu.trader)}
+                  readOnly
+                />{" "}
+                Négociant{" "}
+                <input
+                  type="checkbox"
+                  checked={!bsvhu.trader && Boolean(bsvhu.broker)}
+                  readOnly
+                />{" "}
+                Courtier
+              </strong>
+            </p>
+            <div className="Row">
+              <div className="Col">
+                <FormCompanyFields
+                  company={
+                    bsvhu.trader ? bsvhu.trader.company : bsvhu.broker?.company
+                  }
+                />
+              </div>
+              <div className="Col">
+                <Recepisse
+                  recepisse={{
+                    ...(bsvhu.trader?.recepisse ??
+                      bsvhu.broker?.recepisse ??
+                      {})
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* End Broker/Trader informations */}
+        {/* Broker information */}
+        {bsvhu.broker ? (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>
+                  8.{bsvhu.trader ? "2" : ""}{" "}
+                  <input type="checkbox" checked={false} readOnly /> Négociant{" "}
+                  <input type="checkbox" checked={true} readOnly /> Courtier
+                </strong>
+              </p>
+              <div className="Row">
+                <div className="Col">
+                  <FormCompanyFields company={bsvhu.broker?.company} />
+                </div>
+                <div className="Col">
+                  <Recepisse
+                    recepisse={{
+                      ...(bsvhu.broker?.recepisse ?? {})
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+        {/* End Broker informations */}
         {/* Transporter */}
         <div className="BoxRow">
           <div className="BoxCol">
             <p className="mb-3">
-              <strong>8. Transporteur</strong>
+              <strong>9. Transporteur</strong>
             </p>
 
             <div>
@@ -364,7 +437,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
         <div className="BoxRow">
           <div className="BoxCol">
             <p className="mb-3">
-              <strong>9. Installation de destination</strong>
+              <strong>10. Installation de destination</strong>
             </p>
             <p className="mb-3">
               <input
@@ -455,7 +528,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             </p>
           </div>
           <div className="BoxCol">
-            <strong>10. Réalisation de l’opération</strong>
+            <strong>11. Réalisation de l’opération</strong>
 
             <div>
               <input

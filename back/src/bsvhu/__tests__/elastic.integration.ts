@@ -31,6 +31,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
   let intermediary1: Company;
   let intermediary2: Company;
   let ecoOrganisme: Company;
+  let broker: Company;
+  let trader: Company;
 
   beforeAll(async () => {
     // Given
@@ -45,7 +47,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     intermediary1 = await companyFactory({ name: "Intermediaire 1" });
     intermediary2 = await companyFactory({ name: "Intermediaire 2" });
     ecoOrganisme = await companyFactory({ name: "Eco organisme" });
-
+    broker = await companyFactory({ name: "Broker" });
+    trader = await companyFactory({ name: "Trader" });
     bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanyName: emitter.name,
@@ -57,6 +60,10 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         destinationCompanySiret: destination.siret,
         ecoOrganismeName: ecoOrganisme.name,
         ecoOrganismeSiret: ecoOrganisme.siret,
+        brokerCompanySiret: broker.siret,
+        brokerCompanyName: broker.name,
+        traderCompanySiret: trader.siret,
+        traderCompanyName: trader.name,
         intermediaries: {
           createMany: {
             data: [
@@ -80,6 +87,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyNames).toContain(intermediary1.name);
     expect(elasticBsvhu.companyNames).toContain(intermediary2.name);
     expect(elasticBsvhu.companyNames).toContain(ecoOrganisme.name);
+    expect(elasticBsvhu.companyNames).toContain(broker.name);
+    expect(elasticBsvhu.companyNames).toContain(trader.name);
   });
 
   test("companyOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {
@@ -90,5 +99,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyOrgIds).toContain(intermediary1.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(intermediary2.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(ecoOrganisme.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(broker.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(trader.siret);
   });
 });

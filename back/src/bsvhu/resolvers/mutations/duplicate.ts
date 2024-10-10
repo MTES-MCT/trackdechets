@@ -65,7 +65,8 @@ async function getDuplicateData(
     user
   });
 
-  const { emitter, transporter, destination } = await getBsvhuCompanies(bsvhu);
+  const { emitter, transporter, destination, broker, trader } =
+    await getBsvhuCompanies(bsvhu);
 
   let data: Prisma.BsvhuCreateInput = {
     ...parsedBsvhu,
@@ -90,7 +91,31 @@ async function getDuplicateData(
       transporter?.contactPhone ?? parsedBsvhu.transporterCompanyPhone,
     transporterCompanyMail:
       transporter?.contactEmail ?? parsedBsvhu.transporterCompanyMail,
-    transporterCompanyVatNumber: parsedBsvhu.transporterCompanyVatNumber
+    transporterCompanyVatNumber: parsedBsvhu.transporterCompanyVatNumber,
+    // Broker company info
+    brokerCompanyMail: broker?.contactEmail ?? bsvhu.brokerCompanyMail,
+    brokerCompanyPhone: broker?.contactPhone ?? bsvhu.brokerCompanyPhone,
+    brokerCompanyContact: broker?.contact ?? bsvhu.brokerCompanyContact,
+    // Broker recepisse
+    brokerRecepisseNumber:
+      broker?.brokerReceipt?.receiptNumber ?? bsvhu.brokerRecepisseNumber,
+    brokerRecepisseValidityLimit:
+      broker?.brokerReceipt?.validityLimit ??
+      bsvhu.brokerRecepisseValidityLimit,
+    brokerRecepisseDepartment:
+      broker?.brokerReceipt?.department ?? bsvhu.brokerRecepisseDepartment,
+    // Trader company info
+    traderCompanyMail: trader?.contactEmail ?? bsvhu.traderCompanyMail,
+    traderCompanyPhone: trader?.contactPhone ?? bsvhu.traderCompanyPhone,
+    traderCompanyContact: trader?.contact ?? bsvhu.traderCompanyContact,
+    // Trader recepisse
+    traderRecepisseNumber:
+      trader?.traderReceipt?.receiptNumber ?? bsvhu.traderRecepisseNumber,
+    traderRecepisseValidityLimit:
+      trader?.traderReceipt?.validityLimit ??
+      bsvhu.traderRecepisseValidityLimit,
+    traderRecepisseDepartment:
+      trader?.traderReceipt?.department ?? bsvhu.traderRecepisseDepartment
   };
   if (intermediaries) {
     data = {
@@ -119,14 +144,18 @@ async function getBsvhuCompanies(bsvhu: PrismaBsvhuForParsing) {
     bsvhu.emitterCompanySiret,
     bsvhu.transporterCompanySiret,
     bsvhu.transporterCompanyVatNumber,
-    bsvhu.destinationCompanySiret
+    bsvhu.destinationCompanySiret,
+    bsvhu.brokerCompanySiret,
+    bsvhu.traderCompanySiret
   ].filter(Boolean);
 
   // Batch fetch all companies involved in the BSVHU
   const companies = await prisma.company.findMany({
     where: { orgId: { in: companiesOrgIds } },
     include: {
-      transporterReceipt: true
+      transporterReceipt: true,
+      brokerReceipt: true,
+      traderReceipt: true
     }
   });
 
@@ -144,5 +173,13 @@ async function getBsvhuCompanies(bsvhu: PrismaBsvhuForParsing) {
       company.orgId === bsvhu.transporterCompanyVatNumber
   );
 
-  return { emitter, destination, transporter };
+  const broker = companies.find(
+    company => company.orgId === bsvhu.brokerCompanySiret
+  );
+
+  const trader = companies.find(
+    company => company.orgId === bsvhu.traderCompanySiret
+  );
+
+  return { emitter, destination, transporter, broker, trader };
 }
