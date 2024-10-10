@@ -28,3 +28,11 @@ export const isDefinedStrict = (val: any): boolean => {
 
   return isDefined(val);
 };
+
+/*
+ * Tests if a list of objects are ALL defined. 0 will be considered as defined
+ */
+export const areDefined = (...obj: any[]) => {
+  if (obj.some(o => !isDefined(o))) return false;
+  return true;
+};
