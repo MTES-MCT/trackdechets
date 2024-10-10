@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'Eco-organisme sur BSVHU [PR 3619](https://github.com/MTES-MCT/trackdechets/pull/3619)
+- Ajoute d'un moteur de recherche sur la documentation développeurs [PR 3622](https://github.com/MTES-MCT/trackdechets/pull/3622)
 
 #### :bug: Corrections de bugs
 
