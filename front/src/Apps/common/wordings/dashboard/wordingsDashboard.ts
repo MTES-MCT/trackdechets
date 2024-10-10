@@ -135,7 +135,7 @@ export const bsd_sub_type_option_synthesis = "Synthèse";
 export const filter_type_select_option_placeholder = "Sélectionner une option";
 export const max_filter_autorized_label =
   "Vous avez atteint le nombre de filtres maximum";
-export const sr_btn_delete_filter_line = "supprimer un filtre";
+export const sr_btn_delete_filter_line = "Retirer le filtre";
 export const sr_btn_add_filter_line = "ajouter un filtre";
 export const multi_select_select_all_label = "Tout sélectionner";
 

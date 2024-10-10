@@ -8,6 +8,7 @@ import BrowserDetect from "./BrowserDetect";
 import ErrorBoundary from "./ErrorBoundary";
 import { FeatureFlagsProvider } from "./common/contexts/FeatureFlagsContext";
 import { PermissionsProvider } from "./common/contexts/PermissionsContext";
+import A11ySkipLinks from "./Apps/common/Components/A11ySkipLinks/A11ySkipLinks";
 
 // Defines app-wide french error messages for yup
 // See https://github.com/jquense/yup#using-a-custom-locale-dictionary
@@ -22,6 +23,7 @@ export default function App() {
             <PermissionsProvider defaultPermissions={[]}>
               <FeatureFlagsProvider defaultFeatureFlags={{}}>
                 <div className="App">
+                  <A11ySkipLinks />
                   <LayoutContainer />
                 </div>
               </FeatureFlagsProvider>

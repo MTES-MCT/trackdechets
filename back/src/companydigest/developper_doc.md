@@ -29,7 +29,7 @@ Chaque établissement est autorisé par un featureFlag.
 ### Base de données
 
 Le modèle CompanyDigest centralise les données persistés necessaires à cette fonctionalité.
-Le modèle Company reçoit une nouvelle colonne featureFlags (string[]) dans lequel la présence de la chaine `COMPANY_DIGEST` détermine l'accès à la fonctionalité.
+L'accès à la fonctionnalité est ouvert à tous les établissementts depuis le 22/10/2024.
 CompanyDigest comporte user pour suivre l'utilisateur à l'origine de la demande
 
 ### Webhook

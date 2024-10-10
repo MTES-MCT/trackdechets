@@ -41,7 +41,7 @@ export default function Account() {
     return (
       <div id="account" className="account dashboard">
         {!isMobile && <AccountMenu />}
-        <div className="dashboard-content">
+        <div id="account-info" className="dashboard-content" tabIndex={-1}>
           <Routes>
             <Route index element={<Redirect path={routes.account.info} />} />
 

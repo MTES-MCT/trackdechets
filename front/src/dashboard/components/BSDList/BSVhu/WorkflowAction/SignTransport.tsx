@@ -9,7 +9,8 @@ import {
   Mutation,
   MutationSignBsvhuArgs,
   MutationUpdateBsvhuArgs,
-  SignatureTypeInput
+  SignatureTypeInput,
+  Bsvhu
 } from "@td/codegen-ui";
 import React from "react";
 import { generatePath, Link, useLocation } from "react-router-dom";
@@ -59,14 +60,14 @@ export function SignTransport({
       onModalCloseFromParent={onModalCloseFromParent}
       displayActionButton={displayActionButton}
     >
-      {({ bsvhu, onClose }) => {
+      {({ bsvhu, onClose }: { bsvhu: Bsvhu; onClose: Function }) => {
         const TODAY = new Date();
 
         return (bsvhu.metadata?.errors ?? []).some(
           error =>
             error.requiredFor === SignatureTypeInput.Transport &&
             // Transporter Receipt will be auto-completed by the transporter
-            !error.path.startsWith("transporter.recepisse")
+            !error.path.join(".").startsWith("transporter.recepisse")
         ) ? (
           <>
             <p className="tw-mt-2 tw-text-red-700">

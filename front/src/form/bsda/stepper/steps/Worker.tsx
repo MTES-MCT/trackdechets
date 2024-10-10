@@ -10,6 +10,7 @@ import {
 } from "@td/codegen-ui";
 import React, { useCallback, useState } from "react";
 import { getInitialState } from "../initial-state";
+import { NoWorkerAlert } from "../../components/NoWorkerAlert";
 
 export function Worker({ disabled }) {
   const initialState = getInitialState();
@@ -101,6 +102,12 @@ export function Worker({ disabled }) {
           Il n'y a pas d'entreprise de travaux
         </label>
       </div>
+
+      {values?.worker?.isDisabled === true && (
+        <div style={{ marginTop: 25 }}>
+          <NoWorkerAlert />
+        </div>
+      )}
 
       {!Boolean(values?.worker?.isDisabled) && (
         <>

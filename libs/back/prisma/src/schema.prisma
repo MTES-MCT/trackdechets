@@ -312,8 +312,8 @@ model Company {
   receivedAdministrativeTransfers AdministrativeTransfer[] @relation("AdministrativeTransferTo")
   webhookSettingsLimit            Int                      @default(1)
 
-  delegatorRndtsDeclarationDelegations RndtsDeclarationDelegation[] @relation("RndtsDeclarationDelegationDelegator")
-  delegateRndtsDeclarationDelegations RndtsDeclarationDelegation[] @relation("RndtsDeclarationDelegationDelegate")
+  delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
+  delegateRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegate")
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -395,6 +395,7 @@ model EcoOrganisme {
   address       String
   handleBsdasri Boolean @default(false)
   handleBsda    Boolean @default(false)
+  handleBsvhu   Boolean @default(false)
 }
 
 // Permet de faire le lien entre un bordereau "initial" et le ou 
@@ -425,14 +426,14 @@ model BsddFinalOperation {
 }
 
 model Form {
-  id                                    String                  @id @default(cuid()) @db.VarChar(30)
-  rowNumber                             Int                     @unique(map: "Form_rowNumber_ukey") @default(autoincrement())
-  createdAt                             DateTime                @default(now()) @db.Timestamptz(6)
-  updatedAt                             DateTime                @updatedAt @db.Timestamptz(6)
-  readableId                            String                  @unique(map: "Form.readableId._UNIQUE")
+  id                                    String                     @id @default(cuid()) @db.VarChar(30)
+  rowNumber                             Int                        @unique(map: "Form_rowNumber_ukey") @default(autoincrement())
+  createdAt                             DateTime                   @default(now()) @db.Timestamptz(6)
+  updatedAt                             DateTime                   @updatedAt @db.Timestamptz(6)
+  readableId                            String                     @unique(map: "Form.readableId._UNIQUE")
   customId                              String?
-  isDeleted                             Boolean?                @default(false)
-  status                                Status                  @default(DRAFT)
+  isDeleted                             Boolean?                   @default(false)
+  status                                Status                     @default(DRAFT)
   emitterType                           EmitterType?
   emitterPickupSite                     String?
   emitterCompanyName                    String?
@@ -446,8 +447,8 @@ model Form {
   emitterWorkSiteCity                   String?
   emitterWorkSitePostalCode             String?
   emitterWorkSiteInfos                  String?
-  emitterIsPrivateIndividual            Boolean?                @default(false)
-  emitterIsForeignShip                  Boolean?                @default(false)
+  emitterIsPrivateIndividual            Boolean?                   @default(false)
+  emitterIsForeignShip                  Boolean?                   @default(false)
   emitterCompanyOmiNumber               String?
   recipientCap                          String?
   recipientProcessingOperation          String?
@@ -457,18 +458,18 @@ model Form {
   recipientCompanyContact               String?
   recipientCompanyPhone                 String?
   recipientCompanyMail                  String?
-  recipientIsTempStorage                Boolean?                @default(false)
+  recipientIsTempStorage                Boolean?                   @default(false)
   wasteDetailsCode                      String?
   wasteDetailsName                      String?
   wasteDetailsOnuCode                   String?
-  wasteDetailsQuantity                  Decimal?                @db.Decimal(65, 30)
+  wasteDetailsQuantity                  Decimal?                   @db.Decimal(65, 30)
   wasteDetailsQuantityType              QuantityType?
   wasteDetailsConsistence               Consistence?
-  wasteDetailsPackagingInfos            Json                    @default("[]")
-  wasteDetailsPop                       Boolean                 @default(false)
+  wasteDetailsPackagingInfos            Json                       @default("[]")
+  wasteDetailsPop                       Boolean                    @default(false)
   wasteDetailsSampleNumber              String?
-  wasteDetailsIsDangerous               Boolean                 @default(false)
-  wasteDetailsParcelNumbers             Json?                   @default("[]")
+  wasteDetailsIsDangerous               Boolean                    @default(false)
+  wasteDetailsParcelNumbers             Json?                      @default("[]")
   wasteDetailsAnalysisReferences        String[]
   wasteDetailsLandIdentifiers           String[]
   traderCompanyName                     String?
@@ -479,7 +480,7 @@ model Form {
   traderCompanyMail                     String?
   traderReceipt                         String?
   traderDepartment                      String?
-  traderValidityLimit                   DateTime?               @db.Timestamptz(6)
+  traderValidityLimit                   DateTime?                  @db.Timestamptz(6)
   ecoOrganismeName                      String?
   ecoOrganismeSiret                     String?
   brokerCompanyName                     String?
@@ -490,7 +491,7 @@ model Form {
   brokerCompanyMail                     String?
   brokerReceipt                         String?
   brokerDepartment                      String?
-  brokerValidityLimit                   DateTime?               @db.Timestamptz(6)
+  brokerValidityLimit                   DateTime?                  @db.Timestamptz(6)
   nextDestinationProcessingOperation    String?
   nextDestinationCompanyName            String?
   nextDestinationCompanySiret           String?
@@ -499,31 +500,31 @@ model Form {
   nextDestinationCompanyPhone           String?
   nextDestinationCompanyMail            String?
   nextDestinationCompanyCountry         String?
-  nextDestinationCompanyVatNumber       String?                 @db.VarChar(30)
+  nextDestinationCompanyVatNumber       String?                    @db.VarChar(30)
   nextDestinationNotificationNumber     String?
   nextDestinationCompanyExtraEuropeanId String?
   nextTransporterOrgId                  String?
-  emittedAt                             DateTime?               @db.Timestamptz(6)
+  emittedAt                             DateTime?                  @db.Timestamptz(6)
   emittedBy                             String?
   emittedByEcoOrganisme                 Boolean?
-  takenOverAt                           DateTime?               @db.Timestamptz(6)
+  takenOverAt                           DateTime?                  @db.Timestamptz(6)
   takenOverBy                           String?
-  signedAt                              DateTime?               @db.Timestamptz(6)
+  signedAt                              DateTime?                  @db.Timestamptz(6)
   signedBy                              String?
-  isImportedFromPaper                   Boolean                 @default(false)
+  isImportedFromPaper                   Boolean                    @default(false)
   quantityReceivedType                  QuantityType?
   signedByTransporter                   Boolean?
-  sentAt                                DateTime?               @db.Timestamptz(6)
+  sentAt                                DateTime?                  @db.Timestamptz(6)
   sentBy                                String?
-  isAccepted                            Boolean?                @default(false)
+  isAccepted                            Boolean?                   @default(false)
   wasteAcceptationStatus                WasteAcceptationStatus?
   wasteRefusalReason                    String?
   receivedBy                            String?
-  receivedAt                            DateTime?               @db.Timestamptz(6)
-  quantityReceived                      Decimal?                @db.Decimal(65, 30)
-  quantityRefused                       Decimal?                @db.Decimal(65, 30)
+  receivedAt                            DateTime?                  @db.Timestamptz(6)
+  quantityReceived                      Decimal?                   @db.Decimal(65, 30)
+  quantityRefused                       Decimal?                   @db.Decimal(65, 30)
   processedBy                           String?
-  processedAt                           DateTime?               @db.Timestamptz(6)
+  processedAt                           DateTime?                  @db.Timestamptz(6)
   processingOperationDone               String?
   processingOperationDescription        String?
   noTraceability                        Boolean?
@@ -998,8 +999,8 @@ model Bsvhu {
 
   status BsvhuStatus @default(INITIAL)
 
-  emitterIrregularSituation                           Boolean?
-  emitterNoSiret                                      Boolean?
+  emitterIrregularSituation                           Boolean?                 @default(false)
+  emitterNoSiret                                      Boolean?                 @default(false)
   emitterAgrementNumber                               String?                  @db.VarChar(100)
   emitterCompanyName                                  String?
   emitterCompanySiret                                 String?                  @db.VarChar(17)
@@ -1067,6 +1068,9 @@ model Bsvhu {
   transporterTransportPlates                          String[]
   transporterRecepisseIsExempted                      Boolean?
 
+  ecoOrganismeName  String?
+  ecoOrganismeSiret String?
+
   intermediaries IntermediaryBsvhuAssociation[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
@@ -1078,12 +1082,13 @@ model Bsvhu {
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterCompanyVatNumberIdx")
+  @@index([ecoOrganismeSiret], map: "_BsvhuEcoOrganismeSiretIdx")
   @@index([intermediariesOrgIds], map: "_BsvhuIntermediariesOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
 }
 
-model RndtsDeclarationDelegation {
+model RegistryDelegation {
   id String @id @default(cuid())
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
@@ -1091,11 +1096,11 @@ model RndtsDeclarationDelegation {
 
   // Entreprise délégataire
   delegateId String @db.VarChar(30)
-  delegate Company  @relation("RndtsDeclarationDelegationDelegate", fields: [delegateId], references: [id])
+  delegate Company  @relation("RegistryDelegationDelegate", fields: [delegateId], references: [id])
 
   // Entreprise délégante
   delegatorId String @db.VarChar(30)
-  delegator Company  @relation("RndtsDeclarationDelegationDelegator", fields: [delegatorId], references: [id])
+  delegator Company  @relation("RegistryDelegationDelegator", fields: [delegatorId], references: [id])
 
   // Dates de validité
   startDate DateTime  @db.Timestamptz(6)
@@ -1105,8 +1110,8 @@ model RndtsDeclarationDelegation {
 
   isRevoked Boolean @default(false)
 
-  @@index([delegateId], map: "_RndtsDeclarationDelegationDelegateIdIdx")
-  @@index([delegatorId], map: "_RndtsDeclarationDelegationDelegatorIdIdx")
+  @@index([delegateId], map: "_RegistryDelegationDelegateIdIdx")
+  @@index([delegatorId], map: "_RegistryDelegationDelegatorIdIdx")
 }
 
 model IntermediaryBsvhuAssociation {
@@ -1674,6 +1679,7 @@ model Bsda {
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
+  @@index([ecoOrganismeSiret], map: "_BsdaEcoOrganismeSiretIdx")
   @@index([destinationOperationNextDestinationCompanySiret], map: "_BsdaDestinationOperationNextDestinationCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
   @@index([groupedInId], map: "_BsdaGroupedInIdIdx")

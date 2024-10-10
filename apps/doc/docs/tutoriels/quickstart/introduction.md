@@ -14,7 +14,7 @@ Vous y apprendrez comment réaliser des requêtes GraphQL depuis le playground w
 4. [Créer votre premier bordereau](tutoriels/quickstart/first-bsd)
 
 :::info
-Une connaissance approfondie du standard GraphQL utilisée par l'API n'est pas requise mais vous pouvez au besoin vous référer à [Introduction à GraphQL](../../concepts/graphql).
+Une connaissance approfondie du standard GraphQL utilisée par l'API n'est pas requise mais vous pouvez au besoin vous référer à [Introduction à GraphQL](../../concepts/graphql.md).
 :::
 
 

@@ -43,11 +43,15 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
       if (hasSubOptions) {
         return (
-          <SelectWithSubOptions
-            options={options}
-            selected={selected}
-            onChange={onChange}
-          />
+          //@ts-ignore
+          // quick fix pour réparer la nav clavier avec ce type de select
+          <div ref={ref} tabIndex={-1}>
+            <SelectWithSubOptions
+              options={options}
+              selected={selected}
+              onChange={onChange}
+            />
+          </div>
         );
       } else if (isMultiple) {
         return (

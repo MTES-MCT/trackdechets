@@ -1259,7 +1259,9 @@ describe("mutation.markAsProcessed", () => {
         status: "GROUPED",
         quantityReceived: 0.02
       },
-      forwardedInOpts: { quantityReceived: 0.007 }
+      forwardedInOpts: {
+        quantityReceived: 0.007
+      }
     });
 
     const form = await formFactory({
@@ -1278,6 +1280,90 @@ describe("mutation.markAsProcessed", () => {
             {
               initialFormId: groupedForm2.id,
               quantity: groupedForm2.forwardedIn!.quantityReceived!.toNumber()
+            }
+          ]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const mutateFn = () =>
+      mutate(MARK_AS_PROCESSED, {
+        variables: {
+          id: form.id,
+          processedInfo: {
+            processingOperationDescription: "Une description",
+            processingOperationDone: "D 1",
+            destinationOperationMode: OperationMode.ELIMINATION,
+            processedBy: "A simple bot",
+            processedAt: "2018-12-11T00:00:00.000Z"
+          }
+        }
+      });
+
+    await waitForJobsCompletion({
+      fn: mutateFn,
+      queue: updateAppendix2Queue,
+      expectedJobCount: 2
+    });
+
+    const updatedGroupedForm1 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm1.id }
+    });
+    expect(updatedGroupedForm1.status).toEqual("PROCESSED");
+
+    const updatedGroupedForm2 = await prisma.form.findUniqueOrThrow({
+      where: { id: groupedForm2.id }
+    });
+    expect(updatedGroupedForm2.status).toEqual("PROCESSED");
+  });
+
+  it("should mark partially accepted appendix2 forms as processed", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const groupedForm1 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        // quantité acceptée = 0.52
+        quantityReceived: 1,
+        quantityRefused: 0.48,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED"
+      }
+    });
+
+    // it should also work for BSD with temporary storage
+    const groupedForm2 = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        quantityReceived: 1
+      },
+      forwardedInOpts: {
+        // quantité acceptée = 0.52
+        quantityReceived: 1,
+        quantityRefused: 0.48,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED"
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        emitterType: "APPENDIX2",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        grouping: {
+          create: [
+            {
+              initialFormId: groupedForm1.id,
+              quantity: 0.52
+            },
+            {
+              initialFormId: groupedForm2.id,
+              quantity: 0.52
             }
           ]
         }

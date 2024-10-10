@@ -1,3 +1,5 @@
+name: Add Ready to merge label
+
 on:
   pull_request_review:
     types:
@@ -8,19 +10,40 @@ jobs:
   your-action:
     runs-on: 'ubuntu-latest'
     steps:
+      - uses: actions/checkout@v3
       - id: 'reviews'
-        uses: 'jrylan/github-action-reviews-counter@v1.0.0'
+        uses: actions/github-script@v7
         with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          script: |
+            const script = require('./scripts/gh-get-review-counts.js')
+            await script({github, context, core})
       - name: Add Label if 2 Approvals
         if: 'steps.reviews.outputs.approved >= 2 && steps.reviews.outputs.changes_requested == 0'
-        uses: actions/github-script@v4
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.issues.addLabels({
+            github.rest.issues.addLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               labels: ["ready to merge"]
+            })
+      - name: Remove Label if less than 2 approvals or change requested
+        if: 'steps.reviews.outputs.approved < 2 || steps.reviews.outputs.changes_requested > 0'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: "ready to merge"
+            }).catch(function(error) {
+              if (error.status === 404) {
+                return;
+              } else {
+                throw error;
+              }
             })

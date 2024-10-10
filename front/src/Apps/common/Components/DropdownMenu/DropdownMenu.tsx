@@ -36,6 +36,7 @@ const DropdownMenu = ({
         })}
       >
         <button
+          id="create-bsd-btn"
           className={classNames(
             `menu-btn fr-btn fr-btn--${primary ? "primary" : "secondary"}`,
             {
@@ -46,6 +47,7 @@ const DropdownMenu = ({
           )}
           disabled={isDisabled}
           onClick={toggleMenu}
+          aria-label={isOpen ? `Fermer ${menuTitle}` : `Ouvrir ${menuTitle}`}
         >
           {menuTitle}
         </button>
@@ -71,10 +73,14 @@ const DropdownMenu = ({
                       }}
                     >
                       {link.icon && (
-                        <span className="dropdown-menu__content__icon">
+                        <span
+                          className="dropdown-menu__content__icon"
+                          aria-hidden
+                        >
                           {link.icon}
                         </span>
                       )}
+                      <span className="sr-only">{menuTitle}</span>
                       {link.title}
                     </button>
                   ) : (
@@ -88,15 +94,20 @@ const DropdownMenu = ({
                       state={link.state && { ...link.state }}
                     >
                       {link.icon && (
-                        <span className="dropdown-menu__content__icon">
+                        <span
+                          className="dropdown-menu__content__icon"
+                          aria-hidden
+                        >
                           {link.icon}
                         </span>
                       )}
                       {link.iconId && (
                         <span
+                          aria-hidden
                           className={classNames([iconId, "fr-btn--icon-left"])}
                         ></span>
                       )}
+                      <span className="fr-sr-only">{menuTitle}</span>
                       {link.title}
                     </Link>
                   )}

@@ -183,18 +183,18 @@ function BsdCard({
     ? getPrimaryActionsReviewsLabel(bsdDisplay, currentSiret)
     : "";
 
+  const isTransportTabs = isToCollectTab || isCollectedTab;
+
   const currentTransporterInfos = useMemo(() => {
-    if (!isToCollectTab && !isCollectedTab) {
-      return null;
-    }
     return getCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
-  }, [bsd, currentSiret, isToCollectTab, isCollectedTab]);
+  }, [bsd, currentSiret, isToCollectTab]);
 
   // display the transporter's custom info if:
   // - we are in the "To Collect" tab
   // OR
   // - we are in the "Collected" tab and there is a custom info
   const displayTransporterCustomInfo =
+    isTransportTabs &&
     !!currentTransporterInfos &&
     (isToCollectTab ||
       (isCollectedTab &&
@@ -202,10 +202,6 @@ function BsdCard({
 
   // display the transporter's number plate if:
   // - the mode of transport is ROAD
-  // AND
-  // - we are in the "To Collect" tab
-  // OR
-  // - we are in the "Collected" tab and there is a number plate
   const displayTransporterNumberPlate =
     !!currentTransporterInfos &&
     (currentTransporterInfos.transporterMode === TransportMode.Road ||
@@ -213,9 +209,7 @@ function BsdCard({
       // qui ne rend pas le mode de transport obligatoire à la signature transporteur
       // en attente de correction Cf ticket tra-14517
       !currentTransporterInfos.transporterMode) &&
-    (isToCollectTab ||
-      (isCollectedTab &&
-        !!currentTransporterInfos?.transporterNumberPlate?.length));
+    !!currentTransporterInfos?.transporterNumberPlate?.length;
 
   const handleValidationClick = (
     _: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -399,12 +393,19 @@ function BsdCard({
                         transporterNumberPlate:
                           currentTransporterInfos?.transporterNumberPlate
                       }}
-                      hasEditableInfos
+                      hasEditableInfos={isToCollectTab}
+                      info={currentTransporterInfos?.transporterNumberPlate?.toString()}
                       isDisabled={
                         isCollectedTab ||
                         !permissions.includes(UserPermission.BsdCanUpdate)
                       }
                       onClick={handleEditableInfoClick}
+                    />
+                  )}
+                  {bsdDisplay?.destination?.["cap"] && (
+                    <InfoWithIcon
+                      labelCode={InfoIconCode.Cap}
+                      info={bsdDisplay?.destination?.["cap"]}
                     />
                   )}
                 </div>
@@ -464,6 +465,9 @@ function BsdCard({
                       onClick={handleValidationClick}
                     >
                       {ctaPrimaryLabel}
+                      <span className="fr-sr-only">
+                        bordereau numéro {bsdDisplay.readableid}
+                      </span>
                     </button>
                   )}
 
