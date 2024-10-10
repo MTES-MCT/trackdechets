@@ -1,11 +1,7 @@
-import {
-  Company,
-  RndtsDeclarationDelegation,
-  User,
-  UserRole
-} from "@prisma/client";
+import { Company, RndtsDeclarationDelegation, User } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { ForbiddenError } from "../common/errors";
+import { can, Permission } from "../permissions";
 
 export async function checkCanCreate(user: User, delegator: Company) {
   const companyAssociation = await prisma.companyAssociation.findFirst({
@@ -24,9 +20,11 @@ export async function checkCanCreate(user: User, delegator: Company) {
     );
   }
 
-  if (companyAssociation.role !== UserRole.ADMIN) {
+  if (
+    !can(companyAssociation.role, Permission.CompanyCanManageRegistryDelegation)
+  ) {
     throw new ForbiddenError(
-      "Vous devez être admin pour pouvoir créer une délégation."
+      "Vous n'avez pas les permissions suffisantes pour pouvoir créer une délégation."
     );
   }
 }
@@ -73,12 +71,12 @@ export async function checkCanRevoke(
   }
 
   if (
-    !companyAssociations.some(
-      association => association.role === UserRole.ADMIN
+    !companyAssociations.some(association =>
+      can(association.role, Permission.CompanyCanManageRegistryDelegation)
     )
   ) {
     throw new ForbiddenError(
-      "Vous devez être admin pour pouvoir révoquer une délégation."
+      "Vous n'avez pas les permissions suffisantes pour pouvoir créer une délégation."
     );
   }
 }

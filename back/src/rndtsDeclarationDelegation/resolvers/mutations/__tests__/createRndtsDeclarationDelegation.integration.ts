@@ -280,7 +280,7 @@ describe("mutation createRndtsDeclarationDelegation", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Vous devez être admin pour pouvoir créer une délégation."
+        "Vous n'avez pas les permissions suffisantes pour pouvoir créer une délégation."
       );
     });
 
