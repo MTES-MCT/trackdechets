@@ -26,6 +26,9 @@
       .fr-btn {
         margin: 5px 0;
         width: 180px;
+        @include desktop {
+          width: 100%;
+        }
         justify-content: center;
         box-sizing: content-box;
         padding: 0px;
