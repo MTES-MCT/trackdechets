@@ -22,6 +22,7 @@ import {
   isTransporterRefinement
 } from "../../common/validation/zod/refinement";
 import { EditionRule } from "./rules";
+import { CompanyRole } from "../../common/validation/zod/schema";
 
 // Date de la MAJ 2024.07.2 introduisant un changement
 // des règles de validations sur les poids et volume qui doivent
@@ -41,6 +42,12 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
     bsvhu.destinationCompanySiret,
     zodContext,
     bsvhu.destinationType ?? "WASTE_VEHICLES"
+  );
+  await isDestinationRefinement(
+    bsvhu.destinationOperationNextDestinationCompanySiret,
+    zodContext,
+    "BROYEUR",
+    CompanyRole.DestinationOperationNextDestination
   );
   await isTransporterRefinement(
     {

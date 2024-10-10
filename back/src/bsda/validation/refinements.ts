@@ -33,6 +33,7 @@ import {
   isTransporterRefinement,
   refineSiretAndGetCompany
 } from "../../common/validation/zod/refinement";
+import { CompanyRole } from "../../common/validation/zod/schema";
 
 export const checkOperationIsAfterReception: Refinement<ParsedZodBsda> = (
   bsda,
@@ -304,12 +305,14 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
     bsda.destinationCompanySiret,
     zodContext,
     "DESTINATION",
+    CompanyRole.Destination,
     isBsdaDestinationExemptFromVerification
   );
   await isDestinationRefinement(
     bsda.destinationOperationNextDestinationCompanySiret,
     zodContext,
     "DESTINATION",
+    CompanyRole.DestinationOperationNextDestination,
     isBsdaDestinationExemptFromVerification
   );
   for (const transporter of bsda.transporters ?? []) {

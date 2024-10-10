@@ -133,13 +133,10 @@ export async function isDestinationRefinement(
     | "WASTE_VEHICLES"
     | "BROYEUR"
     | "DEMOLISSEUR" = "DESTINATION",
+  bsdCompanyRole: CompanyRole = CompanyRole.Destination,
   isExemptedFromVerification?: (destination: Company | null) => boolean
 ) {
-  const company = await refineSiretAndGetCompany(
-    siret,
-    ctx,
-    CompanyRole.Destination
-  );
+  const company = await refineSiretAndGetCompany(siret, ctx, bsdCompanyRole);
   if (company) {
     if (
       role === "WASTE_VEHICLES" ||
@@ -149,21 +146,21 @@ export async function isDestinationRefinement(
       if (!isWasteVehicles(company)) {
         return ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: pathFromCompanyRole(CompanyRole.Destination),
+          path: pathFromCompanyRole(bsdCompanyRole),
           message: `Cet établissement n'a pas le profil Installation de traitement de VHU.`
         });
       }
       if (role === "BROYEUR" && !isBroyeur(company)) {
         return ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: pathFromCompanyRole(CompanyRole.Destination),
+          path: pathFromCompanyRole(bsdCompanyRole),
           message: `Cet établissement n'a pas le sous-profil Broyeur.`
         });
       }
       if (role === "DEMOLISSEUR" && !isDemolisseur(company)) {
         return ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: pathFromCompanyRole(CompanyRole.Destination),
+          path: pathFromCompanyRole(bsdCompanyRole),
           message: `Cet établissement n'a pas le sous-profil Casse automobile / démolisseur.`
         });
       }
@@ -175,7 +172,7 @@ export async function isDestinationRefinement(
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.Destination),
+        path: pathFromCompanyRole(bsdCompanyRole),
         message:
           `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
           ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
@@ -194,7 +191,7 @@ export async function isDestinationRefinement(
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.Destination),
+        path: pathFromCompanyRole(bsdCompanyRole),
         message:
           `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
           ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
