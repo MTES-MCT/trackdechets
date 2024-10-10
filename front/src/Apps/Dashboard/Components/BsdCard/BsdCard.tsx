@@ -61,6 +61,8 @@ import { isDefined } from "../../../../common/helper";
 
 function BsdCard({
   bsd,
+  posInSet = 0,
+  setSize = -1,
   bsdCurrentTab,
   currentSiret,
   onValidate,
@@ -330,7 +332,13 @@ function BsdCard({
 
   return (
     <>
-      <div className="bsd-card" tabIndex={0}>
+      <div
+        className="bsd-card"
+        tabIndex={0}
+        aria-posinset={posInSet}
+        aria-setsize={setSize}
+        role="article"
+      >
         {bsdDisplay && (
           <>
             <div className="bsd-card__header">

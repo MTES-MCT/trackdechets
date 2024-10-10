@@ -164,6 +164,8 @@ describe("Bsd card primary action label", () => {
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
                 currentSiret={siretEmmiter}
+                posInSet={0}
+                setSize={1}
                 bsd={bsdd}
                 onValidate={onValidate}
                 secondaryActions={{
@@ -203,6 +205,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={
                   { ...bsdd, emitter: { type: "APPENDIX1_PRODUCER" } } as Form
@@ -296,6 +300,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsda}
                 onValidate={onValidate}
@@ -465,6 +471,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsvhu}
                 onValidate={onValidate}
@@ -504,6 +512,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsvhuProcessed}
                 onValidate={functionMock}
@@ -528,6 +538,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretTransporter}
                 bsd={bsvhu}
                 onValidate={functionMock}
@@ -561,6 +573,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsff}
                 bsdCurrentTab="actTab"
@@ -606,6 +620,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsffDifferentSiret}
                 bsdCurrentTab={bsdCurrentTab}
@@ -694,6 +710,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsda}
                 onValidate={functionMock}
@@ -805,6 +823,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsdd}
                 onValidate={functionMock}
@@ -930,6 +950,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsdd}
                 bsdCurrentTab="actTab"
@@ -1074,6 +1096,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretNextTransporter}
                 bsd={bsdd}
                 bsdCurrentTab="toCollectTab"
@@ -1176,6 +1200,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsdari}
                 bsdCurrentTab="actTab"
@@ -1268,6 +1294,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsdari}
                 bsdCurrentTab="actTab"
@@ -1383,6 +1411,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsdd}
                 onValidate={functionMock}
@@ -1424,6 +1454,8 @@ describe("Bsd card primary action label", () => {
           <MockedProvider mocks={mocks} addTypename={false}>
             <MemoryRouter initialEntries={[route]}>
               <BsdCard
+                posInSet={0}
+                setSize={1}
                 currentSiret={siretEmmiter}
                 bsd={bsdd}
                 onValidate={functionMock}
