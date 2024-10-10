@@ -1,5 +1,5 @@
 import { EmitterType, Form, Status } from "@prisma/client";
-import { contentAwaitsGuest, renderMail } from "@td/mail";
+import { yourCompanyIsIdentifiedOnABsd, renderMail } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -141,10 +141,13 @@ async function mailToNonExistentEmitter(
   if (
     form.emitterCompanyMail &&
     form.emitterCompanySiret &&
+    form.emitterCompanyName &&
+    form.recipientCompanyName &&
+    form.recipientCompanySiret &&
     !contactAlreadyMentionned
   ) {
     await sendMail(
-      renderMail(contentAwaitsGuest, {
+      renderMail(yourCompanyIsIdentifiedOnABsd, {
         to: [
           {
             email: form.emitterCompanyMail,
@@ -152,9 +155,13 @@ async function mailToNonExistentEmitter(
           }
         ],
         variables: {
-          company: {
+          emitter: {
             siret: form.emitterCompanySiret,
-            name: form.emitterCompanyName ?? ""
+            name: form.emitterCompanyName
+          },
+          destination: {
+            siret: form.recipientCompanySiret,
+            name: form.recipientCompanyName
           }
         }
       })

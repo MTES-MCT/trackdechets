@@ -12,7 +12,7 @@ import {
   membershipRequestRefused,
   verificationProcessInfo,
   verificationDone,
-  contentAwaitsGuest
+  yourCompanyIsIdentifiedOnABsd
 } from "..";
 import { toFrFormat } from "../../helpers";
 import { renderMail } from "../renderers";
@@ -30,14 +30,17 @@ describe("templates", () => {
     expect(rendered.body).toContain(activationHash);
   });
 
-  test("contentAwaitsGuest", () => {
-    const company = { siret: "000000000000001", name: "ACME" };
-    const rendered = renderMail(contentAwaitsGuest, {
-      variables: { company },
+  test("yourCompanyIsIdentifiedOnABsd", () => {
+    const emitter = { siret: "000000000000001", name: "ACME" };
+    const destination = { siret: "000000000000002", name: "ACME 2" };
+    const rendered = renderMail(yourCompanyIsIdentifiedOnABsd, {
+      variables: { emitter, destination },
       to
     });
-    expect(rendered.body).toContain(company.siret);
-    expect(rendered.body).toContain(company.name);
+    expect(rendered.body).toContain(emitter.siret);
+    expect(rendered.body).toContain(emitter.name);
+    expect(rendered.body).toContain(destination.siret);
+    expect(rendered.body).toContain(destination.name);
   });
 
   test("inviteUserToJoin", () => {
