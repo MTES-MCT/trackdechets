@@ -110,7 +110,7 @@ function BsdAdditionalActionsButton({
   };
   const handleClone = () => {
     closeMenu();
-    onClone(bsd);
+    onClone!(bsd);
   };
   const handleDelete = () => {
     closeMenu();
