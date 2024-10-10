@@ -582,7 +582,11 @@ export default function Header({
                     <br />
                     de la transition
                     <br />
-                    écologique
+                    écologique,
+                    <br />
+                    de l'énergie, du climat, <br />
+                    et de la prévention <br />
+                    des risques
                   </p>
                 </div>
                 <div className="fr-header__operator">
