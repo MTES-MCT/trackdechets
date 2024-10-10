@@ -7,6 +7,7 @@ export function toGqlCompanyPrivate(company: Company): CompanyPrivate {
     ...company,
     ecoOrganismeAgreements:
       company.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
+    naf: company.codeNaf,
     libelleNaf: company.codeNaf ? libelleFromCodeNaf(company.codeNaf) : "",
     // les champs ci-dessous sont calculés dans le resolver CompanyPrivate
     signatureAutomations: [],
