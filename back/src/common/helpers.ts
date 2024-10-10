@@ -19,3 +19,12 @@ export const dateToXMonthAtHHMM = (date: Date = new Date()): string => {
 export const isDefined = (obj: any) => {
   return obj !== null && obj !== undefined;
 };
+
+/**
+ * This one does not consider empty strings "" as 'defined'
+ */
+export const isDefinedStrict = (val: any): boolean => {
+  if (val === "") return false;
+
+  return isDefined(val);
+};

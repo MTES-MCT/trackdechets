@@ -24,21 +24,22 @@ const cloneBsdResolver: MutationResolvers["cloneBsd"] = async (
 
   await idSchema.parse(id);
 
+  let newBsd;
   if (id.startsWith("BSDA-")) {
-    await cloneBsda(user, id);
+    newBsd = await cloneBsda(user, id);
   } else if (id.startsWith("DASRI-")) {
-    await cloneBsdasri(user, id);
+    newBsd = await cloneBsdasri(user, id);
   } else if (id.startsWith("FF-")) {
-    await cloneBsff(user, id);
+    newBsd = await cloneBsff(user, id);
   } else if (id.startsWith("VHU-")) {
-    await cloneBsvhu(user, id);
+    newBsd = await cloneBsvhu(user, id);
   } else if (id.startsWith("PAOH-")) {
-    await cloneBspaoh(user, id);
+    newBsd = await cloneBspaoh(user, id);
   } else {
-    await cloneBsdd(user, id);
+    newBsd = await cloneBsdd(user, id);
   }
 
-  return true;
+  return { id: newBsd.id };
 };
 
 export default cloneBsdResolver;

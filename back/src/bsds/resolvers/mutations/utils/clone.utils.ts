@@ -12,18 +12,20 @@ import { getBsffRepository } from "../../../../bsffs/repository";
 import { getBsvhuRepository } from "../../../../bsvhu/repository";
 import { getBspaohRepository } from "../../../../bspaoh/repository";
 
+export const bsdaInclude = {
+  transporters: true,
+  intermediaries: true,
+  finalOperations: true,
+  grouping: true,
+  groupedIn: true,
+  forwarding: true,
+  forwardedIn: true
+};
+
 export const cloneBsda = async (user: Express.User, id: string) => {
   const bsda = await prisma.bsda.findFirstOrThrow({
     where: { id },
-    include: {
-      transporters: true,
-      intermediaries: true,
-      finalOperations: true,
-      grouping: true,
-      groupedIn: true,
-      forwarding: true,
-      forwardedIn: true
-    }
+    include: bsdaInclude
   });
 
   if (!bsda) {
@@ -190,16 +192,18 @@ export const cloneBsda = async (user: Express.User, id: string) => {
   });
 };
 
+export const bsdasriInclude = {
+  finalOperations: true,
+  grouping: true,
+  groupedIn: true,
+  synthesizedIn: true,
+  synthesizing: true
+};
+
 export const cloneBsdasri = async (user: Express.User, id: string) => {
   const bsdasri = await prisma.bsdasri.findFirstOrThrow({
     where: { id },
-    include: {
-      finalOperations: true,
-      grouping: true,
-      groupedIn: true,
-      synthesizedIn: true,
-      synthesizing: true
-    }
+    include: bsdasriInclude
   });
 
   if (!bsdasri) {
@@ -210,7 +214,8 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
     bsdasri.grouping?.length ||
     bsdasri.groupedIn ||
     bsdasri.synthesizedInId ||
-    bsdasri.synthesizing
+    bsdasri.synthesizedIn ||
+    bsdasri.synthesizing.length
   ) {
     throw new UserInputError(
       "Impossible de cloner ce type de BSD pour le moment"
@@ -371,14 +376,16 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
   });
 };
 
+export const bsffInclude = {
+  transporters: true,
+  ficheInterventions: true,
+  packagings: true
+};
+
 export const cloneBsff = async (user: Express.User, id: string) => {
   const bsff = await prisma.bsff.findFirstOrThrow({
     where: { id },
-    include: {
-      transporters: true,
-      ficheInterventions: true,
-      packagings: true
-    }
+    include: bsffInclude
   });
 
   if (!bsff) {
@@ -422,7 +429,10 @@ export const cloneBsff = async (user: Express.User, id: string) => {
       packagings: bsff.packagings.length
         ? {
             createMany: {
-              data: bsff.packagings
+              data: bsff.packagings!.map(t => {
+                const { id, bsffId, ...data } = t;
+                return data;
+              })
             }
           }
         : undefined,
@@ -431,8 +441,8 @@ export const cloneBsff = async (user: Express.User, id: string) => {
         ? {
             createMany: {
               data: bsff.transporters!.map((t, idx) => {
-                const { id, ...data } = t;
-                return { ...data, bsffId: undefined, number: idx + 1 };
+                const { id, bsffId, ...data } = t;
+                return { ...data, number: idx + 1 };
               })
             }
           }
@@ -456,12 +466,14 @@ export const cloneBsff = async (user: Express.User, id: string) => {
   });
 };
 
+export const bsvhuInclude = {
+  intermediaries: true
+};
+
 export const cloneBsvhu = async (user: Express.User, id: string) => {
   const bsvhu = await prisma.bsvhu.findFirstOrThrow({
     where: { id },
-    include: {
-      intermediaries: true
-    }
+    include: bsvhuInclude
   });
 
   if (!bsvhu) {
@@ -580,12 +592,14 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
   });
 };
 
+export const bspaohInclude = {
+  transporters: true
+};
+
 export const cloneBspaoh = async (user: Express.User, id: string) => {
   const bspaoh = await prisma.bspaoh.findFirstOrThrow({
     where: { id },
-    include: {
-      transporters: true
-    }
+    include: bspaohInclude
   });
 
   if (!bspaoh) {
@@ -685,20 +699,22 @@ export const cloneBspaoh = async (user: Express.User, id: string) => {
   });
 };
 
+export const bsddInclude = {
+  transporters: true,
+  intermediaries: true,
+  finalOperations: true,
+  grouping: true,
+  groupedIn: true,
+  forwarding: true
+};
+
 export const cloneBsdd = async (
   user: Express.User,
   id: string
 ): Promise<Form & FormWithTransporters> => {
   const bsdd = await prisma.form.findFirstOrThrow({
     where: { id },
-    include: {
-      transporters: true,
-      intermediaries: true,
-      finalOperations: true,
-      grouping: true,
-      groupedIn: true,
-      forwarding: true
-    }
+    include: bsddInclude
   });
 
   if (!bsdd) {
@@ -707,7 +723,7 @@ export const cloneBsdd = async (
 
   if (
     bsdd.grouping?.length ||
-    bsdd.groupedIn ||
+    bsdd.groupedIn?.length ||
     bsdd.forwarding ||
     bsdd.forwardedInId
   ) {

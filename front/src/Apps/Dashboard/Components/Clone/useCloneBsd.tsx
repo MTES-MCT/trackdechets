@@ -9,7 +9,9 @@ import { toastApolloError } from "../../Creation/toaster";
 
 const CLONE_BSD = gql`
   mutation cloneBsd($id: String!) {
-    cloneBsd(id: $id)
+    cloneBsd(id: $id) {
+      id
+    }
   }
 `;
 

@@ -6,5 +6,5 @@ type ReindexBsds {
 type Mutation {
   reindexBsds(ids: String!): ReindexBsds!
 
-  cloneBsd(id: String!): Boolean!
+  cloneBsd(id: String!): CloneId!
 }
