@@ -127,7 +127,7 @@ export interface BsdDisplay {
     | Maybe<Array<InitialBsdasri>>
     | Array<BsffPackaging>
     | Maybe<Array<InitialBsda>>;
-  groupedIn?: Maybe<Bsda>;
+  groupedIn?: Maybe<Bsda> | Maybe<Bsdasri>;
   forwardedIn?: Maybe<Bsda>;
   synthesizing?: Maybe<Array<InitialBsdasri>>;
   temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
