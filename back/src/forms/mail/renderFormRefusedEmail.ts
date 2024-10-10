@@ -10,7 +10,7 @@ import {
 import { getTransporterCompanyOrgId, Dreals } from "@td/constants";
 import { getFirstTransporter } from "../database";
 import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
-import { getMailNotificationSubscribers } from "../../users/notifications";
+import { getNotificationSubscribers } from "../../users/notifications";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -58,12 +58,12 @@ export async function renderFormRefusedEmail(
     drealsRecipients = Dreals.filter(d => formDepartments.includes(d.Dept));
   }
 
-  const to = await getMailNotificationSubscribers(
+  const to = await getNotificationSubscribers(
     UserNotification.BSD_REFUSAL,
     [form.emitterCompanySiret].filter(Boolean)
   );
 
-  const destinationCC = await getMailNotificationSubscribers(
+  const destinationCC = await getNotificationSubscribers(
     UserNotification.BSD_REFUSAL,
     [
       form.recipientCompanySiret,

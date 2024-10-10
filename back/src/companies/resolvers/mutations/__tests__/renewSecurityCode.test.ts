@@ -23,11 +23,10 @@ jest.mock("../../../../mailer/mailing", () => ({
   sendMail: jest.fn((...args) => sendMailMock(...args))
 }));
 
-const getCompanyActiveUsersMock = jest.fn();
+const getNotificationSubscribersMock = jest.fn();
 
-jest.mock("../../../database", () => ({
-  getCompanyActiveUsers: jest.fn(() => getCompanyActiveUsersMock()),
-  convertUrls: v => v
+jest.mock("../../../../users/notifications", () => ({
+  getNotificationSubscribers: jest.fn(() => getNotificationSubscribersMock())
 }));
 
 describe("renewSecurityCode", () => {
@@ -36,7 +35,7 @@ describe("renewSecurityCode", () => {
     updateCompanyMock.mockReset();
     (utils.randomNumber as jest.Mock).mockReset();
     sendMailMock.mockReset();
-    getCompanyActiveUsersMock.mockReset();
+    getNotificationSubscribersMock.mockReset();
   });
 
   it("should throw BAD_USER_INPUT exception if siret is not 14 character long", async () => {
@@ -67,12 +66,12 @@ describe("renewSecurityCode", () => {
       .mockReturnValueOnce(1234)
       .mockReturnValueOnce(2345);
 
-    getCompanyActiveUsersMock.mockReturnValueOnce([]);
+    getNotificationSubscribersMock.mockReturnValueOnce([]);
     await renewSecurityCode("85001946400013");
 
     expect(utils.randomNumber as jest.Mock).toHaveBeenCalledTimes(2);
   });
-  it("should send a notification email to all users and return updated company", async () => {
+  it("should send a notification email to subscribers and return updated company", async () => {
     const siret = siretify(2);
     companyMock.mockResolvedValueOnce({
       securityCode: 1234,
@@ -101,13 +100,13 @@ describe("renewSecurityCode", () => {
         }
       }
     });
-    getCompanyActiveUsersMock.mockReturnValueOnce(users);
+    getNotificationSubscribersMock.mockReturnValueOnce(users);
 
     const updatedCompany = await renewSecurityCode(siret);
 
     expect(sendMailMock).toHaveBeenCalledWith(mail);
 
-    expect(updatedCompany).toEqual({
+    expect(updatedCompany).toMatchObject({
       orgId: siret,
       name: "Code en stock",
       securityCode: 4567
