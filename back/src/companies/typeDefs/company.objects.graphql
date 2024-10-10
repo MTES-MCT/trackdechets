@@ -498,6 +498,7 @@ type EcoOrganisme {
 
   handleBsdasri: Boolean
   handleBsda: Boolean
+  handleBsvhu: Boolean
 }
 
 """

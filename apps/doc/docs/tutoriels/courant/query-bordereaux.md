@@ -6,7 +6,7 @@ Les bordereaux Bsda, Bsdasri, Bsff et Bsvhu, ont bénéficié des retours utiili
 
 Veuillez noter que les Bsdd (requête forms) ne disposent pas des mêmes filtres. 
 
-Pour une documentation exhaustive, veuillez consulter la référence des requêtes de chaque bordereau, par exemple [la requête bsdasri](../../reference/api-reference/bsdasri/queries#bsdasris).
+Pour une documentation exhaustive, veuillez consulter la référence des requêtes de chaque bordereau, par exemple [la requête bsdasri](../../reference/api-reference/bsdasri/queries.md#bsdasris).
  
 Les exemples suivants portent sur les dasris, mais sont aisément transposables aux autres bordereaux. 
 Ils ne prétendent pas avoir un intérêt métier particulier, mais simplement expliciter la syntaxe de requête.
@@ -65,7 +65,7 @@ query {
 ```
 #### Filtres temporels
 
-Les opérateurs et formats de date acceptés sont documentés dans [la référence de DateFilter](../../reference/api-reference/bsdasri/inputObjects#datefilter).
+Les opérateurs et formats de date acceptés sont documentés dans [la référence de DateFilter](../../reference/api-reference/bsdasri/inputObjects.md#datefilter).
 
 
 Renvoie les dasris dont la date de création est égale ou postérieure au 23/11/2021.

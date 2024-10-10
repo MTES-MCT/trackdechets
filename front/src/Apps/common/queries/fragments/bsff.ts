@@ -57,6 +57,7 @@ export const dashboardBsffFragment = gql`
         name
       }
       plannedOperationCode
+      cap
     }
     waste {
       code

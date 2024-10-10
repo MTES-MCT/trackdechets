@@ -1,0 +1,54 @@
+{
+  "name": "object-creator",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/back/object-creator/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/libs/back/object-creator",
+        "format": ["cjs"],
+        "bundle": false,
+        "main": "libs/back/object-creator/src/main.ts",
+        "tsConfig": "libs/back/object-creator/tsconfig.app.json",
+        "assets": ["libs/back/object-creator/src/assets"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        }
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "run": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "object-creator:build",
+        "watch": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "object-creator:build:development"
+        }
+      }
+    }
+  },
+  "tags": []
+}

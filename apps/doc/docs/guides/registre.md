@@ -7,13 +7,13 @@ L'[arrêté du 31 mai 2021](https://www.legifrance.gouv.fr/jorf/id/JORFTEXT00004
 ## Export JSON
 
 Les `queries` permettant d'exporter les données registre sont les suivantes :
-- [`incomingWastes`](../reference/api-reference/registre/queries#incomingwastes) : registre de déchets entrants
-- [`outgoingWastes`](../reference/api-reference/registre/queries#outgoingwastes) : registre de déchets sortants
-- [`transporteWastes`](../reference/api-reference/registre/queries#transportedwastes): registre de déchets transportés
-- [`managedWastes`](../reference/api-reference/registre/queries#managedwastes) : registre de déchets gérés (courtage ou négoce)
-- [`allWastes`](../reference/api-reference/registre/queries#allwastes) : registre permettant d'exporter toutes les données de bordereaux pour un ou plusieurs établissements
+- [`incomingWastes`](../reference/api-reference/registre/queries.md#incomingwastes) : registre de déchets entrants
+- [`outgoingWastes`](../reference/api-reference/registre/queries.md#outgoingwastes) : registre de déchets sortants
+- [`transporteWastes`](../reference/api-reference/registre/queries.md#transportedwastes): registre de déchets transportés
+- [`managedWastes`](../reference/api-reference/registre/queries.md#managedwastes) : registre de déchets gérés (courtage ou négoce)
+- [`allWastes`](../reference/api-reference/registre/queries.md#allwastes) : registre permettant d'exporter toutes les données de bordereaux pour un ou plusieurs établissements
 
-Des filtres avancés peuvent être appliqués pour restreindre les données exportés par code déchet, quantité, date d'expédition, etc, et son décrits dans l'objet [RegisterWhere](../reference/api-reference/registre/inputObjects#wasteregistrywhere).
+Des filtres avancés peuvent être appliqués pour restreindre les données exportés par code déchet, quantité, date d'expédition, etc, et son décrits dans l'objet [RegisterWhere](../reference/api-reference/registre/inputObjects.md#wasteregistrywhere).
 
 Exemple de requête :
 
@@ -102,7 +102,7 @@ Les résultats sont paginés. Pour récupérer tous les déchets :
 
 Les données peuvent également être téléchargées au format `CSV` ou Excel (`XLXS`).
 
-Pour ce faire vous devez utiliser la query [`wastesRegistryCsv`](../reference/api-reference/registre/queries#wastesregistrycsv) ou [`wastesRegistryXls`](../reference/api-reference/registre/queries#wastesregistryxls) de la façon suivante :
+Pour ce faire vous devez utiliser la query [`wastesRegistryCsv`](../reference/api-reference/registre/queries.md#wastesregistrycsv) ou [`wastesRegistryXls`](../reference/api-reference/registre/queries.md#wastesregistryxls) de la façon suivante :
 
 ```graphql
 query {

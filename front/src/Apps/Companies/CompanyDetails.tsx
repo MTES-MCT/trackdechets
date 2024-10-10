@@ -27,8 +27,6 @@ export type TabContentProps = {
   company: CompanyPrivate;
 };
 
-const COMPANY_DIGEST_FLAG = "COMPANY_DIGEST";
-
 const buildTabs = (
   company: CompanyPrivate
 ): {
@@ -36,10 +34,7 @@ const buildTabs = (
   tabsContent: Record<string, React.FC<TabContentProps>>;
 } => {
   const isAdmin = company.userRole === UserRole.Admin;
-  const isMember = company.userRole === UserRole.Member;
-  // Admin and member can access the gerico tab
-  const canViewCompanyDigestTab =
-    company.featureFlags.includes(COMPANY_DIGEST_FLAG) && (isAdmin || isMember);
+
   const iconId = "fr-icon-checkbox-line" as FrIconClassName;
   const tabs = [
     {
@@ -61,22 +56,21 @@ const buildTabs = (
       tabId: "tab4",
       label: "Contact",
       iconId
+    },
+    {
+      tabId: "tab5",
+      label: "Fiche",
+      iconId
     }
   ];
   const tabsContent = {
     tab1: CompanyInfo,
     tab2: CompanySignature,
     tab3: CompanyMembers,
-    tab4: CompanyContactForm
+    tab4: CompanyContactForm,
+    tab5: CompanyDigestSheetForm
   };
-  if (canViewCompanyDigestTab) {
-    tabs.push({
-      tabId: "tab5",
-      label: "Fiche",
-      iconId
-    });
-    tabsContent["tab5"] = CompanyDigestSheetForm;
-  }
+
   if (isAdmin) {
     tabs.push({
       tabId: "tab6",
@@ -136,13 +130,15 @@ export default function CompanyDetails() {
         </>
       }
     >
-      <Tabs
-        selectedTabId={selectedTabId}
-        tabs={tabs}
-        onTabChange={setSelectedTabId}
-      >
-        <CurrenComponent company={company} />
-      </Tabs>
+      <div id="company-tab-content" tabIndex={-1}>
+        <Tabs
+          selectedTabId={selectedTabId}
+          tabs={tabs}
+          onTabChange={setSelectedTabId}
+        >
+          <CurrenComponent company={company} />
+        </Tabs>
+      </div>
     </AccountContentWrapper>
   );
 }

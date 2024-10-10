@@ -21,4 +21,4 @@ Un token est lié à un utilisateur. Les permissions du token découle donc dire
 
 ## Authentification pour le compte de tiers
 
-Pour les logiciels (ex : logiciel SaaS déchets) désirant se connecter à l'API Trackdéchets pour le compte d'utilisateurs tiers, nous recommandons d'utiliser le protocole OAuth2 : [Créer une application OAuth2](../guides/oauth2)
+Pour les logiciels (ex : logiciel SaaS déchets) désirant se connecter à l'API Trackdéchets pour le compte d'utilisateurs tiers, nous recommandons d'utiliser le protocole OAuth2 : [Créer une application OAuth2](../guides/oauth2.md)

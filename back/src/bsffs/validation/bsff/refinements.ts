@@ -32,7 +32,7 @@ import { OPERATION } from "../../constants";
 import { BsffOperationCode } from "../../../generated/graphql/types";
 import {
   isDestinationRefinement,
-  isNotDormantRefinement,
+  isEmitterNotDormantRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
 } from "../../../common/validation/zod/refinement";
@@ -55,7 +55,7 @@ export const checkCompanies: Refinement<ParsedZodBsff> = async (
   bsff,
   zodContext
 ) => {
-  await isNotDormantRefinement(bsff.emitterCompanySiret, zodContext);
+  await isEmitterNotDormantRefinement(bsff.emitterCompanySiret, zodContext);
   await isDestinationRefinement(bsff.destinationCompanySiret, zodContext);
 
   for (const transporter of bsff.transporters ?? []) {
@@ -88,10 +88,14 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
     if (
       (packaging.volume === null || packaging.volume === undefined) &&
       !bsff.isDraft &&
+      ![BsffType.REEXPEDITION, BsffType.GROUPEMENT].includes(bsff.type) &&
       isCreatedAfterV2024091
     ) {
       // TRA-14567 Le volume est rendu obligatoire sur les contenants BSFF
-      // à partir de la v2024091
+      // à partir de la v2024091. L'obligation ne concerne pas les bordereaux
+      // de groupement ou réexpedition pour ne pas bloquer des utilisateurs
+      // regroupant des BSFF crées avant 2024091 ayant un volume null (les contenants
+      // étant calculés automatiquement à partir des contenants réexpédiés / regroupés).
       addIssue({
         code: z.ZodIssueCode.custom,
         message: "Conditionnements : le volume est requis"

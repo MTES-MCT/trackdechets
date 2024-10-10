@@ -11,6 +11,7 @@ function readers(bsvhu: Bsvhu): string[] {
     bsvhu.destinationCompanySiret,
     bsvhu.transporterCompanySiret,
     bsvhu.transporterCompanyVatNumber,
+    bsvhu.ecoOrganismeSiret,
     ...bsvhu.intermediariesOrgIds
   ].filter(Boolean);
 }
@@ -27,6 +28,8 @@ function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
   const updateTransporterCompanySiret = input?.transporter?.company?.siret;
   const updateTransporterCompanyVatNumber =
     input?.transporter?.company?.vatNumber;
+  const updateEcoOrganismeCompanySiret = input?.ecoOrganisme?.siret;
+
   const updateIntermediaries = (input?.intermediaries ?? []).flatMap(i => [
     i.siret,
     i.vatNumber
@@ -52,6 +55,10 @@ function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
       ? updateTransporterCompanyVatNumber
       : bsvhu.transporterCompanyVatNumber;
 
+  const ecoOrganismeCompanySiret =
+    updateEcoOrganismeCompanySiret !== undefined
+      ? updateEcoOrganismeCompanySiret
+      : bsvhu.ecoOrganismeSiret;
   const intermediariesOrgIds =
     input?.intermediaries !== undefined
       ? updateIntermediaries
@@ -62,6 +69,7 @@ function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
     destinationCompanySiret,
     transporterCompanySiret,
     transporterCompanyVatNumber,
+    ecoOrganismeCompanySiret,
     ...intermediariesOrgIds
   ].filter(Boolean);
 }
@@ -72,6 +80,7 @@ function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
 function creators(input: BsvhuInput) {
   return [
     input.emitter?.company?.siret,
+    input.ecoOrganisme?.siret,
     input.transporter?.company?.siret,
     input.transporter?.company?.vatNumber,
     input.destination?.company?.siret
