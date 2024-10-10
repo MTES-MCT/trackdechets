@@ -376,7 +376,7 @@ export function createFicheIntervention({
 type AddBsffTransporterOpt = {
   bsffId: string;
   transporter: UserWithCompany;
-  opt: { transporterTransportPlates: string[] };
+  opt?: { transporterTransportPlates: string[] };
 };
 
 export const addBsffTransporter = async ({

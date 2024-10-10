@@ -14,6 +14,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Documentation API Developers : Page Not Found, si on n'y accède pas via l'arborescence [PR 3621](https://github.com/MTES-MCT/trackdechets/pull/3621)
+- Ne pas apporter automatiquement de modification sur la liste des contenants lorsque je procède à une modification transporteur et que le BSFF est au statut SENT [PR 3615](https://github.com/MTES-MCT/trackdechets/pull/3615)
 
 #### :house: Interne
 
