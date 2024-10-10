@@ -12,6 +12,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout d'Eco-organisme sur BSVHU [PR 3619](https://github.com/MTES-MCT/trackdechets/pull/3619)
 - Ajoute d'un moteur de recherche sur la documentation développeurs [PR 3622](https://github.com/MTES-MCT/trackdechets/pull/3622)
 
+#### :nail_care: Améliorations
+
+- Changer la référence du cerfa lors de l'ajout d'une fiche d'intervention [PR 3616](https://github.com/MTES-MCT/trackdechets/pull/3616)
+
 #### :bug: Corrections de bugs
 
 - Documentation API Developers : Page Not Found, si on n'y accède pas via l'arborescence [PR 3621](https://github.com/MTES-MCT/trackdechets/pull/3621)
