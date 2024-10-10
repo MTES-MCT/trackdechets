@@ -6,9 +6,9 @@ import {
   SignatureStamp
 } from "../../../common/pdf";
 import { Bsvhu, OperationMode } from "../../../generated/graphql/types";
-import { Recepisse } from "./Recepisse";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { dateToXMonthAtHHMM } from "../../../common/helpers";
+import { Recepisse } from "../../../common/pdf/components/Recepisse";
 
 const IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:

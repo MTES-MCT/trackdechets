@@ -3,6 +3,7 @@ import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,
   ecoOrganismeFactory,
+  intermediaryReceiptFactory,
   transporterReceiptFactory
 } from "../../../__tests__/factories";
 import { CompanySearchResult } from "../../../companies/types";
@@ -17,6 +18,8 @@ import { BsvhuValidationContext } from "../types";
 import { getCurrentSignatureType, prismaToZodBsvhu } from "../helpers";
 import { parseBsvhu, parseBsvhuAsync } from "..";
 import { ZodError } from "zod";
+import { CompanyRole } from "../../../common/validation/zod/schema";
+import { prisma } from "@td/prisma";
 
 const searchResult = (companyName: string) => {
   return {
@@ -740,7 +743,7 @@ describe("BSVHU validation", () => {
   });
 
   describe("BSVHU Recipify Module", () => {
-    it("recipify should correctly process input and return completedInput with transporter receipt", async () => {
+    it("recipify should correctly process transporter and return completedInput with transporter receipt", async () => {
       const receipt = await transporterReceiptFactory({
         company: transporterCompany
       });
@@ -771,6 +774,41 @@ describe("BSVHU validation", () => {
           transporterRecepisseNumber: null,
           transporterRecepisseDepartment: null,
           transporterRecepisseValidityLimit: null
+        })
+      );
+    });
+
+    it("recipify should correctly process broker and trader", async () => {
+      const brokerReceipt = await intermediaryReceiptFactory({
+        role: CompanyRole.Broker,
+        company: brokerCompany
+      });
+      const traderReceipt = await intermediaryReceiptFactory({
+        role: CompanyRole.Trader,
+        company: traderCompany
+      });
+      const recipified = await parseBsvhuAsync(
+        {
+          ...bsvhu,
+          brokerRecepisseNumber: null,
+          brokerRecepisseDepartment: null,
+          brokerRecepisseValidityLimit: null,
+          traderRecepisseNumber: null,
+          traderRecepisseDepartment: null,
+          traderRecepisseValidityLimit: null
+        },
+        {
+          ...context
+        }
+      );
+      expect(recipified).toEqual(
+        expect.objectContaining({
+          brokerRecepisseNumber: brokerReceipt.receiptNumber,
+          brokerRecepisseDepartment: brokerReceipt.department,
+          brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
+          traderRecepisseNumber: traderReceipt.receiptNumber,
+          traderRecepisseDepartment: traderReceipt.department,
+          traderRecepisseValidityLimit: traderReceipt.validityLimit
         })
       );
     });
