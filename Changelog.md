@@ -15,6 +15,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Documentation API Developers : Page Not Found, si on n'y accède pas via l'arborescence [PR 3621](https://github.com/MTES-MCT/trackdechets/pull/3621)
 
+#### :house: Interne
+
+- Suppression du champ isRegistreNational [PR 3652](https://github.com/MTES-MCT/trackdechets/pull/3652)
+
 # [2024.9.1] 24/09/2024
 
 #### :rocket: Nouvelles fonctionnalités
