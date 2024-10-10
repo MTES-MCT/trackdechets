@@ -92,7 +92,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       })
     ]);
   });
-  it("should deny bsdd token creation for non SENT status", async () => {
+  it("should deny bsdd token creation for non SENT status and no citerne/ADR business", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -157,6 +157,45 @@ describe("Mutation.creatPdfAccessToken", () => {
     // token lifespan should be 30'
     expect(token.expiresAt.getTime() > addMinutes(new Date(), 29).getTime());
   });
+
+  it("should create a token for a bsdd if status is not OK but belongs to isReturnTab", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        transporters: {
+          create: { transporterCompanySiret: company.siret, number: 1 }
+        },
+        status: Status.RECEIVED,
+        receivedAt: new Date(),
+        emptyReturnADR: "EMPTY_CITERNE"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createPdfAccessToken">>(
+      CREATE_PDF_TOKEN,
+      {
+        variables: {
+          input: { bsdId: bsdd.id }
+        }
+      }
+    );
+
+    // Then
+    const token = await prisma.pdfAccessToken.findFirstOrThrow({
+      where: { bsdType: BsdType.BSDD, userId: user.id, bsdId: bsdd.id }
+    });
+
+    expect(data.createPdfAccessToken).toEqual(
+      `http://api.trackdechets.local/road-control/${token.token}`
+    );
+    // token lifespan should be 30'
+    expect(token.expiresAt.getTime() > addMinutes(new Date(), 29).getTime());
+  });
+
   it("should deny token creation for a bsda if user does not belong to it", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
     const user = await userFactory();
