@@ -312,6 +312,9 @@ model Company {
   receivedAdministrativeTransfers AdministrativeTransfer[] @relation("AdministrativeTransferTo")
   webhookSettingsLimit            Int                      @default(1)
 
+  delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
+  delegateRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegate")
+
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
   @@index([createdAt], map: "_CompanyCreatedAtIdx")
@@ -1083,6 +1086,32 @@ model Bsvhu {
   @@index([intermediariesOrgIds], map: "_BsvhuIntermediariesOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
+}
+
+model RegistryDelegation {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  // Entreprise délégataire
+  delegateId String @db.VarChar(30)
+  delegate Company  @relation("RegistryDelegationDelegate", fields: [delegateId], references: [id])
+
+  // Entreprise délégante
+  delegatorId String @db.VarChar(30)
+  delegator Company  @relation("RegistryDelegationDelegator", fields: [delegatorId], references: [id])
+
+  // Dates de validité
+  startDate DateTime  @db.Timestamptz(6)
+  endDate   DateTime? @db.Timestamptz(6)
+
+  comment String? @db.VarChar(500)
+
+  isRevoked Boolean @default(false)
+
+  @@index([delegateId], map: "_RegistryDelegationDelegateIdIdx")
+  @@index([delegatorId], map: "_RegistryDelegationDelegatorIdIdx")
 }
 
 model IntermediaryBsvhuAssociation {

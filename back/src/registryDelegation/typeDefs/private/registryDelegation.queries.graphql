@@ -1,0 +1,15 @@
+type Query {
+  """
+  Renvoie une délégation, séléctionnée par son ID
+  """
+  registryDelegation(delegationId: ID!): RegistryDelegation!
+
+  """
+  Renvoie une liste de délégations (triée par updatedAt)
+  """
+  registryDelegations(
+    where: RegistryDelegationWhere
+    skip: Int
+    first: Int
+  ): RegistryDelegationConnection!
+}

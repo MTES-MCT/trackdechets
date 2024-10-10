@@ -148,6 +148,27 @@ export const userWithCompanyFactory = async (
   return { user, company };
 };
 
+/**
+ * Create a user and add him to an existing company
+ */
+export const userInCompany = async (
+  role: UserRole = "ADMIN",
+  companyId: string,
+  userOpts: Partial<Prisma.UserCreateInput> = {}
+) => {
+  const user = await userFactory({
+    ...userOpts,
+    companyAssociations: {
+      create: {
+        company: { connect: { id: companyId } },
+        role: role
+      }
+    }
+  });
+
+  return user;
+};
+
 export const destinationFactory = async (
   companyOpts: Partial<Prisma.CompanyCreateInput> = {}
 ) => {
