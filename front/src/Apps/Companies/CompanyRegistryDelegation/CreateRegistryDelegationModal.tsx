@@ -2,7 +2,7 @@ import React from "react";
 import {
   CompanyPrivate,
   Mutation,
-  MutationCreateRndtsDeclarationDelegationArgs
+  MutationCreateRegistryDelegationArgs
 } from "@td/codegen-ui";
 import { FieldError, useForm } from "react-hook-form";
 import { Modal } from "../../../common/components";
@@ -16,9 +16,9 @@ import { datetimeToYYYYMMDD } from "../../Dashboard/Validation/BSPaoh/paohUtils"
 import { startOfDay } from "date-fns";
 import { useMutation } from "@apollo/client";
 import {
-  CREATE_RNDTS_DECLARATION_DELEGATION,
-  RNDTS_DECLARATION_DELEGATIONS
-} from "../../common/queries/rndtsDeclarationDelegation/queries";
+  CREATE_REGISTRY_DELEGATION,
+  REGISTRY_DELEGATIONS
+} from "../../common/queries/registryDelegation/queries";
 import toast from "react-hot-toast";
 
 const displayError = (error: FieldError | undefined) => {
@@ -81,16 +81,16 @@ interface Props {
   onClose: () => void;
 }
 
-export const CreateRndtsDeclarationDelegationModal = ({
+export const CreateRegistryDelegationModal = ({
   company,
   onClose,
   isOpen
 }: Props) => {
-  const [createRndtsDeclarationDelegation, { loading }] = useMutation<
-    Pick<Mutation, "createRndtsDeclarationDelegation">,
-    MutationCreateRndtsDeclarationDelegationArgs
-  >(CREATE_RNDTS_DECLARATION_DELEGATION, {
-    refetchQueries: [RNDTS_DECLARATION_DELEGATIONS]
+  const [createRegistryDelegation, { loading }] = useMutation<
+    Pick<Mutation, "createRegistryDelegation">,
+    MutationCreateRegistryDelegationArgs
+  >(CREATE_REGISTRY_DELEGATION, {
+    refetchQueries: [REGISTRY_DELEGATIONS]
   });
 
   const validationSchema = getSchema();
@@ -114,7 +114,7 @@ export const CreateRndtsDeclarationDelegationModal = ({
   };
 
   const onSubmit = async input => {
-    await createRndtsDeclarationDelegation({
+    await createRegistryDelegation({
       variables: {
         input: {
           ...input,

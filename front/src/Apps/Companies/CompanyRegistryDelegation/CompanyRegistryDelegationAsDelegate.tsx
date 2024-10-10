@@ -1,15 +1,13 @@
 import React from "react";
-import "./companyRndtsDeclarationDelegation.scss";
+import "./companyRegistryDelegation.scss";
 import { CompanyPrivate } from "@td/codegen-ui";
-import { RndtsDeclarationDelegationsTable } from "./RndtsDeclarationDelegationsTable";
+import { RegistryDelegationsTable } from "./RegistryDelegationsTable";
 
 interface Props {
   company: CompanyPrivate;
 }
 
-export const CompanyRndtsDeclarationDelegationAsDelegate = ({
-  company
-}: Props) => {
+export const CompanyRegistryDelegationAsDelegate = ({ company }: Props) => {
   return (
     <>
       <h4>Délégataires</h4>
@@ -18,7 +16,7 @@ export const CompanyRndtsDeclarationDelegationAsDelegate = ({
         registres RNDTS
       </div>
       <div>
-        <RndtsDeclarationDelegationsTable as="delegate" company={company} />
+        <RegistryDelegationsTable as="delegate" company={company} />
       </div>
     </>
   );

@@ -1,12 +1,9 @@
 import React from "react";
-import {
-  Mutation,
-  MutationRevokeRndtsDeclarationDelegationArgs
-} from "@td/codegen-ui";
+import { Mutation, MutationRevokeRegistryDelegationArgs } from "@td/codegen-ui";
 import { Modal } from "../../../common/components";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
-import { REVOKE_RNDTS_DECLARATION_DELEGATION } from "../../common/queries/rndtsDeclarationDelegation/queries";
+import { REVOKE_REGISTRY_DELEGATION } from "../../common/queries/registryDelegation/queries";
 import toast from "react-hot-toast";
 import { isDefined } from "../../../common/helper";
 
@@ -25,19 +22,19 @@ interface Props {
   onClose: () => void;
 }
 
-export const RevokeRndtsDeclarationDelegationModal = ({
+export const RevokeRegistryDelegationModal = ({
   delegationId,
   to,
   from,
   onClose
 }: Props) => {
-  const [revokeRndtsDeclarationDelegation, { loading }] = useMutation<
-    Pick<Mutation, "revokeRndtsDeclarationDelegation">,
-    MutationRevokeRndtsDeclarationDelegationArgs
-  >(REVOKE_RNDTS_DECLARATION_DELEGATION);
+  const [revokeRegistryDelegation, { loading }] = useMutation<
+    Pick<Mutation, "revokeRegistryDelegation">,
+    MutationRevokeRegistryDelegationArgs
+  >(REVOKE_REGISTRY_DELEGATION);
 
   const onRevoke = async () => {
-    await revokeRndtsDeclarationDelegation({
+    await revokeRegistryDelegation({
       variables: {
         delegationId
       },

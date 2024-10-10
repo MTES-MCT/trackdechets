@@ -1,10 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
-  mutation createRndtsDeclarationDelegation(
-    $input: CreateRndtsDeclarationDelegationInput!
-  ) {
-    createRndtsDeclarationDelegation(input: $input) {
+export const CREATE_REGISTRY_DELEGATION = gql`
+  mutation createRegistryDelegation($input: CreateRegistryDelegationInput!) {
+    createRegistryDelegation(input: $input) {
       id
       updatedAt
       delegate {
@@ -21,13 +19,13 @@ export const CREATE_RNDTS_DECLARATION_DELEGATION = gql`
   }
 `;
 
-export const RNDTS_DECLARATION_DELEGATIONS = gql`
-  query rndtsDeclarationDelegations(
+export const REGISTRY_DELEGATIONS = gql`
+  query registryDelegations(
     $skip: Int
     $first: Int
-    $where: RndtsDeclarationDelegationWhere
+    $where: RegistryDelegationWhere
   ) {
-    rndtsDeclarationDelegations(skip: $skip, first: $first, where: $where) {
+    registryDelegations(skip: $skip, first: $first, where: $where) {
       totalCount
       pageInfo {
         startCursor
@@ -59,9 +57,9 @@ export const RNDTS_DECLARATION_DELEGATIONS = gql`
   }
 `;
 
-export const REVOKE_RNDTS_DECLARATION_DELEGATION = gql`
-  mutation revokeRndtsDeclarationDelegation($delegationId: ID!) {
-    revokeRndtsDeclarationDelegation(delegationId: $delegationId) {
+export const REVOKE_REGISTRY_DELEGATION = gql`
+  mutation revokeRegistryDelegation($delegationId: ID!) {
+    revokeRegistryDelegation(delegationId: $delegationId) {
       id
       isRevoked
       status

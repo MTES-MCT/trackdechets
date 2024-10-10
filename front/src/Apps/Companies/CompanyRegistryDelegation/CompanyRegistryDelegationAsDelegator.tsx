@@ -1,17 +1,15 @@
 import React, { useState } from "react";
-import "./companyRndtsDeclarationDelegation.scss";
+import "./companyRegistryDelegation.scss";
 import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { CreateRndtsDeclarationDelegationModal } from "./CreateRndtsDeclarationDelegationModal";
-import { RndtsDeclarationDelegationsTable } from "./RndtsDeclarationDelegationsTable";
+import { CreateRegistryDelegationModal } from "./CreateRegistryDelegationModal";
+import { RegistryDelegationsTable } from "./RegistryDelegationsTable";
 
 interface Props {
   company: CompanyPrivate;
 }
 
-export const CompanyRndtsDeclarationDelegationAsDelegator = ({
-  company
-}: Props) => {
+export const CompanyRegistryDelegationAsDelegator = ({ company }: Props) => {
   const isAdmin = company.userRole === UserRole.Admin;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,7 +30,7 @@ export const CompanyRndtsDeclarationDelegationAsDelegator = ({
             className="fr-my-4v"
             nativeButtonProps={{
               type: "button",
-              "data-testid": "company-add-rndtsDeclarationDelegation"
+              "data-testid": "company-add-registryDelegation"
             }}
             disabled={isModalOpen}
             onClick={() => setIsModalOpen(true)}
@@ -43,10 +41,10 @@ export const CompanyRndtsDeclarationDelegationAsDelegator = ({
       )}
 
       <div>
-        <RndtsDeclarationDelegationsTable as="delegator" company={company} />
+        <RegistryDelegationsTable as="delegator" company={company} />
       </div>
 
-      <CreateRndtsDeclarationDelegationModal
+      <CreateRegistryDelegationModal
         company={company}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

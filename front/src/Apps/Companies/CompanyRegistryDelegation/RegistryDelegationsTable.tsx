@@ -2,39 +2,38 @@ import React, { useState } from "react";
 import {
   CompanyPrivate,
   Query,
-  RndtsDeclarationDelegation,
-  RndtsDeclarationDelegationStatus,
+  RegistryDelegation,
+  RegistryDelegationStatus,
   UserRole
 } from "@td/codegen-ui";
 import { isDefinedStrict } from "../../../common/helper";
 import { formatDateViewDisplay } from "../common/utils";
 import classnames from "classnames";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
-import "./companyRndtsDeclarationDelegation.scss";
+import "./companyRegistryDelegation.scss";
 import { useQuery } from "@apollo/client";
-import { RNDTS_DECLARATION_DELEGATIONS } from "../../common/queries/rndtsDeclarationDelegation/queries";
+import { REGISTRY_DELEGATIONS } from "../../common/queries/registryDelegation/queries";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { RevokeRndtsDeclarationDelegationModal } from "./RevokeRndtsDeclarationDelegationModal";
+import { RevokeRegistryDelegationModal } from "./RevokeRegistryDelegationModal";
 
-const getStatusLabel = (status: RndtsDeclarationDelegationStatus) => {
+const getStatusLabel = (status: RegistryDelegationStatus) => {
   switch (status) {
-    case RndtsDeclarationDelegationStatus.Ongoing:
+    case RegistryDelegationStatus.Ongoing:
       return "EN COURS";
-    case RndtsDeclarationDelegationStatus.Incoming:
+    case RegistryDelegationStatus.Incoming:
       return "À VENIR";
-    case RndtsDeclarationDelegationStatus.Closed:
+    case RegistryDelegationStatus.Closed:
       return "CLÔTURÉE";
   }
 };
 
-const getStatusBadge = (status: RndtsDeclarationDelegationStatus) => {
+const getStatusBadge = (status: RegistryDelegationStatus) => {
   return (
     <p
       className={classnames(`fr-badge fr-badge--sm fr-badge--no-icon`, {
-        "fr-badge--success":
-          status === RndtsDeclarationDelegationStatus.Ongoing,
-        "fr-badge--info": status === RndtsDeclarationDelegationStatus.Incoming,
-        "fr-badge--error": status === RndtsDeclarationDelegationStatus.Closed
+        "fr-badge--success": status === RegistryDelegationStatus.Ongoing,
+        "fr-badge--info": status === RegistryDelegationStatus.Incoming,
+        "fr-badge--error": status === RegistryDelegationStatus.Closed
       })}
     >
       {getStatusLabel(status)}
@@ -60,16 +59,16 @@ interface Props {
   company: CompanyPrivate;
 }
 
-export const RndtsDeclarationDelegationsTable = ({ as, company }: Props) => {
+export const RegistryDelegationsTable = ({ as, company }: Props) => {
   const [pageIndex, setPageIndex] = useState(0);
   const [delegationToRevoke, setDelegationToRevoke] =
-    useState<RndtsDeclarationDelegation | null>(null);
+    useState<RegistryDelegation | null>(null);
 
   const isAdmin = company.userRole === UserRole.Admin;
 
   const { data, loading, refetch } = useQuery<
-    Pick<Query, "rndtsDeclarationDelegations">
-  >(RNDTS_DECLARATION_DELEGATIONS, {
+    Pick<Query, "registryDelegations">
+  >(REGISTRY_DELEGATIONS, {
     skip: !company.orgId,
     fetchPolicy: "network-only",
     variables: {
@@ -80,9 +79,9 @@ export const RndtsDeclarationDelegationsTable = ({ as, company }: Props) => {
     }
   });
 
-  const totalCount = data?.rndtsDeclarationDelegations.totalCount;
+  const totalCount = data?.registryDelegations.totalCount;
   const delegations =
-    data?.rndtsDeclarationDelegations.edges.map(edge => edge.node) ?? [];
+    data?.registryDelegations.edges.map(edge => edge.node) ?? [];
 
   const PAGE_SIZE = 10;
   const pageCount = totalCount ? Math.ceil(totalCount / PAGE_SIZE) : 0;
@@ -171,8 +170,7 @@ export const RndtsDeclarationDelegationsTable = ({ as, company }: Props) => {
                       <td>{getStatusBadge(status)}</td>
                       {isAdmin && (
                         <td>
-                          {status !==
-                            RndtsDeclarationDelegationStatus.Closed && (
+                          {status !== RegistryDelegationStatus.Closed && (
                             <Button
                               priority="primary"
                               size="small"
@@ -180,7 +178,7 @@ export const RndtsDeclarationDelegationsTable = ({ as, company }: Props) => {
                               nativeButtonProps={{
                                 type: "button",
                                 "data-testid":
-                                  "company-revoke-rndtsDeclarationDelegation"
+                                  "company-revoke-registryDelegation"
                               }}
                               disabled={false}
                               onClick={() => setDelegationToRevoke(delegation)}
@@ -223,7 +221,7 @@ export const RndtsDeclarationDelegationsTable = ({ as, company }: Props) => {
       </div>
 
       {delegationToRevoke && (
-        <RevokeRndtsDeclarationDelegationModal
+        <RevokeRegistryDelegationModal
           delegationId={delegationToRevoke.id}
           to={as === "delegator" ? delegationToRevoke.delegate.name : null}
           from={as === "delegate" ? delegationToRevoke.delegator.name : null}
