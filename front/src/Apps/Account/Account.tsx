@@ -14,6 +14,7 @@ import AccountApplications from "./AccountApplications/AccountApplications";
 import "../Dashboard/dashboard.scss";
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
+import AccountNotifications from "./AccountNotifications/AccountNotifications";
 
 export const GET_ME = gql`
   {
@@ -50,6 +51,15 @@ export default function Account() {
               element={
                 <AccountContentWrapper title="Mes paramètres">
                   <AccountInfo me={data.me} />
+                </AccountContentWrapper>
+              }
+            />
+
+            <Route
+              path={toRelative(routes.account.notifications)}
+              element={
+                <AccountContentWrapper title="Notifications">
+                  <AccountNotifications />
                 </AccountContentWrapper>
               }
             />

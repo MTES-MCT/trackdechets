@@ -5,7 +5,7 @@ import {
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
   sendPendingMembershipRequestToAdminDetailsEmail,
-  sendPendingRevisionRequestToAdminDetailsEmail,
+  sendPendingRevisionRequestEmail,
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
 import { cleanAppendix1 } from "./commands/appendix1.helpers";
@@ -63,7 +63,7 @@ if (CRON_ONBOARDING_SCHEDULE) {
     new cron.CronJob({
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
-        await sendPendingRevisionRequestToAdminDetailsEmail();
+        await sendPendingRevisionRequestEmail();
       },
       timeZone: TZ
     })

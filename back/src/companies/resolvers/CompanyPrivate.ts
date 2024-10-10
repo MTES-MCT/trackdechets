@@ -27,6 +27,20 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       parent.userRole ?? (await getUserRole(context.user!.id, parent.orgId));
     return role ? grants[role].map(toGraphQLPermission) : [];
   },
+  userNotifications: async (parent, _, context) => {
+    if (!context.user) {
+      return [];
+    }
+    const companyAssociations = await prisma.company
+      .findUnique({ where: { id: parent.id } })
+      .companyAssociations({ where: { userId: context.user.id } });
+
+    if (companyAssociations?.length) {
+      return companyAssociations[0].notifications;
+    }
+
+    return [];
+  },
   transporterReceipt: parent => {
     return prisma.company
       .findUnique({ where: { id: parent.id } })

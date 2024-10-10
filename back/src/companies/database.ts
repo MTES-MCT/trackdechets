@@ -8,7 +8,9 @@ import {
   Prisma,
   Company,
   CompanyAssociation,
-  UserAccountHash
+  UserAccountHash,
+  UserNotification,
+  UserRole
 } from "@prisma/client";
 import {
   CompanyNotFound,
@@ -25,7 +27,7 @@ import { UserInputError } from "../common/errors";
 import { allFavoriteTypes } from "./types";
 import { favoritesCompanyQueue } from "../queue/producers/company";
 import { searchTDSireneFailFast } from "./sirenify";
-import { isSiret, isVat } from "@td/constants";
+import { ALL_NOTIFICATIONS, isSiret, isVat } from "@td/constants";
 import {
   PartialCompanyVatSearchResult,
   searchVatFrOnlyOrNotFoundFailFast
@@ -185,22 +187,23 @@ export const userNameDisplay = (
 
 /**
  * map a user's company association to a CompanyMember
- * @param companyAssociations
+ * @param companyAssociation
  * @param company
  * @param isTDAdmin
  */
 export const userAssociationToCompanyMember = (
-  companyAssociations: CompanyAssociation & { user: User },
+  companyAssociation: CompanyAssociation & { user: User },
   orgId: string,
   requestingUserId?: string,
   isTDAdmin = false
-) => {
+): CompanyMember => {
   return {
-    ...companyAssociations.user,
+    ...companyAssociation.user,
     orgId: orgId,
-    name: userNameDisplay(companyAssociations, requestingUserId, isTDAdmin),
-    role: companyAssociations.role,
-    isPendingInvitation: false
+    name: userNameDisplay(companyAssociation, requestingUserId, isTDAdmin),
+    role: companyAssociation.role,
+    isPendingInvitation: false,
+    notifications: companyAssociation.notifications
   };
 };
 
@@ -213,7 +216,7 @@ export const userAssociationToCompanyMember = (
 export const userAccountHashToCompanyMember = (
   userAccountHash: UserAccountHash,
   orgId: string
-) => {
+): CompanyMember => {
   return {
     id: userAccountHash.id,
     orgId: orgId,
@@ -221,7 +224,9 @@ export const userAccountHashToCompanyMember = (
     email: userAccountHash.email,
     role: userAccountHash.role,
     isActive: false,
-    isPendingInvitation: true
+    isPendingInvitation: true,
+    notifications:
+      userAccountHash.role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
   };
 };
 
@@ -308,31 +313,37 @@ export async function getActiveAdminsByCompanyIds(
 }
 
 /**
- * Get all the companies and admins from companies, by companyOrgIds
+ * Get all the companies and subscribers to notification from companies, by companyOrgIds
  * Will return an object like:
  * {
- *   [ordId]: { ...company, admins: user[] }
+ *   [ordId]: { ...company, subscribers: user[] }
  * }
  */
-export const getCompaniesAndActiveAdminsByCompanyOrgIds = async (
-  orgIds: string[]
-): Promise<Record<string, Company & { admins: User[] }>> => {
+export const getCompaniesAndSubscribersByCompanyOrgIds = async (
+  orgIds: string[],
+  notification: UserNotification
+): Promise<Record<string, Company & { subscribers: User[] }>> => {
   const companies = await prisma.company.findMany({
     where: { orgId: { in: orgIds } },
     include: {
       companyAssociations: {
-        where: { role: "ADMIN", user: { isActive: true } },
+        where: {
+          notifications: { has: notification },
+          user: {
+            isActive: true
+          }
+        },
         include: { user: true, company: true }
       }
     }
   });
 
-  return companies.reduce<Record<string, Company & { admins: User[] }>>(
+  return companies.reduce<Record<string, Company & { subscribers: User[] }>>(
     (companiesAndAdminsByOrgId, { companyAssociations, ...company }) => ({
       ...companiesAndAdminsByOrgId,
       [company.orgId]: {
         ...company,
-        admins: companyAssociations.map(({ user }) => user)
+        subscribers: companyAssociations.map(({ user }) => user)
       }
     }),
     {}
@@ -389,24 +400,6 @@ export async function getWorkerCertificationOrNotFound({
     throw new WorkerCertificationNotFound();
   }
   return agrement;
-}
-
-export function convertUrls<T extends Partial<Company>>(
-  company: T
-): T & {
-  ecoOrganismeAgreements: URL[];
-  signatureAutomations: [];
-  receivedSignatureAutomations: [];
-  userPermissions: [];
-} {
-  return {
-    ...company,
-    ecoOrganismeAgreements:
-      company.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
-    signatureAutomations: [],
-    receivedSignatureAutomations: [],
-    userPermissions: []
-  };
 }
 
 export async function updateFavorites(orgIds: string[]) {

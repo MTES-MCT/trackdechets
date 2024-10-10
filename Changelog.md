@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'Eco-organisme sur BSVHU [PR 3619](https://github.com/MTES-MCT/trackdechets/pull/3619)
+- ETQ membre d'un établissement, je peux gérer mes préférences de notifications (demandes de rattachement, demandes de révisions, renouvellement code signature, etc) en lien avec cet établissement [PR 3634](https://github.com/MTES-MCT/trackdechets/pull/3634)
 
 #### :bug: Corrections de bugs
 

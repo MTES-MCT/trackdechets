@@ -25,6 +25,7 @@ import {
   updateCompanyAssociation,
   updateUserAccountHash
 } from "../../database";
+import { ALL_NOTIFICATIONS } from "@td/constants";
 
 const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
   parent,
@@ -46,12 +47,24 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
     where: { company: { orgId: args.orgId }, userId: args.userId }
   });
   if (association) {
+    if (args.role === association.role) {
+      // Évite de faire l'update si le rôle est inchangé
+      return userAssociationToCompanyMember(
+        { ...association, user },
+        company.orgId,
+        user.id,
+        isTDAdmin
+      );
+    }
+
     const updatedAssociation = await updateCompanyAssociation({
       associationId: association.id,
       data: {
-        role: args.role
+        role: args.role,
+        notifications: args.role === "ADMIN" ? ALL_NOTIFICATIONS : []
       }
     });
+
     if (!updatedAssociation) {
       throw new UserInputError(
         `L'utilisateur n'est pas membre de l'entreprise`

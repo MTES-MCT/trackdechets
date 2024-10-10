@@ -9,6 +9,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { renderMail, membershipRequestAccepted } from "@td/mail";
 import { Mutation } from "../../../../generated/graphql/types";
+import { UserRole } from "@prisma/client";
+import { ALL_NOTIFICATIONS } from "@td/constants";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -112,7 +114,7 @@ describe("mutation acceptMembershipRequest", () => {
     );
   });
 
-  it.each(["MEMBER", "ADMIN"])(
+  it.each([UserRole.ADMIN, UserRole.MEMBER, UserRole.READER, UserRole.DRIVER])(
     "should associate requesting user to company with role %p",
     async role => {
       const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -150,6 +152,12 @@ describe("mutation acceptMembershipRequest", () => {
 
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
+
+      const expectedNotifications = role === "ADMIN" ? ALL_NOTIFICATIONS : [];
+
+      expect(companyAssociations[0].notifications).toEqual(
+        expectedNotifications
+      );
 
       // when a new user is invited and accepts invitation, `automaticallyAccepted` is false
       expect(companyAssociations[0].automaticallyAccepted).toEqual(false);

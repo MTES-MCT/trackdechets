@@ -38,6 +38,7 @@ const MY_COMPANIES = gql`
         cursor
         node {
           id
+          orgId
           siret
           givenName
           name
@@ -47,6 +48,7 @@ const MY_COMPANIES = gql`
           }
           userRole
           userPermissions
+          userNotifications
         }
       }
     }
@@ -460,6 +462,45 @@ describe("query { myCompanies }", () => {
       "BSD_CAN_SIGN_OPERATION",
       "BSD_CAN_DELETE",
       "BSD_CAN_REVISE"
+    ]);
+  });
+
+  it("should return userNotifications", async () => {
+    const user = await userFactory();
+    const company1 = await companyFactory();
+    const company2 = await companyFactory();
+    const company3 = await companyFactory();
+
+    await associateUserToCompany(user.id, company1.orgId, "ADMIN", {
+      notifications: ["MEMBERSHIP_REQUEST"]
+    });
+    await associateUserToCompany(user.id, company2.orgId, "ADMIN", {
+      notifications: ["BSD_REFUSAL"]
+    });
+    await associateUserToCompany(user.id, company3.orgId, "ADMIN", {
+      notifications: ["SIGNATURE_CODE_RENEWAL", "REVISION_REQUEST"]
+    });
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "myCompanies">>(MY_COMPANIES);
+    expect(data.myCompanies.edges).toHaveLength(3);
+
+    const userNotificationsByOrgId = data.myCompanies.edges.reduce(
+      (notifications, edge) => {
+        return {
+          ...notifications,
+          [edge.node.orgId]: edge.node.userNotifications
+        };
+      },
+      {}
+    );
+
+    expect(userNotificationsByOrgId[company1.orgId]).toEqual([
+      "MEMBERSHIP_REQUEST"
+    ]);
+    expect(userNotificationsByOrgId[company2.orgId]).toEqual(["BSD_REFUSAL"]);
+    expect(userNotificationsByOrgId[company3.orgId]).toEqual([
+      "SIGNATURE_CODE_RENEWAL",
+      "REVISION_REQUEST"
     ]);
   });
 });

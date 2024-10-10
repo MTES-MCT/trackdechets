@@ -5,10 +5,12 @@ import { sendMail } from "../../../mailer/mailing";
 import { CompanyPrivate } from "../../../generated/graphql/types";
 
 import { randomNumber } from "../../../utils";
-import { convertUrls, getCompanyActiveUsers } from "../../database";
 import { renderMail, securityCodeRenewal } from "@td/mail";
 import { isSiret, isVat } from "@td/constants";
 import { UserInputError } from "../../../common/errors";
+import { getNotificationSubscribers } from "../../../users/notifications";
+import { UserNotification } from "@prisma/client";
+import { toGqlCompanyPrivate } from "../../converters";
 
 /**
  * This function is used to renew the security code
@@ -50,19 +52,20 @@ export async function renewSecurityCodeFn(
     }
   });
 
-  const users = await getCompanyActiveUsers(orgId);
-  const recipients = users.map(({ email, name }) => ({
-    email,
-    name: name ?? ""
-  }));
+  const subscribers = await getNotificationSubscribers(
+    UserNotification.SIGNATURE_CODE_RENEWAL,
+    [orgId]
+  );
 
-  const mail = renderMail(securityCodeRenewal, {
-    to: recipients,
-    variables: {
-      company: { orgId: company.orgId, name: company.name }
-    }
-  });
-  sendMail(mail);
+  if (subscribers.length) {
+    const mail = renderMail(securityCodeRenewal, {
+      to: subscribers,
+      variables: {
+        company: { orgId: company.orgId, name: company.name }
+      }
+    });
+    await sendMail(mail);
+  }
 
-  return convertUrls(updatedCompany);
+  return toGqlCompanyPrivate(updatedCompany);
 }
