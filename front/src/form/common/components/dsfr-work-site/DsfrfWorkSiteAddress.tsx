@@ -43,7 +43,8 @@ export default function DsfrfWorkSiteAddress({
   postalCode,
   onAddressSelection,
   designation,
-  disabled = false
+  disabled = false,
+  placeholder = "Recherchez une adresse puis sélectionnez un des choix qui apparait..."
 }) {
   const [state, dispatch] = useReducer(
     reducer,
@@ -97,12 +98,12 @@ export default function DsfrfWorkSiteAddress({
 
   return (
     <div className="form__row">
-      <label>Adresse {designation}</label>
+      <label className="fr-label fr-mb-1w">Adresse {designation}</label>
 
       <SearchInput
         id="eco-search"
-        placeholder="Recherchez une adresse puis sélectionnez un des choix qui apparait..."
-        className="fr-col-7"
+        placeholder={placeholder}
+        className="fr-col-8 fr-mb-2w"
         onChange={e =>
           dispatch({ type: "search_input", payload: e.target.value })
         }
@@ -112,7 +113,8 @@ export default function DsfrfWorkSiteAddress({
       <ToggleSwitch
         inputTitle="showAdressFields"
         defaultChecked={false}
-        showCheckedHint={showAdressFields}
+        showCheckedHint={false}
+        className="fr-mb-2w"
         onChange={e => {
           setShowAdressFields(e);
         }}
@@ -120,8 +122,8 @@ export default function DsfrfWorkSiteAddress({
       />
 
       {showAdressFields && (
-        <div>
-          <div>
+        <div className="fr-grid-row">
+          <div className="fr-col-md-8 fr-mb-2w">
             <Input
               label="N° et libellé de voie ou lieu-dit"
               nativeInputProps={{
@@ -135,37 +137,39 @@ export default function DsfrfWorkSiteAddress({
               }}
             />
           </div>
-          <div>
-            <Input
-              label="Ville"
-              nativeInputProps={{
-                defaultValue: city,
-                onChange: e =>
-                  setManualAddress({
-                    address: state.address,
-                    postalCode: state.postalCode,
-                    city: e.target.value
-                  })
-              }}
-            />
-          </div>
-          <div>
-            <Input
-              label="Code postal"
-              nativeInputProps={{
-                defaultValue: city,
-                onChange: e =>
-                  setManualAddress({
-                    address: state.address,
-                    city: state.city,
-                    postalCode: e.target.value
-                  })
-              }}
-            />
+          <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
+            <div className="fr-col-md-4">
+              <Input
+                label="Code postal"
+                nativeInputProps={{
+                  defaultValue: postalCode,
+                  onChange: e =>
+                    setManualAddress({
+                      address: state.address,
+                      city: state.city,
+                      postalCode: e.target.value
+                    })
+                }}
+              />
+            </div>
+            <div className="fr-col-md-8">
+              <Input
+                label="Ville"
+                nativeInputProps={{
+                  defaultValue: city,
+                  onChange: e =>
+                    setManualAddress({
+                      address: state.address,
+                      postalCode: state.postalCode,
+                      city: e.target.value
+                    })
+                }}
+              />
+            </div>
           </div>
         </div>
       )}
-      {state.searchResults.map(feature => (
+      {state.searchResults?.map(feature => (
         <div
           className={styles.worksiteSearchResult}
           key={feature.properties.id}

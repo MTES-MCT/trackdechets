@@ -23,6 +23,7 @@ import { VHU_VERBOSE_STATUSES } from "@td/constants";
 type CompanyProps = {
   company?: FormCompany | null;
   label: string;
+  isIrregularSituation?: boolean;
 };
 
 type Props = { form: Bsvhu };
@@ -114,9 +115,15 @@ export function BsvhuDetailContent({ form }: Props) {
   );
 }
 
-function Company({ company, label }: CompanyProps) {
+function Company({ company, label, isIrregularSituation }: CompanyProps) {
   return (
     <>
+      {isIrregularSituation && (
+        <>
+          <dt></dt>
+          <dd>Installation en situation irrégulière</dd>
+        </>
+      )}
       <DetailRow label={label} value={company?.name} />
       <DetailRow label="Siret" value={company?.siret} />
       <DetailRow label="Numéro de TVA" value={company?.vatNumber} />
@@ -136,7 +143,11 @@ function Emitter({ form }: { form: Bsvhu }) {
   return (
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
-        <Company label="Émetteur" company={emitter?.company} />
+        <Company
+          label="Émetteur"
+          company={emitter?.company}
+          isIrregularSituation={emitter?.irregularSituation}
+        />
       </div>
       <div className={styles.detailGrid}>
         <DetailRow

@@ -103,6 +103,7 @@ export const FullBsvhuFragment = gql`
         ...CompanyFragment
       }
       agrementNumber
+      irregularSituation
       emission {
         signature {
           author
