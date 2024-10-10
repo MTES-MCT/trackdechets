@@ -152,6 +152,7 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     where: { id: existingCompany.id },
     data
   });
+
   await updateFavorites([existingCompany.orgId]);
 
   return toGqlCompanyPrivate(updatedCompany);
