@@ -1,4 +1,9 @@
-import { BsddTransporter, EmitterType, Status } from "@prisma/client";
+import {
+  BsddTransporter,
+  EmitterType,
+  Status,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import { FullForm } from "./types";
 
@@ -10,6 +15,8 @@ import {
 } from "./database";
 import { FormForElastic } from "./elastic";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 /**
  * Computes which SIRET or VAT number should appear on which tab in the frontend
@@ -38,7 +45,8 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor";
+  | "isCollectedFor"
+  | "isReturnFor";
 
 // génère une clé permettant d'identifier les transporteurs de façon
 // unique dans un mapping
@@ -55,7 +63,8 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: []
+    isCollectedFor: [],
+    isReturnFor: []
   };
 
   // build a mapping to store which actor will see this form appear on a given UI tab
@@ -214,6 +223,14 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
       break;
   }
 
+  // Return tab
+  if (belongsToIsReturnForTab(form)) {
+    const transporters = getTransportersSync(form);
+    const lastTransporter = transporters[transporters.length - 1];
+
+    setFieldTab(transporterCompanyOrgIdKey(lastTransporter), "isReturnFor");
+  }
+
   for (const [field, tab] of fieldTabs.entries()) {
     if (field) {
       siretsByTab[tab].push(formSirets[field]);
@@ -222,6 +239,26 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
 
   return siretsByTab;
 }
+
+/**
+ * BSDD belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste has citerne business (emptyReturnADR or citerne washed) OR waste hasn't been fully accepted
+ */
+export const belongsToIsReturnForTab = (form: FullForm) => {
+  const hasBeenReceivedLately =
+    isDefined(form.receivedAt) && form.receivedAt! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasCiterneBusiness =
+    isDefined(form.emptyReturnADR) || isDefined(form.hasCiterneBeenWashedOut);
+
+  const hasNotBeenFullyAccepted =
+    form.wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED;
+
+  return hasCiterneBusiness || hasNotBeenFullyAccepted;
+};
 
 function getFormSirets(form: FullForm) {
   const transporter = getFirstTransporterSync(form);

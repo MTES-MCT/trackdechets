@@ -97,6 +97,7 @@ export interface BsdElastic {
   isArchivedFor: string[];
   isToCollectFor: string[];
   isCollectedFor: string[];
+  isReturnFor: string[];
   sirets: string[];
 
   isIncomingWasteFor: string[];
@@ -286,6 +287,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isArchivedFor: stringField,
   isToCollectFor: stringField,
   isCollectedFor: stringField,
+  isReturnFor: stringField,
   sirets: stringField,
 
   isIncomingWasteFor: stringField,

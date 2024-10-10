@@ -3,7 +3,7 @@ import { BsdaForElasticInclude, indexBsda } from "../../bsda/elastic";
 import { BsdasriForElasticInclude, indexBsdasri } from "../../bsdasris/elastic";
 import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 import { getBsvhuForElastic, indexBsvhu } from "../../bsvhu/elastic";
-import { indexBspaoh } from "../../bspaoh/elastic";
+import { getBspaohForElastic, indexBspaoh } from "../../bspaoh/elastic";
 import { getFormForElastic, indexForm } from "../../forms/elastic";
 import { deleteBsd } from "../../common/elastic";
 import { getReadonlyBsdaRepository } from "../../bsda/repository";
@@ -75,7 +75,7 @@ export async function reindex(bsdId, exitFn) {
     });
 
     if (!!bspaoh && !bspaoh.isDeleted) {
-      await indexBspaoh(bspaoh);
+      await indexBspaoh(await getBspaohForElastic(bspaoh));
     } else {
       await deleteBsd({ id: bsdId });
     }

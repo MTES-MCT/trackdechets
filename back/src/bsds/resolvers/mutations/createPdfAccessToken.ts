@@ -27,6 +27,12 @@ import { ROAD_CONTROL_SLUG } from "@td/constants";
 import { checkCanRead as checkCanReadForm } from "../../../forms/permissions";
 import { checkCanRead as checkCanReadBsdasri } from "../../../bsdasris/permissions";
 import { ForbiddenError } from "../../../common/errors";
+import { belongsToIsReturnForTab as formBelongsToIsReturnForTab } from "../../../forms/elasticHelpers";
+import { belongsToIsReturnForTab as bsdaBelongsToIsReturnForTab } from "../../../bsda/elastic";
+import { belongsToIsReturnForTab as bsdasriBelongsToIsReturnForTab } from "../../../bsdasris/elastic";
+import { belongsToIsReturnForTab as bsffBelongsToIsReturnForTab } from "../../../bsffs/elastic";
+import { belongsToIsReturnForTab as bsvhuBelongsToIsReturnForTab } from "../../../bsvhu/elastic";
+import { belongsToIsReturnForTab as bspaohBelongsToIsReturnForTab } from "../../../bspaoh/elastic";
 
 const accessors = {
   [BsdType.BSDD]: id =>
@@ -54,6 +60,15 @@ const checkStatus = {
   [BsdType.BSFF]: bsd => bsd.status === BsffStatus.SENT,
   [BsdType.BSVHU]: bsd => bsd.status === BsvhuStatus.SENT,
   [BsdType.BSPAOH]: bsd => bsd.status === BspaohStatus.SENT
+};
+
+const checkBelongsToIsReturnForTab = {
+  [BsdType.BSDD]: bsd => formBelongsToIsReturnForTab(bsd),
+  [BsdType.BSDA]: bsd => bsdaBelongsToIsReturnForTab(bsd),
+  [BsdType.BSDASRI]: bsd => bsdasriBelongsToIsReturnForTab(bsd),
+  [BsdType.BSFF]: bsd => bsffBelongsToIsReturnForTab(bsd),
+  [BsdType.BSVHU]: bsd => bsvhuBelongsToIsReturnForTab(bsd),
+  [BsdType.BSPAOH]: bsd => bspaohBelongsToIsReturnForTab(bsd)
 };
 
 const permissions = {
@@ -97,10 +112,13 @@ const createPdfAccessToken: MutationResolvers["createPdfAccessToken"] = async (
 
   const bsd = await accessors[bsdType](input.bsdId);
 
-  // check status
-  if (!checkStatus[bsdType](bsd)) {
+  // Check status
+  if (
+    !checkStatus[bsdType](bsd) &&
+    !checkBelongsToIsReturnForTab[bsdType](bsd)
+  ) {
     throw new ForbiddenError(
-      "Seuls les bordereaux pris en charge par un transporteur peuvent être consulté via un accès temporaire."
+      "Seuls les bordereaux pris en charge par un transporteur peuvent être consultés via un accès temporaire."
     );
   }
   // check perms

@@ -648,7 +648,8 @@ export const getBsdCurrentTab = ({
   isToCollectTab,
   isCollectedTab,
   isReviewedTab,
-  isToReviewTab
+  isToReviewTab,
+  isReturnTab
 }): BsdCurrentTab => {
   if (isDraftTab) {
     return "draftTab";
@@ -673,6 +674,9 @@ export const getBsdCurrentTab = ({
   }
   if (isCollectedTab) {
     return "collectedTab";
+  }
+  if (isReturnTab) {
+    return "returnTab";
   }
   // default tab
   return "allBsdsTab";

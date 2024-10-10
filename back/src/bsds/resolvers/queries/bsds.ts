@@ -118,7 +118,8 @@ async function buildQuery(
     isToCollectFor: where?.isToCollectFor,
     isCollectedFor: where?.isCollectedFor,
     isInRevisionFor: where?.isInRevisionFor,
-    isRevisedFor: where?.isRevisedFor
+    isRevisedFor: where?.isRevisedFor,
+    isReturnFor: where?.isReturnFor
   })
     .filter(([_, value]) => value != null)
     .forEach(([key, value]) => {

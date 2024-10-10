@@ -1,4 +1,10 @@
-import { Bsda, BsdaStatus, BsdaTransporter, BsdType } from "@prisma/client";
+import {
+  Bsda,
+  BsdaStatus,
+  BsdaTransporter,
+  BsdType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -24,6 +30,8 @@ import {
   getTransportersSync
 } from "./database";
 import { getBsdaSubType } from "../common/subTypes";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export type BsdaForElastic = Bsda &
   BsdaWithTransporters &
@@ -120,7 +128,8 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor";
+  | "isCollectedFor"
+  | "isReturnFor";
 // | state              | emitter         | worker          | transporter | destination     | nextDestination | intermediary |
 // | ------------------ | --------------- | --------------- | ----------- | --------------- | --------------- | ------------ |
 // | INITIAL (draft)    | draft           | draft           | draft       | draft           | follow          | follow       |
@@ -138,7 +147,8 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: []
+    isCollectedFor: [],
+    isReturnFor: []
   };
 
   const firstTransporter = getFirstTransporterSync(bsda);
@@ -282,6 +292,18 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     case BsdaStatus.AWAITING_CHILD:
     default:
       break;
+  }
+
+  // Return tab
+  if (belongsToIsReturnForTab(bsda)) {
+    const transporters = getTransportersSync(bsda);
+    const lastTransporter = transporters[transporters.length - 1];
+
+    setTab(
+      siretsFilters,
+      transporterCompanyOrgIdKey(lastTransporter),
+      "isReturnFor"
+    );
   }
 
   for (const [fieldName, filter] of siretsFilters.entries()) {
@@ -428,3 +450,22 @@ export function getBsdaRevisionOrgIds(
 ): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
   return getRevisionOrgIds(bsda.bsdaRevisionRequests);
 }
+
+/**
+ * BSDA belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste hasn't been fully accepted
+ */
+export const belongsToIsReturnForTab = (bsda: BsdaForElastic) => {
+  const hasBeenReceivedLately =
+    isDefined(bsda.destinationReceptionDate) &&
+    bsda.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted =
+    bsda.destinationReceptionAcceptationStatus !==
+    WasteAcceptationStatus.ACCEPTED;
+
+  return hasNotBeenFullyAccepted;
+};

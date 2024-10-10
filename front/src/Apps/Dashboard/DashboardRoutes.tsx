@@ -274,6 +274,11 @@ function DashboardRoutes() {
           />
 
           <Route
+            path={toRelative(routes.dashboard.transport.return)}
+            element={<DashboardPage />}
+          />
+
+          <Route
             path={`${routes.dashboard.index}/*`}
             element={
               <Redirect

@@ -144,7 +144,8 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
           isArchivedFor: [],
           isToCollectFor: [],
           isCollectedFor: [],
-          isInRevisionFor: []
+          isInRevisionFor: [],
+          isReturnFor: []
         }
       : siretsByTab),
     ...getFormRevisionOrgIds(form),

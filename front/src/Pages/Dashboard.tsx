@@ -53,6 +53,7 @@ const DashboardPage = () => {
   const isReviewedTab = !!useMatch(routes.dashboard.bsds.reviewed);
   const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
   const isCollectedTab = !!useMatch(routes.dashboard.transport.collected);
+  const isReturnTab = !!useMatch(routes.dashboard.transport.return);
   const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
   const location = useLocation();
 
@@ -65,7 +66,8 @@ const DashboardPage = () => {
     isToCollectTab,
     isCollectedTab,
     isReviewedTab,
-    isToReviewTab
+    isToReviewTab,
+    isReturnTab
   });
   const { siret } = useParams<{ siret: string }>();
   const [areAdvancedFiltersOpen, setAreAdvancedFiltersOpen] = useState(false);
@@ -95,7 +97,8 @@ const DashboardPage = () => {
       isCollectedTab,
       isAllBsdsTab,
       isReviewedTab,
-      isToReviewTab
+      isToReviewTab,
+      isReturnTab
     }),
     [
       isActTab,
@@ -106,7 +109,8 @@ const DashboardPage = () => {
       isFollowTab,
       isReviewedTab,
       isToCollectTab,
-      isToReviewTab
+      isToReviewTab,
+      isReturnTab
     ]
   );
 

@@ -1,4 +1,9 @@
-import { BsvhuStatus, Bsvhu, BsdType } from "@prisma/client";
+import {
+  BsvhuStatus,
+  Bsvhu,
+  BsdType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { prisma } from "@td/prisma";
 import {
   getIntermediaryCompanyOrgId,
@@ -13,6 +18,8 @@ import {
   BsvhuWithIntermediaries,
   BsvhuWithIntermediariesInclude
 } from "./types";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export const BsvhuForElasticInclude = {
   ...BsvhuWithIntermediariesInclude
@@ -69,7 +76,8 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor";
+  | "isCollectedFor"
+  | "isReturnFor";
 
 // | state              | emitter | transporter | destination | intermediary |
 // |--------------------|---------|-------------|-------------|--------------|
@@ -87,7 +95,8 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: []
+    isCollectedFor: [],
+    isReturnFor: []
   };
 
   const formSirets = getBsvhuSirets(bsvhu);
@@ -139,6 +148,11 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
     }
     default:
       break;
+  }
+
+  // Return tab
+  if (belongsToIsReturnForTab(bsvhu)) {
+    setTab(siretsFilters, "transporterCompanySiret", "isReturnFor");
   }
 
   for (const [fieldName, filter] of siretsFilters.entries()) {
@@ -269,3 +283,22 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
 export function indexBsvhu(bsvhu: BsvhuForElastic, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsvhu), ctx);
 }
+
+/**
+ * BSVHU belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste hasn't been fully accepted at reception
+ */
+export const belongsToIsReturnForTab = (bsvhu: BsvhuForElastic) => {
+  const hasBeenReceivedLately =
+    isDefined(bsvhu.destinationReceptionDate) &&
+    bsvhu.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted =
+    bsvhu.destinationReceptionAcceptationStatus !==
+    WasteAcceptationStatus.ACCEPTED;
+
+  return hasNotBeenFullyAccepted;
+};
