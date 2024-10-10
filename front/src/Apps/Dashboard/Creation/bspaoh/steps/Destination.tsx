@@ -98,7 +98,7 @@ export function Destination({ errors }) {
   );
 
   const selectedCompanyError = (company?: CompanySearchResult) => {
-    // Le destinatiare doi être inscrit et avec un profil crématorium ou sous-type crémation
+    // Le destinatiare doit être inscrit et avec un profil crématorium ou sous-type crémation
     // Le profil crématorium sera bientôt supprimé
     if (company) {
       if (!company.isRegistered) {

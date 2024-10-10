@@ -22,10 +22,13 @@ import CompanyMembers from "./CompanyMembers/CompanyMembers";
 import CompanyDigestSheetForm from "./CompanyDigestSheet/CompanyDigestSheet";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import { FrIconClassName } from "@codegouvfr/react-dsfr";
+import { CompanyRegistryDelegation } from "./CompanyRegistryDelegation/CompanyRegistryDelegation";
 
 export type TabContentProps = {
   company: CompanyPrivate;
 };
+
+const REGISTRY_V2_FLAG = "REGISTRY_V2";
 
 const buildTabs = (
   company: CompanyPrivate
@@ -34,6 +37,9 @@ const buildTabs = (
   tabsContent: Record<string, React.FC<TabContentProps>>;
 } => {
   const isAdmin = company.userRole === UserRole.Admin;
+
+  // RNDTS features protected by feature flag
+  const canViewRndtsFeatures = company.featureFlags.includes(REGISTRY_V2_FLAG);
 
   const iconId = "fr-icon-checkbox-line" as FrIconClassName;
   const tabs = [
@@ -70,14 +76,21 @@ const buildTabs = (
     tab4: CompanyContactForm,
     tab5: CompanyDigestSheetForm
   };
-
-  if (isAdmin) {
+  if (canViewRndtsFeatures) {
     tabs.push({
       tabId: "tab6",
+      label: "Délégations RNDTS",
+      iconId
+    });
+    tabsContent["tab6"] = CompanyRegistryDelegation;
+  }
+  if (isAdmin) {
+    tabs.push({
+      tabId: "tab7",
       label: "Avancé",
       iconId
     });
-    tabsContent["tab6"] = CompanyAdvanced;
+    tabsContent["tab7"] = CompanyAdvanced;
   }
 
   return { tabs, tabsContent };
