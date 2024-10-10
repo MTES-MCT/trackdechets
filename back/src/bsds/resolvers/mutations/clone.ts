@@ -13,7 +13,6 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 
 const idSchema = z.string().min(15).max(50);
 
-// TODO: env var to enable on Dev only (back & front)
 const cloneBsdResolver: MutationResolvers["cloneBsd"] = async (
   _,
   { id },

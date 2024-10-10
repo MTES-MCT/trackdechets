@@ -21,6 +21,7 @@ import {
   canReviewBsd,
   canDeleteBsd,
   canDuplicate,
+  canClone,
   canUpdateBsd,
   canGeneratePdf,
   hasBsdSuite,
@@ -300,7 +301,7 @@ function BsdAdditionalActionsButton({
                 </button>
               </li>
             )}
-          {permissions.includes(UserPermission.BsdCanCreate) && (
+          {permissions.includes(UserPermission.BsdCanCreate) && canClone() && (
             <li>
               <button
                 type="button"

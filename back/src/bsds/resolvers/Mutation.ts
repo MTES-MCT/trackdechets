@@ -6,5 +6,7 @@ import reindexBsds from "./mutations/reindexBsds";
 export const Mutation: MutationResolvers = {
   createPdfAccessToken: createPdfAccessTokenResolver,
   reindexBsds: reindexBsds,
-  cloneBsd: cloneBsdResolver
+  ...(process.env.ALLOW_CLONING_BSDS === "true"
+    ? { cloneBsd: cloneBsdResolver }
+    : {})
 };

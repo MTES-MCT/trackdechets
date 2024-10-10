@@ -6,5 +6,12 @@ type ReindexBsds {
 type Mutation {
   reindexBsds(ids: String!): ReindexBsds!
 
+  """
+  FOR TEST ENVS ONLY
+
+  This resolver will clone a BSD. Contrarily to a duplication, it will copy ALL its fields.
+
+  Does not support complex BSDs like groupement, entreposage etc. for now.
+  """
   cloneBsd(id: String!): CloneId!
 }
