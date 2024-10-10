@@ -134,10 +134,16 @@ export const dashboardDasriFragment = gql`
         }
       }
     }
+    groupedIn {
+      id
+    }
     # Attention, pour des raisons de performance, seul
     # l'identifiant est exposé ici. Requêter d'autres champs sur
     # grouping ne fonctionnera pas
     grouping {
+      id
+    }
+    synthesizedIn {
       id
     }
     # Attention, pour des raisons de performance, seul
