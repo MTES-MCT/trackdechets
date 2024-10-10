@@ -8,7 +8,7 @@ import { randomNumber } from "../../../utils";
 import { renderMail, securityCodeRenewal } from "@td/mail";
 import { isSiret, isVat } from "@td/constants";
 import { UserInputError } from "../../../common/errors";
-import { getMailNotificationSubscribers } from "../../../users/notifications";
+import { getNotificationSubscribers } from "../../../users/notifications";
 import { UserNotification } from "@prisma/client";
 import { toGqlCompanyPrivate } from "../../converters";
 
@@ -52,7 +52,7 @@ export async function renewSecurityCodeFn(
     }
   });
 
-  const subscribers = await getMailNotificationSubscribers(
+  const subscribers = await getNotificationSubscribers(
     UserNotification.SIGNATURE_CODE_RENEWAL,
     [orgId]
   );

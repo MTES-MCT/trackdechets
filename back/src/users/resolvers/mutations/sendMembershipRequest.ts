@@ -14,7 +14,7 @@ import {
 } from "@td/mail";
 import { getEmailDomain, canSeeEmail } from "../../utils";
 import { UserInputError } from "../../../common/errors";
-import { getMailNotificationSubscribers } from "../../notifications";
+import { getNotificationSubscribers } from "../../notifications";
 import { UserNotification } from "@prisma/client";
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] =
@@ -51,7 +51,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
       );
     }
 
-    const subscribers = await getMailNotificationSubscribers(
+    const subscribers = await getNotificationSubscribers(
       UserNotification.MEMBERSHIP_REQUEST,
       [siret]
     );

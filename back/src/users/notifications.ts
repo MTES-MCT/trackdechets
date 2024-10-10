@@ -4,7 +4,7 @@ import { prisma } from "@td/prisma";
 
 // Récupère la liste des des utilisateurs abonnés à un type
 // de notification donnée au sein d'un ou plusieurs établissements
-export async function getMailNotificationSubscribers(
+export async function getNotificationSubscribers(
   notification: UserNotification,
   orgIds: string[]
 ): Promise<Recipient[]> {

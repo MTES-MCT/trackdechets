@@ -42,7 +42,7 @@ import { parseBsdaAsync } from "../../validation";
 import { prismaToZodBsda } from "../../validation/helpers";
 import { AlreadySignedError } from "../../../bsvhu/errors";
 import { operationHook } from "../../operationHook";
-import { getMailNotificationSubscribers } from "../../../users/notifications";
+import { getNotificationSubscribers } from "../../../users/notifications";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,
@@ -400,7 +400,7 @@ async function sendAlertIfFollowingBsdaChangedPlannedDestination(bsda: Bsda) {
       previousBsda.destinationOperationNextDestinationCompanySiret !==
         bsda.destinationCompanySiret
     ) {
-      const subscribers = await getMailNotificationSubscribers(
+      const subscribers = await getNotificationSubscribers(
         UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
         [previousBsda.emitterCompanySiret].filter(Boolean)
       );
