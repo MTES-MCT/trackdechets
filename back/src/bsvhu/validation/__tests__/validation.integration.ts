@@ -48,6 +48,10 @@ describe("BSVHU validation", () => {
       companyTypes: ["WASTE_VEHICLES"],
       wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
     });
+    const nextDestinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR"]
+    });
     foreignTransporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
       orgId: "IT13029381004",
@@ -71,6 +75,8 @@ describe("BSVHU validation", () => {
         emitterCompanySiret: emitterCompany.siret,
         transporterCompanySiret: transporterCompany.siret,
         destinationCompanySiret: destinationCompany.siret,
+        destinationOperationNextDestinationCompanySiret:
+          nextDestinationCompany.siret,
         ecoOrganismeSiret: ecoOrganisme.siret,
         brokerCompanySiret: brokerCompany.siret,
         traderCompanySiret: traderCompany.siret,
@@ -352,6 +358,29 @@ describe("BSVHU validation", () => {
       const data: ZodBsvhu = {
         ...bsvhu,
         destinationCompanySiret: company.siret
+      };
+      expect.assertions(1);
+
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Cet établissement n'a pas le profil Installation de traitement de VHU."
+          })
+        ]);
+      }
+    });
+
+    test("when next destination is registered with wrong profile", async () => {
+      const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        destinationOperationNextDestinationCompanySiret: company.siret
       };
       expect.assertions(1);
 
