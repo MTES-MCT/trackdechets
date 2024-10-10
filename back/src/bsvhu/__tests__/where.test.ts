@@ -19,17 +19,21 @@ describe("Bsvhu where builder", () => {
 
   it("should convert string filters to db filters", () => {
     const where: BsvhuWhere = {
-      emitter: { company: { siret: { _eq: "1234" } } },
-      destination: { company: { siret: { _eq: "1234" } } },
-      transporter: { company: { siret: { _eq: "1234" } } }
+      emitter: { company: { siret: { _eq: "emitter" } } },
+      destination: { company: { siret: { _eq: "destination" } } },
+      transporter: { company: { siret: { _eq: "transporter" } } },
+      broker: { company: { siret: { _eq: "broker" } } },
+      trader: { company: { siret: { _eq: "trader" } } }
     };
 
     const dbFilter = toPrismaWhereInput(where);
 
     expect(dbFilter).toEqual({
-      emitterCompanySiret: { equals: "1234" },
-      destinationCompanySiret: { equals: "1234" },
-      transporterCompanySiret: { equals: "1234" }
+      emitterCompanySiret: { equals: "emitter" },
+      destinationCompanySiret: { equals: "destination" },
+      transporterCompanySiret: { equals: "transporter" },
+      brokerCompanySiret: { equals: "broker" },
+      traderCompanySiret: { equals: "trader" }
     });
   });
 

@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'Eco-organisme sur BSVHU [PR 3619](https://github.com/MTES-MCT/trackdechets/pull/3619)
+- Ajout des profils Négociant et Courtier sur BSVHU [PR 3645](https://github.com/MTES-MCT/trackdechets/pull/3645)
 
 #### :bug: Corrections de bugs
 

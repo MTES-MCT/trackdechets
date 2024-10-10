@@ -65,6 +65,12 @@ type Bsvhu {
   "Eco-organisme"
   ecoOrganisme: BsvhuEcoOrganisme
 
+  "Courtier"
+  broker: BsvhuBroker
+
+  "Négociant"
+  trader: BsvhuTrader
+
   metadata: BsvhuMetadata!
 }
 
@@ -109,9 +115,26 @@ type BsvhuTransport {
 type BsvhuRecepisse {
   "Exemption de récépissé"
   isExempted: Boolean
+  "Numéro de récépissé"
   number: String
+  "Département"
   department: String
+  "Date limite de validité"
   validityLimit: DateTime
+}
+
+type BsvhuBroker {
+  "Coordonnées de l'entreprise courtier"
+  company: FormCompany
+  "Récépissé courtier"
+  recepisse: BsvhuRecepisse
+}
+
+type BsvhuTrader {
+  "Coordonnées de l'entreprise de négoce"
+  company: FormCompany
+  "Récépissé négociant"
+  recepisse: BsvhuRecepisse
 }
 
 type BsvhuDestination {

@@ -255,10 +255,11 @@ describe("indexAllBsdTypeSync", () => {
   });
 
   it("should index BSVHUs synchronously", async () => {
+    const user = await userFactory();
     const bsvhus = await Promise.all([
-      bsvhuFactory({}),
-      bsvhuFactory({}),
-      bsvhuFactory({})
+      bsvhuFactory({ userId: user.id }),
+      bsvhuFactory({ userId: user.id }),
+      bsvhuFactory({ userId: user.id })
     ]);
     await indexAllBsdTypeSync({
       bsdName: "bsvhu",
@@ -407,10 +408,11 @@ describe("indexAllBsdTypeConcurrently", () => {
   });
 
   it("should index BSVHUs using the index queue", async () => {
+    const user = await userFactory();
     const bsvhus = await Promise.all([
-      bsvhuFactory({}),
-      bsvhuFactory({}),
-      bsvhuFactory({})
+      bsvhuFactory({ userId: user.id }),
+      bsvhuFactory({ userId: user.id }),
+      bsvhuFactory({ userId: user.id })
     ]);
     const jobs = await indexAllBsdTypeConcurrentJobs({
       bsdName: "bsvhu",

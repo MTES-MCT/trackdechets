@@ -63,6 +63,7 @@ describe("Mutation.Vhu.publish", () => {
   it("should pass the form as non draft", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await bsvhuFactory({
+      userId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
         isDraft: true
@@ -78,5 +79,41 @@ describe("Mutation.Vhu.publish", () => {
     );
 
     expect(data.publishBsvhu.isDraft).toBe(false);
+  });
+
+  it("should fail if the user is not part a the creator's companies", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: company2, user: user2 } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: ["TRANSPORTER"]
+      }
+    );
+    const form = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: company2.siret,
+        isDraft: true
+      }
+    });
+
+    const { mutate } = makeClient(user2);
+    const { errors } = await mutate<Pick<Mutation, "publishBsvhu">>(
+      PUBLISH_VHU_FORM,
+      {
+        variables: { id: form.id }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
   });
 });

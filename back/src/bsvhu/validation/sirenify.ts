@@ -58,6 +58,22 @@ const sirenifyBsvhuAccessors = (
       }
     }
   },
+  {
+    siret: bsvhu?.brokerCompanySiret,
+    skip: sealedFields.includes("brokerCompanySiret"),
+    setter: (input, companyInput) => {
+      input.brokerCompanyName = companyInput.name;
+      input.brokerCompanyAddress = companyInput.address;
+    }
+  },
+  {
+    siret: bsvhu?.traderCompanySiret,
+    skip: sealedFields.includes("traderCompanySiret"),
+    setter: (input, companyInput) => {
+      input.traderCompanyName = companyInput.name;
+      input.traderCompanyAddress = companyInput.address;
+    }
+  },
   ...(bsvhu.intermediaries ?? []).map(
     (_, idx) =>
       ({
