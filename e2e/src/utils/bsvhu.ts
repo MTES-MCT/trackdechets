@@ -343,17 +343,21 @@ export const verifyCardData = async (
     .locator(".actors__label")
     .first()
     .getAttribute("aria-label");
-  await expect(emitterName).toEqual(emitter.name);
+  await expect(emitterName).toEqual(`Expédition du bordereau ${emitter.name}`);
   const transporterName = await vhuDiv
     .locator(".actors__label")
     .nth(1)
     .getAttribute("aria-label");
-  await expect(transporterName).toEqual(transporter.name);
+  await expect(transporterName).toEqual(
+    `Transporteur visé sur le bordereau ${transporter.name}`
+  );
   const destinationName = await vhuDiv
     .locator(".actors__label")
     .nth(2)
     .getAttribute("aria-label");
-  await expect(destinationName).toEqual(destination.name);
+  await expect(destinationName).toEqual(
+    `Destination du bordereau ${destination.name}`
+  );
 
   // Primary button
   await expect(vhuDiv.getByRole("button").getByText("Publier")).toBeVisible();

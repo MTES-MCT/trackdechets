@@ -103,6 +103,7 @@ const SelectWithSubOptions = ({
         className={`fr-select select ${isOpen ? "select-open" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
+        aria-expanded={isOpen}
       >
         {getLabel(allOptions, getValuesFromOptions(selected))}
       </div>

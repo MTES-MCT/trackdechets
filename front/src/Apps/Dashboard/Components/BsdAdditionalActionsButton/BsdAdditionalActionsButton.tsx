@@ -155,7 +155,9 @@ function BsdAdditionalActionsButton({
           onClick={toggleMenu}
         >
           <span className="sr-only">
-            {isOpen ? "fermer menu actions" : "ouvrir menu actions"}
+            {isOpen
+              ? `fermer le menu secondaire du bordereau numéro ${bsd.readableid}`
+              : `ouvrir le menu secondaire du bordereau numéro ${bsd.readableid}`}
           </span>
           <figure aria-hidden={true} className="dots"></figure>
           <figure aria-hidden={true} className="dots"></figure>
