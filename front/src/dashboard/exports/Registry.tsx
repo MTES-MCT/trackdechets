@@ -52,7 +52,7 @@ export default function Exports() {
       {!isMobile && <RegistryMenu />}
       <div className="dashboard-content">
         <div className="tw-p-6">
-          <h2 className="h2 tw-mb-4">Exporter un registre</h2>
+          <h1 className="h2 tw-mb-4">Exporter un registre</h1>
           <ExportsForm companies={companies} />
         </div>
       </div>

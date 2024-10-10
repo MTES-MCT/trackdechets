@@ -6,7 +6,12 @@ import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 
 export const AccountMenuContent = () => (
   <>
-    <Accordion defaultExpanded label="Mon compte" className="fr-mt-4w">
+    <Accordion
+      titleAs="h2"
+      defaultExpanded
+      label="Mon compte"
+      className="fr-mt-4w"
+    >
       <ul>
         <li className="tw-mb-1">
           <NavLink
@@ -23,7 +28,7 @@ export const AccountMenuContent = () => (
       </ul>
     </Accordion>
 
-    <Accordion defaultExpanded label="Paramètres avancés">
+    <Accordion titleAs="h2" defaultExpanded label="Paramètres avancés">
       <ul>
         <li>
           <NavLink
