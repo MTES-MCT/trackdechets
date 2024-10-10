@@ -25,6 +25,10 @@ export const bsvhuFactory = async ({
     companyTypes: ["WASTE_VEHICLES"],
     wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
   });
+  const nextDestinationCompany = await companyFactory({
+    companyTypes: ["WASTE_VEHICLES"],
+    wasteVehiclesTypes: ["BROYEUR"]
+  });
   const brokerCompany = await companyFactory({
     companyTypes: ["BROKER"]
   });
@@ -40,6 +44,8 @@ export const bsvhuFactory = async ({
       ...getVhuFormdata(),
       transporterCompanySiret: transporterCompany.siret,
       destinationCompanySiret: destinationCompany.siret,
+      destinationOperationNextDestinationCompanySiret:
+        nextDestinationCompany.siret,
       ecoOrganismeSiret: ecoOrganisme.siret,
       brokerCompanySiret: brokerCompany.siret,
       traderCompanySiret: traderCompany.siret,
@@ -83,6 +89,14 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   destinationCompanyPhone: "05 05 05 05 05",
   destinationCompanyMail: "recipient@td.io",
 
+  destinationOperationNextDestinationCompanyName: "Car crusher",
+  destinationOperationNextDestinationCompanySiret: siretify(3),
+  destinationOperationNextDestinationCompanyAddress:
+    "12 rue des épavistes, Detroit",
+  destinationOperationNextDestinationCompanyContact: "Jean l'opérateur",
+  destinationOperationNextDestinationCompanyPhone: "06 07 08 09 10",
+  destinationOperationNextDestinationCompanyMail: "operator@carcrusher.com",
+
   packaging: "UNITE" as BsvhuPackaging,
   identificationNumbers: ["1", "2", "3"],
   identificationType: "NUMERO_ORDRE_REGISTRE_POLICE" as BsvhuIdentificationType,
@@ -91,7 +105,7 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   weightIsEstimate: true,
 
   transporterCompanyName: "Transport facile",
-  transporterCompanySiret: siretify(3),
+  transporterCompanySiret: siretify(4),
   transporterCompanyAddress: "12 route du Transporter, Transporter City",
   transporterCompanyContact: "Henri Transport",
   transporterCompanyPhone: "06 06 06 06 06",
@@ -105,11 +119,11 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   destinationReceptionRefusalReason: null,
   destinationOperationCode: null,
 
-  ecoOrganismeSiret: siretify(4),
+  ecoOrganismeSiret: siretify(5),
   ecoOrganismeName: "Eco-Organisme",
 
   brokerCompanyName: "Courtier efficace",
-  brokerCompanySiret: siretify(5),
+  brokerCompanySiret: siretify(6),
   brokerCompanyAddress: "15 Rue des Lilas, 33000 Lille",
   brokerCompanyContact: "Anton Spencer",
   brokerCompanyPhone: "06 67 78 89 91",
@@ -118,7 +132,7 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   brokerRecepisseDepartment: "33",
   brokerRecepisseValidityLimit: "2026-11-27T00:00:00.000Z",
   traderCompanyName: "Le Négoce QVB",
-  traderCompanySiret: siretify(6),
+  traderCompanySiret: siretify(7),
   traderCompanyAddress: "32 Avenue des Azalées, 33700 Mérignac",
   traderCompanyContact: "Benjamin Turner",
   traderCompanyPhone: "06 68 35 64 34",
