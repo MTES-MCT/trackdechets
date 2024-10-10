@@ -36,6 +36,7 @@ jobs:
           npx nx run back:test:integration -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
 env:
+  ALLOW_CLONING_BSDS: true
   TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
   TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
   NODE_ENV: test

@@ -16,6 +16,7 @@ import {
 import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
+import { getFormSiretsByRole } from "../forms/database";
 
 /**
  * Create a user with name and email
@@ -423,14 +424,24 @@ export const formFactory = async ({
     }
   };
 
-  return prisma.form.create({
+  const form = await prisma.form.create({
     data: {
       readableId: getReadableId(),
       ...formParams,
       owner: { connect: { id: ownerId } }
     },
+    include: { forwardedIn: true, transporters: true }
+  });
+
+  // Fix fields like "recipientsSirets" or "transportersSirets"
+  const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
+  const updated = await prisma.form.update({
+    where: { id: form.id },
+    data: { ...denormalizedSirets },
     include: { forwardedIn: true }
   });
+
+  return updated;
 };
 
 export const formWithTempStorageFactory = async ({
