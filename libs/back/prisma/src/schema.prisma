@@ -312,8 +312,8 @@ model Company {
   receivedAdministrativeTransfers AdministrativeTransfer[] @relation("AdministrativeTransferTo")
   webhookSettingsLimit            Int                      @default(1)
 
-  delegatorRndtsDeclarationDelegations RndtsDeclarationDelegation[] @relation("RndtsDeclarationDelegationDelegator")
-  delegateRndtsDeclarationDelegations RndtsDeclarationDelegation[] @relation("RndtsDeclarationDelegationDelegate")
+  delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
+  delegateRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegate")
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -1083,7 +1083,7 @@ model Bsvhu {
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
 }
 
-model RndtsDeclarationDelegation {
+model RegistryDelegation {
   id String @id @default(cuid())
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
@@ -1091,11 +1091,11 @@ model RndtsDeclarationDelegation {
 
   // Entreprise délégataire
   delegateId String @db.VarChar(30)
-  delegate Company  @relation("RndtsDeclarationDelegationDelegate", fields: [delegateId], references: [id])
+  delegate Company  @relation("RegistryDelegationDelegate", fields: [delegateId], references: [id])
 
   // Entreprise délégante
   delegatorId String @db.VarChar(30)
-  delegator Company  @relation("RndtsDeclarationDelegationDelegator", fields: [delegatorId], references: [id])
+  delegator Company  @relation("RegistryDelegationDelegator", fields: [delegatorId], references: [id])
 
   // Dates de validité
   startDate DateTime  @db.Timestamptz(6)
@@ -1105,8 +1105,8 @@ model RndtsDeclarationDelegation {
 
   isRevoked Boolean @default(false)
 
-  @@index([delegateId], map: "_RndtsDeclarationDelegationDelegateIdIdx")
-  @@index([delegatorId], map: "_RndtsDeclarationDelegationDelegatorIdIdx")
+  @@index([delegateId], map: "_RegistryDelegationDelegateIdIdx")
+  @@index([delegatorId], map: "_RegistryDelegationDelegatorIdIdx")
 }
 
 model IntermediaryBsvhuAssociation {
