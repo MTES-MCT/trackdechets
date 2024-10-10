@@ -16,6 +16,7 @@ import { GraphQLFormattedError } from "graphql";
 import { nowPlusXHours, todayAtMidnight, toddMMYYYY } from "../../../../utils";
 import { sendMail } from "../../../../mailer/mailing";
 import { renderMail, registryDelegationCreation } from "@td/mail";
+import { getStream } from "../../../../activity-events/data";
 
 // Mock emails
 jest.mock("../../../../mailer/mailing");
@@ -107,6 +108,15 @@ describe("mutation createRegistryDelegation", () => {
       // Persisted value should be OK
       expect(delegation?.delegatorId).toBe(delegator.id);
       expect(delegation?.delegateId).toBe(delegate.id);
+
+      // Should create an event
+      const eventsAfterCreate = await getStream(delegation!.id);
+      expect(eventsAfterCreate.length).toBe(1);
+      expect(eventsAfterCreate[0]).toMatchObject({
+        type: "RegistryDelegationCreated",
+        actor: user.id,
+        streamId: delegation!.id
+      });
     });
 
     it("should populate default values", async () => {

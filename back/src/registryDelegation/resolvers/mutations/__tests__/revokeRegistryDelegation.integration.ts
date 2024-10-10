@@ -6,6 +6,7 @@ import { Mutation } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { registryDelegationFactory } from "../../../__tests__/factories";
 import { userFactory, userInCompany } from "../../../../__tests__/factories";
+import { getStream } from "../../../../activity-events/data";
 
 const REVOKE_REGISTRY_DELEGATION = gql`
   mutation revokeRegistryDelegation($delegationId: ID!) {
@@ -61,6 +62,15 @@ describe("mutation revokeRegistryDelegation", () => {
         delegateCompany.orgId
       );
       expect(updatedDelegation?.isRevoked).toBeTruthy();
+
+      // Should create an event
+      const eventsAfterCreate = await getStream(delegation!.id);
+      expect(eventsAfterCreate.length).toBe(1);
+      expect(eventsAfterCreate[0]).toMatchObject({
+        type: "RegistryDelegationUpdated",
+        actor: delegatorUser.id,
+        streamId: delegation!.id
+      });
     });
 
     it("delegator can revoke delegation", async () => {

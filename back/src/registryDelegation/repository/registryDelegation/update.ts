@@ -13,12 +13,22 @@ export type UpdateRegistryDelegationFn = (
 export const buildUpdateRegistryDelegation = (
   deps: RepositoryFnDeps
 ): UpdateRegistryDelegationFn => {
-  return async (where, data) => {
-    const { prisma } = deps;
+  return async (where, data, logMetadata) => {
+    const { prisma, user } = deps;
 
     const delegation = await prisma.registryDelegation.update({
       where,
       data
+    });
+
+    await prisma.event.create({
+      data: {
+        streamId: delegation.id,
+        actor: user.id,
+        type: "RegistryDelegationUpdated",
+        data: { content: data } as Prisma.InputJsonObject,
+        metadata: { ...logMetadata, authType: user.auth }
+      }
     });
 
     return delegation;
