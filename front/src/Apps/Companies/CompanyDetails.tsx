@@ -40,7 +40,7 @@ const buildTabs = (
 
   // RNDTS features protected by feature flag
   const canViewRndtsFeatures = company.featureFlags.includes(RNDTS_FLAG);
-  
+
   const iconId = "fr-icon-checkbox-line" as FrIconClassName;
   const tabs = [
     {
