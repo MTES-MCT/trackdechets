@@ -1,10 +1,7 @@
 import { MutationHookOptions, useMutation } from "@apollo/client";
 import gql from "graphql-tag";
 import toast from "react-hot-toast";
-import {
-  Mutation,
-  MutationCloneBsdArgs
-} from "../../../../../../libs/front/codegen-ui/src";
+import { Mutation, MutationCloneBsdArgs } from "@td/codegen-ui";
 import { toastApolloError } from "../../Creation/toaster";
 
 const CLONE_BSD = gql`
