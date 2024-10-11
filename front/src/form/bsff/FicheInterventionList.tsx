@@ -105,10 +105,19 @@ function AddFicheInterventionModal({
       <h2 className="td-modal-title">Ajouter une fiche d'intervention</h2>
 
       <div className="notification">
-        Reportez ici certaines des informations d'une fiche d'intervention
-        (formulaire 15497*03) dans Trackdéchets. L'ajout d'une fiche
-        d'intervention permet d'identifier le détenteur d'un équipement afin que
-        celui-ci ait accès au suivi du bordereau.
+        Reportez ici certaines des informations d'une fiche d'intervention (
+        <a
+          href="https://entreprendre.service-public.fr/vosdroits/R43122"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fr-link"
+          style={{ textDecoration: "none" }}
+        >
+          formulaire 15497*04
+        </a>
+        ) dans Trackdéchets. L'ajout d'une fiche d'intervention permet
+        d'identifier le détenteur d'un équipement afin que celui-ci ait accès au
+        suivi du bordereau.
       </div>
 
       <Formik<Values>
