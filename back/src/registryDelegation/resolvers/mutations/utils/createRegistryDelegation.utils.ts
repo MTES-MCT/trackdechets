@@ -92,6 +92,7 @@ export const sendRegistryDelegationCreationEmail = async (
   const payload = renderMail(registryDelegationCreation, {
     variables: {
       startDate: toddMMYYYY(delegation.startDate),
+      endDate: delegation.endDate ? toddMMYYYY(delegation.endDate) : undefined,
       delegator,
       delegate
     },

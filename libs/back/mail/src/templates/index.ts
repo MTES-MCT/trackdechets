@@ -254,6 +254,7 @@ export const registryDelegationCreation: MailTemplate<{
   startDate: string;
   delegator: Company;
   delegate: Company;
+  endDate?: string;
 }> = {
   subject: ({ delegator }) =>
     `Émission d'une demande de délégation de l'établissement ${delegator.name} (${delegator.siret})`,

@@ -2,6 +2,10 @@ import { prisma } from "@td/prisma";
 import { UserInputError } from "../../common/errors";
 import { getRegistryDelegationRepository } from "../repository";
 import { Company, Prisma } from "@prisma/client";
+import {
+  RegistryDelegation,
+  RegistryDelegationStatus
+} from "../../generated/graphql/types";
 
 export const findDelegateAndDelegatorOrThrow = async (
   delegateOrgId: string,
@@ -73,4 +77,19 @@ export const findDelegateOrDelegatorOrThrow = async (
   }
 
   return { delegator, delegate };
+};
+
+export const getDelegationStatus = (delegation: RegistryDelegation) => {
+  const NOW = new Date();
+
+  const { isRevoked, startDate, endDate } = delegation;
+
+  if (isRevoked) return "CLOSED" as RegistryDelegationStatus;
+
+  if (startDate > NOW) return "INCOMING" as RegistryDelegationStatus;
+
+  if (startDate <= NOW && (!endDate || endDate > NOW))
+    return "ONGOING" as RegistryDelegationStatus;
+
+  return "CLOSED" as RegistryDelegationStatus;
 };
