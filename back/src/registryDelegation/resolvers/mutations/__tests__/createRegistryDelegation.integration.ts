@@ -251,6 +251,80 @@ describe("mutation createRegistryDelegation", () => {
     });
   });
 
+  it("testing email content - no end date", async () => {
+    // Given
+    const delegate = await companyFactory({ givenName: "Some given name" });
+    const { user: delegatorAdmin, company: delegator } =
+      await userWithCompanyFactory();
+
+    // Email
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { errors, delegation } = await createDelegation(delegatorAdmin, {
+      delegateOrgId: delegate.orgId,
+      delegatorOrgId: delegator.orgId
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(delegation).not.toBeUndefined();
+
+    if (!delegation) return;
+
+    const formattedStartDate = toddMMYYYY(delegation.startDate).replace(
+      /\//g,
+      "&#x2F;"
+    );
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.stringContaining(`effective à partir du ${formattedStartDate}
+  <span>pour une durée illimitée.</span>`),
+        subject: `Émission d'une demande de délégation de l'établissement ${delegator.name} (${delegator.siret})`
+      })
+    );
+  });
+
+  it("testing email content - with end date", async () => {
+    // Given
+    const delegate = await companyFactory({ givenName: "Some given name" });
+    const { user: delegatorAdmin, company: delegator } =
+      await userWithCompanyFactory();
+    const endDate = new Date("2050-10-10");
+
+    // Email
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { errors, delegation } = await createDelegation(delegatorAdmin, {
+      delegateOrgId: delegate.orgId,
+      delegatorOrgId: delegator.orgId,
+      endDate: endDate.toISOString() as any
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+    if (!delegation) return;
+
+    const formattedStartDate = toddMMYYYY(delegation.startDate).replace(
+      /\//g,
+      "&#x2F;"
+    );
+    const formattedEndDate = toddMMYYYY(endDate).replace(/\//g, "&#x2F;");
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.stringContaining(`effective à partir du ${formattedStartDate}
+  <span>et jusqu'au ${formattedEndDate}.</span>`),
+        subject: `Émission d'une demande de délégation de l'établissement ${delegator.name} (${delegator.siret})`
+      })
+    );
+  });
+
   describe("authentication & roles", () => {
     it("user must be authenticated", async () => {
       // Given
