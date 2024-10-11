@@ -9,7 +9,6 @@ import {
 import { associateUserToCompany, createUserAccountHash } from "../database";
 import { getUserRoles } from "../../permissions";
 import { UserRole } from "@prisma/client";
-import { ALL_NOTIFICATIONS } from "@td/constants";
 import { getDefaultNotifications } from "../notifications";
 
 describe("createUserAccountHash", () => {

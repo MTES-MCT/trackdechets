@@ -5,7 +5,6 @@ import { getUserCompanies } from "../../../database";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { UserRole } from "@prisma/client";
-import { ALL_NOTIFICATIONS } from "@td/constants";
 import { getDefaultNotifications } from "../../../notifications";
 
 const JOIN_WITH_INVITE = `

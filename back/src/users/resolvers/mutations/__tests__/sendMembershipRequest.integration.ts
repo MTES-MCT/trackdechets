@@ -16,6 +16,7 @@ import {
 } from "@td/mail";
 import { Mutation } from "../../../../generated/graphql/types";
 import { subMinutes } from "date-fns";
+import { UserNotification } from "@prisma/client";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -54,8 +55,19 @@ describe("mutation sendMembershipRequest", () => {
       email: "john.snow@trackdechets.fr",
       createdAt: subMinutes(new Date(), 5)
     });
+    const admin2 = await userFactory({
+      email: "aria.starck@trackdechets.fr",
+      createdAt: subMinutes(new Date(), 5)
+    });
     const company = await companyFactory();
-    await associateUserToCompany(admin.id, company.orgId, "ADMIN");
+    // this user should receive the notification
+    await associateUserToCompany(admin.id, company.orgId, "ADMIN", {
+      notifications: [UserNotification.MEMBERSHIP_REQUEST]
+    });
+    // this user should not receive the notification
+    await associateUserToCompany(admin2.id, company.orgId, "ADMIN", {
+      notifications: []
+    });
     const { mutate } = makeClient(requester);
     const { data } = await mutate<Pick<Mutation, "sendMembershipRequest">>(
       SEND_MEMBERSHIP_REQUEST,

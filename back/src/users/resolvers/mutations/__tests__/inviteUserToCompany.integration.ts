@@ -12,7 +12,6 @@ import { Mutation } from "../../../../generated/graphql/types";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
 import { templateIds } from "@td/mail";
-import { ALL_NOTIFICATIONS } from "@td/constants";
 import { getDefaultNotifications } from "../../../notifications";
 
 const INVITE_USER_TO_COMPANY = `
