@@ -49,6 +49,15 @@ const sirenifyBsvhuAccessors = (
       input.transporterCompanyAddress = companyInput.address;
     }
   },
+  {
+    siret: bsvhu?.ecoOrganismeSiret,
+    skip: sealedFields.includes("ecoOrganismeSiret"),
+    setter: (input, companyInput) => {
+      if (companyInput.name) {
+        input.ecoOrganismeName = companyInput.name;
+      }
+    }
+  },
   ...(bsvhu.intermediaries ?? []).map(
     (_, idx) =>
       ({

@@ -19,7 +19,10 @@ async function testWorkflow(workflow: Workflow) {
     });
     if (workflowCompany.companyTypes.includes("ECO_ORGANISME")) {
       // create ecoOrganisme to allow its user to perform api calls
-      await ecoOrganismeFactory({ siret: company.siret!, handleBsdasri: true });
+      await ecoOrganismeFactory({
+        siret: company.siret!,
+        handle: { handleBsdasri: true }
+      });
     }
     if (
       workflowCompany.companyTypes.includes("TRANSPORTER") &&

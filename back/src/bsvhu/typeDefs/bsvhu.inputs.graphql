@@ -96,6 +96,9 @@ input BsvhuInput {
   Le nombre maximal d'intermédiaires sur un bordereau est de 3.
   """
   intermediaries: [CompanyInput!]
+
+  "Eco-organisme"
+  ecoOrganisme: BsvhuEcoOrganismeInput
 }
 
 input BsvhuEmitterInput {
@@ -107,6 +110,11 @@ input BsvhuEmitterInput {
   noSiret: Boolean
   "Coordonnées de l'entreprise émétrice"
   company: BsvhuCompanyInput
+}
+
+input BsvhuEcoOrganismeInput {
+  name: String!
+  siret: String!
 }
 
 "Extension de CompanyInput ajoutant des champs d'adresse séparés"

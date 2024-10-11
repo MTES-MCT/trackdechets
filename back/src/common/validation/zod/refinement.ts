@@ -7,7 +7,7 @@ import {
   isWasteVehicles
 } from "../../../companies/validation";
 import { prisma } from "@td/prisma";
-import { Company, CompanyVerificationStatus } from "@prisma/client";
+import { BsdType, Company, CompanyVerificationStatus } from "@prisma/client";
 import { getOperationModesFromOperationCode } from "../../operationModes";
 import { CompanyRole, pathFromCompanyRole } from "./schema";
 
@@ -73,6 +73,27 @@ export async function refineSiretAndGetCompany(
 
   return company;
 }
+
+export async function refineAndGetEcoOrganisme(
+  siret: string | null | undefined,
+  ctx: RefinementCtx
+) {
+  if (!siret) return null;
+  const ecoOrganisme = await prisma.ecoOrganisme.findUnique({
+    where: { siret }
+  });
+
+  if (ecoOrganisme === null) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["ecoOrganisme", "siret"],
+      message: `L'éco-organisme avec le SIRET ${siret} n'est pas référencé sur Trackdéchets`
+    });
+  }
+
+  return ecoOrganisme;
+}
+
 export const isRegisteredVatNumberRefinement = async (
   vatNumber: string | null | undefined,
   ctx: RefinementCtx
@@ -159,7 +180,7 @@ export async function isDestinationRefinement(
   }
 }
 
-export async function isNotDormantRefinement(
+export async function isEmitterNotDormantRefinement(
   siret: string | null | undefined,
   ctx: RefinementCtx
 ) {
@@ -171,6 +192,7 @@ export async function isNotDormantRefinement(
   if (company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Emitter),
       message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
     });
   }
@@ -201,6 +223,30 @@ export function destinationOperationModeRefinement(
         path: pathFromCompanyRole(CompanyRole.Destination),
         message:
           "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+      });
+    }
+  }
+}
+
+export async function isEcoOrganismeRefinement(
+  siret: string | null | undefined,
+  bsdType: BsdType,
+  ctx: RefinementCtx
+) {
+  const ecoOrganisme = await refineAndGetEcoOrganisme(siret, ctx);
+
+  if (ecoOrganisme) {
+    if (bsdType === BsdType.BSDA && !ecoOrganisme.handleBsda) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
+        message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSDA`
+      });
+    } else if (bsdType === BsdType.BSVHU && !ecoOrganisme.handleBsvhu) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
+        message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSVHU`
       });
     }
   }

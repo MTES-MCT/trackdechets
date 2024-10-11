@@ -473,6 +473,9 @@ function BsdCard({
                       onClick={handleValidationClick}
                     >
                       {ctaPrimaryLabel}
+                      <span className="fr-sr-only">
+                        bordereau numéro {bsdDisplay.readableid}
+                      </span>
                     </button>
                   )}
 

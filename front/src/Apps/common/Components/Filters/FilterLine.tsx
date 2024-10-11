@@ -19,6 +19,7 @@ interface FilterLineProps {
   ) => void;
   disabledSelect?: boolean;
   value?: string;
+  srLabel?: string;
   children?: ReactElement;
   isMaxLine: boolean;
   isCurrentLine: boolean;
@@ -33,7 +34,8 @@ const FilterLine = ({
   value,
   children,
   isMaxLine,
-  isCurrentLine
+  isCurrentLine,
+  srLabel = ""
 }: FilterLineProps) => (
   <div className="filters__line">
     <div className="filters__line__item">
@@ -54,18 +56,26 @@ const FilterLine = ({
         onClick={e => onRemoveFilterType(e, value)}
         id={`${value}_delete_btn`}
       >
-        - <span className="sr-only">{sr_btn_delete_filter_line}</span>
+        <span aria-hidden>-</span>
+        <span className="sr-only">{`${sr_btn_delete_filter_line} ${srLabel}`}</span>
       </button>
       {isCurrentLine && (
         <button
           type="button"
           className="fr-btn fr-btn--secondary"
-          onClick={onAddFilterType}
+          onClick={e => {
+            onAddFilterType(e);
+            e.currentTarget.setAttribute("aria-expanded", "true");
+          }}
           id={`${value}_add_btn`}
           title={isMaxLine ? max_filter_autorized_label : ""}
           disabled={isMaxLine}
+          aria-expanded={false}
         >
-          + <span className="sr-only">{sr_btn_add_filter_line}</span>
+          <span aria-hidden>+</span>
+          <span className="sr-only">{`${sr_btn_add_filter_line} ${
+            isMaxLine ? max_filter_autorized_label : ""
+          }`}</span>
         </button>
       )}
     </div>

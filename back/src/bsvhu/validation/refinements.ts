@@ -10,11 +10,12 @@ import {
 import { getSignatureAncestors } from "./helpers";
 import { isArray } from "../../common/dataTypes";
 import { capitalize } from "../../common/strings";
-import { WasteAcceptationStatus } from "@prisma/client";
+import { BsdType, WasteAcceptationStatus } from "@prisma/client";
 import {
   destinationOperationModeRefinement,
   isDestinationRefinement,
-  isNotDormantRefinement,
+  isEcoOrganismeRefinement,
+  isEmitterNotDormantRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
 } from "../../common/validation/zod/refinement";
@@ -33,7 +34,7 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
   bsvhu,
   zodContext
 ) => {
-  await isNotDormantRefinement(bsvhu.emitterCompanySiret, zodContext);
+  await isEmitterNotDormantRefinement(bsvhu.emitterCompanySiret, zodContext);
   await isDestinationRefinement(
     bsvhu.destinationCompanySiret,
     zodContext,
@@ -49,6 +50,11 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
   );
   await isRegisteredVatNumberRefinement(
     bsvhu.transporterCompanyVatNumber,
+    zodContext
+  );
+  await isEcoOrganismeRefinement(
+    bsvhu.ecoOrganismeSiret,
+    BsdType.BSVHU,
     zodContext
   );
 };

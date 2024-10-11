@@ -40,6 +40,10 @@ query GetBsvhu($id: ID!) {
         number
       }
     }
+    ecoOrganisme {
+      name
+      siret
+    }
     weight {
       value
     }

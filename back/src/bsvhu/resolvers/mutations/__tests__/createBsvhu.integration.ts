@@ -6,7 +6,8 @@ import {
   siretify,
   userFactory,
   userWithCompanyFactory,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import gql from "graphql-tag";
@@ -45,6 +46,10 @@ const CREATE_VHU_FORM = gql`
       }
       intermediaries {
         siret
+      }
+      ecoOrganisme {
+        siret
+        name
       }
       weight {
         value
@@ -309,6 +314,71 @@ describe("Mutation.Vhu.create", () => {
     expect(data.createBsvhu.transporter!.recepisse!.validityLimit).toEqual(
       "2055-01-01T00:00:00.000Z"
     );
+  });
+
+  it("should create a bsvhu with eco-organisme", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"]
+    });
+
+    const ecoOrganisme = await ecoOrganismeFactory({
+      handle: { handleBsvhu: true },
+      createAssociatedCompany: true
+    });
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      },
+      ecoOrganisme: {
+        siret: ecoOrganisme.siret,
+        name: ecoOrganisme.name
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(data.createBsvhu.id).toBeDefined();
+    expect(data.createBsvhu.ecoOrganisme!.siret).toBe(ecoOrganisme.siret);
   });
 
   it("should create a bsvhu with intermediary", async () => {

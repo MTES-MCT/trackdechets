@@ -182,6 +182,8 @@ const rawBsvhuSchema = z.object({
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
+  ecoOrganismeName: z.string().nullish(),
+  ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   intermediaries: z
     .array(intermediarySchema)
     .nullish()

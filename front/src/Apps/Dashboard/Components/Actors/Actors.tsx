@@ -33,7 +33,10 @@ function Actors({
       {emitterName && (
         <div className="actors__item">
           <IconEmitter className="actors__emitter-icon" />
-          <p className="actors__label" aria-label={emitterName}>
+          <p
+            className="actors__label"
+            aria-label={`Expédition du bordereau ${emitterName}`}
+          >
             <span className="actors__label--first">
               {split(emitterName).firstPart}
             </span>
@@ -48,7 +51,10 @@ function Actors({
       {workerCompanyName && (
         <div className="actors__item">
           <IconWorker className="actors__worker-icon" />
-          <p className="actors__label" aria-label={workerCompanyName}>
+          <p
+            className="actors__label"
+            aria-label={`Entreprise de travaux visée sur le bordereau ${workerCompanyName}`}
+          >
             <span className="actors__label--first">
               {split(workerCompanyName).firstPart}
             </span>
@@ -63,7 +69,10 @@ function Actors({
       {transporterName && (
         <div className="actors__item">
           <IconTransporter className="actors__transporter-icon" />
-          <p className="actors__label" aria-label={transporterName}>
+          <p
+            className="actors__label"
+            aria-label={`Transporteur visé sur le bordereau ${transporterName}`}
+          >
             <span className="actors__label--first">
               {split(transporterName).firstPart}
             </span>
@@ -78,7 +87,10 @@ function Actors({
       {destinationName && (
         <div className="actors__item">
           <IconDestination className="actors__destination-icon" />
-          <p className="actors__label" aria-label={destinationName}>
+          <p
+            className="actors__label"
+            aria-label={`Destination du bordereau ${destinationName}`}
+          >
             <span className="actors__label--first">
               {split(destinationName).firstPart}
             </span>
