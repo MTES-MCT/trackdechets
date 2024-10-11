@@ -31,6 +31,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
   let elasticBsvhu: BsdElastic;
   let intermediary1: Company;
   let intermediary2: Company;
+  let ecoOrganisme: Company;
 
   beforeAll(async () => {
     // Given
@@ -44,6 +45,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     });
     intermediary1 = await companyFactory({ name: "Intermediaire 1" });
     intermediary2 = await companyFactory({ name: "Intermediaire 2" });
+    ecoOrganisme = await companyFactory({ name: "Eco organisme" });
 
     bsvhu = await bsvhuFactory({
       opt: {
@@ -54,6 +56,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         transporterCompanyVatNumber: transporter.vatNumber,
         destinationCompanyName: destination.name,
         destinationCompanySiret: destination.siret,
+        ecoOrganismeName: ecoOrganisme.name,
+        ecoOrganismeSiret: ecoOrganisme.siret,
         intermediaries: {
           createMany: {
             data: [
@@ -76,6 +80,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyNames).toContain(destination.name);
     expect(elasticBsvhu.companyNames).toContain(intermediary1.name);
     expect(elasticBsvhu.companyNames).toContain(intermediary2.name);
+    expect(elasticBsvhu.companyNames).toContain(ecoOrganisme.name);
   });
 
   test("companyOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {
@@ -85,6 +90,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyOrgIds).toContain(destination.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(intermediary1.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(intermediary2.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(ecoOrganisme.siret);
   });
 
   describe("isReturnFor", () => {

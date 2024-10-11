@@ -3,6 +3,7 @@ import { xDaysAgo } from "../../../../utils";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   companyFactory,
+  ecoOrganismeFactory,
   transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -82,6 +83,10 @@ describe("mutaion.duplicateBsvhu", () => {
 
     const intermediary = await companyFactory();
 
+    const ecoOrganisme = await ecoOrganismeFactory({
+      handle: { handleBsvhu: true }
+    });
+
     const bsvhu = await bsvhuFactory({
       opt: {
         emitterIrregularSituation: false,
@@ -125,7 +130,9 @@ describe("mutaion.duplicateBsvhu", () => {
               }
             ]
           }
-        }
+        },
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        ecoOrganismeName: ecoOrganisme.name
       }
     });
     const { mutate } = makeClient(emitter.user);
@@ -195,6 +202,8 @@ describe("mutaion.duplicateBsvhu", () => {
       transporterCustomInfo,
       transporterTransportPlates,
       transporterRecepisseIsExempted,
+      ecoOrganismeSiret,
+      ecoOrganismeName,
       ...rest
     } = bsvhu;
 
@@ -283,7 +292,9 @@ describe("mutaion.duplicateBsvhu", () => {
       transporterTransportTakenOverAt,
       transporterCustomInfo,
       transporterTransportPlates,
-      transporterRecepisseIsExempted
+      transporterRecepisseIsExempted,
+      ecoOrganismeSiret,
+      ecoOrganismeName
     });
 
     // make sure this test breaks when a new field is added to the Bsvhu model

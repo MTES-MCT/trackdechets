@@ -1,5 +1,8 @@
 import { Prisma } from "@prisma/client";
-import buildSirenify, { nextBuildSirenify } from "../companies/sirenify";
+import buildSirenify, {
+  nextBuildSirenify,
+  NextCompanyInputAccessor
+} from "../companies/sirenify";
 import {
   CompanyInput,
   CreateFormInput,
@@ -127,7 +130,7 @@ export const sirenifyTransporterInput = buildSirenify(
 const formCreateInputAccessors = (
   formCreateInput: Prisma.FormCreateInput,
   sealedFields: string[] = [] // Tranformations should not be run on sealed fields
-) => [
+): NextCompanyInputAccessor<Prisma.FormCreateInput>[] => [
   {
     siret: formCreateInput?.emitterCompanySiret,
     skip: sealedFields.includes("emitterCompanySiret"),
@@ -164,7 +167,9 @@ const formCreateInputAccessors = (
     siret: formCreateInput?.ecoOrganismeSiret,
     skip: sealedFields.includes("ecoOrganismeSiret"),
     setter: (formCreateInput, companyInput: CompanyInput) => {
-      formCreateInput.ecoOrganismeName = companyInput.name;
+      if (companyInput.name) {
+        formCreateInput.ecoOrganismeName = companyInput.name;
+      }
     }
   },
   ...(
@@ -194,10 +199,14 @@ const formCreateInputAccessors = (
       )?.transporterCompanySiret ||
       sealedFields.includes("transporterCompanySiret"),
     setter: (formCreateInput, companyInput: CompanyInput) => {
-      formCreateInput.transporters.create.transporterCompanyName =
-        companyInput.name;
-      formCreateInput.transporters.create.transporterCompanyAddress =
-        companyInput.address;
+      (
+        formCreateInput.transporters
+          ?.create as Prisma.BsddTransporterCreateWithoutFormInput
+      ).transporterCompanyName = companyInput.name;
+      (
+        formCreateInput.transporters
+          ?.create as Prisma.BsddTransporterCreateWithoutFormInput
+      ).transporterCompanyAddress = companyInput.address;
     }
   }
 ];

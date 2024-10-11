@@ -140,41 +140,47 @@ export function nextBuildSirenify<T>(
 
     // check if we found a corresponding companySearchResult based on siret
     const companySearchResults = await Promise.all(
-      accessors.map(({ siret, skip }) =>
-        !skip && siret ? searchCompanyFailFast(siret) : null
-      )
+      accessors.map(({ siret, skip }) => {
+        if (skip || !siret) {
+          return null;
+        }
+        return searchCompanyFailFast(siret);
+      })
     );
 
     // make a copy to avoid mutating initial data
     const sirenifiedInput = { ...input };
 
     for (const [idx, companySearchResult] of companySearchResults.entries()) {
-      if (
-        !companySearchResult ||
-        companySearchResult.statutDiffusionEtablissement ===
-          ("P" as StatutDiffusionEtablissement)
-      )
-        continue;
-      if (companySearchResult.etatAdministratif === "F") {
-        throw new UserInputError(
-          `L'établissement ${companySearchResult.siret} est fermé selon le répertoire SIRENE`
-        );
-      }
-
-      if (companySearchResult.isDormant) {
-        throw new UserInputError(
-          `L'établissement ${companySearchResult.siret} est en sommeil sur Trackdéchets. Il n'est pas possible de le mentionner dans un BSD.`
-        );
-      }
-
       const { setter } = accessors[idx];
+      if (!companySearchResult) {
+        continue;
+      }
+      const company = companySearchResult as CompanySearchResult;
+      if (
+        company.statutDiffusionEtablissement ===
+        ("P" as StatutDiffusionEtablissement)
+      ) {
+        continue;
+      }
+      if (company.etatAdministratif === "F") {
+        throw new UserInputError(
+          `L'établissement ${company.siret} est fermé selon le répertoire SIRENE`
+        );
+      }
+
+      if (company.isDormant) {
+        throw new UserInputError(
+          `L'établissement ${company.siret} est en sommeil sur Trackdéchets. Il n'est pas possible de le mentionner dans un BSD.`
+        );
+      }
 
       setter(sirenifiedInput, {
-        name: companySearchResult.name,
-        address: companySearchResult.address,
-        city: companySearchResult.addressCity,
-        postalCode: companySearchResult.addressPostalCode,
-        street: companySearchResult.addressVoie
+        name: company.name,
+        address: company.address,
+        city: company.addressCity,
+        postalCode: company.addressPostalCode,
+        street: company.addressVoie
       });
     }
 

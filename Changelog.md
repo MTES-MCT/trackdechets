@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2024.10.1] 22/10/2024
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'Eco-organisme sur BSVHU [PR 3619](https://github.com/MTES-MCT/trackdechets/pull/3619)
+
 #### :bug: Corrections de bugs
 
 - Documentation API Developers : Page Not Found, si on n'y accède pas via l'arborescence [PR 3621](https://github.com/MTES-MCT/trackdechets/pull/3621)

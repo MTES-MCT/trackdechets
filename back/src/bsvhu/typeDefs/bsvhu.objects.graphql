@@ -62,6 +62,9 @@ type Bsvhu {
   """
   intermediaries: [FormCompany!]
 
+  "Eco-organisme"
+  ecoOrganisme: BsvhuEcoOrganisme
+
   metadata: BsvhuMetadata!
 }
 
@@ -80,6 +83,12 @@ type BsvhuEmitter {
 
 type BsvhuEmission {
   signature: Signature
+}
+
+"Information sur l'éco-organisme responsable du BSVHU"
+type BsvhuEcoOrganisme {
+  name: String!
+  siret: String!
 }
 
 type BsvhuTransporter {

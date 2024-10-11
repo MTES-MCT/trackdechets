@@ -129,7 +129,9 @@ describe("Mutation.createDasri", () => {
     ]);
   });
   it("create a dasri with an eco-organisme (eco-org user)", async () => {
-    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({
+      handle: { handleBsdasri: true }
+    });
     const { user } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -178,7 +180,9 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.ecoOrganisme?.siret).toEqual(ecoOrg.siret);
   });
   it("create a dasri with an eco-organisme and an unregistered emitter(eco-org user)", async () => {
-    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({
+      handle: { handleBsdasri: true }
+    });
     const { user } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -229,7 +233,9 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.emitter?.company?.siret).toEqual(siret);
   });
   it("create a dasri with an eco-organism (emitter user)", async () => {
-    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({
+      handle: { handleBsdasri: true }
+    });
     const { company: ecoOrgCompany } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });

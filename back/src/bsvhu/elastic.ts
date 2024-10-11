@@ -36,6 +36,7 @@ export async function getBsvhuForElastic(
 
 type ElasticSirets = {
   emitterCompanySiret: string | null | undefined;
+  ecoOrganismeSiret: string | null | undefined;
   destinationCompanySiret: string | null | undefined;
   transporterCompanySiret: string | null | undefined;
   intermediarySiret1?: string | null | undefined;
@@ -61,6 +62,7 @@ const getBsvhuSirets = (bsvhu: BsvhuForElastic): ElasticSirets => {
   const bsvhuSirets: ElasticSirets = {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
+    ecoOrganismeSiret: bsvhu.ecoOrganismeSiret,
     transporterCompanySiret: getTransporterCompanyOrgId(bsvhu),
     ...intermediarySirets
   };
@@ -224,8 +226,8 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     traderCompanySiret: "",
     traderCompanyAddress: "",
 
-    ecoOrganismeName: "",
-    ecoOrganismeSiret: "",
+    ecoOrganismeName: bsvhu.ecoOrganismeName ?? "",
+    ecoOrganismeSiret: bsvhu.ecoOrganismeSiret ?? "",
 
     nextDestinationCompanyName:
       bsvhu.destinationOperationNextDestinationCompanyName ?? "",
@@ -261,6 +263,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
       bsvhu.emitterCompanyName,
       bsvhu.transporterCompanyName,
       bsvhu.destinationCompanyName,
+      bsvhu.ecoOrganismeName,
       ...bsvhu.intermediaries.map(intermediary => intermediary.name)
     ]
       .filter(Boolean)
@@ -270,6 +273,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
       bsvhu.transporterCompanySiret,
       bsvhu.transporterCompanyVatNumber,
       bsvhu.destinationCompanySiret,
+      bsvhu.ecoOrganismeSiret,
       ...bsvhu.intermediaries.map(intermediary => intermediary.siret),
       ...bsvhu.intermediaries.map(intermediary => intermediary.vatNumber)
     ].filter(Boolean)

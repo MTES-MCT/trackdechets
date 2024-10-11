@@ -119,6 +119,10 @@ export function getRegistryFields(
       registryFields.isTransportedWasteFor.push(bsvhu.transporterCompanySiret);
       registryFields.isAllWasteFor.push(bsvhu.transporterCompanySiret);
     }
+    if (bsvhu.ecoOrganismeSiret) {
+      registryFields.isOutgoingWasteFor.push(bsvhu.ecoOrganismeSiret);
+      registryFields.isAllWasteFor.push(bsvhu.ecoOrganismeSiret);
+    }
     if (bsvhu.intermediaries?.length) {
       for (const intermediary of bsvhu.intermediaries) {
         const intermediaryOrgId = getIntermediaryCompanyOrgId(intermediary);
@@ -172,8 +176,8 @@ export function toGenericWaste(bsvhu: RegistryBsvhu): GenericWaste {
     id: bsvhu.id,
     createdAt: bsvhu.createdAt,
     updatedAt: bsvhu.createdAt,
-    ecoOrganismeName: null,
-    ecoOrganismeSiren: null,
+    ecoOrganismeName: bsvhu.ecoOrganismeName,
+    ecoOrganismeSiren: bsvhu.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSVHU",
     bsdSubType: getBsvhuSubType(bsvhu),
     status: bsvhu.status,
