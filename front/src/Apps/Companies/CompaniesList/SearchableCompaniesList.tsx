@@ -28,7 +28,7 @@ type SearchableCompaniesListProps = {
   onCompleted?: (data: CompanyPrivateConnection, isFiltered: boolean) => void;
 };
 
-// Prevent to short and long clues
+// Prevent too short and long clues
 const isSearchClueValid = clue =>
   clue.length >= MIN_MY_COMPANIES_SEARCH &&
   clue.length <= MAX_MY_COMPANIES_SEARCH;
