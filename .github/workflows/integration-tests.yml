@@ -31,9 +31,12 @@ jobs:
         run: |
           npx nx run-many -t serve --projects=tag:backend:queues --parallel=6 --configuration=integration &
           sleep 5
-      - name: Run integration tests
+      - name: Run back integration tests
         run: |
           npx nx run back:test:integration -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+      - name: Run cron integration tests
+        run: |
+          npx nx run cron:test:integration -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
 env:
   ALLOW_CLONING_BSDS: true
