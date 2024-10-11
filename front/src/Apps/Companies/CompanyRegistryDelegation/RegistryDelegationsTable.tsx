@@ -2,19 +2,21 @@ import React, { useState } from "react";
 import {
   CompanyPrivate,
   Query,
+  QueryRegistryDelegationsArgs,
   RegistryDelegation,
   RegistryDelegationStatus,
   UserRole
 } from "@td/codegen-ui";
 import { isDefinedStrict } from "../../../common/helper";
 import { formatDateViewDisplay } from "../common/utils";
-import classnames from "classnames";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import "./companyRegistryDelegation.scss";
 import { useQuery } from "@apollo/client";
 import { REGISTRY_DELEGATIONS } from "../../common/queries/registryDelegation/queries";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { RevokeRegistryDelegationModal } from "./RevokeRegistryDelegationModal";
+import Badge from "@codegouvfr/react-dsfr/Badge";
+import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 
 const getStatusLabel = (status: RegistryDelegationStatus) => {
   switch (status) {
@@ -28,16 +30,14 @@ const getStatusLabel = (status: RegistryDelegationStatus) => {
 };
 
 const getStatusBadge = (status: RegistryDelegationStatus) => {
+  let severity: AlertProps.Severity = "success";
+  if (status === RegistryDelegationStatus.Incoming) severity = "info";
+  if (status === RegistryDelegationStatus.Closed) severity = "error";
+
   return (
-    <p
-      className={classnames(`fr-badge fr-badge--sm fr-badge--no-icon`, {
-        "fr-badge--success": status === RegistryDelegationStatus.Ongoing,
-        "fr-badge--info": status === RegistryDelegationStatus.Incoming,
-        "fr-badge--error": status === RegistryDelegationStatus.Closed
-      })}
-    >
+    <Badge severity={severity} small noIcon>
       {getStatusLabel(status)}
-    </p>
+    </Badge>
   );
 };
 
@@ -67,7 +67,8 @@ export const RegistryDelegationsTable = ({ as, company }: Props) => {
   const isAdmin = company.userRole === UserRole.Admin;
 
   const { data, loading, refetch } = useQuery<
-    Pick<Query, "registryDelegations">
+    Pick<Query, "registryDelegations">,
+    QueryRegistryDelegationsArgs
   >(REGISTRY_DELEGATIONS, {
     skip: !company.orgId,
     fetchPolicy: "network-only",

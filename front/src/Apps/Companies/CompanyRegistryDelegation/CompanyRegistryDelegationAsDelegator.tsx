@@ -18,8 +18,8 @@ export const CompanyRegistryDelegationAsDelegator = ({ company }: Props) => {
     <>
       <h4>Délégations</h4>
       <div>
-        J'autorise les entreprises ci-dessous à faire mes déclarations des
-        registres RNDTS
+        J'autorise les entreprises ci-dessous à faire mes déclarations au
+        Registre National des Déchets, Terres Excavées et Sédiments (RNDTS)
       </div>
 
       {isAdmin && (
