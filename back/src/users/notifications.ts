@@ -33,6 +33,6 @@ export async function getNotificationSubscribers(
  * Renvoie les notififications auxquelles un utilisateur est abonné par
  * défaut lorsqu'il rejoint un établissement ou change de rôle
  */
-export async function getDefaultNotifications(role: UserRole) {
+export function getDefaultNotifications(role: UserRole) {
   return role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
 }

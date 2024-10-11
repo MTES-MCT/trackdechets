@@ -90,7 +90,7 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
 
   if (isWasteRefused(acceptedForm)) {
     const refusedEmail = await renderFormRefusedEmail(acceptedForm);
-    if (refusedEmail) {
+    if (refusedEmail && refusedEmail.to?.length) {
       sendMail(refusedEmail);
     }
   }
