@@ -14,6 +14,7 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
 import { SET_COMPANY_NOTIFICATIONS } from "./queries";
+import styles from "./NotificationsUpdateModal.module.scss";
 
 type AccountCompanyNotificationsUpdateModalProps = {
   company: CompanyPrivate;
@@ -21,13 +22,6 @@ type AccountCompanyNotificationsUpdateModalProps = {
 };
 
 type FormValues = { [key in UserNotification]: boolean };
-
-// Ce texte s'affiche en texte d'informations quand une checkbox est
-// grisée parce que le rôle de l'utilisateur ne l'autorise pas à
-// s'abonner à un type d'alerte
-const disabledHintText =
-  "Votre rôle au sein de l'établissement ne vous permet pas " +
-  "de vous abonner à ce type d'alerte";
 
 export default function NotificationsUpdateModal({
   company,
@@ -51,17 +45,6 @@ export default function NotificationsUpdateModal({
   const authorizedNotifications = company.userRole
     ? authorizedNotificationsByUserRole[company.userRole]
     : [];
-
-  // L'abonnement à certaines notifications est restreinte
-  // en fonction du rôle de l'utilisateur au sein de l'établissement
-  const disabled: { [key in UserNotification]: boolean } =
-    ALL_NOTIFICATIONS.reduce(
-      (acc, notification) => ({
-        ...acc,
-        [notification]: !authorizedNotifications.includes(notification)
-      }),
-      {} as { [key in UserNotification]: boolean }
-    );
 
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues
@@ -90,9 +73,58 @@ export default function NotificationsUpdateModal({
     checkboxState = "success";
   }
 
+  const optionsLabels = [
+    {
+      hintText:
+        "Seuls les membres avec le rôle Administrateur sont en mesure de recevoir " +
+        "et d'accepter / refuser / effectuer des demandes de rattachement à leur établissement. " +
+        "Nous vous conseillons donc vivement, pour chaque établissement de conserver au moins un " +
+        "administrateur abonné à ce type de notification.",
+      label: "aux demandes de rattachement",
+      notification: UserNotification.MembershipRequest
+    },
+    {
+      hintText:
+        "Un courriel sera envoyé à chaque renouvellement du code de signature",
+      label: "au renouvellement du code de signature",
+      notification: UserNotification.SignatureCodeRenewal
+    },
+    {
+      hintText:
+        "un courriel sera envoyé à chaque refus total ou partiel d'un bordereau",
+      label: "au refus total et partiel des bordereaux",
+      notification: UserNotification.BsdRefusal
+    },
+    {
+      hintText:
+        "Un courriel sera envoyé lorsque le BSDA est envoyé à un exutoire" +
+        " différent de celui prévu lors de la signature producteur",
+      label: "à la modification de la destination finale amiante",
+      notification: UserNotification.BsdaFinalDestinationUpdate
+    },
+    {
+      hintText:
+        "Un courriel sera envoyé à chaque fois qu'une révision sera restée sans réponse 14 jours après sa demande",
+      label: "aux demandes de révision",
+      notification: UserNotification.RevisionRequest
+    }
+  ];
+
+  const options = optionsLabels
+    .filter(({ notification }) =>
+      authorizedNotifications.includes(notification)
+    )
+    .map(({ label, hintText, notification }) => ({
+      label,
+      hintText,
+      nativeInputProps: {
+        ...register(notification)
+      }
+    }));
+
   return (
     <>
-      <div style={{ marginBottom: 10, marginTop: 10 }}>
+      <div className="fr-my-2w">
         Je souhaite recevoir par courriel les notifications de l'établissement{" "}
         {company.name} ({company.siret}) relatives :
       </div>
@@ -101,65 +133,10 @@ export default function NotificationsUpdateModal({
           small
           state={checkboxState}
           stateRelatedMessage={error?.message}
-          options={[
-            {
-              hintText: !disabled[UserNotification.MembershipRequest]
-                ? "Seuls les membres avec le rôle Administrateur sont en mesure de recevoir " +
-                  "et d'accepter / refuser / effectuer des demandes de rattachement à leur établissement. " +
-                  "Nous vous conseillons donc vivement, pour chaque établissement de conserver au moins un " +
-                  "administrateur abonné à ce type de notification."
-                : disabledHintText,
-              label: "aux demandes de rattachement",
-              nativeInputProps: {
-                disabled: disabled[UserNotification.MembershipRequest],
-                ...register(UserNotification.MembershipRequest)
-              }
-            },
-            {
-              hintText: !disabled[UserNotification.SignatureCodeRenewal]
-                ? "Un courriel sera envoyé à chaque renouvellement du code de signature"
-                : disabledHintText,
-              label: "au renouvellement du code de signature",
-              nativeInputProps: {
-                disabled: disabled[UserNotification.SignatureCodeRenewal],
-                ...register(UserNotification.SignatureCodeRenewal)
-              }
-            },
-            {
-              hintText: !disabled[UserNotification.BsdRefusal]
-                ? "un courriel sera envoyé à chaque refus total ou partiel d'un bordereau"
-                : disabledHintText,
-              label: "au refus total et partiel des bordereaux",
-              nativeInputProps: {
-                disabled: disabled[UserNotification.BsdRefusal],
-                ...register(UserNotification.BsdRefusal)
-              }
-            },
-            {
-              hintText: !disabled[UserNotification.BsdaFinalDestinationUpdate]
-                ? "Un courriel sera envoyé lorsque le BSDA est envoyé à un exutoire" +
-                  " différent de celui prévu lors de la signature producteur"
-                : disabledHintText,
-              label: "à la modification de la destination finale amiante",
-              nativeInputProps: {
-                disabled: disabled[UserNotification.BsdaFinalDestinationUpdate],
-                ...register(UserNotification.BsdaFinalDestinationUpdate)
-              }
-            },
-            {
-              hintText: !disabled[UserNotification.RevisionRequest]
-                ? "Un courriel sera envoyé à chaque fois qu'une révision sera restée sans réponse 14 jours après sa demande"
-                : disabledHintText,
-              label: "aux demandes de révision",
-              nativeInputProps: {
-                disabled: disabled[UserNotification.RevisionRequest],
-                ...register(UserNotification.RevisionRequest)
-              }
-            }
-          ]}
+          options={options}
         />
 
-        <div style={{ display: "flex", justifyContent: "right", gap: 20 }}>
+        <div className={styles.buttons}>
           <Button
             title="Annuler"
             priority="secondary"

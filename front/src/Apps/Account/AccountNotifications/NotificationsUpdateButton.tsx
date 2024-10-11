@@ -11,9 +11,8 @@ type AccountCompanyNotificationsUpdateButtonProps = {
 export default function NotificationsUpdateButton({
   company
 }: AccountCompanyNotificationsUpdateButtonProps) {
-  const btnLabel = company.userNotifications?.length
-    ? `Gérer les notifications (${company.userNotifications.length})`
-    : "S'abonner";
+  const btnLabel = `Gérer (${company.userNotifications.length})`;
+
   const modalTitle = `Gérer les notifications`;
 
   const iconId = company.userNotifications?.length

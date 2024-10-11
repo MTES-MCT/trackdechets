@@ -1,32 +1,26 @@
-import React, { CSSProperties } from "react";
+import React from "react";
 import { CompanyPrivate } from "@td/codegen-ui";
 import Tag from "@codegouvfr/react-dsfr/Tag";
 import { userRoleLabel } from "../../Companies/common/utils";
+import styles from "./CompanyDisplay.module.scss";
 
 type AccountCompanyNotificationsProps = {
   company: CompanyPrivate;
-};
-
-const tagStyle: CSSProperties = {
-  color: "var(--text-action-high-blue-france)",
-  backgroundColor: "var(--background-action-low-blue-france)"
 };
 
 export default function CompanyDisplay({
   company
 }: AccountCompanyNotificationsProps) {
   return (
-    <div>
-      <div>
-        <div style={{ color: "#000091", fontWeight: "bold" }}>
-          {company.name}
-          {company.givenName && ` - ${company.givenName}`}
-        </div>
-        <p className="fr-text">{company.orgId}</p>
-        <Tag small style={tagStyle}>
-          {userRoleLabel(company.userRole!)}
-        </Tag>
-      </div>
-    </div>
+    <>
+      <h4 className={styles.companyName}>
+        {company.name}
+        {company.givenName && ` - ${company.givenName}`}
+      </h4>
+      <p className="fr-text">{company.orgId}</p>
+      <Tag small className={styles.roleTag}>
+        {userRoleLabel(company.userRole!)}
+      </Tag>
+    </>
   );
 }

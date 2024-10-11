@@ -9,7 +9,7 @@ export default function AccountNotificationsUpdateAllModal({
   totalCount
 }: AccountNotificationsUpdateAllModalProps) {
   return (
-    <div style={{ marginTop: 10 }}>
+    <div className="fr-mb-1w">
       {/* TODO implémenter les actions en masse dans cette modale */}
       Mise à jour en masse de {totalCount} établissements
     </div>

@@ -5,6 +5,7 @@ import { NotificationsDisplay } from "./NotificationsDisplay";
 import NotificationsUpdateButton from "./NotificationsUpdateButton";
 import SearchableCompaniesList from "../../Companies/CompaniesList/SearchableCompaniesList";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import styles from "./AccountNotifications.module.scss";
 
 const alertDescription =
   "Il est impératif de veiller à ce qu'au moins un membre de vos établissements" +
@@ -26,7 +27,7 @@ export default function AccountNotifications() {
         severity="warning"
         title=""
         description={alertDescription}
-        style={{ marginBottom: 20 }}
+        className="fr-mb-4w"
       />
       {/* Liste paginée des établissements avec un bouton "Charger plus" 
       et une barre de recherche */}
@@ -37,7 +38,7 @@ export default function AccountNotifications() {
             data={companies.map(company => [
               <CompanyDisplay company={company} />,
               <NotificationsDisplay company={company} />,
-              <div style={{ display: "flex", justifyContent: "end" }}>
+              <div className={styles.alignRight}>
                 <NotificationsUpdateButton company={company} />
               </div>
             ])}
