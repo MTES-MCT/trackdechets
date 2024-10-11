@@ -1,4 +1,5 @@
-import { UserNotification } from "@prisma/client";
+import { UserNotification, UserRole } from "@prisma/client";
+import { ALL_NOTIFICATIONS } from "@td/constants";
 import { Recipient } from "@td/mail";
 import { prisma } from "@td/prisma";
 
@@ -26,4 +27,12 @@ export async function getNotificationSubscribers(
   });
 
   return companies.flatMap(c => c.companyAssociations.map(a => a.user));
+}
+
+/**
+ * Renvoie les notififications auxquelles un utilisateur est abonné par
+ * défaut lorsqu'il rejoint un établissement ou change de rôle
+ */
+export async function getDefaultNotifications(role: UserRole) {
+  return role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
 }

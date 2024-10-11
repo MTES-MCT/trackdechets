@@ -13,6 +13,7 @@ import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
 import { templateIds } from "@td/mail";
 import { ALL_NOTIFICATIONS } from "@td/constants";
+import { getDefaultNotifications } from "../../../notifications";
 
 const INVITE_USER_TO_COMPANY = `
   mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!){
@@ -66,8 +67,7 @@ describe("mutation inviteUserToCompany", () => {
       expect(companyAssociations[0].automaticallyAccepted).toEqual(true);
       expect(companyAssociations[0].createdAt).toBeTruthy();
 
-      const expectedEmailNotification =
-        role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
+      const expectedEmailNotification = getDefaultNotifications(role);
 
       expect(companyAssociations[0].notifications).toEqual(
         expectedEmailNotification

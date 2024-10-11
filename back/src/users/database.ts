@@ -18,6 +18,7 @@ import { hashPassword, passwordVersion } from "./utils";
 import { UserInputError } from "../common/errors";
 import { PrismaTransaction } from "../common/repository/types";
 import { ALL_NOTIFICATIONS } from "@td/constants";
+import { getDefaultNotifications } from "./notifications";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.companyAssociation.findMany({
@@ -111,7 +112,7 @@ export async function associateUserToCompany(
     );
   }
 
-  const notifications = role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
+  const notifications = getDefaultNotifications(role);
 
   const association = await prisma.companyAssociation.create({
     data: {

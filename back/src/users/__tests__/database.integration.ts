@@ -10,6 +10,7 @@ import { associateUserToCompany, createUserAccountHash } from "../database";
 import { getUserRoles } from "../../permissions";
 import { UserRole } from "@prisma/client";
 import { ALL_NOTIFICATIONS } from "@td/constants";
+import { getDefaultNotifications } from "../notifications";
 
 describe("createUserAccountHash", () => {
   afterAll(resetDatabase);
@@ -77,8 +78,7 @@ describe("associateUserToCompany", () => {
         });
       expect(companyAssociation.role).toEqual(role);
 
-      const expectedNotifications =
-        role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
+      const expectedNotifications = getDefaultNotifications(role);
 
       expect(companyAssociation.notifications).toEqual(expectedNotifications);
 

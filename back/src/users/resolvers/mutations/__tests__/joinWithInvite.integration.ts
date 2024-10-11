@@ -6,6 +6,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { UserRole } from "@prisma/client";
 import { ALL_NOTIFICATIONS } from "@td/constants";
+import { getDefaultNotifications } from "../../../notifications";
 
 const JOIN_WITH_INVITE = `
   mutation JoinWithInvite($inviteHash: String!, $name: String!, $password: String!){
@@ -106,8 +107,7 @@ describe("joinWithInvite mutation", () => {
       expect(companyAssociation).not.toBeNull();
       expect(companyAssociation?.role).toEqual(role);
 
-      const expectedNotifications =
-        role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
+      const expectedNotifications = getDefaultNotifications(role);
 
       expect(companyAssociation?.notifications).toEqual(expectedNotifications);
 
