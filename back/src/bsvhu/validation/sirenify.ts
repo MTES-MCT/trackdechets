@@ -2,9 +2,7 @@ import {
   nextBuildSirenify,
   NextCompanyInputAccessor
 } from "../../companies/sirenify";
-import { getSealedFields } from "./rules";
 import { ParsedZodBsvhu } from "./schema";
-import { BsvhuValidationContext, ZodBsvhuTransformer } from "./types";
 
 const sirenifyBsvhuAccessors = (
   bsvhu: ParsedZodBsvhu,
@@ -92,14 +90,6 @@ const sirenifyBsvhuAccessors = (
   )
 ];
 
-export const sirenifyBsvhu: (
-  context: BsvhuValidationContext
-) => ZodBsvhuTransformer = context => {
-  return async bsvhu => {
-    const sealedFields = await getSealedFields(bsvhu, context);
-    return nextBuildSirenify<ParsedZodBsvhu>(sirenifyBsvhuAccessors)(
-      bsvhu,
-      sealedFields
-    );
-  };
-};
+export const sirenifyBsvhu = nextBuildSirenify<ParsedZodBsvhu>(
+  sirenifyBsvhuAccessors
+);

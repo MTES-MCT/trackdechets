@@ -1,7 +1,28 @@
-import { ZodBsffTransformer, ZodBsffTransporterTransformer } from "./types";
+import {
+  BsffValidationContext,
+  ZodBsffTransformer,
+  ZodBsffTransporterTransformer
+} from "./types";
 import { BsffType } from "@prisma/client";
 import { checkPreviousPackagings } from "./refinements";
 import { recipifyTransporter } from "../../../common/validation/zod/transformers";
+import { ParsedZodBsff } from "./schema";
+import { sirenifyBsff } from "./sirenify";
+import { recipifyBsff } from "./recipify";
+import { getSealedFields } from "./rules";
+
+export const runTransformers = async (
+  bsff: ParsedZodBsff,
+  context: BsffValidationContext
+): Promise<ParsedZodBsff> => {
+  const transformers = [sirenifyBsff, recipifyBsff];
+  const sealedFields = await getSealedFields(bsff, context);
+
+  for (const transformer of transformers) {
+    bsff = await transformer(bsff, sealedFields);
+  }
+  return bsff;
+};
 
 /**
  * Applique les vérifications sur les contenants à réexpédier / grouper / reconditionner puis applique

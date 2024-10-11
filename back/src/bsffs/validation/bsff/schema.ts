@@ -14,9 +14,10 @@ import {
 import { BsffValidationContext } from "./types";
 import { weightSchema } from "../../../common/validation/weight";
 import { WeightUnits } from "../../../common/validation";
-import { sirenifyBsff, sirenifyBsffTransporter } from "./sirenify";
+import { sirenifyBsffTransporter } from "./sirenify";
 import {
   checkAndSetPreviousPackagings,
+  runTransformers,
   updateTransporterRecepisse
 } from "./transformers";
 import {
@@ -24,7 +25,6 @@ import {
   rawTransporterSchema,
   siretSchema
 } from "../../../common/validation/zod/schema";
-import { recipifyBsff } from "./recipify";
 
 export const ZodWasteCodeEnum = z
   .enum(BSFF_WASTE_CODES, {
@@ -194,8 +194,7 @@ export const contextualBsffSchema = (context: BsffValidationContext) => {
 export const contextualBsffSchemaAsync = (context: BsffValidationContext) => {
   return refinedBsffSchema
     .superRefine(checkCompanies)
-    .transform(sirenifyBsff(context))
-    .transform(recipifyBsff(context))
+    .transform((bsff: ParsedZodBsff) => runTransformers(bsff, context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où des transformations auto-complète certains champs

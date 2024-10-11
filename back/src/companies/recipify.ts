@@ -11,7 +11,6 @@ import {
   BsffTransporter
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
-import { CompanyRole } from "../common/validation/zod/schema";
 
 type RecipifyOutput = {
   number: string | null;
@@ -135,73 +134,3 @@ export async function getTransporterReceipt(
     transporterRecepisseValidityLimit: transporterReceipt?.validityLimit ?? null
   };
 }
-
-type Receipt = {
-  receiptNumber: string;
-  validityLimit: Date;
-  department: string;
-};
-
-export type RecipifyInputAccessor<T> = {
-  role: CompanyRole.Transporter | CompanyRole.Broker | CompanyRole.Trader;
-  skip: boolean;
-  orgIdGetter: () => string | null;
-  setter: (input: T, receipt: Receipt | null) => Promise<void>;
-};
-
-export const buildRecipify = async <T>(
-  accessors: RecipifyInputAccessor<T>[],
-  bsd: T
-): Promise<T> => {
-  const recipifiedBsd = { ...bsd };
-  for (const { role, skip, setter, orgIdGetter } of accessors) {
-    if (skip) {
-      continue;
-    }
-    let receipt: Receipt | null = null;
-    const orgId = orgIdGetter();
-    if (!orgId) {
-      continue;
-    }
-    if (role === CompanyRole.Transporter) {
-      try {
-        receipt = await prisma.company
-          .findUnique({
-            where: {
-              orgId
-            }
-          })
-          .transporterReceipt();
-      } catch (error) {
-        // do nothing
-      }
-    } else if (role === CompanyRole.Broker) {
-      try {
-        receipt = await prisma.company
-          .findUnique({
-            where: {
-              orgId
-            }
-          })
-          .brokerReceipt();
-      } catch (error) {
-        // do nothing
-      }
-    } else if (role === CompanyRole.Trader) {
-      try {
-        receipt = await prisma.company
-          .findUnique({
-            where: {
-              orgId
-            }
-          })
-          .traderReceipt();
-      } catch (error) {
-        // do nothing
-      }
-    }
-    setter(recipifiedBsd, receipt);
-  }
-
-  return recipifiedBsd;
-};

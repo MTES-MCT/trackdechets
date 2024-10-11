@@ -19,7 +19,6 @@ import { getCurrentSignatureType, prismaToZodBsvhu } from "../helpers";
 import { parseBsvhu, parseBsvhuAsync } from "..";
 import { ZodError } from "zod";
 import { CompanyRole } from "../../../common/validation/zod/schema";
-import { prisma } from "@td/prisma";
 
 const searchResult = (companyName: string) => {
   return {

@@ -1,9 +1,10 @@
 import { getTransporterCompanyOrgId } from "@td/constants";
-import { getSealedFields } from "./rules";
 import { ParsedZodBsvhu } from "./schema";
-import { BsvhuValidationContext, ZodBsvhuTransformer } from "./types";
 import { CompanyRole } from "../../common/validation/zod/schema";
-import { buildRecipify, RecipifyInputAccessor } from "../../companies/recipify";
+import {
+  buildRecipify,
+  RecipifyInputAccessor
+} from "../../common/validation/recipify";
 
 const recipifyBsvhuAccessors = (
   bsd: ParsedZodBsvhu,
@@ -73,12 +74,6 @@ const recipifyBsvhuAccessors = (
   }
 ];
 
-export const recipifyBsvhu: (
-  context: BsvhuValidationContext
-) => ZodBsvhuTransformer = context => {
-  return async bsvhu => {
-    const sealedFields = await getSealedFields(bsvhu, context);
-    const accessors = recipifyBsvhuAccessors(bsvhu, sealedFields);
-    return buildRecipify(accessors, bsvhu);
-  };
-};
+export const recipifyBsvhu = buildRecipify<ParsedZodBsvhu>(
+  recipifyBsvhuAccessors
+);

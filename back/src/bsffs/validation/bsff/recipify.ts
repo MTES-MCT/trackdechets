@@ -1,11 +1,10 @@
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { ParsedZodBsff } from "./schema";
-import { BsffValidationContext, ZodBsffTransformer } from "./types";
 import { CompanyRole } from "../../../common/validation/zod/schema";
 import {
   buildRecipify,
   RecipifyInputAccessor
-} from "../../../companies/recipify";
+} from "../../../common/validation/recipify";
 
 const recipifyBsffAccessors = (
   bsd: ParsedZodBsff
@@ -43,12 +42,4 @@ const recipifyBsffAccessors = (
   )
 ];
 
-export const recipifyBsff: (
-  context: BsffValidationContext
-) => ZodBsffTransformer = () => {
-  return async bsff => {
-    // const sealedFields = await getSealedFields(bsda, context);
-    const accessors = recipifyBsffAccessors(bsff);
-    return buildRecipify(accessors, bsff);
-  };
-};
+export const recipifyBsff = buildRecipify<ParsedZodBsff>(recipifyBsffAccessors);

@@ -1,53 +1,77 @@
-import {
-  BsdaInput,
-  BsdasriInput,
-  BsdasriRecepisseInput,
-  BsvhuInput,
-  BsvhuRecepisseInput
-} from "../../generated/graphql/types";
+import { prisma } from "@td/prisma";
+import { CompanyRole } from "./zod/schema";
 
-import { recipifyGeneric } from "../../companies/recipify";
+type Receipt = {
+  receiptNumber: string;
+  validityLimit: Date;
+  department: string;
+};
 
-/**
- * Generic setter for Bsvhu and Bsdasri
- * @param input auto-completed Input
- * @param recepisseInput Original input
- * @returns
- */
-export const autocompletedRecepisse = (
-  input: BsvhuInput | BsdasriInput,
-  recepisseInput: BsvhuRecepisseInput | BsdasriRecepisseInput
-) => ({
-  ...input.transporter?.recepisse,
-  ...recepisseInput
-});
+export type RecipifyInputAccessor<T> = {
+  role: CompanyRole.Transporter | CompanyRole.Broker | CompanyRole.Trader;
+  skip: boolean;
+  orgIdGetter: () => string | null;
+  setter: (input: T, receipt: Receipt | null) => Promise<void>;
+};
 
-/**
- * Generic getter for Bsda, Bsvhu and Bsdasri
- * Null when exempted or if transporter company has not changed
- * @param input auto-completed Input
- * @returns
- */
-export const genericGetter = (input: BsvhuInput | BsdasriInput) => () =>
-  input?.transporter?.recepisse?.isExempted !== true
-    ? input?.transporter?.company
-    : null;
-
-const accessors = (input: BsdaInput) => [
-  {
-    getter: genericGetter(input),
-    setter: (
-      input: BsvhuInput | BsdasriInput,
-      recepisseInput: BsvhuRecepisseInput | BsdasriRecepisseInput
-    ) => ({
-      ...input,
-      transporter: {
-        company: input.transporter?.company,
-        transport: input.transporter?.transport,
-        recepisse: autocompletedRecepisse(input, recepisseInput)
+export const buildRecipify = <T>(
+  companyInputAccessors: (
+    input: T,
+    sealedFields: string[]
+  ) => RecipifyInputAccessor<T>[]
+): ((bsd: T, sealedFields: string[]) => Promise<T>) => {
+  return async (bsd, sealedFields) => {
+    const accessors = companyInputAccessors(bsd, sealedFields);
+    const recipifiedBsd = { ...bsd };
+    for (const { role, skip, setter, orgIdGetter } of accessors) {
+      if (skip) {
+        continue;
       }
-    })
-  }
-];
+      let receipt: Receipt | null = null;
+      const orgId = orgIdGetter();
+      if (!orgId) {
+        continue;
+      }
+      if (role === CompanyRole.Transporter) {
+        try {
+          receipt = await prisma.company
+            .findUnique({
+              where: {
+                orgId
+              }
+            })
+            .transporterReceipt();
+        } catch (error) {
+          // do nothing
+        }
+      } else if (role === CompanyRole.Broker) {
+        try {
+          receipt = await prisma.company
+            .findUnique({
+              where: {
+                orgId
+              }
+            })
+            .brokerReceipt();
+        } catch (error) {
+          // do nothing
+        }
+      } else if (role === CompanyRole.Trader) {
+        try {
+          receipt = await prisma.company
+            .findUnique({
+              where: {
+                orgId
+              }
+            })
+            .traderReceipt();
+        } catch (error) {
+          // do nothing
+        }
+      }
+      setter(recipifiedBsd, receipt);
+    }
 
-export const recipify = recipifyGeneric(accessors);
+    return recipifiedBsd;
+  };
+};
