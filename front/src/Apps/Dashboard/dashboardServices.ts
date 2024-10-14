@@ -1265,6 +1265,10 @@ export const canDuplicate = (bsd, siret) =>
   canDuplicateBsvhu(bsd) ||
   canDuplicateBspaoh(bsd);
 
+export const canClone = () => {
+  return import.meta.env.VITE_ALLOW_CLONING_BSDS === "true";
+};
+
 const canDeleteBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
   (bsd.status === BsdStatusCode.Initial ||

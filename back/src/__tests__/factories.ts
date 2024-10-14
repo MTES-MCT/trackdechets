@@ -16,6 +16,7 @@ import {
 import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
+import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../forms/database";
 
 /**
  * Create a user with name and email
@@ -371,7 +372,7 @@ export const bsddTransporterFactory = async ({
   opts: Omit<Prisma.BsddTransporterCreateWithoutFormInput, "number">;
 }) => {
   const count = await prisma.bsddTransporter.count({ where: { formId } });
-  return prisma.bsddTransporter.create({
+  const transporter = await prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: formId } },
       ...bsddTransporterData,
@@ -379,6 +380,24 @@ export const bsddTransporterFactory = async ({
       ...opts
     }
   });
+
+  const form = await prisma.form.findFirstOrThrow({
+    where: { id: formId },
+    include: {
+      ...SIRETS_BY_ROLE_INCLUDE,
+      forwardedIn: true,
+      transporters: true
+    }
+  });
+
+  // Fix fields like "recipientsSirets" or "transportersSirets"
+  const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
+  await prisma.form.update({
+    where: { id: formId },
+    data: { ...denormalizedSirets, updatedAt: form.updatedAt }
+  });
+
+  return transporter;
 };
 
 export const upsertBaseSiret = async siret => {
@@ -444,14 +463,31 @@ export const formFactory = async ({
     }
   };
 
-  return prisma.form.create({
+  const form = await prisma.form.create({
     data: {
       readableId: getReadableId(),
       ...formParams,
       owner: { connect: { id: ownerId } }
     },
+    include: {
+      ...SIRETS_BY_ROLE_INCLUDE,
+      forwardedIn: true,
+      transporters: true
+    }
+  });
+
+  // Fix fields like "recipientsSirets" or "transportersSirets"
+  const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
+  const updated = await prisma.form.update({
+    where: { id: form.id },
+    data: {
+      ...denormalizedSirets,
+      updatedAt: opt?.updatedAt ?? new Date()
+    },
     include: { forwardedIn: true }
   });
+
+  return updated;
 };
 
 export const formWithTempStorageFactory = async ({

@@ -21,6 +21,15 @@ export const isDefined = (obj: any) => {
 };
 
 /**
+ * This one does not consider empty strings "" as 'defined'
+ */
+export const isDefinedStrict = (val: any): boolean => {
+  if (val === "") return false;
+
+  return isDefined(val);
+};
+
+/*
  * Tests if a list of objects are ALL defined. 0 will be considered as defined
  */
 export const areDefined = (...obj: any[]) => {

@@ -10,3 +10,7 @@ type BsdEdge {
 }
 
 union Bsd = Form | Bsdasri | Bsvhu | Bsda | Bsff | Bspaoh
+
+type CloneId {
+  id: ID!
+}

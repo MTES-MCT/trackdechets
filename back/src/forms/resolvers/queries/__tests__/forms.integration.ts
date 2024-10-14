@@ -888,13 +888,14 @@ describe("Integration / Forms query for transporters", () => {
 
     // the transporter makes the query
     const { query } = makeClient(user);
-    const { data } = await query<Pick<Query, "forms">>(FORMS, {
+    const { data, errors } = await query<Pick<Query, "forms">>(FORMS, {
       variables: {
         siret: transporter.siret,
         roles: ["TRANSPORTER"]
       }
     });
 
+    expect(errors).toBeUndefined();
     expect(data.forms.length).toBe(1);
     expect(data.forms[0].id).toBe(form.id);
   });

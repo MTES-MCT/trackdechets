@@ -51,6 +51,7 @@ export const modifier_action_label = "Modifier";
 export const dupliquer_action_label = "Dupliquer";
 export const revision_action_label = "Réviser";
 export const supprimer_action_label = "Supprimer";
+export const clone_action_label = "Cloner";
 export const completer_bsd_suite = "Compléter le BSD suite";
 export const annexe1 = "Annexe 1";
 
