@@ -141,6 +141,10 @@ type WhereKeys =
 // | PROCESSED          | archive         | archive         | archive     | archive         | follow          | archive      |
 // | REFUSED            | archive         | archive         | archive     | archive         | follow          | archive      |
 // | AWAITING_CHILD     | follow          | follow          | follow      | follow          | follow          | follow       |
+//
+// For Transporters only, the BSD will be in the "isReturnFor" tab if:
+// - BSD has been received in the last 48 hours
+// - BSD hasn't been fully accepted
 function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
   const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],

@@ -65,7 +65,10 @@ type WhereKeys =
 // | processed          | archive | archive     | archive   |
 // | refused            | archive | archive     | archive   |
 // | awaiting_group     | follow  | follow      | follow    |
-
+//
+// For Transporters only, the BSD will be in the "isReturnFor" tab if:
+// - BSD has been received in the last 48 hours
+// - BSD hasn't been fully accepted
 function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
   const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],

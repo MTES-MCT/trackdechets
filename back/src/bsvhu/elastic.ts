@@ -88,7 +88,10 @@ type WhereKeys =
 // | sent               | follow  | collected   | action      | follow       |
 // | processed          | archive | archive     | archive     | archive      |
 // | refused            | archive | archive     | archive     | archive      |
-
+//
+// For Transporters only, the BSD will be in the "isReturnFor" tab if:
+// - BSD has been received in the last 48 hours
+// - BSD hasn't been fully accepted
 export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
   const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],
