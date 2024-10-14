@@ -391,7 +391,7 @@ export const bsddTransporterFactory = async ({
   const updated = await prisma.form.update({
     where: { id: formId },
     data: { ...denormalizedSirets },
-    include: { forwardedIn: true, transporters: true, intermediaries: true }
+    include: { forwardedIn: true }
   });
 
   return updated;
@@ -474,7 +474,7 @@ export const formFactory = async ({
   const updated = await prisma.form.update({
     where: { id: form.id },
     data: { ...denormalizedSirets },
-    include: { forwardedIn: true, transporters: true, intermediaries: true }
+    include: { forwardedIn: true }
   });
 
   return updated;
