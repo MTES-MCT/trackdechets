@@ -11,7 +11,9 @@ export default {
         author: null,
         date: null
       }
-    }
+    },
+    irregularSituation: false,
+    noSiret: false
   },
   destination: {
     type: "BROYEUR",

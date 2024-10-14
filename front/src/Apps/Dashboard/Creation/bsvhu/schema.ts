@@ -11,17 +11,10 @@ const zodCompany = z.object({
 });
 
 const zodEmitter = z.object({
-  company: zodCompany.superRefine((val, ctx) => {
-    if (!val?.siret) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["orgId"],
-        message:
-          "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparaît pas"
-      });
-    }
-  }),
+  company: zodCompany,
   agrementNumber: z.string().nullish(),
+  irregularSituation: z.boolean(),
+  noSiret: z.boolean(),
   emission: z.object({
     signature: z.object({
       author: z.string().nullish(),
