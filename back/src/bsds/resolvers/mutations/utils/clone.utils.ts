@@ -46,7 +46,18 @@ export const cloneBsda = async (user: Express.User, id: string) => {
   return await runInTransaction(async transaction => {
     const { create } = getBsdaRepository(user, transaction);
 
-    const newBsdaCreateInput: Prisma.BsdaCreateInput = {
+    const newBsdaCreateInput: Omit<
+      Required<Prisma.BsdaCreateInput>,
+      // Ignored for the time being
+      | "rowNumber"
+      | "bsdaRevisionRequests"
+      | "FinalOperationToFinalForm"
+      | "forwardedIn"
+      | "forwarding"
+      | "groupedIn"
+      | "grouping"
+      | "rowNumber"
+    > = {
       id: getReadableId(ReadableIdPrefix.BSDA),
       brokerCompanyAddress: bsda.brokerCompanyAddress,
       brokerCompanyContact: bsda.brokerCompanyContact,
@@ -121,14 +132,14 @@ export const cloneBsda = async (user: Express.User, id: string) => {
               data: bsda.finalOperations
             }
           }
-        : undefined,
+        : {},
       intermediaries: bsda.intermediaries.length
         ? {
             createMany: {
               data: bsda.intermediaries
             }
           }
-        : undefined,
+        : {},
       intermediariesOrgIds: bsda.intermediariesOrgIds,
       isDeleted: bsda.isDeleted,
       isDraft: bsda.isDraft,
@@ -143,7 +154,7 @@ export const cloneBsda = async (user: Express.User, id: string) => {
               })
             }
           }
-        : undefined,
+        : {},
       transportersOrgIds: bsda.transportersOrgIds,
       transporterTransportSignatureDate: bsda.transporterTransportSignatureDate,
       type: bsda.type,
@@ -176,14 +187,6 @@ export const cloneBsda = async (user: Express.User, id: string) => {
         bsda.workerWorkHasEmitterPaperSignature,
       workerWorkSignatureAuthor: bsda.workerWorkSignatureAuthor,
       workerWorkSignatureDate: bsda.workerWorkSignatureDate
-      // Ignored for the time being
-      // bsdaRevisionRequests,
-      // FinalOperationToFinalForm,
-      // forwardedIn,
-      // forwarding,
-      // groupedIn,
-      // grouping,
-      // rowNumber,
     };
 
     const newBsda = await create(newBsdaCreateInput);
@@ -225,7 +228,17 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
   return await runInTransaction(async transaction => {
     const { create } = getBsdasriRepository(user, transaction);
 
-    const newBsdasriCreateInput: Prisma.BsdasriCreateInput = {
+    const newBsdasriCreateInput: Omit<
+      Required<Prisma.BsdasriCreateInput>,
+      // Ignored for the time being
+      | "bsdasriRevisionRequests"
+      | "FinalOperationToFinalBsdasri"
+      | "groupedIn"
+      | "grouping"
+      | "synthesizedIn"
+      | "synthesizing"
+      | "rowNumber"
+    > = {
       id: getReadableId(ReadableIdPrefix.DASRI),
       createdAt: bsdasri.createdAt,
       destinationCompanyAddress: bsdasri.destinationCompanyAddress,
@@ -267,7 +280,7 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
               id: bsdasri.emissionSignatoryId
             }
           }
-        : undefined,
+        : {},
       emittedByEcoOrganisme: bsdasri.emittedByEcoOrganisme,
       emitterCompanyAddress: bsdasri.emitterCompanyAddress,
       emitterCompanyContact: bsdasri.emitterCompanyContact,
@@ -293,7 +306,7 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
               data: bsdasri.finalOperations
             }
           }
-        : undefined,
+        : {},
       groupingEmitterSirets: bsdasri.groupingEmitterSirets,
       handedOverToRecipientAt: bsdasri.handedOverToRecipientAt,
       identificationNumbers: bsdasri.identificationNumbers,
@@ -308,14 +321,14 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
               id: bsdasri.operationSignatoryId
             }
           }
-        : undefined,
+        : {},
       receptionSignatory: bsdasri.receptionSignatoryId
         ? {
             connect: {
               id: bsdasri.receptionSignatoryId
             }
           }
-        : undefined,
+        : {},
       status: bsdasri.status,
       synthesisEmitterSirets: bsdasri.synthesisEmitterSirets,
       transporterAcceptationStatus: bsdasri.transporterAcceptationStatus,
@@ -355,19 +368,11 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
               id: bsdasri.transportSignatoryId
             }
           }
-        : undefined,
+        : {},
       type: bsdasri.type,
       updatedAt: bsdasri.updatedAt,
       wasteAdr: bsdasri.wasteAdr,
       wasteCode: bsdasri.wasteCode
-      // Ignored for the time being
-      // bsdasriRevisionRequests,
-      // FinalOperationToFinalBsdasri,
-      // groupedIn,
-      // grouping,
-      // synthesizedIn,
-      // synthesizing
-      // rowNumber
     };
 
     const newBsda = await create(newBsdasriCreateInput);
@@ -395,7 +400,11 @@ export const cloneBsff = async (user: Express.User, id: string) => {
   return await runInTransaction(async transaction => {
     const { create } = getBsffRepository(user, transaction);
 
-    const newBsffCreateInput: Prisma.BsffCreateInput = {
+    const newBsffCreateInput: Omit<
+      Required<Prisma.BsffCreateInput>,
+      // Ignored for the time being
+      "rowNumber"
+    > = {
       id: getReadableId(ReadableIdPrefix.FF),
       createdAt: bsff.createdAt,
       destinationCap: bsff.destinationCap,
@@ -423,7 +432,7 @@ export const cloneBsff = async (user: Express.User, id: string) => {
       emitterEmissionSignatureDate: bsff.emitterEmissionSignatureDate,
       ficheInterventions: bsff.ficheInterventions.length
         ? { create: bsff.ficheInterventions[0] }
-        : undefined,
+        : {},
       isDeleted: bsff.isDeleted,
       isDraft: bsff.isDraft,
       packagings: bsff.packagings.length
@@ -435,7 +444,7 @@ export const cloneBsff = async (user: Express.User, id: string) => {
               })
             }
           }
-        : undefined,
+        : {},
       status: bsff.status,
       transporters: bsff.transporters.length
         ? {
@@ -446,7 +455,7 @@ export const cloneBsff = async (user: Express.User, id: string) => {
               })
             }
           }
-        : undefined,
+        : {},
       transportersOrgIds: bsff.transportersOrgIds,
       transporterTransportSignatureDate: bsff.transporterTransportSignatureDate,
       type: bsff.type,
@@ -456,8 +465,6 @@ export const cloneBsff = async (user: Express.User, id: string) => {
       wasteDescription: bsff.wasteDescription,
       weightIsEstimate: bsff.weightIsEstimate,
       weightValue: bsff.weightValue
-      // Ignored for the time being
-      // rowNumber
     };
 
     const newBsff = await create({ data: newBsffCreateInput });
@@ -483,7 +490,11 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
   return await runInTransaction(async transaction => {
     const { create } = getBsvhuRepository(user, transaction);
 
-    const newBsvhuCreateInput: Prisma.BsvhuCreateInput = {
+    const newBsvhuCreateInput: Omit<
+      Required<Prisma.BsvhuCreateInput>,
+      // Ignored for the time being
+      "rowNumber"
+    > = {
       id: getReadableId(ReadableIdPrefix.VHU),
       createdAt: bsvhu.createdAt,
       destinationAgrementNumber: bsvhu.destinationAgrementNumber,
@@ -552,7 +563,7 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
               data: bsvhu.intermediaries
             }
           }
-        : undefined,
+        : {},
       intermediariesOrgIds: bsvhu.intermediariesOrgIds,
       isDeleted: bsvhu.isDeleted,
       isDraft: bsvhu.isDraft,
@@ -581,9 +592,9 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
       updatedAt: bsvhu.updatedAt,
       wasteCode: bsvhu.wasteCode,
       weightIsEstimate: bsvhu.weightIsEstimate,
-      weightValue: bsvhu.weightValue
-      // Ignored for the time being
-      // rowNumber
+      weightValue: bsvhu.weightValue,
+      ecoOrganismeName: bsvhu.ecoOrganismeName,
+      ecoOrganismeSiret: bsvhu.ecoOrganismeSiret
     };
 
     const newBsvhu = await create(newBsvhuCreateInput);
@@ -609,7 +620,11 @@ export const cloneBspaoh = async (user: Express.User, id: string) => {
   return await runInTransaction(async transaction => {
     const { create } = getBspaohRepository(user, transaction);
 
-    const newBspaohCreateInput: Prisma.BspaohCreateInput = {
+    const newBspaohCreateInput: Omit<
+      Required<Prisma.BspaohCreateInput>,
+      // Ignored for the time being
+      "rowNumber"
+    > = {
       id: getReadableId(ReadableIdPrefix.PAOH),
       canAccessDraftSirets: bspaoh.canAccessDraftSirets,
       createdAt: bspaoh.createdAt,
@@ -681,7 +696,7 @@ export const cloneBspaoh = async (user: Express.User, id: string) => {
               })
             }
           }
-        : undefined,
+        : {},
       transportersSirets: bspaoh.transportersSirets,
       transporterTransportTakenOverAt: bspaoh.transporterTransportTakenOverAt,
       updatedAt: bspaoh.updatedAt,
@@ -689,8 +704,6 @@ export const cloneBspaoh = async (user: Express.User, id: string) => {
       wasteCode: bspaoh.wasteCode,
       wastePackagings: prismaJsonNoNull(bspaoh.wastePackagings),
       wasteType: bspaoh.wasteType
-      // Ignored for the time being
-      // rowNumber
     };
 
     const newBspaoh = await create(newBspaohCreateInput);
@@ -735,7 +748,19 @@ export const cloneBsdd = async (
   return await runInTransaction(async transaction => {
     const { create } = getFormRepository(user, transaction);
 
-    const newBsddCreateInput: Prisma.FormCreateInput = {
+    const newBsddCreateInput: Omit<
+      Required<Prisma.FormCreateInput>,
+      // Ignored for the time being
+      | "FinalOperationToFinalForm"
+      | "forwardedIn"
+      | "forwarding"
+      | "groupedIn"
+      | "grouping"
+      | "id"
+      | "rowNumber"
+      | "StatusLog"
+      | "bsddRevisionRequests"
+    > = {
       owner: {
         connect: {
           id: bsdd.ownerId
@@ -751,7 +776,6 @@ export const cloneBsdd = async (
       brokerDepartment: bsdd.brokerDepartment,
       brokerReceipt: bsdd.brokerReceipt,
       brokerValidityLimit: bsdd.brokerValidityLimit,
-      bsddRevisionRequests: undefined,
       canAccessDraftSirets: bsdd.canAccessDraftSirets,
       citerneNotWashedOutReason: bsdd.citerneNotWashedOutReason,
       createdAt: bsdd.createdAt,
@@ -786,7 +810,7 @@ export const cloneBsdd = async (
               data: bsdd.finalOperations
             }
           }
-        : undefined,
+        : {},
       hasCiterneBeenWashedOut: bsdd.hasCiterneBeenWashedOut,
       intermediaries: bsdd.intermediaries.length
         ? {
@@ -794,7 +818,7 @@ export const cloneBsdd = async (
               data: bsdd.intermediaries
             }
           }
-        : undefined,
+        : {},
       intermediariesSirets: bsdd.intermediariesSirets,
       isAccepted: bsdd.isAccepted,
       isDeleted: bsdd.isDeleted,
@@ -860,7 +884,7 @@ export const cloneBsdd = async (
               })
             }
           }
-        : undefined,
+        : {},
       transportersSirets: bsdd.transportersSirets,
       updatedAt: bsdd.updatedAt,
       wasteAcceptationStatus: bsdd.wasteAcceptationStatus,
@@ -882,15 +906,6 @@ export const cloneBsdd = async (
       wasteDetailsQuantityType: bsdd.wasteDetailsQuantityType,
       wasteDetailsSampleNumber: bsdd.wasteDetailsSampleNumber,
       wasteRefusalReason: bsdd.wasteRefusalReason
-      // Ignored for the time being
-      // FinalOperationToFinalForm,
-      // forwardedIn,
-      // forwarding,
-      // groupedIn,
-      // grouping,
-      // id,
-      // rowNumber,
-      // StatusLog
     };
 
     const newBsdd = await create(newBsddCreateInput);
