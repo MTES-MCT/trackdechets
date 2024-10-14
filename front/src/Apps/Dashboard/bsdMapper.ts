@@ -309,6 +309,7 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     emittedByEcoOrganisme: bsdasri.ecoOrganisme?.emittedByEcoOrganisme,
     bsdWorkflowType: bsdasri?.type,
     grouping: bsdasri?.grouping,
+    groupedIn: bsdasri.groupedIn,
     synthesizing: bsdasri?.synthesizing,
     allowDirectTakeOver: bsdasri?.allowDirectTakeOver,
     transporterCustomInfo: truncateTransporterInfo(

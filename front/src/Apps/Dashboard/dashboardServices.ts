@@ -1311,9 +1311,10 @@ const canReviewBsdasri = (bsd, siret) => {
     return false;
   }
 
-  if (bsd.groupedInId || bsd.synthesizedInId) {
+  if (bsd.groupedIn || bsd.synthesizedIn) {
     return false;
   }
+
   const isDestination = isSameSiretDestination(siret, bsd);
   const isProducer = isSameSiretEmitter(siret, bsd);
   const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
