@@ -766,7 +766,7 @@ export default function Header({
 
           <nav className={`fr-nav ${styles.headerNav}`}>
             <ul
-              className={`fr-nav__list`}
+              className={`fr-nav__list ${styles.headerNavList}`}
               style={{ margin: "initial", maxWidth: "initial" }}
             >
               {menuEntries.map((e, idx) => (
