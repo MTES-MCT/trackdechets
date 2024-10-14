@@ -16,7 +16,7 @@ import {
 import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
-import { getFormSiretsByRole } from "../forms/database";
+import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../forms/database";
 
 /**
  * Create a user with name and email
@@ -372,7 +372,7 @@ export const bsddTransporterFactory = async ({
   opts: Omit<Prisma.BsddTransporterCreateWithoutFormInput, "number">;
 }) => {
   const count = await prisma.bsddTransporter.count({ where: { formId } });
-  await prisma.bsddTransporter.create({
+  const transporter = await prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: formId } },
       ...bsddTransporterData,
@@ -383,18 +383,21 @@ export const bsddTransporterFactory = async ({
 
   const form = await prisma.form.findFirstOrThrow({
     where: { id: formId },
-    include: { transporters: true, intermediaries: true, forwardedIn: true }
+    include: {
+      ...SIRETS_BY_ROLE_INCLUDE,
+      forwardedIn: true,
+      transporters: true
+    }
   });
 
   // Fix fields like "recipientsSirets" or "transportersSirets"
   const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
-  const updated = await prisma.form.update({
+  await prisma.form.update({
     where: { id: formId },
-    data: { ...denormalizedSirets },
-    include: { forwardedIn: true }
+    data: denormalizedSirets
   });
 
-  return updated;
+  return transporter;
 };
 
 export const upsertBaseSiret = async siret => {
@@ -466,14 +469,18 @@ export const formFactory = async ({
       ...formParams,
       owner: { connect: { id: ownerId } }
     },
-    include: { forwardedIn: true, transporters: true, intermediaries: true }
+    include: {
+      ...SIRETS_BY_ROLE_INCLUDE,
+      forwardedIn: true,
+      transporters: true
+    }
   });
 
   // Fix fields like "recipientsSirets" or "transportersSirets"
   const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
   const updated = await prisma.form.update({
     where: { id: form.id },
-    data: { ...denormalizedSirets },
+    data: denormalizedSirets,
     include: { forwardedIn: true }
   });
 
