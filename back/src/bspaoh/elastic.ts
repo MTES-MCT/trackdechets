@@ -59,20 +59,20 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
     transporterCompanySiret: getTransporterCompanyOrgId(transporter)
   };
 
-  const siretsFilters = new Map<string, keyof typeof where>(
+  const siretsFilters = new Map<string, Array<keyof typeof where>>(
     Object.entries(bsdSirets)
-      .filter(([_, siret]) => !!siret)
-      .map(([actor, _]) => [actor, "isFollowFor"])
+      .filter(([_, siret]) => Boolean(siret))
+      .map(([actor, _]) => [actor, []])
   );
-
-  type Mapping = Map<string, keyof typeof where>;
+  type Mapping = Map<string, Array<keyof typeof where>>;
   const setTab = (map: Mapping, key: string, newValue: keyof typeof where) => {
     if (!map.has(key)) {
       return;
     }
 
-    map.set(key, newValue);
+    map.set(key, [...(map.get(key) ?? []), newValue]);
   };
+
   switch (bspaoh.status) {
     case BspaohStatus.DRAFT: {
       for (const fieldName of siretsFilters.keys()) {
@@ -118,10 +118,17 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
     setTab(siretsFilters, "transporterCompanySiret", "isReturnFor");
   }
 
-  for (const [fieldName, filter] of siretsFilters.entries()) {
-    const filterValue = bsdSirets[fieldName];
-    if (fieldName && filterValue) {
-      where[filter].push(filterValue);
+  for (const [fieldName, filters] of siretsFilters.entries()) {
+    if (fieldName) {
+      if (!filters.length) {
+        // Onglet "Suivi" par défaut
+        if (bsdSirets[fieldName])
+          where["isFollowFor"].push(bsdSirets[fieldName]);
+      } else {
+        filters.forEach(filter => {
+          if (bsdSirets[fieldName]) where[filter].push(bsdSirets[fieldName]);
+        });
+      }
     }
   }
 
@@ -278,8 +285,9 @@ export const belongsToIsReturnForTab = (bspaoh: Bspaoh) => {
   if (!hasBeenReceivedLately) return false;
 
   const hasNotBeenFullyAccepted =
+    bspaoh.status === BspaohStatus.REFUSED ||
     bspaoh.destinationReceptionAcceptationStatus !==
-    WasteAcceptationStatus.ACCEPTED;
+      WasteAcceptationStatus.ACCEPTED;
 
   return hasNotBeenFullyAccepted;
 };

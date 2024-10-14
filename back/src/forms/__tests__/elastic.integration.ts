@@ -315,6 +315,21 @@ describe("getSiretsByTab", () => {
     expect(isForActionFor).toContain(form.recipientCompanySiret);
   });
 
+  test("status REFUSED", async () => {
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: { status: Status.REFUSED, receivedAt: new Date() }
+    });
+    const fullForm = await getFullForm(form);
+    const transporter = getFirstTransporterSync(fullForm);
+    const { isArchivedFor, isReturnFor } = getSiretsByTab(fullForm);
+    expect(isArchivedFor).toContain(form.emitterCompanySiret);
+    expect(isArchivedFor).toContain(form.recipientCompanySiret);
+    expect(isArchivedFor).toContain(transporter!.transporterCompanySiret);
+    expect(isReturnFor).toContain(transporter!.transporterCompanySiret);
+  });
+
   test("status TEMP_STORED", async () => {
     const user = await userFactory();
     const form = await formWithTempStorageFactory({
@@ -402,6 +417,26 @@ describe("getSiretsByTab", () => {
         expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
       }
     );
+
+    it("status is REFUSED > bsdd should belong to tab", async () => {
+      // Given
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.REFUSED,
+          receivedAt: new Date()
+        }
+      });
+      const fullForm = await getFullForm(form);
+      const transporter = getFirstTransporterSync(fullForm);
+
+      // When
+      const { isReturnFor } = getSiretsByTab(fullForm);
+
+      // Then
+      expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
+    });
 
     it("waste acceptation status is ACCEPTED > bsdd should not belong to tab", async () => {
       // Given

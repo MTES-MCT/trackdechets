@@ -32,6 +32,7 @@ import {
 import { getBsdaSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import { distinct } from "../common/arrays";
 
 export type BsdaForElastic = Bsda &
   BsdaWithTransporters &
@@ -155,18 +156,18 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
 
   const bsdaSirets = getBsdaSirets(bsda);
 
-  const siretsFilters = new Map<string, keyof typeof where>(
+  const siretsFilters = new Map<string, Array<keyof typeof where>>(
     Object.entries(bsdaSirets)
       .filter(([_, siret]) => Boolean(siret))
-      .map(([actor, _]) => [actor, "isFollowFor"])
+      .map(([actor, _]) => [actor, []])
   );
-  type Mapping = Map<string, keyof typeof where>;
+  type Mapping = Map<string, Array<keyof typeof where>>;
   const setTab = (map: Mapping, key: string, newValue: keyof typeof where) => {
     if (!map.has(key)) {
       return;
     }
 
-    map.set(key, newValue);
+    map.set(key, [...(map.get(key) ?? []), newValue]);
   };
 
   switch (bsda.status) {
@@ -306,10 +307,23 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     );
   }
 
-  for (const [fieldName, filter] of siretsFilters.entries()) {
+  for (const [fieldName, filters] of siretsFilters.entries()) {
     if (fieldName) {
-      where[filter].push(bsdaSirets[fieldName]);
+      if (!filters.length) {
+        // Onglet "Suivi" par défaut
+        if (bsdaSirets[fieldName])
+          where["isFollowFor"].push(bsdaSirets[fieldName]);
+      } else {
+        filters.forEach(filter => {
+          if (bsdaSirets[fieldName]) where[filter].push(bsdaSirets[fieldName]);
+        });
+      }
     }
+  }
+
+  // deduplicate sirets
+  for (const [tab, sirets] of Object.entries(where)) {
+    where[tab] = distinct(sirets);
   }
 
   return where;

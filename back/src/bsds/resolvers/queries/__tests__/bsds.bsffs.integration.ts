@@ -4,7 +4,10 @@ import {
   resetDatabase
 } from "../../../../../integration-tests/helper";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
-import { createBsffAfterEmission } from "../../../../bsffs/__tests__/factories";
+import {
+  createBsffAfterEmission,
+  createBsffAfterOperation
+} from "../../../../bsffs/__tests__/factories";
 import { getBsffForElastic, indexBsff } from "../../../../bsffs/elastic";
 import { prisma } from "@td/prisma";
 import makeClient from "../../../../__tests__/testClient";
@@ -49,5 +52,65 @@ describe("Bsff subresolver in query bsds", () => {
     const bsffs = data.bsds!.edges.map(e => e.node);
     expect(bsffs).toHaveLength(1);
     expect((bsffs[0] as any).packagings).toHaveLength(1);
+  });
+
+  describe("when bsff is refused", () => {
+    let bsff;
+    let emitter;
+    let transporter;
+    let destination;
+
+    beforeAll(async () => {
+      emitter = await userWithCompanyFactory();
+      transporter = await userWithCompanyFactory();
+      destination = await userWithCompanyFactory();
+      bsff = await createBsffAfterOperation(
+        { emitter, transporter, destination },
+        {
+          data: {
+            status: "REFUSED",
+            destinationReceptionDate: new Date()
+          },
+          packagingData: {
+            acceptationStatus: "REFUSED"
+          }
+        }
+      );
+      await indexBsff(await getBsffForElastic(bsff));
+      await refreshElasticSearch();
+    });
+
+    it("refused bsff should be isArchivedFor & isReturnFor transporter", async () => {
+      // isArchivedFor
+      const { query } = makeClient(transporter.user);
+      const { data: archiveData } = await query<
+        Pick<Query, "bsds">,
+        QueryBsdsArgs
+      >(GET_BSDS, {
+        variables: {
+          where: {
+            isArchivedFor: [transporter.company.siret!]
+          }
+        }
+      });
+
+      expect(archiveData.bsds.edges.length).toBe(1);
+      expect(archiveData.bsds.edges[0].node).toMatchObject({ id: bsff.id });
+
+      // isReturnFor
+      const { data: returnData } = await query<
+        Pick<Query, "bsds">,
+        QueryBsdsArgs
+      >(GET_BSDS, {
+        variables: {
+          where: {
+            isReturnFor: [transporter.company.siret!]
+          }
+        }
+      });
+
+      expect(returnData.bsds.edges.length).toBe(1);
+      expect(returnData.bsds.edges[0].node).toMatchObject({ id: bsff.id });
+    });
   });
 });

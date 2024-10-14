@@ -540,7 +540,7 @@ describe("Query.bsds.vhus base workflow", () => {
     beforeAll(async () => {
       const refusedVhu = await prisma.bsvhu.update({
         where: { id: vhuId },
-        data: { status: "REFUSED" },
+        data: { status: "REFUSED", destinationReceptionDate: new Date() },
         include: {
           ...BsvhuForElasticInclude
         }
@@ -569,20 +569,37 @@ describe("Query.bsds.vhus base workflow", () => {
       ]);
     });
 
-    it("refused vhu should be isArchivedFor transporter", async () => {
+    it("refused vhu should be isArchivedFor & isReturnFor transporter", async () => {
+      // isArchivedFor
       const { query } = makeClient(transporter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isArchivedFor: [transporter.company.siret!]
-            }
+      const { data: archiveData } = await query<
+        Pick<Query, "bsds">,
+        QueryBsdsArgs
+      >(GET_BSDS, {
+        variables: {
+          where: {
+            isArchivedFor: [transporter.company.siret!]
           }
         }
-      );
+      });
 
-      expect(data.bsds.edges).toEqual([
+      expect(archiveData.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: vhuId } })
+      ]);
+
+      // isReturnFor
+      const { data: returnData } = await query<
+        Pick<Query, "bsds">,
+        QueryBsdsArgs
+      >(GET_BSDS, {
+        variables: {
+          where: {
+            isReturnFor: [transporter.company.siret!]
+          }
+        }
+      });
+
+      expect(returnData.bsds.edges).toEqual([
         expect.objectContaining({ node: { id: vhuId } })
       ]);
     });

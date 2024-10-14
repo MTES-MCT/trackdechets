@@ -793,20 +793,37 @@ describe("Query.bsds.dasris base workflow", () => {
       ]);
     });
 
-    it("refused bsdasri should be isArchivedFor transporter", async () => {
+    it("refused bsdasri should be isArchivedFor & isReturnFor transporter", async () => {
+      // isArchivedFor
       const { query } = makeClient(transporter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isArchivedFor: [transporter.company.siret!]
-            }
+      const { data: archiveData } = await query<
+        Pick<Query, "bsds">,
+        QueryBsdsArgs
+      >(GET_BSDS, {
+        variables: {
+          where: {
+            isArchivedFor: [transporter.company.siret!]
           }
         }
-      );
+      });
 
-      expect(data.bsds.edges).toEqual([
+      expect(archiveData.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdasriId } })
+      ]);
+
+      // isReturnFor
+      const { data: returnData } = await query<
+        Pick<Query, "bsds">,
+        QueryBsdsArgs
+      >(GET_BSDS, {
+        variables: {
+          where: {
+            isReturnFor: [transporter.company.siret!]
+          }
+        }
+      });
+
+      expect(returnData.bsds.edges).toEqual([
         expect.objectContaining({ node: { id: bsdasriId } })
       ]);
     });

@@ -23,6 +23,7 @@ import { getRevisionOrgIds } from "../common/elasticHelpers";
 import { getBsdasriSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import { distinct } from "../common/arrays";
 
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &
@@ -83,19 +84,19 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
     ecoOrganismeSiret: bsdasri.ecoOrganismeSiret
   };
 
-  const siretsFilters = new Map<string, keyof typeof where>(
+  const siretsFilters = new Map<string, Array<keyof typeof where>>(
     Object.entries(formSirets)
-      .filter(([_, siret]) => !!siret)
-      .map(([actor, _]) => [actor, "isFollowFor"])
+      .filter(([_, siret]) => Boolean(siret))
+      .map(([actor, _]) => [actor, []])
   );
 
-  type Mapping = Map<string, keyof typeof where>;
+  type Mapping = Map<string, Array<keyof typeof where>>;
   const setTab = (map: Mapping, key: string, newValue: keyof typeof where) => {
     if (!map.has(key)) {
       return;
     }
 
-    map.set(key, newValue);
+    map.set(key, [...(map.get(key) ?? []), newValue]);
   };
   switch (bsdasri.status) {
     case BsdasriStatus.INITIAL: {
@@ -147,11 +148,23 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
     setTab(siretsFilters, "transporterCompanySiret", "isReturnFor");
   }
 
-  for (const [fieldName, filter] of siretsFilters.entries()) {
-    const filterValue = formSirets[fieldName];
-    if (fieldName && filterValue) {
-      where[filter].push(filterValue);
+  for (const [fieldName, filters] of siretsFilters.entries()) {
+    if (fieldName) {
+      if (!filters.length) {
+        // Onglet "Suivi" par défaut
+        if (formSirets[fieldName])
+          where["isFollowFor"].push(formSirets[fieldName]);
+      } else {
+        filters.forEach(filter => {
+          if (formSirets[fieldName]) where[filter].push(formSirets[fieldName]);
+        });
+      }
     }
+  }
+
+  // deduplicate sirets
+  for (const [tab, sirets] of Object.entries(where)) {
+    where[tab] = distinct(sirets);
   }
 
   return where;
@@ -289,8 +302,9 @@ export const belongsToIsReturnForTab = (bsdasri: Bsdasri) => {
   if (!hasBeenReceivedLately) return false;
 
   const hasNotBeenFullyAccepted =
+    bsdasri.status === BsdasriStatus.REFUSED ||
     bsdasri.destinationReceptionAcceptationStatus !==
-    WasteAcceptationStatus.ACCEPTED;
+      WasteAcceptationStatus.ACCEPTED;
 
   return hasNotBeenFullyAccepted;
 };

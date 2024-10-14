@@ -27,6 +27,7 @@ import {
 import { getBsffSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import { distinct } from "../common/arrays";
 
 export type BsffForElastic = Bsff &
   BsffWithPackagings &
@@ -123,11 +124,11 @@ export function getOrgIdsByTab(
 
   const roles = Object.keys(orgIdByRole);
 
-  // Crée un mapping qui associe pour chaque rôle l'onglet
-  // où le BSFF doit apparaitre. Défaut à "Suivi" pour chaque rôle.
+  // Crée un mapping qui associe pour chaque rôle le ou les onglets
+  // où le BSFF doit apparaitre.
   const tabsByRole = roles.reduce((acc, role) => {
     if (orgIdByRole[role]) {
-      return { ...acc, [role]: "isFollowFor" };
+      return { ...acc, [role]: [] };
     }
     return acc;
   }, {});
@@ -136,7 +137,7 @@ export function getOrgIdsByTab(
   // le bordereau doit apparaitre pour un rôle donné
   function setTab(role: string, tab: TabsKeys) {
     if (tabsByRole[role]) {
-      tabsByRole[role] = tab;
+      tabsByRole[role] = [...tabsByRole[role], tab];
     }
   }
 
@@ -227,11 +228,19 @@ export function getOrgIdsByTab(
   }
 
   for (const role of roles) {
-    const tab = tabsByRole[role];
-    if (tab) {
-      const orgId = orgIdByRole[role];
-      tabs[tab].push(orgId);
+    const roleTabs = tabsByRole[role];
+    const orgId = orgIdByRole[role];
+    if (roleTabs.length) {
+      roleTabs.forEach(tab => tabs[tab].push(orgId));
+    } else {
+      // Si aucun onglet, ajouter l'onglet "Suivi" par défaut
+      tabs["isFollowFor"].push(orgId);
     }
+  }
+
+  // deduplicate sirets
+  for (const [tab, sirets] of Object.entries(tabs)) {
+    tabs[tab] = distinct(sirets);
   }
 
   return tabs;

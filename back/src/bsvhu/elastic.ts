@@ -20,6 +20,7 @@ import {
 } from "./types";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import { distinct } from "../common/arrays";
 
 export const BsvhuForElasticInclude = {
   ...BsvhuWithIntermediariesInclude
@@ -101,18 +102,18 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
 
   const formSirets = getBsvhuSirets(bsvhu);
 
-  const siretsFilters = new Map<string, keyof typeof where>(
+  const siretsFilters = new Map<string, Array<keyof typeof where>>(
     Object.entries(formSirets)
-      .filter(([_, siret]) => !!siret)
-      .map(([actor, _]) => [actor, "isFollowFor"])
+      .filter(([_, siret]) => Boolean(siret))
+      .map(([actor, _]) => [actor, []])
   );
-  type Mapping = Map<string, keyof typeof where>;
+  type Mapping = Map<string, Array<keyof typeof where>>;
   const setTab = (map: Mapping, key: string, newValue: keyof typeof where) => {
     if (!map.has(key)) {
       return;
     }
 
-    map.set(key, newValue);
+    map.set(key, [...(map.get(key) ?? []), newValue]);
   };
 
   switch (bsvhu.status) {
@@ -155,10 +156,23 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
     setTab(siretsFilters, "transporterCompanySiret", "isReturnFor");
   }
 
-  for (const [fieldName, filter] of siretsFilters.entries()) {
+  for (const [fieldName, filters] of siretsFilters.entries()) {
     if (fieldName) {
-      where[filter].push(formSirets[fieldName]);
+      if (!filters.length) {
+        // Onglet "Suivi" par défaut
+        if (formSirets[fieldName])
+          where["isFollowFor"].push(formSirets[fieldName]);
+      } else {
+        filters.forEach(filter => {
+          if (formSirets[fieldName]) where[filter].push(formSirets[fieldName]);
+        });
+      }
     }
+  }
+
+  // deduplicate sirets
+  for (const [tab, sirets] of Object.entries(where)) {
+    where[tab] = distinct(sirets);
   }
 
   return where;
@@ -297,8 +311,9 @@ export const belongsToIsReturnForTab = (bsvhu: BsvhuForElastic) => {
   if (!hasBeenReceivedLately) return false;
 
   const hasNotBeenFullyAccepted =
+    bsvhu.status === BsvhuStatus.REFUSED ||
     bsvhu.destinationReceptionAcceptationStatus !==
-    WasteAcceptationStatus.ACCEPTED;
+      WasteAcceptationStatus.ACCEPTED;
 
   return hasNotBeenFullyAccepted;
 };

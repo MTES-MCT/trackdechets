@@ -17,6 +17,7 @@ import { FormForElastic } from "./elastic";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import { distinct } from "../common/arrays";
 
 /**
  * Computes which SIRET or VAT number should appear on which tab in the frontend
@@ -68,19 +69,18 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
   };
 
   // build a mapping to store which actor will see this form appear on a given UI tab
-  // eg: 'transporterCompanySiret' : 'isCollectedFor'
-  const fieldTabs = new Map<string, keyof typeof siretsByTab>(
+  // eg: 'transporterCompanySiret' : ['isCollectedFor']
+  const fieldTabs = new Map<string, Array<keyof typeof siretsByTab>>(
     Object.entries(formSirets)
-      .filter(item => !!item[1])
-      // initialize all SIRET into "isFollowFor"
-      .map(item => [item[0], "isFollowFor"])
+      .filter(([_, siret]) => Boolean(siret))
+      .map(([actor, _]) => [actor, []])
   );
 
   function setFieldTab(field: string, tab: keyof typeof siretsByTab) {
     if (!fieldTabs.has(field)) {
       return;
     }
-    fieldTabs.set(field, tab);
+    fieldTabs.set(field, [...(fieldTabs.get(field) ?? []), tab]);
   }
 
   // initialize intermediaries into isFollowFor
@@ -231,10 +231,24 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
     setFieldTab(transporterCompanyOrgIdKey(lastTransporter), "isReturnFor");
   }
 
-  for (const [field, tab] of fieldTabs.entries()) {
-    if (field) {
-      siretsByTab[tab].push(formSirets[field]);
+  for (const [fieldName, filters] of fieldTabs.entries()) {
+    if (fieldName) {
+      if (!filters.length) {
+        // Onglet "Suivi" par défaut
+        if (formSirets[fieldName])
+          siretsByTab["isFollowFor"].push(formSirets[fieldName]);
+      } else {
+        filters.forEach(filter => {
+          if (formSirets[fieldName])
+            siretsByTab[filter].push(formSirets[fieldName]);
+        });
+      }
     }
+  }
+
+  // deduplicate sirets
+  for (const [tab, sirets] of Object.entries(fieldTabs)) {
+    fieldTabs[tab] = distinct(sirets);
   }
 
   return siretsByTab;
@@ -255,6 +269,7 @@ export const belongsToIsReturnForTab = (form: FullForm) => {
     isDefined(form.emptyReturnADR) || isDefined(form.hasCiterneBeenWashedOut);
 
   const hasNotBeenFullyAccepted =
+    form.status === Status.REFUSED ||
     form.wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED;
 
   return hasCiterneBusiness || hasNotBeenFullyAccepted;

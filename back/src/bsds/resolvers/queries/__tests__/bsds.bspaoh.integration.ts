@@ -654,7 +654,7 @@ describe("Query.bsds.bspaohs base workflow", () => {
     beforeAll(async () => {
       const refusedBspaoh = await prisma.bspaoh.update({
         where: { id: bspaohId },
-        data: { status: "REFUSED" },
+        data: { status: "REFUSED", destinationReceptionDate: new Date() },
         include: BspaohForElasticInclude
       });
       await indexBspaoh(refusedBspaoh);
@@ -679,20 +679,37 @@ describe("Query.bsds.bspaohs base workflow", () => {
       ]);
     });
 
-    it("refused bspaoh should be isArchivedFor transporter", async () => {
+    it("refused bspaoh should be isArchivedFor & isReturnFor transporter", async () => {
+      // isArchivedFor
       const { query } = makeClient(transporter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isArchivedFor: [transporter.company.siret!]
-            }
+      const { data: archiveData } = await query<
+        Pick<Query, "bsds">,
+        QueryBsdsArgs
+      >(GET_BSDS, {
+        variables: {
+          where: {
+            isArchivedFor: [transporter.company.siret!]
           }
         }
-      );
+      });
 
-      expect(data.bsds.edges).toEqual([
+      expect(archiveData.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bspaohId } })
+      ]);
+
+      // isArchivedFor
+      const { data: returnData } = await query<
+        Pick<Query, "bsds">,
+        QueryBsdsArgs
+      >(GET_BSDS, {
+        variables: {
+          where: {
+            isReturnFor: [transporter.company.siret!]
+          }
+        }
+      });
+
+      expect(returnData.bsds.edges).toEqual([
         expect.objectContaining({ node: { id: bspaohId } })
       ]);
     });
