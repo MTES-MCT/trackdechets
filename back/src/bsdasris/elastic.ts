@@ -152,11 +152,14 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
     if (fieldName) {
       if (!filters.length) {
         // Onglet "Suivi" par défaut
-        if (formSirets[fieldName])
-          where["isFollowFor"].push(formSirets[fieldName]);
+        if (formSirets[fieldName]) {
+          where["isFollowFor"].push(formSirets[fieldName] as string);
+        }
       } else {
         filters.forEach(filter => {
-          if (formSirets[fieldName]) where[filter].push(formSirets[fieldName]);
+          if (formSirets[fieldName]) {
+            where[filter].push(formSirets[fieldName] as string);
+          }
         });
       }
     }

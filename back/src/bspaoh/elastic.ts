@@ -122,11 +122,14 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
     if (fieldName) {
       if (!filters.length) {
         // Onglet "Suivi" par défaut
-        if (bsdSirets[fieldName])
-          where["isFollowFor"].push(bsdSirets[fieldName]);
+        if (bsdSirets[fieldName]) {
+          where["isFollowFor"].push(bsdSirets[fieldName] as string);
+        }
       } else {
         filters.forEach(filter => {
-          if (bsdSirets[fieldName]) where[filter].push(bsdSirets[fieldName]);
+          if (bsdSirets[fieldName]) {
+            where[filter].push(bsdSirets[fieldName] as string);
+          }
         });
       }
     }
