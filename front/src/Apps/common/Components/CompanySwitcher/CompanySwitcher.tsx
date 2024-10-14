@@ -138,9 +138,15 @@ const CompanySwitcher = ({
         role="presentation"
       >
         <div className="company-switcher-item__content">
-          <div className="company-switcher-item__name">
-            {company.givenName || company.name}
-          </div>
+          {current ? (
+            <h1 className="company-switcher-item__name">
+              {company.givenName || company.name}
+            </h1>
+          ) : (
+            <div className="company-switcher-item__name">
+              {company.givenName || company.name}
+            </div>
+          )}
           {current && companies.length > 1 && (
             <span
               className="fr-icon-arrow-down-s-line company-switcher-item__arrow"

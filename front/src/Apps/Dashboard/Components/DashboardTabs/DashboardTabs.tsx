@@ -126,6 +126,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
       {showMyBsds && (
         <>
           <Accordion
+            titleAs="h2"
             label="Mes bordereaux"
             onExpandedChange={handleToggle}
             expanded
@@ -207,7 +208,12 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             </ul>
           </Accordion>
 
-          <Accordion label={REVIEWS} onExpandedChange={handleToggle} expanded>
+          <Accordion
+            titleAs="h2"
+            label={REVIEWS}
+            onExpandedChange={handleToggle}
+            expanded
+          >
             <ul>
               <li>
                 <NavLink
@@ -247,7 +253,12 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
       )}
 
       {showTransportTabs && (
-        <Accordion label={TRANSPORT} onExpandedChange={handleToggle} expanded>
+        <Accordion
+          titleAs="h2"
+          label={TRANSPORT}
+          onExpandedChange={handleToggle}
+          expanded
+        >
           <ul>
             <li>
               <NavLink
