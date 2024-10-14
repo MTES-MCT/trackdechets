@@ -1,0 +1,17 @@
+h4 {
+  font-size: 1.5rem; //24px;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 2vh;
+}
+
+.delegations-table {
+  th,
+  td {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

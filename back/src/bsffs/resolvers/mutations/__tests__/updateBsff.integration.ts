@@ -2,7 +2,8 @@ import {
   UserRole,
   BsffType,
   BsffStatus,
-  BsffPackagingType
+  BsffPackagingType,
+  Prisma
 } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -40,10 +41,20 @@ import {
   getFirstTransporterSync,
   getTransportersSync
 } from "../../../database";
+import { Query, QueryBsffArgs } from "@td/codegen-ui";
 
 export const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
     updateBsff(id: $id, input: $input) {
+      ...FullBsff
+    }
+  }
+  ${fullBsff}
+`;
+
+const BSFF = gql`
+  query Bsff($id: ID!) {
+    bsff(id: $id) {
       ...FullBsff
     }
   }
@@ -3007,4 +3018,78 @@ describe("Mutation.updateBsff", () => {
       })
     ]);
   });
+
+  it(
+    "should be possible to resend same packagings data after emitter's signature" +
+      "in the same order as it is received from the query bsff { packagings }",
+    async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const destination = await userWithCompanyFactory("ADMIN");
+
+      const bsff = await createBsffAfterEmission({
+        emitter,
+        destination
+      });
+
+      const packagingsData: Prisma.BsffPackagingUncheckedCreateInput[] = [
+        {
+          bsffId: bsff.id,
+          type: BsffPackagingType.BOUTEILLE,
+          weight: 1,
+          volume: 1,
+          numero: "C",
+          emissionNumero: "C"
+        },
+        {
+          bsffId: bsff.id,
+          type: BsffPackagingType.BOUTEILLE,
+          weight: 1,
+          volume: 1,
+          numero: "B",
+          emissionNumero: "B"
+        },
+        {
+          bsffId: bsff.id,
+          type: BsffPackagingType.BOUTEILLE,
+          weight: 1,
+          volume: 1,
+          numero: "A",
+          emissionNumero: "A"
+        }
+      ];
+
+      for (const packagingData of packagingsData) {
+        await prisma.bsffPackaging.create({ data: packagingData });
+      }
+
+      const { query, mutate } = makeClient(destination.user);
+
+      const { data: bsffData } = await query<
+        Pick<Query, "bsff">,
+        QueryBsffArgs
+      >(BSFF, {
+        variables: { id: bsff.id }
+      });
+
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsff">,
+        MutationUpdateBsffArgs
+      >(UPDATE_BSFF, {
+        variables: {
+          id: bsff.id,
+          input: {
+            packagings: bsffData.bsff.packagings.map(p => ({
+              type: p.type,
+              weight: p.weight,
+              volume: p.volume,
+              numero: p.numero,
+              other: p.other
+            }))
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+    }
+  );
 });
