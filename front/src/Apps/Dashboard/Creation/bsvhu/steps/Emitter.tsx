@@ -207,46 +207,52 @@ const EmitterBsvhu = ({ errors }) => {
             {formState.errors?.emitter?.["company"]?.siret?.message}
           </p>
         )}
-
-        <Checkbox
-          options={[
-            {
-              label: "L'installation n'a pas de numéro SIRET",
-              nativeInputProps: {
-                ...register("emitter.noSiret")
-              }
-            }
-          ]}
-          disabled={sealedFields.includes(`emitter.noSiret`)}
-        />
-
-        <DsfrfWorkSiteAddress
-          designation="du site d'enlèvement"
-          address={emitter.company.address}
-          postalCode={emitter.company.postalCode}
-          city={emitter.company.city}
-          placeholder="Rechercher"
-          onAddressSelection={details => {
-            // `address` is passed as `name` because of adresse api return fields
-            setValue(`emitter.company.address`, details.name);
-            setValue(`emitter.company.city`, details.city);
-            setValue(`emitter.company.postalCode`, details.postcode);
-          }}
-        />
-
-        {emitter.noSiret && (
-          <div className="fr-col-md-8 fr-mb-2w">
-            <Input
-              label="Nom ou identification de l'installation"
-              disabled={sealedFields.includes(`emitter.company.name`)}
-              nativeInputProps={{ ...register("emitter.company.name") }}
-              state={formState.errors?.emitter?.["company"]?.name && "error"}
-              stateRelatedMessage={
-                (formState.errors?.emitter?.["company"]?.name
-                  ?.message as string) ?? ""
-              }
+        {emitter.irregularSituation && (
+          <>
+            <Checkbox
+              options={[
+                {
+                  label: "L'installation n'a pas de numéro SIRET",
+                  nativeInputProps: {
+                    ...register("emitter.noSiret")
+                  }
+                }
+              ]}
+              disabled={sealedFields.includes(`emitter.noSiret`)}
             />
-          </div>
+
+            {emitter.noSiret && (
+              <>
+                <DsfrfWorkSiteAddress
+                  designation="du site d'enlèvement"
+                  address={emitter.company.address}
+                  postalCode={emitter.company.postalCode}
+                  city={emitter.company.city}
+                  placeholder="Rechercher"
+                  onAddressSelection={details => {
+                    // `address` is passed as `name` because of adresse api return fields
+                    setValue(`emitter.company.address`, details.name);
+                    setValue(`emitter.company.city`, details.city);
+                    setValue(`emitter.company.postalCode`, details.postcode);
+                  }}
+                />
+                <div className="fr-col-md-8 fr-mb-2w">
+                  <Input
+                    label="Nom ou identification de l'installation"
+                    disabled={sealedFields.includes(`emitter.company.name`)}
+                    nativeInputProps={{ ...register("emitter.company.name") }}
+                    state={
+                      formState.errors?.emitter?.["company"]?.name && "error"
+                    }
+                    stateRelatedMessage={
+                      (formState.errors?.emitter?.["company"]?.name
+                        ?.message as string) ?? ""
+                    }
+                  />
+                </div>
+              </>
+            )}
+          </>
         )}
 
         <CompanyContactInfo
