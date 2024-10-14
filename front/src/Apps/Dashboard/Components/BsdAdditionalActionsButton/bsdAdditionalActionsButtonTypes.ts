@@ -10,6 +10,7 @@ export interface BsdAdditionalActionsButtonProps {
     onPdf?: Function;
     onDuplicate: Function;
     onUpdate?: Function;
+    onClone?: Function;
     onDelete?: Function;
     onRevision?: Function;
     onAppendix1?: Function;

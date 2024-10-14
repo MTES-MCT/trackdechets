@@ -44,7 +44,10 @@ export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
     include: {
       ...BsffWithTransportersInclude,
       ...BsffWithFicheInterventionInclude,
-      packagings: { include: { previousPackagings: true } }
+      packagings: {
+        include: { previousPackagings: true },
+        orderBy: { numero: "asc" }
+      }
     }
   });
 

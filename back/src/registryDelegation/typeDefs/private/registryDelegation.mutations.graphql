@@ -1,0 +1,15 @@
+type Mutation {
+  """
+  Permet de créer une demande de délégation pour déléguer les déclarations propres aux
+  registres RNDTS à un établissement.
+  """
+  createRegistryDelegation(
+    input: CreateRegistryDelegationInput!
+  ): RegistryDelegation!
+
+  """
+  Permet de révoquer une demande de délégation. Peut être utilisé par le délégataire ou
+  le délégant. Une fois révoquée, une délégation ne peut plus être modifiée.
+  """
+  revokeRegistryDelegation(delegationId: ID!): RegistryDelegation!
+}

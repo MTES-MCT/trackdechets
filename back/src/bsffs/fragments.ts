@@ -60,6 +60,7 @@ export const fullBsff = gql`
       }
     }
     packagings {
+      type
       name
       volume
       numero
