@@ -394,7 +394,7 @@ export const bsddTransporterFactory = async ({
   const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
   await prisma.form.update({
     where: { id: formId },
-    data: denormalizedSirets
+    data: { ...denormalizedSirets, updatedAt: form.updatedAt }
   });
 
   return transporter;
@@ -480,7 +480,10 @@ export const formFactory = async ({
   const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
   const updated = await prisma.form.update({
     where: { id: form.id },
-    data: denormalizedSirets,
+    data: {
+      ...denormalizedSirets,
+      updatedAt: opt?.updatedAt ?? new Date()
+    },
     include: { forwardedIn: true }
   });
 
