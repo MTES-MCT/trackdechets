@@ -150,11 +150,6 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
       break;
   }
 
-  // Return tab
-  if (belongsToIsReturnForTab(bsvhu)) {
-    setTab(siretsFilters, "transporterCompanySiret", "isReturnFor");
-  }
-
   for (const [fieldName, filter] of siretsFilters.entries()) {
     if (fieldName) {
       where[filter].push(formSirets[fieldName]);
@@ -252,6 +247,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     ...where,
     isInRevisionFor: [],
     isRevisedFor: [],
+    ...getBsvhuReturnOrgIds(bsvhu),
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),
     rawBsd: bsvhu,
@@ -302,3 +298,16 @@ export const belongsToIsReturnForTab = (bsvhu: BsvhuForElastic) => {
 
   return hasNotBeenFullyAccepted;
 };
+
+function getBsvhuReturnOrgIds(bsvhu: BsvhuForElastic): {
+  isReturnFor: string[];
+} {
+  // Return tab
+  if (belongsToIsReturnForTab(bsvhu)) {
+    return {
+      isReturnFor: [bsvhu.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
+}

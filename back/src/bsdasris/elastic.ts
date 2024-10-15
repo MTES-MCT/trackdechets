@@ -142,11 +142,6 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
       break;
   }
 
-  // Return tab
-  if (belongsToIsReturnForTab(bsdasri)) {
-    setTab(siretsFilters, "transporterCompanySiret", "isReturnFor");
-  }
-
   for (const [fieldName, filter] of siretsFilters.entries()) {
     const filterValue = formSirets[fieldName];
     if (fieldName && filterValue) {
@@ -238,6 +233,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     ...where,
 
     ...getBsdasriRevisionOrgIds(bsdasri),
+    ...getBsdasriReturnOrgIds(bsdasri),
     revisionRequests: bsdasri.bsdasriRevisionRequests,
 
     sirets: Object.values(where).flat(),
@@ -294,3 +290,14 @@ export const belongsToIsReturnForTab = (bsdasri: Bsdasri) => {
 
   return hasNotBeenFullyAccepted;
 };
+
+function getBsdasriReturnOrgIds(bsdasri: Bsdasri): { isReturnFor: string[] } {
+  // Return tab
+  if (belongsToIsReturnForTab(bsdasri)) {
+    return {
+      isReturnFor: [bsdasri.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
+}

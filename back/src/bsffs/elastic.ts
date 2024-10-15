@@ -21,6 +21,7 @@ import {
 import { prisma } from "@td/prisma";
 import {
   getFirstTransporterSync,
+  getLastTransporterSync,
   getNextTransporterSync,
   getTransportersSync
 } from "./database";
@@ -218,14 +219,6 @@ export function getOrgIdsByTab(
       break;
   }
 
-  // Return tab
-  if (belongsToIsReturnForTab(bsff)) {
-    const transporters = getTransportersSync(bsff);
-    const lastTransporter = transporters[transporters.length - 1];
-
-    setTab(transporterCompanyRole(lastTransporter), "isReturnFor");
-  }
-
   for (const role of roles) {
     const tab = tabsByRole[role];
     if (tab) {
@@ -315,6 +308,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     ...tabs,
     isInRevisionFor: [] as string[],
     isRevisedFor: [] as string[],
+    ...getBsffReturnOrgIds(bsff),
     sirets: Object.values(tabs).flat(),
     ...getRegistryFields(bsff),
     rawBsd: bsff,
@@ -365,3 +359,17 @@ export const belongsToIsReturnForTab = (bsff: BsffForElastic) => {
 
   return hasNotBeenFullyAccepted;
 };
+
+function getBsffReturnOrgIds(bsff: BsffForElastic): { isReturnFor: string[] } {
+  // Return tab
+  if (belongsToIsReturnForTab(bsff)) {
+    const transporters = bsff?.transporters ?? [];
+    const lastTransporter = getLastTransporterSync({ transporters });
+
+    return {
+      isReturnFor: [lastTransporter?.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
+}

@@ -17,7 +17,8 @@ import { getRegistryFields } from "./registry";
 import {
   getSiretsByTab,
   getRecipient,
-  getFormRevisionOrgIds
+  getFormRevisionOrgIds,
+  getFormReturnOrgIds
 } from "./elasticHelpers";
 
 import { buildAddress } from "../companies/sirene/utils";
@@ -149,6 +150,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
         }
       : siretsByTab),
     ...getFormRevisionOrgIds(form),
+    ...getFormReturnOrgIds(form),
     revisionRequests: form.bsddRevisionRequests,
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),

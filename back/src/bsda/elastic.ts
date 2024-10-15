@@ -26,6 +26,7 @@ import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
 import {
   getFirstTransporterSync,
+  getLastTransporterSync,
   getNextTransporterSync,
   getTransportersSync
 } from "./database";
@@ -294,18 +295,6 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
       break;
   }
 
-  // Return tab
-  if (belongsToIsReturnForTab(bsda)) {
-    const transporters = getTransportersSync(bsda);
-    const lastTransporter = transporters[transporters.length - 1];
-
-    setTab(
-      siretsFilters,
-      transporterCompanyOrgIdKey(lastTransporter),
-      "isReturnFor"
-    );
-  }
-
   for (const [fieldName, filter] of siretsFilters.entries()) {
     if (fieldName) {
       where[filter].push(bsdaSirets[fieldName]);
@@ -402,6 +391,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     ...where,
     ...getBsdaRevisionOrgIds(bsda),
+    ...getBsdaReturnOrgIds(bsda),
     revisionRequests: bsda.bsdaRevisionRequests,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
@@ -469,3 +459,16 @@ export const belongsToIsReturnForTab = (bsda: BsdaForElastic) => {
 
   return hasNotBeenFullyAccepted;
 };
+
+function getBsdaReturnOrgIds(bsda: BsdaForElastic): { isReturnFor: string[] } {
+  // Return tab
+  if (belongsToIsReturnForTab(bsda)) {
+    const lastTransporter = getLastTransporterSync(bsda);
+
+    return {
+      isReturnFor: [lastTransporter?.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
+}

@@ -10,6 +10,7 @@ import { FullForm } from "./types";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   getFirstTransporterSync,
+  getLastTransporterSync,
   getNextTransporterSync,
   getTransportersSync
 } from "./database";
@@ -223,14 +224,6 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
       break;
   }
 
-  // Return tab
-  if (belongsToIsReturnForTab(form)) {
-    const transporters = getTransportersSync(form);
-    const lastTransporter = transporters[transporters.length - 1];
-
-    setFieldTab(transporterCompanyOrgIdKey(lastTransporter), "isReturnFor");
-  }
-
   for (const [field, tab] of fieldTabs.entries()) {
     if (field) {
       siretsByTab[tab].push(formSirets[field]);
@@ -259,6 +252,19 @@ export const belongsToIsReturnForTab = (form: FullForm) => {
 
   return hasCiterneBusiness || hasNotBeenFullyAccepted;
 };
+
+export function getFormReturnOrgIds(form: FullForm) {
+  // Return tab
+  if (belongsToIsReturnForTab(form)) {
+    const lastTransporter = getLastTransporterSync(form);
+
+    return {
+      isReturnFor: [lastTransporter?.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
+}
 
 function getFormSirets(form: FullForm) {
   const transporter = getFirstTransporterSync(form);

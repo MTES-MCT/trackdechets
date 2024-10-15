@@ -11,7 +11,7 @@ import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
-import { getFirstTransporterSync } from "./converter";
+import { getFirstTransporterSync, getLastTransporterSync } from "./converter";
 import { prisma } from "@td/prisma";
 import { distinct } from "../common/arrays";
 import { BspaohIncludes } from "./types";
@@ -111,11 +111,6 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
     }
     default:
       break;
-  }
-
-  // Return tab
-  if (belongsToIsReturnForTab(bspaoh)) {
-    setTab(siretsFilters, "transporterCompanySiret", "isReturnFor");
   }
 
   for (const [fieldName, filter] of siretsFilters.entries()) {
@@ -225,6 +220,7 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
     ...where,
     isInRevisionFor: [],
     isRevisedFor: [],
+    ...getBspaohReturnOrgIds(bspaoh),
     sirets: distinct(Object.values(where).flat()),
     ...getRegistryFields(bspaoh),
     rawBsd: bspaoh,
@@ -283,3 +279,19 @@ export const belongsToIsReturnForTab = (bspaoh: Bspaoh) => {
 
   return hasNotBeenFullyAccepted;
 };
+
+function getBspaohReturnOrgIds(bspaoh: BspaohForElastic): {
+  isReturnFor: string[];
+} {
+  // Return tab
+  if (belongsToIsReturnForTab(bspaoh)) {
+    const transporters = bspaoh?.transporters ?? [];
+    const lastTransporter = getLastTransporterSync({ transporters });
+
+    return {
+      isReturnFor: [lastTransporter?.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
+}

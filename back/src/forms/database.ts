@@ -217,6 +217,15 @@ export function getFirstTransporterSync(form: {
   return firstTransporter ?? null;
 }
 
+export function getLastTransporterSync(form: {
+  transporters: BsddTransporter[] | null;
+}): BsddTransporter | null {
+  const transporters = getTransportersSync(form);
+  const greatestNumber = Math.max(...transporters.map(t => t.number));
+  const lastTransporter = transporters.find(t => t.number === greatestNumber);
+  return lastTransporter ?? null;
+}
+
 // Renvoie le premier transporteur qui n'a pas encor signé
 export function getNextTransporterSync(form: {
   transporters: BsddTransporter[] | null;
