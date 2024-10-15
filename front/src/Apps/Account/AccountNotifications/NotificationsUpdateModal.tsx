@@ -6,16 +6,46 @@ import {
   UserNotification
 } from "@td/codegen-ui";
 import { useForm } from "react-hook-form";
-import {
-  ALL_NOTIFICATIONS,
-  authorizedNotifications as authorizedNotificationsByUserRole
-} from "@td/constants";
+
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
 import { SET_COMPANY_NOTIFICATIONS } from "./queries";
 import styles from "./NotificationsUpdateModal.module.scss";
 
+export const ALL_NOTIFICATIONS = [
+  "MEMBERSHIP_REQUEST",
+  "REVISION_REQUEST",
+  "BSD_REFUSAL",
+  "SIGNATURE_CODE_RENEWAL",
+  "BSDA_FINAL_DESTINATION_UPDATE"
+];
+export const authorizedNotificationsByUserRole = {
+  ADMIN: [
+    "MEMBERSHIP_REQUEST",
+    "REVISION_REQUEST",
+    "BSD_REFUSAL",
+    "SIGNATURE_CODE_RENEWAL",
+    "BSDA_FINAL_DESTINATION_UPDATE"
+  ],
+  MEMBER: [
+    "REVISION_REQUEST",
+    "BSD_REFUSAL",
+    "SIGNATURE_CODE_RENEWAL",
+    "BSDA_FINAL_DESTINATION_UPDATE"
+  ],
+  READER: [
+    "REVISION_REQUEST",
+    "BSD_REFUSAL",
+    "SIGNATURE_CODE_RENEWAL",
+    "BSDA_FINAL_DESTINATION_UPDATE"
+  ],
+  DRIVER: [
+    "BSD_REFUSAL",
+    "SIGNATURE_CODE_RENEWAL",
+    "BSDA_FINAL_DESTINATION_UPDATE"
+  ]
+};
 type AccountCompanyNotificationsUpdateModalProps = {
   company: CompanyPrivate;
   close: () => void;
