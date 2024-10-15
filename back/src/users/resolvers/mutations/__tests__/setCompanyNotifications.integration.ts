@@ -9,9 +9,9 @@ import {
   Mutation,
   MutationSetCompanyNotificationsArgs
 } from "../../../../generated/graphql/types";
-import { ALL_NOTIFICATIONS } from "../../../../common/authorizedNotifications";
 import { prisma } from "@td/prisma";
 import { UserNotification, UserRole } from "@prisma/client";
+import { ALL_NOTIFICATIONS } from "../../../notifications";
 
 export const SET_COMPANY_NOTIFICATIONS = gql`
   mutation SetCompanyNotifications($input: SetCompanyNotificationsInput!) {

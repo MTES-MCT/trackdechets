@@ -1,5 +1,4 @@
 import { UserNotification, UserRole } from "@prisma/client";
-import { ALL_NOTIFICATIONS } from "../common/authorizedNotifications";
 import { Recipient } from "@td/mail";
 import { prisma } from "@td/prisma";
 
@@ -36,3 +35,36 @@ export async function getNotificationSubscribers(
 export function getDefaultNotifications(role: UserRole) {
   return role === UserRole.ADMIN ? ALL_NOTIFICATIONS : [];
 }
+
+// if you modify this structure, please modify
+// in front/src/common/notifications
+export const ALL_NOTIFICATIONS: UserNotification[] = [
+  UserNotification.MEMBERSHIP_REQUEST,
+  UserNotification.REVISION_REQUEST,
+  UserNotification.BSD_REFUSAL,
+  UserNotification.SIGNATURE_CODE_RENEWAL,
+  UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+];
+
+// if you modify this structure, please modify
+// in front/src/common/notifications
+export const authorizedNotifications = {
+  [UserRole.ADMIN]: ALL_NOTIFICATIONS,
+  [UserRole.MEMBER]: [
+    UserNotification.REVISION_REQUEST,
+    UserNotification.BSD_REFUSAL,
+    UserNotification.SIGNATURE_CODE_RENEWAL,
+    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+  ],
+  [UserRole.READER]: [
+    UserNotification.REVISION_REQUEST,
+    UserNotification.BSD_REFUSAL,
+    UserNotification.SIGNATURE_CODE_RENEWAL,
+    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+  ],
+  DRIVER: [
+    UserNotification.BSD_REFUSAL,
+    UserNotification.SIGNATURE_CODE_RENEWAL,
+    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+  ]
+};

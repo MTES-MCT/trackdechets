@@ -33,7 +33,7 @@ import {
   searchVatFrOnlyOrNotFoundFailFast
 } from "./search";
 import { SireneSearchResult } from "./sirene/types";
-import { ALL_NOTIFICATIONS } from "../common/authorizedNotifications";
+import { ALL_NOTIFICATIONS } from "../users/notifications";
 
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error
