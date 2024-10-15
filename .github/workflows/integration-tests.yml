@@ -33,10 +33,7 @@ jobs:
           sleep 5
       - name: Run back integration tests
         run: |
-          npx nx run back:test:integration -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
-      - name: Run cron integration tests
-        run: |
-          npx nx run cron:test:integration -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+          npx nx run-many --target=test --projects=back,cron --configuration=integration --parallel=1 -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
 env:
   ALLOW_CLONING_BSDS: true
