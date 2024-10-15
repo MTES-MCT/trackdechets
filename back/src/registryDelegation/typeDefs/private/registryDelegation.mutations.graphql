@@ -8,7 +8,7 @@ type Mutation {
   ): RegistryDelegation!
 
   """
-  Permet de révoquer une demande de délégation. Peut être utilisé par le
+  Permet de révoquer une demande de délégation. Peut être utilisé par
   le délégant. Une fois révoquée, une délégation ne peut plus être modifiée.
   """
   revokeRegistryDelegation(delegationId: ID!): RegistryDelegation!
