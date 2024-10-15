@@ -50,8 +50,7 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor"
-  | "isReturnFor";
+  | "isCollectedFor";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -72,8 +71,7 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: [],
-    isReturnFor: []
+    isCollectedFor: []
   };
 
   const formSirets: Record<string, string | null | undefined> = {
@@ -285,8 +283,9 @@ export const belongsToIsReturnForTab = (bsdasri: Bsdasri) => {
   if (!hasBeenReceivedLately) return false;
 
   const hasNotBeenFullyAccepted =
+    bsdasri.status === BsdasriStatus.REFUSED ||
     bsdasri.destinationReceptionAcceptationStatus !==
-    WasteAcceptationStatus.ACCEPTED;
+      WasteAcceptationStatus.ACCEPTED;
 
   return hasNotBeenFullyAccepted;
 };

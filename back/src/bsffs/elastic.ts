@@ -55,8 +55,7 @@ type TabsKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor"
-  | "isReturnFor";
+  | "isCollectedFor";
 
 /**
  * Renvoie pour chaque statut du bordereau les différents onglets (Brouillon, Pour Action, etc)
@@ -71,8 +70,7 @@ export function getOrgIdsByTab(
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: [],
-    isReturnFor: []
+    isCollectedFor: []
   };
 
   const firstTransporter = getFirstTransporterSync(bsff);
@@ -353,9 +351,12 @@ export const belongsToIsReturnForTab = (bsff: BsffForElastic) => {
 
   if (!hasBeenReceivedLately) return false;
 
-  const hasNotBeenFullyAccepted = bsff.packagings.some(
-    packaging => packaging.acceptationStatus !== WasteAcceptationStatus.ACCEPTED
-  );
+  const hasNotBeenFullyAccepted =
+    bsff.status === BsffStatus.REFUSED ||
+    bsff.packagings.some(
+      packaging =>
+        packaging.acceptationStatus !== WasteAcceptationStatus.ACCEPTED
+    );
 
   return hasNotBeenFullyAccepted;
 };

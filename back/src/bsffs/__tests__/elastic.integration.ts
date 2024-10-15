@@ -21,7 +21,11 @@ import {
   createFicheIntervention
 } from "./factories";
 import { prisma } from "@td/prisma";
-import { BsffFicheIntervention, WasteAcceptationStatus } from "@prisma/client";
+import {
+  BsffFicheIntervention,
+  BsffStatus,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { xDaysAgo } from "../../utils";
 
 describe("getOrgIdsByTab", () => {
@@ -299,12 +303,31 @@ describe("getOrgIdsByTab", () => {
         );
 
         // When
-        const { isReturnFor } = getOrgIdsByTab(bsff);
+        const { isReturnFor } = toBsdElastic(bsff);
 
         // Then
         expect(isReturnFor).toContain(transporter.company.siret);
       }
     );
+
+    it("status is REFUSED > bsff should belong to tab", async () => {
+      // Given
+      const bsff = await createBsffAfterOperation(
+        { emitter, transporter, destination },
+        {
+          data: {
+            status: BsffStatus.REFUSED,
+            destinationReceptionDate: new Date()
+          }
+        }
+      );
+
+      // When
+      const { isReturnFor } = toBsdElastic(bsff);
+
+      // Then
+      expect(isReturnFor).toContain(transporter.company.siret);
+    });
 
     it("waste acceptation status is ACCEPTED > bsff should not belong to tab", async () => {
       // Given
@@ -321,7 +344,7 @@ describe("getOrgIdsByTab", () => {
       );
 
       // When
-      const { isReturnFor } = getOrgIdsByTab(bsff);
+      const { isReturnFor } = toBsdElastic(bsff);
 
       // Then
       expect(isReturnFor).toStrictEqual([]);
@@ -342,7 +365,7 @@ describe("getOrgIdsByTab", () => {
       );
 
       // When
-      const { isReturnFor } = getOrgIdsByTab(bsff);
+      const { isReturnFor } = toBsdElastic(bsff);
 
       // Then
       expect(isReturnFor).toStrictEqual([]);

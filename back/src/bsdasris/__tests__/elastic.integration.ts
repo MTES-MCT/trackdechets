@@ -3,7 +3,7 @@ import { companyFactory } from "../../__tests__/factories";
 import { getBsdasriForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { bsdasriFactory } from "./factories";
-import { Company, WasteAcceptationStatus } from "@prisma/client";
+import { BsdasriStatus, Company, WasteAcceptationStatus } from "@prisma/client";
 import { xDaysAgo } from "../../utils";
 
 describe("toBsdElastic > companies Names & OrgIds", () => {
@@ -90,6 +90,28 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         expect(isReturnFor).toContain(transporter.siret);
       }
     );
+
+    it("status is REFUSED > bsvhu should belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanyName: emitter.name,
+          emitterCompanySiret: emitter.siret,
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          destinationReceptionDate: new Date(),
+          status: BsdasriStatus.REFUSED
+        }
+      });
+
+      // When
+      const bsdasriForElastic = await getBsdasriForElastic(bsdasri);
+      const { isReturnFor } = toBsdElastic(bsdasriForElastic);
+
+      // Then
+      expect(isReturnFor).toContain(transporter.siret);
+    });
 
     it("waste acceptation status is ACCEPTED > bsvhu should not belong to tab", async () => {
       // Given

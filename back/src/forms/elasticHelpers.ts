@@ -46,8 +46,7 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor"
-  | "isReturnFor";
+  | "isCollectedFor";
 
 // génère une clé permettant d'identifier les transporteurs de façon
 // unique dans un mapping
@@ -64,8 +63,7 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: [],
-    isReturnFor: []
+    isCollectedFor: []
   };
 
   // build a mapping to store which actor will see this form appear on a given UI tab
@@ -248,6 +246,7 @@ export const belongsToIsReturnForTab = (form: FullForm) => {
     isDefined(form.emptyReturnADR) || isDefined(form.hasCiterneBeenWashedOut);
 
   const hasNotBeenFullyAccepted =
+    form.status === Status.REFUSED ||
     form.wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED;
 
   return hasCiterneBusiness || hasNotBeenFullyAccepted;

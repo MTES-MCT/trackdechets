@@ -76,8 +76,7 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor"
-  | "isReturnFor";
+  | "isCollectedFor";
 
 // | state              | emitter | transporter | destination | intermediary |
 // |--------------------|---------|-------------|-------------|--------------|
@@ -95,8 +94,7 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: [],
-    isReturnFor: []
+    isCollectedFor: []
   };
 
   const formSirets = getBsvhuSirets(bsvhu);
@@ -293,8 +291,9 @@ export const belongsToIsReturnForTab = (bsvhu: BsvhuForElastic) => {
   if (!hasBeenReceivedLately) return false;
 
   const hasNotBeenFullyAccepted =
+    bsvhu.status === BsvhuStatus.REFUSED ||
     bsvhu.destinationReceptionAcceptationStatus !==
-    WasteAcceptationStatus.ACCEPTED;
+      WasteAcceptationStatus.ACCEPTED;
 
   return hasNotBeenFullyAccepted;
 };

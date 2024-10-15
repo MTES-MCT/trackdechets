@@ -3,7 +3,7 @@ import { companyFactory } from "../../__tests__/factories";
 import { getBspaohForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { bspaohFactory } from "./factories";
-import { Company, WasteAcceptationStatus } from "@prisma/client";
+import { BspaohStatus, Company, WasteAcceptationStatus } from "@prisma/client";
 import { xDaysAgo } from "../../utils";
 
 describe("toBsdElastic > companies Names & OrgIds", () => {
@@ -94,6 +94,34 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         expect(isReturnFor).toContain(transporter.siret);
       }
     );
+
+    it("status is REFUSED > bspaoh should belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bspaoh = await bspaohFactory({
+        opt: {
+          emitterCompanyName: emitter.name,
+          emitterCompanySiret: emitter.siret,
+          destinationReceptionDate: new Date(),
+          status: BspaohStatus.REFUSED,
+          transporters: {
+            create: {
+              transporterCompanyName: transporter.name,
+              transporterCompanySiret: transporter.siret,
+              transporterCompanyVatNumber: transporter.vatNumber,
+              number: 1
+            }
+          }
+        }
+      });
+
+      // When
+      const bspaohForElastic = await getBspaohForElastic(bspaoh);
+      const { isReturnFor } = toBsdElastic(bspaohForElastic);
+
+      // Then
+      expect(isReturnFor).toContain(transporter.siret);
+    });
 
     it("waste acceptation status is ACCEPTED > bspaoh should not belong to tab", async () => {
       // Given

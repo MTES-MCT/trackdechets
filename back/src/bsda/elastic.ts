@@ -129,8 +129,7 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor"
-  | "isReturnFor";
+  | "isCollectedFor";
 // | state              | emitter         | worker          | transporter | destination     | nextDestination | intermediary |
 // | ------------------ | --------------- | --------------- | ----------- | --------------- | --------------- | ------------ |
 // | INITIAL (draft)    | draft           | draft           | draft       | draft           | follow          | follow       |
@@ -148,8 +147,7 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: [],
-    isReturnFor: []
+    isCollectedFor: []
   };
 
   const firstTransporter = getFirstTransporterSync(bsda);
@@ -454,8 +452,9 @@ export const belongsToIsReturnForTab = (bsda: BsdaForElastic) => {
   if (!hasBeenReceivedLately) return false;
 
   const hasNotBeenFullyAccepted =
+    bsda.status === BsdaStatus.REFUSED ||
     bsda.destinationReceptionAcceptationStatus !==
-    WasteAcceptationStatus.ACCEPTED;
+      WasteAcceptationStatus.ACCEPTED;
 
   return hasNotBeenFullyAccepted;
 };

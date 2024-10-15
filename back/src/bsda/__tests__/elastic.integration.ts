@@ -1,4 +1,4 @@
-import { Company, WasteAcceptationStatus } from "@prisma/client";
+import { BsdaStatus, Company, WasteAcceptationStatus } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { companyFactory } from "../../__tests__/factories";
@@ -143,6 +143,29 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         expect(elasticBsda.isReturnFor).toContain(transporter?.siret);
       }
     );
+
+    it("status is REFUSED > bsda should belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsda = await bsdaFactory({
+        opt: {
+          destinationReceptionDate: new Date(),
+          status: BsdaStatus.REFUSED
+        },
+        transporterOpt: {
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          transporterCompanyVatNumber: transporter.vatNumber
+        }
+      });
+
+      // When
+      const bsdaForElastic = await getBsdaForElastic(bsda);
+      const elasticBsda = toBsdElastic(bsdaForElastic);
+
+      // Then
+      expect(elasticBsda.isReturnFor).toContain(transporter?.siret);
+    });
 
     it("waste acceptation status is ACCEPTED > bsda should not belong to tab", async () => {
       // Given

@@ -29,8 +29,7 @@ type WhereKeys =
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor"
-  | "isReturnFor";
+  | "isCollectedFor";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -49,8 +48,7 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
     isFollowFor: [],
     isArchivedFor: [],
     isToCollectFor: [],
-    isCollectedFor: [],
-    isReturnFor: []
+    isCollectedFor: []
   };
 
   const bsdSirets: Record<string, string | null | undefined> = {
@@ -274,8 +272,9 @@ export const belongsToIsReturnForTab = (bspaoh: Bspaoh) => {
   if (!hasBeenReceivedLately) return false;
 
   const hasNotBeenFullyAccepted =
+    bspaoh.status === BspaohStatus.REFUSED ||
     bspaoh.destinationReceptionAcceptationStatus !==
-    WasteAcceptationStatus.ACCEPTED;
+      WasteAcceptationStatus.ACCEPTED;
 
   return hasNotBeenFullyAccepted;
 };

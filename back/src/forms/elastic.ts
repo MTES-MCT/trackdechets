@@ -136,6 +136,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       ? form.quantityReceived.toNumber()
       : null,
     destinationOperationDate: form.processedAt?.getTime(),
+    ...getFormReturnOrgIds(form),
     ...(form.forwarding
       ? {
           // do not display BSD suite in dashboard
@@ -145,12 +146,10 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
           isArchivedFor: [],
           isToCollectFor: [],
           isCollectedFor: [],
-          isInRevisionFor: [],
-          isReturnFor: []
+          isInRevisionFor: []
         }
       : siretsByTab),
     ...getFormRevisionOrgIds(form),
-    ...getFormReturnOrgIds(form),
     revisionRequests: form.bsddRevisionRequests,
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),

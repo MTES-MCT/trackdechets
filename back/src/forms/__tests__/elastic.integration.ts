@@ -14,7 +14,11 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-import { getFirstTransporterSync, getFullForm } from "../database";
+import {
+  getFirstTransporterSync,
+  getFullForm,
+  getLastTransporterSync
+} from "../database";
 import { getSiretsByTab } from "../elasticHelpers";
 import { getFormForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
@@ -392,16 +396,36 @@ describe("getSiretsByTab", () => {
             wasteAcceptationStatus
           }
         });
-        const fullForm = await getFullForm(form);
-        const transporter = getFirstTransporterSync(fullForm);
+        const formForElastic = await getFormForElastic(form);
+        const transporter = getLastTransporterSync(formForElastic);
 
         // When
-        const { isReturnFor } = getSiretsByTab(fullForm);
+        const { isReturnFor } = toBsdElastic(formForElastic);
 
         // Then
         expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
       }
     );
+
+    it("status is REFUSED > bsdd should belong to tab", async () => {
+      // Given
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.REFUSED,
+          receivedAt: new Date()
+        }
+      });
+      const fullForm = await getFormForElastic(form);
+      const transporter = getLastTransporterSync(fullForm);
+
+      // When
+      const { isReturnFor } = toBsdElastic(fullForm);
+
+      // Then
+      expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
+    });
 
     it("waste acceptation status is ACCEPTED > bsdd should not belong to tab", async () => {
       // Given
@@ -414,10 +438,10 @@ describe("getSiretsByTab", () => {
           wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED
         }
       });
-      const fullForm = await getFullForm(form);
+      const fullForm = await getFormForElastic(form);
 
       // When
-      const { isReturnFor } = getSiretsByTab(fullForm);
+      const { isReturnFor } = toBsdElastic(fullForm);
 
       // Then
       expect(isReturnFor).toStrictEqual([]);
@@ -434,10 +458,10 @@ describe("getSiretsByTab", () => {
           wasteAcceptationStatus: WasteAcceptationStatus.REFUSED
         }
       });
-      const fullForm = await getFullForm(form);
+      const fullForm = await getFormForElastic(form);
 
       // When
-      const { isReturnFor } = getSiretsByTab(fullForm);
+      const { isReturnFor } = toBsdElastic(fullForm);
 
       // Then
       expect(isReturnFor).toStrictEqual([]);
@@ -454,11 +478,11 @@ describe("getSiretsByTab", () => {
           emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
         }
       });
-      const fullForm = await getFullForm(form);
-      const transporter = getFirstTransporterSync(fullForm);
+      const fullForm = await getFormForElastic(form);
+      const transporter = getLastTransporterSync(fullForm);
 
       // When
-      const { isReturnFor } = getSiretsByTab(fullForm);
+      const { isReturnFor } = toBsdElastic(fullForm);
 
       // Then
       expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
@@ -475,11 +499,11 @@ describe("getSiretsByTab", () => {
           hasCiterneBeenWashedOut: false
         }
       });
-      const fullForm = await getFullForm(form);
-      const transporter = getFirstTransporterSync(fullForm);
+      const fullForm = await getFormForElastic(form);
+      const transporter = getLastTransporterSync(fullForm);
 
       // When
-      const { isReturnFor } = getSiretsByTab(fullForm);
+      const { isReturnFor } = toBsdElastic(fullForm);
 
       // Then
       expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
@@ -498,11 +522,11 @@ describe("getSiretsByTab", () => {
           emptyReturnADR: EmptyReturnADR.EMPTY_RETURN_NOT_WASHED
         }
       });
-      const fullForm = await getFullForm(form);
-      const transporter = getFirstTransporterSync(fullForm);
+      const fullForm = await getFormForElastic(form);
+      const transporter = getLastTransporterSync(fullForm);
 
       // When
-      const { isReturnFor } = getSiretsByTab(fullForm);
+      const { isReturnFor } = toBsdElastic(fullForm);
 
       // Then
       expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
