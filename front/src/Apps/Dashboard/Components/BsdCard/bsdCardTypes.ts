@@ -19,6 +19,8 @@ export interface BsdCardProps {
           id: string;
         };
       });
+  posInSet?: number;
+  setSize?: number;
   bsdCurrentTab?: BsdCurrentTab;
   currentSiret: string;
   onValidate: (bsd: Bsd) => void;
