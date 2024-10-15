@@ -6,6 +6,9 @@ export const ALL_NOTIFICATIONS = [
   "BSDA_FINAL_DESTINATION_UPDATE"
 ];
 
+// if you modify this structure, please modify
+// in back/src/common/authorizedNotifications
+// and front/src/common/authorizedNotifications
 export const authorizedNotifications = {
   ADMIN: ALL_NOTIFICATIONS,
   MEMBER: [
