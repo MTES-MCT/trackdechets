@@ -17,9 +17,6 @@ ADD
 UPDATE
   "CompanyAssociation"
 SET
-  "notifications" = ARRAY(
-    SELECT
-      enum_range(NULL :: "UserNotification")
-  )
+  "notifications" = enum_range(NULL :: "UserNotification")
 WHERE
   "role" = 'ADMIN';

@@ -18,8 +18,7 @@ import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   isClosedCompany,
   CLOSED_COMPANY_ERROR,
-  isProfessional,
-  ALL_NOTIFICATIONS
+  isProfessional
 } from "@td/constants";
 import { searchCompany } from "../../search";
 import {
@@ -34,7 +33,7 @@ import { isGenericEmail } from "@td/constants";
 import { parseCompanyAsync } from "../../validation/index";
 import { companyInputToZodCompany } from "../../validation/helpers";
 import { toGqlCompanyPrivate } from "../../converters";
-
+import { ALL_NOTIFICATIONS } from "../../../common/authorizedNotifications";
 /**
  * Create a new company and associate it to a user
  * who becomes the first admin of the company

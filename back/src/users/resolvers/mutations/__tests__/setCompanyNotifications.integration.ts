@@ -9,7 +9,7 @@ import {
   Mutation,
   MutationSetCompanyNotificationsArgs
 } from "../../../../generated/graphql/types";
-import { ALL_NOTIFICATIONS } from "@td/constants";
+import { ALL_NOTIFICATIONS } from "../../../../common/authorizedNotifications";
 import { prisma } from "@td/prisma";
 import { UserNotification, UserRole } from "@prisma/client";
 

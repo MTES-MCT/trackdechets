@@ -1,5 +1,5 @@
 import { UserNotification, UserRole } from "@prisma/client";
-import { ALL_NOTIFICATIONS } from "@td/constants";
+import { ALL_NOTIFICATIONS } from "../common/authorizedNotifications";
 import { Recipient } from "@td/mail";
 import { prisma } from "@td/prisma";
 

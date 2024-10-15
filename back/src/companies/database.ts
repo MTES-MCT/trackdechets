@@ -27,12 +27,13 @@ import { UserInputError } from "../common/errors";
 import { allFavoriteTypes } from "./types";
 import { favoritesCompanyQueue } from "../queue/producers/company";
 import { searchTDSireneFailFast } from "./sirenify";
-import { ALL_NOTIFICATIONS, isSiret, isVat } from "@td/constants";
+import { isSiret, isVat } from "@td/constants";
 import {
   PartialCompanyVatSearchResult,
   searchVatFrOnlyOrNotFoundFailFast
 } from "./search";
 import { SireneSearchResult } from "./sirene/types";
+import { ALL_NOTIFICATIONS } from "../common/authorizedNotifications";
 
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error

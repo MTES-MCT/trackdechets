@@ -17,7 +17,7 @@ import { deleteCachedUserRoles } from "../common/redis/users";
 import { hashPassword, passwordVersion } from "./utils";
 import { UserInputError } from "../common/errors";
 import { PrismaTransaction } from "../common/repository/types";
-import { ALL_NOTIFICATIONS } from "@td/constants";
+import { ALL_NOTIFICATIONS } from "../common/authorizedNotifications";
 import { getDefaultNotifications } from "./notifications";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
