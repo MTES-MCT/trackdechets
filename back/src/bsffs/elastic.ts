@@ -230,7 +230,7 @@ export function getOrgIdsByTab(
   for (const role of roles) {
     const roleTabs = tabsByRole[role];
     const orgId = orgIdByRole[role];
-    if (roleTabs.length) {
+    if (roleTabs?.length) {
       roleTabs.forEach(tab => tabs[tab].push(orgId));
     } else {
       // Si aucun onglet, ajouter l'onglet "Suivi" par défaut
