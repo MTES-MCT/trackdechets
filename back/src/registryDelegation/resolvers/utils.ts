@@ -82,14 +82,15 @@ export const findDelegateOrDelegatorOrThrow = async (
 export const getDelegationStatus = (delegation: RegistryDelegation) => {
   const NOW = new Date();
 
-  const { isRevoked, startDate, endDate } = delegation;
+  const { revokedBy, cancelledBy, startDate, endDate } = delegation;
 
-  if (isRevoked) return "CLOSED" as RegistryDelegationStatus;
+  if (revokedBy) return "REVOKED" as RegistryDelegationStatus;
+
+  if (cancelledBy) return "CANCELLED" as RegistryDelegationStatus;
 
   if (startDate > NOW) return "INCOMING" as RegistryDelegationStatus;
 
-  if (startDate <= NOW && (!endDate || endDate > NOW))
-    return "ONGOING" as RegistryDelegationStatus;
+  if (!endDate || endDate > NOW) return "ONGOING" as RegistryDelegationStatus;
 
-  return "CLOSED" as RegistryDelegationStatus;
+  return "EXPIRED" as RegistryDelegationStatus;
 };

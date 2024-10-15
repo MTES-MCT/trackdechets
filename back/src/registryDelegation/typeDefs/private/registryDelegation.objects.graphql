@@ -46,14 +46,19 @@ type RegistryDelegation {
   comment: String
 
   """
-  Si la demande de délégation a été révoquée (par le délégataire ou le délégant)
-  """
-  isRevoked: Boolean!
-
-  """
   Statut de la délégation
   """
   status: RegistryDelegationStatus!
+
+  """
+  ID de l'utilisateur qui a révoqué la délégation
+  """
+  revokedBy: ID
+
+  """
+  ID de l'utilisateur qui a annulé la délégation
+  """
+  cancelledBy: ID
 }
 
 type RegistryDelegationEdge {

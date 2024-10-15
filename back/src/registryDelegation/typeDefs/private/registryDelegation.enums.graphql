@@ -13,7 +13,17 @@ enum RegistryDelegationStatus {
   ONGOING
 
   """
-  Clôturée
+  Annulée
   """
-  CLOSED
+  CANCELLED
+
+  """
+  Révoquée
+  """
+  REVOKED
+
+  """
+  Expirée
+  """
+  EXPIRED
 }

@@ -54,10 +54,18 @@ export async function checkCanRevoke(
   user: User,
   delegation: RegistryDelegation
 ) {
+  if (delegation.revokedBy) {
+    throw new ForbiddenError("Cette délégation a déjà été révoquée.");
+  }
+
+  if (delegation.cancelledBy) {
+    throw new ForbiddenError("Cette délégation a été annulée.");
+  }
+
   const companyAssociations = await prisma.companyAssociation.findMany({
     where: {
       userId: user.id,
-      companyId: { in: [delegation.delegatorId, delegation.delegateId] }
+      companyId: delegation.delegatorId
     },
     select: {
       role: true
@@ -66,7 +74,7 @@ export async function checkCanRevoke(
 
   if (!companyAssociations?.length) {
     throw new ForbiddenError(
-      "Vous devez faire partie de l'entreprise délégante ou délégataire d'une délégation pour pouvoir la révoquer."
+      "Vous devez faire partie de l'entreprise délégante d'une délégation pour pouvoir la révoquer."
     );
   }
 
@@ -76,7 +84,46 @@ export async function checkCanRevoke(
     )
   ) {
     throw new ForbiddenError(
-      "Vous n'avez pas les permissions suffisantes pour pouvoir créer une délégation."
+      "Vous n'avez pas les permissions suffisantes pour pouvoir révoquer une délégation."
+    );
+  }
+}
+
+export async function checkCanCancel(
+  user: User,
+  delegation: RegistryDelegation
+) {
+  if (delegation.cancelledBy) {
+    throw new ForbiddenError("Cette délégation a déjà été annulée.");
+  }
+
+  if (delegation.revokedBy) {
+    throw new ForbiddenError("Cette délégation a été révoquée.");
+  }
+
+  const companyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      userId: user.id,
+      companyId: delegation.delegateId
+    },
+    select: {
+      role: true
+    }
+  });
+
+  if (!companyAssociations?.length) {
+    throw new ForbiddenError(
+      "Vous devez faire partie de l'entreprise délégataire d'une délégation pour pouvoir l'annuler."
+    );
+  }
+
+  if (
+    !companyAssociations.some(association =>
+      can(association.role, Permission.CompanyCanManageRegistryDelegation)
+    )
+  ) {
+    throw new ForbiddenError(
+      "Vous n'avez pas les permissions suffisantes pour pouvoir annuler une délégation."
     );
   }
 }

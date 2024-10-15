@@ -61,7 +61,15 @@ export const REVOKE_REGISTRY_DELEGATION = gql`
   mutation revokeRegistryDelegation($delegationId: ID!) {
     revokeRegistryDelegation(delegationId: $delegationId) {
       id
-      isRevoked
+      status
+    }
+  }
+`;
+
+export const CANCEL_REGISTRY_DELEGATION = gql`
+  mutation cancelRegistryDelegation($delegationId: ID!) {
+    cancelRegistryDelegation(delegationId: $delegationId) {
+      id
       status
     }
   }

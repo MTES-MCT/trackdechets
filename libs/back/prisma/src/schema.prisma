@@ -1106,7 +1106,8 @@ model RegistryDelegation {
 
   comment String? @db.VarChar(500)
 
-  isRevoked Boolean @default(false)
+  revokedBy String? @db.VarChar(30)
+  cancelledBy String? @db.VarChar(30)
 
   @@index([delegateId], map: "_RegistryDelegationDelegateIdIdx")
   @@index([delegatorId], map: "_RegistryDelegationDelegatorIdIdx")

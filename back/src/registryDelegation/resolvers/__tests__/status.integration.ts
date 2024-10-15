@@ -6,38 +6,63 @@ import { RegistryDelegationStatus } from "../../../generated/graphql/types";
 
 describe("status", () => {
   it.each([
-    // CLOSED
+    // REVOKED
     [
-      { isRevoked: true, startDate: nowPlusXHours(-2) },
-      "CLOSED" as RegistryDelegationStatus
+      { revokedBy: "someuserid", startDate: nowPlusXHours(-2) },
+      "REVOKED" as RegistryDelegationStatus
     ],
     [
-      { isRevoked: true, startDate: nowPlusXHours(2) },
-      "CLOSED" as RegistryDelegationStatus
+      { revokedBy: "someuserid", startDate: nowPlusXHours(2) },
+      "REVOKED" as RegistryDelegationStatus
     ],
     [
       {
-        isRevoked: true,
+        revokedBy: "someuserid",
         startDate: nowPlusXHours(2),
         endDate: nowPlusXHours(3)
       },
-      "CLOSED" as RegistryDelegationStatus
+      "REVOKED" as RegistryDelegationStatus
     ],
     [
       {
-        isRevoked: true,
+        revokedBy: "someuserid",
         startDate: nowPlusXHours(-4),
         endDate: nowPlusXHours(-3)
       },
-      "CLOSED" as RegistryDelegationStatus
+      "REVOKED" as RegistryDelegationStatus
+    ],
+    // CANCELLED
+    [
+      { cancelledBy: "someuserid", startDate: nowPlusXHours(-2) },
+      "CANCELLED" as RegistryDelegationStatus
+    ],
+    [
+      { cancelledBy: "someuserid", startDate: nowPlusXHours(2) },
+      "CANCELLED" as RegistryDelegationStatus
     ],
     [
       {
-        isRevoked: false,
+        cancelledBy: "someuserid",
+        startDate: nowPlusXHours(2),
+        endDate: nowPlusXHours(3)
+      },
+      "CANCELLED" as RegistryDelegationStatus
+    ],
+    [
+      {
+        cancelledBy: "someuserid",
         startDate: nowPlusXHours(-4),
         endDate: nowPlusXHours(-3)
       },
-      "CLOSED" as RegistryDelegationStatus
+      "CANCELLED" as RegistryDelegationStatus
+    ],
+    // EXPIRED
+    [
+      {
+        startDate: nowPlusXHours(-4),
+        endDate: nowPlusXHours(-3)
+      },
+      "EXPIRED" as RegistryDelegationStatus
     ],
     // INCOMING
     [{ startDate: nowPlusXHours(2) }, "INCOMING" as RegistryDelegationStatus],

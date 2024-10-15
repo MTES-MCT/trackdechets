@@ -14,7 +14,7 @@ import "./companyRegistryDelegation.scss";
 import { useQuery } from "@apollo/client";
 import { REGISTRY_DELEGATIONS } from "../../common/queries/registryDelegation/queries";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { RevokeRegistryDelegationModal } from "./RevokeRegistryDelegationModal";
+import { RevokeOrCancelRegistryDelegationModal } from "./RevokeOrCancelRegistryDelegationModal";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 
@@ -24,15 +24,19 @@ const getStatusLabel = (status: RegistryDelegationStatus) => {
       return "EN COURS";
     case RegistryDelegationStatus.Incoming:
       return "À VENIR";
-    case RegistryDelegationStatus.Closed:
-      return "CLÔTURÉE";
+    case RegistryDelegationStatus.Revoked:
+      return "RÉVOQUÉE";
+    case RegistryDelegationStatus.Cancelled:
+      return "ANNULÉE";
+    case RegistryDelegationStatus.Expired:
+      return "EXPIRÉE";
   }
 };
 
 const getStatusBadge = (status: RegistryDelegationStatus) => {
-  let severity: AlertProps.Severity = "success";
+  let severity: AlertProps.Severity = "error";
   if (status === RegistryDelegationStatus.Incoming) severity = "info";
-  if (status === RegistryDelegationStatus.Closed) severity = "error";
+  else if (status === RegistryDelegationStatus.Ongoing) severity = "success";
 
   return (
     <Badge severity={severity} small noIcon>
@@ -61,7 +65,7 @@ interface Props {
 
 export const RegistryDelegationsTable = ({ as, company }: Props) => {
   const [pageIndex, setPageIndex] = useState(0);
-  const [delegationToRevoke, setDelegationToRevoke] =
+  const [delegationToRevokeOrCancel, setDelegationToRevokeOrCancel] =
     useState<RegistryDelegation | null>(null);
 
   const isAdmin = company.userRole === UserRole.Admin;
@@ -133,6 +137,10 @@ export const RegistryDelegationsTable = ({ as, company }: Props) => {
                     ? company.givenName
                     : company.name;
 
+                  const canRevokeOrCancel =
+                    status === RegistryDelegationStatus.Ongoing ||
+                    status === RegistryDelegationStatus.Incoming;
+
                   return (
                     <tr key={id}>
                       <td
@@ -171,7 +179,7 @@ export const RegistryDelegationsTable = ({ as, company }: Props) => {
                       <td>{getStatusBadge(status)}</td>
                       {isAdmin && (
                         <td>
-                          {status !== RegistryDelegationStatus.Closed && (
+                          {canRevokeOrCancel && (
                             <Button
                               priority="primary"
                               size="small"
@@ -182,7 +190,9 @@ export const RegistryDelegationsTable = ({ as, company }: Props) => {
                                   "company-revoke-registryDelegation"
                               }}
                               disabled={false}
-                              onClick={() => setDelegationToRevoke(delegation)}
+                              onClick={() =>
+                                setDelegationToRevokeOrCancel(delegation)
+                              }
                             >
                               {as === "delegator" ? "Révoquer" : "Annuler"}
                             </Button>
@@ -221,12 +231,16 @@ export const RegistryDelegationsTable = ({ as, company }: Props) => {
         />
       </div>
 
-      {delegationToRevoke && (
-        <RevokeRegistryDelegationModal
-          delegationId={delegationToRevoke.id}
-          to={as === "delegator" ? delegationToRevoke.delegate.name : null}
-          from={as === "delegate" ? delegationToRevoke.delegator.name : null}
-          onClose={() => setDelegationToRevoke(null)}
+      {delegationToRevokeOrCancel && (
+        <RevokeOrCancelRegistryDelegationModal
+          delegationId={delegationToRevokeOrCancel.id}
+          to={
+            as === "delegator" ? delegationToRevokeOrCancel.delegate.name : null
+          }
+          from={
+            as === "delegate" ? delegationToRevokeOrCancel.delegator.name : null
+          }
+          onClose={() => setDelegationToRevokeOrCancel(null)}
         />
       )}
     </div>
