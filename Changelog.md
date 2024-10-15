@@ -16,6 +16,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Changer la référence du cerfa lors de l'ajout d'une fiche d'intervention [PR 3616](https://github.com/MTES-MCT/trackdechets/pull/3616)
 
+#### :boom: Breaking changes
+
+- La Raison Sociale, le SIRET et l'Adresse de la destination sont scellés à la signature émetteur, sauf pour l'émetteur qui doit pouvoir le modifier jusqu'à la prochaine signature [PR 3628](https://github.com/MTES-MCT/trackdechets/pull/3628)
+
+- La complétion du champ identificationNumbers est obligatoire à la publication d'un VHU [PR 3628](https://github.com/MTES-MCT/trackdechets/pull/3628)
+
 #### :bug: Corrections de bugs
 
 - Documentation API Developers : Page Not Found, si on n'y accède pas via l'arborescence [PR 3621](https://github.com/MTES-MCT/trackdechets/pull/3621)
