@@ -1,10 +1,7 @@
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  convertUrls,
-  getCompanyOrCompanyNotFound
-} from "../../../companies/database";
+import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getCompanyAssociationOrNotFound } from "../../database";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
@@ -13,6 +10,7 @@ import {
   Permission
 } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
+import { toGqlCompanyPrivate } from "../../../companies/converters";
 
 const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] =
   async (parent, { userId, siret }, context) => {
@@ -40,7 +38,7 @@ const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] 
       where: { orgId: siret }
     });
 
-    return convertUrls(dbCompany!);
+    return toGqlCompanyPrivate(dbCompany!);
   };
 
 export default removeUserFromCompanyResolver;

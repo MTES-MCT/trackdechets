@@ -7,7 +7,6 @@ import {
   WasteProcessorType,
   WasteVehiclesType
 } from "@prisma/client";
-import { convertUrls } from "../../database";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
@@ -19,7 +18,8 @@ import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   isClosedCompany,
   CLOSED_COMPANY_ERROR,
-  isProfessional
+  isProfessional,
+  ALL_NOTIFICATIONS
 } from "@td/constants";
 import { searchCompany } from "../../search";
 import {
@@ -33,6 +33,7 @@ import { sendVerificationCodeLetter } from "../../../common/post";
 import { isGenericEmail } from "@td/constants";
 import { parseCompanyAsync } from "../../validation/index";
 import { companyInputToZodCompany } from "../../validation/helpers";
+import { toGqlCompanyPrivate } from "../../converters";
 
 /**
  * Create a new company and associate it to a user
@@ -185,7 +186,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       company: {
         create: companyCreateInput
       },
-      role: "ADMIN"
+      role: "ADMIN",
+      notifications: ALL_NOTIFICATIONS
     },
     include: { company: true }
   });
@@ -252,7 +254,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   ) {
     await sendFirstOnboardingEmail(companyInput, user);
   }
-  return convertUrls(company);
+  return toGqlCompanyPrivate(company);
 };
 
 export default createCompanyResolver;

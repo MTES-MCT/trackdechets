@@ -11,10 +11,10 @@ import {
   MembershipRequestAlreadyAccepted,
   MembershipRequestAlreadyRefused
 } from "../../errors";
-import { convertUrls } from "../../../companies/database";
 import { membershipRequestAccepted, renderMail } from "@td/mail";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
+import { toGqlCompanyPrivate } from "../../../companies/converters";
 
 const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipRequest"] =
   async (_, { id, role }, context) => {
@@ -84,7 +84,7 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
     const dbCompany = await prisma.company.findUnique({
       where: { id: company.id }
     });
-    return convertUrls(dbCompany!);
+    return toGqlCompanyPrivate(dbCompany!);
   };
 
 export default acceptMembershipRequestResolver;

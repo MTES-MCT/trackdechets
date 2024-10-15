@@ -98,6 +98,7 @@ const routes = {
   account: {
     index: "/account",
     info: "/account/info",
+    notifications: "/account/notifications",
     // Old routes to keep integrations from breaking
     companies: {
       create: {

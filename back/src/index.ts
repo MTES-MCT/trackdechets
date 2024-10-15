@@ -16,7 +16,7 @@ export { closeQueues } from "./queue/producers";
 export { initSentry } from "./common/sentry";
 export * from "./utils";
 export { deleteBsd } from "./common/elastic";
-export { getCompaniesAndActiveAdminsByCompanyOrgIds } from "./companies/database";
+export { getCompaniesAndSubscribersByCompanyOrgIds } from "./companies/database";
 export { formatDate } from "./common/pdf";
 export { sendMail } from "./mailer/mailing";
 export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";

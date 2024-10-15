@@ -1,5 +1,5 @@
 import {
-  getCompaniesAndActiveAdminsByCompanyOrgIds,
+  getCompaniesAndSubscribersByCompanyOrgIds,
   formatDate,
   sendMail
 } from "back";
@@ -16,7 +16,8 @@ import {
   Company,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus,
-  User
+  User,
+  UserNotification
 } from "@prisma/client";
 import * as COMPANY_CONSTANTS from "@td/constants";
 import {
@@ -24,10 +25,10 @@ import {
   MessageVersion,
   membershipRequestDetailsEmail,
   pendingMembershipRequestDetailsEmail,
-  pendingMembershipRequestAdminDetailsEmail,
+  pendingMembershipRequestEmail,
   profesionalsSecondOnboardingEmail,
   producersSecondOnboardingEmail,
-  pendingRevisionRequestAdminDetailsEmail
+  pendingRevisionRequestEmail
 } from "@td/mail";
 import { xDaysAgo } from "./helpers";
 
@@ -121,7 +122,7 @@ export const getRecentlyRegisteredProducers = async (daysAgo = 2) => {
 /**
  * Second onboarding email. Different for profesionals & non-profesionals / producers
  */
-export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
+export const sendSecondOnboardingEmail = async (daysAgo = 2, sync = false) => {
   // Pros
   const profesionals = await getRecentlyRegisteredProfesionals(daysAgo);
 
@@ -134,7 +135,7 @@ export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
       messageVersions: proMessageVersions
     });
 
-    await sendMail(proPayload);
+    await sendMail(proPayload, { sync });
   }
 
   // Producers. If already in pro list, remove (only 1 email, pro has priority)
@@ -155,7 +156,7 @@ export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
       messageVersions: producersMessageVersions
     });
 
-    await sendMail(producersPayload);
+    await sendMail(producersPayload, { sync });
   }
 
   await prisma.$disconnect();
@@ -189,7 +190,10 @@ export const getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest =
  * Send a mail to users who registered recently and who haven't
  * issued a single MembershipRequest yet
  */
-export const sendMembershipRequestDetailsEmail = async (daysAgo = 7) => {
+export const sendMembershipRequestDetailsEmail = async (
+  daysAgo = 7,
+  sync = false
+) => {
   const recipients =
     await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(daysAgo);
 
@@ -202,7 +206,7 @@ export const sendMembershipRequestDetailsEmail = async (daysAgo = 7) => {
       messageVersions
     });
 
-    await sendMail(payload);
+    await sendMail(payload, { sync });
   }
 
   await prisma.$disconnect();
@@ -242,7 +246,8 @@ export const getActiveUsersWithPendingMembershipRequests = async (
  * got no answer
  */
 export const sendPendingMembershipRequestDetailsEmail = async (
-  daysAgo = 14
+  daysAgo = 14,
+  sync = false
 ) => {
   const recipients = await getActiveUsersWithPendingMembershipRequests(daysAgo);
 
@@ -255,13 +260,20 @@ export const sendPendingMembershipRequestDetailsEmail = async (
       messageVersions
     });
 
-    await sendMail(payload);
+    await sendMail(payload, { sync });
   }
 
   await prisma.$disconnect();
 };
 
-export const getPendingMembershipRequestsAndAssociatedAdmins = async (
+/**
+ * Récupère toutes les demandes de rattachement qui sont en attente depuis `daysAgo`
+ * jours ainsi que :
+ * - les établissements de rattachement correspondants.
+ * - les utilisateurs au sein de ces établissements qui sont abonnées aux notifications
+ * de demandes de rattachement par e-mail.
+ */
+export const getPendingMembershipRequestsAndAssociatedSubscribers = async (
   daysAgo: number
 ) => {
   const now = new Date();
@@ -280,7 +292,14 @@ export const getPendingMembershipRequestsAndAssociatedAdmins = async (
       company: {
         include: {
           companyAssociations: {
-            where: { role: "ADMIN", user: { isActive: true } },
+            where: {
+              notifications: {
+                has: UserNotification.MEMBERSHIP_REQUEST
+              },
+              user: {
+                isActive: true
+              }
+            },
             include: { user: true }
           }
         }
@@ -291,47 +310,55 @@ export const getPendingMembershipRequestsAndAssociatedAdmins = async (
 
 /**
  * For each unanswered membership request issued X days ago, send an
- * email to all the admins of request's targeted company
+ * email to all the users inside the companies who are subsribed to
+ * membership requests notifications by e-mail.
  */
-export const sendPendingMembershipRequestToAdminDetailsEmail = async (
-  daysAgo = 14
+export const sendPendingMembershipRequestEmail = async (
+  daysAgo = 14,
+  sync = false
 ) => {
-  const requests = await getPendingMembershipRequestsAndAssociatedAdmins(
+  const requests = await getPendingMembershipRequestsAndAssociatedSubscribers(
     daysAgo
   );
 
   if (requests.length) {
-    const messageVersions: MessageVersion[] = requests.map(request => {
-      const variables = {
-        requestId: request.id,
-        email: request.user.email,
-        orgName: request.company.name,
-        orgId: request.company.orgId
-      };
+    const messageVersions: MessageVersion[] = requests
+      .map(request => {
+        const variables = {
+          requestId: request.id,
+          email: request.user.email,
+          orgName: request.company.name,
+          orgId: request.company.orgId
+        };
 
-      const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
-        variables,
-        messageVersions: []
-      });
+        const template = renderMail(pendingMembershipRequestEmail, {
+          variables,
+          messageVersions: []
+        });
 
-      return {
-        to: request.company.companyAssociations.map(companyAssociation => ({
-          email: companyAssociation.user.email,
-          name: companyAssociation.user.name
-        })),
-        ...(template.body && {
-          params: {
-            body: template.body
-          }
-        })
-      };
-    });
+        if (request.company.companyAssociations.length) {
+          return {
+            to: request.company.companyAssociations.map(companyAssociation => ({
+              email: companyAssociation.user.email,
+              name: companyAssociation.user.name
+            })),
+            ...(template.body && {
+              params: {
+                body: template.body
+              }
+            })
+          };
+        }
 
-    const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+        return null;
+      })
+      .filter(Boolean);
+
+    const payload = renderMail(pendingMembershipRequestEmail, {
       messageVersions
     });
 
-    await sendMail(payload);
+    await sendMail(payload, { sync });
   }
 
   await prisma.$disconnect();
@@ -355,19 +382,19 @@ type RequestWithApprovals =
 type RequestWithWrappedApprovals =
   | (BsddRevisionRequestWithReadableId & {
       approvals: (BsddRevisionRequestApproval & {
-        admins: User[];
+        subscribers: User[];
         company: Company;
       })[];
     })
   | (BsdaRevisionRequest & {
       approvals: (BsdaRevisionRequestApproval & {
-        admins: User[];
+        subscribers: User[];
         company: Company;
       })[];
     })
   | (BsdasriRevisionRequest & {
       approvals: (BsdasriRevisionRequestApproval & {
-        admins: User[];
+        subscribers: User[];
         company: Company;
       })[];
     });
@@ -375,7 +402,7 @@ type RequestWithWrappedApprovals =
 /**
  * Will add pending approval companies' admins to requests
  */
-export const addPendingApprovalsCompanyAdmins = async (
+export const addPendingApprovalsCompanySubscribers = async (
   requests: RequestWithApprovals[]
 ): Promise<RequestWithWrappedApprovals[]> => {
   // Extract all pending company sirets
@@ -389,11 +416,14 @@ export const addPendingApprovalsCompanyAdmins = async (
     )
     .flat();
 
-  // Find companies and their respective admins
+  // Find companies and their respective mail subscribers
   const companiesAndAdminsByOrgIds =
-    await getCompaniesAndActiveAdminsByCompanyOrgIds(companySirets);
+    await getCompaniesAndSubscribersByCompanyOrgIds(
+      companySirets,
+      UserNotification.REVISION_REQUEST
+    );
 
-  // Add admins to requests
+  // Add mail subscribers to requests
   return requests.map((request: RequestWithApprovals) => {
     return {
       ...request,
@@ -407,13 +437,14 @@ export const addPendingApprovalsCompanyAdmins = async (
         .map(approval => ({
           ...approval,
           company: companiesAndAdminsByOrgIds[approval.approverSiret],
-          admins: companiesAndAdminsByOrgIds[approval.approverSiret].admins
+          subscribers:
+            companiesAndAdminsByOrgIds[approval.approverSiret].subscribers
         }))
     };
   });
 };
 
-export const getPendingBSDDRevisionRequestsWithAdmins = async (
+export const getPendingBSDDRevisionRequestsWithSubscribers = async (
   daysAgo: number
 ): Promise<RequestWithWrappedApprovals[]> => {
   const now = new Date();
@@ -431,10 +462,10 @@ export const getPendingBSDDRevisionRequestsWithAdmins = async (
   });
 
   // Add admins to requests
-  return await addPendingApprovalsCompanyAdmins(requests);
+  return await addPendingApprovalsCompanySubscribers(requests);
 };
 
-export const getPendingBSDARevisionRequestsWithAdmins = async (
+export const getPendingBSDARevisionRequestsWithSubscribers = async (
   daysAgo: number
 ): Promise<RequestWithWrappedApprovals[]> => {
   const now = new Date();
@@ -452,10 +483,10 @@ export const getPendingBSDARevisionRequestsWithAdmins = async (
   });
 
   // Add admins to requests
-  return await addPendingApprovalsCompanyAdmins(requests);
+  return await addPendingApprovalsCompanySubscribers(requests);
 };
 
-export const getPendingBSDASRIRevisionRequestsWithAdmins = async (
+export const getPendingBSDASRIRevisionRequestsWithSubscribers = async (
   daysAgo: number
 ): Promise<RequestWithWrappedApprovals[]> => {
   const now = new Date();
@@ -473,19 +504,20 @@ export const getPendingBSDASRIRevisionRequestsWithAdmins = async (
   });
 
   // Add admins to requests
-  return await addPendingApprovalsCompanyAdmins(requests);
+  return await addPendingApprovalsCompanySubscribers(requests);
 };
 
 /**
  * Send an email to admins who didn't answer to a revision request
  */
-export const sendPendingRevisionRequestToAdminDetailsEmail = async (
-  daysAgo = 5
+export const sendPendingRevisionRequestEmail = async (
+  daysAgo = 5,
+  sync = false
 ) => {
   const pendingBsddRevisionRequest =
-    await getPendingBSDDRevisionRequestsWithAdmins(daysAgo);
+    await getPendingBSDDRevisionRequestsWithSubscribers(daysAgo);
   const pendingBsdaRevisionRequest =
-    await getPendingBSDARevisionRequestsWithAdmins(daysAgo);
+    await getPendingBSDARevisionRequestsWithSubscribers(daysAgo);
 
   const requests = [
     ...pendingBsddRevisionRequest,
@@ -510,13 +542,13 @@ export const sendPendingRevisionRequestToAdminDetailsEmail = async (
             companyOrgId: approval.company.orgId
           };
 
-          const template = renderMail(pendingRevisionRequestAdminDetailsEmail, {
+          const template = renderMail(pendingRevisionRequestEmail, {
             variables,
             messageVersions: []
           });
 
           return {
-            to: approval.admins.map(admin => ({
+            to: approval.subscribers.map(admin => ({
               email: admin.email,
               name: admin.name
             })),
@@ -530,11 +562,11 @@ export const sendPendingRevisionRequestToAdminDetailsEmail = async (
       })
       .flat();
 
-    const payload = renderMail(pendingRevisionRequestAdminDetailsEmail, {
+    const payload = renderMail(pendingRevisionRequestEmail, {
       messageVersions
     });
 
-    await sendMail(payload);
+    await sendMail(payload, { sync });
   }
 
   await prisma.$disconnect();

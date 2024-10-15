@@ -5,6 +5,7 @@ import {
   EmptyReturnADR,
   Status,
   TransportMode,
+  UserNotification,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -29,6 +30,7 @@ import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
 import getReadableId from "../../../readableId";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 import { waitForJobsCompletion } from "../../../../queue/helpers";
+import { associateUserToCompany } from "../../../../users/database";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -241,8 +243,32 @@ describe("Test Form reception", () => {
   });
 
   it("should mark a received form as refused", async () => {
-    const { emitterCompany, recipient, recipientCompany, form } =
+    const { emitter, emitterCompany, recipient, recipientCompany, form } =
       await prepareDB();
+
+    // should received email
+    const emitter2 = await userFactory();
+    await associateUserToCompany(emitter2.id, emitterCompany.orgId, "ADMIN", {
+      notifications: [UserNotification.BSD_REFUSAL]
+    });
+
+    // should not receive email
+    const emitter3 = await userFactory();
+    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN", {
+      notifications: []
+    });
+
+    // should received email
+    const recipient2 = await userFactory();
+    await associateUserToCompany(
+      recipient2.id,
+      recipientCompany.orgId,
+      "ADMIN",
+      {
+        notifications: [UserNotification.BSD_REFUSAL]
+      }
+    );
+
     await prisma.form.update({
       where: { id: form.id },
       data: {
@@ -289,14 +315,57 @@ describe("Test Form reception", () => {
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
-          "Le déchet de l’entreprise company_1 a été totalement refusé à réception"
+          "Le déchet de l’entreprise company_1 a été totalement refusé à réception",
+        to: [
+          { email: emitter.email, name: emitter.name },
+          { email: emitter2.email, name: emitter2.name }
+        ],
+        cc: [
+          { email: recipient.email, name: recipient.name },
+          { email: recipient2.email, name: recipient2.name }
+        ]
       })
     );
   });
 
-  it("should mark a received form as partially refused", async () => {
-    const { emitterCompany, recipient, recipientCompany, form } =
+  it("should mark a received form as partially refused and send emails to subscribers", async () => {
+    const { emitter, emitterCompany, recipient, recipientCompany, form } =
       await prepareDB();
+
+    // should received email
+    const emitter2 = await userFactory();
+    await associateUserToCompany(emitter2.id, emitterCompany.orgId, "ADMIN", {
+      notifications: [UserNotification.BSD_REFUSAL]
+    });
+
+    // should not receive email
+    const emitter3 = await userFactory();
+    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN", {
+      notifications: []
+    });
+
+    // should received email
+    const recipient2 = await userFactory();
+    await associateUserToCompany(
+      recipient2.id,
+      recipientCompany.orgId,
+      "ADMIN",
+      {
+        notifications: [UserNotification.BSD_REFUSAL]
+      }
+    );
+
+    // should not receive email
+    const recipient3 = await userFactory();
+    await associateUserToCompany(
+      recipient3.id,
+      recipientCompany.orgId,
+      "ADMIN",
+      {
+        notifications: []
+      }
+    );
+
     await prisma.form.update({
       where: { id: form.id },
       data: {
@@ -342,7 +411,15 @@ describe("Test Form reception", () => {
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
         subject:
-          "Le déchet de l’entreprise company_1 a été partiellement refusé à réception"
+          "Le déchet de l’entreprise company_1 a été partiellement refusé à réception",
+        to: [
+          { email: emitter.email, name: emitter.name },
+          { email: emitter2.email, name: emitter2.name }
+        ],
+        cc: [
+          { email: recipient.email, name: recipient.name },
+          { email: recipient2.email, name: recipient2.name }
+        ]
       })
     );
   });

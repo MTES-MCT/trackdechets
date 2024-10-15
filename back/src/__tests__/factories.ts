@@ -11,7 +11,8 @@ import {
   User,
   Prisma,
   Company,
-  TransportMode
+  TransportMode,
+  UserNotification
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
@@ -136,11 +137,23 @@ export const userWithCompanyFactory = async (
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
+  const notifications =
+    role === "ADMIN"
+      ? [
+          UserNotification.MEMBERSHIP_REQUEST,
+          UserNotification.REVISION_REQUEST,
+          UserNotification.BSD_REFUSAL,
+          UserNotification.SIGNATURE_CODE_RENEWAL,
+          UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+        ]
+      : [];
+
   const user = await userFactory({
     ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
+        notifications,
         role: role,
         ...companyAssociationOpts
       }

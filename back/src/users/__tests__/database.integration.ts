@@ -8,6 +8,8 @@ import {
 } from "../../__tests__/factories";
 import { associateUserToCompany, createUserAccountHash } from "../database";
 import { getUserRoles } from "../../permissions";
+import { UserRole } from "@prisma/client";
+import { getDefaultNotifications } from "../notifications";
 
 describe("createUserAccountHash", () => {
   afterAll(resetDatabase);
@@ -50,7 +52,7 @@ describe("associateUserToCompany", () => {
   it("should throw error if association already exists", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     try {
-      await associateUserToCompany(user.id, company.siret, "MEMBER");
+      await associateUserToCompany(user.id, company.orgId, "MEMBER");
     } catch (err) {
       expect(err.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
       expect(err.message).toEqual(
@@ -59,16 +61,29 @@ describe("associateUserToCompany", () => {
     }
   });
 
-  it("should associate an user to a company", async () => {
-    const user = await userFactory();
-    const company = await companyFactory();
+  it.each([UserRole.ADMIN, UserRole.MEMBER, UserRole.READER, UserRole.DRIVER])(
+    "should associate a user to a company with tole %p",
+    async role => {
+      const user = await userFactory();
+      const company = await companyFactory();
 
-    await associateUserToCompany(user.id, company.siret, "MEMBER");
-    const refreshedUser = await prisma.user.findUniqueOrThrow({
-      where: { id: user.id }
-    });
-    const userRoles = await getUserRoles(user.id);
-    expect(userRoles).toEqual({ [company.orgId]: "MEMBER" });
-    expect(refreshedUser.firstAssociationDate).toBeTruthy();
-  });
+      await associateUserToCompany(user.id, company.orgId, role);
+      const refreshedUser = await prisma.user.findUniqueOrThrow({
+        where: { id: user.id }
+      });
+      const companyAssociation =
+        await prisma.companyAssociation.findFirstOrThrow({
+          where: { companyId: company.id, userId: user.id }
+        });
+      expect(companyAssociation.role).toEqual(role);
+
+      const expectedNotifications = getDefaultNotifications(role);
+
+      expect(companyAssociation.notifications).toEqual(expectedNotifications);
+
+      const userRoles = await getUserRoles(user.id);
+      expect(userRoles).toEqual({ [company.orgId]: role });
+      expect(refreshedUser.firstAssociationDate).toBeTruthy();
+    }
+  );
 });
