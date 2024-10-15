@@ -1,9 +1,9 @@
 import { prisma } from "@td/prisma";
-import { convertUrls } from "../../../companies/database";
 import {
   RegistryDelegation,
   RegistryDelegationResolvers
 } from "../../../generated/graphql/types";
+import { toGqlCompanyPrivate } from "../../../companies/converters";
 
 const getDelegate = async (delegation: RegistryDelegation) => {
   const company = await prisma.registryDelegation
@@ -12,7 +12,7 @@ const getDelegate = async (delegation: RegistryDelegation) => {
     })
     .delegate();
 
-  return convertUrls(company);
+  return toGqlCompanyPrivate(company);
 };
 
 export const delegateResolver: RegistryDelegationResolvers["delegate"] =
