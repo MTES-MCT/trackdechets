@@ -122,7 +122,7 @@ export const getRecentlyRegisteredProducers = async (daysAgo = 2) => {
 /**
  * Second onboarding email. Different for profesionals & non-profesionals / producers
  */
-export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
+export const sendSecondOnboardingEmail = async (daysAgo = 2, sync = false) => {
   // Pros
   const profesionals = await getRecentlyRegisteredProfesionals(daysAgo);
 
@@ -135,7 +135,7 @@ export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
       messageVersions: proMessageVersions
     });
 
-    await sendMail(proPayload);
+    await sendMail(proPayload, { sync });
   }
 
   // Producers. If already in pro list, remove (only 1 email, pro has priority)
@@ -156,7 +156,7 @@ export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
       messageVersions: producersMessageVersions
     });
 
-    await sendMail(producersPayload);
+    await sendMail(producersPayload, { sync });
   }
 
   await prisma.$disconnect();
@@ -190,7 +190,10 @@ export const getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest =
  * Send a mail to users who registered recently and who haven't
  * issued a single MembershipRequest yet
  */
-export const sendMembershipRequestDetailsEmail = async (daysAgo = 7) => {
+export const sendMembershipRequestDetailsEmail = async (
+  daysAgo = 7,
+  sync = false
+) => {
   const recipients =
     await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(daysAgo);
 
@@ -203,7 +206,7 @@ export const sendMembershipRequestDetailsEmail = async (daysAgo = 7) => {
       messageVersions
     });
 
-    await sendMail(payload);
+    await sendMail(payload, { sync });
   }
 
   await prisma.$disconnect();
@@ -243,7 +246,8 @@ export const getActiveUsersWithPendingMembershipRequests = async (
  * got no answer
  */
 export const sendPendingMembershipRequestDetailsEmail = async (
-  daysAgo = 14
+  daysAgo = 14,
+  sync = false
 ) => {
   const recipients = await getActiveUsersWithPendingMembershipRequests(daysAgo);
 
@@ -256,7 +260,7 @@ export const sendPendingMembershipRequestDetailsEmail = async (
       messageVersions
     });
 
-    await sendMail(payload);
+    await sendMail(payload, { sync });
   }
 
   await prisma.$disconnect();
@@ -269,7 +273,7 @@ export const sendPendingMembershipRequestDetailsEmail = async (
  * - les utilisateurs au sein de ces établissements qui sont abonnées aux notifications
  * de demandes de rattachement par e-mail.
  */
-export const getPendingMembershipRequestsAndAssociatedMailSubscribers = async (
+export const getPendingMembershipRequestsAndAssociatedSubscribers = async (
   daysAgo: number
 ) => {
   const now = new Date();
@@ -309,44 +313,52 @@ export const getPendingMembershipRequestsAndAssociatedMailSubscribers = async (
  * email to all the users inside the companies who are subsribed to
  * membership requests notifications by e-mail.
  */
-export const sendPendingMembershipRequestToAdminDetailsEmail = async (
-  daysAgo = 14
+export const sendPendingMembershipRequestEmail = async (
+  daysAgo = 14,
+  sync = false
 ) => {
-  const requests =
-    await getPendingMembershipRequestsAndAssociatedMailSubscribers(daysAgo);
+  const requests = await getPendingMembershipRequestsAndAssociatedSubscribers(
+    daysAgo
+  );
 
   if (requests.length) {
-    const messageVersions: MessageVersion[] = requests.map(request => {
-      const variables = {
-        requestId: request.id,
-        email: request.user.email,
-        orgName: request.company.name,
-        orgId: request.company.orgId
-      };
+    const messageVersions: MessageVersion[] = requests
+      .map(request => {
+        const variables = {
+          requestId: request.id,
+          email: request.user.email,
+          orgName: request.company.name,
+          orgId: request.company.orgId
+        };
 
-      const template = renderMail(pendingMembershipRequestEmail, {
-        variables,
-        messageVersions: []
-      });
+        const template = renderMail(pendingMembershipRequestEmail, {
+          variables,
+          messageVersions: []
+        });
 
-      return {
-        to: request.company.companyAssociations.map(companyAssociation => ({
-          email: companyAssociation.user.email,
-          name: companyAssociation.user.name
-        })),
-        ...(template.body && {
-          params: {
-            body: template.body
-          }
-        })
-      };
-    });
+        if (request.company.companyAssociations.length) {
+          return {
+            to: request.company.companyAssociations.map(companyAssociation => ({
+              email: companyAssociation.user.email,
+              name: companyAssociation.user.name
+            })),
+            ...(template.body && {
+              params: {
+                body: template.body
+              }
+            })
+          };
+        }
+
+        return null;
+      })
+      .filter(Boolean);
 
     const payload = renderMail(pendingMembershipRequestEmail, {
       messageVersions
     });
 
-    await sendMail(payload);
+    await sendMail(payload, { sync });
   }
 
   await prisma.$disconnect();
@@ -474,7 +486,7 @@ export const getPendingBSDARevisionRequestsWithSubscribers = async (
   return await addPendingApprovalsCompanySubscribers(requests);
 };
 
-export const getPendingBSDASRIRevisionRequestsWithAdmins = async (
+export const getPendingBSDASRIRevisionRequestsWithSubscribers = async (
   daysAgo: number
 ): Promise<RequestWithWrappedApprovals[]> => {
   const now = new Date();
@@ -498,7 +510,10 @@ export const getPendingBSDASRIRevisionRequestsWithAdmins = async (
 /**
  * Send an email to admins who didn't answer to a revision request
  */
-export const sendPendingRevisionRequestEmail = async (daysAgo = 5) => {
+export const sendPendingRevisionRequestEmail = async (
+  daysAgo = 5,
+  sync = false
+) => {
   const pendingBsddRevisionRequest =
     await getPendingBSDDRevisionRequestsWithSubscribers(daysAgo);
   const pendingBsdaRevisionRequest =
@@ -551,7 +566,7 @@ export const sendPendingRevisionRequestEmail = async (daysAgo = 5) => {
       messageVersions
     });
 
-    await sendMail(payload);
+    await sendMail(payload, { sync });
   }
 
   await prisma.$disconnect();

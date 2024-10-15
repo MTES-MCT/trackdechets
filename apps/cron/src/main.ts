@@ -4,7 +4,7 @@ import { initSentry } from "back";
 import {
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
-  sendPendingMembershipRequestToAdminDetailsEmail,
+  sendPendingMembershipRequestEmail,
   sendPendingRevisionRequestEmail,
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
@@ -55,7 +55,7 @@ if (CRON_ONBOARDING_SCHEDULE) {
     new cron.CronJob({
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
-        await sendPendingMembershipRequestToAdminDetailsEmail();
+        await sendPendingMembershipRequestEmail();
       },
       timeZone: TZ
     }),
