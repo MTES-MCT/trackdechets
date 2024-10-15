@@ -21,7 +21,7 @@ export default function AccountContentWrapper({
     <div className={`fr-container--fluid ${styles.content}`}>
       <div className={`fr-mb-4w ${styles.panelTitle}`}>
         <div className={styles.titles}>
-          <h3 className="fr-h3 fr-mb-n0-5v">{title}</h3>
+          <h1 className="fr-h3 fr-mb-n0-5v">{title}</h1>
           {subtitle && (
             <p data-testid="page-subtitle" className="fr-text">
               {subtitle}

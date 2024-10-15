@@ -33,7 +33,8 @@ export enum Permission {
   CompanyCanVerify = "CompanyCanVerify",
   CompanyCanManageSignatureAutomation = "CompanyCanManageSignatureAutomation",
   CompanyCanManageMembers = "CompanyCanManageMembers",
-  CompanyCanRenewSecurityCode = "CompanyCanRenewSecurityCode"
+  CompanyCanRenewSecurityCode = "CompanyCanRenewSecurityCode",
+  CompanyCanManageRegistryDelegation = "CompanyCanManageRegistryDelegation"
 }
 
 export function toGraphQLPermission(permission: Permission): UserPermission {
@@ -57,7 +58,9 @@ export function toGraphQLPermission(permission: Permission): UserPermission {
     [Permission.CompanyCanManageSignatureAutomation]:
       "COMPANY_CAN_MANAGE_SIGNATURE_AUTOMATION",
     [Permission.CompanyCanManageMembers]: "COMPANY_CAN_MANAGE_MEMBERS",
-    [Permission.CompanyCanRenewSecurityCode]: "COMPANY_CAN_RENEW_SECURITY_CODE"
+    [Permission.CompanyCanRenewSecurityCode]: "COMPANY_CAN_RENEW_SECURITY_CODE",
+    [Permission.CompanyCanManageRegistryDelegation]:
+      "COMPANY_CAN_MANAGE_REGISTRY_DELEAGATION"
   };
   return mapping[permission];
 }
@@ -105,7 +108,8 @@ const adminPermissions = [
   Permission.CompanyCanVerify,
   Permission.CompanyCanManageSignatureAutomation,
   Permission.CompanyCanManageMembers,
-  Permission.CompanyCanRenewSecurityCode
+  Permission.CompanyCanRenewSecurityCode,
+  Permission.CompanyCanManageRegistryDelegation
 ];
 
 export const grants: { [Key in UserRole]: Permission[] } = {

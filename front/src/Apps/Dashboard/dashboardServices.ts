@@ -205,6 +205,63 @@ const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
 export const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
 export const isBspaoh = (type: BsdType): boolean => type === BsdType.Bspaoh;
 
+export enum ActorType {
+  Emitter = "EMITTER",
+  Transporter = "TRANSPORTER",
+  NextTransporter = "NEXTTRANSPORTER",
+  Destination = "DESTINATION",
+  Intermediary = "INTERMEDIARY",
+  EcoOrganisme = "ECOORGANISME",
+  Broker = "BROKER",
+  Worker = "WORKER",
+  TempStorage = "TEMPSTORAGE",
+  Trader = "TRADER"
+}
+
+interface ActorTypes {
+  type: ActorType;
+  strict?: boolean;
+}
+
+export const isSiretActorForBsd = (
+  bsd: BsdDisplay,
+  siret: string,
+  actorTypes: ActorTypes[]
+): boolean => {
+  const actorTypesForSiret = [
+    ...(siret === bsd.emitter?.company?.siret ? [ActorType.Emitter] : []),
+    ...(siret === bsd.ecoOrganisme?.siret ? [ActorType.EcoOrganisme] : []),
+    ...(siret === bsd.destination?.company?.siret
+      ? [ActorType.Destination]
+      : []),
+    ...(siret === bsd.worker?.company?.siret ? [ActorType.Worker] : []),
+    ...(siret === bsd.transporter?.company?.siret
+      ? [ActorType.Transporter]
+      : []),
+    ...(siret === bsd.broker?.company?.siret ? [ActorType.Broker] : []),
+    ...(siret === bsd.trader?.company?.siret ? [ActorType.Trader] : []),
+    ...(bsd.intermediaries?.some(p => p.siret === siret)
+      ? [ActorType.Intermediary]
+      : []),
+    ...(siret === bsd.temporaryStorageDetail?.destination?.company?.siret
+      ? [ActorType.TempStorage]
+      : []),
+    ...(siret === getNextTransporter(bsd)?.company?.siret
+      ? [ActorType.NextTransporter]
+      : [])
+  ];
+
+  return actorTypesForSiret.length === 0
+    ? false
+    : actorTypes
+        .map(({ type, strict = false }) => {
+          return actorTypesForSiret.includes(type) && strict
+            ? actorTypesForSiret.length === 1
+            : true;
+        })
+        .reduce((acc, curr) => acc && curr, true);
+};
+
 const hasEmitterTransporterAndEcoOrgSiret = (
   bsd: BsdDisplay,
   siret: string
@@ -1269,6 +1326,10 @@ export const canDuplicate = (bsd, siret) =>
   canDuplicateBsvhu(bsd) ||
   canDuplicateBspaoh(bsd);
 
+export const canClone = () => {
+  return import.meta.env.VITE_ALLOW_CLONING_BSDS === "true";
+};
+
 const canDeleteBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
   (bsd.status === BsdStatusCode.Initial ||
@@ -1315,9 +1376,10 @@ const canReviewBsdasri = (bsd, siret) => {
     return false;
   }
 
-  if (bsd.groupedInId || bsd.synthesizedInId) {
+  if (bsd.groupedIn || bsd.synthesizedIn) {
     return false;
   }
+
   const isDestination = isSameSiretDestination(siret, bsd);
   const isProducer = isSameSiretEmitter(siret, bsd);
   const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
@@ -1436,11 +1498,24 @@ export const canUpdateBsd = (bsd, siret) =>
 
 export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
 
-export const hasAppendix1Cta = (bsd: BsdDisplay): boolean => {
+export const hasAppendix1Cta = (
+  bsd: BsdDisplay,
+  currentSiret: string
+): boolean => {
   return (
     bsd.type === BsdType.Bsdd &&
     bsd?.emitterType === EmitterType.Appendix1 &&
-    (BsdStatusCode.Sealed === bsd.status || BsdStatusCode.Sent === bsd.status)
+    (BsdStatusCode.Sealed === bsd.status ||
+      BsdStatusCode.Sent === bsd.status) &&
+    !isSiretActorForBsd(bsd, currentSiret, [
+      { type: ActorType.Broker, strict: true }
+    ]) &&
+    !isSiretActorForBsd(bsd, currentSiret, [
+      { type: ActorType.Intermediary, strict: true }
+    ]) &&
+    !isSiretActorForBsd(bsd, currentSiret, [
+      { type: ActorType.Trader, strict: true }
+    ])
   );
 };
 

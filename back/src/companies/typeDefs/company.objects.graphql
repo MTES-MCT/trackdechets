@@ -182,8 +182,10 @@ type CompanyPublic {
   address: String
   "Code commune de l'établissement"
   codeCommune: String
-  "Nom de l'établissement"
+  "Raison sociale de l'établissement"
   name: String
+  "Nom de l'établissement"
+  givenName: String
   "Code NAF"
   naf: String
   "Libellé NAF"

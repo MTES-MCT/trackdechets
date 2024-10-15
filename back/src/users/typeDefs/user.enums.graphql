@@ -66,6 +66,8 @@ enum UserPermission {
   COMPANY_CAN_MANAGE_MEMBERS
   "Renouveler le code de signature"
   COMPANY_CAN_RENEW_SECURITY_CODE
+  "Créer ou révoquer une délégation pour le registre terres & sédiments"
+  COMPANY_CAN_MANAGE_REGISTRY_DELEAGATION
 }
 
 """

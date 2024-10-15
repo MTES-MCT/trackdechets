@@ -5,7 +5,12 @@ import routes from "../routes";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 
 export const CompaniesMenuContent = () => (
-  <Accordion defaultExpanded label="Mes établissements" className="fr-mt-4w">
+  <Accordion
+    titleAs="h2"
+    defaultExpanded
+    label="Mes établissements"
+    className="fr-mt-4w"
+  >
     <ul>
       <li className="tw-mb-1">
         <NavLink

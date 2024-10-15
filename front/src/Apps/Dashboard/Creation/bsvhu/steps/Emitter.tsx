@@ -4,12 +4,14 @@ import React, { useEffect, useMemo, useContext } from "react";
 import { useFormContext } from "react-hook-form";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
 
-import { FavoriteType } from "@td/codegen-ui";
+import { CompanySearchResult, FavoriteType } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { setFieldError } from "../../utils";
+import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
+import DsfrfWorkSiteAddress from "../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 
 const EmitterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
@@ -26,6 +28,8 @@ const EmitterBsvhu = ({ errors }) => {
     register("emitter.company.name");
     register("emitter.company.vatNumber");
     register("emitter.company.address");
+    register("emitter.irregularSituation");
+    register("emitter.noSiret");
   }, [register]);
 
   useEffect(() => {
@@ -39,6 +43,13 @@ const EmitterBsvhu = ({ errors }) => {
         errors,
         `${actor}.company.siret`,
         formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+
+      setFieldError(
+        errors,
+        `${actor}.company.name`,
+        formState.errors?.[actor]?.["company"]?.name,
         setError
       );
 
@@ -101,16 +112,38 @@ const EmitterBsvhu = ({ errors }) => {
     [emitter?.company?.orgId, emitter?.company?.siret]
   );
 
+  const selectedCompanyError = (company?: CompanySearchResult) => {
+    // L'émetteur est en situation irrégulière mais il a un SIRET et n'est pas inscrit sur Trackdéchets
+    if (company) {
+      if (!company.isRegistered) {
+        return "L'entreprise n'est pas inscrite sur Trackdéchets, la signature Producteur ne pourra pas se faire. Vous pouvez publier le bordereau, mais seul le transporteur pourra le signer.";
+      }
+    }
+    return null;
+  };
+
   return (
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
       <div className="fr-col-md-10 fr-mt-4w">
+        <Checkbox
+          options={[
+            {
+              label: "Installation en situation irrégulière",
+              nativeInputProps: {
+                ...register("emitter.irregularSituation")
+              }
+            }
+          ]}
+          disabled={sealedFields.includes(`emitter.irregularSituation`)}
+        />
         <h4 className="fr-h4">Entreprise</h4>
         <CompanySelectorWrapper
           orgId={siret}
           favoriteType={FavoriteType.Emitter}
           disabled={sealedFields.includes(`emitter.company.siret`)}
           selectedCompanyOrgId={orgId}
+          selectedCompanyError={selectedCompanyError}
           onCompanySelected={company => {
             if (company) {
               let companyData = {
@@ -174,6 +207,54 @@ const EmitterBsvhu = ({ errors }) => {
             {formState.errors?.emitter?.["company"]?.siret?.message}
           </p>
         )}
+        {emitter.irregularSituation && (
+          <>
+            <Checkbox
+              options={[
+                {
+                  label: "L'installation n'a pas de numéro SIRET",
+                  nativeInputProps: {
+                    ...register("emitter.noSiret")
+                  }
+                }
+              ]}
+              disabled={sealedFields.includes(`emitter.noSiret`)}
+            />
+
+            {emitter.noSiret && (
+              <>
+                <DsfrfWorkSiteAddress
+                  designation="du site d'enlèvement"
+                  address={emitter.company.address}
+                  postalCode={emitter.company.postalCode}
+                  city={emitter.company.city}
+                  placeholder="Rechercher"
+                  onAddressSelection={details => {
+                    // `address` is passed as `name` because of adresse api return fields
+                    setValue(`emitter.company.address`, details.name);
+                    setValue(`emitter.company.city`, details.city);
+                    setValue(`emitter.company.postalCode`, details.postcode);
+                  }}
+                />
+                <div className="fr-col-md-8 fr-mb-2w">
+                  <Input
+                    label="Nom ou identification de l'installation"
+                    disabled={sealedFields.includes(`emitter.company.name`)}
+                    nativeInputProps={{ ...register("emitter.company.name") }}
+                    state={
+                      formState.errors?.emitter?.["company"]?.name && "error"
+                    }
+                    stateRelatedMessage={
+                      (formState.errors?.emitter?.["company"]?.name
+                        ?.message as string) ?? ""
+                    }
+                  />
+                </div>
+              </>
+            )}
+          </>
+        )}
+
         <CompanyContactInfo
           fieldName={"emitter.company"}
           name="emitter"

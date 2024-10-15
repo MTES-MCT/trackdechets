@@ -594,7 +594,11 @@ export default function Header({
                     <br />
                     de la transition
                     <br />
-                    écologique
+                    écologique,
+                    <br />
+                    de l'énergie, du climat, <br />
+                    et de la prévention <br />
+                    des risques
                   </p>
                 </div>
                 <div className="fr-header__operator">
@@ -774,7 +778,7 @@ export default function Header({
 
           <nav className={`fr-nav ${styles.headerNav}`}>
             <ul
-              className={`fr-nav__list`}
+              className={`fr-nav__list ${styles.headerNavList}`}
               style={{ margin: "initial", maxWidth: "initial" }}
             >
               {menuEntries.map((e, idx) => (

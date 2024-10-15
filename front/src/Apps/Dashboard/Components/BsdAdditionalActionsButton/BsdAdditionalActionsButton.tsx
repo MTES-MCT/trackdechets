@@ -12,7 +12,8 @@ import {
   modifier_action_label,
   pdf_action_label,
   revision_action_label,
-  supprimer_action_label
+  supprimer_action_label,
+  clone_action_label
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 import { BsdAdditionalActionsButtonProps } from "./bsdAdditionalActionsButtonTypes";
 import useOnClickOutsideRefTarget from "../../../common/hooks/useOnClickOutsideRefTarget";
@@ -20,6 +21,7 @@ import {
   canReviewBsd,
   canDeleteBsd,
   canDuplicate,
+  canClone,
   canUpdateBsd,
   canGeneratePdf,
   hasBsdSuite,
@@ -43,6 +45,7 @@ function BsdAdditionalActionsButton({
     onPdf,
     onDelete,
     onUpdate,
+    onClone,
     onRevision,
     onAppendix1,
     onBsdSuite,
@@ -104,6 +107,10 @@ function BsdAdditionalActionsButton({
   const handleDuplicate = () => {
     closeMenu();
     onDuplicate(bsd);
+  };
+  const handleClone = () => {
+    closeMenu();
+    onClone!(bsd);
   };
   const handleDelete = () => {
     closeMenu();
@@ -244,7 +251,7 @@ function BsdAdditionalActionsButton({
               </li>
             )}
           {permissions.includes(UserPermission.BsdCanUpdate) &&
-            hasAppendix1Cta(bsd) && (
+            hasAppendix1Cta(bsd, currentSiret) && (
               <li>
                 <button
                   type="button"
@@ -296,6 +303,19 @@ function BsdAdditionalActionsButton({
                 </button>
               </li>
             )}
+          {permissions.includes(UserPermission.BsdCanCreate) && canClone() && (
+            <li>
+              <button
+                type="button"
+                data-testid="bsd-duplicate-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleClone}
+              >
+                {clone_action_label}
+              </button>
+            </li>
+          )}
           {permissions.includes(UserPermission.BsdCanUpdate) &&
             canUpdateBsd(bsd, currentSiret) && (
               <li>

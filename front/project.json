@@ -7,7 +7,7 @@
     "dsfr": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cd front && copy-dsfr-to-public && only-include-used-icons"
+        "command": "cd front && react-dsfr update-icons"
       }
     },
     "build": {
