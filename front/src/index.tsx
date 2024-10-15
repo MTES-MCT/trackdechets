@@ -13,6 +13,13 @@ import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
 import "./scss/index.scss";
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
+
+import "@codegouvfr/react-dsfr/favicon/apple-touch-icon.png";
+import "@codegouvfr/react-dsfr/favicon/favicon.svg";
+import "@codegouvfr/react-dsfr/favicon/favicon.ico";
+import "@codegouvfr/react-dsfr/favicon/manifest.webmanifest";
+import "@codegouvfr/react-dsfr/main.css";
+
 startReactDsfr({ defaultColorScheme: "light" });
 
 try {
