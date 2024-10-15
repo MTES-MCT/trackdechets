@@ -1,8 +1,10 @@
 import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
 import { getTabClassName } from "../../Forms/Components/FormStepsTabs/utils";
 import { toastApolloError } from "./toaster";
+import { BsdType } from "@td/codegen-ui";
+import { ApolloError } from "@apollo/client";
 
-export const getNextTab = (tabIds, currentTabId) => {
+export const getNextTab = (tabIds: TabId[], currentTabId: TabId) => {
   const idx = tabIds.indexOf(currentTabId);
   if (idx === -1 || idx === tabIds.length) {
     return currentTabId;
@@ -10,7 +12,7 @@ export const getNextTab = (tabIds, currentTabId) => {
   return tabIds[idx + 1];
 };
 
-export const getPrevTab = (tabIds, currentTabId) => {
+export const getPrevTab = (tabIds: TabId[], currentTabId: TabId) => {
   const idx = tabIds.indexOf(currentTabId);
   if (idx === -1 || idx === 0) {
     return currentTabId;
@@ -18,7 +20,27 @@ export const getPrevTab = (tabIds, currentTabId) => {
   return tabIds[idx - 1];
 };
 
-export type TabsName = "waste" | "emitter" | "transporter" | "destination";
+export enum TabId {
+  Waste = "waste",
+  Emitter = "emitter",
+  Transporter = "transporter",
+  Destination = "destination"
+}
+
+export type NormalizedError = {
+  code: string;
+  path: string[];
+  message: string;
+};
+
+export type SupportedBsdTypes = BsdType.Bsvhu | BsdType.Bspaoh;
+
+export type TabError = {
+  tabId: TabId;
+  name: string;
+  message: string;
+};
+
 export type IconIdName =
   | "fr-icon-arrow-right-line"
   | "tabError fr-icon-warning-line fr-icon-arrow-right-line"
@@ -26,83 +48,127 @@ export type IconIdName =
   | RiIconClassName;
 
 export const getTabs = (
-  isCrematorium?: boolean,
-  errorTabIds?: string[] | (TabsName | undefined)[]
+  bsdType: SupportedBsdTypes,
+  errorTabIds?: TabId[]
 ): {
-  tabId: TabsName;
+  tabId: TabId;
   label: string;
   iconId: IconIdName;
 }[] => [
   {
-    tabId: "waste",
+    tabId: TabId.Waste,
     label: "Déchet",
     iconId: getTabClassName(errorTabIds, "waste")
   },
   {
-    tabId: "emitter",
+    tabId: TabId.Emitter,
     label: "Producteur",
     iconId: getTabClassName(errorTabIds, "emitter")
   },
   {
-    tabId: "transporter",
+    tabId: TabId.Transporter,
     label: "Transporteur",
     iconId: getTabClassName(errorTabIds, "transporter")
   },
   {
-    tabId: "destination",
-    label: isCrematorium ? "Crématorium" : "Destination finale",
+    tabId: TabId.Destination,
+    label: bsdType === BsdType.Bspaoh ? "Crématorium" : "Destination finale",
     iconId: getTabClassName(errorTabIds, "destination")
   }
 ];
 
-export const getPublishErrorTabIds = (apiErrors, tabIds) => {
+const pathPrefixToTab = {
+  [BsdType.Bsvhu]: (pathPrefix: string): TabId | null => {
+    if (
+      pathPrefix === "weight" ||
+      pathPrefix === "quantity" ||
+      pathPrefix === "wasteCode" ||
+      pathPrefix === "identification"
+    ) {
+      return TabId.Waste;
+    }
+    if (Object.values(TabId).includes(pathPrefix as TabId)) {
+      return TabId[pathPrefix];
+    }
+    return null;
+  },
+  [BsdType.Bspaoh]: (pathPrefix: string): TabId | null => {
+    if (Object.values(TabId).includes(pathPrefix as TabId)) {
+      return TabId[pathPrefix];
+    }
+    return null;
+  }
+};
+
+export const getPublishErrorTabIds = (
+  bsdType: SupportedBsdTypes,
+  apiErrors?: NormalizedError[]
+): TabId[] => {
   // search for presence of tabId return in zod path api errors then return tab ids in error
   const publishErrorTabIds = [
     ...new Set(
       apiErrors?.map(apiError => {
-        if (apiError.path[0]?.includes("weight")) {
-          return tabIds.find(key => key === "waste");
+        if (apiError.path?.[0] && typeof apiError.path[0] === "string") {
+          return pathPrefixToTab[bsdType](apiError.path[0]);
         }
-        return tabIds.find(key => apiError.path[0]?.includes(key));
+        return null;
       })
     )
-  ];
+  ].filter((tabId): tabId is TabId => !!tabId);
 
-  return publishErrorTabIds as string[] | (TabsName | undefined)[];
+  return publishErrorTabIds;
 };
 
-export const getPublishErrorMessages = apiErrors => {
+export const getPublishErrorMessages = (
+  bsdType: SupportedBsdTypes,
+  apiErrors?: NormalizedError[]
+): TabError[] => {
   // return an array of messages with tabId, name (path) and the related message
-  const publishErrorMessages = apiErrors?.map(apiError => {
-    const errorPath = apiError?.path;
-    const pathPrefix = errorPath?.[0];
-    const tabId = pathPrefix === "weight" ? "waste" : pathPrefix;
-    const name = errorPath.join(".");
-    const message = apiError.message;
-    return { tabId, name, message };
-  });
+  const publishErrorMessages =
+    apiErrors
+      ?.map(apiError => {
+        const errorPath = apiError?.path;
+        const pathPrefix = errorPath?.[0];
+        const tabId = pathPrefixToTab[bsdType](pathPrefix);
+        const name = errorPath.join(".");
+        const message = apiError.message;
+        return { tabId, name, message };
+      })
+      .filter(
+        (
+          err
+        ): err is {
+          tabId: TabId;
+          name: string;
+          message: string;
+        } => !!err.tabId
+      ) ?? [];
 
   return publishErrorMessages;
 };
 
-export const getErrorTabIds = (apiErrorTabIds, formStateErrorsKeys) => {
+export const getErrorTabIds = (
+  bsdType: BsdType,
+  apiErrorTabIds: TabId[],
+  formStateErrorsKeys: string[]
+): TabId[] => {
   // get tab id in error in order to display icon tab error (either api or front validation we need to display the right icon)
   const errorTabIds = apiErrorTabIds?.length
     ? apiErrorTabIds
     : formStateErrorsKeys?.length > 0
-    ? formStateErrorsKeys
+    ? pathPrefixToTab[bsdType](formStateErrorsKeys)
     : [];
 
   return errorTabIds;
 };
 
-export const handleGraphQlError = (err, setPublishErrors) => {
-  if (err?.graphQLErrors?.length) {
-    const issues = err.graphQLErrors[0]?.extensions?.issues as {
-      code: string;
-      path: string[];
-      message: string;
-    }[];
+export const handleGraphQlError = (
+  err: ApolloError,
+  setPublishErrors: (normalizedErrors: NormalizedError[]) => void
+) => {
+  if (err.graphQLErrors?.length) {
+    const issues = err.graphQLErrors[0]?.extensions
+      ?.issues as NormalizedError[];
     if (issues?.length) {
       const errorsWithEmptyPath = issues.filter(f => !f.path.length);
       if (errorsWithEmptyPath.length) {
@@ -111,13 +177,7 @@ export const handleGraphQlError = (err, setPublishErrors) => {
       const errorDetailList = issues?.map(error => {
         return error;
       });
-      setPublishErrors(
-        errorDetailList as {
-          code: string;
-          path: string[];
-          message: string;
-        }[]
-      );
+      setPublishErrors(errorDetailList as NormalizedError[]);
     } else {
       toastApolloError(err); // other case like forbidden, we need to display an error anyway ...
     }

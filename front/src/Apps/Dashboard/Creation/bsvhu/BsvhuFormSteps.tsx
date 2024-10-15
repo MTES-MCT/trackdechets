@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  BsdType,
   BsvhuInput,
   Mutation,
   MutationCreateBsvhuArgs,
@@ -32,7 +33,7 @@ import {
   getErrorTabIds,
   getPublishErrorMessages,
   getPublishErrorTabIds,
-  getTabs
+  TabId
 } from "../utils";
 
 const vhuToInput = (paoh: BsvhuInput): BsvhuInput => {
@@ -134,49 +135,61 @@ const BsvhuFormSteps = ({
     }
   };
 
-  const tabIds = getTabs().map(tab => tab.tabId);
   const errorsFromPublishApi = publishErrors || publishErrorsFromRedirect;
   const publishErrorTabIds = getPublishErrorTabIds(
-    errorsFromPublishApi,
-    tabIds
+    BsdType.Bsvhu,
+    errorsFromPublishApi
   );
   const formStateErrorsKeys = Object.keys(methods?.formState?.errors);
-  const errorTabIds = getErrorTabIds(publishErrorTabIds, formStateErrorsKeys);
+  const errorTabIds = getErrorTabIds(
+    BsdType.Bsvhu,
+    publishErrorTabIds,
+    formStateErrorsKeys
+  );
 
-  const publishErrorMessages = getPublishErrorMessages(errorsFromPublishApi);
+  const publishErrorMessages = useMemo(
+    () => getPublishErrorMessages(BsdType.Bsvhu, errorsFromPublishApi),
+    [errorsFromPublishApi]
+  );
 
-  const tabsContent = {
-    waste: (
-      <WasteBsvhu
-        errors={publishErrorMessages?.filter(error => error.tabId === "waste")}
-      />
-    ),
-    emitter: (
-      <EmitterBsvhu
-        errors={publishErrorMessages?.filter(
-          error => error.tabId === "emitter"
-        )}
-      />
-    ),
-    transporter: (
-      <TransporterBsvhu
-        errors={publishErrorMessages?.filter(
-          error => error.tabId === "transporter"
-        )}
-      />
-    ),
-    destination: (
-      <DestinationBsvhu
-        errors={publishErrorMessages?.filter(
-          error => error.tabId === "destination"
-        )}
-      />
-    )
-  };
+  const tabsContent = useMemo(
+    () => ({
+      waste: (
+        <WasteBsvhu
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.Waste
+          )}
+        />
+      ),
+      emitter: (
+        <EmitterBsvhu
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.Emitter
+          )}
+        />
+      ),
+      transporter: (
+        <TransporterBsvhu
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.Transporter
+          )}
+        />
+      ),
+      destination: (
+        <DestinationBsvhu
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.Destination
+          )}
+        />
+      )
+    }),
+    [publishErrorMessages]
+  );
 
   return (
     <>
       <FormStepsContent
+        bsdType={BsdType.Bsvhu}
         draftCtaLabel={draftCtaLabel}
         isLoading={loading}
         mainCtaLabel={mainCtaLabel}

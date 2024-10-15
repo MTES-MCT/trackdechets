@@ -5,7 +5,9 @@ import FormStepsTabs from "../../Forms/Components/FormStepsTabs/FormStepsTabs";
 import { Loader } from "../../common/Components";
 import { SealedFieldsContext } from "./context";
 import {
-  TabsName,
+  NormalizedError,
+  SupportedBsdTypes,
+  TabId,
   getNextTab,
   getPrevTab,
   getTabs,
@@ -13,7 +15,7 @@ import {
 } from "./utils";
 
 interface FormStepsContentProps {
-  isCrematorium?: boolean;
+  bsdType: SupportedBsdTypes;
   sealedFields?: string[];
   isLoading: boolean;
   useformMethods: UseFormReturn<any>;
@@ -26,11 +28,11 @@ interface FormStepsContentProps {
     transporter: React.JSX.Element;
     destination: React.JSX.Element;
   };
-  setPublishErrors: Function;
-  errorTabIds?: string[] | (TabsName | undefined)[];
+  setPublishErrors: (normalizedErrors: NormalizedError[]) => void;
+  errorTabIds?: TabId[];
 }
 const FormStepsContent = ({
-  isCrematorium = false,
+  bsdType,
   tabsContent,
   sealedFields = [],
   isLoading,
@@ -41,9 +43,9 @@ const FormStepsContent = ({
   setPublishErrors,
   errorTabIds
 }: FormStepsContentProps) => {
-  const [selectedTabId, setSelectedTabId] = useState<TabsName>("waste");
+  const [selectedTabId, setSelectedTabId] = useState<TabId>(TabId.Waste);
   const navigate = useNavigate();
-  const tabList = getTabs(isCrematorium, errorTabIds);
+  const tabList = getTabs(bsdType, errorTabIds);
   const tabIds = tabList.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
