@@ -146,7 +146,10 @@ describe("Mutation.Vhu.sign", () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
       securityCode: 9421
     });
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
     const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitterCompany.siret,
