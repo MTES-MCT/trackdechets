@@ -21,10 +21,10 @@ export const getPrevTab = (tabIds: TabId[], currentTabId: TabId) => {
 };
 
 export enum TabId {
-  Waste = "waste",
-  Emitter = "emitter",
-  Transporter = "transporter",
-  Destination = "destination"
+  waste = "waste",
+  emitter = "emitter",
+  transporter = "transporter",
+  destination = "destination"
 }
 
 export type NormalizedError = {
@@ -56,22 +56,22 @@ export const getTabs = (
   iconId: IconIdName;
 }[] => [
   {
-    tabId: TabId.Waste,
+    tabId: TabId.waste,
     label: "Déchet",
     iconId: getTabClassName(errorTabIds, "waste")
   },
   {
-    tabId: TabId.Emitter,
+    tabId: TabId.emitter,
     label: "Producteur",
     iconId: getTabClassName(errorTabIds, "emitter")
   },
   {
-    tabId: TabId.Transporter,
+    tabId: TabId.transporter,
     label: "Transporteur",
     iconId: getTabClassName(errorTabIds, "transporter")
   },
   {
-    tabId: TabId.Destination,
+    tabId: TabId.destination,
     label: bsdType === BsdType.Bspaoh ? "Crématorium" : "Destination finale",
     iconId: getTabClassName(errorTabIds, "destination")
   }
@@ -85,7 +85,7 @@ const pathPrefixToTab = {
       pathPrefix === "wasteCode" ||
       pathPrefix === "identification"
     ) {
-      return TabId.Waste;
+      return TabId.waste;
     }
     if (Object.values(TabId).includes(pathPrefix as TabId)) {
       return TabId[pathPrefix];
@@ -156,7 +156,7 @@ export const getErrorTabIds = (
   const errorTabIds = apiErrorTabIds?.length
     ? apiErrorTabIds
     : formStateErrorsKeys?.length > 0
-    ? pathPrefixToTab[bsdType](formStateErrorsKeys)
+    ? formStateErrorsKeys.map(errKey => pathPrefixToTab[bsdType](errKey))
     : [];
 
   return errorTabIds;

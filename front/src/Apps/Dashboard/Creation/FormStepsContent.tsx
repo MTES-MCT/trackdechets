@@ -43,7 +43,7 @@ const FormStepsContent = ({
   setPublishErrors,
   errorTabIds
 }: FormStepsContentProps) => {
-  const [selectedTabId, setSelectedTabId] = useState<TabId>(TabId.Waste);
+  const [selectedTabId, setSelectedTabId] = useState<TabId>(TabId.waste);
   const navigate = useNavigate();
   const tabList = getTabs(bsdType, errorTabIds);
   const tabIds = tabList.map(tab => tab.tabId);

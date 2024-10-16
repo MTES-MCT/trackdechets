@@ -157,28 +157,28 @@ const BsvhuFormSteps = ({
       waste: (
         <WasteBsvhu
           errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.Waste
+            error => error.tabId === TabId.waste
           )}
         />
       ),
       emitter: (
         <EmitterBsvhu
           errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.Emitter
+            error => error.tabId === TabId.emitter
           )}
         />
       ),
       transporter: (
         <TransporterBsvhu
           errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.Transporter
+            error => error.tabId === TabId.transporter
           )}
         />
       ),
       destination: (
         <DestinationBsvhu
           errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.Destination
+            error => error.tabId === TabId.destination
           )}
         />
       )
