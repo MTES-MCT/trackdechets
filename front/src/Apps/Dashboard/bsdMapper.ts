@@ -101,37 +101,47 @@ export const getBsddCurrentTransporterInfos = (
   isToCollectTab: boolean
 ): BsdCurrentTransporterInfos => {
   let currentTransporter: Transporter | undefined;
-  // in case the BSD is going through temporary storage,
-  // fetch the transporter from the temporaryStorageDetail property
-  if (
-    bsdd.status === FormStatus.Resealed ||
-    bsdd.status === FormStatus.Resent ||
-    bsdd.status === FormStatus.SignedByTempStorer ||
-    bsdd.status === FormStatus.TempStored ||
-    bsdd.status === FormStatus.TempStorerAccepted
-  ) {
-    currentTransporter =
-      bsdd.temporaryStorageDetail?.transporter &&
-      bsdd.temporaryStorageDetail?.transporter.company?.orgId === currentSiret
-        ? bsdd.temporaryStorageDetail?.transporter
-        : undefined;
-  } else {
-    if (isToCollectTab) {
-      // find the first transporter with this SIRET who hasn't taken over yet
+
+  if (isToCollectTab) {
+    // the current company is a transporter and we should show his next transport's plate
+    // if the BSD should be collected, and the BSD is in a temp storage status, the transporter
+    // is the one on the temp storage
+    if (
+      bsdd.status === FormStatus.Resealed ||
+      bsdd.status === FormStatus.Resent ||
+      bsdd.status === FormStatus.SignedByTempStorer ||
+      bsdd.status === FormStatus.TempStored ||
+      bsdd.status === FormStatus.TempStorerAccepted
+    ) {
+      currentTransporter =
+        bsdd.temporaryStorageDetail?.transporter &&
+        bsdd.temporaryStorageDetail?.transporter.company?.orgId === currentSiret
+          ? bsdd.temporaryStorageDetail?.transporter
+          : undefined;
+    } else {
+      // else find the first transporter with this SIRET who hasn't taken over yet
       currentTransporter = bsdd.transporters?.find(
         transporter =>
           transporter.company?.orgId === currentSiret &&
           !transporter.takenOverAt
       );
+    }
+  } else {
+    // all other tabs work like the collected tab: show the last transporter
+    // that picked up the waste
+
+    // if there is a temp storage with a transporter, and the transporter has picked up
+    // the waste, show this one
+    if (
+      bsdd.temporaryStorageDetail?.transporter &&
+      bsdd.temporaryStorageDetail.takenOverAt
+    ) {
+      currentTransporter = bsdd.temporaryStorageDetail?.transporter;
     } else {
-      // find the last transporter with this SIRET who has taken over
+      // else, show the last transporter that picked up the waste
       currentTransporter = [...(bsdd.transporters ?? [])]
         .reverse()
-        .find(
-          transporter =>
-            transporter.company?.orgId === currentSiret &&
-            !!transporter.takenOverAt
-        );
+        .find(transporter => !!transporter.takenOverAt);
     }
   }
   if (!currentTransporter) {
@@ -139,7 +149,7 @@ export const getBsddCurrentTransporterInfos = (
   }
   return {
     transporterId: currentTransporter?.id,
-    transporterNumberPlate: currentTransporter?.numberPlate,
+    transporterNumberPlate: currentTransporter?.numberPlate?.trim(),
     transporterCustomInfo: currentTransporter?.customInfo,
     transporterMode: currentTransporter?.mode ?? undefined
   };
@@ -162,11 +172,7 @@ export const getMultiModalCurrentTransporterInfos = (
     // find the last transporter with this SIRET who has taken over
     currentTransporter = [...(bsd.transporters ?? [])]
       .reverse()
-      .find(
-        transporter =>
-          transporter.company?.orgId === currentSiret &&
-          !!transporter.transport?.signature?.date
-      );
+      .find(transporter => !!transporter.transport?.signature?.date);
   }
   if (!currentTransporter) {
     return {};
