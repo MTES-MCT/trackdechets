@@ -26,30 +26,45 @@ const WasteBsvhu = ({ errors }) => {
   }, [setValue, identificationNumbers]);
 
   useEffect(() => {
-    if (
-      errors?.length &&
-      errors?.length !== Object.keys(formState.errors)?.length &&
-      !weight
-    ) {
-      setFieldError(
-        errors,
-        "weight.value",
-        formState.errors?.weight?.value,
-        setError
-      );
-    }
-    if (errors?.length && weight) {
-      clearErrors("weight.value");
+    if (errors?.length) {
+      if (!weight) {
+        setFieldError(
+          errors,
+          "weight.value",
+          formState.errors?.weight?.value,
+          setError
+        );
+      }
+
+      if (!identificationNumbers?.length) {
+        setFieldError(
+          errors,
+          "identification.numbers",
+          formState.errors?.identification?.numbers,
+          setError
+        );
+      }
     }
   }, [
     errors,
     errors?.length,
-    formState?.errors,
+    formState.errors,
     formState.errors?.weight?.value,
+    identificationNumbers?.length,
     setError,
-    weight,
-    clearErrors
+    weight
   ]);
+
+  useEffect(() => {
+    if (errors?.length) {
+      if (weight) {
+        clearErrors("weight.value");
+      }
+      if (identificationNumbers?.length) {
+        clearErrors("identification.numbers");
+      }
+    }
+  }, [clearErrors, errors?.length, identificationNumbers?.length, weight]);
 
   return (
     <>

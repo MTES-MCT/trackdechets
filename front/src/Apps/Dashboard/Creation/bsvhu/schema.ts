@@ -3,7 +3,8 @@ import { z } from "zod";
 import { BSVHU_WASTE_CODES } from "@td/constants";
 
 const zodCompany = z.object({
-  siret: z.string(),
+  siret: z.string().nullish(),
+  name: z.string(),
   contact: z.string().nullish(),
   phone: z.string().nullish(),
   mail: z.string().nullish(),

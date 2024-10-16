@@ -104,6 +104,7 @@ export const FullBsvhuFragment = gql`
       }
       agrementNumber
       irregularSituation
+      noSiret
       emission {
         signature {
           author
