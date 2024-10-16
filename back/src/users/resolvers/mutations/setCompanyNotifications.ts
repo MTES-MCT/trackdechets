@@ -6,8 +6,8 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
-import { authorizedNotifications } from "@td/constants";
 import { toGqlCompanyPrivate } from "../../../companies/converters";
+import { authorizedNotifications } from "../../notifications";
 
 const setCompanyNotificationsResolver: MutationResolvers["setCompanyNotifications"] =
   async (parent, args, context: GraphQLContext) => {

@@ -33,7 +33,7 @@ import { isGenericEmail } from "@td/constants";
 import { parseCompanyAsync } from "../../validation/index";
 import { companyInputToZodCompany } from "../../validation/helpers";
 import { toGqlCompanyPrivate } from "../../converters";
-import { ALL_NOTIFICATIONS } from "../../../common/authorizedNotifications";
+import { ALL_NOTIFICATIONS } from "../../../users/notifications";
 /**
  * Create a new company and associate it to a user
  * who becomes the first admin of the company

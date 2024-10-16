@@ -10,7 +10,7 @@ import { AuthType } from "../../../../auth";
 import { Mutation } from "../../../../generated/graphql/types";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
-import { ALL_NOTIFICATIONS } from "../../../../common/authorizedNotifications";
+import { ALL_NOTIFICATIONS } from "../../../notifications";
 
 const CHANGE_USER_ROLE = `
   mutation ChangeUserRole($userId: ID!, $orgId: ID!, $role: UserRole!){

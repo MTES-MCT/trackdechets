@@ -6,15 +6,15 @@ import {
   UserNotification
 } from "@td/codegen-ui";
 import { useForm } from "react-hook-form";
-import {
-  ALL_NOTIFICATIONS,
-  authorizedNotifications as authorizedNotificationsByUserRole
-} from "@td/constants";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
 import { SET_COMPANY_NOTIFICATIONS } from "./queries";
 import styles from "./NotificationsUpdateModal.module.scss";
+import {
+  ALL_NOTIFICATIONS,
+  authorizedNotifications as authorizedNotificationsByUserRole
+} from "../../../common/notifications";
 
 type AccountCompanyNotificationsUpdateModalProps = {
   company: CompanyPrivate;
@@ -35,9 +35,7 @@ export default function NotificationsUpdateModal({
   const defaultValues: FormValues = ALL_NOTIFICATIONS.reduce(
     (values, notification) => ({
       ...values,
-      [notification]: company.userNotifications.includes(
-        notification as UserNotification
-      )
+      [notification]: company.userNotifications.includes(notification)
     }),
     {} as FormValues
   );

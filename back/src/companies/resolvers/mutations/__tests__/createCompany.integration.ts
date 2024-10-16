@@ -31,7 +31,7 @@ import {
 import { searchCompany } from "../../../search";
 import { sendVerificationCodeLetter } from "../../../../common/post";
 import gql from "graphql-tag";
-import { ALL_NOTIFICATIONS } from "../../../../common/authorizedNotifications";
+import { ALL_NOTIFICATIONS } from "../../../../users/notifications";
 
 // Mock external search services
 jest.mock("../../../search");
