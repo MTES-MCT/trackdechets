@@ -3,6 +3,7 @@ import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,
   ecoOrganismeFactory,
+  intermediaryReceiptFactory,
   transporterReceiptFactory
 } from "../../../__tests__/factories";
 import { CompanySearchResult } from "../../../companies/types";
@@ -17,6 +18,7 @@ import { BsvhuValidationContext } from "../types";
 import { getCurrentSignatureType, prismaToZodBsvhu } from "../helpers";
 import { parseBsvhu, parseBsvhuAsync } from "..";
 import { ZodError } from "zod";
+import { CompanyRole } from "../../../common/validation/zod/schema";
 
 const searchResult = (companyName: string) => {
   return {
@@ -37,13 +39,20 @@ describe("BSVHU validation", () => {
   let transporterCompany: Company;
   let intermediaryCompany: Company;
   let ecoOrganisme: EcoOrganisme;
+  let brokerCompany: Company;
+  let traderCompany: Company;
   beforeAll(async () => {
     const emitterCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
     transporterCompany = await companyFactory({
       companyTypes: ["TRANSPORTER"]
     });
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTE_VEHICLES"]
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
+    const nextDestinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR"]
     });
     foreignTransporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -57,12 +66,22 @@ describe("BSVHU validation", () => {
       handle: { handleBsvhu: true },
       createAssociatedCompany: true
     });
+    brokerCompany = await companyFactory({
+      companyTypes: ["BROKER"]
+    });
+    traderCompany = await companyFactory({
+      companyTypes: ["TRADER"]
+    });
     const prismaBsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitterCompany.siret,
         transporterCompanySiret: transporterCompany.siret,
         destinationCompanySiret: destinationCompany.siret,
+        destinationOperationNextDestinationCompanySiret:
+          nextDestinationCompany.siret,
         ecoOrganismeSiret: ecoOrganisme.siret,
+        brokerCompanySiret: brokerCompany.siret,
+        traderCompanySiret: traderCompany.siret,
         intermediaries: {
           create: [toIntermediaryCompany(intermediaryCompany)]
         }
@@ -353,9 +372,30 @@ describe("BSVHU validation", () => {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message:
-              `L'installation de destination avec le SIRET \"${company.siret}\" n'est pas inscrite` +
-              " sur Trackdéchets en tant qu'installation de traitement de VHU. Cette installation ne peut donc pas" +
-              " être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements"
+              "Cet établissement n'a pas le profil Installation de traitement de VHU."
+          })
+        ]);
+      }
+    });
+
+    test("when next destination is registered with wrong profile", async () => {
+      const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        destinationOperationNextDestinationCompanySiret: company.siret
+      };
+      expect.assertions(1);
+
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Cet établissement n'a pas le profil Installation de traitement de VHU."
           })
         ]);
       }
@@ -608,7 +648,9 @@ describe("BSVHU validation", () => {
         [bsvhu.transporterCompanySiret!]: searchResult("transporteur"),
         [bsvhu.destinationCompanySiret!]: searchResult("destinataire"),
         [intermediaryCompany.siret!]: searchResult("intermédiaire"),
-        [ecoOrganisme.siret!]: searchResult("ecoOrganisme")
+        [ecoOrganisme.siret!]: searchResult("ecoOrganisme"),
+        [brokerCompany.siret!]: searchResult("broker"),
+        [traderCompany.siret!]: searchResult("trader")
       };
       (searchCompany as jest.Mock).mockImplementation((clue: string) => {
         return Promise.resolve(searchResults[clue]);
@@ -644,6 +686,12 @@ describe("BSVHU validation", () => {
       );
       expect(sirenified.ecoOrganismeName).toEqual(
         searchResults[ecoOrganisme.siret!].name
+      );
+      expect(sirenified.brokerCompanyName).toEqual(
+        searchResults[brokerCompany.siret!].name
+      );
+      expect(sirenified.traderCompanyName).toEqual(
+        searchResults[traderCompany.siret!].name
       );
     });
     it("should not overwrite `name` and `address` based on SIRENE data for sealed fields", async () => {
@@ -694,7 +742,7 @@ describe("BSVHU validation", () => {
   });
 
   describe("BSVHU Recipify Module", () => {
-    it("recipify should correctly process input and return completedInput with transporter receipt", async () => {
+    it("recipify should correctly process transporter and return completedInput with transporter receipt", async () => {
       const receipt = await transporterReceiptFactory({
         company: transporterCompany
       });
@@ -725,6 +773,41 @@ describe("BSVHU validation", () => {
           transporterRecepisseNumber: null,
           transporterRecepisseDepartment: null,
           transporterRecepisseValidityLimit: null
+        })
+      );
+    });
+
+    it("recipify should correctly process broker and trader", async () => {
+      const brokerReceipt = await intermediaryReceiptFactory({
+        role: CompanyRole.Broker,
+        company: brokerCompany
+      });
+      const traderReceipt = await intermediaryReceiptFactory({
+        role: CompanyRole.Trader,
+        company: traderCompany
+      });
+      const recipified = await parseBsvhuAsync(
+        {
+          ...bsvhu,
+          brokerRecepisseNumber: null,
+          brokerRecepisseDepartment: null,
+          brokerRecepisseValidityLimit: null,
+          traderRecepisseNumber: null,
+          traderRecepisseDepartment: null,
+          traderRecepisseValidityLimit: null
+        },
+        {
+          ...context
+        }
+      );
+      expect(recipified).toEqual(
+        expect.objectContaining({
+          brokerRecepisseNumber: brokerReceipt.receiptNumber,
+          brokerRecepisseDepartment: brokerReceipt.department,
+          brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
+          traderRecepisseNumber: traderReceipt.receiptNumber,
+          traderRecepisseDepartment: traderReceipt.department,
+          traderRecepisseValidityLimit: traderReceipt.validityLimit
         })
       );
     });

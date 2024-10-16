@@ -18,6 +18,7 @@ import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../forms/database";
+import { CompanyRole } from "../common/validation/zod/schema";
 
 /**
  * Create a user with name and email
@@ -655,5 +656,49 @@ export const transporterReceiptFactory = async ({
     });
   }
 
+  return receipt;
+};
+
+export const intermediaryReceiptFactory = async ({
+  role = CompanyRole.Broker,
+  number = "el numero",
+  department = "69",
+  company
+}: {
+  role: CompanyRole.Broker | CompanyRole.Trader;
+  number?: string;
+  department?: string;
+  company?: Company;
+}) => {
+  let receipt;
+  if (role === CompanyRole.Broker) {
+    receipt = await prisma.brokerReceipt.create({
+      data: {
+        receiptNumber: number,
+        validityLimit: "2055-01-01T00:00:00.000Z",
+        department: department
+      }
+    });
+    if (!!company) {
+      await prisma.company.update({
+        where: { id: company.id },
+        data: { brokerReceipt: { connect: { id: receipt.id } } }
+      });
+    }
+  } else if (role === CompanyRole.Trader) {
+    receipt = await prisma.traderReceipt.create({
+      data: {
+        receiptNumber: number,
+        validityLimit: "2055-01-01T00:00:00.000Z",
+        department: department
+      }
+    });
+    if (!!company) {
+      await prisma.company.update({
+        where: { id: company.id },
+        data: { traderReceipt: { connect: { id: receipt.id } } }
+      });
+    }
+  }
   return receipt;
 };
