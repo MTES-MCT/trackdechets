@@ -146,26 +146,31 @@ async function mailToNonExistentEmitter(
     form.recipientCompanySiret &&
     !contactAlreadyMentionned
   ) {
-    await sendMail(
-      renderMail(yourCompanyIsIdentifiedOnABsd, {
-        to: [
-          {
-            email: form.emitterCompanyMail,
-            name: form.emitterCompanyContact ?? ""
-          }
-        ],
-        variables: {
-          emitter: {
-            siret: form.emitterCompanySiret,
-            name: form.emitterCompanyName
-          },
-          destination: {
-            siret: form.recipientCompanySiret,
-            name: form.recipientCompanyName
-          }
+    const mail = renderMail(yourCompanyIsIdentifiedOnABsd, {
+      to: [
+        {
+          email: form.emitterCompanyMail,
+          name: form.emitterCompanyContact ?? ""
         }
-      })
-    );
+      ],
+      variables: {
+        emitter: {
+          siret: form.emitterCompanySiret,
+          name: form.emitterCompanyName
+        },
+        destination: {
+          siret: form.recipientCompanySiret,
+          name: form.recipientCompanyName
+        }
+      }
+    });
+
+    await sendMail({
+      ...mail,
+      // permet de cacher le message "Vous avez reçu cet e-mail car vous
+      // êtes inscrit sur la plateforme Trackdéchets" dans le template Brevo
+      params: { hideRegisteredUserInfo: true }
+    });
   }
 }
 
