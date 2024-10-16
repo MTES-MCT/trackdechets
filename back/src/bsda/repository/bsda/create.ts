@@ -90,8 +90,7 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
       where: { id: bsda.id },
       data: {
         ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {}),
-        ...(transportersOrgIds.length ? { transportersOrgIds } : {}),
-        transportersOrgIds
+        ...(transportersOrgIds.length ? { transportersOrgIds } : {})
       },
       include: {
         grouping: { select: { id: true } },

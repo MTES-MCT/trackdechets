@@ -119,6 +119,7 @@ describe("mutaion.duplicateBsvhu", () => {
     });
 
     const bsvhu = await bsvhuFactory({
+      userId: emitter.user.id,
       opt: {
         emitterIrregularSituation: false,
         emitterNoSiret: false,
@@ -301,7 +302,8 @@ describe("mutaion.duplicateBsvhu", () => {
       "destinationOperationSignatureDate",
 
       "intermediaries",
-      "intermediariesOrgIds"
+      "intermediariesOrgIds",
+      "canAccessDraftOrgIds"
     ];
 
     expect(duplicatedBsvhu.status).toEqual("INITIAL");

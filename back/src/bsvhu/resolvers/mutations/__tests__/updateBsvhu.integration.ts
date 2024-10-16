@@ -10,6 +10,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { UserRole } from "@prisma/client";
+import { prisma } from "@td/prisma";
 import gql from "graphql-tag";
 
 const UPDATE_VHU_FORM = gql`
@@ -101,6 +102,73 @@ describe("Mutation.Vhu.update", () => {
       }
     );
 
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+  });
+
+  it("should allow user to update a draft BSVHU", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      quantity: 4
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+    expect(errors).toBeUndefined();
+    const updatedBsvhu = await prisma.bsvhu.findFirstOrThrow({
+      where: { id: bsvhu.id }
+    });
+    expect(updatedBsvhu.quantity).toEqual(4);
+  });
+
+  it("should disallow user who isn't part of the creator's companies to update a draft BSVHU", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: company2, user: user2 } = await userWithCompanyFactory(
+      UserRole.ADMIN,
+      {
+        companyTypes: ["TRANSPORTER"]
+      }
+    );
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: company2.siret
+      }
+    });
+    const { mutate } = makeClient(user2);
+    const input = {
+      weight: {
+        value: 4
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
     expect(errors).toEqual([
       expect.objectContaining({
         message:

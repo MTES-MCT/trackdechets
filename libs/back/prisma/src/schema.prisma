@@ -1111,6 +1111,7 @@ model Bsvhu {
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
+  canAccessDraftOrgIds String[] @default([])
 
   // partial indices _BsvhuIsDeletedIdx,_BsvhuIsDraftIdx  see migration82_missing_indices.sql
 
@@ -1122,6 +1123,7 @@ model Bsvhu {
   @@index([brokerCompanySiret], map: "_BsvhuBrokerCompanySiretIdx")
   @@index([traderCompanySiret], map: "_BsvhuTraderCompanySiretIdx")
   @@index([intermediariesOrgIds], map: "_BsvhuIntermediariesOrgIdsIdx", type: Gin)
+  @@index([canAccessDraftOrgIds], map: "_BsvhuCanAccessDraftOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
 }

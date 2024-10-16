@@ -324,18 +324,6 @@ const DestinationBsvhu = ({ errors }) => {
                   destination?.operation?.nextDestinationcompany
                     ?.contactEmail || company.contactEmail
                 );
-
-                const agrementNumber =
-                  company?.vhuAgrementBroyeur?.agrementNumber;
-
-                if (agrementNumber) {
-                  setValue(
-                    "destination.agrementNumber",
-                    company?.vhuAgrementBroyeur?.agrementNumber
-                  );
-                } else {
-                  setValue("destination.agrementNumber", "");
-                }
               }
             }}
           />

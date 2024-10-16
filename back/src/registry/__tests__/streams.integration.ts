@@ -111,6 +111,7 @@ describe("wastesReader", () => {
         .fill(1)
         .map(() =>
           bsvhuFactory({
+            userId: destination.user.id,
             opt: {
               destinationCompanySiret: destination.company.siret,
               destinationReceptionDate: new Date(),
