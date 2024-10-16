@@ -19,7 +19,7 @@ const IdentificationNumber = ({
   type,
   defaultValue
 }: IdentificationNumberProps) => {
-  const { setValue, getValues } = useFormContext();
+  const { setValue, getValues, clearErrors } = useFormContext();
 
   const SET_INPUT_CODE = "set_input_code";
   const ADD_CODE = "add_code";
@@ -85,7 +85,8 @@ const IdentificationNumber = ({
 
   useEffect(() => {
     setValue(name, state.codes);
-  }, [state, name, setValue]);
+    clearErrors(name);
+  }, [state, name, setValue, clearErrors]);
 
   useEffect(() => {
     if (defaultValue) {
@@ -95,11 +96,15 @@ const IdentificationNumber = ({
 
   return (
     <>
-      <p>
+      <p className={`multiTags-title${error ? " error" : ""}`}>
         {title}
         <TdTooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
       </p>
-      <div className="fr-grid-row fr-grid-row--bottom multiTags">
+      <div
+        className={`fr-grid-row fr-grid-row--bottom multiTags${
+          error ? " error" : ""
+        }`}
+      >
         {state?.codes?.map((code, idx) => (
           <Tag
             dismissible

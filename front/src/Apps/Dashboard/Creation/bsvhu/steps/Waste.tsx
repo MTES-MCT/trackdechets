@@ -7,10 +7,10 @@ import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRa
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { ZodBsvhu } from "../schema";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import { setFieldError } from "../../utils";
+import { setFieldError, TabError } from "../../utils";
 
-const WasteBsvhu = ({ errors }) => {
-  const { register, watch, setValue, formState, setError, clearErrors } =
+const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
+  const { register, watch, setValue, formState, setError } =
     useFormContext<ZodBsvhu>(); // retrieve all hook methods
 
   const weight = watch("weight.value");
@@ -27,33 +27,21 @@ const WasteBsvhu = ({ errors }) => {
 
   useEffect(() => {
     if (errors?.length) {
-      if (!weight) {
-        setFieldError(
-          errors,
-          "weight.value",
-          formState.errors?.weight?.value,
-          setError
-        );
-      }
-
-      if (!identificationNumbers?.length) {
-        setFieldError(
-          errors,
-          "identification.numbers",
-          formState.errors?.identification?.numbers,
-          setError
-        );
-      }
+      setFieldError(
+        errors,
+        "weight.value",
+        formState.errors?.weight?.value,
+        setError
+      );
+      setFieldError(
+        errors,
+        "identification.numbers",
+        formState.errors?.identification?.numbers?.length,
+        setError
+      );
     }
-  }, [
-    errors,
-    errors?.length,
-    formState.errors,
-    formState.errors?.weight?.value,
-    identificationNumbers?.length,
-    setError,
-    weight
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errors]);
 
   useEffect(() => {
     if (errors?.length) {
@@ -140,6 +128,7 @@ const WasteBsvhu = ({ errors }) => {
           disabled={sealedFields.includes("identification.numbers")}
           name="identification.numbers"
           defaultValue={identificationNumbersDefaultValue}
+          error={formState.errors.identification?.numbers}
         />
         {formState.errors.identification?.numbers?.message && (
           <p className="fr-text fr-error-text">

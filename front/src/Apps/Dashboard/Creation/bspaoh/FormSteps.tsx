@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  BsdType,
   BspaohInput,
   Mutation,
   MutationCreateBspaohArgs,
@@ -34,8 +35,7 @@ import { Destination } from "./steps/Destination";
 import {
   getErrorTabIds,
   getPublishErrorMessages,
-  getPublishErrorTabIds,
-  getTabs
+  getPublishErrorTabIds
 } from "../utils";
 
 const paohToInput = (paoh: BspaohInput): BspaohInput => {
@@ -139,17 +139,23 @@ export function ControlledTabs(props: Readonly<Props>) {
     }
   }
 
-  const tabIds = getTabs().map(tab => tab.tabId);
   const errorsFromPublishApi =
     publishErrors || props?.publishErrorsFromRedirect;
   const publishErrorTabIds = getPublishErrorTabIds(
-    errorsFromPublishApi,
-    tabIds
+    BsdType.Bspaoh,
+    errorsFromPublishApi
   );
   const formStateErrorsKeys = Object.keys(methods?.formState?.errors);
-  const errorTabIds = getErrorTabIds(publishErrorTabIds, formStateErrorsKeys);
+  const errorTabIds = getErrorTabIds(
+    BsdType.Bspaoh,
+    publishErrorTabIds,
+    formStateErrorsKeys
+  );
 
-  const publishErrorMessages = getPublishErrorMessages(errorsFromPublishApi);
+  const publishErrorMessages = getPublishErrorMessages(
+    BsdType.Bspaoh,
+    errorsFromPublishApi
+  );
 
   const tabsContent = {
     waste: <Waste />,
@@ -179,13 +185,13 @@ export function ControlledTabs(props: Readonly<Props>) {
   return (
     <>
       <FormStepsContent
+        bsdType={BsdType.Bspaoh}
         draftCtaLabel={draftCtaLabel}
         isLoading={loading}
         mainCtaLabel={mainCtaLabel}
         saveForm={saveForm}
         sealedFields={sealedFields}
         useformMethods={methods}
-        isCrematorium={true}
         tabsContent={tabsContent}
         setPublishErrors={setPublishErrors}
         errorTabIds={errorTabIds}
