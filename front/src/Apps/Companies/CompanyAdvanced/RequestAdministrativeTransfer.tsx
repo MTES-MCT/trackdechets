@@ -117,9 +117,9 @@ export function RequestAdministrativeTranfer({ company }: Props) {
 
   return (
     <div className="company-advanced__section">
-      <h4 className="company-advanced__title">
+      <h3 className="company-advanced__title">
         Transfert administratif de bordereaux
-      </h4>
+      </h3>
       <p className="company-advanced__description">
         La fonctionnalité de transfert de bordereaux concerne les établissements
         qui changent de SIRET mais conservent leurs activités. Elle permet de

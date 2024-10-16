@@ -47,9 +47,9 @@ export function ApproveAdministrativeTransfer({ company }: Props) {
 
   return (
     <div className="company-advanced__section">
-      <h4 className="company-advanced__title">
+      <h3 className="company-advanced__title">
         Réception d'un transfert administratif de bordereaux
-      </h4>
+      </h3>
       <p className="company-advanced__description">
         Vous vous apprêtez à valider la modification des BSDs sur lesquels
         l'établissement {administrativeTranfer.from.name} -{" "}
@@ -92,7 +92,7 @@ export function ApproveAdministrativeTransfer({ company }: Props) {
         onClose={() => setIsModalOpened(false)}
         isOpen={isModalOpened}
       >
-        <h4 className="company-advanced__modal-title">Valider le transfert</h4>
+        <h3 className="company-advanced__modal-title">Valider le transfert</h3>
 
         <p className="company-advanced__modal-description">
           Êtes vous sûr de vouloir valider le transfert des BSDs sur lesquels

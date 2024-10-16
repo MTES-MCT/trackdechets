@@ -187,7 +187,7 @@ const CompanySignatureAutomation = ({
 
   return (
     <div className="company-signature__automation">
-      <h4 className="fr-h4">Signature automatique (annexe 1)</h4>
+      <h3 className="fr-h4">Signature automatique (annexe 1)</h3>
       {isAdmin ? (
         <ToggleSwitch
           label="J'autorise Trackdéchets à apposer ma signature électronique au moment de la collecte de déchets avec une annexe 1 pour le ou les établissement(s) que je désigne ci-après comme collecteurs autorisés, et avec lesquels j'ai un contrat de collecte."

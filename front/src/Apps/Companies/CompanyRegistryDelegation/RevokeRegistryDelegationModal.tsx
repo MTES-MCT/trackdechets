@@ -70,9 +70,9 @@ export const RevokeRegistryDelegationModal = ({
       isOpen
     >
       <div>
-        <h4>
+        <h3>
           <WarningIcon /> {title}
-        </h4>
+        </h3>
 
         <p>{content}</p>
 

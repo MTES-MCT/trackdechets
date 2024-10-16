@@ -141,7 +141,7 @@ export const CreateRegistryDelegationModal = ({
     >
       <div>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <h4>Créer une délégation</h4>
+          <h3>Créer une délégation</h3>
 
           <CompanySelectorWrapper
             orgId={company.orgId}
