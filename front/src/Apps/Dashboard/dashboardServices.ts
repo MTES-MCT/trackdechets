@@ -256,8 +256,9 @@ export const isSiretActorForBsd = (
     : actorTypes
         .map(({ type, strict = false }) => {
           return actorTypesForSiret.includes(type) && strict
-            ? actorTypesForSiret.length === 1
-            : true;
+            ? actorTypesForSiret.includes(type) &&
+                actorTypesForSiret.length === 1
+            : actorTypesForSiret.includes(type);
         })
         .reduce((acc, curr) => acc && curr, true);
 };
@@ -592,7 +593,11 @@ export const getSealedBtnLabel = (
     (permissions.includes(UserPermission.BsdCanSignEmission) ||
       permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
-    if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
+    if (
+      isAppendix1(bsd) &&
+      canAddAppendix1(bsd) &&
+      hasAppendix1Cta(bsd, currentSiret)
+    ) {
       return AJOUTER_ANNEXE_1;
     }
 
@@ -678,6 +683,7 @@ export const getSentBtnLabel = (
       if (
         isAppendix1(bsd) &&
         canAddAppendix1(bsd) &&
+        hasAppendix1Cta(bsd, currentSiret) &&
         permissions.includes(UserPermission.BsdCanUpdate)
       ) {
         return AJOUTER_ANNEXE_1;
@@ -1498,20 +1504,26 @@ export const hasAppendix1Cta = (
   bsd: BsdDisplay,
   currentSiret: string
 ): boolean => {
+  const isBroker = isSiretActorForBsd(bsd, currentSiret, [
+    { type: ActorType.Broker, strict: true }
+  ]);
+
+  const isIntermediary = isSiretActorForBsd(bsd, currentSiret, [
+    { type: ActorType.Intermediary, strict: true }
+  ]);
+
+  const isTrader = isSiretActorForBsd(bsd, currentSiret, [
+    { type: ActorType.Trader, strict: true }
+  ]);
+
   return (
     bsd.type === BsdType.Bsdd &&
     bsd?.emitterType === EmitterType.Appendix1 &&
     (BsdStatusCode.Sealed === bsd.status ||
       BsdStatusCode.Sent === bsd.status) &&
-    !isSiretActorForBsd(bsd, currentSiret, [
-      { type: ActorType.Broker, strict: true }
-    ]) &&
-    !isSiretActorForBsd(bsd, currentSiret, [
-      { type: ActorType.Intermediary, strict: true }
-    ]) &&
-    !isSiretActorForBsd(bsd, currentSiret, [
-      { type: ActorType.Trader, strict: true }
-    ])
+    !isBroker &&
+    !isIntermediary &&
+    !isTrader
   );
 };
 
