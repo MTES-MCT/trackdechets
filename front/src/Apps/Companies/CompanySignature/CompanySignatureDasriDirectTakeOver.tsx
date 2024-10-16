@@ -55,7 +55,7 @@ const CompanySignatureDasriDirectTakeOver = ({
 
   return (
     <div className="company-signature__takeover">
-      <h4 className="fr-h4">Emport direct de DASRI</h4>
+      <h3 className="fr-h4">Emport direct de DASRI</h3>
       {isAdmin ? (
         <ToggleSwitch
           label="Mon établissement produit des DASRI. Je dispose d’une convention avec un collecteur et j’accepte que ce collecteur prenne en charge mes DASRI sans ma signature lors de la collecte si je ne suis pas disponible."

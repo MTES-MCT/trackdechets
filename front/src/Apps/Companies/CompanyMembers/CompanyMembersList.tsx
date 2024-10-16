@@ -184,7 +184,7 @@ const CompanyMembersList = ({
     <div className="company-members__list">
       {company && company.users && company.users.length > 0 && (
         <>
-          <h4 className="fr-h4">Gérer les membres</h4>
+          <h3 className="fr-h4">Gérer les membres</h3>
           <div className={`fr-container--fluid`}>
             <div
               className={`fr-grid-row fr-grid-row--gutters fr-grid-row--bottom`}

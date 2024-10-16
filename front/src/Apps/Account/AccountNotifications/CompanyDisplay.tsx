@@ -13,10 +13,10 @@ export default function CompanyDisplay({
 }: AccountCompanyNotificationsProps) {
   return (
     <>
-      <h4 className={styles.companyName}>
+      <h3 className={styles.companyName}>
         {company.name}
         {company.givenName && ` - ${company.givenName}`}
-      </h4>
+      </h3>
       <p className="fr-text">{company.orgId}</p>
       <Tag small className={styles.roleTag}>
         {userRoleLabel(company.userRole!)}
