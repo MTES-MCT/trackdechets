@@ -85,11 +85,11 @@ export const getCurrentTransporterInfos = (
         isToCollectTab
       );
     case BsdTypename.Bsdasri:
-      return getBsdasriCurrentTransporterInfos(bsd, currentSiret);
+      return getBsdasriCurrentTransporterInfos(bsd);
     case BsdTypename.Bsvhu:
       return null;
     case BsdTypename.Bspaoh:
-      return getBspaohCurrentTransporterInfos(bsd, currentSiret);
+      return getBspaohCurrentTransporterInfos(bsd);
     default:
       return null;
   }
@@ -186,30 +186,24 @@ export const getMultiModalCurrentTransporterInfos = (
 };
 
 export const getBsdasriCurrentTransporterInfos = (
-  bsdasri: Bsdasri,
-  currentSiret: string
+  bsdasri: Bsdasri
 ): BsdCurrentTransporterInfos => {
   const currentTransporter = bsdasri.transporter;
-  if (currentTransporter?.company?.orgId !== currentSiret) {
-    return {};
-  }
   // since there is only one transporter per BSDASRI, transporterId is useless,
   // the update is done through the BSD using its id
   return {
-    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterNumberPlate: currentTransporter?.transport?.plates?.filter(
+      plate => plate.trim()
+    ),
     transporterCustomInfo: currentTransporter?.customInfo,
     transporterMode: currentTransporter?.transport?.mode ?? undefined
   };
 };
 
 export const getBspaohCurrentTransporterInfos = (
-  bspaoh: Bspaoh,
-  currentSiret: string
+  bspaoh: Bspaoh
 ): BsdCurrentTransporterInfos => {
   const currentTransporter = bspaoh.transporter;
-  if (currentTransporter?.company?.orgId !== currentSiret) {
-    return {};
-  }
   return {
     transporterNumberPlate: currentTransporter?.transport?.plates,
     transporterCustomInfo: currentTransporter?.customInfo,
