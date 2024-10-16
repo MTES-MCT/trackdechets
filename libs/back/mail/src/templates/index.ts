@@ -41,11 +41,13 @@ export const notifyUserOfInvite: MailTemplate<{
   templateId: templateIds.LAYOUT
 };
 
-export const contentAwaitsGuest: MailTemplate<{
-  company: { siret: string; name?: string };
+export const yourCompanyIsIdentifiedOnABsd: MailTemplate<{
+  emitter: { siret: string; name?: string };
+  destination: { siret: string; name?: string };
 }> = {
-  subject: "Votre Bordereau de Suivi de Déchet",
-  body: mustacheRenderer("suite-transmission-bsd.html"),
+  subject:
+    "Votre établissement a été identifié sur un bordereau de suivi de déchets dangereux sur Trackdéchets",
+  body: mustacheRenderer("your-company-is-identified-on-a-bsd.html"),
   templateId: templateIds.LAYOUT
 };
 

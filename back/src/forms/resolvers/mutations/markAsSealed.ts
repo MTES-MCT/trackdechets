@@ -1,5 +1,5 @@
 import { EmitterType, Form, Status } from "@prisma/client";
-import { contentAwaitsGuest, renderMail } from "@td/mail";
+import { yourCompanyIsIdentifiedOnABsd, renderMail } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -141,24 +141,36 @@ async function mailToNonExistentEmitter(
   if (
     form.emitterCompanyMail &&
     form.emitterCompanySiret &&
+    form.emitterCompanyName &&
+    form.recipientCompanyName &&
+    form.recipientCompanySiret &&
     !contactAlreadyMentionned
   ) {
-    await sendMail(
-      renderMail(contentAwaitsGuest, {
-        to: [
-          {
-            email: form.emitterCompanyMail,
-            name: form.emitterCompanyContact ?? ""
-          }
-        ],
-        variables: {
-          company: {
-            siret: form.emitterCompanySiret,
-            name: form.emitterCompanyName ?? ""
-          }
+    const mail = renderMail(yourCompanyIsIdentifiedOnABsd, {
+      to: [
+        {
+          email: form.emitterCompanyMail,
+          name: form.emitterCompanyContact ?? ""
         }
-      })
-    );
+      ],
+      variables: {
+        emitter: {
+          siret: form.emitterCompanySiret,
+          name: form.emitterCompanyName
+        },
+        destination: {
+          siret: form.recipientCompanySiret,
+          name: form.recipientCompanyName
+        }
+      }
+    });
+
+    await sendMail({
+      ...mail,
+      // permet de cacher le message "Vous avez reçu cet e-mail car vous
+      // êtes inscrit sur la plateforme Trackdéchets" dans le template Brevo
+      params: { hideRegisteredUserInfo: true }
+    });
   }
 }
 
