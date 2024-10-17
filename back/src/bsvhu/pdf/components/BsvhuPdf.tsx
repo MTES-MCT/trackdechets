@@ -86,7 +86,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
                     id="e_irregularSituation"
                   />{" "}
                   <label htmlFor="e_irregularSituation">
-                    Établissement en situation irrégulière
+                    Installation en situation irrégulière
                   </label>
                 </p>
               ) : null}
