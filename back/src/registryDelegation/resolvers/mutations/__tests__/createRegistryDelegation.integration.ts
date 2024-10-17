@@ -38,7 +38,6 @@ const CREATE_REGISTRY_DELEGATION = gql`
       startDate
       endDate
       comment
-      isRevoked
     }
   }
 `;
@@ -142,7 +141,6 @@ describe("mutation createRegistryDelegation", () => {
       );
       expect(data.createRegistryDelegation.endDate).toBeNull();
       expect(data.createRegistryDelegation.comment).toBeNull();
-      expect(data.createRegistryDelegation.isRevoked).toBeFalsy();
 
       // Persisted value should be OK
       expect(delegation?.createdAt).not.toBeNull();
@@ -152,7 +150,8 @@ describe("mutation createRegistryDelegation", () => {
       );
       expect(delegation?.endDate).toBeNull();
       expect(delegation?.comment).toBeNull();
-      expect(delegation?.isRevoked).toBeFalsy();
+      expect(delegation?.revokedBy).toBeFalsy();
+      expect(delegation?.cancelledBy).toBeFalsy();
     });
 
     it("user can add a comment", async () => {
@@ -532,7 +531,7 @@ describe("mutation createRegistryDelegation", () => {
       );
     });
 
-    it("should not throw if there is an overlapping delegation but it's been refused", async () => {
+    it("should not throw if there is an overlapping delegation but it's been revoqued", async () => {
       // Given
       const delegate = await companyFactory();
       const { user, company: delegator } = await userWithCompanyFactory();
@@ -550,7 +549,7 @@ describe("mutation createRegistryDelegation", () => {
       // Refuse the delegation
       await prisma.registryDelegation.update({
         where: { id: delegation?.id },
-        data: { isRevoked: true }
+        data: { revokedBy: "someuserid" }
       });
 
       // When: create second delegation
@@ -563,7 +562,38 @@ describe("mutation createRegistryDelegation", () => {
       expect(errors2).toBeUndefined();
     });
 
-    it("should not throw if there is an existing delegation in the future but it's been refused", async () => {
+    it("should not throw if there is an overlapping delegation but it's been cancelled", async () => {
+      // Given
+      const delegate = await companyFactory();
+      const { user, company: delegator } = await userWithCompanyFactory();
+
+      // When: create first delegation
+      const { errors, delegation } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId,
+        endDate: nowPlusXHours(3).toISOString() as any
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Refuse the delegation
+      await prisma.registryDelegation.update({
+        where: { id: delegation?.id },
+        data: { cancelledBy: "someuserid" }
+      });
+
+      // When: create second delegation
+      const { errors: errors2 } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
+
+      // Then
+      expect(errors2).toBeUndefined();
+    });
+
+    it("should not throw if there is an existing delegation in the future but it's been revoked", async () => {
       // Given
       const delegate = await companyFactory();
       const { user, company: delegator } = await userWithCompanyFactory();
@@ -582,7 +612,39 @@ describe("mutation createRegistryDelegation", () => {
       // Refuse the delegation
       await prisma.registryDelegation.update({
         where: { id: delegation?.id },
-        data: { isRevoked: true }
+        data: { revokedBy: "someuserid" }
+      });
+
+      // When: create second delegation
+      const { errors: errors2 } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
+
+      // Then
+      expect(errors2).toBeUndefined();
+    });
+
+    it("should not throw if there is an existing delegation in the future but it's been cancelled", async () => {
+      // Given
+      const delegate = await companyFactory();
+      const { user, company: delegator } = await userWithCompanyFactory();
+
+      // When: create first delegation
+      const { errors, delegation } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId,
+        startDate: nowPlusXHours(2).toISOString() as any,
+        endDate: nowPlusXHours(3).toISOString() as any
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Refuse the delegation
+      await prisma.registryDelegation.update({
+        where: { id: delegation?.id },
+        data: { cancelledBy: "someuserid" }
       });
 
       // When: create second delegation

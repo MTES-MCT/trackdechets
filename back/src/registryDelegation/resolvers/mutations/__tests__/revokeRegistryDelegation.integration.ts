@@ -12,7 +12,6 @@ const REVOKE_REGISTRY_DELEGATION = gql`
   mutation revokeRegistryDelegation($delegationId: ID!) {
     revokeRegistryDelegation(delegationId: $delegationId) {
       id
-      isRevoked
       status
       delegate {
         orgId
@@ -56,12 +55,11 @@ describe("mutation revokeRegistryDelegation", () => {
 
       // Then
       expect(errors).toBeUndefined();
-      expect(data.revokeRegistryDelegation.isRevoked).toBeTruthy();
-      expect(data.revokeRegistryDelegation.status).toBe("CLOSED");
+      expect(data.revokeRegistryDelegation.status).toBe("REVOKED");
       expect(data.revokeRegistryDelegation.delegate.orgId).toBe(
         delegateCompany.orgId
       );
-      expect(updatedDelegation?.isRevoked).toBeTruthy();
+      expect(updatedDelegation?.revokedBy).toBe(delegatorUser.id);
 
       // Should create an event
       const eventsAfterCreate = await getStream(delegation!.id);
@@ -86,27 +84,8 @@ describe("mutation revokeRegistryDelegation", () => {
 
       // Then
       expect(errors).toBeUndefined();
-      expect(data.revokeRegistryDelegation.isRevoked).toBeTruthy();
-      expect(data.revokeRegistryDelegation.status).toBe("CLOSED");
-      expect(updatedDelegation?.isRevoked).toBeTruthy();
-    });
-
-    it("delegate can revoke delegation", async () => {
-      // Given
-      const { delegation, delegateUser } = await registryDelegationFactory();
-
-      // When
-      const {
-        errors,
-        data,
-        delegation: updatedDelegation
-      } = await revokeDelegation(delegateUser, delegation.id);
-
-      // Then
-      expect(errors).toBeUndefined();
-      expect(data.revokeRegistryDelegation.isRevoked).toBeTruthy();
-      expect(data.revokeRegistryDelegation.status).toBe("CLOSED");
-      expect(updatedDelegation?.isRevoked).toBeTruthy();
+      expect(data.revokeRegistryDelegation.status).toBe("REVOKED");
+      expect(updatedDelegation?.revokedBy).toBe(delegatorUser.id);
     });
   });
 
@@ -123,7 +102,7 @@ describe("mutation revokeRegistryDelegation", () => {
       expect(errors[0].message).toBe("Vous n'êtes pas connecté.");
     });
 
-    it("user must belong to one of the companies", async () => {
+    it("user must belong to the delegator company", async () => {
       // Given
       const { delegation } = await registryDelegationFactory();
       const user = await userFactory();
@@ -134,14 +113,15 @@ describe("mutation revokeRegistryDelegation", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Vous devez faire partie de l'entreprise délégante ou délégataire d'une délégation pour pouvoir la révoquer."
+        "Vous devez faire partie de l'entreprise délégante d'une délégation pour pouvoir la révoquer."
       );
     });
 
     it("user must be admin", async () => {
       // Given
-      const { delegation, delegateCompany } = await registryDelegationFactory();
-      const user = await userInCompany("MEMBER", delegateCompany.id);
+      const { delegation, delegatorCompany } =
+        await registryDelegationFactory();
+      const user = await userInCompany("MEMBER", delegatorCompany.id);
 
       // When
       const { errors } = await revokeDelegation(user, delegation.id);
@@ -149,7 +129,21 @@ describe("mutation revokeRegistryDelegation", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Vous n'avez pas les permissions suffisantes pour pouvoir créer une délégation."
+        "Vous n'avez pas les permissions suffisantes pour pouvoir révoquer une délégation."
+      );
+    });
+
+    it("delegate can NOT revoke delegation", async () => {
+      // Given
+      const { delegation, delegateUser } = await registryDelegationFactory();
+
+      // When
+      const { errors } = await revokeDelegation(delegateUser, delegation.id);
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Vous devez faire partie de l'entreprise délégante d'une délégation pour pouvoir la révoquer."
       );
     });
   });
@@ -170,6 +164,34 @@ describe("mutation revokeRegistryDelegation", () => {
       expect(errors[0].message).toBe(
         "La demande de délégation cxxxxxxxxxxxxxxxxxxxxxxxx n'existe pas."
       );
+    });
+
+    it("cannot revoke an already revoked delegation", async () => {
+      // Given
+      const { delegation, delegatorUser } = await registryDelegationFactory({
+        revokedBy: "someuserid"
+      });
+
+      // When
+      const { errors } = await revokeDelegation(delegatorUser, delegation.id);
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Cette délégation a déjà été révoquée.");
+    });
+
+    it("cannot revoke a cancelled delegation", async () => {
+      // Given
+      const { delegation, delegatorUser } = await registryDelegationFactory({
+        cancelledBy: "someuserid"
+      });
+
+      // When
+      const { errors } = await revokeDelegation(delegatorUser, delegation.id);
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Cette délégation a été annulée.");
     });
   });
 });

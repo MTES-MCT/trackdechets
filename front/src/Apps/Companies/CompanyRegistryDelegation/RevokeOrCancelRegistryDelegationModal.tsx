@@ -1,9 +1,16 @@
 import React from "react";
-import { Mutation, MutationRevokeRegistryDelegationArgs } from "@td/codegen-ui";
+import {
+  Mutation,
+  MutationCancelRegistryDelegationArgs,
+  MutationRevokeRegistryDelegationArgs
+} from "@td/codegen-ui";
 import { Modal } from "../../../common/components";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
-import { REVOKE_REGISTRY_DELEGATION } from "../../common/queries/registryDelegation/queries";
+import {
+  CANCEL_REGISTRY_DELEGATION,
+  REVOKE_REGISTRY_DELEGATION
+} from "../../common/queries/registryDelegation/queries";
 import toast from "react-hot-toast";
 import { isDefined } from "../../../common/helper";
 
@@ -22,13 +29,13 @@ interface Props {
   onClose: () => void;
 }
 
-export const RevokeRegistryDelegationModal = ({
+export const RevokeOrCancelRegistryDelegationModal = ({
   delegationId,
   to,
   from,
   onClose
 }: Props) => {
-  const [revokeRegistryDelegation, { loading }] = useMutation<
+  const [revokeRegistryDelegation, { loading: loadingRevoke }] = useMutation<
     Pick<Mutation, "revokeRegistryDelegation">,
     MutationRevokeRegistryDelegationArgs
   >(REVOKE_REGISTRY_DELEGATION);
@@ -39,6 +46,24 @@ export const RevokeRegistryDelegationModal = ({
         delegationId
       },
       onCompleted: () => toast.success("Délégation révoquée!"),
+      onError: err => toast.error(err.message)
+    });
+
+    // Delegation is automatically updated in Apollo's cache
+    onClose();
+  };
+
+  const [cancelRegistryDelegation, { loading: loadingCancel }] = useMutation<
+    Pick<Mutation, "cancelRegistryDelegation">,
+    MutationCancelRegistryDelegationArgs
+  >(CANCEL_REGISTRY_DELEGATION);
+
+  const onCancel = async () => {
+    await cancelRegistryDelegation({
+      variables: {
+        delegationId
+      },
+      onCompleted: () => toast.success("Délégation annulée!"),
       onError: err => toast.error(err.message)
     });
 
@@ -61,6 +86,8 @@ export const RevokeRegistryDelegationModal = ({
     closeModalLabel = "Ne pas annuler";
   }
 
+  const loading = loadingRevoke || loadingCancel;
+
   return (
     <Modal
       onClose={onClose}
@@ -80,7 +107,7 @@ export const RevokeRegistryDelegationModal = ({
           <Button
             disabled={loading}
             priority="secondary"
-            onClick={onRevoke}
+            onClick={isDefined(to) ? onRevoke : onCancel}
             type="button"
           >
             {acceptLabel}

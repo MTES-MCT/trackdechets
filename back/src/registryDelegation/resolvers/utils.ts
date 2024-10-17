@@ -1,11 +1,8 @@
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../common/errors";
 import { getRegistryDelegationRepository } from "../repository";
-import { Company, Prisma } from "@prisma/client";
-import {
-  RegistryDelegation,
-  RegistryDelegationStatus
-} from "../../generated/graphql/types";
+import { Company, Prisma, RegistryDelegation } from "@prisma/client";
+import { RegistryDelegationStatus } from "../../generated/graphql/types";
 
 export const findDelegateAndDelegatorOrThrow = async (
   delegateOrgId: string,
@@ -82,14 +79,15 @@ export const findDelegateOrDelegatorOrThrow = async (
 export const getDelegationStatus = (delegation: RegistryDelegation) => {
   const NOW = new Date();
 
-  const { isRevoked, startDate, endDate } = delegation;
+  const { revokedBy, cancelledBy, startDate, endDate } = delegation;
 
-  if (isRevoked) return "CLOSED" as RegistryDelegationStatus;
+  if (revokedBy) return "REVOKED" as RegistryDelegationStatus;
+
+  if (cancelledBy) return "CANCELLED" as RegistryDelegationStatus;
 
   if (startDate > NOW) return "INCOMING" as RegistryDelegationStatus;
 
-  if (startDate <= NOW && (!endDate || endDate > NOW))
-    return "ONGOING" as RegistryDelegationStatus;
+  if (!endDate || endDate > NOW) return "ONGOING" as RegistryDelegationStatus;
 
-  return "CLOSED" as RegistryDelegationStatus;
+  return "EXPIRED" as RegistryDelegationStatus;
 };

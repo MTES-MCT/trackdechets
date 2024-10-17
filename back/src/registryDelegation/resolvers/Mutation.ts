@@ -1,15 +1,19 @@
 import { MutationResolvers } from "../../generated/graphql/types";
+import cancelRegistryDelegation from "./mutations/cancelRegistryDelegation";
 import createRegistryDelegation from "./mutations/createRegistryDelegation";
 import revokeRegistryDelegation from "./mutations/revokeRegistryDelegation";
 
 export type RegistryDelegationMutationResolvers = Pick<
   MutationResolvers,
-  "createRegistryDelegation" | "revokeRegistryDelegation"
+  | "createRegistryDelegation"
+  | "revokeRegistryDelegation"
+  | "cancelRegistryDelegation"
 >;
 
 const Mutation: RegistryDelegationMutationResolvers = {
   createRegistryDelegation,
-  revokeRegistryDelegation
+  revokeRegistryDelegation,
+  cancelRegistryDelegation
 };
 
 export default Mutation;
