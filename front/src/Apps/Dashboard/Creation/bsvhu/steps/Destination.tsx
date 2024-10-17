@@ -33,14 +33,12 @@ const DestinationBsvhu = ({ errors }) => {
 
   useEffect(() => {
     if (errors?.length) {
-      if (!destination?.company?.siret) {
-        setFieldError(
-          errors,
-          `${actor}.company.siret`,
-          formState.errors?.[actor]?.["company"]?.siret,
-          setError
-        );
-      }
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
       if (!destination?.company?.contact) {
         setFieldError(
           errors,
@@ -90,20 +88,8 @@ const DestinationBsvhu = ({ errors }) => {
         );
       }
     }
-  }, [
-    errors,
-    errors?.length,
-    formState.errors,
-    formState.errors.length,
-    setError,
-    destination?.company?.siret,
-    destination?.company?.contact,
-    destination?.company?.address,
-    destination?.company?.phone,
-    destination?.company?.mail,
-    destination?.company?.vatNumber,
-    destination?.agrementNumber
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errors]);
 
   const updateAgrementNumber = (destination, type?) => {
     const destinationType = type || destination?.type;
@@ -162,6 +148,8 @@ const DestinationBsvhu = ({ errors }) => {
         return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
       } else if (!company.companyTypes?.includes(CompanyType.WasteVehicles)) {
         return "Cet établissement n'a pas le profil Installation de traitement de VHU.";
+      } else if (formState.errors?.destination?.["company"]?.siret?.message) {
+        return formState.errors?.destination?.["company"]?.siret?.message;
       }
     }
     return null;
@@ -215,41 +203,48 @@ const DestinationBsvhu = ({ errors }) => {
           selectedCompanyError={selectedCompanyError}
           onCompanySelected={company => {
             if (company) {
+              if (company.siret !== destination?.company?.siret) {
+                setValue(`${actor}.company.contact`, company.contact);
+                setValue(`${actor}.company.phone`, company.contactPhone);
+
+                setValue(`${actor}.company.mail`, company.contactEmail);
+                if (errors?.length) {
+                  // server errors
+                  clearCompanyError(destination, actor, clearErrors);
+                  clearErrors(`${actor}.agrementNumber`);
+                }
+              } else {
+                setValue(
+                  `${actor}.company.contact`,
+                  destination?.company?.contact || company.contact
+                );
+                setValue(
+                  `${actor}.company.phone`,
+                  destination?.company?.phone || company.contactPhone
+                );
+
+                setValue(
+                  `${actor}.company.mail`,
+                  destination?.company?.mail || company.contactEmail
+                );
+              }
               setValue(`${actor}.company.orgId`, company.orgId);
               setValue(`${actor}.company.siret`, company.siret);
               setValue(`${actor}.company.name`, company.name);
               setValue(`${actor}.company.vatNumber`, company.vatNumber);
               setValue(`${actor}.company.address`, company.address);
-              setValue(
-                `${actor}.company.contact`,
-                destination?.company?.contact || company.contact
-              );
-              setValue(
-                `${actor}.company.phone`,
-                destination?.company?.phone || company.contactPhone
-              );
-
-              setValue(
-                `${actor}.company.mail`,
-                destination?.company?.mail || company.contactEmail
-              );
 
               setSelectedDestination(company);
               updateAgrementNumber(company, destination?.type);
-
-              if (errors?.length) {
-                // server errors
-                clearCompanyError(destination, actor, clearErrors);
-                clearErrors(`${actor}.agrementNumber`);
-              }
             }
           }}
         />
-        {formState.errors?.destination?.["company"]?.siret && (
-          <p className="fr-text--sm fr-error-text fr-mb-4v">
-            {formState.errors?.destination?.["company"]?.siret?.message}
-          </p>
-        )}
+        {!destination?.company?.siret &&
+          formState.errors?.destination?.["company"]?.siret && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {formState.errors?.destination?.["company"]?.siret?.message}
+            </p>
+          )}
         <CompanyContactInfo
           fieldName={`${actor}.company`}
           name={actor}

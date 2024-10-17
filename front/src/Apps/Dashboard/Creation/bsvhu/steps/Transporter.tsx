@@ -126,29 +126,34 @@ const TransporterBsvhu = ({ errors }) => {
           selectedCompanyError={selectedCompanyError}
           onCompanySelected={company => {
             if (company) {
+              if (company.siret !== transporter?.company?.siret) {
+                setValue(`${actor}.company.contact`, company.contact);
+                setValue(`${actor}.company.phone`, company.contactPhone);
+                setValue(`${actor}.company.mail`, company.contactEmail);
+                if (errors?.length) {
+                  // server errors
+                  clearCompanyError(transporter, actor, clearErrors);
+                }
+              } else {
+                setValue(
+                  `${actor}.company.contact`,
+                  transporter?.company?.contact || company.contact
+                );
+                setValue(
+                  `${actor}.company.phone`,
+                  transporter?.company?.phone || company.contactPhone
+                );
+
+                setValue(
+                  `${actor}.company.mail`,
+                  transporter?.company?.mail || company.contactEmail
+                );
+              }
               setValue(`${actor}.company.orgId`, company.orgId);
               setValue(`${actor}.company.siret`, company.siret);
               setValue(`${actor}.company.name`, company.name);
               setValue(`${actor}.company.vatNumber`, company.vatNumber);
               setValue(`${actor}.company.address`, company.address);
-              setValue(
-                `${actor}.company.contact`,
-                transporter?.company?.contact || company.contact
-              );
-              setValue(
-                `${actor}.company.phone`,
-                transporter?.company?.phone || company.contactPhone
-              );
-
-              setValue(
-                `${actor}.company.mail`,
-                transporter?.company?.mail || company.contactEmail
-              );
-
-              if (errors?.length) {
-                // server errors
-                clearCompanyError(transporter, actor, clearErrors);
-              }
             }
           }}
         />
