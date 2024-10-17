@@ -233,6 +233,7 @@ export const mapBsdd = (bsdd: Form): BsdDisplay => {
     ecoOrganisme: bsdd.ecoOrganisme,
     broker: bsdd.broker,
     trader: bsdd.trader,
+    intermediaries: bsdd.intermediaries,
     updatedAt: bsdd.stateSummary?.lastActionOn,
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,
     grouping: bsdd.grouping,

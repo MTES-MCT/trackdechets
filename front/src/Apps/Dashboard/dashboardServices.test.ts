@@ -1557,9 +1557,26 @@ describe("dashboardServices", () => {
       transporter: { company: { siret: "2" } },
       broker: { company: { siret: "4" } },
       trader: { company: { siret: "5" } },
+      intermediaries: [{ siret: "6" }],
       destination: { company: { siret: "3" } },
       ecoOrganisme: { siret: "2" }
     } as BsdDisplay;
+
+    it("should return true if testing for Intermediary, strict", () => {
+      const currentSiret = "6";
+      const result = isSiretActorForBsd(bsd, currentSiret, [
+        { type: ActorType.Intermediary }
+      ]);
+      expect(result).toBe(true);
+    });
+
+    it("should return false if testing for Broker with wrong siret, strict", () => {
+      const currentSiret = "6";
+      const result = isSiretActorForBsd(bsd, currentSiret, [
+        { type: ActorType.Broker }
+      ]);
+      expect(result).toBe(false);
+    });
 
     it("should return true if testing for EcoOrganisme, non-strict", () => {
       const currentSiret = "2";

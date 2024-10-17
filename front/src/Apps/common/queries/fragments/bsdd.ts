@@ -568,6 +568,15 @@ export const dashboardFormFragment = gql`
     }
     currentTransporterSiret
     nextTransporterSiret
+    intermediaries {
+      ...CompanyFragment
+    }
+    trader {
+      ...TraderFragment
+    }
+    broker {
+      ...BrokerFragment
+    }
     metadata {
       latestRevision {
         id
@@ -583,4 +592,7 @@ export const dashboardFormFragment = gql`
       }
     }
   }
+  ${traderFragment}
+  ${companyFragment}
+  ${brokerFragment}
 `;
