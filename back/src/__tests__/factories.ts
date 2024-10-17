@@ -702,3 +702,25 @@ export const intermediaryReceiptFactory = async ({
   }
   return receipt;
 };
+
+export const bsddFinalOperationFactory = async ({
+  bsddId,
+  opts = {}
+}: {
+  bsddId: string;
+  opts?: Omit<
+    Partial<Prisma.BsddFinalOperationCreateInput>,
+    "initialForm" | "finalForm"
+  >;
+}) => {
+  return prisma.bsddFinalOperation.create({
+    data: {
+      initialForm: { connect: { id: bsddId } },
+      finalForm: { connect: { id: bsddId } },
+      operationCode: "",
+      quantity: 1,
+      noTraceability: false,
+      ...opts
+    }
+  });
+};
