@@ -6,16 +6,18 @@ import { Permission, checkUserPermissions } from "../permissions";
  * Retrieves organisations allowed to read a BSVHU
  */
 function readers(bsvhu: Bsvhu): string[] {
-  return [
-    bsvhu.emitterCompanySiret,
-    bsvhu.destinationCompanySiret,
-    bsvhu.transporterCompanySiret,
-    bsvhu.transporterCompanyVatNumber,
-    bsvhu.ecoOrganismeSiret,
-    bsvhu.brokerCompanySiret,
-    bsvhu.traderCompanySiret,
-    ...bsvhu.intermediariesOrgIds
-  ].filter(Boolean);
+  return bsvhu.isDraft
+    ? [...bsvhu.canAccessDraftOrgIds]
+    : [
+        bsvhu.emitterCompanySiret,
+        bsvhu.destinationCompanySiret,
+        bsvhu.transporterCompanySiret,
+        bsvhu.transporterCompanyVatNumber,
+        bsvhu.ecoOrganismeSiret,
+        bsvhu.brokerCompanySiret,
+        bsvhu.traderCompanySiret,
+        ...bsvhu.intermediariesOrgIds
+      ].filter(Boolean);
 }
 
 /**
@@ -25,6 +27,9 @@ function readers(bsvhu: Bsvhu): string[] {
  * a user is not removing his own company from the BSVHU
  */
 function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
+  if (bsvhu.isDraft) {
+    return [...bsvhu.canAccessDraftOrgIds];
+  }
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateDestinationCompanySiret = input?.destination?.company?.siret;
   const updateTransporterCompanySiret = input?.transporter?.company?.siret;

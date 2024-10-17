@@ -6,7 +6,7 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
 import { BsdaWithTransporters } from "../../types";
-import { getUserCompanies } from "../../../users/database";
+import { getCanAccessDraftOrgIds } from "../../utils";
 
 export type CreateBsdaFn = (
   data: Prisma.BsdaCreateInput,
@@ -52,11 +52,7 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
         )
       );
     }
-    const intermediariesOrgIds: string[] = bsda.intermediaries
-      ? bsda.intermediaries
-          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
-          .filter(Boolean)
-      : [];
+
     const transportersOrgIds: string[] = bsda.transporters
       ? bsda.transporters
           .flatMap(t => [
@@ -66,32 +62,13 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
           .filter(Boolean)
       : [];
     // For drafts, only the owner's sirets that appear on the bsd have access
-    const canAccessDraftOrgIds: string[] = [];
-    if (bsda.isDraft) {
-      const userCompanies = await getUserCompanies(user.id);
-      const userOrgIds = userCompanies.map(company => company.orgId);
-      const bsdaOrgIds = [
-        ...intermediariesOrgIds,
-        ...transportersOrgIds,
-        bsda.emitterCompanySiret,
-        bsda.ecoOrganismeSiret,
-        bsda.destinationCompanySiret,
-        bsda.destinationOperationNextDestinationCompanySiret,
-        bsda.workerCompanySiret,
-        bsda.brokerCompanySiret
-      ].filter(Boolean);
-      const userOrgIdsInForm = userOrgIds.filter(orgId =>
-        bsdaOrgIds.includes(orgId)
-      );
-      canAccessDraftOrgIds.push(...userOrgIdsInForm);
-    }
+    const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(bsda, user.id);
 
     const updatedBsda = await prisma.bsda.update({
       where: { id: bsda.id },
       data: {
         ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {}),
-        ...(transportersOrgIds.length ? { transportersOrgIds } : {}),
-        transportersOrgIds
+        ...(transportersOrgIds.length ? { transportersOrgIds } : {})
       },
       include: {
         grouping: { select: { id: true } },

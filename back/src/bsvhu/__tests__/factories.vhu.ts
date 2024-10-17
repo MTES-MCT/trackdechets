@@ -9,13 +9,17 @@ import { prisma } from "@td/prisma";
 import {
   companyFactory,
   ecoOrganismeFactory,
-  siretify
+  siretify,
+  userWithCompanyFactory
 } from "../../__tests__/factories";
 import { BsvhuForElastic, BsvhuForElasticInclude } from "../elastic";
+import { getCanAccessDraftOrgIds } from "../utils";
 
 export const bsvhuFactory = async ({
+  userId,
   opt = {}
 }: {
+  userId?: string;
   opt?: Partial<Prisma.BsvhuCreateInput>;
 }): Promise<BsvhuForElastic> => {
   const transporterCompany = await companyFactory({
@@ -39,9 +43,20 @@ export const bsvhuFactory = async ({
     handle: { handleBsvhu: true },
     createAssociatedCompany: true
   });
+  const bsvhuObject = getVhuFormdata();
+  const userAndCompany = userId
+    ? null
+    : await userWithCompanyFactory("ADMIN", {
+        siret: bsvhuObject.emitterCompanySiret,
+        name: bsvhuObject.emitterCompanyName ?? undefined,
+        address: bsvhuObject.emitterCompanyAddress ?? undefined,
+        contact: bsvhuObject.emitterCompanyContact ?? undefined,
+        contactPhone: bsvhuObject.emitterCompanyPhone ?? undefined,
+        contactEmail: bsvhuObject.emitterCompanyMail ?? undefined
+      });
   const created = await prisma.bsvhu.create({
     data: {
-      ...getVhuFormdata(),
+      ...bsvhuObject,
       transporterCompanySiret: transporterCompany.siret,
       destinationCompanySiret: destinationCompany.siret,
       destinationOperationNextDestinationCompanySiret:
@@ -60,9 +75,17 @@ export const bsvhuFactory = async ({
         .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
         .filter(Boolean)
     : [];
+
+  // For drafts, only the owner's sirets that appear on the bsd have access
+  const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(
+    created,
+    (userId || userAndCompany?.user?.id) as string
+  );
+
   return prisma.bsvhu.update({
     where: { id: created.id },
     data: {
+      ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {}),
       ...(intermediariesOrgIds.length ? { intermediariesOrgIds } : {})
     },
     include: BsvhuForElasticInclude

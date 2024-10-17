@@ -6,7 +6,7 @@ import {
   upsertBaseSiret,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-import { getUserCompanies } from "../../users/database";
+import { getCanAccessDraftOrgIds } from "../utils";
 
 /**
  * Permet de créer un BSDA avec des données par défaut et
@@ -83,28 +83,10 @@ export const bsdaFactory = async ({
         .filter(Boolean)
     : [];
   // For drafts, only the owner's sirets that appear on the bsd have access
-  const canAccessDraftOrgIds: string[] = [];
-  if (created.isDraft) {
-    const userCompanies = await getUserCompanies(
-      (userId || userAndCompany?.user?.id) as string
-    );
-    const userOrgIds = userCompanies.map(company => company.orgId);
-
-    const bsdaOrgIds = [
-      ...intermediariesOrgIds,
-      ...transportersOrgIds,
-      created.emitterCompanySiret,
-      created.ecoOrganismeSiret,
-      created.destinationCompanySiret,
-      created.destinationOperationNextDestinationCompanySiret,
-      created.workerCompanySiret,
-      created.brokerCompanySiret
-    ].filter(Boolean);
-    const userOrgIdsInForm = userOrgIds.filter(orgId =>
-      bsdaOrgIds.includes(orgId)
-    );
-    canAccessDraftOrgIds.push(...userOrgIdsInForm);
-  }
+  const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(
+    created,
+    (userId || userAndCompany?.user?.id) as string
+  );
 
   return prisma.bsda.update({
     where: { id: created.id },
