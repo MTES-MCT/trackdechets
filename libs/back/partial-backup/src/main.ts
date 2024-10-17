@@ -194,16 +194,18 @@ const run = async () => {
         continue;
       }
       const objects = await getter?.(item.foreignKey, root.obj[item.localKey]);
-      const filteredObjects = objects?.filter(obj => {
-        if (alreadyFetched[obj.id]) {
-          return false;
-        }
-        alreadyFetched[obj.id] = {
-          type: item.type,
-          obj
-        };
-        return true;
-      });
+      const filteredObjects = objects
+        ? objects?.filter(obj => {
+            if (alreadyFetched[obj.id]) {
+              return false;
+            }
+            alreadyFetched[obj.id] = {
+              type: item.type,
+              obj
+            };
+            return true;
+          })
+        : null;
       if (filteredObjects?.length) {
         const subRoots: structItem[] = filteredObjects.map(obj => ({
           type: item.type,

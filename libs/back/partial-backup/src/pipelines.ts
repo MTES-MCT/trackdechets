@@ -23,6 +23,7 @@ import {
   BsffTransporter,
   Bspaoh,
   BspaohTransporter,
+  Bsvhu,
   Company,
   CompanyAssociation,
   EcoOrganisme,
@@ -124,6 +125,12 @@ const getPipelines = (
             Prisma.JsonNull
         }
       })
+  },
+  Bsvhu: {
+    getter: async (key: string, value?: string) =>
+      value && prismaRemote.bsvhu.findMany({ where: { [key]: value } }),
+    setter: async (bsvhu?: Bsvhu) =>
+      bsvhu && prismaLocal.bsvhu.create({ data: bsvhu })
   },
   Company: {
     getter: async (key: string, value?: string) =>
