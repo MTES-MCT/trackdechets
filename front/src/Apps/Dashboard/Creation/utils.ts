@@ -60,7 +60,7 @@ export const getPublishErrorTabIds = (apiErrors, tabIds) => {
   const publishErrorTabIds = [
     ...new Set(
       apiErrors?.map(apiError => {
-        if (apiError.path[0]?.includes("weight")) {
+        if (["weight", "identification"].includes(apiError.path[0])) {
           return tabIds.find(key => key === "waste");
         }
         return tabIds.find(key => apiError.path[0]?.includes(key));
@@ -76,7 +76,9 @@ export const getPublishErrorMessages = apiErrors => {
   const publishErrorMessages = apiErrors?.map(apiError => {
     const errorPath = apiError?.path;
     const pathPrefix = errorPath?.[0];
-    const tabId = pathPrefix === "weight" ? "waste" : pathPrefix;
+    const tabId = ["weight", "identification"].includes(pathPrefix)
+      ? "waste"
+      : pathPrefix;
     const name = errorPath.join(".");
     const message = apiError.message;
     return { tabId, name, message };
@@ -138,11 +140,14 @@ export const setFieldError = (errors, errorPath, stateError, setError) => {
 };
 
 export const clearCompanyError = (actor, actorName, clearErrors) => {
-  if (actor?.["company"]?.siret) {
+  if (actor?.["company"]?.siret || actor?.noSiret) {
     clearErrors([`${actorName}.company.siret`]);
   }
-  if (actor?.["company"]?.orgId) {
+  if (actor?.["company"]?.orgId || actor?.noSiret) {
     clearErrors([`${actorName}.company.orgId`]);
+  }
+  if (actor?.["company"]?.name) {
+    clearErrors([`${actorName}.company.name`]);
   }
   if (actor?.["company"]?.contact) {
     clearErrors([`${actorName}.company.contact`]);

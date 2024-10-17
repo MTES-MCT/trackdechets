@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { FormProvider, UseFormReturn } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import FormStepsTabs from "../../Forms/Components/FormStepsTabs/FormStepsTabs";
@@ -47,15 +47,11 @@ const FormStepsContent = ({
   const tabIds = tabList.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
-  const ref = useRef<HTMLDivElement>(null);
 
   const scrollToTop = () => {
-    const element = ref.current;
+    const element = document.getElementById("formStepsTabsContent");
     if (element) {
-      const scrollPos = element.scrollHeight - window.innerHeight;
-      if (scrollPos > 0) {
-        ref.current?.scrollIntoView({ behavior: "instant", block: "start" });
-      }
+      element.scroll({ top: 0, behavior: "smooth" });
     }
   };
   const onSubmit = (data, e) => {
@@ -76,6 +72,7 @@ const FormStepsContent = ({
   };
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
+    scrollToTop();
   };
 
   return (
@@ -83,31 +80,31 @@ const FormStepsContent = ({
       <SealedFieldsContext.Provider value={sealedFields}>
         <FormProvider {...useformMethods}>
           {!isLoading && (
-            <div ref={ref}>
-              <FormStepsTabs
-                //@ts-ignore
-                tabList={tabList}
-                draftCtaLabel={draftCtaLabel}
-                mainCtaLabel={mainCtaLabel}
-                selectedTabId={selectedTabId}
-                isPrevStepDisabled={selectedTabId === firstTabId}
-                isNextStepDisabled={selectedTabId === lastTabId}
-                onSubmit={useformMethods.handleSubmit(
-                  (data, e) => onSubmit(data, e),
-                  () => onErrors()
-                )}
-                onCancel={() => navigate(-1)}
-                onPrevTab={() =>
-                  setSelectedTabId(getPrevTab(tabIds, selectedTabId))
-                }
-                onNextTab={() =>
-                  setSelectedTabId(getNextTab(tabIds, selectedTabId))
-                }
-                onTabChange={onTabChange}
-              >
-                {tabsContent[selectedTabId] ?? <p></p>}
-              </FormStepsTabs>
-            </div>
+            <FormStepsTabs
+              //@ts-ignore
+              tabList={tabList}
+              draftCtaLabel={draftCtaLabel}
+              mainCtaLabel={mainCtaLabel}
+              selectedTabId={selectedTabId}
+              isPrevStepDisabled={selectedTabId === firstTabId}
+              isNextStepDisabled={selectedTabId === lastTabId}
+              onSubmit={useformMethods.handleSubmit(
+                (data, e) => onSubmit(data, e),
+                () => onErrors()
+              )}
+              onCancel={() => navigate(-1)}
+              onPrevTab={() => {
+                setSelectedTabId(getPrevTab(tabIds, selectedTabId));
+                scrollToTop();
+              }}
+              onNextTab={() => {
+                setSelectedTabId(getNextTab(tabIds, selectedTabId));
+                scrollToTop();
+              }}
+              onTabChange={onTabChange}
+            >
+              {tabsContent[selectedTabId] ?? <p></p>}
+            </FormStepsTabs>
           )}
         </FormProvider>
       </SealedFieldsContext.Provider>

@@ -54,7 +54,9 @@ const FormStepsTabs = ({
         tabs={tabList}
         onTabChange={onTabChange}
       >
-        <div className="formSteps__tabs">{children} </div>
+        <div id="formStepsTabsContent" className="formSteps__tabs">
+          {children}
+        </div>
       </Tabs>
       <div className="formSteps__actions">
         <div className="formSteps__actions__cta-group">

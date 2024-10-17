@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import { setFieldError } from "../../utils";
+import { clearCompanyError, setFieldError } from "../../utils";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import DsfrfWorkSiteAddress from "../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 
@@ -34,67 +34,64 @@ const EmitterBsvhu = ({ errors }) => {
 
   useEffect(() => {
     const actor = "emitter";
-    if (
-      errors?.length &&
-      errors?.length !== Object.keys(formState.errors)?.length &&
-      (!emitter?.company?.siret || !emitter?.company?.orgId)
-    ) {
-      setFieldError(
-        errors,
-        `${actor}.company.siret`,
-        formState.errors?.[actor]?.["company"]?.siret,
-        setError
-      );
+    if (errors?.length) {
+      if (!emitter?.company?.siret && !emitter?.noSiret) {
+        setFieldError(
+          errors,
+          `${actor}.company.siret`,
+          formState.errors?.[actor]?.["company"]?.siret,
+          setError
+        );
+      }
+      if (!emitter?.company?.name) {
+        setFieldError(
+          errors,
+          `${actor}.company.name`,
+          formState.errors?.[actor]?.["company"]?.name,
+          setError
+        );
+      }
+      if (!emitter?.company?.contact) {
+        setFieldError(
+          errors,
+          `${actor}.company.contact`,
+          formState.errors?.[actor]?.["company"]?.contact,
+          setError
+        );
+      }
 
-      setFieldError(
-        errors,
-        `${actor}.company.name`,
-        formState.errors?.[actor]?.["company"]?.name,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.company.contact`,
-        formState.errors?.[actor]?.["company"]?.contact,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.company.address`,
-        formState.errors?.[actor]?.["company"]?.address,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.company.phone`,
-        formState.errors?.[actor]?.["company"]?.phone,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.company.mail`,
-        formState.errors?.[actor]?.["company"]?.mail,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.company.vatNumber`,
-        formState.errors?.[actor]?.["company"]?.vatNumber,
-        setError
-      );
-    }
-
-    if (
-      (formState.errors?.emitter?.["company"]?.orgId?.message ||
-        formState.errors?.emitter?.["company"]?.siret?.message) &&
-      emitter?.company?.siret
-    ) {
-      clearErrors(`${actor}.company.orgId`);
+      if (!emitter?.company?.address) {
+        setFieldError(
+          errors,
+          `${actor}.company.address`,
+          formState.errors?.[actor]?.["company"]?.address,
+          setError
+        );
+      }
+      if (!emitter?.company?.phone) {
+        setFieldError(
+          errors,
+          `${actor}.company.phone`,
+          formState.errors?.[actor]?.["company"]?.phone,
+          setError
+        );
+      }
+      if (!emitter?.company?.mail) {
+        setFieldError(
+          errors,
+          `${actor}.company.mail`,
+          formState.errors?.[actor]?.["company"]?.mail,
+          setError
+        );
+      }
+      if (!emitter?.company?.vatNumber) {
+        setFieldError(
+          errors,
+          `${actor}.company.vatNumber`,
+          formState.errors?.[actor]?.["company"]?.vatNumber,
+          setError
+        );
+      }
     }
   }, [
     errors,
@@ -103,9 +100,14 @@ const EmitterBsvhu = ({ errors }) => {
     formState.errors?.length,
     setError,
     emitter?.company?.siret,
-    emitter?.company?.orgId,
-    clearErrors
+    emitter?.company?.orgId
   ]);
+
+  useEffect(() => {
+    if (errors?.length && (emitter?.noSiret || emitter?.company?.siret)) {
+      clearCompanyError(emitter, "emitter", clearErrors);
+    }
+  }, [clearErrors, emitter?.noSiret, emitter?.company?.siret, errors?.length]);
 
   const orgId = useMemo(
     () => emitter?.company?.orgId ?? emitter?.company?.siret ?? null,
@@ -131,7 +133,16 @@ const EmitterBsvhu = ({ errors }) => {
             {
               label: "Installation en situation irrégulière",
               nativeInputProps: {
-                ...register("emitter.irregularSituation")
+                ...register("emitter.irregularSituation"),
+                onChange: e => {
+                  setValue(
+                    "emitter.irregularSituation",
+                    e.currentTarget.checked
+                  );
+                  if (!e.currentTarget.checked) {
+                    setValue("emitter.noSiret", false);
+                  }
+                }
               }
             }
           ]}
@@ -231,11 +242,20 @@ const EmitterBsvhu = ({ errors }) => {
                   placeholder="Rechercher"
                   onAddressSelection={details => {
                     // `address` is passed as `name` because of adresse api return fields
-                    setValue(`emitter.company.address`, details.name);
+                    setValue(`emitter.company.address`, details.label);
                     setValue(`emitter.company.city`, details.city);
+                    setValue(`emitter.company.street`, details.label);
                     setValue(`emitter.company.postalCode`, details.postcode);
                   }}
                 />
+                {formState.errors?.emitter?.["company"]?.address?.message && (
+                  <p
+                    id="text-input-error-desc-error"
+                    className="fr-mb-4v fr-error-text"
+                  >
+                    {formState.errors?.emitter?.["company"]?.address?.message}
+                  </p>
+                )}
                 <div className="fr-col-md-8 fr-mb-2w">
                   <Input
                     label="Nom ou identification de l'installation"
