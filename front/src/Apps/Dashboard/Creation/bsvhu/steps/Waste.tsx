@@ -43,17 +43,6 @@ const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
 
-  useEffect(() => {
-    if (errors?.length) {
-      if (weight) {
-        clearErrors("weight.value");
-      }
-      if (identificationNumbers?.length) {
-        clearErrors("identification.numbers");
-      }
-    }
-  }, [clearErrors, errors?.length, identificationNumbers?.length, weight]);
-
   return (
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}

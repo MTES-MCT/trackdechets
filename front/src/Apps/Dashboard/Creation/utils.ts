@@ -198,12 +198,8 @@ export const setFieldError = (errors, errorPath, stateError, setError) => {
 };
 
 export const clearCompanyError = (actor, actorName, clearErrors) => {
-  if (actor?.["company"]?.siret || actor?.noSiret) {
-    clearErrors([`${actorName}.company.siret`]);
-  }
-  if (actor?.["company"]?.orgId || actor?.noSiret) {
-    clearErrors([`${actorName}.company.orgId`]);
-  }
+  clearErrors([`${actorName}.company.siret`]);
+  clearErrors([`${actorName}.company.orgId`]);
   if (actor?.["company"]?.name) {
     clearErrors([`${actorName}.company.name`]);
   }
