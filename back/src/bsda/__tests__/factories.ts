@@ -140,6 +140,27 @@ export const bsdaTransporterFactory = async ({
   });
 };
 
+export const bsdaFinalOperationFactory = async ({
+  bsdaId,
+  opts = {}
+}: {
+  bsdaId: string;
+  opts?: Omit<
+    Partial<Prisma.BsdaFinalOperationCreateInput>,
+    "initialBsda" | "finalBsda"
+  >;
+}) => {
+  return prisma.bsdaFinalOperation.create({
+    data: {
+      initialBsda: { connect: { id: bsdaId } },
+      finalBsda: { connect: { id: bsdaId } },
+      operationCode: "",
+      quantity: 1,
+      ...opts
+    }
+  });
+};
+
 const bsdaTransporterData: Omit<
   Prisma.BsdaTransporterCreateWithoutBsdaInput,
   "number"
