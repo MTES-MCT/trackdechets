@@ -399,6 +399,21 @@ const traversals = {
       foreignKey: "orgId"
     },
     {
+      type: "Company",
+      localKey: "traderCompanySiret",
+      foreignKey: "orgId"
+    },
+    {
+      type: "EcoOrganisme",
+      localKey: "ecoOrganismeSiret",
+      foreignKey: "orgId"
+    },
+    {
+      type: "Company",
+      localKey: "brokerCompanySiret",
+      foreignKey: "orgId"
+    },
+    {
       type: "AnonymousCompany",
       localKey: "emitterCompanySiret",
       foreignKey: "orgId"
