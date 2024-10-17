@@ -17,7 +17,8 @@ import { getRegistryFields } from "./registry";
 import {
   getSiretsByTab,
   getRecipient,
-  getFormRevisionOrgIds
+  getFormRevisionOrgIds,
+  getFormReturnOrgIds
 } from "./elasticHelpers";
 
 import { buildAddress } from "../companies/sirene/utils";
@@ -135,6 +136,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       ? form.quantityReceived.toNumber()
       : null,
     destinationOperationDate: form.processedAt?.getTime(),
+    ...getFormReturnOrgIds(form),
     ...(form.forwarding
       ? {
           // do not display BSD suite in dashboard

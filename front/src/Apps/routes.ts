@@ -92,7 +92,8 @@ const routes = {
     transport: {
       index: "/dashboard/:siret/transport",
       toCollect: "/dashboard/:siret/transport/to-collect",
-      collected: "/dashboard/:siret/transport/collected"
+      collected: "/dashboard/:siret/transport/collected",
+      return: "/dashboard/:siret/transport/return"
     }
   },
   account: {

@@ -1,6 +1,6 @@
 import * as cron from "cron";
 import cronValidator from "cron-validate";
-import { initSentry } from "back";
+import { cleanUpIsReturnForTab, initSentry } from "back";
 import {
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
@@ -10,7 +10,8 @@ import {
 } from "./commands/onboarding.helpers";
 import { cleanAppendix1 } from "./commands/appendix1.helpers";
 
-const { CRON_ONBOARDING_SCHEDULE, TZ } = process.env;
+const { CRON_ONBOARDING_SCHEDULE, CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE, TZ } =
+  process.env;
 
 let jobs: cron.CronJob[] = [
   new cron.CronJob({
@@ -23,7 +24,7 @@ let jobs: cron.CronJob[] = [
 ];
 
 if (CRON_ONBOARDING_SCHEDULE) {
-  validateOnbardingCronSchedule(CRON_ONBOARDING_SCHEDULE);
+  validateDailyCronSchedule(CRON_ONBOARDING_SCHEDULE);
 
   jobs = [
     ...jobs,
@@ -70,6 +71,22 @@ if (CRON_ONBOARDING_SCHEDULE) {
   ];
 }
 
+if (CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE) {
+  validateDailyCronSchedule(CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE);
+
+  jobs = [
+    ...jobs,
+    // cleanup the isReturnFor tab
+    new cron.CronJob({
+      cronTime: CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE,
+      onTick: async () => {
+        await cleanUpIsReturnForTab();
+      },
+      timeZone: TZ
+    })
+  ];
+}
+
 const Sentry = initSentry();
 
 if (Sentry) {
@@ -88,7 +105,7 @@ if (Sentry) {
 
 jobs.forEach(job => job.start());
 
-export function validateOnbardingCronSchedule(cronExp: string) {
+export function validateDailyCronSchedule(cronExp: string) {
   // checks it is a valid cron quartz expression
   const isValid = cronValidator(cronExp).isValid();
 

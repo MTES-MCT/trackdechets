@@ -60,6 +60,7 @@ function BsdCardList({
     bsdCurrentTab === "reviewedTab" || bsdCurrentTab === "toReviewTab";
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
+  const isReturnTab = bsdCurrentTab === "returnTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
   const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
 
@@ -346,7 +347,13 @@ function BsdCardList({
         if (status === FormStatus.Draft || bsd["isDraft"]) {
           handleDraftValidation(bsd as Bsd);
         } else {
-          if (hasRoadControlButton(bsdDisplay as BsdDisplay, isCollectedTab)) {
+          if (
+            hasRoadControlButton(
+              bsdDisplay as BsdDisplay,
+              isCollectedTab,
+              isReturnTab
+            )
+          ) {
             const path = routes.dashboard.roadControl;
             redirectToPath(path, bsd.id);
           } else {
@@ -357,6 +364,7 @@ function BsdCardList({
     },
     [
       isReviewsTab,
+      isReturnTab,
       isCollectedTab,
       siret,
       handleDraftValidation,

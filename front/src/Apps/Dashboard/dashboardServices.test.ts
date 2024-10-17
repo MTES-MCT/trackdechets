@@ -26,6 +26,8 @@ import {
   isEmetteurSign,
   isSignTransportCanSkipEmission,
   getOperationCodesFromSearchString,
+  hasRoadControlButton,
+  getPrimaryActionsLabelFromBsdStatus,
   isSiretActorForBsd,
   ActorType
 } from "./dashboardServices";
@@ -1582,6 +1584,31 @@ describe("dashboardServices", () => {
         { type: ActorType.EcoOrganisme }
       ]);
       expect(result).toBe(true);
+    });
+  });
+
+  describe("hasRoadControlButton", () => {
+    it("should return true if isReturnTab", () => {
+      // When
+      const result = hasRoadControlButton({} as BsdDisplay, false, true);
+
+      // Then
+      expect(result).toBeTruthy();
+    });
+  });
+
+  describe("getPrimaryActionsLabelFromBsdStatus", () => {
+    it("should return ROAD_CONTROL if isReturnTab", () => {
+      // When
+      const result = getPrimaryActionsLabelFromBsdStatus(
+        {} as BsdDisplay,
+        "any-siret",
+        [],
+        "returnTab"
+      );
+
+      // Then
+      expect(result).toBe(ROAD_CONTROL);
     });
   });
 });

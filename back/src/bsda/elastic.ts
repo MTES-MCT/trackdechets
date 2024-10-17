@@ -1,4 +1,10 @@
-import { Bsda, BsdaStatus, BsdaTransporter, BsdType } from "@prisma/client";
+import {
+  Bsda,
+  BsdaStatus,
+  BsdaTransporter,
+  BsdType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -20,10 +26,13 @@ import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
 import {
   getFirstTransporterSync,
+  getLastTransporterSync,
   getNextTransporterSync,
   getTransportersSync
 } from "./database";
 import { getBsdaSubType } from "../common/subTypes";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export type BsdaForElastic = Bsda &
   BsdaWithTransporters &
@@ -380,6 +389,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     ...where,
     ...getBsdaRevisionOrgIds(bsda),
+    ...getBsdaReturnOrgIds(bsda),
     revisionRequests: bsda.bsdaRevisionRequests,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
@@ -427,4 +437,37 @@ export function getBsdaRevisionOrgIds(
   bsda: BsdaForElastic
 ): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
   return getRevisionOrgIds(bsda.bsdaRevisionRequests);
+}
+
+/**
+ * BSDA belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste hasn't been fully accepted
+ */
+export const belongsToIsReturnForTab = (bsda: BsdaForElastic) => {
+  const hasBeenReceivedLately =
+    isDefined(bsda.destinationReceptionDate) &&
+    bsda.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted =
+    bsda.status === BsdaStatus.REFUSED ||
+    bsda.destinationReceptionAcceptationStatus !==
+      WasteAcceptationStatus.ACCEPTED;
+
+  return hasNotBeenFullyAccepted;
+};
+
+function getBsdaReturnOrgIds(bsda: BsdaForElastic): { isReturnFor: string[] } {
+  // Return tab
+  if (belongsToIsReturnForTab(bsda)) {
+    const lastTransporter = getLastTransporterSync(bsda);
+
+    return {
+      isReturnFor: [lastTransporter?.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
 }

@@ -30,6 +30,7 @@ input BsdWhere {
   isArchivedFor: [String!]
   isToCollectFor: [String!]
   isCollectedFor: [String!]
+  isReturnFor: [String!]
   # Révisions en cours
   isInRevisionFor: [String!]
   # Révisions passées

@@ -1055,7 +1055,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Meilleure gestion des ré-indexations de BSD sans interruption du service avec `npm run reindex-all-bsds-bulk` et parallélisation avec la job queue avec l'option `--useQueue` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
-- Création de nouveau jobs `indexAllInBulk` et `indexChunk` pour la queue d'indexation, , création d'un groupe de workers de job spécifiques pour l'indexation `indexQueue` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
+- Création de nouveau jobs `indexAllInBulk` et `indexChunk` pour la queue d'indexation, création d'un groupe de workers de job spécifiques pour l'indexation `indexQueue` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
 - Refonte d'un script de reindexation partielle avec interruption du service `npm run reindex-partial-in-place` avec une demande de confirmation dans la console [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
 - Création d'un nouveau script pour vider de force une queue par son nom `npm run queue:obliterate` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
 - Suppression du script `bin/indexElasticSearch.ts` au profit des scripts `reindex*.ts` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).

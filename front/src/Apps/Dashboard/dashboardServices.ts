@@ -1089,6 +1089,10 @@ export const getPrimaryActionsLabelFromBsdStatus = (
   hasAutomaticSignature?: boolean,
   emitterIsExutoireOrTtr?: boolean
 ) => {
+  const isReturnTab = bsdCurrentTab === "returnTab";
+
+  if (isReturnTab) return ROAD_CONTROL;
+
   switch (bsd.status) {
     case BsdStatusCode.Draft:
     case BsdStatusCode.Initial:
@@ -1550,8 +1554,11 @@ export const hasBsdasriEmitterSign = (
 
 export const hasRoadControlButton = (
   bsd: BsdDisplay,
-  isCollectedTab: boolean
+  isCollectedTab: boolean,
+  isReturnTab?: boolean
 ) => {
+  if (isReturnTab) return true;
+
   // L'action principale sur le paoh collecté est la déclaration de dépôt par le transporteur
   if (bsd.type === BsdType.Bspaoh) {
     return false;
