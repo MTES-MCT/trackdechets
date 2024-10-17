@@ -11,12 +11,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout d'Eco-organisme sur BSVHU [PR 3619](https://github.com/MTES-MCT/trackdechets/pull/3619)
 - Ajout des profils Négociant et Courtier sur BSVHU [PR 3645](https://github.com/MTES-MCT/trackdechets/pull/3645)
-- Ajoute d'un moteur de recherche sur la documentation développeurs [PR 3622](https://github.com/MTES-MCT/trackdechets/pull/3622)
+- Ajout d'un moteur de recherche sur la documentation développeurs [PR 3622](https://github.com/MTES-MCT/trackdechets/pull/3622)
+- Ajout d'un nouvel onglet "Retours" pour les transporteurs [PR 3669](https://github.com/MTES-MCT/trackdechets/pull/3669)
 
 #### :nail_care: Améliorations
 
 - Changer la référence du cerfa lors de l'ajout d'une fiche d'intervention [PR 3616](https://github.com/MTES-MCT/trackdechets/pull/3616)
 - ETQ membre d'un établissement, je peux gérer mes préférences de notifications (demandes de rattachement, demandes de révisions, renouvellement code signature, etc) en lien avec cet établissement [PR 3634](https://github.com/MTES-MCT/trackdechets/pull/3634)
+- Amélioration du contenu de l'e-mail transactionnel envoyé au contact d'un établissement visé sur un bordereau en tant qu'émetteur [PR 3635](https://github.com/MTES-MCT/trackdechets/pull/3635)
 
 #### :boom: Breaking changes
 
@@ -24,22 +26,19 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - La complétion du champ identificationNumbers est obligatoire à la publication d'un VHU [PR 3628](https://github.com/MTES-MCT/trackdechets/pull/3628)
 
-#### :nail_care: Améliorations
-
-- Amélioration du contenu de l'e-mail transactionnel envoyé au contact d'un établissement visé sur un bordereau en tant qu'émetteur [PR 3635](https://github.com/MTES-MCT/trackdechets/pull/3635)
-
 #### :bug: Corrections de bugs
 
 - Documentation API Developers : Page Not Found, si on n'y accède pas via l'arborescence [PR 3621](https://github.com/MTES-MCT/trackdechets/pull/3621)
 - Ne pas apporter automatiquement de modification sur la liste des contenants lorsque je procède à une modification transporteur et que le BSFF est au statut SENT [PR 3615](https://github.com/MTES-MCT/trackdechets/pull/3615)
+- Correction du poids d'une annexe 1 après la révision du poids d'un BSD enfant [PR 3631](https://github.com/MTES-MCT/trackdechets/pull/3631)
+- Retrait du bouton de revision dans l'UI sur les DASRI regroupés [PR 3657](https://github.com/MTES-MCT/trackdechets/pull/3657)
 
 #### :house: Interne
 
 - Migration vers le nouveau portail API de l'INSEE [PR 3602](https://github.com/MTES-MCT/trackdechets/pull/3602)
-
-#### :house: Interne
-
 - Suppression du champ isRegistreNational [PR 3652](https://github.com/MTES-MCT/trackdechets/pull/3652)
+- ETQ utilisateur je peux cloner un BSD [PR 3637](https://github.com/MTES-MCT/trackdechets/pull/3637)
+- ETQ utilisateur je peux créer, révoquer et consulter mes demandes de délégation RNDTS [PR 3561](https://github.com/MTES-MCT/trackdechets/pull/3561) [PR 3588](https://github.com/MTES-MCT/trackdechets/pull/3588)
 
 # [2024.9.1] 24/09/2024
 
