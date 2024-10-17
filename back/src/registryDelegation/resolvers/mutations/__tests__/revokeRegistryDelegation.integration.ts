@@ -16,7 +16,6 @@ const REVOKE_REGISTRY_DELEGATION = gql`
       delegate {
         orgId
       }
-      revokedBy
     }
   }
 `;
@@ -56,7 +55,6 @@ describe("mutation revokeRegistryDelegation", () => {
 
       // Then
       expect(errors).toBeUndefined();
-      expect(data.revokeRegistryDelegation.revokedBy).toBe(delegatorUser.id);
       expect(data.revokeRegistryDelegation.status).toBe("REVOKED");
       expect(data.revokeRegistryDelegation.delegate.orgId).toBe(
         delegateCompany.orgId
@@ -86,7 +84,6 @@ describe("mutation revokeRegistryDelegation", () => {
 
       // Then
       expect(errors).toBeUndefined();
-      expect(data.revokeRegistryDelegation.revokedBy).toBe(delegatorUser.id);
       expect(data.revokeRegistryDelegation.status).toBe("REVOKED");
       expect(updatedDelegation?.revokedBy).toBe(delegatorUser.id);
     });

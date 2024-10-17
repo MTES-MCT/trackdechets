@@ -49,16 +49,6 @@ type RegistryDelegation {
   Statut de la délégation
   """
   status: RegistryDelegationStatus!
-
-  """
-  ID de l'utilisateur qui a révoqué la délégation
-  """
-  revokedBy: ID
-
-  """
-  ID de l'utilisateur qui a annulé la délégation
-  """
-  cancelledBy: ID
 }
 
 type RegistryDelegationEdge {

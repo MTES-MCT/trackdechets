@@ -38,8 +38,6 @@ const CREATE_REGISTRY_DELEGATION = gql`
       startDate
       endDate
       comment
-      revokedBy
-      cancelledBy
     }
   }
 `;
@@ -143,8 +141,6 @@ describe("mutation createRegistryDelegation", () => {
       );
       expect(data.createRegistryDelegation.endDate).toBeNull();
       expect(data.createRegistryDelegation.comment).toBeNull();
-      expect(data.createRegistryDelegation.revokedBy).toBeNull();
-      expect(data.createRegistryDelegation.cancelledBy).toBeNull();
 
       // Persisted value should be OK
       expect(delegation?.createdAt).not.toBeNull();

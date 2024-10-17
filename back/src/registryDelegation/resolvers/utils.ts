@@ -1,11 +1,8 @@
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../common/errors";
 import { getRegistryDelegationRepository } from "../repository";
-import { Company, Prisma } from "@prisma/client";
-import {
-  RegistryDelegation,
-  RegistryDelegationStatus
-} from "../../generated/graphql/types";
+import { Company, Prisma, RegistryDelegation } from "@prisma/client";
+import { RegistryDelegationStatus } from "../../generated/graphql/types";
 
 export const findDelegateAndDelegatorOrThrow = async (
   delegateOrgId: string,

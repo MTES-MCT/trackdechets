@@ -16,7 +16,6 @@ const CANCEL_REGISTRY_DELEGATION = gql`
       delegate {
         orgId
       }
-      cancelledBy
     }
   }
 `;
@@ -56,7 +55,6 @@ describe("mutation cancelRegistryDelegation", () => {
 
       // Then
       expect(errors).toBeUndefined();
-      expect(data.cancelRegistryDelegation.cancelledBy).toBe(delegateUser.id);
       expect(data.cancelRegistryDelegation.status).toBe("CANCELLED");
       expect(data.cancelRegistryDelegation.delegate.orgId).toBe(
         delegateCompany.orgId
@@ -87,7 +85,6 @@ describe("mutation cancelRegistryDelegation", () => {
 
       // Then
       expect(errors).toBeUndefined();
-      expect(data.cancelRegistryDelegation.cancelledBy).toBe(delegateUser.id);
       expect(data.cancelRegistryDelegation.status).toBe("CANCELLED");
       expect(data.cancelRegistryDelegation.delegate.orgId).toBe(
         delegateCompany.orgId

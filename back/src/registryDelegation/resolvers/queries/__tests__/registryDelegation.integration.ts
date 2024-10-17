@@ -21,8 +21,6 @@ const REGISTRY_DELEGATION = gql`
       startDate
       endDate
       comment
-      revokedBy
-      cancelledBy
       status
     }
   }
