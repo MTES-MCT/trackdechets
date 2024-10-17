@@ -5,7 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
-import { getUserCompanies } from "../../../users/database";
+import { getCanAccessDraftOrgIds } from "../../utils";
 export type CreateBsvhuFn = (
   data: Prisma.BsvhuCreateInput,
   logMetadata?: LogMetadata
@@ -32,34 +32,8 @@ export function buildCreateBsvhu(deps: RepositoryFnDeps): CreateBsvhuFn {
       }
     });
 
-    const intermediariesOrgIds: string[] = bsvhu.intermediaries
-      ? bsvhu.intermediaries
-          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
-          .filter(Boolean)
-      : [];
-
     // For drafts, only the owner's sirets that appear on the bsd have access
-    const canAccessDraftOrgIds: string[] = [];
-    if (bsvhu.isDraft) {
-      const userCompanies = await getUserCompanies(user.id);
-      const userOrgIds = userCompanies.map(company => company.orgId);
-      const bsvhuOrgIds = [
-        ...intermediariesOrgIds,
-        bsvhu.emitterCompanySiret,
-        ...[
-          bsvhu.transporterCompanySiret,
-          bsvhu.transporterCompanyVatNumber
-        ].filter(Boolean),
-        bsvhu.ecoOrganismeSiret,
-        bsvhu.destinationCompanySiret,
-        bsvhu.traderCompanySiret,
-        bsvhu.brokerCompanySiret
-      ].filter(Boolean);
-      const userOrgIdsInForm = userOrgIds.filter(orgId =>
-        bsvhuOrgIds.includes(orgId)
-      );
-      canAccessDraftOrgIds.push(...userOrgIdsInForm);
-    }
+    const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(bsvhu, user.id);
 
     const updatedBsvhu = await prisma.bsvhu.update({
       where: { id: bsvhu.id },

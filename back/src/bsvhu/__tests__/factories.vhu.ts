@@ -13,7 +13,7 @@ import {
   userWithCompanyFactory
 } from "../../__tests__/factories";
 import { BsvhuForElastic, BsvhuForElasticInclude } from "../elastic";
-import { getUserCompanies } from "../../users/database";
+import { getCanAccessDraftOrgIds } from "../utils";
 
 export const bsvhuFactory = async ({
   userId,
@@ -77,29 +77,11 @@ export const bsvhuFactory = async ({
     : [];
 
   // For drafts, only the owner's sirets that appear on the bsd have access
-  const canAccessDraftOrgIds: string[] = [];
-  if (created.isDraft) {
-    const userCompanies = await getUserCompanies(
-      (userId || userAndCompany?.user?.id) as string
-    );
-    const userOrgIds = userCompanies.map(company => company.orgId);
-    const bsvhuOrgIds = [
-      ...intermediariesOrgIds,
-      created.emitterCompanySiret,
-      ...[
-        created.transporterCompanySiret,
-        created.transporterCompanyVatNumber
-      ].filter(Boolean),
-      created.ecoOrganismeSiret,
-      created.destinationCompanySiret,
-      created.traderCompanySiret,
-      created.brokerCompanySiret
-    ].filter(Boolean);
-    const userOrgIdsInForm = userOrgIds.filter(orgId =>
-      bsvhuOrgIds.includes(orgId)
-    );
-    canAccessDraftOrgIds.push(...userOrgIdsInForm);
-  }
+  const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(
+    created,
+    (userId || userAndCompany?.user?.id) as string
+  );
+
   return prisma.bsvhu.update({
     where: { id: created.id },
     data: {
