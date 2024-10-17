@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { nxViteTsPaths } from "@nx/vite/plugins/nx-tsconfig-paths.plugin";
+import { nxCopyAssetsPlugin } from "@nx/vite/plugins/nx-copy-assets.plugin";
 import svgrPlugin from "vite-plugin-svgr";
 
 // https://vitejs.dev/config/
@@ -18,6 +19,10 @@ export default defineConfig({
   plugins: [
     react(),
     nxViteTsPaths(),
+    nxCopyAssetsPlugin([
+      "../node_modules/@codegouvfr/react-dsfr/favicon/*.*",
+      "../node_modules/@codegouvfr/react-dsfr/main.css"
+    ]),
     svgrPlugin({
       svgrOptions: {
         icon: true

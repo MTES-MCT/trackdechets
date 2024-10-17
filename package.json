@@ -198,7 +198,7 @@
     "@nx/node": "18.0.7",
     "@nx/react": "18.0.7",
     "@nx/storybook": "^18.0.8",
-    "@nx/vite": "18.0.7",
+    "@nx/vite": "20.0.3",
     "@nx/web": "18.0.7",
     "@playwright/test": "^1.40.1",
     "@storybook/addon-a11y": "^8.0.0",
