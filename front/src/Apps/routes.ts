@@ -210,6 +210,7 @@ export const titles = {
     "Bordereaux à collecter — Trackdéchets",
   "/dashboard/:siret/transport/collected":
     "Bordereaux collectés — Trackdéchets",
+  "/dashboard/:siret/transport/return": "Bordereaux en retour — Trackdéchets",
   "/account": "Mon compte — Trackdéchets",
   "/account/info": "Informations sur mon compte — Trackdéchets",
   "/account/companies/new":
