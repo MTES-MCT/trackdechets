@@ -1,27 +1,13 @@
-// OLD
 import { ApiResponse, estypes } from "@elastic/elasticsearch";
 import {
   QueryResolvers,
-  Bsd,
   QueryBsdsArgs,
-  BsdType,
   OrderType
 } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  client,
-  BsdElastic,
-  index,
-  groupByBsdType
-} from "../../../common/elastic";
-import { prisma } from "@td/prisma";
-import { expandFormFromElastic } from "../../../forms/converter";
-import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
-import { expandVhuFormFromDb } from "../../../bsvhu/converter";
-import { expandBsdaFromElastic } from "../../../bsda/converter";
-import { expandBsffFromElastic } from "../../../bsffs/converter";
-import { expandBspaohFromElastic } from "../../../bspaoh/converter";
+import { client, BsdElastic, index } from "../../../common/elastic";
+
 import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
 import {
@@ -30,59 +16,13 @@ import {
   getUserRoles,
   hasGovernmentReadAllBsdsPermOrThrow
 } from "../../../permissions";
-import { distinct } from "../../../common/arrays";
-import { FormForElastic } from "../../../forms/elastic";
-import { BsdasriForElastic } from "../../../bsdasris/elastic";
-import { BsvhuForElastic } from "../../../bsvhu/elastic";
-import { BsdaForElastic } from "../../../bsda/elastic";
-import { BsffForElastic } from "../../../bsffs/elastic";
-import { BspaohForElastic } from "../../../bspaoh/elastic";
+
 import { QueryContainer } from "@elastic/elasticsearch/api/types";
 import { GraphQLContext } from "../../../types";
-
-// complete Typescript example:
-// https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
-export interface SearchResponse<T> {
-  hits: {
-    total: {
-      value: number;
-    };
-    hits: Array<{
-      _source: T;
-    }>;
-  };
-}
+import { buildResponse } from "./helpers";
 
 export interface GetResponse<T> {
   _source: T;
-}
-
-type PrismaBsdMap = {
-  bsdds: FormForElastic[];
-  bsdasris: BsdasriForElastic[];
-  bsvhus: BsvhuForElastic[];
-  bsdas: BsdaForElastic[];
-  bsffs: BsffForElastic[];
-  bspaohs: BspaohForElastic[];
-};
-
-/**
- * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
- */
-async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
-  const { BSDD, BSDA, BSDASRI, BSFF, BSVHU, BSPAOH } =
-    groupByBsdType(bsdsElastic);
-
-  return {
-    bsdds: BSDD.map(bsdElastic => bsdElastic.rawBsd as FormForElastic),
-    bsdasris: BSDASRI.map(
-      bsdsElastic => bsdsElastic.rawBsd as BsdasriForElastic
-    ),
-    bsvhus: BSVHU.map(bsdElastic => bsdElastic.rawBsd as BsvhuForElastic),
-    bsdas: BSDA.map(bsdElastic => bsdElastic.rawBsd as BsdaForElastic),
-    bsffs: BSFF.map(bsdsElastic => bsdsElastic.rawBsd as BsffForElastic),
-    bspaohs: BSPAOH.map(bsdsElastic => bsdsElastic.rawBsd as BspaohForElastic)
-  };
 }
 
 /**
@@ -294,39 +234,6 @@ async function buildSearchAfter(
   );
 }
 
-/**
- * This function takes an array of dasris and, expand them and add `allowDirectTakeOver` boolean field by
- * requesting emittercompany to know wether direct takeover is allowed
- */
-async function buildDasris(dasris: BsdasriForElastic[]) {
-  // build a list of emitter siret from dasris, non-INITIAL bsds are ignored
-  const emitterSirets = dasris
-    .filter(bsd => !!bsd.emitterCompanySiret && bsd.status === "INITIAL")
-    .map(bsd => bsd.emitterCompanySiret)
-    .filter(Boolean);
-
-  const uniqueSirets = distinct(emitterSirets);
-
-  // build an array of sirets allowing direct takeover
-  const allows = (
-    await prisma.company.findMany({
-      where: {
-        siret: { in: uniqueSirets },
-        allowBsdasriTakeOverWithoutSignature: true
-      },
-      select: {
-        siret: true
-      }
-    })
-  ).map(comp => comp.siret);
-
-  // expand dasris and insert `allowDirectTakeOver`
-  return dasris.map(bsd => ({
-    ...expandBsdasriFromElastic(bsd),
-    allowDirectTakeOver: allows.includes(bsd.emitterCompanySiret)
-  }));
-}
-
 const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   // This query is restricted to Session users (UI) and government accounts (gerico)
 
@@ -357,77 +264,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   const query = await buildQuery(args, user, bypassOrgIdsWithListPermission);
   const sort = buildSort(args);
   const search_after = await buildSearchAfter(args, sort);
-
-  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
-    {
-      index: index.alias,
-      body: {
-        size:
-          size +
-          // Take one more result to know if there's a next page
-          // it's removed from the actual results though
-          1,
-        query,
-        sort,
-        search_after
-      }
-    }
-  );
-
-  const hits = body.hits.hits.slice(0, size);
-
-  const {
-    bsdds: concreteBsdds,
-    bsdasris: concreteBsdasris,
-    bsvhus: concreteBsvhus,
-    bsdas: concreteBsdas,
-    bsffs: concreteBsffs,
-    bspaohs: concreteBspaohs
-  } = await toRawBsds(hits.map(hit => hit._source));
-
-  const bsds: Record<BsdType, Bsd[]> = {
-    BSDD: concreteBsdds.map(expandFormFromElastic),
-    BSDASRI: await buildDasris(concreteBsdasris),
-    BSVHU: concreteBsvhus.map(expandVhuFormFromDb),
-    BSDA: concreteBsdas.map(expandBsdaFromElastic),
-    BSFF: concreteBsffs.map(expandBsffFromElastic),
-    BSPAOH: concreteBspaohs.map(expandBspaohFromElastic)
-  };
-
-  const edges = hits
-    .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {
-      const bsd = bsds[type].find(bsd => bsd.id === id);
-
-      if (bsd) {
-        // filter out null values in case Elastic Search
-        // is desynchronized with the actual database
-        return acc.concat(bsd);
-      }
-
-      return acc;
-    }, [])
-    .map(node => ({
-      cursor: node.id,
-      node
-    }));
-
-  const pageInfo = {
-    // startCursor and endCursor are null if the list is empty
-    // this is not 100% spec compliant but there are discussions to change that:
-    // https://github.com/facebook/relay/issues/1852
-    // https://github.com/facebook/relay/pull/2655
-    startCursor: edges[0]?.cursor || null,
-    endCursor: edges[edges.length - 1]?.cursor || null,
-
-    hasNextPage: body.hits.hits.length > size,
-    hasPreviousPage: false
-  };
-
-  return {
-    edges,
-    pageInfo,
-    totalCount: body.hits.total.value
-  };
+  return buildResponse({ query, size, sort, search_after });
 };
 
 /**
