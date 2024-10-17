@@ -8,10 +8,6 @@ import "./setupPlausible";
 import * as React from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
 
-import "@codegouvfr/react-dsfr/favicon/apple-touch-icon.png";
-import "@codegouvfr/react-dsfr/favicon/favicon.svg";
-import "@codegouvfr/react-dsfr/favicon/favicon.ico";
-import "@codegouvfr/react-dsfr/favicon/manifest.webmanifest";
 import "@codegouvfr/react-dsfr/main.css";
 import "./scss/index.scss";
 
