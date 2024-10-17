@@ -604,7 +604,7 @@ export default function Header({
                 <div className="fr-header__operator">
                   <img
                     className="fr-responsive-img"
-                    style={{ width: "70px", height: "70px" }}
+                    style={{ width: "70px" }}
                     src="./trackdechets.png"
                     alt="Trackdéchets"
                     data-fr-js-ratio="true"
@@ -798,6 +798,7 @@ export default function Header({
               <li className="fr-nav__item">
                 <button
                   className="fr-nav__btn"
+                  style={{ width: "fit-content" }}
                   aria-expanded="false"
                   aria-controls="aidemenu"
                 >
