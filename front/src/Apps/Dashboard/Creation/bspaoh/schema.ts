@@ -18,6 +18,7 @@ const bspaohPackagingSchema = z.object({
 
 const zodCompany = z.object({
   siret: z.string(),
+  name: z.string(),
   contact: z.string().nullish(),
   phone: z.string().nullish(),
   mail: z.string().nullish(),
