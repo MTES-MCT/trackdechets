@@ -16,6 +16,10 @@ input BsvhuWhere {
   transporter: BsvhuTransporterWhere
   "Filtre sur le champ destination."
   destination: BsvhuDestinationWhere
+  "Filtre sur le champ broker."
+  broker: BsvhuBrokerWhere
+  "Filtre sur le champ négociant."
+  trader: BsvhuTraderWhere
   "ET logique"
   _and: [BsvhuWhere!]
   "OU logique"
@@ -59,6 +63,16 @@ input BsvhuDestinationWhere {
   operation: BsvhuOperationWhere
 }
 
+"Champs possible pour le filtre sur le courtier."
+input BsvhuBrokerWhere {
+  company: CompanyWhere
+}
+
+"Champs possible pour le filtre sur le négociant."
+input BsvhuTraderWhere {
+  company: CompanyWhere
+}
+
 "Champs possibles pour le filtre sur la réception"
 input BsvhuReceptionWhere {
   date: DateFilter
@@ -89,6 +103,13 @@ input BsvhuInput {
   destination: BsvhuDestinationInput
   "Détails sur le transporteur"
   transporter: BsvhuTransporterInput
+
+  "Courtier"
+  broker: BsvhuBrokerInput
+
+  "Négociant"
+  trader: BsvhuTraderInput
+
   """
   Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
   mais pas à la responsabilité de la traçabilité. Il pourra lire ce bordereau, sans étape de signature.
@@ -238,6 +259,20 @@ input BsvhuTransporterInput {
   recepisse: BsvhuRecepisseInput
   "Informations liés au transport"
   transport: BsvhuTransportInput
+}
+
+input BsvhuBrokerInput {
+  "Coordonnées de l'entreprise courtier"
+  company: CompanyInput
+  "Récépissé courtier"
+  recepisse: BsvhuRecepisseInput
+}
+
+input BsvhuTraderInput {
+  "Coordonnées de l'entreprise de négoce"
+  company: CompanyInput
+  "Récépissé courtier"
+  recepisse: BsvhuRecepisseInput
 }
 
 input BsvhuTransportInput {

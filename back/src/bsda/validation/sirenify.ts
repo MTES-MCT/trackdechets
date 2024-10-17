@@ -4,12 +4,7 @@ import {
   nextBuildSirenify,
   NextCompanyInputAccessor
 } from "../../companies/sirenify";
-import { getSealedFields } from "./rules";
-import {
-  BsdaValidationContext,
-  ZodBsdaTransformer,
-  ZodBsdaTransporterTransformer
-} from "./types";
+import { ZodBsdaTransporterTransformer } from "./types";
 
 const sirenifyBsdaAccessors = (
   bsda: ParsedZodBsda,
@@ -91,17 +86,9 @@ const sirenifyBsdaAccessors = (
   )
 ];
 
-export const sirenifyBsda: (
-  context: BsdaValidationContext
-) => ZodBsdaTransformer = context => {
-  return async bsda => {
-    const sealedFields = await getSealedFields(bsda, context);
-    return nextBuildSirenify<ParsedZodBsda>(sirenifyBsdaAccessors)(
-      bsda,
-      sealedFields
-    );
-  };
-};
+export const sirenifyBsda = nextBuildSirenify<ParsedZodBsda>(
+  sirenifyBsdaAccessors
+);
 
 const sirenifyBsdaTransporterAccessors = (
   bsdaTransporter: ParsedZodBsdaTransporter

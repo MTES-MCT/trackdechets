@@ -11,7 +11,6 @@
 
   &__item {
     display: block;
-    height: 30px;
     line-height: 30px;
     border-left: 3px solid transparent;
     padding-left: 1rem;
@@ -31,9 +30,15 @@
     font-weight: bold;
     border-color: $blue-dark;
   }
+
   li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     list-style: none;
+
     a {
+      display: inline-block;
       text-decoration: none;
       color: $black;
     }

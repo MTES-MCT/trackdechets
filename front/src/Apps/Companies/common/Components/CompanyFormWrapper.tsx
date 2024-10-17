@@ -45,7 +45,7 @@ const CompanyFormWrapper = ({
   return (
     <div className="companyFormWrapper">
       <div className="companyFormWrapper__topActions">
-        <h4>{title}</h4>
+        <h3>{title}</h3>
         {showEditCta && (
           <Button
             data-testid={dataTestId}

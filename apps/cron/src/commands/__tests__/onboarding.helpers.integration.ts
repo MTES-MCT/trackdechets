@@ -2,6 +2,7 @@ import {
   BsdaRevisionRequest,
   BsdasriRevisionRequest,
   MembershipRequestStatus,
+  UserNotification,
   UserRole
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
@@ -24,12 +25,12 @@ import { bsdaFactory } from "back/src/bsda/__tests__/factories";
 import { bsdasriFactory } from "back/src/bsdasris/__tests__/factories";
 import {
   BsddRevisionRequestWithReadableId,
-  addPendingApprovalsCompanyAdmins,
+  addPendingApprovalsCompanySubscribers,
   getActiveUsersWithPendingMembershipRequests,
-  getPendingBSDARevisionRequestsWithAdmins,
-  getPendingBSDDRevisionRequestsWithAdmins,
-  getPendingBSDASRIRevisionRequestsWithAdmins,
-  getPendingMembershipRequestsAndAssociatedAdmins,
+  getPendingBSDARevisionRequestsWithSubscribers,
+  getPendingBSDDRevisionRequestsWithSubscribers,
+  getPendingBSDASRIRevisionRequestsWithSubscribers,
+  getPendingMembershipRequestsAndAssociatedSubscribers,
   getRecentlyRegisteredProducers,
   getRecentlyRegisteredProfesionals,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest
@@ -279,16 +280,40 @@ describe("getActiveUsersWithPendingMembershipRequests", () => {
   });
 });
 
-describe("getPendingMembershipRequestsAndAssociatedAdmins", () => {
+describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
   afterEach(resetDatabase);
 
-  it("should return pending membership requests created X days ago with all associated company admins", async () => {
+  it("should return pending membership requests created X days ago with all associated notification subscribers", async () => {
     const user0 = await userFactory();
     const user1 = await userFactory();
     const user2 = await userFactory();
     const user3 = await userFactory({ isActive: false });
 
-    const companyAndAdmin0 = await userWithCompanyFactory("ADMIN");
+    const companyAndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.MEMBERSHIP_REQUEST] }
+    );
+
+    // crée un second admin abonné aux notifications de demandes de rattachement
+    const admin01 = await userFactory();
+    await associateUserToCompany(
+      admin01.id,
+      companyAndAdmin0.company.orgId,
+      UserRole.ADMIN,
+      { notifications: [UserNotification.MEMBERSHIP_REQUEST] }
+    );
+
+    // crée un troisième admin qui n'est pas abonné aux notifications de demandes de rattachement
+    const admin02 = await userFactory();
+    await associateUserToCompany(
+      admin02.id,
+      companyAndAdmin0.company.orgId,
+      UserRole.ADMIN,
+      { notifications: [] }
+    );
+
     const companyAndAdmin1 = await userWithCompanyFactory("ADMIN");
     const companyAndAdmin2 = await userWithCompanyFactory("ADMIN");
     const companyAndAdmin3 = await userWithCompanyFactory("ADMIN");
@@ -321,87 +346,36 @@ describe("getPendingMembershipRequestsAndAssociatedAdmins", () => {
       status: MembershipRequestStatus.PENDING
     });
 
-    const requests = await getPendingMembershipRequestsAndAssociatedAdmins(3);
-
-    expect(requests.length).toEqual(1);
-
-    const expectedResult = [
-      {
-        requestId: request0.id,
-        email: user0.email,
-        orgId: companyAndAdmin0.company.orgId,
-        adminIds: [companyAndAdmin0.user.id]
-      }
-    ];
-
-    const actualResult = requests.map(r => ({
-      requestId: r.id,
-      email: r.user.email,
-      orgId: r.company.orgId,
-      adminIds: r.company.companyAssociations.map(a => a.user.id).sort()
-    }));
-
-    expect(expectedResult).toEqual(actualResult);
-  });
-
-  it("should return ALL active admins from request's company", async () => {
-    const user0 = await userFactory();
-
-    // Should be returned
-    const companyAndAdmin0 = await userWithCompanyFactory("ADMIN");
-
-    // Should be returned
-    const admin1 = await userFactory({
-      companyAssociations: {
-        create: {
-          company: { connect: { id: companyAndAdmin0.company.id } },
-          role: "ADMIN"
-        }
-      }
-    });
-
-    // Should not be returned, because unactive
-    await userFactory({
-      isActive: false,
-      companyAssociations: {
-        create: {
-          company: { connect: { id: companyAndAdmin0.company.id } },
-          role: "ADMIN"
-        }
-      }
-    });
-
-    // Should be returned, along with both admins
-    const request0 = await createMembershipRequest(
-      user0,
-      companyAndAdmin0.company,
-      {
-        createdAt: THREE_DAYS_AGO,
-        status: MembershipRequestStatus.PENDING
-      }
+    const requests = await getPendingMembershipRequestsAndAssociatedSubscribers(
+      3
     );
 
-    const requests = await getPendingMembershipRequestsAndAssociatedAdmins(3);
-
     expect(requests.length).toEqual(1);
 
-    const expectedResult = [
-      {
-        requestId: request0.id,
-        email: user0.email,
-        orgId: companyAndAdmin0.company.orgId,
-        adminIds: [companyAndAdmin0.user.id, admin1.id].sort()
-      }
-    ];
-
-    const actualResult = requests.map(r => ({
-      requestId: r.id,
-      email: r.user.email,
-      orgId: r.company.orgId,
-      adminIds: r.company.companyAssociations.map(a => a.user.id).sort()
-    }));
-
-    expect(expectedResult).toEqual(actualResult);
+    expect(requests).toEqual([
+      expect.objectContaining({
+        id: request0.id,
+        user: expect.objectContaining({ email: user0.email }),
+        company: expect.objectContaining({
+          orgId: companyAndAdmin0.company.orgId,
+          companyAssociations: [
+            expect.objectContaining({
+              user: expect.objectContaining({
+                email: companyAndAdmin0.user.email
+              })
+            }),
+            expect.objectContaining({
+              user: expect.objectContaining({
+                email: admin01.email
+              })
+            })
+            // admin02 ne doit pas être présent ici car
+            // il n'est pas abonné aux notifications de
+            // demandes de rattachement
+          ]
+        })
+      })
+    ]);
   });
 
   it("should return all requests from a user, even if targeting different companies", async () => {
@@ -433,39 +407,34 @@ describe("getPendingMembershipRequestsAndAssociatedAdmins", () => {
       }
     );
 
-    const requests = await getPendingMembershipRequestsAndAssociatedAdmins(3);
+    const requests = await getPendingMembershipRequestsAndAssociatedSubscribers(
+      3
+    );
 
     expect(requests.length).toEqual(2);
 
-    const expectedResult = [
-      {
-        requestId: request0.id,
-        email: user0.email,
-        orgId: companyAndAdmin0.company.orgId,
-        adminIds: [companyAndAdmin0.user.id]
-      },
-      {
-        requestId: request1.id,
-        email: user0.email,
-        orgId: companyAndAdmin1.company.orgId,
-        adminIds: [companyAndAdmin1.user.id]
-      }
-    ].sort((a, b) => a.requestId.localeCompare(b.requestId));
-
-    const actualResult = requests
-      .map(r => ({
-        requestId: r.id,
-        email: r.user.email,
-        orgId: r.company.orgId,
-        adminIds: r.company.companyAssociations.map(a => a.user.id).sort()
-      }))
-      .sort((a, b) => a.requestId.localeCompare(b.requestId));
-
-    expect(expectedResult).toEqual(actualResult);
+    expect(
+      requests.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    ).toEqual([
+      expect.objectContaining({
+        id: request0.id,
+        company: expect.objectContaining({
+          orgId: companyAndAdmin0.company.orgId
+        }),
+        user: expect.objectContaining({ email: user0.email })
+      }),
+      expect.objectContaining({
+        id: request1.id,
+        company: expect.objectContaining({
+          orgId: companyAndAdmin1.company.orgId
+        }),
+        user: expect.objectContaining({ email: user0.email })
+      })
+    ]);
   });
 });
 
-describe("getPendingBSDARevisionRequestsWithAdmins", () => {
+describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
   afterEach(resetDatabase);
 
   it("should return empty array if DB is empty", async () => {
@@ -473,15 +442,20 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDARevisionRequest =
-      await getPendingBSDARevisionRequestsWithAdmins(2);
+      await getPendingBSDARevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(0);
   });
 
-  it("should return pending request and company admins", async () => {
+  it("should return pending request and subscribers to REVISION_REQUEST notifications", async () => {
     // Given
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
+    );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -505,7 +479,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDARevisionRequest =
-      await getPendingBSDARevisionRequestsWithAdmins(2);
+      await getPendingBSDARevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(1);
@@ -517,13 +491,15 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
-    expect(pendingBSDARevisionRequest[0].approvals[0].admins.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[0].approvals[0].admins[0].id).toEqual(
-      user.id
-    );
+    expect(
+      pendingBSDARevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(
+      pendingBSDARevisionRequest[0].approvals[0].subscribers[0].id
+    ).toEqual(user.id);
   });
 
-  it("should not return pending request and company admins NOT xDaysAgo", async () => {
+  it("should not return pending request and subscribers NOT xDaysAgo", async () => {
     // Given
     const { company } = await userWithCompanyFactory("ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
@@ -568,7 +544,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDARevisionRequest =
-      await getPendingBSDARevisionRequestsWithAdmins(2);
+      await getPendingBSDARevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(0);
@@ -602,7 +578,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDARevisionRequest =
-      await getPendingBSDARevisionRequestsWithAdmins(2);
+      await getPendingBSDARevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(0);
@@ -612,7 +588,12 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     // Given
 
     // Request 1
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
+    );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -636,7 +617,10 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
 
     // Request 2
     const { user: user2, company: company2 } = await userWithCompanyFactory(
-      "ADMIN"
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -661,7 +645,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDARevisionRequest =
-      await getPendingBSDARevisionRequestsWithAdmins(2);
+      await getPendingBSDARevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(2);
@@ -671,10 +655,12 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
       (pendingBSDARevisionRequest[0] as BsdaRevisionRequest).bsdaId
     ).toEqual(bsda.id);
     expect(pendingBSDARevisionRequest[0].approvals.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[0].approvals[0].admins.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[0].approvals[0].admins[0].id).toEqual(
-      user.id
-    );
+    expect(
+      pendingBSDARevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(
+      pendingBSDARevisionRequest[0].approvals[0].subscribers[0].id
+    ).toEqual(user.id);
     expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
@@ -684,20 +670,30 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
       (pendingBSDARevisionRequest[1] as BsdaRevisionRequest).bsdaId
     ).toEqual(bsda2.id);
     expect(pendingBSDARevisionRequest[1].approvals.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[1].approvals[0].admins.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[1].approvals[0].admins[0].id).toEqual(
-      user2.id
-    );
+    expect(
+      pendingBSDARevisionRequest[1].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(
+      pendingBSDARevisionRequest[1].approvals[0].subscribers[0].id
+    ).toEqual(user2.id);
     expect(pendingBSDARevisionRequest[1].approvals[0].company.id).toEqual(
       company2.id
     );
   });
 
-  it("should return all admins from pending companies", async () => {
+  it("should return all subscribers from pending companies", async () => {
     // Given
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
+    );
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
+      notifications: [UserNotification.REVISION_REQUEST]
+    });
+
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -721,7 +717,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDARevisionRequest =
-      await getPendingBSDARevisionRequestsWithAdmins(2);
+      await getPendingBSDARevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(1);
@@ -733,20 +729,24 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
-    expect(pendingBSDARevisionRequest[0].approvals[0].admins.length).toEqual(2);
+    expect(
+      pendingBSDARevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(2);
 
-    const adminIds = pendingBSDARevisionRequest[0].approvals[0].admins.map(
+    const adminIds = pendingBSDARevisionRequest[0].approvals[0].subscribers.map(
       a => a.id
     );
     expect(adminIds.includes(user.id)).toBe(true);
     expect(adminIds.includes(user2.id)).toBe(true);
   });
 
-  it("should not return non-admins from pending companies", async () => {
+  it("should not return non subscribers from pending companies", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "MEMBER");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
+      notifications: []
+    });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -770,7 +770,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDARevisionRequest =
-      await getPendingBSDARevisionRequestsWithAdmins(2);
+      await getPendingBSDARevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(1);
@@ -782,14 +782,16 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
-    expect(pendingBSDARevisionRequest[0].approvals[0].admins.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[0].approvals[0].admins[0].id).toEqual(
-      user.id
-    );
+    expect(
+      pendingBSDARevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(
+      pendingBSDARevisionRequest[0].approvals[0].subscribers[0].id
+    ).toEqual(user.id);
   });
 });
 
-describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
+describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
   afterEach(resetDatabase);
 
   it("should return empty array if DB is empty", async () => {
@@ -797,15 +799,20 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDRevisionRequest =
-      await getPendingBSDDRevisionRequestsWithAdmins(2);
+      await getPendingBSDDRevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(0);
   });
 
-  it("should return pending request and company admins", async () => {
+  it("should return pending request and company subscribers to REVISION_REQUEST notification", async () => {
     // Given
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
+    );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -827,7 +834,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDRevisionRequest =
-      await getPendingBSDDRevisionRequestsWithAdmins(2);
+      await getPendingBSDDRevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(1);
@@ -837,8 +844,10 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         .readableId
     ).toEqual(bsdd.readableId);
     expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[0].approvals[0].admins[0].id).toEqual(
+    expect(
+      pendingBSDRevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].subscribers[0].id).toEqual(
       user.id
     );
     expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
@@ -846,7 +855,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     );
   });
 
-  it("should not return pending request and company admins NOT xDaysAgo", async () => {
+  it("should not return pending request and subscribers NOT xDaysAgo", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
@@ -887,7 +896,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDRevisionRequest =
-      await getPendingBSDDRevisionRequestsWithAdmins(2);
+      await getPendingBSDDRevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(0);
@@ -919,17 +928,22 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDRevisionRequest =
-      await getPendingBSDDRevisionRequestsWithAdmins(2);
+      await getPendingBSDDRevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(0);
   });
 
-  it("should return multiple pending request and company admins", async () => {
+  it("should return multiple pending request and subsrribers", async () => {
     // Given
 
     // Request 1
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
+    );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -951,7 +965,10 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
 
     // Request 2
     const { user: user2, company: company2 } = await userWithCompanyFactory(
-      "ADMIN"
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -974,7 +991,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDRevisionRequest =
-      await getPendingBSDDRevisionRequestsWithAdmins(2);
+      await getPendingBSDDRevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(2);
@@ -985,8 +1002,10 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         .readableId
     ).toEqual(bsdd.readableId);
     expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[0].approvals[0].admins[0].id).toEqual(
+    expect(
+      pendingBSDRevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].subscribers[0].id).toEqual(
       user.id
     );
     expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
@@ -999,8 +1018,10 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         .readableId
     ).toEqual(bsdd2.readableId);
     expect(pendingBSDRevisionRequest[1].approvals.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[1].approvals[0].admins.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[1].approvals[0].admins[0].id).toEqual(
+    expect(
+      pendingBSDRevisionRequest[1].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(pendingBSDRevisionRequest[1].approvals[0].subscribers[0].id).toEqual(
       user2.id
     );
     expect(pendingBSDRevisionRequest[1].approvals[0].company.id).toEqual(
@@ -1008,11 +1029,18 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     );
   });
 
-  it("should return all admins from pending companies", async () => {
+  it("should return all subscribers from pending companies", async () => {
     // Given
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
+    );
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
+      notifications: [UserNotification.REVISION_REQUEST]
+    });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1034,7 +1062,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDRevisionRequest =
-      await getPendingBSDDRevisionRequestsWithAdmins(2);
+      await getPendingBSDDRevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(1);
@@ -1047,20 +1075,24 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
-    expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(2);
+    expect(
+      pendingBSDRevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(2);
 
-    const adminIds = pendingBSDRevisionRequest[0].approvals[0].admins.map(
+    const adminIds = pendingBSDRevisionRequest[0].approvals[0].subscribers.map(
       a => a.id
     );
     expect(adminIds.includes(user.id)).toBe(true);
     expect(adminIds.includes(user2.id)).toBe(true);
   });
 
-  it("should not return non-admins from pending companies", async () => {
+  it("should not return non-subscribers from pending companies", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "MEMBER");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
+      notifications: []
+    });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1082,7 +1114,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
 
     // When
     const pendingBSDRevisionRequest =
-      await getPendingBSDDRevisionRequestsWithAdmins(2);
+      await getPendingBSDDRevisionRequestsWithSubscribers(2);
 
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(1);
@@ -1095,24 +1127,26 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
-    expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[0].approvals[0].admins[0].id).toEqual(
+    expect(
+      pendingBSDRevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].subscribers[0].id).toEqual(
       user.id
     );
   });
 });
 
-describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
+describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
   afterEach(resetDatabase);
 
   it("should return empty array if DB is empty", async () => {
     const pendingBSDASRIRevisionRequest =
-      await getPendingBSDASRIRevisionRequestsWithAdmins(2);
+      await getPendingBSDASRIRevisionRequestsWithSubscribers(2);
 
     expect(pendingBSDASRIRevisionRequest.length).toEqual(0);
   });
 
-  it("should return pending request and company admins", async () => {
+  it("should return pending request and company subscribers to notification REVISION_REQUEST", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -1136,7 +1170,7 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
     });
 
     const pendingBSDARIRevisionRequest =
-      await getPendingBSDASRIRevisionRequestsWithAdmins(2);
+      await getPendingBSDASRIRevisionRequestsWithSubscribers(2);
 
     expect(pendingBSDARIRevisionRequest.length).toEqual(1);
     expect(pendingBSDARIRevisionRequest[0].id).toEqual(request.id);
@@ -1147,15 +1181,15 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
     expect(pendingBSDARIRevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
-    expect(pendingBSDARIRevisionRequest[0].approvals[0].admins.length).toEqual(
-      1
-    );
-    expect(pendingBSDARIRevisionRequest[0].approvals[0].admins[0].id).toEqual(
-      user.id
-    );
+    expect(
+      pendingBSDARIRevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(
+      pendingBSDARIRevisionRequest[0].approvals[0].subscribers[0].id
+    ).toEqual(user.id);
   });
 
-  it("should not return pending request and company admins NOT xDaysAgo", async () => {
+  it("should not return pending request and company subscribers NOT xDaysAgo", async () => {
     const { company } = await userWithCompanyFactory("ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -1198,7 +1232,7 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
     });
 
     const pendingBSDASRIRevisionRequest =
-      await getPendingBSDASRIRevisionRequestsWithAdmins(2);
+      await getPendingBSDASRIRevisionRequestsWithSubscribers(2);
 
     expect(pendingBSDASRIRevisionRequest.length).toEqual(0);
   });
@@ -1229,14 +1263,19 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
     });
 
     const pendingBSDASRIRevisionRequest =
-      await getPendingBSDASRIRevisionRequestsWithAdmins(2);
+      await getPendingBSDASRIRevisionRequestsWithSubscribers(2);
 
     expect(pendingBSDASRIRevisionRequest.length).toEqual(0);
   });
 
-  it("should return multiple pending request and company admins", async () => {
+  it("should return multiple pending request and company subscribers", async () => {
     // Request 1
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
+    );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1260,7 +1299,10 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
 
     // Request 2
     const { user: user2, company: company2 } = await userWithCompanyFactory(
-      "ADMIN"
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -1284,7 +1326,7 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
     });
 
     const pendingBSDASRIRevisionRequest =
-      await getPendingBSDASRIRevisionRequestsWithAdmins(2);
+      await getPendingBSDASRIRevisionRequestsWithSubscribers(2);
 
     expect(pendingBSDASRIRevisionRequest.length).toEqual(2);
 
@@ -1293,12 +1335,12 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
       (pendingBSDASRIRevisionRequest[0] as BsdasriRevisionRequest).bsdasriId
     ).toEqual(bsdasri.id);
     expect(pendingBSDASRIRevisionRequest[0].approvals.length).toEqual(1);
-    expect(pendingBSDASRIRevisionRequest[0].approvals[0].admins.length).toEqual(
-      1
-    );
-    expect(pendingBSDASRIRevisionRequest[0].approvals[0].admins[0].id).toEqual(
-      user.id
-    );
+    expect(
+      pendingBSDASRIRevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(
+      pendingBSDASRIRevisionRequest[0].approvals[0].subscribers[0].id
+    ).toEqual(user.id);
     expect(pendingBSDASRIRevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
@@ -1308,21 +1350,28 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
       (pendingBSDASRIRevisionRequest[1] as BsdasriRevisionRequest).bsdasriId
     ).toEqual(bsdasri2.id);
     expect(pendingBSDASRIRevisionRequest[1].approvals.length).toEqual(1);
-    expect(pendingBSDASRIRevisionRequest[1].approvals[0].admins.length).toEqual(
-      1
-    );
-    expect(pendingBSDASRIRevisionRequest[1].approvals[0].admins[0].id).toEqual(
-      user2.id
-    );
+    expect(
+      pendingBSDASRIRevisionRequest[1].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(
+      pendingBSDASRIRevisionRequest[1].approvals[0].subscribers[0].id
+    ).toEqual(user2.id);
     expect(pendingBSDASRIRevisionRequest[1].approvals[0].company.id).toEqual(
       company2.id
     );
   });
 
-  it("should return all admins from pending companies", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+  it("should return all subscribers from pending companies", async () => {
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
+    );
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
+      notifications: [UserNotification.REVISION_REQUEST]
+    });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1345,7 +1394,7 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
     });
 
     const pendingBSDASRIevisionRequest =
-      await getPendingBSDASRIRevisionRequestsWithAdmins(2);
+      await getPendingBSDASRIRevisionRequestsWithSubscribers(2);
 
     expect(pendingBSDASRIevisionRequest.length).toEqual(1);
     expect(pendingBSDASRIevisionRequest[0].approvals.length).toEqual(1);
@@ -1356,21 +1405,22 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
     expect(pendingBSDASRIevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
-    expect(pendingBSDASRIevisionRequest[0].approvals[0].admins.length).toEqual(
-      2
-    );
+    expect(
+      pendingBSDASRIevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(2);
 
-    const adminIds = pendingBSDASRIevisionRequest[0].approvals[0].admins.map(
-      a => a.id
-    );
+    const adminIds =
+      pendingBSDASRIevisionRequest[0].approvals[0].subscribers.map(a => a.id);
     expect(adminIds.includes(user.id)).toBe(true);
     expect(adminIds.includes(user2.id)).toBe(true);
   });
 
-  it("should not return non-admins from pending companies", async () => {
+  it("should not return non-subscribers from pending companies", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "MEMBER");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
+      notifications: []
+    });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1393,7 +1443,7 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
     });
 
     const pendingBSDASRIRevisionRequest =
-      await getPendingBSDASRIRevisionRequestsWithAdmins(2);
+      await getPendingBSDASRIRevisionRequestsWithSubscribers(2);
 
     expect(pendingBSDASRIRevisionRequest.length).toEqual(1);
     expect(pendingBSDASRIRevisionRequest[0].id).toEqual(request.id);
@@ -1404,12 +1454,12 @@ describe("getPendingBSDARIRevisionRequestsWithAdmins", () => {
     expect(pendingBSDASRIRevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
-    expect(pendingBSDASRIRevisionRequest[0].approvals[0].admins.length).toEqual(
-      1
-    );
-    expect(pendingBSDASRIRevisionRequest[0].approvals[0].admins[0].id).toEqual(
-      user.id
-    );
+    expect(
+      pendingBSDASRIRevisionRequest[0].approvals[0].subscribers.length
+    ).toEqual(1);
+    expect(
+      pendingBSDASRIRevisionRequest[0].approvals[0].subscribers[0].id
+    ).toEqual(user.id);
   });
 });
 
@@ -2002,7 +2052,7 @@ describe("addPendingApprovalsCompanyAdmins", () => {
       include: { approvals: true, bsdd: { select: { readableId: true } } }
     });
 
-    const wrappedRequests = await addPendingApprovalsCompanyAdmins(
+    const wrappedRequests = await addPendingApprovalsCompanySubscribers(
       requestsWithApprovals
     );
 

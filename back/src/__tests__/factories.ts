@@ -11,12 +11,14 @@ import {
   User,
   Prisma,
   Company,
-  TransportMode
+  TransportMode,
+  UserNotification
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../forms/database";
+import { CompanyRole } from "../common/validation/zod/schema";
 
 /**
  * Create a user with name and email
@@ -136,11 +138,23 @@ export const userWithCompanyFactory = async (
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
+  const notifications =
+    role === "ADMIN"
+      ? [
+          UserNotification.MEMBERSHIP_REQUEST,
+          UserNotification.REVISION_REQUEST,
+          UserNotification.BSD_REFUSAL,
+          UserNotification.SIGNATURE_CODE_RENEWAL,
+          UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+        ]
+      : [];
+
   const user = await userFactory({
     ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
+        notifications,
         role: role,
         ...companyAssociationOpts
       }
@@ -642,5 +656,49 @@ export const transporterReceiptFactory = async ({
     });
   }
 
+  return receipt;
+};
+
+export const intermediaryReceiptFactory = async ({
+  role = CompanyRole.Broker,
+  number = "el numero",
+  department = "69",
+  company
+}: {
+  role: CompanyRole.Broker | CompanyRole.Trader;
+  number?: string;
+  department?: string;
+  company?: Company;
+}) => {
+  let receipt;
+  if (role === CompanyRole.Broker) {
+    receipt = await prisma.brokerReceipt.create({
+      data: {
+        receiptNumber: number,
+        validityLimit: "2055-01-01T00:00:00.000Z",
+        department: department
+      }
+    });
+    if (!!company) {
+      await prisma.company.update({
+        where: { id: company.id },
+        data: { brokerReceipt: { connect: { id: receipt.id } } }
+      });
+    }
+  } else if (role === CompanyRole.Trader) {
+    receipt = await prisma.traderReceipt.create({
+      data: {
+        receiptNumber: number,
+        validityLimit: "2055-01-01T00:00:00.000Z",
+        department: department
+      }
+    });
+    if (!!company) {
+      await prisma.company.update({
+        where: { id: company.id },
+        data: { traderReceipt: { connect: { id: receipt.id } } }
+      });
+    }
+  }
   return receipt;
 };

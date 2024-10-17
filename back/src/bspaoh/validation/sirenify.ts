@@ -1,4 +1,7 @@
-import { nextBuildSirenify } from "../../companies/sirenify";
+import {
+  nextBuildSirenify,
+  NextCompanyInputAccessor
+} from "../../companies/sirenify";
 import { CompanyInput } from "../../generated/graphql/types";
 
 import { ZodFullBspaoh } from "./schema";
@@ -10,7 +13,7 @@ type SiretInfos = {
 const accessors = (
   input: ZodFullBspaoh,
   sealedFields: string[] // Transformations should not be run on sealed fields
-) => {
+): NextCompanyInputAccessor<ZodFullBspaoh>[] => {
   return [
     {
       siret: input?.emitterCompanySiret,

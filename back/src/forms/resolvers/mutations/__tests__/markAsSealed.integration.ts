@@ -16,7 +16,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
-import { renderMail, contentAwaitsGuest } from "@td/mail";
+import { renderMail, yourCompanyIsIdentifiedOnABsd } from "@td/mail";
 import { MARK_AS_SEALED } from "./mutations";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 import { waitForJobsCompletion } from "../../../../queue/helpers";
@@ -1147,19 +1147,26 @@ describe("Mutation.markAsSealed", () => {
       variables: { id: form.id }
     });
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
-      renderMail(contentAwaitsGuest, {
+    const expectedMail = {
+      ...renderMail(yourCompanyIsIdentifiedOnABsd, {
         to: [
           { email: form.emitterCompanyMail!, name: form.emitterCompanyContact! }
         ],
         variables: {
-          company: {
+          emitter: {
             siret: form.emitterCompanySiret!,
             name: form.emitterCompanyName!
+          },
+          destination: {
+            siret: form.recipientCompanySiret!,
+            name: form.recipientCompanyName!
           }
         }
-      })
-    );
+      }),
+      params: { hideRegisteredUserInfo: true }
+    };
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(expectedMail);
   });
 
   it("should not send an email to emitter contact if contact email already appears in a previous BSD", async () => {

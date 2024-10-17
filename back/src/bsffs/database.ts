@@ -383,6 +383,15 @@ export function getFirstTransporterSync(bsff: {
   return firstTransporter ?? null;
 }
 
+export function getLastTransporterSync(bsff: {
+  transporters: BsffTransporter[] | null;
+}): BsffTransporter | null {
+  const transporters = getTransportersSync(bsff);
+  const greatestNumber = Math.max(...transporters.map(t => t.number));
+  const lastTransporter = transporters.find(t => t.number === greatestNumber);
+  return lastTransporter ?? null;
+}
+
 export function getNthTransporterSync(
   bsff: BsffWithTransporters,
   n: number

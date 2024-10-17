@@ -31,6 +31,7 @@ import {
 import { searchCompany } from "../../../search";
 import { sendVerificationCodeLetter } from "../../../../common/post";
 import gql from "graphql-tag";
+import { ALL_NOTIFICATIONS } from "../../../../users/notifications";
 
 // Mock external search services
 jest.mock("../../../search");
@@ -165,14 +166,15 @@ describe("Mutation.createCompany", () => {
       })) != null;
     expect(newCompanyExists).toBe(true);
 
-    const newCompanyAssociationExists =
-      (await prisma.companyAssociation.findFirst({
-        where: {
-          company: { siret: companyInput.siret },
-          user: { id: user.id }
-        }
-      })) != null;
-    expect(newCompanyAssociationExists).toBe(true);
+    const newCompanyAssociation = await prisma.companyAssociation.findFirst({
+      where: {
+        company: { siret: companyInput.siret },
+        user: { id: user.id }
+      }
+    });
+
+    expect(newCompanyAssociation).not.toBeNull();
+    expect(newCompanyAssociation?.notifications).toEqual(ALL_NOTIFICATIONS);
 
     const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }

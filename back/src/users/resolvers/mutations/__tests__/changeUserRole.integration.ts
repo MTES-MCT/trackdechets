@@ -9,6 +9,8 @@ import { hash } from "bcrypt";
 import { AuthType } from "../../../../auth";
 import { Mutation } from "../../../../generated/graphql/types";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
+import { UserRole } from "@prisma/client";
+import { ALL_NOTIFICATIONS } from "../../../notifications";
 
 const CHANGE_USER_ROLE = `
   mutation ChangeUserRole($userId: ID!, $orgId: ID!, $role: UserRole!){
@@ -22,36 +24,155 @@ const CHANGE_USER_ROLE = `
 describe("mutation changeUserRole", () => {
   afterAll(resetDatabase);
 
-  test("admin can change a company user's role", async () => {
-    const { user: admin, company } = await userWithCompanyFactory("ADMIN");
-    const userToModify = await userFactory({
-      companyAssociations: {
-        create: {
-          company: { connect: { id: company.id } },
-          role: "MEMBER"
+  test.each([UserRole.MEMBER, UserRole.READER, UserRole.DRIVER])(
+    "admin can change a company user with role ADMIN to role %p",
+    async role => {
+      const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+      const userToModify = await userFactory({
+        companyAssociations: {
+          create: {
+            company: { connect: { id: company.id } },
+            role: UserRole.ADMIN,
+            notifications: ALL_NOTIFICATIONS
+          }
         }
-      }
-    });
+      });
 
-    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
-    const { data } = await mutate<Pick<Mutation, "changeUserRole">>(
-      CHANGE_USER_ROLE,
-      {
-        variables: {
-          userId: userToModify.id,
-          orgId: company.orgId,
-          role: "ADMIN"
+      const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+      const { data } = await mutate<Pick<Mutation, "changeUserRole">>(
+        CHANGE_USER_ROLE,
+        {
+          variables: {
+            userId: userToModify.id,
+            orgId: company.orgId,
+            role
+          }
         }
-      }
-    );
-    expect(data.changeUserRole.email).toEqual(userToModify.email);
-    expect(data.changeUserRole.role).toEqual("ADMIN");
-    const companyAssociations = await prisma.user
-      .findUniqueOrThrow({ where: { id: userToModify.id } })
-      .companyAssociations();
-    expect(companyAssociations).toHaveLength(1);
-    expect(companyAssociations[0].role).toEqual("ADMIN");
-  });
+      );
+      expect(data.changeUserRole.email).toEqual(userToModify.email);
+      expect(data.changeUserRole.role).toEqual(role);
+      const companyAssociations = await prisma.user
+        .findUniqueOrThrow({ where: { id: userToModify.id } })
+        .companyAssociations();
+      expect(companyAssociations).toHaveLength(1);
+      expect(companyAssociations[0].role).toEqual(role);
+      expect(companyAssociations[0].notifications).toEqual([]);
+    }
+  );
+
+  test.each([UserRole.ADMIN, UserRole.READER, UserRole.DRIVER])(
+    "admin can change a company user with role MEMBER to role %p",
+    async role => {
+      const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+      const userToModify = await userFactory({
+        companyAssociations: {
+          create: {
+            company: { connect: { id: company.id } },
+            role: UserRole.MEMBER,
+            notifications: []
+          }
+        }
+      });
+
+      const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+      const { data } = await mutate<Pick<Mutation, "changeUserRole">>(
+        CHANGE_USER_ROLE,
+        {
+          variables: {
+            userId: userToModify.id,
+            orgId: company.orgId,
+            role
+          }
+        }
+      );
+      expect(data.changeUserRole.email).toEqual(userToModify.email);
+      expect(data.changeUserRole.role).toEqual(role);
+      const companyAssociations = await prisma.user
+        .findUniqueOrThrow({ where: { id: userToModify.id } })
+        .companyAssociations();
+      expect(companyAssociations).toHaveLength(1);
+      expect(companyAssociations[0].role).toEqual(role);
+      expect(companyAssociations[0].notifications).toEqual(
+        role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
+      );
+    }
+  );
+
+  test.each([UserRole.ADMIN, UserRole.MEMBER, UserRole.DRIVER])(
+    "admin can change a company user with role READER to role %p",
+    async role => {
+      const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+      const userToModify = await userFactory({
+        companyAssociations: {
+          create: {
+            company: { connect: { id: company.id } },
+            role: UserRole.READER,
+            notifications: []
+          }
+        }
+      });
+
+      const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+      const { data } = await mutate<Pick<Mutation, "changeUserRole">>(
+        CHANGE_USER_ROLE,
+        {
+          variables: {
+            userId: userToModify.id,
+            orgId: company.orgId,
+            role
+          }
+        }
+      );
+      expect(data.changeUserRole.email).toEqual(userToModify.email);
+      expect(data.changeUserRole.role).toEqual(role);
+      const companyAssociations = await prisma.user
+        .findUniqueOrThrow({ where: { id: userToModify.id } })
+        .companyAssociations();
+      expect(companyAssociations).toHaveLength(1);
+      expect(companyAssociations[0].role).toEqual(role);
+      expect(companyAssociations[0].notifications).toEqual(
+        role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
+      );
+    }
+  );
+
+  test.each([UserRole.ADMIN, UserRole.MEMBER, UserRole.READER])(
+    "admin can change a company user with role DRIVER to role %p",
+    async role => {
+      const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+      const userToModify = await userFactory({
+        companyAssociations: {
+          create: {
+            company: { connect: { id: company.id } },
+            role: UserRole.DRIVER,
+            notifications: []
+          }
+        }
+      });
+
+      const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+      const { data } = await mutate<Pick<Mutation, "changeUserRole">>(
+        CHANGE_USER_ROLE,
+        {
+          variables: {
+            userId: userToModify.id,
+            orgId: company.orgId,
+            role
+          }
+        }
+      );
+      expect(data.changeUserRole.email).toEqual(userToModify.email);
+      expect(data.changeUserRole.role).toEqual(role);
+      const companyAssociations = await prisma.user
+        .findUniqueOrThrow({ where: { id: userToModify.id } })
+        .companyAssociations();
+      expect(companyAssociations).toHaveLength(1);
+      expect(companyAssociations[0].role).toEqual(role);
+      expect(companyAssociations[0].notifications).toEqual(
+        role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
+      );
+    }
+  );
 
   test("admin can change an invited user's role", async () => {
     const { user: admin, company } = await userWithCompanyFactory("ADMIN");

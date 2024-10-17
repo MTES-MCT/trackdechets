@@ -251,7 +251,7 @@ function BsdAdditionalActionsButton({
               </li>
             )}
           {permissions.includes(UserPermission.BsdCanUpdate) &&
-            hasAppendix1Cta(bsd) && (
+            hasAppendix1Cta(bsd, currentSiret) && (
               <li>
                 <button
                   type="button"

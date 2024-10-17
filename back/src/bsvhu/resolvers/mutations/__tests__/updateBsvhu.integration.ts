@@ -132,7 +132,6 @@ describe("Mutation.Vhu.update", () => {
         variables: { id: form.id, input }
       }
     );
-
     expect(data.updateBsvhu.weight!.value).toBe(4);
   });
 

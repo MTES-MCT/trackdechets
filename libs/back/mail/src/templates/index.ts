@@ -41,11 +41,13 @@ export const notifyUserOfInvite: MailTemplate<{
   templateId: templateIds.LAYOUT
 };
 
-export const contentAwaitsGuest: MailTemplate<{
-  company: { siret: string; name?: string };
+export const yourCompanyIsIdentifiedOnABsd: MailTemplate<{
+  emitter: { siret: string; name?: string };
+  destination: { siret: string; name?: string };
 }> = {
-  subject: "Votre Bordereau de Suivi de Déchet",
-  body: mustacheRenderer("suite-transmission-bsd.html"),
+  subject:
+    "Votre établissement a été identifié sur un bordereau de suivi de déchets dangereux sur Trackdéchets",
+  body: mustacheRenderer("your-company-is-identified-on-a-bsd.html"),
   templateId: templateIds.LAYOUT
 };
 
@@ -126,7 +128,7 @@ export const membershipRequest: MailTemplate<{
   membershipRequestId: string;
 }> = {
   subject: "Un utilisateur souhaite rejoindre votre établissement",
-  body: mustacheRenderer("information-demande-de-rattachement.html"),
+  body: mustacheRenderer("membership-request.html"),
   templateId: templateIds.LAYOUT
 };
 
@@ -216,13 +218,13 @@ export const pendingMembershipRequestDetailsEmail: MailTemplate = {
   templateId: templateIds.LAYOUT
 };
 
-export const pendingMembershipRequestAdminDetailsEmail: MailTemplate<{
+export const pendingMembershipRequestEmail: MailTemplate<{
   requestId: string;
   email: string;
   orgId: string;
 }> = {
   subject: "Un utilisateur est toujours en attente de réponse de votre part",
-  body: mustacheRenderer("pending-membership-request-admin-details.html"),
+  body: mustacheRenderer("pending-membership-request.html"),
   templateId: templateIds.LAYOUT
 };
 
@@ -238,7 +240,7 @@ export const producersSecondOnboardingEmail: MailTemplate = {
   templateId: templateIds.PRODUCER_SECOND_ONBOARDING
 };
 
-export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
+export const pendingRevisionRequestEmail: MailTemplate<{
   requestCreatedAt: string;
   bsdReadableId: string;
   bsdId: string;

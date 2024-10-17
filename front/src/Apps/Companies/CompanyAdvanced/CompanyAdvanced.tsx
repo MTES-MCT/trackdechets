@@ -90,9 +90,9 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
   return (
     <div className="company-advanced">
       <div className="company-advanced__section">
-        <h4 className="company-advanced__title">
+        <h3 className="company-advanced__title">
           Mise en sommeil de l'établissement
-        </h4>
+        </h3>
         <p className="company-advanced__description">
           La mise en sommeil de votre établissement ne permettra plus de viser
           son SIRET sur de nouveaux bordereaux. Elle permettra de gérer les
@@ -142,9 +142,9 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
 
       <ApproveAdministrativeTransfer company={company} />
 
-      <h4 className="company-advanced__title">
+      <h3 className="company-advanced__title">
         Suppression de l'établissement
-      </h4>
+      </h3>
       <p className="company-advanced__description">
         En supprimant cet établissement, vous supprimez les accès de tous ses
         membres et vous ne pourrez plus accéder, ni au suivi des bordereaux, ni
@@ -164,9 +164,9 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
         onClose={onCloseModal}
         isOpen={isModalOpened}
       >
-        <h4 className="company-advanced__modal-title">
+        <h3 className="company-advanced__modal-title">
           Supprimer {company?.name} - {company?.givenName}
-        </h4>
+        </h3>
 
         <p className="company-advanced__modal-description">
           Êtes vous sur de vouloir supprimer l'établissement {companyFullname} ?

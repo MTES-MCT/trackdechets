@@ -21,7 +21,12 @@ import {
   createFicheIntervention
 } from "./factories";
 import { prisma } from "@td/prisma";
-import { BsffFicheIntervention } from "@prisma/client";
+import {
+  BsffFicheIntervention,
+  BsffStatus,
+  WasteAcceptationStatus
+} from "@prisma/client";
+import { xDaysAgo } from "../../utils";
 
 describe("getOrgIdsByTab", () => {
   let emitter: UserWithCompany;
@@ -275,6 +280,96 @@ describe("getOrgIdsByTab", () => {
     expect(isFollowFor).toContain(transporter.company.siret);
     expect(isFollowFor).toContain(destination.company.siret);
     expect(isFollowFor).toContain(detenteur.company.siret);
+  });
+
+  describe("isReturnFor", () => {
+    it.each([
+      WasteAcceptationStatus.REFUSED,
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+    ])(
+      "waste acceptation status is %p > bsff should belong to tab",
+      async acceptationStatus => {
+        // Given
+        const bsff = await createBsffAfterOperation(
+          { emitter, transporter, destination },
+          {
+            data: {
+              destinationReceptionDate: new Date()
+            },
+            packagingData: {
+              acceptationStatus
+            }
+          }
+        );
+
+        // When
+        const { isReturnFor } = toBsdElastic(bsff);
+
+        // Then
+        expect(isReturnFor).toContain(transporter.company.siret);
+      }
+    );
+
+    it("status is REFUSED > bsff should belong to tab", async () => {
+      // Given
+      const bsff = await createBsffAfterOperation(
+        { emitter, transporter, destination },
+        {
+          data: {
+            status: BsffStatus.REFUSED,
+            destinationReceptionDate: new Date()
+          }
+        }
+      );
+
+      // When
+      const { isReturnFor } = toBsdElastic(bsff);
+
+      // Then
+      expect(isReturnFor).toContain(transporter.company.siret);
+    });
+
+    it("waste acceptation status is ACCEPTED > bsff should not belong to tab", async () => {
+      // Given
+      const bsff = await createBsffAfterOperation(
+        { emitter, transporter, destination },
+        {
+          data: {
+            destinationReceptionDate: new Date()
+          },
+          packagingData: {
+            acceptationStatus: WasteAcceptationStatus.ACCEPTED
+          }
+        }
+      );
+
+      // When
+      const { isReturnFor } = toBsdElastic(bsff);
+
+      // Then
+      expect(isReturnFor).toStrictEqual([]);
+    });
+
+    it("bsda has been received too long ago > should not belong to tab", async () => {
+      // Given
+      const bsff = await createBsffAfterOperation(
+        { emitter, transporter, destination },
+        {
+          data: {
+            destinationReceptionDate: xDaysAgo(new Date(), 10)
+          },
+          packagingData: {
+            acceptationStatus: WasteAcceptationStatus.REFUSED
+          }
+        }
+      );
+
+      // When
+      const { isReturnFor } = toBsdElastic(bsff);
+
+      // Then
+      expect(isReturnFor).toStrictEqual([]);
+    });
   });
 });
 

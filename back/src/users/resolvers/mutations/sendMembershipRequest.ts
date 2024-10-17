@@ -14,6 +14,8 @@ import {
 } from "@td/mail";
 import { getEmailDomain, canSeeEmail } from "../../utils";
 import { UserInputError } from "../../../common/errors";
+import { getNotificationSubscribers } from "../../notifications";
+import { UserNotification } from "@prisma/client";
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] =
   async (parent, { siret }, context) => {
@@ -49,31 +51,33 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
       );
     }
 
-    const emails = admins.map(a => a.email);
+    const subscribers = await getNotificationSubscribers(
+      UserNotification.MEMBERSHIP_REQUEST,
+      [siret]
+    );
 
     const membershipRequest = await prisma.membershipRequest.create({
       data: {
         user: { connect: { id: user.id } },
         company: { connect: { id: company.id } },
-        sentTo: emails
+        sentTo: subscribers.map(r => r.email)
       }
     });
 
-    // send membership request to all admins of the company
-    const recipients = admins.map(a => ({ email: a.email, name: a.name! }));
-
-    await sendMail(
-      renderMail(membershipRequestMail, {
-        to: recipients,
-        variables: {
-          userEmail: user.email,
-          companyName: company.name,
-          companySiret: company.orgId,
-          companyGivenName: company.givenName,
-          membershipRequestId: membershipRequest.id
-        }
-      })
-    );
+    if (subscribers) {
+      await sendMail(
+        renderMail(membershipRequestMail, {
+          to: subscribers,
+          variables: {
+            userEmail: user.email,
+            companyName: company.name,
+            companySiret: company.orgId,
+            companyGivenName: company.givenName,
+            membershipRequestId: membershipRequest.id
+          }
+        })
+      );
+    }
 
     // send membership request confirmation to requester
     // Iot let him/her know about admin emails, we filter them (same domain name, no public email providers)

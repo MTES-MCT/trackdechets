@@ -45,6 +45,7 @@ import { formatBsd, mapBsdasri } from "../../bsdMapper";
 import RevisionModal, { ActionType } from "../Revision/RevisionModal";
 
 import "./bsdCardList.scss";
+import { useKeyboard } from "react-aria";
 
 function BsdCardList({
   siret,
@@ -59,6 +60,7 @@ function BsdCardList({
     bsdCurrentTab === "reviewedTab" || bsdCurrentTab === "toReviewTab";
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
+  const isReturnTab = bsdCurrentTab === "returnTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
   const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
 
@@ -78,6 +80,61 @@ function BsdCardList({
     },
     [navigate, location, siret]
   );
+
+  const { keyboardProps } = useKeyboard({
+    onKeyDown: event => {
+      const key = event.key;
+      const focusedElement = document.activeElement;
+
+      if (!focusedElement) {
+        return;
+      }
+
+      const focusedArticle =
+        focusedElement.role === "article"
+          ? focusedElement
+          : focusedElement.closest("div[role=article]");
+
+      if (!focusedArticle) {
+        return;
+      }
+
+      const focusedIndex = Number(focusedArticle.getAttribute("aria-posinset"));
+
+      const articles = document.querySelectorAll("div[role=article]");
+
+      switch (key) {
+        case "PageUp":
+          event.preventDefault();
+          if (focusedIndex > 0) {
+            const previousArticle = articles[focusedIndex - 1] as HTMLElement;
+            previousArticle.focus();
+          }
+          break;
+        case "PageDown":
+          event.preventDefault();
+          if (articles.length >= focusedIndex) {
+            const nextArticle = articles[focusedIndex + 1] as HTMLElement;
+            nextArticle.focus();
+          }
+          break;
+        case "Home":
+          if (event.ctrlKey && articles.length > 0) {
+            event.preventDefault();
+            const firstArticle = articles[0] as HTMLElement;
+            firstArticle.focus();
+          }
+          break;
+        case "End":
+          if (event.ctrlKey) {
+            event.preventDefault();
+            const lastArticle = articles[articles.length - 1] as HTMLElement;
+            lastArticle.focus();
+          }
+          break;
+      }
+    }
+  });
 
   const [validationWorkflowType, setValidationWorkflowType] =
     useState<string>();
@@ -290,7 +347,13 @@ function BsdCardList({
         if (status === FormStatus.Draft || bsd["isDraft"]) {
           handleDraftValidation(bsd as Bsd);
         } else {
-          if (hasRoadControlButton(bsdDisplay as BsdDisplay, isCollectedTab)) {
+          if (
+            hasRoadControlButton(
+              bsdDisplay as BsdDisplay,
+              isCollectedTab,
+              isReturnTab
+            )
+          ) {
             const path = routes.dashboard.roadControl;
             redirectToPath(path, bsd.id);
           } else {
@@ -301,6 +364,7 @@ function BsdCardList({
     },
     [
       isReviewsTab,
+      isReturnTab,
       isCollectedTab,
       siret,
       handleDraftValidation,
@@ -383,8 +447,8 @@ function BsdCardList({
 
   return (
     <>
-      <ul className="bsd-card-list">
-        {bsds?.map(({ node }) => {
+      <ul className="bsd-card-list" {...keyboardProps}>
+        {bsds?.map(({ node }, index) => {
           const key = `${node.id}${node.status}`;
           const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
             node?.emitter?.company?.siret
@@ -393,6 +457,8 @@ function BsdCardList({
             <li className="bsd-card-list__item" key={key}>
               <BsdCard
                 bsd={node}
+                posInSet={index}
+                setSize={bsds.length}
                 currentSiret={siret}
                 bsdCurrentTab={bsdCurrentTab}
                 onValidate={onBsdValidation}

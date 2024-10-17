@@ -117,9 +117,9 @@ export default function AccountMembershipRequest() {
     return (
       <div className="container-narrow">
         <section className="section section-white">
-          <h4 className="h4 tw-mb-10">
+          <h3 className="h4 tw-mb-10">
             Un utilisateur aimerait rejoindre l'établissement {name} ({siret})
-          </h4>
+          </h3>
 
           <div className="tw-flex tw-flex-row tw-justify-start">
             <label className="tw-mr-5">{email}</label>

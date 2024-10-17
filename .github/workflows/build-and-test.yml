@@ -39,4 +39,5 @@ jobs:
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
           OTEL_SDK_DISABLED: true
+          ELASTIC_SEARCH_URL: http://elasticsearch:9200
       - run: npx nx affected -t build --parallel=3

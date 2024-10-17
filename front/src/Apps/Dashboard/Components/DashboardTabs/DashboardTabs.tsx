@@ -23,7 +23,8 @@ import {
   REVIEWS,
   TO_COLLECT,
   TO_REVIEW,
-  TRANSPORT
+  TRANSPORT,
+  RETURN
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./DashboardTabs.scss";
@@ -126,6 +127,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
       {showMyBsds && (
         <>
           <Accordion
+            titleAs="h2"
             label="Mes bordereaux"
             onExpandedChange={handleToggle}
             expanded
@@ -207,7 +209,12 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             </ul>
           </Accordion>
 
-          <Accordion label={REVIEWS} onExpandedChange={handleToggle} expanded>
+          <Accordion
+            titleAs="h2"
+            label={REVIEWS}
+            onExpandedChange={handleToggle}
+            expanded
+          >
             <ul>
               <li>
                 <NavLink
@@ -247,7 +254,12 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
       )}
 
       {showTransportTabs && (
-        <Accordion label={TRANSPORT} onExpandedChange={handleToggle} expanded>
+        <Accordion
+          titleAs="h2"
+          label={TRANSPORT}
+          onExpandedChange={handleToggle}
+          expanded
+        >
           <ul>
             <li>
               <NavLink
@@ -279,6 +291,20 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 }
               >
                 {COLLECTED}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to={generatePath(routes.dashboard.transport.return, {
+                  siret: currentCompany.orgId
+                })}
+                className={({ isActive }) =>
+                  isActive
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
+                }
+              >
+                {RETURN}
               </NavLink>
             </li>
           </ul>

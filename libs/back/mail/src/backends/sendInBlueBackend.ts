@@ -43,7 +43,7 @@ const sendInBlueBackend = {
       );
     }
 
-    const params = { body: mail.body ?? "" };
+    const params = { body: mail.body ?? "", ...mail.params };
 
     const payload = {
       subject: mail.subject,

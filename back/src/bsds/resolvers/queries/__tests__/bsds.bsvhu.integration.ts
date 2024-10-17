@@ -92,6 +92,9 @@ describe("Query.bsds.vhus base workflow", () => {
     destination = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["WASTE_VEHICLES"]
+      },
+      wasteVehiclesTypes: {
+        set: ["BROYEUR", "DEMOLISSEUR"]
       }
     });
   });

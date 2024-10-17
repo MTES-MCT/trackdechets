@@ -10,11 +10,23 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'Eco-organisme sur BSVHU [PR 3619](https://github.com/MTES-MCT/trackdechets/pull/3619)
+- Ajout des profils Négociant et Courtier sur BSVHU [PR 3645](https://github.com/MTES-MCT/trackdechets/pull/3645)
 - Ajoute d'un moteur de recherche sur la documentation développeurs [PR 3622](https://github.com/MTES-MCT/trackdechets/pull/3622)
 
 #### :nail_care: Améliorations
 
 - Changer la référence du cerfa lors de l'ajout d'une fiche d'intervention [PR 3616](https://github.com/MTES-MCT/trackdechets/pull/3616)
+- ETQ membre d'un établissement, je peux gérer mes préférences de notifications (demandes de rattachement, demandes de révisions, renouvellement code signature, etc) en lien avec cet établissement [PR 3634](https://github.com/MTES-MCT/trackdechets/pull/3634)
+
+#### :boom: Breaking changes
+
+- La Raison Sociale, le SIRET et l'Adresse de la destination sont scellés à la signature émetteur, sauf pour l'émetteur qui doit pouvoir le modifier jusqu'à la prochaine signature [PR 3628](https://github.com/MTES-MCT/trackdechets/pull/3628)
+
+- La complétion du champ identificationNumbers est obligatoire à la publication d'un VHU [PR 3628](https://github.com/MTES-MCT/trackdechets/pull/3628)
+
+#### :nail_care: Améliorations
+
+- Amélioration du contenu de l'e-mail transactionnel envoyé au contact d'un établissement visé sur un bordereau en tant qu'émetteur [PR 3635](https://github.com/MTES-MCT/trackdechets/pull/3635)
 
 #### :bug: Corrections de bugs
 
@@ -1043,7 +1055,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Meilleure gestion des ré-indexations de BSD sans interruption du service avec `npm run reindex-all-bsds-bulk` et parallélisation avec la job queue avec l'option `--useQueue` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
-- Création de nouveau jobs `indexAllInBulk` et `indexChunk` pour la queue d'indexation, , création d'un groupe de workers de job spécifiques pour l'indexation `indexQueue` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
+- Création de nouveau jobs `indexAllInBulk` et `indexChunk` pour la queue d'indexation, création d'un groupe de workers de job spécifiques pour l'indexation `indexQueue` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
 - Refonte d'un script de reindexation partielle avec interruption du service `npm run reindex-partial-in-place` avec une demande de confirmation dans la console [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
 - Création d'un nouveau script pour vider de force une queue par son nom `npm run queue:obliterate` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
 - Suppression du script `bin/indexElasticSearch.ts` au profit des scripts `reindex*.ts` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).

@@ -118,6 +118,15 @@ export function getFirstTransporterSync(bsda: {
   return firstTransporter ?? null;
 }
 
+export function getLastTransporterSync(bsda: {
+  transporters: BsdaTransporter[] | null;
+}): BsdaTransporter | null {
+  const transporters = getTransportersSync(bsda);
+  const greatestNumber = Math.max(...transporters.map(t => t.number));
+  const lastTransporter = transporters.find(t => t.number === greatestNumber);
+  return lastTransporter ?? null;
+}
+
 export function getNthTransporterSync(
   bsda: BsdaWithTransporters,
   n: number

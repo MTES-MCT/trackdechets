@@ -348,6 +348,21 @@ model AnonymousCompany {
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
 
+// Notifications auxquelles un utilisateur peut s'abonner pour 
+// un établissement donné
+enum UserNotification {
+  // Notification de demande de rattachement
+  MEMBERSHIP_REQUEST
+  // Notification de renouvellement du code signature
+  SIGNATURE_CODE_RENEWAL
+  // Notifications en cas de refus total ou partiel d'un BSD
+  BSD_REFUSAL
+  // Notification lors de la modification de la destination finale amiante
+  BSDA_FINAL_DESTINATION_UPDATE
+  // Notification lors d'une demande de révision
+  REVISION_REQUEST
+}
+
 model CompanyAssociation {
   id                    String    @id @default(cuid()) @db.VarChar(30)
   role                  UserRole
@@ -358,6 +373,9 @@ model CompanyAssociation {
   createdAt             DateTime? @default(now())
   // Tell apart automatically accepted invitations from others
   automaticallyAccepted Boolean   @default(false)
+
+  // Abonnements aux notifications
+  notifications UserNotification[]
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
@@ -1069,6 +1087,26 @@ model Bsvhu {
   ecoOrganismeName  String?
   ecoOrganismeSiret String?
 
+  brokerCompanyName            String?
+  brokerCompanySiret           String?
+  brokerCompanyAddress         String?
+  brokerCompanyContact         String?
+  brokerCompanyPhone           String?
+  brokerCompanyMail            String?
+  brokerRecepisseNumber        String?
+  brokerRecepisseDepartment    String?
+  brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
+  traderCompanyName            String?
+  traderCompanySiret           String?
+  traderCompanyAddress         String?
+  traderCompanyContact         String?
+  traderCompanyPhone           String?
+  traderCompanyMail            String?
+  traderRecepisseNumber        String?
+  traderRecepisseDepartment    String?
+  traderRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
   intermediaries IntermediaryBsvhuAssociation[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
@@ -1081,6 +1119,8 @@ model Bsvhu {
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterCompanyVatNumberIdx")
   @@index([ecoOrganismeSiret], map: "_BsvhuEcoOrganismeSiretIdx")
+  @@index([brokerCompanySiret], map: "_BsvhuBrokerCompanySiretIdx")
+  @@index([traderCompanySiret], map: "_BsvhuTraderCompanySiretIdx")
   @@index([intermediariesOrgIds], map: "_BsvhuIntermediariesOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")

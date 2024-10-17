@@ -1,18 +1,16 @@
-import { nextBuildSirenify } from "../../../companies/sirenify";
-import { CompanyInput } from "../../../generated/graphql/types";
-import { getSealedFields } from "./rules";
-import { ParsedZodBsff, ParsedZodBsffTransporter } from "./schema";
 import {
-  BsffValidationContext,
-  ZodBsffTransformer,
-  ZodBsffTransporterTransformer
-} from "./types";
+  nextBuildSirenify,
+  NextCompanyInputAccessor
+} from "../../../companies/sirenify";
+import { CompanyInput } from "../../../generated/graphql/types";
+import { ParsedZodBsff, ParsedZodBsffTransporter } from "./schema";
+import { ZodBsffTransporterTransformer } from "./types";
 
 const sirenifyBsffAccessors = (
   bsff: ParsedZodBsff,
   // Tranformations should not be run on sealed fields
   sealedFields: string[]
-) => [
+): NextCompanyInputAccessor<ParsedZodBsff>[] => [
   {
     siret: bsff?.emitterCompanySiret,
     skip: sealedFields.includes("emitterCompanySiret"),
@@ -41,17 +39,9 @@ const sirenifyBsffAccessors = (
   }))
 ];
 
-export const sirenifyBsff: (
-  context: BsffValidationContext
-) => ZodBsffTransformer = context => {
-  return async bsff => {
-    const sealedFields = await getSealedFields(bsff, context);
-    return nextBuildSirenify<ParsedZodBsff>(sirenifyBsffAccessors)(
-      bsff,
-      sealedFields
-    );
-  };
-};
+export const sirenifyBsff = nextBuildSirenify<ParsedZodBsff>(
+  sirenifyBsffAccessors
+);
 
 const sirenifyBsffTransporterAccessors = (
   bsffTransporter: ParsedZodBsffTransporter

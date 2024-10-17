@@ -1,11 +1,6 @@
 import { prisma } from "@td/prisma";
-
 import { sendMail } from "../../../mailer/mailing";
-
-import {
-  convertUrls,
-  getCompanyOrCompanyNotFound
-} from "../../../companies/database";
+import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import {
   CompanyPrivate,
   MutationInviteUserToCompanyArgs
@@ -15,6 +10,7 @@ import { associateUserToCompany, createUserAccountHash } from "../../database";
 
 import { inviteUserToJoin, notifyUserOfInvite, renderMail } from "@td/mail";
 import { User } from "@prisma/client";
+import { toGqlCompanyPrivate } from "../../../companies/converters";
 
 export async function inviteUserToCompanyFn(
   user: User,
@@ -68,5 +64,5 @@ export async function inviteUserToCompanyFn(
     await sendMail(mail);
   }
 
-  return convertUrls(company);
+  return toGqlCompanyPrivate(company);
 }

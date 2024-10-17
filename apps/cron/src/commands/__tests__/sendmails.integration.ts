@@ -1,9 +1,11 @@
 import axios from "axios";
 import { resetDatabase } from "libs/back/tests-integration";
-import { CompanyType, MembershipRequestStatus } from "@prisma/client";
-import { addToMailQueue } from "back";
+import {
+  CompanyType,
+  MembershipRequestStatus,
+  UserNotification
+} from "@prisma/client";
 import { prisma } from "@td/prisma";
-
 import {
   companyFactory,
   createMembershipRequest,
@@ -16,18 +18,12 @@ import { bsdaFactory } from "back/src/bsda/__tests__/factories";
 import {
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
-  sendPendingMembershipRequestToAdminDetailsEmail,
-  sendPendingRevisionRequestToAdminDetailsEmail,
+  sendPendingMembershipRequestEmail,
+  sendPendingRevisionRequestEmail,
   sendSecondOnboardingEmail
 } from "../onboarding.helpers";
 import { xDaysAgo } from "../helpers";
-// Intercept calls
-// Simulate queue error in order to test with sendMailSync
-jest.mock("back");
-(addToMailQueue as jest.Mock).mockRejectedValue(
-  new Error("any queue error to bypass job queue and sendmail synchronously")
-);
-// Integration tests EMAIL_BACKEND is supposed to use axios.
+
 jest.mock("axios");
 
 const TODAY = new Date();
@@ -40,7 +36,6 @@ describe("sendSecondOnboardingEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
     (axios.post as jest.Mock).mockClear();
-    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it.each([ONE_DAY_AGO, TWO_DAYS_AGO, FOUR_DAYS_AGO])(
@@ -80,7 +75,7 @@ describe("sendSecondOnboardingEmail", () => {
         })
       );
 
-      await sendSecondOnboardingEmail(3);
+      await sendSecondOnboardingEmail(3, true);
 
       expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
     }
@@ -107,7 +102,7 @@ describe("sendSecondOnboardingEmail", () => {
       })
     );
 
-    await sendSecondOnboardingEmail(3);
+    await sendSecondOnboardingEmail(3, true);
 
     expect(axios.post as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(axios.post as jest.Mock).toHaveBeenCalledWith(
@@ -159,7 +154,7 @@ describe("sendSecondOnboardingEmail", () => {
       })
     );
 
-    await sendSecondOnboardingEmail(3);
+    await sendSecondOnboardingEmail(3, true);
 
     expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
     expect(axios.post as jest.Mock).toHaveBeenCalledWith(
@@ -195,7 +190,6 @@ describe("sendMembershipRequestDetailsEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
     (axios.post as jest.Mock).mockClear();
-    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it("no membership request > should not send any mail", async () => {
@@ -205,7 +199,7 @@ describe("sendMembershipRequestDetailsEmail", () => {
       })
     );
 
-    await sendMembershipRequestDetailsEmail(3);
+    await sendMembershipRequestDetailsEmail(3, true);
 
     expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
   });
@@ -220,7 +214,7 @@ describe("sendMembershipRequestDetailsEmail", () => {
       })
     );
 
-    await sendMembershipRequestDetailsEmail(3);
+    await sendMembershipRequestDetailsEmail(3, true);
 
     expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
     expect(axios.post as jest.Mock).toHaveBeenCalledWith(
@@ -255,7 +249,6 @@ describe("sendPendingMembershipRequestDetailsEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
     (axios.post as jest.Mock).mockClear();
-    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it("no pending membership request > should not send any mail", async () => {
@@ -265,7 +258,7 @@ describe("sendPendingMembershipRequestDetailsEmail", () => {
       })
     );
 
-    await sendPendingMembershipRequestDetailsEmail(3);
+    await sendPendingMembershipRequestDetailsEmail(3, true);
 
     expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
   });
@@ -286,7 +279,7 @@ describe("sendPendingMembershipRequestDetailsEmail", () => {
       })
     );
 
-    await sendPendingMembershipRequestDetailsEmail(3);
+    await sendPendingMembershipRequestDetailsEmail(3, true);
 
     expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
     expect(axios.post as jest.Mock).toHaveBeenCalledWith(
@@ -321,7 +314,6 @@ describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
     (axios.post as jest.Mock).mockClear();
-    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it("no pending membership request > should not send any mail", async () => {
@@ -331,15 +323,20 @@ describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
       })
     );
 
-    await sendPendingMembershipRequestToAdminDetailsEmail(3);
+    await sendPendingMembershipRequestEmail(3, true);
 
     expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
   });
 
-  it("pending membership > should send a mail to admin", async () => {
+  it("pending membership > should send a mail to subscriber", async () => {
     const user = await userFactory();
 
-    const companyAndAdmin = await userWithCompanyFactory("ADMIN");
+    const companyAndAdmin = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.MEMBERSHIP_REQUEST] }
+    );
 
     await createMembershipRequest(user, companyAndAdmin.company, {
       createdAt: THREE_DAYS_AGO,
@@ -352,7 +349,7 @@ describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
       })
     );
 
-    await sendPendingMembershipRequestToAdminDetailsEmail(3);
+    await sendPendingMembershipRequestEmail(3, true);
 
     expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
     expect(axios.post as jest.Mock).toHaveBeenCalledWith(
@@ -391,7 +388,6 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
     (axios.post as jest.Mock).mockClear();
-    (addToMailQueue as jest.Mock).mockClear();
   });
 
   it("no request > should not send anything", async () => {
@@ -403,7 +399,7 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
     );
 
     // When
-    await sendPendingRevisionRequestToAdminDetailsEmail(5);
+    await sendPendingRevisionRequestEmail(5, true);
 
     // Then
     expect(axios.post as jest.Mock).toHaveBeenCalledTimes(0);
@@ -413,7 +409,12 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
     // Given
 
     // BSDD
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
+    );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -434,7 +435,10 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
     });
 
     const { user: user2, company: company2 } = await userWithCompanyFactory(
-      "ADMIN"
+      "ADMIN",
+      {},
+      {},
+      { notifications: [UserNotification.REVISION_REQUEST] }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -465,7 +469,7 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
     );
 
     // When
-    await sendPendingRevisionRequestToAdminDetailsEmail(2);
+    await sendPendingRevisionRequestEmail(2, true);
 
     // Then
     expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);

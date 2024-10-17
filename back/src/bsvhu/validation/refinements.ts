@@ -13,13 +13,16 @@ import { capitalize } from "../../common/strings";
 import { BsdType, WasteAcceptationStatus } from "@prisma/client";
 import {
   destinationOperationModeRefinement,
+  isBrokerRefinement,
   isDestinationRefinement,
   isEcoOrganismeRefinement,
   isEmitterNotDormantRefinement,
   isRegisteredVatNumberRefinement,
+  isTraderRefinement,
   isTransporterRefinement
 } from "../../common/validation/zod/refinement";
 import { EditionRule } from "./rules";
+import { CompanyRole } from "../../common/validation/zod/schema";
 
 // Date de la MAJ 2024.07.2 introduisant un changement
 // des règles de validations sur les poids et volume qui doivent
@@ -38,7 +41,13 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
   await isDestinationRefinement(
     bsvhu.destinationCompanySiret,
     zodContext,
-    "WASTE_VEHICLES"
+    bsvhu.destinationType ?? "WASTE_VEHICLES"
+  );
+  await isDestinationRefinement(
+    bsvhu.destinationOperationNextDestinationCompanySiret,
+    zodContext,
+    "BROYEUR",
+    CompanyRole.DestinationOperationNextDestination
   );
   await isTransporterRefinement(
     {
@@ -57,6 +66,8 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
     BsdType.BSVHU,
     zodContext
   );
+  await isBrokerRefinement(bsvhu.brokerCompanySiret, zodContext);
+  await isTraderRefinement(bsvhu.traderCompanySiret, zodContext);
 };
 
 export const checkWeights: Refinement<ParsedZodBsvhu> = (

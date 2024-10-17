@@ -24,6 +24,7 @@ import { TOAST_DURATION } from "../../../common/config";
 
 import "./companyMembers.scss";
 import { CompanyPrivateMembers } from "./CompanyMembers";
+import { userRoleLabel } from "../common/utils";
 
 interface CompanyMembersListProps {
   company: CompanyPrivateMembers;
@@ -34,19 +35,6 @@ const deleteModal = createModal({
   id: "user-delete-modal",
   isOpenedByDefault: false
 });
-
-const userRoleLabel = role => {
-  switch (role) {
-    case UserRole.Admin:
-      return "Administrateur";
-    case UserRole.Member:
-      return "Collaborateur";
-    case UserRole.Driver:
-      return "Chauffeur";
-    case UserRole.Reader:
-      return "Lecteur";
-  }
-};
 
 export const userRoleSwitchOptions = () => {
   return Object.keys(UserRole).map(role => (
@@ -196,7 +184,7 @@ const CompanyMembersList = ({
     <div className="company-members__list">
       {company && company.users && company.users.length > 0 && (
         <>
-          <h4 className="fr-h4">Gérer les membres</h4>
+          <h3 className="fr-h4">Gérer les membres</h3>
           <div className={`fr-container--fluid`}>
             <div
               className={`fr-grid-row fr-grid-row--gutters fr-grid-row--bottom`}

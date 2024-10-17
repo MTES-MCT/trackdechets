@@ -1,4 +1,10 @@
-import { Bsff, BsffStatus, BsdType, BsffTransporter } from "@prisma/client";
+import {
+  Bsff,
+  BsffStatus,
+  BsdType,
+  BsffTransporter,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -15,10 +21,13 @@ import {
 import { prisma } from "@td/prisma";
 import {
   getFirstTransporterSync,
+  getLastTransporterSync,
   getNextTransporterSync,
   getTransportersSync
 } from "./database";
 import { getBsffSubType } from "../common/subTypes";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export type BsffForElastic = Bsff &
   BsffWithPackagings &
@@ -297,6 +306,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     ...tabs,
     isInRevisionFor: [] as string[],
     isRevisedFor: [] as string[],
+    ...getBsffReturnOrgIds(bsff),
     sirets: Object.values(tabs).flat(),
     ...getRegistryFields(bsff),
     rawBsd: bsff,
@@ -327,4 +337,40 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
 
 export async function indexBsff(bsff: BsffForElastic, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsff), ctx);
+}
+
+/**
+ * BSFF belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - at least one packaging hasn't been fully accepted
+ */
+export const belongsToIsReturnForTab = (bsff: BsffForElastic) => {
+  const hasBeenReceivedLately =
+    isDefined(bsff.destinationReceptionDate) &&
+    bsff.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted =
+    bsff.status === BsffStatus.REFUSED ||
+    bsff.packagings.some(
+      packaging =>
+        packaging.acceptationStatus !== WasteAcceptationStatus.ACCEPTED
+    );
+
+  return hasNotBeenFullyAccepted;
+};
+
+function getBsffReturnOrgIds(bsff: BsffForElastic): { isReturnFor: string[] } {
+  // Return tab
+  if (belongsToIsReturnForTab(bsff)) {
+    const transporters = bsff?.transporters ?? [];
+    const lastTransporter = getLastTransporterSync({ transporters });
+
+    return {
+      isReturnFor: [lastTransporter?.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
 }

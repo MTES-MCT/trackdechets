@@ -78,6 +78,10 @@ sur l'état précis du bordereau.`;
 export const blankstate_reviews_title = "Il n'y a aucun bordereau en révision";
 export const blankstate_reviews_desc =
   "Vous n'avez aucune révision en attente.";
+export const blankstate_return_title =
+  'Aucun bordereau dans le dossier "Retours"';
+export const blankstate_return_desc =
+  "Les bordereaux refusés, retournés à vide (ADR) ou liés à un nettoyage citerne, sont affichés dans ce dossier durant 24h après la réception,  afin de permettre de disposer du bordereau en cas de contrôle lors du retour. Si un BSD est absent vérifiez qu'il est bien complété.";
 export const blankstate_default_title = "Il n'y a aucun bordereau";
 export const blankstate_default_desc =
   "Si vous le souhaitez, vous pouvez créer un bordereau depuis le menu de création ci-dessus";
@@ -191,6 +195,7 @@ export const COLLECTED = "Collectés";
 export const REGISTER = "Registre";
 export const TO_REVIEW = "En cours";
 export const REVIEWED = "Révisés";
+export const RETURN = "Retours";
 
 // Reviews
 export const GERER_REVISION = "Gérer la révision";

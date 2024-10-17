@@ -115,7 +115,7 @@ describe("Query.Bsvhu", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(21);
+    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(24);
   });
 
   it("should return TRANSPORTER signed bsvhu sealed fields", async () => {
@@ -139,7 +139,7 @@ describe("Query.Bsvhu", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(34);
+    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(37);
   });
 
   it("should return OPERATION signed bsvhu sealed fields", async () => {
@@ -161,6 +161,6 @@ describe("Query.Bsvhu", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(60);
+    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(78);
   });
 });

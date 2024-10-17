@@ -1,6 +1,10 @@
 import { RefinementCtx, z } from "zod";
 import {
+  isBroker,
+  isBroyeur,
   isCollector,
+  isDemolisseur,
+  isTrader,
   isTransporter,
   isWasteCenter,
   isWasteProcessor,
@@ -124,59 +128,75 @@ export const isRegisteredVatNumberRefinement = async (
 export async function isDestinationRefinement(
   siret: string | null | undefined,
   ctx: RefinementCtx,
-  role: "DESTINATION" | "WASTE_VEHICLES" = "DESTINATION",
+  role:
+    | "DESTINATION"
+    | "WASTE_VEHICLES"
+    | "BROYEUR"
+    | "DEMOLISSEUR" = "DESTINATION",
+  bsdCompanyRole: CompanyRole = CompanyRole.Destination,
   isExemptedFromVerification?: (destination: Company | null) => boolean
 ) {
-  const company = await refineSiretAndGetCompany(
-    siret,
-    ctx,
-    CompanyRole.Destination
-  );
-
-  if (company && role === "WASTE_VEHICLES" && !isWasteVehicles(company)) {
-    return ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Destination),
-      message:
-        `L'installation de destination avec le SIRET "${siret}" n'est pas inscrite` +
-        ` sur Trackdéchets en tant qu'installation de traitement de VHU. Cette installation ne peut` +
-        ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
-        ` modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
-    });
-  } else if (
-    company &&
-    !isCollector(company) &&
-    !isWasteProcessor(company) &&
-    !isWasteCenter(company) &&
-    !isWasteVehicles(company)
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Destination),
-      message:
-        `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
-        ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
-        ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
-        ` modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
-    });
-  }
-
-  if (
-    company &&
-    VERIFY_COMPANY === "true" &&
-    company.verificationStatus !== CompanyVerificationStatus.VERIFIED
-  ) {
-    if (isExemptedFromVerification && isExemptedFromVerification(company)) {
-      return true;
+  const company = await refineSiretAndGetCompany(siret, ctx, bsdCompanyRole);
+  if (company) {
+    if (
+      role === "WASTE_VEHICLES" ||
+      role === "BROYEUR" ||
+      role === "DEMOLISSEUR"
+    ) {
+      if (!isWasteVehicles(company)) {
+        return ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: pathFromCompanyRole(bsdCompanyRole),
+          message: `Cet établissement n'a pas le profil Installation de traitement de VHU.`
+        });
+      }
+      if (role === "BROYEUR" && !isBroyeur(company)) {
+        return ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: pathFromCompanyRole(bsdCompanyRole),
+          message: `Cet établissement n'a pas le sous-profil Broyeur.`
+        });
+      }
+      if (role === "DEMOLISSEUR" && !isDemolisseur(company)) {
+        return ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: pathFromCompanyRole(bsdCompanyRole),
+          message: `Cet établissement n'a pas le sous-profil Casse automobile / démolisseur.`
+        });
+      }
+    } else if (
+      !isCollector(company) &&
+      !isWasteProcessor(company) &&
+      !isWasteCenter(company) &&
+      !isWasteVehicles(company)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole(bsdCompanyRole),
+        message:
+          `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
+          ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
+          ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
+          ` modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
+      });
     }
 
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Destination),
-      message:
-        `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
-        ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
-    });
+    if (
+      VERIFY_COMPANY === "true" &&
+      company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+    ) {
+      if (isExemptedFromVerification && isExemptedFromVerification(company)) {
+        return true;
+      }
+
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole(bsdCompanyRole),
+        message:
+          `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
+          ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
+      });
+    }
   }
 }
 
@@ -249,5 +269,43 @@ export async function isEcoOrganismeRefinement(
         message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSVHU`
       });
     }
+  }
+}
+
+export async function isBrokerRefinement(
+  siret: string | null | undefined,
+  ctx: RefinementCtx
+) {
+  const company = await refineSiretAndGetCompany(
+    siret,
+    ctx,
+    CompanyRole.Broker
+  );
+
+  if (company && !isBroker(company)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Broker),
+      message: `Cet établissement n'a pas le profil Courtier.`
+    });
+  }
+}
+
+export async function isTraderRefinement(
+  siret: string | null | undefined,
+  ctx: RefinementCtx
+) {
+  const company = await refineSiretAndGetCompany(
+    siret,
+    ctx,
+    CompanyRole.Trader
+  );
+
+  if (company && !isTrader(company)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: pathFromCompanyRole(CompanyRole.Trader),
+      message: `Cet établissement n'a pas le profil Négociant.`
+    });
   }
 }

@@ -2,8 +2,16 @@ import { backend, Mail, Contact } from "@td/mail";
 import { addToMailQueue } from "../queue/producers/mail";
 import { logger } from "@td/logger";
 
+type SendMailOpts = {
+  sync: boolean;
+};
+
 // push job to the job queue for the api server not to execute the sendMail itself
-export async function sendMail(mail: Mail): Promise<void> {
+export async function sendMail(mail: Mail, opts?: SendMailOpts): Promise<void> {
+  if (opts?.sync) {
+    await sendMailSync(mail);
+    return;
+  }
   try {
     await addToMailQueue(mail);
   } catch (err) {

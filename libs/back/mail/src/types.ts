@@ -20,6 +20,8 @@ export type Mail = {
   attachment?: Attachment;
   templateId: number;
   vars?: { [id: string]: any };
+  // paramètres transactionnels Brevo
+  params?: { [id: string]: any };
 } & (
   | // 'to' or 'messageVersions' are mandatory (one or the other)
   { messageVersions: MessageVersion[]; to?: never }

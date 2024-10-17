@@ -1,4 +1,10 @@
-import { BsdasriStatus, Bsdasri, BsdasriType, BsdType } from "@prisma/client";
+import {
+  BsdasriStatus,
+  Bsdasri,
+  BsdasriType,
+  BsdType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -15,6 +21,8 @@ import {
 import { prisma } from "@td/prisma";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
 import { getBsdasriSubType } from "../common/subTypes";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &
@@ -223,6 +231,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     ...where,
 
     ...getBsdasriRevisionOrgIds(bsdasri),
+    ...getBsdasriReturnOrgIds(bsdasri),
     revisionRequests: bsdasri.bsdasriRevisionRequests,
 
     sirets: Object.values(where).flat(),
@@ -259,4 +268,35 @@ export function getBsdasriRevisionOrgIds(
   bsdasri: BsdasriForElastic
 ): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
   return getRevisionOrgIds(bsdasri.bsdasriRevisionRequests);
+}
+
+/**
+ * BSDASRI belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste hasn't been fully accepted at reception
+ */
+export const belongsToIsReturnForTab = (bsdasri: Bsdasri) => {
+  const hasBeenReceivedLately =
+    isDefined(bsdasri.destinationReceptionDate) &&
+    bsdasri.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted =
+    bsdasri.status === BsdasriStatus.REFUSED ||
+    bsdasri.destinationReceptionAcceptationStatus !==
+      WasteAcceptationStatus.ACCEPTED;
+
+  return hasNotBeenFullyAccepted;
+};
+
+function getBsdasriReturnOrgIds(bsdasri: Bsdasri): { isReturnFor: string[] } {
+  // Return tab
+  if (belongsToIsReturnForTab(bsdasri)) {
+    return {
+      isReturnFor: [bsdasri.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
 }

@@ -5,7 +5,7 @@ import { UserRole } from "@prisma/client";
 export function createCompanyDataLoaders() {
   return {
     installations: new DataLoader((sirets: string[]) =>
-      genInstallations(sirets)
+      getInstallations(sirets)
     ),
     companiesAdmin: new DataLoader((companyIds: string[]) =>
       getCompaniesAdmin(companyIds)
@@ -13,7 +13,7 @@ export function createCompanyDataLoaders() {
   };
 }
 
-async function genInstallations(sirets: string[]) {
+async function getInstallations(sirets: string[]) {
   const installations = await prisma.installation.findMany({
     where: {
       OR: [
