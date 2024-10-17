@@ -81,7 +81,7 @@ const DestinationBsvhu = ({ errors }) => {
           setError
         );
       }
-      if (!destination?.company?.agrementNumber) {
+      if (!destination?.agrementNumber) {
         setFieldError(
           errors,
           `${actor}.agrementNumber`,
@@ -102,7 +102,7 @@ const DestinationBsvhu = ({ errors }) => {
     destination?.company?.phone,
     destination?.company?.mail,
     destination?.company?.vatNumber,
-    destination?.company?.agrementNumber
+    destination?.agrementNumber
   ]);
 
   const updateAgrementNumber = (destination, type?) => {
