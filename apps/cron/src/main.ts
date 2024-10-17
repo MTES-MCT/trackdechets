@@ -10,7 +10,7 @@ import {
 } from "./commands/onboarding.helpers";
 import { cleanAppendix1 } from "./commands/appendix1.helpers";
 
-const { CRON_ONBOARDING_SCHEDULE, CRON_CLEANUP_ISRETURNTAB_SCHEDULE, TZ } =
+const { CRON_ONBOARDING_SCHEDULE, CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE, TZ } =
   process.env;
 
 let jobs: cron.CronJob[] = [
@@ -71,14 +71,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
   ];
 }
 
-if (CRON_CLEANUP_ISRETURNTAB_SCHEDULE) {
-  validateDailyCronSchedule(CRON_CLEANUP_ISRETURNTAB_SCHEDULE);
+if (CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE) {
+  validateDailyCronSchedule(CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE);
 
   jobs = [
     ...jobs,
     // cleanup the isReturnFor tab
     new cron.CronJob({
-      cronTime: CRON_CLEANUP_ISRETURNTAB_SCHEDULE,
+      cronTime: CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE,
       onTick: async () => {
         await cleanUpIsReturnForTab();
       },

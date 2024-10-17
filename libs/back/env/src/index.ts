@@ -38,7 +38,7 @@ export const schema = z.object({
   MAX_REQUESTS_PER_WINDOW: z.string().optional().default("1000"),
   TRUST_PROXY_HOPS: z.string().optional().default("1").refine(isNumber),
   CRON_ONBOARDING_SCHEDULE: z.string().optional(),
-  CRON_CLEANUP_ISRETURNTAB_SCHEDULE: z.string().optional(),
+  CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE: z.string().optional(),
   FORCE_LOGGER_CONSOLE: z
     .string()
     .optional()
