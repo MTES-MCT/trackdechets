@@ -62,7 +62,7 @@ export async function checkCanRevoke(
     throw new ForbiddenError("Cette délégation a été annulée.");
   }
 
-  const companyAssociations = await prisma.companyAssociation.findMany({
+  const companyAssociation = await prisma.companyAssociation.findFirst({
     where: {
       userId: user.id,
       companyId: delegation.delegatorId
@@ -72,16 +72,14 @@ export async function checkCanRevoke(
     }
   });
 
-  if (!companyAssociations?.length) {
+  if (!companyAssociation) {
     throw new ForbiddenError(
       "Vous devez faire partie de l'entreprise délégante d'une délégation pour pouvoir la révoquer."
     );
   }
 
   if (
-    !companyAssociations.some(association =>
-      can(association.role, Permission.CompanyCanManageRegistryDelegation)
-    )
+    !can(companyAssociation.role, Permission.CompanyCanManageRegistryDelegation)
   ) {
     throw new ForbiddenError(
       "Vous n'avez pas les permissions suffisantes pour pouvoir révoquer une délégation."
@@ -101,7 +99,7 @@ export async function checkCanCancel(
     throw new ForbiddenError("Cette délégation a été révoquée.");
   }
 
-  const companyAssociations = await prisma.companyAssociation.findMany({
+  const companyAssociation = await prisma.companyAssociation.findFirst({
     where: {
       userId: user.id,
       companyId: delegation.delegateId
@@ -111,16 +109,14 @@ export async function checkCanCancel(
     }
   });
 
-  if (!companyAssociations?.length) {
+  if (!companyAssociation) {
     throw new ForbiddenError(
       "Vous devez faire partie de l'entreprise délégataire d'une délégation pour pouvoir l'annuler."
     );
   }
 
   if (
-    !companyAssociations.some(association =>
-      can(association.role, Permission.CompanyCanManageRegistryDelegation)
-    )
+    !can(companyAssociation.role, Permission.CompanyCanManageRegistryDelegation)
   ) {
     throw new ForbiddenError(
       "Vous n'avez pas les permissions suffisantes pour pouvoir annuler une délégation."
