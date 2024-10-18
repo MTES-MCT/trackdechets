@@ -313,7 +313,7 @@ model Company {
   webhookSettingsLimit            Int                      @default(1)
 
   delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
-  delegateRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegate")
+  delegateRegistryDelegations  RegistryDelegation[] @relation("RegistryDelegationDelegate")
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -348,21 +348,6 @@ model AnonymousCompany {
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
 
-// Notifications auxquelles un utilisateur peut s'abonner pour 
-// un établissement donné
-enum UserNotification {
-  // Notification de demande de rattachement
-  MEMBERSHIP_REQUEST
-  // Notification de renouvellement du code signature
-  SIGNATURE_CODE_RENEWAL
-  // Notifications en cas de refus total ou partiel d'un BSD
-  BSD_REFUSAL
-  // Notification lors de la modification de la destination finale amiante
-  BSDA_FINAL_DESTINATION_UPDATE
-  // Notification lors d'une demande de révision
-  REVISION_REQUEST
-}
-
 model CompanyAssociation {
   id                    String    @id @default(cuid()) @db.VarChar(30)
   role                  UserRole
@@ -374,8 +359,12 @@ model CompanyAssociation {
   // Tell apart automatically accepted invitations from others
   automaticallyAccepted Boolean   @default(false)
 
-  // Abonnements aux notifications
-  notifications UserNotification[]
+  // Abonnements de l'utilisateur aux notifications pour cet établissement
+  notificationIsActiveMembershipRequest          Boolean @default(false)
+  notificationIsActiveSignatureCodeRenewal       Boolean @default(false)
+  notificationIsActiveBsdaFinalDestinationUpdate Boolean @default(false)
+  notificationIsActiveBsdRefusal                 Boolean @default(false)
+  notificationIsActiveRevisionRequest            Boolean @default(false)
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
@@ -1135,12 +1124,12 @@ model RegistryDelegation {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   // Entreprise délégataire
-  delegateId String @db.VarChar(30)
-  delegate Company  @relation("RegistryDelegationDelegate", fields: [delegateId], references: [id])
+  delegateId String  @db.VarChar(30)
+  delegate   Company @relation("RegistryDelegationDelegate", fields: [delegateId], references: [id])
 
   // Entreprise délégante
-  delegatorId String @db.VarChar(30)
-  delegator Company  @relation("RegistryDelegationDelegator", fields: [delegatorId], references: [id])
+  delegatorId String  @db.VarChar(30)
+  delegator   Company @relation("RegistryDelegationDelegator", fields: [delegatorId], references: [id])
 
   // Dates de validité
   startDate DateTime  @db.Timestamptz(6)

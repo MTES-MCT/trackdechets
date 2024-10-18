@@ -14,8 +14,10 @@ import {
 } from "@td/mail";
 import { getEmailDomain, canSeeEmail } from "../../utils";
 import { UserInputError } from "../../../common/errors";
-import { getNotificationSubscribers } from "../../notifications";
-import { UserNotification } from "@prisma/client";
+import {
+  getNotificationSubscribers,
+  UserNotification
+} from "../../notifications";
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] =
   async (parent, { siret }, context) => {

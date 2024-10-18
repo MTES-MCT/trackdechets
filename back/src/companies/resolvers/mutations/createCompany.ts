@@ -4,6 +4,7 @@ import {
   CompanyVerificationMode,
   CompanyVerificationStatus,
   Prisma,
+  UserRole,
   WasteProcessorType,
   WasteVehiclesType
 } from "@prisma/client";
@@ -33,7 +34,7 @@ import { isGenericEmail } from "@td/constants";
 import { parseCompanyAsync } from "../../validation/index";
 import { companyInputToZodCompany } from "../../validation/helpers";
 import { toGqlCompanyPrivate } from "../../converters";
-import { ALL_NOTIFICATIONS } from "../../../users/notifications";
+import { getDefaultNotifications } from "../../../users/notifications";
 /**
  * Create a new company and associate it to a user
  * who becomes the first admin of the company
@@ -179,14 +180,15 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     companyCreateInput.verifiedAt = new Date();
   }
 
+  const notifications = getDefaultNotifications(UserRole.ADMIN);
   const companyAssociation = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: user.id } },
       company: {
         create: companyCreateInput
       },
-      role: "ADMIN",
-      notifications: ALL_NOTIFICATIONS
+      role: UserRole.ADMIN,
+      ...notifications
     },
     include: { company: true }
   });

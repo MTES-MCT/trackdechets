@@ -2,59 +2,83 @@ import React from "react";
 import {
   CompanyPrivate,
   Mutation,
-  MutationSetCompanyNotificationsArgs,
-  UserNotification
+  MutationSubscribeToCompanyNotificationsArgs,
+  UserNotifications,
+  UserRole
 } from "@td/codegen-ui";
 import { useForm } from "react-hook-form";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
-import { SET_COMPANY_NOTIFICATIONS } from "./queries";
+import { SUBSCRIBE_TO_COMPANY_NOTIFICATIONS } from "./queries";
 import styles from "./NotificationsUpdateModal.module.scss";
-import {
-  ALL_NOTIFICATIONS,
-  authorizedNotifications as authorizedNotificationsByUserRole
-} from "../../../common/notifications";
 
 type AccountCompanyNotificationsUpdateModalProps = {
   company: CompanyPrivate;
   close: () => void;
 };
 
-type FormValues = { [key in UserNotification]: boolean };
+type OptionLabel = {
+  hintText: string;
+  label: string;
+  notification: keyof UserNotifications;
+};
+
+// if you modify this structure, please modify
+// in back/src/users/notifications
+export const authorizedNotificationsByUserRole: {
+  [key in UserRole]: (keyof UserNotifications)[];
+} = {
+  [UserRole.Admin]: [
+    "membershipRequest",
+    "revisionRequest",
+    "bsdRefusal",
+    "signatureCodeRenewal",
+    "bsdaFinalDestinationUpdate"
+  ],
+  [UserRole.Member]: [
+    "revisionRequest",
+    "bsdRefusal",
+    "signatureCodeRenewal",
+    "bsdaFinalDestinationUpdate"
+  ],
+  [UserRole.Reader]: [
+    "revisionRequest",
+    "bsdRefusal",
+    "signatureCodeRenewal",
+    "bsdaFinalDestinationUpdate"
+  ],
+  [UserRole.Driver]: [
+    "bsdRefusal",
+    "signatureCodeRenewal",
+    "bsdaFinalDestinationUpdate"
+  ]
+};
 
 export default function NotificationsUpdateModal({
   company,
   close
 }: AccountCompanyNotificationsUpdateModalProps) {
-  const [setCompanyNotifications, { loading, data, error }] = useMutation<
-    Pick<Mutation, "setCompanyNotifications">,
-    MutationSetCompanyNotificationsArgs
-  >(SET_COMPANY_NOTIFICATIONS);
-
-  const defaultValues: FormValues = ALL_NOTIFICATIONS.reduce(
-    (values, notification) => ({
-      ...values,
-      [notification]: company.userNotifications.includes(notification)
-    }),
-    {} as FormValues
-  );
+  const [subscribeToCompanyNotifications, { loading, data, error }] =
+    useMutation<
+      Pick<Mutation, "subscribeToCompanyNotifications">,
+      MutationSubscribeToCompanyNotificationsArgs
+    >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS);
 
   const authorizedNotifications = company.userRole
     ? authorizedNotificationsByUserRole[company.userRole]
     : [];
 
-  const { register, handleSubmit } = useForm<FormValues>({
-    defaultValues
+  const { register, handleSubmit } = useForm<UserNotifications>({
+    defaultValues: company.userNotifications
   });
 
-  const onSubmit = async (data: FormValues) => {
-    const notifications = Object.keys(data).filter(k => data[k]);
-    const { errors } = await setCompanyNotifications({
+  const onSubmit = async (data: UserNotifications) => {
+    const { errors } = await subscribeToCompanyNotifications({
       variables: {
         input: {
           companyOrgId: company.orgId,
-          notifications: notifications as UserNotification[]
+          notifications: data
         }
       }
     });
@@ -71,7 +95,7 @@ export default function NotificationsUpdateModal({
     checkboxState = "success";
   }
 
-  const optionsLabels = [
+  const optionsLabels: OptionLabel[] = [
     {
       hintText:
         "Seuls les membres avec le rôle Administrateur sont en mesure de recevoir " +
@@ -79,32 +103,32 @@ export default function NotificationsUpdateModal({
         "Nous vous conseillons donc vivement, pour chaque établissement de conserver au moins un " +
         "administrateur abonné à ce type de notification.",
       label: "aux demandes de rattachement",
-      notification: UserNotification.MembershipRequest
+      notification: "membershipRequest"
     },
     {
       hintText:
         "Un courriel sera envoyé à chaque renouvellement du code de signature",
       label: "au renouvellement du code de signature",
-      notification: UserNotification.SignatureCodeRenewal
+      notification: "signatureCodeRenewal"
     },
     {
       hintText:
         "un courriel sera envoyé à chaque refus total ou partiel d'un bordereau",
       label: "au refus total et partiel des bordereaux",
-      notification: UserNotification.BsdRefusal
+      notification: "bsdRefusal"
     },
     {
       hintText:
         "Un courriel sera envoyé lorsque le BSDA est envoyé à un exutoire" +
         " différent de celui prévu lors de la signature producteur",
       label: "à la modification de la destination finale amiante",
-      notification: UserNotification.BsdaFinalDestinationUpdate
+      notification: "bsdaFinalDestinationUpdate"
     },
     {
       hintText:
         "Un courriel sera envoyé à chaque fois qu'une révision sera restée sans réponse 14 jours après sa demande",
       label: "aux demandes de révision",
-      notification: UserNotification.RevisionRequest
+      notification: "revisionRequest"
     }
   ];
 

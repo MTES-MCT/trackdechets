@@ -5,7 +5,6 @@ import {
   EmptyReturnADR,
   Status,
   TransportMode,
-  UserNotification,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -249,13 +248,13 @@ describe("Test Form reception", () => {
     // should received email
     const emitter2 = await userFactory();
     await associateUserToCompany(emitter2.id, emitterCompany.orgId, "ADMIN", {
-      notifications: [UserNotification.BSD_REFUSAL]
+      notificationIsActiveBsdRefusal: true
     });
 
     // should not receive email
     const emitter3 = await userFactory();
     await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN", {
-      notifications: []
+      notificationIsActiveBsdRefusal: false
     });
 
     // should received email
@@ -265,7 +264,7 @@ describe("Test Form reception", () => {
       recipientCompany.orgId,
       "ADMIN",
       {
-        notifications: [UserNotification.BSD_REFUSAL]
+        notificationIsActiveBsdRefusal: true
       }
     );
 
@@ -335,13 +334,13 @@ describe("Test Form reception", () => {
     // should received email
     const emitter2 = await userFactory();
     await associateUserToCompany(emitter2.id, emitterCompany.orgId, "ADMIN", {
-      notifications: [UserNotification.BSD_REFUSAL]
+      notificationIsActiveBsdRefusal: true
     });
 
     // should not receive email
     const emitter3 = await userFactory();
     await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN", {
-      notifications: []
+      notificationIsActiveBsdRefusal: false
     });
 
     // should received email
@@ -351,7 +350,7 @@ describe("Test Form reception", () => {
       recipientCompany.orgId,
       "ADMIN",
       {
-        notifications: [UserNotification.BSD_REFUSAL]
+        notificationIsActiveBsdRefusal: true
       }
     );
 
@@ -362,7 +361,7 @@ describe("Test Form reception", () => {
       recipientCompany.orgId,
       "ADMIN",
       {
-        notifications: []
+        notificationIsActiveBsdRefusal: false
       }
     );
 

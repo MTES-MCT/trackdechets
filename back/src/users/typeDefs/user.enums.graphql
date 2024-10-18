@@ -27,24 +27,6 @@ enum UserRole {
   ADMIN
 }
 
-"""
-Notifications auxquelles un utilisateur peut s'abonner pour un établissement donné.
-Par défaut les utilisateurs avec le rôle ADMIN sont abonnés à toutes les notifications
-tandis que les autres rôles ne sont abonnés à aucune notification.
-"""
-enum UserNotification {
-  # Notification de demande de rattachement
-  MEMBERSHIP_REQUEST
-  #  Notification de renouvellement du code signature
-  SIGNATURE_CODE_RENEWAL
-  # Notifications en cas de refus total ou partiel d'un BSD
-  BSD_REFUSAL
-  #  Notification lors de la modification de la destination finale amiante
-  BSDA_FINAL_DESTINATION_UPDATE
-  #  Notification lors d'une demande de révision
-  REVISION_REQUEST
-}
-
 enum UserPermission {
   "Lire un BSD."
   BSD_CAN_READ
