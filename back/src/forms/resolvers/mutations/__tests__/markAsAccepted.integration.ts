@@ -5,7 +5,6 @@ import {
   EmptyReturnADR,
   Status,
   TransportMode,
-  UserNotification,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -249,14 +248,12 @@ describe("Test Form reception", () => {
     // should received email
     const emitter2 = await userFactory();
     await associateUserToCompany(emitter2.id, emitterCompany.orgId, "ADMIN", {
-      notifications: [UserNotification.BSD_REFUSAL]
+      notificationIsActiveBsdRefusal: true
     });
 
     // should not receive email
     const emitter3 = await userFactory();
-    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN", {
-      notifications: []
-    });
+    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN");
 
     // should received email
     const recipient2 = await userFactory();
@@ -265,7 +262,7 @@ describe("Test Form reception", () => {
       recipientCompany.orgId,
       "ADMIN",
       {
-        notifications: [UserNotification.BSD_REFUSAL]
+        notificationIsActiveBsdRefusal: true
       }
     );
 
@@ -335,14 +332,12 @@ describe("Test Form reception", () => {
     // should received email
     const emitter2 = await userFactory();
     await associateUserToCompany(emitter2.id, emitterCompany.orgId, "ADMIN", {
-      notifications: [UserNotification.BSD_REFUSAL]
+      notificationIsActiveBsdRefusal: true
     });
 
     // should not receive email
     const emitter3 = await userFactory();
-    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN", {
-      notifications: []
-    });
+    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN");
 
     // should received email
     const recipient2 = await userFactory();
@@ -351,7 +346,7 @@ describe("Test Form reception", () => {
       recipientCompany.orgId,
       "ADMIN",
       {
-        notifications: [UserNotification.BSD_REFUSAL]
+        notificationIsActiveBsdRefusal: true
       }
     );
 
@@ -360,10 +355,7 @@ describe("Test Form reception", () => {
     await associateUserToCompany(
       recipient3.id,
       recipientCompany.orgId,
-      "ADMIN",
-      {
-        notifications: []
-      }
+      "ADMIN"
     );
 
     await prisma.form.update({

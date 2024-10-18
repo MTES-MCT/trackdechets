@@ -10,8 +10,8 @@ import {
   MutationSetCompanyNotificationsArgs
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
-import { UserNotification, UserRole } from "@prisma/client";
-import { ALL_NOTIFICATIONS } from "../../../notifications";
+import { UserRole } from "@prisma/client";
+import { toPrismaNotifications } from "../../../notifications";
 
 export const SET_COMPANY_NOTIFICATIONS = gql`
   mutation SetCompanyNotifications($input: SetCompanyNotificationsInput!) {
@@ -23,14 +23,20 @@ export const SET_COMPANY_NOTIFICATIONS = gql`
   }
 `;
 
+const unactiveNotifications = {
+  notificationIsActiveBsdaFinalDestinationUpdate: false,
+  notificationIsActiveBsdRefusal: false,
+  notificationIsActiveMembershipRequest: false,
+  notificationIsActiveRevisionRequest: false,
+  notificationIsActiveSignatureCodeRenewal: false
+};
+
 describe("Mutation { setCompanyNotifications }", () => {
   test("Users who don't belong to company cannot subscribe to notifications", async () => {
     const user = await userFactory();
     const company = await companyFactory();
 
     const { mutate } = makeClient(user);
-
-    const newNotifications = [UserNotification.MEMBERSHIP_REQUEST];
 
     const { errors } = await mutate<
       Pick<Mutation, "setCompanyNotifications">,
@@ -39,7 +45,7 @@ describe("Mutation { setCompanyNotifications }", () => {
       variables: {
         input: {
           companyOrgId: company.siret!,
-          notifications: newNotifications
+          notifications: { membershipRequest: true }
         }
       }
     });
@@ -51,17 +57,21 @@ describe("Mutation { setCompanyNotifications }", () => {
     ]);
   });
 
-  test.each(ALL_NOTIFICATIONS)(
+  test.each([
+    "membershipRequest",
+    "signatureCodeRenewal",
+    "bsdRefusal",
+    "bsdaFinalDestinationUpdate",
+    "revisionRequest"
+  ])(
     "User with role ADMIN can subscribe to notification %p",
     async notification => {
-      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-
-      const companyAssociation =
-        await prisma.companyAssociation.findFirstOrThrow({
-          where: { companyId: company.id, userId: user.id }
-        });
-
-      expect(companyAssociation.notifications).toEqual(ALL_NOTIFICATIONS);
+      const { user, company } = await userWithCompanyFactory(
+        UserRole.ADMIN,
+        {},
+        {},
+        unactiveNotifications
+      );
 
       const { mutate } = makeClient(user);
 
@@ -74,7 +84,7 @@ describe("Mutation { setCompanyNotifications }", () => {
         variables: {
           input: {
             companyOrgId: company.orgId,
-            notifications: newNotifications
+            notifications: { [notification]: true }
           }
         }
       });
@@ -90,26 +100,27 @@ describe("Mutation { setCompanyNotifications }", () => {
           where: { companyId: company.id, userId: user.id }
         });
 
-      expect(updatedCompanyAssociation.notifications).toEqual(newNotifications);
+      expect(updatedCompanyAssociation).toMatchObject({
+        ...unactiveNotifications,
+        ...toPrismaNotifications({ [notification]: true })
+      });
     }
   );
 
   test.each([
-    UserNotification.REVISION_REQUEST,
-    UserNotification.BSD_REFUSAL,
-    UserNotification.SIGNATURE_CODE_RENEWAL,
-    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+    "signatureCodeRenewal",
+    "bsdRefusal",
+    "bsdaFinalDestinationUpdate",
+    "revisionRequest"
   ])(
     "User with role MEMBER can subscribe to notification %p",
     async notification => {
-      const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
-
-      const companyAssociation =
-        await prisma.companyAssociation.findFirstOrThrow({
-          where: { companyId: company.id, userId: user.id }
-        });
-
-      expect(companyAssociation.notifications).toEqual([]);
+      const { user, company } = await userWithCompanyFactory(
+        UserRole.MEMBER,
+        {},
+        {},
+        unactiveNotifications
+      );
 
       const { mutate } = makeClient(user);
 
@@ -122,7 +133,7 @@ describe("Mutation { setCompanyNotifications }", () => {
         variables: {
           input: {
             companyOrgId: company.orgId,
-            notifications: newNotifications
+            notifications: { [notification]: true }
           }
         }
       });
@@ -137,26 +148,27 @@ describe("Mutation { setCompanyNotifications }", () => {
           where: { companyId: company.id, userId: user.id }
         });
 
-      expect(updatedCompanyAssociation.notifications).toEqual(newNotifications);
+      expect(updatedCompanyAssociation).toMatchObject({
+        ...unactiveNotifications,
+        ...toPrismaNotifications({ [notification]: true })
+      });
     }
   );
 
   test.each([
-    UserNotification.REVISION_REQUEST,
-    UserNotification.BSD_REFUSAL,
-    UserNotification.SIGNATURE_CODE_RENEWAL,
-    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+    "signatureCodeRenewal",
+    "bsdRefusal",
+    "bsdaFinalDestinationUpdate",
+    "revisionRequest"
   ])(
     "User with role READER can subscribe to notification %p",
     async notification => {
-      const { user, company } = await userWithCompanyFactory(UserRole.READER);
-
-      const companyAssociation =
-        await prisma.companyAssociation.findFirstOrThrow({
-          where: { companyId: company.id, userId: user.id }
-        });
-
-      expect(companyAssociation.notifications).toEqual([]);
+      const { user, company } = await userWithCompanyFactory(
+        UserRole.READER,
+        {},
+        {},
+        unactiveNotifications
+      );
 
       const { mutate } = makeClient(user);
 
@@ -169,7 +181,7 @@ describe("Mutation { setCompanyNotifications }", () => {
         variables: {
           input: {
             companyOrgId: company.orgId,
-            notifications: newNotifications
+            notifications: { [notification]: true }
           }
         }
       });
@@ -184,25 +196,26 @@ describe("Mutation { setCompanyNotifications }", () => {
           where: { companyId: company.id, userId: user.id }
         });
 
-      expect(updatedCompanyAssociation.notifications).toEqual(newNotifications);
+      expect(updatedCompanyAssociation).toMatchObject({
+        ...unactiveNotifications,
+        ...toPrismaNotifications({ [notification]: true })
+      });
     }
   );
 
   test.each([
-    UserNotification.BSD_REFUSAL,
-    UserNotification.SIGNATURE_CODE_RENEWAL,
-    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+    "signatureCodeRenewal",
+    "bsdRefusal",
+    "bsdaFinalDestinationUpdate"
   ])(
     "User with role DRIVER can subscribe to notification %p",
     async notification => {
-      const { user, company } = await userWithCompanyFactory(UserRole.DRIVER);
-
-      const companyAssociation =
-        await prisma.companyAssociation.findFirstOrThrow({
-          where: { companyId: company.id, userId: user.id }
-        });
-
-      expect(companyAssociation.notifications).toEqual([]);
+      const { user, company } = await userWithCompanyFactory(
+        UserRole.DRIVER,
+        {},
+        {},
+        unactiveNotifications
+      );
 
       const { mutate } = makeClient(user);
 
@@ -215,7 +228,7 @@ describe("Mutation { setCompanyNotifications }", () => {
         variables: {
           input: {
             companyOrgId: company.orgId,
-            notifications: newNotifications
+            notifications: { [notification]: true }
           }
         }
       });
@@ -230,25 +243,24 @@ describe("Mutation { setCompanyNotifications }", () => {
           where: { companyId: company.id, userId: user.id }
         });
 
-      expect(updatedCompanyAssociation.notifications).toEqual(newNotifications);
+      expect(updatedCompanyAssociation).toMatchObject({
+        ...unactiveNotifications,
+        ...toPrismaNotifications({ [notification]: true })
+      });
     }
   );
 
   test.each([UserRole.MEMBER, UserRole.DRIVER, UserRole.READER])(
     "users with role %p should not be able to subscribe to MEMBERSHIP_REQUEST notifications",
     async role => {
-      const { user, company } = await userWithCompanyFactory(role);
-
-      const companyAssociation =
-        await prisma.companyAssociation.findFirstOrThrow({
-          where: { companyId: company.id, userId: user.id }
-        });
-
-      expect(companyAssociation.notifications).toEqual([]);
+      const { user, company } = await userWithCompanyFactory(
+        role,
+        {},
+        {},
+        unactiveNotifications
+      );
 
       const { mutate } = makeClient(user);
-
-      const newNotifications = [UserNotification.MEMBERSHIP_REQUEST];
 
       const { errors } = await mutate<
         Pick<Mutation, "setCompanyNotifications">,
@@ -257,7 +269,7 @@ describe("Mutation { setCompanyNotifications }", () => {
         variables: {
           input: {
             companyOrgId: company.orgId,
-            notifications: newNotifications
+            notifications: { membershipRequest: true }
           }
         }
       });
@@ -272,19 +284,14 @@ describe("Mutation { setCompanyNotifications }", () => {
   );
 
   test("Users with role DRIVER should not be able to susbcribe to REVISION_REQUEST notifications", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.DRIVER);
-
-    const companyAssociation = await prisma.companyAssociation.findFirstOrThrow(
-      {
-        where: { companyId: company.id, userId: user.id }
-      }
+    const { user, company } = await userWithCompanyFactory(
+      UserRole.DRIVER,
+      {},
+      {},
+      unactiveNotifications
     );
 
-    expect(companyAssociation.notifications).toEqual([]);
-
     const { mutate } = makeClient(user);
-
-    const newNotifications = [UserNotification.REVISION_REQUEST];
 
     const { errors } = await mutate<
       Pick<Mutation, "setCompanyNotifications">,
@@ -293,7 +300,7 @@ describe("Mutation { setCompanyNotifications }", () => {
       variables: {
         input: {
           companyOrgId: company.orgId,
-          notifications: newNotifications
+          notifications: { revisionRequest: true }
         }
       }
     });

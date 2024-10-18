@@ -2,7 +2,6 @@ import {
   BsdaRevisionRequest,
   BsdasriRevisionRequest,
   MembershipRequestStatus,
-  UserNotification,
   UserRole
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
@@ -293,7 +292,7 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.MEMBERSHIP_REQUEST] }
+      { notificationIsActiveMembershipRequest: true }
     );
 
     // crée un second admin abonné aux notifications de demandes de rattachement
@@ -302,7 +301,7 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
       admin01.id,
       companyAndAdmin0.company.orgId,
       UserRole.ADMIN,
-      { notifications: [UserNotification.MEMBERSHIP_REQUEST] }
+      { notificationIsActiveMembershipRequest: true }
     );
 
     // crée un troisième admin qui n'est pas abonné aux notifications de demandes de rattachement
@@ -310,8 +309,7 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
     await associateUserToCompany(
       admin02.id,
       companyAndAdmin0.company.orgId,
-      UserRole.ADMIN,
-      { notifications: [] }
+      UserRole.ADMIN
     );
 
     const companyAndAdmin1 = await userWithCompanyFactory("ADMIN");
@@ -454,7 +452,7 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -592,7 +590,7 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -620,7 +618,7 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -687,11 +685,11 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const user2 = await userFactory();
     await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: [UserNotification.REVISION_REQUEST]
+      notificationIsActiveRevisionRequest: true
     });
 
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
@@ -744,9 +742,7 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: []
-    });
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -811,7 +807,7 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -942,7 +938,7 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -968,7 +964,7 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -1035,11 +1031,11 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const user2 = await userFactory();
     await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: [UserNotification.REVISION_REQUEST]
+      notificationIsActiveRevisionRequest: true
     });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -1090,9 +1086,7 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: []
-    });
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1274,7 +1268,7 @@ describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -1302,7 +1296,7 @@ describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -1366,11 +1360,11 @@ describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const user2 = await userFactory();
     await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: [UserNotification.REVISION_REQUEST]
+      notificationIsActiveRevisionRequest: true
     });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -1418,9 +1412,7 @@ describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
   it("should not return non-subscribers from pending companies", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: []
-    });
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );

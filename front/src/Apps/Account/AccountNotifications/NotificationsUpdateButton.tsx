@@ -11,11 +11,15 @@ type AccountCompanyNotificationsUpdateButtonProps = {
 export default function NotificationsUpdateButton({
   company
 }: AccountCompanyNotificationsUpdateButtonProps) {
-  const btnLabel = `Gérer (${company.userNotifications.length})`;
+  const activeNotifications = Object.keys(company.userNotifications).filter(
+    notification => company.userNotifications[notification] === true
+  );
+
+  const btnLabel = `Gérer (${activeNotifications.length})`;
 
   const modalTitle = `Gérer les notifications`;
 
-  const iconId = company.userNotifications?.length
+  const iconId = activeNotifications.length
     ? "ri-notification-3-line"
     : "ri-notification-off-line";
 

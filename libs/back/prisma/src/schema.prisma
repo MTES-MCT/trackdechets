@@ -348,21 +348,6 @@ model AnonymousCompany {
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
 
-// Notifications auxquelles un utilisateur peut s'abonner pour 
-// un établissement donné
-enum UserNotification {
-  // Notification de demande de rattachement
-  MEMBERSHIP_REQUEST
-  // Notification de renouvellement du code signature
-  SIGNATURE_CODE_RENEWAL
-  // Notifications en cas de refus total ou partiel d'un BSD
-  BSD_REFUSAL
-  // Notification lors de la modification de la destination finale amiante
-  BSDA_FINAL_DESTINATION_UPDATE
-  // Notification lors d'une demande de révision
-  REVISION_REQUEST
-}
-
 model CompanyAssociation {
   id                    String    @id @default(cuid()) @db.VarChar(30)
   role                  UserRole
@@ -374,8 +359,12 @@ model CompanyAssociation {
   // Tell apart automatically accepted invitations from others
   automaticallyAccepted Boolean   @default(false)
 
-  // Abonnements aux notifications
-  notifications UserNotification[]
+  // Abonnements de l'utilisateur aux notifications pour cet établissement
+  notificationIsActiveMembershipRequest          Boolean @default(false)
+  notificationIsActiveSignatureCodeRenewal       Boolean @default(false)
+  notificationIsActiveBsdaFinalDestinationUpdate Boolean @default(false)
+  notificationIsActiveBsdRefusal                 Boolean @default(false)
+  notificationIsActiveRevisionRequest            Boolean @default(false)
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")

@@ -17,7 +17,7 @@ import { deleteCachedUserRoles } from "../common/redis/users";
 import { hashPassword, passwordVersion } from "./utils";
 import { UserInputError } from "../common/errors";
 import { PrismaTransaction } from "../common/repository/types";
-import { ALL_NOTIFICATIONS, getDefaultNotifications } from "./notifications";
+import { getDefaultNotifications } from "./notifications";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.companyAssociation.findMany({
@@ -118,7 +118,7 @@ export async function associateUserToCompany(
       user: { connect: { id: userId } },
       role,
       company: { connect: { orgId } },
-      notifications,
+      ...notifications,
       ...opt
     }
   });
@@ -202,17 +202,17 @@ export async function acceptNewUserCompanyInvitations(user: User) {
   }
 
   await Promise.all(
-    existingHashes.map(existingHash =>
-      prisma.companyAssociation.create({
+    existingHashes.map(existingHash => {
+      const notifications = getDefaultNotifications(existingHash.role);
+      return prisma.companyAssociation.create({
         data: {
           company: { connect: { orgId: existingHash.companySiret } },
           user: { connect: { id: user.id } },
           role: existingHash.role,
-          notifications:
-            existingHash.role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
+          ...notifications
         }
-      })
-    )
+      });
+    })
   );
   if (!user.firstAssociationDate) {
     await prisma.user.update({

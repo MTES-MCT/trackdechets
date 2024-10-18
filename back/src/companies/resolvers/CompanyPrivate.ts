@@ -2,6 +2,7 @@ import { prisma } from "@td/prisma";
 import { CompanyPrivateResolvers } from "../../generated/graphql/types";
 import { getCompanyUsers } from "../database";
 import { getUserRole, grants, toGraphQLPermission } from "../../permissions";
+import { toGqlNotifications } from "../../users/notifications";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
@@ -28,18 +29,10 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     return role ? grants[role].map(toGraphQLPermission) : [];
   },
   userNotifications: async (parent, _, context) => {
-    if (!context.user) {
-      return [];
-    }
-    const companyAssociations = await prisma.company
-      .findUnique({ where: { id: parent.id } })
-      .companyAssociations({ where: { userId: context.user.id } });
-
-    if (companyAssociations?.length) {
-      return companyAssociations[0].notifications;
-    }
-
-    return [];
+    const companyAssociation = await prisma.companyAssociation.findFirstOrThrow(
+      { where: { companyId: parent.id, userId: context.user?.id } }
+    );
+    return toGqlNotifications(companyAssociation);
   },
   transporterReceipt: parent => {
     return prisma.company
