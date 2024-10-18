@@ -6,6 +6,7 @@ import NotificationsUpdateButton from "./NotificationsUpdateButton";
 import SearchableCompaniesList from "../../Companies/CompaniesList/SearchableCompaniesList";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import styles from "./AccountNotifications.module.scss";
+import NotificationsUpdateAllButton from "./NotificationsUpdateAllButton";
 
 const alertDescription =
   "Il est impératif de veiller à ce qu'au moins un membre de vos établissements" +
@@ -32,7 +33,7 @@ export default function AccountNotifications() {
       {/* Liste paginée des établissements avec un bouton "Charger plus" 
       et une barre de recherche */}
       <SearchableCompaniesList
-        renderCompanies={(companies, _totalCount) => (
+        renderCompanies={(companies, totalCount) => (
           <Table
             fixed
             data={companies.map(company => [
@@ -42,7 +43,13 @@ export default function AccountNotifications() {
                 <NotificationsUpdateButton company={company} />
               </div>
             ])}
-            headers={["Établissements", "Notifications", ""]}
+            headers={[
+              "Établissements",
+              "Notifications",
+              <div className={styles.alignRight}>
+                <NotificationsUpdateAllButton totalCount={totalCount} />
+              </div>
+            ]}
           />
         )}
       />

@@ -17,3 +17,19 @@ export const SUBSCRIBE_TO_COMPANY_NOTIFICATIONS = gql`
     }
   }
 `;
+
+export const SUBSCRIBE_TO_NOTIFICATIONS = gql`
+  mutation SubscribeToNotifications($input: SubscribeToNotificationsInput!) {
+    subscribeToNotifications(input: $input) {
+      id
+      orgId
+      userNotifications {
+        membershipRequest
+        signatureCodeRenewal
+        bsdRefusal
+        bsdaFinalDestinationUpdate
+        revisionRequest
+      }
+    }
+  }
+`;

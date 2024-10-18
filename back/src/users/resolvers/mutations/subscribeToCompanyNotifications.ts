@@ -8,7 +8,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../../companies/converters";
 import {
-  authorizedNotifications,
+  authorizedNotificationsByRole,
   toPrismaNotifications,
   UserNotification
 } from "../../notifications";
@@ -65,7 +65,9 @@ const subscribeToCompanyNotificationsResolver: MutationResolvers["subscribeToCom
 
     const unauthorizedNotifications = subscribeTo.filter(
       notification =>
-        !authorizedNotifications[companyAssociation.role].includes(notification)
+        !authorizedNotificationsByRole[companyAssociation.role].includes(
+          notification
+        )
     );
 
     if (unauthorizedNotifications.length) {
@@ -83,4 +85,5 @@ const subscribeToCompanyNotificationsResolver: MutationResolvers["subscribeToCom
 
     return toGqlCompanyPrivate(updatedCompanyAssociation.company);
   };
+
 export default subscribeToCompanyNotificationsResolver;
