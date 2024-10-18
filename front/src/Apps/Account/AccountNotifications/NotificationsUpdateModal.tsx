@@ -29,7 +29,13 @@ type OptionLabel = {
 export const authorizedNotificationsByUserRole: {
   [key in UserRole]: (keyof UserNotifications)[];
 } = {
-  [UserRole.Admin]: [],
+  [UserRole.Admin]: [
+    "membershipRequest",
+    "revisionRequest",
+    "bsdRefusal",
+    "signatureCodeRenewal",
+    "bsdaFinalDestinationUpdate"
+  ],
   [UserRole.Member]: [
     "revisionRequest",
     "bsdRefusal",

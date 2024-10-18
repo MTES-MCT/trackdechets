@@ -12,7 +12,7 @@ function getNotificationLabels(notifications: UserNotifications) {
       isActive: notifications.membershipRequest
     },
     { value: "Code signature", isActive: notifications.signatureCodeRenewal },
-    { label: "Refus", isActive: notifications.bsdRefusal },
+    { value: "Refus", isActive: notifications.bsdRefusal },
     {
       value: "Destination finale amiante",
       isActive: notifications.bsdaFinalDestinationUpdate
@@ -29,11 +29,12 @@ export function NotificationsDisplay({
   company
 }: AccountCompanyNotificationsProps) {
   if (
-    Object.keys(company.userNotifications).every(
-      notification => !company.userNotifications[notification]
+    Object.keys(company.userNotifications).some(
+      notification => company.userNotifications[notification] === true
     )
   ) {
-    return <div>Désactivé</div>;
+    return <div>{getNotificationLabels(company.userNotifications)}</div>;
   }
-  return <div>{getNotificationLabels(company.userNotifications)}</div>;
+
+  return <div>Désactivé</div>;
 }

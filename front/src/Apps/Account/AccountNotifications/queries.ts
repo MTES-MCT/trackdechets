@@ -5,7 +5,13 @@ export const SET_COMPANY_NOTIFICATIONS = gql`
     setCompanyNotifications(input: $input) {
       id
       orgId
-      userNotifications
+      userNotifications {
+        membershipRequest
+        signatureCodeRenewal
+        bsdRefusal
+        bsdaFinalDestinationUpdate
+        revisionRequest
+      }
     }
   }
 `;

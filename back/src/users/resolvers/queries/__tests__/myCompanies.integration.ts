@@ -11,7 +11,6 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { AuthType } from "../../../../auth";
 import { subDays } from "date-fns";
-import { membershipRequest } from "@td/mail";
 
 const MY_COMPANIES = gql`
   query MyCompanies(

@@ -160,7 +160,13 @@ export const AccountCompanyInfoFragment = {
       naf
       libelleNaf
       userRole
-      userNotifications
+      userNotifications {
+        membershipRequest
+        signatureCodeRenewal
+        bsdRefusal
+        bsdaFinalDestinationUpdate
+        revisionRequest
+      }
       givenName
       ...AccountFieldCompanyTypesFragment
       ...AccountFieldCompanyGerepIdFragment
