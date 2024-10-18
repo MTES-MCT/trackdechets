@@ -171,7 +171,9 @@ describe("mutation changeUserRole", () => {
         .companyAssociations();
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
-      expect(companyAssociations[0]).toMatchObject(companyAssociations[0].role);
+      expect(companyAssociations[0]).toMatchObject(
+        getDefaultNotifications(companyAssociations[0].role)
+      );
     }
   );
 

@@ -11,15 +11,15 @@ import { safeInput } from "../common/converter";
 // un établissement donné
 export enum UserNotification {
   // Notification de demande de rattachement
-  MEMBERSHIP_REQUEST,
+  MEMBERSHIP_REQUEST = "MEMBERSHIP_REQUEST",
   // Notification de renouvellement du code signature
-  SIGNATURE_CODE_RENEWAL,
+  SIGNATURE_CODE_RENEWAL = "SIGNATURE_CODE_RENEWAL",
   // Notifications en cas de refus total ou partiel d'un BSD
-  BSD_REFUSAL,
+  BSD_REFUSAL = "BSD_REFUSAL",
   // Notification lors de la modification de la destination finale amiante
-  BSDA_FINAL_DESTINATION_UPDATE,
+  BSDA_FINAL_DESTINATION_UPDATE = "BSDA_FINAL_DESTINATION_UPDATE",
   // Notification lors d'une demande de révision
-  REVISION_REQUEST
+  REVISION_REQUEST = "REVISION_REQUEST"
 }
 
 // Liste les champs qui permettent de contrôler les abonnements

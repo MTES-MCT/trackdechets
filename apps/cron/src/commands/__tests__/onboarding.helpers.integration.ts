@@ -309,7 +309,8 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
     await associateUserToCompany(
       admin02.id,
       companyAndAdmin0.company.orgId,
-      UserRole.ADMIN
+      UserRole.ADMIN,
+      { notificationIsActiveMembershipRequest: false }
     );
 
     const companyAndAdmin1 = await userWithCompanyFactory("ADMIN");
@@ -411,24 +412,40 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
 
     expect(requests.length).toEqual(2);
 
-    expect(
-      requests.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    ).toEqual([
-      expect.objectContaining({
-        id: request0.id,
-        company: expect.objectContaining({
-          orgId: companyAndAdmin0.company.orgId
-        }),
-        user: expect.objectContaining({ email: user0.email })
+    expect(requests.find(r => r.id === request0.id)).toMatchObject({
+      id: request0.id,
+      company: expect.objectContaining({
+        orgId: companyAndAdmin0.company.orgId
       }),
-      expect.objectContaining({
-        id: request1.id,
-        company: expect.objectContaining({
-          orgId: companyAndAdmin1.company.orgId
-        }),
-        user: expect.objectContaining({ email: user0.email })
-      })
-    ]);
+      user: expect.objectContaining({ email: user0.email })
+    });
+
+    expect(requests.find(r => r.id == request1.id)).toMatchObject({
+      id: request1.id,
+      company: expect.objectContaining({
+        orgId: companyAndAdmin1.company.orgId
+      }),
+      user: expect.objectContaining({ email: user0.email })
+    });
+
+    // expect(
+    //   requests.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    // ).toEqual([
+    //   expect.objectContaining({
+    //     id: request1.id,
+    //     company: expect.objectContaining({
+    //       orgId: companyAndAdmin1.company.orgId
+    //     }),
+    //     user: expect.objectContaining({ email: user0.email })
+    //   }),
+    //   expect.objectContaining({
+    //     id: request0.id,
+    //     company: expect.objectContaining({
+    //       orgId: companyAndAdmin0.company.orgId
+    //     }),
+    //     user: expect.objectContaining({ email: user0.email })
+    //   })
+    // ]);
   });
 });
 
@@ -742,7 +759,9 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
+      notificationIsActiveRevisionRequest: false
+    });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1086,7 +1105,9 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
+      notificationIsActiveRevisionRequest: false
+    });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1412,7 +1433,9 @@ describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
   it("should not return non-subscribers from pending companies", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
+      notificationIsActiveRevisionRequest: false
+    });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );

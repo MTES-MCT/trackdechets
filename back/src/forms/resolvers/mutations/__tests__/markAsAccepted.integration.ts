@@ -253,7 +253,9 @@ describe("Test Form reception", () => {
 
     // should not receive email
     const emitter3 = await userFactory();
-    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN");
+    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN", {
+      notificationIsActiveBsdRefusal: false
+    });
 
     // should received email
     const recipient2 = await userFactory();
@@ -337,7 +339,9 @@ describe("Test Form reception", () => {
 
     // should not receive email
     const emitter3 = await userFactory();
-    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN");
+    await associateUserToCompany(emitter3.id, emitterCompany.orgId, "ADMIN", {
+      notificationIsActiveBsdRefusal: false
+    });
 
     // should received email
     const recipient2 = await userFactory();
@@ -355,7 +359,10 @@ describe("Test Form reception", () => {
     await associateUserToCompany(
       recipient3.id,
       recipientCompany.orgId,
-      "ADMIN"
+      "ADMIN",
+      {
+        notificationIsActiveBsdRefusal: false
+      }
     );
 
     await prisma.form.update({

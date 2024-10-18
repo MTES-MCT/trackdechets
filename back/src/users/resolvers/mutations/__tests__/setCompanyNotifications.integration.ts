@@ -18,7 +18,13 @@ export const SET_COMPANY_NOTIFICATIONS = gql`
     setCompanyNotifications(input: $input) {
       id
       orgId
-      userNotifications
+      userNotifications {
+        membershipRequest
+        signatureCodeRenewal
+        bsdRefusal
+        bsdaFinalDestinationUpdate
+        revisionRequest
+      }
     }
   }
 `;
@@ -75,7 +81,7 @@ describe("Mutation { setCompanyNotifications }", () => {
 
       const { mutate } = makeClient(user);
 
-      const newNotifications = [notification];
+      const newNotifications = { [notification]: true };
 
       const { data, errors } = await mutate<
         Pick<Mutation, "setCompanyNotifications">,
@@ -84,14 +90,14 @@ describe("Mutation { setCompanyNotifications }", () => {
         variables: {
           input: {
             companyOrgId: company.orgId,
-            notifications: { [notification]: true }
+            notifications: newNotifications
           }
         }
       });
 
       expect(errors).toBeUndefined();
 
-      expect(data.setCompanyNotifications.userNotifications).toEqual(
+      expect(data.setCompanyNotifications.userNotifications).toMatchObject(
         newNotifications
       );
 
@@ -124,7 +130,7 @@ describe("Mutation { setCompanyNotifications }", () => {
 
       const { mutate } = makeClient(user);
 
-      const newNotifications = [notification];
+      const newNotifications = { [notification]: true };
 
       const { data, errors } = await mutate<
         Pick<Mutation, "setCompanyNotifications">,
@@ -133,13 +139,13 @@ describe("Mutation { setCompanyNotifications }", () => {
         variables: {
           input: {
             companyOrgId: company.orgId,
-            notifications: { [notification]: true }
+            notifications: newNotifications
           }
         }
       });
 
       expect(errors).toBeUndefined();
-      expect(data.setCompanyNotifications.userNotifications).toEqual(
+      expect(data.setCompanyNotifications.userNotifications).toMatchObject(
         newNotifications
       );
 
@@ -172,7 +178,7 @@ describe("Mutation { setCompanyNotifications }", () => {
 
       const { mutate } = makeClient(user);
 
-      const newNotifications = [notification];
+      const newNotifications = { [notification]: true };
 
       const { data, errors } = await mutate<
         Pick<Mutation, "setCompanyNotifications">,
@@ -181,13 +187,13 @@ describe("Mutation { setCompanyNotifications }", () => {
         variables: {
           input: {
             companyOrgId: company.orgId,
-            notifications: { [notification]: true }
+            notifications: newNotifications
           }
         }
       });
 
       expect(errors).toBeUndefined();
-      expect(data.setCompanyNotifications.userNotifications).toEqual(
+      expect(data.setCompanyNotifications.userNotifications).toMatchObject(
         newNotifications
       );
 
@@ -219,7 +225,7 @@ describe("Mutation { setCompanyNotifications }", () => {
 
       const { mutate } = makeClient(user);
 
-      const newNotifications = [notification];
+      const newNotifications = { [notification]: true };
 
       const { data, errors } = await mutate<
         Pick<Mutation, "setCompanyNotifications">,
@@ -228,13 +234,13 @@ describe("Mutation { setCompanyNotifications }", () => {
         variables: {
           input: {
             companyOrgId: company.orgId,
-            notifications: { [notification]: true }
+            notifications: newNotifications
           }
         }
       });
 
       expect(errors).toBeUndefined();
-      expect(data.setCompanyNotifications.userNotifications).toEqual(
+      expect(data.setCompanyNotifications.userNotifications).toMatchObject(
         newNotifications
       );
 
