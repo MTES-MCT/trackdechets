@@ -18,11 +18,19 @@ export default function NotificationsUpdateAllButton({
 
   return (
     <>
-      <modal.Component title="Gérer les notifications en masse">
-        <AccountNotificationsUpdateAllModal totalCount={totalCount} />
+      <modal.Component title="Gérer les notifications">
+        <AccountNotificationsUpdateAllModal
+          totalCount={totalCount}
+          close={modal.close}
+        />
       </modal.Component>
-      <Button size="small" priority="secondary" onClick={() => modal.open()}>
-        Gérer les notifications en masse
+      <Button
+        iconId="ri-notification-3-line"
+        size="small"
+        priority="secondary"
+        onClick={() => modal.open()}
+      >
+        Gérer tout
       </Button>
     </>
   );

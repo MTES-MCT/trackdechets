@@ -52,6 +52,21 @@ export const notificationToPrismaField: {
 };
 
 /**
+ * Construit un mapping entre les champs booléans du type
+ * GraphQL `UserNotifications` et les types de notifications
+ * définies en tant qu'enum dans le code
+ */
+export const gqlFieldToNotification: {
+  [key in keyof GqlNotifications]: UserNotification;
+} = {
+  membershipRequest: UserNotification.MEMBERSHIP_REQUEST,
+  signatureCodeRenewal: UserNotification.SIGNATURE_CODE_RENEWAL,
+  bsdRefusal: UserNotification.BSD_REFUSAL,
+  revisionRequest: UserNotification.REVISION_REQUEST,
+  bsdaFinalDestinationUpdate: UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+};
+
+/**
  * Renvoie les notififications auxquelles un utilisateur est abonné par
  * défaut lorsqu'il rejoint un établissement ou change de rôle
  */
@@ -107,7 +122,7 @@ export function toPrismaNotifications(
 
 // if you modify this structure, please modify
 // in front/src/common/notifications
-export const authorizedNotifications = {
+export const authorizedNotificationsByRole = {
   [UserRole.ADMIN]: [
     UserNotification.MEMBERSHIP_REQUEST,
     UserNotification.REVISION_REQUEST,
@@ -127,12 +142,33 @@ export const authorizedNotifications = {
     UserNotification.SIGNATURE_CODE_RENEWAL,
     UserNotification.BSDA_FINAL_DESTINATION_UPDATE
   ],
-  DRIVER: [
+  [UserRole.DRIVER]: [
     UserNotification.BSD_REFUSAL,
     UserNotification.SIGNATURE_CODE_RENEWAL,
     UserNotification.BSDA_FINAL_DESTINATION_UPDATE
   ]
 };
+
+// Inverse la structure précédente afin de renvoyer
+// pour chaque notification les rôles autorisés
+export const authorizedRolesByNotification: {
+  [key in UserNotification]: UserRole[];
+} = Object.entries(authorizedNotificationsByRole).reduce(
+  (inverted, [role, notifications]) => {
+    notifications.forEach(notification => {
+      // Si la notification n'existe pas encore dans le mapping inversé, l'initialiser
+      if (!inverted[notification]) {
+        inverted[notification] = [];
+      }
+      // Ajouter le rôle à la liste des rôles autorisés pour cette notification
+      inverted[notification].push(role as UserRole);
+    });
+    return inverted;
+  },
+  {} as {
+    [key in UserNotification]: UserRole[];
+  }
+);
 
 // Récupère la liste des des utilisateurs abonnés à un type
 // de notification donnée au sein d'un ou plusieurs établissements
