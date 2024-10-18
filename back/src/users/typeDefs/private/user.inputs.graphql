@@ -52,12 +52,20 @@ input UserNotificationsInput {
   revisionRequest: Boolean
 }
 
-input SetCompanyNotificationsInput {
+input SubscribeToCompanyNotificationsInput {
   "Identifiant de l'établissement"
   companyOrgId: String!
   """
-  Notifications auxquelles l'utilisateur souhaite être abonné pour l'établisement
-  identifié par le paramètre companyOrgId
+  Notifications auxquelles l'utilisateur souhaite s'abonner / se désabonner
+  pour l'établissement identifié par le paramètre companyOrgId
+  """
+  notifications: UserNotificationsInput!
+}
+
+input SubscribeToNotificationsInput {
+  """
+  Notifications auxquelles l'utilisateur souhaite s'abonner / se désabonner
+  sur l'ensemble de ses établissement
   """
   notifications: UserNotificationsInput!
 }

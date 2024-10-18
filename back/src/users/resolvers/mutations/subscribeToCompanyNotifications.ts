@@ -43,7 +43,7 @@ function activeNotifications(
     .map(n => n.name);
 }
 
-const setCompanyNotificationsResolver: MutationResolvers["setCompanyNotifications"] =
+const subscribeToCompanyNotificationsResolver: MutationResolvers["subscribeToCompanyNotifications"] =
   async (parent, args, context: GraphQLContext) => {
     applyAuthStrategies(context, [AuthType.Session]);
 
@@ -83,4 +83,4 @@ const setCompanyNotificationsResolver: MutationResolvers["setCompanyNotification
 
     return toGqlCompanyPrivate(updatedCompanyAssociation.company);
   };
-export default setCompanyNotificationsResolver;
+export default subscribeToCompanyNotificationsResolver;
