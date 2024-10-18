@@ -7,15 +7,17 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import {
   Mutation,
-  MutationSetCompanyNotificationsArgs
+  MutationSubscribeToCompanyNotificationsArgs
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { UserRole } from "@prisma/client";
 import { toPrismaNotifications } from "../../../notifications";
 
-export const SET_COMPANY_NOTIFICATIONS = gql`
-  mutation SetCompanyNotifications($input: SetCompanyNotificationsInput!) {
-    setCompanyNotifications(input: $input) {
+export const SUBSCRIBE_TO_COMPANY_NOTIFICATIONS = gql`
+  mutation SubscribeToCompanyNotifications(
+    $input: SubscribeToCompanyNotificationsInput!
+  ) {
+    subscribeToCompanyNotifications(input: $input) {
       id
       orgId
       userNotifications {
@@ -37,7 +39,7 @@ const unactiveNotifications = {
   notificationIsActiveSignatureCodeRenewal: false
 };
 
-describe("Mutation { setCompanyNotifications }", () => {
+describe("Mutation { subscribeToCompanyNotifications }", () => {
   test("Users who don't belong to company cannot subscribe to notifications", async () => {
     const user = await userFactory();
     const company = await companyFactory();
@@ -45,9 +47,9 @@ describe("Mutation { setCompanyNotifications }", () => {
     const { mutate } = makeClient(user);
 
     const { errors } = await mutate<
-      Pick<Mutation, "setCompanyNotifications">,
-      MutationSetCompanyNotificationsArgs
-    >(SET_COMPANY_NOTIFICATIONS, {
+      Pick<Mutation, "subscribeToCompanyNotifications">,
+      MutationSubscribeToCompanyNotificationsArgs
+    >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS, {
       variables: {
         input: {
           companyOrgId: company.siret!,
@@ -84,9 +86,9 @@ describe("Mutation { setCompanyNotifications }", () => {
       const newNotifications = { [notification]: true };
 
       const { data, errors } = await mutate<
-        Pick<Mutation, "setCompanyNotifications">,
-        MutationSetCompanyNotificationsArgs
-      >(SET_COMPANY_NOTIFICATIONS, {
+        Pick<Mutation, "subscribeToCompanyNotifications">,
+        MutationSubscribeToCompanyNotificationsArgs
+      >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS, {
         variables: {
           input: {
             companyOrgId: company.orgId,
@@ -97,9 +99,9 @@ describe("Mutation { setCompanyNotifications }", () => {
 
       expect(errors).toBeUndefined();
 
-      expect(data.setCompanyNotifications.userNotifications).toMatchObject(
-        newNotifications
-      );
+      expect(
+        data.subscribeToCompanyNotifications.userNotifications
+      ).toMatchObject(newNotifications);
 
       const updatedCompanyAssociation =
         await prisma.companyAssociation.findFirstOrThrow({
@@ -133,9 +135,9 @@ describe("Mutation { setCompanyNotifications }", () => {
       const newNotifications = { [notification]: true };
 
       const { data, errors } = await mutate<
-        Pick<Mutation, "setCompanyNotifications">,
-        MutationSetCompanyNotificationsArgs
-      >(SET_COMPANY_NOTIFICATIONS, {
+        Pick<Mutation, "subscribeToCompanyNotifications">,
+        MutationSubscribeToCompanyNotificationsArgs
+      >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS, {
         variables: {
           input: {
             companyOrgId: company.orgId,
@@ -145,9 +147,9 @@ describe("Mutation { setCompanyNotifications }", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.setCompanyNotifications.userNotifications).toMatchObject(
-        newNotifications
-      );
+      expect(
+        data.subscribeToCompanyNotifications.userNotifications
+      ).toMatchObject(newNotifications);
 
       const updatedCompanyAssociation =
         await prisma.companyAssociation.findFirstOrThrow({
@@ -181,9 +183,9 @@ describe("Mutation { setCompanyNotifications }", () => {
       const newNotifications = { [notification]: true };
 
       const { data, errors } = await mutate<
-        Pick<Mutation, "setCompanyNotifications">,
-        MutationSetCompanyNotificationsArgs
-      >(SET_COMPANY_NOTIFICATIONS, {
+        Pick<Mutation, "subscribeToCompanyNotifications">,
+        MutationSubscribeToCompanyNotificationsArgs
+      >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS, {
         variables: {
           input: {
             companyOrgId: company.orgId,
@@ -193,9 +195,9 @@ describe("Mutation { setCompanyNotifications }", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.setCompanyNotifications.userNotifications).toMatchObject(
-        newNotifications
-      );
+      expect(
+        data.subscribeToCompanyNotifications.userNotifications
+      ).toMatchObject(newNotifications);
 
       const updatedCompanyAssociation =
         await prisma.companyAssociation.findFirstOrThrow({
@@ -228,9 +230,9 @@ describe("Mutation { setCompanyNotifications }", () => {
       const newNotifications = { [notification]: true };
 
       const { data, errors } = await mutate<
-        Pick<Mutation, "setCompanyNotifications">,
-        MutationSetCompanyNotificationsArgs
-      >(SET_COMPANY_NOTIFICATIONS, {
+        Pick<Mutation, "subscribeToCompanyNotifications">,
+        MutationSubscribeToCompanyNotificationsArgs
+      >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS, {
         variables: {
           input: {
             companyOrgId: company.orgId,
@@ -240,9 +242,9 @@ describe("Mutation { setCompanyNotifications }", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.setCompanyNotifications.userNotifications).toMatchObject(
-        newNotifications
-      );
+      expect(
+        data.subscribeToCompanyNotifications.userNotifications
+      ).toMatchObject(newNotifications);
 
       const updatedCompanyAssociation =
         await prisma.companyAssociation.findFirstOrThrow({
@@ -269,9 +271,9 @@ describe("Mutation { setCompanyNotifications }", () => {
       const { mutate } = makeClient(user);
 
       const { errors } = await mutate<
-        Pick<Mutation, "setCompanyNotifications">,
-        MutationSetCompanyNotificationsArgs
-      >(SET_COMPANY_NOTIFICATIONS, {
+        Pick<Mutation, "subscribeToCompanyNotifications">,
+        MutationSubscribeToCompanyNotificationsArgs
+      >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS, {
         variables: {
           input: {
             companyOrgId: company.orgId,
@@ -300,9 +302,9 @@ describe("Mutation { setCompanyNotifications }", () => {
     const { mutate } = makeClient(user);
 
     const { errors } = await mutate<
-      Pick<Mutation, "setCompanyNotifications">,
-      MutationSetCompanyNotificationsArgs
-    >(SET_COMPANY_NOTIFICATIONS, {
+      Pick<Mutation, "subscribeToCompanyNotifications">,
+      MutationSubscribeToCompanyNotificationsArgs
+    >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS, {
       variables: {
         input: {
           companyOrgId: company.orgId,

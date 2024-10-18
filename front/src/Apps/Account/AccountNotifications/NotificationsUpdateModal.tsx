@@ -2,7 +2,7 @@ import React from "react";
 import {
   CompanyPrivate,
   Mutation,
-  MutationSetCompanyNotificationsArgs,
+  MutationSubscribeToCompanyNotificationsArgs,
   UserNotifications,
   UserRole
 } from "@td/codegen-ui";
@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
-import { SET_COMPANY_NOTIFICATIONS } from "./queries";
+import { SUBSCRIBE_TO_COMPANY_NOTIFICATIONS } from "./queries";
 import styles from "./NotificationsUpdateModal.module.scss";
 
 type AccountCompanyNotificationsUpdateModalProps = {
@@ -59,10 +59,11 @@ export default function NotificationsUpdateModal({
   company,
   close
 }: AccountCompanyNotificationsUpdateModalProps) {
-  const [setCompanyNotifications, { loading, data, error }] = useMutation<
-    Pick<Mutation, "setCompanyNotifications">,
-    MutationSetCompanyNotificationsArgs
-  >(SET_COMPANY_NOTIFICATIONS);
+  const [subscribeToCompanyNotifications, { loading, data, error }] =
+    useMutation<
+      Pick<Mutation, "subscribeToCompanyNotifications">,
+      MutationSubscribeToCompanyNotificationsArgs
+    >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS);
 
   const authorizedNotifications = company.userRole
     ? authorizedNotificationsByUserRole[company.userRole]
@@ -73,7 +74,7 @@ export default function NotificationsUpdateModal({
   });
 
   const onSubmit = async (data: UserNotifications) => {
-    const { errors } = await setCompanyNotifications({
+    const { errors } = await subscribeToCompanyNotifications({
       variables: {
         input: {
           companyOrgId: company.orgId,
