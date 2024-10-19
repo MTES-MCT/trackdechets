@@ -67,6 +67,21 @@ const UPDATE_COMPANY = gql`
   }
 `;
 
+const UPDATE_COMPANY_BSDASRI_TAKEOVER = gql`
+  mutation UpdateCompany(
+    $id: String!
+    $allowBsdasriTakeOverWithoutSignature: Boolean
+  ) {
+    updateCompany(
+      id: $id
+
+      allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature
+    ) {
+      id
+    }
+  }
+`;
+
 describe("mutation updateCompany", () => {
   afterEach(async () => {
     await resetDatabase();
@@ -89,6 +104,33 @@ describe("mutation updateCompany", () => {
     };
     const { data } = await mutate<Pick<Mutation, "updateCompany">>(
       UPDATE_COMPANY,
+      {
+        variables
+      }
+    );
+    expect(data.updateCompany.id).toEqual(company.id);
+
+    const updatedCompany = await prisma.company.findUnique({
+      where: { id: company.id }
+    });
+    expect(updatedCompany).toMatchObject(variables);
+  });
+
+  it("should update a company allowBsdasriTakeOverWithoutSignature when cotactEMail is an contactEmail string", async () => {
+    // bugfix: user were not able to update allowBsdasriTakeOverWithoutSignature when contactEmail was en empty string
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      contactEmail: ""
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const variables = {
+      id: company.id,
+
+      allowBsdasriTakeOverWithoutSignature: true
+    };
+    const { data } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY_BSDASRI_TAKEOVER,
       {
         variables
       }

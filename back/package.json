@@ -11,7 +11,8 @@
     "reindex-bsd": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexBsd.ts $bsdId",
     "purge-pdf-token": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/purgePdfAccessToken.ts",
     "storeAllWebhookSettings.ts": "tsx --tsconfig tsconfig.lib.json ./src/webhooks/commands/storeAllWebhookSettings.ts",
-    "generate-bsds-templates": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/bsdTemplates/generateBsdTemplates.ts"
+    "generate-bsds-templates": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/bsdTemplates/generateBsdTemplates.ts",
+    "reindex-deleted-orphan-appendix1": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexDeletedOrphanAppendix1.ts"
   },
   "engines": {
     "node": "^20"

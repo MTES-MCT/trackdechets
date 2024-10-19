@@ -276,7 +276,7 @@ export function computeLatestRevision(
   return revisionRequests.reduce((latestRevision, currentRevision) => {
     if (
       !latestRevision ||
-      currentRevision.updatedAt > latestRevision.updatedAt
+      currentRevision.createdAt > latestRevision.createdAt
     ) {
       return currentRevision;
     }

@@ -4,6 +4,7 @@ import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import SearchInput from "../../../../Apps/common/Components/search/DsfrSearchInput";
 import styles from "./WorkSiteAddress.module.scss";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { API_MIN_CHARS } from "../../constants";
 
 function init({ address, city, postalCode }) {
   const selectedAdress = [address, postalCode, city].filter(Boolean).join(" ");
@@ -20,9 +21,9 @@ function init({ address, city, postalCode }) {
 function reducer(state, action) {
   switch (action.type) {
     case "search_input":
-      return { ...state, searchInput: action.payload };
+      return { ...state, searchInput: action.payload ?? [] };
     case "search_done":
-      return { ...state, searchResults: action.payload };
+      return { ...state, searchResults: action.payload ?? [] };
     case "set_fields":
       return {
         ...state,
@@ -56,7 +57,11 @@ export default function DsfrfWorkSiteAddress({
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      if (!state.searchInput || state.searchInput === state.selectedAdress) {
+      if (
+        !state.searchInput ||
+        state.searchInput === state.selectedAdress ||
+        state.searchInput.length < API_MIN_CHARS
+      ) {
         dispatch({ type: "search_done", payload: [] });
         return;
       }
