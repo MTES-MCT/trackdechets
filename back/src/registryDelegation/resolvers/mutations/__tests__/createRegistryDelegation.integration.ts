@@ -415,6 +415,45 @@ describe("mutation createRegistryDelegation", () => {
         "L'entreprise 40081510600010 visée comme délégante n'existe pas dans Trackdéchets"
       );
     });
+
+    it("delegator company must not be dormant", async () => {
+      // Given
+      const { user, company: delegator } = await userWithCompanyFactory(
+        "ADMIN",
+        { isDormantSince: new Date() }
+      );
+      const delegate = await companyFactory();
+
+      // When
+      const { errors } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'entreprise ${delegator.siret} visée comme délégante est en sommeil`
+      );
+    });
+
+    it("delegate company must not be dormant", async () => {
+      // Given
+      const { user, company: delegator } = await userWithCompanyFactory();
+      const delegate = await companyFactory({ isDormantSince: new Date() });
+
+      // When
+      const { errors } = await createDelegation(user, {
+        delegateOrgId: delegate.orgId,
+        delegatorOrgId: delegator.orgId
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'entreprise ${delegate.siret} visée comme délégataire est en sommeil`
+      );
+    });
   });
 
   describe("prevent simultaneous valid delegations", () => {

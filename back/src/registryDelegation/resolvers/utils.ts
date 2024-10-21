@@ -23,9 +23,21 @@ export const findDelegateAndDelegatorOrThrow = async (
     );
   }
 
+  if (delegator.isDormantSince) {
+    throw new UserInputError(
+      `L'entreprise ${delegatorOrgId} visée comme délégante est en sommeil`
+    );
+  }
+
   if (!delegate) {
     throw new UserInputError(
       `L'entreprise ${delegateOrgId} visée comme délégataire n'existe pas dans Trackdéchets`
+    );
+  }
+
+  if (delegate.isDormantSince) {
+    throw new UserInputError(
+      `L'entreprise ${delegateOrgId} visée comme délégataire est en sommeil`
     );
   }
 
