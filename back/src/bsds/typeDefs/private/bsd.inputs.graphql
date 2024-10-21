@@ -165,3 +165,22 @@ input BsdSubTypeFilter {
   _eq: BsdSubType
   _in: [BsdSubType!]
 }
+
+"""
+Payload de recherche d'un établissment pour la fiche établissement
+
+Recherche par:
+
+- readableId
+- siret (transporteur)
+- plates
+- siret et plate
+"""
+input ControlBsdWhere {
+  # le siret d'un transporteur: 14 à 18 caractères
+  siret: String
+  # plaque d'immatriculation: 6 à 12 caractères
+  plate: String
+  # identifiant lisible du bsd: 20 à 25 caractères
+  readableId: String
+}
