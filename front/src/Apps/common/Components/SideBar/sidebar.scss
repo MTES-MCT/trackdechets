@@ -10,17 +10,25 @@
   top: 56px;
 
   &__item {
-    display: block;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-all;
     line-height: 30px;
     border-left: 3px solid transparent;
     padding-left: 1rem;
+
     &--indented {
       padding-left: 1.2rem;
     }
+
     &--chapter {
       margin-top: 0.8rem;
       font-weight: bold;
     }
+
     &:hover {
       border-color: $blue-dark;
     }
@@ -38,7 +46,6 @@
     list-style: none;
 
     a {
-      display: inline-block;
       text-decoration: none;
       color: $black;
     }
