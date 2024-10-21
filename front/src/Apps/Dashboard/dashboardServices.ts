@@ -21,7 +21,8 @@ import {
   Transporter,
   BsdaTransporter,
   BsdasriStatus,
-  BsffTransporter
+  BsffTransporter,
+  BsvhuStatus
 } from "@td/codegen-ui";
 import {
   ACCEPTE,
@@ -393,8 +394,17 @@ export const isBsdaSignWorker = (bsd: BsdDisplay, currentSiret: string) => {
   return false;
 };
 
+const canIrregularSituationSign = (bsd: BsdDisplay, currentSiret: string) => {
+  return (
+    bsd.status === BsvhuStatus.Initial &&
+    bsd.emitter?.irregularSituation &&
+    isSameSiretTransporter(currentSiret, bsd)
+  );
+};
 export const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
-  isBsvhu(bsd.type) && isSameSiretEmitter(currentSiret, bsd);
+  isBsvhu(bsd.type) &&
+  (isSameSiretEmitter(currentSiret, bsd) ||
+    canIrregularSituationSign(bsd, currentSiret));
 
 export const isBsffSign = (
   bsd: BsdDisplay,

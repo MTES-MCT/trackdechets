@@ -53,10 +53,13 @@ const ActBsvhuValidation = ({
   };
 
   const status = bsd["bsvhuStatus"];
+  const canIrregularSituationSign =
+    status === BsvhuStatus.Initial && bsd.emitter?.irregularSituation;
   return (
     <>
       {status === BsvhuStatus.Initial && renderInitialModal()}
-      {status === BsvhuStatus.SignedByProducer && renderSignedByProducerModal()}
+      {(status === BsvhuStatus.SignedByProducer || canIrregularSituationSign) &&
+        renderSignedByProducerModal()}
       {status === BsvhuStatus.Sent && renderSentModal()}
     </>
   );
