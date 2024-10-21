@@ -40,6 +40,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Suppression du champ isRegistreNational [PR 3652](https://github.com/MTES-MCT/trackdechets/pull/3652)
 - ETQ utilisateur je peux cloner un BSD [PR 3637](https://github.com/MTES-MCT/trackdechets/pull/3637)
 - ETQ utilisateur je peux créer, révoquer et consulter mes demandes de délégation RNDTS [PR 3561](https://github.com/MTES-MCT/trackdechets/pull/3561) [PR 3588](https://github.com/MTES-MCT/trackdechets/pull/3588)
+- Ajout de la query controlBsds dédiée à la fiche établissment [PR 3694](https://github.com/MTES-MCT/trackdechets/pull/3694)
 
 # [2024.9.1] 24/09/2024
 

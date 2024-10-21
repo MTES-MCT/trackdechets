@@ -16,7 +16,7 @@ import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 
 import { faker } from "@faker-js/faker";
 
-describe("query bsds: governement accoutns permissions", () => {
+describe("query bsds: governement accounts permissions", () => {
   afterEach(resetDatabase);
 
   it("should allow user authenticated with a token when tied to a government account with relevant perms", async () => {
@@ -103,8 +103,7 @@ describe("query bsds: governement accoutns permissions", () => {
     expect(errors[0].message).toEqual(`Vous n'êtes pas connecté.`);
   });
 
-  it("should forbid user authenticated with a token if no gov government is associated", async () => {
-    // the company and owner to build a registry
+  it("should forbid user authenticated with a token if no government account is associated", async () => {
     const { user: owner, company: someCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
