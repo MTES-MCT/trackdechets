@@ -81,7 +81,7 @@ export const blankstate_reviews_desc =
 export const blankstate_return_title =
   'Aucun bordereau dans le dossier "Retours"';
 export const blankstate_return_desc =
-  "Les bordereaux refusés, retournés à vide (ADR) ou liés à un nettoyage citerne, sont affichés dans ce dossier durant 24h après la réception,  afin de permettre de disposer du bordereau en cas de contrôle lors du retour. Si un BSD est absent vérifiez qu'il est bien complété.";
+  "Les bordereaux refusés, même partiellement ou ayant fait l'objet d'une information sur le retour à vide (ADR) ou de rinçage citerne, seront affichés dans ce dossier durant 48h après la réception de l'installation de destination, et ce afin de permettre de disposer du bordereau en cas de contrôle lors du retour. Si un BSD est absent vérifiez qu'il est bien complété.";
 export const blankstate_default_title = "Il n'y a aucun bordereau";
 export const blankstate_default_desc =
   "Si vous le souhaitez, vous pouvez créer un bordereau depuis le menu de création ci-dessus";
