@@ -21,7 +21,8 @@ import {
   Transporter,
   BsdaTransporter,
   BsdasriStatus,
-  BsffTransporter
+  BsffTransporter,
+  BsvhuStatus
 } from "@td/codegen-ui";
 import {
   ACCEPTE,
@@ -393,8 +394,55 @@ export const isBsdaSignWorker = (bsd: BsdDisplay, currentSiret: string) => {
   return false;
 };
 
+const isIrregularSituation = bsd => bsd.emitter?.irregularSituation;
+
+// emitter is irregular and has no siret, transporter signature is needed
+const canIrregularSituationSignWithNoSiret = (
+  bsd: BsdDisplay,
+  currentSiret: string
+) => {
+  return (
+    bsd.status === BsvhuStatus.Initial &&
+    isIrregularSituation(bsd) &&
+    bsd.emitter?.noSiret &&
+    isSameSiretTransporter(currentSiret, bsd)
+  );
+};
+
+// emitter is irregular but has registered siret, he can sign
+const canIrregularSituationSignWithSiretRegistered = (
+  bsd: BsdDisplay,
+  currentSiret: string
+) => {
+  return (
+    bsd.status === BsvhuStatus.Initial &&
+    isIrregularSituation(bsd) &&
+    !bsd.emitter?.noSiret &&
+    isSameSiretEmitter(currentSiret, bsd) &&
+    !isSameSiretTransporter(currentSiret, bsd)
+  );
+};
+
+// emitter is irregular but has not registered siret, transporter signature is needed
+const canIrregularSituationSignWithSiretNotRegistered = (
+  bsd: BsdDisplay,
+  currentSiret: string
+) => {
+  return (
+    bsd.status === BsvhuStatus.Initial &&
+    isIrregularSituation(bsd) &&
+    !bsd.emitter?.noSiret &&
+    !isSameSiretEmitter(currentSiret, bsd) &&
+    isSameSiretTransporter(currentSiret, bsd)
+  );
+};
+
 export const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
-  isBsvhu(bsd.type) && isSameSiretEmitter(currentSiret, bsd);
+  isBsvhu(bsd.type) &&
+  ((isSameSiretEmitter(currentSiret, bsd) && !isIrregularSituation(bsd)) ||
+    canIrregularSituationSignWithNoSiret(bsd, currentSiret) ||
+    canIrregularSituationSignWithSiretRegistered(bsd, currentSiret) ||
+    canIrregularSituationSignWithSiretNotRegistered(bsd, currentSiret));
 
 export const isBsffSign = (
   bsd: BsdDisplay,
