@@ -53,12 +53,12 @@ const ActBsvhuValidation = ({
   };
 
   const status = bsd["bsvhuStatus"];
-  const canIrregularSituationSignNoSiret =
+  const canIrregularSituationSignWithNoSiret =
     status === BsvhuStatus.Initial &&
     bsd.emitter?.irregularSituation &&
     bsd.emitter?.noSiret;
 
-  const canIrregularSituationSignWithSiret =
+  const canIrregularSituationSignWithSiretRegistered =
     status === BsvhuStatus.Initial &&
     bsd.emitter?.irregularSituation &&
     !bsd.emitter?.noSiret &&
@@ -71,20 +71,20 @@ const ActBsvhuValidation = ({
     bsd.emitter?.company?.siret !== currentSiret &&
     bsd.transporter?.company?.siret === currentSiret;
 
-  const canSignWithNotIrregular =
+  const canRegularSituationSign =
     status === BsvhuStatus.Initial && !bsd.emitter?.irregularSituation;
 
   return (
     <>
       {status === BsvhuStatus.Initial &&
-        canSignWithNotIrregular &&
+        canRegularSituationSign &&
         renderInitialModal()}
       {status === BsvhuStatus.Initial &&
-        canIrregularSituationSignWithSiret &&
+        canIrregularSituationSignWithSiretRegistered &&
         renderInitialModal()}
       {(status === BsvhuStatus.SignedByProducer ||
         (status === BsvhuStatus.Initial &&
-          (canIrregularSituationSignNoSiret ||
+          (canIrregularSituationSignWithNoSiret ||
             canIrregularSituationSignWithSiretNotRegistered))) &&
         renderSignedByProducerModal()}
       {status === BsvhuStatus.Sent && renderSentModal()}
