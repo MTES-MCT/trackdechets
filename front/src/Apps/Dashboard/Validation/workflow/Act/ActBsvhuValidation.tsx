@@ -53,12 +53,29 @@ const ActBsvhuValidation = ({
   };
 
   const status = bsd["bsvhuStatus"];
-  const canIrregularSituationSign =
-    status === BsvhuStatus.Initial && bsd.emitter?.irregularSituation;
+  const canIrregularSituationSignNoSiret =
+    status === BsvhuStatus.Initial &&
+    bsd.emitter?.irregularSituation &&
+    bsd.emitter?.noSiret;
+
+  const canIrregularSituationSignWithSiret =
+    status === BsvhuStatus.Initial &&
+    bsd.emitter?.irregularSituation &&
+    !bsd.emitter?.noSiret;
+
+  const canSignWithNotIrregular =
+    status === BsvhuStatus.Initial && !bsd.emitter?.irregularSituation;
+
   return (
     <>
-      {status === BsvhuStatus.Initial && renderInitialModal()}
-      {(status === BsvhuStatus.SignedByProducer || canIrregularSituationSign) &&
+      {status === BsvhuStatus.Initial &&
+        canSignWithNotIrregular &&
+        renderInitialModal()}
+      {status === BsvhuStatus.Initial &&
+        canIrregularSituationSignWithSiret &&
+        renderInitialModal()}
+      {(status === BsvhuStatus.SignedByProducer ||
+        (status === BsvhuStatus.Initial && canIrregularSituationSignNoSiret)) &&
         renderSignedByProducerModal()}
       {status === BsvhuStatus.Sent && renderSentModal()}
     </>
