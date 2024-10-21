@@ -23,13 +23,15 @@ export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";
 export { operationHooksQueue } from "./queue/producers/operationHook";
 export { administrativeTransferQueue } from "./queue/producers/administrativeTransfer";
 export { updateAppendix2Queue } from "./queue/producers/updateAppendix2";
+export { registryImportQueue } from "./queue/producers/registryImport";
 export {
   indexBsdJob,
   operationHookJob,
   updateAppendix2Job,
   sendMailJob,
   postGericoJob,
-  processAdministrativeTransferJob
+  processAdministrativeTransferJob,
+  processRegistryImportJob
 } from "./queue/jobs";
 
 export {

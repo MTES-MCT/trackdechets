@@ -8,6 +8,7 @@
   border-right: solid 1px $grey-light;
   position: sticky;
   top: 56px;
+  flex-shrink: 0;
 
   &__item {
     display: -webkit-box;

@@ -783,7 +783,8 @@ describe("Index favorites job", () => {
       contactPhone: "00 00 00 00 00",
       contact: "John Snow",
       codePaysEtrangerEtablissement: "FR",
-      etatAdministratif: "A"
+      etatAdministratif: "A",
+      isDormant: false
     };
     (searchCompany as jest.Mock).mockResolvedValueOnce(destination);
 
@@ -885,7 +886,8 @@ describe("Index favorites job", () => {
       contactPhone: "00 00 00 00 00",
       contact: "John Snow",
       etatAdministratif: "A",
-      codePaysEtrangerEtablissement: "FR"
+      codePaysEtrangerEtablissement: "FR",
+      isDormant: false
     };
     (searchCompany as jest.Mock).mockResolvedValueOnce(traderSirene);
 
@@ -964,7 +966,8 @@ describe("Index favorites job", () => {
       contactPhone: "00 00 00 00 00",
       contact: "John Snow",
       etatAdministratif: "A",
-      codePaysEtrangerEtablissement: "FR"
+      codePaysEtrangerEtablissement: "FR",
+      isDormant: false
     };
 
     (searchCompany as jest.Mock).mockResolvedValueOnce(brokerSirene);
