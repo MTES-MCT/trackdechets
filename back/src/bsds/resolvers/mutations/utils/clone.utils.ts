@@ -408,6 +408,12 @@ export const cloneBsff = async (user: Express.User, id: string) => {
     throw new UserInputError(`ID invalide ${id}`);
   }
 
+  if (bsff.packagings?.some(packaging => packaging.nextPackagingId)) {
+    throw new UserInputError(
+      "Impossible de cloner ce type de BSD pour le moment"
+    );
+  }
+
   const { create } = getBsffRepository(user);
 
   const newBsffCreateInput: Omit<
@@ -441,7 +447,12 @@ export const cloneBsff = async (user: Express.User, id: string) => {
     emitterEmissionSignatureAuthor: bsff.emitterEmissionSignatureAuthor,
     emitterEmissionSignatureDate: bsff.emitterEmissionSignatureDate,
     ficheInterventions: bsff.ficheInterventions.length
-      ? { create: bsff.ficheInterventions[0] }
+      ? {
+          create: {
+            ...bsff.ficheInterventions[0],
+            id: undefined
+          }
+        }
       : {},
     isDeleted: bsff.isDeleted,
     isDraft: bsff.isDraft,
