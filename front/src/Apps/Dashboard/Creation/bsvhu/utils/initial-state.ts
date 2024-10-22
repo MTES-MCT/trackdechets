@@ -1,10 +1,28 @@
 /* eslint-disable import/no-anonymous-default-export */
 
+import { BsvhuCompanyInput } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
+
+const getInitialEmitterCompany = (company?: BsvhuCompanyInput | null) => {
+  return {
+    siret: company?.siret ?? "",
+    name: company?.name ?? "",
+    address: company?.address ?? "",
+    city: company?.city ?? "",
+    street: company?.street ?? "",
+    postalCode: company?.postalCode ?? "",
+    contact: company?.contact ?? "",
+    mail: company?.mail ?? "",
+    phone: company?.phone ?? "",
+    vatNumber: company?.vatNumber ?? "",
+    country: company?.country ?? "",
+    omiNumber: company?.omiNumber ?? ""
+  };
+};
 
 export default {
   emitter: {
-    company: getInitialCompany(),
+    company: getInitialEmitterCompany(),
     agrementNumber: "",
     emission: {
       signature: {

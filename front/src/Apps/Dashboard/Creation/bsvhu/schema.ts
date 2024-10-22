@@ -8,7 +8,10 @@ const zodCompany = z.object({
   contact: z.string().nullish(),
   phone: z.string().nullish(),
   mail: z.string().nullish(),
-  address: z.string().nullish()
+  address: z.string().nullish(),
+  city: z.string().nullish(),
+  street: z.string().nullish(),
+  postalCode: z.string().nullish()
 });
 
 const zodEmitter = z.object({
