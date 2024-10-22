@@ -1,11 +1,17 @@
 import { useMutation } from "@apollo/client";
-import { Mutation, MutationSubscribeToNotificationsArgs } from "@td/codegen-ui";
+import {
+  Mutation,
+  MutationSubscribeToNotificationsArgs,
+  UserNotifications,
+  UserNotificationsInput
+} from "@td/codegen-ui";
 import React from "react";
 import { SUBSCRIBE_TO_NOTIFICATIONS } from "./queries";
 import { useForm } from "react-hook-form";
 import Button from "@codegouvfr/react-dsfr/Button";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import styles from "./NotificationsUpdateAllModal.module.scss";
+import { hintTexts } from "./utils";
 
 type AccountNotificationsUpdateAllModalProps = {
   // nombre total d'établissements
@@ -13,32 +19,112 @@ type AccountNotificationsUpdateAllModalProps = {
   close: () => void;
 };
 
-enum SubscribeAction {
+enum SubscribeActions {
   DoNothing = "DoNothing",
   Subscribe = "Subscribe",
   Unsuscribe = "Unsubscribe"
 }
 
 type FormValues = {
-  membershipRequest: SubscribeAction;
+  membershipRequest: SubscribeActions;
+  signatureCodeRenewal: SubscribeActions;
+  bsdRefusal: SubscribeActions;
+  bsdaFinalDestinationUpdate: SubscribeActions;
+  revisionRequest: SubscribeActions;
+};
+
+type RadioInput = {
+  legend: string;
+  notification: keyof Omit<UserNotifications, "__typename">;
 };
 
 export default function AccountNotificationsUpdateAllModal({
   totalCount,
   close
 }: AccountNotificationsUpdateAllModalProps) {
-  const [subscribeToNotifications, { loading, data, error }] = useMutation<
+  const [
+    subscribeToNotifications,
+    { loading, data, error, reset: resetMutation }
+  ] = useMutation<
     Pick<Mutation, "subscribeToNotifications">,
     MutationSubscribeToNotificationsArgs
   >(SUBSCRIBE_TO_NOTIFICATIONS);
 
   const { register, handleSubmit, reset } = useForm<FormValues>({
-    defaultValues: { membershipRequest: SubscribeAction.DoNothing }
+    defaultValues: {
+      membershipRequest: SubscribeActions.DoNothing,
+      signatureCodeRenewal: SubscribeActions.DoNothing,
+      bsdRefusal: SubscribeActions.DoNothing,
+      bsdaFinalDestinationUpdate: SubscribeActions.DoNothing,
+      revisionRequest: SubscribeActions.DoNothing
+    }
   });
 
+  function resetAndClose() {
+    reset();
+    resetMutation();
+    close();
+  }
+
   const onSubmit = async (data: FormValues) => {
-    console.log(data);
+    const notifications: UserNotificationsInput = Object.entries(data).reduce(
+      (acc, [notification, action]) => {
+        if (action === SubscribeActions.Subscribe) {
+          return { ...acc, [notification]: true };
+        } else if (action === SubscribeActions.Unsuscribe) {
+          return { ...acc, [notification]: false };
+        }
+        return acc;
+      },
+      {}
+    );
+    if (Object.keys(notifications).length === 0) {
+      resetAndClose();
+      return;
+    }
+
+    const { errors } = await subscribeToNotifications({
+      variables: {
+        input: {
+          notifications
+        }
+      }
+    });
+    if (!errors) {
+      resetAndClose();
+    }
   };
+
+  const radioInputs: RadioInput[] = [
+    {
+      legend: "Demandes de rattachement",
+      notification: "membershipRequest"
+    },
+    {
+      legend: "Renouvellement du code signature",
+      notification: "signatureCodeRenewal"
+    },
+    {
+      legend: "Refus total et partiel des bordereaux",
+      notification: "bsdRefusal"
+    },
+    {
+      legend: "Modification de la destination finale amiante",
+      notification: "bsdaFinalDestinationUpdate"
+    },
+    {
+      legend: "Demandes de révision",
+      notification: "revisionRequest"
+    }
+  ];
+
+  let radioButtonState: "default" | "error" | "success" = "default";
+
+  if (error) {
+    radioButtonState = "error";
+  } else if (data) {
+    radioButtonState = "success";
+  }
 
   return (
     <>
@@ -50,35 +136,39 @@ export default function AccountNotificationsUpdateAllModal({
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <RadioButtons
-            legend="Demandes de rattachement"
-            hintText="Texte de description additionnel"
-            name="membership-request"
-            options={[
-              {
-                label: "Ne rien faire",
-                nativeInputProps: {
-                  value: SubscribeAction.DoNothing,
-                  ...register("membershipRequest")
+          {radioInputs.map(({ notification, legend }) => (
+            <RadioButtons
+              legend={legend}
+              hintText={hintTexts[notification]}
+              name={notification}
+              state={radioButtonState}
+              stateRelatedMessage={error?.message}
+              options={[
+                {
+                  label: "Ne rien faire",
+                  nativeInputProps: {
+                    value: SubscribeActions.DoNothing,
+                    ...register(notification)
+                  }
+                },
+                {
+                  label: "S'abonner",
+                  nativeInputProps: {
+                    value: SubscribeActions.Subscribe,
+                    ...register(notification)
+                  }
+                },
+                {
+                  label: "Se désabonner",
+                  nativeInputProps: {
+                    value: SubscribeActions.Unsuscribe,
+                    ...register(notification)
+                  }
                 }
-              },
-              {
-                label: "S'abonner",
-                nativeInputProps: {
-                  value: SubscribeAction.Subscribe,
-                  ...register("membershipRequest")
-                }
-              },
-              {
-                label: "Se désabonner",
-                nativeInputProps: {
-                  value: SubscribeAction.Unsuscribe,
-                  ...register("membershipRequest")
-                }
-              }
-            ]}
-            orientation="horizontal"
-          />
+              ]}
+              orientation="horizontal"
+            />
+          ))}
         </div>
         <div className={styles.buttons}>
           <Button

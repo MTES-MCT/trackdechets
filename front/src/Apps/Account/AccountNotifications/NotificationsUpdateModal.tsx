@@ -12,6 +12,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { useMutation } from "@apollo/client";
 import { SUBSCRIBE_TO_COMPANY_NOTIFICATIONS } from "./queries";
 import styles from "./NotificationsUpdateModal.module.scss";
+import { hintTexts } from "./utils";
 
 type AccountCompanyNotificationsUpdateModalProps = {
   company: CompanyPrivate;
@@ -19,7 +20,6 @@ type AccountCompanyNotificationsUpdateModalProps = {
 };
 
 type OptionLabel = {
-  hintText: string;
   label: string;
   notification: keyof UserNotifications;
 };
@@ -97,36 +97,22 @@ export default function NotificationsUpdateModal({
 
   const optionsLabels: OptionLabel[] = [
     {
-      hintText:
-        "Seuls les membres avec le rôle Administrateur sont en mesure de recevoir " +
-        "et d'accepter / refuser / effectuer des demandes de rattachement à leur établissement. " +
-        "Nous vous conseillons donc vivement, pour chaque établissement de conserver au moins un " +
-        "administrateur abonné à ce type de notification.",
       label: "aux demandes de rattachement",
       notification: "membershipRequest"
     },
     {
-      hintText:
-        "Un courriel sera envoyé à chaque renouvellement du code de signature",
       label: "au renouvellement du code de signature",
       notification: "signatureCodeRenewal"
     },
     {
-      hintText:
-        "un courriel sera envoyé à chaque refus total ou partiel d'un bordereau",
       label: "au refus total et partiel des bordereaux",
       notification: "bsdRefusal"
     },
     {
-      hintText:
-        "Un courriel sera envoyé lorsque le BSDA est envoyé à un exutoire" +
-        " différent de celui prévu lors de la signature producteur",
       label: "à la modification de la destination finale amiante",
       notification: "bsdaFinalDestinationUpdate"
     },
     {
-      hintText:
-        "Un courriel sera envoyé à chaque fois qu'une révision sera restée sans réponse 14 jours après sa demande",
       label: "aux demandes de révision",
       notification: "revisionRequest"
     }
@@ -136,9 +122,9 @@ export default function NotificationsUpdateModal({
     .filter(({ notification }) =>
       authorizedNotifications.includes(notification)
     )
-    .map(({ label, hintText, notification }) => ({
+    .map(({ label, notification }) => ({
       label,
-      hintText,
+      hintText: hintTexts[notification],
       nativeInputProps: {
         ...register(notification)
       }
