@@ -28,6 +28,9 @@ const EmitterBsvhu = ({ errors }) => {
     register("emitter.company.name");
     register("emitter.company.vatNumber");
     register("emitter.company.address");
+    register("emitter.company.city");
+    register("emitter.company.street");
+    register("emitter.company.postalCode");
     register("emitter.irregularSituation");
     register("emitter.noSiret");
   }, [register]);
@@ -242,9 +245,9 @@ const EmitterBsvhu = ({ errors }) => {
                   placeholder="Rechercher"
                   onAddressSelection={details => {
                     // `address` is passed as `name` because of adresse api return fields
-                    setValue(`emitter.company.address`, details.label);
+                    setValue(`emitter.company.address`, details.name);
                     setValue(`emitter.company.city`, details.city);
-                    setValue(`emitter.company.street`, details.label);
+                    setValue(`emitter.company.street`, details.name);
                     setValue(`emitter.company.postalCode`, details.postcode);
                   }}
                 />
