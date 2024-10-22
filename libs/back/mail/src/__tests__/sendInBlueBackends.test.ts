@@ -13,8 +13,7 @@ const mail: Mail = {
   body: "<p>Donéc non massa pretïum</p>",
 
   templateId: 33,
-  attachment: { file: "base64abc", name: "file.pdf" },
-  vars: { foo: "bar" }
+  attachment: { file: "base64abc", name: "file.pdf" }
 };
 
 const batchMail: Mail = {
@@ -34,8 +33,7 @@ const batchMail: Mail = {
   body: "<p>Donéc non massa pretïum</p>",
 
   templateId: 33,
-  attachment: { file: "base64abc", name: "file.pdf" },
-  vars: { foo: "bar" }
+  attachment: { file: "base64abc", name: "file.pdf" }
 };
 
 describe("sendInBlue backend", () => {

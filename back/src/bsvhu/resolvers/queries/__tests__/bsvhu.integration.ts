@@ -40,6 +40,26 @@ query GetBsvhu($id: ID!) {
         number
       }
     }
+    ecoOrganisme {
+      name
+      siret
+    }
+    broker {
+      company {
+        siret
+      }
+      recepisse {
+        number
+      }
+    }
+    trader {
+      company {
+        siret
+      }
+      recepisse {
+        number
+      }
+    }
     weight {
       value
     }

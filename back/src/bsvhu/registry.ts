@@ -119,6 +119,18 @@ export function getRegistryFields(
       registryFields.isTransportedWasteFor.push(bsvhu.transporterCompanySiret);
       registryFields.isAllWasteFor.push(bsvhu.transporterCompanySiret);
     }
+    if (bsvhu.ecoOrganismeSiret) {
+      registryFields.isOutgoingWasteFor.push(bsvhu.ecoOrganismeSiret);
+      registryFields.isAllWasteFor.push(bsvhu.ecoOrganismeSiret);
+    }
+    if (bsvhu.brokerCompanySiret) {
+      registryFields.isManagedWasteFor.push(bsvhu.brokerCompanySiret);
+      registryFields.isAllWasteFor.push(bsvhu.brokerCompanySiret);
+    }
+    if (bsvhu.traderCompanySiret) {
+      registryFields.isManagedWasteFor.push(bsvhu.traderCompanySiret);
+      registryFields.isAllWasteFor.push(bsvhu.traderCompanySiret);
+    }
     if (bsvhu.intermediaries?.length) {
       for (const intermediary of bsvhu.intermediaries) {
         const intermediaryOrgId = getIntermediaryCompanyOrgId(intermediary);
@@ -172,8 +184,8 @@ export function toGenericWaste(bsvhu: RegistryBsvhu): GenericWaste {
     id: bsvhu.id,
     createdAt: bsvhu.createdAt,
     updatedAt: bsvhu.createdAt,
-    ecoOrganismeName: null,
-    ecoOrganismeSiren: null,
+    ecoOrganismeName: bsvhu.ecoOrganismeName,
+    ecoOrganismeSiren: bsvhu.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSVHU",
     bsdSubType: getBsvhuSubType(bsvhu),
     status: bsvhu.status,
@@ -215,6 +227,8 @@ export function toGenericWaste(bsvhu: RegistryBsvhu): GenericWaste {
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyIrregularSituation: !!bsvhu.emitterIrregularSituation,
+    brokerCompanyMail: bsvhu.brokerCompanyMail,
+    traderCompanyMail: bsvhu.traderCompanyMail,
     weight: bsvhu.weightValue
       ? new Decimal(bsvhu.weightValue)
           .dividedBy(1000)
@@ -233,12 +247,12 @@ export function toIncomingWaste(bsvhu: RegistryBsvhu): Required<IncomingWaste> {
     ...emptyIncomingWaste,
     ...genericWaste,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    traderRecepisseNumber: null,
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
-    brokerRecepisseNumber: null,
+    traderCompanyName: bsvhu.traderCompanyName,
+    traderCompanySiret: bsvhu.traderCompanySiret,
+    traderRecepisseNumber: bsvhu.traderRecepisseNumber,
+    brokerCompanyName: bsvhu.brokerCompanyName,
+    brokerCompanySiret: bsvhu.brokerCompanySiret,
+    brokerRecepisseNumber: bsvhu.brokerRecepisseNumber,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     ...getOperationData(bsvhu),
     ...getTransporterData(bsvhu),
@@ -253,13 +267,13 @@ export function toOutgoingWaste(bsvhu: RegistryBsvhu): Required<OutgoingWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyOutgoingWaste,
     ...genericWaste,
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
-    brokerRecepisseNumber: null,
     destinationPlannedOperationMode: null,
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    traderRecepisseNumber: null,
+    brokerCompanyName: bsvhu.brokerCompanyName,
+    brokerCompanySiret: bsvhu.brokerCompanySiret,
+    brokerRecepisseNumber: bsvhu.brokerRecepisseNumber,
+    traderCompanyName: bsvhu.traderCompanyName,
+    traderCompanySiret: bsvhu.traderCompanySiret,
+    traderRecepisseNumber: bsvhu.traderRecepisseNumber,
     ...getOperationData(bsvhu),
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     ...getOperationData(bsvhu),
@@ -279,12 +293,12 @@ export function toTransportedWaste(
     ...genericWaste,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    traderRecepisseNumber: null,
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
-    brokerRecepisseNumber: null,
+    traderCompanyName: bsvhu.traderCompanyName,
+    traderCompanySiret: bsvhu.traderCompanySiret,
+    traderRecepisseNumber: bsvhu.traderRecepisseNumber,
+    brokerCompanyName: bsvhu.brokerCompanyName,
+    brokerCompanySiret: bsvhu.brokerCompanySiret,
+    brokerRecepisseNumber: bsvhu.brokerRecepisseNumber,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     ...getTransporterData(bsvhu, true)
   };
@@ -301,10 +315,10 @@ export function toManagedWaste(bsvhu: RegistryBsvhu): Required<ManagedWaste> {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyManagedWaste,
     ...genericWaste,
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
+    traderCompanyName: bsvhu.traderCompanyName,
+    traderCompanySiret: bsvhu.traderCompanySiret,
+    brokerCompanyName: bsvhu.brokerCompanyName,
+    brokerCompanySiret: bsvhu.brokerCompanySiret,
     destinationPlannedOperationMode: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     ...getTransporterData(bsvhu)
@@ -320,14 +334,14 @@ export function toAllWaste(bsvhu: RegistryBsvhu): Required<AllWaste> {
     ...genericWaste,
     createdAt: bsvhu.createdAt,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
-    brokerRecepisseNumber: null,
+    brokerCompanyName: bsvhu.brokerCompanyName,
+    brokerCompanySiret: bsvhu.brokerCompanySiret,
+    brokerRecepisseNumber: bsvhu.brokerRecepisseNumber,
+    traderCompanyName: bsvhu.traderCompanyName,
+    traderCompanySiret: bsvhu.traderCompanySiret,
+    traderRecepisseNumber: bsvhu.traderRecepisseNumber,
     destinationPlannedOperationMode: null,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    traderRecepisseNumber: null,
     emitterCompanyMail: bsvhu.emitterCompanyMail,
     ...getOperationData(bsvhu),
     ...getTransporterData(bsvhu, true),

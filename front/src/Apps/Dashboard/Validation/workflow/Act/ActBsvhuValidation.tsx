@@ -53,10 +53,40 @@ const ActBsvhuValidation = ({
   };
 
   const status = bsd["bsvhuStatus"];
+  const canIrregularSituationSignWithNoSiret =
+    status === BsvhuStatus.Initial &&
+    bsd.emitter?.irregularSituation &&
+    bsd.emitter?.noSiret;
+
+  const canIrregularSituationSignWithSiretRegistered =
+    status === BsvhuStatus.Initial &&
+    bsd.emitter?.irregularSituation &&
+    !bsd.emitter?.noSiret &&
+    bsd.emitter?.company?.siret === currentSiret;
+
+  const canIrregularSituationSignWithSiretNotRegistered =
+    status === BsvhuStatus.Initial &&
+    bsd.emitter?.irregularSituation &&
+    !bsd.emitter?.noSiret &&
+    bsd.emitter?.company?.siret !== currentSiret &&
+    bsd.transporter?.company?.siret === currentSiret;
+
+  const canRegularSituationSign =
+    status === BsvhuStatus.Initial && !bsd.emitter?.irregularSituation;
+
   return (
     <>
-      {status === BsvhuStatus.Initial && renderInitialModal()}
-      {status === BsvhuStatus.SignedByProducer && renderSignedByProducerModal()}
+      {status === BsvhuStatus.Initial &&
+        canRegularSituationSign &&
+        renderInitialModal()}
+      {status === BsvhuStatus.Initial &&
+        canIrregularSituationSignWithSiretRegistered &&
+        renderInitialModal()}
+      {(status === BsvhuStatus.SignedByProducer ||
+        (status === BsvhuStatus.Initial &&
+          (canIrregularSituationSignWithNoSiret ||
+            canIrregularSituationSignWithSiretNotRegistered))) &&
+        renderSignedByProducerModal()}
       {status === BsvhuStatus.Sent && renderSentModal()}
     </>
   );

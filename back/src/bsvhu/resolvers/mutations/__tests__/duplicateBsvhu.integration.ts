@@ -3,6 +3,7 @@ import { xDaysAgo } from "../../../../utils";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   companyFactory,
+  ecoOrganismeFactory,
   transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -78,11 +79,47 @@ describe("mutaion.duplicateBsvhu", () => {
       await prisma.transporterReceipt.findUniqueOrThrow({
         where: { id: transporter.transporterReceiptId! }
       });
-    const destination = await companyFactory();
+    const destination = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
 
     const intermediary = await companyFactory();
 
+    const ecoOrganisme = await ecoOrganismeFactory({
+      handle: { handleBsvhu: true },
+      createAssociatedCompany: true
+    });
+
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: {
+        create: {
+          receiptNumber: "BROKER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "BROKER-RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const brokerReceipt = await prisma.brokerReceipt.findUniqueOrThrow({
+      where: { id: broker.brokerReceiptId! }
+    });
+    const trader = await companyFactory({
+      companyTypes: ["TRADER"],
+      traderReceipt: {
+        create: {
+          receiptNumber: "TRADER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "TRADER-RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const traderReceipt = await prisma.traderReceipt.findUniqueOrThrow({
+      where: { id: trader.traderReceiptId! }
+    });
+
     const bsvhu = await bsvhuFactory({
+      userId: emitter.user.id,
       opt: {
         emitterIrregularSituation: false,
         emitterNoSiret: false,
@@ -125,7 +162,27 @@ describe("mutaion.duplicateBsvhu", () => {
               }
             ]
           }
-        }
+        },
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        ecoOrganismeName: ecoOrganisme.name,
+        brokerCompanyName: broker.name,
+        brokerCompanySiret: broker.siret,
+        brokerCompanyAddress: broker.address,
+        brokerCompanyContact: broker.contact,
+        brokerCompanyPhone: broker.contactPhone,
+        brokerCompanyMail: broker.contactEmail,
+        brokerRecepisseNumber: brokerReceipt.receiptNumber,
+        brokerRecepisseDepartment: brokerReceipt.department,
+        brokerRecepisseValidityLimit: brokerReceipt.validityLimit,
+        traderCompanyName: trader.name,
+        traderCompanySiret: trader.siret,
+        traderCompanyAddress: trader.address,
+        traderCompanyContact: trader.contact,
+        traderCompanyPhone: trader.contactPhone,
+        traderCompanyMail: trader.contactEmail,
+        traderRecepisseNumber: traderReceipt.receiptNumber,
+        traderRecepisseDepartment: traderReceipt.department,
+        traderRecepisseValidityLimit: traderReceipt.validityLimit
       }
     });
     const { mutate } = makeClient(emitter.user);
@@ -195,6 +252,26 @@ describe("mutaion.duplicateBsvhu", () => {
       transporterCustomInfo,
       transporterTransportPlates,
       transporterRecepisseIsExempted,
+      ecoOrganismeSiret,
+      ecoOrganismeName,
+      brokerCompanyName,
+      brokerCompanySiret,
+      brokerCompanyAddress,
+      brokerCompanyContact,
+      brokerCompanyPhone,
+      brokerCompanyMail,
+      brokerRecepisseNumber,
+      brokerRecepisseDepartment,
+      brokerRecepisseValidityLimit,
+      traderCompanyName,
+      traderCompanySiret,
+      traderCompanyAddress,
+      traderCompanyContact,
+      traderCompanyPhone,
+      traderCompanyMail,
+      traderRecepisseNumber,
+      traderRecepisseDepartment,
+      traderRecepisseValidityLimit,
       ...rest
     } = bsvhu;
 
@@ -225,7 +302,8 @@ describe("mutaion.duplicateBsvhu", () => {
       "destinationOperationSignatureDate",
 
       "intermediaries",
-      "intermediariesOrgIds"
+      "intermediariesOrgIds",
+      "canAccessDraftOrgIds"
     ];
 
     expect(duplicatedBsvhu.status).toEqual("INITIAL");
@@ -283,7 +361,27 @@ describe("mutaion.duplicateBsvhu", () => {
       transporterTransportTakenOverAt,
       transporterCustomInfo,
       transporterTransportPlates,
-      transporterRecepisseIsExempted
+      transporterRecepisseIsExempted,
+      ecoOrganismeSiret,
+      ecoOrganismeName,
+      brokerCompanyName,
+      brokerCompanySiret,
+      brokerCompanyAddress,
+      brokerCompanyContact,
+      brokerCompanyPhone,
+      brokerCompanyMail,
+      brokerRecepisseNumber,
+      brokerRecepisseDepartment,
+      brokerRecepisseValidityLimit,
+      traderCompanyName,
+      traderCompanySiret,
+      traderCompanyAddress,
+      traderCompanyContact,
+      traderCompanyPhone,
+      traderCompanyMail,
+      traderRecepisseNumber,
+      traderRecepisseDepartment,
+      traderRecepisseValidityLimit
     });
 
     // make sure this test breaks when a new field is added to the Bsvhu model
@@ -374,6 +472,8 @@ describe("mutaion.duplicateBsvhu", () => {
         where: { id: transporterCompany.transporterReceiptId! }
       });
     const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"],
       vhuAgrementDemolisseur: {
         create: {
           agrementNumber: "UPDATED-AGREEMENT-NUMBER",
@@ -558,6 +658,8 @@ describe("mutaion.duplicateBsvhu", () => {
         where: { id: transporterCompany.transporterReceiptId! }
       });
     const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"],
       vhuAgrementDemolisseur: {
         create: {
           agrementNumber: "UPDATED-AGREEMENT-NUMBER",

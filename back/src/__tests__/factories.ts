@@ -11,11 +11,14 @@ import {
   User,
   Prisma,
   Company,
-  TransportMode
+  TransportMode,
+  UserNotification
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
+import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../forms/database";
+import { CompanyRole } from "../common/validation/zod/schema";
 
 /**
  * Create a user with name and email
@@ -135,17 +138,50 @@ export const userWithCompanyFactory = async (
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
+  const notifications =
+    role === "ADMIN"
+      ? [
+          UserNotification.MEMBERSHIP_REQUEST,
+          UserNotification.REVISION_REQUEST,
+          UserNotification.BSD_REFUSAL,
+          UserNotification.SIGNATURE_CODE_RENEWAL,
+          UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+        ]
+      : [];
+
   const user = await userFactory({
     ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
+        notifications,
         role: role,
         ...companyAssociationOpts
       }
     }
   });
   return { user, company };
+};
+
+/**
+ * Create a user and add him to an existing company
+ */
+export const userInCompany = async (
+  role: UserRole = "ADMIN",
+  companyId: string,
+  userOpts: Partial<Prisma.UserCreateInput> = {}
+) => {
+  const user = await userFactory({
+    ...userOpts,
+    companyAssociations: {
+      create: {
+        company: { connect: { id: companyId } },
+        role: role
+      }
+    }
+  });
+
+  return user;
 };
 
 export const destinationFactory = async (
@@ -350,7 +386,7 @@ export const bsddTransporterFactory = async ({
   opts: Omit<Prisma.BsddTransporterCreateWithoutFormInput, "number">;
 }) => {
   const count = await prisma.bsddTransporter.count({ where: { formId } });
-  return prisma.bsddTransporter.create({
+  const transporter = await prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: formId } },
       ...bsddTransporterData,
@@ -358,6 +394,24 @@ export const bsddTransporterFactory = async ({
       ...opts
     }
   });
+
+  const form = await prisma.form.findFirstOrThrow({
+    where: { id: formId },
+    include: {
+      ...SIRETS_BY_ROLE_INCLUDE,
+      forwardedIn: true,
+      transporters: true
+    }
+  });
+
+  // Fix fields like "recipientsSirets" or "transportersSirets"
+  const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
+  await prisma.form.update({
+    where: { id: formId },
+    data: { ...denormalizedSirets, updatedAt: form.updatedAt }
+  });
+
+  return transporter;
 };
 
 export const upsertBaseSiret = async siret => {
@@ -423,14 +477,31 @@ export const formFactory = async ({
     }
   };
 
-  return prisma.form.create({
+  const form = await prisma.form.create({
     data: {
       readableId: getReadableId(),
       ...formParams,
       owner: { connect: { id: ownerId } }
     },
+    include: {
+      ...SIRETS_BY_ROLE_INCLUDE,
+      forwardedIn: true,
+      transporters: true
+    }
+  });
+
+  // Fix fields like "recipientsSirets" or "transportersSirets"
+  const denormalizedSirets = getFormSiretsByRole(form as any); // Ts doesn't infer correctly because of the boolean
+  const updated = await prisma.form.update({
+    where: { id: form.id },
+    data: {
+      ...denormalizedSirets,
+      updatedAt: opt?.updatedAt ?? new Date()
+    },
     include: { forwardedIn: true }
   });
+
+  return updated;
 };
 
 export const formWithTempStorageFactory = async ({
@@ -521,20 +592,36 @@ export const applicationFactory = async (openIdEnabled?: boolean) => {
 
 export const ecoOrganismeFactory = async ({
   siret,
-  handleBsdasri = false
+  handle,
+  createAssociatedCompany
 }: {
   siret?: string;
-  handleBsdasri?: boolean;
+  handle?: {
+    handleBsdasri?: boolean;
+    handleBsda?: boolean;
+    handleBsvhu?: boolean;
+  };
+  createAssociatedCompany?: boolean;
 }) => {
+  const { handleBsdasri, handleBsda, handleBsvhu } = handle ?? {};
   const ecoOrganismeIndex = (await prisma.ecoOrganisme.count()) + 1;
   const ecoOrganisme = await prisma.ecoOrganisme.create({
     data: {
       address: "",
       name: `Eco-Organisme ${ecoOrganismeIndex}`,
-      siret: siret ?? siretify(ecoOrganismeIndex),
-      handleBsdasri
+      siret: siret ?? siretify(),
+      handleBsdasri,
+      handleBsda,
+      handleBsvhu
     }
   });
+  if (createAssociatedCompany) {
+    // create the related company so sirenify works as expected
+    await companyFactory({
+      siret: ecoOrganisme.siret,
+      name: `Eco-Organisme ${ecoOrganismeIndex}`
+    });
+  }
 
   return ecoOrganisme;
 };
@@ -570,4 +657,70 @@ export const transporterReceiptFactory = async ({
   }
 
   return receipt;
+};
+
+export const intermediaryReceiptFactory = async ({
+  role = CompanyRole.Broker,
+  number = "el numero",
+  department = "69",
+  company
+}: {
+  role: CompanyRole.Broker | CompanyRole.Trader;
+  number?: string;
+  department?: string;
+  company?: Company;
+}) => {
+  let receipt;
+  if (role === CompanyRole.Broker) {
+    receipt = await prisma.brokerReceipt.create({
+      data: {
+        receiptNumber: number,
+        validityLimit: "2055-01-01T00:00:00.000Z",
+        department: department
+      }
+    });
+    if (!!company) {
+      await prisma.company.update({
+        where: { id: company.id },
+        data: { brokerReceipt: { connect: { id: receipt.id } } }
+      });
+    }
+  } else if (role === CompanyRole.Trader) {
+    receipt = await prisma.traderReceipt.create({
+      data: {
+        receiptNumber: number,
+        validityLimit: "2055-01-01T00:00:00.000Z",
+        department: department
+      }
+    });
+    if (!!company) {
+      await prisma.company.update({
+        where: { id: company.id },
+        data: { traderReceipt: { connect: { id: receipt.id } } }
+      });
+    }
+  }
+  return receipt;
+};
+
+export const bsddFinalOperationFactory = async ({
+  bsddId,
+  opts = {}
+}: {
+  bsddId: string;
+  opts?: Omit<
+    Partial<Prisma.BsddFinalOperationCreateInput>,
+    "initialForm" | "finalForm"
+  >;
+}) => {
+  return prisma.bsddFinalOperation.create({
+    data: {
+      initialForm: { connect: { id: bsddId } },
+      finalForm: { connect: { id: bsddId } },
+      operationCode: "",
+      quantity: 1,
+      noTraceability: false,
+      ...opts
+    }
+  });
 };

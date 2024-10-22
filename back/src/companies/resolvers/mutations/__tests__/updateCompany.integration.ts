@@ -178,21 +178,21 @@ describe("mutation updateCompany", () => {
     };
     mockGetUpdatedCompanyNameAndAddress.mockResolvedValueOnce({
       name: "nom de sirene",
-      address: "l'adresse de sirene"
+      address: "l'adresse de sirene",
+      codeNaf: "0710Z"
     });
-    const { data } = await mutate<Pick<Mutation, "updateCompany">>(
+    const { data, errors } = await mutate<Pick<Mutation, "updateCompany">>(
       UPDATE_COMPANY,
       {
         variables
       }
     );
+    expect(errors).toBeUndefined();
     expect(data.updateCompany.id).toEqual(company.id);
     expect(data.updateCompany.name).toEqual("nom de sirene");
     expect(data.updateCompany.address).toEqual("l'adresse de sirene");
-    expect(data.updateCompany.naf).toEqual(company.codeNaf);
-    expect(data.updateCompany.libelleNaf).toEqual(
-      libelleFromCodeNaf(company.codeNaf!)
-    );
+    expect(data.updateCompany.naf).toEqual("0710Z");
+    expect(data.updateCompany.libelleNaf).toEqual(libelleFromCodeNaf("0710Z"));
 
     const updatedCompany = await prisma.company.findUnique({
       where: { id: company.id }
@@ -209,8 +209,7 @@ describe("mutation updateCompany", () => {
       vatNumber: "RO17579668",
       name: "Acme in EU",
       address: "Transporter street",
-      companyTypes: ["TRANSPORTER"],
-      codeNaf: "0112Z"
+      companyTypes: ["TRANSPORTER"]
     });
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
@@ -231,10 +230,6 @@ describe("mutation updateCompany", () => {
     expect(data.updateCompany.id).toEqual(company.id);
     expect(data.updateCompany.name).toEqual("nom de vies");
     expect(data.updateCompany.address).toEqual("l'adresse de vies");
-    expect(data.updateCompany.naf).toEqual(company.codeNaf);
-    expect(data.updateCompany.libelleNaf).toEqual(
-      libelleFromCodeNaf(company.codeNaf!)
-    );
 
     const updatedCompany = await prisma.company.findUnique({
       where: { id: company.id }

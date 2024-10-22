@@ -8,15 +8,16 @@ export enum InfoIconCode {
   TransporterNumberPlate = "TransporterNumberPlate",
   PickupSite = "PickupSite",
   CustomId = "CustomId",
+  Cap = "Cap",
   default = ""
 }
 export enum InfoIconValue {
   TempStorage = "Entreposage provisoire",
   LastModificationDate = "Modifié le",
   CustomInfo = "Champ libre",
-  TransporterNumberPlate = "Plaque d'immatriculation",
   PickupSite = "Adresse chantier",
   CustomId = "N° libre : ",
+  Cap = "CAP : ",
   default = ""
 }
 

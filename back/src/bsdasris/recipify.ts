@@ -3,10 +3,19 @@ import {
   BsdasriRecepisseInput
 } from "../generated/graphql/types";
 import { recipifyGeneric } from "../companies/recipify";
-import {
-  autocompletedRecepisse,
-  genericGetter
-} from "../common/validation/recipify";
+
+export const autocompletedRecepisse = (
+  input: BsdasriInput,
+  recepisseInput: BsdasriRecepisseInput
+) => ({
+  ...input.transporter?.recepisse,
+  ...recepisseInput
+});
+
+const genericGetter = (input: BsdasriInput) => () =>
+  input?.transporter?.recepisse?.isExempted !== true
+    ? input?.transporter?.company
+    : null;
 
 const dasriAccessors = (input: BsdasriInput) => [
   {

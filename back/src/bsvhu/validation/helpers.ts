@@ -113,7 +113,16 @@ export async function getBsvhuUserFunctions(
       (bsvhu.transporterCompanySiret != null &&
         orgIds.includes(bsvhu.transporterCompanySiret)) ||
       (bsvhu.transporterCompanyVatNumber != null &&
-        orgIds.includes(bsvhu.transporterCompanyVatNumber))
+        orgIds.includes(bsvhu.transporterCompanyVatNumber)),
+    isEcoOrganisme:
+      bsvhu.ecoOrganismeSiret != null &&
+      orgIds.includes(bsvhu.ecoOrganismeSiret),
+    isBroker:
+      bsvhu.brokerCompanySiret != null &&
+      orgIds.includes(bsvhu.brokerCompanySiret),
+    isTrader:
+      bsvhu.traderCompanySiret != null &&
+      orgIds.includes(bsvhu.traderCompanySiret)
   };
 }
 

@@ -1,34 +1,46 @@
 import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 import { redisClient, setInCache } from "../../../common/redis";
 
-const SIRENE_API_TOKEN_URL = "https://api.insee.fr/token";
+const SIRENE_API_TOKEN_URL =
+  "https://auth.insee.net/auth/realms/apim-gravitee/protocol/openid-connect/token";
 export const INSEE_TOKEN_KEY = "insee_token";
-const { INSEE_SECRET } = process.env;
+const { INSEE_CLIENT_SECRET, INSEE_CLIENT_ID, INSEE_USERNAME, INSEE_PASSWORD } =
+  process.env;
 
 /**
  * Generates INSEE Sirene API token
  */
 async function generateToken(): Promise<string> {
   const headers = {
-    Authorization: `Basic ${INSEE_SECRET}`,
     "Content-Type": "application/x-www-form-urlencoded"
   };
 
+  // Création des paramètres de la requête avec URLSearchParams
+  const params = new URLSearchParams();
+  params.append("grant_type", "password");
+  params.append("client_id", INSEE_CLIENT_ID);
+  params.append("client_secret", INSEE_CLIENT_SECRET);
+  params.append("username", INSEE_USERNAME);
+  params.append("password", INSEE_PASSWORD);
+
   const response = await axios.post<{ access_token: string }>(
     SIRENE_API_TOKEN_URL,
-    "grant_type=client_credentials",
+    params,
     { headers }
   );
 
   return response.data.access_token;
 }
 
+// Le token expire au bout de 300 secondes
+const INSEE_TOKEN_EX = 300;
+
 /**
  * Generates a token and save it to redis cache
  */
 async function renewToken(): Promise<void> {
   const token = await generateToken();
-  await setInCache(INSEE_TOKEN_KEY, token);
+  await setInCache(INSEE_TOKEN_KEY, token, { EX: INSEE_TOKEN_EX });
 }
 
 /**

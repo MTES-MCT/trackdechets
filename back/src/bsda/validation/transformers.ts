@@ -1,6 +1,27 @@
 import { prisma } from "@td/prisma";
-import { ZodBsdaTransformer, ZodBsdaTransporterTransformer } from "./types";
+import {
+  BsdaValidationContext,
+  ZodBsdaTransformer,
+  ZodBsdaTransporterTransformer
+} from "./types";
 import { recipifyTransporter } from "../../common/validation/zod/transformers";
+import { ParsedZodBsda } from "./schema";
+import { sirenifyBsda } from "./sirenify";
+import { recipifyBsda } from "./recipify";
+import { getSealedFields } from "./rules";
+
+export const runTransformers = async (
+  bsda: ParsedZodBsda,
+  context: BsdaValidationContext
+): Promise<ParsedZodBsda> => {
+  const transformers = [sirenifyBsda, recipifyBsda];
+  const sealedFields = await getSealedFields(bsda, context);
+
+  for (const transformer of transformers) {
+    bsda = await transformer(bsda, sealedFields);
+  }
+  return bsda;
+};
 
 export const fillIntermediariesOrgIds: ZodBsdaTransformer = bsda => {
   bsda.intermediariesOrgIds = bsda.intermediaries

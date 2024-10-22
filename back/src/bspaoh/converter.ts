@@ -55,6 +55,16 @@ export function getFirstTransporterSync(bspaoh: {
   return firstTransporter ?? null;
 }
 
+export function getLastTransporterSync(bspaoh: {
+  transporters: PrismaBspaohTransporter[] | null;
+}): PrismaBspaohTransporter | null {
+  const { transporters } = bspaoh;
+  if (!transporters) return null;
+  const greatestNumber = Math.max(...transporters.map(t => t.number));
+  const lastTransporter = transporters.find(t => t.number === greatestNumber);
+  return lastTransporter ?? null;
+}
+
 const getWastepackagingAcceptationStatus = (
   wastePackaging,
   packagingsAcceptation

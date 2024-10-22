@@ -85,11 +85,11 @@ export const getCurrentTransporterInfos = (
         isToCollectTab
       );
     case BsdTypename.Bsdasri:
-      return getBsdasriCurrentTransporterInfos(bsd, currentSiret);
+      return getBsdasriCurrentTransporterInfos(bsd);
     case BsdTypename.Bsvhu:
       return null;
     case BsdTypename.Bspaoh:
-      return getBspaohCurrentTransporterInfos(bsd, currentSiret);
+      return getBspaohCurrentTransporterInfos(bsd);
     default:
       return null;
   }
@@ -101,37 +101,47 @@ export const getBsddCurrentTransporterInfos = (
   isToCollectTab: boolean
 ): BsdCurrentTransporterInfos => {
   let currentTransporter: Transporter | undefined;
-  // in case the BSD is going through temporary storage,
-  // fetch the transporter from the temporaryStorageDetail property
-  if (
-    bsdd.status === FormStatus.Resealed ||
-    bsdd.status === FormStatus.Resent ||
-    bsdd.status === FormStatus.SignedByTempStorer ||
-    bsdd.status === FormStatus.TempStored ||
-    bsdd.status === FormStatus.TempStorerAccepted
-  ) {
-    currentTransporter =
-      bsdd.temporaryStorageDetail?.transporter &&
-      bsdd.temporaryStorageDetail?.transporter.company?.orgId === currentSiret
-        ? bsdd.temporaryStorageDetail?.transporter
-        : undefined;
-  } else {
-    if (isToCollectTab) {
-      // find the first transporter with this SIRET who hasn't taken over yet
+
+  if (isToCollectTab) {
+    // the current company is a transporter and we should show his next transport's plate
+    // if the BSD should be collected, and the BSD is in a temp storage status, the transporter
+    // is the one on the temp storage
+    if (
+      bsdd.status === FormStatus.Resealed ||
+      bsdd.status === FormStatus.Resent ||
+      bsdd.status === FormStatus.SignedByTempStorer ||
+      bsdd.status === FormStatus.TempStored ||
+      bsdd.status === FormStatus.TempStorerAccepted
+    ) {
+      currentTransporter =
+        bsdd.temporaryStorageDetail?.transporter &&
+        bsdd.temporaryStorageDetail?.transporter.company?.orgId === currentSiret
+          ? bsdd.temporaryStorageDetail?.transporter
+          : undefined;
+    } else {
+      // else find the first transporter with this SIRET who hasn't taken over yet
       currentTransporter = bsdd.transporters?.find(
         transporter =>
           transporter.company?.orgId === currentSiret &&
           !transporter.takenOverAt
       );
+    }
+  } else {
+    // all other tabs work like the collected tab: show the last transporter
+    // that picked up the waste
+
+    // if there is a temp storage with a transporter, and the transporter has picked up
+    // the waste, show this one
+    if (
+      bsdd.temporaryStorageDetail?.transporter &&
+      bsdd.temporaryStorageDetail.takenOverAt
+    ) {
+      currentTransporter = bsdd.temporaryStorageDetail?.transporter;
     } else {
-      // find the last transporter with this SIRET who has taken over
+      // else, show the last transporter that picked up the waste
       currentTransporter = [...(bsdd.transporters ?? [])]
         .reverse()
-        .find(
-          transporter =>
-            transporter.company?.orgId === currentSiret &&
-            !!transporter.takenOverAt
-        );
+        .find(transporter => !!transporter.takenOverAt);
     }
   }
   if (!currentTransporter) {
@@ -139,7 +149,7 @@ export const getBsddCurrentTransporterInfos = (
   }
   return {
     transporterId: currentTransporter?.id,
-    transporterNumberPlate: currentTransporter?.numberPlate,
+    transporterNumberPlate: currentTransporter?.numberPlate?.trim(),
     transporterCustomInfo: currentTransporter?.customInfo,
     transporterMode: currentTransporter?.mode ?? undefined
   };
@@ -162,11 +172,7 @@ export const getMultiModalCurrentTransporterInfos = (
     // find the last transporter with this SIRET who has taken over
     currentTransporter = [...(bsd.transporters ?? [])]
       .reverse()
-      .find(
-        transporter =>
-          transporter.company?.orgId === currentSiret &&
-          !!transporter.transport?.signature?.date
-      );
+      .find(transporter => !!transporter.transport?.signature?.date);
   }
   if (!currentTransporter) {
     return {};
@@ -180,30 +186,24 @@ export const getMultiModalCurrentTransporterInfos = (
 };
 
 export const getBsdasriCurrentTransporterInfos = (
-  bsdasri: Bsdasri,
-  currentSiret: string
+  bsdasri: Bsdasri
 ): BsdCurrentTransporterInfos => {
   const currentTransporter = bsdasri.transporter;
-  if (currentTransporter?.company?.orgId !== currentSiret) {
-    return {};
-  }
   // since there is only one transporter per BSDASRI, transporterId is useless,
   // the update is done through the BSD using its id
   return {
-    transporterNumberPlate: currentTransporter?.transport?.plates,
+    transporterNumberPlate: currentTransporter?.transport?.plates?.filter(
+      plate => plate.trim()
+    ),
     transporterCustomInfo: currentTransporter?.customInfo,
     transporterMode: currentTransporter?.transport?.mode ?? undefined
   };
 };
 
 export const getBspaohCurrentTransporterInfos = (
-  bspaoh: Bspaoh,
-  currentSiret: string
+  bspaoh: Bspaoh
 ): BsdCurrentTransporterInfos => {
   const currentTransporter = bspaoh.transporter;
-  if (currentTransporter?.company?.orgId !== currentSiret) {
-    return {};
-  }
   return {
     transporterNumberPlate: currentTransporter?.transport?.plates,
     transporterCustomInfo: currentTransporter?.customInfo,
@@ -231,6 +231,9 @@ export const mapBsdd = (bsdd: Form): BsdDisplay => {
     transporter: bsdd.transporter,
     transporters: bsdd.transporters,
     ecoOrganisme: bsdd.ecoOrganisme,
+    broker: bsdd.broker,
+    trader: bsdd.trader,
+    intermediaries: bsdd.intermediaries,
     updatedAt: bsdd.stateSummary?.lastActionOn,
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,
     grouping: bsdd.grouping,
@@ -267,6 +270,7 @@ const mapBsda = (bsda: Bsda): BsdDisplay => {
     updatedAt: bsda.updatedAt || bsda["bsdaUpdatedAt"],
     emittedByEcoOrganisme: bsda.ecoOrganisme,
     worker: bsda.worker,
+    broker: bsda.broker,
     bsdWorkflowType: bsda.type || bsda["bsdaType"],
     groupedIn: bsda.groupedIn,
     forwardedIn: bsda.forwardedIn,
@@ -309,6 +313,7 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     emittedByEcoOrganisme: bsdasri.ecoOrganisme?.emittedByEcoOrganisme,
     bsdWorkflowType: bsdasri?.type,
     grouping: bsdasri?.grouping,
+    groupedIn: bsdasri.groupedIn,
     synthesizing: bsdasri?.synthesizing,
     allowDirectTakeOver: bsdasri?.allowDirectTakeOver,
     transporterCustomInfo: truncateTransporterInfo(

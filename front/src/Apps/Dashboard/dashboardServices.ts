@@ -21,7 +21,8 @@ import {
   Transporter,
   BsdaTransporter,
   BsdasriStatus,
-  BsffTransporter
+  BsffTransporter,
+  BsvhuStatus
 } from "@td/codegen-ui";
 import {
   ACCEPTE,
@@ -205,6 +206,64 @@ const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
 export const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
 export const isBspaoh = (type: BsdType): boolean => type === BsdType.Bspaoh;
 
+export enum ActorType {
+  Emitter = "EMITTER",
+  Transporter = "TRANSPORTER",
+  NextTransporter = "NEXTTRANSPORTER",
+  Destination = "DESTINATION",
+  Intermediary = "INTERMEDIARY",
+  EcoOrganisme = "ECOORGANISME",
+  Broker = "BROKER",
+  Worker = "WORKER",
+  TempStorage = "TEMPSTORAGE",
+  Trader = "TRADER"
+}
+
+interface ActorTypes {
+  type: ActorType;
+  strict?: boolean;
+}
+
+export const isSiretActorForBsd = (
+  bsd: BsdDisplay,
+  siret: string,
+  actorTypes: ActorTypes[]
+): boolean => {
+  const actorTypesForSiret = [
+    ...(siret === bsd.emitter?.company?.siret ? [ActorType.Emitter] : []),
+    ...(siret === bsd.ecoOrganisme?.siret ? [ActorType.EcoOrganisme] : []),
+    ...(siret === bsd.destination?.company?.siret
+      ? [ActorType.Destination]
+      : []),
+    ...(siret === bsd.worker?.company?.siret ? [ActorType.Worker] : []),
+    ...(siret === bsd.transporter?.company?.siret
+      ? [ActorType.Transporter]
+      : []),
+    ...(siret === bsd.broker?.company?.siret ? [ActorType.Broker] : []),
+    ...(siret === bsd.trader?.company?.siret ? [ActorType.Trader] : []),
+    ...(bsd.intermediaries?.some(p => p.siret === siret)
+      ? [ActorType.Intermediary]
+      : []),
+    ...(siret === bsd.temporaryStorageDetail?.destination?.company?.siret
+      ? [ActorType.TempStorage]
+      : []),
+    ...(siret === getNextTransporter(bsd)?.company?.siret
+      ? [ActorType.NextTransporter]
+      : [])
+  ];
+
+  return actorTypesForSiret.length === 0
+    ? false
+    : actorTypes
+        .map(({ type, strict = false }) => {
+          return actorTypesForSiret.includes(type) && strict
+            ? actorTypesForSiret.includes(type) &&
+                actorTypesForSiret.length === 1
+            : actorTypesForSiret.includes(type);
+        })
+        .reduce((acc, curr) => acc && curr, true);
+};
+
 const hasEmitterTransporterAndEcoOrgSiret = (
   bsd: BsdDisplay,
   siret: string
@@ -335,8 +394,55 @@ export const isBsdaSignWorker = (bsd: BsdDisplay, currentSiret: string) => {
   return false;
 };
 
+const isIrregularSituation = bsd => bsd.emitter?.irregularSituation;
+
+// emitter is irregular and has no siret, transporter signature is needed
+const canIrregularSituationSignWithNoSiret = (
+  bsd: BsdDisplay,
+  currentSiret: string
+) => {
+  return (
+    bsd.status === BsvhuStatus.Initial &&
+    isIrregularSituation(bsd) &&
+    bsd.emitter?.noSiret &&
+    isSameSiretTransporter(currentSiret, bsd)
+  );
+};
+
+// emitter is irregular but has registered siret, he can sign
+const canIrregularSituationSignWithSiretRegistered = (
+  bsd: BsdDisplay,
+  currentSiret: string
+) => {
+  return (
+    bsd.status === BsvhuStatus.Initial &&
+    isIrregularSituation(bsd) &&
+    !bsd.emitter?.noSiret &&
+    isSameSiretEmitter(currentSiret, bsd) &&
+    !isSameSiretTransporter(currentSiret, bsd)
+  );
+};
+
+// emitter is irregular but has not registered siret, transporter signature is needed
+const canIrregularSituationSignWithSiretNotRegistered = (
+  bsd: BsdDisplay,
+  currentSiret: string
+) => {
+  return (
+    bsd.status === BsvhuStatus.Initial &&
+    isIrregularSituation(bsd) &&
+    !bsd.emitter?.noSiret &&
+    !isSameSiretEmitter(currentSiret, bsd) &&
+    isSameSiretTransporter(currentSiret, bsd)
+  );
+};
+
 export const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
-  isBsvhu(bsd.type) && isSameSiretEmitter(currentSiret, bsd);
+  isBsvhu(bsd.type) &&
+  ((isSameSiretEmitter(currentSiret, bsd) && !isIrregularSituation(bsd)) ||
+    canIrregularSituationSignWithNoSiret(bsd, currentSiret) ||
+    canIrregularSituationSignWithSiretRegistered(bsd, currentSiret) ||
+    canIrregularSituationSignWithSiretNotRegistered(bsd, currentSiret));
 
 export const isBsffSign = (
   bsd: BsdDisplay,
@@ -535,7 +641,11 @@ export const getSealedBtnLabel = (
     (permissions.includes(UserPermission.BsdCanSignEmission) ||
       permissions.includes(UserPermission.BsdCanSignTransport))
   ) {
-    if (isAppendix1(bsd) && canAddAppendix1(bsd)) {
+    if (
+      isAppendix1(bsd) &&
+      canAddAppendix1(bsd) &&
+      hasAppendix1Cta(bsd, currentSiret)
+    ) {
       return AJOUTER_ANNEXE_1;
     }
 
@@ -621,6 +731,7 @@ export const getSentBtnLabel = (
       if (
         isAppendix1(bsd) &&
         canAddAppendix1(bsd) &&
+        hasAppendix1Cta(bsd, currentSiret) &&
         permissions.includes(UserPermission.BsdCanUpdate)
       ) {
         return AJOUTER_ANNEXE_1;
@@ -1032,6 +1143,10 @@ export const getPrimaryActionsLabelFromBsdStatus = (
   hasAutomaticSignature?: boolean,
   emitterIsExutoireOrTtr?: boolean
 ) => {
+  const isReturnTab = bsdCurrentTab === "returnTab";
+
+  if (isReturnTab) return ROAD_CONTROL;
+
   switch (bsd.status) {
     case BsdStatusCode.Draft:
     case BsdStatusCode.Initial:
@@ -1265,6 +1380,10 @@ export const canDuplicate = (bsd, siret) =>
   canDuplicateBsvhu(bsd) ||
   canDuplicateBspaoh(bsd);
 
+export const canClone = () => {
+  return import.meta.env.VITE_ALLOW_CLONING_BSDS === "true";
+};
+
 const canDeleteBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
   (bsd.status === BsdStatusCode.Initial ||
@@ -1311,9 +1430,10 @@ const canReviewBsdasri = (bsd, siret) => {
     return false;
   }
 
-  if (bsd.groupedInId || bsd.synthesizedInId) {
+  if (bsd.groupedIn || bsd.synthesizedIn) {
     return false;
   }
+
   const isDestination = isSameSiretDestination(siret, bsd);
   const isProducer = isSameSiretEmitter(siret, bsd);
   const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
@@ -1432,11 +1552,30 @@ export const canUpdateBsd = (bsd, siret) =>
 
 export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
 
-export const hasAppendix1Cta = (bsd: BsdDisplay): boolean => {
+export const hasAppendix1Cta = (
+  bsd: BsdDisplay,
+  currentSiret: string
+): boolean => {
+  const isBroker = isSiretActorForBsd(bsd, currentSiret, [
+    { type: ActorType.Broker, strict: true }
+  ]);
+
+  const isIntermediary = isSiretActorForBsd(bsd, currentSiret, [
+    { type: ActorType.Intermediary, strict: true }
+  ]);
+
+  const isTrader = isSiretActorForBsd(bsd, currentSiret, [
+    { type: ActorType.Trader, strict: true }
+  ]);
+
   return (
     bsd.type === BsdType.Bsdd &&
     bsd?.emitterType === EmitterType.Appendix1 &&
-    (BsdStatusCode.Sealed === bsd.status || BsdStatusCode.Sent === bsd.status)
+    (BsdStatusCode.Sealed === bsd.status ||
+      BsdStatusCode.Sent === bsd.status) &&
+    !isBroker &&
+    !isIntermediary &&
+    !isTrader
   );
 };
 
@@ -1475,8 +1614,11 @@ export const hasBsdasriEmitterSign = (
 
 export const hasRoadControlButton = (
   bsd: BsdDisplay,
-  isCollectedTab: boolean
+  isCollectedTab: boolean,
+  isReturnTab?: boolean
 ) => {
+  if (isReturnTab) return true;
+
   // L'action principale sur le paoh collecté est la déclaration de dépôt par le transporteur
   if (bsd.type === BsdType.Bspaoh) {
     return false;

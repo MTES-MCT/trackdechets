@@ -3,7 +3,8 @@ import { companyFactory } from "../../__tests__/factories";
 import { getBsdasriForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { bsdasriFactory } from "./factories";
-import { Company } from "@prisma/client";
+import { BsdasriStatus, Company, WasteAcceptationStatus } from "@prisma/client";
+import { xDaysAgo } from "../../utils";
 
 describe("toBsdElastic > companies Names & OrgIds", () => {
   afterEach(resetDatabase);
@@ -59,5 +60,101 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsdasri.companyOrgIds).toContain(transporter.vatNumber);
     expect(elasticBsdasri.companyOrgIds).toContain(destination.siret);
     expect(elasticBsdasri.companyOrgIds).toContain(ecoOrganisme.siret);
+  });
+
+  describe("isReturnFor", () => {
+    it.each([
+      WasteAcceptationStatus.REFUSED,
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+    ])(
+      "waste acceptation status is %p > bsvhu should belong to tab",
+      async destinationReceptionAcceptationStatus => {
+        // Given
+        const transporter = await companyFactory();
+        const bsdasri = await bsdasriFactory({
+          opt: {
+            emitterCompanyName: emitter.name,
+            emitterCompanySiret: emitter.siret,
+            transporterCompanyName: transporter.name,
+            transporterCompanySiret: transporter.siret,
+            destinationReceptionDate: new Date(),
+            destinationReceptionAcceptationStatus
+          }
+        });
+
+        // When
+        const bsdasriForElastic = await getBsdasriForElastic(bsdasri);
+        const { isReturnFor } = toBsdElastic(bsdasriForElastic);
+
+        // Then
+        expect(isReturnFor).toContain(transporter.siret);
+      }
+    );
+
+    it("status is REFUSED > bsvhu should belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanyName: emitter.name,
+          emitterCompanySiret: emitter.siret,
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          destinationReceptionDate: new Date(),
+          status: BsdasriStatus.REFUSED
+        }
+      });
+
+      // When
+      const bsdasriForElastic = await getBsdasriForElastic(bsdasri);
+      const { isReturnFor } = toBsdElastic(bsdasriForElastic);
+
+      // Then
+      expect(isReturnFor).toContain(transporter.siret);
+    });
+
+    it("waste acceptation status is ACCEPTED > bsvhu should not belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanyName: emitter.name,
+          emitterCompanySiret: emitter.siret,
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          destinationReceptionDate: new Date(),
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
+        }
+      });
+
+      // When
+      const bsdasriForElastic = await getBsdasriForElastic(bsdasri);
+      const { isReturnFor } = toBsdElastic(bsdasriForElastic);
+
+      // Then
+      expect(isReturnFor).toStrictEqual([]);
+    });
+
+    it("bsda has been received too long ago > should not belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanyName: emitter.name,
+          emitterCompanySiret: emitter.siret,
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          destinationReceptionDate: xDaysAgo(new Date(), 10),
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED
+        }
+      });
+
+      // When
+      const bsdasriForElastic = await getBsdasriForElastic(bsdasri);
+      const { isReturnFor } = toBsdElastic(bsdasriForElastic);
+
+      // Then
+      expect(isReturnFor).toStrictEqual([]);
+    });
   });
 });

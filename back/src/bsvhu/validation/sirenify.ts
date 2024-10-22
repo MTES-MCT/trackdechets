@@ -2,9 +2,7 @@ import {
   nextBuildSirenify,
   NextCompanyInputAccessor
 } from "../../companies/sirenify";
-import { getSealedFields } from "./rules";
 import { ParsedZodBsvhu } from "./schema";
-import { BsvhuValidationContext, ZodBsvhuTransformer } from "./types";
 
 const sirenifyBsvhuAccessors = (
   bsvhu: ParsedZodBsvhu,
@@ -49,6 +47,31 @@ const sirenifyBsvhuAccessors = (
       input.transporterCompanyAddress = companyInput.address;
     }
   },
+  {
+    siret: bsvhu?.ecoOrganismeSiret,
+    skip: sealedFields.includes("ecoOrganismeSiret"),
+    setter: (input, companyInput) => {
+      if (companyInput.name) {
+        input.ecoOrganismeName = companyInput.name;
+      }
+    }
+  },
+  {
+    siret: bsvhu?.brokerCompanySiret,
+    skip: sealedFields.includes("brokerCompanySiret"),
+    setter: (input, companyInput) => {
+      input.brokerCompanyName = companyInput.name;
+      input.brokerCompanyAddress = companyInput.address;
+    }
+  },
+  {
+    siret: bsvhu?.traderCompanySiret,
+    skip: sealedFields.includes("traderCompanySiret"),
+    setter: (input, companyInput) => {
+      input.traderCompanyName = companyInput.name;
+      input.traderCompanyAddress = companyInput.address;
+    }
+  },
   ...(bsvhu.intermediaries ?? []).map(
     (_, idx) =>
       ({
@@ -67,14 +90,6 @@ const sirenifyBsvhuAccessors = (
   )
 ];
 
-export const sirenifyBsvhu: (
-  context: BsvhuValidationContext
-) => ZodBsvhuTransformer = context => {
-  return async bsvhu => {
-    const sealedFields = await getSealedFields(bsvhu, context);
-    return nextBuildSirenify<ParsedZodBsvhu>(sirenifyBsvhuAccessors)(
-      bsvhu,
-      sealedFields
-    );
-  };
-};
+export const sirenifyBsvhu = nextBuildSirenify<ParsedZodBsvhu>(
+  sirenifyBsvhuAccessors
+);

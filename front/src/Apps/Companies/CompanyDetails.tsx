@@ -22,12 +22,13 @@ import CompanyMembers from "./CompanyMembers/CompanyMembers";
 import CompanyDigestSheetForm from "./CompanyDigestSheet/CompanyDigestSheet";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import { FrIconClassName } from "@codegouvfr/react-dsfr";
+import { CompanyRegistryDelegation } from "./CompanyRegistryDelegation/CompanyRegistryDelegation";
 
 export type TabContentProps = {
   company: CompanyPrivate;
 };
 
-const COMPANY_DIGEST_FLAG = "COMPANY_DIGEST";
+const REGISTRY_V2_FLAG = "REGISTRY_V2";
 
 const buildTabs = (
   company: CompanyPrivate
@@ -36,10 +37,10 @@ const buildTabs = (
   tabsContent: Record<string, React.FC<TabContentProps>>;
 } => {
   const isAdmin = company.userRole === UserRole.Admin;
-  const isMember = company.userRole === UserRole.Member;
-  // Admin and member can access the gerico tab
-  const canViewCompanyDigestTab =
-    company.featureFlags.includes(COMPANY_DIGEST_FLAG) && (isAdmin || isMember);
+
+  // RNDTS features protected by feature flag
+  const canViewRndtsFeatures = company.featureFlags.includes(REGISTRY_V2_FLAG);
+
   const iconId = "fr-icon-checkbox-line" as FrIconClassName;
   const tabs = [
     {
@@ -61,29 +62,35 @@ const buildTabs = (
       tabId: "tab4",
       label: "Contact",
       iconId
+    },
+    {
+      tabId: "tab5",
+      label: "Fiche",
+      iconId
     }
   ];
   const tabsContent = {
     tab1: CompanyInfo,
     tab2: CompanySignature,
     tab3: CompanyMembers,
-    tab4: CompanyContactForm
+    tab4: CompanyContactForm,
+    tab5: CompanyDigestSheetForm
   };
-  if (canViewCompanyDigestTab) {
+  if (canViewRndtsFeatures) {
     tabs.push({
-      tabId: "tab5",
-      label: "Fiche",
+      tabId: "tab6",
+      label: "Délégations RNDTS",
       iconId
     });
-    tabsContent["tab5"] = CompanyDigestSheetForm;
+    tabsContent["tab6"] = CompanyRegistryDelegation;
   }
   if (isAdmin) {
     tabs.push({
-      tabId: "tab6",
+      tabId: "tab7",
       label: "Avancé",
       iconId
     });
-    tabsContent["tab6"] = CompanyAdvanced;
+    tabsContent["tab7"] = CompanyAdvanced;
   }
 
   return { tabs, tabsContent };
@@ -136,13 +143,15 @@ export default function CompanyDetails() {
         </>
       }
     >
-      <Tabs
-        selectedTabId={selectedTabId}
-        tabs={tabs}
-        onTabChange={setSelectedTabId}
-      >
-        <CurrenComponent company={company} />
-      </Tabs>
+      <div id="company-tab-content" tabIndex={-1}>
+        <Tabs
+          selectedTabId={selectedTabId}
+          tabs={tabs}
+          onTabChange={setSelectedTabId}
+        >
+          <CurrenComponent company={company} />
+        </Tabs>
+      </div>
     </AccountContentWrapper>
   );
 }

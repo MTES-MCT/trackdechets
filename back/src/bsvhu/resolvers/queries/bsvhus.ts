@@ -8,6 +8,7 @@ import { getReadonlyBsvhuRepository } from "../../repository";
 
 import { toPrismaWhereInput } from "../../where";
 import { Permission, can, getUserRoles } from "../../../permissions";
+import { Prisma } from "@prisma/client";
 
 export default async function bsvhus(
   _,
@@ -27,7 +28,23 @@ export default async function bsvhus(
       { transporterCompanySiret: { in: orgIdsWithListPermission } },
       { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
       { destinationCompanySiret: { in: orgIdsWithListPermission } },
+      { brokerCompanySiret: { in: orgIdsWithListPermission } },
+      { traderCompanySiret: { in: orgIdsWithListPermission } },
       { intermediariesOrgIds: { hasSome: orgIdsWithListPermission } }
+    ]
+  };
+
+  const draftMask: Prisma.BsvhuWhereInput = {
+    OR: [
+      {
+        isDraft: false,
+        ...mask
+      },
+      {
+        isDraft: true,
+        canAccessDraftOrgIds: { hasSome: orgIdsWithListPermission },
+        ...mask
+      }
     ]
   };
 
@@ -36,7 +53,7 @@ export default async function bsvhus(
     isDeleted: false
   };
 
-  const where = applyMask(prismaWhere, mask);
+  const where = applyMask<Prisma.BsvhuWhereInput>(prismaWhere, draftMask);
   const bsvhuRepository = getReadonlyBsvhuRepository();
   const totalCount = await bsvhuRepository.count(where);
 

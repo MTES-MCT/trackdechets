@@ -1,10 +1,11 @@
-import { Company } from "@prisma/client";
+import { BsdaStatus, Company, WasteAcceptationStatus } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { companyFactory } from "../../__tests__/factories";
 import { getBsdaForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { bsdaFactory } from "./factories";
+import { xDaysAgo } from "../../utils";
 
 describe("toBsdElastic > companies Names & OrgIds", () => {
   afterEach(resetDatabase);
@@ -111,5 +112,105 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsda.companyOrgIds).toContain(nextDestination.siret);
     expect(elasticBsda.companyOrgIds).toContain(intermediary1.siret);
     expect(elasticBsda.companyOrgIds).toContain(intermediary2.siret);
+  });
+
+  describe("isReturnFor", () => {
+    it.each([
+      WasteAcceptationStatus.REFUSED,
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+    ])(
+      "waste acceptation status is %p > bsda should belong to tab",
+      async destinationReceptionAcceptationStatus => {
+        // Given
+        const transporter = await companyFactory();
+        const bsda = await bsdaFactory({
+          opt: {
+            destinationReceptionDate: new Date(),
+            destinationReceptionAcceptationStatus
+          },
+          transporterOpt: {
+            transporterCompanyName: transporter.name,
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyVatNumber: transporter.vatNumber
+          }
+        });
+
+        // When
+        const bsdaForElastic = await getBsdaForElastic(bsda);
+        const elasticBsda = toBsdElastic(bsdaForElastic);
+
+        // Then
+        expect(elasticBsda.isReturnFor).toContain(transporter?.siret);
+      }
+    );
+
+    it("status is REFUSED > bsda should belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsda = await bsdaFactory({
+        opt: {
+          destinationReceptionDate: new Date(),
+          status: BsdaStatus.REFUSED
+        },
+        transporterOpt: {
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          transporterCompanyVatNumber: transporter.vatNumber
+        }
+      });
+
+      // When
+      const bsdaForElastic = await getBsdaForElastic(bsda);
+      const elasticBsda = toBsdElastic(bsdaForElastic);
+
+      // Then
+      expect(elasticBsda.isReturnFor).toContain(transporter?.siret);
+    });
+
+    it("waste acceptation status is ACCEPTED > bsda should not belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsda = await bsdaFactory({
+        opt: {
+          destinationReceptionDate: new Date(),
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
+        },
+        transporterOpt: {
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          transporterCompanyVatNumber: transporter.vatNumber
+        }
+      });
+
+      // When
+      const bsdaForElastic = await getBsdaForElastic(bsda);
+      const elasticBsda = toBsdElastic(bsdaForElastic);
+
+      // Then
+      expect(elasticBsda.isReturnFor).toStrictEqual([]);
+    });
+
+    it("bsda has been received too long ago > should not belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const bsda = await bsdaFactory({
+        opt: {
+          destinationReceptionDate: xDaysAgo(new Date(), 10),
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED
+        },
+        transporterOpt: {
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          transporterCompanyVatNumber: transporter.vatNumber
+        }
+      });
+
+      // When
+      const bsdaForElastic = await getBsdaForElastic(bsda);
+      const elasticBsda = toBsdElastic(bsdaForElastic);
+
+      // Then
+      expect(elasticBsda.isReturnFor).toStrictEqual([]);
+    });
   });
 });

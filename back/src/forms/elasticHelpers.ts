@@ -1,15 +1,23 @@
-import { BsddTransporter, EmitterType, Status } from "@prisma/client";
+import {
+  BsddTransporter,
+  EmitterType,
+  Status,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import { FullForm } from "./types";
 
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   getFirstTransporterSync,
+  getLastTransporterSync,
   getNextTransporterSync,
   getTransportersSync
 } from "./database";
 import { FormForElastic } from "./elastic";
 import { getRevisionOrgIds } from "../common/elasticHelpers";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 /**
  * Computes which SIRET or VAT number should appear on which tab in the frontend
@@ -221,6 +229,40 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
   }
 
   return siretsByTab;
+}
+
+/**
+ * BSDD belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste has citerne business (emptyReturnADR or citerne washed) OR waste hasn't been fully accepted
+ */
+export const belongsToIsReturnForTab = (form: FullForm) => {
+  const hasBeenReceivedLately =
+    isDefined(form.receivedAt) && form.receivedAt! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasCiterneBusiness =
+    isDefined(form.emptyReturnADR) || isDefined(form.hasCiterneBeenWashedOut);
+
+  const hasNotBeenFullyAccepted =
+    form.status === Status.REFUSED ||
+    form.wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED;
+
+  return hasCiterneBusiness || hasNotBeenFullyAccepted;
+};
+
+export function getFormReturnOrgIds(form: FullForm) {
+  // Return tab
+  if (belongsToIsReturnForTab(form)) {
+    const lastTransporter = getLastTransporterSync(form);
+
+    return {
+      isReturnFor: [lastTransporter?.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
 }
 
 function getFormSirets(form: FullForm) {

@@ -44,7 +44,10 @@ export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
     include: {
       ...BsffWithTransportersInclude,
       ...BsffWithFicheInterventionInclude,
-      packagings: { include: { previousPackagings: true } }
+      packagings: {
+        include: { previousPackagings: true },
+        orderBy: { numero: "asc" }
+      }
     }
   });
 
@@ -378,6 +381,15 @@ export function getFirstTransporterSync(bsff: {
   const transporters = getTransportersSync(bsff);
   const firstTransporter = transporters.find(t => t.number === 1);
   return firstTransporter ?? null;
+}
+
+export function getLastTransporterSync(bsff: {
+  transporters: BsffTransporter[] | null;
+}): BsffTransporter | null {
+  const transporters = getTransportersSync(bsff);
+  const greatestNumber = Math.max(...transporters.map(t => t.number));
+  const lastTransporter = transporters.find(t => t.number === greatestNumber);
+  return lastTransporter ?? null;
 }
 
 export function getNthTransporterSync(

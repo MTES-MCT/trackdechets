@@ -7,6 +7,9 @@ export type BsvhuUserFunctions = {
   isEmitter: boolean;
   isDestination: boolean;
   isTransporter: boolean;
+  isEcoOrganisme: boolean;
+  isBroker: boolean;
+  isTrader: boolean;
 };
 
 export type BsvhuValidationContext = {

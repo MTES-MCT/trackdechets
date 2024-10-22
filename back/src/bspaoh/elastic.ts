@@ -3,18 +3,21 @@ import {
   Bspaoh,
   BsdType,
   Prisma,
-  OperationMode
+  OperationMode,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
-import { getFirstTransporterSync } from "./converter";
+import { getFirstTransporterSync, getLastTransporterSync } from "./converter";
 import { prisma } from "@td/prisma";
 import { distinct } from "../common/arrays";
 import { BspaohIncludes } from "./types";
 import { getBspaohSubType } from "../common/subTypes";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export const BspaohForElasticInclude = {
   ...BspaohIncludes
@@ -215,6 +218,7 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
     ...where,
     isInRevisionFor: [],
     isRevisedFor: [],
+    ...getBspaohReturnOrgIds(bspaoh),
     sirets: distinct(Object.values(where).flat()),
     ...getRegistryFields(bspaoh),
     rawBsd: bspaoh,
@@ -253,4 +257,40 @@ export async function getBspaohForElastic(
     where: { id: bspaoh.id },
     include: { transporters: true }
   });
+}
+
+/**
+ * BSPAOH belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste hasn't been fully accepted at reception
+ */
+export const belongsToIsReturnForTab = (bspaoh: Bspaoh) => {
+  const hasBeenReceivedLately =
+    isDefined(bspaoh.destinationReceptionDate) &&
+    bspaoh.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted =
+    bspaoh.status === BspaohStatus.REFUSED ||
+    bspaoh.destinationReceptionAcceptationStatus !==
+      WasteAcceptationStatus.ACCEPTED;
+
+  return hasNotBeenFullyAccepted;
+};
+
+function getBspaohReturnOrgIds(bspaoh: BspaohForElastic): {
+  isReturnFor: string[];
+} {
+  // Return tab
+  if (belongsToIsReturnForTab(bspaoh)) {
+    const transporters = bspaoh?.transporters ?? [];
+    const lastTransporter = getLastTransporterSync({ transporters });
+
+    return {
+      isReturnFor: [lastTransporter?.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
 }

@@ -9,7 +9,7 @@ import { GraphQLContext } from "../../../types";
 import { UserRole } from "@prisma/client";
 import { bulkUpdateCompanySchema } from "../../validation/schema";
 import { UserInputError } from "../../../common/errors";
-import { convertUrls } from "../../../companies/database";
+import { toGqlCompanyPrivate } from "../../converters";
 export async function bulkUpdateCompaniesProfiles(
   _,
   { input }: MutationBulkUpdateCompaniesProfilesArgs,
@@ -78,7 +78,7 @@ export async function bulkUpdateCompaniesProfiles(
       },
       where: { orgId: row.orgId }
     });
-    updatedCompanies.push(convertUrls(updatedCompany));
+    updatedCompanies.push(toGqlCompanyPrivate(updatedCompany));
   }
 
   return updatedCompanies;

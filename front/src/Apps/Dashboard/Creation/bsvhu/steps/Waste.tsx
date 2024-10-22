@@ -7,10 +7,10 @@ import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRa
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { ZodBsvhu } from "../schema";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import { setFieldError } from "../../utils";
+import { setFieldError, TabError } from "../../utils";
 
-const WasteBsvhu = ({ errors }) => {
-  const { register, watch, setValue, formState, setError, clearErrors } =
+const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
+  const { register, watch, setValue, formState, setError } =
     useFormContext<ZodBsvhu>(); // retrieve all hook methods
 
   const weight = watch("weight.value");
@@ -26,30 +26,22 @@ const WasteBsvhu = ({ errors }) => {
   }, [setValue, identificationNumbers]);
 
   useEffect(() => {
-    if (
-      errors?.length &&
-      errors?.length !== Object.keys(formState.errors)?.length &&
-      !weight
-    ) {
+    if (errors?.length) {
       setFieldError(
         errors,
         "weight.value",
         formState.errors?.weight?.value,
         setError
       );
+      setFieldError(
+        errors,
+        "identification.numbers",
+        formState.errors?.identification?.numbers?.length,
+        setError
+      );
     }
-    if (errors?.length && weight) {
-      clearErrors("weight.value");
-    }
-  }, [
-    errors,
-    errors?.length,
-    formState?.errors,
-    formState.errors?.weight?.value,
-    setError,
-    weight,
-    clearErrors
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errors]);
 
   return (
     <>
@@ -125,6 +117,7 @@ const WasteBsvhu = ({ errors }) => {
           disabled={sealedFields.includes("identification.numbers")}
           name="identification.numbers"
           defaultValue={identificationNumbersDefaultValue}
+          error={formState.errors.identification?.numbers}
         />
         {formState.errors.identification?.numbers?.message && (
           <p className="fr-text fr-error-text">

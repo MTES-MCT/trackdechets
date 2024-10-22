@@ -1,4 +1,9 @@
-import { BsvhuStatus, Bsvhu, BsdType } from "@prisma/client";
+import {
+  BsvhuStatus,
+  Bsvhu,
+  BsdType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { prisma } from "@td/prisma";
 import {
   getIntermediaryCompanyOrgId,
@@ -13,6 +18,8 @@ import {
   BsvhuWithIntermediaries,
   BsvhuWithIntermediariesInclude
 } from "./types";
+import { isDefined } from "../common/helpers";
+import { xDaysAgo } from "../utils";
 
 export const BsvhuForElasticInclude = {
   ...BsvhuWithIntermediariesInclude
@@ -29,8 +36,11 @@ export async function getBsvhuForElastic(
 
 type ElasticSirets = {
   emitterCompanySiret: string | null | undefined;
+  ecoOrganismeSiret: string | null | undefined;
   destinationCompanySiret: string | null | undefined;
   transporterCompanySiret: string | null | undefined;
+  brokerCompanySiret: string | null | undefined;
+  traderCompanySiret: string | null | undefined;
   intermediarySiret1?: string | null | undefined;
   intermediarySiret2?: string | null | undefined;
   intermediarySiret3?: string | null | undefined;
@@ -54,9 +64,20 @@ const getBsvhuSirets = (bsvhu: BsvhuForElastic): ElasticSirets => {
   const bsvhuSirets: ElasticSirets = {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
+    ecoOrganismeSiret: bsvhu.ecoOrganismeSiret,
+    brokerCompanySiret: bsvhu.brokerCompanySiret,
+    traderCompanySiret: bsvhu.traderCompanySiret,
     transporterCompanySiret: getTransporterCompanyOrgId(bsvhu),
     ...intermediarySirets
   };
+
+  // Drafts only appear in the dashboard for companies the bsvhu owner belongs to
+  if (bsvhu.isDraft) {
+    const draftFormSiretsEntries = Object.entries(bsvhuSirets).filter(
+      ([, siret]) => siret && bsvhu.canAccessDraftOrgIds.includes(siret)
+    );
+    return Object.fromEntries(draftFormSiretsEntries) as ElasticSirets;
+  }
 
   return bsvhuSirets;
 };
@@ -202,16 +223,16 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     destinationCustomInfo: "",
     destinationCap: "",
 
-    brokerCompanyName: "",
-    brokerCompanySiret: "",
-    brokerCompanyAddress: "",
+    brokerCompanyName: bsvhu.brokerCompanyName ?? "",
+    brokerCompanySiret: bsvhu.brokerCompanySiret ?? "",
+    brokerCompanyAddress: bsvhu.brokerCompanyAddress ?? "",
 
-    traderCompanyName: "",
-    traderCompanySiret: "",
-    traderCompanyAddress: "",
+    traderCompanyName: bsvhu.traderCompanyName ?? "",
+    traderCompanySiret: bsvhu.traderCompanySiret ?? "",
+    traderCompanyAddress: bsvhu.traderCompanyAddress ?? "",
 
-    ecoOrganismeName: "",
-    ecoOrganismeSiret: "",
+    ecoOrganismeName: bsvhu.ecoOrganismeName ?? "",
+    ecoOrganismeSiret: bsvhu.ecoOrganismeSiret ?? "",
 
     nextDestinationCompanyName:
       bsvhu.destinationOperationNextDestinationCompanyName ?? "",
@@ -236,6 +257,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     ...where,
     isInRevisionFor: [],
     isRevisedFor: [],
+    ...getBsvhuReturnOrgIds(bsvhu),
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),
     rawBsd: bsvhu,
@@ -247,6 +269,9 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
       bsvhu.emitterCompanyName,
       bsvhu.transporterCompanyName,
       bsvhu.destinationCompanyName,
+      bsvhu.ecoOrganismeName,
+      bsvhu.brokerCompanyName,
+      bsvhu.traderCompanyName,
       ...bsvhu.intermediaries.map(intermediary => intermediary.name)
     ]
       .filter(Boolean)
@@ -256,6 +281,9 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
       bsvhu.transporterCompanySiret,
       bsvhu.transporterCompanyVatNumber,
       bsvhu.destinationCompanySiret,
+      bsvhu.ecoOrganismeSiret,
+      bsvhu.brokerCompanySiret,
+      bsvhu.traderCompanySiret,
       ...bsvhu.intermediaries.map(intermediary => intermediary.siret),
       ...bsvhu.intermediaries.map(intermediary => intermediary.vatNumber)
     ].filter(Boolean)
@@ -264,4 +292,37 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
 
 export function indexBsvhu(bsvhu: BsvhuForElastic, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsvhu), ctx);
+}
+
+/**
+ * BSVHU belongs to isReturnFor tab if:
+ * - waste has been received in the last 48 hours
+ * - waste hasn't been fully accepted at reception
+ */
+export const belongsToIsReturnForTab = (bsvhu: BsvhuForElastic) => {
+  const hasBeenReceivedLately =
+    isDefined(bsvhu.destinationReceptionDate) &&
+    bsvhu.destinationReceptionDate! > xDaysAgo(new Date(), 2);
+
+  if (!hasBeenReceivedLately) return false;
+
+  const hasNotBeenFullyAccepted =
+    bsvhu.status === BsvhuStatus.REFUSED ||
+    bsvhu.destinationReceptionAcceptationStatus !==
+      WasteAcceptationStatus.ACCEPTED;
+
+  return hasNotBeenFullyAccepted;
+};
+
+function getBsvhuReturnOrgIds(bsvhu: BsvhuForElastic): {
+  isReturnFor: string[];
+} {
+  // Return tab
+  if (belongsToIsReturnForTab(bsvhu)) {
+    return {
+      isReturnFor: [bsvhu.transporterCompanySiret].filter(Boolean)
+    };
+  }
+
+  return { isReturnFor: [] };
 }

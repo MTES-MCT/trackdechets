@@ -24,9 +24,25 @@ function InfoWithIcon({
     []
   );
 
+  const displayAlternativeText = () => {
+    switch (labelCode) {
+      case InfoIconCode.EcoOrganism:
+        return "Éco-organisme visé sur le bordereau";
+      case InfoIconCode.PickupSite:
+        return "Nom de l'adresse de chantier";
+      case InfoIconCode.CustomInfo:
+        return "Champs libres ajoutés sur le bordereau";
+      case InfoIconCode.TransporterNumberPlate:
+        return "Immatriculation du transporteur";
+      default:
+        return "";
+    }
+  };
+
   const customInfo = editableInfos?.customInfo || "-";
   return !hasEditableInfos ? (
     <p className={`label-icon label-icon__${labelCode}`}>
+      <span className="fr-sr-only">{displayAlternativeText()}</span>
       {!info ? labelValue : `${labelValue} ${info}`}
     </p>
   ) : (
@@ -38,12 +54,20 @@ function InfoWithIcon({
       title={labelValue}
     >
       <p className={`label-icon label-icon__${labelCode}`}>
+        <span className="fr-sr-only">
+          Modifier le champ libre et l'immatriculation
+        </span>
         {labelCode === InfoIconCode.CustomInfo
           ? customInfo
           : formatTranporterPlates(editableInfos?.transporterNumberPlate)}
       </p>
       {labelCode === InfoIconCode.TransporterNumberPlate && !isDisabled && (
-        <span className="edition-pencil-icon" />
+        <>
+          <span className="fr-sr-only">
+            Modifier le champ libre et l'immatriculation
+          </span>
+          <span className="edition-pencil-icon" />
+        </>
       )}
     </button>
   );

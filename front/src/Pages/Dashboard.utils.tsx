@@ -11,6 +11,8 @@ import {
   blankstate_follow_title,
   blankstate_history_desc,
   blankstate_history_title,
+  blankstate_return_desc,
+  blankstate_return_title,
   blankstate_reviews_desc,
   blankstate_reviews_title
 } from "../Apps/common/wordings/dashboard/wordingsDashboard";
@@ -27,6 +29,7 @@ export type Tabs = {
   isAllBsdsTab;
   isToReviewTab;
   isReviewedTab;
+  isReturnTab;
 };
 
 export const getRoutePredicate = (props: Tabs & { siret }) => {
@@ -40,7 +43,8 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
     isCollectedTab,
     isAllBsdsTab,
     isToReviewTab,
-    isReviewedTab
+    isReviewedTab,
+    isReturnTab
   } = props;
 
   if (isActTab) {
@@ -91,6 +95,11 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
       isRevisedFor: [siret]
     };
   }
+  if (isReturnTab) {
+    return {
+      isReturnFor: [siret]
+    };
+  }
 };
 
 export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
@@ -100,7 +109,8 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
     isFollowTab,
     isArchivesTab,
     isReviewedTab,
-    isToReviewTab
+    isToReviewTab,
+    isReturnTab
   } = tabs;
 
   if (isActTab) {
@@ -118,6 +128,9 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
   if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_title;
   }
+  if (isReturnTab) {
+    return blankstate_return_title;
+  }
   return blankstate_default_title;
 };
 
@@ -127,7 +140,8 @@ export const getBlankslateDescription = ({
   isFollowTab,
   isArchivesTab,
   isReviewedTab,
-  isToReviewTab
+  isToReviewTab,
+  isReturnTab
 }: Tabs) => {
   if (isActTab) {
     return blankstate_action_desc;
@@ -150,6 +164,9 @@ export const getBlankslateDescription = ({
   }
   if (isReviewedTab || isToReviewTab) {
     return blankstate_reviews_desc;
+  }
+  if (isReturnTab) {
+    return blankstate_return_desc;
   }
   return blankstate_default_desc;
 };

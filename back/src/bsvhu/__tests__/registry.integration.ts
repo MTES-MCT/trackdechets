@@ -9,7 +9,7 @@ import {
 } from "../registry";
 import { bsvhuFactory, toIntermediaryCompany } from "./factories.vhu";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { companyFactory } from "../../__tests__/factories";
+import { companyFactory, ecoOrganismeFactory } from "../../__tests__/factories";
 import { RegistryBsvhuInclude } from "../../registry/elastic";
 
 describe("toGenericWaste", () => {
@@ -61,6 +61,27 @@ describe("toGenericWaste", () => {
     expect(waste.emitterCompanyPostalCode).toBe("13370");
     expect(waste.emitterCompanyCity).toBe("Mallemort");
     expect(waste.emitterCompanyCountry).toBe("FR");
+  });
+
+  it("should contain broker and trader emails", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        brokerCompanyMail: "broker@mail.com",
+        traderCompanyMail: "trader@mail.com"
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toGenericWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.brokerCompanyMail).toBe("broker@mail.com");
+    expect(waste.traderCompanyMail).toBe("trader@mail.com");
   });
 });
 
@@ -142,6 +163,30 @@ describe("toIncomingWaste", () => {
     expect(waste.initialEmitterCompanyName).toBeNull();
     expect(waste.initialEmitterCompanySiret).toBeNull();
   });
+
+  it("should contain broker and trader information", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({});
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toIncomingWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.brokerCompanySiret).toBe(bsvhuForRegistry.brokerCompanySiret);
+    expect(waste.brokerCompanyName).toBe(bsvhuForRegistry.brokerCompanyName);
+    expect(waste.brokerRecepisseNumber).toBe(
+      bsvhuForRegistry.brokerRecepisseNumber
+    );
+    expect(waste.traderCompanySiret).toBe(bsvhuForRegistry.traderCompanySiret);
+    expect(waste.traderCompanyName).toBe(bsvhuForRegistry.traderCompanyName);
+    expect(waste.traderRecepisseNumber).toBe(
+      bsvhuForRegistry.traderRecepisseNumber
+    );
+  });
 });
 
 describe("toOutgoingWaste", () => {
@@ -189,6 +234,29 @@ describe("toOutgoingWaste", () => {
     expect(waste.initialEmitterCompanyCountry).toBeNull();
     expect(waste.initialEmitterCompanyName).toBeNull();
     expect(waste.initialEmitterCompanySiret).toBeNull();
+  });
+  it("should contain broker and trader information", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({});
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toOutgoingWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.brokerCompanySiret).toBe(bsvhuForRegistry.brokerCompanySiret);
+    expect(waste.brokerCompanyName).toBe(bsvhuForRegistry.brokerCompanyName);
+    expect(waste.brokerRecepisseNumber).toBe(
+      bsvhuForRegistry.brokerRecepisseNumber
+    );
+    expect(waste.traderCompanySiret).toBe(bsvhuForRegistry.traderCompanySiret);
+    expect(waste.traderCompanyName).toBe(bsvhuForRegistry.traderCompanyName);
+    expect(waste.traderRecepisseNumber).toBe(
+      bsvhuForRegistry.traderRecepisseNumber
+    );
   });
 });
 
@@ -253,6 +321,29 @@ describe("toTransportedWaste", () => {
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste.transporter5NumberPlates).toBeNull();
   });
+  it("should contain broker and trader information", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({});
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toTransportedWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.brokerCompanySiret).toBe(bsvhuForRegistry.brokerCompanySiret);
+    expect(waste.brokerCompanyName).toBe(bsvhuForRegistry.brokerCompanyName);
+    expect(waste.brokerRecepisseNumber).toBe(
+      bsvhuForRegistry.brokerRecepisseNumber
+    );
+    expect(waste.traderCompanySiret).toBe(bsvhuForRegistry.traderCompanySiret);
+    expect(waste.traderCompanyName).toBe(bsvhuForRegistry.traderCompanyName);
+    expect(waste.traderRecepisseNumber).toBe(
+      bsvhuForRegistry.traderRecepisseNumber
+    );
+  });
 });
 
 describe("toManagedWaste", () => {
@@ -312,6 +403,23 @@ describe("toManagedWaste", () => {
 
     expect(waste.transporter5CompanySiret).toBeNull();
     expect(waste["transporter5NumberPlates"]).toBeUndefined();
+  });
+  it("should contain broker and trader information", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({});
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toManagedWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.brokerCompanySiret).toBe(bsvhuForRegistry.brokerCompanySiret);
+    expect(waste.brokerCompanyName).toBe(bsvhuForRegistry.brokerCompanyName);
+    expect(waste.traderCompanySiret).toBe(bsvhuForRegistry.traderCompanySiret);
+    expect(waste.traderCompanyName).toBe(bsvhuForRegistry.traderCompanyName);
   });
 });
 
@@ -558,6 +666,55 @@ describe("toAllWaste", () => {
     expect(waste.intermediary2CompanySiret).toBe(intermediary2.siret);
     expect(waste.intermediary3CompanyName).toBe(null);
     expect(waste.intermediary3CompanySiret).toBe(null);
+  });
+
+  it("should contain ecoOrganisme infos", async () => {
+    // Given
+    const ecoOrganisme = await ecoOrganismeFactory({
+      handle: { handleBsvhu: true }
+    });
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        ecoOrganismeName: ecoOrganisme.name
+      }
+    });
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toAllWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste).not.toBeUndefined();
+    expect(waste.ecoOrganismeSiren).toBe(ecoOrganisme.siret.substring(0, 9));
+    expect(waste.ecoOrganismeName).toBe(ecoOrganisme.name);
+  });
+  it("should contain broker and trader information", async () => {
+    // Given
+    const bsvhu = await bsvhuFactory({});
+
+    // When
+    const bsvhuForRegistry = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsvhu.id },
+      include: RegistryBsvhuInclude
+    });
+    const waste = toAllWaste(bsvhuForRegistry);
+
+    // Then
+    expect(waste.brokerCompanySiret).toBe(bsvhuForRegistry.brokerCompanySiret);
+    expect(waste.brokerCompanyName).toBe(bsvhuForRegistry.brokerCompanyName);
+    expect(waste.brokerRecepisseNumber).toBe(
+      bsvhuForRegistry.brokerRecepisseNumber
+    );
+    expect(waste.traderCompanySiret).toBe(bsvhuForRegistry.traderCompanySiret);
+    expect(waste.traderCompanyName).toBe(bsvhuForRegistry.traderCompanyName);
+    expect(waste.traderRecepisseNumber).toBe(
+      bsvhuForRegistry.traderRecepisseNumber
+    );
   });
 });
 

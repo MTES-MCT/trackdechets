@@ -1,6 +1,7 @@
 import Tag from "@codegouvfr/react-dsfr/Tag";
 import React, { useEffect, useReducer, useRef } from "react";
 import { useFormContext } from "react-hook-form";
+import classNames from "classnames";
 import TdTooltip from "../../../../common/components/Tooltip";
 import "./identificationNumber.scss";
 interface IdentificationNumberProps {
@@ -19,7 +20,7 @@ const IdentificationNumber = ({
   type,
   defaultValue
 }: IdentificationNumberProps) => {
-  const { setValue, getValues } = useFormContext();
+  const { setValue, getValues, clearErrors } = useFormContext();
 
   const SET_INPUT_CODE = "set_input_code";
   const ADD_CODE = "add_code";
@@ -85,7 +86,8 @@ const IdentificationNumber = ({
 
   useEffect(() => {
     setValue(name, state.codes);
-  }, [state, name, setValue]);
+    clearErrors(name);
+  }, [state, name, setValue, clearErrors]);
 
   useEffect(() => {
     if (defaultValue) {
@@ -95,11 +97,18 @@ const IdentificationNumber = ({
 
   return (
     <>
-      <p>
+      <p className={classNames("multiTags-title", { error: !!error })}>
         {title}
         <TdTooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
       </p>
-      <div className="fr-grid-row fr-grid-row--bottom multiTags">
+      <div
+        className={classNames(
+          "fr-grid-row",
+          "fr-grid-row--bottom",
+          "multiTags",
+          { error: !!error }
+        )}
+      >
         {state?.codes?.map((code, idx) => (
           <Tag
             dismissible
@@ -144,7 +153,12 @@ const IdentificationNumber = ({
         )}
       </div>
       {type && (
-        <p className={`${error ? "fr-error-text" : "fr-info-text"} fr-mt-5v`}>
+        <p
+          className={classNames(
+            "fr-mt-5v",
+            error ? "fr-error-text" : "fr-info-text"
+          )}
+        >
           Vous avez {state.codes.length} {type} pour ce contenant
         </p>
       )}

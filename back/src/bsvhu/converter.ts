@@ -22,7 +22,10 @@ import {
   BsvhuNextDestination,
   BsvhuTransport,
   BsvhuTransportInput,
-  CompanyInput
+  CompanyInput,
+  BsvhuEcoOrganisme,
+  BsvhuBroker,
+  BsvhuTrader
 } from "../generated/graphql/types";
 import {
   Prisma,
@@ -57,8 +60,8 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
     status: form.status,
     emitter: nullIfNoValues<BsvhuEmitter>({
       agrementNumber: form.emitterAgrementNumber,
-      irregularSituation: form.emitterIrregularSituation,
-      noSiret: form.emitterNoSiret,
+      irregularSituation: form.emitterIrregularSituation ?? false,
+      noSiret: form.emitterNoSiret ?? false,
       company: nullIfNoValues<FormCompany>({
         name: form.emitterCompanyName,
         siret: form.emitterCompanySiret,
@@ -160,6 +163,40 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         takenOverAt: processDate(form.transporterTransportTakenOverAt)
       })
     }),
+    ecoOrganisme: nullIfNoValues<BsvhuEcoOrganisme>({
+      name: form.ecoOrganismeName,
+      siret: form.ecoOrganismeSiret
+    }),
+    broker: nullIfNoValues<BsvhuBroker>({
+      company: nullIfNoValues<FormCompany>({
+        name: form.brokerCompanyName,
+        siret: form.brokerCompanySiret,
+        address: form.brokerCompanyAddress,
+        contact: form.brokerCompanyContact,
+        phone: form.brokerCompanyPhone,
+        mail: form.brokerCompanyMail
+      }),
+      recepisse: nullIfNoValues<BsvhuRecepisse>({
+        department: form.brokerRecepisseDepartment,
+        number: form.brokerRecepisseNumber,
+        validityLimit: processDate(form.brokerRecepisseValidityLimit)
+      })
+    }),
+    trader: nullIfNoValues<BsvhuTrader>({
+      company: nullIfNoValues<FormCompany>({
+        name: form.traderCompanyName,
+        siret: form.traderCompanySiret,
+        address: form.traderCompanyAddress,
+        contact: form.traderCompanyContact,
+        phone: form.traderCompanyPhone,
+        mail: form.traderCompanyMail
+      }),
+      recepisse: nullIfNoValues<BsvhuRecepisse>({
+        department: form.traderRecepisseDepartment,
+        number: form.traderRecepisseNumber,
+        validityLimit: processDate(form.traderRecepisseValidityLimit)
+      })
+    }),
     metadata: null as any
   };
 }
@@ -169,6 +206,9 @@ export function flattenVhuInput(formInput: BsvhuInput) {
     ...flattenVhuEmitterInput(formInput),
     ...flattenVhuDestinationInput(formInput),
     ...flattenVhuTransporterInput(formInput),
+    ...flattenVhuEcoOrganismeInput(formInput),
+    ...flattenVhuBrokerInput(formInput),
+    ...flattenVhuTraderInput(formInput),
     packaging: chain(formInput, f => f.packaging),
     wasteCode: chain(formInput, f => f.wasteCode),
     quantity: chain(formInput, f => f.quantity),
@@ -338,6 +378,55 @@ function flattenVhuTransporterInput({
       chain(t.recepisse, r => r.isExempted)
     ),
     ...flattenTransporterTransportInput(transporter)
+  };
+}
+
+function flattenVhuEcoOrganismeInput({
+  ecoOrganisme
+}: Pick<BsvhuInput, "ecoOrganisme">) {
+  return {
+    ecoOrganismeName: chain(ecoOrganisme, e => e.name),
+    ecoOrganismeSiret: chain(ecoOrganisme, e => e.siret)
+  };
+}
+
+function flattenVhuBrokerInput({ broker }: Pick<BsvhuInput, "broker">) {
+  return {
+    brokerCompanyName: chain(broker, b => chain(b.company, c => c.name)),
+    brokerCompanySiret: chain(broker, b => chain(b.company, c => c.siret)),
+    brokerCompanyAddress: chain(broker, b => chain(b.company, c => c.address)),
+    brokerCompanyContact: chain(broker, b => chain(b.company, c => c.contact)),
+    brokerCompanyPhone: chain(broker, b => chain(b.company, c => c.phone)),
+    brokerCompanyMail: chain(broker, b => chain(b.company, c => c.mail)),
+    brokerRecepisseNumber: chain(broker, b =>
+      chain(b.recepisse, r => r.number)
+    ),
+    brokerRecepisseDepartment: chain(broker, b =>
+      chain(b.recepisse, r => r.department)
+    ),
+    brokerRecepisseValidityLimit: chain(broker, b =>
+      chain(b.recepisse, r => r.validityLimit)
+    )
+  };
+}
+
+function flattenVhuTraderInput({ trader }: Pick<BsvhuInput, "trader">) {
+  return {
+    traderCompanyName: chain(trader, b => chain(b.company, c => c.name)),
+    traderCompanySiret: chain(trader, b => chain(b.company, c => c.siret)),
+    traderCompanyAddress: chain(trader, b => chain(b.company, c => c.address)),
+    traderCompanyContact: chain(trader, b => chain(b.company, c => c.contact)),
+    traderCompanyPhone: chain(trader, b => chain(b.company, c => c.phone)),
+    traderCompanyMail: chain(trader, b => chain(b.company, c => c.mail)),
+    traderRecepisseNumber: chain(trader, b =>
+      chain(b.recepisse, r => r.number)
+    ),
+    traderRecepisseDepartment: chain(trader, b =>
+      chain(b.recepisse, r => r.department)
+    ),
+    traderRecepisseValidityLimit: chain(trader, b =>
+      chain(b.recepisse, r => r.validityLimit)
+    )
   };
 }
 

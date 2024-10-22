@@ -113,12 +113,12 @@ export default function LayoutContainer() {
               isAdmin={isAdmin}
               v2banner={
                 <SurveyBanner
-                  message="La fiche établissement est désormais disponible pour tous les utilisateurs Trackdéchets. Rendez-vous dans Mes établissements, sélectionnez l'établissement souhaité, puis cliquez sur l'onglet Fiche."
+                  message="Gérez vos notifications e-mail sur Trackdéchets ! Vous pouvez désormais personnaliser les types d'e-mails que vous souhaitez recevoir directement depuis Mon compte > Notifications"
                   button={{
                     title: "Plus d'informations",
-                    href: "https://faq.trackdechets.fr/les-bases-interface/la-fiche-entreprise"
+                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#gerer-les-notifications-e-mail"
                   }}
-                  persistedSurveyName="td-20240924"
+                  persistedSurveyName="td-20241022"
                 />
               }
               defaultOrgId={defaultOrgId}

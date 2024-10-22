@@ -1,11 +1,13 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { FormProvider, UseFormReturn } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import FormStepsTabs from "../../Forms/Components/FormStepsTabs/FormStepsTabs";
 import { Loader } from "../../common/Components";
 import { SealedFieldsContext } from "./context";
 import {
-  TabsName,
+  NormalizedError,
+  SupportedBsdTypes,
+  TabId,
   getNextTab,
   getPrevTab,
   getTabs,
@@ -13,7 +15,7 @@ import {
 } from "./utils";
 
 interface FormStepsContentProps {
-  isCrematorium?: boolean;
+  bsdType: SupportedBsdTypes;
   sealedFields?: string[];
   isLoading: boolean;
   useformMethods: UseFormReturn<any>;
@@ -26,11 +28,11 @@ interface FormStepsContentProps {
     transporter: React.JSX.Element;
     destination: React.JSX.Element;
   };
-  setPublishErrors: Function;
-  errorTabIds?: string[] | (TabsName | undefined)[];
+  setPublishErrors: (normalizedErrors: NormalizedError[]) => void;
+  errorTabIds?: TabId[];
 }
 const FormStepsContent = ({
-  isCrematorium = false,
+  bsdType,
   tabsContent,
   sealedFields = [],
   isLoading,
@@ -41,21 +43,17 @@ const FormStepsContent = ({
   setPublishErrors,
   errorTabIds
 }: FormStepsContentProps) => {
-  const [selectedTabId, setSelectedTabId] = useState<TabsName>("waste");
+  const [selectedTabId, setSelectedTabId] = useState<TabId>(TabId.waste);
   const navigate = useNavigate();
-  const tabList = getTabs(isCrematorium, errorTabIds);
+  const tabList = getTabs(bsdType, errorTabIds);
   const tabIds = tabList.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
-  const ref = useRef<HTMLDivElement>(null);
 
   const scrollToTop = () => {
-    const element = ref.current;
+    const element = document.getElementById("formStepsTabsContent");
     if (element) {
-      const scrollPos = element.scrollHeight - window.innerHeight;
-      if (scrollPos > 0) {
-        ref.current?.scrollIntoView({ behavior: "instant", block: "start" });
-      }
+      element.scroll({ top: 0, behavior: "smooth" });
     }
   };
   const onSubmit = (data, e) => {
@@ -76,6 +74,7 @@ const FormStepsContent = ({
   };
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
+    scrollToTop();
   };
 
   return (
@@ -83,31 +82,31 @@ const FormStepsContent = ({
       <SealedFieldsContext.Provider value={sealedFields}>
         <FormProvider {...useformMethods}>
           {!isLoading && (
-            <div ref={ref}>
-              <FormStepsTabs
-                //@ts-ignore
-                tabList={tabList}
-                draftCtaLabel={draftCtaLabel}
-                mainCtaLabel={mainCtaLabel}
-                selectedTabId={selectedTabId}
-                isPrevStepDisabled={selectedTabId === firstTabId}
-                isNextStepDisabled={selectedTabId === lastTabId}
-                onSubmit={useformMethods.handleSubmit(
-                  (data, e) => onSubmit(data, e),
-                  () => onErrors()
-                )}
-                onCancel={() => navigate(-1)}
-                onPrevTab={() =>
-                  setSelectedTabId(getPrevTab(tabIds, selectedTabId))
-                }
-                onNextTab={() =>
-                  setSelectedTabId(getNextTab(tabIds, selectedTabId))
-                }
-                onTabChange={onTabChange}
-              >
-                {tabsContent[selectedTabId] ?? <p></p>}
-              </FormStepsTabs>
-            </div>
+            <FormStepsTabs
+              //@ts-ignore
+              tabList={tabList}
+              draftCtaLabel={draftCtaLabel}
+              mainCtaLabel={mainCtaLabel}
+              selectedTabId={selectedTabId}
+              isPrevStepDisabled={selectedTabId === firstTabId}
+              isNextStepDisabled={selectedTabId === lastTabId}
+              onSubmit={useformMethods.handleSubmit(
+                (data, e) => onSubmit(data, e),
+                () => onErrors()
+              )}
+              onCancel={() => navigate(-1)}
+              onPrevTab={() => {
+                setSelectedTabId(getPrevTab(tabIds, selectedTabId));
+                scrollToTop();
+              }}
+              onNextTab={() => {
+                setSelectedTabId(getNextTab(tabIds, selectedTabId));
+                scrollToTop();
+              }}
+              onTabChange={onTabChange}
+            >
+              {tabsContent[selectedTabId] ?? <p></p>}
+            </FormStepsTabs>
           )}
         </FormProvider>
       </SealedFieldsContext.Provider>

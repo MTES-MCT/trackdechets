@@ -49,7 +49,7 @@ const CompanySignatureCode = ({ company }: CompanySignatureCodeProps) => {
 
   return (
     <div className="company-signature__code">
-      <h4 className="fr-h4">Code signature</h4>
+      <h3 className="fr-h4">Code signature</h3>
       {isAdmin && (
         <p className="fr-text--sm">
           Ce code sécurisé de signature vous permet de signer un BSD au départ

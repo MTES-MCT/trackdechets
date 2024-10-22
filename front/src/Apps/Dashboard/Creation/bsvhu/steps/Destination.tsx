@@ -1,7 +1,7 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { CompanySearchResult, FavoriteType } from "@td/codegen-ui";
+import { CompanySearchResult, CompanyType, FavoriteType } from "@td/codegen-ui";
 import React, { useEffect, useMemo, useState, useContext } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
@@ -32,68 +32,64 @@ const DestinationBsvhu = ({ errors }) => {
   }, [isDangerousWasteCode, setValue]);
 
   useEffect(() => {
-    if (
-      errors?.length &&
-      errors?.length !== Object.keys(formState.errors)?.length &&
-      !destination?.company?.siret
-    ) {
+    if (errors?.length) {
       setFieldError(
         errors,
         `${actor}.company.siret`,
         formState.errors?.[actor]?.["company"]?.siret,
         setError
       );
-
-      setFieldError(
-        errors,
-        `${actor}.company.contact`,
-        formState.errors?.[actor]?.["company"]?.contact,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.company.address`,
-        formState.errors?.[actor]?.["company"]?.address,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.company.phone`,
-        formState.errors?.[actor]?.["company"]?.phone,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.company.mail`,
-        formState.errors?.[actor]?.["company"]?.mail,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.company.vatNumber`,
-        formState.errors?.[actor]?.["company"]?.vatNumber,
-        setError
-      );
-
-      setFieldError(
-        errors,
-        `${actor}.agrementNumber`,
-        formState.errors?.[actor]?.["agrementNumber"],
-        setError
-      );
+      if (!destination?.company?.contact) {
+        setFieldError(
+          errors,
+          `${actor}.company.contact`,
+          formState.errors?.[actor]?.["company"]?.contact,
+          setError
+        );
+      }
+      if (!destination?.company?.address) {
+        setFieldError(
+          errors,
+          `${actor}.company.address`,
+          formState.errors?.[actor]?.["company"]?.address,
+          setError
+        );
+      }
+      if (!destination?.company?.phone) {
+        setFieldError(
+          errors,
+          `${actor}.company.phone`,
+          formState.errors?.[actor]?.["company"]?.phone,
+          setError
+        );
+      }
+      if (!destination?.company?.mail) {
+        setFieldError(
+          errors,
+          `${actor}.company.mail`,
+          formState.errors?.[actor]?.["company"]?.mail,
+          setError
+        );
+      }
+      if (!destination?.company?.vatNumber) {
+        setFieldError(
+          errors,
+          `${actor}.company.vatNumber`,
+          formState.errors?.[actor]?.["company"]?.vatNumber,
+          setError
+        );
+      }
+      if (!destination?.agrementNumber) {
+        setFieldError(
+          errors,
+          `${actor}.agrementNumber`,
+          formState.errors?.[actor]?.["agrementNumber"],
+          setError
+        );
+      }
     }
-  }, [
-    errors,
-    errors?.length,
-    formState.errors,
-    formState.errors.length,
-    setError,
-    destination?.company?.siret
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errors]);
 
   const updateAgrementNumber = (destination, type?) => {
     const destinationType = type || destination?.type;
@@ -144,6 +140,21 @@ const DestinationBsvhu = ({ errors }) => {
     ]
   );
 
+  const selectedCompanyError = (company?: CompanySearchResult) => {
+    // Le destinatiare doit être inscrit et avec un profil crématorium ou sous-type crémation
+    // Le profil crématorium sera bientôt supprimé
+    if (company) {
+      if (!company.isRegistered) {
+        return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
+      } else if (!company.companyTypes?.includes(CompanyType.WasteVehicles)) {
+        return "Cet établissement n'a pas le profil Installation de traitement de VHU.";
+      } else if (formState.errors?.destination?.["company"]?.siret?.message) {
+        return formState.errors?.destination?.["company"]?.siret?.message;
+      }
+    }
+    return null;
+  };
+
   return (
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
@@ -189,43 +200,51 @@ const DestinationBsvhu = ({ errors }) => {
           favoriteType={FavoriteType.Destination}
           disabled={sealedFields.includes(`${actor}.company.siret`)}
           selectedCompanyOrgId={orgId}
+          selectedCompanyError={selectedCompanyError}
           onCompanySelected={company => {
             if (company) {
+              if (company.siret !== destination?.company?.siret) {
+                setValue(`${actor}.company.contact`, company.contact);
+                setValue(`${actor}.company.phone`, company.contactPhone);
+
+                setValue(`${actor}.company.mail`, company.contactEmail);
+                if (errors?.length) {
+                  // server errors
+                  clearCompanyError(destination, actor, clearErrors);
+                  clearErrors(`${actor}.agrementNumber`);
+                }
+              } else {
+                setValue(
+                  `${actor}.company.contact`,
+                  destination?.company?.contact || company.contact
+                );
+                setValue(
+                  `${actor}.company.phone`,
+                  destination?.company?.phone || company.contactPhone
+                );
+
+                setValue(
+                  `${actor}.company.mail`,
+                  destination?.company?.mail || company.contactEmail
+                );
+              }
               setValue(`${actor}.company.orgId`, company.orgId);
               setValue(`${actor}.company.siret`, company.siret);
               setValue(`${actor}.company.name`, company.name);
               setValue(`${actor}.company.vatNumber`, company.vatNumber);
               setValue(`${actor}.company.address`, company.address);
-              setValue(
-                `${actor}.company.contact`,
-                destination?.company?.contact || company.contact
-              );
-              setValue(
-                `${actor}.company.phone`,
-                destination?.company?.phone || company.contactPhone
-              );
-
-              setValue(
-                `${actor}.company.mail`,
-                destination?.company?.mail || company.contactEmail
-              );
 
               setSelectedDestination(company);
               updateAgrementNumber(company, destination?.type);
-
-              if (errors?.length) {
-                // server errors
-                clearCompanyError(destination, actor, clearErrors);
-                clearErrors(`${actor}.agrementNumber`);
-              }
             }
           }}
         />
-        {formState.errors?.destination?.["company"]?.siret && (
-          <p className="fr-text--sm fr-error-text fr-mb-4v">
-            {formState.errors?.destination?.["company"]?.siret?.message}
-          </p>
-        )}
+        {!destination?.company?.siret &&
+          formState.errors?.destination?.["company"]?.siret && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {formState.errors?.destination?.["company"]?.siret?.message}
+            </p>
+          )}
         <CompanyContactInfo
           fieldName={`${actor}.company`}
           name={actor}
@@ -305,18 +324,6 @@ const DestinationBsvhu = ({ errors }) => {
                   destination?.operation?.nextDestinationcompany
                     ?.contactEmail || company.contactEmail
                 );
-
-                const agrementNumber =
-                  company?.vhuAgrementBroyeur?.agrementNumber;
-
-                if (agrementNumber) {
-                  setValue(
-                    "destination.agrementNumber",
-                    company?.vhuAgrementBroyeur?.agrementNumber
-                  );
-                } else {
-                  setValue("destination.agrementNumber", "");
-                }
               }
             }}
           />

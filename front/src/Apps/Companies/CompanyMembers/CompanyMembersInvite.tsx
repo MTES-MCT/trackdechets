@@ -73,7 +73,7 @@ const CompanyMembersInvite = ({ company }: CompanyMembersInviteProps) => {
   return (
     <>
       <div className="company-members__invite">
-        <h4 className="fr-h4">Inviter une personne</h4>
+        <h3 className="fr-h4">Inviter une personne</h3>
         <form onSubmit={handleSubmit(updateCompanyMembers)}>
           <Input
             label="Email"

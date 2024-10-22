@@ -25,7 +25,11 @@ import {
   isEcoOrgSign,
   isEmetteurSign,
   isSignTransportCanSkipEmission,
-  getOperationCodesFromSearchString
+  getOperationCodesFromSearchString,
+  hasRoadControlButton,
+  getPrimaryActionsLabelFromBsdStatus,
+  isSiretActorForBsd,
+  ActorType
 } from "./dashboardServices";
 import {
   BsdType,
@@ -1474,6 +1478,154 @@ describe("dashboardServices", () => {
       const operationCodes = getOperationCodesFromSearchString(searchString);
 
       expect(operationCodes).toStrictEqual([]);
+    });
+  });
+
+  describe("isSiretActorForBsd", () => {
+    const bsda: BsdDisplay = {
+      type: BsdType.Bsda,
+      bsdWorkflowType: BsdaType.Collection_2710,
+      emitter: {
+        isPrivateIndividual: true
+      },
+      transporter: {
+        company: { siret: "11111111111111" }
+      },
+      worker: {
+        isDisabled: true
+      }
+    } as BsdDisplay;
+
+    it("should return false if testing for a wrong siret", () => {
+      const currentSiret = "555555555";
+      const result = isSiretActorForBsd(bsda, currentSiret, [
+        { type: ActorType.Transporter }
+      ]);
+      expect(result).toBe(false);
+    });
+
+    it("should return true if testing for Transporter, non-strict", () => {
+      const currentSiret = "11111111111111";
+      const result = isSiretActorForBsd(bsda, currentSiret, [
+        { type: ActorType.Transporter }
+      ]);
+      expect(result).toBe(true);
+    });
+
+    it("should return true if testing for Transporter, strict", () => {
+      const currentSiret = "11111111111111";
+      const result = isSiretActorForBsd(bsda, currentSiret, [
+        { type: ActorType.Transporter, strict: true }
+      ]);
+      expect(result).toBe(true);
+    });
+
+    const bsff = {
+      type: BsdType.Bsff,
+      isDraft: true,
+      emitter: {
+        company: { siret: "555555555" }
+      },
+      transporter: {
+        company: { siret: "987654321" }
+      },
+      destination: {
+        company: { siret: "555555555" }
+      }
+    } as BsdDisplay;
+
+    it("should return true if testing for Destination, non-strict", () => {
+      const currentSiret = "555555555";
+      const result = isSiretActorForBsd(bsff, currentSiret, [
+        { type: ActorType.Destination }
+      ]);
+      expect(result).toBe(true);
+    });
+
+    it("should return false if testing for Destination, strict", () => {
+      const currentSiret = "555555555";
+      const result = isSiretActorForBsd(bsff, currentSiret, [
+        { type: ActorType.Destination, strict: true }
+      ]);
+      expect(result).toBe(false);
+    });
+
+    const bsd: BsdDisplay = {
+      status: BsdStatusCode.Sealed,
+      type: BsdType.Bsdd,
+      emitter: { company: { siret: "1" } },
+      transporter: { company: { siret: "2" } },
+      broker: { company: { siret: "4" } },
+      trader: { company: { siret: "5" } },
+      intermediaries: [{ siret: "6" }],
+      destination: { company: { siret: "3" } },
+      ecoOrganisme: { siret: "2" }
+    } as BsdDisplay;
+
+    it("should return true if testing for Intermediary, strict", () => {
+      const currentSiret = "6";
+      const result = isSiretActorForBsd(bsd, currentSiret, [
+        { type: ActorType.Intermediary }
+      ]);
+      expect(result).toBe(true);
+    });
+
+    it("should return false if testing for Broker with wrong siret, strict", () => {
+      const currentSiret = "6";
+      const result = isSiretActorForBsd(bsd, currentSiret, [
+        { type: ActorType.Broker }
+      ]);
+      expect(result).toBe(false);
+    });
+
+    it("should return true if testing for EcoOrganisme, non-strict", () => {
+      const currentSiret = "2";
+      const result = isSiretActorForBsd(bsd, currentSiret, [
+        { type: ActorType.EcoOrganisme }
+      ]);
+      expect(result).toBe(true);
+    });
+
+    it("should return false if testing for EcoOrganisme, strict", () => {
+      const currentSiret = "2";
+      const result = isSiretActorForBsd(bsd, currentSiret, [
+        { type: ActorType.EcoOrganisme, strict: true }
+      ]);
+      expect(result).toBe(false);
+    });
+
+    it("should return true if testing for multiple, non-strict", () => {
+      const currentSiret = "2";
+      const result = isSiretActorForBsd(bsd, currentSiret, [
+        { type: ActorType.Transporter },
+        { type: ActorType.EcoOrganisme }
+      ]);
+      expect(result).toBe(true);
+    });
+  });
+
+  describe("hasRoadControlButton", () => {
+    it("should return true if isReturnTab", () => {
+      // When
+      const result = hasRoadControlButton({} as BsdDisplay, false, true);
+
+      // Then
+      expect(result).toBeTruthy();
+    });
+  });
+
+  describe("getPrimaryActionsLabelFromBsdStatus", () => {
+    it("should return ROAD_CONTROL if isReturnTab", () => {
+      // When
+      const result = getPrimaryActionsLabelFromBsdStatus(
+        {} as BsdDisplay,
+        "any-siret",
+        [],
+        "returnTab"
+      );
+
+      // Then
+      expect(result).toBe(ROAD_CONTROL);
     });
   });
 });

@@ -7,6 +7,8 @@ import Header from "./Header";
 import { Toaster } from "react-hot-toast";
 import sandboxIcon from "./assets/code-sandbox.svg";
 import downtimeIcon from "./assets/code-downtime.svg";
+import PageTitle from "../PageTitle/PageTitle";
+import A11ySkipLinks from "../A11ySkipLinks/A11ySkipLinks";
 
 interface AuthProps {
   isAuthenticated: boolean;
@@ -101,12 +103,14 @@ export default function Layout({
           </Button>
         </div>
       )}
+      <A11ySkipLinks />
       <Header
         isAuthenticated={isAuthenticated}
         isAdmin={isAdmin}
         defaultOrgId={defaultOrgId}
       />
       <Outlet />
+      <PageTitle />
     </>
   );
 }

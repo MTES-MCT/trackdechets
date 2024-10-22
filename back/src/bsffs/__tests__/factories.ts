@@ -322,6 +322,28 @@ export function createBsffAfterOperation(
   });
 }
 
+export const createBsffPackagingFinalOperation = async ({
+  bsffPackagingId,
+  opts = {}
+}: {
+  bsffPackagingId: string;
+  opts?: Omit<
+    Partial<Prisma.BsffPackagingFinalOperationCreateInput>,
+    "finalBsffPackagingId" | "initialBsffPackagingId"
+  >;
+}) => {
+  return prisma.bsffPackagingFinalOperation.create({
+    data: {
+      finalBsffPackaging: { connect: { id: bsffPackagingId } },
+      initialBsffPackaging: { connect: { id: bsffPackagingId } },
+      operationCode: "",
+      noTraceability: false,
+      quantity: 1,
+      ...opts
+    }
+  });
+};
+
 export function createBsffPackaging(
   args: Partial<Prisma.BsffPackagingCreateInput>,
   previousPackagings?: BsffPackaging[]
@@ -376,7 +398,7 @@ export function createFicheIntervention({
 type AddBsffTransporterOpt = {
   bsffId: string;
   transporter: UserWithCompany;
-  opt: { transporterTransportPlates: string[] };
+  opt?: { transporterTransportPlates: string[] };
 };
 
 export const addBsffTransporter = async ({

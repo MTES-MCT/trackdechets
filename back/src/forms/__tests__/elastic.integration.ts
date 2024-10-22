@@ -1,4 +1,9 @@
-import { Company, Status } from "@prisma/client";
+import {
+  Company,
+  EmptyReturnADR,
+  Status,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import {
@@ -9,10 +14,15 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-import { getFirstTransporterSync, getFullForm } from "../database";
+import {
+  getFirstTransporterSync,
+  getFullForm,
+  getLastTransporterSync
+} from "../database";
 import { getSiretsByTab } from "../elasticHelpers";
 import { getFormForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
+import { xDaysAgo } from "../../utils";
 
 describe("getSiretsByTab", () => {
   afterEach(resetDatabase);
@@ -367,6 +377,160 @@ describe("getSiretsByTab", () => {
     expect(isCollectedFor).toContain(
       forwardedInTransporter!.transporterCompanySiret
     );
+  });
+
+  describe("isReturnFor", () => {
+    it.each([
+      WasteAcceptationStatus.REFUSED,
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+    ])(
+      "waste acceptation status is %p > bsdd should belong to tab",
+      async wasteAcceptationStatus => {
+        // Given
+        const user = await userFactory();
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status: Status.RECEIVED,
+            receivedAt: new Date(),
+            wasteAcceptationStatus
+          }
+        });
+        const formForElastic = await getFormForElastic(form);
+        const transporter = getLastTransporterSync(formForElastic);
+
+        // When
+        const { isReturnFor } = toBsdElastic(formForElastic);
+
+        // Then
+        expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
+      }
+    );
+
+    it("status is REFUSED > bsdd should belong to tab", async () => {
+      // Given
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.REFUSED,
+          receivedAt: new Date()
+        }
+      });
+      const fullForm = await getFormForElastic(form);
+      const transporter = getLastTransporterSync(fullForm);
+
+      // When
+      const { isReturnFor } = toBsdElastic(fullForm);
+
+      // Then
+      expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
+    });
+
+    it("waste acceptation status is ACCEPTED > bsdd should not belong to tab", async () => {
+      // Given
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.RECEIVED,
+          receivedAt: new Date(),
+          wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED
+        }
+      });
+      const fullForm = await getFormForElastic(form);
+
+      // When
+      const { isReturnFor } = toBsdElastic(fullForm);
+
+      // Then
+      expect(isReturnFor).toStrictEqual([]);
+    });
+
+    it("form has been received too long ago > should not belong to tab", async () => {
+      // Given
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.RECEIVED,
+          receivedAt: xDaysAgo(new Date(), 10),
+          wasteAcceptationStatus: WasteAcceptationStatus.REFUSED
+        }
+      });
+      const fullForm = await getFormForElastic(form);
+
+      // When
+      const { isReturnFor } = toBsdElastic(fullForm);
+
+      // Then
+      expect(isReturnFor).toStrictEqual([]);
+    });
+
+    it("empty ADR stuff has been precised > bsdd should belong to tab", async () => {
+      // Given
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.RECEIVED,
+          receivedAt: new Date(),
+          emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE
+        }
+      });
+      const fullForm = await getFormForElastic(form);
+      const transporter = getLastTransporterSync(fullForm);
+
+      // When
+      const { isReturnFor } = toBsdElastic(fullForm);
+
+      // Then
+      expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
+    });
+
+    it("citerne stuff has been precised > bsdd should belong to tab", async () => {
+      // Given
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.RECEIVED,
+          receivedAt: new Date(),
+          hasCiterneBeenWashedOut: false
+        }
+      });
+      const fullForm = await getFormForElastic(form);
+      const transporter = getLastTransporterSync(fullForm);
+
+      // When
+      const { isReturnFor } = toBsdElastic(fullForm);
+
+      // Then
+      expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
+    });
+
+    it("combination of all > bsdd should belong to tab", async () => {
+      // Given
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.RECEIVED,
+          receivedAt: new Date(),
+          wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          hasCiterneBeenWashedOut: false,
+          emptyReturnADR: EmptyReturnADR.EMPTY_RETURN_NOT_WASHED
+        }
+      });
+      const fullForm = await getFormForElastic(form);
+      const transporter = getLastTransporterSync(fullForm);
+
+      // When
+      const { isReturnFor } = toBsdElastic(fullForm);
+
+      // Then
+      expect(isReturnFor).toContain(transporter?.transporterCompanySiret);
+    });
   });
 });
 

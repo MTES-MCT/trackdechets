@@ -23,8 +23,7 @@ jest.mock("@td/prisma", () => ({
 
 const installationMock = jest.fn();
 jest.mock("../../../database", () => ({
-  getInstallation: jest.fn((...args) => installationMock(...args)),
-  convertUrls: v => v
+  getInstallation: jest.fn((...args) => installationMock(...args))
 }));
 
 describe("companyInfos with SIRET", () => {

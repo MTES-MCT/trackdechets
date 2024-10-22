@@ -312,6 +312,9 @@ model Company {
   receivedAdministrativeTransfers AdministrativeTransfer[] @relation("AdministrativeTransferTo")
   webhookSettingsLimit            Int                      @default(1)
 
+  delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
+  delegateRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegate")
+
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
   @@index([createdAt], map: "_CompanyCreatedAtIdx")
@@ -345,6 +348,21 @@ model AnonymousCompany {
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
 
+// Notifications auxquelles un utilisateur peut s'abonner pour 
+// un établissement donné
+enum UserNotification {
+  // Notification de demande de rattachement
+  MEMBERSHIP_REQUEST
+  // Notification de renouvellement du code signature
+  SIGNATURE_CODE_RENEWAL
+  // Notifications en cas de refus total ou partiel d'un BSD
+  BSD_REFUSAL
+  // Notification lors de la modification de la destination finale amiante
+  BSDA_FINAL_DESTINATION_UPDATE
+  // Notification lors d'une demande de révision
+  REVISION_REQUEST
+}
+
 model CompanyAssociation {
   id                    String    @id @default(cuid()) @db.VarChar(30)
   role                  UserRole
@@ -355,6 +373,9 @@ model CompanyAssociation {
   createdAt             DateTime? @default(now())
   // Tell apart automatically accepted invitations from others
   automaticallyAccepted Boolean   @default(false)
+
+  // Abonnements aux notifications
+  notifications UserNotification[]
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
@@ -392,6 +413,7 @@ model EcoOrganisme {
   address       String
   handleBsdasri Boolean @default(false)
   handleBsda    Boolean @default(false)
+  handleBsvhu   Boolean @default(false)
 }
 
 // Permet de faire le lien entre un bordereau "initial" et le ou 
@@ -422,14 +444,14 @@ model BsddFinalOperation {
 }
 
 model Form {
-  id                                    String                  @id @default(cuid()) @db.VarChar(30)
-  rowNumber                             Int                     @unique(map: "Form_rowNumber_ukey") @default(autoincrement())
-  createdAt                             DateTime                @default(now()) @db.Timestamptz(6)
-  updatedAt                             DateTime                @updatedAt @db.Timestamptz(6)
-  readableId                            String                  @unique(map: "Form.readableId._UNIQUE")
+  id                                    String                     @id @default(cuid()) @db.VarChar(30)
+  rowNumber                             Int                        @unique(map: "Form_rowNumber_ukey") @default(autoincrement())
+  createdAt                             DateTime                   @default(now()) @db.Timestamptz(6)
+  updatedAt                             DateTime                   @updatedAt @db.Timestamptz(6)
+  readableId                            String                     @unique(map: "Form.readableId._UNIQUE")
   customId                              String?
-  isDeleted                             Boolean?                @default(false)
-  status                                Status                  @default(DRAFT)
+  isDeleted                             Boolean?                   @default(false)
+  status                                Status                     @default(DRAFT)
   emitterType                           EmitterType?
   emitterPickupSite                     String?
   emitterCompanyName                    String?
@@ -443,8 +465,8 @@ model Form {
   emitterWorkSiteCity                   String?
   emitterWorkSitePostalCode             String?
   emitterWorkSiteInfos                  String?
-  emitterIsPrivateIndividual            Boolean?                @default(false)
-  emitterIsForeignShip                  Boolean?                @default(false)
+  emitterIsPrivateIndividual            Boolean?                   @default(false)
+  emitterIsForeignShip                  Boolean?                   @default(false)
   emitterCompanyOmiNumber               String?
   recipientCap                          String?
   recipientProcessingOperation          String?
@@ -454,18 +476,18 @@ model Form {
   recipientCompanyContact               String?
   recipientCompanyPhone                 String?
   recipientCompanyMail                  String?
-  recipientIsTempStorage                Boolean?                @default(false)
+  recipientIsTempStorage                Boolean?                   @default(false)
   wasteDetailsCode                      String?
   wasteDetailsName                      String?
   wasteDetailsOnuCode                   String?
-  wasteDetailsQuantity                  Decimal?                @db.Decimal(65, 30)
+  wasteDetailsQuantity                  Decimal?                   @db.Decimal(65, 30)
   wasteDetailsQuantityType              QuantityType?
   wasteDetailsConsistence               Consistence?
-  wasteDetailsPackagingInfos            Json                    @default("[]")
-  wasteDetailsPop                       Boolean                 @default(false)
+  wasteDetailsPackagingInfos            Json                       @default("[]")
+  wasteDetailsPop                       Boolean                    @default(false)
   wasteDetailsSampleNumber              String?
-  wasteDetailsIsDangerous               Boolean                 @default(false)
-  wasteDetailsParcelNumbers             Json?                   @default("[]")
+  wasteDetailsIsDangerous               Boolean                    @default(false)
+  wasteDetailsParcelNumbers             Json?                      @default("[]")
   wasteDetailsAnalysisReferences        String[]
   wasteDetailsLandIdentifiers           String[]
   traderCompanyName                     String?
@@ -476,7 +498,7 @@ model Form {
   traderCompanyMail                     String?
   traderReceipt                         String?
   traderDepartment                      String?
-  traderValidityLimit                   DateTime?               @db.Timestamptz(6)
+  traderValidityLimit                   DateTime?                  @db.Timestamptz(6)
   ecoOrganismeName                      String?
   ecoOrganismeSiret                     String?
   brokerCompanyName                     String?
@@ -487,7 +509,7 @@ model Form {
   brokerCompanyMail                     String?
   brokerReceipt                         String?
   brokerDepartment                      String?
-  brokerValidityLimit                   DateTime?               @db.Timestamptz(6)
+  brokerValidityLimit                   DateTime?                  @db.Timestamptz(6)
   nextDestinationProcessingOperation    String?
   nextDestinationCompanyName            String?
   nextDestinationCompanySiret           String?
@@ -496,31 +518,31 @@ model Form {
   nextDestinationCompanyPhone           String?
   nextDestinationCompanyMail            String?
   nextDestinationCompanyCountry         String?
-  nextDestinationCompanyVatNumber       String?                 @db.VarChar(30)
+  nextDestinationCompanyVatNumber       String?                    @db.VarChar(30)
   nextDestinationNotificationNumber     String?
   nextDestinationCompanyExtraEuropeanId String?
   nextTransporterOrgId                  String?
-  emittedAt                             DateTime?               @db.Timestamptz(6)
+  emittedAt                             DateTime?                  @db.Timestamptz(6)
   emittedBy                             String?
   emittedByEcoOrganisme                 Boolean?
-  takenOverAt                           DateTime?               @db.Timestamptz(6)
+  takenOverAt                           DateTime?                  @db.Timestamptz(6)
   takenOverBy                           String?
-  signedAt                              DateTime?               @db.Timestamptz(6)
+  signedAt                              DateTime?                  @db.Timestamptz(6)
   signedBy                              String?
-  isImportedFromPaper                   Boolean                 @default(false)
+  isImportedFromPaper                   Boolean                    @default(false)
   quantityReceivedType                  QuantityType?
   signedByTransporter                   Boolean?
-  sentAt                                DateTime?               @db.Timestamptz(6)
+  sentAt                                DateTime?                  @db.Timestamptz(6)
   sentBy                                String?
-  isAccepted                            Boolean?                @default(false)
+  isAccepted                            Boolean?                   @default(false)
   wasteAcceptationStatus                WasteAcceptationStatus?
   wasteRefusalReason                    String?
   receivedBy                            String?
-  receivedAt                            DateTime?               @db.Timestamptz(6)
-  quantityReceived                      Decimal?                @db.Decimal(65, 30)
-  quantityRefused                       Decimal?                @db.Decimal(65, 30)
+  receivedAt                            DateTime?                  @db.Timestamptz(6)
+  quantityReceived                      Decimal?                   @db.Decimal(65, 30)
+  quantityRefused                       Decimal?                   @db.Decimal(65, 30)
   processedBy                           String?
-  processedAt                           DateTime?               @db.Timestamptz(6)
+  processedAt                           DateTime?                  @db.Timestamptz(6)
   processingOperationDone               String?
   processingOperationDescription        String?
   noTraceability                        Boolean?
@@ -890,8 +912,6 @@ model User {
   firstAssociationDate  DateTime?               @db.Timestamptz(6)
   isActive              Boolean?                @default(false)
   isAdmin               Boolean                 @default(false)
-  // TODO champ à supprimer suite à la création des comptes gouvernementaux
-  isRegistreNational    Boolean                 @default(false)
   governmentAccountId   String?                 @unique
   governmentAccount     GovernmentAccount?      @relation(fields: [governmentAccountId], references: [id])
   AccessToken           AccessToken[]
@@ -995,8 +1015,8 @@ model Bsvhu {
 
   status BsvhuStatus @default(INITIAL)
 
-  emitterIrregularSituation                           Boolean?
-  emitterNoSiret                                      Boolean?
+  emitterIrregularSituation                           Boolean?                 @default(false)
+  emitterNoSiret                                      Boolean?                 @default(false)
   emitterAgrementNumber                               String?                  @db.VarChar(100)
   emitterCompanyName                                  String?
   emitterCompanySiret                                 String?                  @db.VarChar(17)
@@ -1064,10 +1084,34 @@ model Bsvhu {
   transporterTransportPlates                          String[]
   transporterRecepisseIsExempted                      Boolean?
 
+  ecoOrganismeName  String?
+  ecoOrganismeSiret String?
+
+  brokerCompanyName            String?
+  brokerCompanySiret           String?
+  brokerCompanyAddress         String?
+  brokerCompanyContact         String?
+  brokerCompanyPhone           String?
+  brokerCompanyMail            String?
+  brokerRecepisseNumber        String?
+  brokerRecepisseDepartment    String?
+  brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
+  traderCompanyName            String?
+  traderCompanySiret           String?
+  traderCompanyAddress         String?
+  traderCompanyContact         String?
+  traderCompanyPhone           String?
+  traderCompanyMail            String?
+  traderRecepisseNumber        String?
+  traderRecepisseDepartment    String?
+  traderRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
   intermediaries IntermediaryBsvhuAssociation[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
+  canAccessDraftOrgIds String[] @default([])
 
   // partial indices _BsvhuIsDeletedIdx,_BsvhuIsDraftIdx  see migration82_missing_indices.sql
 
@@ -1075,9 +1119,40 @@ model Bsvhu {
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterCompanyVatNumberIdx")
+  @@index([ecoOrganismeSiret], map: "_BsvhuEcoOrganismeSiretIdx")
+  @@index([brokerCompanySiret], map: "_BsvhuBrokerCompanySiretIdx")
+  @@index([traderCompanySiret], map: "_BsvhuTraderCompanySiretIdx")
   @@index([intermediariesOrgIds], map: "_BsvhuIntermediariesOrgIdsIdx", type: Gin)
+  @@index([canAccessDraftOrgIds], map: "_BsvhuCanAccessDraftOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
+}
+
+model RegistryDelegation {
+  id String @id @default(cuid())
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  // Entreprise délégataire
+  delegateId String @db.VarChar(30)
+  delegate Company  @relation("RegistryDelegationDelegate", fields: [delegateId], references: [id])
+
+  // Entreprise délégante
+  delegatorId String @db.VarChar(30)
+  delegator Company  @relation("RegistryDelegationDelegator", fields: [delegatorId], references: [id])
+
+  // Dates de validité
+  startDate DateTime  @db.Timestamptz(6)
+  endDate   DateTime? @db.Timestamptz(6)
+
+  comment String? @db.VarChar(500)
+
+  revokedBy String? @db.VarChar(30)
+  cancelledBy String? @db.VarChar(30)
+
+  @@index([delegateId], map: "_RegistryDelegationDelegateIdIdx")
+  @@index([delegatorId], map: "_RegistryDelegationDelegatorIdIdx")
 }
 
 model IntermediaryBsvhuAssociation {
@@ -1645,6 +1720,7 @@ model Bsda {
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
+  @@index([ecoOrganismeSiret], map: "_BsdaEcoOrganismeSiretIdx")
   @@index([destinationOperationNextDestinationCompanySiret], map: "_BsdaDestinationOperationNextDestinationCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
   @@index([groupedInId], map: "_BsdaGroupedInIdIdx")

@@ -114,7 +114,11 @@ env:
   QUEUE_MONITOR_TOKEN: token
   DATABASE_URL: "postgresql://trackdechets:password@postgres:5432/e2e?schema=default$default"
   API_TOKEN_SECRET: any_secret
-  INSEE_SECRET: unset
+  INSEE_CLIENT_ID: unset
+  INSEE_CLIENT_SECRET: unset
+  INSEE_USERNAME: unset
+  INSEE_PASSWORD: unset
+
   SESSION_SECRET: any_secret
   SESSION_NAME: connect.sid
   SESSION_COOKIE_HOST: trackdechets.local
@@ -211,6 +215,7 @@ env:
 
   # Misc
   CRON_ONBOARDING_SCHEDULE: false
+  CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE: false
   VERIFY_COMPANY: false
   ALLOW_TEST_COMPANY: true
   VITE_ALLOW_TEST_COMPANY: true

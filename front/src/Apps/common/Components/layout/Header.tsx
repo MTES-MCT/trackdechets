@@ -27,7 +27,8 @@ import {
   TO_COLLECT,
   TRANSPORT,
   TO_REVIEW,
-  REVIEWED
+  REVIEWED,
+  RETURN
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import routes from "../../../routes";
@@ -281,6 +282,17 @@ function DashboardSubNav({ currentCompany }) {
                   }}
                 />
               </li>
+              <li>
+                <MenuLink
+                  entry={{
+                    navlink: true,
+                    caption: RETURN,
+                    href: generatePath(routes.dashboard.transport.return, {
+                      siret: currentCompany.orgId
+                    })
+                  }}
+                />
+              </li>
             </ul>
           </div>
         </li>
@@ -426,6 +438,7 @@ function MobileSubNav({ currentCompany }) {
     </div>
   );
 }
+const allBsdsMenuEntryLbl = "Mes bordereaux";
 
 const getDesktopMenuEntries = (
   isAuthenticated,
@@ -448,10 +461,9 @@ const getDesktopMenuEntries = (
       navlink: true
     }
   ];
-
   const connected = [
     {
-      caption: "Mes bordereaux",
+      caption: allBsdsMenuEntryLbl,
       href: currentSiret
         ? generatePath(routes.dashboard.index, {
             siret: currentSiret
@@ -582,13 +594,17 @@ export default function Header({
                     <br />
                     de la transition
                     <br />
-                    écologique
+                    écologique,
+                    <br />
+                    de l'énergie, du climat, <br />
+                    et de la prévention <br />
+                    des risques
                   </p>
                 </div>
                 <div className="fr-header__operator">
                   <img
                     className="fr-responsive-img"
-                    style={{ width: "70px", height: "70px" }}
+                    style={{ width: "70px" }}
                     src="./trackdechets.png"
                     alt="Trackdéchets"
                     data-fr-js-ratio="true"
@@ -762,11 +778,19 @@ export default function Header({
 
           <nav className={`fr-nav ${styles.headerNav}`}>
             <ul
-              className={`fr-nav__list`}
+              className={`fr-nav__list ${styles.headerNavList}`}
               style={{ margin: "initial", maxWidth: "initial" }}
             >
               {menuEntries.map((e, idx) => (
-                <li className="fr-nav__item" key={idx}>
+                <li
+                  id={
+                    e.caption === allBsdsMenuEntryLbl
+                      ? "header-all-bsds-link"
+                      : ""
+                  }
+                  className="fr-nav__item"
+                  key={idx}
+                >
                   <MenuLink entry={e} />
                 </li>
               ))}
@@ -774,6 +798,7 @@ export default function Header({
               <li className="fr-nav__item">
                 <button
                   className="fr-nav__btn"
+                  style={{ width: "fit-content" }}
                   aria-expanded="false"
                   aria-controls="aidemenu"
                 >

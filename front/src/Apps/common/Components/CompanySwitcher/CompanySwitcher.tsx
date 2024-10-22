@@ -138,9 +138,15 @@ const CompanySwitcher = ({
         role="presentation"
       >
         <div className="company-switcher-item__content">
-          <div className="company-switcher-item__name">
-            {company.givenName || company.name}
-          </div>
+          {current ? (
+            <h1 className="company-switcher-item__name">
+              {company.givenName || company.name}
+            </h1>
+          ) : (
+            <div className="company-switcher-item__name">
+              {company.givenName || company.name}
+            </div>
+          )}
           {current && companies.length > 1 && (
             <span
               className="fr-icon-arrow-down-s-line company-switcher-item__arrow"
@@ -151,7 +157,10 @@ const CompanySwitcher = ({
         <div className="company-switcher-item__infos">
           <div className="company-switcher-item__siret">{company.orgId}</div>
           {current && (
-            <p className="fr-tag fr-tag--sm fr-icon-pen-nib-line fr-tag--icon-left">
+            <p className="company-switcher-item__code fr-tag fr-tag--sm fr-icon-pen-nib-line fr-tag--icon-left">
+              <span className="fr-sr-only">
+                Code signature de l'établissement
+              </span>
               {company.securityCode}
             </p>
           )}

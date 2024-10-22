@@ -32,10 +32,10 @@ import {
   fillIntermediariesOrgIds,
   fillWasteConsistenceWhenForwarding,
   emptyWorkerCertificationWhenWorkerIsDisabled,
-  updateTransporterRecepisse
+  updateTransporterRecepisse,
+  runTransformers
 } from "./transformers";
-import { sirenifyBsda, sirenifyBsdaTransporter } from "./sirenify";
-import { updateTransportersRecepisse } from "../../common/validation/zod/transformers";
+import { sirenifyBsdaTransporter } from "./sirenify";
 import {
   CompanyRole,
   foreignVatNumberSchema,
@@ -291,8 +291,7 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
     ? // Transformations asynchrones qui ne sont pas
       // `enableCompletionTransformers=false`;
       transformedSyncSchema
-        .transform(sirenifyBsda(context))
-        .transform(updateTransportersRecepisse)
+        .transform((bsda: ParsedZodBsda) => runTransformers(bsda, context))
         .transform(fillWasteConsistenceWhenForwarding)
     : transformedSyncSchema;
 

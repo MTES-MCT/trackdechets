@@ -5,6 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
+import { getCanAccessDraftOrgIds } from "../../utils";
 export type CreateBsvhuFn = (
   data: Prisma.BsvhuCreateInput,
   logMetadata?: LogMetadata
@@ -14,7 +15,12 @@ export function buildCreateBsvhu(deps: RepositoryFnDeps): CreateBsvhuFn {
   return async (data, logMetadata?) => {
     const { prisma, user } = deps;
 
-    const bsvhu = await prisma.bsvhu.create({ data });
+    const bsvhu = await prisma.bsvhu.create({
+      data,
+      include: {
+        intermediaries: true
+      }
+    });
 
     await prisma.event.create({
       data: {
@@ -26,8 +32,23 @@ export function buildCreateBsvhu(deps: RepositoryFnDeps): CreateBsvhuFn {
       }
     });
 
-    prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsvhu.id));
+    // For drafts, only the owner's sirets that appear on the bsd have access
+    const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(bsvhu, user.id);
 
-    return bsvhu;
+    const updatedBsvhu = await prisma.bsvhu.update({
+      where: { id: bsvhu.id },
+      data: {
+        ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {})
+      },
+      include: {
+        intermediaries: true
+      }
+    });
+
+    prisma.addAfterCommitCallback(() =>
+      enqueueCreatedBsdToIndex(updatedBsvhu.id)
+    );
+
+    return updatedBsvhu;
   };
 }

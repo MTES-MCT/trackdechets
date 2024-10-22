@@ -65,6 +65,27 @@ export const bsdasriFactory = async ({
   return created;
 };
 
+export const bsdasriFinalOperationFactory = async ({
+  bsdasriId,
+  opts = {}
+}: {
+  bsdasriId: string;
+  opts?: Omit<
+    Partial<Prisma.BsdasriFinalOperationCreateInput>,
+    "initialBsdasri" | "finalBsdasri"
+  >;
+}) => {
+  return prisma.bsdasriFinalOperation.create({
+    data: {
+      initialBsdasri: { connect: { id: bsdasriId } },
+      finalBsdasri: { connect: { id: bsdasriId } },
+      operationCode: "",
+      quantity: 1,
+      ...opts
+    }
+  });
+};
+
 export const initialData = company => ({
   emitterCompanySiret: company.siret,
   emitterCompanyName: company.name,

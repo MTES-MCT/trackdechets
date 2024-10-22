@@ -15,6 +15,7 @@ import {
   Bsda,
   BsdaStatus,
   BsdaType,
+  BsdType,
   Company,
   CompanyType
 } from "@prisma/client";
@@ -26,11 +27,13 @@ import { prisma } from "@td/prisma";
 import { isWorker } from "../../companies/validation";
 import {
   isDestinationRefinement,
-  isNotDormantRefinement,
+  isEcoOrganismeRefinement,
+  isEmitterNotDormantRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement,
   refineSiretAndGetCompany
 } from "../../common/validation/zod/refinement";
+import { CompanyRole } from "../../common/validation/zod/schema";
 
 export const checkOperationIsAfterReception: Refinement<ParsedZodBsda> = (
   bsda,
@@ -259,36 +262,6 @@ export const checkRequiredFields: (
   };
 };
 
-async function refineAndGetEcoOrganisme(siret: string | null | undefined, ctx) {
-  if (!siret) return null;
-  const ecoOrganisme = await prisma.ecoOrganisme.findUnique({
-    where: { siret }
-  });
-
-  if (ecoOrganisme === null) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `L'éco-organisme avec le SIRET ${siret} n'est pas référencé sur Trackdéchets`
-    });
-  }
-
-  return ecoOrganisme;
-}
-
-async function isBsdaEcoOrganismeRefinement(
-  siret: string | null | undefined,
-  ctx: RefinementCtx
-) {
-  const ecoOrganisme = await refineAndGetEcoOrganisme(siret, ctx);
-
-  if (ecoOrganisme && !ecoOrganisme?.handleBsda) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSDA`
-    });
-  }
-}
-
 async function checkEmitterIsNotEcoOrganisme(
   siret: string | null | undefined,
   ctx: RefinementCtx
@@ -327,17 +300,19 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
     );
   };
 
-  await isNotDormantRefinement(bsda.emitterCompanySiret, zodContext);
+  await isEmitterNotDormantRefinement(bsda.emitterCompanySiret, zodContext);
   await isDestinationRefinement(
     bsda.destinationCompanySiret,
     zodContext,
     "DESTINATION",
+    CompanyRole.Destination,
     isBsdaDestinationExemptFromVerification
   );
   await isDestinationRefinement(
     bsda.destinationOperationNextDestinationCompanySiret,
     zodContext,
     "DESTINATION",
+    CompanyRole.DestinationOperationNextDestination,
     isBsdaDestinationExemptFromVerification
   );
   for (const transporter of bsda.transporters ?? []) {
@@ -355,7 +330,11 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
     );
   }
   await isWorkerRefinement(bsda.workerCompanySiret, zodContext);
-  await isBsdaEcoOrganismeRefinement(bsda.ecoOrganismeSiret, zodContext);
+  await isEcoOrganismeRefinement(
+    bsda.ecoOrganismeSiret,
+    BsdType.BSDA,
+    zodContext
+  );
   await checkEmitterIsNotEcoOrganisme(bsda.emitterCompanySiret, zodContext);
 };
 

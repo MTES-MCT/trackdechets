@@ -36,10 +36,6 @@ export default function Signup() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    document.title = `Créer un compte | ${document.title}`;
-  }, []);
-
   const handleSubmit = event => {
     event?.preventDefault();
 
@@ -119,7 +115,8 @@ export default function Signup() {
               label="Nom et prénom"
               nativeInputProps={{
                 required: true,
-                onChange: e => setNameValue(e.target.value)
+                onChange: e => setNameValue(e.target.value),
+                id: "fullnameSignUp"
               }}
             />
             <Input

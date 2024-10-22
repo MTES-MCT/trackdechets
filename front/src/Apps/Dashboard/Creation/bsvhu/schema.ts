@@ -3,25 +3,22 @@ import { z } from "zod";
 import { BSVHU_WASTE_CODES } from "@td/constants";
 
 const zodCompany = z.object({
-  siret: z.string(),
+  siret: z.string().nullish(),
+  name: z.string(),
   contact: z.string().nullish(),
   phone: z.string().nullish(),
   mail: z.string().nullish(),
-  address: z.string().nullish()
+  address: z.string().nullish(),
+  city: z.string().nullish(),
+  street: z.string().nullish(),
+  postalCode: z.string().nullish()
 });
 
 const zodEmitter = z.object({
-  company: zodCompany.superRefine((val, ctx) => {
-    if (!val?.siret) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["orgId"],
-        message:
-          "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparaît pas"
-      });
-    }
-  }),
+  company: zodCompany,
   agrementNumber: z.string().nullish(),
+  irregularSituation: z.boolean(),
+  noSiret: z.boolean(),
   emission: z.object({
     signature: z.object({
       author: z.string().nullish(),

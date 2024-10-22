@@ -197,19 +197,19 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["destination", "agrementNumber"]
   },
   destinationCompanyName: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "La raison sociale du destinataire",
     path: ["destination", "company", "name"]
   },
   destinationCompanySiret: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "Le N° SIRET du destinataire",
     path: ["destination", "company", "siret"]
   },
   destinationCompanyAddress: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
     readableFieldName: "L'adresse du destinataire",
     path: ["destination", "company", "address"]
@@ -381,6 +381,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   identificationNumbers: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
+    required: { from: "EMISSION" },
     readableFieldName: "Les numéros d'identification",
     path: ["identification", "numbers"]
   },
@@ -510,6 +511,164 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     // required: {
     //   from: "TRANSPORT"
     // }
+  },
+  ecoOrganismeName: {
+    readableFieldName: "le nom de l'éco-organisme",
+    sealed: { from: "OPERATION" },
+    path: ["ecoOrganisme", "name"],
+    required: {
+      from: "TRANSPORT",
+      when: bsvhu => !!bsvhu.ecoOrganismeSiret
+    }
+  },
+  ecoOrganismeSiret: {
+    readableFieldName: "le SIRET de l'éco-organisme",
+    sealed: { from: "OPERATION" },
+    path: ["ecoOrganisme", "siret"]
+  },
+  brokerCompanyName: {
+    readableFieldName: "le nom du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.brokerCompanySiret
+    },
+    path: ["broker", "company", "name"]
+  },
+  brokerCompanySiret: {
+    readableFieldName: "le SIRET du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.brokerCompanySiret
+    },
+    path: ["broker", "company", "siret"]
+  },
+  brokerCompanyAddress: {
+    readableFieldName: "l'adresse du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.brokerCompanySiret
+    },
+    path: ["broker", "company", "address"]
+  },
+  brokerCompanyContact: {
+    readableFieldName: "le nom de contact du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.brokerCompanySiret
+    },
+    path: ["broker", "company", "contact"]
+  },
+  brokerCompanyPhone: {
+    readableFieldName: "le téléphone du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.brokerCompanySiret
+    },
+    path: ["broker", "company", "phone"]
+  },
+  brokerCompanyMail: {
+    readableFieldName: "le mail du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.brokerCompanySiret
+    },
+    path: ["broker", "company", "mail"]
+  },
+  brokerRecepisseNumber: {
+    readableFieldName: "le numéro de récépissé du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.brokerCompanySiret
+    },
+    path: ["broker", "recepisse", "number"]
+  },
+  brokerRecepisseDepartment: {
+    readableFieldName: "le département du récépissé du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.brokerCompanySiret
+    },
+    path: ["broker", "recepisse", "department"]
+  },
+  brokerRecepisseValidityLimit: {
+    readableFieldName: "la date de validité du récépissé du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.brokerCompanySiret
+    },
+    path: ["broker", "recepisse", "validityLimit"]
+  },
+  traderCompanyName: {
+    readableFieldName: "le nom du négociant",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.traderCompanySiret
+    },
+    path: ["trader", "company", "name"]
+  },
+  traderCompanySiret: {
+    readableFieldName: "le SIRET du négociant",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.traderCompanySiret
+    },
+    path: ["trader", "company", "siret"]
+  },
+  traderCompanyAddress: {
+    readableFieldName: "l'adresse du négociant",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.traderCompanySiret
+    },
+    path: ["trader", "company", "address"]
+  },
+  traderCompanyContact: {
+    readableFieldName: "le nom de contact du négociant",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.traderCompanySiret
+    },
+    path: ["trader", "company", "contact"]
+  },
+  traderCompanyPhone: {
+    readableFieldName: "le téléphone du négociant",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.traderCompanySiret
+    },
+    path: ["trader", "company", "phone"]
+  },
+  traderCompanyMail: {
+    readableFieldName: "le mail du négociant",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.traderCompanySiret
+    },
+    path: ["trader", "company", "mail"]
+  },
+  traderRecepisseNumber: {
+    readableFieldName: "le numéro de récépissé du négociant",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.traderCompanySiret
+    },
+    path: ["trader", "recepisse", "number"]
+  },
+  traderRecepisseDepartment: {
+    readableFieldName: "le département du récépissé du négociant",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.traderCompanySiret
+    },
+    path: ["trader", "recepisse", "department"]
+  },
+  traderRecepisseValidityLimit: {
+    readableFieldName: "la date de validité du récépissé du courtier",
+    sealed: {
+      from: "OPERATION",
+      when: bsvhu => !!bsvhu.traderCompanySiret
+    },
+    path: ["trader", "recepisse", "validityLimit"]
   },
   intermediaries: {
     readableFieldName: "les intermédiaires",

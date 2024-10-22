@@ -399,6 +399,21 @@ const traversals = {
       foreignKey: "orgId"
     },
     {
+      type: "Company",
+      localKey: "traderCompanySiret",
+      foreignKey: "orgId"
+    },
+    {
+      type: "EcoOrganisme",
+      localKey: "ecoOrganismeSiret",
+      foreignKey: "orgId"
+    },
+    {
+      type: "Company",
+      localKey: "brokerCompanySiret",
+      foreignKey: "orgId"
+    },
+    {
       type: "AnonymousCompany",
       localKey: "emitterCompanySiret",
       foreignKey: "orgId"
@@ -455,21 +470,21 @@ const traversals = {
       localKey: "id",
       foreignKey: "companyId"
     },
-    {
-      type: "MembershipRequest",
-      localKey: "id",
-      foreignKey: "companyId"
-    },
-    {
-      type: "SignatureAutomation",
-      localKey: "id",
-      foreignKey: "fromId"
-    },
-    {
-      type: "SignatureAutomation",
-      localKey: "id",
-      foreignKey: "toId"
-    },
+    // {
+    //   type: "MembershipRequest",
+    //   localKey: "id",
+    //   foreignKey: "companyId"
+    // },
+    // {
+    //   type: "SignatureAutomation",
+    //   localKey: "id",
+    //   foreignKey: "fromId"
+    // },
+    // {
+    //   type: "SignatureAutomation",
+    //   localKey: "id",
+    //   foreignKey: "toId"
+    // },
     {
       type: "WebhookSetting",
       localKey: "orgId",
@@ -495,11 +510,11 @@ const traversals = {
       localKey: "governmentAccountId",
       foreignKey: "id"
     },
-    {
-      type: "AccessToken",
-      localKey: "id",
-      foreignKey: "userId"
-    },
+    // {
+    //   type: "AccessToken",
+    //   localKey: "id",
+    //   foreignKey: "userId"
+    // },
     {
       type: "Application",
       localKey: "id",
@@ -515,11 +530,11 @@ const traversals = {
       localKey: "id",
       foreignKey: "userId"
     },
-    {
-      type: "Grant",
-      localKey: "id",
-      foreignKey: "userId"
-    },
+    // {
+    //   type: "Grant",
+    //   localKey: "id",
+    //   foreignKey: "userId"
+    // },
     // {
     //   type: "MembershipRequest",
     //   localKey: "id",
@@ -657,17 +672,17 @@ const traversals = {
       type: "User",
       localKey: "adminId",
       foreignKey: "id"
-    },
-    {
-      type: "AccessToken",
-      localKey: "id",
-      foreignKey: "applicationId"
-    },
-    {
-      type: "Grant",
-      localKey: "id",
-      foreignKey: "applicationId"
     }
+    // {
+    //   type: "AccessToken",
+    //   localKey: "id",
+    //   foreignKey: "applicationId"
+    // },
+    // {
+    //   type: "Grant",
+    //   localKey: "id",
+    //   foreignKey: "applicationId"
+    // }
   ],
   FeatureFlag: [],
   Grant: [

@@ -45,6 +45,9 @@ type CompanyPrivate {
   "Liste des permissions de l'utilisateur authentifié au sein de cet établissement"
   userPermissions: [UserPermission!]!
 
+  "Liste des notifications auquels l'utilisateur est abonné pour cet établissement"
+  userNotifications: [UserNotification!]!
+
   """
   Nom d'usage de l'entreprise qui permet de différencier
   différents établissements ayant le même nom
@@ -182,8 +185,10 @@ type CompanyPublic {
   address: String
   "Code commune de l'établissement"
   codeCommune: String
-  "Nom de l'établissement"
+  "Raison sociale de l'établissement"
   name: String
+  "Nom de l'établissement"
+  givenName: String
   "Code NAF"
   naf: String
   "Libellé NAF"
@@ -496,6 +501,7 @@ type EcoOrganisme {
 
   handleBsdasri: Boolean
   handleBsda: Boolean
+  handleBsvhu: Boolean
 }
 
 """
@@ -638,6 +644,9 @@ type CompanyMember {
 
   "Si oui ou non cet utilisateur correspond à l'utilisateur authentifié"
   isMe: Boolean
+
+  "Liste des notifications auxquelles l'utilisateur est abonné pour cet établissement"
+  notifications: [UserNotification!]!
 }
 
 """

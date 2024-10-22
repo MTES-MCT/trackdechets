@@ -58,6 +58,8 @@ export const dashboardVhuFragment = gql`
     isDraft
     emitter {
       agrementNumber
+      irregularSituation
+      noSiret
       company {
         ...DashboardCompanyFragment
       }
@@ -103,6 +105,8 @@ export const FullBsvhuFragment = gql`
         ...CompanyFragment
       }
       agrementNumber
+      irregularSituation
+      noSiret
       emission {
         signature {
           author

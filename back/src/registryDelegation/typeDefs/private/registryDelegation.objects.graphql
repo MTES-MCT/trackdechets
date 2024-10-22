@@ -1,0 +1,66 @@
+"""
+Demande de délégation pour déléguer les déclarations propres aux
+registres RNDTS à un établissement.
+"""
+type RegistryDelegation {
+  """
+  Identifiant de la demande de délégation
+  """
+  id: String!
+
+  """
+  Date à laquelle la demande de délégation a été créée
+  """
+  createdAt: DateTime!
+
+  """
+  Date de dernière mise à jour de la demande de délégation
+  """
+  updatedAt: DateTime!
+
+  """
+  Délégataire, c'est-à-dire l'entreprise qui fera les déclarations
+  à la place du délégant
+  """
+  delegate: CompanyPublic!
+
+  """
+  Délégant, c'est-à-dire l'entreprise qui délègue ses déclarations
+  aux délégataire
+  """
+  delegator: CompanyPublic!
+
+  """
+  Date de début de la délégation
+  """
+  startDate: DateTime!
+
+  """
+  Date de fin de la délégation
+  """
+  endDate: DateTime
+
+  """
+  Objet de la délégation
+  """
+  comment: String
+
+  """
+  Statut de la délégation
+  """
+  status: RegistryDelegationStatus!
+}
+
+type RegistryDelegationEdge {
+  cursor: String!
+  node: RegistryDelegation!
+}
+
+"""
+List paginée de délégations
+"""
+type RegistryDelegationConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [RegistryDelegationEdge!]!
+}

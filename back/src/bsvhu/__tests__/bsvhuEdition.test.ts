@@ -1,6 +1,8 @@
 import {
+  BsvhuBrokerInput,
   BsvhuDestinationInput,
   BsvhuDestinationType,
+  BsvhuEcoOrganismeInput,
   BsvhuEmitterInput,
   BsvhuIdentificationInput,
   BsvhuInput,
@@ -8,6 +10,7 @@ import {
   BsvhuOperationInput,
   BsvhuRecepisseInput,
   BsvhuReceptionInput,
+  BsvhuTraderInput,
   BsvhuTransporterInput,
   BsvhuTransportInput,
   BsvhuWeightInput,
@@ -17,7 +20,7 @@ import { bsvhuEditionRules } from "../validation/rules";
 import { graphQlInputToZodBsvhu } from "../validation/helpers";
 
 describe("edition", () => {
-  test("an edition rule should be defined for every key in BsdaInput", () => {
+  test("an edition rule should be defined for every key in BsvhuInput", () => {
     // Create a dummy BSDVHU input where every possible key is present
     // The typing will break whenever a field is added or modified
     // to BsvhuInput so that we think of adding an entry to the edition rules
@@ -96,6 +99,21 @@ describe("edition", () => {
       operation
     };
 
+    const ecoOrganisme: Required<BsvhuEcoOrganismeInput> = {
+      siret: "xxx",
+      name: "yyy"
+    };
+
+    const broker: Required<BsvhuBrokerInput> = {
+      company,
+      recepisse
+    };
+
+    const trader: Required<BsvhuTraderInput> = {
+      company,
+      recepisse
+    };
+
     const input: Required<BsvhuInput> = {
       emitter,
       wasteCode: "",
@@ -104,7 +122,11 @@ describe("edition", () => {
       quantity: 1,
       weight,
       transporter,
-      destination
+      destination,
+      intermediaries: [company],
+      ecoOrganisme,
+      broker,
+      trader
     };
     const flatInput = graphQlInputToZodBsvhu(input);
     for (const key of Object.keys(flatInput)) {

@@ -51,6 +51,7 @@ export const modifier_action_label = "Modifier";
 export const dupliquer_action_label = "Dupliquer";
 export const revision_action_label = "Réviser";
 export const supprimer_action_label = "Supprimer";
+export const clone_action_label = "Cloner";
 export const completer_bsd_suite = "Compléter le BSD suite";
 export const annexe1 = "Annexe 1";
 
@@ -77,6 +78,10 @@ sur l'état précis du bordereau.`;
 export const blankstate_reviews_title = "Il n'y a aucun bordereau en révision";
 export const blankstate_reviews_desc =
   "Vous n'avez aucune révision en attente.";
+export const blankstate_return_title =
+  'Aucun bordereau dans le dossier "Retours"';
+export const blankstate_return_desc =
+  "Les bordereaux refusés, même partiellement ou ayant fait l'objet d'une information sur le retour à vide (ADR) ou de rinçage citerne, seront affichés dans ce dossier durant 48h après la réception de l'installation de destination, et ce afin de permettre de disposer du bordereau en cas de contrôle lors du retour. Si un BSD est absent vérifiez qu'il est bien complété.";
 export const blankstate_default_title = "Il n'y a aucun bordereau";
 export const blankstate_default_desc =
   "Si vous le souhaitez, vous pouvez créer un bordereau depuis le menu de création ci-dessus";
@@ -135,7 +140,7 @@ export const bsd_sub_type_option_synthesis = "Synthèse";
 export const filter_type_select_option_placeholder = "Sélectionner une option";
 export const max_filter_autorized_label =
   "Vous avez atteint le nombre de filtres maximum";
-export const sr_btn_delete_filter_line = "supprimer un filtre";
+export const sr_btn_delete_filter_line = "Retirer le filtre";
 export const sr_btn_add_filter_line = "ajouter un filtre";
 export const multi_select_select_all_label = "Tout sélectionner";
 
@@ -190,6 +195,7 @@ export const COLLECTED = "Collectés";
 export const REGISTER = "Registre";
 export const TO_REVIEW = "En cours";
 export const REVIEWED = "Révisés";
+export const RETURN = "Retours";
 
 // Reviews
 export const GERER_REVISION = "Gérer la révision";

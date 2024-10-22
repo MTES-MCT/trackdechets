@@ -14,12 +14,12 @@ import {
 import { BsffValidationContext } from "./types";
 import { weightSchema } from "../../../common/validation/weight";
 import { WeightUnits } from "../../../common/validation";
-import { sirenifyBsff, sirenifyBsffTransporter } from "./sirenify";
+import { sirenifyBsffTransporter } from "./sirenify";
 import {
   checkAndSetPreviousPackagings,
+  runTransformers,
   updateTransporterRecepisse
 } from "./transformers";
-import { updateTransportersRecepisse } from "../../../common/validation/zod/transformers";
 import {
   CompanyRole,
   rawTransporterSchema,
@@ -194,8 +194,7 @@ export const contextualBsffSchema = (context: BsffValidationContext) => {
 export const contextualBsffSchemaAsync = (context: BsffValidationContext) => {
   return refinedBsffSchema
     .superRefine(checkCompanies)
-    .transform(sirenifyBsff(context))
-    .transform(updateTransportersRecepisse)
+    .transform((bsff: ParsedZodBsff) => runTransformers(bsff, context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où des transformations auto-complète certains champs
