@@ -19,11 +19,6 @@ const subscribeToNotificationsResolver: MutationResolvers["subscribeToNotificati
     const { notifications } = args.input;
 
     for (const [notification, isActive] of Object.entries(notifications)) {
-      if (isActive === null || isActive === undefined) {
-        // ne fait rien si isActive est `null` ou `undefined
-        return;
-      }
-
       const data = toPrismaNotifications({ [notification]: isActive });
 
       if (isActive === true) {
