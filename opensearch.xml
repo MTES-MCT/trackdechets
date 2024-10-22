@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>Documentation technique de l&#39;API Trackdéchets</ShortName>
+  <Description>Search Documentation technique de l&#39;API Trackdéchets</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="16" height="16" type="image/x-icon">https://developers.trackdechets.beta.gouv.fr/img/trackdechets.png</Image>
+  <Url type="text/html" method="get" template="https://developers.trackdechets.beta.gouv.fr/search?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://developers.trackdechets.beta.gouv.fr/opensearch.xml" />
+  <moz:SearchForm>https://developers.trackdechets.beta.gouv.fr/</moz:SearchForm>
+</OpenSearchDescription>
