@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { useQuery } from "@apollo/client";
+import { DocumentNode, useQuery } from "@apollo/client";
 import {
   Query,
   CompanyPrivate,
@@ -8,17 +8,18 @@ import {
 } from "@td/codegen-ui";
 import { Loader } from "../../common/Components";
 import { NotificationError } from "../../common/Components/Error/Error";
-
 import { debounce } from "../../../common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH
 } from "@td/constants";
 import styles from "./CompaniesList.module.scss";
-
-import { MY_COMPANIES } from "../common/queries";
+import { MY_COMPANIES } from "./queries";
 
 type SearchableCompaniesListProps = {
+  // fragment sur CompanyPrivate permettant de spécifier les champs requis
+  // à fetch pour l'affichage des établissements dans la liste
+  fragment: DocumentNode;
   renderCompanies: (
     companies: CompanyPrivate[],
     totalCount: number
@@ -39,7 +40,8 @@ const isSearchClueValid = clue =>
  */
 export default function SearchableCompaniesList({
   renderCompanies,
-  onCompleted
+  onCompleted,
+  fragment
 }: SearchableCompaniesListProps) {
   const [isFiltered, setIsFiltered] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -49,7 +51,7 @@ export default function SearchableCompaniesList({
   const { data, loading, error, refetch, fetchMore } = useQuery<
     Pick<Query, "myCompanies">,
     QueryMyCompaniesArgs
-  >(MY_COMPANIES, {
+  >(MY_COMPANIES(fragment), {
     fetchPolicy: "network-only",
     variables: { first: 10 },
     onCompleted: data =>

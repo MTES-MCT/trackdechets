@@ -98,6 +98,7 @@ export const SUBMIT_ADMINISTRATIVE_TRANSFER_APPROVAL = gql`
   }
 `;
 
+// Requête utilisée pour afficher le détail d'un de mes établissements
 export const MY_COMPANIES = gql`
   query MyCompanies($first: Int, $after: ID, $search: String) {
     myCompanies(first: $first, after: $after, search: $search) {
