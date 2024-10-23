@@ -9,3 +9,4 @@ generated/
 .terraform/
 /.nx/cache
 .docusaurus/
+/.nx/workspace-data

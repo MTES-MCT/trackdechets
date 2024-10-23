@@ -280,7 +280,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
       try {
         await sendMail(mail);
-      } catch (err) {
+      } catch (_) {
         console.error("Error while sending invitation email");
       }
     }
