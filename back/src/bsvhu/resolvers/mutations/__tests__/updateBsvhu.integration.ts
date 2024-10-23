@@ -104,8 +104,7 @@ describe("Mutation.Vhu.update", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas",
+        message: "Votre établissement doit être visé sur le bordereau",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -171,8 +170,7 @@ describe("Mutation.Vhu.update", () => {
     );
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas",
+        message: "Votre établissement doit être visé sur le bordereau",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })

@@ -35,7 +35,8 @@ import { Destination } from "./steps/Destination";
 import {
   getErrorTabIds,
   getPublishErrorMessages,
-  getPublishErrorTabIds
+  getPublishErrorTabIds,
+  TabId
 } from "../utils";
 
 const paohToInput = (paoh: BspaohInput): BspaohInput => {
@@ -195,6 +196,9 @@ export function ControlledTabs(props: Readonly<Props>) {
         tabsContent={tabsContent}
         setPublishErrors={setPublishErrors}
         errorTabIds={errorTabIds}
+        genericErrorMessage={publishErrorMessages.filter(
+          error => error.tabId === TabId.none
+        )}
       />
       {loading && <Loader />}
     </>

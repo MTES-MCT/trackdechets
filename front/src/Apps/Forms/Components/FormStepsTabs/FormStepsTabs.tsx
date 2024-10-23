@@ -3,6 +3,8 @@ import React, { useEffect } from "react";
 import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import "./formStepsTabs.scss";
+import { TabError } from "../../../Dashboard/Creation/utils";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 interface Props {
   selectedTabId: string;
@@ -21,6 +23,7 @@ interface Props {
   draftCtaLabel: string;
   mainCtaLabel: string;
   children: React.ReactNode;
+  genericErrorMessage?: TabError[];
 }
 const FormStepsTabs = ({
   selectedTabId,
@@ -34,7 +37,8 @@ const FormStepsTabs = ({
   onCancel,
   draftCtaLabel,
   mainCtaLabel,
-  children
+  children,
+  genericErrorMessage
 }: Readonly<Props>) => {
   useEffect(() => {
     // dsfr Tabs hack to add a type button on tabs to avoid submitting a form on tab change
@@ -58,6 +62,14 @@ const FormStepsTabs = ({
           {children}
         </div>
       </Tabs>
+      <br />
+      {!!genericErrorMessage?.[0]?.message && (
+        <Alert
+          description={genericErrorMessage?.[0]?.message}
+          severity="error"
+          title=""
+        />
+      )}
       <div className="formSteps__actions">
         <div className="formSteps__actions__cta-group">
           <Button
