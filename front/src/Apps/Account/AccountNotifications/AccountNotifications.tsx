@@ -46,9 +46,12 @@ export default function AccountNotifications() {
             headers={[
               "Établissements",
               "Notifications actives",
-              <div className={styles.alignRight}>
-                <NotificationsUpdateAllButton totalCount={totalCount} />
-              </div>
+              // affiche le bouton de gestion en masse à partir de 5 établissement
+              totalCount >= 5 && (
+                <div className={styles.alignRight}>
+                  <NotificationsUpdateAllButton totalCount={totalCount} />
+                </div>
+              )
             ]}
           />
         )}

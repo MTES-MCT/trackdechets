@@ -12,7 +12,6 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import styles from "./NotificationsUpdateAllModal.module.scss";
 import { Modal } from "../../../common/components";
-import TdTooltip from "../../../common/components/Tooltip";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type AccountNotificationsUpdateAllModalProps = {
@@ -157,7 +156,7 @@ export default function AccountNotificationsUpdateAllModal({
       isOpen={open}
       title={modaleTitle}
       ariaLabel={modaleTitle}
-      onClose={close}
+      onClose={resetAndClose}
       size="L"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
