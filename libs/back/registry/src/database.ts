@@ -49,6 +49,24 @@ export async function endImport({
   return importResult;
 }
 
+export function updateImportStats({
+  importId,
+  stats
+}: {
+  importId: string;
+  stats: ImportStats;
+}) {
+  return prisma.registryImport.update({
+    where: { id: importId },
+    data: {
+      numberOfCancellations: stats.cancellations,
+      numberOfEdits: stats.edits,
+      numberOfErrors: stats.errors,
+      numberOfInsertions: stats.insertions
+    }
+  });
+}
+
 function getStatus(stats: ImportStats) {
   if (stats.cancellations + stats.edits + stats.insertions === 0) {
     // No data was processed. Mark the import as failed

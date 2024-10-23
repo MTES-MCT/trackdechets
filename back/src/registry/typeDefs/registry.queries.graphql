@@ -184,4 +184,9 @@ type Query {
     "Permet de limiter aux imports que j'ai réalisés"
     ownImportsOnly: Boolean
   ): RegistryImportConnection!
+
+  """
+  Permet de consulter uniquement les imports que l'on a réalisé
+  """
+  registryImport(id: ID!): RegistryImport!
 }

@@ -9,6 +9,7 @@ import wastesRegistryXls from "./queries/wastesRegistryXls";
 import { registryUploadSignedUrl } from "./queries/registryUploadSignedUrl";
 import { registryDownloadSignedUrl } from "./queries/registryDownloadSignedUrl";
 import { registryImports } from "./queries/registryImports";
+import { registryImport } from "./queries/registryImport";
 
 export const Query: QueryResolvers = {
   incomingWastes,
@@ -20,5 +21,6 @@ export const Query: QueryResolvers = {
   wastesRegistryXls,
   registryUploadSignedUrl,
   registryDownloadSignedUrl,
-  registryImports: registryImports as any
+  registryImports: registryImports as any,
+  registryImport: registryImport as any
 };

@@ -3,7 +3,7 @@ import { logger } from "@td/logger";
 import { Readable, Writable } from "node:stream";
 import { SafeParseReturnType } from "zod";
 
-import { endImport, startImport } from "./database";
+import { endImport, startImport, updateImportStats } from "./database";
 import {
   CSV_DELIMITER,
   importOptions,
@@ -50,6 +50,9 @@ export async function processStream({
     fileType === "CSV"
       ? getTransformCsvStream(options)
       : getTransformXlsxStream(options);
+
+  // Timestamp of the last stats update. Used to avoid updating the stats too often.
+  let lastStatsUpdate = 0;
 
   try {
     await startImport(importId);
@@ -110,6 +113,12 @@ export async function processStream({
       const line = { ...result.data, createdById };
 
       await options.saveLine({ line, importId });
+
+      const now = Date.now();
+      if (now - lastStatsUpdate > 5 * 1000) {
+        lastStatsUpdate = now;
+        updateImportStats({ importId, stats });
+      }
     }
   } catch (err) {
     logger.error(`Error processing import ${importId}`, { importId, err });

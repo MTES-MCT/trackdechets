@@ -7,7 +7,9 @@ import {
   Mutation,
   MutationImportFileArgs,
   Query,
+  QueryRegistryImportArgs,
   QueryRegistryUploadSignedUrlArgs,
+  RegistryImportStatus,
   RegistryImportType
 } from "@td/codegen-ui";
 import React, { useState } from "react";
@@ -26,6 +28,8 @@ type StepProps = {
   getValues: UseFormGetValues<Inputs>;
   register: UseFormRegister<Inputs>;
   goToNextStep: () => void;
+  registryImportId: string | undefined;
+  setRegistryImportId: (string) => void;
 };
 
 const steps = [
@@ -51,8 +55,23 @@ const IMPORT_FILE = gql`
   }
 `;
 
+const REGISTRY_IMPORT = gql`
+  query RegistryImport($id: ID!) {
+    registryImport(id: $id) {
+      status
+      numberOfErrors
+      numberOfInsertions
+      numberOfEdits
+      numberOfCancellations
+    }
+  }
+`;
+
 export function ImportModal({ isOpen, onClose }: Props) {
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
+  const [registryImportId, setRegistryImportId] = useState<
+    string | undefined
+  >();
   const {
     register,
     getValues,
@@ -92,6 +111,8 @@ export function ImportModal({ isOpen, onClose }: Props) {
               setCurrentStepIdx(currentStepIdx + 1);
             }
           }}
+          registryImportId={registryImportId}
+          setRegistryImportId={setRegistryImportId}
         />
       </div>
 
@@ -161,7 +182,7 @@ function Step1({ register }: StepProps) {
   );
 }
 
-function Step2({ getValues, goToNextStep }: StepProps) {
+function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
   const [s3UploadError, setS3UploadError] = useState<string | null>(null);
 
   const { files, type } = getValues();
@@ -187,12 +208,14 @@ function Step2({ getValues, goToNextStep }: StepProps) {
       });
 
       if (uploadResponse.ok) {
-        await importFile({
+        const registryImport = await importFile({
           variables: {
             importType: type,
             s3FileKey: registryUploadSignedUrl.fileKey
           }
         });
+
+        setRegistryImportId(registryImport?.data?.importFile?.id);
       } else {
         setS3UploadError(uploadResponse.statusText);
       }
@@ -206,7 +229,9 @@ function Step2({ getValues, goToNextStep }: StepProps) {
         severity="info"
         description="Veuillez patienter pendant que le fichier est téléversé vers Trackdéchets. L'import débutera dans la foulée."
       />
-      <InlineLoader />;
+      <div className="tw-mt-6">
+        <InlineLoader />
+      </div>
       {signedUrlError && (
         <Alert
           title="Erreur lors de la récupération de l'URL de versement"
@@ -232,14 +257,112 @@ function Step2({ getValues, goToNextStep }: StepProps) {
   );
 }
 
-function Step3() {
+function Step3({ registryImportId }) {
+  const { data, stopPolling } = useQuery<
+    Pick<Query, "registryImport">,
+    Partial<QueryRegistryImportArgs>
+  >(REGISTRY_IMPORT, {
+    variables: { id: registryImportId },
+    pollInterval: 5000
+  });
+
+  const isStillRunning =
+    !data?.registryImport?.status ||
+    [RegistryImportStatus.Pending, RegistryImportStatus.Started].includes(
+      data.registryImport.status
+    );
+
+  const isFailed =
+    data?.registryImport?.status &&
+    [RegistryImportStatus.Canceled, RegistryImportStatus.Failed].includes(
+      data.registryImport.status
+    );
+  const isSuccessful =
+    data?.registryImport?.status === RegistryImportStatus.Successful;
+  const isPartiallySuccessful =
+    data?.registryImport?.status === RegistryImportStatus.PartiallySuccessful;
+
+  if (!isStillRunning) {
+    stopPolling();
+  }
+
+  const stats = [
+    `${data?.registryImport?.numberOfErrors} déclarations en erreur non prises en compte`,
+    `${data?.registryImport?.numberOfInsertions} douvelles déclarations`,
+    `${data?.registryImport?.numberOfEdits} déclarations corrigées`,
+    `${data?.registryImport?.numberOfCancellations} déclations annulées`
+  ].filter(v => !v.startsWith("0"));
+
   return (
     <div>
-      <Alert
-        title="Import en cours"
-        severity="info"
-        description="L'import a démarré. Vous pouvez désormais fermer cette modale et suivre son avancement dans la liste des imports."
-      />
+      {isStillRunning && (
+        <>
+          <Alert
+            title="Import en cours"
+            severity="info"
+            description={
+              <>
+                <p>L'import est en cours...</p>
+                <p>
+                  Vous pouvez consulter l'avancement de l'import en restant sur
+                  cette fenêtre ou la quitter et suivre son avancement dans la
+                  liste des imports.
+                </p>
+                <ul>
+                  {stats.map(stat => (
+                    <li>{stat}</li>
+                  ))}
+                </ul>
+              </>
+            }
+          />
+          <div className="tw-mt-6">
+            <InlineLoader />
+          </div>
+        </>
+      )}
+
+      {isSuccessful && (
+        <Alert
+          title="Votre fichier a bien été importé"
+          severity="success"
+          description={
+            <ul>
+              {stats.map(stat => (
+                <li>{stat}</li>
+              ))}
+            </ul>
+          }
+        />
+      )}
+
+      {isPartiallySuccessful && (
+        <Alert
+          title="Votre fichier a été importé partiellement"
+          severity="warning"
+          description={
+            <ul>
+              {stats.map(stat => (
+                <li>{stat}</li>
+              ))}
+            </ul>
+          }
+        />
+      )}
+
+      {isFailed && (
+        <Alert
+          title="Votre fichier n'a pas pu être importé"
+          severity="error"
+          description={
+            <ul>
+              {stats.map(stat => (
+                <li>{stat}</li>
+              ))}
+            </ul>
+          }
+        />
+      )}
     </div>
   );
 }
