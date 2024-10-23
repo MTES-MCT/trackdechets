@@ -7,6 +7,7 @@ import SearchableCompaniesList from "../../Companies/CompaniesList/SearchableCom
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import styles from "./AccountNotifications.module.scss";
 import NotificationsUpdateAllButton from "./NotificationsUpdateAllButton";
+import gql from "graphql-tag";
 
 const alertDescription =
   "Il est impératif de veiller à ce qu'au moins un membre de vos établissements" +
@@ -14,6 +15,21 @@ const alertDescription =
   " de désigner automatiquement un responsable ni de gérer ces inscriptions." +
   " Il est donc de votre responsabilité de vous assurer que les notifications sont" +
   " bien configurées et suivies.";
+
+const fragment = gql`
+  fragment CompanyPrivateFragment on CompanyPrivate {
+    name
+    orgId
+    userRole
+    userNotifications {
+      membershipRequest
+      signatureCodeRenewal
+      bsdRefusal
+      bsdaFinalDestinationUpdate
+      revisionRequest
+    }
+  }
+`;
 
 /**
  * Ce composant permet l'affichage de la liste des établissements
@@ -33,6 +49,7 @@ export default function AccountNotifications() {
       {/* Liste paginée des établissements avec un bouton "Charger plus" 
       et une barre de recherche */}
       <SearchableCompaniesList
+        fragment={fragment}
         renderCompanies={(companies, totalCount) => (
           <Table
             fixed

@@ -14,6 +14,7 @@ import {
   useDownloadMyCompaniesXls
 } from "../common/hooks/useDownloadCompanies";
 import SearchableCompaniesList from "./SearchableCompaniesList";
+import gql from "graphql-tag";
 
 export const userRole = (role: UserRole) => {
   let icon = "fr-icon-user-line";
@@ -42,6 +43,16 @@ export const userRole = (role: UserRole) => {
     </>
   );
 };
+
+const fragment = gql`
+  fragment CompanyPrivateFragment on CompanyPrivate {
+    name
+    givenName
+    address
+    orgId
+    userRole
+  }
+`;
 
 export default function CompaniesList() {
   const navigate = useNavigate();
@@ -137,6 +148,7 @@ export default function CompaniesList() {
       }
     >
       <SearchableCompaniesList
+        fragment={fragment}
         renderCompanies={renderCompanies}
         onCompleted={onMyCompaniesQueryCompleted}
       />
