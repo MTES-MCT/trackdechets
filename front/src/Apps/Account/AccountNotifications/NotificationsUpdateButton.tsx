@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { CompanyPrivate } from "@td/codegen-ui";
 import NotificationsUpdateModal from "./NotificationsUpdateModal";
 
@@ -15,25 +14,22 @@ export default function NotificationsUpdateButton({
     notification => company.userNotifications[notification] === true
   );
 
-  const btnLabel = `Gérer (${activeNotifications.length})`;
+  const [open, setIsOpen] = useState(false);
 
-  const modalTitle = `Gérer les notifications`;
+  const btnLabel = `Gérer (${activeNotifications.length})`;
 
   const iconId = activeNotifications.length
     ? "ri-notification-3-line"
     : "ri-notification-off-line";
 
-  const modal = createModal({
-    id: `${company.orgId}-notifications-update`,
-    isOpenedByDefault: false
-  });
-
   return (
     <>
-      <modal.Component title={modalTitle}>
-        <NotificationsUpdateModal company={company} close={modal.close} />
-      </modal.Component>
-      <Button size="small" onClick={() => modal.open()} iconId={iconId}>
+      <NotificationsUpdateModal
+        company={company}
+        close={() => setIsOpen(false)}
+        open={open}
+      />
+      <Button size="small" onClick={() => setIsOpen(true)} iconId={iconId}>
         {btnLabel}
       </Button>
     </>
