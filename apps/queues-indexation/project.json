@@ -44,7 +44,7 @@
             "output": "./libs/back/prisma/src"
           }
         ],
-        "generatePackageJson": true,
+        "generatePackageJson": false,
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {
