@@ -11,11 +11,16 @@ import { useForm } from "react-hook-form";
 import Button from "@codegouvfr/react-dsfr/Button";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import styles from "./NotificationsUpdateAllModal.module.scss";
-import { hintTexts } from "./utils";
+import { Modal } from "../../../common/components";
+import TdTooltip from "../../../common/components/Tooltip";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type AccountNotificationsUpdateAllModalProps = {
   // nombre total d'établissements
   totalCount: number;
+  // état de la modale
+  open: boolean;
+  // action permettant de fermer la modale
   close: () => void;
 };
 
@@ -36,10 +41,13 @@ type FormValues = {
 type RadioInput = {
   legend: string;
   notification: keyof Omit<UserNotifications, "__typename">;
+  // message à afficher sous le label "Activer pour tous vo établissements"
+  activateHint?: string;
 };
 
 export default function AccountNotificationsUpdateAllModal({
   totalCount,
+  open,
   close
 }: AccountNotificationsUpdateAllModalProps) {
   const [
@@ -50,7 +58,7 @@ export default function AccountNotificationsUpdateAllModal({
     MutationSubscribeToNotificationsArgs
   >(SUBSCRIBE_TO_NOTIFICATIONS);
 
-  const { register, handleSubmit, reset } = useForm<FormValues>({
+  const { register, handleSubmit, reset, watch } = useForm<FormValues>({
     defaultValues: {
       membershipRequest: SubscribeActions.DoNothing,
       signatureCodeRenewal: SubscribeActions.DoNothing,
@@ -98,7 +106,9 @@ export default function AccountNotificationsUpdateAllModal({
   const radioInputs: RadioInput[] = [
     {
       legend: "Demandes de rattachement",
-      notification: "membershipRequest"
+      notification: "membershipRequest",
+      activateHint:
+        "S'applique uniquement aux établissements sur lesquelles vous avez le rôle administrateur"
     },
     {
       legend: "Renouvellement du code signature",
@@ -114,7 +124,9 @@ export default function AccountNotificationsUpdateAllModal({
     },
     {
       legend: "Demandes de révision",
-      notification: "revisionRequest"
+      notification: "revisionRequest",
+      activateHint:
+        "Ne s'applique pas aux établissements sur lesquelles vous avez le rôle chauffeur"
     }
   ];
 
@@ -126,23 +138,37 @@ export default function AccountNotificationsUpdateAllModal({
     radioButtonState = "success";
   }
 
+  const modaleTitle = "Gérer les notifications";
+
+  const values = watch([
+    "membershipRequest",
+    "signatureCodeRenewal",
+    "bsdRefusal",
+    "bsdaFinalDestinationUpdate",
+    "revisionRequest"
+  ]);
+
+  const saveButtonIsDisabled = values.every(
+    v => v === SubscribeActions.DoNothing
+  );
+
   return (
-    <>
-      <div className="fr-my-2w">
-        Le formulaire suivant permet de s'abonner ou se désabonner aux
-        notifications de différents types pour l'ensemble de vos {totalCount}{" "}
-        établissements, à l'exception de ceux pour lesquelles votre rôle ne le
-        permet pas
-      </div>
+    <Modal
+      isOpen={open}
+      title={modaleTitle}
+      ariaLabel={modaleTitle}
+      onClose={close}
+      size="L"
+    >
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
-          {radioInputs.map(({ notification, legend }) => (
+          {radioInputs.map(({ notification, legend, activateHint }) => (
             <RadioButtons
               legend={legend}
-              hintText={hintTexts[notification]}
               name={notification}
               state={radioButtonState}
               stateRelatedMessage={error?.message}
+              className={styles.radioButtons}
               options={[
                 {
                   label: "Ne rien faire",
@@ -152,14 +178,15 @@ export default function AccountNotificationsUpdateAllModal({
                   }
                 },
                 {
-                  label: "S'abonner",
+                  label: "Activer pour tous les établissements",
+                  hintText: activateHint,
                   nativeInputProps: {
                     value: SubscribeActions.Subscribe,
                     ...register(notification)
                   }
                 },
                 {
-                  label: "Se désabonner",
+                  label: "Désactiver pour tous les établissements",
                   nativeInputProps: {
                     value: SubscribeActions.Unsuscribe,
                     ...register(notification)
@@ -170,6 +197,14 @@ export default function AccountNotificationsUpdateAllModal({
             />
           ))}
         </div>
+        {!saveButtonIsDisabled && (
+          <Alert
+            className="fr-mb-5v"
+            severity="warning"
+            title="Attention"
+            description={`Vous vous apprêtez à modifier les préférences de notifications de l'ensemble de vos ${totalCount} établissements`}
+          />
+        )}
         <div className={styles.buttons}>
           <Button
             title="Annuler"
@@ -182,11 +217,15 @@ export default function AccountNotificationsUpdateAllModal({
           >
             Annuler
           </Button>
-          <Button title="Valider" type="submit" disabled={loading}>
+          <Button
+            title="Valider"
+            type="submit"
+            disabled={saveButtonIsDisabled || loading}
+          >
             {loading ? "Enregistrement..." : "Enregistrer"}
           </Button>
         </div>
       </form>
-    </>
+    </Modal>
   );
 }

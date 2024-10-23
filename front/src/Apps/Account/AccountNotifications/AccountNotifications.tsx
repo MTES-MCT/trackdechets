@@ -45,7 +45,7 @@ export default function AccountNotifications() {
             ])}
             headers={[
               "Établissements",
-              "Notifications",
+              "Notifications actives",
               <div className={styles.alignRight}>
                 <NotificationsUpdateAllButton totalCount={totalCount} />
               </div>

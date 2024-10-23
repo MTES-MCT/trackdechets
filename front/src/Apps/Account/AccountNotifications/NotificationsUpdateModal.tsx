@@ -13,9 +13,13 @@ import { useMutation } from "@apollo/client";
 import { SUBSCRIBE_TO_COMPANY_NOTIFICATIONS } from "./queries";
 import styles from "./NotificationsUpdateModal.module.scss";
 import { hintTexts } from "./utils";
+import { Modal } from "../../../common/components";
 
 type AccountCompanyNotificationsUpdateModalProps = {
   company: CompanyPrivate;
+  // état de la modale
+  open: boolean;
+  // action permettant de fermer la modale
   close: () => void;
 };
 
@@ -57,6 +61,7 @@ export const authorizedNotificationsByUserRole: {
 
 export default function NotificationsUpdateModal({
   company,
+  open,
   close
 }: AccountCompanyNotificationsUpdateModalProps) {
   const [subscribeToCompanyNotifications, { loading, data, error }] =
@@ -130,8 +135,16 @@ export default function NotificationsUpdateModal({
       }
     }));
 
+  const modalTitle = "Gérer les notifications";
+
   return (
-    <>
+    <Modal
+      isOpen={open}
+      title={modalTitle}
+      ariaLabel={modalTitle}
+      onClose={close}
+      size="L"
+    >
       <div className="fr-my-2w">
         Je souhaite recevoir par courriel les notifications de l'établissement{" "}
         {company.name} ({company.siret}) relatives :
@@ -158,6 +171,6 @@ export default function NotificationsUpdateModal({
           </Button>
         </div>
       </form>
-    </>
+    </Modal>
   );
 }

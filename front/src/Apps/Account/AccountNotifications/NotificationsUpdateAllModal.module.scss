@@ -4,6 +4,28 @@
   gap: 15px;
 }
 
-legend {
-  margin-bottom: 0.5em;
+.radioButtons  {
+  legend {
+    font-weight: bold !important;
+  }
+
+  :global(.fr-fieldset__content) {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+
+    :global(fr-radio-group){
+      margin-right: 0;
+    }
+
+    label {
+      min-width: 12em;
+      max-width: 15em;
+    }
+  }
+
 }
+
+
+
+
+
