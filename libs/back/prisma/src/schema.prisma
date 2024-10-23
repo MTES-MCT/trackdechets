@@ -2234,6 +2234,7 @@ model RegistryImport {
   numberOfInsertions    Int @default(0)
   numberOfEdits         Int @default(0)
   numberOfCancellations Int @default(0)
+  numberOfSkipped       Int @default(0)
 
   createdById String
   createdBy   User   @relation(fields: [createdById], references: [id])

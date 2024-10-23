@@ -82,6 +82,9 @@ export function MyImports() {
         {importData.node.numberOfCancellations > 0 && (
           <li>{importData.node.numberOfCancellations} annulée(s)</li>
         )}
+        {importData.node.numberOfSkipped > 0 && (
+          <li>{importData.node.numberOfSkipped} ignorées(s)</li>
+        )}
       </ul>,
       importData.node.associations
         .map(

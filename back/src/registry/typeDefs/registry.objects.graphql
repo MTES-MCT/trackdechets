@@ -1935,6 +1935,7 @@ type RegistryImport {
   numberOfInsertions: Int!
   numberOfEdits: Int!
   numberOfCancellations: Int!
+  numberOfSkipped: Int!
   createdBy: User!
   associations: [RegistryImportAssociation!]!
 }

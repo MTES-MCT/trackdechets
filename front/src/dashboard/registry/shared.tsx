@@ -25,6 +25,7 @@ export const GET_REGISTRY_IMPORTS = gql`
           numberOfInsertions
           numberOfEdits
           numberOfCancellations
+          numberOfSkipped
           createdBy {
             name
           }

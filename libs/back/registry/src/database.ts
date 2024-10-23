@@ -5,6 +5,7 @@ type ImportStats = {
   insertions: number;
   edits: number;
   cancellations: number;
+  skipped: number;
 };
 
 export async function startImport(importId: string) {
@@ -32,6 +33,7 @@ export async function endImport({
     data: {
       status,
       numberOfCancellations: stats.cancellations,
+      numberOfSkipped: stats.skipped,
       numberOfEdits: stats.edits,
       numberOfErrors: stats.errors,
       numberOfInsertions: stats.insertions,
@@ -60,6 +62,7 @@ export function updateImportStats({
     where: { id: importId },
     data: {
       numberOfCancellations: stats.cancellations,
+      numberOfSkipped: stats.skipped,
       numberOfEdits: stats.edits,
       numberOfErrors: stats.errors,
       numberOfInsertions: stats.insertions
@@ -68,7 +71,10 @@ export function updateImportStats({
 }
 
 function getStatus(stats: ImportStats) {
-  if (stats.cancellations + stats.edits + stats.insertions === 0) {
+  if (
+    stats.cancellations + stats.edits + stats.insertions + stats.skipped ===
+    0
+  ) {
     // No data was processed. Mark the import as failed
     return "FAILED";
   }

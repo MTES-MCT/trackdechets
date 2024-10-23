@@ -37,7 +37,13 @@ export async function processStream({
     { importId, importType, inputStream, fileType }
   );
   const options = importOptions[importType];
-  const stats = { errors: 0, insertions: 0, edits: 0, cancellations: 0 };
+  const stats = {
+    errors: 0,
+    insertions: 0,
+    edits: 0,
+    cancellations: 0,
+    skipped: 0
+  };
 
   const errorStream = format({
     delimiter: CSV_DELIMITER,
@@ -105,6 +111,7 @@ export async function processStream({
       } else if (result.data.reason === "ANNULER") {
         stats.cancellations++;
       } else if (result.data.reason === "IGNORER") {
+        stats.skipped++;
         continue;
       } else {
         stats.insertions++;

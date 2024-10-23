@@ -80,6 +80,9 @@ export function CompanyImports() {
         {importData.node.numberOfCancellations > 0 && (
           <li>{importData.node.numberOfCancellations} annulée(s)</li>
         )}
+        {importData.node.numberOfSkipped > 0 && (
+          <li>{importData.node.numberOfSkipped} ignorée(s)</li>
+        )}
       </ul>,
       importData.node.createdBy.name,
       <div className="tw-flex tw-justify-center">

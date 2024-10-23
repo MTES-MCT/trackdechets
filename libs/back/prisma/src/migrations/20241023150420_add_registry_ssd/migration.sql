@@ -17,6 +17,7 @@ CREATE TABLE "RegistryImport" (
     "numberOfInsertions" INTEGER NOT NULL DEFAULT 0,
     "numberOfEdits" INTEGER NOT NULL DEFAULT 0,
     "numberOfCancellations" INTEGER NOT NULL DEFAULT 0,
+    "numberOfSkipped" INTEGER NOT NULL DEFAULT 0,
     "createdById" TEXT NOT NULL,
 
     CONSTRAINT "RegistryImport_pkey" PRIMARY KEY ("id")

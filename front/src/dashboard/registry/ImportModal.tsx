@@ -63,6 +63,7 @@ const REGISTRY_IMPORT = gql`
       numberOfInsertions
       numberOfEdits
       numberOfCancellations
+      numberOfSkipped
     }
   }
 `;
@@ -290,7 +291,8 @@ function Step3({ registryImportId }) {
     `${data?.registryImport?.numberOfErrors} déclarations en erreur non prises en compte`,
     `${data?.registryImport?.numberOfInsertions} douvelles déclarations`,
     `${data?.registryImport?.numberOfEdits} déclarations corrigées`,
-    `${data?.registryImport?.numberOfCancellations} déclations annulées`
+    `${data?.registryImport?.numberOfCancellations} déclations annulées`,
+    `${data?.registryImport?.numberOfSkipped} déclations ignorées`
   ].filter(v => !v.startsWith("0"));
 
   return (
@@ -309,8 +311,8 @@ function Step3({ registryImportId }) {
                   liste des imports.
                 </p>
                 <ul>
-                  {stats.map(stat => (
-                    <li>{stat}</li>
+                  {stats.map((stat, idx) => (
+                    <li key={idx}>{stat}</li>
                   ))}
                 </ul>
               </>
@@ -328,8 +330,8 @@ function Step3({ registryImportId }) {
           severity="success"
           description={
             <ul>
-              {stats.map(stat => (
-                <li>{stat}</li>
+              {stats.map((stat, idx) => (
+                <li key={idx}>{stat}</li>
               ))}
             </ul>
           }
@@ -342,8 +344,8 @@ function Step3({ registryImportId }) {
           severity="warning"
           description={
             <ul>
-              {stats.map(stat => (
-                <li>{stat}</li>
+              {stats.map((stat, idx) => (
+                <li key={idx}>{stat}</li>
               ))}
             </ul>
           }
@@ -356,8 +358,8 @@ function Step3({ registryImportId }) {
           severity="error"
           description={
             <ul>
-              {stats.map(stat => (
-                <li>{stat}</li>
+              {stats.map((stat, idx) => (
+                <li key={idx}>{stat}</li>
               ))}
             </ul>
           }
