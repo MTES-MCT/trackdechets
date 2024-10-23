@@ -123,5 +123,16 @@ type Mutation {
   Modifie les préfèrences d'abonnement de l'utilisateur connecté aux notifications
   d'un établissement donné
   """
-  setCompanyNotifications(input: SetCompanyNotificationsInput!): CompanyPrivate!
+  subscribeToCompanyNotifications(
+    input: SubscribeToCompanyNotificationsInput!
+  ): CompanyPrivate!
+
+  """
+  USAGE INTERNE
+  Modifie les préfèrences d'abonnement de l'utilisateur connecté aux notifications
+  de tous ses établissements
+  """
+  subscribeToNotifications(
+    input: SubscribeToNotificationsInput!
+  ): [CompanyPrivate!]!
 }

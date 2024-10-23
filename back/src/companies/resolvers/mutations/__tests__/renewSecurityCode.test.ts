@@ -2,6 +2,7 @@ import { renewSecurityCodeFn as renewSecurityCode } from "../renewSecurityCodeSe
 import { ErrorCode } from "../../../../common/errors";
 import { renderMail, securityCodeRenewal } from "@td/mail";
 import * as utils from "../../../../utils";
+import * as notifications from "../../../../users/notifications";
 import { siretify } from "../../../../__tests__/factories";
 
 const companyMock = jest.fn();
@@ -23,11 +24,17 @@ jest.mock("../../../../mailer/mailing", () => ({
   sendMail: jest.fn((...args) => sendMailMock(...args))
 }));
 
-const getNotificationSubscribersMock = jest.fn();
+jest.mock("../../../../users/notifications", () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual("../../../../users/notifications")
+  };
+});
 
-jest.mock("../../../../users/notifications", () => ({
-  getNotificationSubscribers: jest.fn(() => getNotificationSubscribersMock())
-}));
+const getNotificationSubscribersMock = jest.spyOn(
+  notifications,
+  "getNotificationSubscribers"
+);
 
 describe("renewSecurityCode", () => {
   beforeEach(() => {
