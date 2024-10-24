@@ -8,7 +8,11 @@ export async function transformAndRefineReason(
   { addIssue }: RefinementCtx
 ) {
   const ssdItemInDb = await prisma.registrySsd.findFirst({
-    where: { publicId: ssdItem.publicId }
+    where: {
+      publicId: ssdItem.publicId,
+      reportForSiret: ssdItem.reportForSiret,
+      isActive: true
+    }
   });
 
   // If the line alreary exists in DB and we dont have a reason, we can simply ignore it

@@ -1,5 +1,6 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { Download } from "@codegouvfr/react-dsfr/Download";
 import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
@@ -13,6 +14,7 @@ import { format } from "date-fns";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { MEDIA_QUERIES } from "../../common/config";
 import { useMedia } from "../../common/use-media";
+import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
 import RegistryMenu from "./RegistryMenu";
 import {
   badges,
@@ -20,7 +22,6 @@ import {
   GET_REGISTRY_IMPORTS,
   REGISTRY_DOWNLOAD_SIGNED_URL
 } from "./shared";
-import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
 
 const HEADERS = [
   "Date",
@@ -85,13 +86,22 @@ export function CompanyImports() {
         )}
       </ul>,
       importData.node.createdBy.name,
-      <div className="tw-flex tw-justify-center">
-        <Button
-          title="Voir le fichier d'import"
-          priority="secondary"
-          iconId="fr-icon-download-line"
-          onClick={() => downloadImportFile(importData.node.id)}
-          size="small"
+      <div className="tw-flex">
+        <Download
+          details={(
+            importData.node.originalFileName.split(".").pop() ?? ""
+          ).toUpperCase()}
+          label={importData.node.originalFileName
+            .split(".")
+            .slice(0, -1)
+            .join(".")}
+          linkProps={{
+            href: "#",
+            onClick: e => {
+              e.preventDefault();
+              downloadImportFile(importData.node.id);
+            }
+          }}
         />
       </div>,
       <div className="tw-flex tw-justify-center">
