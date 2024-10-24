@@ -203,7 +203,8 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
       const uploadResponse = await fetch(registryUploadSignedUrl.signedUrl, {
         method: "PUT",
         headers: {
-          "Content-Type": file.type
+          "Content-Type": file.type,
+          "x-amz-meta-filename": file.name
         },
         body: file
       });

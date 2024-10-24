@@ -43,7 +43,7 @@ export function MyImports() {
   const [getDownloadLink] = useLazyQuery<
     Pick<Query, "registryDownloadSignedUrl">,
     Partial<QueryRegistryDownloadSignedUrlArgs>
-  >(REGISTRY_DOWNLOAD_SIGNED_URL);
+  >(REGISTRY_DOWNLOAD_SIGNED_URL, { fetchPolicy: "no-cache" });
 
   async function downloadErrorFile(importId: string) {
     const link = await getDownloadLink({
