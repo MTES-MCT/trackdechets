@@ -25,7 +25,7 @@ export default async function sendVerificationCodeLetters() {
           where: { id: company.id }
         });
         console.log(`Successfully sent letter to company ${company.siret}`);
-      } catch (err) {
+      } catch (_) {
         console.log(
           `Error sending verification code letter to company ${company.siret}`
         );

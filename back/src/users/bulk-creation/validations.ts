@@ -31,7 +31,7 @@ export const companyValidationSchema = yup.object({
             return false;
           }
           return true;
-        } catch (err) {
+        } catch (_) {
           return false;
         }
       }

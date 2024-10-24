@@ -72,6 +72,8 @@ enum UserPermission {
   BSD_CAN_REVISE
   "Exporter le registre"
   REGISTRY_CAN_READ
+  "Importer des données dans le registre"
+  REGISTRY_CAN_IMPORT
   "Lire les informations de l'établissement"
   COMPANY_CAN_READ
   "Modifier les informations de l'établissement"

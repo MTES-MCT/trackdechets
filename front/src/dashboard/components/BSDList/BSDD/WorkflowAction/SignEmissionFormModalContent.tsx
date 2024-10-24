@@ -152,7 +152,7 @@ function SignEmissionFormModalContent({
         }
       });
       onClose();
-    } catch (err) {
+    } catch (_) {
       // Ignore error
     }
   };

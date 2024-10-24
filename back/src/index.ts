@@ -6,7 +6,7 @@ import { z } from "zod";
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-empty-object-type
     interface ProcessEnv extends z.infer<typeof envVariables> {}
   }
 }
@@ -23,13 +23,15 @@ export { BsdUpdateQueueItem, updatesQueue } from "./queue/producers/bsdUpdate";
 export { operationHooksQueue } from "./queue/producers/operationHook";
 export { administrativeTransferQueue } from "./queue/producers/administrativeTransfer";
 export { updateAppendix2Queue } from "./queue/producers/updateAppendix2";
+export { registryImportQueue } from "./queue/producers/registryImport";
 export {
   indexBsdJob,
   operationHookJob,
   updateAppendix2Job,
   sendMailJob,
   postGericoJob,
-  processAdministrativeTransferJob
+  processAdministrativeTransferJob,
+  processRegistryImportJob
 } from "./queue/jobs";
 
 export {

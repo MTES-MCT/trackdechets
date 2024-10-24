@@ -28,6 +28,7 @@ export enum Permission {
   BsdCanSignOperation = "BsdCanSign:Operation",
   BsdCanRevise = "BsdCanRevise",
   RegistryCanRead = "RegistryCanRead",
+  RegistryCanImport = "RegistryCanImport",
   CompanyCanRead = "CompanyCanRead",
   CompanyCanUpdate = "CompanyCanUpdate",
   CompanyCanVerify = "CompanyCanVerify",
@@ -52,6 +53,7 @@ export function toGraphQLPermission(permission: Permission): UserPermission {
     [Permission.BsdCanSignOperation]: "BSD_CAN_SIGN_OPERATION",
     [Permission.BsdCanRevise]: "BSD_CAN_REVISE",
     [Permission.RegistryCanRead]: "REGISTRY_CAN_READ",
+    [Permission.RegistryCanImport]: "REGISTRY_CAN_IMPORT",
     [Permission.CompanyCanRead]: "COMPANY_CAN_READ",
     [Permission.CompanyCanUpdate]: "COMPANY_CAN_UPDATE",
     [Permission.CompanyCanVerify]: "COMPANY_CAN_VERIFY",
@@ -99,7 +101,8 @@ const memberPermissions = [
   Permission.BsdCanSignAcceptation,
   Permission.BsdCanSignOperation,
   Permission.BsdCanDelete,
-  Permission.BsdCanRevise
+  Permission.BsdCanRevise,
+  Permission.RegistryCanImport
 ];
 
 const adminPermissions = [

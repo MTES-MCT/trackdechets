@@ -3,7 +3,7 @@ import Tree, { TreeNode } from "rc-tree";
 import { BSDD_WASTES_TREE, WasteNode } from "@td/constants";
 import "rc-tree/assets/index.css";
 
-const loop = (data: WasteNode[]) => {
+const loop = (data: readonly WasteNode[]) => {
   return data.map(item => {
     if (item.children) {
       return (
@@ -17,7 +17,7 @@ const loop = (data: WasteNode[]) => {
 };
 
 type Props = {
-  wasteTree?: WasteNode[];
+  wasteTree?: readonly WasteNode[];
   checkable?: boolean;
   onSelect?: (selectedKeys: any) => void;
 };

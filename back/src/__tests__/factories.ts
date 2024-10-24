@@ -436,7 +436,7 @@ export const upsertBaseSiret = async siret => {
           contactPhone: `+${siret}`
         }
       });
-    } catch (err) {
+    } catch (_) {
       // Must have been already created (race condition). Just ignore
     }
   }

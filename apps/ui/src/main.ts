@@ -87,7 +87,7 @@ app.post("/sentry", async function (req, res) {
     // Relay response from Sentry servers to front end
     sentryResponse.headers.forEach(h => res.setHeader(h[0], h[1]));
     res.status(sentryResponse.status).send(sentryResponse.body);
-  } catch (err) {
+  } catch (_) {
     return res.status(400).json({ status: "invalid request" });
   }
 });

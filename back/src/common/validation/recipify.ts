@@ -41,7 +41,7 @@ export const buildRecipify = <T>(
               }
             })
             .transporterReceipt();
-        } catch (error) {
+        } catch (_) {
           // do nothing
         }
       } else if (role === CompanyRole.Broker) {
@@ -53,7 +53,7 @@ export const buildRecipify = <T>(
               }
             })
             .brokerReceipt();
-        } catch (error) {
+        } catch (_) {
           // do nothing
         }
       } else if (role === CompanyRole.Trader) {
@@ -65,7 +65,7 @@ export const buildRecipify = <T>(
               }
             })
             .traderReceipt();
-        } catch (error) {
+        } catch (_) {
           // do nothing
         }
       }
