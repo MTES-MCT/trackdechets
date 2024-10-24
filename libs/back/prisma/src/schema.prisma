@@ -2213,7 +2213,6 @@ enum CiterneNotWashedOutReason {
 }
 
 enum EmptyReturnADR {
-  EMPTY_NOT_WASHED // Deprecated
   EMPTY_RETURN_NOT_WASHED
   EMPTY_VEHICLE
   EMPTY_CITERNE
