@@ -106,6 +106,11 @@ export function RegistryCompanySwitcher({ onCompanySelect }: Props) {
       <div
         className="fr-input tw-cursor-pointer tw-flex tw-justify-between"
         onClick={() => setIsOpen(!isOpen)}
+        onKeyDown={e => {
+          if (e.key === "Enter") {
+            setIsOpen(!isOpen);
+          }
+        }}
       >
         {selectedItem}
         <span
@@ -148,6 +153,13 @@ export function RegistryCompanySwitcher({ onCompanySelect }: Props) {
                 setSelectedItem(`${node.name} ${node.siret}`);
                 setIsOpen(false);
               }}
+              onKeyDown={e => {
+                if (e.key === "Enter") {
+                  onCompanySelect(node.orgId);
+                  setSelectedItem(`${node.name} ${node.siret}`);
+                  setIsOpen(false);
+                }
+              }}
               key={node.orgId}
             >
               {node.name} {node.siret}
@@ -162,6 +174,13 @@ export function RegistryCompanySwitcher({ onCompanySelect }: Props) {
                 onCompanySelect(delegator.orgId);
                 setSelectedItem(`${delegator.name} ${delegator.siret}`);
                 setIsOpen(false);
+              }}
+              onKeyDown={e => {
+                if (e.key === "Enter") {
+                  onCompanySelect(delegator.orgId);
+                  setSelectedItem(`${delegator.name} ${delegator.siret}`);
+                  setIsOpen(false);
+                }
               }}
               key={delegator.orgId}
             >
