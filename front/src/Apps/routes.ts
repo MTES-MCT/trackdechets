@@ -133,7 +133,7 @@ const routes = {
   registry: "/registre",
   registry_new: {
     myImports: "/registre-v2/own",
-    companyImports: "/registre-v2/list/:siret",
+    companyImports: "/registre-v2/list",
     export: "/registre-v2/export"
   }
 };

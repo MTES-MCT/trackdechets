@@ -79,8 +79,8 @@ export async function processRegistryImportJob(
       delegateId: { in: allowedSirets },
       revokedBy: null,
       cancelledBy: null,
-      startDate: { gte: new Date() },
-      endDate: { lt: new Date() }
+      startDate: { lte: new Date() },
+      OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
     }
   });
   const delegateToDelegatorsMap = givenDelegations.reduce((map, delegation) => {

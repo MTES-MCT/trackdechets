@@ -24,7 +24,7 @@ export async function registryUploadSignedUrl(
   const signedUrl = await getSignedUrlForUpload({
     bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET!,
     key: fileKey,
-    metadata: { fileName },
+    metadata: { filename: fileName },
     tags: { temp: "true", userId: user.id }
   });
 

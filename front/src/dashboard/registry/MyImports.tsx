@@ -134,23 +134,27 @@ export function MyImports() {
       {!isMobile && <RegistryMenu />}
       <div className="dashboard-content tw-flex-grow">
         <div className="tw-p-6">
-          <div>
-            <Button
-              priority="primary"
-              iconId="fr-icon-upload-line"
-              iconPosition="right"
-              onClick={() => setIsImportModalOpen(true)}
-            >
-              Importer
-            </Button>
-            <Button
-              priority="secondary"
-              iconId="fr-icon-refresh-line"
-              iconPosition="right"
-              onClick={() => refetch()}
-            >
-              Rafraichir
-            </Button>
+          <div className="tw-flex tw-gap-6">
+            <div>
+              <Button
+                priority="primary"
+                iconId="fr-icon-upload-line"
+                iconPosition="right"
+                onClick={() => setIsImportModalOpen(true)}
+              >
+                Importer
+              </Button>
+            </div>
+            <div>
+              <Button
+                priority="secondary"
+                iconId="fr-icon-refresh-line"
+                iconPosition="right"
+                onClick={() => refetch()}
+              >
+                Rafraichir
+              </Button>
+            </div>
           </div>
           {loading && <InlineLoader />}
           {error && (

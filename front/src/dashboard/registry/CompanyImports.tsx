@@ -6,11 +6,10 @@ import {
   QueryRegistryDownloadSignedUrlArgs,
   RegistryDownloadTarget
 } from "@td/codegen-ui";
-import React from "react";
+import React, { useState } from "react";
 
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { format } from "date-fns";
-import { useParams } from "react-router-dom";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { MEDIA_QUERIES } from "../../common/config";
 import { useMedia } from "../../common/use-media";
@@ -21,6 +20,7 @@ import {
   GET_REGISTRY_IMPORTS,
   REGISTRY_DOWNLOAD_SIGNED_URL
 } from "./shared";
+import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
 
 const HEADERS = [
   "Date",
@@ -32,12 +32,12 @@ const HEADERS = [
 ];
 
 export function CompanyImports() {
-  const { siret } = useParams<{ siret: string }>();
+  const [siret, setSiret] = useState<string | undefined>();
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
   const { loading, error, data } = useQuery<Pick<Query, "registryImports">>(
     GET_REGISTRY_IMPORTS,
-    { variables: { siret, first: 25 } }
+    { variables: { siret, first: 25 }, skip: !siret }
   );
 
   const [getDownloadLink] = useLazyQuery<
@@ -112,7 +112,9 @@ export function CompanyImports() {
       {!isMobile && <RegistryMenu />}
       <div className="dashboard-content tw-flex-grow">
         <div className="tw-p-6">
-          <div>TODO sélecteur d'entreprise</div>
+          <div>
+            <RegistryCompanySwitcher onCompanySelect={v => setSiret(v)} />
+          </div>
           {loading && <InlineLoader />}
           {error && (
             <Alert
