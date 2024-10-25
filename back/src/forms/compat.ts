@@ -91,6 +91,7 @@ export function simpleFormToBsdd(
       ? form.wasteDetailsQuantity.toNumber()
       : null,
     wasteAdr: form.wasteDetailsOnuCode,
+    nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
     weightIsEstimate: form.wasteDetailsQuantityType == QuantityType.ESTIMATED,
     transporterCompanyName: transporter?.transporterCompanyName,
     transporterCompanySiret: transporter?.transporterCompanySiret,

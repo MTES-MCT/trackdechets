@@ -292,6 +292,9 @@ type StateSummary {
   "Code ONU le plus à jour"
   onuCode: String
 
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  nonRoadRegulationMention: String
+
   "Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18)"
   transporter: FormCompany
 

@@ -349,6 +349,11 @@ type IncomingWaste {
   wasteAdr: String
 
   """
+  Mention au titre des règlements RID, ADNR, IMDG
+  """
+  nonRoadRegulationMention: String
+
+  """
   Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
   """
   wasteIsDangerous: Boolean
@@ -747,6 +752,11 @@ type OutgoingWaste {
   wasteAdr: String
 
   """
+  Mention au titre des règlements RID, ADNR, IMDG
+  """
+  nonRoadRegulationMention: String
+
+  """
   Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
   """
   wasteIsDangerous: Boolean
@@ -935,6 +945,11 @@ type TransportedWaste {
   transport maritime de marchandises dangereuses
   """
   wasteAdr: String
+
+  """
+  Mention au titre des règlements RID, ADNR, IMDG
+  """
+  nonRoadRegulationMention: String
 
   ###################################################
   # d) Concernant l'origine et la gestion du déchet :
@@ -1450,6 +1465,11 @@ type ManagedWaste {
   wasteAdr: String
 
   """
+  Mention au titre des règlements RID, ADNR, IMDG
+  """
+  nonRoadRegulationMention: String
+
+  """
   Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
   """
   wasteIsDangerous: Boolean
@@ -1717,6 +1737,11 @@ type AllWaste {
   transport maritime de marchandises dangereuses
   """
   wasteAdr: String
+
+  """
+  Mention au titre des règlements RID, ADNR, IMDG
+  """
+  nonRoadRegulationMention: String
 
   """
   Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
