@@ -104,8 +104,8 @@ describe("simpleFormToBsdd", () => {
       packagings: form.wasteDetailsPackagingInfos,
       weightValue: form.wasteDetailsQuantity?.toNumber(),
       wasteAdr: form.wasteDetailsOnuCode,
+      nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
       weightIsEstimate: true,
-
       transporterCompanyName: fullForm.transporters[0].transporterCompanyName,
       transporterCompanySiret: fullForm.transporters[0].transporterCompanySiret,
       transporterCompanyVatNumber:
@@ -496,6 +496,8 @@ describe("simpleFormToBsdd", () => {
       packagings: fullForwardedInForm.wasteDetailsPackagingInfos,
       weightValue: fullForwardedInForm.wasteDetailsQuantity?.toNumber(),
       wasteAdr: fullForwardedInForm.wasteDetailsOnuCode,
+      nonRoadRegulationMention:
+        fullForwardedInForm.wasteDetailsNonRoadRegulationMention,
       weightIsEstimate: true,
       transporterCompanyName:
         fullForwardedInForm.transporters[0].transporterCompanyName,
@@ -690,6 +692,7 @@ describe("simpleFormToBsdd", () => {
         packagings: form.wasteDetailsPackagingInfos,
         weightValue: form.wasteDetailsQuantity?.toNumber(),
         wasteAdr: form.wasteDetailsOnuCode,
+        nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
         weightIsEstimate: true,
         transporterCompanyName: fullForm.transporters[0].transporterCompanyName,
         transporterCompanySiret:
