@@ -520,6 +520,9 @@ type WasteDetails {
   "Code ONU"
   onuCode: String
 
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  nonRoadRegulationMention: String
+
   "Conditionnements"
   packagingInfos: [PackagingInfo!]
 

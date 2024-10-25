@@ -12,6 +12,9 @@ input SignEmissionFormInput {
   "Code ONU"
   onuCode: String
 
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  nonRoadRegulationMention: String
+
   "Numéro de la plaque d'immatriculation transporteur"
   transporterNumberPlate: String
 
@@ -622,6 +625,9 @@ input WasteDetailsInput {
   "Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."
   onuCode: String
 
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  nonRoadRegulationMention: String
+
   "Liste de conditionnements. Les conditionnements CITERNE et BENNE ne peuvent pas être associés à un autre conditionnement"
   packagingInfos: [PackagingInfoInput!]
 
@@ -702,6 +708,9 @@ Payload lié au reconditionnement (case 15 à 17)
 input WasteDetailsRepackagingInput {
   "Code ONU"
   onuCode: String
+
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  wasteDetailsNonRoadRegulationMention: String
 
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]
@@ -800,6 +809,9 @@ Payload lié au reconditionnement (case 15 à 17)
 input WasteDetailsRepackagingInput {
   "Code ONU"
   onuCode: String
+
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  wasteDetailsNonRoadRegulationMention: String
 
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]

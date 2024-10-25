@@ -63,6 +63,8 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
                 tmpStoredInfos.quantityReceived,
               wasteDetailsQuantityType: quantityType,
               wasteDetailsOnuCode: form.wasteDetailsOnuCode,
+              wasteDetailsNonRoadRegulationMention:
+                form.wasteDetailsNonRoadRegulationMention,
               wasteDetailsPackagingInfos: prismaJsonNoNull(
                 form.wasteDetailsPackagingInfos
               )

@@ -820,6 +820,7 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
           ),
       otherwise: () => yup.string().nullable()
     }),
+    wasteDetailsNonRoadRegulationMention: yup.string().nullable(),
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
     wasteDetailsAnalysisReferences: yup.array().of(yup.string()) as any,
     wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,
