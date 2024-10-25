@@ -120,6 +120,7 @@ describe("expandFormFromDb", () => {
         code: form.wasteDetailsCode,
         name: form.wasteDetailsName,
         onuCode: form.wasteDetailsOnuCode,
+        nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
         packagingInfos: form.wasteDetailsPackagingInfos,
         packagings: ["CITERNE"],
         otherPackaging: undefined,
@@ -211,6 +212,8 @@ describe("expandFormFromDb", () => {
         code: forwardedIn!.wasteDetailsCode,
         name: forwardedIn!.wasteDetailsName,
         onuCode: forwardedIn!.wasteDetailsOnuCode,
+        nonRoadRegulationMention:
+          forwardedIn!.wasteDetailsNonRoadRegulationMention,
         packagingInfos: forwardedIn!.wasteDetailsPackagingInfos,
         packagings: ["CITERNE"],
         otherPackaging: undefined,
