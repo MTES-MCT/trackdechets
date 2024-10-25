@@ -295,7 +295,8 @@ describe("Mutation.duplicateForm", () => {
       "quantityGrouped",
       "citerneNotWashedOutReason",
       "hasCiterneBeenWashedOut",
-      "emptyReturnADR"
+      "emptyReturnADR",
+      "wasteDetailsNonRoadRegulationMention"
     ];
 
     const expectedSkippedTransporter = [
@@ -561,6 +562,7 @@ describe("Mutation.duplicateForm", () => {
       "wasteDetailsQuantity",
       "wasteDetailsQuantityType",
       "wasteDetailsSampleNumber",
+      "wasteDetailsNonRoadRegulationMention",
       "emittedBy",
       "emittedAt",
       "emittedByEcoOrganisme",
