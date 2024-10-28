@@ -349,7 +349,8 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
     transporter: bsvhu.transporter || bsvhu["bsvhuTransporter"],
-    updatedAt: bsvhu["bsvhuUpdatedAt"]
+    updatedAt: bsvhu["bsvhuUpdatedAt"],
+    ecoOrganisme: bsvhu.ecoOrganisme
   };
   return bsvhuFormatted;
 };

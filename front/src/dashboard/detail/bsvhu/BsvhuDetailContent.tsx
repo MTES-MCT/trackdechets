@@ -72,6 +72,16 @@ export function BsvhuDetailContent({ form }: Props) {
             <dt>Code déchet</dt>
             <dd>{form.wasteCode}</dd>
           </div>
+
+          {form?.ecoOrganisme && (
+            <div className={styles.detailGrid}>
+              <dt>EcoOrganisme</dt>
+              <dd>{form.ecoOrganisme?.name}</dd>
+
+              <dt>Siret</dt>
+              <dd>{form.ecoOrganisme?.siret}</dd>
+            </div>
+          )}
         </div>
       </div>
 

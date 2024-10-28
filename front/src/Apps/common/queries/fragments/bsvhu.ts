@@ -90,6 +90,10 @@ export const dashboardVhuFragment = gql`
     weight {
       value
     }
+    ecoOrganisme {
+      siret
+      name
+    }
     bsvhuUpdatedAt: updatedAt
   }
   ${dashboardCompanyFragment}
@@ -179,6 +183,10 @@ export const FullBsvhuFragment = gql`
           date
         }
       }
+    }
+    ecoOrganisme {
+      siret
+      name
     }
   }
   ${companyFragment}
