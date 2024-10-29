@@ -109,6 +109,10 @@ function flattenWasteDetailsInput(input: {
 }) {
   return {
     wasteDetailsCode: chain(input.wasteDetails, w => w.code),
+    wasteDetailsIsSubjectToADR: chain(
+      input.wasteDetails,
+      w => w.isSubjectToADR
+    ),
     wasteDetailsOnuCode: chain(input.wasteDetails, w => w.onuCode),
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       chain(input.wasteDetails, w => getProcessedPackagingInfos(w))

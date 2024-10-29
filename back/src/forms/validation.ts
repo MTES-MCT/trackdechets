@@ -75,7 +75,7 @@ import { getOperationModesFromOperationCode } from "../common/operationModes";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
-import { isDefined } from "../common/helpers";
+import { isDefined, isDefinedStrict } from "../common/helpers";
 
 // set yup default error messages
 configureYup();
@@ -807,19 +807,45 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
           ),
       otherwise: () => yup.boolean()
     }),
-    wasteDetailsOnuCode: yup.string().when("wasteDetailsIsDangerous", {
-      is: (wasteDetailsIsDangerous: boolean) =>
-        wasteDetailsIsDangerous === true,
-      then: () =>
-        yup
-          .string()
-          .ensure()
-          .requiredIf(
-            !isDraft,
-            `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
-          ),
-      otherwise: () => yup.string().nullable()
-    }),
+    wasteDetailsIsSubjectToADR: yup.boolean().nullable(),
+    wasteDetailsOnuCode: yup
+      .string()
+      .nullable()
+      // Empty values (or spaces) to null
+      .transform(value =>
+        isDefinedStrict(value?.replace(/\s/g, "")) ? value : null
+      )
+      .test((_, ctx) => {
+        if (isDraft) return true;
+
+        const {
+          wasteDetailsIsDangerous,
+          wasteDetailsIsSubjectToADR,
+          wasteDetailsOnuCode
+        } = ctx.parent;
+
+        if (!isDefined(wasteDetailsOnuCode)) {
+          if (wasteDetailsIsSubjectToADR === true) {
+            return new yup.ValidationError(
+              `Vous avez déclaré que le déchet est soumis à l'ADR. Vous devez préciser la mention correspondante.`
+            );
+          }
+
+          if (wasteDetailsIsDangerous === true) {
+            return new yup.ValidationError(
+              `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
+            );
+          }
+        } else {
+          if (!wasteDetailsIsSubjectToADR && !wasteDetailsIsDangerous) {
+            return new yup.ValidationError(
+              `Le déchet n'est pas dangereux ni soumis à l'ADR, vous ne pouvez pas préciser de mention ADR.`
+            );
+          }
+        }
+
+        return true;
+      }),
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
     wasteDetailsAnalysisReferences: yup.array().of(yup.string()) as any,
     wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,
