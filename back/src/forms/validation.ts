@@ -1650,11 +1650,9 @@ const withNextDestination = (required: boolean) =>
                   "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
                 )
                 .nullable()
-                .notRequired(),
-            // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
-            // .required(
-            //   "Destination ultérieure : le numéro de notification est obligatoire"
-            // ),
+                .required(
+                  "Destination ultérieure : le numéro de notification est obligatoire"
+                ),
             otherwise: schema =>
               schema
                 .max(
