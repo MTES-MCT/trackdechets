@@ -20,7 +20,7 @@ import {
 } from "@td/codegen-ui";
 import graphlClient from "../../../graphql-client";
 import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "../../../Apps/common/queries/company/query";
-import { isVat, isFRVat, isSiret, isDangerous } from "@td/constants";
+import { isVat, isFRVat, isSiret } from "@td/constants";
 import {
   companySchema,
   transporterCompanySchema
@@ -207,16 +207,8 @@ export const formSchema = object().shape({
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),
     name: string().nullable(true),
-    onuCode: string().when("code", {
-      is: (wasteCode: string) => isDangerous(wasteCode || ""),
-      then: () =>
-        string()
-          .ensure()
-          .required(
-            `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
-          ),
-      otherwise: () => string().nullable()
-    }),
+    isSubjectToADR: boolean(),
+    onuCode: string().nullable(),
     packagingInfos: array()
       .required()
       .min(1)

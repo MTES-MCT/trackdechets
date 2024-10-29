@@ -66,6 +66,7 @@ export const wasteDetailsFragment = gql`
   fragment WasteDetailsFragment on WasteDetails {
     code
     name
+    isSubjectToADR
     onuCode
     packagingInfos {
       type

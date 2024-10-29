@@ -18,9 +18,11 @@ import {
 } from "./components/waste-code";
 import "./WasteInfo.scss";
 import EstimatedQuantityTooltip from "../../common/components/EstimatedQuantityTooltip";
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 type Values = {
   wasteDetails: {
+    isSubjectToADR: boolean | null;
     code: string;
     packagings: string[];
     parcelNumbers: any[];
@@ -59,6 +61,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
   useEffect(() => {
     if (isDangerous(values.wasteDetails.code)) {
       setFieldValue("wasteDetails.isDangerous", true);
+      setFieldValue("wasteDetails.isSubjectToADR", true);
     }
   }, [values.wasteDetails.code, setFieldValue]);
 
@@ -275,19 +278,29 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         </>
       )}
 
-      <div className="form__row">
-        <label>
-          Mentions au titre des règlements ADR, RID, ADNR, IMDG{" "}
-          {!isDangerous(values.wasteDetails.code) && "(optionnel)"}
-          <Field
-            type="text"
-            name="wasteDetails.onuCode"
-            className="td-input"
-            disabled={disabled}
-          />
-        </label>
+      <div className="form__row fr-mt-8v">
+        <ToggleSwitch
+          onChange={e => setFieldValue("wasteDetails.isSubjectToADR", e)}
+          inputTitle={"Test"}
+          label="Le déchet est soumis à l'ADR"
+          checked={values.wasteDetails.isSubjectToADR ?? false}
+        />
 
-        <RedErrorMessage name="wasteDetails.onuCode" />
+        {values.wasteDetails.isSubjectToADR && (
+          <div className="fr-ml-18v">
+            <label>
+              Mentions au titre des règlements ADR, RID, ADNR, IMDG{" "}
+              <Field
+                type="text"
+                name="wasteDetails.onuCode"
+                className="td-input"
+                disabled={disabled}
+              />
+            </label>
+
+            <RedErrorMessage name="wasteDetails.onuCode" />
+          </div>
+        )}
       </div>
 
       {SOIL_CODES.includes(values.wasteDetails.code) ||

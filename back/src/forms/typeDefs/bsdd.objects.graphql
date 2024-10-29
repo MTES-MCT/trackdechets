@@ -517,6 +517,9 @@ type WasteDetails {
   "Dénomination usuelle"
   name: String
 
+  "Si le BSD est soumis à l'ADR ou non"
+  isSubjectToADR: Boolean
+
   "Code ONU"
   onuCode: String
 

@@ -677,6 +677,7 @@ export function expandFormFromDb(
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
       name: form.wasteDetailsName,
+      isSubjectToADR: form.wasteDetailsIsSubjectToADR,
       onuCode: form.wasteDetailsOnuCode,
       packagingInfos: form.wasteDetailsPackagingInfos as PackagingInfo[],
       // DEPRECATED - To remove with old packaging fields
@@ -855,6 +856,7 @@ export function expandFormFromDb(
           wasteDetails: nullIfNoValues<WasteDetails>({
             code: forwardedIn.wasteDetailsCode,
             name: forwardedIn.wasteDetailsName,
+            isSubjectToADR: forwardedIn.wasteDetailsIsSubjectToADR,
             onuCode: forwardedIn.wasteDetailsOnuCode,
             packagingInfos:
               forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[],
