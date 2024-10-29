@@ -545,6 +545,7 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
   > = {
     id: getReadableId(ReadableIdPrefix.VHU),
     createdAt: bsvhu.createdAt,
+    customId: null,
     destinationAgrementNumber: bsvhu.destinationAgrementNumber,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationCompanyContact: bsvhu.destinationCompanyContact,

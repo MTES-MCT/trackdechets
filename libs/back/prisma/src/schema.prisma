@@ -1017,6 +1017,7 @@ model Bsvhu {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
   isDraft   Boolean  @default(false)
   isDeleted Boolean  @default(false)
+  customId  String?
 
   status BsvhuStatus @default(INITIAL)
 
@@ -1131,6 +1132,7 @@ model Bsvhu {
   @@index([canAccessDraftOrgIds], map: "_BsvhuCanAccessDraftOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
+  @@index([customId], map: "_Bsvhumigrations/CustomIdIdx")
 }
 
 model RegistryDelegation {

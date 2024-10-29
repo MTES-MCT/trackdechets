@@ -13,6 +13,7 @@ function toPrismaBsvhuWhereInput(where: BsvhuWhere): Prisma.BsvhuWhereInput {
   return safeInput<Prisma.BsvhuWhereInput>({
     ...toPrismaGenericWhereInput(where),
     status: toPrismaEnumFilter(where.status),
+    customId: toPrismaStringFilter(where.customId),
     emitterCompanySiret: toPrismaStringFilter(where.emitter?.company?.siret),
     emitterEmissionSignatureDate: toPrismaDateFilter(
       where.emitter?.emission?.signature?.date

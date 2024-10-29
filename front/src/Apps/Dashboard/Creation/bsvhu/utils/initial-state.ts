@@ -21,6 +21,7 @@ const getInitialEmitterCompany = (company?: BsvhuCompanyInput | null) => {
 };
 
 export default {
+  customId: "",
   emitter: {
     company: getInitialEmitterCompany(),
     agrementNumber: "",

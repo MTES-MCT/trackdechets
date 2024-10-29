@@ -139,6 +139,33 @@ describe("Mutation.Vhu.update", () => {
     expect(updatedBsvhu.quantity).toEqual(4);
   });
 
+  it("should allow user to update a draft BSVHU customId", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      customId: "the custom id"
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+    expect(errors).toBeUndefined();
+    const updatedBsvhu = await prisma.bsvhu.findFirstOrThrow({
+      where: { id: bsvhu.id }
+    });
+    expect(updatedBsvhu.customId).toEqual("the custom id");
+  });
+
   it("should disallow user who isn't part of the creator's companies to update a draft BSVHU", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const { company: company2, user: user2 } = await userWithCompanyFactory(

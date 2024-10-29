@@ -16,6 +16,7 @@ const CREATE_VHU_FORM = gql`
   mutation CreateVhuForm($input: BsvhuInput!) {
     createBsvhu(input: $input) {
       id
+      customId
       destination {
         company {
           siret
@@ -171,6 +172,64 @@ describe("Mutation.Vhu.create", () => {
     expect(data.createBsvhu.destination!.company!.siret).toBe(
       input.destination.company.siret
     );
+  });
+
+  it("should create a valid form with customid", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
+
+    const input = {
+      customId: "my custom id",
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createBsvhu.customId).toBe("my custom id");
   });
 
   it("should create a bsvhu and autocomplete transporter recepisse", async () => {

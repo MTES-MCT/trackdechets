@@ -2,6 +2,8 @@
 input BsvhuWhere {
   "Filtre sur l'ID"
   id: IdFilter
+  ""
+  customId: StringFilter
   "Filtre sur le statut de brouillon."
   isDraft: Boolean
   "Filtre sur le statut"
@@ -87,7 +89,11 @@ input BsvhuOperationWhere {
 input BsvhuInput {
   "Détails sur l'émetteur"
   emitter: BsvhuEmitterInput
-
+  """
+  Identifiant personnalisé permettant de faire le lien avec un
+  objet un système d'information tierce
+  """
+  customId: String
   "Code déchet. Presque toujours 16 01 06"
   wasteCode: String
   "Conditionnement du déchet"

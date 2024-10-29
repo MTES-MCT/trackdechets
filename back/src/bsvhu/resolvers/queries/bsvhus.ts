@@ -52,7 +52,6 @@ export default async function bsvhus(
     ...(whereArgs ? toPrismaWhereInput(whereArgs) : {}),
     isDeleted: false
   };
-
   const where = applyMask<Prisma.BsvhuWhereInput>(prismaWhere, draftMask);
   const bsvhuRepository = getReadonlyBsvhuRepository();
   const totalCount = await bsvhuRepository.count(where);
