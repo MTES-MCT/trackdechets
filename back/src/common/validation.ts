@@ -84,9 +84,13 @@ export const weightConditions: WeightConditions = {
         WasteAcceptationStatus.PARTIALLY_REFUSED
       ].includes(status)
     ) {
-      return weight.positive(
-        "${path} : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
-      );
+      return weight
+        .required(
+          "${path} : le poids est requis lorsque le déchet est accepté ou accepté partiellement."
+        )
+        .positive(
+          "${path} : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
+        );
     }
     return weight;
   },
