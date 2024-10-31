@@ -930,6 +930,7 @@ export const cloneBsdd = async (
     wasteAcceptationStatus: bsdd.wasteAcceptationStatus,
     wasteDetailsAnalysisReferences: bsdd.wasteDetailsAnalysisReferences,
     wasteDetailsCode: bsdd.wasteDetailsCode,
+    wasteDetailsIsSubjectToADR: bsdd.wasteDetailsIsSubjectToADR,
     wasteDetailsConsistence: bsdd.wasteDetailsConsistence,
     wasteDetailsIsDangerous: bsdd.wasteDetailsIsDangerous,
     wasteDetailsLandIdentifiers: bsdd.wasteDetailsLandIdentifiers,
