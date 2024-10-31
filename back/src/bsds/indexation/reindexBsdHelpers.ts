@@ -4,7 +4,11 @@ import { BsdasriForElasticInclude, indexBsdasri } from "../../bsdasris/elastic";
 import { getBsffForElastic, indexBsff } from "../../bsffs/elastic";
 import { getBsvhuForElastic, indexBsvhu } from "../../bsvhu/elastic";
 import { getBspaohForElastic, indexBspaoh } from "../../bspaoh/elastic";
-import { getFormForElastic, indexForm } from "../../forms/elastic";
+import {
+  getFormForElastic,
+  indexForm,
+  isBsddNotIndexable
+} from "../../forms/elastic";
 import { deleteBsd } from "../../common/elastic";
 import { getReadonlyBsdaRepository } from "../../bsda/repository";
 import { getReadonlyBsvhuRepository } from "../../bsvhu/repository";
@@ -84,7 +88,8 @@ export async function reindex(bsdId, exitFn) {
 
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
     const formForElastic = await getFormForElastic({ readableId: bsdId });
-    if (formForElastic.isDeleted) {
+
+    if (isBsddNotIndexable(formForElastic)) {
       await deleteBsd({ id: formForElastic.id });
     } else {
       await indexForm(formForElastic);
