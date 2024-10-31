@@ -824,22 +824,32 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
           wasteDetailsOnuCode
         } = ctx.parent;
 
-        if (!isDefined(wasteDetailsOnuCode)) {
-          if (wasteDetailsIsSubjectToADR === true) {
+        // New method: using the switch wasteDetailsIsSubjectToADR
+        if (isDefined(wasteDetailsIsSubjectToADR)) {
+          if (
+            wasteDetailsIsSubjectToADR === true &&
+            !isDefined(wasteDetailsOnuCode)
+          ) {
             return new yup.ValidationError(
-              `Vous avez déclaré que le déchet est soumis à l'ADR. Vous devez préciser la mention correspondante.`
+              `Le déchet est soumis à l'ADR. Vous devez préciser la mention correspondante.`
+            );
+          } else if (
+            wasteDetailsIsSubjectToADR === false &&
+            isDefined(wasteDetailsOnuCode)
+          ) {
+            return new yup.ValidationError(
+              `Le déchet n'est pas soumis à l'ADR. Vous ne pouvez pas préciser de mention ADR.`
             );
           }
-
-          if (wasteDetailsIsDangerous === true) {
+        }
+        // Legacy
+        else {
+          if (
+            wasteDetailsIsDangerous === true &&
+            !isDefined(wasteDetailsOnuCode)
+          ) {
             return new yup.ValidationError(
               `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
-            );
-          }
-        } else {
-          if (!wasteDetailsIsSubjectToADR && !wasteDetailsIsDangerous) {
-            return new yup.ValidationError(
-              `Le déchet n'est pas dangereux ni soumis à l'ADR, vous ne pouvez pas préciser de mention ADR.`
             );
           }
         }
