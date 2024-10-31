@@ -23,10 +23,6 @@ export const getFormADRMention = ({
   wasteDetailsIsSubjectToADR,
   wasteDetailsOnuCode
 }: GetFormADRMentionProps = {}) => {
-  console.log(">> getFormADRMention");
-  console.log("wasteDetailsIsSubjectToADR", wasteDetailsIsSubjectToADR);
-  console.log("wasteDetailsOnuCode", wasteDetailsOnuCode);
-
   // New method with ADR switch
   if (
     wasteDetailsIsSubjectToADR !== null &&
