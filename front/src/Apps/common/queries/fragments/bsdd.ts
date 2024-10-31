@@ -165,6 +165,7 @@ export const staticFieldsFragment = gql`
         other
         quantity
       }
+      isSubjectToADR
       onuCode
       quantity
       transporterNumberPlate

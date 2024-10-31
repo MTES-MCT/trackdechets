@@ -22,6 +22,7 @@ import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icon
 import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import { useEffect } from "react";
 import { getTransportModeLabel } from "../../../../constants";
+import { getFormWasteDetailsADRMention } from "@td/constants";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
@@ -216,11 +217,13 @@ export function FormWasteTransportSummary({
           <DataListTerm>Code ADR (ONU)</DataListTerm>
           {form.status === FormStatus.SignedByTempStorer ? (
             <DataListDescription>
-              {temporaryStorageDetail?.wasteDetails?.onuCode ?? "Non soumis"}
+              {getFormWasteDetailsADRMention(
+                temporaryStorageDetail?.wasteDetails
+              )}
             </DataListDescription>
           ) : (
             <DataListDescription>
-              {form.wasteDetails?.onuCode ?? "Non soumis"}
+              {getFormWasteDetailsADRMention(form?.wasteDetails)}
             </DataListDescription>
           )}
         </DataListItem>

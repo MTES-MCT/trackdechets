@@ -117,11 +117,16 @@ export function getStateSummary(form: Form) {
 
   const emitter = isResealed ? form.recipient?.company : form.emitter?.company;
 
+  const isSubjectToADR = isResealed
+    ? form.temporaryStorageDetail?.wasteDetails?.isSubjectToADR
+    : form.wasteDetails?.isSubjectToADR;
+
   return {
     quantity,
     quantityType,
     packagingInfos,
     packagings: packagingInfos.map(pi => pi.type),
+    isSubjectToADR,
     onuCode,
     ...transporter,
     recipient,

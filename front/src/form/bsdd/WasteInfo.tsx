@@ -280,7 +280,12 @@ export default connect<{ disabled }, Values>(function WasteInfo({
 
       <div className="form__row fr-mt-8v">
         <ToggleSwitch
-          onChange={e => setFieldValue("wasteDetails.isSubjectToADR", e)}
+          onChange={e => {
+            setFieldValue("wasteDetails.isSubjectToADR", e);
+            if (!e) {
+              setFieldValue("wasteDetails.onuCode", null);
+            }
+          }}
           inputTitle={"Test"}
           label="Le déchet est soumis à l'ADR"
           checked={values.wasteDetails.isSubjectToADR ?? false}

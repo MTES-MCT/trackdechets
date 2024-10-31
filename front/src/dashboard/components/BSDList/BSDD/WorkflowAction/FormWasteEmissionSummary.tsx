@@ -15,6 +15,8 @@ import {
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
+import { getFormWasteDetailsADRMention } from "@td/constants";
+import { isDefined } from "../../../../../common/helper";
 
 interface FormWasteEmissionSummaryProps {
   form: Form;
@@ -123,15 +125,24 @@ export function FormWasteEmissionSummary({
           <DataListItem>
             <DataListTerm>Code ADR (ONU)</DataListTerm>
             <DataListDescription>
-              {values.onuCode ?? "Non soumis"}
-              <button
-                type="button"
-                onClick={() => addField("onuCode")}
-                className="tw-ml-2"
-              >
-                <IconPaperWrite color="blue" />
-              </button>
-              )
+              {getFormWasteDetailsADRMention({
+                ...form.wasteDetails,
+                ...values
+              })}
+
+              {/* Enable editing ADR only if:
+              - BSD is explicictely subject to ADR (isSubjectToADR)
+              - BSD is legacy (isSubjectToADR is not defined) */}
+              {(!isDefined(form.wasteDetails?.isSubjectToADR) ||
+                form.wasteDetails?.isSubjectToADR === true) && (
+                <button
+                  type="button"
+                  onClick={() => addField("onuCode")}
+                  className="tw-ml-2"
+                >
+                  <IconPaperWrite color="blue" />
+                </button>
+              )}
             </DataListDescription>
           </DataListItem>
         )}

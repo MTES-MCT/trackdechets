@@ -289,6 +289,9 @@ type StateSummary {
   "Packaging le plus à jour"
   packagingInfos: [PackagingInfo!]!
 
+  "Si le BSD est soumis à l'ADR ou non"
+  isSubjectToADR: Boolean
+
   "Code ONU le plus à jour"
   onuCode: String
 
