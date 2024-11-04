@@ -791,10 +791,11 @@ function SignReceptionModal({
       <hr />
       <p className="fr-text fr-text--md fr-mb-2w">
         En qualité de <strong>destinataire du déchet</strong>, je confirme la
-        réception des déchets pour la quantité indiquée dans ce bordereau. Un
-        mail automatique Trackdéchets informera le producteur de ce refus
-        partiel, accompagné du récépisséPDF. L’inspection des ICPE et ma société
-        en recevront une copie.
+        réception des déchets pour la quantité indiquée dans ce bordereau. En
+        cas de refus partiel ou total uniquement, un mail automatique
+        Trackdéchets informera le producteur de ce refus, accompagné du
+        récépissé PDF. L’inspection des ICPE et ma société en recevront
+        également une copie.
       </p>
 
       <Input
