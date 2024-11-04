@@ -30,7 +30,6 @@ describe("createApplication", () => {
       variables: {
         input: {
           name: "Acme",
-          logoUrl: "https://acme.com/logo.png",
           redirectUris: [
             "http://localhost:3000/callback",
             "https://acme.com/callback"

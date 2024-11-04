@@ -31,8 +31,6 @@ type AuthorizedApplication {
   id: ID!
   "Nom de l'application"
   name: String!
-  "Logo de l'application"
-  logoUrl: String
   "Date de dernière connexion"
   lastConnection: DateTime
   "Email de l'administrateur"

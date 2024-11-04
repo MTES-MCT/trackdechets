@@ -243,7 +243,6 @@ model Application {
   updatedAt     DateTime         @updatedAt @db.Timestamptz(6)
   clientSecret  String
   name          String
-  logoUrl       String?
   redirectUris  String[]
   adminId       String?
   admin         User?            @relation(fields: [adminId], references: [id], onDelete: Restrict)
