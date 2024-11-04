@@ -34,7 +34,7 @@ type StepProps = {
 
 const steps = [
   { title: "Téléchargement du fichier", component: Step1 },
-  { title: "Vérfication", component: Step2 },
+  { title: "Vérification", component: Step2 },
   { title: "Importation", component: Step3 }
 ];
 
@@ -290,7 +290,7 @@ function Step3({ registryImportId }) {
 
   const stats = [
     `${data?.registryImport?.numberOfErrors} déclarations en erreur non prises en compte`,
-    `${data?.registryImport?.numberOfInsertions} douvelles déclarations`,
+    `${data?.registryImport?.numberOfInsertions} nouvelles déclarations`,
     `${data?.registryImport?.numberOfEdits} déclarations corrigées`,
     `${data?.registryImport?.numberOfCancellations} déclations annulées`,
     `${data?.registryImport?.numberOfSkipped} déclations ignorées`

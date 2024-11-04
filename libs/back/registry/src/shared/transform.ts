@@ -14,7 +14,7 @@ export async function transformReportForInfos(
     addIssue({
       code: z.ZodIssueCode.custom,
       message: `Le siret "${line.reportForSiret}" n'est pas inscrit sur Trackdéchets`,
-      path: ["reason"]
+      path: ["reportForSiret"]
     });
     return z.NEVER;
   }
