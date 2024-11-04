@@ -116,6 +116,7 @@ export const editionRules: {
   recipientCompanyMail: "EMISSION",
   wasteDetailsCode: "EMISSION",
   wasteDetailsOnuCode: "EMISSION",
+  wasteDetailsIsSubjectToADR: "EMISSION",
   wasteDetailsPackagingInfos: "EMISSION",
   wasteDetailsQuantity: "EMISSION",
   wasteDetailsQuantityType: "EMISSION",
