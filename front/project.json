@@ -3,6 +3,7 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "front/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "dsfr": {
       "executor": "nx:run-commands",
@@ -66,7 +67,8 @@
         "production": {
           "buildTarget": "front:build:production"
         }
-      }
+      },
+      "dependsOn": ["build"]
     },
     "test": {
       "executor": "@nx/jest:jest",
@@ -123,6 +125,5 @@
         }
       }
     }
-  },
-  "tags": []
+  }
 }

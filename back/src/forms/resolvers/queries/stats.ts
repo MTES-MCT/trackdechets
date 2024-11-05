@@ -41,9 +41,12 @@ const statsResolver: QueryResolvers["stats"] = async (
         incoming: 0,
         outgoing: 0
       };
-      cur.recipientCompanySiret === userCompany.siret
-        ? (prev[cur.wasteDetailsCode].incoming += cur.quantityReceived)
-        : (prev[cur.wasteDetailsCode].outgoing += cur.quantityReceived);
+
+      if (cur.recipientCompanySiret === userCompany.siret) {
+        prev[cur.wasteDetailsCode].incoming += cur.quantityReceived;
+      } else {
+        prev[cur.wasteDetailsCode].outgoing += cur.quantityReceived;
+      }
 
       prev[cur.wasteDetailsCode].incoming =
         Math.round(prev[cur.wasteDetailsCode].incoming * 100) / 100;

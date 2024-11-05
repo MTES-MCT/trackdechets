@@ -1,12 +1,12 @@
 // source: https://aida.ineris.fr/consultation_document/10327
 
-export interface WasteNode {
+export type WasteNode = Readonly<{
   code: string;
   description: string;
-  children: WasteNode[];
-}
+  children: readonly WasteNode[];
+}>;
 
-export const ALL_WASTES_TREE: WasteNode[] = [
+export const ALL_WASTES_TREE = [
   {
     code: "01",
     description:
@@ -5526,7 +5526,7 @@ export const ALL_WASTES_TREE: WasteNode[] = [
       }
     ]
   }
-];
+] as const;
 
 const bsffOnlyWasteCodes = ["14 06 01*"] as const;
 const bsdaOnlyWasteCodes = [
@@ -5589,6 +5589,19 @@ export const ALL_WASTES = flatten(ALL_WASTES_TREE);
 export const BSDD_WASTES = flatten(BSDD_WASTES_TREE);
 export const BSDD_WASTE_CODES = BSDD_WASTES.map(waste => waste.code);
 
+type WasteCode =
+  (typeof ALL_WASTES_TREE)[number]["children"][number]["children"][number]["code"];
+const wasteCodesArray: WasteCode[] = ALL_WASTES_TREE.flatMap(parent =>
+  parent.children.flatMap(child =>
+    child.children.map(grandchild => grandchild.code)
+  )
+);
+// Build an object that zods nativeEnum can ingest
+export const BSDD_WASTE_CODES_ENUM = wasteCodesArray.reduce((obj, cur) => {
+  obj[cur] = cur;
+  return obj;
+}, {} as Record<WasteCode, WasteCode>);
+
 export const BSDA_WASTES = ALL_WASTES.filter(w =>
   BSDA_WASTE_CODES.some(code => code === w.code)
 );
@@ -5622,7 +5635,7 @@ export const BSDD_SAMPLE_NUMBER_WASTE_CODES = [
   "13 02 08*"
 ];
 
-function flatten(wastes: WasteNode[]): WasteNode[] {
+function flatten(wastes: readonly WasteNode[]): WasteNode[] {
   return wastes
     .reduce(
       (acc: WasteNode[], waste) =>
@@ -5636,7 +5649,7 @@ function flatten(wastes: WasteNode[]): WasteNode[] {
 }
 
 export function toWasteTree(
-  wasteNodes: WasteNode[],
+  wasteNodes: readonly WasteNode[],
   opts?: { exclude?: string[] } | { include?: string[] }
 ): WasteNode[] {
   return wasteNodes

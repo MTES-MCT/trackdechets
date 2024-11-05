@@ -33,6 +33,19 @@ services:
     ports:
       - 27017:27017
 
+  minio:
+    image: minio/minio
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    environment:
+      MINIO_ROOT_USER: trackdechets
+      MINIO_ROOT_PASSWORD: password
+    ports:
+      - "9000:9000"
+      - "8900:8900"
+    volumes:
+      - minio:/data/minio
+    command: minio server /data/minio --console-address ":8900"
+
   nginx:
     image: nginx:1.19.6
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
@@ -55,3 +68,4 @@ volumes:
   postgres:
   elasticsearch:
   mongo:
+  minio:

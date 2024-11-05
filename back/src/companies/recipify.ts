@@ -39,7 +39,7 @@ export async function findCompanyFailFast(orgId: string) {
 
   try {
     return Promise.race([findCompany(where), raceWith]);
-  } catch (e) {
+  } catch (_) {
     return null;
   }
 }

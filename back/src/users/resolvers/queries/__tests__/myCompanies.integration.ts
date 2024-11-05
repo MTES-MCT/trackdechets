@@ -461,7 +461,8 @@ describe("query { myCompanies }", () => {
       "BSD_CAN_SIGN_ACCEPTATION",
       "BSD_CAN_SIGN_OPERATION",
       "BSD_CAN_DELETE",
-      "BSD_CAN_REVISE"
+      "BSD_CAN_REVISE",
+      "REGISTRY_CAN_IMPORT"
     ]);
   });
 
