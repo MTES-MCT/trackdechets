@@ -39,6 +39,90 @@ const PACKAGING_LABELS = {
 };
 
 export function BsvhuDetailContent({ form }: Props) {
+  const Trader = ({ trader }) => (
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Négociant</dt>
+        <dd>{trader.company?.name}</dd>
+
+        <dt>Siret</dt>
+        <dd>{trader.company?.siret}</dd>
+
+        <dt>Adresse</dt>
+        <dd>{trader.company?.address}</dd>
+
+        <dt>Tél</dt>
+        <dd>{trader.company?.phone}</dd>
+
+        <dt>Mél</dt>
+        <dd>{trader.company?.mail}</dd>
+
+        <dt>Contact</dt>
+        <dd>{trader.company?.contact}</dd>
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={trader.receipt} label="Récépissé" />
+        <DetailRow value={trader.department} label="Départment" />
+        <DateRow value={trader.validityLimit} label="Date de validité" />
+      </div>
+    </div>
+  );
+  const Broker = ({ broker }) => (
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Courtier</dt>
+        <dd>{broker.company?.name}</dd>
+
+        <dt>Siret</dt>
+        <dd>{broker.company?.siret}</dd>
+
+        <dt>Adresse</dt>
+        <dd>{broker.company?.address}</dd>
+
+        <dt>Tél</dt>
+        <dd>{broker.company?.phone}</dd>
+
+        <dt>Mél</dt>
+        <dd>{broker.company?.mail}</dd>
+
+        <dt>Contact</dt>
+        <dd>{broker.company?.contact}</dd>
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={broker.receipt} label="Récépissé" />
+        <DetailRow value={broker.department} label="Départment" />
+        <DateRow value={broker.validityLimit} label="Date de validité" />
+      </div>
+    </div>
+  );
+
+  const Intermediary = ({ intermediary }) => (
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Établissement intermédiaire</dt>
+        <dd>{intermediary?.name}</dd>
+
+        <dt>Siret</dt>
+        <dd>{intermediary?.siret}</dd>
+
+        <dt>Numéro de TVA</dt>
+        <dd>{intermediary?.vatNumber}</dd>
+
+        <dt>Adresse</dt>
+        <dd>{intermediary?.address}</dd>
+
+        <dt>Tél</dt>
+        <dd>{intermediary?.phone}</dd>
+
+        <dt>Mél</dt>
+        <dd>{intermediary?.mail}</dd>
+
+        <dt>Contact</dt>
+        <dd>{intermediary?.contact}</dd>
+      </div>
+    </div>
+  );
+
   return (
     <div>
       <div className={styles.detailSummary}>
@@ -112,6 +196,20 @@ export function BsvhuDetailContent({ form }: Props) {
             <Emitter form={form} />
           </TabPanel>
 
+          {/* Trader tab panel */}
+          {!!form?.trader?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Trader trader={form.trader} />
+            </TabPanel>
+          )}
+
+          {/* Broker tab panel */}
+          {!!form?.broker?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Broker broker={form.broker} />
+            </TabPanel>
+          )}
+
           {/* Transporter tab panel */}
           <TabPanel className={styles.detailTabPanel}>
             <Transporter form={form} />
@@ -123,6 +221,15 @@ export function BsvhuDetailContent({ form }: Props) {
               <Destination form={form} />
             </div>
           </TabPanel>
+
+          {/* Intermdiaries tab panel */}
+          {Boolean(form?.intermediaries?.length) && (
+            <TabPanel className={styles.detailTabPanel}>
+              {form?.intermediaries?.map(intermediary => (
+                <Intermediary intermediary={intermediary} />
+              ))}
+            </TabPanel>
+          )}
         </div>
       </Tabs>
     </div>
