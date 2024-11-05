@@ -2342,7 +2342,6 @@ enum RegistryExportDeclarationType {
 }
 
 model RegistryExport {
-  id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   readableId         String
@@ -2372,6 +2371,7 @@ model RegistryExport {
   bsvhuId   String?
   bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
 
+  @@id([readableId, exportRegistryType])
   // pseudo-random with only "=" lookups so hash index is appropriate
   @@index([readableId], map: "_RegistryExportReadableIdIdx", type: Hash)
   // array of elements so gin index
