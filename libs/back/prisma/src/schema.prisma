@@ -561,6 +561,7 @@ model Form {
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
   intermediaries       IntermediaryFormAssociation[]
+  registryExports      RegistryExport[]
 
   forwarding    Form?   @relation("BsddForwarding")
   forwardedInId String? @unique
@@ -1109,7 +1110,8 @@ model Bsvhu {
   traderRecepisseDepartment    String?
   traderRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
-  intermediaries IntermediaryBsvhuAssociation[]
+  intermediaries  IntermediaryBsvhuAssociation[]
+  registryExports RegistryExport[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1277,6 +1279,7 @@ model Bsdasri {
   synthesizedInId String?
 
   bsdasriRevisionRequests BsdasriRevisionRequest[]
+  registryExports         RegistryExport[]
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
   // Emitter sirets list in case of synthesis bsd
@@ -1439,6 +1442,7 @@ model Bsff {
   ficheInterventions BsffFicheIntervention[] @relation("BsffToBsffFicheIntervention")
   packagings         BsffPackaging[]
   transporters       BsffTransporter[]
+  registryExports    RegistryExport[]
 
   // Denormalized detenteur sirets to speed up query `bsffs`
   detenteurCompanySirets String[] @default([])
@@ -1705,6 +1709,7 @@ model Bsda {
   grouping             Bsda[]                        @relation("BsdaGrouping")
   bsdaRevisionRequests BsdaRevisionRequest[]
   intermediaries       IntermediaryBsdaAssociation[]
+  registryExports      RegistryExport[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1958,7 +1963,8 @@ model Bspaoh {
   currentTransporterOrgId                        String?
   nextTransporterOrgId                           String?
 
-  transporters BspaohTransporter[]
+  transporters    BspaohTransporter[]
+  registryExports RegistryExport[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   transportersSirets   String[] @default([])
@@ -2310,6 +2316,74 @@ model RegistrySsd {
   destinationPostalCode      String?
   destinationCountryCode     String?
 
+  registryExports RegistryExport[]
+
   @@index([importId], map: "_RegistrySsdImportIdIdx")
   @@index([publicId], map: "_RegistrySsdPublicIdIdx")
+}
+
+enum RegistryExportType {
+  SSD
+  INCOMING
+  OUTGOING
+  MANAGED
+  TRANSPORTED
+}
+
+enum RegistryExportWasteType {
+  DND
+  DD
+  TEXS
+}
+
+enum RegistryExportDeclarationType {
+  BSD
+  REGISTRY
+}
+
+model RegistryExport {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  readableId         String
+  reportAsSirets     String[]                      @default([])
+  sirets             String[]
+  exportRegistryType RegistryExportType
+  declarationType    RegistryExportDeclarationType
+  wasteType          RegistryExportWasteType
+  wasteCode          String
+  date               DateTime
+
+  // foreign keys to registry models
+  registrySsdId String?
+  registrySsd   RegistrySsd? @relation(fields: [registrySsdId], references: [id], onDelete: Cascade)
+
+  // foreign keys to BSD models
+  bsddId    String?
+  bsdd      Form?    @relation(fields: [bsddId], references: [id], onDelete: Cascade)
+  bsdaId    String?
+  bsda      Bsda?    @relation(fields: [bsdaId], references: [id], onDelete: Cascade)
+  bsdasriId String?
+  bsdasri   Bsdasri? @relation(fields: [bsdasriId], references: [id], onDelete: Cascade)
+  bsffId    String?
+  bsff      Bsff?    @relation(fields: [bsffId], references: [id], onDelete: Cascade)
+  bspaohId  String?
+  bspaoh    Bspaoh?  @relation(fields: [bspaohId], references: [id], onDelete: Cascade)
+  bsvhuId   String?
+  bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
+
+  // pseudo-random with only "=" lookups so hash index is appropriate
+  @@index([readableId], map: "_RegistryExportReadableIdIdx", type: Hash)
+  // array of elements so gin index
+  @@index([reportAsSirets], map: "_RegistryExportReportAsSiretsIdx", type: Gin)
+  // a btree_gin multi column index with [date(sort: Desc), sirets, exportRegistryType] could be advantageous but currently not supported by prisma
+  // https://www.postgresql.org/docs/current/btree-gin.html
+  // https://www.prisma.io/docs/orm/prisma-schema/postgresql-extensions
+  // array of elements so gin index
+  @@index([sirets], map: "_RegistryExportSiretsIdx", type: Gin)
+  // multi-column index because those columns are mandatory for any export
+  @@index([date(sort: Desc), exportRegistryType], map: "_RegistryExportMainIdx")
+  @@index([declarationType], map: "_RegistryExportDeclarationTypeIdx")
+  @@index([wasteType], map: "_RegistryExportWasteTypeIdx")
+  @@index([wasteCode], map: "_RegistryExportWasteCodeIdx")
 }
