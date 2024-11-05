@@ -120,10 +120,21 @@ export function Type({ disabled }: Props) {
       </div>
       <div className="tw-mt-4">
         {BsdaType.Gathering === type && (
-          <BsdaPicker name="grouping" bsdaId={id} />
+          <>
+            <p className="fr-text--bold fr-p-2w">
+              Sélectionner des BSDA ayant le même code déchet et le même
+              excutoire
+            </p>
+            <BsdaPicker name="grouping" bsdaId={id} />
+          </>
         )}
         {BsdaType.Reshipment === type && (
-          <BsdaPicker name="forwarding" bsdaId={id} />
+          <>
+            <p className="fr-text--bold fr-p-2w">
+              Sélectionner 1 seul BSDA à réexpédier
+            </p>
+            <BsdaPicker name="forwarding" bsdaId={id} />
+          </>
         )}
       </div>
     </>
