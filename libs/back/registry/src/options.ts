@@ -2,6 +2,12 @@ import { SafeParseReturnType } from "zod";
 import { SSD_HEADERS } from "./ssd/constants";
 import { safeParseAsyncSsd } from "./ssd/validation";
 import { getSsdImportSiretsAssociations, saveSsdLine } from "./ssd/database";
+import { INCOMING_WASTE_HEADERS } from "./incomingWaste/constants";
+import {
+  saveIncomingWasteLine,
+  getIncomingWasteImportSiretsAssociations
+} from "./incomingWaste/database";
+import { safeParseAsyncIncomingWaste } from "./incomingWaste/validation";
 
 export type ParsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER";
@@ -27,7 +33,7 @@ export type ImportOptions = {
   ) => Promise<{ for: string; as: string }[]>;
 };
 
-export const IMPORT_TYPES = ["SSD"] as const;
+export const IMPORT_TYPES = ["SSD", "INCOMING_WASTE"] as const;
 export type ImportType = (typeof IMPORT_TYPES)[number];
 
 export const importOptions: Record<ImportType, ImportOptions> = {
@@ -36,6 +42,12 @@ export const importOptions: Record<ImportType, ImportOptions> = {
     safeParseAsync: safeParseAsyncSsd,
     saveLine: saveSsdLine,
     getImportSiretsAssociations: getSsdImportSiretsAssociations
+  },
+  INCOMING_WASTE: {
+    headers: INCOMING_WASTE_HEADERS,
+    safeParseAsync: safeParseAsyncIncomingWaste,
+    saveLine: saveIncomingWasteLine,
+    getImportSiretsAssociations: getIncomingWasteImportSiretsAssociations
   }
 };
 

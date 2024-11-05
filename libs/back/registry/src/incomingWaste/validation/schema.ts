@@ -24,6 +24,8 @@ import {
 } from "../../shared/schemas";
 import { sub } from "date-fns";
 
+export type ParsedZodIncomingWasteItem = z.output<typeof incomingWasteSchema>;
+
 const inputIncomingWasteSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
@@ -95,18 +97,39 @@ const inputIncomingWasteSchema = z.object({
   producerPostalCode: getActorCitySchema("du producteur"),
   producerCity: getActorPostalCodeSchema("du producteur"),
   producerCountryCode: getActorCountryCodeSchema("du producteur"),
-  municipalitiesInseeCodes: z.string().optional(), // TODO regexp & contraintes
+  municipalitiesInseeCodes: z
+    .string()
+    .transform(val =>
+      val
+        ? String(val)
+            .split(",")
+            .map(val => val.trim())
+        : []
+    )
+    .pipe(z.array(z.string())),
   municipalitiesNames: z
     .string()
-    .min(
-      1,
-      "Le libellé de la commune de collecte de déchet doit faire plus de 1 caractère"
+    .transform(val =>
+      val
+        ? String(val)
+            .split(",")
+            .map(val => val.trim())
+        : []
     )
-    .max(
-      300,
-      "Le libellé de la commune de collecte de déchet doit faire moins de 300 caractères"
-    )
-    .optional(),
+    .pipe(
+      z.array(
+        z
+          .string()
+          .min(
+            1,
+            "Le libellé de la commune de collecte de déchet doit faire plus de 1 caractère"
+          )
+          .max(
+            300,
+            "Le libellé de la commune de collecte de déchet doit faire moins de 300 caractères"
+          )
+      )
+    ),
   senderType: getActorTypeSchema("d'expéditeur"),
   senderOrgId: getActorOrgIdSchema("d'expéditeur"),
   senderName: getActorNameSchema("d'expéditeur'"),

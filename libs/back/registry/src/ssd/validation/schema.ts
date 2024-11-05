@@ -57,45 +57,53 @@ const inputSsdSchema = z.object({
   wasteCode: wasteCodeSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  secondaryWasteCodes: z.preprocess(
-    val =>
+  secondaryWasteCodes: z
+    .string()
+    .optional()
+    .transform(val =>
       val
         ? String(val)
             .split(",")
             .map(val => val.trim())
-        : [],
-    z
-      .array(
-        z.nativeEnum(BSDD_WASTE_CODES_ENUM, {
-          required_error: "Le code déchet secondaire est requis",
-          invalid_type_error:
-            "Le code déchet secondaire n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces"
-        })
-      )
-      .optional()
-  ),
-  secondaryWasteDescriptions: z.preprocess(
-    val =>
+        : []
+    )
+    .pipe(
+      z
+        .array(
+          z.nativeEnum(BSDD_WASTE_CODES_ENUM, {
+            required_error: "Le code déchet secondaire est requis",
+            invalid_type_error:
+              "Le code déchet secondaire n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces"
+          })
+        )
+        .optional()
+    ),
+  secondaryWasteDescriptions: z
+    .string()
+    .optional()
+    .transform(val =>
       val
         ? String(val)
             .split(",")
             .map(val => val.trim())
-        : [],
-    z
-      .array(
-        z
-          .string()
-          .min(
-            2,
-            "Les dénominations usuelles du déchet doivent faire au moins 2 charactères"
-          )
-          .max(
-            150,
-            "Les dénominations usuelles du déchet ne peuvent pas dépasser 150 charactères"
-          )
-      )
-      .optional()
-  ),
+        : []
+    )
+    .pipe(
+      z
+        .array(
+          z
+            .string()
+            .min(
+              2,
+              "Les dénominations usuelles du déchet doivent faire au moins 2 charactères"
+            )
+            .max(
+              150,
+              "Les dénominations usuelles du déchet ne peuvent pas dépasser 150 charactères"
+            )
+        )
+        .optional()
+    ),
   product: z
     .string()
     .min(2, "Le produit doit faire au moins 2 charactères")

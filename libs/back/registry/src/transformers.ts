@@ -44,7 +44,7 @@ export function getTransformCsvStream(options: ImportOptions) {
         parseStream.destroy(
           new Error(
             `En-tête non valide pour la colonne numéro ${idx + 1}. Attendu "${
-              expectedHeaders[idx]
+              options.headers[expectedHeaders[idx]]
             }", reçu "${header}"`
           )
         );

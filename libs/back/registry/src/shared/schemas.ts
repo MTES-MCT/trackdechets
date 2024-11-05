@@ -63,14 +63,16 @@ export const wasteDescriptionSchema = z
 
 export const wasteCodeBaleSchema = z.enum(WASTE_CODES_BALE).optional();
 
-export const operationCodeSchema = z.nativeEnum(
-  PROCESSING_OPERATIONS_CODES_ENUM,
-  {
-    required_error: "Le code de traitement est requis",
-    invalid_type_error:
-      "Le code de traitement n'est pas une valeur autorisée. Valeurs possibles: R1 à R13, D1 à D15"
-  }
-);
+export const operationCodeSchema = z
+  .string()
+  .transform(val => val.replace(/([A-Z])(\d)/, "$1 $2")) // D5 becomes D 5
+  .pipe(
+    z.nativeEnum(PROCESSING_OPERATIONS_CODES_ENUM, {
+      required_error: "Le code de traitement est requis",
+      invalid_type_error:
+        "Le code de traitement n'est pas une valeur autorisée. Valeurs possibles: R1 à R13, D1 à D15"
+    })
+  );
 
 export const weightValueSchema = z.coerce
   .number({
@@ -177,14 +179,30 @@ export const getActorCountryCodeSchema = (name: string) =>
     return /^[A-Z]{2}$/.test(val);
   }, `Le code du pays ${name} n'est pas valide. Il doit être composé de 2 lettres majuscules`);
 
-export const transportModeSchema = z.enum(
-  ["ROUTE", "AÉRIEN", "FLUVIAL", "MARITIME", "PIPELINE", "FERRÉ"],
-  {
+export const transportModeSchema = z
+  .enum(["ROUTE", "AÉRIEN", "FLUVIAL", "MARITIME", "PIPELINE", "FERRÉ"], {
     required_error: "Le mode de transport est requis",
     invalid_type_error:
       "Le mode de transport n'est pas valide. Consultez la documentation pour la liste des valeurs possibles"
-  }
-);
+  })
+  .transform(val => {
+    switch (val) {
+      case "ROUTE":
+        return "ROAD";
+      case "AÉRIEN":
+        return "AIR";
+      case "FLUVIAL":
+        return "RIVER";
+      case "MARITIME":
+        return "SEA";
+      case "PIPELINE":
+        return "OTHER";
+      case "FERRÉ":
+        return "RAIL";
+      default:
+        throw Error("Unhandled transport mode");
+    }
+  });
 
 export const transportReceiptNumberSchema = z
   .string()
