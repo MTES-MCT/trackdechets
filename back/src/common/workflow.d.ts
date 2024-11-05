@@ -11,7 +11,13 @@ export type Workflow = {
   // Longer description of the workflow explaining the traceability use case;
   description?: string;
   // Name and profile of the companies involved in the workflow
-  companies: { name: string; companyTypes: string[]; opt?: any }[];
+  companies: {
+    name: string;
+    companyTypes: string[];
+    wasteProcessorTypes?: string[];
+    collectorTypes?: string[];
+    opt?: any;
+  }[];
   // List of steps to be applied to the BSD
   steps: WorkflowStep[];
   // Mocked context used in the documentation code examples

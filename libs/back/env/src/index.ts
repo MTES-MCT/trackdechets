@@ -150,7 +150,12 @@ export const schema = z.object({
   GERICO_API_URL: z.string().optional(),
   GERICO_API_KEY: z.string().optional(),
   GERICO_WEBHOOK_SLUG: z.string(),
-  GERICO_WEBHOOK_TOKEN: z.string()
+  GERICO_WEBHOOK_TOKEN: z.string(),
+
+  VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER: z
+    .string()
+    .datetime()
+    .optional()
 });
 
 export const envVariables = schema.superRefine((val, ctx) => {

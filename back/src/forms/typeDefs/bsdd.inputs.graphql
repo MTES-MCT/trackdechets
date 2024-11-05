@@ -511,7 +511,17 @@ input RecipientInput {
   "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
 
-  "Établissement de destination"
+  """
+  Établissement de destination
+
+  Des restrictions reltives aux profils et sous-profils de l'établissment s'appliquent en fonction du caractère de dangerosité du déchet concerné.
+
+  Sous-profils requis pour déchet dangereux (code déchet avec * ou marqué comme dangereux (isDanegrous) ou présence de pop) :
+  collectorTypes : DANGEROUS_WASTES, DEEE_WASTES, OTHER_DANGEROUS_WASTES, wasteProcessorTypes: DANGEROUS_WASTES_INCINERATION, DANGEROUS_WASTES_STORAGE, NON_DANGEROUS_WASTES_STORAGE, OTHER_DANGEROUS_WASTES
+
+  Sous-profils requis pour déchet non dangereux  :
+  collectorTypes : NON_DANGEROUS_WASTES, DEEE_WASTES, OTHER_NON_DANGEROUS_WASTES, wasteProcessorTypes : DANGEROUS_WASTES_INCINERATION, NON_DANGEROUS_WASTES_INCINERATION, CREMATION, NON_DANGEROUS_WASTES_STORAGE, INERT_WASTES_STORAGE, OTHER_NON_DANGEROUS_WASTES
+  """
   company: CompanyInput
 
   "Si c'est un entreprosage provisoire ou reconditionnement"

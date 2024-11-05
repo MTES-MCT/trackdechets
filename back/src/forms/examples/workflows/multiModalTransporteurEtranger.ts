@@ -9,6 +9,7 @@ import { Workflow } from "../../../common/workflow";
 import { signEmissionForm } from "../steps/signEmissionForm";
 import { signTransportForm } from "../steps/signTransportForm";
 import fixtures from "../fixturesForeignTransporter";
+import { WasteProcessorType } from "@prisma/client";
 
 const workflow: Workflow = {
   title: "Transport multi-modal avec transporteurs étrangers",
@@ -29,7 +30,11 @@ mis à jour au fur et mesure de la prise en charge du déchet sur les différent
       companyTypes: ["TRANSPORTER"],
       opt: { siret: null, vatNumber: "RO17579668" }
     },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     createFormMultiModal("producteur", fixtures as any),

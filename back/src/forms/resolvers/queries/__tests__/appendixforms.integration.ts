@@ -11,7 +11,7 @@ import { gql } from "graphql-tag";
 import { prisma } from "@td/prisma";
 import { updateAppendix2Fn } from "../../../updateAppendix2";
 import { AuthType } from "../../../../auth";
-
+import { CompanyType, WasteProcessorType } from "@prisma/client";
 const APPENDIX_FORMS = gql`
   query AppendixForm($siret: String!) {
     appendixForms(siret: $siret) {
@@ -33,7 +33,11 @@ describe("Test appendixForms", () => {
     const { user: emitter, company: emitterCompany } =
       await userWithCompanyFactory("ADMIN");
     const { user: ttr, company: ttrCompany } = await userWithCompanyFactory(
-      "ADMIN"
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
     );
     const { company: destinationCompany } = await userWithCompanyFactory(
       "ADMIN"

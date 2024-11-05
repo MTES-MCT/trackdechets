@@ -1,4 +1,10 @@
-import { CompanyType, CompanyVerificationStatus, Status } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationStatus,
+  Status,
+  WasteProcessorType,
+  CollectorType
+} from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -55,14 +61,12 @@ describe("Mutation.markAsSealed", () => {
 
   it("should fail if SEALED is not a possible next state", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const destination = await destinationFactory();
 
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "SENT",
-        emitterCompanySiret: company.siret,
-        recipientCompanySiret: destination.siret
+        emitterCompanySiret: company.siret
       }
     });
 
@@ -79,6 +83,41 @@ describe("Mutation.markAsSealed", () => {
     );
   });
 
+  it("should fail if destination has inappropriate profile", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.\n" +
+          "Erreur(s): Les autorisations de l'établissement de destination ne semblent pas correspondre à la " +
+          "caractérisation du déchet renseigné. Merci de bien vouloir procéder à la mise à jour du profil de " +
+          "l'établissement ou modifier le type de déchet sans quoi le bordereau ne pourra être enregistré.",
+
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
+  });
+
   it.each(["emitter", "recipient", "trader", "broker", "transporter"])(
     "%p of the BSD can seal it",
     async role => {
@@ -92,7 +131,14 @@ describe("Mutation.markAsSealed", () => {
         }[role]);
 
       const { user, company } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: { set: [companyType(role) as CompanyType] }
+        companyTypes: { set: [companyType(role) as CompanyType] },
+        ...(role === "recipient"
+          ? {
+              wasteProcessorTypes: [
+                WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+              ]
+            }
+          : {})
       });
 
       const form = await formFactory({
@@ -382,7 +428,10 @@ describe("Mutation.markAsSealed", () => {
 
   it("the BSD can not be sealed if data do not validate", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] },
+      wasteProcessorTypes: {
+        set: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
     });
 
     let form = await formFactory({
@@ -921,7 +970,6 @@ describe("Mutation.markAsSealed", () => {
 
   it("should mark appendix2 forms as grouped", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const destination = await destinationFactory();
     const groupedForm1 = await formFactory({
       ownerId: user.id,
       opt: { status: "AWAITING_GROUP", quantityReceived: 1 }
@@ -943,7 +991,6 @@ describe("Mutation.markAsSealed", () => {
         status: "DRAFT",
         emitterType: "APPENDIX2",
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: destination.siret,
         grouping: {
           create: [
             {
@@ -1209,7 +1256,10 @@ describe("Mutation.markAsSealed", () => {
       expect.objectContaining({
         message: [
           "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
-          `Erreur(s): L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
+          `Erreur(s): L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`,
+          "Les autorisations de l'établissement de destination ne semblent pas correspondre à la caractérisation " +
+            "du déchet renseigné. Merci de bien vouloir procéder à la mise à jour du profil de l'établissement ou modifier " +
+            "le type de déchet sans quoi le bordereau ne pourra être enregistré."
         ].join("\n")
       })
     ]);
@@ -1220,7 +1270,8 @@ describe("Mutation.markAsSealed", () => {
       "MEMBER"
     );
     const collector = await companyFactory({
-      companyTypes: { set: [CompanyType.COLLECTOR] }
+      companyTypes: { set: [CompanyType.COLLECTOR] },
+      collectorTypes: { set: [CollectorType.DANGEROUS_WASTES] }
     });
 
     const form = await formWithTempStorageFactory({
@@ -1256,7 +1307,8 @@ describe("Mutation.markAsSealed", () => {
       "MEMBER"
     );
     const collector = await companyFactory({
-      companyTypes: { set: [CompanyType.COLLECTOR] }
+      companyTypes: { set: [CompanyType.COLLECTOR] },
+      collectorTypes: { set: [CollectorType.DANGEROUS_WASTES] }
     });
     const destination = await companyFactory({
       // assume profile is not COLLECTOR or WASTEPROCESSOR
@@ -1300,8 +1352,14 @@ describe("Mutation.markAsSealed", () => {
     );
     const destination = await companyFactory({
       companyTypes: { set: [CompanyType.WASTEPROCESSOR] },
+
+      wasteProcessorTypes: {
+        set: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      },
+
       verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED
     });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -1336,7 +1394,9 @@ describe("Mutation.markAsSealed", () => {
       "MEMBER"
     );
     const collector = await companyFactory({
-      companyTypes: { set: [CompanyType.COLLECTOR] },
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION],
+
       verificationStatus: CompanyVerificationStatus.VERIFIED
     });
     const destination = await companyFactory({
@@ -1374,7 +1434,8 @@ describe("Mutation.markAsSealed", () => {
     const { user, company: destination } = await userWithCompanyFactory(
       "MEMBER",
       {
-        companyTypes: [CompanyType.WASTEPROCESSOR]
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
       }
     );
     const form = await formFactory({
@@ -1461,7 +1522,8 @@ describe("Mutation.markAsSealed", () => {
       companyTypes: [CompanyType.PRODUCER]
     });
     const recipient = await companyFactory({
-      companyTypes: [CompanyType.WASTEPROCESSOR]
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
     });
 
     const broker = await companyFactory();
@@ -1503,7 +1565,8 @@ describe("Mutation.markAsSealed", () => {
       companyTypes: [CompanyType.PRODUCER]
     });
     const recipient = await companyFactory({
-      companyTypes: [CompanyType.WASTEPROCESSOR]
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
     });
 
     const broker = await companyFactory();
@@ -1541,7 +1604,10 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("should fail if bsd has a foreign ship and the wrong emitterType", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
@@ -1573,7 +1639,10 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("should fail if bsd has a private producer and the wrong emitterType", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
@@ -1605,7 +1674,10 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("should seal and automatically transition to SIGNED_BY_PRODUCER when private individual emitter", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
@@ -1637,7 +1709,10 @@ describe("Mutation.markAsSealed", () => {
   });
 
   it("should seal and automatically transition to SIGNED_BY_PRODUCER when foreign ship emitter", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,

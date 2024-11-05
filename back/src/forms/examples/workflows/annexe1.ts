@@ -12,7 +12,7 @@ import {
   groupAppendix1Producer,
   switchAppendixContext
 } from "../steps/updateForm";
-
+import { WasteProcessorType } from "@prisma/client";
 const workflow: Workflow = {
   title: "Bordereau chapeau et annexe 1",
   description: `Le collecteur crée un bordereau chapeau. Il crée ensuite ses bordereaux d'annexe 1 et les rattache à ce chapeau.
@@ -20,7 +20,11 @@ const workflow: Workflow = {
   companies: [
     { name: "collecteur", companyTypes: ["COLLECTOR", "TRANSPORTER"] },
     { name: "producteur", companyTypes: ["PRODUCER"] },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     createAppendix1Form("collecteur"),

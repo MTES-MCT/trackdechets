@@ -43,6 +43,7 @@ import {
   weightConditions,
   WeightUnits
 } from "../common/validation";
+
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
   CiterneNotWashedOutReason,
@@ -620,6 +621,7 @@ const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
       .label("Destinataire")
       .test(siretTests.isRegistered("DESTINATION"))
       .test(siretTests.isNotDormant)
+      .test(siretTests.destinationHasAppropriateSubProfiles)
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`),
     recipientCompanyAddress: yup
       .string()

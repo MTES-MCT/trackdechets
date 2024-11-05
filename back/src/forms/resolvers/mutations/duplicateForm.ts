@@ -297,6 +297,10 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   const sirenified = await sirenifyFormCreateInput(newFormInput, []);
 
+  // We do not check destination company profiles here, hence duplicating a bsdd created before rules enforcement
+  // will produce a bsdd whose destination does not match current subprofile requirements.
+  // The markAsSealed mutation will raise an error and the rule will be enforced then.
+
   const newForm = await formRepository.create(sirenified, {
     duplicate: { id: existingForm.id }
   });
