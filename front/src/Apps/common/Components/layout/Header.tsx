@@ -315,7 +315,7 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
             entry={{
               navlink: true,
               caption: "Mes registres (v2)",
-              href: routes.registry
+              href: routes.registry_new.myImports
             }}
           />
         </li>
