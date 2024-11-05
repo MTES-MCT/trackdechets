@@ -1,4 +1,4 @@
-import { isSiret } from "@td/constants";
+import { isSiret, countries } from "@td/constants";
 import { checkVAT } from "jsvat";
 import { Refinement, z } from "zod";
 
@@ -26,11 +26,11 @@ export const refineDates: Refinement<ParsedZodSsdItem> = (
     });
   }
 
-  if (ssdItem.dispatchDate && ssdItem.dispatchDate > ssdItem.processingDate) {
+  if (ssdItem.dispatchDate && ssdItem.dispatchDate < ssdItem.processingDate) {
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "La date d'expédition ne peut pas être postérieure à la date de traitement.",
+        "La date d'expédition ne peut pas être antérieure à la date de traitement.",
       path: ["dispatchDate"]
     });
   }
@@ -90,7 +90,7 @@ export const refineDestinationOrgId: Refinement<ParsedZodSsdItem> = (
       break;
     }
     case "ENTREPRISE_UE": {
-      const { isValid } = checkVAT(ssdItem.destinationOrgId);
+      const { isValid } = checkVAT(ssdItem.destinationOrgId, countries);
       if (!isValid) {
         addIssue({
           code: z.ZodIssueCode.custom,

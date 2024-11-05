@@ -172,15 +172,15 @@ const inputSsdSchema = z.object({
   administrativeActReference: z
     .string()
     .min(
-      10,
-      "La référence d'acte administratif doit faire au moins 10 charactères"
+      8,
+      "La référence d'acte administratif doit faire au moins 8 charactères"
     )
     .max(
       100,
       "La référence d'acte administratif ne peut pas dépasser 100 charactères"
     )
     .refine(
-      val => /^[a-zA-ZÀ-ú0-9\s]+$/.test(val),
+      val => /^[a-zA-ZÀ-û0-9\s]+$/.test(val),
       "La référence d'acte administratif ne peut contenir que des lettres ou des chiffres"
     )
 });
