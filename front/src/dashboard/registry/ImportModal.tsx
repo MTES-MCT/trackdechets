@@ -199,6 +199,7 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
     Partial<QueryRegistryUploadSignedUrlArgs>
   >(REGISTRY_UPLOAD_SIGNED_URL, {
     variables: { fileName: file.name },
+    fetchPolicy: "no-cache",
     onCompleted: async ({ registryUploadSignedUrl }) => {
       const uploadResponse = await fetch(registryUploadSignedUrl.signedUrl, {
         method: "PUT",

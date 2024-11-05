@@ -94,7 +94,8 @@ export async function getSignedUrlForUpload({
   });
 
   const signedUrl = await getSignedUrl(registryS3Client, command, {
-    expiresIn: SIGNED_URL_EXPIRES_IN
+    expiresIn: SIGNED_URL_EXPIRES_IN,
+    unhoistableHeaders: new Set(["x-amz-meta-filename"])
   });
   return signedUrl;
 }
