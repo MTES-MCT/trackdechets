@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { CompanyPrivate } from "@td/codegen-ui";
+import { CompanyPrivate, User } from "@td/codegen-ui";
 import NotificationsUpdateModal from "./NotificationsUpdateModal";
 
 type AccountCompanyNotificationsUpdateButtonProps = {
   company: CompanyPrivate;
+  me: Pick<User, "email">;
 };
 
 export default function NotificationsUpdateButton({
-  company
+  company,
+  me
 }: AccountCompanyNotificationsUpdateButtonProps) {
   const activeNotifications = Object.keys(company.userNotifications).filter(
     notification => company.userNotifications[notification] === true
@@ -24,11 +26,14 @@ export default function NotificationsUpdateButton({
 
   return (
     <>
-      <NotificationsUpdateModal
-        company={company}
-        close={() => setIsOpen(false)}
-        open={open}
-      />
+      {open && (
+        <NotificationsUpdateModal
+          company={company}
+          me={me}
+          close={() => setIsOpen(false)}
+          open={open}
+        />
+      )}
       <Button size="small" onClick={() => setIsOpen(true)} iconId={iconId}>
         {btnLabel}
       </Button>

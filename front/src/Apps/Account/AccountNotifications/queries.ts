@@ -14,6 +14,18 @@ export const SUBSCRIBE_TO_COMPANY_NOTIFICATIONS = gql`
         bsdaFinalDestinationUpdate
         revisionRequest
       }
+      users {
+        id
+        orgId
+        email
+        notifications {
+          membershipRequest
+          signatureCodeRenewal
+          bsdRefusal
+          bsdaFinalDestinationUpdate
+          revisionRequest
+        }
+      }
     }
   }
 `;
@@ -29,6 +41,18 @@ export const SUBSCRIBE_TO_NOTIFICATIONS = gql`
         bsdRefusal
         bsdaFinalDestinationUpdate
         revisionRequest
+      }
+      users {
+        id
+        orgId
+        email
+        notifications {
+          membershipRequest
+          signatureCodeRenewal
+          bsdRefusal
+          bsdaFinalDestinationUpdate
+          revisionRequest
+        }
       }
     }
   }

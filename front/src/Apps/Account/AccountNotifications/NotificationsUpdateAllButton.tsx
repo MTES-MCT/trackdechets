@@ -14,12 +14,13 @@ export default function NotificationsUpdateAllButton({
 
   return (
     <>
-      <AccountNotificationsUpdateAllModal
-        totalCount={totalCount}
-        open={open}
-        close={() => setIsOpen(false)}
-      />
-
+      {open && (
+        <AccountNotificationsUpdateAllModal
+          totalCount={totalCount}
+          open={open}
+          close={() => setIsOpen(false)}
+        />
+      )}
       <Button
         iconId="ri-notification-3-line"
         size="small"

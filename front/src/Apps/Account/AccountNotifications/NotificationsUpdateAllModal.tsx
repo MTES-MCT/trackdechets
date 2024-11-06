@@ -213,10 +213,7 @@ export default function AccountNotificationsUpdateAllModal({
           <Button
             title="Annuler"
             priority="secondary"
-            onClick={() => {
-              reset();
-              close();
-            }}
+            onClick={resetAndClose}
             disabled={loading}
           >
             Annuler

@@ -4,7 +4,7 @@
   gap: 15px;
 }
 
-.radioButtons  {
+.radioButtons {
   legend {
     font-weight: bold !important;
   }
@@ -13,7 +13,7 @@
     flex-wrap: nowrap;
     justify-content: space-between;
 
-    :global(fr-radio-group){
+    :global(fr-radio-group) {
       margin-right: 0;
     }
 
@@ -22,10 +22,4 @@
       max-width: 15em;
     }
   }
-
 }
-
-
-
-
-

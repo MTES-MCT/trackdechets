@@ -1,8 +1,10 @@
-import React from "react";
+import React, { ReactNode, useMemo } from "react";
 import {
+  CompanyMember,
   CompanyPrivate,
   Mutation,
   MutationSubscribeToCompanyNotificationsArgs,
+  User,
   UserNotifications,
   UserRole
 } from "@td/codegen-ui";
@@ -14,9 +16,11 @@ import { SUBSCRIBE_TO_COMPANY_NOTIFICATIONS } from "./queries";
 import styles from "./NotificationsUpdateModal.module.scss";
 import { hintTexts } from "./utils";
 import { Modal } from "../../../common/components";
+import SubscribersCountBadge from "./SubscribersCountBadge";
 
 type AccountCompanyNotificationsUpdateModalProps = {
   company: CompanyPrivate;
+  me: Pick<User, "email">;
   // état de la modale
   open: boolean;
   // action permettant de fermer la modale
@@ -24,7 +28,7 @@ type AccountCompanyNotificationsUpdateModalProps = {
 };
 
 type OptionLabel = {
-  label: string;
+  label: ReactNode;
   notification: keyof UserNotifications;
 };
 
@@ -59,24 +63,79 @@ export const authorizedNotificationsByUserRole: {
   ]
 };
 
+type GetSubscribersOpts = {
+  // Liste des membres de l'établissements différent de l'utilisateur connecté
+  users: CompanyMember[];
+  // Abonnement de l'utilisateur connecté
+  notifications: UserNotifications;
+};
+
+function getSubscribersCount({ users, notifications }: GetSubscribersOpts) {
+  // Initialise le comptage des abonnés à partir des notifications de l'utilisateur connexté
+  const subscribersCount = {
+    membershipRequest: notifications.membershipRequest ? 1 : 0,
+    signatureCodeRenewal: notifications.signatureCodeRenewal ? 1 : 0,
+    bsdRefusal: notifications.bsdRefusal ? 1 : 0,
+    bsdaFinalDestinationUpdate: notifications.bsdaFinalDestinationUpdate
+      ? 1
+      : 0,
+    revisionRequest: notifications.revisionRequest ? 1 : 0
+  };
+
+  // Incrémente le comptage à partir des abonnements des autres utilisateurs
+  for (const user of users) {
+    if (user.notifications.membershipRequest) {
+      subscribersCount.membershipRequest =
+        subscribersCount.membershipRequest + 1;
+    }
+    if (user.notifications.signatureCodeRenewal) {
+      subscribersCount.signatureCodeRenewal =
+        subscribersCount.signatureCodeRenewal + 1;
+    }
+    if (user.notifications.bsdRefusal) {
+      subscribersCount.bsdRefusal = subscribersCount.bsdRefusal + 1;
+    }
+    if (user.notifications.bsdaFinalDestinationUpdate) {
+      subscribersCount.bsdaFinalDestinationUpdate =
+        subscribersCount.bsdaFinalDestinationUpdate + 1;
+    }
+    if (user.notifications.revisionRequest) {
+      subscribersCount.revisionRequest = subscribersCount.revisionRequest + 1;
+    }
+  }
+
+  return subscribersCount;
+}
+
 export default function NotificationsUpdateModal({
   company,
+  me,
   open,
   close
 }: AccountCompanyNotificationsUpdateModalProps) {
-  const [subscribeToCompanyNotifications, { loading, data, error }] =
-    useMutation<
-      Pick<Mutation, "subscribeToCompanyNotifications">,
-      MutationSubscribeToCompanyNotificationsArgs
-    >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS);
+  const [
+    subscribeToCompanyNotifications,
+    { loading, data, error, reset: resetMutation }
+  ] = useMutation<
+    Pick<Mutation, "subscribeToCompanyNotifications">,
+    MutationSubscribeToCompanyNotificationsArgs
+  >(SUBSCRIBE_TO_COMPANY_NOTIFICATIONS);
 
   const authorizedNotifications = company.userRole
     ? authorizedNotificationsByUserRole[company.userRole]
     : [];
 
-  const { register, handleSubmit } = useForm<UserNotifications>({
+  const { register, handleSubmit, watch, reset } = useForm<UserNotifications>({
     defaultValues: company.userNotifications
   });
+
+  function resetAndClose() {
+    resetMutation();
+    reset();
+    close();
+  }
+
+  const notifications = watch();
 
   const onSubmit = async (data: UserNotifications) => {
     const { errors } = await subscribeToCompanyNotifications({
@@ -88,7 +147,7 @@ export default function NotificationsUpdateModal({
       }
     });
     if (!errors) {
-      close();
+      resetAndClose();
     }
   };
 
@@ -100,25 +159,70 @@ export default function NotificationsUpdateModal({
     checkboxState = "success";
   }
 
+  // liste des utilisateurs autres que l'utilisateur connecté
+  const allMembersButMe = (company.users ?? []).filter(
+    u => u.email !== me.email
+  );
+
+  const subscribersCount = useMemo(
+    () => getSubscribersCount({ users: allMembersButMe, notifications }),
+    [allMembersButMe, notifications]
+  );
+
   const optionsLabels: OptionLabel[] = [
     {
-      label: "aux demandes de rattachement",
+      label: (
+        <div>
+          <span className="fr-mr-1w">aux demandes de rattachement</span>
+          <SubscribersCountBadge count={subscribersCount.membershipRequest} />
+        </div>
+      ),
       notification: "membershipRequest"
     },
     {
-      label: "au renouvellement du code de signature",
+      label: (
+        <div>
+          <span className="fr-mr-1w">
+            au renouvellement du code de signature
+          </span>
+          <SubscribersCountBadge
+            count={subscribersCount.signatureCodeRenewal}
+          />
+        </div>
+      ),
       notification: "signatureCodeRenewal"
     },
     {
-      label: "au refus total et partiel des bordereaux",
+      label: (
+        <div>
+          <span className="fr-mr-1w">
+            au refus total et partiel des bordereaux
+          </span>
+          <SubscribersCountBadge count={subscribersCount.bsdRefusal} />
+        </div>
+      ),
       notification: "bsdRefusal"
     },
     {
-      label: "à la modification de la destination finale amiante",
+      label: (
+        <div>
+          <span className="fr-mr-1w">
+            à la modification de la destination finale amiante
+          </span>
+          <SubscribersCountBadge
+            count={subscribersCount.bsdaFinalDestinationUpdate}
+          />
+        </div>
+      ),
       notification: "bsdaFinalDestinationUpdate"
     },
     {
-      label: "aux demandes de révision",
+      label: (
+        <div>
+          <span className="fr-mr-1w">aux demandes de révision</span>
+          <SubscribersCountBadge count={subscribersCount.revisionRequest} />
+        </div>
+      ),
       notification: "revisionRequest"
     }
   ];
@@ -142,12 +246,12 @@ export default function NotificationsUpdateModal({
       isOpen={open}
       title={modalTitle}
       ariaLabel={modalTitle}
-      onClose={close}
+      onClose={resetAndClose}
       size="L"
     >
       <div className="fr-my-2w">
         Je souhaite recevoir par courriel les notifications de l'établissement{" "}
-        {company.name} ({company.siret}) relatives :
+        {company.name} ({company.orgId}) relatives :
       </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Checkbox
@@ -161,7 +265,7 @@ export default function NotificationsUpdateModal({
           <Button
             title="Annuler"
             priority="secondary"
-            onClick={close}
+            onClick={resetAndClose}
             disabled={loading}
           >
             Annuler
