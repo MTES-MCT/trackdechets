@@ -12,6 +12,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Le champ "Numéro de notification" est obligatoire lorsque la destination ultérieure renseignée est étrangère [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
 - La présence d'une quantité reçue est requise pour passer du statut SENT à ACCEPTED via la mutation markAsReceived [PR 3720](https://github.com/MTES-MCT/trackdechets/pull/3720)
 
+#### :house: Interne
+
+- Modification de la query controlBsds et fermeture de la query bsds aux comptes gouvernementaux [PR 3270](https://github.com/MTES-MCT/trackdechets/pull/3270)
+
 # [2024.10.1] 22/10/2024
 
 #### :rocket: Nouvelles fonctionnalités
