@@ -314,6 +314,7 @@ model Company {
 
   delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
   delegateRegistryDelegations  RegistryDelegation[] @relation("RegistryDelegationDelegate")
+  registryExports              RegistryExport[]
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -561,7 +562,7 @@ model Form {
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
   intermediaries       IntermediaryFormAssociation[]
-  registryExports      RegistryExport[]
+  registrySummaries    RegistrySummary[]
 
   forwarding    Form?   @relation("BsddForwarding")
   forwardedInId String? @unique
@@ -933,6 +934,7 @@ model User {
   CompanyDigest              CompanyDigest[]
   registryImports            RegistryImport[]
   registrySsdDeclarations    RegistrySsd[]
+  registryExports            RegistryExport[]
 }
 
 enum GovernmentPermission {
@@ -1110,8 +1112,8 @@ model Bsvhu {
   traderRecepisseDepartment    String?
   traderRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
-  intermediaries  IntermediaryBsvhuAssociation[]
-  registryExports RegistryExport[]
+  intermediaries    IntermediaryBsvhuAssociation[]
+  registrySummaries RegistrySummary[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1279,7 +1281,7 @@ model Bsdasri {
   synthesizedInId String?
 
   bsdasriRevisionRequests BsdasriRevisionRequest[]
-  registryExports         RegistryExport[]
+  registrySummaries       RegistrySummary[]
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
   // Emitter sirets list in case of synthesis bsd
@@ -1442,7 +1444,7 @@ model Bsff {
   ficheInterventions BsffFicheIntervention[] @relation("BsffToBsffFicheIntervention")
   packagings         BsffPackaging[]
   transporters       BsffTransporter[]
-  registryExports    RegistryExport[]
+  registrySummaries  RegistrySummary[]
 
   // Denormalized detenteur sirets to speed up query `bsffs`
   detenteurCompanySirets String[] @default([])
@@ -1709,7 +1711,7 @@ model Bsda {
   grouping             Bsda[]                        @relation("BsdaGrouping")
   bsdaRevisionRequests BsdaRevisionRequest[]
   intermediaries       IntermediaryBsdaAssociation[]
-  registryExports      RegistryExport[]
+  registrySummaries    RegistrySummary[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1963,8 +1965,8 @@ model Bspaoh {
   currentTransporterOrgId                        String?
   nextTransporterOrgId                           String?
 
-  transporters    BspaohTransporter[]
-  registryExports RegistryExport[]
+  transporters      BspaohTransporter[]
+  registrySummaries RegistrySummary[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   transportersSirets   String[] @default([])
@@ -2316,7 +2318,7 @@ model RegistrySsd {
   destinationPostalCode      String?
   destinationCountryCode     String?
 
-  registryExports RegistryExport[]
+  registrySummaries RegistrySummary[]
 
   @@index([importId], map: "_RegistrySsdImportIdIdx")
   @@index([publicId], map: "_RegistrySsdPublicIdIdx")
@@ -2341,7 +2343,43 @@ enum RegistryExportDeclarationType {
   REGISTRY
 }
 
+enum RegistryExportStatus {
+  PENDING
+  STARTED
+  SUCCESSFUL
+  FAILED
+  CANCELED
+}
+
+enum RegistryExportFormat {
+  CSV
+  XLSX
+}
+
 model RegistryExport {
+  id          String               @id @default(cuid())
+  createdAt   DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime             @updatedAt @db.Timestamptz(6)
+  createdById String
+  status      RegistryExportStatus @default(PENDING)
+  s3FileKey   String
+
+  companyId       String?
+  type            RegistryExportType?
+  wasteTypes      RegistryExportWasteType[]      @default([])
+  wasteCodes      String[]                       @default([])
+  declarationType RegistryExportDeclarationType?
+  startDate       DateTime
+  endDate         DateTime?
+  format          RegistryExportFormat
+
+  createdBy User     @relation(fields: [createdById], references: [id])
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  @@index([createdById], map: "_RegistryExportCreatedByIdIdx")
+}
+
+model RegistrySummary {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   readableId         String
