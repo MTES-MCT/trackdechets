@@ -159,6 +159,11 @@ export default function AccountNotificationsUpdateAllModal({
       onClose={resetAndClose}
       size="L"
     >
+      <div className="fr-mb-2w">
+        Le formulaire suivant permet de s'abonner ou se désabonner aux
+        notifications de différents types pour l'ensemble de vos {totalCount}{" "}
+        établissements.
+      </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
           {radioInputs.map(({ notification, legend, activateHint }) => (
