@@ -26,6 +26,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Amélioration de l'interface d'admin [PR 3735](https://github.com/MTES-MCT/trackdechets/pull/3735)
 - Modification de la query controlBsds et fermeture de la query bsds aux comptes gouvernementaux [PR 3270](https://github.com/MTES-MCT/trackdechets/pull/3270)
 
+# [2024.11.1] 19/11/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Permettre à l'utilisateur de gérer les alertes de tous ses établissements [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
+- Afficher le nombre d'inscrits par type d'alertes au sein d'un établissemen [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
+
 # [2024.10.1] 22/10/2024
 
 #### :rocket: Nouvelles fonctionnalités
