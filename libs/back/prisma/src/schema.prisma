@@ -2412,3 +2412,69 @@ model RegistryIncomingWaste {
   transporter5City                String?
   transporter5CountryCode         String?
 }
+
+enum RegistryExportType {
+  SSD
+  INCOMING
+  OUTGOING
+  MANAGED
+  TRANSPORTED
+}
+
+enum RegistryExportWasteType {
+  DND
+  DD
+  TEXS
+}
+
+enum RegistryExportDeclarationType {
+  BSD
+  REGISTRY
+}
+
+model RegistryExport {
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  readableId         String
+  reportAsSirets     String[]                      @default([])
+  sirets             String[]
+  exportRegistryType RegistryExportType
+  declarationType    RegistryExportDeclarationType
+  wasteType          RegistryExportWasteType
+  wasteCode          String
+  date               DateTime
+
+  // foreign keys to registry models
+  registrySsdId String?
+  registrySsd   RegistrySsd? @relation(fields: [registrySsdId], references: [id], onDelete: Cascade)
+
+  // foreign keys to BSD models
+  bsddId    String?
+  bsdd      Form?    @relation(fields: [bsddId], references: [id], onDelete: Cascade)
+  bsdaId    String?
+  bsda      Bsda?    @relation(fields: [bsdaId], references: [id], onDelete: Cascade)
+  bsdasriId String?
+  bsdasri   Bsdasri? @relation(fields: [bsdasriId], references: [id], onDelete: Cascade)
+  bsffId    String?
+  bsff      Bsff?    @relation(fields: [bsffId], references: [id], onDelete: Cascade)
+  bspaohId  String?
+  bspaoh    Bspaoh?  @relation(fields: [bspaohId], references: [id], onDelete: Cascade)
+  bsvhuId   String?
+  bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
+
+  @@id([readableId, exportRegistryType])
+  // pseudo-random with only "=" lookups so hash index is appropriate
+  @@index([readableId], map: "_RegistryExportReadableIdIdx", type: Hash)
+  // array of elements so gin index
+  @@index([reportAsSirets], map: "_RegistryExportReportAsSiretsIdx", type: Gin)
+  // a btree_gin multi column index with [date(sort: Desc), sirets, exportRegistryType] could be advantageous but currently not supported by prisma
+  // https://www.postgresql.org/docs/current/btree-gin.html
+  // https://www.prisma.io/docs/orm/prisma-schema/postgresql-extensions
+  // array of elements so gin index
+  @@index([sirets], map: "_RegistryExportSiretsIdx", type: Gin)
+  // multi-column index because those columns are mandatory for any export
+  @@index([date(sort: Desc), exportRegistryType], map: "_RegistryExportMainIdx")
+  @@index([declarationType], map: "_RegistryExportDeclarationTypeIdx")
+  @@index([wasteType], map: "_RegistryExportWasteTypeIdx")
+  @@index([wasteCode], map: "_RegistryExportWasteCodeIdx")
+}
