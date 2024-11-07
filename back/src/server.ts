@@ -269,7 +269,7 @@ export const sess: session.SessionOptions = {
     secure: false,
     httpOnly: true,
     domain: SESSION_COOKIE_HOST || UI_HOST,
-    maxAge: 24 * 3600 * 1000
+    maxAge: 3000
   }
 };
 
