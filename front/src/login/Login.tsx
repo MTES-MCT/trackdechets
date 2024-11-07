@@ -100,15 +100,16 @@ export default function Login() {
     </div>
   ) : null;
 
-  const disconectedAlert = (
-    <div className="fr-grid-row fr-mb-2w">
-      <Alert
-        title="Vous avez été déconnecté"
-        description="Votre session a expiré. Vous avez été déconnecté"
-        severity="error"
-      />
-    </div>
-  );
+  const disconectedAlert =
+    queries["session"] === "expired" ? (
+      <div className="fr-grid-row fr-mb-2w">
+        <Alert
+          title="Vous avez été déconnecté"
+          description="Votre session a expiré. Vous avez été déconnecté"
+          severity="warning"
+        />
+      </div>
+    ) : null;
 
   return (
     <div className={styles.onboardingWrapper}>
