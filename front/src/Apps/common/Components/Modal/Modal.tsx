@@ -1,5 +1,10 @@
 import React from "react";
-import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
+import {
+  FocusScope,
+  Overlay,
+  useModalOverlay,
+  useOverlayTrigger
+} from "react-aria";
 import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
 import "./modal.scss";
 
@@ -45,28 +50,30 @@ export function Modal({
             {...modalProps}
             ref={ref}
           >
-            <div className="fr-grid-row fr-grid-row--center">
-              <div className={ModalSizesClass[size]}>
-                <div className="fr-modal__body">
-                  <div className="fr-modal__header close-btn-override">
-                    <button
-                      type="button"
-                      className="fr-btn--close fr-btn"
-                      onClick={state.close}
-                      aria-label="Close"
-                    >
-                      {closeLabel}
-                    </button>
+            <FocusScope contain restoreFocus autoFocus>
+              <div className="fr-grid-row fr-grid-row--center">
+                <div className={ModalSizesClass[size]}>
+                  <div className="fr-modal__body">
+                    <div className="fr-modal__header close-btn-override">
+                      <button
+                        type="button"
+                        className="fr-btn--close fr-btn"
+                        onClick={state.close}
+                        aria-label="Close"
+                      >
+                        {closeLabel}
+                      </button>
+                    </div>
+                    {title && (
+                      <h1 className="fr-modal__header fr-modal__title">
+                        {title}
+                      </h1>
+                    )}
+                    <div className="fr-modal__content">{children}</div>
                   </div>
-                  {title && (
-                    <h1 className="fr-modal__header fr-modal__title">
-                      {title}
-                    </h1>
-                  )}
-                  <div className="fr-modal__content">{children}</div>
                 </div>
               </div>
-            </div>
+            </FocusScope>
           </div>
         </div>
       </div>
