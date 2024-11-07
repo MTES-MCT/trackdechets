@@ -104,8 +104,8 @@ export default function Login() {
     queries["session"] === "expired" ? (
       <div className="fr-grid-row fr-mb-2w">
         <Alert
-          title="Vous avez été déconnecté"
-          description="Votre session a expiré. Vous avez été déconnecté"
+          title="Votre session a expiré"
+          description="Vous avez été déconnecté, veuillez vous connecter à nouveau."
           severity="warning"
         />
       </div>
