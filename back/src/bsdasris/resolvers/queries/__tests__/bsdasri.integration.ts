@@ -75,6 +75,28 @@ describe("Query.Bsdasri", () => {
     ]);
   });
 
+  it("should allow access to admin user not on the bsd", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination)
+      }
+    });
+    const { user: otherUser } = await userWithCompanyFactory(
+      "MEMBER",
+      {},
+      { isAdmin: true }
+    );
+
+    const { query } = makeClient(otherUser);
+    const { data } = await query<Pick<Query, "bsdasri">>(GET_BSDASRI, {
+      variables: { id: dasri.id }
+    });
+    expect(data.bsdasri.id).toBe(dasri.id);
+  });
+
   it("should get a dasri by id", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: destination } = await userWithCompanyFactory("MEMBER");

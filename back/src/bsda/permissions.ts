@@ -190,6 +190,9 @@ async function creators(input: BsdaInput) {
 }
 
 export async function checkCanRead(user: User, bsda: BsdaWithTransporters) {
+  if (user.isAdmin && user.isActive) {
+    return true;
+  }
   const authorizedOrgIds = readers(bsda);
 
   return checkUserPermissions(

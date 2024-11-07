@@ -112,6 +112,9 @@ function creators(input: BsvhuInput) {
 }
 
 export async function checkCanRead(user: User, bsvhu: Bsvhu) {
+  if (user.isAdmin && user.isActive) {
+    return true;
+  }
   const authorizedOrgIds = readers(bsvhu);
 
   return checkUserPermissions(

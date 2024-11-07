@@ -4,8 +4,9 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { Query } from "@td/codegen-ui";
 import React from "react";
+import { SIRET_STORAGE_KEY } from "../../Apps/common/Components/CompanySwitcher/CompanySwitcher";
 
-const COMPANY_ACCOUNT_ADD_PRIVATE_INFOS = gql`
+const COMPANY_PRIVATE_INFOS = gql`
   query CompanyPrivateInfos($clue: String!) {
     companyPrivateInfos(clue: $clue) {
       orgId
@@ -28,7 +29,7 @@ const { VITE_API_ENDPOINT } = import.meta.env;
 export function Impersonate() {
   const [search, { loading, error, data }] = useLazyQuery<
     Pick<Query, "companyPrivateInfos">
-  >(COMPANY_ACCOUNT_ADD_PRIVATE_INFOS);
+  >(COMPANY_PRIVATE_INFOS);
 
   const tableHeaders = ["Email", "Rôle", "Action"];
   const tableData =
@@ -37,7 +38,19 @@ export function Impersonate() {
       infos.role,
       <form action={`${VITE_API_ENDPOINT}/impersonate`} method="post">
         <input type="text" hidden value={infos.email} name="email" />
-        <Button priority="primary" size="small">
+
+        <Button
+          priority="primary"
+          size="small"
+          onClick={() =>
+            // set local storage siret for companyselector
+            !!data?.companyPrivateInfos?.siret &&
+            window.localStorage.setItem(
+              SIRET_STORAGE_KEY,
+              JSON.stringify(data.companyPrivateInfos.siret)
+            )
+          }
+        >
           Impersonner
         </Button>
       </form>

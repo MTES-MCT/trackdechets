@@ -27,7 +27,7 @@ import {
   CREATE_DRAFT_BSPAOH,
   GET_BSPAOH,
   UPDATE_BSPAOH
-} from "./utils/queries";
+} from "../../../../Apps/common/queries/bspaoh/queries";
 import { Waste } from "./steps/Waste";
 import { Emitter } from "./steps/Emitter";
 import { Transporter } from "./steps/Transporter";
