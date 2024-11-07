@@ -7,6 +7,7 @@ import {
 import { onError } from "@apollo/client/link/error";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { removeOrgId } from "./common/helper";
+import { localAuthService } from "./login/auth.service";
 
 /**
  * Automatically erase `__typename` from variables
@@ -48,6 +49,15 @@ const errorLink = onError(({ response, graphQLErrors }) => {
         // modify the response context to ignore the error
         // cf. https://www.apollographql.com/docs/react/data/error-handling/#ignoring-errors
         response!.errors = undefined;
+
+        if (
+          window.location.pathname !== "/" &&
+          window.location.pathname !== "/login"
+        ) {
+          // Logout
+          localAuthService.locallySignOut();
+          document?.forms["logout"]?.submit();
+        }
       }
     }
   }
