@@ -50,13 +50,16 @@ const errorLink = onError(({ response, graphQLErrors }) => {
         // cf. https://www.apollographql.com/docs/react/data/error-handling/#ignoring-errors
         response!.errors = undefined;
 
+        // If we catch an UNAUTHENTICATED exception at this point,
+        // the user session has probably expired. Redirect to login
+        // page with a hint in the URL to display a message
         if (
           window.location.pathname !== "/" &&
           window.location.pathname !== "/login"
         ) {
           // Logout
           localAuthService.locallySignOut();
-          document?.forms["logout"]?.submit();
+          window.location.href = "/login?session=expired";
         }
       }
     }
