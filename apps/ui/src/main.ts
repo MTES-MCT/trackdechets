@@ -47,6 +47,9 @@ app.use(
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
         mediaSrc: ["'self'", "data:"]
       }
+    },
+    referrerPolicy: {
+      policy: "strict-origin-when-cross-origin"
     }
   })
 );
