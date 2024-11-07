@@ -427,25 +427,6 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
       }),
       user: expect.objectContaining({ email: user0.email })
     });
-
-    // expect(
-    //   requests.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    // ).toEqual([
-    //   expect.objectContaining({
-    //     id: request1.id,
-    //     company: expect.objectContaining({
-    //       orgId: companyAndAdmin1.company.orgId
-    //     }),
-    //     user: expect.objectContaining({ email: user0.email })
-    //   }),
-    //   expect.objectContaining({
-    //     id: request0.id,
-    //     company: expect.objectContaining({
-    //       orgId: companyAndAdmin0.company.orgId
-    //     }),
-    //     user: expect.objectContaining({ email: user0.email })
-    //   })
-    // ]);
   });
 });
 
