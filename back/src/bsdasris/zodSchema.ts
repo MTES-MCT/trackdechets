@@ -141,7 +141,8 @@ const revisionRules: RevisionRules = {
       return [
         BsdasriStatus.SENT,
         BsdasriStatus.RECEIVED,
-        BsdasriStatus.PROCESSED
+        BsdasriStatus.PROCESSED,
+        BsdasriStatus.AWAITING_GROUP
       ];
     }
   },
@@ -155,7 +156,8 @@ const revisionRules: RevisionRules = {
       return [
         BsdasriStatus.SENT,
         BsdasriStatus.RECEIVED,
-        BsdasriStatus.PROCESSED
+        BsdasriStatus.PROCESSED,
+        BsdasriStatus.AWAITING_GROUP
       ];
     }
   },
@@ -170,7 +172,8 @@ const revisionRules: RevisionRules = {
       return [
         BsdasriStatus.SENT,
         BsdasriStatus.RECEIVED,
-        BsdasriStatus.PROCESSED
+        BsdasriStatus.PROCESSED,
+        BsdasriStatus.AWAITING_GROUP
       ];
     }
   },
@@ -184,7 +187,8 @@ const revisionRules: RevisionRules = {
       return [
         BsdasriStatus.SENT,
         BsdasriStatus.RECEIVED,
-        BsdasriStatus.PROCESSED
+        BsdasriStatus.PROCESSED,
+        BsdasriStatus.AWAITING_GROUP
       ];
     }
   },
@@ -198,7 +202,8 @@ const revisionRules: RevisionRules = {
       return [
         BsdasriStatus.SENT,
         BsdasriStatus.RECEIVED,
-        BsdasriStatus.PROCESSED
+        BsdasriStatus.PROCESSED,
+        BsdasriStatus.AWAITING_GROUP
       ];
     }
   },
@@ -214,7 +219,8 @@ const revisionRules: RevisionRules = {
       return [
         BsdasriStatus.SENT,
         BsdasriStatus.RECEIVED,
-        BsdasriStatus.PROCESSED
+        BsdasriStatus.PROCESSED,
+        BsdasriStatus.AWAITING_GROUP
       ];
     }
   },
@@ -226,21 +232,25 @@ const revisionRules: RevisionRules = {
       if (type === BsdasriType.SYNTHESIS) {
         return [];
       }
-      return [BsdasriStatus.RECEIVED, BsdasriStatus.PROCESSED];
+      return [
+        BsdasriStatus.RECEIVED,
+        BsdasriStatus.PROCESSED,
+        BsdasriStatus.AWAITING_GROUP
+      ];
     }
   },
   destinationOperationCode: {
     readableFieldName: "le code de traitement",
 
-    revisableFor: () => [BsdasriStatus.PROCESSED]
+    revisableFor: () => [BsdasriStatus.PROCESSED, BsdasriStatus.AWAITING_GROUP]
   },
   destinationOperationMode: {
     readableFieldName: "le mode de traitement",
-    revisableFor: () => [BsdasriStatus.PROCESSED]
+    revisableFor: () => [BsdasriStatus.PROCESSED, BsdasriStatus.AWAITING_GROUP]
   },
   destinationReceptionWasteWeightValue: {
     readableFieldName: "le poids de déchet traité",
-    revisableFor: () => [BsdasriStatus.PROCESSED]
+    revisableFor: () => [BsdasriStatus.PROCESSED, BsdasriStatus.AWAITING_GROUP]
   }
 };
 
