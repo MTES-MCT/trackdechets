@@ -33,9 +33,13 @@ type StepProps = {
 };
 
 const steps = [
-  { title: "Téléchargement du fichier", component: Step1 },
+  {
+    title: "Téléchargement du fichier",
+    component: Step1,
+    buttons: ["CANCEL", "VALIDATE"]
+  },
   { title: "Vérification", component: Step2 },
-  { title: "Importation", component: Step3 }
+  { title: "Importation", component: Step3, buttons: ["CANCEL", "CLOSE"] }
 ];
 
 const REGISTRY_UPLOAD_SIGNED_URL = gql`
@@ -118,23 +122,21 @@ export function ImportModal({ isOpen, onClose }: Props) {
       </div>
 
       <div className="td-modal-actions">
-        {currentStepIdx < steps.length - 1 ? (
-          <>
-            <button
-              className="fr-btn fr-btn--secondary"
-              onClick={closeAndReset}
-            >
-              Annuler
-            </button>
-            <button
-              className="fr-btn"
-              onClick={() => setCurrentStepIdx(currentStepIdx + 1)}
-              disabled={!isValid}
-            >
-              Valider
-            </button>
-          </>
-        ) : (
+        {steps[currentStepIdx].buttons?.includes("CANCEL") && (
+          <button className="fr-btn fr-btn--secondary" onClick={closeAndReset}>
+            Annuler
+          </button>
+        )}
+        {steps[currentStepIdx].buttons?.includes("VALIDATE") && (
+          <button
+            className="fr-btn"
+            onClick={() => setCurrentStepIdx(currentStepIdx + 1)}
+            disabled={!isValid}
+          >
+            Valider
+          </button>
+        )}
+        {steps[currentStepIdx].buttons?.includes("CLOSE") && (
           <button className="fr-btn" onClick={closeAndReset}>
             Fermer
           </button>
@@ -168,6 +170,7 @@ function Step1({ register }: StepProps) {
           Selectionnez une option
         </option>
         <option value="SSD">Sortie de statut de déchet</option>
+        <option value="INCOMING_WASTE">Déchet (non) dangereux entrant</option>
       </Select>
 
       <Upload

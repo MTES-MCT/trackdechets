@@ -14,6 +14,8 @@ export async function transformAndRefineReason(
     }
   });
 
+  incomingWasteItem.id = incomingWasteItemInDb?.id;
+
   // If the line alreary exists in DB and we dont have a reason, we can simply ignore it
   if (incomingWasteItemInDb && !incomingWasteItem.reason) {
     incomingWasteItem.reason = "IGNORER";
