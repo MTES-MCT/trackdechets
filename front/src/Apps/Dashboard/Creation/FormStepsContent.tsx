@@ -7,6 +7,7 @@ import { SealedFieldsContext } from "./context";
 import {
   NormalizedError,
   SupportedBsdTypes,
+  TabError,
   TabId,
   getNextTab,
   getPrevTab,
@@ -30,6 +31,7 @@ interface FormStepsContentProps {
   };
   setPublishErrors: (normalizedErrors: NormalizedError[]) => void;
   errorTabIds?: TabId[];
+  genericErrorMessage?: TabError[];
 }
 const FormStepsContent = ({
   bsdType,
@@ -41,7 +43,8 @@ const FormStepsContent = ({
   mainCtaLabel,
   saveForm,
   setPublishErrors,
-  errorTabIds
+  errorTabIds,
+  genericErrorMessage
 }: FormStepsContentProps) => {
   const [selectedTabId, setSelectedTabId] = useState<TabId>(TabId.waste);
   const navigate = useNavigate();
@@ -104,6 +107,7 @@ const FormStepsContent = ({
                 scrollToTop();
               }}
               onTabChange={onTabChange}
+              genericErrorMessage={genericErrorMessage}
             >
               {tabsContent[selectedTabId] ?? <p></p>}
             </FormStepsTabs>
