@@ -1,8 +1,8 @@
 export const INCOMING_WASTE_HEADERS = {
   reason: "Motif",
-  publicId: " Numéro unique",
+  publicId: "Numéro unique",
   reportAsSiret: "SIRET du déclarant",
-  reportForSiret: " SIRET du destinataire",
+  reportForSiret: "SIRET du destinataire",
   wasteCode: "Code déchet",
   wastePop: "POP",
   wasteIsDangerous: "Dangereux",

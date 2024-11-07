@@ -198,7 +198,8 @@ const transformedSsdSchema = z.object({
   reportForAddress: z.string().default(""),
   reportForCity: z.string().default(""),
   reportForPostalCode: z.string().default(""),
-  reportForName: z.coerce.string().default("")
+  reportForName: z.coerce.string().default(""),
+  id: z.string().optional()
 });
 
 export const ssdSchema = inputSsdSchema.merge(transformedSsdSchema);

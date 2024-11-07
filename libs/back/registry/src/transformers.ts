@@ -62,6 +62,7 @@ export function getTransformCsvStream(options: ImportOptions) {
 }
 
 export function getTransformXlsxStream(options: ImportOptions) {
+  // Create an inputStream to feed the WorkbookReader
   const inputStream = new PassThrough();
   const workbookReader = new Excel.stream.xlsx.WorkbookReader(inputStream, {});
 
@@ -86,7 +87,7 @@ export function getTransformXlsxStream(options: ImportOptions) {
         const rawLine = {};
         const keys = Object.keys(options.headers);
         for (const [index, key] of keys.entries()) {
-          rawLine[key] = row.getCell(index).value;
+          rawLine[key] = row.getCell(index + 1).value;
         }
 
         const result = await options.safeParseAsync(rawLine);
@@ -97,6 +98,7 @@ export function getTransformXlsxStream(options: ImportOptions) {
 
   const outputStream = Readable.from(createReader());
 
-  const xslxTransformStream = duplexify(inputStream, outputStream);
+  // Create a duplex (transform) stream from the passThrough & Exceljs ouput stream
+  const xslxTransformStream = duplexify.obj(inputStream, outputStream);
   return xslxTransformStream;
 }

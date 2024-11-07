@@ -12,16 +12,16 @@ export async function saveSsdLine({
   switch (line.reason) {
     case "MODIFIER":
       await prisma.$transaction(async tx => {
-        await tx.registrySsd.updateMany({
-          where: { publicId: line.publicId },
+        await tx.registrySsd.update({
+          where: { id: line.id },
           data: { isActive: false }
         });
         await tx.registrySsd.create({ data: { ...persistedData, importId } });
       });
       return;
     case "ANNULER":
-      await prisma.registrySsd.updateMany({
-        where: { publicId: line.publicId },
+      await prisma.registrySsd.update({
+        where: { id: line.id },
         data: { isCancelled: true }
       });
       return;

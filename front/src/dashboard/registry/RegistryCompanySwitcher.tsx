@@ -91,9 +91,17 @@ export function RegistryCompanySwitcher({ onCompanySelect }: Props) {
     [refetchMyCompanies, refetchDelegations]
   );
 
-  const displayedCount =
-    (myCompaniesData?.myCompanies.edges.length || 0) +
-    (delegationsData?.registryDelegations.edges.length || 0);
+  const myCompanies =
+    myCompaniesData?.myCompanies.edges.filter(edge => edge.node.siret) ?? [];
+  const delegationsSirets = new Set();
+  const delegations =
+    delegationsData?.registryDelegations.edges.filter(item => {
+      return delegationsSirets.has(item.node.delegator.orgId)
+        ? false
+        : delegationsSirets.add(item.node.delegator.orgId);
+    }) ?? [];
+
+  const displayedCount = (myCompanies.length || 0) + (delegations.length || 0);
   const totalCount =
     (myCompaniesData?.myCompanies.totalCount || 0) +
     (delegationsData?.registryDelegations.totalCount || 0);
@@ -112,7 +120,7 @@ export function RegistryCompanySwitcher({ onCompanySelect }: Props) {
           }
         }}
       >
-        {selectedItem}
+        <span className="tw-truncate">{selectedItem}</span>
         <span
           className={`${
             isOpen ? "fr-icon-arrow-up-s-line" : "fr-icon-arrow-down-s-line"
@@ -143,42 +151,40 @@ export function RegistryCompanySwitcher({ onCompanySelect }: Props) {
           }}
           label=""
         />
-        {myCompaniesData?.myCompanies.edges
-          .filter(edge => edge.node.siret)
-          .map(({ node }) => (
-            <div
-              className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-cursor-pointer"
-              onClick={() => {
+        {myCompanies.map(({ node }) => (
+          <div
+            className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-cursor-pointer"
+            onClick={() => {
+              onCompanySelect(node.orgId);
+              setSelectedItem(`${node.name} ${node.siret}`);
+              setIsOpen(false);
+            }}
+            onKeyDown={e => {
+              if (e.key === "Enter") {
                 onCompanySelect(node.orgId);
                 setSelectedItem(`${node.name} ${node.siret}`);
                 setIsOpen(false);
-              }}
-              onKeyDown={e => {
-                if (e.key === "Enter") {
-                  onCompanySelect(node.orgId);
-                  setSelectedItem(`${node.name} ${node.siret}`);
-                  setIsOpen(false);
-                }
-              }}
-              key={node.orgId}
-            >
-              {node.name} {node.siret}
-            </div>
-          ))}
-        {delegationsData?.registryDelegations.edges
+              }
+            }}
+            key={node.orgId}
+          >
+            {node.givenName ?? node.name} {node.siret}
+          </div>
+        ))}
+        {delegations
           .map(edge => edge.node.delegator)
           .map(delegator => (
             <div
               className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-flex tw-gap-4 tw-justify-between tw-items-center tw-cursor-pointer"
               onClick={() => {
                 onCompanySelect(delegator.orgId);
-                setSelectedItem(`${delegator.name} ${delegator.siret}`);
+                setSelectedItem(`${delegator.name} ${delegator.orgId}`);
                 setIsOpen(false);
               }}
               onKeyDown={e => {
                 if (e.key === "Enter") {
                   onCompanySelect(delegator.orgId);
-                  setSelectedItem(`${delegator.name} ${delegator.siret}`);
+                  setSelectedItem(`${delegator.name} ${delegator.orgId}`);
                   setIsOpen(false);
                 }
               }}

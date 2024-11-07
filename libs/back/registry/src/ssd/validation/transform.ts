@@ -15,6 +15,8 @@ export async function transformAndRefineReason(
     }
   });
 
+  ssdItem.id = ssdItemInDb?.id;
+
   // If the line alreary exists in DB and we dont have a reason, we can simply ignore it
   if (ssdItemInDb && !ssdItem.reason) {
     ssdItem.reason = "IGNORER";

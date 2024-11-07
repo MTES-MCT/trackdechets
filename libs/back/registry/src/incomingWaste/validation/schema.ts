@@ -221,6 +221,7 @@ const inputIncomingWasteSchema = z.object({
 
 // Props added through transform
 const transformedSsdSchema = z.object({
+  id: z.string().optional(),
   reportForAddress: z.string().default(""),
   reportForCity: z.string().default(""),
   reportForPostalCode: z.string().default(""),
