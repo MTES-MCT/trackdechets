@@ -553,7 +553,7 @@ model Form {
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
   intermediaries       IntermediaryFormAssociation[]
-  registrySummaries    RegistrySummary[]
+  registrySummaries    RegistryLookup[]
 
   forwarding    Form?   @relation("BsddForwarding")
   forwardedInId String? @unique
@@ -1106,7 +1106,7 @@ model Bsvhu {
   traderRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
   intermediaries    IntermediaryBsvhuAssociation[]
-  registrySummaries RegistrySummary[]
+  registrySummaries RegistryLookup[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1275,7 +1275,7 @@ model Bsdasri {
   synthesizedInId String?
 
   bsdasriRevisionRequests BsdasriRevisionRequest[]
-  registrySummaries       RegistrySummary[]
+  registrySummaries       RegistryLookup[]
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
   // Emitter sirets list in case of synthesis bsd
@@ -1438,7 +1438,7 @@ model Bsff {
   ficheInterventions BsffFicheIntervention[] @relation("BsffToBsffFicheIntervention")
   packagings         BsffPackaging[]
   transporters       BsffTransporter[]
-  registrySummaries  RegistrySummary[]
+  registrySummaries  RegistryLookup[]
 
   // Denormalized detenteur sirets to speed up query `bsffs`
   detenteurCompanySirets String[] @default([])
@@ -1705,7 +1705,7 @@ model Bsda {
   grouping             Bsda[]                        @relation("BsdaGrouping")
   bsdaRevisionRequests BsdaRevisionRequest[]
   intermediaries       IntermediaryBsdaAssociation[]
-  registrySummaries    RegistrySummary[]
+  registrySummaries    RegistryLookup[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1960,7 +1960,7 @@ model Bspaoh {
   nextTransporterOrgId                           String?
 
   transporters      BspaohTransporter[]
-  registrySummaries RegistrySummary[]
+  registrySummaries RegistryLookup[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   transportersSirets   String[] @default([])
@@ -2313,7 +2313,7 @@ model RegistrySsd {
   destinationPostalCode      String?
   destinationCountryCode     String?
 
-  registrySummaries RegistrySummary[]
+  registrySummaries RegistryLookup[]
 
   @@index([importId], map: "_RegistrySsdImportIdIdx")
   @@index([publicId], map: "_RegistrySsdPublicIdIdx")
@@ -2478,9 +2478,12 @@ model RegistryExport {
   @@index([createdById], map: "_RegistryExportCreatedByIdIdx")
 }
 
-model RegistrySummary {
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-
+model RegistryLookup {
+  createdAt          DateTime                      @default(now()) @db.Timestamptz(6)
+  // contains the id of the Registry entry or the id of the BSD
+  id                 String
+  // contains the publicId of the registry or the readableId of the BSD
+  // for support/display
   readableId         String
   reportAsSirets     String[]                      @default([])
   sirets             String[]
@@ -2508,7 +2511,7 @@ model RegistrySummary {
   bsvhuId   String?
   bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
 
-  @@id([readableId, exportRegistryType])
+  @@id([id, exportRegistryType])
   // pseudo-random with only "=" lookups so hash index is appropriate
   @@index([readableId], map: "_RegistryExportReadableIdIdx", type: Hash)
   // array of elements so gin index
