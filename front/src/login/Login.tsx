@@ -100,7 +100,7 @@ export default function Login() {
     </div>
   ) : null;
 
-  const disconectedAlert =
+  const disconnectedAlert =
     queries["session"] === "expired" ? (
       <div className="fr-grid-row fr-mb-2w">
         <Alert
@@ -121,7 +121,7 @@ export default function Login() {
       >
         <div className={`fr-container fr-pt-10w ${styles.centralContainer}`}>
           {createdAlert}
-          {disconectedAlert}
+          {disconnectedAlert}
           {alert}
           <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
             <div className="fr-col fr-m-auto">
