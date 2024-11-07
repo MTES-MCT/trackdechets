@@ -64,19 +64,31 @@ export function getTransformCsvStream(options: ImportOptions) {
 export function getTransformXlsxStream(options: ImportOptions) {
   // Create an inputStream to feed the WorkbookReader
   const inputStream = new PassThrough();
-  const workbookReader = new Excel.stream.xlsx.WorkbookReader(inputStream, {});
+  const workbookReader = new Excel.stream.xlsx.WorkbookReader(inputStream, {
+    entries: "emit",
+    sharedStrings: "cache",
+    hyperlinks: "cache",
+    styles: "cache",
+    worksheets: "emit"
+  });
 
   const createReader = async function* () {
     for await (const worksheetReader of workbookReader) {
       for await (const row of worksheetReader) {
-        if (row.number === 0) {
+        // In Excel, the first row is 1
+        if (row.number === 1) {
           const headerLabels = Object.values(options.headers);
 
           headerLabels.forEach((label, index) => {
-            const cellValue = row.getCell(index).value;
-            if (cellValue !== label) {
+            const {
+              value,
+              col: colLabel,
+              row: rowLabel
+            } = row.getCell(index + 1);
+
+            if (value !== label) {
               throw new Error(
-                `En-tête non valide à l'index ${index}. Attendu "${label}", reçu "${cellValue}"`
+                `En-tête non valide dans la cellule ${colLabel}:${rowLabel}. Attendu "${label}", reçu "${value}"`
               );
             }
           });
@@ -87,7 +99,8 @@ export function getTransformXlsxStream(options: ImportOptions) {
         const rawLine = {};
         const keys = Object.keys(options.headers);
         for (const [index, key] of keys.entries()) {
-          rawLine[key] = row.getCell(index + 1).value;
+          const { value } = row.getCell(index + 1);
+          rawLine[key] = value === null ? undefined : value;
         }
 
         const result = await options.safeParseAsync(rawLine);

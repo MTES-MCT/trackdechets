@@ -33,27 +33,49 @@ const inputSsdSchema = z.object({
       invalid_type_error:
         "Le SIRET de l'émetteur doit être une chaîne de caractères"
     })
-    .min(14, "Le SIRET de l'émetteur ne doit pas faire moins de 14 chiffres")
-    .max(14, "Le SIRET de l'émetteur ne doit pas faire plus de 14 chiffres")
     .refine(value => {
       return isSiret(value);
     }, "Le SIRET de l'émetteur n'est pas un SIRET valide"),
-  useDate: z.coerce
-    .date()
-    .min(
-      sub(new Date(), { years: 1 }),
-      "La date d'utilisation ne peut pas être antérieure à J-1an"
-    )
-    .max(new Date(), "La date d'utilisation ne peut pas être dans le futur")
-    .optional(),
-  dispatchDate: z.coerce
-    .date()
-    .min(
-      sub(new Date(), { years: 1 }),
-      "La date d'utilisation ne peut pas être antérieure à J-1an"
-    )
-    .max(new Date(), "La date d'utilisation ne peut pas être dans le futur")
-    .optional(),
+  useDate: z.union([
+    z.date().optional(),
+    z
+      .string()
+      .optional()
+      .transform(val => (val ? new Date(val) : undefined))
+      .pipe(
+        z
+          .date()
+          .min(
+            sub(new Date(), { years: 1 }),
+            "La date d'utilisation ne peut pas être antérieure à J-1an"
+          )
+          .max(
+            new Date(),
+            "La date d'utilisation ne peut pas être dans le futur"
+          )
+          .optional()
+      )
+  ]),
+  dispatchDate: z.union([
+    z.date().optional(),
+    z
+      .string()
+      .optional()
+      .transform(val => (val ? new Date(val) : undefined))
+      .pipe(
+        z
+          .date()
+          .min(
+            sub(new Date(), { years: 1 }),
+            "La date d'utilisation ne peut pas être antérieure à J-1an"
+          )
+          .max(
+            new Date(),
+            "La date d'utilisation ne peut pas être dans le futur"
+          )
+          .optional()
+      )
+  ]),
   wasteCode: wasteCodeSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
@@ -95,19 +117,19 @@ const inputSsdSchema = z.object({
             .string()
             .min(
               2,
-              "Les dénominations usuelles du déchet doivent faire au moins 2 charactères"
+              "Les dénominations usuelles du déchet doivent faire au moins 2 caractères"
             )
             .max(
               150,
-              "Les dénominations usuelles du déchet ne peuvent pas dépasser 150 charactères"
+              "Les dénominations usuelles du déchet ne peuvent pas dépasser 150 caractères"
             )
         )
         .optional()
     ),
   product: z
     .string()
-    .min(2, "Le produit doit faire au moins 2 charactères")
-    .max(75, "Le produit ne peut pas dépasser 75 charactères"),
+    .min(2, "Le produit doit faire au moins 2 caractères")
+    .max(75, "Le produit ne peut pas dépasser 75 caractères"),
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
@@ -118,17 +140,26 @@ const inputSsdSchema = z.object({
       "La date de traitement ne peut pas être antérieure à J-1 an"
     )
     .max(new Date(), "La date de traitement ne peut pas être dans le futur"),
-  processingEndDate: z.coerce
-    .date()
-    .min(
-      sub(new Date(), { years: 1 }),
-      "La date de fin de traitement ne peut pas être antérieure à J-1an"
-    )
-    .max(
-      new Date(),
-      "La date de fin de traitement ne peut pas être dans le futur"
-    )
-    .optional(),
+  processingEndDate: z.union([
+    z.date().optional(),
+    z
+      .string()
+      .optional()
+      .transform(val => (val ? new Date(val) : undefined))
+      .pipe(
+        z
+          .date()
+          .min(
+            sub(new Date(), { years: 1 }),
+            "La date de fin de traitement ne peut pas être antérieure à J-1an"
+          )
+          .max(
+            new Date(),
+            "La date de fin de traitement ne peut pas être dans le futur"
+          )
+          .optional()
+      )
+  ]),
   destinationType: getActorTypeSchema("de destinataire"),
   destinationOrgId: getActorOrgIdSchema("du destinataire"),
   destinationName: getActorNameSchema("du destinataire"),
@@ -181,11 +212,11 @@ const inputSsdSchema = z.object({
     .string()
     .min(
       8,
-      "La référence d'acte administratif doit faire au moins 8 charactères"
+      "La référence d'acte administratif doit faire au moins 8 caractères"
     )
     .max(
       100,
-      "La référence d'acte administratif ne peut pas dépasser 100 charactères"
+      "La référence d'acte administratif ne peut pas dépasser 100 caractères"
     )
     .refine(
       val => /^[a-zA-ZÀ-û0-9\s]+$/.test(val),

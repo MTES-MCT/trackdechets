@@ -29,23 +29,31 @@ export const publicIdSchema = z
     invalid_type_error: "Le numéro unique doit être une chaîne de caractères"
   })
   .min(1, "Le numéro unique doit faire au moins 2 caractères")
-  .max(36, "Le numéro unique ne peut pas dépasser 36 charactères")
+  .max(36, "Le numéro unique ne peut pas dépasser 36 caractères")
   .refine(val => /^[a-zA-Z0-9-_./]+$/.test(val), {
     message:
       "Le numéro unique ne peut contenir que des lettres, des chiffres, des tirets, des underscores et des points"
   });
 
-export const reportAsSiretSchema = z.coerce
-  .string({
-    invalid_type_error:
-      "Le SIRET du déclarant doit être une chaîne de caractères"
-  })
-  .min(14, "Le SIRET du déclarant ne doit pas faire moins de 14 chiffres")
-  .max(14, "Le SIRET du déclarant ne doit pas faire plus de 14 chiffres")
-  .refine(value => {
-    return isSiret(value);
-  }, "Le SIRET du déclarant n'est pas un SIRET valide")
-  .optional();
+export const reportAsSiretSchema = z
+  .union([
+    z.string().optional(),
+    z
+      .number()
+      .optional()
+      .transform(val => (val ? String(val) : undefined))
+  ])
+  .pipe(
+    z
+      .string({
+        invalid_type_error:
+          "Le SIRET du déclarant doit être une chaîne de caractères"
+      })
+      .refine(value => {
+        return isSiret(value);
+      }, "Le SIRET du déclarant n'est pas un SIRET valide")
+      .optional()
+  );
 
 export const wasteCodeSchema = z.nativeEnum(BSDD_WASTE_CODES_ENUM, {
   required_error: "Le code déchet est requis",
@@ -55,10 +63,10 @@ export const wasteCodeSchema = z.nativeEnum(BSDD_WASTE_CODES_ENUM, {
 
 export const wasteDescriptionSchema = z
   .string()
-  .min(2, "La dénomination usuelle du déchet doit faire au moins 2 charactères")
+  .min(2, "La dénomination usuelle du déchet doit faire au moins 2 caractères")
   .max(
     150,
-    "La dénomination usuelle du déchet ne peut pas dépasser 150 charactères"
+    "La dénomination usuelle du déchet ne peut pas dépasser 150 caractères"
   );
 
 export const wasteCodeBaleSchema = z.enum(WASTE_CODES_BALE).optional();
@@ -97,15 +105,21 @@ export const weightIsEstimateSchema = z.union(
   { invalid_type_error: "Le type de poids saisi n'est pas valide" }
 );
 
-export const volumeSchema = z.coerce
-  .number({
-    required_error: "La quantité est requise",
-    invalid_type_error: "La quantité doit être un nombre"
-  })
-  .min(0, "La quantité ne peut pas être inférieure à 0")
-  .max(100_000_000, "La quantité ne peut pas dépasser 100 000 000")
-  .multipleOf(0.001, "La quantité ne doit pas avoir plus de 3 décimales")
-  .optional();
+export const volumeSchema = z
+  .string()
+  .optional()
+  .transform(val => (val ? Number(val) : undefined))
+  .pipe(
+    z
+      .number({
+        required_error: "La quantité est requise",
+        invalid_type_error: "La quantité doit être un nombre"
+      })
+      .min(0, "La quantité ne peut pas être inférieure à 0")
+      .max(100_000_000, "La quantité ne peut pas dépasser 100 000 000")
+      .multipleOf(0.001, "La quantité ne doit pas avoir plus de 3 décimales")
+      .optional()
+  );
 
 export const getActorTypeSchema = (name: string) =>
   z.enum(
@@ -118,15 +132,22 @@ export const getActorTypeSchema = (name: string) =>
 
 export const getActorOrgIdSchema = (name: string) =>
   z
-    .string()
-    .min(1, `Le numéro d'identification ${name} doit faire plus d'1 charactère`)
-    .max(
-      27,
-      `Le numéro d'identification ${name} ne peut pas dépasser 27 charactères`
+    .union([z.string(), z.number().transform(val => String(val))])
+    .pipe(
+      z
+        .string()
+        .min(
+          1,
+          `Le numéro d'identification ${name} doit faire plus d'1 caractère`
+        )
+        .max(
+          27,
+          `Le numéro d'identification ${name} ne peut pas dépasser 27 caractères`
+        )
     );
 
 export const getActorSiretSchema = (name: string) =>
-  z.coerce
+  z
     .string({
       invalid_type_error: `Le SIRET ${name} doit être une chaîne de caractères`
     })
@@ -140,19 +161,19 @@ export const getActorSiretSchema = (name: string) =>
 export const getActorNameSchema = (name: string) =>
   z
     .string()
-    .min(2, `Le nom ${name} ne peut pas faire moins de 2 charactères`)
-    .max(150, `Le nom ${name} ne peut pas dépasser 150 charactères`);
+    .min(2, `Le nom ${name} ne peut pas faire moins de 2 caractères`)
+    .max(150, `Le nom ${name} ne peut pas dépasser 150 caractères`);
 
 export const getActorAddressSchema = (name: string) =>
   z
     .string()
     .min(
       2,
-      `Le libellé de la commune ${name} ne peut pas faire moins de 2 charactères`
+      `Le libellé de la commune ${name} ne peut pas faire moins de 2 caractères`
     )
     .max(
       150,
-      `Le libellé de la commune ${name} ne peut pas dépasser 150 charactères`
+      `Le libellé de la commune ${name} ne peut pas dépasser 150 caractères`
     );
 
 export const getActorCitySchema = (name: string) =>
@@ -160,15 +181,15 @@ export const getActorCitySchema = (name: string) =>
     .string()
     .min(
       2,
-      `Le libellé de la commune ${name} ne peut pas faire moins de 2 charactères`
+      `Le libellé de la commune ${name} ne peut pas faire moins de 2 caractères`
     )
     .max(
       45,
-      `Le libellé de la commune ${name} ne peut pas dépasser 45 charactères`
+      `Le libellé de la commune ${name} ne peut pas dépasser 45 caractères`
     );
 
 export const getActorPostalCodeSchema = (name: string) =>
-  z.string().refine(val => {
+  z.coerce.string().refine(val => {
     if (!val) return true;
     return /^[0-9]{5,6}$/.test(val);
   }, `Le code postal ${name} n'est pas valide. Il doit être composé de 5 ou 6 chiffres`);
