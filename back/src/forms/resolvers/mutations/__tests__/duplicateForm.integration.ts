@@ -185,7 +185,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyMail,
       recipientIsTempStorage,
       wasteDetailsCode,
-      wasteDetailsOnuCode,
       wasteDetailsPackagingInfos,
       wasteDetailsQuantity,
       wasteDetailsQuantityType,
@@ -295,7 +294,8 @@ describe("Mutation.duplicateForm", () => {
       "quantityGrouped",
       "citerneNotWashedOutReason",
       "hasCiterneBeenWashedOut",
-      "emptyReturnADR"
+      "emptyReturnADR",
+      "wasteDetailsOnuCode"
     ];
 
     const expectedSkippedTransporter = [
@@ -364,7 +364,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyMail,
       recipientIsTempStorage,
       wasteDetailsCode,
-      wasteDetailsOnuCode,
       wasteDetailsQuantityType,
       wasteDetailsPop,
       wasteDetailsIsDangerous,
@@ -457,7 +456,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyMail,
       wasteDetailsCode,
       wasteDetailsPackagingInfos,
-      wasteDetailsOnuCode,
       wasteDetailsPop,
       wasteDetailsIsDangerous,
       wasteDetailsName,
@@ -514,7 +512,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyMail,
       wasteDetailsCode,
       wasteDetailsPackagingInfos,
-      wasteDetailsOnuCode,
       wasteDetailsPop,
       wasteDetailsIsDangerous,
       wasteDetailsName,
@@ -622,7 +619,8 @@ describe("Mutation.duplicateForm", () => {
       "quantityGrouped",
       "citerneNotWashedOutReason",
       "hasCiterneBeenWashedOut",
-      "emptyReturnADR"
+      "emptyReturnADR",
+      "wasteDetailsOnuCode"
     ];
 
     // make sure this test breaks when a new field is added to the Form model
