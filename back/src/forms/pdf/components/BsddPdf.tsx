@@ -73,11 +73,20 @@ function ReceiptFields({
 }
 
 type QuantityFieldsProps = {
+  isSubjectToADR?: boolean | null;
   quantity?: number | null;
   quantityType?: QuantityType | null;
 };
 
-function QuantityFields({ quantity, quantityType }: QuantityFieldsProps) {
+function QuantityFields({
+  isSubjectToADR,
+  quantity,
+  quantityType
+}: QuantityFieldsProps) {
+  const displayADRArticle =
+    quantityType === QuantityType.ESTIMATED &&
+    (!isDefined(isSubjectToADR) || isSubjectToADR === true);
+
   return (
     <p>
       Tonne(s) : {quantity}
@@ -96,7 +105,9 @@ function QuantityFields({ quantity, quantityType }: QuantityFieldsProps) {
       />{" "}
       Estimée
       <br />
-      "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
+      {displayADRArticle && (
+        <>"QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2"</>
+      )}
     </p>
   );
 }
