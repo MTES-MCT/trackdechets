@@ -41,7 +41,7 @@ export const companyDigestPdfDownloadHandler: DownloadHandler<QueryCompanyDigest
         resp.data.pipe(
           createPDFResponse(res, `fiche-${companyDigest.orgId}.pdf`)
         );
-      } catch (e) {
+      } catch (_) {
         logger.error(
           `Failed to retrieve companyDigest ${companyDigest.distantId}`
         );

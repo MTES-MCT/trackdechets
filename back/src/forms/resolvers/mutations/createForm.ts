@@ -227,17 +227,19 @@ const createFormResolver = async (
     );
     const newForm = await create(formCreateInput);
     if (isGroupement) {
-      newForm.emitterType === EmitterType.APPENDIX1
-        ? await setAppendix1({
-            form: newForm,
-            newAppendix1Fractions: formFractions!,
-            currentAppendix1Forms: []
-          })
-        : await setAppendix2({
-            form: newForm,
-            appendix2: formFractions!,
-            currentAppendix2Forms: []
-          });
+      if (newForm.emitterType === EmitterType.APPENDIX1) {
+        await setAppendix1({
+          form: newForm,
+          newAppendix1Fractions: formFractions!,
+          currentAppendix1Forms: []
+        });
+      } else {
+        await setAppendix2({
+          form: newForm,
+          appendix2: formFractions!,
+          currentAppendix2Forms: []
+        });
+      }
     }
 
     return newForm;

@@ -133,7 +133,7 @@ export async function run() {
               id: correspondingEvent.actor
             }
           });
-        } catch (error) {
+        } catch (_) {
           logger.error(`failed to fetch user ${correspondingEvent.actor}`);
         }
       }
@@ -164,7 +164,7 @@ export async function run() {
         let userCompanies: Company[] = [];
         try {
           userCompanies = await getUserCompanies(user.id as string);
-        } catch (error) {
+        } catch (_) {
           logger.error(`failed to fetch companies of user ${user.id}`);
         }
         const userOrgIds = userCompanies.map(company => company.orgId);

@@ -116,7 +116,6 @@ async function getDuplicateFormInput(
     recipientCompanyMail: recipient?.contactEmail ?? form.recipientCompanyMail,
     recipientIsTempStorage: form.recipientIsTempStorage,
     wasteDetailsCode: form.wasteDetailsCode,
-    wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     wasteDetailsPackagingInfos: Prisma.JsonNull,
     wasteDetailsQuantity: 0,
     wasteDetailsQuantityType: form.wasteDetailsQuantityType,
@@ -235,7 +234,6 @@ async function getDuplicateFormForwardedInInput(
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       form.wasteDetailsPackagingInfos
     ),
-    wasteDetailsOnuCode: forwardedIn.wasteDetailsOnuCode,
     wasteDetailsPop: forwardedIn.wasteDetailsPop,
     wasteDetailsIsDangerous: forwardedIn.wasteDetailsIsDangerous,
     wasteDetailsName: forwardedIn.wasteDetailsName,

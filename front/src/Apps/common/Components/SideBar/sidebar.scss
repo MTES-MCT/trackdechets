@@ -8,6 +8,7 @@
   border-right: solid 1px $grey-light;
   position: sticky;
   top: 56px;
+  flex-shrink: 0;
 
   &__item {
     display: -webkit-box;
@@ -15,7 +16,7 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    word-break: break-all;
+    word-break: break-word;
     line-height: 30px;
     border-left: 3px solid transparent;
     padding-left: 1rem;
