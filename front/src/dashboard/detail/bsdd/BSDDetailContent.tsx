@@ -837,10 +837,8 @@ export default function BSDDetailContent({
             <div className={styles.detailGrid}>
               <dt>Mention ADR</dt>
               <dd>{getFormStateSummaryADRMention(form?.stateSummary)}</dd>
-
               <dt>Mention RID, ADNR, IMDG</dt>
               <dd>{form?.stateSummary?.nonRoadRegulationMention}</dd>
-              
               <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
               {form?.wasteDetails?.sampleNumber && (
                 <>
