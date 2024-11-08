@@ -8,12 +8,12 @@ export async function saveSsdLine({
   line: ParsedZodSsdItem & { createdById: string };
   importId: string | null;
 }) {
-  const { reason, ...persistedData } = line;
+  const { reason, id, ...persistedData } = line;
   switch (line.reason) {
     case "MODIFIER":
       await prisma.$transaction(async tx => {
         await tx.registrySsd.update({
-          where: { id: line.id },
+          where: { id },
           data: { isActive: false }
         });
         await tx.registrySsd.create({ data: { ...persistedData, importId } });
@@ -21,7 +21,7 @@ export async function saveSsdLine({
       return;
     case "ANNULER":
       await prisma.registrySsd.update({
-        where: { id: line.id },
+        where: { id },
         data: { isCancelled: true }
       });
       return;

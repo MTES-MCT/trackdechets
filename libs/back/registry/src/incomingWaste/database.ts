@@ -8,12 +8,12 @@ export async function saveIncomingWasteLine({
   line: ParsedZodIncomingWasteItem & { createdById: string };
   importId: string | null;
 }) {
-  const { reason, ...persistedData } = line;
+  const { reason, id, ...persistedData } = line;
   switch (line.reason) {
     case "MODIFIER":
       await prisma.$transaction(async tx => {
-        await tx.registryIncomingWaste.updateMany({
-          where: { publicId: line.publicId },
+        await tx.registryIncomingWaste.update({
+          where: { id },
           data: { isActive: false }
         });
         await tx.registryIncomingWaste.create({
@@ -22,8 +22,8 @@ export async function saveIncomingWasteLine({
       });
       return;
     case "ANNULER":
-      await prisma.registryIncomingWaste.updateMany({
-        where: { publicId: line.publicId },
+      await prisma.registryIncomingWaste.update({
+        where: { id },
         data: { isCancelled: true }
       });
       return;
