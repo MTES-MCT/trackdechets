@@ -16,7 +16,11 @@ import {
 } from "../../../generated/graphql/types";
 
 import { buildAddress } from "../../../companies/sirene/utils";
-import { isDangerous, packagingsEqual } from "@td/constants";
+import {
+  getFormWasteDetailsADRMention,
+  isDangerous,
+  packagingsEqual
+} from "@td/constants";
 import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { FormCompanyDetails } from "../../../common/pdf/components/FormCompanyDetails";
@@ -721,10 +725,10 @@ export function BsddPdf({
               {isDefined(form.emptyReturnADR) ? (
                 <>
                   {getEmptyReturnADRLabel(form.emptyReturnADR)?.toUpperCase()}:{" "}
-                  {form.wasteDetails?.onuCode}
+                  {getFormWasteDetailsADRMention(form.wasteDetails)}
                 </>
               ) : (
-                <>{form.wasteDetails?.onuCode}</>
+                <>{getFormWasteDetailsADRMention(form.wasteDetails)}</>
               )}
             </p>
           </div>
@@ -1051,9 +1055,13 @@ export function BsddPdf({
                     échéant) :
                   </strong>
                 </p>
-                {isRepackaging ? (
-                  <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
-                ) : null}
+                {isRepackaging && (
+                  <p>
+                    {getFormWasteDetailsADRMention(
+                      form.temporaryStorageDetail?.wasteDetails
+                    )}
+                  </p>
+                )}
               </div>
             </div>
 

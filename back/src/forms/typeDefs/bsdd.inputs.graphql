@@ -622,6 +622,9 @@ input WasteDetailsInput {
   "Dénomination usuelle. Obligatoire"
   name: String
 
+  "Si le déchet est soumis à l'ADR"
+  isSubjectToADR: Boolean
+
   "Mention au titre du règlement ADR. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."
   onuCode: String
 

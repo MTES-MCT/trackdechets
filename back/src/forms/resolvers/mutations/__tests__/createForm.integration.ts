@@ -2194,6 +2194,40 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
+  it.each(["", "     "])(
+    "should convert empty onuCode to null",
+    async onuCode => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              company: { siret: company.siret }
+            },
+            wasteDetails: {
+              onuCode
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const form = await prisma.form.findFirstOrThrow({
+        where: { id: data.createForm.id }
+      });
+
+      expect(form.wasteDetailsOnuCode).toBeNull();
+    }
+  );
   it("should allow to create a form with a nonRoadRegulationMention", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");

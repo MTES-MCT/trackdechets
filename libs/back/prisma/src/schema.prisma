@@ -479,6 +479,7 @@ model Form {
   recipientIsTempStorage                Boolean?                   @default(false)
   wasteDetailsCode                      String?
   wasteDetailsName                      String?
+  wasteDetailsIsSubjectToADR            Boolean?
   wasteDetailsOnuCode                   String?
   wasteDetailsNonRoadRegulationMention  String?
   wasteDetailsQuantity                  Decimal?                   @db.Decimal(65, 30)

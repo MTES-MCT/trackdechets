@@ -11,6 +11,7 @@ import {
   DsfrDataListDescription
 } from "../../../../common/components";
 import { isDefined } from "../../../../common/helper";
+import { getFormWasteDetailsADRMention } from "@td/constants";
 
 interface FormWasteSummaryProps {
   form: Form;
@@ -51,7 +52,7 @@ export function FormWasteSummary({ form }: FormWasteSummaryProps) {
       <DataListItem>
         <DataListTerm>Mention ADR</DataListTerm>
         <DataListDescription>
-          {form.wasteDetails?.onuCode ?? "Non soumis"}
+          {getFormWasteDetailsADRMention(form.wasteDetails)}
         </DataListDescription>
       </DataListItem>
     </DataList>

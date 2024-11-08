@@ -11,6 +11,7 @@ import {
 import { Bsdd } from "./types";
 import { RegistryForm } from "../registry/elastic";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
+import { getFormADRMention } from "@td/constants";
 
 /**
  * Convert a simple form (without temporary storage) to a BSDD v2
@@ -90,7 +91,7 @@ export function simpleFormToBsdd(
     weightValue: form.wasteDetailsQuantity
       ? form.wasteDetailsQuantity.toNumber()
       : null,
-    wasteAdr: form.wasteDetailsOnuCode,
+    wasteAdr: getFormADRMention(form) ?? null,
     nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
     weightIsEstimate: form.wasteDetailsQuantityType == QuantityType.ESTIMATED,
     transporterCompanyName: transporter?.transporterCompanyName,

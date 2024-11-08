@@ -109,6 +109,10 @@ function flattenWasteDetailsInput(input: {
 }) {
   return {
     wasteDetailsCode: chain(input.wasteDetails, w => w.code),
+    wasteDetailsIsSubjectToADR: chain(
+      input.wasteDetails,
+      w => w.isSubjectToADR
+    ),
     wasteDetailsOnuCode: chain(input.wasteDetails, w => w.onuCode),
     wasteDetailsNonRoadRegulationMention: chain(
       input.wasteDetails,
@@ -677,6 +681,7 @@ export function expandFormFromDb(
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
       name: form.wasteDetailsName,
+      isSubjectToADR: form.wasteDetailsIsSubjectToADR,
       onuCode: form.wasteDetailsOnuCode,
       nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
       packagingInfos: form.wasteDetailsPackagingInfos as PackagingInfo[],
@@ -856,6 +861,7 @@ export function expandFormFromDb(
           wasteDetails: nullIfNoValues<WasteDetails>({
             code: forwardedIn.wasteDetailsCode,
             name: forwardedIn.wasteDetailsName,
+            isSubjectToADR: forwardedIn.wasteDetailsIsSubjectToADR,
             onuCode: forwardedIn.wasteDetailsOnuCode,
             nonRoadRegulationMention:
               forwardedIn.wasteDetailsNonRoadRegulationMention,

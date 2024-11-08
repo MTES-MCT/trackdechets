@@ -644,6 +644,253 @@ describe("Mutation.markAsSealed", () => {
     expect(data.markAsSealed.status).toBe("SEALED");
   });
 
+  describe("Mention ADR", () => {
+    describe("new ADR switch", () => {
+      it.each([undefined, null, ""])(
+        "if wastes is subject to ADR, onuCode cannot be %p",
+        async wasteDetailsOnuCode => {
+          // Given
+          const { user, company: emitterCompany } =
+            await userWithCompanyFactory("MEMBER");
+          const recipientCompany = await destinationFactory();
+          const form = await formFactory({
+            ownerId: user.id,
+            opt: {
+              status: "DRAFT",
+              emitterCompanySiret: emitterCompany.siret,
+              recipientCompanySiret: recipientCompany.siret,
+              wasteDetailsIsSubjectToADR: true,
+              wasteDetailsOnuCode
+            }
+          });
+
+          // When
+          const { mutate } = makeClient(user);
+          const { errors } = await mutate(MARK_AS_SEALED, {
+            variables: {
+              id: form.id
+            }
+          });
+
+          // Then
+          expect(errors).not.toBeUndefined();
+          expect(errors).toEqual([
+            expect.objectContaining({
+              message: [
+                "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
+                `Erreur(s): Le déchet est soumis à l'ADR. Vous devez préciser la mention correspondante.`
+              ].join("\n")
+            })
+          ]);
+        }
+      );
+
+      it.each([undefined, null, ""])(
+        "if waste is not subject to ADR, onuCode can be %p",
+        async wasteDetailsOnuCode => {
+          // Given
+          const { user, company: emitterCompany } =
+            await userWithCompanyFactory("MEMBER");
+          const recipientCompany = await destinationFactory();
+          const form = await formFactory({
+            ownerId: user.id,
+            opt: {
+              status: "DRAFT",
+              emitterCompanySiret: emitterCompany.siret,
+              recipientCompanySiret: recipientCompany.siret,
+              wasteDetailsIsSubjectToADR: false,
+              wasteDetailsOnuCode
+            }
+          });
+
+          // When
+          const { mutate } = makeClient(user);
+          const { errors } = await mutate(MARK_AS_SEALED, {
+            variables: {
+              id: form.id
+            }
+          });
+
+          // Then
+          expect(errors).toBeUndefined();
+        }
+      );
+
+      it("should not be allowed to provide onuCode for wastes not subject to ADR", async () => {
+        // Given
+        const { user, company: emitterCompany } = await userWithCompanyFactory(
+          "MEMBER"
+        );
+        const recipientCompany = await destinationFactory();
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status: "DRAFT",
+            emitterCompanySiret: emitterCompany.siret,
+            recipientCompanySiret: recipientCompany.siret,
+            wasteDetailsIsSubjectToADR: false,
+            wasteDetailsOnuCode: "Some ADR mention"
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate(MARK_AS_SEALED, {
+          variables: {
+            id: form.id
+          }
+        });
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors).toEqual([
+          expect.objectContaining({
+            message: [
+              "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
+              `Erreur(s): Le déchet n'est pas soumis à l'ADR. Vous ne pouvez pas préciser de mention ADR.`
+            ].join("\n")
+          })
+        ]);
+      });
+
+      it("waste subject to ADR + onuCode", async () => {
+        // Given
+        const { user, company: emitterCompany } = await userWithCompanyFactory(
+          "MEMBER"
+        );
+        const recipientCompany = await destinationFactory();
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status: "DRAFT",
+            emitterCompanySiret: emitterCompany.siret,
+            recipientCompanySiret: recipientCompany.siret,
+            wasteDetailsIsSubjectToADR: true,
+            wasteDetailsOnuCode: "ADR mention!"
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate(MARK_AS_SEALED, {
+          variables: {
+            id: form.id
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+      });
+    });
+
+    describe("legacy", () => {
+      it.each([undefined, null, ""])(
+        "if waste is not dangerous, onuCode can be %p",
+        async wasteDetailsOnuCode => {
+          // Given
+          const { user, company: emitterCompany } =
+            await userWithCompanyFactory("MEMBER");
+          const recipientCompany = await destinationFactory();
+          const form = await formFactory({
+            ownerId: user.id,
+            opt: {
+              status: "DRAFT",
+              emitterCompanySiret: emitterCompany.siret,
+              recipientCompanySiret: recipientCompany.siret,
+              wasteDetailsIsSubjectToADR: null,
+              wasteDetailsCode: "01 01 01",
+              wasteDetailsIsDangerous: false,
+              wasteDetailsOnuCode
+            }
+          });
+
+          // When
+          const { mutate } = makeClient(user);
+          const { errors } = await mutate(MARK_AS_SEALED, {
+            variables: {
+              id: form.id
+            }
+          });
+
+          // Then
+          expect(errors).toBeUndefined();
+        }
+      );
+
+      it.each([undefined, null, ""])(
+        "if waste is dangerous, onuCode can not be %p",
+        async wasteDetailsOnuCode => {
+          // Given
+          const { user, company: emitterCompany } =
+            await userWithCompanyFactory("MEMBER");
+          const recipientCompany = await destinationFactory();
+          const form = await formFactory({
+            ownerId: user.id,
+            opt: {
+              status: "DRAFT",
+              emitterCompanySiret: emitterCompany.siret,
+              recipientCompanySiret: recipientCompany.siret,
+              wasteDetailsIsSubjectToADR: null,
+              wasteDetailsCode: "01 03 04*",
+              wasteDetailsIsDangerous: true,
+              wasteDetailsOnuCode
+            }
+          });
+
+          // When
+          const { mutate } = makeClient(user);
+          const { errors } = await mutate(MARK_AS_SEALED, {
+            variables: {
+              id: form.id
+            }
+          });
+
+          // Then
+          expect(errors).not.toBeUndefined();
+          expect(errors).toEqual([
+            expect.objectContaining({
+              message: [
+                "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
+                `Erreur(s): La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
+              ].join("\n")
+            })
+          ]);
+        }
+      );
+
+      it("waste is dangerous + onuCode", async () => {
+        // Given
+        const { user, company: emitterCompany } = await userWithCompanyFactory(
+          "MEMBER"
+        );
+        const recipientCompany = await destinationFactory();
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status: "DRAFT",
+            emitterCompanySiret: emitterCompany.siret,
+            recipientCompanySiret: recipientCompany.siret,
+            wasteDetailsIsSubjectToADR: null,
+            wasteDetailsCode: "01 03 04*",
+            wasteDetailsIsDangerous: true,
+            wasteDetailsOnuCode: "Some ADR mention"
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate(MARK_AS_SEALED, {
+          variables: {
+            id: form.id
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+      });
+    });
+  });
+
   it("should be optional to provide packagings", async () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
       "MEMBER"

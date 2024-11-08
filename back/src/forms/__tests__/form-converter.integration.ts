@@ -119,6 +119,7 @@ describe("expandFormFromDb", () => {
       wasteDetails: {
         code: form.wasteDetailsCode,
         name: form.wasteDetailsName,
+        isSubjectToADR: form.wasteDetailsIsSubjectToADR,
         onuCode: form.wasteDetailsOnuCode,
         nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
         packagingInfos: form.wasteDetailsPackagingInfos,
@@ -211,6 +212,7 @@ describe("expandFormFromDb", () => {
       wasteDetails: {
         code: forwardedIn!.wasteDetailsCode,
         name: forwardedIn!.wasteDetailsName,
+        isSubjectToADR: forwardedIn!.wasteDetailsIsSubjectToADR,
         onuCode: forwardedIn!.wasteDetailsOnuCode,
         nonRoadRegulationMention:
           forwardedIn!.wasteDetailsNonRoadRegulationMention,
