@@ -289,7 +289,7 @@ type StateSummary {
   "Packaging le plus à jour"
   packagingInfos: [PackagingInfo!]!
 
-  "Code ONU le plus à jour"
+  "Mention au titre du règlement ADR la plus à jour"
   onuCode: String
 
   "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
@@ -520,7 +520,7 @@ type WasteDetails {
   "Dénomination usuelle"
   name: String
 
-  "Code ONU"
+  "Mention au titre du règlement ADR"
   onuCode: String
 
   "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
