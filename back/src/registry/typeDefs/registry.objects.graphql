@@ -1982,3 +1982,30 @@ type SignedUrlResponse {
   fileKey: String!
   signedUrl: String!
 }
+
+type RegistryExportConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [RegistryExportEdge!]!
+}
+
+type RegistryExportEdge {
+  cursor: String!
+  node: RegistryExport!
+}
+
+type RegistryExport {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: User!
+  status: RegistryExportStatus!
+  siret: String
+  registryType: WasteRegistryType!
+  wasteTypes: [WasteType!]
+  wasteCodes: [String!]
+  declarationType: DeclarationType!
+  startDate: DateTime!
+  endDate: DateTime
+  format: FormsRegisterExportFormat!
+}

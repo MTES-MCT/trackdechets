@@ -313,7 +313,6 @@ model Company {
 
   delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
   delegateRegistryDelegations  RegistryDelegation[] @relation("RegistryDelegationDelegate")
-  registryExports              RegistryExport[]
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -2461,10 +2460,12 @@ model RegistryExport {
   updatedAt   DateTime             @updatedAt @db.Timestamptz(6)
   createdById String
   status      RegistryExportStatus @default(PENDING)
-  s3FileKey   String
+  s3FileKey   String?
 
-  companyId       String?
-  type            RegistryExportType?
+  // if this export is made as a delegate
+  delegateSiret   String?
+  sirets          String[]
+  registryType    RegistryExportType?
   wasteTypes      RegistryExportWasteType[]      @default([])
   wasteCodes      String[]                       @default([])
   declarationType RegistryExportDeclarationType?
@@ -2472,10 +2473,10 @@ model RegistryExport {
   endDate         DateTime?
   format          RegistryExportFormat
 
-  createdBy User     @relation(fields: [createdById], references: [id])
-  company   Company? @relation(fields: [companyId], references: [id])
+  createdBy User @relation(fields: [createdById], references: [id])
 
   @@index([createdById], map: "_RegistryExportCreatedByIdIdx")
+  @@index([sirets], map: "_RegistryExportSiretsIdx", type: Gin)
 }
 
 model RegistryLookup {
@@ -2513,17 +2514,17 @@ model RegistryLookup {
 
   @@id([id, exportRegistryType])
   // pseudo-random with only "=" lookups so hash index is appropriate
-  @@index([readableId], map: "_RegistryExportReadableIdIdx", type: Hash)
+  @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
   // array of elements so gin index
-  @@index([reportAsSirets], map: "_RegistryExportReportAsSiretsIdx", type: Gin)
+  @@index([reportAsSirets], map: "_RegistryLookupReportAsSiretsIdx", type: Gin)
   // a btree_gin multi column index with [date(sort: Desc), sirets, exportRegistryType] could be advantageous but currently not supported by prisma
   // https://www.postgresql.org/docs/current/btree-gin.html
   // https://www.prisma.io/docs/orm/prisma-schema/postgresql-extensions
   // array of elements so gin index
-  @@index([sirets], map: "_RegistryExportSiretsIdx", type: Gin)
+  @@index([sirets], map: "_RegistryLookupSiretsIdx", type: Gin)
   // multi-column index because those columns are mandatory for any export
-  @@index([date(sort: Desc), exportRegistryType], map: "_RegistryExportMainIdx")
-  @@index([declarationType], map: "_RegistryExportDeclarationTypeIdx")
-  @@index([wasteType], map: "_RegistryExportWasteTypeIdx")
-  @@index([wasteCode], map: "_RegistryExportWasteCodeIdx")
+  @@index([date(sort: Desc), exportRegistryType], map: "_RegistryLookupMainIdx")
+  @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
+  @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
+  @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
 }
