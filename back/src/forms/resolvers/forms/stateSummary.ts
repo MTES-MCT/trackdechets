@@ -92,6 +92,10 @@ export function getStateSummary(form: Form) {
     ? form.temporaryStorageDetail?.wasteDetails?.onuCode
     : form.wasteDetails?.onuCode;
 
+  const nonRoadRegulationMention = isResealed
+    ? form.temporaryStorageDetail?.wasteDetails?.nonRoadRegulationMention
+    : form.wasteDetails?.nonRoadRegulationMention;
+
   const packagingInfos =
     (isResealed
       ? form.temporaryStorageDetail?.wasteDetails?.packagingInfos
@@ -123,6 +127,7 @@ export function getStateSummary(form: Form) {
     packagingInfos,
     packagings: packagingInfos.map(pi => pi.type),
     onuCode,
+    nonRoadRegulationMention,
     ...transporter,
     recipient,
     emitter,

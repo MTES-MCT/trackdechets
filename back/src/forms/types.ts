@@ -168,6 +168,7 @@ export type Bsdd = {
   wasteCode: string | null;
   wasteDescription: string | null;
   wasteAdr: string | null;
+  nonRoadRegulationMention: string | null;
   wasteIsDangerous: boolean;
   weightValue: number | null;
   weightIsEstimate: boolean | null;

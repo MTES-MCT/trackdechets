@@ -295,6 +295,7 @@ describe("Mutation.duplicateForm", () => {
       "citerneNotWashedOutReason",
       "hasCiterneBeenWashedOut",
       "emptyReturnADR",
+      "wasteDetailsNonRoadRegulationMention",
       "wasteDetailsOnuCode"
     ];
 
@@ -558,6 +559,7 @@ describe("Mutation.duplicateForm", () => {
       "wasteDetailsQuantity",
       "wasteDetailsQuantityType",
       "wasteDetailsSampleNumber",
+      "wasteDetailsNonRoadRegulationMention",
       "emittedBy",
       "emittedAt",
       "emittedByEcoOrganisme",

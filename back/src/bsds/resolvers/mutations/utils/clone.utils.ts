@@ -935,6 +935,8 @@ export const cloneBsdd = async (
     wasteDetailsLandIdentifiers: bsdd.wasteDetailsLandIdentifiers,
     wasteDetailsName: bsdd.wasteDetailsName,
     wasteDetailsOnuCode: bsdd.wasteDetailsOnuCode,
+    wasteDetailsNonRoadRegulationMention:
+      bsdd.wasteDetailsNonRoadRegulationMention,
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       bsdd.wasteDetailsPackagingInfos
     ),

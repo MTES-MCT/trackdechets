@@ -277,7 +277,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
 
       <div className="form__row">
         <label>
-          Mentions au titre des règlements ADR, RID, ADNR, IMDG{" "}
+          Mention au titre du règlement ADR{" "}
           {!isDangerous(values.wasteDetails.code) && "(optionnel)"}
           <Field
             type="text"
@@ -288,6 +288,20 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         </label>
 
         <RedErrorMessage name="wasteDetails.onuCode" />
+      </div>
+
+      <div className="form__row">
+        <label>
+          Mention au titre des règlements RID, ADNR, IMDG (optionnel){" "}
+          <Field
+            type="text"
+            name="wasteDetails.nonRoadRegulationMention"
+            className="td-input"
+            disabled={disabled}
+          />
+        </label>
+
+        <RedErrorMessage name="wasteDetails.nonRoadRegulationMention" />
       </div>
 
       {SOIL_CODES.includes(values.wasteDetails.code) ||

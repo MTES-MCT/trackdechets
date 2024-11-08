@@ -49,7 +49,7 @@ export function FormWasteSummary({ form }: FormWasteSummaryProps) {
         </DataListDescription>
       </DataListItem>
       <DataListItem>
-        <DataListTerm>Code ADR (ONU)</DataListTerm>
+        <DataListTerm>Mention ADR</DataListTerm>
         <DataListDescription>
           {form.wasteDetails?.onuCode ?? "Non soumis"}
         </DataListDescription>
