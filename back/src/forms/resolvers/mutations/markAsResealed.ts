@@ -60,7 +60,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     quantityReceived: form.quantityReceived,
     quantityRefused: form.quantityRefused
   });
-  form.wasteDetailsNonRoadRegulationMention;
+
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput = {
     emitterType: EmitterType.PRODUCER,
