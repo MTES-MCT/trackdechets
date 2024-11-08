@@ -178,7 +178,7 @@ const revisionRules: RevisionRules = {
     }
   },
   emitterPickupSitePostalCode: {
-    readableFieldName: "le doe postal du site d'enlèvement",
+    readableFieldName: "le code postal du site d'enlèvement",
 
     revisableFor: type => {
       if (type !== BsdasriType.SIMPLE) {
