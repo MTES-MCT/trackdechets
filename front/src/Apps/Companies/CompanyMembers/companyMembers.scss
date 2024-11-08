@@ -4,3 +4,9 @@
 .company-members__invite {
   max-width: 600px;
 }
+
+.company-members__list {
+  .fr-select {
+    width: fit-content;
+  }
+}

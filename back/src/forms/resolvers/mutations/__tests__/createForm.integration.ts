@@ -105,6 +105,8 @@ const CREATE_FORM = `
           quantity
         }
         isDangerous
+        onuCode
+        nonRoadRegulationMention
         parcelNumbers {
           city
           postalCode
@@ -2226,6 +2228,62 @@ describe("Mutation.createForm", () => {
       expect(form.wasteDetailsOnuCode).toBeNull();
     }
   );
+  it("should allow to create a form with a nonRoadRegulationMention", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: {
+            nonRoadRegulationMention: "Non road regulation mention"
+          },
+          transporter: { company: { siret: transporter.siret } }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createForm.wasteDetails?.nonRoadRegulationMention).toEqual(
+      "Non road regulation mention"
+    );
+  });
+
+  it("nonRoadRegulationMention is not required", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporter: { company: { siret: transporter.siret } }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createForm.wasteDetails?.nonRoadRegulationMention).toBeNull();
+  });
 
   describe("Annexe 1", () => {
     it("should create an APPENDIX1_PRODUCER form", async () => {

@@ -304,7 +304,7 @@ export const parseBase64 = async (pdf: string): Promise<ParsedPdf> => {
     });
 
     return data;
-  } catch (e) {
+  } catch (_) {
     throw new UserInputError(
       "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
     );
@@ -336,7 +336,7 @@ export const validateAndExtractSireneDataFromPDFInBase64 = async (
 
     // Get data
     data = extractData(text);
-  } catch (e) {
+  } catch (_) {
     throw new UserInputError(
       "Le fichier téléchargé est illisible ou n'est pas un certificat valide"
     );

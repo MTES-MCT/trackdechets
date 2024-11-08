@@ -117,6 +117,7 @@ export const editionRules: {
   wasteDetailsCode: "EMISSION",
   wasteDetailsOnuCode: "EMISSION",
   wasteDetailsIsSubjectToADR: "EMISSION",
+  wasteDetailsNonRoadRegulationMention: "EMISSION",
   wasteDetailsPackagingInfos: "EMISSION",
   wasteDetailsQuantity: "EMISSION",
   wasteDetailsQuantityType: "EMISSION",

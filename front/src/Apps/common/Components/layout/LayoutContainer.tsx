@@ -14,6 +14,8 @@ import { getDefaultOrgId } from "../CompanySwitcher/CompanySwitcher";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import Exports from "../../../../dashboard/exports/Registry";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
+import { MyImports } from "../../../../dashboard/registry/MyImports";
+import { CompanyImports } from "../../../../dashboard/registry/CompanyImports";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -287,6 +289,24 @@ export default function LayoutContainer() {
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <Exports />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.registry_new.myImports}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <MyImports />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.registry_new.companyImports}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <CompanyImports />
               </RequireAuth>
             }
           />

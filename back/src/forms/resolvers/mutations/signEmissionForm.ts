@@ -75,6 +75,9 @@ const signatures: Partial<
         args.input.quantity ?? existingForm.wasteDetailsQuantity,
       wasteDetailsOnuCode:
         args.input.onuCode ?? existingForm.wasteDetailsOnuCode,
+      wasteDetailsNonRoadRegulationMention:
+        args.input.nonRoadRegulationMention ??
+        existingForm.wasteDetailsNonRoadRegulationMention,
       emittedAt: args.input.emittedAt,
       emittedBy: args.input.emittedBy,
       emittedByEcoOrganisme: args.input.emittedByEcoOrganisme ?? false,
@@ -146,6 +149,9 @@ const signatures: Partial<
         args.input.onuCode ??
         existingFullForm.forwardedIn?.wasteDetailsOnuCode ??
         existingFullForm.wasteDetailsOnuCode,
+      wasteDetailsNonRoadRegulationMention:
+        existingFullForm.forwardedIn?.wasteDetailsNonRoadRegulationMention ??
+        existingFullForm.wasteDetailsNonRoadRegulationMention,
       emittedAt: args.input.emittedAt,
       emittedBy: args.input.emittedBy
     };

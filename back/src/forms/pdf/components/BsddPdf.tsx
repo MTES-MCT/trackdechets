@@ -729,8 +729,7 @@ export function BsddPdf({
           <div className="BoxCol">
             <p>
               <strong>
-                6. Mentions au titre des règlements ADR, RID, ADNR, IMDG (le cas
-                échéant) :
+                6.1 Mention au titre du règlement ADR (le cas échéant) :
               </strong>
             </p>
             <p>
@@ -743,6 +742,18 @@ export function BsddPdf({
                 <>{getFormWasteDetailsADRMention(form.wasteDetails)}</>
               )}
             </p>
+          </div>
+        </div>
+
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              <strong>
+                6.2 Mentions au titre des règlements RID, ADNR, IMDG (le cas
+                échéant) :
+              </strong>
+            </p>
+            <p>{form.wasteDetails?.nonRoadRegulationMention}</p>
           </div>
         </div>
 

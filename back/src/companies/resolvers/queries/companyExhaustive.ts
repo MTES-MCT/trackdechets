@@ -102,14 +102,14 @@ const companyExhaustiveResolvers: QueryResolvers["companyExhaustive"] = async (
   let esCompany;
   try {
     esCompany = await searchCompanyTD(siret);
-  } catch (e) {
+  } catch (_) {
     //
   }
 
   let sireneCompany;
   try {
     sireneCompany = await searchCompanySirene(siret);
-  } catch (e) {
+  } catch (_) {
     //
   }
 

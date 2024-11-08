@@ -14,3 +14,4 @@ export * from "./VALIDATION";
 export * from "./WASTES";
 export * from "./emailHelpers";
 export * from "./adrHelpers";
+export * from "./BALE";

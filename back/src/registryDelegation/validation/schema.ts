@@ -63,11 +63,17 @@ export const queryRegistryDelegationsArgsSchema = z.object({
   where: z
     .object({
       delegatorOrgId: siretSchema().nullish(),
-      delegateOrgId: siretSchema().nullish()
+      delegateOrgId: siretSchema().nullish(),
+      givenToMe: z.boolean().nullish(),
+      activeOnly: z.boolean().nullish(),
+      search: z.string().max(20).nullish()
     })
     .refine(
-      data => Boolean(data.delegatorOrgId) || Boolean(data.delegateOrgId),
-      "Vous devez renseigner un des deux champs (delegatorOrgId ou delegateOrgId)."
+      data =>
+        Boolean(data.delegatorOrgId) ||
+        Boolean(data.delegateOrgId) ||
+        data.givenToMe,
+      "Vous devez renseigner un des champs delegatorOrgId, delegateOrgId ou givenToMe."
     )
     .refine(
       data => !(Boolean(data.delegatorOrgId) && Boolean(data.delegateOrgId)),

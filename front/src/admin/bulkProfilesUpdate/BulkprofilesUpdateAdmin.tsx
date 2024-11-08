@@ -26,7 +26,7 @@ const validationSchema = z.object({
     .transform((val, ctx) => {
       try {
         return JSON.parse(val);
-      } catch (error) {
+      } catch (_) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Le json est invalide"

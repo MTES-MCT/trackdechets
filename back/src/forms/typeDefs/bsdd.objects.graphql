@@ -292,8 +292,11 @@ type StateSummary {
   "Si le BSD est soumis à l'ADR ou non"
   isSubjectToADR: Boolean
 
-  "Code ONU le plus à jour"
+  "Mention au titre du règlement ADR la plus à jour"
   onuCode: String
+
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  nonRoadRegulationMention: String
 
   "Prochaine entreprise à transporter le déchet (entreprise en case 8 ou 18)"
   transporter: FormCompany
@@ -523,8 +526,11 @@ type WasteDetails {
   "Si le BSD est soumis à l'ADR ou non"
   isSubjectToADR: Boolean
 
-  "Code ONU"
+  "Mention au titre du règlement ADR"
   onuCode: String
+
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  nonRoadRegulationMention: String
 
   "Conditionnements"
   packagingInfos: [PackagingInfo!]
