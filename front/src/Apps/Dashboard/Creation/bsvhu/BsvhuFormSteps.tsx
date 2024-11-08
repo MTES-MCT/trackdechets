@@ -199,6 +199,9 @@ const BsvhuFormSteps = ({
         sealedFields={sealedFields}
         setPublishErrors={setPublishErrors}
         errorTabIds={errorTabIds}
+        genericErrorMessage={publishErrorMessages.filter(
+          error => error.tabId === TabId.none
+        )}
       />
       {loading && <Loader />}
     </>

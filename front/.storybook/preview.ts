@@ -15,3 +15,4 @@ export const parameters = {
     MockedProvider
   }
 };
+export const tags = ["autodocs"];

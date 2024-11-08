@@ -91,7 +91,7 @@ export async function recipifyBsdTransporter<Bsd extends ParsedZodBsvhu>(
           transporterReceipt?.validityLimit ?? null,
         transporterRecepisseDepartment: transporterReceipt?.department ?? null
       };
-    } catch (error) {
+    } catch (_) {
       // do nothing
     }
   }

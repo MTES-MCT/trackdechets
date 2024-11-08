@@ -77,6 +77,8 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     wasteDetailsName: form.wasteDetailsName,
     wasteDetailsIsSubjectToADR: form.wasteDetailsIsSubjectToADR,
     wasteDetailsOnuCode: form.wasteDetailsOnuCode,
+    wasteDetailsNonRoadRegulationMention:
+      form.wasteDetailsNonRoadRegulationMention,
     wasteDetailsPop: form.wasteDetailsPop,
     wasteDetailsQuantityType: QuantityType.REAL,
     wasteDetailsQuantity:

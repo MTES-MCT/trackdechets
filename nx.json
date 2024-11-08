@@ -1,7 +1,4 @@
 {
-  "affected": {
-    "defaultBase": "dev"
-  },
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "sharedGlobals": [
@@ -66,5 +63,7 @@
         "cacheableOperations": ["build-storybook"]
       }
     }
-  }
+  },
+  "defaultBase": "dev",
+  "useLegacyCache": true
 }

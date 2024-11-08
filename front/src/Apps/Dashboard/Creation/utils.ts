@@ -24,7 +24,8 @@ export enum TabId {
   waste = "waste",
   emitter = "emitter",
   transporter = "transporter",
-  destination = "destination"
+  destination = "destination",
+  none = "none"
 }
 
 export type NormalizedError = {
@@ -179,10 +180,24 @@ export const handleGraphQlError = (
       });
       setPublishErrors(errorDetailList as NormalizedError[]);
     } else {
-      toastApolloError(err); // other case like forbidden, we need to display an error anyway ...
+      // other case like forbidden, we need to display an error anyway ...
+      setPublishErrors([
+        {
+          code: err.graphQLErrors[0]?.extensions?.code,
+          path: ["none"],
+          message: err.graphQLErrors[0]?.message
+        }
+      ] as NormalizedError[]);
     }
   } else {
-    toastApolloError(err); // other case like forbidden, we need to display an error anyway ...
+    // other case like forbidden, we need to display an error anyway ...
+    setPublishErrors([
+      {
+        code: err.graphQLErrors[0]?.extensions?.code,
+        path: ["none"],
+        message: err.graphQLErrors[0]?.extensions?.message
+      }
+    ] as NormalizedError[]);
   }
 };
 

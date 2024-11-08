@@ -15,7 +15,7 @@ export const InitialBsff: BsffResolvers = {
     });
     try {
       await checkCanRead(user!, bsff!);
-    } catch (err) {
+    } catch (_) {
       throw new ForbiddenError(
         `Vous ne pouvez pas accéder au champ "emitter" du bordereau initial ${id}`
       );

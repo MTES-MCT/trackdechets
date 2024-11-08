@@ -856,6 +856,7 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
 
         return true;
       }),
+    wasteDetailsNonRoadRegulationMention: yup.string().nullable(),
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
     wasteDetailsAnalysisReferences: yup.array().of(yup.string()) as any,
     wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,

@@ -78,7 +78,9 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       wasteDetailsQuantity: infos.quantity
         ? new Decimal(infos.quantity)
         : form.wasteDetailsQuantity,
-      wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode
+      wasteDetailsOnuCode: infos.onuCode ?? form.wasteDetailsOnuCode,
+      wasteDetailsNonRoadRegulationMention:
+        form.wasteDetailsNonRoadRegulationMention
     };
 
     const receiptFields = await getFormReceiptField(transporter);

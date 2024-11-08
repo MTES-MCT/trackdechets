@@ -185,8 +185,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyMail,
       recipientIsTempStorage,
       wasteDetailsCode,
-      wasteDetailsOnuCode,
-      wasteDetailsIsSubjectToADR,
       wasteDetailsPackagingInfos,
       wasteDetailsQuantity,
       wasteDetailsQuantityType,
@@ -296,7 +294,10 @@ describe("Mutation.duplicateForm", () => {
       "quantityGrouped",
       "citerneNotWashedOutReason",
       "hasCiterneBeenWashedOut",
-      "emptyReturnADR"
+      "emptyReturnADR",
+      "wasteDetailsNonRoadRegulationMention",
+      "wasteDetailsOnuCode",
+      "wasteDetailsIsSubjectToADR"
     ];
 
     const expectedSkippedTransporter = [
@@ -365,8 +366,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyMail,
       recipientIsTempStorage,
       wasteDetailsCode,
-      wasteDetailsOnuCode,
-      wasteDetailsIsSubjectToADR,
       wasteDetailsQuantityType,
       wasteDetailsPop,
       wasteDetailsIsDangerous,
@@ -459,8 +458,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyMail,
       wasteDetailsCode,
       wasteDetailsPackagingInfos,
-      wasteDetailsOnuCode,
-      wasteDetailsIsSubjectToADR,
       wasteDetailsPop,
       wasteDetailsIsDangerous,
       wasteDetailsName,
@@ -517,8 +514,6 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyMail,
       wasteDetailsCode,
       wasteDetailsPackagingInfos,
-      wasteDetailsOnuCode,
-      wasteDetailsIsSubjectToADR,
       wasteDetailsPop,
       wasteDetailsIsDangerous,
       wasteDetailsName,
@@ -565,6 +560,8 @@ describe("Mutation.duplicateForm", () => {
       "wasteDetailsQuantity",
       "wasteDetailsQuantityType",
       "wasteDetailsSampleNumber",
+      "wasteDetailsIsSubjectToADR",
+      "wasteDetailsNonRoadRegulationMention",
       "emittedBy",
       "emittedAt",
       "emittedByEcoOrganisme",
@@ -626,7 +623,8 @@ describe("Mutation.duplicateForm", () => {
       "quantityGrouped",
       "citerneNotWashedOutReason",
       "hasCiterneBeenWashedOut",
-      "emptyReturnADR"
+      "emptyReturnADR",
+      "wasteDetailsOnuCode"
     ];
 
     // make sure this test breaks when a new field is added to the Form model

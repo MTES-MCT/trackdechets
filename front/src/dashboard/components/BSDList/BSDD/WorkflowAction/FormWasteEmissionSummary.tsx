@@ -40,7 +40,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   onuCode: () => (
     <div className="form__row">
       <label>
-        Code ADR (ONU)
+        Mention ADR
         <Field name="onuCode" className="td-input" />
       </label>
     </div>
@@ -123,7 +123,7 @@ export function FormWasteEmissionSummary({
         </DataListItem>
         {form.emitter?.type !== EmitterType.Appendix1Producer && (
           <DataListItem>
-            <DataListTerm>Code ADR (ONU)</DataListTerm>
+            <DataListTerm>Mention ADR</DataListTerm>
             <DataListDescription>
               {getFormWasteDetailsADRMention({
                 ...form.wasteDetails,

@@ -19,7 +19,7 @@ export function findPkg(): { name: string | undefined } {
     return JSON.parse(readFileSync(filePath, "utf8")) as {
       name: string | undefined;
     };
-  } catch (e) {
+  } catch (_) {
     return { name: undefined };
   }
 }

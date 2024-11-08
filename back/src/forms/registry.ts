@@ -361,6 +361,7 @@ export function toGenericWaste(
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationCompanyMail: bsdd.destinationCompanyMail,
     wasteAdr: bsdd.wasteAdr,
+    nonRoadRegulationMention: bsdd.nonRoadRegulationMention,
     workerCompanyName: null,
     workerCompanySiret: null,
     workerCompanyAddress: null,

@@ -143,7 +143,13 @@ const TempStorage = ({ form }) => {
             value={getFormWasteDetailsADRMention(
               temporaryStorageDetail?.wasteDetails
             )}
-            label="Code Onu"
+            label="Mention ADR"
+          />
+          <DetailRow
+            value={
+              temporaryStorageDetail?.wasteDetails?.nonRoadRegulationMention
+            }
+            label="Mention RID, ADNR, IMDG"
           />
 
           <PackagingRow packagingInfos={form.stateSummary?.packagingInfos} />
@@ -829,8 +835,12 @@ export default function BSDDetailContent({
             </div>
 
             <div className={styles.detailGrid}>
-              <dt>Code onu</dt>
+              <dt>Mention ADR</dt>
               <dd>{getFormStateSummaryADRMention(form?.stateSummary)}</dd>
+
+              <dt>Mention RID, ADNR, IMDG</dt>
+              <dd>{form?.stateSummary?.nonRoadRegulationMention}</dd>
+              
               <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
               {form?.wasteDetails?.sampleNumber && (
                 <>

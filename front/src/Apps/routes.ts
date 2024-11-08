@@ -130,7 +130,12 @@ const routes = {
     join: "/companies/join",
     orientation: "/companies/create"
   },
-  registry: "/registre"
+  registry: "/registre",
+  registry_new: {
+    myImports: "/registre-v2/own",
+    companyImports: "/registre-v2/list",
+    export: "/registre-v2/export"
+  }
 };
 
 export const titles = {
