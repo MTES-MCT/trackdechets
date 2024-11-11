@@ -154,6 +154,8 @@ input ReceivedFormInput {
   Doit être égale à 0 lorsque le déchet est refusé.
 
   Doit être inférieure à 40T en cas de transport routier et inférieure à 50 000 T tout type de transport confondu.
+
+  Le champ est requis pour passer du statut `SENT` à `ACCEPTED` via `markAsReceived`.
   """
   quantityReceived: Float
 
