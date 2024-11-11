@@ -15,10 +15,13 @@ import { controlBsdSearchSchema } from "../../validation";
  * plate
  * readableId
  * siret
- * @returns
+ * Cette query est destinée à la fiche établissement. Elle permet de faire une recherche par siret/plaque ou par readableId.
+ * Pour la recherche par siret/plaque, seuls les bsds en transit (isCollectedFor ou isReturnFor) sont inclus.
+ * Pour la recherche par readableId, tous les bsds hors draft sont inclus.
  */
 function buildQuery({ where }: QueryControlBsdsArgs) {
   const must: any[] = [];
+  const must_not: any[] = [];
   const should: any[] = [];
 
   if (where?.siret) {
@@ -38,7 +41,7 @@ function buildQuery({ where }: QueryControlBsdsArgs) {
         ]
       }
     });
-  } else {
+  } else if (!where?.readableId) {
     must.push({
       bool: {
         should: [
@@ -80,6 +83,11 @@ function buildQuery({ where }: QueryControlBsdsArgs) {
   }
 
   if (where?.readableId) {
+    must_not.push({
+      match: {
+        status: "DRAFT"
+      }
+    });
     must.push({
       match: {
         "readableId.ngram": {
@@ -92,6 +100,7 @@ function buildQuery({ where }: QueryControlBsdsArgs) {
   const query = {
     bool: {
       must,
+      must_not,
       filter: [
         {
           bool: {

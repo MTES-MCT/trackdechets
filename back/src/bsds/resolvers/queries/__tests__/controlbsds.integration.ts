@@ -692,4 +692,188 @@ describe("query controlbsds: governement accounts permissions", () => {
       form4.id
     ]);
   });
+
+  it.each([
+    Status.SEALED,
+    Status.SENT,
+    Status.RECEIVED,
+    Status.ACCEPTED,
+    Status.REFUSED,
+    Status.PROCESSED
+  ])("should filter by readableId (%p)", async status => {
+    const { user: owner } = await userWithCompanyFactory("MEMBER");
+    const request = supertest(app);
+
+    const allowedIP = faker.internet.ipv4();
+    // the gov account running the query
+    const { accessToken } = await userWithAccessTokenFactory({
+      governmentAccount: {
+        create: {
+          name: "GERICO",
+          permissions: [GovernmentPermission.BSDS_CAN_READ_ALL],
+          authorizedOrgIds: ["ALL"],
+          authorizedIPs: [allowedIP]
+        }
+      }
+    });
+    const siret1 = siretify(1);
+    const siret2 = siretify(2);
+    const siret3 = siretify(3);
+    const siret4 = siretify(3);
+
+    const form1 = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status,
+        sentAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: siret1,
+            number: 1,
+            takenOverAt: new Date(),
+            transporterNumberPlate: "AZ 23 99"
+          }
+        }
+      }
+    });
+
+    const form2 = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status,
+        sentAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: siret2,
+            number: 1,
+            takenOverAt: new Date(),
+            transporterNumberPlate: "AZ 23 99"
+          }
+        }
+      }
+    });
+
+    const form3 = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status,
+        sentAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: siret3,
+            number: 1,
+            takenOverAt: new Date(),
+            transporterNumberPlate: "QS 23 99"
+          }
+        }
+      }
+    });
+
+    const form4 = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status,
+        receivedAt: new Date(),
+        wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+        transporters: {
+          create: {
+            transporterCompanySiret: siret4,
+            number: 1,
+            takenOverAt: new Date(),
+            transporterNumberPlate: "AZ 23 99"
+          }
+        }
+      }
+    });
+
+    await indexForm(await getFormForElastic(form1));
+    await indexForm(await getFormForElastic(form2));
+    await indexForm(await getFormForElastic(form3));
+    await indexForm(await getFormForElastic(form4));
+
+    await refreshElasticSearch();
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ controlBsds(where: {readableId: "${form1.readableId}"}) {  
+          edges {
+            node {
+              ... on Form {
+                id
+          }
+        }
+      }
+        pageInfo: totalCount}}`
+      })
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", allowedIP);
+    const { errors, data } = res.body;
+
+    expect(errors).toBeUndefined();
+    expect(data.controlBsds.pageInfo).toEqual(1);
+    // the form matches the
+    expect(data.controlBsds.edges.map(e => e.node.id).sort()).toEqual([
+      form1.id
+    ]);
+  });
+
+  it("should exclude DRAFT when filtered by readableId  ", async () => {
+    const { user: owner } = await userWithCompanyFactory("MEMBER");
+    const request = supertest(app);
+
+    const allowedIP = faker.internet.ipv4();
+    // the gov account running the query
+    const { accessToken } = await userWithAccessTokenFactory({
+      governmentAccount: {
+        create: {
+          name: "GERICO",
+          permissions: [GovernmentPermission.BSDS_CAN_READ_ALL],
+          authorizedOrgIds: ["ALL"],
+          authorizedIPs: [allowedIP]
+        }
+      }
+    });
+    const siret = siretify(1);
+
+    const form = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "DRAFT",
+        sentAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: siret,
+            number: 1,
+            takenOverAt: new Date(),
+            transporterNumberPlate: "AZ 23 99"
+          }
+        }
+      }
+    });
+
+    await indexForm(await getFormForElastic(form));
+
+    await refreshElasticSearch();
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ controlBsds(where: {readableId: "${form.readableId}"}) {  
+          edges {
+            node {
+              ... on Form {
+                id
+          }
+        }
+      }
+        pageInfo: totalCount}}`
+      })
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", allowedIP);
+    const { errors, data } = res.body;
+
+    expect(errors).toBeUndefined();
+    expect(data.controlBsds.pageInfo).toEqual(0);
+    // the form matches the
+    expect(data.controlBsds.edges).toEqual([]);
+  });
 });
