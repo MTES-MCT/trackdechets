@@ -9,6 +9,7 @@ import {
   bsvhuFactory,
   toIntermediaryCompany
 } from "../../../__tests__/factories.vhu";
+import { ErrorCode } from "../../../../common/errors";
 
 const GET_BSVHU = `
 query GetBsvhu($id: ID!) {
@@ -70,9 +71,32 @@ query GetBsvhu($id: ID!) {
 describe("Query.Bsvhu", () => {
   afterEach(resetDatabase);
 
+  it("should disallow unauthenticated user", async () => {
+    const { query } = makeClient();
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { errors } = await query<Pick<Query, "bsvhu">>(GET_BSVHU, {
+      variables: { id: bsvhu.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas connecté.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.UNAUTHENTICATED
+        })
+      })
+    ]);
+  });
+
   it("should get a bsvhu by id", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await bsvhuFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -81,10 +105,59 @@ describe("Query.Bsvhu", () => {
     const { query } = makeClient(user);
 
     const { data } = await query<Pick<Query, "bsvhu">>(GET_BSVHU, {
-      variables: { id: form.id }
+      variables: { id: bsvhu.id }
     });
 
-    expect(data.bsvhu.id).toBe(form.id);
+    expect(data.bsvhu.id).toBe(bsvhu.id);
+  });
+
+  it("should forbid access to user not on the bsd", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { user: otherUser } = await userWithCompanyFactory("MEMBER");
+
+    const { query } = makeClient(otherUser);
+
+    const { errors } = await query<Pick<Query, "bsvhu">>(GET_BSVHU, {
+      variables: { id: bsvhu.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas autorisé à accéder à ce bordereau",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+  });
+
+  it("should allow access to admin user not on the bsd", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { user: otherUser } = await userWithCompanyFactory(
+      "MEMBER",
+      {},
+      { isAdmin: true }
+    );
+
+    const { query } = makeClient(otherUser);
+
+    const { data } = await query<Pick<Query, "bsvhu">>(GET_BSVHU, {
+      variables: { id: bsvhu.id }
+    });
+
+    expect(data.bsvhu.id).toBe(bsvhu.id);
   });
 
   it("should get a bsvhu by id if current user is an intermediary", async () => {

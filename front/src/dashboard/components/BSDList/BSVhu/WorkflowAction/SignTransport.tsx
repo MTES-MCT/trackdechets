@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
 import routes from "../../../../../Apps/routes";
-import { UPDATE_VHU_FORM } from "../../../../../Apps/Dashboard/Creation/bsvhu/utils/queries";
+import { UPDATE_VHU_FORM } from "../../../../../Apps/common/queries/bsvhu/queries";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { Field, Form, Formik } from "formik";
@@ -15,7 +15,8 @@ import {
 import React from "react";
 import { generatePath, Link, useLocation } from "react-router-dom";
 import * as yup from "yup";
-import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
+import { SignBsvhu } from "./SignBsvhu";
+import { SIGN_BSVHU } from "../../../../../Apps/common/queries/bsvhu/queries";
 import { subMonths } from "date-fns";
 
 const validationSchema = yup.object({

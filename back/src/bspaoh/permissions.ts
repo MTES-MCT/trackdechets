@@ -60,6 +60,9 @@ function readers(bspaoh: PrismaBspaoh): string[] {
 }
 
 export function checkCanRead(user: User, bspaoh: PrismaBspaoh) {
+  if (user.isAdmin && user.isActive) {
+    return true;
+  }
   const authorizedOrgIds = readers(bspaoh);
 
   return checkUserPermissions(

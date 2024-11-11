@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "../../../../../common/components";
 import Operation from "../../../../../form/bsvhu/Operation";
-import { UPDATE_VHU_FORM } from "../../../../../Apps/Dashboard/Creation/bsvhu/utils/queries";
+import { UPDATE_VHU_FORM } from "../../../../../Apps/common/queries/bsvhu/queries";
 import { getComputedState } from "../../../../../Apps/Dashboard/Creation/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
@@ -12,7 +12,8 @@ import {
 } from "@td/codegen-ui";
 import React from "react";
 import * as yup from "yup";
-import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
+import { SignBsvhu } from "./SignBsvhu";
+import { SIGN_BSVHU } from "../../../../../Apps/common/queries/bsvhu/queries";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 import { getInitialCompany } from "../../../../../Apps/common/data/initialState";
