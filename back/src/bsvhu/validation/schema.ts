@@ -74,6 +74,7 @@ const rawBsvhuSchema = z.object({
   // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
   // en cours de route des bordereaux qui ont déjà été publié sur la base d'une
   // ancienne version du schéma.
+  customId: z.string().nullish(),
   createdAt: z.date().nullish(),
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),

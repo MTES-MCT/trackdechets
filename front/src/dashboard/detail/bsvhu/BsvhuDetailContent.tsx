@@ -48,6 +48,10 @@ export function BsvhuDetailContent({ form }: Props) {
             [{form.isDraft ? "Brouillon" : VHU_VERBOSE_STATUSES[form.status]}]
           </span>
           {!form.isDraft && <span>{form.id}</span>}
+
+          {!!form.customId && (
+            <span className="fr-ml-auto">Numéro libre: {form.customId}</span>
+          )}
         </h4>
 
         <div className={styles.detailContent}>

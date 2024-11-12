@@ -120,6 +120,7 @@ const zodDestination = z.object({
 });
 
 export const rawBsvhuSchema = z.object({
+  customId: z.string().nullish(),
   wasteCode: z.enum(BSVHU_WASTE_CODES).nullish(),
   emitter: zodEmitter,
   transporter: zodTransporter,

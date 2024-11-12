@@ -189,7 +189,7 @@ export function toGenericWaste(bsvhu: RegistryBsvhu): GenericWaste {
     bsdType: "BSVHU",
     bsdSubType: getBsvhuSubType(bsvhu),
     status: bsvhu.status,
-    customId: null,
+    customId: bsvhu.customId,
     destinationCap: null,
     destinationOperationNoTraceability: false,
     destinationReceptionAcceptationStatus:
