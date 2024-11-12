@@ -114,7 +114,14 @@ export async function registryExports(
   // to read a registry that contains infos about it, we filter exports with "hasEvery"
   // so the user only sees export where he has access to all the sirets whose data was exported.
   const where: Prisma.RegistryExportWhereInput = {
-    sirets: { hasEvery: sirets }
+    sirets:
+      sirets.length === 1
+        ? {
+            equals: sirets
+          }
+        : {
+            hasEvery: sirets
+          }
   };
   if (delegate) {
     where.delegateSiret = delegate;

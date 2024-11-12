@@ -8,6 +8,9 @@ import {
   getIncomingWasteImportSiretsAssociations
 } from "./incomingWaste/database";
 import { safeParseAsyncIncomingWaste } from "./incomingWaste/validation";
+import { RegistryExportType } from "@prisma/client";
+import { toSsdWaste } from "./ssd/registry";
+import { SsdWaste } from "@td/codegen-back";
 
 export type ParsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER";
@@ -54,3 +57,14 @@ export const importOptions: Record<ImportType, ImportOptions> = {
 export const CSV_DELIMITER = ";";
 export const UNAUTHORIZED_ERROR =
   "Vous n'avez pas le droit de faire une déclaration pour ce SIRET";
+
+export type ExportOptions = {
+  toSsdWaste?: (registry: unknown) => SsdWaste;
+};
+
+export const exportOptions: Partial<Record<RegistryExportType, ExportOptions>> =
+  {
+    SSD: {
+      toSsdWaste
+    }
+  };

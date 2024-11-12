@@ -1,3 +1,4 @@
+import { RegistryExport, RegistryExportStatus } from "@prisma/client";
 import { prisma } from "@td/prisma";
 
 type ImportStats = {
@@ -84,4 +85,34 @@ function getStatus(stats: ImportStats) {
   }
 
   return "SUCCESSFUL";
+}
+
+// enum RegistryExportStatus {
+//   PENDING
+//   STARTED
+//   SUCCESSFUL
+//   FAILED
+//   CANCELED
+// }
+
+export async function startExport(exportId: string): Promise<RegistryExport> {
+  const registryExport = await prisma.registryExport.update({
+    where: { id: exportId },
+    data: { status: RegistryExportStatus.STARTED }
+  });
+  return registryExport;
+}
+
+export async function failExport(exportId: string) {
+  await prisma.registryExport.update({
+    where: { id: exportId },
+    data: { status: RegistryExportStatus.FAILED }
+  });
+}
+
+export async function endExport(exportId: string, s3FileKey?: string) {
+  await prisma.registryExport.update({
+    where: { id: exportId },
+    data: { status: RegistryExportStatus.SUCCESSFUL, s3FileKey }
+  });
 }

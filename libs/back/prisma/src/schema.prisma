@@ -2493,6 +2493,10 @@ model RegistryLookup {
   wasteType          RegistryExportWasteType
   wasteCode          String
   date               DateTime
+  // should ba a UUIDv7 using date as time source
+  // to allow cursor based queries that required a unique key that should
+  // also be the sort order
+  dateId             String                        @unique @db.Uuid
 
   // foreign keys to registry models
   registrySsdId String?
@@ -2525,6 +2529,7 @@ model RegistryLookup {
   // multi-column index because those columns are mandatory for any export
   @@index([date(sort: Desc), exportRegistryType], map: "_RegistryLookupMainIdx")
   @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
+  @@index([dateId(sort: Desc)], map: "_RegistryLookupDateIdIdx")
   @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
   @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
 }

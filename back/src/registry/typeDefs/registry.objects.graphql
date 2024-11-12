@@ -1937,6 +1937,41 @@ type AllWasteConnection {
   edges: [AllWasteEdge!]!
 }
 
+type SsdWaste {
+  id: ID!
+  source: RegistryExportSource!
+  publicId: String!
+  reportForSiret: String!
+  reportForName: String!
+  reportForAddress: String!
+  reportForCity: String!
+  reportForPostalCode: String!
+  reportAsSiret: String
+  realWeight: Float
+  estimatedWeight: Float
+  volume: Float
+  useDate: DateTime
+  dispatchDate: DateTime
+  wasteCode: String!
+  wasteDescription: String!
+  wasteCodeBale: String
+  secondaryWasteCodes: [String!]!
+  secondaryWasteDescriptions: [String!]!
+  product: String
+  processingDate: DateTime!
+  processingEndDate: DateTime
+  destinationType: String!
+  destinationOrgId: String
+  destinationName: String
+  destinationAddress: String
+  destinationPostalCode: String
+  destinationCity: String
+  destinationCountryCode: String
+  operationCode: String!
+  operationMode: OperationMode!
+  administrativeActReference: String!
+}
+
 type RegistryImportConnection {
   totalCount: Int!
   pageInfo: PageInfo!
@@ -2000,7 +2035,7 @@ type RegistryExport {
   updatedAt: DateTime!
   createdBy: User!
   status: RegistryExportStatus!
-  siret: String
+  sirets: [String!]
   registryType: WasteRegistryType!
   wasteTypes: [WasteType!]
   wasteCodes: [String!]

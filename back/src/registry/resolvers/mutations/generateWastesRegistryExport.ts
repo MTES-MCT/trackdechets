@@ -12,6 +12,7 @@ import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getDelegatesOfCompany } from "../../../registryDelegation/resolvers/queries/utils/registryDelegations.utils";
+import { enqueueRegistryExportJob } from "../../../queue/producers/registryExport";
 
 export async function generateWastesRegistryExport(
   _,
@@ -154,14 +155,10 @@ export async function generateWastesRegistryExport(
     }
   });
 
-  // await enqueueRegistryExportJob({
-  //   importId: registryExport.id,
-  //   registryType,
-  //   format,
-  //   siret,
-  //   dateRange,
-  //   where
-  // });
+  await enqueueRegistryExportJob({
+    exportId: registryExport.id,
+    dateRange
+  });
 
   return registryExport;
 }

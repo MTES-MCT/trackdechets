@@ -1,4 +1,5 @@
 import { prisma } from "@td/prisma";
+import { v7 as uuidv7 } from "uuid";
 import { ParsedZodSsdItem } from "./validation/schema";
 import {
   Prisma,
@@ -95,6 +96,12 @@ const updateRegistryLookup = async (
         sirets: [registrySsd.reportForSiret],
         wasteCode: registrySsd.wasteCode,
         date: (registrySsd.useDate ?? registrySsd.dispatchDate) as Date,
+        // generate a uuid v7 id
+        // using the date as timestamp, so we can sort by this dateId
+        // and be in date order with uniqueness
+        dateId: uuidv7({
+          msecs: (registrySsd.useDate ?? registrySsd.dispatchDate)?.getTime()
+        }),
         registrySsdId: registrySsd.id
       },
       select: {
@@ -113,6 +120,9 @@ const updateRegistryLookup = async (
         wasteType: RegistryExportWasteType.DND,
         wasteCode: registrySsd.wasteCode,
         date: (registrySsd.useDate ?? registrySsd.dispatchDate) as Date,
+        dateId: uuidv7({
+          msecs: (registrySsd.useDate ?? registrySsd.dispatchDate)?.getTime()
+        }),
         registrySsdId: registrySsd.id
       },
       select: {

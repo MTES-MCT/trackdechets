@@ -96,6 +96,14 @@ enum RegistryExportWasteType {
   TEXS
 }
 
+"Source de la ligne de registre"
+enum RegistryExportSource {
+  "Bordereau"
+  BSD
+  "Déclaration au registre"
+  REGISTRY
+}
+
 enum RegistryImportStatus {
   PENDING
   STARTED
