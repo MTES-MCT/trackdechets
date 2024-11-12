@@ -6,6 +6,7 @@ import { markAsAwaitingGroup } from "../steps/markAsProcessed";
 import { signEmissionForm } from "../steps/signEmissionForm";
 import { signTransportForm } from "../steps/signTransportForm";
 import fixtures from "../fixturesForeignTransporter";
+import { WasteProcessorType, CollectorType } from "@prisma/client";
 
 const workflow: Workflow = {
   title:
@@ -25,13 +26,21 @@ const workflow: Workflow = {
       companyTypes: ["TRANSPORTER"],
       opt: { siret: null, vatNumber: "BE0541696005" }
     },
-    { name: "ttr", companyTypes: ["COLLECTOR"] },
+    {
+      name: "ttr",
+      companyTypes: ["COLLECTOR"],
+      collectorTypes: [CollectorType.DANGEROUS_WASTES]
+    },
     {
       name: "transporteur2",
       companyTypes: ["TRANSPORTER"],
       opt: { siret: null, vatNumber: "RO17579668" }
     },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     createInitialForm("producteur", fixtures as any),

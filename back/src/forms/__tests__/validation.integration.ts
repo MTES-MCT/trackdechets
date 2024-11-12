@@ -3,7 +3,8 @@ import {
   EmitterType,
   Form,
   OperationMode,
-  TransportMode
+  TransportMode,
+  WasteProcessorType
 } from "@prisma/client";
 import {
   draftFormSchema,
@@ -91,7 +92,10 @@ describe("sealedFormSchema", () => {
       companyTypes: ["TRANSPORTER"]
     });
     const destinationCompany = await companyFactory({
-      companyTypes: ["WASTEPROCESSOR"]
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: {
+        set: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
     });
     sealedForm = {
       ...formData,

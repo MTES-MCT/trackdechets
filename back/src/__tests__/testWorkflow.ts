@@ -15,6 +15,8 @@ async function testWorkflow(workflow: Workflow) {
   for (const workflowCompany of workflow.companies) {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: workflowCompany.companyTypes,
+      wasteProcessorTypes: workflowCompany.wasteProcessorTypes ?? [],
+      collectorTypes: workflowCompany.collectorTypes ?? [],
       ...(workflowCompany?.opt || {})
     });
     if (workflowCompany.companyTypes.includes("ECO_ORGANISME")) {
