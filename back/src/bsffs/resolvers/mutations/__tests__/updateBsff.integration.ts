@@ -12,7 +12,9 @@ import {
   BsffInput,
   BsffOperationCode,
   Mutation,
-  MutationUpdateBsffArgs
+  MutationUpdateBsffArgs,
+  QueryBsffArgs,
+  Query
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
@@ -41,7 +43,6 @@ import {
   getFirstTransporterSync,
   getTransportersSync
 } from "../../../database";
-import { Query, QueryBsffArgs } from "@td/codegen-ui";
 
 export const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {

@@ -1,10 +1,12 @@
 import { GraphQLContext } from "../../../types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { NotCompanyMember, UserInputError } from "../../../common/errors";
-
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import {
+  MutationResolvers,
+  UserNotificationsInput
+} from "../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../../companies/converters";
 import {
@@ -12,7 +14,6 @@ import {
   toPrismaNotifications,
   UserNotification
 } from "../../notifications";
-import { UserNotificationsInput } from "@td/codegen-ui";
 
 function activeNotifications(
   notifications: UserNotificationsInput
