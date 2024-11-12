@@ -3,15 +3,12 @@ import {
   BsdaStatus,
   BsdaType,
   Prisma,
-  UserNotification,
   WasteAcceptationStatus
 } from "@prisma/client";
-
 import {
   BsdTransporterReceiptPart,
   getTransporterReceipt
 } from "../../../companies/recipify";
-
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -42,7 +39,10 @@ import { parseBsdaAsync } from "../../validation";
 import { prismaToZodBsda } from "../../validation/helpers";
 import { AlreadySignedError } from "../../../bsvhu/errors";
 import { operationHook } from "../../operationHook";
-import { getNotificationSubscribers } from "../../../users/notifications";
+import {
+  getNotificationSubscribers,
+  UserNotification
+} from "../../../users/notifications";
 
 const signBsda: MutationResolvers["signBsda"] = async (
   _,

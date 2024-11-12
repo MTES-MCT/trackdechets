@@ -1,15 +1,14 @@
 import { prisma } from "@td/prisma";
-
 import { sendMail } from "../../../mailer/mailing";
-
 import { CompanyPrivate } from "../../../generated/graphql/types";
-
 import { randomNumber } from "../../../utils";
 import { renderMail, securityCodeRenewal } from "@td/mail";
 import { isSiret, isVat } from "@td/constants";
 import { UserInputError } from "../../../common/errors";
-import { getNotificationSubscribers } from "../../../users/notifications";
-import { UserNotification } from "@prisma/client";
+import {
+  getNotificationSubscribers,
+  UserNotification
+} from "../../../users/notifications";
 import { toGqlCompanyPrivate } from "../../converters";
 
 /**

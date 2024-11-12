@@ -13,6 +13,12 @@ export function toGqlCompanyPrivate(company: Company): CompanyPrivate {
     signatureAutomations: [],
     receivedSignatureAutomations: [],
     userPermissions: [],
-    userNotifications: []
+    userNotifications: {
+      membershipRequest: false,
+      signatureCodeRenewal: false,
+      bsdRefusal: false,
+      bsdaFinalDestinationUpdate: false,
+      revisionRequest: false
+    }
   };
 }

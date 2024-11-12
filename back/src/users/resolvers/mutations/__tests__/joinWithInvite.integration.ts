@@ -108,7 +108,7 @@ describe("joinWithInvite mutation", () => {
 
       const expectedNotifications = getDefaultNotifications(role);
 
-      expect(companyAssociation?.notifications).toEqual(expectedNotifications);
+      expect(companyAssociation).toMatchObject(expectedNotifications);
 
       const createdUser = await prisma.user.findUniqueOrThrow({
         where: { email: invitee }

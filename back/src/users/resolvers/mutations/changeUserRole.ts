@@ -25,7 +25,7 @@ import {
   updateCompanyAssociation,
   updateUserAccountHash
 } from "../../database";
-import { ALL_NOTIFICATIONS } from "../../notifications";
+import { getDefaultNotifications } from "../../notifications";
 
 const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
   parent,
@@ -61,7 +61,7 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
       associationId: association.id,
       data: {
         role: args.role,
-        notifications: args.role === "ADMIN" ? ALL_NOTIFICATIONS : []
+        ...getDefaultNotifications(args.role)
       }
     });
 

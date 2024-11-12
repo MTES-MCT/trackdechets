@@ -11,17 +11,16 @@ import {
   User,
   Prisma,
   Company,
-  TransportMode,
-  UserNotification,
   WasteProcessorType,
   CollectorType,
-  CompanyType
+  TransportMode
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../forms/database";
 import { CompanyRole } from "../common/validation/zod/schema";
+import { getDefaultNotifications } from "../users/notifications";
 
 /**
  * Create a user with name and email
@@ -141,24 +140,15 @@ export const userWithCompanyFactory = async (
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
-  const notifications =
-    role === "ADMIN"
-      ? [
-          UserNotification.MEMBERSHIP_REQUEST,
-          UserNotification.REVISION_REQUEST,
-          UserNotification.BSD_REFUSAL,
-          UserNotification.SIGNATURE_CODE_RENEWAL,
-          UserNotification.BSDA_FINAL_DESTINATION_UPDATE
-        ]
-      : [];
+  const notifications = getDefaultNotifications(role);
 
   const user = await userFactory({
     ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
-        notifications,
-        role: role,
+        ...notifications,
+        role,
         ...companyAssociationOpts
       }
     }

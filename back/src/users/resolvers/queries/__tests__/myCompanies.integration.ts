@@ -48,7 +48,13 @@ const MY_COMPANIES = gql`
           }
           userRole
           userPermissions
-          userNotifications
+          userNotifications {
+            membershipRequest
+            signatureCodeRenewal
+            bsdRefusal
+            bsdaFinalDestinationUpdate
+            revisionRequest
+          }
         }
       }
     }
@@ -472,14 +478,15 @@ describe("query { myCompanies }", () => {
     const company2 = await companyFactory();
     const company3 = await companyFactory();
 
-    await associateUserToCompany(user.id, company1.orgId, "ADMIN", {
-      notifications: ["MEMBERSHIP_REQUEST"]
+    await associateUserToCompany(user.id, company1.orgId, "MEMBER", {
+      notificationIsActiveMembershipRequest: true
     });
-    await associateUserToCompany(user.id, company2.orgId, "ADMIN", {
-      notifications: ["BSD_REFUSAL"]
+    await associateUserToCompany(user.id, company2.orgId, "MEMBER", {
+      notificationIsActiveBsdRefusal: true
     });
-    await associateUserToCompany(user.id, company3.orgId, "ADMIN", {
-      notifications: ["SIGNATURE_CODE_RENEWAL", "REVISION_REQUEST"]
+    await associateUserToCompany(user.id, company3.orgId, "MEMBER", {
+      notificationIsActiveSignatureCodeRenewal: true,
+      notificationIsActiveRevisionRequest: true
     });
     const { query } = makeClient(user);
     const { data } = await query<Pick<Query, "myCompanies">>(MY_COMPANIES);
@@ -495,13 +502,26 @@ describe("query { myCompanies }", () => {
       {}
     );
 
-    expect(userNotificationsByOrgId[company1.orgId]).toEqual([
-      "MEMBERSHIP_REQUEST"
-    ]);
-    expect(userNotificationsByOrgId[company2.orgId]).toEqual(["BSD_REFUSAL"]);
-    expect(userNotificationsByOrgId[company3.orgId]).toEqual([
-      "SIGNATURE_CODE_RENEWAL",
-      "REVISION_REQUEST"
-    ]);
+    expect(userNotificationsByOrgId[company1.orgId]).toMatchObject({
+      membershipRequest: true,
+      bsdaFinalDestinationUpdate: false,
+      bsdRefusal: false,
+      revisionRequest: false,
+      signatureCodeRenewal: false
+    });
+    expect(userNotificationsByOrgId[company2.orgId]).toEqual({
+      membershipRequest: false,
+      bsdaFinalDestinationUpdate: false,
+      bsdRefusal: true,
+      revisionRequest: false,
+      signatureCodeRenewal: false
+    });
+    expect(userNotificationsByOrgId[company3.orgId]).toEqual({
+      membershipRequest: false,
+      bsdaFinalDestinationUpdate: false,
+      bsdRefusal: false,
+      revisionRequest: true,
+      signatureCodeRenewal: true
+    });
   });
 });

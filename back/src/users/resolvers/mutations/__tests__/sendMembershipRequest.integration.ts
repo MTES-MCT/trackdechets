@@ -16,7 +16,6 @@ import {
 } from "@td/mail";
 import { Mutation } from "../../../../generated/graphql/types";
 import { subMinutes } from "date-fns";
-import { UserNotification } from "@prisma/client";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -49,7 +48,7 @@ describe("mutation sendMembershipRequest", () => {
     expect(errors[0].message).toEqual("Vous n'êtes pas connecté.");
   });
 
-  it("should send a request to all admins of the company and create a MembershipRequest record. Admins emails partially hidden.", async () => {
+  it("should send a request to all subscribers of the company and create a MembershipRequest record. Admins emails partially hidden.", async () => {
     const requester = await userFactory();
     const admin = await userFactory({
       email: "john.snow@trackdechets.fr",
@@ -62,11 +61,11 @@ describe("mutation sendMembershipRequest", () => {
     const company = await companyFactory();
     // this user should receive the notification
     await associateUserToCompany(admin.id, company.orgId, "ADMIN", {
-      notifications: [UserNotification.MEMBERSHIP_REQUEST]
+      notificationIsActiveMembershipRequest: true
     });
     // this user should not receive the notification
     await associateUserToCompany(admin2.id, company.orgId, "ADMIN", {
-      notifications: []
+      notificationIsActiveMembershipRequest: false
     });
     const { mutate } = makeClient(requester);
     const { data } = await mutate<Pick<Mutation, "sendMembershipRequest">>(
@@ -128,7 +127,7 @@ describe("mutation sendMembershipRequest", () => {
     );
   });
 
-  it("should send a request to all admins of the company and create a MembershipRequest record. Admins emails shown.", async () => {
+  it("should send a request to all subscribers of the company and create a MembershipRequest record. Admins emails shown.", async () => {
     const userIndex = (await prisma.user.count()) + 1;
 
     const requester = await userFactory({
@@ -139,7 +138,9 @@ describe("mutation sendMembershipRequest", () => {
       createdAt: subMinutes(new Date(), 5)
     });
     const company = await companyFactory();
-    await associateUserToCompany(admin.id, company.orgId, "ADMIN");
+    await associateUserToCompany(admin.id, company.orgId, "ADMIN", {
+      notificationIsActiveMembershipRequest: true
+    });
     const { mutate } = makeClient(requester);
     const { data } = await mutate<Pick<Mutation, "sendMembershipRequest">>(
       SEND_MEMBERSHIP_REQUEST,
