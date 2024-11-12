@@ -2,7 +2,7 @@ import {
   Mutation,
   MutationSubscribeToNotificationsArgs,
   UserNotifications
-} from "@td/codegen-ui";
+} from "../../../../generated/graphql/types";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { associateUserToCompany } from "../../../database";
 import { Prisma } from "@prisma/client";
