@@ -9,6 +9,11 @@ import { MailTemplate } from "../types";
 import { templateIds } from "./provider/templateIds";
 import { mustacheRenderer } from "./renderers";
 
+const { UI_HOST } = process.env;
+
+// URL permettant de gérer les préférences de notifications par e-mail
+const handlePreferencesUrl = `${UI_HOST}/account/notifications`;
+
 export const onSignup: MailTemplate<{ activationHash: string }> = {
   subject: "Activer votre compte sur Trackdéchets",
   body: mustacheRenderer("confirmation-de-compte.html"),
@@ -48,7 +53,10 @@ export const yourCompanyIsIdentifiedOnABsd: MailTemplate<{
   subject:
     "Votre établissement a été identifié sur un bordereau de suivi de déchets dangereux sur Trackdéchets",
   body: mustacheRenderer("your-company-is-identified-on-a-bsd.html"),
-  templateId: templateIds.LAYOUT
+  templateId: templateIds.LAYOUT,
+  // permet de cacher le message "Vous avez reçu cet e-mail car vous
+  // êtes inscrit sur la plateforme Trackdéchets" dans le template Brevo
+  params: { hideRegisteredUserInfo: true }
 };
 
 export const onboardingFirstStep: MailTemplate = {
@@ -83,6 +91,10 @@ export const formNotAccepted: MailTemplate<{ form: Form & BsddTransporter }> = {
         sentBy: form.sentBy ?? ""
       }
     };
+  },
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
   }
 };
 
@@ -107,6 +119,10 @@ export const formPartiallyRefused: MailTemplate<{
         sentBy: form.sentBy ?? ""
       }
     };
+  },
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
   }
 };
 
@@ -129,7 +145,11 @@ export const membershipRequest: MailTemplate<{
 }> = {
   subject: "Un utilisateur souhaite rejoindre votre établissement",
   body: mustacheRenderer("membership-request.html"),
-  templateId: templateIds.LAYOUT
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
 };
 
 export const membershipRequestAccepted: MailTemplate<{
@@ -158,7 +178,11 @@ export const securityCodeRenewal: MailTemplate<{
   subject: ({ company }) =>
     `Renouvellement du code de signature de votre établissement "${company.name}" (${company.orgId})`,
   body: mustacheRenderer("notification-renouvellement-code-signature.html"),
-  templateId: templateIds.LAYOUT
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
 };
 
 export const verificationProcessInfo: MailTemplate<{
@@ -203,7 +227,11 @@ export const finalDestinationModified: MailTemplate<{
 }> = {
   subject: ({ id }) => `Alerte sur le bordereau ${id}`,
   body: mustacheRenderer("destination-finale-modifiee.html"),
-  templateId: templateIds.LAYOUT
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
 };
 
 export const membershipRequestDetailsEmail: MailTemplate = {
@@ -225,7 +253,11 @@ export const pendingMembershipRequestEmail: MailTemplate<{
 }> = {
   subject: "Un utilisateur est toujours en attente de réponse de votre part",
   body: mustacheRenderer("pending-membership-request.html"),
-  templateId: templateIds.LAYOUT
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
 };
 
 export const profesionalsSecondOnboardingEmail: MailTemplate = {
@@ -249,7 +281,11 @@ export const pendingRevisionRequestEmail: MailTemplate<{
 }> = {
   subject: "Votre action est attendue sur une demande de révision",
   body: mustacheRenderer("pending-revision-request-admin-details.html"),
-  templateId: templateIds.LAYOUT
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
 };
 
 export const registryDelegationCreation: MailTemplate<{
