@@ -12,6 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Permettre l'ajout d'un numéro libre sur le Bsvhu [PR 3718](https://github.com/MTES-MCT/trackdechets/pull/3718)
 - Permettre à l'utilisateur de gérer les alertes de tous ses établissements [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
 - Afficher le nombre d'inscrits par type d'alertes au sein d'un établissement [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
+- Ajouter un lien "Gérer mes préférences e-mails" dans les e-mails transactionnels auquel l'utilisateur est en capacité de s'inscrire / désinscrire [PR 3738](https://github.com/MTES-MCT/trackdechets/pull/3738)
 
 #### :boom: Breaking changes
 
