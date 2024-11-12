@@ -12,12 +12,17 @@ import {
 
 type CompanyTypeCheckboxProps = {
   label: string;
+  parentValue?: AllCompanyType | undefined;
   value: AllCompanyType;
   helpText?: string;
   subTypeOptions?: CompanySubTypeOption[];
   // Représente un formulaire récépissé, agrément, etc
   certificationForm?: ReactNode;
-  handleToggle: (value: AllCompanyType, checked: boolean) => void;
+  handleToggle: (
+    parentValue: AllCompanyType | undefined,
+    value: AllCompanyType,
+    checked: boolean
+  ) => void;
   inputProps?: CompanyTypeInputProps;
   inputErrors?: CompanyTypeInputErrors;
   inputValues: CompanyTypeInputValues;
@@ -25,6 +30,7 @@ type CompanyTypeCheckboxProps = {
 
 const CompanyTypeCheckbox = ({
   label,
+  parentValue,
   value,
   helpText,
   handleToggle,
@@ -33,10 +39,11 @@ const CompanyTypeCheckbox = ({
   inputProps,
   inputErrors
 }: CompanyTypeCheckboxProps): React.JSX.Element => {
-  const companyTypeChecked = React.useMemo(
-    () => inputValues.companyTypes.includes(value),
-    [value, inputValues.companyTypes]
-  );
+  const companyTypeChecked = React.useMemo(() => {
+    const fullValue = parentValue ? `${parentValue}.${value}` : value;
+    return inputValues.companyTypes.includes(fullValue);
+  }, [parentValue, value, inputValues.companyTypes]);
+
   const showSubTypes = React.useMemo(
     () => companyTypeChecked && Boolean(subTypeOptions),
     [companyTypeChecked, subTypeOptions]
@@ -61,6 +68,7 @@ const CompanyTypeCheckbox = ({
                   checked: companyTypeChecked,
                   onChange: e =>
                     handleToggle(
+                      parentValue,
                       e.currentTarget.value as AllCompanyType,
                       e.currentTarget.checked
                     )
@@ -84,6 +92,7 @@ const CompanyTypeCheckbox = ({
             return (
               <CompanyTypeCheckbox
                 key={subTypeOption.value}
+                parentValue={value}
                 value={subTypeOption.value}
                 label={subTypeOption.label}
                 inputValues={inputValues}
