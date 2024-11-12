@@ -11,7 +11,6 @@ import {
   User,
   Prisma,
   Company,
-  UserNotification,
   WasteProcessorType,
   CollectorType,
   TransportMode

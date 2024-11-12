@@ -9,7 +9,7 @@ export const hintTexts: { [key in keyof UserNotifications]: string } = {
   signatureCodeRenewal:
     "Un courriel sera envoyé à chaque renouvellement du code de signature",
   bsdRefusal:
-    "un courriel sera envoyé à chaque refus total ou partiel d'un bordereau",
+    "Un courriel sera envoyé à chaque refus total ou partiel d'un bordereau",
   bsdaFinalDestinationUpdate:
     "Un courriel sera envoyé lorsque le BSDA est envoyé à un exutoire" +
     " différent de celui prévu lors de la signature producteur",
