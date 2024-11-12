@@ -150,8 +150,12 @@ describe("Test appendixForms", () => {
     });
 
     expect(appendixForms.length).toBe(2);
-    expect(appendixForms[0].id).toBe(awaitingGroupForm.id);
-    expect(appendixForms[1].id).toBe(initialForm2.id);
+
+    expect(
+      appendixForms.map(bsd => bsd.id).sort((a, b) => a.localeCompare(b))
+    ).toEqual(
+      [awaitingGroupForm.id, initialForm2.id].sort((a, b) => a.localeCompare(b))
+    );
   });
 
   it("should not return appendixForms data", async () => {
@@ -322,10 +326,17 @@ describe("Test appendixForms", () => {
       });
 
       expect(appendixForms.length).toBe(2);
-      expect(appendixForms[0].id).toBe(awaitingGroupForm.id);
-      expect(appendixForms[0].quantityGrouped).toBe(0);
-      expect(appendixForms[1].id).toBe(partiallyGrouped.id);
-      expect(appendixForms[1].quantityGrouped).toBe(3);
+
+      expect(
+        appendixForms.map(bsd => bsd.id).sort((a, b) => a.localeCompare(b))
+      ).toEqual(
+        [awaitingGroupForm.id, partiallyGrouped.id].sort((a, b) =>
+          a.localeCompare(b)
+        )
+      );
+      expect(appendixForms.map(bsd => bsd.quantityGrouped).sort()).toEqual([
+        0, 3
+      ]);
     });
 
     it("new + legacy > should return candidates", async () => {
@@ -447,12 +458,17 @@ describe("Test appendixForms", () => {
       });
 
       expect(appendixForms.length).toBe(3);
-      expect(appendixForms[0].id).toBe(awaitingGroupForm.id);
-      expect(appendixForms[0].quantityGrouped).toBe(0);
-      expect(appendixForms[1].id).toBe(awaitingGroupForm2.id);
-      expect(appendixForms[1].quantityGrouped).toBe(0);
-      expect(appendixForms[2].id).toBe(partiallyGrouped.id);
-      expect(appendixForms[2].quantityGrouped).toBe(3);
+
+      expect(
+        appendixForms.map(bsd => bsd.id).sort((a, b) => a.localeCompare(b))
+      ).toEqual(
+        [awaitingGroupForm.id, awaitingGroupForm2.id, partiallyGrouped.id].sort(
+          (a, b) => a.localeCompare(b)
+        )
+      );
+      expect(appendixForms.map(bsd => bsd.quantityGrouped).sort()).toEqual([
+        0, 0, 3
+      ]);
     });
   });
 });

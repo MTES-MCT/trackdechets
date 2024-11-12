@@ -102,7 +102,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
       ecoOrganisme: companies.companyF,
       transporters: [companies.companyL]
     });
-
+    await seedFormGroupment(bsdd3, bsdd2);
     // BSDAs
 
     bsda1 = await seedBsda({
@@ -479,7 +479,7 @@ test.describe.serial("Cahier des filtres rapides", async () => {
           out: [bsda1]
         },
         {
-          desc: '"Supermarché" > bsdd3 devrait remonter',
+          desc: '"Supermarché" > bsdd3 devrait devrait remonter',
           in: "Supermarché",
           out: [bsdd3]
         },
