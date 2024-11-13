@@ -1,11 +1,7 @@
 import React from "react";
-import {
-  FocusScope,
-  Overlay,
-  useModalOverlay,
-  useOverlayTrigger
-} from "react-aria";
+import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
+import FocusTrap from "focus-trap-react";
 import "./modal.scss";
 
 const ModalSizesClass = {
@@ -50,7 +46,7 @@ export function Modal({
             {...modalProps}
             ref={ref}
           >
-            <FocusScope contain restoreFocus autoFocus>
+            <FocusTrap active>
               <div className="fr-grid-row fr-grid-row--center">
                 <div className={ModalSizesClass[size]}>
                   <div className="fr-modal__body">
@@ -73,7 +69,7 @@ export function Modal({
                   </div>
                 </div>
               </div>
-            </FocusScope>
+            </FocusTrap>
           </div>
         </div>
       </div>
