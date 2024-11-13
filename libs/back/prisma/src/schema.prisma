@@ -2527,9 +2527,9 @@ model RegistryLookup {
   // array of elements so gin index
   @@index([sirets], map: "_RegistryLookupSiretsIdx", type: Gin)
   // multi-column index because those columns are mandatory for any export
-  @@index([date(sort: Desc), exportRegistryType], map: "_RegistryLookupMainIdx")
+  @@index([date(sort: Asc), exportRegistryType], map: "_RegistryLookupMainIdx")
   @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
-  @@index([dateId(sort: Desc)], map: "_RegistryLookupDateIdIdx")
+  @@index([dateId(sort: Asc)], map: "_RegistryLookupDateIdIdx")
   @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
   @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
 }

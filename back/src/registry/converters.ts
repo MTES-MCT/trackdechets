@@ -129,14 +129,11 @@ export function toWastes<WasteType extends GenericWaste>(
 }
 // add other types when other exports are added
 type RegistryInputMap = {
-  SSD: RegistrySsd;
-};
-
-export type RegistryExportMap<WasteType> = {
-  SSD: WasteType;
+  SSD: RegistrySsd | null;
 };
 
 const registryToSsdWaste = {
+  // "?." because it's partial. Once completed, remove the partial and "?."
   SSD: exportOptions.SSD?.toSsdWaste
 };
 
@@ -145,13 +142,14 @@ const registryToWaste: Record<"SSD", any> = {
 };
 
 export function toWaste<WasteType extends GenericWaste>(
-  registryType: "SSD",
+  registryType: WasteRegistryType,
   input: RegistryInputMap
-): RegistryExportMap<WasteType> {
+  // remove undefined once all types are defined
+): WasteType | undefined {
   const converter = registryToWaste[registryType];
   const { SSD } = input;
-
-  return {
-    SSD: converter.SSD(SSD)
-  };
+  if (input.SSD) {
+    return converter.SSD?.(SSD);
+  }
+  return;
 }

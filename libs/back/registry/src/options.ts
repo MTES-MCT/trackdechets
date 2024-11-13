@@ -1,5 +1,5 @@
 import { SafeParseReturnType } from "zod";
-import { SSD_HEADERS } from "./ssd/constants";
+import { SSD_EXPORT_HEADERS, SSD_HEADERS } from "./ssd/constants";
 import { safeParseAsyncSsd } from "./ssd/validation";
 import { getSsdImportSiretsAssociations, saveSsdLine } from "./ssd/database";
 import { INCOMING_WASTE_HEADERS } from "./incomingWaste/constants";
@@ -59,12 +59,14 @@ export const UNAUTHORIZED_ERROR =
   "Vous n'avez pas le droit de faire une déclaration pour ce SIRET";
 
 export type ExportOptions = {
+  headers: Record<string, string>;
   toSsdWaste?: (registry: unknown) => SsdWaste;
 };
 
 export const exportOptions: Partial<Record<RegistryExportType, ExportOptions>> =
   {
     SSD: {
+      headers: SSD_EXPORT_HEADERS,
       toSsdWaste
     }
   };

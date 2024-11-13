@@ -20,6 +20,6 @@ export function enqueueRegistryExportJob(
   args: RegistryExportJobArgs,
   options?: JobOptions
 ): Promise<Job<RegistryExportJobArgs>> {
-  logger.info(`Enqueuing registry export ${args.importId}`);
+  logger.info(`Enqueuing registry export ${args.exportId}`);
   return registryExportQueue.add(args, options);
 }
