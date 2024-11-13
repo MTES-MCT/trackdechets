@@ -32,8 +32,7 @@ describe("GET /oauth2/authorize", () => {
     expect(res.body.transactionID).toHaveLength(8);
     expect(res.body.redirectURI).toEqual(application.redirectUris[0]);
     expect(res.body.client).toEqual({
-      name: application.name,
-      logoUrl: application.logoUrl
+      name: application.name
     });
     expect(res.body.user).toEqual({ name: user.name });
   });

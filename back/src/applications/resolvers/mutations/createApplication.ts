@@ -15,7 +15,6 @@ const createApplicationResolver: MutationResolvers["createApplication"] =
     const application = await prisma.application.create({
       data: {
         name: input.name,
-        logoUrl: input.logoUrl,
         goal: input.goal,
         redirectUris: input.redirectUris,
         adminId: user.id,

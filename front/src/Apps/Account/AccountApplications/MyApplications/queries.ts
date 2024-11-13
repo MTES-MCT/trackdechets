@@ -4,7 +4,6 @@ const ApplicationFragment = gql`
   fragment ApplicationFragment on Application {
     id
     name
-    logoUrl
     goal
     redirectUris
     clientSecret

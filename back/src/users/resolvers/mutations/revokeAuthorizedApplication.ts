@@ -41,7 +41,6 @@ const revokeAuthorizedApplicationResolver: MutationResolvers["revokeAuthorizedAp
       id: application.id,
       name: application.name,
       admin: owner.email,
-      logoUrl: application.logoUrl,
       lastConnection
     };
   };
