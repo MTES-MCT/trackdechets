@@ -1,5 +1,5 @@
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import "./formStepsTabs.scss";
@@ -40,6 +40,7 @@ const FormStepsTabs = ({
   children,
   genericErrorMessage
 }: Readonly<Props>) => {
+  const ref = useRef<HTMLDivElement | undefined>();
   useEffect(() => {
     // dsfr Tabs hack to add a type button on tabs to avoid submitting a form on tab change
     const tabsButtonElems = document
@@ -51,6 +52,12 @@ const FormStepsTabs = ({
     });
   }, []);
 
+  useEffect(() => {
+    if (ref.current && genericErrorMessage?.[0]?.message) {
+      ref.current.focus();
+    }
+  }, [genericErrorMessage?.[0]?.message]);
+
   return (
     <form id="formStepsTabs" className="formSteps" onSubmit={onSubmit}>
       <Tabs
@@ -58,57 +65,61 @@ const FormStepsTabs = ({
         tabs={tabList}
         onTabChange={onTabChange}
       >
-        <div id="formStepsTabsContent" className="formSteps__tabs">
-          {children}
-        </div>
+        {children}
       </Tabs>
       <br />
       {!!genericErrorMessage?.[0]?.message && (
-        <Alert
-          description={genericErrorMessage?.[0]?.message}
-          severity="error"
-          title=""
-        />
-      )}
-      <div className="formSteps__actions">
-        <div className="formSteps__actions__cta-group">
-          <Button
-            onClick={onPrevTab}
-            priority="tertiary"
-            disabled={isPrevStepDisabled}
-            type="button"
-          >
-            Précédent
-          </Button>
-
-          <Button
-            onClick={onNextTab}
-            priority="tertiary"
-            disabled={isNextStepDisabled}
-            type="button"
-          >
-            Suivant
-          </Button>
+        <div ref={ref as React.RefObject<HTMLDivElement>} tabIndex={-1}>
+          <Alert
+            description={genericErrorMessage?.[0]?.message}
+            severity="error"
+            title=""
+          />
         </div>
+      )}
+      <div className="fr-modal__footer">
+        <div className="fr-btns-group fr-btns-group--inline">
+          <div>
+            <div>
+              <Button
+                onClick={onPrevTab}
+                priority="tertiary"
+                disabled={isPrevStepDisabled}
+                type="button"
+              >
+                Précédent
+              </Button>
 
-        <div className="formSteps__actions__cta-group">
-          <Button priority="secondary" type="button" onClick={onCancel}>
-            Annuler
-          </Button>
+              <Button
+                onClick={onNextTab}
+                priority="tertiary"
+                disabled={isNextStepDisabled}
+                type="button"
+              >
+                Suivant
+              </Button>
+            </div>
 
-          {draftCtaLabel && (
-            <Button
-              priority="secondary"
-              id="id_save_draft"
-              nativeButtonProps={{ "data-testid": "draftBtn" }}
-            >
-              {draftCtaLabel}
-            </Button>
-          )}
+            <div>
+              <Button priority="secondary" type="button" onClick={onCancel}>
+                Annuler
+              </Button>
 
-          <Button id="id_save" priority="primary">
-            {mainCtaLabel}
-          </Button>
+              {draftCtaLabel && (
+                <Button
+                  priority="secondary"
+                  id="id_save_draft"
+                  nativeButtonProps={{ "data-testid": "draftBtn" }}
+                >
+                  {draftCtaLabel}
+                </Button>
+              )}
+
+              <Button id="id_save" priority="primary">
+                {mainCtaLabel}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </form>
