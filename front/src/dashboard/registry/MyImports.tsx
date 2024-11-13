@@ -167,10 +167,10 @@ export function MyImports() {
           )}
           {data && tableData.length === 0 && (
             <div className="tw-text-center">
-              <p className="tw-mt-10 tw-text-2xl">
+              <p className="tw-mt-24 tw-text-xl tw-mb-4">
                 Vous n'avez pas encore fait d'import
               </p>
-              <p>
+              <p className="tw-text-sm">
                 Utilisez le bouton "Importer" ci-dessus pour réaliser un import
               </p>
             </div>

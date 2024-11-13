@@ -191,6 +191,7 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
 
   const { files, type } = getValues();
   const file = files[0];
+  const fileName = file.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
   const [importFile, { error: importFileError }] = useMutation<
     Pick<Mutation, "importFile">,
@@ -201,14 +202,14 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
     Pick<Query, "registryUploadSignedUrl">,
     Partial<QueryRegistryUploadSignedUrlArgs>
   >(REGISTRY_UPLOAD_SIGNED_URL, {
-    variables: { fileName: file.name },
+    variables: { fileName },
     fetchPolicy: "no-cache",
     onCompleted: async ({ registryUploadSignedUrl }) => {
       const uploadResponse = await fetch(registryUploadSignedUrl.signedUrl, {
         method: "PUT",
         headers: {
           "Content-Type": file.type,
-          "x-amz-meta-filename": file.name
+          "x-amz-meta-filename": fileName
         },
         body: file
       });
@@ -296,8 +297,8 @@ function Step3({ registryImportId }) {
     `${data?.registryImport?.numberOfErrors} déclarations en erreur non prises en compte`,
     `${data?.registryImport?.numberOfInsertions} nouvelles déclarations`,
     `${data?.registryImport?.numberOfEdits} déclarations corrigées`,
-    `${data?.registryImport?.numberOfCancellations} déclations annulées`,
-    `${data?.registryImport?.numberOfSkipped} déclations ignorées`
+    `${data?.registryImport?.numberOfCancellations} déclarations annulées`,
+    `${data?.registryImport?.numberOfSkipped} déclarations ignorées`
   ].filter(v => !v.startsWith("0"));
 
   return (

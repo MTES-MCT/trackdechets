@@ -4,10 +4,12 @@ import { Refinement, z } from "zod";
 
 export function refineActorOrgId<T>({
   typeKey,
-  orgIdKey
+  orgIdKey,
+  countryKey
 }: {
   typeKey: string;
   orgIdKey: string;
+  countryKey?: string;
 }): Refinement<T> {
   return (item, { addIssue }) => {
     const type:
@@ -16,8 +18,11 @@ export function refineActorOrgId<T>({
       | "ENTREPRISE_HORS_UE"
       | "ASSOCIATION"
       | "PERSONNE_PHYSIQUE"
-      | "COMMUNES" = item[typeKey];
+      | "COMMUNE" = item[typeKey];
     const orgId: string = item[orgIdKey];
+    const inputCountry: string | undefined = countryKey
+      ? item[countryKey]
+      : undefined;
 
     switch (type) {
       case "ENTREPRISE_FR": {
@@ -28,16 +33,38 @@ export function refineActorOrgId<T>({
             path: [orgIdKey]
           });
         }
+
+        if (countryKey && inputCountry && inputCountry !== "FR") {
+          addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Le code pays doit être FR pour une entreprise française",
+            path: [countryKey]
+          });
+        }
         break;
       }
       case "ENTREPRISE_UE": {
-        const { isValid } = checkVAT(orgId, countries);
+        const { isValid, country } = checkVAT(orgId, countries);
         if (!isValid) {
           addIssue({
             code: z.ZodIssueCode.custom,
             message:
-              "Le numéro d'identification du destinataire doit faire entre 3 et 27 caractères pour une entreprise Européenne. Il commence par 2 lettres majuscules et est suivi de chiffres.",
+              "Le numéro de TVA du destinataire n'est pas valide. Il commence par 2 lettres majuscules, est suivi de chiffres et doit respexter les contraintes du pays concerné",
             path: [orgIdKey]
+          });
+        }
+
+        if (
+          country &&
+          countryKey &&
+          inputCountry &&
+          country.isoCode.short !== inputCountry
+        ) {
+          addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              "Le code pays ne correspond pas au code pays de la TVA saisie",
+            path: [countryKey]
           });
         }
         break;
@@ -62,6 +89,14 @@ export function refineActorOrgId<T>({
             message:
               "Le numéro d'identification du destinataire doit faire 10 caractères pour une assoxiation. Il commence par un W suivi de 9 chiffres.",
             path: [orgIdKey]
+          });
+        }
+
+        if (countryKey && inputCountry && inputCountry !== "FR") {
+          addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Le code pays doit être FR pour une association française",
+            path: [countryKey]
           });
         }
         break;

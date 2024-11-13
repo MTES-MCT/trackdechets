@@ -36,19 +36,29 @@ export function getTransformCsvStream(options: ImportOptions) {
     .on("headers", headers => {
       const expectedHeaders = Object.keys(options.headers);
 
+      const errors: string[] = [];
+
       for (const [idx, header] of headers.entries()) {
         if (header === expectedHeaders[idx]) {
           continue;
         }
+        errors.push(
+          `Colonne numéro ${idx + 1} - attendu "${
+            options.headers[expectedHeaders[idx]]
+          }", reçu "${header}"`
+        );
+      }
+
+      if (errors.length > 0) {
         // Destroy the stream to stop the parsing process without flushing it
         parseStream.destroy(
           new Error(
-            `En-tête non valide pour la colonne numéro ${idx + 1}. Attendu "${
-              options.headers[expectedHeaders[idx]]
-            }", reçu "${header}"`
+            [
+              "Les en-têtes de colonnes ne correspondent pas au modèle. Assurez-vous que vous utilisez le bon modèle. Le détail des colonnes en erreur est précisé ci-dessous:",
+              ...errors
+            ].join("\n")
           )
         );
-        break;
       }
     })
     .on("error", error => {
@@ -78,6 +88,7 @@ export function getTransformXlsxStream(options: ImportOptions) {
         // In Excel, the first row is 1
         if (row.number === 1) {
           const headerLabels = Object.values(options.headers);
+          const errors: string[] = [];
 
           headerLabels.forEach((label, index) => {
             const {
@@ -87,11 +98,20 @@ export function getTransformXlsxStream(options: ImportOptions) {
             } = row.getCell(index + 1);
 
             if (value !== label) {
-              throw new Error(
+              errors.push(
                 `En-tête non valide dans la cellule ${colLabel}:${rowLabel}. Attendu "${label}", reçu "${value}"`
               );
             }
           });
+
+          if (errors.length > 0) {
+            throw new Error(
+              [
+                "Les en-têtes de colonnes ne correspondent pas au modèle. Assurez-vous que vous utilisez le bon modèle. Le détail des colonnes en erreur est précisé ci-dessous:",
+                ...errors
+              ].join("\n")
+            );
+          }
 
           continue;
         }

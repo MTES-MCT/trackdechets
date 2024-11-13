@@ -120,8 +120,8 @@ const inputSsdSchema = z.object({
               "Les dénominations usuelles du déchet doivent faire au moins 2 caractères"
             )
             .max(
-              150,
-              "Les dénominations usuelles du déchet ne peuvent pas dépasser 150 caractères"
+              200,
+              "Les dénominations usuelles du déchet ne peuvent pas dépasser 200 caractères"
             )
         )
         .optional()
@@ -160,7 +160,10 @@ const inputSsdSchema = z.object({
           .optional()
       )
   ]),
-  destinationType: getActorTypeSchema("de destinataire"),
+  destinationType: getActorTypeSchema("de destinataire").exclude([
+    "PERSONNE_PHYSIQUE",
+    "COMMUNE"
+  ]),
   destinationOrgId: getActorOrgIdSchema("du destinataire"),
   destinationName: getActorNameSchema("du destinataire"),
   destinationAddress: getActorAddressSchema("du destinataire"),
@@ -208,20 +211,19 @@ const inputSsdSchema = z.object({
           throw Error("Unhandled qualification code");
       }
     }),
-  administrativeActReference: z
-    .string()
-    .min(
-      8,
-      "La référence d'acte administratif doit faire au moins 8 caractères"
-    )
-    .max(
-      100,
-      "La référence d'acte administratif ne peut pas dépasser 100 caractères"
-    )
-    .refine(
-      val => /^[a-zA-ZÀ-û0-9\s]+$/.test(val),
-      "La référence d'acte administratif ne peut contenir que des lettres ou des chiffres"
-    )
+  administrativeActReference: z.enum([
+    "Implicite",
+    "Arrêté du 29 juillet 2014",
+    "Arrêté du 24 août 2016",
+    "Arrêté du 10 juillet 2017",
+    "Arrêté du 11 décembre 2018",
+    "Arrêté du 22 février 2019",
+    "Arrêté du 25 février 2019",
+    "Arrêté du 4 juin 2021",
+    "Arrêté du 13 décembre 2021",
+    "Arrêté du 21 décembre 2021",
+    "Arrêté du 19 février 2024"
+  ])
 });
 
 // Props added through transform
