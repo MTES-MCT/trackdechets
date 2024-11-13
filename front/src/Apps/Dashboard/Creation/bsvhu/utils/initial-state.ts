@@ -80,5 +80,13 @@ export default {
         takenOverAt: null
       }
     }
+  },
+  ecoOrganisme: {
+    name: "",
+    siret: ""
   }
 };
+
+export const ecoOrganismeList = [
+  { siret: "92474564900013", name: "Recycler mon véhicule" }
+];

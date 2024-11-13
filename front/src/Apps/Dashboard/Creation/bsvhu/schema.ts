@@ -136,7 +136,22 @@ export const rawBsvhuSchema = z.object({
   weight: z.object({
     isEstimate: z.boolean().nullish(),
     value: z.coerce.number().nonnegative().nullish()
-  })
+  }),
+  ecoOrganisme: z
+    .object({
+      siret: z.string().nullish(),
+      name: z.string().nullish(),
+      hasEcoOrganisme: z.boolean().nullish()
+    })
+    .superRefine((val, ctx) => {
+      if (val?.hasEcoOrganisme && !val.siret) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["siret"],
+          message: `Veuillez sélectionner un éco-organisme`
+        });
+      }
+    })
 });
 
 export type ZodBsvhu = z.infer<typeof rawBsvhuSchema>;
