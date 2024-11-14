@@ -107,9 +107,8 @@ describe("Mutation.markAsSealed", () => {
       expect.objectContaining({
         message:
           "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.\n" +
-          "Erreur(s): Les autorisations de l'établissement de destination ne semblent pas correspondre à la " +
-          "caractérisation du déchet renseigné. Merci de bien vouloir procéder à la mise à jour du profil de " +
-          "l'établissement ou modifier le type de déchet sans quoi le bordereau ne pourra être enregistré.",
+          "Erreur(s): Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+          " Il lui appartient de mettre à jour son profil.",
 
         extensions: {
           code: "BAD_USER_INPUT"
@@ -1257,9 +1256,8 @@ describe("Mutation.markAsSealed", () => {
         message: [
           "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
           `Erreur(s): L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`,
-          "Les autorisations de l'établissement de destination ne semblent pas correspondre à la caractérisation " +
-            "du déchet renseigné. Merci de bien vouloir procéder à la mise à jour du profil de l'établissement ou modifier " +
-            "le type de déchet sans quoi le bordereau ne pourra être enregistré."
+          "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil."
         ].join("\n")
       })
     ]);
