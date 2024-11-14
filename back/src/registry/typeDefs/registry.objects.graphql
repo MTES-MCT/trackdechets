@@ -1966,11 +1966,11 @@ type RegistryImport {
 }
 
 type RegistryImportAssociation {
-  reportedFor: ResgistryImportCompany!
-  reportedAs: ResgistryImportCompany!
+  reportedFor: RegistryCompany!
+  reportedAs: RegistryCompany!
 }
 
-type ResgistryImportCompany {
+type RegistryCompany {
   "Nom de l'établissement"
   name: String
 

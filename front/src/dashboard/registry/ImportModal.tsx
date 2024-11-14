@@ -196,7 +196,7 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
   const [importFile, { error: importFileError }] = useMutation<
     Pick<Mutation, "importFile">,
     MutationImportFileArgs
-  >(IMPORT_FILE, { onCompleted: goToNextStep });
+  >(IMPORT_FILE);
 
   const { error: signedUrlError } = useQuery<
     Pick<Query, "registryUploadSignedUrl">,
@@ -223,6 +223,7 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
         });
 
         setRegistryImportId(registryImport?.data?.importFile?.id);
+        goToNextStep();
       } else {
         setS3UploadError(uploadResponse.statusText);
       }
