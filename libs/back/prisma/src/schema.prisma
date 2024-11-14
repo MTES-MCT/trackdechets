@@ -1120,7 +1120,7 @@ model Bsvhu {
   @@index([canAccessDraftOrgIds], map: "_BsvhuCanAccessDraftOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
-  @@index([customId], map: "_Bsvhumigrations/CustomIdIdx")
+  @@index([customId], map: "_BsvhuCustomIdIdx")
 }
 
 model RegistryDelegation {
