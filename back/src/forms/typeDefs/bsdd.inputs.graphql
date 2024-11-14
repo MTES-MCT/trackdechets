@@ -103,9 +103,6 @@ input AcceptedFormInput {
   """
   Quantité réelle présentée en tonnes (case 10).
 
-  Doit être supérieure à 0 lorsque le déchet est accepté.
-  Doit être égale à 0 lorsque le déchet est refusé.
-
   Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
@@ -149,9 +146,6 @@ input ReceivedFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 10).
-
-  Doit être supérieure à 0 lorsque le déchet est accepté.
-  Doit être égale à 0 lorsque le déchet est refusé.
 
   Doit être inférieure à 40T en cas de transport routier et inférieure à 50 000 T tout type de transport confondu.
 
@@ -757,9 +751,6 @@ input TempStorerAcceptedFormInput {
   """
   Quantité réelle présentée en tonnes (case 13)
 
-  Doit être supérieure à 0 lorsque le déchet est accepté.
-  Doit être égale à 0 lorsque le déchet est refusé.
-
   Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
@@ -796,9 +787,6 @@ input TempStoredFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 13)
-
-  Doit être supérieure à 0 lorsque le déchet est accepté.
-  Doit être égale à 0 lorsque le déchet est refusé.
 
   Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
