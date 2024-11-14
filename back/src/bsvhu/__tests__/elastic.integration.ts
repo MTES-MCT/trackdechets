@@ -52,6 +52,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     trader = await companyFactory({ name: "Trader" });
     bsvhu = await bsvhuFactory({
       opt: {
+        customId: "my custom id",
         emitterCompanyName: emitter.name,
         emitterCompanySiret: emitter.siret,
         transporterCompanyName: transporter.name,
@@ -80,6 +81,11 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     elasticBsvhu = toBsdElastic(bsvhu);
   });
 
+  test("customId should be indexed", async () => {
+    // Then
+    expect(elasticBsvhu.customId).toContain("my custom id");
+  });
+
   test("companyNames > should contain the names of ALL BSVHU companies", async () => {
     // Then
     expect(elasticBsvhu.companyNames).toContain(emitter.name);
@@ -90,6 +96,18 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyNames).toContain(ecoOrganisme.name);
     expect(elasticBsvhu.companyNames).toContain(broker.name);
     expect(elasticBsvhu.companyNames).toContain(trader.name);
+  });
+
+  test("companyOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {
+    // Then
+    expect(elasticBsvhu.companyOrgIds).toContain(emitter.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(transporter.vatNumber);
+    expect(elasticBsvhu.companyOrgIds).toContain(destination.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(intermediary1.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(intermediary2.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(ecoOrganisme.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(broker.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(trader.siret);
   });
 
   test("companyOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {

@@ -67,7 +67,7 @@ export async function getCodeCommune(address: string) {
     }
 
     return null;
-  } catch (e) {
+  } catch (_) {
     logger.error(
       `Error while trying to retrieve codeCommune for address: "${address}"`
     );

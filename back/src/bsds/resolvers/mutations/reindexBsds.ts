@@ -21,7 +21,7 @@ const reindexBsdsResolver: MutationResolvers["reindexBsds"] = async (
     bsdIds.map(async bsdId => {
       try {
         await reindex(bsdId, success => success);
-      } catch (e) {
+      } catch (_) {
         throw new Error(bsdId);
       }
     })

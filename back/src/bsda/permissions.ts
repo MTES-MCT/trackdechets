@@ -170,6 +170,10 @@ async function creators(input: BsdaInput) {
       }
     ];
   }
+
+  const intermediariesOrgIds =
+    input.intermediaries?.map(i => i.siret).filter(Boolean) ?? [];
+
   return [
     input.emitter?.company?.siret,
     input.ecoOrganisme?.siret,
@@ -177,6 +181,7 @@ async function creators(input: BsdaInput) {
       t.transporterCompanySiret,
       t.transporterCompanyVatNumber
     ]),
+    ...intermediariesOrgIds,
     input.destination?.company?.siret,
     input.worker?.company?.siret,
     input.broker?.company?.siret,
@@ -185,6 +190,9 @@ async function creators(input: BsdaInput) {
 }
 
 export async function checkCanRead(user: User, bsda: BsdaWithTransporters) {
+  if (user.isAdmin && user.isActive) {
+    return true;
+  }
   const authorizedOrgIds = readers(bsda);
 
   return checkUserPermissions(

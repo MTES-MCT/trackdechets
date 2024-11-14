@@ -13,6 +13,7 @@ import {
 } from "../../../__tests__/factories";
 import { gql } from "graphql-tag";
 import { fullBsff } from "../../../fragments";
+import { ErrorCode } from "../../../../common/errors";
 
 const GET_BSFF = gql`
   query GetBsff($id: ID!) {
@@ -25,6 +26,29 @@ const GET_BSFF = gql`
 
 describe("Query.bsff", () => {
   afterEach(resetDatabase);
+  it("should disallow unauthenticated user", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff({ emitter });
+
+    const { query } = makeClient();
+    const { errors } = await query<Pick<Query, "bsff">, QueryBsffArgs>(
+      GET_BSFF,
+      {
+        variables: {
+          id: bsff.id
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas connecté.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.UNAUTHENTICATED
+        })
+      })
+    ]);
+  });
 
   it("should allow the emitter to read their bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -88,6 +112,30 @@ describe("Query.bsff", () => {
         message: `Le BSFF n°${bsff.id} n'existe pas.`
       })
     ]);
+  });
+
+  it("should allow admin user even if the user is not a contributor of the bsff", async () => {
+    const { user } = await userWithCompanyFactory(
+      UserRole.ADMIN,
+      {},
+      { isAdmin: true }
+    );
+
+    const otherEmitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff({ emitter: otherEmitter });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    expect(data.bsff).toEqual(
+      expect.objectContaining({
+        id: bsff.id
+      })
+    );
   });
 
   it("should throw an error not found if the user is not a contributor of the bsff", async () => {

@@ -60,6 +60,9 @@ function readers(bspaoh: PrismaBspaoh): string[] {
 }
 
 export function checkCanRead(user: User, bspaoh: PrismaBspaoh) {
+  if (user.isAdmin && user.isActive) {
+    return true;
+  }
   const authorizedOrgIds = readers(bspaoh);
 
   return checkUserPermissions(
@@ -98,7 +101,7 @@ export async function checkCanCreate(user: User, bspaohInput: BspaohInput) {
     user,
     authorizedOrgIds,
     Permission.BsdCanCreate,
-    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparaît pas"
+    "Votre établissement doit être visé sur le bordereau"
   );
 }
 
@@ -113,7 +116,7 @@ export async function checkCanUpdate(
     user,
     authorizedOrgIds,
     Permission.BsdCanUpdate,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
+    "Votre établissement doit être visé sur le bordereau"
   );
   if (input) {
     const authorizedOrgIdsAfterUpdate = contributors(bspaoh, input);

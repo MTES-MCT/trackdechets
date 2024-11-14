@@ -15,6 +15,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, prepareRedis } from "../../../__tests__/helpers";
 import { allowedFormats } from "../../../../common/dates";
+import { ErrorCode } from "../../../../common/errors";
 import {
   Mutation,
   MutationMarkAsReceivedArgs
@@ -189,6 +190,111 @@ describe("Test Form reception", () => {
     });
     expect(logs.length).toBe(1);
     expect(logs[0].status).toBe("ACCEPTED");
+  });
+
+  it("it should not mark a sent form as accepted if wasteAcceptationStatus is ACCEPTED but quantityReceived is 0", async () => {
+    const {
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form: initialForm
+    } = await prepareDB();
+    const form = await prisma.form.update({
+      where: { id: initialForm.id },
+      data: { currentTransporterOrgId: siretify(3) }
+    });
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+    const frm1 = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+
+    expect(frm1.quantityReceivedType).toBeNull();
+    const { mutate } = makeClient(recipient);
+    const { errors } = await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 0
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Réception : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+    const frm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    // form was not accepted, still sent
+    expect(frm.status).toBe("SENT");
+    expect(frm.wasteAcceptationStatus).toBe(null);
+    expect(frm.receivedBy).toBe(null);
+    expect(frm.quantityReceived).toBe(null);
+  });
+
+  it("it should not mark a sent form as accepted if wasteAcceptationStatus is ACCEPTED but quantityReceived is missing", async () => {
+    const {
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form: initialForm
+    } = await prepareDB();
+    const form = await prisma.form.update({
+      where: { id: initialForm.id },
+      data: { currentTransporterOrgId: siretify(3) }
+    });
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+    const frm1 = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+
+    expect(frm1.quantityReceivedType).toBeNull();
+    const { mutate } = makeClient(recipient);
+    const { errors } = await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED"
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Réception : le poids est requis lorsque le déchet est accepté ou accepté partiellement.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+    const frm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    // form was not accepted, still sent
+    expect(frm.status).toBe("SENT");
+    expect(frm.wasteAcceptationStatus).toBe(null);
+    expect(frm.receivedBy).toBe(null);
+    expect(frm.quantityReceived).toBe(null);
   });
 
   it("should not accept negative values", async () => {
@@ -1364,5 +1470,58 @@ describe("Test Form reception", () => {
     expect(errors).toBeUndefined();
     expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
     expect(data.markAsReceived.status).toBe("ACCEPTED");
+  });
+
+  it("quantityReceived is required for a final destination to accept a BSD", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const tempStorer = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: tempStorer.company.siret,
+        status: "RESENT",
+        wasteAcceptationStatus: "ACCEPTED",
+        quantityReceived: 10,
+        quantityRefused: 0
+      },
+      forwardedInOpts: {
+        sentAt: new Date(),
+        emitterCompanySiret: tempStorer.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsReceived">,
+      MutationMarkAsReceivedArgs
+    >(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedAt: new Date("2022-01-01").toISOString() as any,
+          receivedBy: "John",
+
+          wasteAcceptationStatus: "ACCEPTED"
+          // quantityReceived not provided,
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Réception : le poids est requis lorsque le déchet est accepté ou accepté partiellement."
+      })
+    ]);
+
+    const frm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    // form was not accepted, still resent
+    expect(frm.status).toBe("RESENT");
   });
 });

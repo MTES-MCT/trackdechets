@@ -68,9 +68,7 @@ describe("mutation inviteUserToCompany", () => {
 
       const expectedEmailNotification = getDefaultNotifications(role);
 
-      expect(companyAssociations[0].notifications).toEqual(
-        expectedEmailNotification
-      );
+      expect(companyAssociations[0]).toMatchObject(expectedEmailNotification);
 
       const userCompany = await prisma.companyAssociation
         .findUniqueOrThrow({

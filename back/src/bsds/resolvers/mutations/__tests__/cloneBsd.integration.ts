@@ -2,7 +2,8 @@ import gql from "graphql-tag";
 import {
   bsddFinalOperationFactory,
   formFactory,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import { Mutation } from "../../../../generated/graphql/types";
 import makeClient from "../../../../__tests__/testClient";
@@ -26,10 +27,12 @@ import {
 } from "../../../../bsdasris/__tests__/factories";
 import {
   createBsff,
-  createBsffPackagingFinalOperation
+  createBsffPackagingFinalOperation,
+  createFicheIntervention
 } from "../../../../bsffs/__tests__/factories";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
+import { UserRole } from "@prisma/client";
 
 const CLONE_BSD = gql`
   mutation cloneBsd($id: String!) {
@@ -370,18 +373,52 @@ describe("mutation cloneBsd", () => {
     });
 
     expectBsdsToMatch(initialBsff, newBsff);
+  });
 
-    const initialPackagings = await prisma.bsffPackaging.findMany({
-      where: { bsffId: initialBsff.id },
-      include: { finalOperations: true }
+  it("should clone BSFF with fiche d'intervention", async () => {
+    // Given
+    const user = await userFactory();
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+    const ficheIntervention = await createFicheIntervention({
+      operateur,
+      detenteur
+    });
+    const bsff = await createBsff(
+      {},
+      {
+        data: {
+          ficheInterventions: { connect: { id: ficheIntervention.id } },
+          detenteurCompanySirets: [detenteur.company.orgId]
+        }
+      }
+    );
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "cloneBsd">>(
+      CLONE_BSD,
+      {
+        variables: {
+          id: bsff.id
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const initialBsff = await prisma.bsff.findFirstOrThrow({
+      where: { id: bsff.id },
+      include: bsffInclude
     });
 
-    const newPackagings = await prisma.bsffPackaging.findMany({
-      where: { bsffId: newBsff.id },
-      include: { finalOperations: true }
+    const newBsff = await prisma.bsff.findFirstOrThrow({
+      where: { id: data.cloneBsd.id },
+      include: bsffInclude
     });
 
-    expectBsdsToMatch(initialPackagings, newPackagings);
+    expectBsdsToMatch(initialBsff, newBsff);
   });
 
   it("should clone regular BSVHU", async () => {

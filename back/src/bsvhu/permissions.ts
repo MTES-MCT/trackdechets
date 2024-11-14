@@ -112,6 +112,9 @@ function creators(input: BsvhuInput) {
 }
 
 export async function checkCanRead(user: User, bsvhu: Bsvhu) {
+  if (user.isAdmin && user.isActive) {
+    return true;
+  }
   const authorizedOrgIds = readers(bsvhu);
 
   return checkUserPermissions(
@@ -129,7 +132,7 @@ export async function checkCanCreate(user: User, bsvhuInput: BsvhuInput) {
     user,
     authorizedOrgIds,
     Permission.BsdCanCreate,
-    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
+    "Votre établissement doit être visé sur le bordereau"
   );
 }
 
@@ -144,7 +147,7 @@ export async function checkCanUpdate(
     user,
     authorizedOrgIds,
     Permission.BsdCanUpdate,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
+    "Votre établissement doit être visé sur le bordereau"
   );
   if (input) {
     const authorizedOrgIdsAfterUpdate = contributors(bsvhu, input);

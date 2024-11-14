@@ -19,7 +19,8 @@ const CONNECT_SRC = [
   "https://api-adresse.data.gouv.fr",
   "https://sentry.incubateur.net",
   "https://openmaptiles.geo.data.gouv.fr",
-  "https://openmaptiles.github.io"
+  "https://openmaptiles.github.io",
+  "https://s3.fr-par.scw.cloud"
 ];
 
 const WORKER_SRC = ["blob:"]; // needed for MapBox
@@ -87,7 +88,7 @@ app.post("/sentry", async function (req, res) {
     // Relay response from Sentry servers to front end
     sentryResponse.headers.forEach(h => res.setHeader(h[0], h[1]));
     res.status(sentryResponse.status).send(sentryResponse.body);
-  } catch (err) {
+  } catch (_) {
     return res.status(400).json({ status: "invalid request" });
   }
 });

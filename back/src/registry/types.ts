@@ -181,7 +181,8 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
   emitterCompanyPostalCode: null,
-  destinationHasCiterneBeenWashedOut: null
+  destinationHasCiterneBeenWashedOut: null,
+  nonRoadRegulationMention: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -324,7 +325,8 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
   emitterCompanyPostalCode: null,
-  destinationHasCiterneBeenWashedOut: null
+  destinationHasCiterneBeenWashedOut: null,
+  nonRoadRegulationMention: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -452,7 +454,8 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
   emitterCompanyPostalCode: null,
-  destinationHasCiterneBeenWashedOut: null
+  destinationHasCiterneBeenWashedOut: null,
+  nonRoadRegulationMention: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -576,7 +579,8 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   destinationReceptionAcceptedWeight: null,
   destinationReceptionRefusedWeight: null,
   weight: null,
-  destinationHasCiterneBeenWashedOut: null
+  destinationHasCiterneBeenWashedOut: null,
+  nonRoadRegulationMention: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -737,5 +741,6 @@ export const emptyAllWaste: Required<AllWaste> = {
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
   emitterCompanyPostalCode: null,
-  destinationHasCiterneBeenWashedOut: null
+  destinationHasCiterneBeenWashedOut: null,
+  nonRoadRegulationMention: null
 };

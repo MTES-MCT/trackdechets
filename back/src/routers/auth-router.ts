@@ -72,7 +72,7 @@ authRouter.post<{ email: string }>("/impersonate", async (req, res) => {
 
   const parsedBody = z
     .object({
-      email: z.string().email()
+      email: z.string().trim().email()
     })
     .parse(req.body);
 

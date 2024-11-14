@@ -5,6 +5,29 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.11.1] 19/11/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Permettre l'ajout d'un numéro libre sur le Bsvhu [PR 3718](https://github.com/MTES-MCT/trackdechets/pull/3718)
+- Permettre à l'utilisateur de gérer les alertes de tous ses établissements [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
+- Afficher le nombre d'inscrits par type d'alertes au sein d'un établissement [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
+
+#### :boom: Breaking changes
+
+- Le champ "Numéro de notification" est obligatoire lorsque la destination ultérieure renseignée est étrangère [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
+- La présence d'une quantité reçue est requise pour passer du statut SENT à ACCEPTED via la mutation markAsReceived [PR 3720](https://github.com/MTES-MCT/trackdechets/pull/3720)
+- Restriction des TTR et Installations de traitement à être visés sur un BSDD selon leur type de profil [PR 3725](https://github.com/MTES-MCT/trackdechets/pull/3725)
+
+#### :bug: Corrections de bugs
+
+- Corrige l'indexation des annexes 1 orphelines et draft [PR 3721](https://github.com/MTES-MCT/trackdechets/pull/3721)
+
+#### :house: Interne
+
+- Amélioration de l'interface d'admin [PR 3735](https://github.com/MTES-MCT/trackdechets/pull/3735)
+- Modification de la query controlBsds et fermeture de la query bsds aux comptes gouvernementaux [PR 3270](https://github.com/MTES-MCT/trackdechets/pull/3270)
+
 # [2024.10.1] 22/10/2024
 
 #### :rocket: Nouvelles fonctionnalités

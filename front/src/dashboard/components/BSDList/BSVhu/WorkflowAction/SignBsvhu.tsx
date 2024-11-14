@@ -1,17 +1,7 @@
-import { gql } from "@apollo/client";
 import { ActionButton } from "../../../../../common/components";
 import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
 import React, { useState } from "react";
 import { SignBsvhuModal } from "./SignBsvhuModal";
-
-export const SIGN_BSVHU = gql`
-  mutation SignBsvhu($id: ID!, $input: BsvhuSignatureInput!) {
-    signBsvhu(id: $id, input: $input) {
-      id
-      status
-    }
-  }
-`;
 
 type Props = {
   title: string;

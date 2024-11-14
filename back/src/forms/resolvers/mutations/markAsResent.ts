@@ -53,6 +53,8 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
     wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
     wasteDetailsName: form.wasteDetailsName,
     wasteDetailsOnuCode: form.wasteDetailsOnuCode,
+    wasteDetailsNonRoadRegulationMention:
+      form.wasteDetailsNonRoadRegulationMention,
     wasteDetailsPop: form.wasteDetailsPop,
     ...flattenFormInput({ wasteDetails, recipient: destination })
   };

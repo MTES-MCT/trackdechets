@@ -6,7 +6,7 @@ import { markAsProcessed } from "../steps/markAsProcessed";
 import { signEmissionForm } from "../steps/signEmissionForm";
 import { signTransportForm } from "../steps/signTransportForm";
 import fixtures from "../fixturesForeignTransporter";
-
+import { WasteProcessorType } from "@prisma/client";
 const workflow: Workflow = {
   title:
     "Acheminement direct du producteur à l'installation de traitement avec un transporteur étranger",
@@ -23,7 +23,11 @@ const workflow: Workflow = {
         vatNumber: "BE0541696005"
       }
     },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     createForm("producteur", fixtures as any),

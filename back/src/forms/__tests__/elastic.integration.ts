@@ -2,7 +2,8 @@ import {
   Company,
   EmptyReturnADR,
   Status,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  EmitterType
 } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
@@ -60,11 +61,15 @@ describe("getSiretsByTab", () => {
     const user = await userFactory();
     const form = await formFactory({
       ownerId: user.id,
-      opt: { status: Status.SEALED, emitterType: "APPENDIX1_PRODUCER" }
+      opt: {
+        status: Status.SEALED,
+        emitterType: EmitterType.APPENDIX1_PRODUCER
+      }
     });
     const fullForm = await getFullForm(form);
     const transporter = getFirstTransporterSync(fullForm);
     const { isToCollectFor, isForActionFor } = getSiretsByTab(fullForm);
+
     expect(isForActionFor).toContain(form.emitterCompanySiret);
     expect(isToCollectFor).toContain(transporter!.transporterCompanySiret);
   });
@@ -693,5 +698,111 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsd.companyOrgIds).toContain(
       forwardedInTransporter.vatNumber
     );
+  });
+});
+
+describe("toBsdElastic > APPENDIX1", () => {
+  afterEach(resetDatabase);
+  test.each([Status.DRAFT, Status.SEALED, Status.SENT])(
+    "orphan APPENDIX1_PRODUCER : status %p should not appear in dashboard",
+    async status => {
+      const user = await userFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: { status: status, emitterType: EmitterType.APPENDIX1_PRODUCER }
+      });
+      const formForElastic = await getFormForElastic(form);
+
+      const elasticBsd = toBsdElastic(formForElastic);
+
+      expect(elasticBsd.isDraftFor).toEqual([]);
+      expect(elasticBsd.isForActionFor).toEqual([]);
+      expect(elasticBsd.isFollowFor).toEqual([]);
+      expect(elasticBsd.isArchivedFor).toEqual([]);
+      expect(elasticBsd.isToCollectFor).toEqual([]);
+      expect(elasticBsd.isCollectedFor).toEqual([]);
+      expect(elasticBsd.isInRevisionFor).toEqual([]);
+      expect(elasticBsd.isReturnFor).toEqual([]);
+      expect(elasticBsd.isRevisedFor).toEqual([]);
+    }
+  );
+
+  test.each([
+    Status.SEALED,
+    Status.SENT,
+    Status.RECEIVED,
+    Status.RECEIVED,
+    Status.RECEIVED,
+    Status.PROCESSED
+  ])(
+    "grouped APPENDIX1_PRODUCER  : status %p should appear in dashboard",
+    async status => {
+      const user = await userFactory();
+      const appendix1 = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: status,
+          emitterType: EmitterType.APPENDIX1_PRODUCER
+        }
+      });
+      // top level bsdd
+      await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SENT,
+          wasteDetailsCode: "16 06 01*",
+
+          emitterType: EmitterType.APPENDIX1,
+          grouping: { create: { initialFormId: appendix1.id, quantity: 0 } }
+        }
+      });
+      const formForElastic = await getFormForElastic(appendix1);
+
+      const elasticBsd = toBsdElastic(formForElastic);
+      const displayedFor = [
+        ...elasticBsd.isDraftFor,
+        ...elasticBsd.isForActionFor,
+        ...elasticBsd.isFollowFor,
+        ...elasticBsd.isFollowFor,
+        ...elasticBsd.isToCollectFor,
+        ...elasticBsd.isCollectedFor,
+        ...elasticBsd.isArchivedFor
+      ].filter(Boolean);
+      expect(displayedFor.length).toBeTruthy();
+    }
+  );
+
+  test("grouped APPENDIX1_PRODUCER  : DRAFT should appear in dashboard", async () => {
+    const user = await userFactory();
+    const appendix1 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER
+      }
+    });
+    // top level bsdd
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SENT,
+        wasteDetailsCode: "16 06 01*",
+
+        emitterType: EmitterType.APPENDIX1,
+        grouping: { create: { initialFormId: appendix1.id, quantity: 0 } }
+      }
+    });
+    const formForElastic = await getFormForElastic(appendix1);
+
+    const elasticBsd = toBsdElastic(formForElastic);
+    expect(elasticBsd.isDraftFor).toEqual([]);
+    expect(elasticBsd.isForActionFor).toEqual([]);
+    expect(elasticBsd.isFollowFor).toEqual([]);
+    expect(elasticBsd.isArchivedFor).toEqual([]);
+    expect(elasticBsd.isToCollectFor).toEqual([]);
+    expect(elasticBsd.isCollectedFor).toEqual([]);
+    expect(elasticBsd.isInRevisionFor).toEqual([]);
+    expect(elasticBsd.isReturnFor).toEqual([]);
+    expect(elasticBsd.isRevisedFor).toEqual([]);
   });
 });

@@ -5,7 +5,7 @@ import { markAsReceived } from "../steps/markAsReceived";
 import { markAsProcessed } from "../steps/markAsProcessed";
 import { signEmissionForm } from "../steps/signEmissionForm";
 import { signTransportForm } from "../steps/signTransportForm";
-
+import { WasteProcessorType } from "@prisma/client";
 const workflow: Workflow = {
   title: "Acheminement direct du producteur à l'installation de traitement",
   description: `Les informations du BSDD sont remplies par le producteur du déchet.
@@ -14,7 +14,11 @@ const workflow: Workflow = {
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur", companyTypes: ["TRANSPORTER"] },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     createForm("producteur"),

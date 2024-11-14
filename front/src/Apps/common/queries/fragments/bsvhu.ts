@@ -4,6 +4,7 @@ import { companyFragment, dashboardCompanyFragment } from "./company";
 export const vhuFragment = gql`
   fragment VhuFragment on Bsvhu {
     id
+    customId
     bsvhuStatus: status
     isDraft
     emitter {
@@ -54,6 +55,7 @@ export const vhuFragment = gql`
 export const dashboardVhuFragment = gql`
   fragment DashboardVhuFragment on Bsvhu {
     id
+    customId
     bsvhuStatus: status
     isDraft
     emitter {
@@ -96,6 +98,7 @@ export const dashboardVhuFragment = gql`
 export const FullBsvhuFragment = gql`
   fragment FullBsvhu on Bsvhu {
     id
+    customId
     isDraft
     status
     createdAt

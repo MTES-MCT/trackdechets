@@ -85,9 +85,9 @@ export const bspaohFactory = async ({
   const destinationCompanySiret = siretify(2);
   const transporterCompanySiret = siretify(3);
 
-  await upsertBaseSiret(emitterCompanySiret);
-  await upsertBaseSiret(destinationCompanySiret);
-  await upsertBaseSiret(transporterCompanySiret);
+  await upsertBaseSiret({ siret: emitterCompanySiret });
+  await upsertBaseSiret({ siret: destinationCompanySiret });
+  await upsertBaseSiret({ siret: transporterCompanySiret });
 
   await prisma.company.update({
     where: { siret: destinationCompanySiret },

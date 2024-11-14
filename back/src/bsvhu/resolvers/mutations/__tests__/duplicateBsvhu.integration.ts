@@ -277,6 +277,7 @@ describe("mutaion.duplicateBsvhu", () => {
 
     const expectedSkipped = [
       "id",
+      "customId",
       "createdAt",
       "updatedAt",
       "rowNumber",

@@ -10,7 +10,8 @@ import {
 import React from "react";
 import { generatePath, Link, useLocation } from "react-router-dom";
 import * as yup from "yup";
-import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
+import { SignBsvhu } from "./SignBsvhu";
+import { SIGN_BSVHU } from "../../../../../Apps/common/queries/bsvhu/queries";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 

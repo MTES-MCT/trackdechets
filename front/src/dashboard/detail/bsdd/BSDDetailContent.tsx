@@ -65,7 +65,9 @@ import {
   isForeignVat,
   isSiret,
   isDangerous,
-  STATUS_LABELS
+  STATUS_LABELS,
+  getFormWasteDetailsADRMention,
+  getFormStateSummaryADRMention
 } from "@td/constants";
 import { Appendix1ProducerForm } from "../../../form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
@@ -138,8 +140,16 @@ const TempStorage = ({ form }) => {
             label="Description déchet"
           />
           <DetailRow
-            value={temporaryStorageDetail?.wasteDetails?.onuCode}
-            label="Code Onu"
+            value={getFormWasteDetailsADRMention(
+              temporaryStorageDetail?.wasteDetails
+            )}
+            label="Mention ADR"
+          />
+          <DetailRow
+            value={
+              temporaryStorageDetail?.wasteDetails?.nonRoadRegulationMention
+            }
+            label="Mention RID, ADNR, IMDG"
           />
 
           <PackagingRow packagingInfos={form.stateSummary?.packagingInfos} />
@@ -825,8 +835,10 @@ export default function BSDDetailContent({
             </div>
 
             <div className={styles.detailGrid}>
-              <dt>Code onu</dt>
-              <dd>{form?.stateSummary?.onuCode}</dd>
+              <dt>Mention ADR</dt>
+              <dd>{getFormStateSummaryADRMention(form?.stateSummary)}</dd>
+              <dt>Mention RID, ADNR, IMDG</dt>
+              <dd>{form?.stateSummary?.nonRoadRegulationMention}</dd>
               <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
               {form?.wasteDetails?.sampleNumber && (
                 <>

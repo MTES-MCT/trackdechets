@@ -46,7 +46,13 @@ const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
   return (
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
-
+      <div className="fr-col-md-12 fr-mb-4w">
+        <Input
+          label="Numéro libre"
+          disabled={sealedFields.includes("customId")}
+          nativeInputProps={{ ...register("customId") }}
+        />
+      </div>
       <WasteRadioGroup
         title="Déchet"
         disabled={sealedFields.includes("wasteCode")}

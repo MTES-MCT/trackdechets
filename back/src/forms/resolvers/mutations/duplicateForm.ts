@@ -116,7 +116,6 @@ async function getDuplicateFormInput(
     recipientCompanyMail: recipient?.contactEmail ?? form.recipientCompanyMail,
     recipientIsTempStorage: form.recipientIsTempStorage,
     wasteDetailsCode: form.wasteDetailsCode,
-    wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     wasteDetailsPackagingInfos: Prisma.JsonNull,
     wasteDetailsQuantity: 0,
     wasteDetailsQuantityType: form.wasteDetailsQuantityType,
@@ -235,7 +234,6 @@ async function getDuplicateFormForwardedInInput(
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       form.wasteDetailsPackagingInfos
     ),
-    wasteDetailsOnuCode: forwardedIn.wasteDetailsOnuCode,
     wasteDetailsPop: forwardedIn.wasteDetailsPop,
     wasteDetailsIsDangerous: forwardedIn.wasteDetailsIsDangerous,
     wasteDetailsName: forwardedIn.wasteDetailsName,
@@ -298,6 +296,10 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   }
 
   const sirenified = await sirenifyFormCreateInput(newFormInput, []);
+
+  // We do not check destination company profiles here, hence duplicating a bsdd created before rules enforcement
+  // will produce a bsdd whose destination does not match current subprofile requirements.
+  // The markAsSealed mutation will raise an error and the rule will be enforced then.
 
   const newForm = await formRepository.create(sirenified, {
     duplicate: { id: existingForm.id }

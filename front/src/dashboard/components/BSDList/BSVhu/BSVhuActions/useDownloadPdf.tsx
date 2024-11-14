@@ -1,14 +1,6 @@
-import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
+import { LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
 import { Query, QueryBsvhuPdfArgs } from "@td/codegen-ui";
-
-export const BSVHU_PDF = gql`
-  query Bsdasridf($id: ID!) {
-    bsvhuPdf(id: $id) {
-      downloadLink
-      token
-    }
-  }
-`;
+import { BSVHU_PDF } from "../../../../../Apps/common/queries/bsvhu/queries";
 
 export function useDownloadPdf(
   options: LazyQueryHookOptions<Pick<Query, "bsvhuPdf">, QueryBsvhuPdfArgs>

@@ -15,6 +15,7 @@ import {
   CompanyType,
   CompanyVerificationMode,
   CompanyVerificationStatus,
+  UserRole,
   WasteProcessorType,
   WasteVehiclesType
 } from "@prisma/client";
@@ -31,7 +32,7 @@ import {
 import { searchCompany } from "../../../search";
 import { sendVerificationCodeLetter } from "../../../../common/post";
 import gql from "graphql-tag";
-import { ALL_NOTIFICATIONS } from "../../../../users/notifications";
+import { getDefaultNotifications } from "../../../../users/notifications";
 
 // Mock external search services
 jest.mock("../../../search");
@@ -174,7 +175,11 @@ describe("Mutation.createCompany", () => {
     });
 
     expect(newCompanyAssociation).not.toBeNull();
-    expect(newCompanyAssociation?.notifications).toEqual(ALL_NOTIFICATIONS);
+    expect(newCompanyAssociation!.role).toEqual(UserRole.ADMIN);
+    // toutes les notifications doivent être actives
+    expect(newCompanyAssociation).toMatchObject(
+      getDefaultNotifications(newCompanyAssociation!.role)
+    );
 
     const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }

@@ -2,7 +2,6 @@ import {
   BsdaRevisionRequest,
   BsdasriRevisionRequest,
   MembershipRequestStatus,
-  UserNotification,
   UserRole
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
@@ -293,7 +292,7 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.MEMBERSHIP_REQUEST] }
+      { notificationIsActiveMembershipRequest: true }
     );
 
     // crée un second admin abonné aux notifications de demandes de rattachement
@@ -302,7 +301,7 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
       admin01.id,
       companyAndAdmin0.company.orgId,
       UserRole.ADMIN,
-      { notifications: [UserNotification.MEMBERSHIP_REQUEST] }
+      { notificationIsActiveMembershipRequest: true }
     );
 
     // crée un troisième admin qui n'est pas abonné aux notifications de demandes de rattachement
@@ -311,7 +310,7 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
       admin02.id,
       companyAndAdmin0.company.orgId,
       UserRole.ADMIN,
-      { notifications: [] }
+      { notificationIsActiveMembershipRequest: false }
     );
 
     const companyAndAdmin1 = await userWithCompanyFactory("ADMIN");
@@ -413,24 +412,21 @@ describe("getPendingMembershipRequestsAndAssociatedMailSubscribers ", () => {
 
     expect(requests.length).toEqual(2);
 
-    expect(
-      requests.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    ).toEqual([
-      expect.objectContaining({
-        id: request0.id,
-        company: expect.objectContaining({
-          orgId: companyAndAdmin0.company.orgId
-        }),
-        user: expect.objectContaining({ email: user0.email })
+    expect(requests.find(r => r.id === request0.id)).toMatchObject({
+      id: request0.id,
+      company: expect.objectContaining({
+        orgId: companyAndAdmin0.company.orgId
       }),
-      expect.objectContaining({
-        id: request1.id,
-        company: expect.objectContaining({
-          orgId: companyAndAdmin1.company.orgId
-        }),
-        user: expect.objectContaining({ email: user0.email })
-      })
-    ]);
+      user: expect.objectContaining({ email: user0.email })
+    });
+
+    expect(requests.find(r => r.id == request1.id)).toMatchObject({
+      id: request1.id,
+      company: expect.objectContaining({
+        orgId: companyAndAdmin1.company.orgId
+      }),
+      user: expect.objectContaining({ email: user0.email })
+    });
   });
 });
 
@@ -454,7 +450,7 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -592,7 +588,7 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -620,7 +616,7 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -687,11 +683,11 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const user2 = await userFactory();
     await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: [UserNotification.REVISION_REQUEST]
+      notificationIsActiveRevisionRequest: true
     });
 
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
@@ -745,7 +741,7 @@ describe("getPendingBSDARevisionRequestsWithSubscribers", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
     await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: []
+      notificationIsActiveRevisionRequest: false
     });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -811,7 +807,7 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -942,7 +938,7 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -968,7 +964,7 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -1035,11 +1031,11 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const user2 = await userFactory();
     await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: [UserNotification.REVISION_REQUEST]
+      notificationIsActiveRevisionRequest: true
     });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -1091,7 +1087,7 @@ describe("getPendingBSDDRevisionRequestsWithSubscribers", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
     await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: []
+      notificationIsActiveRevisionRequest: false
     });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -1274,7 +1270,7 @@ describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -1302,7 +1298,7 @@ describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
       "ADMIN"
@@ -1366,11 +1362,11 @@ describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
       "ADMIN",
       {},
       {},
-      { notifications: [UserNotification.REVISION_REQUEST] }
+      { notificationIsActiveRevisionRequest: true }
     );
     const user2 = await userFactory();
     await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: [UserNotification.REVISION_REQUEST]
+      notificationIsActiveRevisionRequest: true
     });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
@@ -1419,7 +1415,7 @@ describe("getPendingBSDARIRevisionRequestsWithSubscribers", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
     await associateUserToCompany(user2.id, company.orgId, "ADMIN", {
-      notifications: []
+      notificationIsActiveRevisionRequest: false
     });
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"

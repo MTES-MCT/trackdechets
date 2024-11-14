@@ -11,6 +11,7 @@ import {
   toIntermediaryCompany
 } from "../../../__tests__/factories.vhu";
 import { UserRole } from "@prisma/client";
+import { ErrorCode } from "../../../../common/errors";
 
 const GET_BSVHUS = `
   query GetBsvhus($where: BsvhuWhere) {
@@ -24,6 +25,7 @@ const GET_BSVHUS = `
       edges {
         node {
           id
+          customId
           isDraft
           destination {
             company {
@@ -78,6 +80,25 @@ const GET_BSVHUS = `
 describe("Query.Bsvhus", () => {
   afterEach(resetDatabase);
 
+  it("should disallow unauthenticated user", async () => {
+    const { query } = makeClient();
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    await bsvhuFactory({
+      opt: { emitterCompanySiret: company.siret, customId: "some custom ID" }
+    });
+
+    const { errors } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas connecté.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.UNAUTHENTICATED
+        })
+      })
+    ]);
+  });
+
   it("should get a list of bsvhus when user belongs to only 1 company", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const opt = {
@@ -94,6 +115,55 @@ describe("Query.Bsvhus", () => {
     const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
 
     expect(data.bsvhus.edges.length).toBe(4);
+  });
+
+  it("should retrieve queried fields", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const bsvhu = await bsvhuFactory({
+      opt: { emitterCompanySiret: company.siret, customId: "some custom ID" }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
+
+    expect(data.bsvhus.edges.length).toBe(1);
+
+    const expected = {
+      id: bsvhu.id,
+      customId: "some custom ID",
+      isDraft: false,
+      destination: { company: { siret: bsvhu.destinationCompanySiret } },
+      emitter: {
+        agrementNumber: bsvhu.emitterAgrementNumber,
+        company: { siret: bsvhu.emitterCompanySiret }
+      },
+      transporter: {
+        company: {
+          siret: bsvhu.transporterCompanySiret,
+          name: bsvhu.transporterCompanyName,
+          address: bsvhu.transporterCompanyAddress,
+          contact: bsvhu.transporterCompanyContact,
+          mail: bsvhu.transporterCompanyMail,
+          phone: bsvhu.transporterCompanyPhone,
+          vatNumber: null
+        },
+        recepisse: { number: bsvhu.transporterRecepisseNumber }
+      },
+
+      broker: {
+        company: { siret: bsvhu.brokerCompanySiret },
+        recepisse: { number: bsvhu.brokerRecepisseNumber }
+      },
+      trader: {
+        company: { siret: bsvhu.traderCompanySiret },
+        recepisse: { number: bsvhu.traderRecepisseNumber }
+      },
+      weight: { value: 0.0014 } // cf. getVhuFormdata()
+    };
+
+    expect(data.bsvhus.edges[0].node).toEqual(expected);
   });
 
   it("should return bsvhus where user company is an intermediary", async () => {
@@ -157,6 +227,30 @@ describe("Query.Bsvhus", () => {
     });
 
     expect(data.bsvhus.edges.length).toBe(1);
+  });
+
+  it("should get a filtered list of bsvhus when wehre condition filters by customId", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const opt = {
+      emitterCompanySiret: company.siret
+    };
+    // Create 3 forms on emitter Company
+    const bsvhu = await bsvhuFactory({
+      opt: { ...opt, customId: "mycustomid" }
+    });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS, {
+      variables: {
+        where: { customId: { _eq: "mycustomid" } }
+      }
+    });
+
+    expect(data.bsvhus.edges.length).toBe(1);
+    expect(data.bsvhus.edges[0].node.id).toBe(bsvhu.id);
   });
 
   it("should get bsvhus from every companies when no filter is passed and user belongs to several companies", async () => {

@@ -714,6 +714,63 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
     );
   });
+
+  it("DASRI in AWAITING_GROUP should be able to be reviewed", async () => {
+    // Given
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: recipientCompany.siret,
+        status: "AWAITING_GROUP"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createBsdasriRevisionRequest">,
+      MutationCreateBsdasriRevisionRequestArgs
+    >(CREATE_BSDASRI_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdasriId: bsdasri.id,
+          content: {
+            emitter: {
+              pickupSite: {
+                name: "pickup site name",
+                address: "4 boulevard pasteur",
+                city: "Nantes",
+                postalCode: "44100",
+                infos: "site infos"
+              }
+            },
+            waste: {
+              code: "18 01 03*"
+            },
+            destination: {
+              operation: {
+                code: "R1",
+                mode: "VALORISATION_ENERGETIQUE",
+                weight: 10
+              },
+              reception: {
+                packagings: [{ type: "BOITE_CARTON", volume: 22, quantity: 3 }]
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createBsdasriRevisionRequest.bsdasri.id).toBe(bsdasri.id);
+  });
 });
 
 describe("Mutation.createBsdasriRevisionRequest grouping", () => {

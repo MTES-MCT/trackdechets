@@ -1,7 +1,8 @@
 import {
   getCompaniesAndSubscribersByCompanyOrgIds,
   formatDate,
-  sendMail
+  sendMail,
+  UserNotification
 } from "back";
 import { prisma } from "@td/prisma";
 import {
@@ -16,8 +17,7 @@ import {
   Company,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus,
-  User,
-  UserNotification
+  User
 } from "@prisma/client";
 import * as COMPANY_CONSTANTS from "@td/constants";
 import {
@@ -293,9 +293,7 @@ export const getPendingMembershipRequestsAndAssociatedSubscribers = async (
         include: {
           companyAssociations: {
             where: {
-              notifications: {
-                has: UserNotification.MEMBERSHIP_REQUEST
-              },
+              notificationIsActiveMembershipRequest: true,
               user: {
                 isActive: true
               }

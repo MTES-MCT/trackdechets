@@ -14,6 +14,7 @@ import {
   signTransportFormAfterTempStorage
 } from "../steps/signTransportForm";
 import fixtures from "../fixturesForeignTransporter";
+import { WasteProcessorType } from "@prisma/client";
 
 const workflow: Workflow = {
   title: "Entreposage provisoire avec transporteur étranger",
@@ -31,13 +32,21 @@ de destination finale accepte le déchet et valide le traitement.`,
       companyTypes: ["TRANSPORTER"],
       opt: { siret: null, vatNumber: "BE0541696005" }
     },
-    { name: "ttr", companyTypes: ["COLLECTOR"] },
+    {
+      name: "ttr",
+      companyTypes: ["COLLECTOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    },
     {
       name: "transporteur2",
       companyTypes: ["TRANSPORTER"],
       opt: { siret: null, vatNumber: "IT13029381004" }
     },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     createFormTempStorage("producteur", fixtures as any),

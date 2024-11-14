@@ -43,6 +43,8 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
             tmpStorerAcceptedInfo.quantityReceived,
           wasteDetailsQuantityType: quantityType,
           wasteDetailsOnuCode: form.wasteDetailsOnuCode,
+          wasteDetailsNonRoadRegulationMention:
+            form.wasteDetailsNonRoadRegulationMention,
           wasteDetailsPackagingInfos: prismaJsonNoNull(
             form.wasteDetailsPackagingInfos
           )

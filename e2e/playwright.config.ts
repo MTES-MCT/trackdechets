@@ -43,7 +43,11 @@ export default defineConfig({
     {
       name: "chromium",
       use: {
-        channel: "chromium"
+        channel: "chromium",
+        bypassCSP: true, //to disable cors
+        launchOptions: {
+          args: ["--disable-web-security"] // disable cors
+        }
       }
     }
   ],

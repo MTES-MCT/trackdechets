@@ -5,7 +5,7 @@ import TdModal from "../Modal/Modal";
 import { BSDD_WASTES_TREE, WasteNode } from "@td/constants";
 import Button from "@codegouvfr/react-dsfr/Button";
 type Props = {
-  wasteTree?: WasteNode[];
+  wasteTree?: readonly WasteNode[];
   open: boolean;
   onClose?: () => void;
   onSelect?: (value: any) => void;

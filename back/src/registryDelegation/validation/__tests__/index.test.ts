@@ -265,7 +265,7 @@ describe("index", () => {
         expect(error.errors[0]).toMatchObject({
           path: ["where"],
           message:
-            "Vous devez renseigner un des deux champs (delegatorOrgId ou delegateOrgId)."
+            "Vous devez renseigner un des champs delegatorOrgId, delegateOrgId ou givenToMe."
         });
       }
     });

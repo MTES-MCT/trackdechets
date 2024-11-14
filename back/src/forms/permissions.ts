@@ -220,6 +220,9 @@ export function isFormReader(
 }
 
 export async function checkCanRead(user: User, form: FormForReadCheck) {
+  if (user.isAdmin && user.isActive) {
+    return true;
+  }
   const authorizedOrgIds = formReaders(form);
 
   return checkUserPermissions(

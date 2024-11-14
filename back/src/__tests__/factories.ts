@@ -11,14 +11,16 @@ import {
   User,
   Prisma,
   Company,
-  TransportMode,
-  UserNotification
+  WasteProcessorType,
+  CollectorType,
+  TransportMode
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../forms/database";
 import { CompanyRole } from "../common/validation/zod/schema";
+import { getDefaultNotifications } from "../users/notifications";
 
 /**
  * Create a user with name and email
@@ -138,24 +140,15 @@ export const userWithCompanyFactory = async (
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
-  const notifications =
-    role === "ADMIN"
-      ? [
-          UserNotification.MEMBERSHIP_REQUEST,
-          UserNotification.REVISION_REQUEST,
-          UserNotification.BSD_REFUSAL,
-          UserNotification.SIGNATURE_CODE_RENEWAL,
-          UserNotification.BSDA_FINAL_DESTINATION_UPDATE
-        ]
-      : [];
+  const notifications = getDefaultNotifications(role);
 
   const user = await userFactory({
     ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
-        notifications,
-        role: role,
+        ...notifications,
+        role,
         ...companyAssociationOpts
       }
     }
@@ -193,6 +186,9 @@ export const destinationFactory = async (
       ...companyOpts,
       companyTypes: {
         set: [CompanyType.WASTEPROCESSOR]
+      },
+      wasteProcessorTypes: {
+        set: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
       }
     }
   );
@@ -414,7 +410,17 @@ export const bsddTransporterFactory = async ({
   return transporter;
 };
 
-export const upsertBaseSiret = async siret => {
+export const upsertBaseSiret = async ({
+  siret,
+  companyTypes = ["TRANSPORTER", "WASTEPROCESSOR", "WORKER"],
+  wasteProcessorTypes = [],
+  collectorTypes = []
+}: {
+  siret: string;
+  companyTypes?: CompanyType[];
+  wasteProcessorTypes?: WasteProcessorType[];
+  collectorTypes?: CollectorType[];
+}) => {
   const exists = await prisma.company.findUnique({ where: { siret } });
   if (!exists) {
     // Using prisma.upsert gives us "Unique constraint failed on the fields: (`siret`)"
@@ -425,7 +431,13 @@ export const upsertBaseSiret = async siret => {
           orgId: siret,
           siret,
           companyTypes: {
-            set: ["TRANSPORTER", "WASTEPROCESSOR", "WORKER"]
+            set: companyTypes
+          },
+          wasteProcessorTypes: {
+            set: wasteProcessorTypes
+          },
+          collectorTypes: {
+            set: collectorTypes
           },
           name: `company_${siret}`,
           securityCode: 1234,
@@ -436,7 +448,7 @@ export const upsertBaseSiret = async siret => {
           contactPhone: `+${siret}`
         }
       });
-    } catch (err) {
+    } catch (_) {
       // Must have been already created (race condition). Just ignore
     }
   }
@@ -450,10 +462,16 @@ export const formFactory = async ({
   opt?: Partial<Prisma.FormCreateInput>;
 }) => {
   // Those sirets are required for the form to be updatable
-  await upsertBaseSiret(
-    (formdata.transporters!.create! as any).transporterCompanySiret as any
-  );
-  await upsertBaseSiret(formdata.recipientCompanySiret);
+
+  await upsertBaseSiret({
+    siret: (formdata.transporters!.create! as any).transporterCompanySiret
+  });
+
+  // recipient needs appropriate profiles and subprofiles
+  await upsertBaseSiret({
+    siret: formdata.recipientCompanySiret!,
+    wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+  });
 
   const ownerCompanies = await getUserCompanies(ownerId);
   const ownerOrgIds = ownerCompanies.map(company => company.orgId);
@@ -513,10 +531,10 @@ export const formWithTempStorageFactory = async ({
   opt?: Partial<Prisma.FormCreateInput>;
   forwardedInOpts?: Partial<Prisma.FormCreateInput>;
 }) => {
-  await upsertBaseSiret(
-    (forwardedInData.transporters?.create as any).transporterCompanySiret
-  );
-  await upsertBaseSiret(forwardedInData.recipientCompanySiret);
+  await upsertBaseSiret({
+    siret: (forwardedInData.transporters?.create as any).transporterCompanySiret
+  });
+  await upsertBaseSiret({ siret: forwardedInData.recipientCompanySiret! });
 
   const forwardedCreateInput: Omit<
     Prisma.FormCreateInput,

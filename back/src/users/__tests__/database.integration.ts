@@ -79,7 +79,7 @@ describe("associateUserToCompany", () => {
 
       const expectedNotifications = getDefaultNotifications(role);
 
-      expect(companyAssociation.notifications).toEqual(expectedNotifications);
+      expect(companyAssociation).toMatchObject(expectedNotifications);
 
       const userRoles = await getUserRoles(user.id);
       expect(userRoles).toEqual({ [company.orgId]: role });

@@ -80,6 +80,9 @@ function creators(input: BsdasriInput) {
 }
 
 export function checkCanRead(user: User, bsdasri: Bsdasri) {
+  if (user.isAdmin && user.isActive) {
+    return true;
+  }
   const authorizedOrgIds = readers(bsdasri);
   return checkUserPermissions(
     user,

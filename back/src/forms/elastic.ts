@@ -10,7 +10,9 @@ import {
   FormWithRevisionRequestsInclude,
   FormWithForwarding,
   FormWithForwardingInclude,
-  FormWithForwardedInWithTransporters
+  FormWithForwardedInWithTransporters,
+  FormWithAppendix1GroupingInfo,
+  FormWithAppendix1GroupingInfoInclude
 } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -31,14 +33,16 @@ export type FormForElastic = Form &
   FormWithForwardedInWithTransporters &
   FormWithIntermediaries &
   FormWithForwarding &
-  FormWithRevisionRequests;
+  FormWithRevisionRequests &
+  FormWithAppendix1GroupingInfo;
 
 export const FormForElasticInclude = {
   ...FormWithForwardedInWithTransportersInclude,
   ...FormWithForwardingInclude,
   ...FormWithTransportersInclude,
   ...FormWithIntermediariesInclude,
-  ...FormWithRevisionRequestsInclude
+  ...FormWithRevisionRequestsInclude,
+  ...FormWithAppendix1GroupingInfoInclude // provided to tell apart orphans appendix1 from others
 };
 
 export async function getFormForElastic(
@@ -51,7 +55,31 @@ export async function getFormForElastic(
 }
 
 /**
+ *
+ * Utility to know if BSDD indexing should be skipped
+ *  sould not be indexed:
+ * deleted forms
+ * forwarding forms
+ * appendix form in draft state or not linked to another top level form through formGroupement
+ */
+export function isBsddNotIndexable(form: FormForElastic): boolean {
+  if (form.isDeleted || !!form.forwarding) {
+    return true;
+  }
+
+  if (form.emitterType === "APPENDIX1_PRODUCER") {
+    if (form.status === "DRAFT") {
+      return true;
+    }
+
+    return !form.groupedIn?.length; // no relation
+  }
+  return false;
+}
+
+/**
  * Convert a BSD from the forms table to Elastic Search's BSD model.
+ * NB: some BSDDs should not appear on user dashboard, see `isBsddNotIndexable`
  */
 export function toBsdElastic(form: FormForElastic): BsdElastic {
   const siretsByTab = getSiretsByTab(form);
@@ -137,9 +165,10 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
       : null,
     destinationOperationDate: form.processedAt?.getTime(),
     ...getFormReturnOrgIds(form),
-    ...(form.forwarding
+
+    ...(isBsddNotIndexable(form)
       ? {
-          // do not display BSD suite in dashboard
+          // do not display in dashboard : BSDDs suite, deleted BSDs, orphans appendix1
           isDraftFor: [],
           isForActionFor: [],
           isFollowFor: [],
@@ -149,6 +178,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
           isInRevisionFor: []
         }
       : siretsByTab),
+
     ...getFormRevisionOrgIds(form),
     revisionRequests: form.bsddRevisionRequests,
     sirets: Object.values(siretsByTab).flat(),
@@ -204,6 +234,7 @@ export async function indexForm(
   if (form.isDeleted) {
     return toBsdElastic(form);
   }
+
   if (form.forwardedIn) {
     // index next BSD asynchronously
     indexBsd(
@@ -212,7 +243,8 @@ export async function indexForm(
         intermediaries: [],
         forwardedIn: null,
         forwarding: form,
-        bsddRevisionRequests: []
+        bsddRevisionRequests: [],
+        groupedIn: []
       })
     );
   }

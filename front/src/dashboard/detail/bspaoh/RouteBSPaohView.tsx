@@ -4,7 +4,8 @@ import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { useQuery } from "@apollo/client";
 import { Query, QueryBspaohArgs } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
-import { GET_BSPAOH } from "../../../Apps/Dashboard/Creation/bspaoh/utils/queries";
+import { GET_BSPAOH } from "../../../Apps/common/queries/bspaoh/queries";
+
 import { InlineError } from "../../../Apps/common/Components/Error/Error";
 import EmptyDetail from "../common/EmptyDetailView";
 

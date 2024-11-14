@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { SignBspaoh } from "./SignBspaoh";
 import { subMonths } from "date-fns";
-import { SIGN_BSPAOH } from "../../../Creation/bspaoh/utils/queries";
+import { SIGN_BSPAOH } from "../../../../../Apps/common/queries/bspaoh/queries";
 import { datetimeToYYYYMMDDHHSS } from "../paohUtils";
 import { SignatureTimestamp } from "./components/Signature";
 

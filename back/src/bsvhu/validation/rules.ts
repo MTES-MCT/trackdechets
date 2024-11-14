@@ -91,6 +91,10 @@ const sealedFromEmissionExceptForEmitter: GetBsvhuSignatureTypeFn<ZodBsvhu> = (
 };
 
 export const bsvhuEditionRules: BsvhuEditionRules = {
+  customId: {
+    sealed: { from: "OPERATION" },
+    readableFieldName: "Le numéro libre"
+  },
   createdAt: {
     sealed: { from: "EMISSION" }
   },

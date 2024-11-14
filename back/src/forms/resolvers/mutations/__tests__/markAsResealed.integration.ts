@@ -11,7 +11,13 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { CompanyType, CompanyVerificationStatus, Status } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationStatus,
+  Status,
+  CollectorType,
+  WasteProcessorType
+} from "@prisma/client";
 import {
   Mutation,
   MutationMarkAsResealedArgs
@@ -19,7 +25,10 @@ import {
 import { gql } from "graphql-tag";
 import { sirenifyResealedFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
-
+import {
+  forbbidenProfilesForDangerousWaste,
+  forbbidenProfilesForNonDangerousWaste
+} from "./companyProfiles";
 jest.mock("../../../sirenify");
 (sirenifyResealedFormInput as jest.Mock).mockImplementation(input =>
   Promise.resolve(input)
@@ -355,11 +364,14 @@ describe("Mutation markAsResealed", () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
       "MEMBER",
-      { companyTypes: { set: [CompanyType.COLLECTOR] } }
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
     );
 
     const destination = await companyFactory({
-      companyTypes: [CompanyType.WASTEPROCESSOR]
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
     });
 
     const { mutate } = makeClient(user);
@@ -539,6 +551,95 @@ describe("Mutation markAsResealed", () => {
     ]);
   });
 
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should fail if destination after temp storage does not have appropriate subprofile (%o) when waste is dangerous",
+    async opt => {
+      const owner = await userFactory();
+      const { user, company: collector } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: { set: [CompanyType.COLLECTOR] }
+        }
+      );
+
+      const { mutate } = makeClient(user);
+
+      const destination = await companyFactory(opt);
+
+      const form = await formWithTempStorageFactory({
+        ownerId: owner.id,
+        opt: {
+          status: Status.TEMP_STORER_ACCEPTED,
+          recipientCompanySiret: collector.siret,
+          quantityReceived: 1
+        },
+        forwardedInOpts: {
+          recipientCompanySiret: destination.siret
+        }
+      });
+
+      const { errors } = await mutate(MARK_AS_RESEALED, {
+        variables: {
+          id: form.id,
+          resealedInfos: {}
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Les autorisations de l'établissement de destination ne semblent pas correspondre à la caractérisation du déchet renseigné. Merci de bien vouloir procéder à la mise à jour du profil de l'établissement ou modifier le type de déchet sans quoi le bordereau ne pourra être enregistré."
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForNonDangerousWaste)(
+    "should fail if destination after temp storage does not have appropriate subprofile (%o) whenwaste is not dangerous",
+    async opt => {
+      const owner = await userFactory();
+      const { user, company: collector } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: { set: [CompanyType.COLLECTOR] }
+        }
+      );
+
+      const { mutate } = makeClient(user);
+
+      const destination = await companyFactory(opt);
+
+      const form = await formWithTempStorageFactory({
+        ownerId: owner.id,
+        opt: {
+          status: Status.TEMP_STORER_ACCEPTED,
+          recipientCompanySiret: collector.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: false,
+          quantityReceived: 1
+        },
+        forwardedInOpts: {
+          recipientCompanySiret: destination.siret
+        }
+      });
+
+      const { errors } = await mutate(MARK_AS_RESEALED, {
+        variables: {
+          id: form.id,
+          resealedInfos: {}
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Les autorisations de l'établissement de destination ne semblent pas correspondre à la caractérisation du déchet renseigné. Merci de bien vouloir procéder à la mise à jour du profil de l'établissement ou modifier le type de déchet sans quoi le bordereau ne pourra être enregistré."
+        })
+      ]);
+    }
+  );
+
   it("should throw an error if VERIFY_COMPANY=true and destination after temp storage is not verified", async () => {
     // patch process.env and reload server
     process.env.VERIFY_COMPANY = "true";
@@ -687,7 +788,8 @@ describe("Mutation markAsResealed", () => {
     const { mutate } = makeClient(user);
 
     const destination = await companyFactory({
-      companyTypes: [CompanyType.COLLECTOR]
+      companyTypes: [CompanyType.COLLECTOR],
+      collectorTypes: { set: [CollectorType.DANGEROUS_WASTES] }
     });
 
     const form = await formWithTempStorageFactory({

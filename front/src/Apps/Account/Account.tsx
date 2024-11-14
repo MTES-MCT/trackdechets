@@ -59,7 +59,7 @@ export default function Account() {
               path={toRelative(routes.account.notifications)}
               element={
                 <AccountContentWrapper title="Notifications">
-                  <AccountNotifications />
+                  <AccountNotifications me={data.me} />
                 </AccountContentWrapper>
               }
             />

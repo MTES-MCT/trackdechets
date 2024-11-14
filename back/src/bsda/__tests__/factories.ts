@@ -39,14 +39,14 @@ export const bsdaFactory = async ({
         contactPhone: bsdaObject.emitterCompanyPhone ?? undefined,
         contactEmail: bsdaObject.emitterCompanyMail ?? undefined
       });
-  await upsertBaseSiret(
-    (
+  await upsertBaseSiret({
+    siret: (
       bsdaObject.transporters!
         .create! as Prisma.BsdaTransporterCreateWithoutBsdaInput
-    ).transporterCompanySiret // Prisma.BsdaTransporterCreateWithoutBsdaInput[] is wrongly infered
-  );
-  await upsertBaseSiret(bsdaObject.destinationCompanySiret);
-  await upsertBaseSiret(bsdaObject.workerCompanySiret);
+    ).transporterCompanySiret! // Prisma.BsdaTransporterCreateWithoutBsdaInput[] is wrongly infered
+  });
+  await upsertBaseSiret({ siret: bsdaObject.destinationCompanySiret! });
+  await upsertBaseSiret({ siret: bsdaObject.workerCompanySiret! });
 
   const data: Prisma.BsdaCreateInput = {
     ...bsdaObject,

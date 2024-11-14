@@ -48,6 +48,7 @@ export const GET_ME = gql`
         securityCode
         companyTypes
         userPermissions
+        featureFlags
       }
     }
   }
@@ -69,7 +70,7 @@ const MenuLink = ({ entry }) => {
   );
 };
 
-function DashboardSubNav({ currentCompany }) {
+function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
   const { permissions, role } = usePermissions();
 
   const location = useLocation();
@@ -308,6 +309,17 @@ function DashboardSubNav({ currentCompany }) {
           />
         </li>
       )}
+      {showRegistryTab && canViewNewRegistry && (
+        <li className="fr-nav__item">
+          <MenuLink
+            entry={{
+              navlink: true,
+              caption: "Mes registres (v2)",
+              href: routes.registry_new.myImports
+            }}
+          />
+        </li>
+      )}
     </>
   );
 }
@@ -317,7 +329,7 @@ function DashboardSubNav({ currentCompany }) {
  * Navigation subset to be included in the moble slidning panel nav
  * Contains main navigation items from the desktop top level nav (Dashboard, Account etc.)
  */
-function MobileSubNav({ currentCompany }) {
+function MobileSubNav({ currentCompany, canViewNewRegistry }) {
   const location = useLocation();
 
   const matchAccount = matchPath(
@@ -334,7 +346,12 @@ function MobileSubNav({ currentCompany }) {
   if (!currentCompany) {
     dashboardSubNav = null;
   } else {
-    dashboardSubNav = <DashboardSubNav currentCompany={currentCompany} />;
+    dashboardSubNav = (
+      <DashboardSubNav
+        currentCompany={currentCompany}
+        canViewNewRegistry={canViewNewRegistry}
+      />
+    );
   }
 
   return (
@@ -444,7 +461,8 @@ const getDesktopMenuEntries = (
   isAuthenticated,
   isAdmin,
   showRegistry,
-  currentSiret
+  currentSiret,
+  canViewNewRegistry
 ) => {
   const admin = [
     {
@@ -459,7 +477,16 @@ const getDesktopMenuEntries = (
       caption: "Mes registres",
       href: routes.registry,
       navlink: true
-    }
+    },
+    ...(canViewNewRegistry
+      ? [
+          {
+            caption: "Mes registres (v2)",
+            href: routes.registry_new.myImports,
+            navlink: true
+          }
+        ]
+      : [])
   ];
   const connected = [
     {
@@ -570,11 +597,16 @@ export default function Header({
     company => company.orgId === currentSiret
   );
 
+  const canViewNewRegistry = companies?.some(company =>
+    company.featureFlags?.includes("REGISTRY_V2")
+  );
+
   const menuEntries = getDesktopMenuEntries(
     isAuthenticated,
     isAdmin,
     showRegistry,
-    currentSiret
+    currentSiret,
+    canViewNewRegistry
   );
 
   return !isAuthenticated ? (
@@ -874,7 +906,10 @@ export default function Header({
           </button>
         </div>
 
-        <MobileSubNav currentCompany={currentCompany} />
+        <MobileSubNav
+          currentCompany={currentCompany}
+          canViewNewRegistry={canViewNewRegistry}
+        />
       </div>
 
       {/* Company switcher on top of the page */}

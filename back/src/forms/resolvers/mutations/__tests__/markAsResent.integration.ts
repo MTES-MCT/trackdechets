@@ -7,7 +7,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { CompanyType } from "@prisma/client";
+import { CompanyType, WasteProcessorType } from "@prisma/client";
 
 const MARK_AS_RESENT = `
   mutation MarkAsResent($id: ID!, $resentInfos: ResentFormInput!){
@@ -24,11 +24,16 @@ describe("Mutation markAsResent", () => {
   test("it fails when form is not TEMP_STORER_ACCEPTED", async () => {
     const owner = await userFactory();
     const { user, company } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: { set: [CompanyType.COLLECTOR] }
+      companyTypes: {
+        set: [CompanyType.COLLECTOR]
+      }
     });
 
     const { company: destination } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] },
+      wasteProcessorTypes: {
+        set: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
     });
 
     const { mutate } = makeClient(user);
@@ -65,7 +70,10 @@ describe("Mutation markAsResent", () => {
     });
 
     const { company: destination } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] },
+      wasteProcessorTypes: {
+        set: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
     });
 
     const { mutate } = makeClient(user);
@@ -150,7 +158,10 @@ describe("Mutation markAsResent", () => {
       companyTypes: { set: [CompanyType.COLLECTOR] }
     });
     const { company: destination } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] },
+      wasteProcessorTypes: {
+        set: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
     });
 
     const { mutate } = makeClient(user);

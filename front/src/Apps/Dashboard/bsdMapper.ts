@@ -337,6 +337,7 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
     readableid: bsvhu.id,
+    customId: bsvhu?.customId || "",
     type: mapBsdTypeNameToBsdType(bsvhu.__typename) || BsdType.Bsvhu,
     isDraft: bsvhu.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),

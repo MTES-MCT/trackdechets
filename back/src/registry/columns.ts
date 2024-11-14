@@ -304,7 +304,8 @@ export const columns: Column[] = [
   },
   { field: "transporterCompanyMail", label: "Transporteur contact" },
 
-  { field: "wasteAdr", label: "ADR" },
+  { field: "wasteAdr", label: "Mention ADR" },
+  { field: "nonRoadRegulationMention", label: "Mention RID, ADNR, IMDG" },
   // Destination du déchet
   { field: "destinationCap", label: "CAP" },
   { field: "destinationCompanyName", label: "Destination raison sociale" },

@@ -5,7 +5,9 @@ import {
   Prisma,
   QuantityType,
   Status,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  CompanyType,
+  WasteProcessorType
 } from "@prisma/client";
 import { format } from "date-fns";
 import { prisma } from "@td/prisma";
@@ -43,7 +45,13 @@ describe("mutation / importPaperForm", () => {
         "MEMBER"
       );
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "MEMBER"
+        "MEMBER",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
 
       const input = {
@@ -127,7 +135,10 @@ describe("mutation / importPaperForm", () => {
     });
 
     it("should import a BSD where user is recipient", async () => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const { mutate } = makeClient(user);
 
@@ -166,7 +177,10 @@ describe("mutation / importPaperForm", () => {
     });
 
     it("should fail if data is incomplete", async () => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const { mutate } = makeClient(user);
 
@@ -189,7 +203,10 @@ describe("mutation / importPaperForm", () => {
     });
 
     it("should import a form with an ecoOrganisme", async () => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
       const ecoOrganisme = await prisma.ecoOrganisme.create({
         data: {
           name: "EO",
@@ -228,7 +245,10 @@ describe("mutation / importPaperForm", () => {
     });
 
     it("should fail if eco-organisme is not known", async () => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const { mutate } = makeClient(user);
 
@@ -257,7 +277,12 @@ describe("mutation / importPaperForm", () => {
     test.each(allowedFormats)(
       "%p should be a valid format form date fields",
       async f => {
-        const { user, company } = await userWithCompanyFactory("MEMBER");
+        const { user, company } = await userWithCompanyFactory("MEMBER", {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        });
 
         const { mutate } = makeClient(user);
 
@@ -295,7 +320,10 @@ describe("mutation / importPaperForm", () => {
     );
 
     it("should set status to AWAITING_GROUP in case of groupement code", async () => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const { mutate } = makeClient(user);
 
@@ -328,7 +356,10 @@ describe("mutation / importPaperForm", () => {
     });
 
     it("should set status to NO_TREACEABILITY in case of no traceability", async () => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const { mutate } = makeClient(user);
 
@@ -436,7 +467,10 @@ describe("mutation / importPaperForm", () => {
     it("should update a sealed form with imported data when user is recipient", async () => {
       const owner = await userFactory();
 
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       // create a form with a sealed status
       const form = await formFactory({
@@ -525,7 +559,10 @@ describe("mutation / importPaperForm", () => {
     it("should update as sealed form and overwrite existing data", async () => {
       const owner = await userFactory();
 
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       // create a form with a sealed status
       const form = await formFactory({
@@ -630,7 +667,10 @@ describe("mutation / importPaperForm", () => {
     it("should fail to update a sealed form if data is missing", async () => {
       const owner = await userFactory();
 
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const form = await formFactory({
         ownerId: owner.id,
@@ -668,7 +708,10 @@ describe("mutation / importPaperForm", () => {
     it("should fail when trying to update a SIRET", async () => {
       const owner = await userFactory();
 
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       // create a form with a sealed status
       const form = await formFactory({
@@ -708,7 +751,10 @@ describe("mutation / importPaperForm", () => {
     it("should set status to AWAITING_GROUP in case of groupement code", async () => {
       const owner = await userFactory();
 
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const form = await formFactory({
         ownerId: owner.id,
@@ -755,7 +801,10 @@ describe("mutation / importPaperForm", () => {
     it("should set status to NO_TRACEABILITY in case of no traceability", async () => {
       const owner = await userFactory();
 
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const form = await formFactory({
         ownerId: owner.id,

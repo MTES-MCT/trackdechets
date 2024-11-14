@@ -114,6 +114,7 @@ describe("Query.bsds.vhus base workflow", () => {
       >(CREATE_DRAFT_VHU, {
         variables: {
           input: {
+            customId: "theCustomId",
             emitter: {
               company: {
                 siret: emitter.company.siret,
@@ -203,6 +204,40 @@ describe("Query.bsds.vhus base workflow", () => {
         expect.objectContaining({ node: { id: vhuId } })
       ]);
     });
+
+    it("draft vhu should be found with custom id", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data: data1 } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              customId: { _contains: "nope" },
+              isDraftFor: [emitter.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data1.bsds.edges.length).toEqual(0);
+
+      const { data: data2 } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              customId: { _contains: "theCustomId" },
+              isDraftFor: [emitter.company.siret!]
+            }
+          }
+        }
+      );
+
+      expect(data2.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: vhuId } })
+      ]);
+    });
+
     it("draft vhu should not be isDraftFor transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(

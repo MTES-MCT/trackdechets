@@ -27,7 +27,7 @@ import {
   CREATE_DRAFT_VHU,
   GET_VHU_FORM,
   UPDATE_VHU_FORM
-} from "./utils/queries";
+} from "../../../../Apps/common/queries/bsvhu/queries";
 import { cleanPayload } from "../bspaoh/utils/payload";
 import {
   getErrorTabIds,
@@ -199,6 +199,9 @@ const BsvhuFormSteps = ({
         sealedFields={sealedFields}
         setPublishErrors={setPublishErrors}
         errorTabIds={errorTabIds}
+        genericErrorMessage={publishErrorMessages.filter(
+          error => error.tabId === TabId.none
+        )}
       />
       {loading && <Loader />}
     </>

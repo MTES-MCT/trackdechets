@@ -75,8 +75,7 @@ describe("Mutation.createDraftBspaoh", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparaît pas",
+        message: "Votre établissement doit être visé sur le bordereau",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })

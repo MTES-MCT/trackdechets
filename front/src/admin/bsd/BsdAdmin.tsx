@@ -10,7 +10,8 @@ import {
   Bsvhu,
   Form,
   Query,
-  UserPermission
+  UserPermission,
+  Bsd
 } from "@td/codegen-ui";
 import React, { useState } from "react";
 import BsdCard from "../../Apps/Dashboard/Components/BsdCard/BsdCard";
@@ -93,27 +94,35 @@ export function BsdAdmin() {
     COMPANY_ACCOUNT_ADD_PRIVATE_INFOS
   );
 
+  const getEmitter = (bsd?: Bsd) => {
+    if (bsd?.__typename === "Bsff") return (bsd as Bsff)?.["bsffEmitter"];
+    return (bsd as Form | Bsda | Bsdasri | Bsvhu | Bspaoh)?.emitter;
+  };
+  const getTransporter = (bsd?: Bsd) => {
+    if (bsd?.__typename === "Bsff") return (bsd as Bsff)?.["bsffTransporter"];
+    return (bsd as Form | Bsda | Bsdasri | Bsvhu | Bspaoh)?.transporter;
+  };
+
+  const getDestination = (bsd?: Bsd) => {
+    if (bsd?.__typename === "Form") return bsd?.recipient;
+    if (bsd?.__typename === "Bsff") return (bsd as Bsff)?.["bsffDestination"];
+    return (bsd as Bsda | Bsdasri | Bsvhu | Bspaoh)?.destination;
+  };
+
   const possibleImpersonations = [
     [
-      data?.bsd?.emitter?.company?.siret,
-      data?.bsd?.emitter?.company?.name,
+      getEmitter(data?.bsd)?.company?.siret,
+      getEmitter(data?.bsd)?.company?.name,
       "Emetteur"
     ],
     [
-      data?.bsd?.transporter?.company?.siret,
-      data?.bsd?.transporter?.company?.name,
+      getTransporter(data?.bsd)?.company?.siret,
+      getTransporter(data?.bsd)?.company?.name,
       "Transporteur"
     ],
     [
-      (data?.bsd as Form)?.recipient?.company?.siret,
-      (data?.bsd as Form)?.recipient?.company?.name,
-      "Destination"
-    ],
-    [
-      (data?.bsd as Bsda | Bsdasri | Bsff | Bsvhu | Bspaoh)?.destination
-        ?.company?.siret,
-      (data?.bsd as Bsda | Bsdasri | Bsff | Bsvhu | Bspaoh)?.destination
-        ?.company?.name,
+      getDestination(data?.bsd)?.company?.siret,
+      getDestination(data?.bsd)?.company?.name,
       "Destination"
     ]
   ].filter(v => Boolean(v[0]));
@@ -205,15 +214,14 @@ export function BsdAdmin() {
               />
             </PermissionsContext.Provider>
           </div>
-
           <Modal
             ariaLabel="Aperçu du bordereau"
             isOpen={isPreviewOpen}
             onClose={() => setIsPreviewOpen(false)}
+            size="XL"
           >
             <BsdDetailContent bsd={data.bsd} />
           </Modal>
-
           <h4 className="fr-h4 fr-mt-4w">Impersonation</h4>
           <p>
             La liste des entreprises du bordereau est présentée ci-dessous. Pour
@@ -226,7 +234,6 @@ export function BsdAdmin() {
               headers={possibleImpersonationHeaders}
             />
           </div>
-
           {errorImpersonate && (
             <p>Erreur lors du chargement des impersonations possibles</p>
           )}

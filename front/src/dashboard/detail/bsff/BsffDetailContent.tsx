@@ -49,7 +49,7 @@ type CompanyProps = {
 type Props = { form: Bsff };
 
 export function BsffDetailContent({ form: bsff }: Props) {
-  const { siret } = useParams<{ siret: string }>();
+  const { siret = "" } = useParams<{ siret: string }>();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: bsff.id } });
   const { permissions } = usePermissions();

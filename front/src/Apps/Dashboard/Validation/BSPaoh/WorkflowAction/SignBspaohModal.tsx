@@ -1,7 +1,8 @@
 import { useQuery } from "@apollo/client";
 
 import { Loader } from "../../../../common/Components";
-import { GET_BSPAOH } from "../../../Creation/bspaoh/utils/queries";
+import { GET_BSPAOH } from "../../../../../Apps/common/queries/bspaoh/queries";
+
 import { Query, QueryBspaohArgs } from "@td/codegen-ui";
 import React from "react";
 import { BspaohSummary } from "./BspaohSummary";

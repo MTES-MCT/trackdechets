@@ -1,3 +1,4 @@
+import { getUserCompanies } from "../../../users/database";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
@@ -18,7 +19,8 @@ const registryDelegationsResolver: QueryResolvers["registryDelegations"] =
     // Sync validation of args
     const paginationArgs = parseQueryRegistryDelegationsArgs(args);
 
-    const { delegateOrgId, delegatorOrgId } = paginationArgs.where;
+    const { delegateOrgId, delegatorOrgId, givenToMe, activeOnly, search } =
+      paginationArgs.where;
 
     // Find targeted company
     const { delegate, delegator } = await findDelegateOrDelegatorOrThrow(
@@ -30,10 +32,18 @@ const registryDelegationsResolver: QueryResolvers["registryDelegations"] =
     if (delegate) await checkBelongsTo(user, delegate);
     if (delegator) await checkBelongsTo(user, delegator);
 
+    const delegates = delegate ? [delegate] : [];
+    if (givenToMe) {
+      const userCompanies = await getUserCompanies(user.id);
+      delegates.push(...userCompanies);
+    }
+
     // Get paginated delegations
     const paginatedDelegations = await getPaginatedDelegations(user, {
-      delegate,
+      delegates,
       delegator,
+      activeOnly,
+      search,
       skip: paginationArgs.skip,
       first: paginationArgs.first
     });

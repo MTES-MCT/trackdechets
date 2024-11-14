@@ -184,7 +184,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     updatedAt: bsvhu.updatedAt?.getTime(),
     id: bsvhu.id,
     readableId: bsvhu.id,
-    customId: "",
+    customId: bsvhu.customId ?? "",
     status: bsvhu.status,
     wasteCode: bsvhu.wasteCode ?? "",
     wasteAdr: "",

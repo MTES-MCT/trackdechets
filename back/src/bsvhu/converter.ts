@@ -54,6 +54,7 @@ export const getAddress = ({
 export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
   return {
     id: form.id,
+    customId: form.customId,
     createdAt: processDate(form.createdAt),
     updatedAt: processDate(form.updatedAt),
     isDraft: form.isDraft,
@@ -212,9 +213,11 @@ export function flattenVhuInput(formInput: BsvhuInput) {
     packaging: chain(formInput, f => f.packaging),
     wasteCode: chain(formInput, f => f.wasteCode),
     quantity: chain(formInput, f => f.quantity),
+
     ...flattenVhuIdentificationInput(formInput),
     ...flattenVhuWeightInput(formInput),
-    intermediaries: formInput.intermediaries
+    intermediaries: formInput.intermediaries,
+    customId: chain(formInput, f => f.customId)
   });
 }
 

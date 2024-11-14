@@ -62,6 +62,21 @@ describe("Query.Bspaoh", () => {
     ]);
   });
 
+  it("should allow access to admin user not on the bsd", async () => {
+    const paoh = await bspaohFactory({});
+    const { user: otherUser } = await userWithCompanyFactory(
+      "MEMBER",
+      {},
+      { isAdmin: true }
+    );
+
+    const { query } = makeClient(otherUser);
+    const { data } = await query<Pick<Query, "bspaoh">>(GET_BSPAOH, {
+      variables: { id: paoh.id }
+    });
+    expect(data.bspaoh.id).toBe(paoh.id);
+  });
+
   it("should get a draft bspaoh if user siret belongs to allowed draft sirets", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsd = await bspaohFactory({

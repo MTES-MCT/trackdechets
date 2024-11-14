@@ -10,12 +10,7 @@ import { client, BsdElastic, index } from "../../../common/elastic";
 
 import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
-import {
-  Permission,
-  can,
-  getUserRoles,
-  hasGovernmentReadAllBsdsPermOrThrow
-} from "../../../permissions";
+import { Permission, can, getUserRoles } from "../../../permissions";
 
 import { QueryContainer } from "@elastic/elasticsearch/api/types";
 import { GraphQLContext } from "../../../types";
@@ -29,13 +24,11 @@ export interface GetResponse<T> {
  *
  * @param param0
  * @param user
- * @param bypassOrgIdsWithListPermission : do not restrict search to user companies (for gerico gov account)
  * @returns
  */
 async function buildQuery(
   { clue, where = {} }: QueryBsdsArgs,
-  user: Express.User,
-  bypassOrgIdsWithListPermission?: boolean
+  user: Express.User
 ) {
   const query: {
     bool: estypes.BoolQuery & {
@@ -110,13 +103,11 @@ async function buildQuery(
     can(roles[orgId], Permission.BsdCanList)
   );
 
-  if (!bypassOrgIdsWithListPermission) {
-    query.bool.filter.push({
-      terms: {
-        sirets: orgIdsWithListPermission
-      }
-    });
-  }
+  query.bool.filter.push({
+    terms: {
+      sirets: orgIdsWithListPermission
+    }
+  });
 
   return query;
 }
@@ -237,21 +228,7 @@ async function buildSearchAfter(
 const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   // This query is restricted to Session users (UI) and government accounts (gerico)
 
-  // store user
-  const contextUser = context.user;
-
-  // is user is not authenticated with Session, context.user is set to null
   applyAuthStrategies(context, [AuthType.Session]);
-  let bypassOrgIdsWithListPermission = false;
-
-  // if user is authenticated with Bearer and has a gov account id, check their perms
-  if (!context.user && contextUser?.governmentAccountId) {
-    // throw NotLoggedIn if perms do not match
-    await hasGovernmentReadAllBsdsPermOrThrow(contextUser);
-    // if permission matches, set context.user back
-    context.user = contextUser;
-    bypassOrgIdsWithListPermission = true;
-  }
 
   const user = checkIsAuthenticated(context);
 
@@ -261,7 +238,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   const size = Math.max(Math.min(first!, MAX_SIZE), MIN_SIZE);
   await bsdSearchSchema.validate(args.where, { abortEarly: false });
 
-  const query = await buildQuery(args, user, bypassOrgIdsWithListPermission);
+  const query = await buildQuery(args, user);
   const sort = buildSort(args);
   const search_after = await buildSearchAfter(args, sort);
   return buildResponse({ query, size, sort, search_after });
