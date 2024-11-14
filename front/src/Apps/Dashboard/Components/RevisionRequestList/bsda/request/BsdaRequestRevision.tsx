@@ -33,6 +33,7 @@ import {
 import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCancelationInput";
 import TagsInput from "../../../../../Forms/Components/TagsInput/TagsInput";
 import styles from "./BsdaRequestRevision.module.scss";
+import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 type Props = {
   bsda: Bsda;
 };
@@ -276,7 +277,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 value={bsda.destination?.reception?.weight}
                 defaultValue={initialBsdaReview.destination?.reception?.weight}
               >
-                <Input
+                <NonScrollableInput
                   label="Poids en tonnes"
                   className="fr-col-2"
                   state={errors.destination?.reception?.weight && "error"}
