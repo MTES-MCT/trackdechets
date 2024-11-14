@@ -43,7 +43,7 @@ const getCorrectLine = (siret: string) => {
     destinationCountryCode: "FR",
     operationCode: "R 5",
     qualificationCode: "Recyclage",
-    administrativeActReference: "TODO arrêté"
+    administrativeActReference: "Arrêté du 24 août 2016"
   };
 };
 
@@ -275,7 +275,7 @@ describe("Process registry import job", () => {
       expect(errorFileMetadata).toBeDefined();
     });
 
-    it("should work if a line has missing some columns", async () => {
+    it("should work if the export has correct lines and lines with missing columns", async () => {
       const fileKey = "missing-column.csv";
       const { company, user } = await userWithCompanyFactory();
 
@@ -317,6 +317,163 @@ describe("Process registry import job", () => {
 
       expect(result.status).toBe("PARTIALLY_SUCCESSFUL");
       expect(result.numberOfInsertions).toBe(1);
+      expect(result.numberOfCancellations).toBe(0);
+      expect(result.numberOfEdits).toBe(0);
+      expect(result.numberOfErrors).toBe(1);
+    });
+
+    it("should fail if the current user doesnt have the rights on the reportFor siret", async () => {
+      const fileKey = "missing-colon.csv";
+      const { company } = await userWithCompanyFactory();
+      const { user } = await userWithCompanyFactory();
+
+      const { s3Stream, upload } = getUploadWithWritableStream(
+        process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        fileKey,
+        "text/csv"
+      );
+
+      s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
+      s3Stream.end(
+        Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
+      );
+
+      await upload.done();
+
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "missing-column.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
+
+      await processRegistryImportJob({
+        data: {
+          importId: registryImport.id,
+          importType: registryImport.type,
+          s3FileKey: registryImport.s3FileKey
+        }
+      } as Job<RegistryImportJobArgs>);
+
+      const result = await prisma.registryImport.findUniqueOrThrow({
+        where: { id: registryImport.id }
+      });
+
+      expect(result.status).toBe("FAILED");
+      expect(result.numberOfInsertions).toBe(0);
+      expect(result.numberOfCancellations).toBe(0);
+      expect(result.numberOfEdits).toBe(0);
+      expect(result.numberOfErrors).toBe(1);
+    });
+
+    it("should work if the current user has delegation rights on the reportFor siret", async () => {
+      const fileKey = "missing-colon.csv";
+      const { company } = await userWithCompanyFactory();
+      const { user, company: delegationCompany } =
+        await userWithCompanyFactory();
+
+      await prisma.registryDelegation.create({
+        data: {
+          startDate: new Date(),
+          delegateId: delegationCompany.id,
+          delegatorId: company.id
+        }
+      });
+
+      const { s3Stream, upload } = getUploadWithWritableStream(
+        process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        fileKey,
+        "text/csv"
+      );
+
+      s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
+      s3Stream.end(
+        Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
+      );
+
+      await upload.done();
+
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "missing-column.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
+
+      await processRegistryImportJob({
+        data: {
+          importId: registryImport.id,
+          importType: registryImport.type,
+          s3FileKey: registryImport.s3FileKey
+        }
+      } as Job<RegistryImportJobArgs>);
+
+      const result = await prisma.registryImport.findUniqueOrThrow({
+        where: { id: registryImport.id }
+      });
+
+      expect(result.status).toBe("FAILED");
+      expect(result.numberOfInsertions).toBe(0);
+      expect(result.numberOfCancellations).toBe(0);
+      expect(result.numberOfEdits).toBe(0);
+      expect(result.numberOfErrors).toBe(1);
+    });
+
+    it("should fail if the uploaded file is not in a valid format", async () => {
+      const fileKey = "invalid-file.csv";
+      const { company } = await userWithCompanyFactory();
+      const { user, company: delegationCompany } =
+        await userWithCompanyFactory();
+
+      await prisma.registryDelegation.create({
+        data: {
+          startDate: new Date(),
+          delegateId: delegationCompany.id,
+          delegatorId: company.id
+        }
+      });
+
+      const { s3Stream, upload } = getUploadWithWritableStream(
+        process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        fileKey,
+        "text/csv"
+      );
+
+      s3Stream.write("PK");
+      s3Stream.end("");
+
+      await upload.done();
+
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "missing-column.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
+
+      await processRegistryImportJob({
+        data: {
+          importId: registryImport.id,
+          importType: registryImport.type,
+          s3FileKey: registryImport.s3FileKey
+        }
+      } as Job<RegistryImportJobArgs>);
+
+      const result = await prisma.registryImport.findUniqueOrThrow({
+        where: { id: registryImport.id }
+      });
+
+      expect(result.status).toBe("FAILED");
+      expect(result.numberOfInsertions).toBe(0);
       expect(result.numberOfCancellations).toBe(0);
       expect(result.numberOfEdits).toBe(0);
       expect(result.numberOfErrors).toBe(1);

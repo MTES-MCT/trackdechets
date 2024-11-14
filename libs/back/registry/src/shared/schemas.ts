@@ -65,8 +65,8 @@ export const wasteDescriptionSchema = z
   .string()
   .min(2, "La dénomination usuelle du déchet doit faire au moins 2 caractères")
   .max(
-    150,
-    "La dénomination usuelle du déchet ne peut pas dépasser 150 caractères"
+    200,
+    "La dénomination usuelle du déchet ne peut pas dépasser 200 caractères"
   );
 
 export const wasteCodeBaleSchema = z.enum(WASTE_CODES_BALE).optional();
@@ -87,8 +87,8 @@ export const weightValueSchema = z.coerce
     required_error: "Le poids est requis",
     invalid_type_error: "Le poids doit être un nombre"
   })
-  .min(0, "Le poids ne peut pas être inférieur à 0")
-  .max(100_000_000, "Le poids ne peut pas dépasser 100 000 000")
+  .min(0, "Le poids ne peut pas être inférieur à 0 tonnes")
+  .max(1_000, "Le poids ne peut pas dépasser 1 000 tonnes")
   .multipleOf(0.001, "Le poids ne doit pas avoir plus de 3 décimales");
 
 export const weightIsEstimateSchema = z.union(
@@ -112,18 +112,25 @@ export const volumeSchema = z
   .pipe(
     z
       .number({
-        required_error: "La quantité est requise",
-        invalid_type_error: "La quantité doit être un nombre"
+        required_error: "Le volume est requis",
+        invalid_type_error: "Le volume doit être un nombre"
       })
-      .min(0, "La quantité ne peut pas être inférieure à 0")
-      .max(100_000_000, "La quantité ne peut pas dépasser 100 000 000")
-      .multipleOf(0.001, "La quantité ne doit pas avoir plus de 3 décimales")
+      .min(0, "Le volume ne peut pas être inférieur à 0")
+      .max(1_000, "Le volume ne peut pas dépasser 1 000 M3")
+      .multipleOf(0.001, "Le volume ne doit pas avoir plus de 3 décimales")
       .optional()
   );
 
 export const getActorTypeSchema = (name: string) =>
   z.enum(
-    ["ENTREPRISE_FR", "ENTREPRISE_UE", "ENTREPRISE_HORS_UE", "ASSOCIATION"],
+    [
+      "ENTREPRISE_FR",
+      "ENTREPRISE_UE",
+      "ENTREPRISE_HORS_UE",
+      "ASSOCIATION",
+      "PERSONNE_PHYSIQUE",
+      "COMMUNE"
+    ],
     {
       required_error: `Le type ${name} est requis`,
       invalid_type_error: `Le type ${name} n'est pas une valeur autorisée. Valeurs possibles: ENTREPRISE_FR, ENTREPRISE_UE, ENTREPRISE_HORS_UE, ASSOCIATION`

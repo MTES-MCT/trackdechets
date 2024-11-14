@@ -1,11 +1,12 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "@td/prisma";
+import { UserInputError } from "../../../common/errors";
+import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryRegistryImportsArgs } from "../../../generated/graphql/types";
+import { Permission, checkUserPermissions } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getConnection } from "../../../common/pagination";
-import { Permission, checkUserPermissions } from "../../../permissions";
-import { Prisma } from "@prisma/client";
 
 export async function registryImports(
   _,
@@ -15,6 +16,12 @@ export async function registryImports(
   const user = checkIsAuthenticated(context);
 
   const where: Prisma.RegistryImportWhereInput = {};
+
+  if (!siret && !ownImportsOnly) {
+    throw new UserInputError(
+      "Vous devez spécifier un SIRET via le paramètre 'siret' ou préciser que vous souhaitez récupérer uniquement vos imports via le paramètre 'ownImportsOnly'"
+    );
+  }
 
   if (siret) {
     const userCompanies = await getUserCompanies(user.id);

@@ -1,7 +1,6 @@
-import { isSiret, countries } from "@td/constants";
-import { checkVAT } from "jsvat";
 import { Refinement, z } from "zod";
 
+import { refineActorOrgId } from "../../shared/refinement";
 import { ParsedZodSsdItem } from "./schema";
 
 export const refineDates: Refinement<ParsedZodSsdItem> = (
@@ -74,64 +73,11 @@ export const refineDates: Refinement<ParsedZodSsdItem> = (
   }
 };
 
-export const refineDestinationOrgId: Refinement<ParsedZodSsdItem> = (
-  ssdItem,
-  { addIssue }
-) => {
-  switch (ssdItem.destinationType) {
-    case "ENTREPRISE_FR": {
-      if (!isSiret(ssdItem.destinationOrgId)) {
-        addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Le SIRET du destinataire n'est pas un SIRET valide.",
-          path: ["destinationOrgId"]
-        });
-      }
-      break;
-    }
-    case "ENTREPRISE_UE": {
-      const { isValid } = checkVAT(ssdItem.destinationOrgId, countries);
-      if (!isValid) {
-        addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            "Le numéro d'identification du destinataire doit faire entre 3 et 27 caractères pour une entreprise Européenne. Il commence par 2 lettres majuscules et est suivi de chiffres.",
-          path: ["destinationOrgId"]
-        });
-      }
-      break;
-    }
-    case "ENTREPRISE_HORS_UE": {
-      const isOrgIdValidOutOfUe =
-        ssdItem.destinationOrgId &&
-        /[A-Z0-9]{1,25}/.test(ssdItem.destinationOrgId);
-      if (!isOrgIdValidOutOfUe) {
-        addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            "Le numéro d'identification du destinataire doit faire entre 1 et 25 caractères pour une entreprise hors UE. Il est composé de lettres majuscules et de chiffres.",
-          path: ["destinationOrgId"]
-        });
-      }
-      break;
-    }
-    case "ASSOCIATION": {
-      const isOrgIdValidAssociation =
-        ssdItem.destinationOrgId && /W[0-9]{9}/.test(ssdItem.destinationOrgId);
-      if (!isOrgIdValidAssociation) {
-        addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            "Le numéro d'identification du destinataire doit faire 10 caractères pour une assoxiation. Il commence par un W suivi de 9 chiffres.",
-          path: ["destinationOrgId"]
-        });
-      }
-      break;
-    }
-    default:
-      throw new Error("Unhandled destination type");
-  }
-};
+export const refineDestinationOrgId = refineActorOrgId<ParsedZodSsdItem>({
+  typeKey: "destinationType",
+  orgIdKey: "destinationOrgId",
+  countryKey: "destinationCountryCode"
+});
 
 export const refineSecondaryWasteCodes: Refinement<ParsedZodSsdItem> = (
   ssdItem,

@@ -90,13 +90,14 @@ export async function processStream({
       }
 
       // Check rights
-      if (
-        !allowedSirets.includes(result.data.reportForSiret) &&
-        result.data.reportAsSiret &&
-        !delegateToDelegatorsMap
-          .get(result.data.reportAsSiret)
-          ?.includes(result.data.reportForSiret)
-      ) {
+      const contextualSiretsWithDelegation =
+        delegateToDelegatorsMap.get(result.data.reportAsSiret ?? "") ?? [];
+      const contextualAllowedSirets = [
+        ...allowedSirets,
+        ...contextualSiretsWithDelegation
+      ];
+
+      if (!contextualAllowedSirets.includes(result.data.reportForSiret)) {
         stats.errors++;
 
         errorStream.write([
