@@ -103,7 +103,7 @@ input AcceptedFormInput {
   """
   Quantité réelle présentée en tonnes (case 10).
 
-  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  Doit être inférieure à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
@@ -751,7 +751,7 @@ input TempStorerAcceptedFormInput {
   """
   Quantité réelle présentée en tonnes (case 13)
 
-  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  Doit être inférieure à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
@@ -788,7 +788,7 @@ input TempStoredFormInput {
   """
   Quantité réelle présentée en tonnes (case 13)
 
-  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  Doit être inférieure à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
