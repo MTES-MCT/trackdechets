@@ -294,7 +294,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         {values.wasteDetails.isSubjectToADR && (
           <div className="fr-ml-18v">
             <label>
-              Mentions au titre des règlements ADR, RID, ADNR, IMDG{" "}
+              Mention au titre du règlement ADR{" "}
               <Field
                 type="text"
                 name="wasteDetails.onuCode"
@@ -308,7 +308,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         )}
       </div>
 
-      <div className="form__row">
+      <div className="form__row fr-ml-18v">
         <label>
           Mention au titre des règlements RID, ADNR, IMDG (optionnel){" "}
           <Field
