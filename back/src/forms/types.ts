@@ -93,6 +93,15 @@ export type FormWithRevisionRequests = Prisma.FormGetPayload<{
   include: typeof FormWithRevisionRequestsInclude;
 }>;
 
+export const FormWithAppendix1GroupingInfoInclude =
+  Prisma.validator<Prisma.FormInclude>()({
+    groupedIn: { select: { id: true } }
+  });
+
+export type FormWithAppendix1GroupingInfo = Prisma.FormGetPayload<{
+  include: typeof FormWithAppendix1GroupingInfoInclude;
+}>;
+
 /**
  * A Prisma Form with linked objects
  * ***********************************
@@ -168,6 +177,7 @@ export type Bsdd = {
   wasteCode: string | null;
   wasteDescription: string | null;
   wasteAdr: string | null;
+  nonRoadRegulationMention: string | null;
   wasteIsDangerous: boolean;
   weightValue: number | null;
   weightIsEstimate: boolean | null;

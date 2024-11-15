@@ -160,7 +160,7 @@ export async function getFicheInterventions({
     expandFicheInterventionBsffFromDB
   );
 
-  if (isBsffReader) {
+  if (isBsffReader || user.isAdmin) {
     return expandedFicheInterventions;
   }
 

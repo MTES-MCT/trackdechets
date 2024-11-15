@@ -29,6 +29,11 @@ type BsvhuError {
 type Bsvhu {
   "Numéro unique attribué par Trackdéchets"
   id: ID!
+  """
+  Identifiant personnalisé permettant de faire le lien avec un
+  objet un système d'information tierce
+  """
+  customId: String
   "Date de création"
   createdAt: DateTime
   "Date de dernière modification"

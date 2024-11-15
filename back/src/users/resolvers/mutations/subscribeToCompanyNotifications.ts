@@ -1,15 +1,50 @@
 import { GraphQLContext } from "../../../types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { NotCompanyMember, UserInputError } from "../../../common/errors";
-
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import {
+  MutationResolvers,
+  UserNotificationsInput
+} from "../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../../companies/converters";
-import { authorizedNotifications } from "../../notifications";
+import {
+  authorizedNotificationsByRole,
+  toPrismaNotifications,
+  UserNotification
+} from "../../notifications";
 
-const setCompanyNotificationsResolver: MutationResolvers["setCompanyNotifications"] =
+function activeNotifications(
+  notifications: UserNotificationsInput
+): UserNotification[] {
+  return [
+    {
+      name: UserNotification.MEMBERSHIP_REQUEST,
+      isActive: notifications.membershipRequest
+    },
+    {
+      name: UserNotification.SIGNATURE_CODE_RENEWAL,
+      isActive: notifications.signatureCodeRenewal
+    },
+    {
+      name: UserNotification.BSD_REFUSAL,
+      isActive: notifications.bsdRefusal
+    },
+    {
+      name: UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
+      isActive: notifications.bsdaFinalDestinationUpdate
+    },
+    {
+      name: UserNotification.REVISION_REQUEST,
+      isActive: notifications.revisionRequest
+    }
+  ]
+    .filter(n => n.isActive)
+    .map(n => n.name);
+}
+
+const subscribeToCompanyNotificationsResolver: MutationResolvers["subscribeToCompanyNotifications"] =
   async (parent, args, context: GraphQLContext) => {
     applyAuthStrategies(context, [AuthType.Session]);
 
@@ -27,9 +62,13 @@ const setCompanyNotificationsResolver: MutationResolvers["setCompanyNotification
       throw new NotCompanyMember(company.orgId);
     }
 
-    const unauthorizedNotifications = notifications.filter(
+    const subscribeTo = activeNotifications(notifications);
+
+    const unauthorizedNotifications = subscribeTo.filter(
       notification =>
-        !authorizedNotifications[companyAssociation.role].includes(notification)
+        !authorizedNotificationsByRole[companyAssociation.role].includes(
+          notification
+        )
     );
 
     if (unauthorizedNotifications.length) {
@@ -41,10 +80,11 @@ const setCompanyNotificationsResolver: MutationResolvers["setCompanyNotification
 
     const updatedCompanyAssociation = await prisma.companyAssociation.update({
       where: { id: companyAssociation.id },
-      data: { notifications },
+      data: toPrismaNotifications(notifications),
       include: { company: true }
     });
 
     return toGqlCompanyPrivate(updatedCompanyAssociation.company);
   };
-export default setCompanyNotificationsResolver;
+
+export default subscribeToCompanyNotificationsResolver;

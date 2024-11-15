@@ -10,7 +10,7 @@ import { AuthType } from "../../../../auth";
 import { Mutation } from "../../../../generated/graphql/types";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
-import { ALL_NOTIFICATIONS } from "../../../notifications";
+import { getDefaultNotifications } from "../../../notifications";
 
 const CHANGE_USER_ROLE = `
   mutation ChangeUserRole($userId: ID!, $orgId: ID!, $role: UserRole!){
@@ -28,12 +28,13 @@ describe("mutation changeUserRole", () => {
     "admin can change a company user with role ADMIN to role %p",
     async role => {
       const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+      const notifications = getDefaultNotifications(UserRole.ADMIN);
       const userToModify = await userFactory({
         companyAssociations: {
           create: {
             company: { connect: { id: company.id } },
             role: UserRole.ADMIN,
-            notifications: ALL_NOTIFICATIONS
+            ...notifications
           }
         }
       });
@@ -56,7 +57,9 @@ describe("mutation changeUserRole", () => {
         .companyAssociations();
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
-      expect(companyAssociations[0].notifications).toEqual([]);
+      expect(companyAssociations[0]).toMatchObject(
+        getDefaultNotifications(companyAssociations[0].role)
+      );
     }
   );
 
@@ -69,7 +72,7 @@ describe("mutation changeUserRole", () => {
           create: {
             company: { connect: { id: company.id } },
             role: UserRole.MEMBER,
-            notifications: []
+            ...getDefaultNotifications(UserRole.MEMBER)
           }
         }
       });
@@ -92,8 +95,8 @@ describe("mutation changeUserRole", () => {
         .companyAssociations();
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
-      expect(companyAssociations[0].notifications).toEqual(
-        role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
+      expect(companyAssociations[0]).toMatchObject(
+        getDefaultNotifications(companyAssociations[0].role)
       );
     }
   );
@@ -107,7 +110,7 @@ describe("mutation changeUserRole", () => {
           create: {
             company: { connect: { id: company.id } },
             role: UserRole.READER,
-            notifications: []
+            ...getDefaultNotifications(UserRole.READER)
           }
         }
       });
@@ -130,8 +133,8 @@ describe("mutation changeUserRole", () => {
         .companyAssociations();
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
-      expect(companyAssociations[0].notifications).toEqual(
-        role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
+      expect(companyAssociations[0]).toMatchObject(
+        getDefaultNotifications(companyAssociations[0].role)
       );
     }
   );
@@ -145,7 +148,7 @@ describe("mutation changeUserRole", () => {
           create: {
             company: { connect: { id: company.id } },
             role: UserRole.DRIVER,
-            notifications: []
+            ...getDefaultNotifications(UserRole.DRIVER)
           }
         }
       });
@@ -168,8 +171,8 @@ describe("mutation changeUserRole", () => {
         .companyAssociations();
       expect(companyAssociations).toHaveLength(1);
       expect(companyAssociations[0].role).toEqual(role);
-      expect(companyAssociations[0].notifications).toEqual(
-        role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
+      expect(companyAssociations[0]).toMatchObject(
+        getDefaultNotifications(companyAssociations[0].role)
       );
     }
   );

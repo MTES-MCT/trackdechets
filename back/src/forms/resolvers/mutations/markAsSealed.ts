@@ -165,12 +165,7 @@ async function mailToNonExistentEmitter(
       }
     });
 
-    await sendMail({
-      ...mail,
-      // permet de cacher le message "Vous avez reçu cet e-mail car vous
-      // êtes inscrit sur la plateforme Trackdéchets" dans le template Brevo
-      params: { hideRegisteredUserInfo: true }
-    });
+    await sendMail(mail);
   }
 }
 

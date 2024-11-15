@@ -14,10 +14,19 @@ import {
 } from "../companies/validation";
 import { CompanyInput } from "../generated/graphql/types";
 import { prisma } from "@td/prisma";
-import { isForeignVat, isFRVat, isSiret, isVat } from "@td/constants";
+import {
+  isForeignVat,
+  isFRVat,
+  isSiret,
+  isVat,
+  isDangerous
+} from "@td/constants";
 import { isBase64 } from "../utils";
 import { Decimal } from "decimal.js";
-
+import {
+  canProcessDangerousWaste,
+  canProcessNonDangerousWaste
+} from "../companies/companyProfilesRules";
 // Poids maximum en tonnes tout mode de transport confondu
 export const MAX_WEIGHT_TONNES = 50000;
 
@@ -84,9 +93,13 @@ export const weightConditions: WeightConditions = {
         WasteAcceptationStatus.PARTIALLY_REFUSED
       ].includes(status)
     ) {
-      return weight.positive(
-        "${path} : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
-      );
+      return weight
+        .required(
+          "${path} : le poids est requis lorsque le déchet est accepté ou accepté partiellement."
+        )
+        .positive(
+          "${path} : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
+        );
     }
     return weight;
   },
@@ -172,6 +185,7 @@ type SiretTests = {
     role?: "DESTINATION" | "TRANSPORTER" | "WASTE_VEHICLES"
   ) => yup.TestConfig<string>;
   isNotDormant: yup.TestConfig<string>;
+  destinationHasAppropriateSubProfiles: yup.TestConfig<string>;
 };
 
 export const siretConditions: SiretConditions = {
@@ -210,7 +224,14 @@ export const siretConditions: SiretConditions = {
   }
 };
 
-const { VERIFY_COMPANY } = process.env;
+const { VERIFY_COMPANY, VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER } =
+  process.env;
+
+// Date de la MAJ 2024.11.1 qui rend obligatoire certtains sous profils pour traiter les déchets dangereux et non dangereux
+const v20241101 = new Date(
+  VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER ||
+    "2024-11-19T00:00:00.000Z"
+);
 
 export const siretTests: SiretTests = {
   isRegistered: role => ({
@@ -297,6 +318,40 @@ export const siretTests: SiretTests = {
         return true;
       }
       return company.isDormantSince == null;
+    }
+  },
+  destinationHasAppropriateSubProfiles: {
+    name: "destination-has-appropriate-subprofiles",
+    message: () =>
+      "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+      " Il lui appartient de mettre à jour son profil.",
+    test: async (siret, ctx) => {
+      if (!siret) return true;
+
+      // do not run on existing bsdds created before release v20241101
+      const bsddCreatedAt = ctx.parent.createdAt || new Date(); // new bsd do not have a createdAt yet
+      const isCreatedAfterV202411011 =
+        bsddCreatedAt.getTime() - v20241101.getTime() > 0;
+
+      if (!isCreatedAfterV202411011) {
+        return true;
+      }
+
+      const hasDangerousWaste =
+        isDangerous(ctx.parent.wasteDetailCode) ||
+        ctx.parent.wasteDetailsPop ||
+        ctx.parent.wasteDetailsIsDangerous;
+
+      const company = await prisma.company.findUnique({
+        where: { siret }
+      });
+      if (company === null) {
+        return true; // catched by siretTests.isRegistered
+      }
+
+      return hasDangerousWaste
+        ? canProcessDangerousWaste(company)
+        : canProcessNonDangerousWaste(company);
     }
   }
 };

@@ -13,6 +13,7 @@ import {
   signTransportForm,
   signTransportFormAfterTempStorage
 } from "../steps/signTransportForm";
+import { WasteProcessorType } from "@prisma/client";
 
 const workflow: Workflow = {
   title: "Entreposage provisoire",
@@ -26,9 +27,17 @@ de destination finale accepte le déchet et valide le traitement.`,
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur1", companyTypes: ["TRANSPORTER"] },
-    { name: "ttr", companyTypes: ["COLLECTOR"] },
+    {
+      name: "ttr",
+      companyTypes: ["COLLECTOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    },
     { name: "transporteur2", companyTypes: ["TRANSPORTER"] },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     createFormTempStorage("producteur"),

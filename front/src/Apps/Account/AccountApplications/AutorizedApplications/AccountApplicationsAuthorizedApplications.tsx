@@ -50,7 +50,6 @@ export default function AccountApplicationsAuthorizedApplications() {
               <table id="table-access-tokens">
                 <thead>
                   <tr>
-                    <th scope="col"></th>
                     <th scope="col">Nom de l'application</th>
                     <th className="fr-col--sm" scope="col">
                       Dernière utilisation
@@ -65,13 +64,6 @@ export default function AccountApplicationsAuthorizedApplications() {
                       key={authorizedApplication.id}
                       data-row-key={authorizedApplication.id}
                     >
-                      <td>
-                        <img
-                          width="40"
-                          src={authorizedApplication.logoUrl || ""}
-                          alt={`Logo`}
-                        />
-                      </td>
                       <td>{authorizedApplication.name}</td>
                       <td>
                         {authorizedApplication.lastConnection

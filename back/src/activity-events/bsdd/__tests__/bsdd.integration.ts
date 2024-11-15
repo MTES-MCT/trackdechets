@@ -14,6 +14,7 @@ import {
 import makeClient from "../../../__tests__/testClient";
 import { getStream } from "../../data";
 import { getFirstTransporterSync } from "../../../forms/database";
+import { WasteProcessorType, CompanyType } from "@prisma/client";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -55,7 +56,8 @@ describe("ActivityEvent.Bsdd", () => {
     const { company: destinationCompany } = await userWithCompanyFactory(
       "MEMBER",
       {
-        companyTypes: { set: ["WASTEPROCESSOR", "TRANSPORTER"] }
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
       }
     );
     const transporterCompany = await companyFactory({

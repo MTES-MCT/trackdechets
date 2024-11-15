@@ -161,6 +161,7 @@ export const SIRETS_BY_ROLE_INCLUDE = {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fullInclude = { include: SIRETS_BY_ROLE_INCLUDE };
 
 export function getFormSiretsByRole(

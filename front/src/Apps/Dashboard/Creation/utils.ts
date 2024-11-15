@@ -24,7 +24,9 @@ export enum TabId {
   waste = "waste",
   emitter = "emitter",
   transporter = "transporter",
-  destination = "destination"
+  destination = "destination",
+  none = "none",
+  other = "other"
 }
 
 export type NormalizedError = {
@@ -54,28 +56,46 @@ export const getTabs = (
   tabId: TabId;
   label: string;
   iconId: IconIdName;
-}[] => [
-  {
-    tabId: TabId.waste,
-    label: "Déchet",
-    iconId: getTabClassName(errorTabIds, "waste")
-  },
-  {
-    tabId: TabId.emitter,
-    label: "Producteur",
-    iconId: getTabClassName(errorTabIds, "emitter")
-  },
-  {
-    tabId: TabId.transporter,
-    label: "Transporteur",
-    iconId: getTabClassName(errorTabIds, "transporter")
-  },
-  {
-    tabId: TabId.destination,
-    label: bsdType === BsdType.Bspaoh ? "Crématorium" : "Destination finale",
-    iconId: getTabClassName(errorTabIds, "destination")
+}[] => {
+  const commonsTabs = [
+    {
+      tabId: TabId.waste,
+      label: "Déchet",
+      iconId: getTabClassName(errorTabIds, "waste")
+    },
+    {
+      tabId: TabId.emitter,
+      label: "Producteur",
+      iconId: getTabClassName(errorTabIds, "emitter")
+    },
+    {
+      tabId: TabId.transporter,
+      label: "Transporteur",
+      iconId: getTabClassName(errorTabIds, "transporter")
+    },
+    {
+      tabId: TabId.destination,
+      label: bsdType === BsdType.Bspaoh ? "Crématorium" : "Destination finale",
+      iconId: getTabClassName(errorTabIds, "destination")
+    }
+  ];
+  if (bsdType === BsdType.Bsvhu) {
+    return getBsvhuTabs(commonsTabs, errorTabIds);
   }
-];
+  return commonsTabs;
+};
+
+const getBsvhuTabs = (commonTabs, errorTabIds) => {
+  const vhuTabs = [
+    ...commonTabs,
+    {
+      tabId: TabId.other,
+      label: "Autres acteurs",
+      iconId: getTabClassName(errorTabIds, "other")
+    }
+  ];
+  return vhuTabs;
+};
 
 const pathPrefixToTab = {
   [BsdType.Bsvhu]: (pathPrefix: string): TabId | null => {
@@ -86,6 +106,9 @@ const pathPrefixToTab = {
       pathPrefix === "identification"
     ) {
       return TabId.waste;
+    }
+    if (pathPrefix === "ecoOrganisme") {
+      return TabId.other;
     }
     if (Object.values(TabId).includes(pathPrefix as TabId)) {
       return TabId[pathPrefix];
@@ -179,10 +202,24 @@ export const handleGraphQlError = (
       });
       setPublishErrors(errorDetailList as NormalizedError[]);
     } else {
-      toastApolloError(err); // other case like forbidden, we need to display an error anyway ...
+      // other case like forbidden, we need to display an error anyway ...
+      setPublishErrors([
+        {
+          code: err.graphQLErrors[0]?.extensions?.code,
+          path: ["none"],
+          message: err.graphQLErrors[0]?.message
+        }
+      ] as NormalizedError[]);
     }
   } else {
-    toastApolloError(err); // other case like forbidden, we need to display an error anyway ...
+    // other case like forbidden, we need to display an error anyway ...
+    setPublishErrors([
+      {
+        code: err.graphQLErrors[0]?.extensions?.code,
+        path: ["none"],
+        message: err.graphQLErrors[0]?.extensions?.message
+      }
+    ] as NormalizedError[]);
   }
 };
 

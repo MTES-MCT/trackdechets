@@ -66,7 +66,9 @@ export const wasteDetailsFragment = gql`
   fragment WasteDetailsFragment on WasteDetails {
     code
     name
+    isSubjectToADR
     onuCode
+    nonRoadRegulationMention
     packagingInfos {
       type
       other
@@ -136,6 +138,7 @@ export const temporaryStorageDetailFragment = gql`
     }
     wasteDetails {
       onuCode
+      nonRoadRegulationMention
       packagingInfos {
         type
         other
@@ -164,7 +167,9 @@ export const staticFieldsFragment = gql`
         other
         quantity
       }
+      isSubjectToADR
       onuCode
+      nonRoadRegulationMention
       quantity
       transporterNumberPlate
       transporterCustomInfo

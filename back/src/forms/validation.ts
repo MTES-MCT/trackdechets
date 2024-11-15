@@ -43,6 +43,7 @@ import {
   weightConditions,
   WeightUnits
 } from "../common/validation";
+
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
   CiterneNotWashedOutReason,
@@ -75,7 +76,7 @@ import { getOperationModesFromOperationCode } from "../common/operationModes";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
-import { isDefined } from "../common/helpers";
+import { isDefined, isDefinedStrict } from "../common/helpers";
 
 // set yup default error messages
 configureYup();
@@ -620,6 +621,7 @@ const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
       .label("Destinataire")
       .test(siretTests.isRegistered("DESTINATION"))
       .test(siretTests.isNotDormant)
+      .test(siretTests.destinationHasAppropriateSubProfiles)
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`),
     recipientCompanyAddress: yup
       .string()
@@ -807,19 +809,56 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
           ),
       otherwise: () => yup.boolean()
     }),
-    wasteDetailsOnuCode: yup.string().when("wasteDetailsIsDangerous", {
-      is: (wasteDetailsIsDangerous: boolean) =>
-        wasteDetailsIsDangerous === true,
-      then: () =>
-        yup
-          .string()
-          .ensure()
-          .requiredIf(
-            !isDraft,
-            `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
-          ),
-      otherwise: () => yup.string().nullable()
-    }),
+    wasteDetailsIsSubjectToADR: yup.boolean().nullable(),
+    wasteDetailsOnuCode: yup
+      .string()
+      .nullable()
+      // Empty values (or spaces) to null
+      .transform(value =>
+        isDefinedStrict(value?.replace(/\s/g, "")) ? value : null
+      )
+      .test((_, ctx) => {
+        if (isDraft) return true;
+
+        const {
+          wasteDetailsIsDangerous,
+          wasteDetailsIsSubjectToADR,
+          wasteDetailsOnuCode
+        } = ctx.parent;
+
+        // New method: using the switch wasteDetailsIsSubjectToADR
+        if (isDefined(wasteDetailsIsSubjectToADR)) {
+          if (
+            wasteDetailsIsSubjectToADR === true &&
+            !isDefined(wasteDetailsOnuCode)
+          ) {
+            return new yup.ValidationError(
+              `Le déchet est soumis à l'ADR. Vous devez préciser la mention correspondante.`
+            );
+          } else if (
+            wasteDetailsIsSubjectToADR === false &&
+            isDefined(wasteDetailsOnuCode)
+          ) {
+            return new yup.ValidationError(
+              `Le déchet n'est pas soumis à l'ADR. Vous ne pouvez pas préciser de mention ADR.`
+            );
+          }
+        }
+        // Legacy
+        else {
+          if (
+            wasteDetailsIsDangerous === true &&
+            !isDefined(wasteDetailsOnuCode)
+          ) {
+            return new yup.ValidationError(
+              `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
+            );
+          }
+        }
+
+        return true;
+      }),
+    wasteDetailsNonRoadRegulationMention: yup.string().nullable(),
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
     wasteDetailsAnalysisReferences: yup.array().of(yup.string()) as any,
     wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,
@@ -1650,11 +1689,9 @@ const withNextDestination = (required: boolean) =>
                   "Destination ultérieure : Le numéro de notification (format PPAAAADDDRRR) ou le numéro de déclaration Annexe 7 (format A7E AAAA DDDRRR) renseigné ne correspond pas au format attendu."
                 )
                 .nullable()
-                .notRequired(),
-            // FIXME Revert de TRA-13421 suite à des clients API qui sont bloqués
-            // .required(
-            //   "Destination ultérieure : le numéro de notification est obligatoire"
-            // ),
+                .required(
+                  "Destination ultérieure : le numéro de notification est obligatoire"
+                ),
             otherwise: schema =>
               schema
                 .max(

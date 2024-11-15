@@ -8,6 +8,7 @@ import { markAsProcessed } from "../steps/markAsProcessed";
 import { Workflow } from "../../../common/workflow";
 import { signEmissionForm } from "../steps/signEmissionForm";
 import { signTransportForm } from "../steps/signTransportForm";
+import { WasteProcessorType } from "@prisma/client";
 
 const workflow: Workflow = {
   title: "Transport multi-modal",
@@ -20,7 +21,11 @@ mis à jour au fur et mesure de la prise en charge du déchet sur les différent
     { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur1", companyTypes: ["TRANSPORTER"] },
     { name: "transporteur2", companyTypes: ["TRANSPORTER"] },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     createFormMultiModal("producteur"),

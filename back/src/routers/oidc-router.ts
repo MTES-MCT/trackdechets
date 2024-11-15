@@ -54,8 +54,7 @@ oidcRouter.get(
         name: req.user?.name
       },
       client: {
-        name: req.oauth2.client.name,
-        logoUrl: req.oauth2.client.logoUrl
+        name: req.oauth2.client.name
       },
 
       redirectURI: req.oauth2.redirectURI

@@ -63,7 +63,8 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
         <div className="BoxRow">
           <div className="BoxCol">
             <p className="mb-3">
-              <strong>N° Bordereau :</strong> {bsvhu.id}
+              <strong>N° Bordereau :</strong> {bsvhu.id}{" "}
+              {bsvhu?.customId ? <span>({bsvhu.customId})</span> : ""}
             </p>
           </div>
         </div>

@@ -9,8 +9,11 @@ input SignEmissionFormInput {
   """
   quantity: Float!
 
-  "Code ONU"
+  "Mention au titre du règlement ADR"
   onuCode: String
+
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  nonRoadRegulationMention: String
 
   "Numéro de la plaque d'immatriculation transporteur"
   transporterNumberPlate: String
@@ -72,7 +75,7 @@ input TransporterSignatureFormInput {
   """
   quantity: Float!
 
-  "Code ONU"
+  "Mention au titre du règlement ADR"
   onuCode: String
 }
 
@@ -100,10 +103,7 @@ input AcceptedFormInput {
   """
   Quantité réelle présentée en tonnes (case 10).
 
-  Doit être supérieure à 0 lorsque le déchet est accepté.
-  Doit être égale à 0 lorsque le déchet est refusé.
-
-  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  Doit être inférieure à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
@@ -147,10 +147,9 @@ input ReceivedFormInput {
   """
   Quantité réelle présentée en tonnes (case 10).
 
-  Doit être supérieure à 0 lorsque le déchet est accepté.
-  Doit être égale à 0 lorsque le déchet est refusé.
-
   Doit être inférieure à 40T en cas de transport routier et inférieure à 50 000 T tout type de transport confondu.
+
+  Le champ est requis pour passer du statut `SENT` à `ACCEPTED` via `markAsReceived`.
   """
   quantityReceived: Float
 
@@ -506,7 +505,17 @@ input RecipientInput {
   "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
 
-  "Établissement de destination"
+  """
+  Établissement de destination
+
+  Des restrictions reltives aux profils et sous-profils de l'établissment s'appliquent en fonction du caractère de dangerosité du déchet concerné.
+
+  Sous-profils requis pour déchet dangereux (code déchet avec * ou marqué comme dangereux (isDanegrous) ou présence de pop) :
+  collectorTypes : DANGEROUS_WASTES, DEEE_WASTES, OTHER_DANGEROUS_WASTES, wasteProcessorTypes: DANGEROUS_WASTES_INCINERATION, DANGEROUS_WASTES_STORAGE, NON_DANGEROUS_WASTES_STORAGE, OTHER_DANGEROUS_WASTES
+
+  Sous-profils requis pour déchet non dangereux  :
+  collectorTypes : NON_DANGEROUS_WASTES, DEEE_WASTES, OTHER_NON_DANGEROUS_WASTES, wasteProcessorTypes : DANGEROUS_WASTES_INCINERATION, NON_DANGEROUS_WASTES_INCINERATION, CREMATION, NON_DANGEROUS_WASTES_STORAGE, INERT_WASTES_STORAGE, OTHER_NON_DANGEROUS_WASTES
+  """
   company: CompanyInput
 
   "Si c'est un entreprosage provisoire ou reconditionnement"
@@ -619,8 +628,14 @@ input WasteDetailsInput {
   "Dénomination usuelle. Obligatoire"
   name: String
 
-  "Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."
+  "Si le déchet est soumis à l'ADR"
+  isSubjectToADR: Boolean
+
+  "Mention au titre du règlement ADR. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."
   onuCode: String
+
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  nonRoadRegulationMention: String
 
   "Liste de conditionnements. Les conditionnements CITERNE et BENNE ne peuvent pas être associés à un autre conditionnement"
   packagingInfos: [PackagingInfoInput!]
@@ -700,8 +715,11 @@ input ParcelNumberInput {
 Payload lié au reconditionnement (case 15 à 17)
 """
 input WasteDetailsRepackagingInput {
-  "Code ONU"
+  "Mention au titre du règlement ADR"
   onuCode: String
+
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  wasteDetailsNonRoadRegulationMention: String
 
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]
@@ -733,10 +751,7 @@ input TempStorerAcceptedFormInput {
   """
   Quantité réelle présentée en tonnes (case 13)
 
-  Doit être supérieure à 0 lorsque le déchet est accepté.
-  Doit être égale à 0 lorsque le déchet est refusé.
-
-  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  Doit être inférieure à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
@@ -773,10 +788,7 @@ input TempStoredFormInput {
   """
   Quantité réelle présentée en tonnes (case 13)
 
-  Doit être supérieure à 0 lorsque le déchet est accepté.
-  Doit être égale à 0 lorsque le déchet est refusé.
-
-  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  Doit être inférieure à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
@@ -798,8 +810,11 @@ input TempStoredFormInput {
 Payload lié au reconditionnement (case 15 à 17)
 """
 input WasteDetailsRepackagingInput {
-  "Code ONU"
+  "Mention au titre du règlement ADR"
   onuCode: String
+
+  "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+  wasteDetailsNonRoadRegulationMention: String
 
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]

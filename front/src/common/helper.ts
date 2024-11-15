@@ -91,7 +91,7 @@ export const getNestedNode = (obj: Object, path: string): any => {
   const paths = path.split(".");
   try {
     return traverse({ obj, paths });
-  } catch (e) {
+  } catch (_) {
     return null;
   }
 };

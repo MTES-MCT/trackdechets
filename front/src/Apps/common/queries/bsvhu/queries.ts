@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { FullBsvhuFragment } from "../../../../common/queries/fragments";
+import { FullBsvhuFragment } from "../fragments";
 
 export const GET_VHU_FORM = gql`
   query Bsvhu($id: ID!) {
@@ -79,16 +79,16 @@ export const UPDATE_VHU_FORM = gql`
   ${FullBsvhuFragment}
 `;
 
-export const SIGN_VHU_FORM = gql`
+export const SIGN_BSVHU = gql`
   mutation SignBsvhu($id: ID!, $input: BsvhuSignatureInput!) {
     signBsvhu(id: $id, input: $input) {
-      ...FullBsvhu
+      id
+      status
     }
   }
-  ${FullBsvhuFragment}
 `;
 
-export const PDF_VHU_FORM = gql`
+export const BSVHU_PDF = gql`
   query PdfBsvhu($id: ID) {
     bsvhuPdf(id: $id) {
       downloadLink

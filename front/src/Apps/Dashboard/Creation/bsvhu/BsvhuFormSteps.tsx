@@ -27,7 +27,7 @@ import {
   CREATE_DRAFT_VHU,
   GET_VHU_FORM,
   UPDATE_VHU_FORM
-} from "./utils/queries";
+} from "../../../../Apps/common/queries/bsvhu/queries";
 import { cleanPayload } from "../bspaoh/utils/payload";
 import {
   getErrorTabIds,
@@ -35,14 +35,16 @@ import {
   getPublishErrorTabIds,
   TabId
 } from "../utils";
+import OtherActors from "./steps/OtherActors";
 
-const vhuToInput = (paoh: BsvhuInput): BsvhuInput => {
-  return omitDeep(paoh, [
+const vhuToInput = (vhu: BsvhuInput): BsvhuInput => {
+  return omitDeep(vhu, [
     "isDraft",
     "emitter.emission.signature",
     "transporter.transport.signature",
     "destination.reception.signature",
-    "destination.operation.signature"
+    "destination.operation.signature",
+    "ecoOrganisme.hasEcoOrganisme"
   ]);
 };
 interface Props {
@@ -181,7 +183,8 @@ const BsvhuFormSteps = ({
             error => error.tabId === TabId.destination
           )}
         />
-      )
+      ),
+      other: <OtherActors />
     }),
     [publishErrorMessages]
   );
@@ -199,6 +202,9 @@ const BsvhuFormSteps = ({
         sealedFields={sealedFields}
         setPublishErrors={setPublishErrors}
         errorTabIds={errorTabIds}
+        genericErrorMessage={publishErrorMessages.filter(
+          error => error.tabId === TabId.none
+        )}
       />
       {loading && <Loader />}
     </>

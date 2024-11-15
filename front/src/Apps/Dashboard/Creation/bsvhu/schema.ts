@@ -8,7 +8,10 @@ const zodCompany = z.object({
   contact: z.string().nullish(),
   phone: z.string().nullish(),
   mail: z.string().nullish(),
-  address: z.string().nullish()
+  address: z.string().nullish(),
+  city: z.string().nullish(),
+  street: z.string().nullish(),
+  postalCode: z.string().nullish()
 });
 
 const zodEmitter = z.object({
@@ -117,6 +120,7 @@ const zodDestination = z.object({
 });
 
 export const rawBsvhuSchema = z.object({
+  customId: z.string().nullish(),
   wasteCode: z.enum(BSVHU_WASTE_CODES).nullish(),
   emitter: zodEmitter,
   transporter: zodTransporter,
@@ -132,7 +136,22 @@ export const rawBsvhuSchema = z.object({
   weight: z.object({
     isEstimate: z.boolean().nullish(),
     value: z.coerce.number().nonnegative().nullish()
-  })
+  }),
+  ecoOrganisme: z
+    .object({
+      siret: z.string().nullish(),
+      name: z.string().nullish(),
+      hasEcoOrganisme: z.boolean().nullish()
+    })
+    .superRefine((val, ctx) => {
+      if (val?.hasEcoOrganisme && !val.siret) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["siret"],
+          message: `Veuillez sélectionner un éco-organisme`
+        });
+      }
+    })
 });
 
 export type ZodBsvhu = z.infer<typeof rawBsvhuSchema>;

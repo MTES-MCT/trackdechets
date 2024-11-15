@@ -65,3 +65,21 @@ type MembershipRequest {
   """
   sentTo: [String!]!
 }
+
+"""
+Notifications auxquelles un utilisateur peut s'abonner pour un établissement donné.
+Par défaut les utilisateurs avec le rôle ADMIN sont abonnés à toutes les notifications
+tandis que les autres rôles ne sont abonnés à aucune notification.
+"""
+type UserNotifications {
+  # Abonnement aux notification de demande de rattachement
+  membershipRequest: Boolean!
+  # Abonnement aux notification de renouvellement du code signature
+  signatureCodeRenewal: Boolean!
+  # Abonnement aux notifications de refus total ou partiel d'un BSD
+  bsdRefusal: Boolean!
+  # Abonnement aux notification de modification de la destination finale amiante
+  bsdaFinalDestinationUpdate: Boolean!
+  # Abonnement aux notification de demandes de révision
+  revisionRequest: Boolean!
+}

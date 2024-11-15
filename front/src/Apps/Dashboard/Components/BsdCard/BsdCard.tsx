@@ -60,6 +60,28 @@ import { getCurrentTransporterInfos } from "../../bsdMapper";
 import { isDefined } from "../../../../common/helper";
 import { useCloneBsd } from "../Clone/useCloneBsd";
 
+const shouldDisplayTransporterNumberPlate = (
+  currentTransporterInfos,
+  isToCollectTab
+) => {
+  if (!currentTransporterInfos) return false;
+
+  const isRoad =
+    currentTransporterInfos.transporterMode === TransportMode.Road ||
+    // permet de gérer un trou dans la raquette en terme de validation des données
+    // qui ne rend pas le mode de transport obligatoire à la signature transporteur
+    // en attente de correction Cf ticket tra-14517
+    !currentTransporterInfos.transporterMode;
+
+  if (!isRoad) return false;
+
+  const platesAreDefined = Boolean(
+    currentTransporterInfos?.transporterNumberPlate?.length
+  );
+
+  return platesAreDefined || isToCollectTab;
+};
+
 function BsdCard({
   bsd,
   posInSet = 0,
@@ -206,16 +228,10 @@ function BsdCard({
       (isCollectedTab &&
         !!currentTransporterInfos?.transporterCustomInfo?.length));
 
-  // display the transporter's number plate if:
-  // - the mode of transport is ROAD
-  const displayTransporterNumberPlate =
-    !!currentTransporterInfos &&
-    (currentTransporterInfos.transporterMode === TransportMode.Road ||
-      // permet de gérer un trou dans la raquette en terme de validation des données
-      // qui ne rend pas le mode de transport obligatoire à la signature transporteur
-      // en attente de correction Cf ticket tra-14517
-      !currentTransporterInfos.transporterMode) &&
-    !!currentTransporterInfos?.transporterNumberPlate?.length;
+  const displayTransporterNumberPlate = shouldDisplayTransporterNumberPlate(
+    currentTransporterInfos,
+    isToCollectTab
+  );
 
   const handleValidationClick = (
     _: React.MouseEvent<HTMLButtonElement, MouseEvent>

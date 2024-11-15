@@ -4,13 +4,7 @@ export enum ProcessingOperationType {
   Groupement = "GROUPEMENT"
 }
 
-export interface ProcessingOperation {
-  type: ProcessingOperationType;
-  code: string;
-  description: string;
-}
-
-export const PROCESSING_OPERATIONS: ProcessingOperation[] = [
+export const PROCESSING_OPERATIONS = [
   {
     type: ProcessingOperationType.Valorisation,
     code: "R 1",
@@ -170,11 +164,19 @@ export const PROCESSING_OPERATIONS: ProcessingOperation[] = [
     description:
       "Stockage préalablement à l’une des opérations D1 à D14 (à l’exclusion du stockage temporaire, avant collecte, sur le site de production)."
   }
-];
+] as const;
 
-export const PROCESSING_OPERATIONS_CODES: string[] = PROCESSING_OPERATIONS.map(
+export const PROCESSING_OPERATIONS_CODES = PROCESSING_OPERATIONS.map(
   operation => operation.code
 );
+
+type OperationCodes = (typeof PROCESSING_OPERATIONS_CODES)[number];
+// Build an object that zods nativeEnum can ingest
+export const PROCESSING_OPERATIONS_CODES_ENUM =
+  PROCESSING_OPERATIONS_CODES.reduce((obj, cur) => {
+    obj[cur] = cur;
+    return obj;
+  }, {} as Record<OperationCodes, OperationCodes>);
 
 export const PROCESSING_OPERATIONS_GROUPEMENT_CODES: string[] =
   PROCESSING_OPERATIONS.filter(
