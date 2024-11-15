@@ -15,6 +15,7 @@ docker-compose.override.yml
 .nx/cache
 generated
 .DS_Store
+.nx
 
 # Generated Docusaurus files
 .docusaurus/
