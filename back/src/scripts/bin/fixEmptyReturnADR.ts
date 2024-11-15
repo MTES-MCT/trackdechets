@@ -7,6 +7,8 @@ import { getFormRepository } from "../../forms/repository";
 //
 // !!! DOIT ÊTRE EXECUTE **AVANT** LA MIGRATION !!!
 (async function () {
+  console.log(`> Starting script fixEmptyReturnADR`);
+
   const bsds = await prisma.form.findMany({
     where: { emptyReturnADR: "EMPTY_NOT_WASHED" },
     select: { id: true, readableId: true }
@@ -30,5 +32,5 @@ import { getFormRepository } from "../../forms/repository";
     await update({ id: bsd.id }, { emptyReturnADR: "EMPTY_RETURN_NOT_WASHED" });
   }
 
-  console.log("Done!");
+  console.log("> Done!");
 })().then(() => process.exit());
