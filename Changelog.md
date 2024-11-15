@@ -14,6 +14,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Afficher le nombre d'inscrits par type d'alertes au sein d'un établissement [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
 - Ajouter un lien "Gérer mes préférences e-mails" dans les e-mails transactionnels auquel l'utilisateur est en capacité de s'inscrire / désinscrire [PR 3738](https://github.com/MTES-MCT/trackdechets/pull/3738)
 
+#### :nail_care: Améliorations
+
+- La mention ADR a été séparée des mentions RID, ADNR, IMDG, et désormais un switch permet de préciser si elle est obligatoire pour un BSDD ou non (+ amélioration du PDF) [PR 3714](https://github.com/MTES-MCT/trackdechets/pull/3714) [PR 3717](https://github.com/MTES-MCT/trackdechets/pull/3717) [PR 3724](https://github.com/MTES-MCT/trackdechets/pull/3724)
+
 #### :boom: Breaking changes
 
 - Le champ "Numéro de notification" est obligatoire lorsque la destination ultérieure renseignée est étrangère [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
@@ -23,6 +27,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Corrige l'indexation des annexes 1 orphelines et draft [PR 3721](https://github.com/MTES-MCT/trackdechets/pull/3721)
+- Dans l'onglet "A collecter", l'icône d'immatriculation est disponible pour tous les BSDs [PR 3715](https://github.com/MTES-MCT/trackdechets/pull/3715)
+- Le profil "Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780)" ne se coche plus automatiquement lorsqu'on sélectionne le profil TTR "Autre cas de déchets non dangereux (Rubrique 2731) et inversement [PR 3726](https://github.com/MTES-MCT/trackdechets/pull/3726)
+- ETQ intermédiaire, je peux créer un BSDA sur lequel j'apparais [PR 3732](https://github.com/MTES-MCT/trackdechets/pull/3732)
+- ETQ utilisateur je peux réviser un DASRI en attente d'un bordereau suite [PR 3734](https://github.com/MTES-MCT/trackdechets/pull/3734)
+- ETQ transporteur je peux réviser une Annexe 1 [PR 3740](https://github.com/MTES-MCT/trackdechets/pull/3740)
+- La mention ADR d'un BSDD n'est plus dupliquée [PR 3703](https://github.com/MTES-MCT/trackdechets/pull/3703)
 
 #### :house: Interne
 
