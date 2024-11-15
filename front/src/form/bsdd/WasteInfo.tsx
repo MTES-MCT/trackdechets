@@ -8,7 +8,7 @@ import {
   isDangerous,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "@td/constants";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import Packagings from "./components/packagings/Packagings";
 import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
