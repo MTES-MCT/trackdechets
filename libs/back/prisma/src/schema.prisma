@@ -2208,10 +2208,11 @@ enum CiterneNotWashedOutReason {
 }
 
 enum EmptyReturnADR {
-  EMPTY_NOT_WASHED
   EMPTY_RETURN_NOT_WASHED
   EMPTY_VEHICLE
   EMPTY_CITERNE
+  EMPTY_CONTAINER
+  EMPTY_CITERNE_CONTAINER
 }
 
 model RegistryImport {

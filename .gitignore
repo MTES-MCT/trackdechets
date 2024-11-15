@@ -16,6 +16,7 @@ docker-compose.override.yml
 .nx/workspace-data
 generated
 .DS_Store
+.nx
 
 # Generated Docusaurus files
 .docusaurus/

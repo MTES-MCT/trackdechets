@@ -416,7 +416,7 @@ describe("Query.form", () => {
         status: "RECEIVED",
         emitterCompanySiret: company.siret,
         emitterCompanyName: company.name,
-        emptyReturnADR: EmptyReturnADR.EMPTY_NOT_WASHED
+        emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE_CONTAINER
       }
     });
 
@@ -432,6 +432,8 @@ describe("Query.form", () => {
     );
 
     expect(errors).toBeUndefined();
-    expect(data.form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_NOT_WASHED);
+    expect(data.form.emptyReturnADR).toBe(
+      EmptyReturnADR.EMPTY_CITERNE_CONTAINER
+    );
   });
 });

@@ -208,9 +208,6 @@ enum CiterneNotWashedOutReason {
 
 "Retour à vide ADR"
 enum EmptyReturnADR {
-  "Vide, non nettoyé"
-  EMPTY_NOT_WASHED
-
   "Retour à vide, non nettoyé"
   EMPTY_RETURN_NOT_WASHED
 
@@ -219,4 +216,10 @@ enum EmptyReturnADR {
 
   "Véhicule-Citerne vide, dernière marchandise chargée"
   EMPTY_CITERNE
+
+  "Conteneur vide, dernière marchandise chargée"
+  EMPTY_CONTAINER
+
+  "Conteneur-citerne vide, dernière marchandise chargée"
+  EMPTY_CITERNE_CONTAINER
 }
