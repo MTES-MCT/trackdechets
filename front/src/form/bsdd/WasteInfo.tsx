@@ -8,7 +8,7 @@ import {
   isDangerous,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "@td/constants";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import Packagings from "./components/packagings/Packagings";
 import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
@@ -55,13 +55,28 @@ export default connect<{ disabled }, Values>(function WasteInfo({
 }) {
   const { values, setFieldValue } = formik;
 
+  // Hacky hack
+  // If the user selects a dangerous waste code, we want the ADR mention to switch to true
+  // However, we don't want this behaviour every time the user opens this form (ie for modification),
+  // only when the waste code actually changes. But because we don't have any control over the
+  // <WasteCodeSelect /> component, we use 'useRef' to detect actual value change
+  const prevWasteDetailsCode = useRef(values.wasteDetails.code);
+
   if (!values.wasteDetails.packagings) {
     values.wasteDetails.packagings = [];
   }
   useEffect(() => {
     if (isDangerous(values.wasteDetails.code)) {
       setFieldValue("wasteDetails.isDangerous", true);
-      setFieldValue("wasteDetails.isSubjectToADR", true);
+    }
+
+    // Waste code value has actually changed. Update the ADR switch accordingly
+    if (values.wasteDetails.code !== prevWasteDetailsCode.current) {
+      prevWasteDetailsCode.current = values.wasteDetails.code;
+
+      if (isDangerous(values.wasteDetails.code)) {
+        setFieldValue("wasteDetails.isSubjectToADR", true);
+      }
     }
   }, [values.wasteDetails.code, setFieldValue]);
 
