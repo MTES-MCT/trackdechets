@@ -55,28 +55,12 @@ export default connect<{ disabled }, Values>(function WasteInfo({
 }) {
   const { values, setFieldValue } = formik;
 
-  // Hacky hack
-  // If the user selects a dangerous waste code, we want the ADR mention to switch to true
-  // However, we don't want this behaviour every time the user opens this form (ie for modification),
-  // only when the waste code actually changes. But because we don't have any control over the
-  // <WasteCodeSelect /> component, we use 'useRef' to detect actual value change
-  const prevWasteDetailsCode = useRef(values.wasteDetails.code);
-
   if (!values.wasteDetails.packagings) {
     values.wasteDetails.packagings = [];
   }
   useEffect(() => {
     if (isDangerous(values.wasteDetails.code)) {
       setFieldValue("wasteDetails.isDangerous", true);
-    }
-
-    // Waste code value has actually changed. Update the ADR switch accordingly
-    if (values.wasteDetails.code !== prevWasteDetailsCode.current) {
-      prevWasteDetailsCode.current = values.wasteDetails.code;
-
-      if (isDangerous(values.wasteDetails.code)) {
-        setFieldValue("wasteDetails.isSubjectToADR", true);
-      }
     }
   }, [values.wasteDetails.code, setFieldValue]);
 
@@ -95,6 +79,11 @@ export default connect<{ disabled }, Values>(function WasteInfo({
           component={WasteCodeSelect}
           validate={bsddWasteCodeValidator}
           disabled={disabled}
+          onSelect={code => {
+            if (isDangerous(code)) {
+              setFieldValue("wasteDetails.isSubjectToADR", true);
+            }
+          }}
         />
       </div>
 
