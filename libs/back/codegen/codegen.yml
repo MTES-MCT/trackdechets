@@ -8,6 +8,7 @@ generates:
     config:
       contextType: back/src/types#GraphQLContext
       enumsAsTypes: true
+      allowParentTypeOverride: true
       scalars:
         DateTime: Date
         URL: URL

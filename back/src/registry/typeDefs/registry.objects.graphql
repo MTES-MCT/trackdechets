@@ -1947,8 +1947,8 @@ type SsdWaste {
   reportForCity: String!
   reportForPostalCode: String!
   reportAsSiret: String
-  realWeight: Float
-  estimatedWeight: Float
+  weightValue: Float!
+  weightIsEstimate: Boolean!
   volume: Float
   useDate: DateTime
   dispatchDate: DateTime
@@ -2035,7 +2035,10 @@ type RegistryExport {
   updatedAt: DateTime!
   createdBy: User!
   status: RegistryExportStatus!
+  delegate: RegistryCompany
+  delegateSirets: String
   sirets: [String!]
+  companies: [RegistryCompany!]
   registryType: WasteRegistryType!
   wasteTypes: [WasteType!]
   wasteCodes: [String!]

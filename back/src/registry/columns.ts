@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { TransportMode } from "@prisma/client";
 import { isDefined } from "../common/helpers";
+import { RegistryExportSource } from "@td/codegen-back";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)
@@ -120,6 +121,24 @@ const formatHasCiterneBeenWashedOut = (
   if (!isDefined(hasCiterneBeenWashedOut)) return "";
 
   return hasCiterneBeenWashedOut ? "Effectué" : "Non effectué";
+};
+
+const formatSource = (source: RegistryExportSource) => {
+  switch (source) {
+    case "BSD":
+      return "Tracé";
+    case "REGISTRY":
+      return "Déclaré";
+    default:
+      return "";
+  }
+};
+
+const formatEstimateBoolean = (isEstimate: boolean | null) => {
+  if (isEstimate === null || isEstimate === undefined) {
+    return "";
+  }
+  return isEstimate ? "ESTIME" : "REEL";
 };
 
 export const columns: Column[] = [
@@ -582,7 +601,8 @@ export const columns: Column[] = [
   // registry V2 fields (some are already handled above)
   {
     field: "source",
-    label: "Source"
+    label: "Source",
+    format: formatSource
   },
   {
     field: "publicId",
@@ -627,18 +647,18 @@ export const columns: Column[] = [
     label: "Produit"
   },
   {
-    field: "realWeight",
-    label: "Quantité réelle en tonnes",
+    field: "weightValue",
+    label: "Poids en tonnes",
     format: formatNumber
+  },
+  {
+    field: "weightIsEstimate",
+    label: "Type de poids",
+    format: formatEstimateBoolean
   },
   {
     field: "volume",
     label: "Quantité en M3",
-    format: formatNumber
-  },
-  {
-    field: "estimatedWeight",
-    label: "Quantité estimée en tonnes",
     format: formatNumber
   },
   {

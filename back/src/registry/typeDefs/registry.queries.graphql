@@ -232,17 +232,6 @@ type Query {
     Défaut à 50, maximum à 500
     """
     last: Int
-    """
-    établissement délégataire pour lequel on veut récupérer les exports.
-    Le champ siret est obligatoire si les exports sont demandés en tant que délégataire.
-    """
-    delegateSiret: String
-
-    "SIRET de l'établissement dont je veux visualiser les exports"
-    siret: String
-
-    "Permet de limiter aux imports que j'ai réalisés"
-    ownImportsOnly: Boolean
   ): RegistryExportConnection!
 
   """

@@ -4,6 +4,7 @@ import { UserRole } from "@prisma/client";
 
 export function createCompanyDataLoaders() {
   return {
+    companies: new DataLoader((sirets: string[]) => getCompanies(sirets)),
     installations: new DataLoader((sirets: string[]) =>
       getInstallations(sirets)
     ),
@@ -11,6 +12,18 @@ export function createCompanyDataLoaders() {
       getCompaniesAdmin(companyIds)
     )
   };
+}
+
+async function getCompanies(sirets: string[]) {
+  const companies = await prisma.company.findMany({
+    where: {
+      orgId: { in: sirets }
+    }
+  });
+
+  return sirets.map(
+    siret => companies.find(company => company.orgId === siret) ?? null
+  );
 }
 
 async function getInstallations(sirets: string[]) {

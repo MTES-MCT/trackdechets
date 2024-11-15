@@ -30,7 +30,8 @@ export type RegistryExportJobArgs = {
 
 const streamLookup = (
   findManyArgs: Prisma.RegistryLookupFindManyArgs,
-  registryType: WasteRegistryType
+  registryType: WasteRegistryType,
+  addEncounteredSiret: (sirets: string[]) => void
 ): Readable => {
   let cursorId: string | null = null;
   let count = 0;
@@ -55,6 +56,7 @@ const streamLookup = (
           const lookup = item as Prisma.RegistryLookupGetPayload<{
             include: { registrySsd: true };
           }>;
+          addEncounteredSiret(lookup.sirets);
           // console.log(lookup);
           const mapped = toWaste(registryType, {
             SSD: lookup.registrySsd
@@ -99,10 +101,18 @@ async function failExport(exportId: string) {
   });
 }
 
-async function endExport(exportId: string, s3FileKey?: string) {
+async function endExport(
+  exportId: string,
+  siretsEncountered: string[],
+  s3FileKey?: string
+) {
   await prisma.registryExport.update({
     where: { id: exportId },
-    data: { status: RegistryExportStatus.SUCCESSFUL, s3FileKey }
+    data: {
+      status: RegistryExportStatus.SUCCESSFUL,
+      s3FileKey,
+      sirets: siretsEncountered
+    }
   });
 }
 
@@ -129,7 +139,7 @@ export async function processRegistryExportJob(
     );
     upload = streamInfos.upload;
     const outputStream = streamInfos.s3Stream;
-    //query with cursor
+    //craft the query
     const query: Prisma.RegistryLookupFindManyArgs["where"] = {
       sirets: {
         hasSome: registryExport.sirets
@@ -159,27 +169,34 @@ export async function processRegistryExportJob(
         gte: dateRange._gte ?? undefined
       }
     };
-    console.log(JSON.stringify(query, null, 2));
 
+    // if the export was for all of a user's companies, all the sirets are in the registryExport at the beginning
+    // in order to cleanup the exports list, we memorize the
+    // sirets that are encountered during the export, and update the list of sirets
+    // in registryExport at the end
+    const siretsEncountered: Record<string, boolean> = Object.fromEntries(
+      registryExport.sirets.map(siret => [siret, false])
+    );
+    const addEncounteredSiret = (sirets: string[]) => {
+      sirets.forEach(siret => {
+        if (siretsEncountered[siret] === false) {
+          siretsEncountered[siret] = true;
+        }
+      });
+    };
     const inputStream = streamLookup(
       {
         where: query
       },
-      registryExport.registryType ?? "ALL"
+      registryExport.registryType ?? "ALL",
+      addEncounteredSiret
     );
-    inputStream.on("end", () => {
-      console.log("There will be no more data.");
-    });
-    outputStream.on("end", () => {
-      console.log("output stream ended");
-    });
     outputStream.on("finish", async () => {
       logger.info(`Finished processing export ${exportId}`, { exportId });
     });
     outputStream.on("error", async error => {
-      logger.error(`Error processing export ${exportId}`, error);
+      logger.info(`Error on output stream for export ${exportId}`, error);
       await upload?.abort();
-      await failExport(exportId);
     });
 
     if (registryExport.format === RegistryExportFormat.CSV) {
@@ -187,17 +204,6 @@ export async function processRegistryExportJob(
         headers: true,
         delimiter: ";",
         alwaysWriteHeaders: true
-      });
-      csvStream.on("end", () => {
-        console.log("csv stream ended.");
-      });
-      csvStream.on("finish", () => {
-        console.log("csv stream finished.");
-      });
-      csvStream.on("error", e => {
-        console.log(e);
-
-        console.log("csv stream error.");
       });
       const transformer = wasteFormatter({
         useLabelAsKey: false,
@@ -239,11 +245,25 @@ export async function processRegistryExportJob(
         workbook.commit();
       });
     }
-    upload.on("httpUploadProgress", progress => {
-      console.log(progress);
-    });
-    const result = await upload.done();
-    await endExport(exportId, result?.Key);
+    // upload.on("httpUploadProgress", progress => {
+    //   console.log(progress);
+    // });
+
+    // we call upload.done before it's actually "done", because this call
+    // actually triggers the flow (in @aws-sdk/lib-storage)
+    try {
+      const result = await upload.done();
+      await endExport(
+        exportId,
+        Object.keys(siretsEncountered)
+          .map(key => (siretsEncountered[key] ? key : null))
+          .filter(Boolean),
+        result.Key
+      );
+    } catch (error) {
+      logger.error(`Error processing export ${exportId}`, error);
+      await failExport(exportId);
+    }
   } catch (error) {
     logger.error(`Error processing export ${exportId}`, error);
     if (upload) {

@@ -2,9 +2,6 @@ import { RegistrySsd } from "@prisma/client";
 
 import { SsdWaste } from "@td/codegen-back";
 export const toSsdWaste = (ssd: RegistrySsd): SsdWaste => {
-  const realWeight = ssd.weightIsEstimate ? null : ssd.weightValue;
-  const estimatedWeight = ssd.weightIsEstimate ? ssd.weightValue : null;
-
   return {
     id: ssd.id,
     source: "REGISTRY",
@@ -15,8 +12,8 @@ export const toSsdWaste = (ssd: RegistrySsd): SsdWaste => {
     reportForCity: ssd.reportForCity,
     reportForPostalCode: ssd.reportForPostalCode,
     reportAsSiret: ssd.reportAsSiret,
-    realWeight,
-    estimatedWeight,
+    weightValue: ssd.weightValue,
+    weightIsEstimate: ssd.weightIsEstimate,
     volume: ssd.volume,
     useDate: ssd.useDate,
     dispatchDate: ssd.dispatchDate,
