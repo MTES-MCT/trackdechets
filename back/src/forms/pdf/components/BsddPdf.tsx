@@ -734,13 +734,11 @@ export function BsddPdf({
             </p>
             <p>
               {isDefined(form.emptyReturnADR) ? (
-                <>
-                  {getEmptyReturnADRLabel(form.emptyReturnADR)?.toUpperCase()}:{" "}
-                  {getFormWasteDetailsADRMention(form.wasteDetails)}
-                </>
-              ) : (
-                <>{getFormWasteDetailsADRMention(form.wasteDetails)}</>
-              )}
+                <p>
+                  {getEmptyReturnADRLabel(form.emptyReturnADR)?.toUpperCase()}{" "}
+                </p>
+              ) : null}
+              <>{getFormWasteDetailsADRMention(form.wasteDetails)}</>
             </p>
           </div>
         </div>

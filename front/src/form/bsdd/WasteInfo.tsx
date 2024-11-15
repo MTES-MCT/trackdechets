@@ -61,7 +61,6 @@ export default connect<{ disabled }, Values>(function WasteInfo({
   useEffect(() => {
     if (isDangerous(values.wasteDetails.code)) {
       setFieldValue("wasteDetails.isDangerous", true);
-      setFieldValue("wasteDetails.isSubjectToADR", true);
     }
   }, [values.wasteDetails.code, setFieldValue]);
 
@@ -80,6 +79,11 @@ export default connect<{ disabled }, Values>(function WasteInfo({
           component={WasteCodeSelect}
           validate={bsddWasteCodeValidator}
           disabled={disabled}
+          onSelect={code => {
+            if (isDangerous(code)) {
+              setFieldValue("wasteDetails.isSubjectToADR", true);
+            }
+          }}
         />
       </div>
 
