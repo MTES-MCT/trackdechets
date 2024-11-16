@@ -106,13 +106,16 @@ async function endExport(
   siretsEncountered: string[],
   s3FileKey?: string
 ) {
+  const update: Prisma.RegistryExportUpdateArgs["data"] = {
+    status: RegistryExportStatus.SUCCESSFUL,
+    s3FileKey
+  };
+  if (siretsEncountered.length > 0) {
+    update.sirets = siretsEncountered;
+  }
   await prisma.registryExport.update({
     where: { id: exportId },
-    data: {
-      status: RegistryExportStatus.SUCCESSFUL,
-      s3FileKey,
-      sirets: siretsEncountered
-    }
+    data: update
   });
 }
 
@@ -198,12 +201,15 @@ export async function processRegistryExportJob(
       logger.info(`Error on output stream for export ${exportId}`, error);
       await upload?.abort();
     });
-
     if (registryExport.format === RegistryExportFormat.CSV) {
       const csvStream = csvFormat({
-        headers: true,
+        headers: Object.keys(headers).map(key => headers[key]),
         delimiter: ";",
         alwaysWriteHeaders: true
+      });
+      csvStream.on("error", async error => {
+        logger.info(`Error on CSV stream for export ${exportId}`, error);
+        await upload?.abort();
       });
       const transformer = wasteFormatter({
         useLabelAsKey: false,

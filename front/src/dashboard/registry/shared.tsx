@@ -42,32 +42,32 @@ export const GET_REGISTRY_IMPORTS = gql`
 `;
 
 export const badges = {
-  PENDING: (
+  PENDING: (context: "import" | "export") => (
     <Badge small severity="info">
-      En attente
+      {context === "import" ? "En attente" : "En attente"}
     </Badge>
   ),
-  STARTED: (
+  STARTED: () => (
     <Badge small severity="info">
       En cours
     </Badge>
   ),
-  SUCCESSFUL: (
+  SUCCESSFUL: (context: "import" | "export") => (
     <Badge small severity="success">
-      Complet
+      {context === "import" ? "Complet" : "Terminé"}
     </Badge>
   ),
-  PARTIALLY_SUCCESSFUL: (
+  PARTIALLY_SUCCESSFUL: () => (
     <Badge small severity="warning">
       Partiel
     </Badge>
   ),
-  FAILED: (
+  FAILED: (context: "import" | "export") => (
     <Badge small severity="error">
-      Refus
+      {context === "import" ? "Refus" : "Echec"}
     </Badge>
   ),
-  CANCELED: (
+  CANCELED: () => (
     <Badge small severity="error">
       Annulé
     </Badge>
@@ -108,7 +108,7 @@ const registryExportFragment = gql`
     status
     companies {
       name
-      siret
+      orgId
     }
     createdAt
   }

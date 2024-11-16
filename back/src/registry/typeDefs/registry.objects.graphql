@@ -2006,11 +2006,14 @@ type RegistryImportAssociation {
 }
 
 type RegistryCompany {
-  "Nom de l'établissement"
+  "Raison sociale de l'établissement"
   name: String
-
+  "Nom de l'établissement"
+  givenName: String
   "SIRET de l'établissement"
   siret: String
+  "SIRET ou num de TVA de l'établissement"
+  orgId: String
 }
 
 type SignedUrlResponse {
@@ -2037,8 +2040,8 @@ type RegistryExport {
   status: RegistryExportStatus!
   delegate: RegistryCompany
   delegateSirets: String
-  sirets: [String!]
-  companies: [RegistryCompany!]
+  sirets: [String!]!
+  companies: [RegistryCompany!]!
   registryType: WasteRegistryType!
   wasteTypes: [WasteType!]
   wasteCodes: [String!]

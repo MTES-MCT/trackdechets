@@ -5,7 +5,7 @@ import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
 import { Loader } from "../../Apps/common/Components";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import styles from "./MyExports.module.scss";
 import {
   DeclarationType,
@@ -13,25 +13,39 @@ import {
   Mutation,
   MutationGenerateWastesRegistryExportArgs,
   Query,
+  QueryRegistryExportDownloadSignedUrlArgs,
+  RegistryExportStatus,
   RegistryExportWasteType,
   UserRole,
   WasteRegistryType
 } from "@td/codegen-ui";
 import {
+  badges,
+  downloadFromSignedUrl,
   GENERATE_REGISTRY_EXPORT,
   GET_MY_COMPANIES_WITH_DELEGATORS,
-  GET_REGISTRY_EXPORTS
+  GET_REGISTRY_EXPORTS,
+  REGISTRY_EXPORT_DOWNLOAD_SIGNED_URL
 } from "./shared";
 import { FieldError, useForm } from "react-hook-form";
 import { datetimeToYYYYMMDD } from "../../Apps/Dashboard/Validation/BSPaoh/paohUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { format, getYear, startOfDay, startOfYear, subYears } from "date-fns";
+import {
+  format,
+  getYear,
+  startOfDay,
+  startOfYear,
+  endOfYear,
+  subYears
+} from "date-fns";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
 import classNames from "classnames";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
+import Table from "@codegouvfr/react-dsfr/Table";
+import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
 
 type ExportCompany = {
   orgId: string;
@@ -44,6 +58,68 @@ const displayError = (error: FieldError | undefined) => {
   return error ? error.message : null;
 };
 
+const getRegistryTypeWording = (registryType: WasteRegistryType): string => {
+  switch (registryType) {
+    case WasteRegistryType.Ssd:
+      return `Sortie de statut de déchet`;
+    case WasteRegistryType.Incoming:
+      return `Registre entrant`;
+    case WasteRegistryType.Managed:
+      return `Registre géré`;
+    case WasteRegistryType.Outgoing:
+      return `Registre sortant`;
+    case WasteRegistryType.Transported:
+      return `Registre transporté`;
+    case WasteRegistryType.All:
+      return `Registre exhaustif`;
+    default:
+      return `Registre exhaustif`;
+  }
+};
+
+const getDeclarationTypeWording = (
+  declarationType: DeclarationType
+): string => {
+  switch (declarationType) {
+    case DeclarationType.All:
+      return `Tous`;
+    case DeclarationType.Bsd:
+      return `Tracé`;
+    case DeclarationType.Registry:
+      return `Déclaré`;
+    default:
+      return `Tous`;
+  }
+};
+
+const formatRegistryDates = (
+  createdAt: string,
+  startDate: string,
+  endDate?: string | null
+): string => {
+  const startDateObj = new Date(startDate);
+  const endDateObj = endDate ? new Date(endDate) : null;
+  if (
+    format(startOfYear(startDateObj), "yyyy-MM-dd") ===
+      format(startDateObj, "yyyy-MM-dd") &&
+    endDateObj &&
+    format(endOfYear(endDateObj), "yyyy-MM-dd") ===
+      format(endDateObj, "yyyy-MM-dd")
+  ) {
+    return `${getYear(startDateObj)}`;
+  }
+  if (!endDateObj) {
+    return `du ${format(startDateObj, "dd/MM/yyyy")} au ${format(
+      new Date(createdAt),
+      "dd/MM/yyyy"
+    )}`;
+  }
+  return `du ${format(startDateObj, "dd/MM/yyyy")} au ${format(
+    endDateObj,
+    "dd/MM/yyyy"
+  )}`;
+};
+
 const getDateButtons = () => {
   const currentYear = getYear(new Date());
   return [
@@ -54,17 +130,17 @@ const getDateButtons = () => {
     {
       label: `${currentYear - 3}`,
       startDate: format(startOfYear(subYears(new Date(), 3)), "yyyy-MM-dd"),
-      endDate: format(startOfYear(subYears(new Date(), 2)), "yyyy-MM-dd")
+      endDate: format(endOfYear(subYears(new Date(), 3)), "yyyy-MM-dd")
     },
     {
       label: `${currentYear - 2}`,
       startDate: format(startOfYear(subYears(new Date(), 2)), "yyyy-MM-dd"),
-      endDate: format(startOfYear(subYears(new Date(), 1)), "yyyy-MM-dd")
+      endDate: format(endOfYear(subYears(new Date(), 2)), "yyyy-MM-dd")
     },
     {
       label: `${currentYear - 1}`,
       startDate: format(startOfYear(subYears(new Date(), 1)), "yyyy-MM-dd"),
-      endDate: format(startOfYear(new Date()), "yyyy-MM-dd")
+      endDate: format(endOfYear(subYears(new Date(), 1)), "yyyy-MM-dd")
     }
   ];
 };
@@ -131,6 +207,12 @@ export function MyExports() {
     error
   } = useQuery<Pick<Query, "myCompanies">>(GET_MY_COMPANIES_WITH_DELEGATORS);
 
+  const {
+    data: exportsData,
+    loading: exportsLoading,
+    refetch
+  } = useQuery<Pick<Query, "registryExports">>(GET_REGISTRY_EXPORTS);
+  const registryExports = exportsData?.registryExports?.edges;
   const [generateExport, { loading: generateLoading }] = useMutation<
     Pick<Mutation, "generateWastesRegistryExport">,
     Omit<MutationGenerateWastesRegistryExportArgs, "where"> & {
@@ -141,6 +223,20 @@ export function MyExports() {
   >(GENERATE_REGISTRY_EXPORT, {
     refetchQueries: [GET_REGISTRY_EXPORTS]
   });
+
+  const [getDownloadLink] = useLazyQuery<
+    Pick<Query, "registryExportDownloadSignedUrl">,
+    Partial<QueryRegistryExportDownloadSignedUrlArgs>
+  >(REGISTRY_EXPORT_DOWNLOAD_SIGNED_URL, { fetchPolicy: "no-cache" });
+
+  async function downloadRegistryExportFile(exportId: string) {
+    const link = await getDownloadLink({
+      variables: { exportId }
+    });
+    await downloadFromSignedUrl(
+      link.data?.registryExportDownloadSignedUrl.signedUrl
+    );
+  }
 
   useEffect(() => {
     const rawCompanies = companiesData?.myCompanies?.edges;
@@ -182,8 +278,6 @@ export function MyExports() {
     register,
     handleSubmit,
     setValue,
-    watch,
-    reset,
     formState: { errors, isSubmitting }
   } = useForm<z.infer<typeof validationSchema>>({
     defaultValues: {
@@ -260,6 +354,7 @@ export function MyExports() {
             <div className="fr-container--fluid fr-mb-8v">
               <Select
                 label="Etablissement concerné"
+                disabled={isLoading}
                 nativeSelectProps={{
                   ...register("companyOrgId")
                 }}
@@ -286,73 +381,44 @@ export function MyExports() {
             <div className="fr-container--fluid fr-mb-8v">
               <Select
                 label="Type de registre"
+                disabled={isLoading}
                 nativeSelectProps={{
                   ...register("registryType")
                 }}
               >
-                <option
-                  value={WasteRegistryType.Ssd}
-                  key={WasteRegistryType.Ssd}
-                >
-                  {`Sortie de statut de déchet`}
-                </option>
-                <option
-                  value={WasteRegistryType.Incoming}
-                  key={WasteRegistryType.Incoming}
-                >
-                  {`Registre entrant`}
-                </option>
-                <option
-                  value={WasteRegistryType.Managed}
-                  key={WasteRegistryType.Managed}
-                >
-                  {`Registre géré`}
-                </option>
-                <option
-                  value={WasteRegistryType.Outgoing}
-                  key={WasteRegistryType.Outgoing}
-                >
-                  {`Registre sortant`}
-                </option>
-                <option
-                  value={WasteRegistryType.Transported}
-                  key={WasteRegistryType.Transported}
-                >
-                  {`Registre transporté`}
-                </option>
-                <option
-                  value={WasteRegistryType.All}
-                  key={WasteRegistryType.All}
-                >
-                  {`Registre exhaustif`}
-                </option>
+                {Object.keys(WasteRegistryType).map(key => (
+                  <option
+                    value={WasteRegistryType[key]}
+                    key={WasteRegistryType[key]}
+                  >
+                    {getRegistryTypeWording(WasteRegistryType[key])}
+                  </option>
+                ))}
               </Select>
             </div>
             <div className="fr-container--fluid fr-mb-8v">
               <Select
                 label="Type de déclaration"
+                disabled={isLoading}
                 nativeSelectProps={{
                   ...register("declarationType")
                 }}
               >
-                <option value={DeclarationType.All} key={DeclarationType.All}>
-                  {`Tous`}
-                </option>
-                <option value={DeclarationType.Bsd} key={DeclarationType.Bsd}>
-                  {`Tracé`}
-                </option>
-                <option
-                  value={DeclarationType.Registry}
-                  key={DeclarationType.Registry}
-                >
-                  {`Déclaré`}
-                </option>
+                {Object.keys(DeclarationType).map(key => (
+                  <option
+                    value={DeclarationType[key]}
+                    key={DeclarationType[key]}
+                  >
+                    {getDeclarationTypeWording(DeclarationType[key])}
+                  </option>
+                ))}
               </Select>
             </div>
             <div className="fr-container--fluid">
               <Checkbox
                 hintText="Sélectionner au moins un type de déchets"
                 legend="Type de déchets"
+                disabled={isLoading}
                 options={[
                   {
                     label: "Déchets non dangereux",
@@ -390,6 +456,7 @@ export function MyExports() {
                       setValue("endDate", null);
                     }
                   }}
+                  disabled={isLoading}
                   type="button"
                   priority="tertiary"
                 >
@@ -431,6 +498,7 @@ export function MyExports() {
             <div className="fr-container--fluid fr-mb-8v">
               <Select
                 label="Format d'export"
+                disabled={isLoading}
                 nativeSelectProps={{
                   ...register("format")
                 }}
@@ -449,16 +517,121 @@ export function MyExports() {
                 </option>
               </Select>
             </div>
-            <div className="fr-container--fluid fr-mb-8v">
+            <div className="fr-container--fluid">
               <Button
                 priority="primary"
                 iconId="fr-icon-download-line"
                 iconPosition="right"
+                disabled={isLoading}
               >
                 Exporter
               </Button>
             </div>
           </form>
+        </div>
+        <div className="tw-p-6">
+          {!exportsLoading ? (
+            <Table
+              caption="Exports récents"
+              data={
+                registryExports
+                  ? registryExports.map(registryExport => [
+                      <div>
+                        <div>
+                          {format(
+                            new Date(registryExport.node.createdAt),
+                            "dd/MM/yyyy HH:mm"
+                          )}
+                        </div>
+                        {badges[registryExport.node.status]("export")}
+                      </div>,
+                      <div>
+                        {[
+                          `${
+                            registryExport.node.companies[0]?.givenName &&
+                            registryExport.node.companies[0]?.givenName !== ""
+                              ? registryExport.node.companies[0]?.givenName
+                              : registryExport.node.companies[0]?.name
+                          } - ${registryExport.node.companies[0]?.orgId}`,
+                          ...(registryExport.node.companies.length > 1
+                            ? [
+                                `et ${
+                                  registryExport.node.companies.length - 1
+                                } autre${
+                                  registryExport.node.companies.length > 2
+                                    ? "s"
+                                    : ""
+                                } `
+                              ]
+                            : [])
+                        ].join(", ")}
+                        {registryExport.node.companies.length > 1 ? (
+                          <Tooltip
+                            kind="hover"
+                            className={styles.prewrap}
+                            title={registryExport.node.companies
+                              .slice(1)
+                              .map(
+                                company =>
+                                  `${
+                                    company.givenName &&
+                                    company.givenName !== ""
+                                      ? company.givenName
+                                      : company.name
+                                  } - ${company.orgId}`
+                              )
+                              .join(",\n")}
+                          />
+                        ) : null}
+                      </div>,
+                      getRegistryTypeWording(registryExport.node.registryType),
+                      getDeclarationTypeWording(
+                        registryExport.node.declarationType
+                      ),
+                      formatRegistryDates(
+                        registryExport.node.createdAt,
+                        registryExport.node.startDate,
+                        registryExport.node.endDate
+                      ),
+                      registryExport.node.status ===
+                      RegistryExportStatus.Successful ? (
+                        <Button
+                          title="Télécharger"
+                          priority="secondary"
+                          iconId="fr-icon-download-line"
+                          onClick={() =>
+                            downloadRegistryExportFile(registryExport.node.id)
+                          }
+                          size="small"
+                        />
+                      ) : registryExport.node.status ===
+                          RegistryExportStatus.Pending ||
+                        registryExport.node.status ===
+                          RegistryExportStatus.Started ? (
+                        <Button
+                          title="Rafraîchir"
+                          disabled={exportsLoading}
+                          priority="secondary"
+                          iconId="fr-icon-refresh-line"
+                          onClick={() => refetch()}
+                          size="small"
+                        />
+                      ) : (
+                        ""
+                      )
+                    ])
+                  : []
+              }
+              headers={[
+                "Date",
+                "Etablissements",
+                "Type de registre",
+                "Type de déclaration",
+                "Période",
+                "Fichier"
+              ]}
+            />
+          ) : null}
         </div>
       </div>
     </div>
