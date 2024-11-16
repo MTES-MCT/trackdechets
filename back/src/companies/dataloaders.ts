@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { prisma } from "@td/prisma";
-import { UserRole } from "@prisma/client";
+import { Company, UserRole } from "@prisma/client";
 
 export function createCompanyDataLoaders() {
   return {
@@ -10,6 +10,9 @@ export function createCompanyDataLoaders() {
     ),
     companiesAdmin: new DataLoader((companyIds: string[]) =>
       getCompaniesAdmin(companyIds)
+    ),
+    delegators: new DataLoader((companyIds: string[]) =>
+      getCompaniesDelegators(companyIds)
     )
   };
 }
@@ -104,3 +107,25 @@ async function getCompaniesAdmin(companyIds: string[]) {
     return association?.admin ?? null;
   });
 }
+
+const getCompaniesDelegators = async (
+  companyIds: string[]
+): Promise<Company[][]> => {
+  const delegations = await prisma.registryDelegation.findMany({
+    where: {
+      delegateId: { in: companyIds },
+      revokedBy: null,
+      cancelledBy: null,
+      startDate: { lte: new Date() },
+      OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
+    },
+    include: {
+      delegator: true
+    }
+  });
+  return companyIds.map(companyId =>
+    delegations
+      .filter(delegation => delegation.delegateId === companyId)
+      .map(delegation => delegation.delegator)
+  );
+};

@@ -3,6 +3,7 @@ import { CompanyPrivateResolvers } from "../../generated/graphql/types";
 import { getCompanyUsers } from "../database";
 import { getUserRole, grants, toGraphQLPermission } from "../../permissions";
 import { toGqlNotifications } from "../../users/notifications";
+import { toGqlCompanyPublic } from "../converters";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
@@ -96,6 +97,10 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     return prisma.company
       .findUnique({ where: { id: parent.id } })
       .receivedAdministrativeTransfers() as any;
+  },
+  delegators: async (parent, _, context) => {
+    const res = await context.dataloaders.delegators.load(parent.id);
+    return res.map(toGqlCompanyPublic);
   }
 };
 

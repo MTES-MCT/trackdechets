@@ -96,3 +96,101 @@ export async function downloadFromSignedUrl(signedUrl: string | undefined) {
   link.click();
   link.remove();
 }
+
+const registryExportFragment = gql`
+  fragment RegistryExportFragment on RegistryExport {
+    id
+    registryType
+    startDate
+    endDate
+    format
+    declarationType
+    status
+    companies {
+      name
+      siret
+    }
+    createdAt
+  }
+`;
+
+export const GENERATE_REGISTRY_EXPORT = gql`
+  mutation GenerateExport(
+    $registryType: WasteRegistryType!
+    $format: FormsRegisterExportFormat!
+    $siret: String
+    $delegateSiret: String
+    $dateRange: DateFilter!
+    $declarationType: DeclarationType
+    $wasteTypes: [RegistryExportWasteType!]
+    $wasteCodes: [String!]
+  ) {
+    generateWastesRegistryExport(
+      dateRange: $dateRange
+      format: $format
+      registryType: $registryType
+      delegateSiret: $delegateSiret
+      siret: $siret
+      where: {
+        declarationType: { _eq: $declarationType }
+        wasteType: { _in: $wasteTypes }
+        wasteCode: { _in: $wasteCodes }
+      }
+    ) {
+      ...RegistryExportFragment
+    }
+  }
+  ${registryExportFragment}
+`;
+
+export const GET_REGISTRY_EXPORTS = gql`
+  query RegistryExports($first: Int = 5) {
+    registryExports(first: $first) {
+      edges {
+        node {
+          ...RegistryExportFragment
+        }
+      }
+    }
+  }
+  ${registryExportFragment}
+`;
+
+export const GET_REGISTRY_EXPORT = gql`
+  query RegistryExport($id: ID!) {
+    registryExport(id: $id) {
+      ...RegistryExportFragment
+    }
+  }
+  ${registryExportFragment}
+`;
+
+export const REGISTRY_EXPORT_DOWNLOAD_SIGNED_URL = gql`
+  query RegistryExportDownloadSignedUrl($exportId: String!) {
+    registryExportDownloadSignedUrl(exportId: $exportId) {
+      fileKey
+      signedUrl
+    }
+  }
+`;
+
+export const GET_MY_COMPANIES_WITH_DELEGATORS = gql`
+  query MyCompaniesWithDelegators {
+    myCompanies {
+      edges {
+        node {
+          id
+          givenName
+          name
+          orgId
+          userRole
+          delegators {
+            orgId
+            givenName
+            name
+          }
+        }
+      }
+    }
+  }
+`;
