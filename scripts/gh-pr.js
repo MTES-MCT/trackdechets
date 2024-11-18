@@ -20,11 +20,13 @@ async function getBody(github, context) {
     const awaitingApprovers = await getRequestedReviewers(github, context, pr);
 
     const line = [
+      "", // The line must start with | to be a valid markdown table
       pr.title,
       `[#${pr.number}](${pr.html_url})`,
       `@${pr.user.login}`,
       awaitingApprovers.map(login => `@${login}`).join(", "),
-      `${nbApprovals >= 2 ? "🐥" : nbApprovals === 1 ? "🐣" : "🥚"}`
+      `${nbApprovals >= 2 ? "🐥" : nbApprovals === 1 ? "🐣" : "🥚"}`,
+      ""
     ].map(v => (v ? v.replaceAll("|", "\\|") : v));
 
     lines.push(line.join("|"));
