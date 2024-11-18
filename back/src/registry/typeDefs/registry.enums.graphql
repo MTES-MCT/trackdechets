@@ -78,7 +78,7 @@ enum BsdSubType {
 enum RegistryImportType {
   "Sortie de statut de déchet"
   SSD
-  "Déchet (non) dangereux entrant"
+  "Déchet dangereux et non dangereux entrant"
   INCOMING_WASTE
 }
 
