@@ -139,6 +139,10 @@ async function setAppendix1AutomaticValues(
           wasteDetailsName: container.wasteDetailsName,
           wasteDetailsQuantityType: "ESTIMATED",
           wasteDetailsConsistence: container.wasteDetailsConsistence,
+          wasteDetailsOnuCode: container.wasteDetailsOnuCode,
+          wasteDetailsNonRoadRegulationMention:
+            container.wasteDetailsNonRoadRegulationMention,
+          wasteDetailsIsSubjectToADR: container.wasteDetailsIsSubjectToADR,
           recipientCompanySiret: container.recipientCompanySiret,
           recipientCompanyName: container.recipientCompanyName,
           recipientCompanyAddress: container.recipientCompanyAddress,
