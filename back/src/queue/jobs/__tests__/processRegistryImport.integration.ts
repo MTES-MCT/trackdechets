@@ -5,6 +5,7 @@ import {
   SSD_HEADERS
 } from "@td/registry";
 import { Job } from "bull";
+import { format } from "date-fns";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   userFactory,
@@ -269,7 +270,9 @@ describe("Process registry import job", () => {
 
       const errorFileMetadata = await getFileMetadata(
         process.env.S3_REGISTRY_ERRORS_BUCKET,
-        `${registryImport.id}.csv`
+        `${format(new Date(), "yyyyMMdd")}_TD_rapport_erreur_${
+          registryImport.id
+        }.csv`
       );
 
       expect(errorFileMetadata).toBeDefined();
