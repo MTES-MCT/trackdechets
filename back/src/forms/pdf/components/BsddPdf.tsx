@@ -371,7 +371,7 @@ export function BsddPdf({
     isDangerous(form.wasteDetails?.code) ||
     Boolean(form.wasteDetails?.pop);
 
-  const appendix1ProducerPlaceholder = `En cas de contrôle, les informations relatives à ce cadre sont celle du BSD de tournée dédié associé n° ${groupedIn.map(
+  const appendix1ProducerPlaceholder = `En cas de contrôle, les informations relatives à ce cadre sont celles du BSD de tournée dédié associé n° ${groupedIn.map(
     bsd => bsd.readableId
   )}`;
   const isRepackaging =
