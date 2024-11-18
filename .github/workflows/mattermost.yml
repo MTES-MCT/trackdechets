@@ -3,6 +3,7 @@ name: Send reviewable PRs to Mattermost
 on:
   schedule:
     - cron:  '0 9 * * 1-5'
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   notify:
