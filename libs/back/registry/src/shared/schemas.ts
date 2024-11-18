@@ -106,9 +106,13 @@ export const weightIsEstimateSchema = z.union(
 );
 
 export const volumeSchema = z
-  .string()
-  .optional()
-  .transform(val => (val ? Number(val) : undefined))
+  .union([
+    z.number().optional(),
+    z
+      .string()
+      .optional()
+      .transform(val => (val ? Number(val) : undefined))
+  ]) // No coercion to keep .optional()
   .pipe(
     z
       .number({
@@ -138,19 +142,12 @@ export const getActorTypeSchema = (name: string) =>
   );
 
 export const getActorOrgIdSchema = (name: string) =>
-  z
-    .union([z.string(), z.number().transform(val => String(val))])
-    .pipe(
-      z
-        .string()
-        .min(
-          1,
-          `Le numéro d'identification ${name} doit faire plus d'1 caractère`
-        )
-        .max(
-          27,
-          `Le numéro d'identification ${name} ne peut pas dépasser 27 caractères`
-        )
+  z.coerce
+    .string()
+    .min(1, `Le numéro d'identification ${name} doit faire plus d'1 caractère`)
+    .max(
+      27,
+      `Le numéro d'identification ${name} ne peut pas dépasser 27 caractères`
     );
 
 export const getActorSiretSchema = (name: string) =>

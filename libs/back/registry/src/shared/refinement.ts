@@ -49,7 +49,7 @@ export function refineActorOrgId<T>({
           addIssue({
             code: z.ZodIssueCode.custom,
             message:
-              "Le numéro de TVA du destinataire n'est pas valide. Il commence par 2 lettres majuscules, est suivi de chiffres et doit respexter les contraintes du pays concerné",
+              "Le numéro de TVA du destinataire n'est pas valide. Il commence par 2 lettres majuscules, est suivi de chiffres et doit respecter les contraintes du pays concerné",
             path: [orgIdKey]
           });
         }

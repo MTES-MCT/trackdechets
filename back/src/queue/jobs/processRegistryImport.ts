@@ -9,6 +9,7 @@ import {
   setFileAsNotTemporary
 } from "@td/registry";
 import { Job } from "bull";
+import { format } from "date-fns";
 
 import { getUserCompanies } from "../../users/database";
 
@@ -93,7 +94,7 @@ export async function processRegistryImportJob(
 
   const { s3Stream: outputErrorStream, upload } = getUploadWithWritableStream(
     process.env.S3_REGISTRY_ERRORS_BUCKET!,
-    `${importId}.csv`
+    `${format(new Date(), "yyyyMMdd")}_TD_rapport_erreur_${importId}.csv`
   );
 
   const stats = await processStream({

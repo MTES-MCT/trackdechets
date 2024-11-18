@@ -170,7 +170,9 @@ function Step1({ register }: StepProps) {
           Selectionnez une option
         </option>
         <option value="SSD">Sortie de statut de déchet</option>
-        <option value="INCOMING_WASTE">Déchet (non) dangereux entrant</option>
+        <option value="INCOMING_WASTE">
+          Déchet dangereux et non dangereux entrant
+        </option>
       </Select>
 
       <Upload
@@ -198,6 +200,8 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
     MutationImportFileArgs
   >(IMPORT_FILE);
 
+  const displayedAt = Date.now();
+
   const { error: signedUrlError } = useQuery<
     Pick<Query, "registryUploadSignedUrl">,
     Partial<QueryRegistryUploadSignedUrlArgs>
@@ -223,6 +227,14 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
         });
 
         setRegistryImportId(registryImport?.data?.importFile?.id);
+
+        const minimalWait = 2000; // 2 seconds
+        const now = Date.now();
+        if (now - displayedAt < minimalWait) {
+          await new Promise(resolve =>
+            setTimeout(resolve, minimalWait - (now - displayedAt))
+          );
+        }
         goToNextStep();
       } else {
         setS3UploadError(uploadResponse.statusText);
@@ -295,11 +307,13 @@ function Step3({ registryImportId }) {
   }
 
   const stats = [
-    `${data?.registryImport?.numberOfErrors} déclarations en erreur non prises en compte`,
-    `${data?.registryImport?.numberOfInsertions} nouvelles déclarations`,
-    `${data?.registryImport?.numberOfEdits} déclarations corrigées`,
-    `${data?.registryImport?.numberOfCancellations} déclarations annulées`,
-    `${data?.registryImport?.numberOfSkipped} déclarations ignorées`
+    `${
+      data?.registryImport?.numberOfErrors ?? 0
+    } déclarations en erreur non prises en compte`,
+    `${data?.registryImport?.numberOfInsertions ?? 0} nouvelles déclarations`,
+    `${data?.registryImport?.numberOfEdits ?? 0} déclarations corrigées`,
+    `${data?.registryImport?.numberOfCancellations ?? 0} déclarations annulées`,
+    `${data?.registryImport?.numberOfSkipped ?? 0} déclarations ignorées`
   ].filter(v => !v.startsWith("0"));
 
   return (

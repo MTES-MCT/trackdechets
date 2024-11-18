@@ -95,6 +95,7 @@ describe("Schemas", () => {
   });
 
   test("volumeSchema", () => {
+    expect(volumeSchema.parse(500)).toBe(500);
     expect(volumeSchema.parse("500")).toBe(500);
     expect(volumeSchema.parse(undefined)).toBeUndefined();
     expect(() => volumeSchema.parse("-1")).toThrow();
