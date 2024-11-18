@@ -2666,6 +2666,60 @@ describe("Mutation.createForm", () => {
         })
       ]);
     });
+
+    it("should create an appendix 1 child and copy parent's ADR info in it", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { mutate } = makeClient(user);
+
+      const appendix1Child = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SEALED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      // When
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: "APPENDIX1",
+              company: { siret: company.siret }
+            },
+            transporter: { company: { siret: company.siret } },
+            wasteDetails: {
+              isSubjectToADR: true,
+              onuCode: "Mention ADR",
+              nonRoadRegulationMention: "Mention RID"
+            },
+            grouping: [{ form: { id: appendix1Child.id } }]
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedAppendix1Child = await prisma.form.findFirstOrThrow({
+        where: { id: appendix1Child.id }
+      });
+
+      expect(updatedAppendix1Child.wasteDetailsIsSubjectToADR).toBeTruthy();
+      expect(updatedAppendix1Child.wasteDetailsOnuCode).toBe("Mention ADR");
+      expect(updatedAppendix1Child.wasteDetailsNonRoadRegulationMention).toBe(
+        "Mention RID"
+      );
+    });
   });
 
   describe("annexe2 + quantityRefused", () => {
