@@ -9,6 +9,7 @@ import { getFormRevisionOrgIds } from "../elasticHelpers";
 import { getFormForElastic } from "../elastic";
 import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { CompanyType, WasteProcessorType } from "@prisma/client";
 
 const CREATE_FORM_REVISION_REQUEST = gql`
   mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
@@ -24,7 +25,10 @@ describe("getFormRevisionOrgIds", () => {
   it("should list organisation identifiers in `isInRevisionFor` and `isRevisedFor`", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
-    const recipient = await userWithCompanyFactory("ADMIN");
+    const recipient = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: emitter.user.id,

@@ -18,7 +18,8 @@ import {
   BSDD_SAMPLE_NUMBER_WASTE_CODES
 } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { WeightUnits, weight } from "../../../common/validation";
+import { WeightUnits, weight, v20241101 } from "../../../common/validation";
+import { prisma } from "@td/prisma";
 import {
   FormRevisionRequestContentInput,
   MutationCreateFormRevisionRequestArgs
@@ -36,6 +37,12 @@ import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn, quantityRefused } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../common/operationModes";
+import { isDangerous } from "@td/constants";
+import {
+  canProcessDangerousWaste,
+  canProcessNonDangerousWaste
+} from "../../../companies/companyProfilesRules";
+import { INVALID_DESTINATION_SUBPROFILE } from "../../errors";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [
@@ -223,6 +230,35 @@ async function checkIfUserCanRequestRevisionOnBsdd(
   }
 }
 
+async function validateWAsteAccordingToDestination(bsdd: Form, flatContent) {
+  // do not run on existing bsdds created before release v20241101
+  const bsddCreatedAt = bsdd.createdAt || new Date(); // new bsd do not have a createdAt yet
+  const isCreatedAfterV202411011 =
+    bsddCreatedAt.getTime() > v20241101.getTime();
+
+  if (!isCreatedAfterV202411011) {
+    return true;
+  }
+
+  const recipientCompany = await prisma.company.findUnique({
+    where: { siret: bsdd.recipientCompanySiret! }
+  });
+  const hasDangerousWaste =
+    isDangerous(flatContent.wasteDetailsCode || bsdd.wasteDetailsCode) ||
+    flatContent.wasteDetailsPop ||
+    bsdd.wasteDetailsPop ||
+    flatContent.wasteDetailsIsDangerous ||
+    bsdd.wasteDetailsIsDangerous;
+
+  if (recipientCompany) {
+    const canProcess = hasDangerousWaste
+      ? canProcessDangerousWaste(recipientCompany)
+      : canProcessNonDangerousWaste(recipientCompany);
+    if (!canProcess) {
+      throw new UserInputError(INVALID_DESTINATION_SUBPROFILE);
+    }
+  }
+}
 async function getFlatContent(
   content: FormRevisionRequestContentInput,
   bsdd: Form & { transporters: BsddTransporter[] }
@@ -311,6 +347,9 @@ async function getFlatContent(
     );
   }
 
+  await validateWAsteAccordingToDestination(bsdd, flatContent);
+
+  //
   if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
     await appendix1ProducerRevisionRequestSchema.validate(flatContent, {
       strict: true
@@ -326,7 +365,9 @@ async function getFlatContent(
       );
     }
   } else {
-    await bsddRevisionRequestSchema.validate(flatContent, { strict: true });
+    await bsddRevisionRequestSchema.validate(flatContent, {
+      strict: true
+    });
   }
 
   // Double-check the waste quantities
@@ -430,6 +471,7 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
     wasteDetailsCode: yup
       .string()
       .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
+
     wasteDetailsName: yup.string().nullable(),
     wasteDetailsPop: yup.boolean().nullable(),
     wasteDetailsPackagingInfos: yup
