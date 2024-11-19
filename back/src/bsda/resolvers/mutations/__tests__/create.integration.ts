@@ -6,10 +6,11 @@ import {
   userFactory,
   userWithCompanyFactory,
   companyFactory,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { BsdaStatus } from "@prisma/client";
+import { BsdaStatus, Company, EcoOrganisme, User } from "@prisma/client";
 import { bsdaFactory } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 import { gql } from "graphql-tag";
@@ -55,6 +56,9 @@ describe("Mutation.Bsda.create", () => {
 
   afterEach(() => {
     process.env = OLD_ENV;
+  });
+
+  afterAll(() => {
     return resetDatabase();
   });
 
@@ -1711,5 +1715,183 @@ describe("Mutation.Bsda.create", () => {
           "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
       )
     ).toBeFalsy();
+  });
+
+  describe("closed sirets", () => {
+    let user: User;
+    let emitter: Company;
+    let destination: Company;
+    let transporter: Company;
+    let worker: Company;
+    let broker: Company;
+    let intermediary: Company;
+    let ecoOrganisme: EcoOrganisme;
+    let bsdaInput: BsdaInput;
+
+    // eslint-disable-next-line prefer-const
+    let searchCompanyMock = jest.fn().mockReturnValue({});
+    let makeClientLocal: typeof makeClient;
+
+    beforeAll(async () => {
+      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER");
+      user = emitterCompanyAndUser.user;
+      emitter = emitterCompanyAndUser.company;
+      destination = await companyFactory();
+      transporter = await companyFactory();
+      worker = await companyFactory();
+      broker = await companyFactory();
+      intermediary = await companyFactory();
+      ecoOrganisme = await ecoOrganismeFactory({
+        handle: { handleBsda: true }
+      });
+
+      bsdaInput = {
+        type: "OTHER_COLLECTIONS",
+        emitter: {
+          isPrivateIndividual: false,
+          company: {
+            siret: emitter.siret,
+            name: "The crusher",
+            address: "Rue de la carcasse",
+            contact: "Centre amiante",
+            phone: "0101010101",
+            mail: "emitter@mail.com"
+          }
+        },
+        worker: {
+          company: {
+            siret: worker.siret,
+            name: "worker",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        },
+        transporter: {
+          company: { siret: transporter.siret }
+        },
+        waste: {
+          code: "06 07 01*",
+          adr: "ADR",
+          pop: true,
+          consistence: "SOLIDE",
+          familyCode: "Code famille",
+          materialName: "A material",
+          sealNumbers: ["1", "2"]
+        },
+        broker: {
+          company: {
+            siret: broker.siret,
+            name: "broker",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        },
+        packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+        weight: { isEstimate: true, value: 1.2 },
+        destination: {
+          cap: "A cap",
+          plannedOperationCode: "D 9",
+          company: {
+            siret: destination.siret,
+            name: "destination",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        },
+        ecoOrganisme: {
+          siret: ecoOrganisme.siret!,
+          name: "Eco Organisme"
+        },
+        intermediaries: [
+          {
+            siret: intermediary.siret,
+            address: "intermediary address",
+            name: "Intermediary",
+            contact: "intermediary contact",
+            phone: "060401020304",
+            mail: "intermediary@mail.com"
+          }
+        ]
+      };
+
+      // Mock les appels à la base SIRENE
+      jest.mock("../../../../companies/search", () => ({
+        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+        ...jest.requireActual("../../../../companies/search"),
+        searchCompany: searchCompanyMock
+      }));
+
+      // Ré-importe makeClient pour que searchCompany soit bien mocké
+      jest.resetModules();
+      makeClientLocal = require("../../../../__tests__/testClient")
+        .default as typeof makeClient;
+    });
+
+    const mockCloseCompany = siretToClose => {
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: siret === siretToClose ? "F" : "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+    };
+
+    const testCreatingBsdaWithClosedSiret = async siret => {
+      // Given
+      mockCloseCompany(siret);
+
+      // When
+      const { mutate } = makeClientLocal(user);
+      const { errors } = await mutate<Pick<Mutation, "createBsda">>(
+        CREATE_BSDA,
+        {
+          variables: {
+            input: bsdaInput
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'établissement ${siret} est fermé selon le répertoire SIRENE`
+      );
+    };
+
+    //TODO: emitter ?
+    it.each(["transporter", "destination", "worker", "broker"])(
+      "should not allow creating a BSDA with a closed %p siret",
+      async role => {
+        // Given
+        const siret = bsdaInput?.[role]?.company?.siret;
+
+        // When > Then
+        await testCreatingBsdaWithClosedSiret(siret);
+      }
+    );
+
+    it("should not allow creating a BSDA with a closed intermediary siret", async () => {
+      // Given
+      const siret = (bsdaInput?.intermediaries ?? [])[0].siret;
+
+      // When > Then
+      await testCreatingBsdaWithClosedSiret(siret);
+    });
+
+    it("should not allow creating a BSDA with a closed ecoOrganisme siret", async () => {
+      // Given
+      const siret = bsdaInput?.ecoOrganisme?.siret;
+
+      // When > Then
+      await testCreatingBsdaWithClosedSiret(siret);
+    });
   });
 });
