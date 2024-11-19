@@ -1652,4 +1652,64 @@ describe("Mutation.Bsda.create", () => {
     expect(errors).toBeUndefined();
     expect(data.createBsda.status).toBe("INITIAL");
   });
+
+  it("should allow broker to create a bsda", async () => {
+    // Given
+    const { company: broker, user } = await userWithCompanyFactory("MEMBER");
+
+    const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
+      broker: {
+        company: {
+          siret: broker.siret
+        }
+      }
+    };
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    // Then
+    expect(
+      errors.some(
+        error =>
+          error.message ===
+          "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
+      )
+    ).toBeFalsy();
+  });
+
+  it("should allow intermediary to create a bsda", async () => {
+    // Given
+    const { company: intermediary, user } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
+      intermediaries: [{ siret: intermediary.siret }]
+    };
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    // Then
+    expect(
+      errors.some(
+        error =>
+          error.message ===
+          "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
+      )
+    ).toBeFalsy();
+  });
 });

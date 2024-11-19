@@ -109,7 +109,15 @@ function flattenWasteDetailsInput(input: {
 }) {
   return {
     wasteDetailsCode: chain(input.wasteDetails, w => w.code),
+    wasteDetailsIsSubjectToADR: chain(
+      input.wasteDetails,
+      w => w.isSubjectToADR
+    ),
     wasteDetailsOnuCode: chain(input.wasteDetails, w => w.onuCode),
+    wasteDetailsNonRoadRegulationMention: chain(
+      input.wasteDetails,
+      w => w.nonRoadRegulationMention
+    ),
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       chain(input.wasteDetails, w => getProcessedPackagingInfos(w))
     ),
@@ -673,7 +681,9 @@ export function expandFormFromDb(
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
       name: form.wasteDetailsName,
+      isSubjectToADR: form.wasteDetailsIsSubjectToADR,
       onuCode: form.wasteDetailsOnuCode,
+      nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
       packagingInfos: form.wasteDetailsPackagingInfos as PackagingInfo[],
       // DEPRECATED - To remove with old packaging fields
       ...getDeprecatedPackagingApiFields(
@@ -851,7 +861,10 @@ export function expandFormFromDb(
           wasteDetails: nullIfNoValues<WasteDetails>({
             code: forwardedIn.wasteDetailsCode,
             name: forwardedIn.wasteDetailsName,
+            isSubjectToADR: forwardedIn.wasteDetailsIsSubjectToADR,
             onuCode: forwardedIn.wasteDetailsOnuCode,
+            nonRoadRegulationMention:
+              forwardedIn.wasteDetailsNonRoadRegulationMention,
             packagingInfos:
               forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[],
             // DEPRECATED - To remove with old packaging fields

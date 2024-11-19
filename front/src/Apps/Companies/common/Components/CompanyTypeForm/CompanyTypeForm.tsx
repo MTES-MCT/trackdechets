@@ -10,7 +10,7 @@ import { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import "./CompanyTypeForm.scss";
 
 export type CompanyTypeInputValues = {
-  companyTypes: AllCompanyType[];
+  companyTypes: string[];
   workerCertification: {
     hasSubSectionThree: boolean;
   };
@@ -99,7 +99,11 @@ type CompanyTypeFormProps = {
   inputErrors?: CompanyTypeInputErrors;
   // Gère les événements de sélection ou dé-selection d'une checkbox représentant
   // ou type ou sous-type d'établissement.
-  handleToggle: (value: AllCompanyType, checked: boolean) => void;
+  handleToggle: (
+    parentValue: AllCompanyType | undefined,
+    value: AllCompanyType,
+    checked: boolean
+  ) => void;
 };
 
 /**

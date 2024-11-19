@@ -119,6 +119,9 @@ function creators(input: BsffInput) {
 }
 
 export async function checkCanRead(user: User, bsff: BsffWithTransporters) {
+  if (user.isAdmin && user.isActive) {
+    return true;
+  }
   const authorizedOrgIds = readers(bsff);
 
   return checkUserPermissions(

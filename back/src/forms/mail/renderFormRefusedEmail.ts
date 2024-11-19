@@ -1,4 +1,4 @@
-import { BsddTransporter, Form, UserNotification } from "@prisma/client";
+import { BsddTransporter, Form } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { generateBsddPdfToBase64 } from "../pdf";
 import {
@@ -10,7 +10,10 @@ import {
 import { getTransporterCompanyOrgId, Dreals } from "@td/constants";
 import { getFirstTransporter } from "../database";
 import { bsddWasteQuantities } from "../helpers/bsddWasteQuantities";
-import { getNotificationSubscribers } from "../../users/notifications";
+import {
+  getNotificationSubscribers,
+  UserNotification
+} from "../../users/notifications";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 

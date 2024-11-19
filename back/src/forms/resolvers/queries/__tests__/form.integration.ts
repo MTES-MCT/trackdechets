@@ -16,6 +16,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
+import { ErrorCode } from "../../../../common/errors";
 
 const GET_FORM_QUERY = `
   query GetForm($id: ID, $readableId: String) {
@@ -70,6 +71,26 @@ async function createForm(
 
 describe("Query.form", () => {
   afterEach(() => resetDatabase());
+
+  it("should disallow unauthenticated user", async () => {
+    const form = await createForm({});
+
+    const { query } = makeClient();
+    const { errors } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas connecté.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.UNAUTHENTICATED
+        })
+      })
+    ]);
+  });
 
   it.each(["emitter", "recipient", "transporter"])(
     "should allow user from the %p company to read their form",
@@ -159,6 +180,20 @@ describe("Query.form", () => {
     expect(errors[0].message).toBe(
       "Vous n'êtes pas autorisé à accéder à ce bordereau"
     );
+  });
+
+  it("should allow access to admin user not on the bsd", async () => {
+    const user = await userFactory({ isAdmin: true });
+    const form = await createForm({});
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "form">>(GET_FORM_QUERY, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    expect(data.form.id).toBe(form.id);
   });
 
   it("should return a form based on its readableId", async () => {
@@ -381,7 +416,7 @@ describe("Query.form", () => {
         status: "RECEIVED",
         emitterCompanySiret: company.siret,
         emitterCompanyName: company.name,
-        emptyReturnADR: EmptyReturnADR.EMPTY_NOT_WASHED
+        emptyReturnADR: EmptyReturnADR.EMPTY_CITERNE_CONTAINER
       }
     });
 
@@ -397,6 +432,8 @@ describe("Query.form", () => {
     );
 
     expect(errors).toBeUndefined();
-    expect(data.form.emptyReturnADR).toBe(EmptyReturnADR.EMPTY_NOT_WASHED);
+    expect(data.form.emptyReturnADR).toBe(
+      EmptyReturnADR.EMPTY_CITERNE_CONTAINER
+    );
   });
 });

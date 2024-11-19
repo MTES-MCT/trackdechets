@@ -33,6 +33,9 @@ export const SIGN_EMISSION_FORM = `
         emittedAt
         emittedBy
       }
+      wasteDetails {
+        nonRoadRegulationMention
+      }
     }
   }
 `;

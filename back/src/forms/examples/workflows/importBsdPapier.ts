@@ -2,6 +2,7 @@ import { createForm } from "../steps/createForm";
 import { markAsSealed } from "../steps/markAsSealed";
 import { importPaperForm } from "../steps/importPaperForm";
 import { Workflow } from "../../../common/workflow";
+import { WasteProcessorType } from "@prisma/client";
 
 const workflow: Workflow = {
   title: `Acheminement direct du producteur à l'installation de traitement avec import de BSD signé papier.`,
@@ -12,7 +13,11 @@ dans Trackdéchets par l'installation de destination pour assurer la traçabilit
   companies: [
     { name: "producteur", companyTypes: ["PRODUCER"] },
     { name: "transporteur", companyTypes: ["TRANSPORTER"] },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     createForm("producteur"),

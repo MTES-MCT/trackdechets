@@ -25,13 +25,20 @@ import {
   EmitterType,
   Status,
   UserRole,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  CompanyType,
+  WasteProcessorType
 } from "@prisma/client";
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 import { waitForJobsCompletion } from "../../../../queue/helpers";
+
+import {
+  forbbidenProfilesForDangerousWaste,
+  forbbidenProfilesForNonDangerousWaste
+} from "./companyProfiles";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -105,6 +112,8 @@ const CREATE_FORM = `
           quantity
         }
         isDangerous
+        onuCode
+        nonRoadRegulationMention
         parcelNumbers {
           city
           postalCode
@@ -182,7 +191,8 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
-  it.each(["emitter", "trader", "recipient", "transporter"])(
+  it.each(["emitter", "trader", "transporter"])(
+    // recipient: see below
     "should allow %p to create a form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -203,6 +213,168 @@ describe("Mutation.createForm", () => {
       expect(data.createForm.id).toBeTruthy();
       // check input is sirenified
       expect(sirenifyFormInput as jest.Mock).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it("should allow recipient to create a form", async () => {
+    // recipient needs appropriate profiles and subprofiles
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          recipient: {
+            company: { siret: company.siret }
+          }
+        }
+      }
+    });
+
+    expect(data.createForm.id).toBeTruthy();
+    // check input is sirenified
+    expect(sirenifyFormInput as jest.Mock).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should forbid recipient with inappropriate profile %o on a bsdd with dangerous waste code (*)",
+    async opt => {
+      // recipient needs appropriate profiles and subprofiles
+      const { user, company } = await userWithCompanyFactory("MEMBER", opt);
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            wasteDetails: { code: "10 05 10*" },
+            recipient: {
+              company: { siret: company.siret }
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should forbid recipient with inappropriate profile %o on a bsdd with non dangerous waste code and wasteDetailsIsDangerous",
+    async opt => {
+      // recipient needs appropriate profiles and subprofiles
+      const { user, company } = await userWithCompanyFactory("MEMBER", opt);
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            wasteDetails: { code: "10 05 09", isDangerous: true },
+            recipient: {
+              company: { siret: company.siret }
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should forbid recipient with inappropriate profile %o on a bsdd with non dangerous waste code and pop",
+    async opt => {
+      // recipient needs appropriate profiles and subprofiles
+      const { user, company } = await userWithCompanyFactory("MEMBER", opt);
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            wasteDetails: { code: "10 05 09", pop: true },
+            recipient: {
+              company: { siret: company.siret }
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForNonDangerousWaste)(
+    "should forbid recipient with inappropriate profile %o on a non dangerous bsdd ",
+    async opt => {
+      // recipient needs appropriate profiles and subprofiles
+      const { user, company } = await userWithCompanyFactory("MEMBER", opt);
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            wasteDetails: { code: "10 05 09" }, // non dnagerous
+            recipient: {
+              company: { siret: company.siret }
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
     }
   );
 
@@ -396,7 +568,12 @@ describe("Mutation.createForm", () => {
   it("should allow to create a form without space in recipientProcessingOperation", async () => {
     const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
     const transporter = await companyFactory();
-    const destination = await companyFactory();
+
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const { mutate } = makeClient(user);
     const { data, errors } = await mutate<
@@ -763,7 +940,11 @@ describe("Mutation.createForm", () => {
   it("create a form with a recipient", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: recipientCompany } = await userWithCompanyFactory(
-      "MEMBER"
+      "MEMBER",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
     );
 
     const createFormInput = {
@@ -2107,6 +2288,11 @@ describe("Mutation.createForm", () => {
 
   it("should fill denormalized fields upon creation", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const recipient = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const { mutate } = makeClient(user);
 
     const intermediaryCreation = toIntermediaryCompany(company);
@@ -2122,7 +2308,7 @@ describe("Mutation.createForm", () => {
             company: { siret: company.siret }
           },
           transporter: { company: { siret: company.siret } },
-          recipient: { company: { siret: company.siret } },
+          recipient: { company: { siret: recipient.siret } },
           intermediaries: [intermediaryCreation]
         }
       }
@@ -2132,7 +2318,7 @@ describe("Mutation.createForm", () => {
       where: { id: data.createForm.id }
     });
 
-    expect(form.recipientsSirets).toContain(company.siret);
+    expect(form.recipientsSirets).toContain(recipient.siret);
     expect(form.transportersSirets).toContain(company.siret);
     expect(form.intermediariesSirets).toContain(company.siret);
   });
@@ -2190,6 +2376,97 @@ describe("Mutation.createForm", () => {
           "Vous ne pouvez pas utiliser les champs `transporter` et `transporters` en même temps"
       })
     ]);
+  });
+
+  it.each(["", "     "])(
+    "should convert empty onuCode to null",
+    async onuCode => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              company: { siret: company.siret }
+            },
+            wasteDetails: {
+              onuCode
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const form = await prisma.form.findFirstOrThrow({
+        where: { id: data.createForm.id }
+      });
+
+      expect(form.wasteDetailsOnuCode).toBeNull();
+    }
+  );
+  it("should allow to create a form with a nonRoadRegulationMention", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: {
+            nonRoadRegulationMention: "Non road regulation mention"
+          },
+          transporter: { company: { siret: transporter.siret } }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createForm.wasteDetails?.nonRoadRegulationMention).toEqual(
+      "Non road regulation mention"
+    );
+  });
+
+  it("nonRoadRegulationMention is not required", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporter: { company: { siret: transporter.siret } }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createForm.wasteDetails?.nonRoadRegulationMention).toBeNull();
   });
 
   describe("Annexe 1", () => {
@@ -2388,6 +2665,60 @@ describe("Mutation.createForm", () => {
           }
         })
       ]);
+    });
+
+    it("should create an appendix 1 child and copy parent's ADR info in it", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { mutate } = makeClient(user);
+
+      const appendix1Child = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SEALED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      // When
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: "APPENDIX1",
+              company: { siret: company.siret }
+            },
+            transporter: { company: { siret: company.siret } },
+            wasteDetails: {
+              isSubjectToADR: true,
+              onuCode: "Mention ADR",
+              nonRoadRegulationMention: "Mention RID"
+            },
+            grouping: [{ form: { id: appendix1Child.id } }]
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedAppendix1Child = await prisma.form.findFirstOrThrow({
+        where: { id: appendix1Child.id }
+      });
+
+      expect(updatedAppendix1Child.wasteDetailsIsSubjectToADR).toBeTruthy();
+      expect(updatedAppendix1Child.wasteDetailsOnuCode).toBe("Mention ADR");
+      expect(updatedAppendix1Child.wasteDetailsNonRoadRegulationMention).toBe(
+        "Mention RID"
+      );
     });
   });
 

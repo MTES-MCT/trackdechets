@@ -58,12 +58,18 @@ const RhfCompanyTypeForm = ({
   const wasteVehiclesTypes = watch("wasteVehiclesTypes");
   const ecoOrganismeAgreements = watch("ecoOrganismeAgreements");
 
-  // La couche d'affichage des données au niveau de <CompanyTypeForm /> ne fait
-  // pas de différence entre type et sous-type d'établissement. La correspondance
-  // est gérée ici pour mettre à jour l'un des champs suivants :
-  // `companyType`, `wasteProcessTypes`, `collectorTypes` ou `wasteVehiclesTypes`,
-  const handleToggle = (value: AllCompanyType, checked: boolean) => {
-    if (COMPANY_TYPE_VALUES.includes(value as CompanyType)) {
+  // Reçoit le type ou sous-type d'établissement qui a été sélectionné, pour mettre
+  // à jour l'un des champs suivants : `companyType`, `wasteProcessTypes`, `collectorTypes`
+  // ou `wasteVehiclesTypes`.
+  //
+  // Ex pour un type: { parentValue: undefined, value: "PRODUCER"}
+  // Ex pour un sous-type: { parentValue: "COLLECTOR", value: "OTHER_NON_DANGEROUS_WASTES"}
+  const handleToggle = (
+    parentValue: AllCompanyType | undefined,
+    value: AllCompanyType,
+    checked: boolean
+  ) => {
+    if (!parentValue && COMPANY_TYPE_VALUES.includes(value as CompanyType)) {
       if (checked) {
         setValue("companyTypes", [...companyTypes, value as CompanyType], {
           shouldDirty: true,
@@ -81,7 +87,10 @@ const RhfCompanyTypeForm = ({
       }
     }
 
-    if (COLLECTOR_TYPE_VALUES.includes(value as CollectorType)) {
+    if (
+      parentValue === "COLLECTOR" &&
+      COLLECTOR_TYPE_VALUES.includes(value as CollectorType)
+    ) {
       if (checked) {
         setValue(
           "collectorTypes",
@@ -101,7 +110,10 @@ const RhfCompanyTypeForm = ({
       }
     }
 
-    if (WASTE_PROCESSOR_TYPE_VALUES.includes(value as WasteProcessorType)) {
+    if (
+      parentValue === "WASTEPROCESSOR" &&
+      WASTE_PROCESSOR_TYPE_VALUES.includes(value as WasteProcessorType)
+    ) {
       if (checked) {
         setValue(
           "wasteProcessorTypes",
@@ -121,7 +133,10 @@ const RhfCompanyTypeForm = ({
       }
     }
 
-    if (WASTE_VEHICLES_TYPE_VALUES.includes(value as WasteVehiclesType)) {
+    if (
+      parentValue === "WASTE_VEHICLES" &&
+      WASTE_VEHICLES_TYPE_VALUES.includes(value as WasteVehiclesType)
+    ) {
       if (checked) {
         setValue(
           "wasteVehiclesTypes",
@@ -154,9 +169,9 @@ const RhfCompanyTypeForm = ({
 
   const allCompanyTypes = [
     ...companyTypes,
-    ...collectorTypes,
-    ...wasteProcessorTypes,
-    ...wasteVehiclesTypes
+    ...collectorTypes.map(type => `COLLECTOR.${type}`),
+    ...wasteProcessorTypes.map(type => `WASTEPROCESSOR.${type}`),
+    ...wasteVehiclesTypes.map(type => `WASTE_VEHICLES.${type}`)
   ];
 
   const hasSubSectionThree = watch("workerCertification.hasSubSectionThree");

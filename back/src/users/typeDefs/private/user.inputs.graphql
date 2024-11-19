@@ -35,12 +35,37 @@ input CreatePasswordResetRequestInput {
   captcha: CaptchaInput!
 }
 
-input SetCompanyNotificationsInput {
+"""
+Abonnement d'un utilisateur aux notifications d'un ou
+plusieurs établissements
+"""
+input UserNotificationsInput {
+  # Abonnement aux notification de demande de rattachement
+  membershipRequest: Boolean
+  # Abonnement aux notification de renouvellement du code signature
+  signatureCodeRenewal: Boolean
+  # Abonnement aux notifications de refus total ou partiel d'un BSD
+  bsdRefusal: Boolean
+  # Abonnement aux notification de modification de la destination finale amiante
+  bsdaFinalDestinationUpdate: Boolean
+  # Abonnement aux notification de demandes de révision
+  revisionRequest: Boolean
+}
+
+input SubscribeToCompanyNotificationsInput {
   "Identifiant de l'établissement"
   companyOrgId: String!
   """
-  Notifications auxquelles l'utilisateur souhaite être abonné pour l'établisement
-  identifié par le paramètre companyOrgId
+  Notifications auxquelles l'utilisateur souhaite s'abonner / se désabonner
+  pour l'établissement identifié par le paramètre companyOrgId
   """
-  notifications: [UserNotification!]!
+  notifications: UserNotificationsInput!
+}
+
+input SubscribeToNotificationsInput {
+  """
+  Notifications auxquelles l'utilisateur souhaite s'abonner / se désabonner
+  sur l'ensemble de ses établissement
+  """
+  notifications: UserNotificationsInput!
 }

@@ -1483,10 +1483,15 @@ export const canReviewBsdd = (bsd, siret) => {
 };
 
 const canReviewBsddAppendix1 = (bsd, siret) => {
+  const transporterHasSigned = ![
+    BsdStatusCode.Draft,
+    BsdStatusCode.Sealed
+  ].includes(bsd.status);
+
   return (
     bsd.type === BsdType.Bsdd &&
     isAppendix1Producer(bsd) &&
-    BsdStatusCode.Sent === bsd.status &&
+    transporterHasSigned &&
     isSameSiretTransporter(siret, bsd)
   );
 };

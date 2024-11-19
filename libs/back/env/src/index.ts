@@ -124,6 +124,10 @@ export const schema = z.object({
   S3_SECRET_ACCESS_KEY: z.string(),
   S3_BUCKET: z.string(),
   // -------
+  // S3 for registry
+  S3_REGISTRY_ERRORS_BUCKET: z.string(),
+  S3_REGISTRY_IMPORTS_BUCKET: z.string(),
+  // -------
   // S3 for empty bsds templates
   S3_BSD_TEMPLATES_ACCESS_KEY_ID: z.string().optional(),
   S3_BSD_TEMPLATES_SECRET_ACCESS_KEY: z.string().optional(),
@@ -146,7 +150,12 @@ export const schema = z.object({
   GERICO_API_URL: z.string().optional(),
   GERICO_API_KEY: z.string().optional(),
   GERICO_WEBHOOK_SLUG: z.string(),
-  GERICO_WEBHOOK_TOKEN: z.string()
+  GERICO_WEBHOOK_TOKEN: z.string(),
+
+  VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER: z
+    .string()
+    .datetime()
+    .optional()
 });
 
 export const envVariables = schema.superRefine((val, ctx) => {
@@ -173,7 +182,7 @@ export type EnvVariables = z.infer<typeof envVariables>;
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    // eslint-disable-next-line @typescript-eslint/no-empty-interface, @typescript-eslint/no-empty-object-type
     interface ProcessEnv extends z.infer<typeof envVariables> {}
   }
 }

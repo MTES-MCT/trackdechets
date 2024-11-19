@@ -10,12 +10,22 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
-import { EmitterType, Status, WasteAcceptationStatus } from "@prisma/client";
+import {
+  EmitterType,
+  Status,
+  WasteAcceptationStatus,
+  CompanyType,
+  WasteProcessorType
+} from "@prisma/client";
 import {
   CANCELLABLE_BSDD_STATUSES,
   NON_CANCELLABLE_BSDD_STATUSES
 } from "../createFormRevisionRequest";
 import { prisma } from "@td/prisma";
+import {
+  forbbidenProfilesForDangerousWaste,
+  forbbidenProfilesForNonDangerousWaste
+} from "./companyProfiles";
 
 const CREATE_FORM_REVISION_REQUEST = `
   mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
@@ -96,7 +106,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should fail if trying to cancel AND modify the bsdd", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const bsdd = await formFactory({
@@ -128,7 +144,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should fail if revision has no modifications", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const bsdd = await formFactory({
@@ -160,7 +182,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should fail if the bsdd is canceled", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const bsdd = await formFactory({
@@ -193,7 +221,14 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should create a revisionRequest and identifying current user as the requester (emitter)", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -227,9 +262,212 @@ describe("Mutation.createFormRevisionRequest", () => {
       { approverSiret: recipientCompany.siret, status: "PENDING" }
     ]);
   });
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should fail to create a revisionRequest for non dangerous waste to dangerous waste if recipient has not relevant subprofiles (%o)",
+    async opt => {
+      // create a revision from  `10 05 09` to `10 05 10*`
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        opt
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      // non dangerous waste
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: false
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      // make revision to mark the waste as dangerous
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { wasteDetails: { code: "10 05 10*" } },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should fail to create a revisionRequest for dangerous waste if recipient has not relevant subprofiles (%o)",
+    async opt => {
+      // create a revision from  `20 01 27*` to `10 05 10*`
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        opt
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      // non dangerous waste
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsCode: "20 01 27*",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: false
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      // make revision to mark the waste as dangerous
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { wasteDetails: { code: "10 05 10*" } },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForNonDangerousWaste)(
+    "should fail to create a revisionRequest for dangerous watses to non dangerous waste if recipient has not relevant subprofiles (%o)",
+    async opt => {
+      // create a revision from `20 01 27*` to `20 03 01`
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        opt
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+
+          wasteDetailsCode: "20 01 27*",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: false
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+
+            content: { wasteDetails: { code: "20 03 01" } },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForNonDangerousWaste)(
+    "should fail to create a revisionRequest for non dangerous waste if recipient has not relevant subprofiles (%o)",
+    async opt => {
+      // create a revision from `16 02 16` to `20 03 01`
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        opt
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+
+          wasteDetailsCode: "16 02 16",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: false
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+
+            content: { wasteDetails: { code: "20 03 01" } },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
   it("should create a revisionRequest and identifying current user as the requester (eco-organisme)", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
 
     const { user, company: ecoOrganismeCompany } = await userWithCompanyFactory(
       "ADMIN"
@@ -277,7 +515,11 @@ describe("Mutation.createFormRevisionRequest", () => {
     // when an eco-org is on the bsdd, revision requested by the recipient should trigger approvals creation for emitter and ecoorg
     const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company: recipientCompany } = await userWithCompanyFactory(
-      "ADMIN"
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
     );
 
     const { company: ecoOrganismeCompany } = await userWithCompanyFactory(
@@ -385,7 +627,13 @@ describe("Mutation.createFormRevisionRequest", () => {
       " as the requester (transporter when emitterType=APPENIDX_PRODUCER) ",
     async () => {
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
       const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -432,7 +680,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   );
 
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -517,7 +771,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should store flattened input in revision content", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -613,7 +873,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     "should succeed if status is in cancellable list",
     async (status: Status) => {
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
 
@@ -650,7 +916,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     "should fail if status is in non-cancellable list",
     async (status: Status) => {
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
 
@@ -685,7 +957,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   );
 
   it("should fail to cancel if the emitter type is APPENDIX1", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const bsdd = await formFactory({
@@ -721,7 +999,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should fail if trying to use a forbidden waste code on EmitterType.APPENDIX1 bsdd", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const bsdd = await formFactory({
@@ -755,7 +1039,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should fail if quantityReceived is modified and the bsd hasn't been received yet", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -787,7 +1077,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should work if quantityReceived is modified and the bsd has been received", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -821,7 +1117,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should fail if quantityReceived > 40 tons and transportMode = ROAD", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -861,7 +1163,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should work if quantityReceived <= 40 tons and transportMode = ROAD", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -901,7 +1209,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should work if quantityReceived > 40 tons and transportMode != ROAD", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -941,7 +1255,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should fail if operation code has corresponding modes but none is specified", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -971,7 +1291,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should work if operation code has corresponding modes and one is specified", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -1003,7 +1329,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should work if operation code has no corresponding mode", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdd = await formFactory({
       ownerId: user.id,
@@ -1037,7 +1369,13 @@ describe("Mutation.createFormRevisionRequest", () => {
       async status => {
         // Given
         const { company: recipientCompany } = await userWithCompanyFactory(
-          "ADMIN"
+          "ADMIN",
+          {
+            companyTypes: [CompanyType.WASTEPROCESSOR],
+            wasteProcessorTypes: [
+              WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+            ]
+          }
         );
         const { user, company } = await userWithCompanyFactory("ADMIN");
         const bsdd = await formFactory({
@@ -1092,7 +1430,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("can NOT review BSD wasteAcceptationStatus if status is NOT ACCEPTED or TEMP_STORED_ACCEPTED", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1138,7 +1482,13 @@ describe("Mutation.createFormRevisionRequest", () => {
       async status => {
         // Given
         const { company: recipientCompany } = await userWithCompanyFactory(
-          "ADMIN"
+          "ADMIN",
+          {
+            companyTypes: [CompanyType.WASTEPROCESSOR],
+            wasteProcessorTypes: [
+              WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+            ]
+          }
         );
         const { user, company } = await userWithCompanyFactory("ADMIN");
         const bsdd = await formFactory({
@@ -1195,7 +1545,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("can NOT review BSD wasteAcceptationStatus if not defined", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1238,7 +1594,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("cannot specify quantityRefused < quantityReceived if wasteAcceptationStatus = REFUSED", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1284,7 +1646,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("cannot specify quantityRefused > 0 if wasteAcceptationStatus = ACCEPTED", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1330,7 +1698,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("cannot specify quantityRefused = quantityReceived if wasteAcceptationStatus = PARTIALLY_ACCEPTED", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1377,7 +1751,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("bsdd waste is refused > should not be able to update quantityRefused to 0", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1422,7 +1802,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("bsdd waste is accepted > should not be able to update quantityRefused to > 0", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1467,7 +1853,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("bsdd waste is partially refused > should not be able to update quantityRefused to >= quantityReceived", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1512,7 +1904,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("one can update quantityRefused even if not undefined in original bsdd, without specifying the waste acceptation status", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1554,7 +1952,13 @@ describe("Mutation.createFormRevisionRequest", () => {
     it("cannot specify quantityReceived < quantityRefused", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const bsdd = await formFactory({
@@ -1598,7 +2002,13 @@ describe("Mutation.createFormRevisionRequest", () => {
 
     it("should work for APPENDIX1_PRODUCER", async () => {
       const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
       );
       const { user, company } = await userWithCompanyFactory("ADMIN");
 
@@ -1632,7 +2042,13 @@ describe("Mutation.createFormRevisionRequest", () => {
   });
 
   it("should not allow to revise sample number on a non APPENDIX1_PRODUCER BSDD", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const bsdd = await formFactory({

@@ -13,6 +13,7 @@ const CREATE_VHU_FORM = `
 mutation CreateVhuForm($input: BsvhuInput!) {
   createDraftBsvhu(input: $input) {
     id
+    customId
     destination {
       company {
           siret
@@ -85,8 +86,7 @@ describe("Mutation.Vhu.createDraft", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas",
+        message: "Votre établissement doit être visé sur le bordereau",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
@@ -125,5 +125,37 @@ describe("Mutation.Vhu.createDraft", () => {
     expect(data.createDraftBsvhu.destination!.company).toMatchObject(
       input.destination.company
     );
+  });
+
+  it("create a form with a customid", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"]
+    });
+
+    const input = {
+      customId: "my custom id",
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      destination: {
+        company: {
+          siret: destination.siret
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createDraftBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createDraftBsvhu.customId).toEqual("my custom id");
   });
 });

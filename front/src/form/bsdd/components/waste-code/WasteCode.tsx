@@ -30,8 +30,9 @@ function formatWasteCode(wasteCode: string) {
 export function WasteCodeSelect({
   field,
   form,
-  disabled
-}: FieldProps & { disabled: boolean }) {
+  disabled,
+  onSelect
+}: FieldProps & { disabled: boolean; onSelect?: (code) => void }) {
   const [openModal, setOpenModal] = useState(false);
 
   const waste = BSDD_WASTES.find(waste => waste.code === field.value);
@@ -53,6 +54,7 @@ export function WasteCodeSelect({
               onClose={() => setOpenModal(false)}
               onSelect={codes => {
                 form.setFieldValue(field.name, codes[0]);
+                if (onSelect) onSelect(codes[0]);
               }}
             />
           </li>

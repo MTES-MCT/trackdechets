@@ -74,3 +74,31 @@ enum BsdSubType {
   "Synthèse"
   SYNTHESIS
 }
+
+enum RegistryImportType {
+  "Sortie de statut de déchet"
+  SSD
+  "Déchet dangereux et non dangereux entrant"
+  INCOMING_WASTE
+}
+
+enum RegistryImportStatus {
+  PENDING
+  STARTED
+  SUCCESSFUL
+  PARTIALLY_SUCCESSFUL
+  FAILED
+  CANCELED
+}
+
+enum RegistryDownloadTarget {
+  ERROR_FILE
+  IMPORT_FILE
+}
+
+enum RegistryLineReason {
+  "Spécifie que la ligne doit être modifiée dans le registre"
+  EDIT
+  "Spécifie que la ligne doit être supprimée du registre"
+  CANCEL
+}

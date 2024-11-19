@@ -18,9 +18,11 @@ import {
 } from "./components/waste-code";
 import "./WasteInfo.scss";
 import EstimatedQuantityTooltip from "../../common/components/EstimatedQuantityTooltip";
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 type Values = {
   wasteDetails: {
+    isSubjectToADR: boolean | null;
     code: string;
     packagings: string[];
     parcelNumbers: any[];
@@ -77,6 +79,11 @@ export default connect<{ disabled }, Values>(function WasteInfo({
           component={WasteCodeSelect}
           validate={bsddWasteCodeValidator}
           disabled={disabled}
+          onSelect={code => {
+            if (isDangerous(code)) {
+              setFieldValue("wasteDetails.isSubjectToADR", true);
+            }
+          }}
         />
       </div>
 
@@ -275,19 +282,48 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         </>
       )}
 
-      <div className="form__row">
+      <div className="form__row fr-mt-8v">
+        <ToggleSwitch
+          onChange={e => {
+            setFieldValue("wasteDetails.isSubjectToADR", e);
+            if (!e) {
+              setFieldValue("wasteDetails.onuCode", null);
+            }
+          }}
+          inputTitle={"Test"}
+          label="Le déchet est soumis à l'ADR"
+          checked={values.wasteDetails.isSubjectToADR ?? false}
+        />
+
+        {values.wasteDetails.isSubjectToADR && (
+          <div className="fr-ml-18v">
+            <label>
+              Mention au titre du règlement ADR{" "}
+              <Field
+                type="text"
+                name="wasteDetails.onuCode"
+                className="td-input"
+                disabled={disabled}
+              />
+            </label>
+
+            <RedErrorMessage name="wasteDetails.onuCode" />
+          </div>
+        )}
+      </div>
+
+      <div className="form__row fr-ml-18v">
         <label>
-          Mentions au titre des règlements ADR, RID, ADNR, IMDG{" "}
-          {!isDangerous(values.wasteDetails.code) && "(optionnel)"}
+          Mention au titre des règlements RID, ADNR, IMDG (optionnel){" "}
           <Field
             type="text"
-            name="wasteDetails.onuCode"
+            name="wasteDetails.nonRoadRegulationMention"
             className="td-input"
             disabled={disabled}
           />
         </label>
 
-        <RedErrorMessage name="wasteDetails.onuCode" />
+        <RedErrorMessage name="wasteDetails.nonRoadRegulationMention" />
       </div>
 
       {SOIL_CODES.includes(values.wasteDetails.code) ||

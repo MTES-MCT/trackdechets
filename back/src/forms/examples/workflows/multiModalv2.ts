@@ -8,6 +8,7 @@ import { signTransportForm } from "../steps/signTransportForm";
 import { createFormTransporter } from "../steps/createFormTransporter";
 import { updateFormTransporterPlates } from "../steps/updateFormTransporter";
 import { updateFormTransporters } from "../steps/updateForm";
+import { WasteProcessorType } from "@prisma/client";
 
 const workflow: Workflow = {
   title: "Transport multi-modal (amélioration juillet 2023)",
@@ -25,7 +26,11 @@ const workflow: Workflow = {
     { name: "transporteur1", companyTypes: ["TRANSPORTER"] },
     { name: "transporteur2", companyTypes: ["TRANSPORTER"] },
     { name: "transporteur3", companyTypes: ["TRANSPORTER"] },
-    { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
+    {
+      name: "traiteur",
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    }
   ],
   steps: [
     {

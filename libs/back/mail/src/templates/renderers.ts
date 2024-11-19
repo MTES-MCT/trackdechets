@@ -93,6 +93,7 @@ export function renderMail<V>(
     subject,
     templateId: mailTemplate.templateId,
     ...sanitizeMailProps(mailProps),
+    params: mailTemplate.params,
     vars // pass vars to mail provider
   };
 }

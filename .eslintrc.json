@@ -35,6 +35,9 @@
             "args": "after-used",
             "varsIgnorePattern": "^_",
             "argsIgnorePattern": "^_",
+            "caughtErrors": "all",
+            "caughtErrorsIgnorePattern": "^_",
+            "destructuredArrayIgnorePattern": "^_",
             "ignoreRestSiblings": true
           }
         ]
@@ -43,7 +46,9 @@
     {
       "files": ["*.js", "*.jsx"],
       "extends": ["plugin:@nx/javascript"],
-      "rules": {}
+      "rules": {
+        "no-extra-semi": "off"
+      }
     },
     {
       "files": [

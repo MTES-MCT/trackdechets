@@ -6,15 +6,22 @@ import "./CountrySelector.scss";
 interface CountrySelectorProps {
   onChange: (code: string) => void;
   value: string;
+  cca2sToExclude?: string[]; // country code to exlude from select
 }
 
 export default function CountrySelector(props: CountrySelectorProps) {
+  const { cca2sToExclude = [] } = props;
+
   const currentCountry =
     countries.find(country => country.cca2 === props.value) ?? null;
+
+  const options = countries.filter(
+    country => !cca2sToExclude.includes(country.cca2)
+  );
   return (
     <Select
       {...props}
-      options={countries}
+      options={options}
       onChange={option =>
         props.onChange(
           // option can be null, an option or an array of options

@@ -13,8 +13,10 @@ docker-compose.override.yml
 /dist
 /out-tsc
 .nx/cache
+.nx/workspace-data
 generated
 .DS_Store
+.nx
 
 # Generated Docusaurus files
 .docusaurus/

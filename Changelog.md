@@ -5,6 +5,40 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.11.1] 19/11/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Permettre l'ajout d'un numéro libre sur le Bsvhu [PR 3718](https://github.com/MTES-MCT/trackdechets/pull/3718)
+- Permettre à l'utilisateur de gérer les alertes de tous ses établissements [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
+- Afficher le nombre d'inscrits par type d'alertes au sein d'un établissement [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
+- Ajouter un lien "Gérer mes préférences e-mails" dans les e-mails transactionnels auquel l'utilisateur est en capacité de s'inscrire / désinscrire [PR 3738](https://github.com/MTES-MCT/trackdechets/pull/3738)
+
+#### :nail_care: Améliorations
+
+- La mention ADR a été séparée des mentions RID, ADNR, IMDG, et désormais un switch permet de préciser si elle est obligatoire pour un BSDD ou non (+ amélioration du PDF) [PR 3714](https://github.com/MTES-MCT/trackdechets/pull/3714) [PR 3717](https://github.com/MTES-MCT/trackdechets/pull/3717) [PR 3724](https://github.com/MTES-MCT/trackdechets/pull/3724)
+
+#### :boom: Breaking changes
+
+- Le champ "Numéro de notification" est obligatoire lorsque la destination ultérieure renseignée est étrangère [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
+- La présence d'une quantité reçue est requise pour passer du statut SENT à ACCEPTED via la mutation markAsReceived [PR 3720](https://github.com/MTES-MCT/trackdechets/pull/3720)
+- Restriction des TTR et Installations de traitement à être visés sur un BSDD selon leur type de profil [PR 3725](https://github.com/MTES-MCT/trackdechets/pull/3725)
+
+#### :bug: Corrections de bugs
+
+- Corrige l'indexation des annexes 1 orphelines et draft [PR 3721](https://github.com/MTES-MCT/trackdechets/pull/3721)
+- Dans l'onglet "A collecter", l'icône d'immatriculation est disponible pour tous les BSDs [PR 3715](https://github.com/MTES-MCT/trackdechets/pull/3715)
+- Le profil "Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780)" ne se coche plus automatiquement lorsqu'on sélectionne le profil TTR "Autre cas de déchets non dangereux (Rubrique 2731) et inversement [PR 3726](https://github.com/MTES-MCT/trackdechets/pull/3726)
+- ETQ intermédiaire, je peux créer un BSDA sur lequel j'apparais [PR 3732](https://github.com/MTES-MCT/trackdechets/pull/3732)
+- ETQ utilisateur je peux réviser un DASRI en attente d'un bordereau suite [PR 3734](https://github.com/MTES-MCT/trackdechets/pull/3734)
+- ETQ transporteur je peux réviser une Annexe 1 [PR 3740](https://github.com/MTES-MCT/trackdechets/pull/3740)
+- La mention ADR d'un BSDD n'est plus dupliquée [PR 3703](https://github.com/MTES-MCT/trackdechets/pull/3703)
+
+#### :house: Interne
+
+- Amélioration de l'interface d'admin [PR 3735](https://github.com/MTES-MCT/trackdechets/pull/3735)
+- Modification de la query controlBsds et fermeture de la query bsds aux comptes gouvernementaux [PR 3270](https://github.com/MTES-MCT/trackdechets/pull/3270)
+
 # [2024.10.1] 22/10/2024
 
 #### :rocket: Nouvelles fonctionnalités
@@ -20,6 +54,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - ETQ membre d'un établissement, je peux gérer mes préférences de notifications (demandes de rattachement, demandes de révisions, renouvellement code signature, etc) en lien avec cet établissement [PR 3634](https://github.com/MTES-MCT/trackdechets/pull/3634)
 - Amélioration du contenu de l'e-mail transactionnel envoyé au contact d'un établissement visé sur un bordereau en tant qu'émetteur [PR 3635](https://github.com/MTES-MCT/trackdechets/pull/3635)
 - Rendre les brouillons BSVHU non accessibles aux entreprises mentionnées sur le bordereau mais qui n'en sont pas les auteurs [PR 3677](https://github.com/MTES-MCT/trackdechets/pull/3677)
+- Modification des valeurs de l'enum EmptyReturnADR [PR 3707](https://github.com/MTES-MCT/trackdechets/pull/3707)
 
 #### :boom: Breaking changes
 

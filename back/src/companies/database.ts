@@ -8,9 +8,7 @@ import {
   Prisma,
   Company,
   CompanyAssociation,
-  UserAccountHash,
-  UserNotification,
-  UserRole
+  UserAccountHash
 } from "@prisma/client";
 import {
   CompanyNotFound,
@@ -33,7 +31,12 @@ import {
   searchVatFrOnlyOrNotFoundFailFast
 } from "./search";
 import { SireneSearchResult } from "./sirene/types";
-import { ALL_NOTIFICATIONS } from "../users/notifications";
+import {
+  getDefaultNotifications,
+  notificationToPrismaField,
+  toGqlNotifications,
+  UserNotification
+} from "../users/notifications";
 
 /**
  * Retrieves a company by any unique identifier or throw a CompanyNotFound error
@@ -204,7 +207,7 @@ export const userAssociationToCompanyMember = (
     name: userNameDisplay(companyAssociation, requestingUserId, isTDAdmin),
     role: companyAssociation.role,
     isPendingInvitation: false,
-    notifications: companyAssociation.notifications
+    notifications: toGqlNotifications(companyAssociation)
   };
 };
 
@@ -226,8 +229,9 @@ export const userAccountHashToCompanyMember = (
     role: userAccountHash.role,
     isActive: false,
     isPendingInvitation: true,
-    notifications:
-      userAccountHash.role === UserRole.ADMIN ? ALL_NOTIFICATIONS : []
+    notifications: toGqlNotifications(
+      getDefaultNotifications(userAccountHash.role)
+    )
   };
 };
 
@@ -329,7 +333,7 @@ export const getCompaniesAndSubscribersByCompanyOrgIds = async (
     include: {
       companyAssociations: {
         where: {
-          notifications: { has: notification },
+          [notificationToPrismaField[notification]]: true,
           user: {
             isActive: true
           }

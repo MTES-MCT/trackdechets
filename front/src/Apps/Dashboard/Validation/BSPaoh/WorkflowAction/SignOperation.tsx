@@ -3,7 +3,7 @@ import { useMutation } from "@apollo/client";
 import {
   UPDATE_BSPAOH,
   SIGN_BSPAOH
-} from "../../../Creation/bspaoh/utils/queries";
+} from "../../../../../Apps/common/queries/bspaoh/queries";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";

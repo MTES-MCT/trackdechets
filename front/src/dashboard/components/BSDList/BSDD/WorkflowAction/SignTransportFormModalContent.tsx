@@ -187,7 +187,7 @@ export default function SignTransportFormModalContent({
             }
           });
           onClose();
-        } catch (err) {
+        } catch (_) {
           // Ignore error
         }
       }}

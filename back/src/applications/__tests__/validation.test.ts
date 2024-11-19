@@ -3,7 +3,6 @@ import { applicationSchema } from "../validation";
 
 const application: CreateApplicationInput = {
   name: "Waste Manager",
-  logoUrl: "https://wastemanager.fr/assets/logo.jpg",
   redirectUris: ["https://api.wastemanager.fr/callback"],
   goal: "CLIENTS"
 };
@@ -26,15 +25,6 @@ describe("applicationSchema", () => {
       applicationSchema.validate({
         ...application,
         redirectUris: ["ceci n'est pas une URL"]
-      });
-    await expect(shouldThrow()).rejects.toThrowError("URL invalide");
-  });
-
-  test("invalid logoUrl", async () => {
-    const shouldThrow = () =>
-      applicationSchema.validate({
-        ...application,
-        logoUrl: "ceci n'est pas une URL"
       });
     await expect(shouldThrow()).rejects.toThrowError("URL invalide");
   });

@@ -1,4 +1,10 @@
-import { Company, User, UserRole } from "@prisma/client";
+import {
+  Company,
+  User,
+  UserRole,
+  WasteProcessorType,
+  CompanyType
+} from "@prisma/client";
 import {
   Query,
   QueryBsdsArgs,
@@ -84,17 +90,17 @@ describe("Query.bsds workflow", () => {
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
-        set: ["PRODUCER"]
+        set: [CompanyType.PRODUCER]
       }
     });
     intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
       companyTypes: {
-        set: ["TRANSPORTER"]
+        set: [CompanyType.TRANSPORTER]
       }
     });
     transporter = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
-        set: ["TRANSPORTER"]
+        set: [CompanyType.TRANSPORTER]
       }
     });
     await transporterReceiptFactory({
@@ -103,7 +109,10 @@ describe("Query.bsds workflow", () => {
 
     recipient = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
-        set: ["WASTEPROCESSOR"]
+        set: [CompanyType.WASTEPROCESSOR]
+      },
+      wasteProcessorTypes: {
+        set: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
       }
     });
     (searchCompany as jest.Mock).mockResolvedValue({

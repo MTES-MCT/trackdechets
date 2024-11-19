@@ -408,6 +408,12 @@ export const cloneBsff = async (user: Express.User, id: string) => {
     throw new UserInputError(`ID invalide ${id}`);
   }
 
+  if (bsff.packagings?.some(packaging => packaging.nextPackagingId)) {
+    throw new UserInputError(
+      "Impossible de cloner ce type de BSD pour le moment"
+    );
+  }
+
   const { create } = getBsffRepository(user);
 
   const newBsffCreateInput: Omit<
@@ -441,7 +447,12 @@ export const cloneBsff = async (user: Express.User, id: string) => {
     emitterEmissionSignatureAuthor: bsff.emitterEmissionSignatureAuthor,
     emitterEmissionSignatureDate: bsff.emitterEmissionSignatureDate,
     ficheInterventions: bsff.ficheInterventions.length
-      ? { create: bsff.ficheInterventions[0] }
+      ? {
+          create: {
+            ...bsff.ficheInterventions[0],
+            id: undefined
+          }
+        }
       : {},
     isDeleted: bsff.isDeleted,
     isDraft: bsff.isDraft,
@@ -534,6 +545,7 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
   > = {
     id: getReadableId(ReadableIdPrefix.VHU),
     createdAt: bsvhu.createdAt,
+    customId: null,
     destinationAgrementNumber: bsvhu.destinationAgrementNumber,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationCompanyContact: bsvhu.destinationCompanyContact,
@@ -930,11 +942,14 @@ export const cloneBsdd = async (
     wasteAcceptationStatus: bsdd.wasteAcceptationStatus,
     wasteDetailsAnalysisReferences: bsdd.wasteDetailsAnalysisReferences,
     wasteDetailsCode: bsdd.wasteDetailsCode,
+    wasteDetailsIsSubjectToADR: bsdd.wasteDetailsIsSubjectToADR,
     wasteDetailsConsistence: bsdd.wasteDetailsConsistence,
     wasteDetailsIsDangerous: bsdd.wasteDetailsIsDangerous,
     wasteDetailsLandIdentifiers: bsdd.wasteDetailsLandIdentifiers,
     wasteDetailsName: bsdd.wasteDetailsName,
     wasteDetailsOnuCode: bsdd.wasteDetailsOnuCode,
+    wasteDetailsNonRoadRegulationMention:
+      bsdd.wasteDetailsNonRoadRegulationMention,
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       bsdd.wasteDetailsPackagingInfos
     ),

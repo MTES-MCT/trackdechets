@@ -10,7 +10,8 @@ export const revisionDasriRules = {
     revisable: [
       BsdasriStatus.Sent,
       BsdasriStatus.Received,
-      BsdasriStatus.Processed
+      BsdasriStatus.Processed,
+      BsdasriStatus.AwaitingGroup
     ]
   },
 
@@ -18,19 +19,24 @@ export const revisionDasriRules = {
     revisable: [
       BsdasriStatus.Sent,
       BsdasriStatus.Received,
-      BsdasriStatus.Processed
+      BsdasriStatus.Processed,
+      BsdasriStatus.AwaitingGroup
     ]
   },
 
   "destination.reception.packagings": {
-    revisable: [BsdasriStatus.Received, BsdasriStatus.Processed]
+    revisable: [
+      BsdasriStatus.Received,
+      BsdasriStatus.Processed,
+      BsdasriStatus.AwaitingGroup
+    ]
   },
   "destination.operation.code": {
-    revisable: [BsdasriStatus.Processed]
+    revisable: [BsdasriStatus.Processed, BsdasriStatus.AwaitingGroup]
   },
 
   "destination.operation.weight": {
-    revisable: [BsdasriStatus.Processed]
+    revisable: [BsdasriStatus.Processed, BsdasriStatus.AwaitingGroup]
   }
 };
 

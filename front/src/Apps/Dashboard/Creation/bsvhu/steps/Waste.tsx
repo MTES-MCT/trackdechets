@@ -8,6 +8,7 @@ import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { ZodBsvhu } from "../schema";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { setFieldError, TabError } from "../../utils";
+import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
 const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
   const { register, watch, setValue, formState, setError } =
@@ -46,7 +47,13 @@ const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
   return (
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
-
+      <div className="fr-col-md-12 fr-mb-4w">
+        <Input
+          label="Numéro libre"
+          disabled={sealedFields.includes("customId")}
+          nativeInputProps={{ ...register("customId") }}
+        />
+      </div>
       <WasteRadioGroup
         title="Déchet"
         disabled={sealedFields.includes("wasteCode")}
@@ -129,7 +136,7 @@ const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
       <h4 className="fr-h4">Quantité remise</h4>
       <div className="fr-grid-row">
         <div className="fr-col-12 fr-col-md-6">
-          <Input
+          <NonScrollableInput
             label="En nombre"
             disabled
             nativeInputProps={{
@@ -143,7 +150,7 @@ const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
       </div>
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top  fr-mt-5v">
         <div className="fr-col-12 fr-col-md-6">
-          <Input
+          <NonScrollableInput
             label="Poids total en tonnes"
             disabled={sealedFields.includes("weight.value")}
             state={formState.errors?.weight?.value && "error"}

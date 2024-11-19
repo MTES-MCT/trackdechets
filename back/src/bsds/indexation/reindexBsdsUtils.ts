@@ -64,7 +64,7 @@ export const toBsdId = (chunk: string) => {
     const suffix = extractSuffix(prefix, rest2);
 
     return `${prefix}-${date}-${suffix}`;
-  } catch (e) {
+  } catch (_) {
     throw new UserInputError(
       `"${chunk}" n'est pas un identifiant de bordereau valide`
     );

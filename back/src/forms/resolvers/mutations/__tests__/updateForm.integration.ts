@@ -1,4 +1,10 @@
-import { EmitterType, Status, UserRole } from "@prisma/client";
+import {
+  EmitterType,
+  Status,
+  UserRole,
+  CompanyType,
+  WasteProcessorType
+} from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";
@@ -27,6 +33,10 @@ import { getFirstTransporter, getTransportersSync } from "../../../database";
 import { getStream } from "../../../../activity-events";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 import { waitForJobsCompletion } from "../../../../queue/helpers";
+import {
+  forbbidenProfilesForDangerousWaste,
+  forbbidenProfilesForNonDangerousWaste
+} from "./companyProfiles";
 
 jest.mock("../../../sirenify");
 (sirenifyFormInput as jest.Mock).mockImplementation(input =>
@@ -247,7 +257,10 @@ describe("Mutation.updateForm", () => {
 
   it("should be possible for the TTR to resend the same data on the temporaryStorateDetail input", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
-    const ttr = await userWithCompanyFactory("ADMIN");
+    const ttr = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const destination = await companyFactory();
 
     const form = await formWithTempStorageFactory({
@@ -279,7 +292,10 @@ describe("Mutation.updateForm", () => {
 
   it("should not be possible to update intermediaries when emitter has signed", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
-    const destination = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const intermediary1 = await companyFactory();
     const intermediary2 = await companyFactory();
     const form = await formFactory({
@@ -339,7 +355,10 @@ describe("Mutation.updateForm", () => {
 
   it("should be possible to resend same intermediaries data when emitter has signed", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
-    const destination = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const intermediary1 = await companyFactory();
     const form = await formFactory({
       ownerId: emitter.user.id,
@@ -370,7 +389,10 @@ describe("Mutation.updateForm", () => {
 
   it("should be possible to resend same Decimal value when emitter has signed", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
-    const destination = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const intermediary1 = await companyFactory();
     const form = await formFactory({
       ownerId: emitter.user.id,
@@ -399,13 +421,21 @@ describe("Mutation.updateForm", () => {
     expect(errors).toBeUndefined();
   });
 
-  it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
+  it.each(["emitter", "trader", "broker", "transporter"])(
     "should allow %p to update a draft form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      // recipient needs appropriate profiles and subprofiles
+      const destination = await companyFactory({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+
       const form = await formFactory({
         ownerId: user.id,
         opt: {
+          recipientCompanySiret: destination.siret,
           status: "DRAFT",
           ...(role === "transporter"
             ? {
@@ -432,11 +462,288 @@ describe("Mutation.updateForm", () => {
       const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
         variables: { updateFormInput }
       });
+
       expect(data.updateForm.wasteDetails).toMatchObject(
         updateFormInput.wasteDetails
       );
       // check input is sirenified
       expect(sirenifyFormInput as jest.Mock).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  it("should allow recipient to update a draft form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        code: "01 01 01"
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.wasteDetails).toMatchObject(
+      updateFormInput.wasteDetails
+    );
+    // check input is sirenified
+    expect(sirenifyFormInput as jest.Mock).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should forbid recipient without inappropriate profile %o on a draft bsdd with dangerous waste code",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: company.siret
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should forbid recipient without inappropriate profile %o on a draft bsdd with non dangerous waste and isDangerous",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: company.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsIsDangerous: true
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should forbid recipient without inappropriate profile %o on a draft bsdd with non dangerous waste code and pop",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: company.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsPop: true
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForNonDangerousWaste)(
+    "should forbid recipient without inappropriate profile %o on a draft bsdd with non dangerous waste",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: company.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: false
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should allow recipient with inappropriate profile %o on a draft bsdd with dangerous waste code on bsdd created before VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: company.siret,
+          createdAt: new Date("2024-10-01T00:00:00.000Z") // created before VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toBe(undefined);
+    }
+  );
+
+  it.each(forbbidenProfilesForNonDangerousWaste)(
+    "should allow recipient with inappropriate profile %o on a draft bsdd with non dangerous waste on bsdd created before VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: company.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: false,
+          createdAt: new Date("2024-10-01T00:00:00.000Z") // created before VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toBe(undefined);
     }
   );
 
@@ -449,11 +756,19 @@ describe("Mutation.updateForm", () => {
     await transporterReceiptFactory({
       company: transporterCompany
     });
+
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
         transporters: {
           create: {
             transporterCompanySiret: company.siret,
@@ -487,11 +802,19 @@ describe("Mutation.updateForm", () => {
     const transporterCompany = await companyFactory({
       companyTypes: ["TRANSPORTER"]
     });
+
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
         transporters: {
           create: {
             transporterCompanySiret: company.siret,
@@ -523,12 +846,20 @@ describe("Mutation.updateForm", () => {
   it("should let the transporter receipt unchanged if transporter is unchanged", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const receipt = await transporterReceiptFactory({ company });
-    // form receipt is fileld
+
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    // form receipt is filled
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
         transporters: {
           create: {
             transporterCompanySiret: company.siret,
@@ -560,13 +891,22 @@ describe("Mutation.updateForm", () => {
     );
   });
 
-  it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
+  it.each(["emitter", "trader", "broker", "transporter"])(
     "should allow %p to update a sealed form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      // recipient needs appropriate profiles and subprofiles
+      const destination = await companyFactory({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+
       const form = await formFactory({
         ownerId: user.id,
         opt: {
+          recipientCompanySiret: destination.siret,
+
           status: "SEALED",
           ...(role === "transporter"
             ? {
@@ -612,12 +952,295 @@ describe("Mutation.updateForm", () => {
     }
   );
 
+  it("should allow recipient to update a sealed form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        code: "08 01 11*"
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(data.updateForm.wasteDetails).toMatchObject(
+      updateFormInput.wasteDetails
+    );
+  });
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should forbid recipient without inappropriate profile %o on a sealed bsdd with dangerous waste code",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "SEALED",
+          emitterCompanySiret: company.siret
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should forbid recipient without inappropriate profile %o on a SEALED bsdd with non dangerous waste and isDangerous",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "SEALED",
+          emitterCompanySiret: company.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsIsDangerous: true
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should forbid recipient without inappropriate profile %o on a sealed bsdd with non dangerous waste code and pop",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "SEALED",
+          emitterCompanySiret: company.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsPop: true
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForNonDangerousWaste)(
+    "should forbid recipient without inappropriate profile %o on a sealed bsdd with non dangerous waste",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "SEALED",
+          emitterCompanySiret: company.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: false
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
+          extensions: {
+            code: "BAD_USER_INPUT"
+          }
+        })
+      ]);
+    }
+  );
+
+  it.each(forbbidenProfilesForDangerousWaste)(
+    "should allow recipient with inappropriate profile %o on a sealed bsdd with dangerous waste code on bsdd created before VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "SEALED",
+          emitterCompanySiret: company.siret,
+          createdAt: new Date("2024-10-01T00:00:00.000Z") // created before VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toBe(undefined);
+    }
+  );
+
+  it.each(forbbidenProfilesForNonDangerousWaste)(
+    "should allow recipient with inappropriate profile %o on a sealed bsdd with non dangerous waste on bsdd created before VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER",
+    async opt => {
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "SEALED",
+          emitterCompanySiret: company.siret,
+          wasteDetailsCode: "10 05 09",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: false,
+          createdAt: new Date("2024-10-01T00:00:00.000Z") // created before VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const destination = await companyFactory(opt);
+      const updateFormInput = {
+        id: form.id,
+        recipient: {
+          company: { siret: destination.siret }
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toBe(undefined);
+    }
+  );
+
   it("should allow a destination after temp storage to update a form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
+    //  recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const form = await formWithTempStorageFactory({
       ownerId: user.id,
-      opt: { status: "DRAFT" },
+      opt: { status: "DRAFT", recipientCompanySiret: destination.siret },
       forwardedInOpts: { recipientCompanySiret: company.siret }
     });
 
@@ -715,13 +1338,21 @@ describe("Mutation.updateForm", () => {
         siret: eo.siret!
       }
     });
+
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
+
       opt: {
         status: "DRAFT",
         emitterType: "OTHER",
         ecoOrganismeName: eo.name,
-        ecoOrganismeSiret: eo.siret
+        ecoOrganismeSiret: eo.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -805,6 +1436,12 @@ describe("Mutation.updateForm", () => {
 
   it("should update the eco-organisme", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const originalEO = await companyFactory({
       companyTypes: {
         set: ["ECO_ORGANISME"]
@@ -823,7 +1460,8 @@ describe("Mutation.updateForm", () => {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
         ecoOrganismeName: originalEO.name,
-        ecoOrganismeSiret: originalEO.siret
+        ecoOrganismeSiret: originalEO.siret,
+        recipientCompanySiret: destination.siret
       }
     });
     const newEO = await companyFactory({
@@ -872,13 +1510,19 @@ describe("Mutation.updateForm", () => {
         siret: eo.siret!
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
         ecoOrganismeName: eo.name,
-        ecoOrganismeSiret: eo.siret
+        ecoOrganismeSiret: eo.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -898,12 +1542,17 @@ describe("Mutation.updateForm", () => {
   it("should add the first intermediary on an existing draft", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -930,11 +1579,18 @@ describe("Mutation.updateForm", () => {
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
     const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
 
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
         intermediaries: {
           create: [toIntermediaryCompany(intermediary.company)]
         }
@@ -994,12 +1650,17 @@ describe("Mutation.updateForm", () => {
   it("should remove the intermediary when input is an empty array", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
         intermediaries: {
           create: [toIntermediaryCompany(intermediary.company)]
         }
@@ -1025,12 +1686,17 @@ describe("Mutation.updateForm", () => {
   it("should remove the intermediary when input intermediaries is null", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
         intermediaries: {
           create: [toIntermediaryCompany(intermediary.company)]
         }
@@ -1056,12 +1722,17 @@ describe("Mutation.updateForm", () => {
   it("should not update the intermediary when no input", async () => {
     const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
         intermediaries: {
           create: [toIntermediaryCompany(intermediary.company)]
         }
@@ -1091,11 +1762,17 @@ describe("Mutation.updateForm", () => {
   it("should update a form as an intermediary", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "SEALED",
         emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
         intermediaries: {
           create: [toIntermediaryCompany(intermediary.company)]
         }
@@ -1125,11 +1802,17 @@ describe("Mutation.updateForm", () => {
 
   it("should update a form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -1150,11 +1833,17 @@ describe("Mutation.updateForm", () => {
 
   it("should update a form with a PIPELINE packaging, erasing transporter infos and forcing transporter mode OTHER", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -1226,11 +1915,17 @@ describe("Mutation.updateForm", () => {
 
   it("should add a temporary storage", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -1259,11 +1954,17 @@ describe("Mutation.updateForm", () => {
 
   it("should add a temporary storage even if temporaryStorageDetail is empty ", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -1291,12 +1992,18 @@ describe("Mutation.updateForm", () => {
 
   it("should update the temporary storage", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
         recipientIsTempStorage: true,
+        recipientCompanySiret: destination.siret,
         forwardedIn: {
           create: {
             readableId: getReadableId(),
@@ -1329,11 +2036,17 @@ describe("Mutation.updateForm", () => {
 
   it("should remove a temporary storage", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
         forwardedIn: {
           create: {
             readableId: getReadableId(),
@@ -1360,14 +2073,23 @@ describe("Mutation.updateForm", () => {
 
   it("should add a recipient", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
-    const newRecipientCompany = await companyFactory();
+    const newRecipientCompany = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const { mutate } = makeClient(user);
     const updateFormInput = {
@@ -1391,7 +2113,12 @@ describe("Mutation.updateForm", () => {
 
   it("should update the recipient", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const originalRecipientCompany = await companyFactory();
+    // recipient needs appropriate profiles and subprofiles
+    const originalRecipientCompany = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -1400,8 +2127,11 @@ describe("Mutation.updateForm", () => {
         recipientCompanySiret: originalRecipientCompany.siret
       }
     });
-    const newRecipientCompany = await companyFactory();
 
+    const newRecipientCompany = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const updateFormInput = {
       id: form.id,
       recipient: {
@@ -1513,6 +2243,11 @@ describe("Mutation.updateForm", () => {
         quantityGrouped: 0
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
@@ -1520,6 +2255,8 @@ describe("Mutation.updateForm", () => {
         emitterType: EmitterType.APPENDIX2,
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
+        recipientCompanySiret: destination.siret,
+
         grouping: {
           create: {
             initialFormId: appendixForm.id,
@@ -1575,6 +2312,11 @@ describe("Mutation.updateForm", () => {
         quantityReceived: 1
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
@@ -1582,6 +2324,8 @@ describe("Mutation.updateForm", () => {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
+        recipientCompanySiret: destination.siret,
+
         grouping: {
           create: {
             initialFormId: appendixForm.id,
@@ -1620,6 +2364,11 @@ describe("Mutation.updateForm", () => {
         quantityReceived: 1
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: ttrUser.id,
@@ -1627,6 +2376,8 @@ describe("Mutation.updateForm", () => {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
+        recipientCompanySiret: destination.siret,
+
         grouping: {
           create: {
             initialFormId: appendixForm.id,
@@ -1676,6 +2427,11 @@ describe("Mutation.updateForm", () => {
           quantityReceived: 1
         }
       });
+      // recipient needs appropriate profiles and subprofiles
+      const destination = await companyFactory({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const form = await formFactory({
         ownerId: user.id,
@@ -1683,6 +2439,8 @@ describe("Mutation.updateForm", () => {
           status: Status.SEALED,
           emitterCompanySiret: ttr.siret,
           emitterType: EmitterType.APPENDIX2,
+          recipientCompanySiret: destination.siret,
+
           grouping: {
             create: {
               initialFormId: initialAppendix2.id,
@@ -1729,6 +2487,11 @@ describe("Mutation.updateForm", () => {
           quantityReceived: 1
         }
       });
+      // recipient needs appropriate profiles and subprofiles
+      const destination = await companyFactory({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const form = await formFactory({
         ownerId: user.id,
@@ -1736,6 +2499,8 @@ describe("Mutation.updateForm", () => {
           status: Status.SEALED,
           emitterCompanySiret: ttr.siret,
           emitterType: EmitterType.APPENDIX2,
+          recipientCompanySiret: destination.siret,
+
           grouping: {
             create: {
               initialFormId: initialAppendix2.id,
@@ -1785,6 +2550,11 @@ describe("Mutation.updateForm", () => {
         quantityReceived: 1
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
@@ -1792,6 +2562,8 @@ describe("Mutation.updateForm", () => {
         status: "DRAFT",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
+        recipientCompanySiret: destination.siret,
+
         grouping: {
           create: {
             initialFormId: appendixForm.id,
@@ -1836,13 +2608,19 @@ describe("Mutation.updateForm", () => {
           recipientCompanySiret: producer.siret
         }
       });
+      // recipient needs appropriate profiles and subprofiles
+      const destination = await companyFactory({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
 
       const form = await formFactory({
         ownerId: user.id,
         opt: {
           status: "DRAFT",
           emitterCompanySiret: producer.siret,
-          emitterType: EmitterType.PRODUCER
+          emitterType: EmitterType.PRODUCER,
+          recipientCompanySiret: destination.siret
         }
       });
 
@@ -1884,12 +2662,19 @@ describe("Mutation.updateForm", () => {
         }
       });
 
+      // recipient needs appropriate profiles and subprofiles
+      const destination = await companyFactory({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+
       const form = await formFactory({
         ownerId: user.id,
         opt: {
           status: "DRAFT",
           emitterCompanySiret: producer.siret,
-          emitterType: EmitterType.PRODUCER
+          emitterType: EmitterType.PRODUCER,
+          recipientCompanySiret: destination.siret
         }
       });
 
@@ -1930,6 +2715,11 @@ describe("Mutation.updateForm", () => {
         quantityReceived: 1
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
@@ -1937,6 +2727,8 @@ describe("Mutation.updateForm", () => {
         status: "DRAFT",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
+        recipientCompanySiret: destination.siret,
+
         grouping: {
           create: {
             initialFormId: appendixForm.id,
@@ -1974,6 +2766,11 @@ describe("Mutation.updateForm", () => {
         quantityReceived: 1
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
@@ -1981,6 +2778,8 @@ describe("Mutation.updateForm", () => {
         status: "DRAFT",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
+        recipientCompanySiret: destination.siret,
+
         grouping: {
           create: {
             initialFormId: appendixForm.id,
@@ -2019,13 +2818,19 @@ describe("Mutation.updateForm", () => {
         quantityGrouped: 1
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
-        emitterType: EmitterType.APPENDIX2
+        emitterType: EmitterType.APPENDIX2,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2076,13 +2881,19 @@ describe("Mutation.updateForm", () => {
         quantityReceived: 1
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const groupingForm1 = await formFactory({
       ownerId: user.id,
       opt: {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
-        emitterType: EmitterType.APPENDIX2
+        emitterType: EmitterType.APPENDIX2,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2091,7 +2902,8 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
-        emitterType: EmitterType.APPENDIX2
+        emitterType: EmitterType.APPENDIX2,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2159,6 +2971,8 @@ describe("Mutation.updateForm", () => {
   });
 
   it("should default to quantity left when no quantity is specified in grouping", async () => {
+    // recipient needs appropriate profiles and subprofiles
+
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
 
     const appendix2Form = await formFactory({
@@ -2183,13 +2997,19 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const groupingForm = await formFactory({
       ownerId: user.id,
       opt: {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
-        emitterType: EmitterType.APPENDIX2
+        emitterType: EmitterType.APPENDIX2,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2243,13 +3063,20 @@ describe("Mutation.updateForm", () => {
 
   it("should be possible to set isDangerous=true with a waste code without *", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
         wasteDetailsCode: "20 03 01",
-        wasteDetailsIsDangerous: false
+        wasteDetailsIsDangerous: false,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2268,6 +3095,11 @@ describe("Mutation.updateForm", () => {
 
   it("should perform update in transaction", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
 
     const form = await formFactory({
       ownerId: user.id,
@@ -2275,7 +3107,8 @@ describe("Mutation.updateForm", () => {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
-        wasteDetailsCode: "01 03 04*"
+        wasteDetailsCode: "01 03 04*",
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2311,10 +3144,19 @@ describe("Mutation.updateForm", () => {
   });
 
   it("should update denormalized fields", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const transporterCompany = await companyFactory({
       companyTypes: ["TRANSPORTER"]
     });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     await transporterReceiptFactory({ company: transporterCompany });
 
     const intermediaryCompany = await companyFactory();
@@ -2326,7 +3168,8 @@ describe("Mutation.updateForm", () => {
         status: "SEALED",
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX2,
-        wasteDetailsCode: "01 03 04*"
+        wasteDetailsCode: "01 03 04*",
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2357,6 +3200,12 @@ describe("Mutation.updateForm", () => {
 
   it("should not be possible to update a weight > 40 T when transport mode is ROAD", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const { mutate } = makeClient(user);
     const form = await formFactory({
       ownerId: user.id,
@@ -2365,6 +3214,7 @@ describe("Mutation.updateForm", () => {
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX2,
         wasteDetailsCode: "01 03 04*",
+        recipientCompanySiret: destination.siret,
         transporters: {
           create: {
             transporterTransportMode: "ROAD",
@@ -2394,6 +3244,12 @@ describe("Mutation.updateForm", () => {
 
   it("should be possible to update a weight > 40 T when transport mode is not ROAD", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const { mutate } = makeClient(user);
     const form = await formFactory({
       ownerId: user.id,
@@ -2403,6 +3259,7 @@ describe("Mutation.updateForm", () => {
         emitterType: EmitterType.APPENDIX2,
         wasteDetailsCode: "01 03 04*",
         wasteDetailsQuantity: 10,
+        recipientCompanySiret: destination.siret,
         transporters: {
           create: {
             transporterTransportMode: "ROAD",
@@ -2438,6 +3295,12 @@ describe("Mutation.updateForm", () => {
   it("should be possible to update a weight > 40 T when deleting first transporter by road", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -2446,6 +3309,7 @@ describe("Mutation.updateForm", () => {
         emitterType: EmitterType.APPENDIX2,
         wasteDetailsCode: "01 03 04*",
         wasteDetailsQuantity: 10,
+        recipientCompanySiret: destination.siret,
         transporters: {
           create: { transporterTransportMode: "ROAD", number: 1 }
         }
@@ -2485,6 +3349,12 @@ describe("Mutation.updateForm", () => {
   it("should clean appendix1 items on update", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const { mutate } = makeClient(user);
 
     const appendix1_1 = await prisma.form.create({
@@ -2526,6 +3396,7 @@ describe("Mutation.updateForm", () => {
         wasteDetailsCode: "16 06 01*",
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX1,
+        recipientCompanySiret: destination.siret,
         grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
       }
     });
@@ -2555,6 +3426,12 @@ describe("Mutation.updateForm", () => {
   it("should append appendix1 item on update", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     const { mutate } = makeClient(user);
 
     const appendix1_1 = await prisma.form.create({
@@ -2568,6 +3445,7 @@ describe("Mutation.updateForm", () => {
         emitterCompanyContact: "Contact",
         emitterCompanyPhone: "01 01 01 01 01",
         emitterCompanyMail: "annexe1@test.com",
+        recipientCompanySiret: destination.siret,
         wasteDetailsCode: "16 06 01*",
         owner: { connect: { id: user.id } }
       }
@@ -2596,6 +3474,8 @@ describe("Mutation.updateForm", () => {
         wasteDetailsCode: "16 06 01*",
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX1,
+        recipientCompanySiret: destination.siret,
+
         grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
       }
     });
@@ -2646,6 +3526,11 @@ describe("Mutation.updateForm", () => {
     });
 
     // Group with appendix1_1
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -2653,6 +3538,8 @@ describe("Mutation.updateForm", () => {
         wasteDetailsCode: "16 06 01*",
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX1,
+        recipientCompanySiret: destination.siret,
+
         grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
       }
     });
@@ -2714,6 +3601,11 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     // Group with appendix1_1
     const form = await formFactory({
       ownerId: user.id,
@@ -2721,7 +3613,8 @@ describe("Mutation.updateForm", () => {
         status: Status.SEALED,
         wasteDetailsCode: "16 06 01*",
         emitterCompanySiret: company.siret,
-        emitterType: EmitterType.APPENDIX1
+        emitterType: EmitterType.APPENDIX1,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2781,6 +3674,12 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
     // Group with appendix1_1
     const form = await formFactory({
       ownerId: user.id,
@@ -2790,7 +3689,8 @@ describe("Mutation.updateForm", () => {
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX1,
         ecoOrganismeName: ecoOrganisme.company.name,
-        ecoOrganismeSiret: ecoOrganisme.company.siret
+        ecoOrganismeSiret: ecoOrganisme.company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2816,6 +3716,11 @@ describe("Mutation.updateForm", () => {
     async () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const { mutate } = makeClient(user);
+      // recipient needs appropriate profiles and subprofiles
+      const destination = await companyFactory({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
       const form = await formFactory({
         ownerId: user.id,
         opt: {
@@ -2823,6 +3728,8 @@ describe("Mutation.updateForm", () => {
           status: "SEALED",
           emitterCompanySiret: company.siret,
           emitterType: EmitterType.APPENDIX2,
+          recipientCompanySiret: destination.siret,
+
           wasteDetailsCode: "01 03 04*",
           wasteDetailsQuantity: 50,
           transporters: {
@@ -2872,6 +3779,11 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     // Group with appendix1_1
     const form = await formFactory({
       ownerId: user.id,
@@ -2880,6 +3792,8 @@ describe("Mutation.updateForm", () => {
         wasteDetailsCode: "16 06 01*",
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX1,
+        recipientCompanySiret: destination.siret,
+
         grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
       }
     });
@@ -2926,7 +3840,11 @@ describe("Mutation.updateForm", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     // Group with appendix1_1
     const form = await formFactory({
       ownerId: user.id,
@@ -2934,7 +3852,8 @@ describe("Mutation.updateForm", () => {
         status: Status.DRAFT,
         wasteDetailsCode: "16 06 01*",
         emitterCompanySiret: company.siret,
-        emitterType: EmitterType.APPENDIX1
+        emitterType: EmitterType.APPENDIX1,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -2996,6 +3915,11 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     // Group with appendix1_1
     const form = await formFactory({
       ownerId: user.id,
@@ -3004,6 +3928,8 @@ describe("Mutation.updateForm", () => {
         wasteDetailsCode: "16 06 01*",
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX1,
+        recipientCompanySiret: destination.siret,
+
         grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
       }
     });
@@ -3046,10 +3972,14 @@ describe("Mutation.updateForm", () => {
   it.each([Status.DRAFT, Status.SEALED, Status.SIGNED_BY_PRODUCER])(
     "should be possible to update transporter when status is %p",
     async status => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
       const transporter = await companyFactory({
         companyTypes: ["TRANSPORTER"]
       });
+
       const form = await formFactory({
         ownerId: user.id,
         opt: {
@@ -3093,6 +4023,11 @@ describe("Mutation.updateForm", () => {
       await prisma.transporterReceipt.findUniqueOrThrow({
         where: { id: transporter.company.transporterReceiptId! }
       });
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
@@ -3103,6 +4038,8 @@ describe("Mutation.updateForm", () => {
         emitterCompanyContact: emitter.company.contact,
         emitterCompanyPhone: emitter.company.contactPhone,
         emitterCompanyMail: emitter.company.contactEmail,
+        recipientCompanySiret: destination.siret,
+
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
@@ -3145,12 +4082,17 @@ describe("Mutation.updateForm", () => {
     const transporter3 = await userWithCompanyFactory("MEMBER");
     const transporter4 = await userWithCompanyFactory("MEMBER");
     const transporter5 = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
         status: Status.DRAFT,
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -3260,12 +4202,17 @@ describe("Mutation.updateForm", () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter1 = await userWithCompanyFactory("MEMBER");
     const transporter2 = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
         status: Status.DRAFT,
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -3326,12 +4273,17 @@ describe("Mutation.updateForm", () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter1 = await userWithCompanyFactory("MEMBER");
     const transporter2 = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
         status: Status.DRAFT,
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -3409,12 +4361,17 @@ describe("Mutation.updateForm", () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter1 = await userWithCompanyFactory("MEMBER");
     const transporter2 = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
         status: Status.DRAFT,
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -3472,12 +4429,17 @@ describe("Mutation.updateForm", () => {
     const transporter1 = await userWithCompanyFactory("MEMBER");
     const transporter2 = await userWithCompanyFactory("MEMBER");
     const transporter3 = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
         status: Status.DRAFT,
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -3540,7 +4502,11 @@ describe("Mutation.updateForm", () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter1 = await userWithCompanyFactory("MEMBER");
     const transporter2 = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     // Create a form that has already been received
     const form = await formFactory({
       ownerId: emitter.user.id,
@@ -3550,6 +4516,8 @@ describe("Mutation.updateForm", () => {
         takenOverAt: new Date(),
         receivedAt: new Date(),
         emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret,
+
         transporters: {
           create: {
             transporterCompanySiret: transporter1.company.siret,
@@ -3594,7 +4562,11 @@ describe("Mutation.updateForm", () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter1 = await userWithCompanyFactory("MEMBER");
     const transporter2 = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     // Create a form that has already been sent
     const form = await formFactory({
       ownerId: emitter.user.id,
@@ -3603,6 +4575,8 @@ describe("Mutation.updateForm", () => {
         emittedAt: new Date(),
         takenOverAt: new Date(),
         emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret,
+
         transporters: {
           create: {
             transporterCompanySiret: transporter1.company.siret,
@@ -3648,7 +4622,11 @@ describe("Mutation.updateForm", () => {
     const transporter1 = await userWithCompanyFactory("MEMBER");
     const transporter2 = await userWithCompanyFactory("MEMBER");
     const transporter3 = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     // Create a form that has already been signed by the first transporter
     const form = await formFactory({
       ownerId: emitter.user.id,
@@ -3657,6 +4635,8 @@ describe("Mutation.updateForm", () => {
         emittedAt: new Date(),
         takenOverAt: new Date(),
         emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret,
+
         transporters: {
           create: {
             transporterCompanySiret: transporter1.company.siret,
@@ -3709,7 +4689,11 @@ describe("Mutation.updateForm", () => {
   it("should not be possible to update `transporter` (first transporter) when the form has been sent", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     // Create a form that has already been sent
     const form = await formFactory({
       ownerId: emitter.user.id,
@@ -3718,6 +4702,8 @@ describe("Mutation.updateForm", () => {
         emittedAt: new Date(),
         takenOverAt: new Date(),
         emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret,
+
         transporters: {
           create: {
             transporterCompanySiret: transporter.company.siret,
@@ -3752,7 +4738,11 @@ describe("Mutation.updateForm", () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter1 = await userWithCompanyFactory("MEMBER");
     const transporter2 = await userWithCompanyFactory("MEMBER");
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     // Create a form that has already been received
     const form = await formFactory({
       ownerId: emitter.user.id,
@@ -3761,6 +4751,8 @@ describe("Mutation.updateForm", () => {
         emittedAt: new Date(),
         takenOverAt: new Date(),
         emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret,
+
         transporters: {
           create: {
             transporterCompanySiret: transporter1.company.siret,
@@ -3864,13 +4856,19 @@ describe("Mutation.updateForm", () => {
       name: "Nom intermédiaire 2",
       siret: siretify()
     });
-
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
         status: Status.SENT,
         takenOverAt: new Date(),
         emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret,
+
         transporters: {
           create: {
             transporterCompanySiret: transporter1.company.siret,
@@ -3940,11 +4938,16 @@ describe("Mutation.updateForm", () => {
 
   it("should log in an event the updated data", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "SEALED",
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret
       }
     });
 

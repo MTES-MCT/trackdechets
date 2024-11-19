@@ -2,6 +2,10 @@ name: Integration tests
 
 on: pull_request
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   back:
     runs-on: ubuntu-latest
@@ -27,6 +31,11 @@ jobs:
           npx nx run back:codegen
           npx nx run @td/prisma:generate
           TERM=xterm bash ./scripts/deploy-db.sh
+      - name: Create MinIO buckets
+        run: |
+          docker exec trackdechets-minio-1 mc alias set myminio http://localhost:9000 trackdechets password
+          docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_ERRORS_BUCKET"
+          docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_IMPORTS_BUCKET"
       - name: Start queues
         run: |
           npx nx run-many -t serve --projects=tag:backend:queues --parallel=6 --configuration=integration &
@@ -108,4 +117,11 @@ env:
   WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
   GERICO_WEBHOOK_SLUG: secret-slug-lorem
   GERICO_WEBHOOK_TOKEN: wxcfdzr
-  
+  S3_ENDPOINT: http://localhost:9000
+  S3_REGION: fr-par
+  S3_ACCESS_KEY_ID: trackdechets
+  S3_SECRET_ACCESS_KEY: password
+  S3_REGISTRY_ERRORS_BUCKET: registry-errors-integration
+  S3_REGISTRY_IMPORTS_BUCKET: registry-imports-integration
+  VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER: 2024-10-30T00:00:00.000Z
+   

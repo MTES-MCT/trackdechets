@@ -1,6 +1,6 @@
 import { useMutation } from "@apollo/client";
 
-import { SIGN_BSPAOH } from "../../../Creation/bspaoh/utils/queries";
+import { SIGN_BSPAOH } from "../../../../../Apps/common/queries/bspaoh/queries";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import {

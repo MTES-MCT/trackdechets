@@ -6,6 +6,7 @@ import { PaohPackagings } from "../components/Packagings";
 import { ZodBspaoh } from "../schema";
 import { SealedFieldsContext } from "../../context";
 import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
+import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
 export function Waste() {
   const { register, watch, setValue, formState } = useFormContext<ZodBspaoh>(); // retrieve all hook methods
@@ -57,7 +58,7 @@ export function Waste() {
 
       <div className="fr-grid-row">
         <div className="fr-col-12 fr-col-md-6">
-          <Input
+          <NonScrollableInput
             label="En nombre de conditionnement(s)"
             disabled
             nativeInputProps={{
@@ -71,7 +72,7 @@ export function Waste() {
       </div>
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top  fr-mt-5v">
         <div className="fr-col-12 fr-col-md-6">
-          <Input
+          <NonScrollableInput
             label="Poids total en kg (optionnel)"
             disabled={sealedFields.includes(
               "emitter.emission.detail.weight.value"

@@ -679,4 +679,42 @@ describe("signEmissionForm", () => {
       "Le nombre de contenants doit être supérieur à 0"
     );
   });
+
+  it("can still modify nonRoadRegulationMention", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SEALED",
+        signedByTransporter: null,
+        sentAt: null,
+        sentBy: null,
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        wasteDetailsNonRoadRegulationMention: "mention A"
+      }
+    });
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "signEmissionForm">,
+      MutationSignEmissionFormArgs
+    >(SIGN_EMISSION_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          nonRoadRegulationMention: "mention B",
+          emittedAt: emittedAt.toISOString() as unknown as Date,
+          emittedBy: emitter.user.name,
+          quantity: 1
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(
+      data.signEmissionForm.wasteDetails?.nonRoadRegulationMention
+    ).toEqual("mention B");
+  });
 });

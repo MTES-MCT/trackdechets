@@ -16,7 +16,11 @@ import {
 } from "../../../generated/graphql/types";
 
 import { buildAddress } from "../../../companies/sirene/utils";
-import { isDangerous, packagingsEqual } from "@td/constants";
+import {
+  getFormWasteDetailsADRMention,
+  isDangerous,
+  packagingsEqual
+} from "@td/constants";
 import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { FormCompanyDetails } from "../../../common/pdf/components/FormCompanyDetails";
@@ -69,11 +73,20 @@ function ReceiptFields({
 }
 
 type QuantityFieldsProps = {
+  isSubjectToADR?: boolean | null;
   quantity?: number | null;
   quantityType?: QuantityType | null;
 };
 
-function QuantityFields({ quantity, quantityType }: QuantityFieldsProps) {
+function QuantityFields({
+  isSubjectToADR,
+  quantity,
+  quantityType
+}: QuantityFieldsProps) {
+  const displayADRArticle =
+    quantityType === QuantityType.ESTIMATED &&
+    (!isDefined(isSubjectToADR) || isSubjectToADR === true);
+
   return (
     <p>
       Tonne(s) : {quantity}
@@ -92,7 +105,9 @@ function QuantityFields({ quantity, quantityType }: QuantityFieldsProps) {
       />{" "}
       Estimée
       <br />
-      "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
+      {displayADRArticle && (
+        <>"QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2"</>
+      )}
     </p>
   );
 }
@@ -356,7 +371,7 @@ export function BsddPdf({
     isDangerous(form.wasteDetails?.code) ||
     Boolean(form.wasteDetails?.pop);
 
-  const appendix1ProducerPlaceholder = `En cas de contrôle, les informations relatives à ce cadre sont celle du BSD de tournée dédié associé n° ${groupedIn.map(
+  const appendix1ProducerPlaceholder = `En cas de contrôle, les informations relatives à ce cadre sont celles du BSD de tournée dédié associé n° ${groupedIn.map(
     bsd => bsd.readableId
   )}`;
   const isRepackaging =
@@ -714,20 +729,29 @@ export function BsddPdf({
           <div className="BoxCol">
             <p>
               <strong>
-                6. Mentions au titre des règlements ADR, RID, ADNR, IMDG (le cas
-                échéant) :
+                6.1 Mention au titre du règlement ADR (le cas échéant) :
               </strong>
             </p>
             <p>
               {isDefined(form.emptyReturnADR) ? (
-                <>
-                  {getEmptyReturnADRLabel(form.emptyReturnADR)?.toUpperCase()}:{" "}
-                  {form.wasteDetails?.onuCode}
-                </>
-              ) : (
-                <>{form.wasteDetails?.onuCode}</>
-              )}
+                <p>
+                  {getEmptyReturnADRLabel(form.emptyReturnADR)?.toUpperCase()}{" "}
+                </p>
+              ) : null}
+              <>{getFormWasteDetailsADRMention(form.wasteDetails)}</>
             </p>
+          </div>
+        </div>
+
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              <strong>
+                6.2 Mentions au titre des règlements RID, ADNR, IMDG (le cas
+                échéant) :
+              </strong>
+            </p>
+            <p>{form.wasteDetails?.nonRoadRegulationMention}</p>
           </div>
         </div>
 
@@ -1040,9 +1064,13 @@ export function BsddPdf({
                     échéant) :
                   </strong>
                 </p>
-                {isRepackaging ? (
-                  <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
-                ) : null}
+                {isRepackaging && (
+                  <p>
+                    {getFormWasteDetailsADRMention(
+                      form.temporaryStorageDetail?.wasteDetails
+                    )}
+                  </p>
+                )}
               </div>
             </div>
 

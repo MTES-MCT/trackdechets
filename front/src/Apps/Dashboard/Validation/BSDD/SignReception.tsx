@@ -18,6 +18,7 @@ import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignForm } from "./SignForm";
+import NonScrollableInput from "../../../common/Components/NonScrollableInput/NonScrollableInput";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Button from "@codegouvfr/react-dsfr/Button";
@@ -473,7 +474,7 @@ function SignReceptionModal({
       </h4>
       <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-md-4">
-          <Input
+          <NonScrollableInput
             label="Poids total net en tonnes"
             className="fr-col-12"
             state={errors?.receivedWeight && "error"}
@@ -534,7 +535,7 @@ function SignReceptionModal({
               <h6 className="fr-text--lg">
                 <strong>Poids refusé</strong>
               </h6>
-              <Input
+              <NonScrollableInput
                 label="Poids total net en tonnes"
                 disabled={refusedWeightDisabled}
                 className="fr-col-12"
@@ -558,7 +559,7 @@ function SignReceptionModal({
               <h6 className="fr-text--lg">
                 <strong>Poids accepté</strong>
               </h6>
-              <Input
+              <NonScrollableInput
                 label="Poids total net en tonnes"
                 disabled
                 className="fr-col-12"
@@ -744,15 +745,6 @@ function SignReceptionModal({
                   options={[
                     {
                       label:
-                        EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyNotWashed],
-                      nativeInputProps: {
-                        ...register("emptyReturnADR", {}),
-                        value: EmptyReturnAdr.EmptyNotWashed,
-                        defaultChecked: false
-                      }
-                    },
-                    {
-                      label:
                         EMPTY_RETURN_ADR_REASON[
                           EmptyReturnAdr.EmptyReturnNotWashed
                         ],
@@ -779,6 +771,26 @@ function SignReceptionModal({
                         value: EmptyReturnAdr.EmptyCiterne,
                         defaultChecked: false
                       }
+                    },
+                    {
+                      label:
+                        EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyContainer],
+                      nativeInputProps: {
+                        ...register("emptyReturnADR", {}),
+                        value: EmptyReturnAdr.EmptyContainer,
+                        defaultChecked: false
+                      }
+                    },
+                    {
+                      label:
+                        EMPTY_RETURN_ADR_REASON[
+                          EmptyReturnAdr.EmptyCiterneContainer
+                        ],
+                      nativeInputProps: {
+                        ...register("emptyReturnADR", {}),
+                        value: EmptyReturnAdr.EmptyCiterneContainer,
+                        defaultChecked: false
+                      }
                     }
                   ]}
                 />
@@ -791,10 +803,11 @@ function SignReceptionModal({
       <hr />
       <p className="fr-text fr-text--md fr-mb-2w">
         En qualité de <strong>destinataire du déchet</strong>, je confirme la
-        réception des déchets pour la quantité indiquée dans ce bordereau. Un
-        mail automatique Trackdéchets informera le producteur de ce refus
-        partiel, accompagné du récépisséPDF. L’inspection des ICPE et ma société
-        en recevront une copie.
+        réception des déchets pour la quantité indiquée dans ce bordereau. En
+        cas de refus partiel ou total uniquement, un mail automatique
+        Trackdéchets informera le producteur de ce refus, accompagné du
+        récépissé PDF. L’inspection des ICPE et ma société en recevront
+        également une copie.
       </p>
 
       <Input
