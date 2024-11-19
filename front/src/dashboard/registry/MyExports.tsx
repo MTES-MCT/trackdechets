@@ -92,6 +92,113 @@ const getDeclarationTypeWording = (
   }
 };
 
+const getFilterStateForRegistryType = (
+  registryType: WasteRegistryType,
+  filterName: string
+): {
+  disabled: boolean;
+} => {
+  if (registryType === WasteRegistryType.Ssd) {
+    if (filterName.startsWith("wasteTypes")) {
+      return {
+        disabled: true
+      };
+    } else if (filterName === "declarationType") {
+      return {
+        disabled: true
+      };
+    }
+  } else if (registryType === WasteRegistryType.All) {
+    if (filterName === "wasteTypes.dnd") {
+      return {
+        disabled: false
+      };
+    } else if (filterName === "wasteTypes.dd") {
+      return {
+        disabled: false
+      };
+    } else if (filterName === "wasteTypes.texs") {
+      return {
+        disabled: true
+      };
+    } else if (filterName === "declarationType") {
+      return {
+        disabled: true
+      };
+    }
+  }
+  return {
+    disabled: false
+  };
+};
+
+const getDefaultsForRegistryType = (
+  registryType: WasteRegistryType
+): {
+  wasteTypes: [RegistryExportWasteType, ...RegistryExportWasteType[]];
+  declarationType: DeclarationType;
+} => {
+  if (registryType === WasteRegistryType.Ssd) {
+    return {
+      wasteTypes: [
+        RegistryExportWasteType.Dnd,
+        RegistryExportWasteType.Dd,
+        RegistryExportWasteType.Texs
+      ],
+      declarationType: DeclarationType.Registry
+    };
+  } else if (registryType === WasteRegistryType.Incoming) {
+    return {
+      wasteTypes: [
+        RegistryExportWasteType.Dnd,
+        RegistryExportWasteType.Dd,
+        RegistryExportWasteType.Texs
+      ],
+      declarationType: DeclarationType.All
+    };
+  } else if (registryType === WasteRegistryType.Managed) {
+    return {
+      wasteTypes: [
+        RegistryExportWasteType.Dnd,
+        RegistryExportWasteType.Dd,
+        RegistryExportWasteType.Texs
+      ],
+      declarationType: DeclarationType.All
+    };
+  } else if (registryType === WasteRegistryType.Outgoing) {
+    return {
+      wasteTypes: [
+        RegistryExportWasteType.Dnd,
+        RegistryExportWasteType.Dd,
+        RegistryExportWasteType.Texs
+      ],
+      declarationType: DeclarationType.All
+    };
+  } else if (registryType === WasteRegistryType.Transported) {
+    return {
+      wasteTypes: [
+        RegistryExportWasteType.Dnd,
+        RegistryExportWasteType.Dd,
+        RegistryExportWasteType.Texs
+      ],
+      declarationType: DeclarationType.All
+    };
+  } else if (registryType === WasteRegistryType.All) {
+    return {
+      wasteTypes: [RegistryExportWasteType.Dnd, RegistryExportWasteType.Dd],
+      declarationType: DeclarationType.Bsd
+    };
+  }
+  return {
+    wasteTypes: [
+      RegistryExportWasteType.Dnd,
+      RegistryExportWasteType.Dd,
+      RegistryExportWasteType.Texs
+    ],
+    declarationType: DeclarationType.All
+  };
+};
+
 const formatRegistryDates = (
   createdAt: string,
   startDate: string,
@@ -238,6 +345,28 @@ export function MyExports() {
     );
   }
 
+  const validationSchema = getSchema();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting }
+  } = useForm<z.infer<typeof validationSchema>>({
+    defaultValues: {
+      startDate: format(startOfYear(new Date()), "yyyy-MM-dd"),
+      registryType: WasteRegistryType.Ssd,
+      format: FormsRegisterExportFormat.Csv,
+      declarationType: DeclarationType.All,
+      wasteTypes: [
+        RegistryExportWasteType.Dd,
+        RegistryExportWasteType.Dnd,
+        RegistryExportWasteType.Texs
+      ]
+    },
+    resolver: zodResolver(validationSchema)
+  });
+
   useEffect(() => {
     const rawCompanies = companiesData?.myCompanies?.edges;
     if (!rawCompanies?.length) {
@@ -273,26 +402,15 @@ export function MyExports() {
     setCompanies(tmpCompanies);
   }, [companiesData]);
 
-  const validationSchema = getSchema();
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors, isSubmitting }
-  } = useForm<z.infer<typeof validationSchema>>({
-    defaultValues: {
-      startDate: format(startOfYear(new Date()), "yyyy-MM-dd"),
-      registryType: WasteRegistryType.Ssd,
-      format: FormsRegisterExportFormat.Csv,
-      declarationType: DeclarationType.All,
-      wasteTypes: [
-        RegistryExportWasteType.Dd,
-        RegistryExportWasteType.Dnd,
-        RegistryExportWasteType.Texs
-      ]
-    },
-    resolver: zodResolver(validationSchema)
-  });
+  const registryType = watch("registryType");
+
+  useEffect(() => {
+    const defaults = getDefaultsForRegistryType(registryType);
+    Object.keys(defaults).forEach((key: "wasteTypes" | "declarationType") =>
+      setValue(key, defaults[key])
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registryType]);
 
   const onSubmit = async (input: z.infer<typeof validationSchema>) => {
     const {
@@ -399,7 +517,11 @@ export function MyExports() {
             <div className="fr-container--fluid fr-mb-8v">
               <Select
                 label="Type de déclaration"
-                disabled={isLoading}
+                disabled={
+                  isLoading ||
+                  getFilterStateForRegistryType(registryType, "declarationType")
+                    .disabled
+                }
                 nativeSelectProps={{
                   ...register("declarationType")
                 }}
@@ -424,6 +546,10 @@ export function MyExports() {
                     label: "Déchets non dangereux",
                     nativeInputProps: {
                       value: RegistryExportWasteType.Dnd,
+                      disabled: getFilterStateForRegistryType(
+                        registryType,
+                        "wasteTypes.dnd"
+                      ).disabled,
                       ...register("wasteTypes")
                     }
                   },
@@ -431,6 +557,10 @@ export function MyExports() {
                     label: "Déchets dangereux",
                     nativeInputProps: {
                       value: RegistryExportWasteType.Dd,
+                      disabled: getFilterStateForRegistryType(
+                        registryType,
+                        "wasteTypes.dd"
+                      ).disabled,
                       ...register("wasteTypes")
                     }
                   },
@@ -438,6 +568,10 @@ export function MyExports() {
                     label: "Terres et sédiments",
                     nativeInputProps: {
                       value: RegistryExportWasteType.Texs,
+                      disabled: getFilterStateForRegistryType(
+                        registryType,
+                        "wasteTypes.texs"
+                      ).disabled,
                       ...register("wasteTypes")
                     }
                   }
