@@ -9,7 +9,7 @@ import { format as csvFormat } from "@fast-csv/format";
 import { DateFilter, WasteRegistryType } from "@td/codegen-back";
 import { Upload } from "@aws-sdk/lib-storage";
 import { UserInputError } from "../../common/errors";
-import { Readable } from "stream";
+import { pipeline, Readable } from "stream";
 import {
   Prisma,
   RegistryExport,
@@ -28,6 +28,8 @@ export type RegistryExportJobArgs = {
   dateRange: DateFilter;
 };
 
+const LOOKUP_PAGE_SIZE = 100;
+
 const streamLookup = (
   findManyArgs: Prisma.RegistryLookupFindManyArgs,
   registryType: WasteRegistryType,
@@ -37,12 +39,12 @@ const streamLookup = (
   let count = 0;
   return new Readable({
     objectMode: true,
-    highWaterMark: 200,
+    highWaterMark: LOOKUP_PAGE_SIZE * 2,
     async read() {
       try {
         const items = await prisma.registryLookup.findMany({
           ...findManyArgs,
-          take: 100,
+          take: LOOKUP_PAGE_SIZE,
           skip: cursorId ? 1 : 0,
           cursor: cursorId ? { dateId: cursorId } : undefined,
           orderBy: {
@@ -57,7 +59,6 @@ const streamLookup = (
             include: { registrySsd: true };
           }>;
           addEncounteredSiret(lookup.sirets);
-          // console.log(lookup);
           const mapped = toWaste(registryType, {
             SSD: lookup.registrySsd
           });
@@ -65,13 +66,12 @@ const streamLookup = (
             this.push(mapped);
           }
         }
-        if (items.length < 100) {
-          console.log("PUSH NULL");
+        if (items.length < LOOKUP_PAGE_SIZE) {
           this.push(null);
           return;
         }
         count += items.length;
-        if (count % 10000 === 0) {
+        if (count % (LOOKUP_PAGE_SIZE * 100) === 0) {
           console.log("count", count);
         }
         cursorId = items[items.length - 1].dateId;
@@ -95,7 +95,7 @@ async function startExport(exportId: string): Promise<RegistryExport | null> {
 }
 
 async function failExport(exportId: string) {
-  await prisma.registryExport.update({
+  await prisma.registryExport.updateMany({
     where: { id: exportId },
     data: { status: RegistryExportStatus.FAILED }
   });
@@ -124,7 +124,6 @@ export async function processRegistryExportJob(
 ) {
   const { exportId, dateRange } = job.data;
   let upload: Upload | null = null;
-  console.log("AQUI");
 
   try {
     const registryExport = await startExport(exportId);
@@ -194,22 +193,13 @@ export async function processRegistryExportJob(
       registryExport.registryType ?? "ALL",
       addEncounteredSiret
     );
-    outputStream.on("finish", async () => {
-      logger.info(`Finished processing export ${exportId}`, { exportId });
-    });
-    outputStream.on("error", async error => {
-      logger.info(`Error on output stream for export ${exportId}`, error);
-      await upload?.abort();
-    });
+
+    // handle CSV exports
     if (registryExport.format === RegistryExportFormat.CSV) {
       const csvStream = csvFormat({
         headers: Object.keys(headers).map(key => headers[key]),
         delimiter: ";",
         alwaysWriteHeaders: true
-      });
-      csvStream.on("error", async error => {
-        logger.info(`Error on CSV stream for export ${exportId}`, error);
-        await upload?.abort();
       });
       const transformer = wasteFormatter({
         useLabelAsKey: false,
@@ -219,7 +209,22 @@ export async function processRegistryExportJob(
           );
         }
       });
-      inputStream.pipe(transformer).pipe(csvStream).pipe(outputStream);
+      pipeline(
+        inputStream,
+        transformer,
+        csvStream,
+        outputStream,
+        async error => {
+          if (error) {
+            logger.info(`Error on stream for export ${exportId}`, error);
+            await upload?.abort();
+            return;
+          }
+          logger.info(`Finished processing export ${exportId}`, { exportId });
+        }
+      );
+
+      // handle XLSX exports
     } else {
       const workbook = new Excel.stream.xlsx.WorkbookWriter({
         stream: outputStream
@@ -233,7 +238,6 @@ export async function processRegistryExportJob(
           );
         }
       });
-      inputStream.pipe(transformer);
       transformer.on("data", waste => {
         if (worksheet.columns === null) {
           // write headers if not present
@@ -250,10 +254,23 @@ export async function processRegistryExportJob(
         worksheet.commit();
         workbook.commit();
       });
+      // output stream event handlers that can't be handled in pipeline
+      outputStream.on("finish", async () => {
+        logger.info(`Finished processing export ${exportId}`, { exportId });
+      });
+      outputStream.on("error", async error => {
+        logger.info(`Error on output stream for export ${exportId}`, error);
+        await upload?.abort();
+      });
+      pipeline(inputStream, transformer, async error => {
+        if (error) {
+          logger.info(`Error on stream for export ${exportId}`, error);
+          await upload?.abort();
+          return;
+        }
+        logger.info(`Finished processing export ${exportId}`, { exportId });
+      });
     }
-    // upload.on("httpUploadProgress", progress => {
-    //   console.log(progress);
-    // });
 
     // we call upload.done before it's actually "done", because this call
     // actually triggers the flow (in @aws-sdk/lib-storage)
@@ -274,7 +291,7 @@ export async function processRegistryExportJob(
     logger.error(`Error processing export ${exportId}`, error);
     if (upload) {
       await upload.abort();
-      await failExport(exportId);
     }
+    await failExport(exportId);
   }
 }

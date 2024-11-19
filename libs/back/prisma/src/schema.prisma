@@ -552,7 +552,7 @@ model Form {
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
   intermediaries       IntermediaryFormAssociation[]
-  registrySummaries    RegistryLookup[]
+  registryLookups      RegistryLookup[]
 
   forwarding    Form?   @relation("BsddForwarding")
   forwardedInId String? @unique
@@ -1104,8 +1104,8 @@ model Bsvhu {
   traderRecepisseDepartment    String?
   traderRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
-  intermediaries    IntermediaryBsvhuAssociation[]
-  registrySummaries RegistryLookup[]
+  intermediaries  IntermediaryBsvhuAssociation[]
+  registryLookups RegistryLookup[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1274,7 +1274,7 @@ model Bsdasri {
   synthesizedInId String?
 
   bsdasriRevisionRequests BsdasriRevisionRequest[]
-  registrySummaries       RegistryLookup[]
+  registryLookups         RegistryLookup[]
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
   // Emitter sirets list in case of synthesis bsd
@@ -1437,7 +1437,7 @@ model Bsff {
   ficheInterventions BsffFicheIntervention[] @relation("BsffToBsffFicheIntervention")
   packagings         BsffPackaging[]
   transporters       BsffTransporter[]
-  registrySummaries  RegistryLookup[]
+  registryLookups    RegistryLookup[]
 
   // Denormalized detenteur sirets to speed up query `bsffs`
   detenteurCompanySirets String[] @default([])
@@ -1704,7 +1704,7 @@ model Bsda {
   grouping             Bsda[]                        @relation("BsdaGrouping")
   bsdaRevisionRequests BsdaRevisionRequest[]
   intermediaries       IntermediaryBsdaAssociation[]
-  registrySummaries    RegistryLookup[]
+  registryLookups      RegistryLookup[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1958,8 +1958,8 @@ model Bspaoh {
   currentTransporterOrgId                        String?
   nextTransporterOrgId                           String?
 
-  transporters      BspaohTransporter[]
-  registrySummaries RegistryLookup[]
+  transporters    BspaohTransporter[]
+  registryLookups RegistryLookup[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   transportersSirets   String[] @default([])
@@ -2312,7 +2312,7 @@ model RegistrySsd {
   destinationPostalCode      String?
   destinationCountryCode     String?
 
-  registrySummaries RegistryLookup[]
+  registryLookups RegistryLookup[]
 
   @@index([importId], map: "_RegistrySsdImportIdIdx")
   @@index([publicId], map: "_RegistrySsdPublicIdIdx")

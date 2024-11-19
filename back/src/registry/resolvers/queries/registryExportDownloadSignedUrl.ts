@@ -5,6 +5,7 @@ import { QueryRegistryExportDownloadSignedUrlArgs } from "../../../generated/gra
 import { GraphQLContext } from "../../../types";
 import { ForbiddenError } from "../../../common/errors";
 import { getRegistryFileName } from "../../filename";
+import { RegistryExportFormat } from "@prisma/client";
 
 export async function registryExportDownloadSignedUrl(
   _,
@@ -36,7 +37,9 @@ export async function registryExportDownloadSignedUrl(
   const signedUrl = await getSignedUrlForDownload({
     bucketName,
     key,
-    fileName
+    fileName: `${fileName}${
+      registryExport.format === RegistryExportFormat.CSV ? ".csv" : ".xlsx"
+    }`
   });
 
   return { fileKey: key, signedUrl };

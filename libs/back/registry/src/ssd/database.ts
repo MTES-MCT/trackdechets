@@ -138,9 +138,7 @@ const updateRegistryLookup = async (
   if (
     registrySsd.reportAsSiret &&
     registrySsd.reportAsSiret !== registrySsd.reportForSiret &&
-    !registryLookup.reportAsSirets.some(
-      siret => siret === registrySsd.reportAsSiret
-    )
+    !registryLookup.reportAsSirets.includes(registrySsd.reportAsSiret)
   ) {
     await tx.registryLookup.update({
       where: {
