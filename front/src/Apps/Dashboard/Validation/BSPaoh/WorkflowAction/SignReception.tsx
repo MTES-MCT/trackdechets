@@ -7,6 +7,7 @@ import {
 
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
@@ -305,7 +306,7 @@ function SignReceptionModal({
           />
         </div>
         <div className="fr-col-12 fr-col-md-4">
-          <Input
+          <NonScrollableInput
             label="Poids total en kg"
             state={errors?.receivedWeight && "error"}
             stateRelatedMessage={
