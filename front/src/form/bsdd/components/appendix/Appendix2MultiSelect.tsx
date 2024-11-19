@@ -1,16 +1,26 @@
-import { gql, useQuery } from "@apollo/client";
-import { InlineError } from "../../../../Apps/common/Components/Error/Error";
-import { formatDate } from "../../../../common/datetime";
-import { FieldArray, useFormikContext } from "formik";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Form,
+  InitialForm,
   InitialFormFraction,
+  Packagings,
   Query,
-  QueryAppendixFormsArgs,
-  Packagings
+  QueryAppendixFormsArgs
 } from "@td/codegen-ui";
-import React, { useEffect, useMemo, useState } from "react";
-import { Decimal } from "decimal.js";
+import { gql, useQuery } from "@apollo/client";
+import {
+  FieldArray,
+  FieldArrayRenderProps,
+  SharedRenderProps,
+  useFormikContext
+} from "formik";
+import Table from "@codegouvfr/react-dsfr/Table";
+import { Loader } from "../../../../Apps/common/Components";
+import { formatDate } from "../../../../common/datetime";
+import Input from "@codegouvfr/react-dsfr/Input";
+import Alert from "@codegouvfr/react-dsfr/Alert";
+import Decimal from "decimal.js";
+import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 
 const APPENDIX2_FORMS = gql`
   query AppendixForms($siret: String!, $wasteCode: String) {
@@ -38,15 +48,16 @@ const APPENDIX2_FORMS = gql`
       quantityRefused
       quantityGrouped
       processingOperationDone
+      recipient {
+        cap
+      }
     }
   }
 `;
 
 export default function Appendix2MultiSelect() {
-  const [wasteCodeFilter, setWasteCodeFilter] = useState("");
   const { values, setFieldValue, getFieldMeta } = useFormikContext<Form>();
   const meta = getFieldMeta<InitialFormFraction[]>("grouping");
-  const [hasChanged, setHasChanged] = useState(false);
 
   const { loading, error, data } = useQuery<
     Pick<Query, "appendixForms">,
@@ -59,56 +70,103 @@ export default function Appendix2MultiSelect() {
     fetchPolicy: "network-only"
   });
 
-  const [quantitesToGroup, setQuantitiesToGroup] = useState({});
+  const [readableIdFilter, setReadableIdFilter] = useState("");
+  const [wasteCodeFilter, setWasteCodeFilter] = useState("");
+  const [emitterSiretFilter, setEmitterSiretFilter] = useState("");
 
-  // because { query { appendixForms } } does not return forms that
-  // have already been appended to a BSDD, we need to keep track of
-  // initial value of form.grouping when updating a BSDD
-  const appendix2Candidates = useMemo(() => {
-    const initialValue = (meta.initialValue ?? []).filter(g => {
-      return (
-        g.form.recipient?.company?.siret === values.emitter?.company?.siret
-      );
-    });
-    const appendix2Forms =
-      data?.appendixForms?.filter(
-        form => !initialValue.map(({ form }) => form.id).includes(form.id)
-      ) ?? [];
-    return [
-      ...initialValue.map(({ form, quantity }) => ({
-        form,
-        quantity: new Decimal(quantity)
-      })),
-      ...appendix2Forms.map(f => ({
-        form: f,
-        quantity: new Decimal(f.quantityAccepted ?? f.quantityReceived!).minus(
-          f.quantityGrouped ?? 0
-        )
-      }))
-    ].filter(({ form }) => {
-      return wasteCodeFilter?.length
-        ? form.wasteDetails?.code?.includes(wasteCodeFilter)
-        : true;
-    });
-  }, [data, meta.initialValue, wasteCodeFilter, values.emitter]);
+  const [isDirty, setIsDirty] = useState(false);
 
-  const appendix2Selected = useMemo(
+  // Liste les bordereaux déjà annexés au bordereau de groupement
+  // au moment de l'ouverture du formulaire (cas d'une modification du
+  // bordereau de groupement)
+  const initiallyAnnexedForms = useMemo(
+    () => meta.initialValue ?? [],
+    [meta.initialValue]
+  );
+  const initiallyAnnexedFormIds = initiallyAnnexedForms.map(
+    ({ form }) => form.id
+  );
+
+  // Liste les bordereaux en attente de regroupement qui ne sont pas
+  // déjà annexés au bordereau de groupement au moment de l'ouverture du
+  // formulaire
+  const canBeAnnexedForms = (data?.appendixForms ?? [])
+    .filter(f => !initiallyAnnexedFormIds.includes(f.id))
+    .map(form => ({ form, quantity: 0 }));
+
+  // Liste tous les bordereaux candidats au regroupement, en commençant
+  // par les bordereaux déjà annexés au moment de l'ouverture du formulaire
+  const forms = useMemo(
+    () => [...initiallyAnnexedForms, ...canBeAnnexedForms],
+    [initiallyAnnexedForms, canBeAnnexedForms]
+  );
+
+  const filteredForms = useMemo(
+    () =>
+      forms.filter(({ form }) => {
+        let r = true;
+
+        if (readableIdFilter.length > 0) {
+          r = r && form.readableId.includes(readableIdFilter);
+          if (r === false) return r;
+        }
+
+        if (wasteCodeFilter.length > 0) {
+          r = r && !!form.wasteDetails?.code?.includes(wasteCodeFilter);
+          if (r === false) return r;
+        }
+
+        if (emitterSiretFilter.length > 0) {
+          r = r && !!form.emitter?.company?.siret?.includes(emitterSiretFilter);
+          if (r === false) return r;
+        }
+
+        return r;
+      }),
+    [forms, readableIdFilter, wasteCodeFilter, emitterSiretFilter]
+  );
+
+  // Liste les bordereaux annexés au bordereau de groupement présentement
+  const currentlyAnnexedForms = useMemo(
     () => values.grouping ?? [],
     [values.grouping]
   );
-
-  useEffect(() => {
-    const quantites = appendix2Selected.reduce((qs, { form, quantity }) => {
-      return { ...qs, [form.id]: quantity };
+  const currentlyAnnexedFormIds = currentlyAnnexedForms.map(
+    ({ form }) => form.id
+  );
+  const quantitiesGrouped: { [key: string]: number | string } =
+    currentlyAnnexedForms.reduce((acc, { form, quantity }) => {
+      return { ...acc, [form.id]: quantity };
     }, {});
-    setQuantitiesToGroup(prevState => ({ ...prevState, ...quantites }));
-  }, [appendix2Selected]);
+
+  function getQuantityLeft({
+    form,
+    quantity: initialQuantity
+  }: {
+    form: Form | InitialForm;
+    quantity: number;
+  }) {
+    const quantityAccepted = new Decimal(
+      form.quantityAccepted ?? form.quantityReceived!
+    );
+
+    let quantityLeft = new Decimal(quantityAccepted);
+    if (form.quantityGrouped) {
+      quantityLeft = quantityLeft
+        // retranche la quantité déjà groupée
+        .minus(form.quantityGrouped)
+        // sauf la quantité déjà groupée sur ce bordereau
+        // qui doit apparaitre comme disponible
+        .plus(initialQuantity);
+    }
+
+    return quantityLeft;
+  }
 
   useEffect(() => {
-    // avoid overwriting values on first render when updating a BSDD
-    if (!values.id || hasChanged) {
-      // Computes sum of quantities of appendix2
-      const totalQuantity = appendix2Selected
+    if (isDirty) {
+      // Auto-complète la quantité totale à partir des annexes 2 séletionnées
+      const totalQuantity = currentlyAnnexedForms
         .reduce((q, { quantity }) => {
           if (!quantity) {
             return q;
@@ -117,37 +175,40 @@ export default function Appendix2MultiSelect() {
         }, new Decimal(0))
         .toNumber();
 
-      // Computes the sum of packagingsInfos of appendix2
+      // Auto-complète les contenants à partir des annexes 2 sélectionnés
       const totalPackagings = (() => {
-        const quantityByType = appendix2Selected.reduce((acc1, { form }) => {
-          if (!form.wasteDetails?.packagingInfos) {
-            return acc1;
-          }
+        const quantityByType = currentlyAnnexedForms.reduce(
+          (acc1, { form, quantity }) => {
+            if (!form.wasteDetails?.packagingInfos || !quantity) {
+              return acc1;
+            }
 
-          return form.wasteDetails.packagingInfos.reduce(
-            (acc2, packagingInfo) => {
-              if (!acc2[packagingInfo.type]) {
+            return form.wasteDetails.packagingInfos.reduce(
+              (acc2, packagingInfo) => {
+                if (!acc2[packagingInfo.type]) {
+                  return {
+                    ...acc2,
+                    [packagingInfo.type]: packagingInfo.quantity
+                  };
+                }
                 return {
                   ...acc2,
-                  [packagingInfo.type]: packagingInfo.quantity
+                  [packagingInfo.type]: [
+                    Packagings.Benne,
+                    Packagings.Citerne
+                  ].includes(packagingInfo.type)
+                    ? Math.min(
+                        packagingInfo.quantity + acc2[packagingInfo.type],
+                        2
+                      )
+                    : packagingInfo.quantity + acc2[packagingInfo.type]
                 };
-              }
-              return {
-                ...acc2,
-                [packagingInfo.type]: [
-                  Packagings.Benne,
-                  Packagings.Citerne
-                ].includes(packagingInfo.type)
-                  ? Math.min(
-                      packagingInfo.quantity + acc2[packagingInfo.type],
-                      2
-                    )
-                  : packagingInfo.quantity + acc2[packagingInfo.type]
-              };
-            },
-            acc1
-          );
-        }, {});
+              },
+              acc1
+            );
+          },
+          {}
+        );
         return Object.keys(quantityByType).map(type => ({
           type,
           other: "",
@@ -158,181 +219,194 @@ export default function Appendix2MultiSelect() {
       setFieldValue("wasteDetails.quantity", totalQuantity);
       setFieldValue("wasteDetails.packagingInfos", totalPackagings);
     }
-  }, [appendix2Selected, values.id, hasChanged, setFieldValue]);
+  }, [currentlyAnnexedForms, isDirty, setFieldValue]);
 
-  function onSelectAll() {
-    if (appendix2Selected.length === appendix2Candidates.length) {
-      setFieldValue("grouping", []);
-    } else {
-      setFieldValue(
-        "grouping",
-        appendix2Candidates.map(candidate => ({
-          form: candidate.form,
-          quantity: candidate.quantity.toNumber()
-        }))
+  const renderTable: SharedRenderProps<FieldArrayRenderProps>["render"] = ({
+    push,
+    remove,
+    replace
+  }) => {
+    const rows = filteredForms.map(({ form, quantity }) => {
+      const checked = currentlyAnnexedFormIds.includes(form.id);
+      const quantityAccepted = new Decimal(
+        form.quantityAccepted ?? form.quantityReceived!
       );
+
+      const quantityLeft = getQuantityLeft({ form, quantity });
+
+      const quantityGrouped = checked
+        ? // si le bordereau est sélectionné, `quantityGrouped`
+          // est contrôlé par le state Formik
+          quantitiesGrouped[form.id]
+        : // sinon l'input est disabled et sa valeur par défaut
+          // est égale à la quantité restante à regrouper
+          quantityLeft;
+
+      return [
+        <Checkbox
+          options={[
+            {
+              label: "",
+              nativeInputProps: {
+                checked,
+                onChange: e => {
+                  setIsDirty(true);
+                  if (e.target.checked) {
+                    push({
+                      form,
+                      quantity: quantityGrouped
+                    });
+                  } else {
+                    const idx = currentlyAnnexedFormIds.indexOf(form.id);
+                    remove(idx);
+                  }
+                }
+              }
+            }
+          ]}
+        />,
+        form.readableId,
+        form.wasteDetails?.code,
+        `${form.emitter?.company?.name} (${form.emitter?.company?.siret})`,
+        form.signedAt && formatDate(form.signedAt),
+        form.processingOperationDone,
+        quantityAccepted.toNumber(),
+        quantityLeft.toNumber(),
+        <Input
+          label=""
+          disabled={!checked}
+          state={
+            Number(quantityGrouped) < 0 ||
+            quantityLeft.lessThan(Number(quantityGrouped))
+              ? "error"
+              : "default"
+          }
+          stateRelatedMessage={
+            Number(quantityGrouped) < 0
+              ? "La quantité doit être un nombre supérieur à 0"
+              : "Vous ne pouvez pas regrouper une" +
+                " quantité supérieure à la quantité restante"
+          }
+          nativeInputProps={{
+            type: "number",
+            min: 0,
+            max: quantityLeft.toNumber(),
+            inputMode: "decimal",
+            step: 0.000001, // increment kg
+            value: String(quantityGrouped),
+            onChange: e => {
+              setIsDirty(true);
+              const idx = currentlyAnnexedFormIds.indexOf(form.id);
+              const value = e.target.value;
+              replace(idx, {
+                form,
+                quantity: value === "" ? "" : Number(value)
+              });
+            }
+          }}
+        />
+      ];
+    });
+
+    // Callback executé lorsque l'on clique sur la checkbox de l'en-tête
+    // permettant de sélectionner / dé-sélectionner en masse
+    function onSelectAll(e: React.ChangeEvent<HTMLInputElement>) {
+      setIsDirty(true);
+      if (e.target.checked) {
+        for (const { form, quantity } of forms) {
+          if (!currentlyAnnexedFormIds.includes(form.id)) {
+            push({
+              form,
+              quantity: getQuantityLeft({ form, quantity }).toNumber()
+            });
+          }
+        }
+      } else {
+        setFieldValue("grouping", []);
+      }
     }
-  }
+
+    // En tête du tableau
+    const headers = [
+      <Checkbox
+        options={[
+          {
+            label: "",
+            nativeInputProps: {
+              checked: currentlyAnnexedForms.length === forms.length,
+              onChange: onSelectAll
+            }
+          }
+        ]}
+      />,
+      "Numéro",
+      "Code déchet",
+      "Émetteur initial",
+      "Date de l'acceptation",
+      "Opération réalisée",
+      "Qté acceptée",
+      "Qté restante",
+      "Qté à regrouper"
+    ];
+
+    return <Table headers={headers} data={rows} />;
+  };
 
   if (loading) {
-    return <div>Chargement...</div>;
+    return <Loader />;
   }
 
-  return (
-    <>
-      <table className="td-table" style={{ display: "table-cell" }}>
-        <thead>
-          <tr className="td-table__head-tr">
-            <th>
-              {appendix2Candidates.length > 0 && (
-                <input
-                  type="checkbox"
-                  className="td-checkbox"
-                  checked={
-                    appendix2Selected.length === appendix2Candidates.length
-                  }
-                  onChange={onSelectAll}
-                />
-              )}
-            </th>
-            <th>Numéro</th>
-            <th>
-              <div>Code déchet</div>
-              <input
-                type="text"
-                className="td-input"
-                value={wasteCodeFilter}
-                placeholder="Filtrer..."
-                onChange={e => {
-                  setWasteCodeFilter(e.target.value);
+  if (error) {
+    return (
+      <Alert severity="error" description={error.message} title="" small />
+    );
+  }
+
+  if (data) {
+    if (forms.length > 0) {
+      return (
+        <>
+          <div className="fr-grid-row fr-grid-row--gutters">
+            <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
+              <Input
+                label="Numéro de bordereau"
+                nativeInputProps={{
+                  value: readableIdFilter,
+                  onChange: v => setReadableIdFilter(v.target.value)
                 }}
-              ></input>
-            </th>
-            <th>Expéditeur initial</th>
-            <th>Date de réception</th>
-            <th>Quantité acceptée</th>
-            <th>Quantité restante</th>
-            <th>Quantité à regrouper</th>
-            <th>Opération réalisée</th>
-          </tr>
-        </thead>
-        <tbody>
-          <FieldArray
-            name="grouping"
-            render={({ push, remove, replace }) => (
-              <>
-                {appendix2Candidates.map(
-                  ({ form, quantity: defaultQuantity }, index) => {
-                    const quantitySet = quantitesToGroup[form.id];
-                    let quantityLeft = new Decimal(
-                      form.quantityAccepted ?? form.quantityReceived!
-                    ).minus(form.quantityGrouped ?? 0);
+              />
+            </div>
+            <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
+              <Input
+                label="Code déchet"
+                nativeInputProps={{
+                  value: wasteCodeFilter,
+                  onChange: v => setWasteCodeFilter(v.target.value)
+                }}
+              />
+            </div>
+            <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
+              <Input
+                label="N°SIRET émetteur"
+                nativeInputProps={{
+                  value: emitterSiretFilter,
+                  onChange: v => setEmitterSiretFilter(v.target.value)
+                }}
+              />
+            </div>
+          </div>
+          <FieldArray name="grouping" render={renderTable} />
+        </>
+      );
+    }
 
-                    if (values.id) {
-                      quantityLeft = quantityLeft.plus(defaultQuantity);
-                    }
-
-                    return (
-                      <tr key={form.id} className="td-table__tr">
-                        <td>
-                          <input
-                            type="checkbox"
-                            className="td-checkbox"
-                            name={`grouping[${index}].id`}
-                            value={form.id}
-                            checked={appendix2Selected
-                              .map(({ form: f }) => f.id)
-                              .includes(form.id)}
-                            onChange={e => {
-                              if (e.target.checked) {
-                                push({
-                                  form,
-                                  quantity:
-                                    quantitySet !== undefined
-                                      ? quantitySet
-                                      : defaultQuantity.toNumber()
-                                });
-                              } else {
-                                const idx = appendix2Selected
-                                  .map(({ form: f }) => f.id)
-                                  .indexOf(form.id);
-                                remove(idx);
-                              }
-                              setHasChanged(true);
-                            }}
-                          />
-                        </td>
-                        <td>{form.readableId}</td>
-                        <td>
-                          {form.wasteDetails?.code} - {form.wasteDetails?.name}
-                        </td>
-                        <td>{form.emitter?.company?.name}</td>
-                        <td>{formatDate(form.signedAt!)}</td>
-                        <td>
-                          {form.quantityAccepted ?? form.quantityReceived} T
-                        </td>
-                        <td>{quantityLeft.toNumber()} T</td>
-                        <td>
-                          <input
-                            className="td-input td-input--small"
-                            type="number"
-                            min={0}
-                            step={0.000001} // increment kg
-                            disabled={
-                              !appendix2Selected
-                                .map(({ form: f }) => f.id)
-                                .includes(form.id)
-                            }
-                            onChange={e => {
-                              const idx = appendix2Selected
-                                .map(({ form: f }) => f.id)
-                                .indexOf(form.id);
-                              replace(idx, {
-                                form,
-                                quantity: e.target.value
-                                  ? parseFloat(e.target.value)
-                                  : 0
-                              });
-                              setHasChanged(true);
-                            }}
-                            max={quantityLeft.toNumber()}
-                            defaultValue={
-                              quantitySet ?? defaultQuantity.toNumber()
-                            }
-                          ></input>
-                          {!!quantitySet &&
-                            quantityLeft.lessThan(quantitySet) && (
-                              <div className="error-message">
-                                Vous ne pouvez pas regrouper une quantité
-                                supérieure à la quantité restante sur ce
-                                bordereau qui est de {quantityLeft.toNumber()} T
-                              </div>
-                            )}
-                          {quantitySet < 0 && (
-                            <div className="error-message">
-                              La quantité doit être un nombre supérieur à 0
-                            </div>
-                          )}
-                        </td>
-                        <td>{form.processingOperationDone}</td>
-                      </tr>
-                    );
-                  }
-                )}
-              </>
-            )}
-          />
-          {appendix2Candidates.length === 0 && (
-            <tr>
-              <td colSpan={100}>
-                Aucun bordereau éligible au regroupement. Vérifiez que vous avez
-                bien sélectionné le bon émetteur.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-      {error && <InlineError apolloError={error} />}
-    </>
-  );
+    return (
+      <Alert
+        severity="warning"
+        title="Aucun bordereau éligible au regroupement"
+        description="Vérifiez que vous avez bien sélectionné le bon émetteur"
+        small
+      />
+    );
+  }
 }
