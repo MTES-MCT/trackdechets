@@ -9,7 +9,6 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "@td/constants";
 import React, { useEffect } from "react";
-import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import Packagings from "./components/packagings/Packagings";
 import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
 import {
@@ -19,6 +18,7 @@ import {
 import "./WasteInfo.scss";
 import EstimatedQuantityTooltip from "../../common/components/EstimatedQuantityTooltip";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
+import Appendix2MultiSelectWrapper from "./components/appendix/Appendix2MultiSelectWrapper";
 
 type Values = {
   wasteDetails: {
@@ -185,7 +185,9 @@ export default connect<{ disabled }, Values>(function WasteInfo({
             traitement de type{" "}
             {PROCESSING_OPERATIONS_GROUPEMENT_CODES.join(", ")}.
           </p>
-          <Appendix2MultiSelect />
+          <Appendix2MultiSelectWrapper
+            emitterCompanySiret={values.emitter?.company?.siret}
+          />
         </>
       )}
 

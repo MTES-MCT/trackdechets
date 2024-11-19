@@ -3,11 +3,8 @@ import {
   Form,
   InitialForm,
   InitialFormFraction,
-  Packagings,
-  Query,
-  QueryAppendixFormsArgs
+  Packagings
 } from "@td/codegen-ui";
-import { gql, useQuery } from "@apollo/client";
 import {
   FieldArray,
   FieldArrayRenderProps,
@@ -15,60 +12,37 @@ import {
   useFormikContext
 } from "formik";
 import Table from "@codegouvfr/react-dsfr/Table";
-import { Loader } from "../../../../Apps/common/Components";
 import { formatDate } from "../../../../common/datetime";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Decimal from "decimal.js";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 
-const APPENDIX2_FORMS = gql`
-  query AppendixForms($siret: String!, $wasteCode: String) {
-    appendixForms(siret: $siret, wasteCode: $wasteCode) {
-      id
-      readableId
-      emitter {
-        company {
-          name
-        }
-      }
-      wasteDetails {
-        code
-        name
-        quantity
-        packagingInfos {
-          type
-          other
-          quantity
-        }
-      }
-      signedAt
-      quantityReceived
-      quantityAccepted
-      quantityRefused
-      quantityGrouped
-      processingOperationDone
-      recipient {
-        cap
-      }
-    }
-  }
-`;
+type Appendix2MultiSelectProps = {
+  // Résultat de la query `appendixForms` executé
+  // dans le composant wrapper parent
+  appendixForms: Form[];
+  // callback permettant de mettre à jour la quantité totale
+  // du bordereau en fonction des annexes 2 sélectionnées
+  updateTotalQuantity: (totalQuantity: number) => void;
+  // callback permettant de mettre à jour la liste de contenants
+  // du bordereau en fonction des annexes 2 sélectionnées
+  updatePackagings: (
+    packagings: {
+      type: string;
+      other: string;
+      quantity: any;
+    }[]
+  ) => void;
+};
 
-export default function Appendix2MultiSelect() {
+export default function Appendix2MultiSelect({
+  appendixForms,
+  updateTotalQuantity,
+  updatePackagings
+}: Appendix2MultiSelectProps) {
   const { values, setFieldValue, getFieldMeta } = useFormikContext<Form>();
   const meta = getFieldMeta<InitialFormFraction[]>("grouping");
-
-  const { loading, error, data } = useQuery<
-    Pick<Query, "appendixForms">,
-    QueryAppendixFormsArgs
-  >(APPENDIX2_FORMS, {
-    variables: {
-      siret: values.emitter?.company?.siret ?? ""
-    },
-    skip: !values.emitter?.company?.siret,
-    fetchPolicy: "network-only"
-  });
 
   const [readableIdFilter, setReadableIdFilter] = useState("");
   const [wasteCodeFilter, setWasteCodeFilter] = useState("");
@@ -83,6 +57,7 @@ export default function Appendix2MultiSelect() {
     () => meta.initialValue ?? [],
     [meta.initialValue]
   );
+
   const initiallyAnnexedFormIds = initiallyAnnexedForms.map(
     ({ form }) => form.id
   );
@@ -90,7 +65,7 @@ export default function Appendix2MultiSelect() {
   // Liste les bordereaux en attente de regroupement qui ne sont pas
   // déjà annexés au bordereau de groupement au moment de l'ouverture du
   // formulaire
-  const canBeAnnexedForms = (data?.appendixForms ?? [])
+  const canBeAnnexedForms = (appendixForms ?? [])
     .filter(f => !initiallyAnnexedFormIds.includes(f.id))
     .map(form => ({ form, quantity: 0 }));
 
@@ -117,7 +92,7 @@ export default function Appendix2MultiSelect() {
         }
 
         if (emitterSiretFilter.length > 0) {
-          r = r && !!form.emitter?.company?.siret?.includes(emitterSiretFilter);
+          r = r && !!form.emitter?.company?.orgId?.includes(emitterSiretFilter);
           if (r === false) return r;
         }
 
@@ -165,10 +140,10 @@ export default function Appendix2MultiSelect() {
 
   useEffect(() => {
     if (isDirty) {
-      // Auto-complète la quantité totale à partir des annexes 2 séletionnées
+      // Auto-complète la quantité totale à partir des annexes 2 sélectionnées
       const totalQuantity = currentlyAnnexedForms
         .reduce((q, { quantity }) => {
-          if (!quantity) {
+          if (!quantity || quantity < 0) {
             return q;
           }
           return q.plus(quantity);
@@ -216,10 +191,10 @@ export default function Appendix2MultiSelect() {
         }));
       })();
 
-      setFieldValue("wasteDetails.quantity", totalQuantity);
-      setFieldValue("wasteDetails.packagingInfos", totalPackagings);
+      updateTotalQuantity(totalQuantity);
+      updatePackagings(totalPackagings);
     }
-  }, [currentlyAnnexedForms, isDirty, setFieldValue]);
+  }, [currentlyAnnexedForms, isDirty, updateTotalQuantity, updatePackagings]);
 
   const renderTable: SharedRenderProps<FieldArrayRenderProps>["render"] = ({
     push,
@@ -267,7 +242,7 @@ export default function Appendix2MultiSelect() {
         />,
         form.readableId,
         form.wasteDetails?.code,
-        `${form.emitter?.company?.name} (${form.emitter?.company?.siret})`,
+        `${form.emitter?.company?.name} (${form.emitter?.company?.orgId})`,
         form.signedAt && formatDate(form.signedAt),
         form.processingOperationDone,
         quantityAccepted.toNumber(),
@@ -352,61 +327,49 @@ export default function Appendix2MultiSelect() {
     return <Table headers={headers} data={rows} />;
   };
 
-  if (loading) {
-    return <Loader />;
-  }
-
-  if (error) {
+  if (forms.length > 0) {
     return (
-      <Alert severity="error" description={error.message} title="" small />
-    );
-  }
-
-  if (data) {
-    if (forms.length > 0) {
-      return (
-        <>
-          <div className="fr-grid-row fr-grid-row--gutters">
-            <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
-              <Input
-                label="Numéro de bordereau"
-                nativeInputProps={{
-                  value: readableIdFilter,
-                  onChange: v => setReadableIdFilter(v.target.value)
-                }}
-              />
-            </div>
-            <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
-              <Input
-                label="Code déchet"
-                nativeInputProps={{
-                  value: wasteCodeFilter,
-                  onChange: v => setWasteCodeFilter(v.target.value)
-                }}
-              />
-            </div>
-            <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
-              <Input
-                label="N°SIRET émetteur"
-                nativeInputProps={{
-                  value: emitterSiretFilter,
-                  onChange: v => setEmitterSiretFilter(v.target.value)
-                }}
-              />
-            </div>
+      <>
+        <div className="fr-grid-row fr-grid-row--gutters">
+          <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
+            <Input
+              label="Numéro de bordereau"
+              nativeInputProps={{
+                value: readableIdFilter,
+                onChange: v => setReadableIdFilter(v.target.value)
+              }}
+            />
           </div>
-          <FieldArray name="grouping" render={renderTable} />
-        </>
-      );
-    }
-
-    return (
-      <Alert
-        severity="warning"
-        title="Aucun bordereau éligible au regroupement"
-        description="Vérifiez que vous avez bien sélectionné le bon émetteur"
-        small
-      />
+          <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
+            <Input
+              label="Code déchet"
+              nativeInputProps={{
+                value: wasteCodeFilter,
+                onChange: v => setWasteCodeFilter(v.target.value)
+              }}
+            />
+          </div>
+          <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
+            <Input
+              label="N°SIRET émetteur"
+              nativeInputProps={{
+                value: emitterSiretFilter,
+                onChange: v => setEmitterSiretFilter(v.target.value)
+              }}
+            />
+          </div>
+        </div>
+        <FieldArray name="grouping" render={renderTable} />
+      </>
     );
   }
+
+  return (
+    <Alert
+      severity="warning"
+      title="Aucun bordereau éligible au regroupement"
+      description="Vérifiez que vous avez bien sélectionné le bon émetteur"
+      small
+    />
+  );
 }
