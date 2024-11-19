@@ -58,9 +58,7 @@ describe("Mutation.Bsda.create", () => {
     process.env = OLD_ENV;
   });
 
-  afterAll(() => {
-    return resetDatabase();
-  });
+  afterAll(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();

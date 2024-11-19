@@ -1,6 +1,9 @@
 import {
   BsdaStatus,
+  Company,
+  EcoOrganisme,
   TransportMode,
+  User,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -13,6 +16,8 @@ import {
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
+  companyFactory,
+  ecoOrganismeFactory,
   transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -24,10 +29,48 @@ import {
 import { buildPdfAsBase64 } from "../../../pdf/generator";
 import { getTransportersSync } from "../../../database";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
-import { UPDATE_BSDA } from "./update.integration";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
+
+export const UPDATE_BSDA = `
+  mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
+    updateBsda(id: $id, input: $input) {
+      id
+      emitter {
+        company {
+          name
+        }
+      }
+      waste {
+        code
+      }
+      transporter {
+        company {
+          name
+          siret
+        }
+        recepisse {
+          isExempted
+          number
+          department
+          validityLimit
+        }
+        transport {
+          mode
+        }
+      }
+      destination {
+        company {
+          name
+        }
+      }
+      intermediaries {
+        siret
+      }
+    }
+  }
+`;
 
 const SIGN_BSDA = `
 mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
@@ -47,7 +90,7 @@ mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
 `;
 
 describe("Mutation.Bsda.sign", () => {
-  afterEach(resetDatabase);
+  afterAll(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
@@ -1604,6 +1647,153 @@ describe("Mutation.Bsda.sign", () => {
       expect(
         updatedBsda.transporters[0].transporterTransportSignatureDate
       ).toBeDefined();
+    });
+  });
+
+  describe.only("closed sirets", () => {
+    let emitterUser: User;
+    let emitter: Company;
+    let destination: Company;
+    let transporter: Company;
+    let workerUser: User;
+    let worker: Company;
+    let broker: Company;
+    let intermediary: Company;
+    let ecoOrganisme: EcoOrganisme;
+    let bsda: Awaited<ReturnType<typeof bsdaFactory>>;
+
+    // eslint-disable-next-line prefer-const
+    let searchCompanyMock = jest.fn().mockReturnValue({});
+    let makeClientLocal: typeof makeClient;
+
+    beforeAll(async () => {
+      const emitterCompanyAndUser = await userWithCompanyFactory();
+      emitterUser = emitterCompanyAndUser.user;
+      emitter = emitterCompanyAndUser.company;
+
+      const workerCompanyAndUser = await userWithCompanyFactory();
+      workerUser = workerCompanyAndUser.user;
+      worker = workerCompanyAndUser.company;
+
+      destination = await companyFactory();
+      transporter = await companyFactory();
+      broker = await companyFactory();
+      intermediary = await companyFactory();
+      ecoOrganisme = await ecoOrganismeFactory({
+        handle: { handleBsda: true }
+      });
+
+      bsda = await bsdaFactory({
+        opt: {
+          status: BsdaStatus.INITIAL,
+          emitterCompanySiret: emitter.siret,
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          destinationCompanySiret: destination.siret,
+          workerCompanySiret: worker.siret,
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          brokerCompanySiret: broker.siret,
+          transporters: {
+            createMany: {
+              data: [
+                {
+                  number: 1,
+                  transporterCompanySiret: transporter.siret,
+                  transporterCompanyName: transporter.name
+                }
+              ]
+            }
+          },
+          intermediaries: {
+            create: [
+              {
+                siret: intermediary.siret!,
+                name: intermediary.name,
+                address: "intermediary address",
+                contact: "intermediary"
+              }
+            ]
+          },
+          ecoOrganismeSiret: ecoOrganisme.siret
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date()
+        }
+      });
+
+      // Mock les appels à la base SIRENE
+      jest.mock("../../../../companies/search", () => ({
+        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+        ...jest.requireActual("../../../../companies/search"),
+        searchCompany: searchCompanyMock
+      }));
+
+      // Ré-importe makeClient pour que searchCompany soit bien mocké
+      jest.resetModules();
+      makeClientLocal = require("../../../../__tests__/testClient")
+        .default as typeof makeClient;
+    });
+
+    const mockCloseCompany = siretToClose => {
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: siret === siretToClose ? "F" : "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+    };
+
+    const testSigningBsdaWithClosedSiret = async (status, type, user) => {
+      // Given
+      await prisma.bsda.update({
+        where: { id: bsda.id },
+        data: { status }
+      });
+      //  mockCloseCompany(siret);
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: user.name,
+            type
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Nope");
+    };
+
+    // BsdaStatus.INITIAL,
+    // BsdaStatus.SIGNED_BY_PRODUCER,
+    // BsdaStatus.SIGNED_BY_WORKER,
+    // BsdaStatus.SENT,
+    // BsdaStatus.PROCESSED,
+    // BsdaStatus.CANCELED,
+    // BsdaStatus.REFUSED
+
+    it("emitter signs EMISSION", async () => {
+      // Given
+      // const siret = bsda.destinationCompanySiret;
+
+      // When > Then
+      await testSigningBsdaWithClosedSiret(
+        "SIGNED_BY_PRODUCER",
+        "WORK",
+        workerUser
+      );
     });
   });
 });
