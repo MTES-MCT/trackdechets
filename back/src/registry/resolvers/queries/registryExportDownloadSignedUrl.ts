@@ -4,6 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryRegistryExportDownloadSignedUrlArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { ForbiddenError } from "../../../common/errors";
+import { getRegistryFileName } from "../../filename";
 
 export async function registryExportDownloadSignedUrl(
   _,
@@ -27,10 +28,15 @@ export async function registryExportDownloadSignedUrl(
     );
   }
   const bucketName = process.env.S3_REGISTRY_EXPORTS_BUCKET!;
-
+  const fileName = getRegistryFileName(
+    registryExport.registryType ?? "ALL",
+    registryExport.sirets,
+    registryExport.createdAt
+  );
   const signedUrl = await getSignedUrlForDownload({
     bucketName,
-    key
+    key,
+    fileName
   });
 
   return { fileKey: key, signedUrl };
