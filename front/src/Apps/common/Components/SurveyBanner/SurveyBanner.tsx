@@ -135,7 +135,7 @@ const iconSurvey = (
 );
 
 const SurveyBanner = ({
-  message,
+  messages,
   button,
   persistedSurveyName
 }: SurveyBannerProps) => {
@@ -156,7 +156,11 @@ const SurveyBanner = ({
         <div className="survey-banner__group">
           <div className="survey-banner__subgroup">
             <div className="survey-banner__icon">{iconSurvey}</div>
-            <div className="survey-banner__message">{message}</div>
+            <div className="survey-banner__message">
+              {messages.map(message => (
+                <p>{message}</p>
+              ))}
+            </div>
           </div>
           <div className="survey-banner__link">
             <Button
