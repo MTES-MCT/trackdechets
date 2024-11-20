@@ -109,17 +109,23 @@ export async function getSignedUrlForUpload({
 
 export async function getSignedUrlForDownload({
   bucketName,
-  key
+  key,
+  fileName
 }: {
   bucketName: string;
   key: string;
-  metadata?: Record<string, string>;
-  tags?: Record<string, string>;
+  fileName?: string;
 }) {
+  const metadataResponse = await getFileMetadata(bucketName, key);
+  const metadataFileName = metadataResponse?.Metadata?.filename;
+
+  const computedFileName =
+    fileName ?? metadataFileName ?? `${bucketName}_${key}`;
+
   const command = new GetObjectCommand({
     Bucket: bucketName,
     Key: key,
-    ResponseContentDisposition: `attachment; filename="${bucketName}_${key}"`
+    ResponseContentDisposition: `attachment; filename="${computedFileName}"`
   });
 
   const signedUrl = await getSignedUrl(registryS3Client, command, {
