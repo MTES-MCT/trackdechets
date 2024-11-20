@@ -92,10 +92,16 @@ export async function processRegistryImportJob(
     return map;
   }, new Map<string, string[]>());
 
-  const { s3Stream: outputErrorStream, upload } = getUploadWithWritableStream(
-    process.env.S3_REGISTRY_ERRORS_BUCKET!,
-    `${format(new Date(), "yyyyMMdd")}_TD_rapport_erreur_${importId}.csv`
-  );
+  const { s3Stream: outputErrorStream, upload } = getUploadWithWritableStream({
+    bucketName: process.env.S3_REGISTRY_ERRORS_BUCKET!,
+    key: registryImport.s3FileKey,
+    metadata: {
+      filename: `${format(
+        new Date(),
+        "yyyyMMdd"
+      )}_TD_rapport_erreur_${importId}.csv`
+    }
+  });
 
   const stats = await processStream({
     importId,
