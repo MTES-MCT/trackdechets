@@ -293,6 +293,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
           inputTitle={"Test"}
           label="Le déchet est soumis à l'ADR"
           checked={values.wasteDetails.isSubjectToADR ?? false}
+          disabled={disabled}
         />
 
         {values.wasteDetails.isSubjectToADR && (
