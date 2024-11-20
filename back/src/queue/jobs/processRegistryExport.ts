@@ -33,7 +33,7 @@ const LOOKUP_PAGE_SIZE = 100;
 const streamLookup = (
   findManyArgs: Prisma.RegistryLookupFindManyArgs,
   registryType: WasteRegistryType,
-  addEncounteredSiret: (sirets: string[]) => void
+  addEncounteredSirets: (sirets: string[]) => void
 ): Readable => {
   let cursorId: string | null = null;
   let count = 0;
@@ -58,7 +58,7 @@ const streamLookup = (
           const lookup = item as Prisma.RegistryLookupGetPayload<{
             include: { registrySsd: true };
           }>;
-          addEncounteredSiret(lookup.sirets);
+          addEncounteredSirets(lookup.sirets);
           const mapped = toWaste(registryType, {
             SSD: lookup.registrySsd
           });
@@ -174,16 +174,12 @@ export async function processRegistryExportJob(
 
     // if the export was for all of a user's companies, all the sirets are in the registryExport at the beginning
     // in order to cleanup the exports list, we memorize the
-    // sirets that are encountered during the export, and update the list of sirets
+    // sirets that are never encountered during the export, and update the list of sirets
     // in registryExport at the end
-    const siretsEncountered: Record<string, boolean> = Object.fromEntries(
-      registryExport.sirets.map(siret => [siret, false])
-    );
-    const addEncounteredSiret = (sirets: string[]) => {
+    const unusedSirets = new Set(registryExport.sirets);
+    const addEncounteredSirets = (sirets: string[]) => {
       sirets.forEach(siret => {
-        if (siretsEncountered[siret] === false) {
-          siretsEncountered[siret] = true;
-        }
+        unusedSirets.delete(siret);
       });
     };
     const inputStream = streamLookup(
@@ -191,7 +187,7 @@ export async function processRegistryExportJob(
         where: query
       },
       registryExport.registryType ?? "ALL",
-      addEncounteredSiret
+      addEncounteredSirets
     );
 
     // handle CSV exports
@@ -274,23 +270,18 @@ export async function processRegistryExportJob(
 
     // we call upload.done before it's actually "done", because this call
     // actually triggers the flow (in @aws-sdk/lib-storage)
-    try {
-      const result = await upload.done();
-      await endExport(
-        exportId,
-        Object.keys(siretsEncountered)
-          .map(key => (siretsEncountered[key] ? key : null))
-          .filter(Boolean),
-        result.Key
-      );
-    } catch (error) {
-      logger.error(`Error processing export ${exportId}`, error);
-      await failExport(exportId);
-    }
+    const result = await upload.done();
+    await endExport(
+      exportId,
+      registryExport.sirets.filter(siret => !unusedSirets.has(siret)),
+      result.Key
+    );
   } catch (error) {
     logger.error(`Error processing export ${exportId}`, error);
     if (upload) {
-      await upload.abort();
+      await upload
+        .abort()
+        .catch(error => logger.error("Upload cannot be aborted", error));
     }
     await failExport(exportId);
   }
