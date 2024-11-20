@@ -23,11 +23,17 @@ export const registryS3Client = new S3Client({
 
 const SIGNED_URL_EXPIRES_IN = 60 * 10; // 10 minutes
 
-export function getUploadWithWritableStream(
-  bucketName: string,
-  key: string,
-  contentType?: string
-): {
+export function getUploadWithWritableStream({
+  bucketName,
+  key,
+  contentType,
+  metadata
+}: {
+  bucketName: string;
+  key: string;
+  contentType?: string;
+  metadata?: Record<string, string>;
+}): {
   s3Stream: PassThrough;
   upload: Upload;
 } {
@@ -39,6 +45,7 @@ export function getUploadWithWritableStream(
       Bucket: bucketName,
       Key: key,
       Body: s3Stream,
+      Metadata: metadata,
       ContentType: contentType
     }
   });

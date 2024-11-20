@@ -70,10 +70,10 @@ describe("Process registry import job", () => {
       expect.assertions(1);
       const fileKey = "test-file";
 
-      const { s3Stream, upload } = getUploadWithWritableStream(
-        process.env.S3_REGISTRY_IMPORTS_BUCKET,
-        fileKey
-      );
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey
+      });
 
       s3Stream.end("test file text");
       await upload.done();
@@ -93,11 +93,11 @@ describe("Process registry import job", () => {
       const fileKey = "no-data.csv";
       const user = await userFactory({});
 
-      const { s3Stream, upload } = getUploadWithWritableStream(
-        process.env.S3_REGISTRY_IMPORTS_BUCKET,
-        fileKey,
-        "text/csv"
-      );
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
 
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.end();
@@ -137,11 +137,11 @@ describe("Process registry import job", () => {
       const fileKey = "one-insertion.csv";
       const { company, user } = await userWithCompanyFactory();
 
-      const { s3Stream, upload } = getUploadWithWritableStream(
-        process.env.S3_REGISTRY_IMPORTS_BUCKET,
-        fileKey,
-        "text/csv"
-      );
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
 
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.end(
@@ -183,11 +183,11 @@ describe("Process registry import job", () => {
       const fileKey = "mixed.csv";
       const { company, user } = await userWithCompanyFactory();
 
-      const { s3Stream, upload } = getUploadWithWritableStream(
-        process.env.S3_REGISTRY_IMPORTS_BUCKET,
-        fileKey,
-        "text/csv"
-      );
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
 
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.write(
@@ -230,11 +230,11 @@ describe("Process registry import job", () => {
       const fileKey = "check-errors.csv";
       const { company, user } = await userWithCompanyFactory();
 
-      const { s3Stream, upload } = getUploadWithWritableStream(
-        process.env.S3_REGISTRY_IMPORTS_BUCKET,
-        fileKey,
-        "text/csv"
-      );
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
 
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.write(
@@ -282,11 +282,11 @@ describe("Process registry import job", () => {
       const fileKey = "missing-column.csv";
       const { company, user } = await userWithCompanyFactory();
 
-      const { s3Stream, upload } = getUploadWithWritableStream(
-        process.env.S3_REGISTRY_IMPORTS_BUCKET,
-        fileKey,
-        "text/csv"
-      );
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
 
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.write(
@@ -330,11 +330,11 @@ describe("Process registry import job", () => {
       const { company } = await userWithCompanyFactory();
       const { user } = await userWithCompanyFactory();
 
-      const { s3Stream, upload } = getUploadWithWritableStream(
-        process.env.S3_REGISTRY_IMPORTS_BUCKET,
-        fileKey,
-        "text/csv"
-      );
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
 
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.end(
@@ -386,11 +386,11 @@ describe("Process registry import job", () => {
         }
       });
 
-      const { s3Stream, upload } = getUploadWithWritableStream(
-        process.env.S3_REGISTRY_IMPORTS_BUCKET,
-        fileKey,
-        "text/csv"
-      );
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
 
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.end(
@@ -442,11 +442,11 @@ describe("Process registry import job", () => {
         }
       });
 
-      const { s3Stream, upload } = getUploadWithWritableStream(
-        process.env.S3_REGISTRY_IMPORTS_BUCKET,
-        fileKey,
-        "text/csv"
-      );
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
 
       s3Stream.write("PK");
       s3Stream.end("");
