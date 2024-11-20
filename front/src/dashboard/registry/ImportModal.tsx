@@ -34,12 +34,12 @@ type StepProps = {
 
 const steps = [
   {
-    title: "Téléchargement du fichier",
+    title: "Sélection du fichier",
     component: Step1,
     buttons: ["CANCEL", "VALIDATE"]
   },
-  { title: "Vérification", component: Step2 },
-  { title: "Importation", component: Step3, buttons: ["CANCEL", "CLOSE"] }
+  { title: "Téléversement en cours", component: Step2 },
+  { title: "Import en cours", component: Step3, buttons: ["CANCEL", "CLOSE"] }
 ];
 
 const REGISTRY_UPLOAD_SIGNED_URL = gql`
@@ -245,9 +245,9 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
   return (
     <div>
       <Alert
-        title="Téléversement du fichier"
+        title="Envoi du fichier"
         severity="info"
-        description="Veuillez patienter pendant que le fichier est téléversé vers Trackdéchets. L'import débutera dans la foulée."
+        description="Veuillez patienter pendant que le fichier est téléversé vers Trackdéchets. L'import des déclarations débutera automatiquement à la suite."
       />
       <div className="tw-mt-6">
         <InlineLoader />
@@ -309,11 +309,19 @@ function Step3({ registryImportId }) {
   const stats = [
     `${
       data?.registryImport?.numberOfErrors ?? 0
-    } déclarations en erreur non prises en compte`,
-    `${data?.registryImport?.numberOfInsertions ?? 0} nouvelles déclarations`,
-    `${data?.registryImport?.numberOfEdits ?? 0} déclarations corrigées`,
-    `${data?.registryImport?.numberOfCancellations ?? 0} déclarations annulées`,
-    `${data?.registryImport?.numberOfSkipped ?? 0} déclarations ignorées`
+    } lignes n'ont pas pu être traitées car elles comportent au moins une erreur`,
+    `${
+      data?.registryImport?.numberOfInsertions ?? 0
+    } nouvelles lignes ont été importées`,
+    `${
+      data?.registryImport?.numberOfEdits ?? 0
+    } lignes existantes ont été modifées`,
+    `${
+      data?.registryImport?.numberOfCancellations ?? 0
+    } lignes existantes ont été annulées`,
+    `${
+      data?.registryImport?.numberOfSkipped ?? 0
+    } lignes ont été ignorées (numéro unique déjà déclaré et aucun motif présent)`
   ].filter(v => !v.startsWith("0"));
 
   return (
@@ -321,7 +329,7 @@ function Step3({ registryImportId }) {
       {isStillRunning && (
         <>
           <Alert
-            title="Import en cours"
+            title="Traitement des déclarations"
             severity="info"
             description={
               <>
@@ -347,7 +355,7 @@ function Step3({ registryImportId }) {
 
       {isSuccessful && (
         <Alert
-          title="Votre fichier a bien été importé"
+          title="Votre fichier a été importé"
           severity="success"
           description={
             <ul>
@@ -361,7 +369,7 @@ function Step3({ registryImportId }) {
 
       {isPartiallySuccessful && (
         <Alert
-          title="Votre fichier a été importé partiellement"
+          title="Votre fichier a été partiellement importé "
           severity="warning"
           description={
             <ul>
