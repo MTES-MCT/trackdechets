@@ -240,7 +240,9 @@ export default function Appendix2MultiSelect({
             }
           ]}
         />,
-        form.readableId,
+        <div style={{ wordBreak: "break-word", wordWrap: "break-word" }}>
+          {form.readableId}
+        </div>,
         form.wasteDetails?.code,
         `${form.emitter?.company?.name} (${form.emitter?.company?.orgId})`,
         form.signedAt && formatDate(form.signedAt),
@@ -324,7 +326,14 @@ export default function Appendix2MultiSelect({
       "Qté à regrouper"
     ];
 
-    return <Table headers={headers} data={rows} />;
+    return (
+      <Table
+        caption="Sélection des bordereaux à ajouter en annexe 2" // accessibilité
+        noCaption
+        headers={headers}
+        data={rows}
+      />
+    );
   };
 
   if (forms.length > 0) {
