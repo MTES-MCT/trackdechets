@@ -38,6 +38,7 @@ const CREATE_FORM_REVISION_REQUEST = `
         wasteDetails { code }
       }
       authoringCompany {
+        orgId
         siret
       }
       approvals {
@@ -624,7 +625,7 @@ describe("Mutation.createFormRevisionRequest", () => {
 
   it(
     "should create a revisionRequest and identifying current user" +
-      " as the requester (transporter when emitterType=APPENIDX_PRODUCER) ",
+      " as the requester (transporter when emitterType=APPENDIX_PRODUCER) ",
     async () => {
       const { company: recipientCompany } = await userWithCompanyFactory(
         "ADMIN",
@@ -671,6 +672,75 @@ describe("Mutation.createFormRevisionRequest", () => {
       expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
       expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
         company.siret
+      );
+      // one approval is created
+      expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+        { approverSiret: emitterCompany.siret, status: "PENDING" }
+      ]);
+    }
+  );
+
+  it.only(
+    "should create a revisionRequest and identifying current user" +
+      " as the requester (foreign transporter when emitterType=APPENDIX_PRODUCER) ",
+    async () => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
+      const vatNumber = "IT13029381004";
+      const { user, company: foreignTransporter } =
+        await userWithCompanyFactory("ADMIN", {
+          vatNumber,
+          orgId: vatNumber,
+          siret: null
+        });
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          transportersSirets: [foreignTransporter.vatNumber!],
+          wasteDetailsQuantity: 1,
+          status: "SENT",
+          takenOverAt: new Date(),
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: null,
+              transporterCompanyVatNumber: foreignTransporter.vatNumber
+            }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { wasteDetails: { quantity: 10 } },
+            comment: "A comment",
+            authoringCompanySiret: foreignTransporter.vatNumber!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.orgId).toBe(
+        foreignTransporter.vatNumber
       );
       // one approval is created
       expect(data.createFormRevisionRequest.approvals).toStrictEqual([
