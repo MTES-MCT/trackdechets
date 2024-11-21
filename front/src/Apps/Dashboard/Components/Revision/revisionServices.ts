@@ -9,7 +9,8 @@ export const getActorName = (bsd: Form | Bsda, siret: string): string => {
       company: bsdFormatted?.emitter?.company
     },
     { company: bsdFormatted?.destination?.company },
-    { company: bsdFormatted?.transporter?.company }
+    { company: bsdFormatted?.transporter?.company },
+    { company: bsdFormatted?.worker?.company }
   ];
 
   const actor = actors.find(actor => actor?.company?.siret === siret);

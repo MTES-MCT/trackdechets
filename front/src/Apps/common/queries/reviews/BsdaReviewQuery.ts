@@ -24,6 +24,13 @@ const reviewFragment = gql`
           infos
         }
       }
+      worker {
+        company {
+          name
+          siret
+          orgId
+        }
+      }
       waste {
         code
         materialName
