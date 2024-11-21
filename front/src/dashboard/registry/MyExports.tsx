@@ -34,10 +34,11 @@ import toast from "react-hot-toast";
 import {
   format,
   getYear,
-  startOfDay,
   startOfYear,
   endOfYear,
-  subYears
+  subYears,
+  endOfDay,
+  startOfDay
 } from "date-fns";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
@@ -84,9 +85,9 @@ const getDeclarationTypeWording = (
     case DeclarationType.All:
       return `Tous`;
     case DeclarationType.Bsd:
-      return `Tracé`;
+      return `Tracé (bordereaux)`;
     case DeclarationType.Registry:
-      return `Déclaré`;
+      return `Déclaré (registre national)`;
     default:
       return `Tous`;
   }
@@ -261,7 +262,7 @@ const getSchema = () =>
           required_error: "La date de début est requise",
           invalid_type_error: "La date de début est invalide"
         })
-        .max(startOfDay(new Date()), {
+        .max(new Date(), {
           message: "La date de début ne peut pas être dans le futur"
         })
         .transform(val => val.toISOString()),
@@ -293,7 +294,7 @@ const getSchema = () =>
         const { startDate, endDate } = data;
 
         if (startDate && endDate) {
-          return new Date(startDate) < new Date(endDate);
+          return new Date(startDate) <= new Date(endDate);
         }
 
         return true;
@@ -424,6 +425,11 @@ export function MyExports() {
     } = input;
     const siret = companyOrgId === "all" ? null : companyOrgId;
     let delegateSiret: string | null = null;
+    // push the dates to the extremities of days so we include the days entered in the inputs
+    const startOfDayStartDate = startOfDay(new Date(startDate)).toISOString();
+    const endOfDayEndDate = endDate
+      ? endOfDay(new Date(endDate)).toISOString()
+      : null;
     if (siret) {
       const company = companies.find(comp => comp.orgId === siret);
       if (company?.delegate) {
@@ -441,8 +447,8 @@ export function MyExports() {
         registryType, // WasteRegistryType.Ssd
         format, //FormsRegisterExportFormat.Csv
         dateRange: {
-          _gte: startDate,
-          _lt: endDate
+          _gte: startOfDayStartDate,
+          _lt: endOfDayEndDate
         },
         declarationType, // DeclarationType.All
         wasteTypes, //RegistryExportWasteType[]
@@ -461,7 +467,12 @@ export function MyExports() {
   return (
     <div id="my-registry-exports" className="dashboard">
       {!isMobile && <RegistryMenu />}
-      <div className="dashboard-content tw-flex-grow">
+      <div
+        className={classNames([
+          "tw-flex-grow",
+          styles.myRegistryExportsContainer
+        ])}
+      >
         <div
           className={classNames([
             "tw-p-6",

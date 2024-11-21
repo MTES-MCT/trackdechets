@@ -2,6 +2,19 @@
   max-width: 40rem;
 }
 
+.myRegistryExportsContainer {
+  width: 100%;
+}
+
+.loaderButton {
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 2rem;
+  max-height: 2rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 .dateButtons {
   display: flex;
   flex-direction: row;
