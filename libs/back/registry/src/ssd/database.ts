@@ -1,15 +1,6 @@
 import { prisma } from "@td/prisma";
-import { v7 as uuidv7 } from "uuid";
 import { ParsedZodSsdItem } from "./validation/schema";
-import {
-  Prisma,
-  PrismaClient,
-  RegistryExportDeclarationType,
-  RegistryExportType,
-  RegistryExportWasteType,
-  RegistrySsd
-} from "@prisma/client";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
+import LookupUtils from "../lookup/utils";
 
 export async function saveSsdLine({
   line,
@@ -29,7 +20,7 @@ export async function saveSsdLine({
         const registrySsd = await tx.registrySsd.create({
           data: { ...persistedData, importId }
         });
-        await updateRegistryLookup(registrySsd, tx, id);
+        await LookupUtils.RegistrySsd.update(registrySsd, id ?? null, tx);
       });
       return;
     case "ANNULER":
@@ -39,7 +30,7 @@ export async function saveSsdLine({
           data: { isCancelled: true }
         });
         if (id) {
-          await deleteRegistryLookup(id, tx);
+          await LookupUtils.RegistrySsd.delete(id, tx);
         }
       });
 
@@ -51,111 +42,12 @@ export async function saveSsdLine({
         const registrySsd = await tx.registrySsd.create({
           data: { ...persistedData, importId }
         });
-        await updateRegistryLookup(registrySsd, tx);
+        await LookupUtils.RegistrySsd.update(registrySsd, null, tx);
       });
 
       return;
   }
 }
-
-const deleteRegistryLookup = async (
-  id: string,
-  tx: Omit<PrismaClient, ITXClientDenyList>
-): Promise<void> => {
-  await tx.registryLookup.deleteMany({
-    where: {
-      id: id
-    }
-  });
-  return;
-};
-
-const updateRegistryLookup = async (
-  registrySsd: RegistrySsd,
-  tx: Omit<PrismaClient, ITXClientDenyList>,
-  oldRegistrySsdId?: string
-): Promise<void> => {
-  let registryLookup: Prisma.RegistryLookupGetPayload<{
-    select: { reportAsSirets: true };
-  }>;
-  if (oldRegistrySsdId) {
-    registryLookup = await tx.registryLookup.update({
-      where: {
-        // we use this compound id to target a specific registry type for a specific registry id
-        // this is not strictly necessary on SSDs since they only appear in one export registry
-        // but is necessary on other types of registries that appear for multiple actors.
-        id_exportRegistryType: {
-          id: oldRegistrySsdId,
-          exportRegistryType: RegistryExportType.SSD
-        }
-      },
-      data: {
-        // only those properties can change during an update
-        // the id changes because a new RegistrySsd entry is created on each update
-        id: registrySsd.id,
-        sirets: [registrySsd.reportForSiret],
-        wasteCode: registrySsd.wasteCode,
-        date: (registrySsd.useDate ?? registrySsd.dispatchDate) as Date,
-        // generate a uuid v7 id
-        // using the date as timestamp, so we can sort by this dateId
-        // and be in date order with uniqueness
-        dateId: uuidv7({
-          msecs: (registrySsd.useDate ?? registrySsd.dispatchDate)?.getTime()
-        }),
-        registrySsdId: registrySsd.id
-      },
-      select: {
-        // lean selection to improve performances
-        reportAsSirets: true
-      }
-    });
-  } else {
-    registryLookup = await tx.registryLookup.create({
-      data: {
-        id: registrySsd.id,
-        readableId: registrySsd.publicId,
-        sirets: [registrySsd.reportForSiret],
-        exportRegistryType: RegistryExportType.SSD,
-        declarationType: RegistryExportDeclarationType.REGISTRY,
-        wasteType: RegistryExportWasteType.DND,
-        wasteCode: registrySsd.wasteCode,
-        date: (registrySsd.useDate ?? registrySsd.dispatchDate) as Date,
-        dateId: uuidv7({
-          msecs: (registrySsd.useDate ?? registrySsd.dispatchDate)?.getTime()
-        }),
-        registrySsdId: registrySsd.id
-      },
-      select: {
-        // lean selection to improve performances
-        reportAsSirets: true
-      }
-    });
-  }
-  // if the registry entry comes from a delegation, we need to update the reportAsSirets array.
-  // We only push the delegator's siret if it's not in it yet.
-  // this is done separately from the previous upsert because it's not possible
-  // to push to an array and check unicity with prisma.
-  if (
-    registrySsd.reportAsSiret &&
-    registrySsd.reportAsSiret !== registrySsd.reportForSiret &&
-    !registryLookup.reportAsSirets.includes(registrySsd.reportAsSiret)
-  ) {
-    await tx.registryLookup.update({
-      where: {
-        id_exportRegistryType: {
-          id: registrySsd.id,
-          exportRegistryType: RegistryExportType.SSD
-        }
-      },
-      data: {
-        reportAsSirets: [
-          ...registryLookup.reportAsSirets,
-          registrySsd.reportAsSiret
-        ]
-      }
-    });
-  }
-};
 
 export async function getSsdImportSiretsAssociations(importId: string) {
   const importSirets = await prisma.registrySsd.findMany({

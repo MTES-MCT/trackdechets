@@ -36,7 +36,6 @@ const streamLookup = (
   addEncounteredSirets: (sirets: string[]) => void
 ): Readable => {
   let cursorId: string | null = null;
-  let count = 0;
   return new Readable({
     objectMode: true,
     highWaterMark: LOOKUP_PAGE_SIZE * 2,
@@ -70,7 +69,6 @@ const streamLookup = (
           this.push(null);
           return;
         }
-        count += items.length;
         cursorId = items[items.length - 1].dateId;
       } catch (err) {
         this.destroy(err);
