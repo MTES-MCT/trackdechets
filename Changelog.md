@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2024.12.1] 17/12/2024
+
+#### :nail_care: Améliorations
+
+- Permettre au transporteur étranger d'avoir les mêmes droits qu'un transporteur FR concernant la révision sur une Annexe 1 [PR 3770](https://github.com/MTES-MCT/trackdechets/pull/3770)
+
 # [2024.11.1] 19/11/2024
 
 #### :rocket: Nouvelles fonctionnalités

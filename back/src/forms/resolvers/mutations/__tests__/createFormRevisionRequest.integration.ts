@@ -680,7 +680,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     }
   );
 
-  it.only(
+  it(
     "should create a revisionRequest and identifying current user" +
       " as the requester (foreign transporter when emitterType=APPENDIX_PRODUCER) ",
     async () => {

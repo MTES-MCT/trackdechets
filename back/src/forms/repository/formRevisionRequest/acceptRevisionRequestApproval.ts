@@ -137,7 +137,6 @@ const buildAcceptRevisionRequestApproval: (
         status: RevisionRequestApprovalStatus.PENDING
       }
     });
-
     if (remainingApprovals !== 0) return;
 
     await approveAndApplyRevisionRequest(updatedApproval.revisionRequestId, {
