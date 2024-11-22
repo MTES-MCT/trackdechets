@@ -76,7 +76,6 @@ export const sendRegistryDelegationCreationEmail = async (
   const companyAssociations = await prisma.companyAssociation.findMany({
     where: {
       companyId: { in: [delegator.id, delegate.id] },
-      role: "ADMIN",
       notificationIsActiveRegistryDelegation: true
     },
     include: {
