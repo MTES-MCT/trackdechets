@@ -35,6 +35,7 @@ type FormValues = {
   bsdRefusal: SubscribeActions;
   bsdaFinalDestinationUpdate: SubscribeActions;
   revisionRequest: SubscribeActions;
+  registryDelegation: SubscribeActions;
 };
 
 type RadioInput = {
@@ -63,7 +64,8 @@ export default function AccountNotificationsUpdateAllModal({
       signatureCodeRenewal: SubscribeActions.DoNothing,
       bsdRefusal: SubscribeActions.DoNothing,
       bsdaFinalDestinationUpdate: SubscribeActions.DoNothing,
-      revisionRequest: SubscribeActions.DoNothing
+      revisionRequest: SubscribeActions.DoNothing,
+      registryDelegation: SubscribeActions.DoNothing
     }
   });
 
@@ -126,6 +128,12 @@ export default function AccountNotificationsUpdateAllModal({
       notification: "revisionRequest",
       activateHint:
         "Ne s'applique pas aux établissements sur lesquelles vous avez le rôle chauffeur"
+    },
+    {
+      legend: "Demandes de révision",
+      notification: "registryDelegation",
+      activateHint:
+        "S'applique uniquement aux établissements sur lesquelles vous avez le rôle administrateur"
     }
   ];
 
@@ -144,7 +152,8 @@ export default function AccountNotificationsUpdateAllModal({
     "signatureCodeRenewal",
     "bsdRefusal",
     "bsdaFinalDestinationUpdate",
-    "revisionRequest"
+    "revisionRequest",
+    "registryDelegation"
   ]);
 
   const saveButtonIsDisabled = values.every(

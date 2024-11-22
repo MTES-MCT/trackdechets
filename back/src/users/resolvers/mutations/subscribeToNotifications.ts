@@ -18,10 +18,19 @@ const subscribeToNotificationsResolver: MutationResolvers["subscribeToNotificati
 
     const { notifications } = args.input;
 
+    console.log("notifications", notifications);
+
     for (const [notification, isActive] of Object.entries(notifications)) {
       const data = toPrismaNotifications({ [notification]: isActive });
 
+      console.log("data", data);
+
       if (isActive === true) {
+        console.log(
+          "in",
+          authorizedRolesByNotification[gqlFieldToNotification[notification]]
+        );
+        console.log("data", data);
         await prisma.companyAssociation.updateMany({
           where: {
             userId: user.id,
@@ -48,6 +57,11 @@ const subscribeToNotificationsResolver: MutationResolvers["subscribeToNotificati
       where: { userId: user.id },
       include: { company: true }
     });
+    console.log("companyAssociations", companyAssociations);
+    console.log(
+      "formatted",
+      companyAssociations.map(a => toGqlCompanyPrivate(a.company))
+    );
 
     return companyAssociations.map(a => toGqlCompanyPrivate(a.company));
   };
