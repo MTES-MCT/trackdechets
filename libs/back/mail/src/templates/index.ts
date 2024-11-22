@@ -299,3 +299,9 @@ export const registryDelegationCreation: MailTemplate<{
   body: mustacheRenderer("registry-delegation-creation.html"),
   templateId: templateIds.LAYOUT
 };
+
+export const expiringRegistryDelegationWarning: MailTemplate = {
+  subject: () => `Expiration prochaine de votre délégation`,
+  body: mustacheRenderer("expiring-registry-delegation-warning.html"),
+  templateId: templateIds.LAYOUT
+};

@@ -2,10 +2,10 @@ import { Company, RegistryDelegation } from "@prisma/client";
 import { UserInputError } from "../../../../common/errors";
 import { getRegistryDelegationRepository } from "../../../repository";
 import { ParsedCreateRegistryDelegationInput } from "../../../validation";
-import { prisma } from "@td/prisma";
 import { renderMail, registryDelegationCreation } from "@td/mail";
 import { sendMail } from "../../../../mailer/mailing";
 import { toddMMYYYY } from "../../../../utils";
+import { getDelegationNotifiableUsers } from "../../utils";
 
 export const createDelegation = async (
   user: Express.User,
@@ -72,22 +72,8 @@ export const sendRegistryDelegationCreationEmail = async (
   delegator: Company,
   delegate: Company
 ) => {
-  // Find admins from both delegator & delegate companies
-  const companyAssociations = await prisma.companyAssociation.findMany({
-    where: {
-      companyId: { in: [delegator.id, delegate.id] },
-      notificationIsActiveRegistryDelegation: true
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true
-        }
-      }
-    }
-  });
+  // Find notifiable users from both delegator & delegate companies
+  const companyAssociations = await getDelegationNotifiableUsers(delegation);
 
   // Noone subscribed to notifications
   if (!companyAssociations.length) return;

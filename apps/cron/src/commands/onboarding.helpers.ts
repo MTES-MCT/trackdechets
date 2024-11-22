@@ -2,7 +2,9 @@ import {
   getCompaniesAndSubscribersByCompanyOrgIds,
   formatDate,
   sendMail,
-  UserNotification
+  UserNotification,
+  getDelegationNotifiableUsers,
+  getRegistryDelegationsExpiringInDays
 } from "back";
 import { prisma } from "@td/prisma";
 import {
@@ -28,7 +30,8 @@ import {
   pendingMembershipRequestEmail,
   profesionalsSecondOnboardingEmail,
   producersSecondOnboardingEmail,
-  pendingRevisionRequestEmail
+  pendingRevisionRequestEmail,
+  expiringRegistryDelegationWarning
 } from "@td/mail";
 import { xDaysAgo } from "./helpers";
 
@@ -568,4 +571,46 @@ export const sendPendingRevisionRequestEmail = async (
   }
 
   await prisma.$disconnect();
+};
+
+/**
+ * If a delegation expires in X days, warn involved companies' users.
+ *
+ * If delegation isn't even X days long, skip.
+ */
+export const sendExpiringRegistryDelegationWarning = async () => {
+  const expiringDelegations = await getRegistryDelegationsExpiringInDays(7);
+
+  const messageVersions: MessageVersion[] = await Promise.all(
+    expiringDelegations.map(async delegation => {
+      const companyAssociations = await getDelegationNotifiableUsers(
+        delegation
+      );
+
+      const template = renderMail(expiringRegistryDelegationWarning, {
+        variables: {
+          // TODO
+        },
+        messageVersions: []
+      });
+
+      return {
+        to: companyAssociations.map(association => ({
+          email: association.user.email,
+          name: association.user.name
+        })),
+        ...(template.body && {
+          params: {
+            body: template.body
+          }
+        })
+      };
+    })
+  );
+
+  const payload = renderMail(pendingRevisionRequestEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
 };

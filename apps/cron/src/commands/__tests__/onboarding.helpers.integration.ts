@@ -2061,3 +2061,20 @@ describe("addPendingApprovalsCompanyAdmins", () => {
     expect(wrappedRequests[0].approvals.length).toBe(0);
   });
 });
+
+describe("sendExpiringRegistryDelegationWarning", () => {
+  it("should do nothing if no expiring delegation", async () => {
+    // TODO
+    expect(true).toBe(true);
+  });
+
+  it("should send a warning email to expired delegation's involved users", async () => {
+    // TODO
+    expect(true).toBe(true);
+  });
+
+  it("should send a warning email to expired delegation's involved users - multiple delegations involved", async () => {
+    // TODO
+    expect(true).toBe(true);
+  });
+});
