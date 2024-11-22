@@ -42,7 +42,8 @@ export const authorizedNotificationsByUserRole: {
     "revisionRequest",
     "bsdRefusal",
     "signatureCodeRenewal",
-    "bsdaFinalDestinationUpdate"
+    "bsdaFinalDestinationUpdate",
+    "registryDelegation"
   ],
   [UserRole.Member]: [
     "revisionRequest",
@@ -79,7 +80,8 @@ function getSubscribersCount({ users, notifications }: GetSubscribersOpts) {
     bsdaFinalDestinationUpdate: notifications.bsdaFinalDestinationUpdate
       ? 1
       : 0,
-    revisionRequest: notifications.revisionRequest ? 1 : 0
+    revisionRequest: notifications.revisionRequest ? 1 : 0,
+    registryDelegation: notifications.registryDelegation ? 1 : 0
   };
 
   // Incrémente le comptage à partir des abonnements des autres utilisateurs
@@ -101,6 +103,10 @@ function getSubscribersCount({ users, notifications }: GetSubscribersOpts) {
     }
     if (user.notifications.revisionRequest) {
       subscribersCount.revisionRequest = subscribersCount.revisionRequest + 1;
+    }
+    if (user.notifications.registryDelegation) {
+      subscribersCount.registryDelegation =
+        subscribersCount.registryDelegation + 1;
     }
   }
 
@@ -224,6 +230,17 @@ export default function NotificationsUpdateModal({
         </div>
       ),
       notification: "revisionRequest"
+    },
+    {
+      label: (
+        <div>
+          <span className="fr-mr-1w">
+            aux délégations en lien avec le registre
+          </span>
+          <SubscribersCountBadge count={subscribersCount.registryDelegation} />
+        </div>
+      ),
+      notification: "registryDelegation"
     }
   ];
 

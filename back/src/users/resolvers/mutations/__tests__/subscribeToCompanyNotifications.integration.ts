@@ -26,6 +26,7 @@ export const SUBSCRIBE_TO_COMPANY_NOTIFICATIONS = gql`
         bsdRefusal
         bsdaFinalDestinationUpdate
         revisionRequest
+        registryDelegation
       }
     }
   }
@@ -36,7 +37,8 @@ const unactiveNotifications = {
   notificationIsActiveBsdRefusal: false,
   notificationIsActiveMembershipRequest: false,
   notificationIsActiveRevisionRequest: false,
-  notificationIsActiveSignatureCodeRenewal: false
+  notificationIsActiveSignatureCodeRenewal: false,
+  notificationIsActiveRegistryDelegation: false
 };
 
 describe("Mutation { subscribeToCompanyNotifications }", () => {
@@ -70,7 +72,8 @@ describe("Mutation { subscribeToCompanyNotifications }", () => {
     "signatureCodeRenewal",
     "bsdRefusal",
     "bsdaFinalDestinationUpdate",
-    "revisionRequest"
+    "revisionRequest",
+    "registryDelegation"
   ])(
     "User with role ADMIN can subscribe to notification %p",
     async notification => {

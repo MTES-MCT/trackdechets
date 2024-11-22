@@ -229,7 +229,7 @@ describe("mutation createRegistryDelegation", () => {
 
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
 
-      // Onboarding email
+      // Registry email
       expect(sendMail as jest.Mock).toHaveBeenCalledWith(
         renderMail(registryDelegationCreation, {
           variables: {
@@ -248,6 +248,38 @@ describe("mutation createRegistryDelegation", () => {
         })
       );
     });
+  });
+
+  it("should skip sending mail if no admin has subscribed to notification", async () => {
+    // Given
+    const delegate = await companyFactory({ givenName: "Some given name" });
+    const { user: delegatorAdmin, company: delegator } =
+      await userWithCompanyFactory();
+    await userInCompany("MEMBER", delegator.id); // Not an admin, shoud not receive mail
+    await userInCompany("MEMBER", delegate.id); // Not an admin, shoud not receive mail
+    const delegateAdmin = await userInCompany("ADMIN", delegate.id); // Admin, should receive mail
+    await userWithCompanyFactory("ADMIN"); // Not part of the delegation, should not receive mail
+
+    // Unsubscribe admins from registry notification
+    await prisma.companyAssociation.updateMany({
+      where: { userId: { in: [delegateAdmin.id, delegatorAdmin.id] } },
+      data: { notificationIsActiveRegistryDelegation: false }
+    });
+
+    // When
+    const { errors } = await createDelegation(delegatorAdmin, {
+      delegateOrgId: delegate.orgId,
+      delegatorOrgId: delegator.orgId
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    // Email
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
   });
 
   it("testing email content - no end date", async () => {
