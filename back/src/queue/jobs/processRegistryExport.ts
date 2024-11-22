@@ -127,13 +127,14 @@ export async function processRegistryExportJob(
     }
     const { headers } = exportOptions[registryExport.registryType ?? "ALL"];
     // create s3 file with stream
-    const streamInfos = getUploadWithWritableStream(
-      process.env.S3_REGISTRY_EXPORTS_BUCKET!,
-      `${exportId}${registryExport.format === "CSV" ? ".csv" : ".xlsx"}`,
-      registryExport.format === "CSV"
-        ? "text/csv"
-        : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
+    const streamInfos = getUploadWithWritableStream({
+      bucketName: process.env.S3_REGISTRY_EXPORTS_BUCKET!,
+      key: `${exportId}${registryExport.format === "CSV" ? ".csv" : ".xlsx"}`,
+      contentType:
+        registryExport.format === "CSV"
+          ? "text/csv"
+          : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
     upload = streamInfos.upload;
     const outputStream = streamInfos.s3Stream;
     //craft the query
