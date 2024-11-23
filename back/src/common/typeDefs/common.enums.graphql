@@ -97,3 +97,17 @@ enum DeclarationType {
   "Tous types"
   ALL
 }
+
+"""
+Format de l'export du registre
+"""
+enum FormsRegisterExportFormat {
+  """
+  Fichier csv
+  """
+  CSV
+  """
+  Fichier Excel
+  """
+  XLSX
+}
