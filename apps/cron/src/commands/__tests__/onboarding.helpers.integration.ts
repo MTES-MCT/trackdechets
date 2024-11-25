@@ -38,7 +38,6 @@ import {
   getRecentlyRegisteredProducers,
   getRecentlyRegisteredProfesionals,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
-  sendExpiringRegistryDelegationWarning,
   getExpiringRegistryDelegationWarningMailPayloads
 } from "../onboarding.helpers";
 import { xDaysAgo } from "../helpers";
