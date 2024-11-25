@@ -1622,10 +1622,14 @@ export const hasRoadControlButton = (
   isCollectedTab: boolean,
   isReturnTab?: boolean
 ) => {
-  if (isReturnTab) return true;
+  const isAppendix1 = bsd.emitterType === "APPENDIX1_PRODUCER";
+  if (!isAppendix1 && isReturnTab) return true;
 
   // L'action principale sur le paoh collecté est la déclaration de dépôt par le transporteur
   if (bsd.type === BsdType.Bspaoh) {
+    return false;
+  }
+  if (isAppendix1 && isCollectedTab) {
     return false;
   }
   return ["SENT", "RESENT"].includes(bsd.status) && isCollectedTab;
