@@ -149,4 +149,29 @@ describe("getDelegationNotifiableUsers", () => {
       delegateAdmin3.id
     ]);
   });
+
+  it("should return empty array if no user subscribed", async () => {
+    // Given
+
+    // Delegator company
+    const { user: delegatorAdmin, company: delegator } =
+      await userWithCompanyFactory();
+    await setNotificationIsActiveRegistryDelegation(delegatorAdmin.id, false);
+
+    // Delegate company
+    const { user: delegateAdmin, company: delegate } =
+      await userWithCompanyFactory();
+    await setNotificationIsActiveRegistryDelegation(delegateAdmin.id, false);
+
+    const { delegation } = await registryDelegationFactory({
+      delegate: { connect: { id: delegate.id } },
+      delegator: { connect: { id: delegator.id } }
+    });
+
+    // When
+    const users = await getDelegationNotifiableUsers(delegation);
+
+    // Then
+    expect(users.map(user => user.id)).toMatchObject([]);
+  });
 });
