@@ -300,8 +300,14 @@ export const registryDelegationCreation: MailTemplate<{
   templateId: templateIds.LAYOUT
 };
 
-export const expiringRegistryDelegationWarning: MailTemplate = {
-  subject: () => `Expiration prochaine de votre délégation`,
+export const expiringRegistryDelegationWarning: MailTemplate<{
+  delegator: Company;
+  delegate: Company;
+  startDate: string;
+  endDate: string;
+}> = {
+  subject: ({ delegator, delegate }) =>
+    `Expiration prochaine de la délégation entre l'établissement ${delegator.orgId} et l'établissement ${delegate.orgId}`,
   body: mustacheRenderer("expiring-registry-delegation-warning.html"),
   templateId: templateIds.LAYOUT
 };

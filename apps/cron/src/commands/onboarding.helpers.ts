@@ -4,7 +4,8 @@ import {
   sendMail,
   UserNotification,
   getDelegationNotifiableUsers,
-  getRegistryDelegationsExpiringInDays
+  getRegistryDelegationsExpiringInDays,
+  toddMMYYYY
 } from "back";
 import { prisma } from "@td/prisma";
 import {
@@ -31,7 +32,8 @@ import {
   profesionalsSecondOnboardingEmail,
   producersSecondOnboardingEmail,
   pendingRevisionRequestEmail,
-  expiringRegistryDelegationWarning
+  expiringRegistryDelegationWarning,
+  Mail
 } from "@td/mail";
 import { xDaysAgo } from "./helpers";
 
@@ -573,46 +575,52 @@ export const sendPendingRevisionRequestEmail = async (
   await prisma.$disconnect();
 };
 
-/**
- * If a delegation expires in X days, warn involved companies' users.
- *
- * If delegation isn't even X days long, skip.
- */
-export const sendExpiringRegistryDelegationWarning = async () => {
+export const getExpiringRegistryDelegationWarningMailPayloads = async () => {
   const expiringDelegations = await getRegistryDelegationsExpiringInDays(7);
 
-  const messageVersions: MessageVersion[] = await Promise.all(
+  if (!expiringDelegations.length) return [];
+
+  const payloads: Mail[] = await Promise.all(
     expiringDelegations
       .map(async delegation => {
         const users = await getDelegationNotifiableUsers(delegation);
 
         if (!users.length) return undefined;
 
-        const template = renderMail(expiringRegistryDelegationWarning, {
-          variables: {
-            // TODO
-          },
-          messageVersions: []
-        });
+        const variables = {
+          startDate: toddMMYYYY(delegation.startDate),
+          endDate: toddMMYYYY(delegation.endDate!),
+          delegator: delegation.delegator,
+          delegate: delegation.delegate
+        };
 
-        return {
+        const payload = renderMail(expiringRegistryDelegationWarning, {
+          variables,
           to: users.map(user => ({
             email: user.email,
             name: user.name
-          })),
-          ...(template.body && {
-            params: {
-              body: template.body
-            }
-          })
-        };
+          }))
+        });
+
+        return payload;
       })
-      .filter(Boolean) as unknown as MessageVersion[]
+      .filter(Boolean) as unknown as Mail[]
   );
 
-  const payload = renderMail(pendingRevisionRequestEmail, {
-    messageVersions
-  });
+  return payloads;
+};
 
-  await sendMail(payload);
+/**
+ * If a delegation expires in X days, warn involved companies' users.
+ *
+ * If delegation isn't even X days long, skip.
+ */
+export const sendExpiringRegistryDelegationWarning = async () => {
+  const payloads = await getExpiringRegistryDelegationWarningMailPayloads();
+
+  if (!payloads?.length) return;
+
+  await Promise.all(payloads?.map(async p => await sendMail(p)));
+
+  await prisma.$disconnect();
 };

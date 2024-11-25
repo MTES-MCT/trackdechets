@@ -120,6 +120,10 @@ export const getRegistryDelegationsExpiringInDays = async (days: number) => {
       endDate: X_DAYS_FROM_NOW,
       cancelledBy: null,
       revokedBy: null
+    },
+    include: {
+      delegator: true,
+      delegate: true
     }
   });
 
