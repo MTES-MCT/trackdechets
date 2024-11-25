@@ -131,9 +131,7 @@ export default function AccountNotificationsUpdateAllModal({
     },
     {
       legend: "Demandes de révision",
-      notification: "registryDelegation",
-      activateHint:
-        "S'applique uniquement aux établissements sur lesquelles vous avez le rôle administrateur"
+      notification: "registryDelegation"
     }
   ];
 

@@ -122,7 +122,8 @@ describe("Mutation { subscribeToCompanyNotifications }", () => {
     "signatureCodeRenewal",
     "bsdRefusal",
     "bsdaFinalDestinationUpdate",
-    "revisionRequest"
+    "revisionRequest",
+    "registryDelegation"
   ])(
     "User with role MEMBER can subscribe to notification %p",
     async notification => {
@@ -170,7 +171,8 @@ describe("Mutation { subscribeToCompanyNotifications }", () => {
     "signatureCodeRenewal",
     "bsdRefusal",
     "bsdaFinalDestinationUpdate",
-    "revisionRequest"
+    "revisionRequest",
+    "registryDelegation"
   ])(
     "User with role READER can subscribe to notification %p",
     async notification => {
