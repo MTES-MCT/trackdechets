@@ -11,7 +11,6 @@ import {
   inXDays,
   Mutation,
   MutationDeleteCompanyArgs,
-  registryDelegationFactory,
   todayAtMidnight,
   toddMMYYYY
 } from "back";
@@ -25,6 +24,7 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "back/src/__tests__/factories";
+import { registryDelegationFactory } from "back/src/registryDelegation/__tests__/factories";
 import { bsdaFactory } from "back/src/bsda/__tests__/factories";
 import { bsdasriFactory } from "back/src/bsdasris/__tests__/factories";
 import {

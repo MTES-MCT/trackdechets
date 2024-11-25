@@ -90,4 +90,3 @@ export {
   getDelegationNotifiableUsers,
   getRegistryDelegationsExpiringInDays
 } from "./registryDelegation/resolvers/utils";
-export { registryDelegationFactory } from "./registryDelegation/__tests__/factories";
