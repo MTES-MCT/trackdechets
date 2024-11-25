@@ -145,13 +145,15 @@ export const authorizedNotificationsByRole = {
     UserNotification.REVISION_REQUEST,
     UserNotification.BSD_REFUSAL,
     UserNotification.SIGNATURE_CODE_RENEWAL,
-    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+    UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
+    UserNotification.REGISTRY_DELEGATION
   ],
   [UserRole.READER]: [
     UserNotification.REVISION_REQUEST,
     UserNotification.BSD_REFUSAL,
     UserNotification.SIGNATURE_CODE_RENEWAL,
-    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+    UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
+    UserNotification.REGISTRY_DELEGATION
   ],
   [UserRole.DRIVER]: [
     UserNotification.BSD_REFUSAL,

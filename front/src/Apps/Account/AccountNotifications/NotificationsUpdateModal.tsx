@@ -49,13 +49,15 @@ export const authorizedNotificationsByUserRole: {
     "revisionRequest",
     "bsdRefusal",
     "signatureCodeRenewal",
-    "bsdaFinalDestinationUpdate"
+    "bsdaFinalDestinationUpdate",
+    "registryDelegation"
   ],
   [UserRole.Reader]: [
     "revisionRequest",
     "bsdRefusal",
     "signatureCodeRenewal",
-    "bsdaFinalDestinationUpdate"
+    "bsdaFinalDestinationUpdate",
+    "registryDelegation"
   ],
   [UserRole.Driver]: [
     "bsdRefusal",
