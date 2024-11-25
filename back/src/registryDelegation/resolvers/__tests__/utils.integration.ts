@@ -139,10 +139,10 @@ describe("getDelegationNotifiableUsers", () => {
     });
 
     // When
-    const companyAssociations = await getDelegationNotifiableUsers(delegation);
+    const users = await getDelegationNotifiableUsers(delegation);
 
     // Then
-    expect(companyAssociations.map(c => c.userId)).toMatchObject([
+    expect(users.map(user => user.id)).toMatchObject([
       delegatorAdmin.id,
       delegatorAdmin3.id,
       delegateAdmin.id,

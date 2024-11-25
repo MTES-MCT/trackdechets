@@ -582,30 +582,32 @@ export const sendExpiringRegistryDelegationWarning = async () => {
   const expiringDelegations = await getRegistryDelegationsExpiringInDays(7);
 
   const messageVersions: MessageVersion[] = await Promise.all(
-    expiringDelegations.map(async delegation => {
-      const companyAssociations = await getDelegationNotifiableUsers(
-        delegation
-      );
+    expiringDelegations
+      .map(async delegation => {
+        const users = await getDelegationNotifiableUsers(delegation);
 
-      const template = renderMail(expiringRegistryDelegationWarning, {
-        variables: {
-          // TODO
-        },
-        messageVersions: []
-      });
+        if (!users.length) return undefined;
 
-      return {
-        to: companyAssociations.map(association => ({
-          email: association.user.email,
-          name: association.user.name
-        })),
-        ...(template.body && {
-          params: {
-            body: template.body
-          }
-        })
-      };
-    })
+        const template = renderMail(expiringRegistryDelegationWarning, {
+          variables: {
+            // TODO
+          },
+          messageVersions: []
+        });
+
+        return {
+          to: users.map(user => ({
+            email: user.email,
+            name: user.name
+          })),
+          ...(template.body && {
+            params: {
+              body: template.body
+            }
+          })
+        };
+      })
+      .filter(Boolean) as unknown as MessageVersion[]
   );
 
   const payload = renderMail(pendingRevisionRequestEmail, {

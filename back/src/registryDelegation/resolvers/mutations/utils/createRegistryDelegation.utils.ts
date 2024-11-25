@@ -73,10 +73,10 @@ export const sendRegistryDelegationCreationEmail = async (
   delegate: Company
 ) => {
   // Find notifiable users from both delegator & delegate companies
-  const companyAssociations = await getDelegationNotifiableUsers(delegation);
+  const users = await getDelegationNotifiableUsers(delegation);
 
   // Noone subscribed to notifications
-  if (!companyAssociations.length) return;
+  if (!users.length) return;
 
   // Prepare mail template
   const payload = renderMail(registryDelegationCreation, {
@@ -88,9 +88,9 @@ export const sendRegistryDelegationCreationEmail = async (
     },
     messageVersions: [
       {
-        to: companyAssociations.map(companyAssociation => ({
-          email: companyAssociation.user.email,
-          name: companyAssociation.user.name
+        to: users.map(user => ({
+          email: user.email,
+          name: user.name
         }))
       }
     ]
