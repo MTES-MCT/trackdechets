@@ -6,6 +6,7 @@ import { SafeParseReturnType } from "zod";
 import { endImport, startImport, updateImportStats } from "./database";
 import {
   CSV_DELIMITER,
+  ERROR_HEADER,
   importOptions,
   ImportType,
   ParsedLine,
@@ -47,7 +48,7 @@ export async function processStream({
 
   const errorStream = format({
     delimiter: CSV_DELIMITER,
-    headers: ["Erreur", ...Object.values(options.headers)],
+    headers: [ERROR_HEADER, ...Object.values(options.headers)],
     writeHeaders: true
   });
   errorStream.pipe(outputErrorStream);

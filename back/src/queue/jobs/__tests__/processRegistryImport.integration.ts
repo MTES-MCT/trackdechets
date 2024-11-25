@@ -192,7 +192,7 @@ describe("Process registry import job", () => {
       s3Stream.write(
         Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
       ); // Correct line
-      s3Stream.end(";".repeat(Object.values(SSD_HEADERS).length - 1)); // Error line
+      s3Stream.end("I'm not a correct line\n"); // Error line
 
       await upload.done();
 
@@ -239,7 +239,7 @@ describe("Process registry import job", () => {
       s3Stream.write(
         Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
       ); // Correct line
-      s3Stream.end(";".repeat(Object.values(SSD_HEADERS).length - 1)); // Error line
+      s3Stream.end("I'm not a correct line\n"); // Error line
 
       await upload.done();
 
@@ -289,7 +289,7 @@ describe("Process registry import job", () => {
       s3Stream.write(
         Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
       );
-      s3Stream.end(";;;;;\n");
+      s3Stream.end("I'm not a correct line\n");
 
       await upload.done();
 
@@ -477,6 +477,104 @@ describe("Process registry import job", () => {
       expect(result.numberOfCancellations).toBe(0);
       expect(result.numberOfEdits).toBe(0);
       expect(result.numberOfErrors).toBe(1);
+    });
+
+    it("should ignore the first column if its called Erreur", async () => {
+      const fileKey = "one-insertion-with-error.csv";
+      const { company, user } = await userWithCompanyFactory();
+
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
+
+      s3Stream.write(
+        ["Erreur", ...Object.values(SSD_HEADERS)].join(";") + "\n"
+      );
+      s3Stream.end(
+        ["Une erreur", ...Object.values(getCorrectLine(company.orgId))].join(
+          ";"
+        ) + "\n"
+      );
+
+      await upload.done();
+
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "one-insertion-with-error.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
+
+      await processRegistryImportJob({
+        data: {
+          importId: registryImport.id,
+          importType: registryImport.type,
+          s3FileKey: registryImport.s3FileKey
+        }
+      } as Job<RegistryImportJobArgs>);
+
+      const result = await prisma.registryImport.findUniqueOrThrow({
+        where: { id: registryImport.id }
+      });
+
+      expect(result.status).toBe("SUCCESSFUL");
+      expect(result.numberOfInsertions).toBe(1);
+      expect(result.numberOfCancellations).toBe(0);
+      expect(result.numberOfEdits).toBe(0);
+      expect(result.numberOfErrors).toBe(0);
+    });
+
+    it("should ignore empty lines", async () => {
+      const fileKey = "one-insertion-with-empty-lines.csv";
+      const { company, user } = await userWithCompanyFactory();
+
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
+
+      s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
+      s3Stream.write(";".repeat(Object.values(SSD_HEADERS).length - 1) + "\n");
+      s3Stream.write(
+        Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
+      );
+      s3Stream.end(";".repeat(Object.values(SSD_HEADERS).length - 1) + "\n");
+
+      await upload.done();
+
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "one-insertion-with-empty-lines.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
+
+      await processRegistryImportJob({
+        data: {
+          importId: registryImport.id,
+          importType: registryImport.type,
+          s3FileKey: registryImport.s3FileKey
+        }
+      } as Job<RegistryImportJobArgs>);
+
+      const result = await prisma.registryImport.findUniqueOrThrow({
+        where: { id: registryImport.id }
+      });
+
+      expect(result.status).toBe("SUCCESSFUL");
+      expect(result.numberOfInsertions).toBe(1);
+      expect(result.numberOfCancellations).toBe(0);
+      expect(result.numberOfEdits).toBe(0);
+      expect(result.numberOfErrors).toBe(0);
     });
   });
 });
