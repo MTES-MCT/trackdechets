@@ -98,7 +98,7 @@ export function MyImports() {
             : []
         )
         .join("\n"),
-      <div className="tw-flex">
+      <div>
         <Download
           details={(
             importData.node.originalFileName.split(".").pop() ?? ""
@@ -133,7 +133,7 @@ export function MyImports() {
     <div id="companies" className="companies dashboard">
       {!isMobile && <RegistryMenu />}
       <div className="dashboard-content tw-flex-grow">
-        <div className="tw-p-6">
+        <div className="tw-px-6 tw-py-4">
           <div className="tw-flex tw-gap-6">
             <div>
               <Button

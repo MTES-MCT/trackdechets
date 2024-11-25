@@ -36,6 +36,7 @@ export type ImportOptions = {
   ) => Promise<{ for: string; as: string }[]>;
 };
 
+export const ERROR_HEADER = "Erreur";
 export const IMPORT_TYPES = ["SSD", "INCOMING_WASTE"] as const;
 export type ImportType = (typeof IMPORT_TYPES)[number];
 
