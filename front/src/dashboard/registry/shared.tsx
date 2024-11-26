@@ -42,9 +42,9 @@ export const GET_REGISTRY_IMPORTS = gql`
 `;
 
 export const badges = {
-  PENDING: (context: "import" | "export") => (
+  PENDING: () => (
     <Badge small severity="info">
-      {context === "import" ? "En attente" : "En attente"}
+      En attente
     </Badge>
   ),
   STARTED: () => (

@@ -2454,6 +2454,9 @@ enum RegistryExportFormat {
   XLSX
 }
 
+// This object is created when a user requests a registry export
+// it is used in the export processing job to get the export parameters
+// and to display the export history with their statuses on the frontend
 model RegistryExport {
   id          String               @id @default(cuid())
   createdAt   DateTime             @default(now()) @db.Timestamptz(6)
@@ -2479,6 +2482,9 @@ model RegistryExport {
   @@index([sirets], map: "_RegistryExportSiretsIdx", type: Gin)
 }
 
+// This object is associated with every BSD/registry entry, and is used for efficient lookup
+// during registry exports. There is one registry lookup for every BSD/registrry entry, PER EXPORT REGISTRY
+// for example, if a BSD should appear in IncomingRegistry and TransportRegistry, there will be 2 registryLookup objects
 model RegistryLookup {
   createdAt          DateTime                      @default(now()) @db.Timestamptz(6)
   // contains the id of the Registry entry or the id of the BSD
@@ -2493,7 +2499,7 @@ model RegistryLookup {
   wasteType          RegistryExportWasteType
   wasteCode          String
   date               DateTime
-  // should ba a UUIDv7 using date as time source
+  // should be a UUIDv7 using date as time source
   // to allow cursor based queries that required a unique key that should
   // also be the sort order
   dateId             String                        @unique @db.Uuid
@@ -2516,6 +2522,8 @@ model RegistryLookup {
   bsvhuId   String?
   bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
 
+  // the id itself is not unique, since a same BSD will appear in multiple export registries.
+  // so the unique index is made of id + exportRegistryType
   @@id([id, exportRegistryType])
   // pseudo-random with only "=" lookups so hash index is appropriate
   @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)

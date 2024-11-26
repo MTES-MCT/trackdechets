@@ -235,7 +235,7 @@ type Query {
   ): RegistryExportConnection!
 
   """
-  Permet de un export en particulier
+  Permet de récupérer un export en particulier
   """
   registryExport(id: ID!): RegistryExport!
 }

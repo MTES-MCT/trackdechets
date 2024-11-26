@@ -20,6 +20,7 @@ import { toWaste } from "../../registry/converters";
 import { wasteFormatter } from "../../registry/streams";
 import { getXlsxHeaders } from "../../registry/columns";
 import { exportOptions } from "@td/registry";
+
 // we have all verified infos in the registryExport,
 // but the date range is a bit more fine in the query than in the object
 // so we need to pass it down
@@ -128,7 +129,7 @@ export async function processRegistryExportJob(
     const { headers } = exportOptions[registryExport.registryType ?? "ALL"];
     // create s3 file with stream
     const streamInfos = getUploadWithWritableStream({
-      bucketName: process.env.S3_REGISTRY_EXPORTS_BUCKET!,
+      bucketName: process.env.S3_REGISTRY_EXPORTS_BUCKET,
       key: `${exportId}${registryExport.format === "CSV" ? ".csv" : ".xlsx"}`,
       contentType:
         registryExport.format === "CSV"
