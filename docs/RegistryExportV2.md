@@ -9,7 +9,7 @@ L'import des déclarations de registres peut se faire de 2 manières:
 - via l'API (sous forme d'une array d'inputs)
 - en important un fichier csv/xlsx
 
-L'import via l'API est relativement simple, puisqu'il s'agit de valider les lignes envoyées via l'API (avec `safeParseAsync`, qui est un parser Zod), et créer les objets associés end DB via `saveLine`.
+L'import via l'API est relativement simple, puisqu'il s'agit de valider les lignes envoyées via l'API (avec `safeParseAsync`, qui est un parser Zod), et créer les objets associés en DB via `saveLine`.
 
 L'import via un fichier est un peu plus complexe et suit le flow suivant :
 
@@ -47,9 +47,9 @@ flowchart TD
 
 Ce processus d'import génère plusieurs objets en DB:
 
-- RegistryImport : l'objet de suivi du processus l'import
+- RegistryImport : l'objet de suivi du processus d'import
 - Registry object (RegistrySsd, RegistryIncomingWaste, ...) : contient les infos validées/parsées de l'import
-- RegistryLookup : contient un résumé cherchable de l'entrée de registre, servant à l'export
+- RegistryLookup : contient un résumé cherchable de la ligne de registre importée, servant à l'export
 
 ainsi que 2 fichiers dans S3 (ou équivalent) :
 
