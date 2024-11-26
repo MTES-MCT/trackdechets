@@ -15,17 +15,13 @@ interface Args {
   first?: number | null | undefined;
 }
 
-const getActiveDelegationFilter = (
-  activeOnly = true
-): Prisma.RegistryDelegationWhereInput => {
-  return activeOnly
-    ? {
-        revokedBy: null,
-        cancelledBy: null,
-        startDate: { lte: new Date() },
-        OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
-      }
-    : {};
+const getActiveDelegationFilter = (): Prisma.RegistryDelegationWhereInput => {
+  return {
+    revokedBy: null,
+    cancelledBy: null,
+    startDate: { lte: new Date() },
+    OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
+  };
 };
 
 export const getPaginatedDelegations = async (
@@ -44,7 +40,7 @@ export const getPaginatedDelegations = async (
     delegateId: delegates.length
       ? { in: delegates.map(delegate => delegate.id) }
       : undefined,
-    ...getActiveDelegationFilter(!!activeOnly),
+    ...(activeOnly ? getActiveDelegationFilter() : {}),
     ...(search
       ? {
           delegator: {

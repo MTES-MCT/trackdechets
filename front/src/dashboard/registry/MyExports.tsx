@@ -591,7 +591,7 @@ export function MyExports() {
             </div>
             <h6 className="fr-h6">{`Période concernée`}</h6>
             <div className={classNames(["fr-mb-8v", styles.dateButtons])}>
-              {dateButtons.map(dateButton => (
+              {dateButtons.map((dateButton, key) => (
                 <Button
                   onClick={() => {
                     setValue("startDate", dateButton.startDate);
@@ -604,6 +604,7 @@ export function MyExports() {
                   disabled={isLoading}
                   type="button"
                   priority="tertiary"
+                  key={key}
                 >
                   {dateButton.label}
                 </Button>
