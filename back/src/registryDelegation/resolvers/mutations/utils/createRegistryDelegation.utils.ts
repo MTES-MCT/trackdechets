@@ -76,7 +76,7 @@ export const sendRegistryDelegationCreationEmail = async (
   const companyAssociations = await prisma.companyAssociation.findMany({
     where: {
       companyId: { in: [delegator.id, delegate.id] },
-      role: "ADMIN"
+      notificationIsActiveRegistryDelegation: true
     },
     include: {
       user: {
@@ -88,6 +88,9 @@ export const sendRegistryDelegationCreationEmail = async (
       }
     }
   });
+
+  // Noone subscribed to notifications
+  if (!companyAssociations.length) return;
 
   // Prepare mail template
   const payload = renderMail(registryDelegationCreation, {

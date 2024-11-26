@@ -39,7 +39,8 @@ function withoutSubscribersCount(users: CompanyMember[]) {
     signatureCodeRenewal: 0,
     bsdRefusal: 0,
     bsdaFinalDestinationUpdate: 0,
-    revisionRequest: 0
+    revisionRequest: 0,
+    registryDelegation: 0
   };
   for (const user of users) {
     if (user.notifications.membershipRequest) {
@@ -59,6 +60,10 @@ function withoutSubscribersCount(users: CompanyMember[]) {
     }
     if (user.notifications.revisionRequest) {
       subscribersCount.revisionRequest = subscribersCount.revisionRequest + 1;
+    }
+    if (user.notifications.registryDelegation) {
+      subscribersCount.registryDelegation =
+        subscribersCount.registryDelegation + 1;
     }
   }
 

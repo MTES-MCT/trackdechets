@@ -18,7 +18,8 @@ export function toGqlCompanyPrivate(company: Company): CompanyPrivate {
       signatureCodeRenewal: false,
       bsdRefusal: false,
       bsdaFinalDestinationUpdate: false,
-      revisionRequest: false
+      revisionRequest: false,
+      registryDelegation: false
     }
   };
 }

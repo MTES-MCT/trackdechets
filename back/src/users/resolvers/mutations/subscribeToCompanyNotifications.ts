@@ -38,6 +38,10 @@ function activeNotifications(
     {
       name: UserNotification.REVISION_REQUEST,
       isActive: notifications.revisionRequest
+    },
+    {
+      name: UserNotification.REGISTRY_DELEGATION,
+      isActive: notifications.registryDelegation
     }
   ]
     .filter(n => n.isActive)
