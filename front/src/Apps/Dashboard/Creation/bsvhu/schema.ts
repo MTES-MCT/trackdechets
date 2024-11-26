@@ -31,7 +31,7 @@ const zodEmitter = z.object({
 });
 
 const zodTransporter = z.object({
-  company: zodCompany,
+  company: zodCompany.extend({ vatNumber: z.string().nullish() }),
   transport: z.object({
     signature: z.object({
       author: z.string().nullish(),
