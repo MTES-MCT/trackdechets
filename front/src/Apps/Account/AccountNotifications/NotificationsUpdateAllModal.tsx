@@ -130,7 +130,7 @@ export default function AccountNotificationsUpdateAllModal({
         "Ne s'applique pas aux établissements sur lesquelles vous avez le rôle chauffeur"
     },
     {
-      legend: "Demandes de révision",
+      legend: "Délégations en lien avec le registre",
       notification: "registryDelegation"
     }
   ];
