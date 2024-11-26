@@ -79,24 +79,28 @@ export default function Appendix2MultiSelect({
   const filteredForms = useMemo(
     () =>
       forms.filter(({ form }) => {
-        let r = true;
-
-        if (readableIdFilter.length > 0) {
-          r = r && form.readableId.includes(readableIdFilter);
-          if (r === false) return r;
+        if (
+          readableIdFilter.length > 0 &&
+          !form.readableId.includes(readableIdFilter)
+        ) {
+          return false;
         }
 
-        if (wasteCodeFilter.length > 0) {
-          r = r && !!form.wasteDetails?.code?.includes(wasteCodeFilter);
-          if (r === false) return r;
+        if (
+          wasteCodeFilter.length > 0 &&
+          !form.wasteDetails?.code?.includes(wasteCodeFilter)
+        ) {
+          return false;
         }
 
-        if (emitterSiretFilter.length > 0) {
-          r = r && !!form.emitter?.company?.orgId?.includes(emitterSiretFilter);
-          if (r === false) return r;
+        if (
+          emitterSiretFilter.length > 0 &&
+          !form.emitter?.company?.orgId?.includes(emitterSiretFilter)
+        ) {
+          return false;
         }
 
-        return r;
+        return true;
       }),
     [forms, readableIdFilter, wasteCodeFilter, emitterSiretFilter]
   );
@@ -135,7 +139,7 @@ export default function Appendix2MultiSelect({
         .plus(initialQuantity);
     }
 
-    return quantityLeft;
+    return quantityLeft.toDecimalPlaces(6);
   }
 
   useEffect(() => {

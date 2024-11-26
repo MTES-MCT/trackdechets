@@ -62,7 +62,7 @@ function Appendix2MultiSelectWrapper({
   });
 
   // Cette fonction est ensuite utilisée dans un useEffect
-  // On la wrap dans un `useCallaback` pour éviter un render infinie
+  // On la wrap dans un `useCallback` pour éviter un render infini
   const updateTotalQuantity = useCallback(
     (totalQuantity: number) =>
       setFieldValue("wasteDetails.quantity", totalQuantity),
