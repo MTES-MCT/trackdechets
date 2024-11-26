@@ -69,7 +69,7 @@ if (CRON_ONBOARDING_SCHEDULE) {
       },
       timeZone: TZ
     }),
-    // delegations 'bout to expire
+    // delegations about to expire
     new cron.CronJob({
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
