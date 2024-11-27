@@ -1,6 +1,6 @@
 import React from "react";
 import { Bsvhu, BsvhuStatus } from "@td/codegen-ui";
-import { SignEmission } from "../../../../../dashboard/components/BSDList/BSVhu/WorkflowAction/SignEmission";
+import SignVhuEmission from "../../Bsvhu/SignVhuEmission";
 import { SignTransport } from "../../../../../dashboard/components/BSDList/BSVhu/WorkflowAction/SignTransport";
 import { SignOperation } from "../../../../../dashboard/components/BSDList/BSVhu/WorkflowAction/SignOperation";
 
@@ -23,13 +23,7 @@ const ActBsvhuValidation = ({
   };
 
   const renderInitialModal = () => {
-    return (
-      <SignEmission
-        bsvhuId={bsd.id}
-        siret={currentSiret}
-        {...actionButtonAdapterProps}
-      />
-    );
+    return <SignVhuEmission bsvhuId={bsd.id} onClose={onClose} />;
   };
 
   const renderSignedByProducerModal = () => {
