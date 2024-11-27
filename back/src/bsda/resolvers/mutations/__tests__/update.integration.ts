@@ -1,4 +1,4 @@
-import { TransportMode, UserRole } from "@prisma/client";
+import { Bsda, BsdaStatus, TransportMode, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   BsdaInput,
@@ -19,6 +19,7 @@ import {
 } from "../../../__tests__/factories";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
 import { getStream } from "../../../../activity-events";
+import { producerShouldBeNotifiedOfDestinationCapModification } from "../update";
 
 export const UPDATE_BSDA = `
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
@@ -2223,5 +2224,101 @@ describe("Mutation.updateBsda", () => {
     expect(updatedBsda.destinationReceptionWeight!.toNumber()).toEqual(
       2000 // 2 * 1000
     );
+  });
+
+  describe.only("updating the CAP", () => {
+    describe("producerShouldBeNotifiedOfDestinationCapModification", () => {
+      const previousBsda = {
+        destinationCap: "A",
+        status: BsdaStatus.SIGNED_BY_PRODUCER,
+        emitterCompanySiret: "somesiret",
+        workerCompanySiret: "somesiret"
+      };
+      const updatedBsda = {
+        destinationCap: "A",
+        status: BsdaStatus.SIGNED_BY_PRODUCER,
+        emitterCompanySiret: "somesiret",
+        workerCompanySiret: "somesiret"
+      };
+
+      const previousBsdaWithNextDestination = {
+        destinationCap: "A",
+        status: BsdaStatus.SIGNED_BY_PRODUCER,
+        emitterCompanySiret: "somesiret",
+        workerCompanySiret: "somesiret",
+        destinationOperationNextDestinationCompanySiret: "somesiret",
+        destinationOperationNextDestinationCap: "A"
+      };
+      const updatedBsdaWithNextDestination = {
+        destinationCap: "A",
+        status: BsdaStatus.SIGNED_BY_PRODUCER,
+        emitterCompanySiret: "somesiret",
+        workerCompanySiret: "somesiret",
+        destinationOperationNextDestinationCompanySiret: "somesiret",
+        destinationOperationNextDestinationCap: "A"
+      };
+
+      it.each([
+        // Status pas bon
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.INITIAL }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.AWAITING_CHILD }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.CANCELED }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.PROCESSED }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.REFUSED }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.SIGNED_BY_WORKER }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.SENT }],
+        // Pas d'entreprise de travaux
+        [previousBsda, { ...updatedBsda, workerCompanySiret: undefined }],
+        // Pas d'émetteur
+        [previousBsda, { ...updatedBsda, emitterCompanySiret: undefined }],
+        // destinationCap identique
+        [previousBsda, updatedBsda],
+        // nextDestinationCap identique
+        [previousBsdaWithNextDestination, updatedBsdaWithNextDestination]
+      ])(
+        "should return false - previous: %p, updated: %p",
+        (previousBsda, updatedBsda) => {
+          // Given
+
+          // When
+          const shouldBeNotified =
+            producerShouldBeNotifiedOfDestinationCapModification(
+              previousBsda as Bsda,
+              updatedBsda as Bsda
+            );
+
+          // Then
+          expect(shouldBeNotified).toBeFalsy();
+        }
+      );
+
+      it.each([
+        // destinationCap différent
+        [previousBsda, { ...updatedBsda, destinationCap: "B" }],
+        // nextDestinationCap différent
+        [
+          previousBsdaWithNextDestination,
+          {
+            ...updatedBsdaWithNextDestination,
+            destinationOperationNextDestinationCap: "B"
+          }
+        ]
+      ])(
+        "should return true - previous: %p, updated: %p",
+        (previousBsda, updatedBsda) => {
+          // Given
+
+          // When
+          const shouldBeNotified =
+            producerShouldBeNotifiedOfDestinationCapModification(
+              previousBsda as Bsda,
+              updatedBsda as Bsda
+            );
+
+          // Then
+          expect(shouldBeNotified).toBeTruthy();
+        }
+      );
+    });
   });
 });

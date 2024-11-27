@@ -299,3 +299,16 @@ export const registryDelegationCreation: MailTemplate<{
   body: mustacheRenderer("registry-delegation-creation.html"),
   templateId: templateIds.LAYOUT
 };
+
+export const bsdaDestinationCapModificationEmail: MailTemplate<{
+  bsdaId: string;
+  previousCap: string;
+  newCap: string;
+  workerCompanyName: string;
+  workerCompanySiret: string;
+}> = {
+  subject: ({ bsdaId, newCap }) =>
+    `CAP du bordereau amiante n° ${bsdaId} mis à jour par ${newCap}`,
+  body: mustacheRenderer("bsda-destinationCap-modification-email.html"),
+  templateId: templateIds.LAYOUT
+};
