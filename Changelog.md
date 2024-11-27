@@ -21,6 +21,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de l'export v2 des registres SSD [PR 3755](https://github.com/MTES-MCT/trackdechets/pull/3755)
+- Permettre de faire une demande de révision BSDD lorsque le l'émetteur est un particulier ou un navire étranger [PR 3785](https://github.com/MTES-MCT/trackdechets/pull/3785)
 
 #### :bug: Corrections de bugs
 
