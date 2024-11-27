@@ -169,7 +169,8 @@ export const userInCompany = async (
     companyAssociations: {
       create: {
         company: { connect: { id: companyId } },
-        role: role
+        role: role,
+        ...getDefaultNotifications(role)
       }
     }
   });

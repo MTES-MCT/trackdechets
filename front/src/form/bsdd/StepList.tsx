@@ -194,10 +194,15 @@ export default function StepsList(props: Props) {
       ...(ecoOrganisme?.siret ? { ecoOrganisme } : { ecoOrganisme: null }),
       ...(grouping?.length
         ? {
-            grouping: grouping.map(({ form, quantity }) => ({
-              form: { id: form.id },
-              quantity
-            }))
+            grouping: grouping
+              .map(({ form, quantity }) => ({
+                form: { id: form.id },
+                // quantity peut être égal à "" dans le
+                // cas où l'input est laissé vide dans le sélecteur
+                // d'annexes 2
+                quantity: Number(quantity)
+              }))
+              .filter(g => g.quantity > 0)
           }
         : {}),
       transporters: transporterIds

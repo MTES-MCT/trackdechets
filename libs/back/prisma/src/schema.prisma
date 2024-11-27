@@ -364,6 +364,7 @@ model CompanyAssociation {
   notificationIsActiveBsdaFinalDestinationUpdate Boolean @default(false)
   notificationIsActiveBsdRefusal                 Boolean @default(false)
   notificationIsActiveRevisionRequest            Boolean @default(false)
+  notificationIsActiveRegistryDelegation         Boolean @default(false)
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")

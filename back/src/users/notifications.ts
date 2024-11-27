@@ -19,7 +19,9 @@ export enum UserNotification {
   // Notification lors de la modification de la destination finale amiante
   BSDA_FINAL_DESTINATION_UPDATE = "BSDA_FINAL_DESTINATION_UPDATE",
   // Notification lors d'une demande de révision
-  REVISION_REQUEST = "REVISION_REQUEST"
+  REVISION_REQUEST = "REVISION_REQUEST",
+  // Notification concernant les délégations (registre)
+  REGISTRY_DELEGATION = "REGISTRY_DELEGATION"
 }
 
 // Liste les champs qui permettent de contrôler les abonnements
@@ -29,7 +31,8 @@ type notificationFields =
   | "notificationIsActiveSignatureCodeRenewal"
   | "notificationIsActiveBsdRefusal"
   | "notificationIsActiveRevisionRequest"
-  | "notificationIsActiveBsdaFinalDestinationUpdate";
+  | "notificationIsActiveBsdaFinalDestinationUpdate"
+  | "notificationIsActiveRegistryDelegation";
 
 type PrismaNotifications = Pick<CompanyAssociation, notificationFields>;
 
@@ -48,7 +51,9 @@ export const notificationToPrismaField: {
   [UserNotification.BSD_REFUSAL]: "notificationIsActiveBsdRefusal",
   [UserNotification.REVISION_REQUEST]: "notificationIsActiveRevisionRequest",
   [UserNotification.BSDA_FINAL_DESTINATION_UPDATE]:
-    "notificationIsActiveBsdaFinalDestinationUpdate"
+    "notificationIsActiveBsdaFinalDestinationUpdate",
+  [UserNotification.REGISTRY_DELEGATION]:
+    "notificationIsActiveRegistryDelegation"
 };
 
 /**
@@ -63,7 +68,8 @@ export const gqlFieldToNotification: {
   signatureCodeRenewal: UserNotification.SIGNATURE_CODE_RENEWAL,
   bsdRefusal: UserNotification.BSD_REFUSAL,
   revisionRequest: UserNotification.REVISION_REQUEST,
-  bsdaFinalDestinationUpdate: UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+  bsdaFinalDestinationUpdate: UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
+  registryDelegation: UserNotification.REGISTRY_DELEGATION
 };
 
 /**
@@ -77,7 +83,8 @@ export function getDefaultNotifications(role: UserRole): PrismaNotifications {
     notificationIsActiveSignatureCodeRenewal: isActive,
     notificationIsActiveBsdRefusal: isActive,
     notificationIsActiveRevisionRequest: isActive,
-    notificationIsActiveBsdaFinalDestinationUpdate: isActive
+    notificationIsActiveBsdaFinalDestinationUpdate: isActive,
+    notificationIsActiveRegistryDelegation: isActive
   };
 }
 
@@ -96,7 +103,8 @@ export function toGqlNotifications(
       notifications.notificationIsActiveSignatureCodeRenewal,
     bsdRefusal: notifications.notificationIsActiveBsdRefusal,
     bsdaFinalDestinationUpdate:
-      notifications.notificationIsActiveBsdaFinalDestinationUpdate
+      notifications.notificationIsActiveBsdaFinalDestinationUpdate,
+    registryDelegation: notifications.notificationIsActiveRegistryDelegation
   };
 }
 
@@ -116,7 +124,9 @@ export function toPrismaNotifications(
       notifications.signatureCodeRenewal ?? undefined,
     notificationIsActiveBsdRefusal: notifications.bsdRefusal ?? undefined,
     notificationIsActiveBsdaFinalDestinationUpdate:
-      notifications.bsdaFinalDestinationUpdate ?? undefined
+      notifications.bsdaFinalDestinationUpdate ?? undefined,
+    notificationIsActiveRegistryDelegation:
+      notifications.registryDelegation ?? undefined
   });
 }
 
@@ -128,19 +138,22 @@ export const authorizedNotificationsByRole = {
     UserNotification.REVISION_REQUEST,
     UserNotification.BSD_REFUSAL,
     UserNotification.SIGNATURE_CODE_RENEWAL,
-    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+    UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
+    UserNotification.REGISTRY_DELEGATION
   ],
   [UserRole.MEMBER]: [
     UserNotification.REVISION_REQUEST,
     UserNotification.BSD_REFUSAL,
     UserNotification.SIGNATURE_CODE_RENEWAL,
-    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+    UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
+    UserNotification.REGISTRY_DELEGATION
   ],
   [UserRole.READER]: [
     UserNotification.REVISION_REQUEST,
     UserNotification.BSD_REFUSAL,
     UserNotification.SIGNATURE_CODE_RENEWAL,
-    UserNotification.BSDA_FINAL_DESTINATION_UPDATE
+    UserNotification.BSDA_FINAL_DESTINATION_UPDATE,
+    UserNotification.REGISTRY_DELEGATION
   ],
   [UserRole.DRIVER]: [
     UserNotification.BSD_REFUSAL,

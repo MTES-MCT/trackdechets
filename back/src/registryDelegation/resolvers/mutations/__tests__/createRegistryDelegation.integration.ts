@@ -204,15 +204,21 @@ describe("mutation createRegistryDelegation", () => {
       expect(delegation?.delegateId).toBe(delegate.id);
     });
 
-    it("should send an email to companies admins", async () => {
+    it("should send an email to companies subscribed members", async () => {
       // Given
       const delegate = await companyFactory({ givenName: "Some given name" });
       const { user: delegatorAdmin, company: delegator } =
         await userWithCompanyFactory();
-      await userInCompany("MEMBER", delegator.id); // Not an admin, shoud not receive mail
-      await userInCompany("MEMBER", delegate.id); // Not an admin, shoud not receive mail
-      const delegateAdmin = await userInCompany("ADMIN", delegate.id); // Admin, should receive mail
-      await userWithCompanyFactory("ADMIN"); // Not part of the delegation, should not receive mail
+      const delegatorMember = await userInCompany("MEMBER", delegator.id);
+      // Subscribe member to registry notification
+      await prisma.companyAssociation.updateMany({
+        where: { userId: delegatorMember.id },
+        data: { notificationIsActiveRegistryDelegation: true }
+      });
+
+      await userInCompany("MEMBER", delegate.id);
+      const delegateAdmin = await userInCompany("ADMIN", delegate.id);
+      await userWithCompanyFactory("ADMIN");
 
       // When
       const { errors, delegation } = await createDelegation(delegatorAdmin, {
@@ -229,7 +235,7 @@ describe("mutation createRegistryDelegation", () => {
 
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
 
-      // Onboarding email
+      // Registry email
       expect(sendMail as jest.Mock).toHaveBeenCalledWith(
         renderMail(registryDelegationCreation, {
           variables: {
@@ -241,13 +247,46 @@ describe("mutation createRegistryDelegation", () => {
             {
               to: expect.arrayContaining([
                 { email: delegatorAdmin.email, name: delegatorAdmin.name },
-                { email: delegateAdmin.email, name: delegateAdmin.name }
+                { email: delegateAdmin.email, name: delegateAdmin.name },
+                { email: delegatorMember.email, name: delegatorMember.name }
               ])
             }
           ]
         })
       );
     });
+  });
+
+  it("should skip sending mail if no one has subscribed to notification", async () => {
+    // Given
+    const delegate = await companyFactory({ givenName: "Some given name" });
+    const { user: delegatorAdmin, company: delegator } =
+      await userWithCompanyFactory();
+    await userInCompany("MEMBER", delegator.id);
+    await userInCompany("MEMBER", delegate.id);
+    const delegateAdmin = await userInCompany("ADMIN", delegate.id);
+    await userWithCompanyFactory("ADMIN");
+
+    // Unsubscribe admins from registry notification
+    await prisma.companyAssociation.updateMany({
+      where: { userId: { in: [delegateAdmin.id, delegatorAdmin.id] } },
+      data: { notificationIsActiveRegistryDelegation: false }
+    });
+
+    // When
+    const { errors } = await createDelegation(delegatorAdmin, {
+      delegateOrgId: delegate.orgId,
+      delegatorOrgId: delegator.orgId
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    // Email
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
   });
 
   it("testing email content - no end date", async () => {

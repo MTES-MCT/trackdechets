@@ -50,6 +50,8 @@ input UserNotificationsInput {
   bsdaFinalDestinationUpdate: Boolean
   # Abonnement aux notification de demandes de révision
   revisionRequest: Boolean
+  # Abonnement aux notifications concernant les délégations (registre)
+  registryDelegation: Boolean
 }
 
 input SubscribeToCompanyNotificationsInput {
