@@ -789,6 +789,123 @@ describe("Mutation.createFormRevisionRequest", () => {
     expect(data.createFormRevisionRequest.approvals[0].status).toBe("PENDING");
   });
 
+  it.each(["emitterIsPrivateIndividual", "emitterIsForeignShip"])(
+    "should be possible for the destination to create a revision request " +
+      "when %p and an eco-organisme is present",
+    async field => {
+      const { company: recipientCompany, user } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { company: ecoOrganismeCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: null,
+          [field]: true,
+          recipientCompanySiret: recipientCompany.siret,
+          ecoOrganismeSiret: ecoOrganismeCompany.siret,
+          wasteDetailsQuantity: 1,
+          quantityReceived: 1,
+          sentAt: new Date(),
+          receivedAt: new Date(),
+          processedAt: new Date(),
+          status: "PROCESSED"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { quantityReceived: 2 },
+            comment: "A comment",
+            authoringCompanySiret: recipientCompany.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+        recipientCompany.siret
+      );
+      expect(data.createFormRevisionRequest.status).toEqual("PENDING");
+
+      // one approval is created
+      expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+        { approverSiret: ecoOrganismeCompany.siret, status: "PENDING" }
+      ]);
+    }
+  );
+
+  it.each(["emitterIsPrivateIndividual", "emitterIsForeignShip"])(
+    "revision request should be automatically approved if %p " +
+      "and there is no eco-organisme",
+    async field => {
+      const { company: recipientCompany, user } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: null,
+          [field]: true,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsQuantity: 1,
+          quantityReceived: 1,
+          sentAt: new Date(),
+          receivedAt: new Date(),
+          processedAt: new Date(),
+          status: "PROCESSED"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { quantityReceived: 2 },
+            comment: "A comment",
+            authoringCompanySiret: recipientCompany.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+        recipientCompany.siret
+      );
+      expect(data.createFormRevisionRequest.approvals).toStrictEqual([]);
+      expect(data.createFormRevisionRequest.status).toEqual("ACCEPTED");
+    }
+  );
+
   it("should fail if unknown fields are provided", async () => {
     const { user } = await userWithCompanyFactory("ADMIN");
 
