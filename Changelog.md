@@ -14,6 +14,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Ne pas doubler les quantités restantes à regrouper lorsqu'on modifie un bordereau de groupement [PR 3760](https://github.com/MTES-MCT/trackdechets/pull/3760)
+- Retirer la possibilité de réviser une Annexe 1 avant la signature de l'enlèvement pour tous les acteurs [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
+- Retirer les accès à la révision pour les profils Négociant, Courtier et Autre intermédiaire [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
 
 # [2024.11.1] 19/11/2024
 
