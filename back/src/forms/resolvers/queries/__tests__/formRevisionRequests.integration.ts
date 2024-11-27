@@ -108,6 +108,60 @@ describe("Mutation.formRevisionRequests", () => {
     expect(data.formRevisionRequests.pageInfo.hasNextPage).toBe(false);
   });
 
+  it("should return revision request of foreign transporter", async () => {
+    const vatNumber = "IT13029381004";
+    const { user, company: foreignTransporter } = await userWithCompanyFactory(
+      "ADMIN",
+      { siret: null, vatNumber, orgId: vatNumber }
+    );
+    const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const { query } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterType: "APPENDIX1_PRODUCER",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: destinationCompany.siret,
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: foreignTransporter.vatNumber
+          }
+        }
+      }
+    });
+
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: foreignTransporter.id,
+        approvals: {
+          createMany: {
+            data: [{ approverSiret: emitterCompany.siret! }]
+          }
+        },
+        comment: ""
+      }
+    });
+
+    const { data, errors } = await query<Pick<Query, "formRevisionRequests">>(
+      FORM_REVISION_REQUESTS,
+      {
+        variables: { siret: foreignTransporter.vatNumber }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+
+    expect(data.formRevisionRequests.totalCount).toBe(1);
+  });
+
   it("should list every revisionRequest related to eco-organismes", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const { company: otherCompany } = await userWithCompanyFactory("ADMIN");

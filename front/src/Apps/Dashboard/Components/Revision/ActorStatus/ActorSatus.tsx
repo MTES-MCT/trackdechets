@@ -36,7 +36,7 @@ const ActorStatus = ({ review }: { review: ReviewInterface }) => {
           &nbsp;Demandeur
         </p>
         <p className="actor-name">
-          {`${review.authoringCompany?.name} - ${review.authoringCompany?.siret}`}
+          {`${review.authoringCompany?.name} - ${review.authoringCompany?.orgId}`}
         </p>
       </div>
       {Object.entries(approvalsGroupedByStatus).map(([status, approvals]) => (
