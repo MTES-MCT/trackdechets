@@ -32,14 +32,13 @@ const TransporterBsvhu = ({ errors }) => {
 
   useEffect(() => {
     if (errors?.length) {
-      if (!transporter?.company?.siret) {
-        setFieldError(
-          errors,
-          `${actor}.company.siret`,
-          formState.errors?.[actor]?.["company"]?.siret,
-          setError
-        );
-      }
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+
       if (transporter?.company?.contact) {
         setFieldError(
           errors,

@@ -38,14 +38,7 @@ import {
 import OtherActors from "./steps/OtherActors";
 
 const vhuToInput = (vhu: BsvhuInput): BsvhuInput => {
-  return omitDeep(vhu, [
-    "isDraft",
-    "emitter.emission.signature",
-    "transporter.transport.signature",
-    "destination.reception.signature",
-    "destination.operation.signature",
-    "ecoOrganisme.hasEcoOrganisme"
-  ]);
+  return omitDeep(vhu, ["isDraft", "ecoOrganisme.hasEcoOrganisme"]);
 };
 interface Props {
   bsdId?: string;
@@ -122,9 +115,8 @@ const BsvhuFormSteps = ({
   const saveForm = (input: BsvhuInput, draft: boolean): Promise<any> => {
     const cleanedInput = vhuToInput(input);
     if (formState.id!) {
-      const cleanedPayload = cleanPayload(omitDeep(cleanedInput));
       return updateVhuForm({
-        variables: { id: formState.id, input: cleanedPayload }
+        variables: { id: formState.id, input: cleanedInput }
       });
     } else {
       const cleanedPayload = cleanPayload(cleanedInput);
