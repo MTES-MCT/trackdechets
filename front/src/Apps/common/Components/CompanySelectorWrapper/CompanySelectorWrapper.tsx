@@ -2,7 +2,7 @@
 
 import { useLazyQuery, ApolloError } from "@apollo/client";
 import React, { useCallback, useEffect, useState } from "react";
-import CompanySelector from "../../../../Apps/common/Components/CompanySelector/CompanySelector";
+import CompanySelector from "../CompanySelector/CompanySelector";
 import {
   CompanySearchResult,
   FavoriteType,
@@ -10,11 +10,8 @@ import {
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs
 } from "@td/codegen-ui";
-import { NotificationError } from "../../../../Apps/common/Components/Error/Error";
-import {
-  FAVORITES,
-  SEARCH_COMPANIES
-} from "../../../../Apps/common/queries/company/query";
+import { NotificationError } from "../Error/Error";
+import { FAVORITES, SEARCH_COMPANIES } from "../../queries/company/query";
 
 interface CompanySelectorWrapperProps {
   // Expose le state depuis le composant parent
@@ -43,10 +40,10 @@ interface CompanySelectorWrapperProps {
  * - Il implémente le search et gère les erreurs.
  * - Il initialise l'établissement sélectionné à partir des données du store (Formik).
  * - Il propage l'événement de sélection d'un établissement au parent pour modifier.
- * les données du store (Formik)
+ * les données du store (Formik ou RHF)
  */
 
-export default function RhfCompanySelectorWrapper({
+export default function CompanySelectorWrapper({
   selectedCompanyOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
@@ -92,7 +89,7 @@ export default function RhfCompanySelectorWrapper({
   const onSelectCompany = useCallback(
     (company: CompanySearchResult) => {
       setSelectedCompany(company);
-      // propage l'événement au parent pour modifier les données du store (Formik)
+      // propage l'événement au parent pour modifier les données du store (Formik ou RHF)
       onCompanySelected && onCompanySelected(company);
     },
     [setSelectedCompany, onCompanySelected]
