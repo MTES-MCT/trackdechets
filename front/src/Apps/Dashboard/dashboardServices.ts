@@ -1422,8 +1422,7 @@ export const canReviewBsda = (bsd: BsdDisplay, siret: string) => {
   const isDestination = isSameSiretDestination(siret, bsd);
   const isEmitter = isSameSiretEmitter(siret, bsd);
   const isWorker = isSameSiretWorker(siret, bsd);
-  // TODO [tra-15516] gérer l'implémentation back
-  //const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
+  const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
 
   return (
     (isEmitter &&
@@ -1432,9 +1431,8 @@ export const canReviewBsda = (bsd: BsdDisplay, siret: string) => {
       // modifier le BSDA
       bsd.status !== BsdStatusCode.SignedByProducer) ||
     isDestination ||
-    isWorker
-    // TODO [tra-15516] gérer l'implémentation back
-    // || isEcoOrganisme
+    isWorker ||
+    isEcoOrganisme
   );
 };
 

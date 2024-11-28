@@ -336,7 +336,8 @@ export async function checkCanRequestRevision(user: User, bsda: Bsda) {
   const authorizedOrgIds = [
     bsda.emitterCompanySiret,
     bsda.workerCompanySiret,
-    bsda.destinationCompanySiret
+    bsda.destinationCompanySiret,
+    bsda.ecoOrganismeSiret
   ].filter(Boolean);
 
   return checkUserPermissions(
