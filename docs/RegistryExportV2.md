@@ -76,19 +76,15 @@ La colonne readableId contient le publicId dans le cas des registres, et le read
 
 Cette colonne contient les délégataires ayant ajouté/modifié la ligne de registre correspondant à l'objet RegistryLookup. Elle permet de retrouver les lignes de registre à exporter chez un délégataire. Il peut sembler étrange que cette colonne soit une array, alors que lors de l'ajout d'une ligne de registre, il n'y a qu'un seul délégataire qui fait l'import. Cependant, il est possible qu'un établissement ait plusieurs délégataires, et que l'un crée la ligne de registre, et qu'un autre la modifie. Or dans ce cas il faut que les 2 délégataires voient cette ligne dans leurs exports, ce qui justifie donc que tous les délégaitaires ayant touché à cette ligne soient ajoutés au RegistryLookup dans cette array.
 
-### sirets
-
-Cette colonne contient les sirets de tous les établissements concernés par une ligne d'export de registre. Dans le cas d'imports de regsitres, il n'y a qu'un seul siret. Cependant, dans le cas de BSD, plusieurs établissements peuvent être concernés par une ligne de registre d'export.
-
 ### dateId
 
 La colonne dateId est une colonne utilisée uniquement pour la pagination lors de l'export. Afin de traverser efficacement la db à l'export, une pagination par curseur est utilisée. Or pour la pagination par curseur, il faut utiliser comme valeur de curseur une colonne qui est classée dans l'ordre du sort de la query, mais aussi dont les valeurs sont uniques. Les exports se faisant par ordre chronologique décroissant, une colonne classable par date est nécessaire. Cependant, la colonne "date" n'est pas unique, et ne peut donc pas être utilisée comme curseur.
 
 Le choix a donc été fait d'ajouter cette colonne dateId, qui contient un UUIDv7, généré à la création de l'objet dans le serveur. La particularité d'UUIDv7 est qu'il est possible de générer ces ids à partir d'un timestamp (la colonne date dans notre cas), que ces UUID soient classable par ordre chronologique, tout en étant uniques.
 
-### id composé (id + exportRegistryType)
+### id composé (id + exportRegistryType + siret)
 
-Puisqu'un même BSD peut apparaître sur plusieurs lignes de RegistryLookup, la valeur "id" n'est pas forcément unique, et ne peut donc pas servir d'id à elle seule. On utilise donc un id composé de id + exportRegistryType, car l'id doit n'apparaître qu'une seule fois par type d'export.
+Puisqu'un même BSD peut apparaître sur plusieurs lignes de RegistryLookup, la valeur "id" n'est pas forcément unique, et ne peut donc pas servir d'id à elle seule. On utilise donc un id composé de id + exportRegistryType + siret, car l'id doit n'apparaître qu'une seule fois par type d'export et par siret. En d'autres termes, un même objet (particulièrement les BSDs) peuvent apparaître dans plusieurs types d'export, et parfois pour plusieurs sirets dans un même type d'export (ex: plusieurs transporteurs). Il doit donc y avoir unicité de id + exportRegistryType + siret, d'où l'intérêt d'utiliser cet index composé.
 
 ## Export
 
