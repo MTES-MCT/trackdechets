@@ -2493,7 +2493,7 @@ model RegistryLookup {
   // for support/display
   readableId         String
   reportAsSirets     String[]                      @default([])
-  sirets             String[]
+  siret              String
   exportRegistryType RegistryExportType
   declarationType    RegistryExportDeclarationType
   wasteType          RegistryExportWasteType
@@ -2524,18 +2524,13 @@ model RegistryLookup {
 
   // the id itself is not unique, since a same BSD will appear in multiple export registries.
   // so the unique index is made of id + exportRegistryType
-  @@id([id, exportRegistryType])
+  @@id([id, exportRegistryType, siret])
   // pseudo-random with only "=" lookups so hash index is appropriate
   @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
   // array of elements so gin index
   @@index([reportAsSirets], map: "_RegistryLookupReportAsSiretsIdx", type: Gin)
-  // a btree_gin multi column index with [date(sort: Desc), sirets, exportRegistryType] could be advantageous but currently not supported by prisma
-  // https://www.postgresql.org/docs/current/btree-gin.html
-  // https://www.prisma.io/docs/orm/prisma-schema/postgresql-extensions
-  // array of elements so gin index
-  @@index([sirets], map: "_RegistryLookupSiretsIdx", type: Gin)
   // multi-column index because those columns are mandatory for any export
-  @@index([date(sort: Asc), exportRegistryType], map: "_RegistryLookupMainIdx")
+  @@index([date(sort: Asc), exportRegistryType, siret], map: "_RegistryLookupMainIdx")
   @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
   @@index([dateId(sort: Asc)], map: "_RegistryLookupDateIdIdx")
   @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")

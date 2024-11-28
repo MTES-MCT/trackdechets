@@ -34,7 +34,7 @@ const LOOKUP_PAGE_SIZE = 100;
 const streamLookup = (
   findManyArgs: Prisma.RegistryLookupFindManyArgs,
   registryType: WasteRegistryType,
-  addEncounteredSirets: (sirets: string[]) => void
+  addEncounteredSiret: (siret: string) => void
 ): Readable => {
   let cursorId: string | null = null;
   return new Readable({
@@ -58,7 +58,7 @@ const streamLookup = (
           const lookup = item as Prisma.RegistryLookupGetPayload<{
             include: { registrySsd: true };
           }>;
-          addEncounteredSirets(lookup.sirets);
+          addEncounteredSiret(lookup.siret);
           const mapped = toWaste(registryType, {
             SSD: lookup.registrySsd
           });
@@ -140,8 +140,8 @@ export async function processRegistryExportJob(
     const outputStream = streamInfos.s3Stream;
     //craft the query
     const query: Prisma.RegistryLookupFindManyArgs["where"] = {
-      sirets: {
-        hasSome: registryExport.sirets
+      siret: {
+        in: registryExport.sirets
       },
       reportAsSirets: registryExport.delegateSiret
         ? {
@@ -174,17 +174,15 @@ export async function processRegistryExportJob(
     // sirets that are never encountered during the export, and update the list of sirets
     // in registryExport at the end
     const unusedSirets = new Set(registryExport.sirets);
-    const addEncounteredSirets = (sirets: string[]) => {
-      sirets.forEach(siret => {
-        unusedSirets.delete(siret);
-      });
+    const addEncounteredSiret = (siret: string) => {
+      unusedSirets.delete(siret);
     };
     const inputStream = streamLookup(
       {
         where: query
       },
       registryExport.registryType ?? "ALL",
-      addEncounteredSirets
+      addEncounteredSiret
     );
 
     // handle CSV exports
