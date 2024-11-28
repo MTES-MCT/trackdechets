@@ -88,6 +88,10 @@ const rawBsvhuSchema = z.object({
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
+  emitterNotOnTD: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   emitterCompanyName: z.string().nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),

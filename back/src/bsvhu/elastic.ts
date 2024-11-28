@@ -131,6 +131,8 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
         for (const fieldName of siretsFilters.keys()) {
           setTab(siretsFilters, fieldName, "isDraftFor");
         }
+      } else if (bsvhu.emitterNoSiret || bsvhu.emitterNotOnTD) {
+        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
       } else {
         setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
         setTab(siretsFilters, "transporterCompanySiret", "isFollowFor");

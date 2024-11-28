@@ -1014,6 +1014,7 @@ model Bsvhu {
 
   emitterIrregularSituation                           Boolean?                 @default(false)
   emitterNoSiret                                      Boolean?                 @default(false)
+  emitterNotOnTD                                      Boolean?                 @default(false)
   emitterAgrementNumber                               String?                  @db.VarChar(100)
   emitterCompanyName                                  String?
   emitterCompanySiret                                 String?                  @db.VarChar(17)

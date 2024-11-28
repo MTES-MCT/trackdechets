@@ -21,6 +21,7 @@ export type BsvhuEditableFields = Required<
     | "isDraft"
     | "isDeleted"
     | "emitterCustomInfo"
+    | "emitterNotOnTD"
     | "destinationCustomInfo"
     | "transporterCustomInfo"
     | "transporterTransportPlates"
