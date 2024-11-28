@@ -154,8 +154,7 @@ describe("Mutation.duplicateForm", () => {
   it("should duplicate a form %s", async () => {
     const { form, emitter } = await createForm({
       ecoOrganismeName: "COREPILE",
-      ecoOrganismeSiret: siretify(1),
-      wasteDetailsIsSubjectToADR: true
+      ecoOrganismeSiret: siretify(1)
     });
 
     const {
@@ -1256,6 +1255,82 @@ describe("Mutation.duplicateForm", () => {
       );
       expect(duplicatedForwardedIn?.recipientCompanyAddress).toEqual(
         "updated destination address"
+      );
+    }
+  );
+
+  it.each([true, false, null])(
+    "should set `wasteDetailsIsSubjectToADR=true` when waste is dangerous " +
+      "and wasteDetailsIsSubjectToADR is %p on the BSDD being duplicated",
+    async wasteDetailsIsSubjectToADR => {
+      const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret,
+          wasteDetailsIsDangerous: true,
+          wasteDetailsIsSubjectToADR
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+        DUPLICATE_FORM,
+        {
+          variables: {
+            id: form.id
+          }
+        }
+      );
+
+      const duplicatedForm = await prisma.form.findUniqueOrThrow({
+        where: {
+          id: data.duplicateForm.id
+        }
+      });
+
+      expect(duplicatedForm).toEqual(
+        expect.objectContaining({
+          wasteDetailsIsSubjectToADR: true
+        })
+      );
+    }
+  );
+
+  it.each([true, false, null])(
+    "should keep existing wasteDetailsIsSubjectToADR when" +
+      " wasteDetailsIsSubjectToADR is %p and waste is not dangerous",
+    async wasteDetailsIsSubjectToADR => {
+      const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret,
+          wasteDetailsIsDangerous: false,
+          wasteDetailsIsSubjectToADR
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+        DUPLICATE_FORM,
+        {
+          variables: {
+            id: form.id
+          }
+        }
+      );
+
+      const duplicatedForm = await prisma.form.findUniqueOrThrow({
+        where: {
+          id: data.duplicateForm.id
+        }
+      });
+
+      expect(duplicatedForm).toEqual(
+        expect.objectContaining({
+          wasteDetailsIsSubjectToADR
+        })
       );
     }
   );

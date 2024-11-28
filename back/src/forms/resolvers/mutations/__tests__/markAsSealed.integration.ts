@@ -563,38 +563,43 @@ describe("Mutation.markAsSealed", () => {
     }
   );
 
-  it("should be required to provide onuCode for dangerous wastes", async () => {
-    const { user, company: emitterCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-    const recipientCompany = await destinationFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-        wasteDetailsCode: "05 01 04*",
-        wasteDetailsOnuCode: null
-      }
-    });
+  it(
+    "should be required to provide onuCode for dangerous wastes" +
+      " when `wasteDetailsIsSubjectToADR` is not speified ",
+    async () => {
+      const { user, company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const recipientCompany = await destinationFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsCode: "05 01 04*",
+          wasteDetailsOnuCode: null,
+          wasteDetailsIsSubjectToADR: null
+        }
+      });
 
-    const { mutate } = makeClient(user);
+      const { mutate } = makeClient(user);
 
-    const { errors } = await mutate(MARK_AS_SEALED, {
-      variables: {
-        id: form.id
-      }
-    });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: [
-          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
-          `Erreur(s): La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
-        ].join("\n")
-      })
-    ]);
-  });
+      const { errors } = await mutate(MARK_AS_SEALED, {
+        variables: {
+          id: form.id
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: [
+            "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
+            `Erreur(s): La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
+          ].join("\n")
+        })
+      ]);
+    }
+  );
 
   it("should be optional to provide onuCode for non-dangerous wastes", async () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
@@ -609,6 +614,7 @@ describe("Mutation.markAsSealed", () => {
         recipientCompanySiret: recipientCompany.siret,
         wasteDetailsCode: "01 01 01",
         wasteDetailsIsDangerous: false,
+        wasteDetailsIsSubjectToADR: false,
         wasteDetailsOnuCode: null
       }
     });
