@@ -6,7 +6,7 @@ import {
   WasteProcessorType
 } from "@td/codegen-ui";
 import { useFormContext, useWatch } from "react-hook-form";
-import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";

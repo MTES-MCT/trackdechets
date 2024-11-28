@@ -9,7 +9,7 @@ import RecepisseExemption from "../../../../Forms/Components/RecepisseExemption/
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import { RhfTagsInputWrapper } from "../../../../Forms/Components/TagsInput/TagsInputWrapper";
 import TransporterRecepisse from "../../../../Forms/Components/TransporterRecepisse/TransporterRecepisse";
-import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { SealedFieldsContext } from "../../context";
 import { clearCompanyError, setFieldError } from "../../utils";
 
