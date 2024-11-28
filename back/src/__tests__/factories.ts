@@ -336,6 +336,7 @@ const formdata: Partial<Prisma.FormCreateInput> = {
   wasteDetailsIsDangerous: true,
   wasteDetailsName: "Divers",
   wasteDetailsOnuCode: "2003",
+  wasteDetailsIsSubjectToADR: true,
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
   wasteDetailsPop: false,
   wasteDetailsQuantity: 22.5,
