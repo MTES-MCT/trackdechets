@@ -362,10 +362,10 @@ describe("<Appendix2MultiSelect />", () => {
     const readableIfFilter = screen.getByLabelText("Numéro de bordereau");
     expect(readableIfFilter).toBeInTheDocument();
 
-    user.type(readableIfFilter, appendixForms[0].readableId);
+    await user.type(readableIfFilter, appendixForms[0].readableId);
     await waitFor(() => expect(screen.getAllByRole("row")).toHaveLength(2));
 
-    user.clear(readableIfFilter);
+    await user.clear(readableIfFilter);
     await waitFor(() => expect(screen.getAllByRole("row")).toHaveLength(4));
   });
 });
