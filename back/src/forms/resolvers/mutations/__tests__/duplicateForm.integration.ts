@@ -154,7 +154,8 @@ describe("Mutation.duplicateForm", () => {
   it("should duplicate a form %s", async () => {
     const { form, emitter } = await createForm({
       ecoOrganismeName: "COREPILE",
-      ecoOrganismeSiret: siretify(1)
+      ecoOrganismeSiret: siretify(1),
+      wasteDetailsIsSubjectToADR: true
     });
 
     const {
@@ -216,6 +217,7 @@ describe("Mutation.duplicateForm", () => {
       brokerValidityLimit,
       ecoOrganismeName,
       ecoOrganismeSiret,
+      wasteDetailsIsSubjectToADR,
       ...rest
     } = form;
 
@@ -296,8 +298,7 @@ describe("Mutation.duplicateForm", () => {
       "hasCiterneBeenWashedOut",
       "emptyReturnADR",
       "wasteDetailsNonRoadRegulationMention",
-      "wasteDetailsOnuCode",
-      "wasteDetailsIsSubjectToADR"
+      "wasteDetailsOnuCode"
     ];
 
     const expectedSkippedTransporter = [
@@ -394,7 +395,8 @@ describe("Mutation.duplicateForm", () => {
       brokerDepartment,
       brokerValidityLimit,
       ecoOrganismeName,
-      ecoOrganismeSiret
+      ecoOrganismeSiret,
+      wasteDetailsIsSubjectToADR
     });
 
     expect(duplicatedTransporter).toMatchObject({

@@ -127,6 +127,7 @@ async function getDuplicateFormInput(
     wasteDetailsName: form.wasteDetailsName,
     wasteDetailsConsistence: form.wasteDetailsConsistence,
     wasteDetailsSampleNumber: form.wasteDetailsSampleNumber,
+    wasteDetailsIsSubjectToADR: form.wasteDetailsIsSubjectToADR,
     traderCompanyName: trader?.name ?? form.traderCompanyName,
     traderCompanySiret: form.traderCompanySiret,
     traderCompanyAddress: trader?.address ?? form.traderCompanyAddress,
