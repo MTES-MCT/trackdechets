@@ -605,6 +605,7 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
     emitterEmissionSignatureDate: bsvhu.emitterEmissionSignatureDate,
     emitterIrregularSituation: bsvhu.emitterIrregularSituation,
     emitterNoSiret: bsvhu.emitterNoSiret,
+    emitterNotOnTD: bsvhu.emitterNotOnTD,
     identificationNumbers: bsvhu.identificationNumbers,
     identificationType: bsvhu.identificationType,
     intermediaries: bsvhu.intermediaries.length
