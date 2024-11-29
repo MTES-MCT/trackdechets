@@ -104,6 +104,22 @@ export const refineMunicipalities: Refinement<ParsedZodIncomingWasteItem> = (
   incomingWasteItem,
   { addIssue }
 ) => {
+  if (incomingWasteItem.producerType === "COMMUNE" && !incomingWasteItem.municipalitiesInseeCodes?.length) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le ou les codes INSEE des communes doivent être saisi`,
+      path: ["municipalitiesInseeCodes"]
+    });
+  }
+
+  if (incomingWasteItem.producerType === "COMMUNE" && !incomingWasteItem.municipalitiesNames?.length) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le ou les libellés des communes doivent être saisi`,
+      path: ["municipalitiesNames"]
+    });
+  }
+
   if (
     incomingWasteItem.municipalitiesInseeCodes?.length !==
     incomingWasteItem.municipalitiesNames?.length
