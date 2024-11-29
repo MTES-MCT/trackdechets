@@ -42,6 +42,7 @@ export const INCOMING_WASTE_HEADERS = {
   documentNumber: "Numéro de document",
   notificationNumber: "Numéro de notification",
   notificationDocumentInputNumber: "Numéro de saisie du document",
+  nextOperationCode: "Code d'opération ultérieure prévue",
   transporter1TransportMode: "Mode de transport du transporteur n°1",
   transporter1Type: "Type de transporteur n°1",
   transporter1OrgId: "Numéro d'identification du transporteur n°1",
