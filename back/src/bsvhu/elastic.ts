@@ -131,7 +131,13 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
         for (const fieldName of siretsFilters.keys()) {
           setTab(siretsFilters, fieldName, "isDraftFor");
         }
-      } else if (bsvhu.emitterNoSiret || bsvhu.emitterNotOnTD) {
+      } else if (bsvhu.emitterNotOnTD) {
+        // even though the emitter is not on TD, we still add the SIRET to the index
+        // so if the account is created after the BSVHU, it will still appear in the
+        // emitter's dashboard.
+        setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
+        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+      } else if (bsvhu.emitterNoSiret) {
         setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
       } else {
         setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
