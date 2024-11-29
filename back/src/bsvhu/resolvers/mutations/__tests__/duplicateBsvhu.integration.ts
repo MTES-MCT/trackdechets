@@ -123,6 +123,7 @@ describe("mutaion.duplicateBsvhu", () => {
       opt: {
         emitterIrregularSituation: false,
         emitterNoSiret: false,
+        emitterNotOnTD: false,
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: emitter.company.name,
         emitterCompanyAddress: emitter.company.address,
@@ -185,6 +186,14 @@ describe("mutaion.duplicateBsvhu", () => {
         traderRecepisseValidityLimit: traderReceipt.validityLimit
       }
     });
+
+    const searchResults = {
+      [emitter.company.siret!]: emitter.company
+    };
+
+    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
     const { mutate } = makeClient(emitter.user);
 
     const { errors, data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
@@ -202,6 +211,7 @@ describe("mutaion.duplicateBsvhu", () => {
     const {
       emitterIrregularSituation,
       emitterNoSiret,
+      emitterNotOnTD,
       emitterAgrementNumber,
       emitterCompanyName,
       emitterCompanySiret,
@@ -313,6 +323,7 @@ describe("mutaion.duplicateBsvhu", () => {
     expect(duplicatedBsvhu).toMatchObject({
       emitterIrregularSituation,
       emitterNoSiret,
+      emitterNotOnTD,
       emitterAgrementNumber,
       emitterCompanyName,
       emitterCompanySiret,
