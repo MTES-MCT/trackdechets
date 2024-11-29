@@ -94,11 +94,12 @@ const inputIncomingWasteSchema = z.object({
   producerOrgId: getActorOrgIdSchema("du producteur"),
   producerName: getActorNameSchema("du producteur"),
   producerAddress: getActorAddressSchema("du producteur"),
-  producerPostalCode: getActorCitySchema("du producteur"),
-  producerCity: getActorPostalCodeSchema("du producteur"),
+  producerPostalCode: getActorPostalCodeSchema("du producteur"),
+  producerCity: getActorCitySchema("du producteur"),
   producerCountryCode: getActorCountryCodeSchema("du producteur"),
   municipalitiesInseeCodes: z
     .string()
+    .optional()
     .transform(val =>
       val
         ? String(val)
@@ -109,6 +110,7 @@ const inputIncomingWasteSchema = z.object({
     .pipe(z.array(z.string())),
   municipalitiesNames: z
     .string()
+    .optional()
     .transform(val =>
       val
         ? String(val)
@@ -144,10 +146,10 @@ const inputIncomingWasteSchema = z.object({
       "L'adresse de prise en charge de l'expéditeur doit faire moins de 150 caractères"
     )
     .optional(),
-  senderAddress: getActorAddressSchema("d'expéditeur'"),
-  senderPostalCode: getActorCitySchema("d'expéditeur'"),
-  senderCity: getActorPostalCodeSchema("d'expéditeur'"),
-  senderCountryCode: getActorCountryCodeSchema("d'expéditeur'"),
+  senderAddress: getActorAddressSchema("d'expéditeur"),
+  senderPostalCode: getActorPostalCodeSchema("d'expéditeur"),
+  senderCity: getActorCitySchema("d'expéditeur"),
+  senderCountryCode: getActorCountryCodeSchema("d'expéditeur"),
   brokerSiret: getActorSiretSchema("du courtier").optional(),
   brokerName: getActorNameSchema("du courtier").optional(),
   brokerReceiptNumber: z
@@ -172,51 +174,60 @@ const inputIncomingWasteSchema = z.object({
   documentNumber: z.string().optional(), // TODO 12 caractères & rule
   notificationNumber: z.string().optional(), // TODO 12 caractères & rule
   notificationDocumentInputNumber: z.string().optional(), // TODO rule
+  nextOperationCode: operationCodeSchema.optional(),
   transporter1TransportMode: transportModeSchema,
   transporter1Type: getActorTypeSchema("de transporteur 1"),
   transporter1OrgId: getActorOrgIdSchema("du transporteur 1"),
   transporter1ReceiptNumber: transportReceiptNumberSchema,
   transporter1Name: getActorNameSchema("du transporteur 1"),
   transporter1Address: getActorAddressSchema("du transporteur 1"),
-  transporter1PostalCode: getActorCitySchema("du transporteur 1"),
-  transporter1City: getActorPostalCodeSchema("du transporteur 1"),
+  transporter1PostalCode: getActorPostalCodeSchema("du transporteur 1"),
+  transporter1City: getActorCitySchema("du transporteur 1"),
   transporter1CountryCode: getActorCountryCodeSchema("du transporteur 1"),
   transporter2TransportMode: transportModeSchema.optional(),
-  transporter2Type: getActorTypeSchema("de transporteur 2"),
-  transporter2OrgId: getActorOrgIdSchema("du transporteur 2"),
-  transporter2ReceiptNumber: transportReceiptNumberSchema,
-  transporter2Name: getActorNameSchema("du transporteur 2"),
-  transporter2Address: getActorAddressSchema("du transporteur 2"),
-  transporter2PostalCode: getActorCitySchema("du transporteur 2"),
-  transporter2City: getActorPostalCodeSchema("du transporteur 2"),
-  transporter2CountryCode: getActorCountryCodeSchema("du transporteur 2"),
+  transporter2Type: getActorTypeSchema("de transporteur 2").optional(),
+  transporter2OrgId: getActorOrgIdSchema("du transporteur 2").optional(),
+  transporter2ReceiptNumber: transportReceiptNumberSchema.optional(),
+  transporter2Name: getActorNameSchema("du transporteur 2").optional(),
+  transporter2Address: getActorAddressSchema("du transporteur 2").optional(),
+  transporter2PostalCode:
+    getActorPostalCodeSchema("du transporteur 2").optional(),
+  transporter2City: getActorCitySchema("du transporteur 2").optional(),
+  transporter2CountryCode:
+    getActorCountryCodeSchema("du transporteur 2").optional(),
   transporter3TransportMode: transportModeSchema.optional(),
-  transporter3Type: getActorTypeSchema("de transporteur 3"),
-  transporter3OrgId: getActorOrgIdSchema("du transporteur 3"),
-  transporter3ReceiptNumber: transportReceiptNumberSchema,
-  transporter3Name: getActorNameSchema("du transporteur 3"),
-  transporter3Address: getActorAddressSchema("du transporteur 3"),
-  transporter3PostalCode: getActorCitySchema("du transporteur 3"),
-  transporter3City: getActorPostalCodeSchema("du transporteur 3"),
-  transporter3CountryCode: getActorCountryCodeSchema("du transporteur 3"),
+  transporter3Type: getActorTypeSchema("de transporteur 3").optional(),
+  transporter3OrgId: getActorOrgIdSchema("du transporteur 3").optional(),
+  transporter3ReceiptNumber: transportReceiptNumberSchema.optional(),
+  transporter3Name: getActorNameSchema("du transporteur 3").optional(),
+  transporter3Address: getActorAddressSchema("du transporteur 3").optional(),
+  transporter3PostalCode:
+    getActorPostalCodeSchema("du transporteur 3").optional(),
+  transporter3City: getActorCitySchema("du transporteur 3").optional(),
+  transporter3CountryCode:
+    getActorCountryCodeSchema("du transporteur 3").optional(),
   transporter4TransportMode: transportModeSchema.optional(),
-  transporter4Type: getActorTypeSchema("de transporteur 4"),
-  transporter4OrgId: getActorOrgIdSchema("du transporteur 4"),
-  transporter4ReceiptNumber: transportReceiptNumberSchema,
-  transporter4Name: getActorNameSchema("du transporteur 4"),
-  transporter4Address: getActorAddressSchema("du transporteur 4"),
-  transporter4PostalCode: getActorCitySchema("du transporteur 4"),
-  transporter4City: getActorPostalCodeSchema("du transporteur 4"),
-  transporter4CountryCode: getActorCountryCodeSchema("du transporteur 4"),
+  transporter4Type: getActorTypeSchema("de transporteur 4").optional(),
+  transporter4OrgId: getActorOrgIdSchema("du transporteur 4").optional(),
+  transporter4ReceiptNumber: transportReceiptNumberSchema.optional(),
+  transporter4Name: getActorNameSchema("du transporteur 4").optional(),
+  transporter4Address: getActorAddressSchema("du transporteur 4").optional(),
+  transporter4PostalCode:
+    getActorPostalCodeSchema("du transporteur 4").optional(),
+  transporter4City: getActorCitySchema("du transporteur 4").optional(),
+  transporter4CountryCode:
+    getActorCountryCodeSchema("du transporteur 4").optional(),
   transporter5TransportMode: transportModeSchema.optional(),
-  transporter5Type: getActorTypeSchema("de transporteur 5"),
-  transporter5OrgId: getActorOrgIdSchema("du transporteur 5"),
-  transporter5ReceiptNumber: transportReceiptNumberSchema,
-  transporter5Name: getActorNameSchema("du transporteur 5"),
-  transporter5Address: getActorAddressSchema("du transporteur 5"),
-  transporter5PostalCode: getActorCitySchema("du transporteur 5"),
-  transporter5City: getActorPostalCodeSchema("du transporteur 5"),
-  transporter5CountryCode: getActorCountryCodeSchema("du transporteur 5")
+  transporter5Type: getActorTypeSchema("de transporteur 5").optional(),
+  transporter5OrgId: getActorOrgIdSchema("du transporteur 5").optional(),
+  transporter5ReceiptNumber: transportReceiptNumberSchema.optional(),
+  transporter5Name: getActorNameSchema("du transporteur 5").optional(),
+  transporter5Address: getActorAddressSchema("du transporteur 5").optional(),
+  transporter5PostalCode:
+    getActorPostalCodeSchema("du transporteur 5").optional(),
+  transporter5City: getActorCitySchema("du transporteur 5").optional(),
+  transporter5CountryCode:
+    getActorCountryCodeSchema("du transporteur 5").optional()
 });
 
 // Props added through transform
