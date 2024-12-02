@@ -17,18 +17,18 @@ const MAX_SIZE = 50;
 
 const formRevisionRequestResolver: QueryResolvers["formRevisionRequests"] =
   async (_, args, context) => {
-    const { siret, where, first = MAX_SIZE, after } = args;
+    const { siret: orgId, where, first = MAX_SIZE, after } = args;
 
     const user = checkIsAuthenticated(context);
 
     await checkUserPermissions(
       user,
-      siret,
+      orgId,
       Permission.BsdCanList,
-      `Vous n'avez pas la permission de lister les demandes de révision de l'établissement ${siret}`
+      `Vous n'avez pas la permission de lister les demandes de révision de l'établissement ${orgId}`
     );
-    // TODO support orgId instead of siret for foreign companies
-    const company = await getCompanyOrCompanyNotFound({ siret });
+
+    const company = await getCompanyOrCompanyNotFound({ orgId });
 
     const pageSize = Math.max(Math.min(first ?? 0, MAX_SIZE), MIN_SIZE);
 

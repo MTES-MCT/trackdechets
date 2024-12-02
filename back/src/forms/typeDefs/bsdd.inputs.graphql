@@ -927,7 +927,10 @@ input ImportPaperFormInput {
 input CreateFormRevisionRequestInput {
   "Identifiant du bordereau à réviser"
   formId: ID!
-  "Numéro SIRET du demandeur"
+  """
+  Numéro SIRET du demandeur (ou numéro de TVA intracommunautaire dans le cas d'un transporteur
+  étranger faisant une demande de révision sur un bordereau d'annexe 1)
+  """
   authoringCompanySiret: String!
   "Contenu de la révision"
   content: FormRevisionRequestContentInput!

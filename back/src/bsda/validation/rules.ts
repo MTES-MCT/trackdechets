@@ -142,6 +142,17 @@ const sealedFromEmissionExceptAddOrRemoveNextDestination: GetBsdaSignatureTypeFn
   return isEmitter ? "WORK" : "EMISSION";
 };
 
+const sealedFromEmissionExceptIfWorker: GetBsdaSignatureTypeFn<ZodBsda> = (
+  bsda,
+  _
+) => {
+  // Si entreprise de travaux: on peut modifier jusqu'à l'étape de transport
+  // Sinon, scellé dès la signature émetteur
+  const hasWorker = bsda?.workerCompanySiret;
+
+  return hasWorker ? "TRANSPORT" : "EMISSION";
+};
+
 /**
  * Renvoie la signature émetteur s'il n'y a pas d'entreprise de travaux sur le BSDA.
  * Sinon, renvoie la signature de l'entreprise de travaux.
@@ -434,7 +445,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   destinationCap: {
     readableFieldName: "le CAP du destinataire",
-    sealed: { from: sealedFromEmissionExceptAddOrRemoveNextDestination },
+    sealed: { from: sealedFromEmissionExceptIfWorker },
     required: {
       from: "EMISSION",
       when: bsda =>

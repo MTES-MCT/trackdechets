@@ -82,6 +82,7 @@ const reviewFragment = gql`
     }
     authoringCompany {
       siret
+      orgId
       name
     }
     approvals {

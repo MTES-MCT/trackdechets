@@ -196,58 +196,63 @@ describe("Mutation.signedByTransporter", () => {
     );
   });
 
-  it("should return an error if onuCode is provided empty for a dangerous waste", async () => {
-    const { user, company: transporter } = await userWithCompanyFactory(
-      "ADMIN"
-    );
-    await transporterReceiptFactory({ company: transporter });
+  it(
+    "should return an error if onuCode is provided empty for a dangerous waste " +
+      "and wasteDetailsIsSubjectToADR is not specified",
+    async () => {
+      const { user, company: transporter } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      await transporterReceiptFactory({ company: transporter });
 
-    const emitter = await companyFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        sentAt: null,
-        status: "SEALED",
-        wasteDetailsCode: "01 03 04*",
-        emitterCompanySiret: emitter.siret,
-        transporters: {
-          create: {
-            transporterCompanySiret: transporter.siret,
-            number: 1
+      const emitter = await companyFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          sentAt: null,
+          status: "SEALED",
+          wasteDetailsCode: "01 03 04*",
+          wasteDetailsIsSubjectToADR: null,
+          emitterCompanySiret: emitter.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.siret,
+              number: 1
+            }
           }
         }
-      }
-    });
+      });
 
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
-      SIGNED_BY_TRANSPORTER,
-      {
-        variables: {
-          id: form.id,
-          signingInfo: {
-            sentAt: "2018-12-11T00:00:00.000Z",
-            signedByTransporter: true,
-            securityCode: emitter.securityCode,
-            sentBy: "Roger Lapince",
-            signedByProducer: true,
-            packagingInfos: form.wasteDetailsPackagingInfos,
-            quantity: form.wasteDetailsQuantity?.toNumber(),
-            onuCode: ""
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "signedByTransporter">>(
+        SIGNED_BY_TRANSPORTER,
+        {
+          variables: {
+            id: form.id,
+            signingInfo: {
+              sentAt: "2018-12-11T00:00:00.000Z",
+              signedByTransporter: true,
+              securityCode: emitter.securityCode,
+              sentBy: "Roger Lapince",
+              signedByProducer: true,
+              packagingInfos: form.wasteDetailsPackagingInfos,
+              quantity: form.wasteDetailsQuantity?.toNumber(),
+              onuCode: ""
+            }
           }
         }
-      }
-    );
+      );
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`,
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`,
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
         })
-      })
-    ]);
-  });
+      ]);
+    }
+  );
 
   it("should return an error if transporter receipt is missing", async () => {
     const { user, company: transporter } = await userWithCompanyFactory(
@@ -302,52 +307,57 @@ describe("Mutation.signedByTransporter", () => {
     ]);
   });
 
-  it("should not return an error if onuCode is provided empty for a non-dangerous waste", async () => {
-    const { user, company: transporter } = await userWithCompanyFactory(
-      "ADMIN"
-    );
-    await transporterReceiptFactory({ company: transporter });
+  it(
+    "should not return an error if onuCode is provided empty for a non-dangerous waste " +
+      "and wasteDetailsIsSubjectToADR is not specified",
+    async () => {
+      const { user, company: transporter } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      await transporterReceiptFactory({ company: transporter });
 
-    const emitter = await companyFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        sentAt: null,
-        status: "SEALED",
-        wasteDetailsCode: "01 01 01",
-        wasteDetailsIsDangerous: false,
-        emitterCompanySiret: emitter.siret,
-        transporters: {
-          create: {
-            transporterCompanySiret: transporter.siret,
-            number: 1
+      const emitter = await companyFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          sentAt: null,
+          status: "SEALED",
+          wasteDetailsCode: "01 01 01",
+          wasteDetailsIsDangerous: false,
+          wasteDetailsIsSubjectToADR: null,
+          emitterCompanySiret: emitter.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.siret,
+              number: 1
+            }
           }
         }
-      }
-    });
+      });
 
-    const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
-      Pick<Mutation, "signedByTransporter">
-    >(SIGNED_BY_TRANSPORTER, {
-      variables: {
-        id: form.id,
-        signingInfo: {
-          sentAt: "2018-12-11T00:00:00.000Z",
-          signedByTransporter: true,
-          securityCode: emitter.securityCode,
-          sentBy: "Roger Lapince",
-          signedByProducer: true,
-          packagingInfos: form.wasteDetailsPackagingInfos,
-          quantity: form.wasteDetailsQuantity?.toNumber(),
-          onuCode: ""
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signedByTransporter">
+      >(SIGNED_BY_TRANSPORTER, {
+        variables: {
+          id: form.id,
+          signingInfo: {
+            sentAt: "2018-12-11T00:00:00.000Z",
+            signedByTransporter: true,
+            securityCode: emitter.securityCode,
+            sentBy: "Roger Lapince",
+            signedByProducer: true,
+            packagingInfos: form.wasteDetailsPackagingInfos,
+            quantity: form.wasteDetailsQuantity?.toNumber(),
+            onuCode: ""
+          }
         }
-      }
-    });
+      });
 
-    expect(errors).toBe(undefined);
-    expect(data.signedByTransporter.status).toBe("SENT");
-  });
+      expect(errors).toBe(undefined);
+      expect(data.signedByTransporter.status).toBe("SENT");
+    }
+  );
 
   it("should fail if wrong security code", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");

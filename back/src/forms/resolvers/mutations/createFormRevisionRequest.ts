@@ -26,10 +26,11 @@ import {
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getFormOrFormNotFound } from "../../database";
+import { getFormOrFormNotFound, getTransportersSync } from "../../database";
 import {
   expandableFormIncludes,
-  flattenBsddRevisionRequestInput
+  flattenBsddRevisionRequestInput,
+  PrismaFormWithForwardedInAndTransporters
 } from "../../converter";
 import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
@@ -109,7 +110,12 @@ export default async function createFormRevisionRequest(
   { input }: MutationCreateFormRevisionRequestArgs,
   context: GraphQLContext
 ) {
-  const { formId, content, comment, authoringCompanySiret } = input;
+  const {
+    formId,
+    content,
+    comment,
+    authoringCompanySiret: authoringCompanyOrgId
+  } = input;
 
   const user = checkIsAuthenticated(context);
   const existingBsdd = await getFormOrFormNotFound(
@@ -127,7 +133,7 @@ export default async function createFormRevisionRequest(
   const authoringCompany = await getAuthoringCompany(
     user,
     existingBsdd,
-    authoringCompanySiret
+    authoringCompanyOrgId
   );
   const approversSirets = await getApproversSirets(
     existingBsdd,
@@ -150,8 +156,8 @@ export default async function createFormRevisionRequest(
 
 async function getAuthoringCompany(
   user: Express.User,
-  bsdd: Form,
-  authoringCompanySiret: string
+  bsdd: PrismaFormWithForwardedInAndTransporters,
+  authoringCompanyOrgId: string
 ) {
   const forwardedIn = await getFormRepository(user).findForwardedInById(
     bsdd.id
@@ -160,28 +166,33 @@ async function getAuthoringCompany(
   const transporterCanBeAuthor =
     bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER && bsdd.takenOverAt;
 
+  const transporterOrgIds = () =>
+    getTransportersSync(bsdd)
+      .flatMap(t => [t.transporterCompanySiret, t.transporterCompanyVatNumber])
+      .filter(Boolean);
+
   const canBeAuthorCompany = [
     bsdd.emitterCompanySiret,
     bsdd.recipientCompanySiret,
     bsdd.ecoOrganismeSiret,
     forwardedIn?.recipientCompanySiret,
-    ...(transporterCanBeAuthor ? bsdd.transportersSirets : [])
+    ...(transporterCanBeAuthor ? transporterOrgIds() : [])
   ].filter(Boolean);
 
-  if (!canBeAuthorCompany.includes(authoringCompanySiret)) {
+  if (!canBeAuthorCompany.includes(authoringCompanyOrgId)) {
     throw new UserInputError(
-      `Le SIRET "${authoringCompanySiret}" ne peut pas être auteur de la révision.`
+      `Le SIRET "${authoringCompanyOrgId}" ne peut pas être auteur de la révision.`
     );
   }
 
   const userCompanies = await getUserCompanies(user.id);
   const authoringCompany = userCompanies.find(
-    company => company.siret === authoringCompanySiret
+    company => company.orgId === authoringCompanyOrgId
   );
 
   if (!authoringCompany) {
     throw new UserInputError(
-      `Vous n'avez pas les droits suffisants pour déclarer le SIRET "${authoringCompanySiret}" comme auteur de la révision.`
+      `Vous n'avez pas les droits suffisants pour déclarer le SIRET "${authoringCompanyOrgId}" comme auteur de la révision.`
     );
   }
 
