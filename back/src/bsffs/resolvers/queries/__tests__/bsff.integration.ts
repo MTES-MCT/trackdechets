@@ -114,6 +114,55 @@ describe("Query.bsff", () => {
     ]);
   });
 
+  it("should allow access to draft bsff created by the user themselves", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter, destination },
+      { data: { isDraft: true }, userId: destination.user.id }
+    );
+
+    // destination created this draft bsff and access is allowed
+    const { query } = makeClient(destination.user);
+    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    expect(data.bsff).toEqual(
+      expect.objectContaining({
+        id: bsff.id
+      })
+    );
+  });
+
+  it("should throw an error when trying to access a draft bsff created by somebody else", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter, destination },
+      { data: { isDraft: true }, userId: emitter.user.id }
+    );
+
+    // destination is on the bsff, but bsff is draft and created by emitter, destination user does not belong to  emitter company
+    const { query } = makeClient(destination.user);
+    const { errors } = await query<Pick<Query, "bsff">, QueryBsffArgs>(
+      GET_BSFF,
+      {
+        variables: {
+          id: bsff.id
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Vous ne pouvez pas accéder à ce BSFF`
+      })
+    ]);
+  });
+
   it("should allow admin user even if the user is not a contributor of the bsff", async () => {
     const { user } = await userWithCompanyFactory(
       UserRole.ADMIN,
