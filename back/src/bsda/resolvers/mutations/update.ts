@@ -216,7 +216,13 @@ export const sendDestinationCapModificationMail = async (
         updatedBsda.destinationOperationNextDestinationCap ??
         updatedBsda.destinationCap,
       workerCompanyName: updatedBsda.workerCompanyName,
-      workerCompanySiret: updatedBsda.workerCompanySiret
+      workerCompanySiret: updatedBsda.workerCompanySiret,
+      destinationCompanyName:
+        updatedBsda.destinationOperationNextDestinationCompanyName ??
+        updatedBsda.destinationCompanyName,
+      destinationCompanySiret:
+        updatedBsda.destinationOperationNextDestinationCompanySiret ??
+        updatedBsda.destinationCompanySiret
     },
     messageVersions: [messageVersion],
     cc: companyAssociations

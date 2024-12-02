@@ -326,6 +326,8 @@ export const bsdaDestinationCapModificationEmail: MailTemplate<{
   newCap: string;
   workerCompanyName: string;
   workerCompanySiret: string;
+  destinationCompanyName: string;
+  destinationCompanySiret: string;
 }> = {
   subject: ({ bsdaId, newCap }) =>
     `CAP du bordereau amiante n° ${bsdaId} mis à jour par ${newCap}`,

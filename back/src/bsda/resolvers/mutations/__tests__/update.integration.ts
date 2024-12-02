@@ -2427,14 +2427,16 @@ describe("Mutation.updateBsda", () => {
 </p>
 
 <p>
-  Le champ CAP initialement A est désormais complété par
+  Le champ CAP initialement A est désormais remplacé par
   B.
 </p>
 
 <p>
-  En cas de désaccord, ou de question, il convient de vous rapprocher de
+  En cas de désaccord ou de question, il convient de vous rapprocher de
   l'entreprise de travaux amiante ${bsda.workerCompanyName}
-  ${bsda.workerCompanySiret} visée sur ce même bordereau.
+  ${bsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
+  l'établissement de destination finale ${bsda.destinationCompanyName}
+  ${bsda.destinationCompanySiret}.
 </p>
 `,
             cc: [
@@ -2554,14 +2556,16 @@ describe("Mutation.updateBsda", () => {
 </p>
 
 <p>
-  Le champ CAP initialement A est désormais complété par
+  Le champ CAP initialement A est désormais remplacé par
   B.
 </p>
 
 <p>
-  En cas de désaccord, ou de question, il convient de vous rapprocher de
+  En cas de désaccord ou de question, il convient de vous rapprocher de
   l'entreprise de travaux amiante ${bsda.workerCompanyName}
-  ${bsda.workerCompanySiret} visée sur ce même bordereau.
+  ${bsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
+  l'établissement de destination finale ${bsda.destinationOperationNextDestinationCompanyName}
+  ${bsda.destinationOperationNextDestinationCompanySiret}.
 </p>
 `,
             cc: [
