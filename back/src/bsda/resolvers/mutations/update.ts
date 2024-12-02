@@ -161,7 +161,7 @@ export const producerShouldBeNotifiedOfDestinationCapModification = (
   }
 };
 
-const sendDestinationCapModificationMail = async (
+export const sendDestinationCapModificationMail = async (
   previousBsda: Bsda,
   updatedBsda: Bsda
 ) => {
@@ -214,7 +214,7 @@ const sendDestinationCapModificationMail = async (
         previousBsda.destinationCap,
       newCap:
         updatedBsda.destinationOperationNextDestinationCap ??
-        previousBsda.destinationCap,
+        updatedBsda.destinationCap,
       workerCompanyName: updatedBsda.workerCompanyName,
       workerCompanySiret: updatedBsda.workerCompanySiret
     },
