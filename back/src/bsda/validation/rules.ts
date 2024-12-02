@@ -143,13 +143,12 @@ const sealedFromEmissionExceptAddOrRemoveNextDestination: GetBsdaSignatureTypeFn
 };
 
 const sealedFromEmissionExceptIfWorker: GetBsdaSignatureTypeFn<ZodBsda> = (
-  _,
-  context
+  bsda,
+  _
 ) => {
   // Si entreprise de travaux: on peut modifier jusqu'à l'étape de transport
   // Sinon, scellé dès la signature émetteur
-  const persisted = context!.persisted;
-  const hasWorker = persisted?.workerCompanySiret;
+  const hasWorker = bsda?.workerCompanySiret;
 
   return hasWorker ? "TRANSPORT" : "EMISSION";
 };
