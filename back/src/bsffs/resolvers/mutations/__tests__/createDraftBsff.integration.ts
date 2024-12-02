@@ -14,7 +14,8 @@ import {
   userFactory,
   siretify,
   UserWithCompany,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  companyAssociatedToExistingUserFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
@@ -72,8 +73,63 @@ describe("Mutation.createDraftBsff", () => {
 
       expect(errors).toBeUndefined();
       expect(data.createDraftBsff.id).toBeTruthy();
+
+      // check canAccessDraftOrgIds
+      const bsff = await prisma.bsff.findUnique({
+        where: { id: data.createDraftBsff.id }
+      });
+      expect(bsff?.canAccessDraftOrgIds).toEqual([company.siret]);
     }
   );
+
+  it("should denormalize canAccessDraftOrgIds", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await companyAssociatedToExistingUserFactory(
+      user,
+      UserRole.ADMIN
+    );
+
+    const transporter = await companyAssociatedToExistingUserFactory(
+      user,
+      UserRole.ADMIN
+    );
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createDraftBsff">,
+      MutationCreateDraftBsffArgs
+    >(CREATE_DRAFT_BSFF, {
+      variables: {
+        input: {
+          type: BsffType.COLLECTE_PETITES_QUANTITES,
+          emitter: {
+            company: {
+              siret: company.siret
+            }
+          },
+          destination: {
+            company: {
+              siret: destination.siret
+            }
+          },
+          transporter: {
+            company: {
+              siret: transporter.siret
+            }
+          }
+        }
+      }
+    });
+
+    // check canAccessDraftOrgIds
+    const bsff = await prisma.bsff.findUnique({
+      where: { id: data.createDraftBsff.id }
+    });
+    expect(bsff?.canAccessDraftOrgIds).toEqual([
+      company.siret,
+      destination.siret,
+      transporter.siret
+    ]);
+  });
 
   it("should disallow unauthenticated user from creating a bsff", async () => {
     const { mutate } = makeClient();

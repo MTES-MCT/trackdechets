@@ -20,12 +20,26 @@ const bsffs: QueryResolvers["bsffs"] = async (
     can(roles[orgId], Permission.BsdCanList)
   );
 
-  const mask: Prisma.Enumerable<Prisma.BsffWhereInput> = {
+  const orgMask = {
     OR: [
       { emitterCompanySiret: { in: orgIdsWithListPermission } },
       { transportersOrgIds: { hasSome: orgIdsWithListPermission } },
       { destinationCompanySiret: { in: orgIdsWithListPermission } },
       { detenteurCompanySirets: { hasSome: orgIdsWithListPermission } }
+    ]
+  };
+
+  const mask: Prisma.Enumerable<Prisma.BsffWhereInput> = {
+    OR: [
+      {
+        isDraft: false,
+        ...orgMask
+      },
+      {
+        isDraft: true,
+        canAccessDraftOrgIds: { hasSome: orgIdsWithListPermission },
+        ...orgMask
+      }
     ]
   };
 
