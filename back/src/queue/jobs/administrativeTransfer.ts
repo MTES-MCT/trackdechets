@@ -50,16 +50,6 @@ export async function processAdministrativeTransferJob(
   );
 
   // BSDAs
-  const bsdasToTransfer = await prisma.bsda.findMany({
-    where: {
-      destinationCompanySiret: fromOrgId,
-      status: {
-        in: ["AWAITING_CHILD"]
-      }
-    },
-    select: { id: true }
-  });
-
   const bsdaRepository = getBsdaRepository({
     auth: AuthType.Bearer,
     id: "JOB_ADMINISTRATIVE_TRANSFER",
@@ -67,7 +57,10 @@ export async function processAdministrativeTransferJob(
   } as Express.User);
 
   await bsdaRepository.updateMany(
-    { id: { in: bsdasToTransfer.map(bsda => bsda.id) } },
+    {
+      destinationCompanySiret: fromOrgId,
+      status: "AWAITING_CHILD"
+    },
     {
       destinationCompanySiret: toCompany.orgId,
       destinationCompanyName: toCompany.name,
