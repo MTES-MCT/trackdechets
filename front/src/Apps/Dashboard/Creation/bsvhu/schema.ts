@@ -18,16 +18,7 @@ const zodEmitter = z.object({
   company: zodCompany,
   agrementNumber: z.string().nullish(),
   irregularSituation: z.boolean(),
-  noSiret: z.boolean(),
-  emission: z.object({
-    signature: z.object({
-      author: z.string().nullish(),
-      date: z.coerce
-        .date()
-        .nullish()
-        .transform(v => v?.toISOString())
-    })
-  })
+  noSiret: z.boolean()
 });
 
 const zodTransporter = z.object({
@@ -52,20 +43,10 @@ const zodDestination = z.object({
   operation: z
     .object({
       code: z.string().nullish(),
-      number: z.string().nullish(),
       date: z.coerce
         .date()
         .nullish()
         .transform(v => v?.toISOString()),
-      signature: z
-        .object({
-          author: z.string().nullish(),
-          takenOverAt: z.coerce
-            .date()
-            .nullish()
-            .transform(v => v?.toISOString())
-        })
-        .nullish(),
       nextDestination: z
         .object({
           company: zodCompany
