@@ -120,7 +120,7 @@ export default function AccountNotificationsUpdateAllModal({
       notification: "bsdRefusal"
     },
     {
-      legend: "Modification de la destination finale amiante",
+      legend: "Modification de la destination finale amiante ou du CAP",
       notification: "bsdaFinalDestinationUpdate"
     },
     {
