@@ -12,7 +12,8 @@ describe("getDefaultNotifications", () => {
           notificationIsActiveSignatureCodeRenewal: true,
           notificationIsActiveBsdRefusal: true,
           notificationIsActiveRevisionRequest: true,
-          notificationIsActiveBsdaFinalDestinationUpdate: true
+          notificationIsActiveBsdaFinalDestinationUpdate: true,
+          notificationIsActiveRegistryDelegation: true
         });
       } else {
         expect(notifications).toEqual({
@@ -20,7 +21,8 @@ describe("getDefaultNotifications", () => {
           notificationIsActiveSignatureCodeRenewal: false,
           notificationIsActiveBsdRefusal: false,
           notificationIsActiveRevisionRequest: false,
-          notificationIsActiveBsdaFinalDestinationUpdate: false
+          notificationIsActiveBsdaFinalDestinationUpdate: false,
+          notificationIsActiveRegistryDelegation: false
         });
       }
     }

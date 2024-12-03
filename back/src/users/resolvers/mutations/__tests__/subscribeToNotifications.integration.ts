@@ -21,6 +21,7 @@ export const SUBSCRIBE_TO_NOTIFICATIONS = gql`
         bsdRefusal
         bsdaFinalDestinationUpdate
         revisionRequest
+        registryDelegation
       }
     }
   }
@@ -31,7 +32,8 @@ const allSubscribedPrisma: Partial<Prisma.CompanyAssociationCreateInput> = {
   notificationIsActiveBsdRefusal: true,
   notificationIsActiveMembershipRequest: true,
   notificationIsActiveRevisionRequest: true,
-  notificationIsActiveSignatureCodeRenewal: true
+  notificationIsActiveSignatureCodeRenewal: true,
+  notificationIsActiveRegistryDelegation: true
 };
 
 const allSubscribedGql: UserNotifications = {
@@ -39,7 +41,8 @@ const allSubscribedGql: UserNotifications = {
   signatureCodeRenewal: true,
   bsdRefusal: true,
   bsdaFinalDestinationUpdate: true,
-  revisionRequest: true
+  revisionRequest: true,
+  registryDelegation: true
 };
 
 const allUnsubscribedPrisma: Partial<Prisma.CompanyAssociationCreateInput> = {
@@ -47,7 +50,8 @@ const allUnsubscribedPrisma: Partial<Prisma.CompanyAssociationCreateInput> = {
   notificationIsActiveBsdRefusal: false,
   notificationIsActiveMembershipRequest: false,
   notificationIsActiveRevisionRequest: false,
-  notificationIsActiveSignatureCodeRenewal: false
+  notificationIsActiveSignatureCodeRenewal: false,
+  notificationIsActiveRegistryDelegation: false
 };
 
 const allUnsubscribedGql: UserNotifications = {
@@ -55,7 +59,8 @@ const allUnsubscribedGql: UserNotifications = {
   signatureCodeRenewal: false,
   bsdRefusal: false,
   bsdaFinalDestinationUpdate: false,
-  revisionRequest: false
+  revisionRequest: false,
+  registryDelegation: false
 };
 
 describe("mutation { subscribeToNotifications }", () => {
@@ -254,7 +259,8 @@ describe("mutation { subscribeToNotifications }", () => {
         // Les notifications suivantes ne sont pas autorisées pour un rôle Chauffeur
         // Leurs valeurs est donc inchangées
         membershipRequest: false,
-        revisionRequest: false
+        revisionRequest: false,
+        registryDelegation: false
       });
     }
 
@@ -273,7 +279,8 @@ describe("mutation { subscribeToNotifications }", () => {
       // Les notifications suivantes ne sont pas autorisées pour un rôle Chauffeur
       // Leurs valeurs est donc inchangées
       notificationIsActiveMembershipRequest: false,
-      notificationIsActiveRevisionRequest: false
+      notificationIsActiveRevisionRequest: false,
+      notificationIsActiveRegistryDelegation: false
     };
 
     expect(updatedCompanyAssociation1).toMatchObject(expected);

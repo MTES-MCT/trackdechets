@@ -169,7 +169,8 @@ export const userInCompany = async (
     companyAssociations: {
       create: {
         company: { connect: { id: companyId } },
-        role: role
+        role: role,
+        ...getDefaultNotifications(role)
       }
     }
   });
@@ -335,6 +336,7 @@ const formdata: Partial<Prisma.FormCreateInput> = {
   wasteDetailsIsDangerous: true,
   wasteDetailsName: "Divers",
   wasteDetailsOnuCode: "2003",
+  wasteDetailsIsSubjectToADR: true,
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
   wasteDetailsPop: false,
   wasteDetailsQuantity: 22.5,

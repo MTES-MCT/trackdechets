@@ -9,7 +9,6 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "@td/constants";
 import React, { useEffect } from "react";
-import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import Packagings from "./components/packagings/Packagings";
 import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
 import {
@@ -19,6 +18,7 @@ import {
 import "./WasteInfo.scss";
 import EstimatedQuantityTooltip from "../../common/components/EstimatedQuantityTooltip";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
+import Appendix2MultiSelectWrapper from "./components/appendix/Appendix2MultiSelectWrapper";
 
 type Values = {
   wasteDetails: {
@@ -61,7 +61,6 @@ export default connect<{ disabled }, Values>(function WasteInfo({
   useEffect(() => {
     if (isDangerous(values.wasteDetails.code)) {
       setFieldValue("wasteDetails.isDangerous", true);
-      setFieldValue("wasteDetails.isSubjectToADR", true);
     }
   }, [values.wasteDetails.code, setFieldValue]);
 
@@ -80,6 +79,11 @@ export default connect<{ disabled }, Values>(function WasteInfo({
           component={WasteCodeSelect}
           validate={bsddWasteCodeValidator}
           disabled={disabled}
+          onSelect={code => {
+            if (isDangerous(code)) {
+              setFieldValue("wasteDetails.isSubjectToADR", true);
+            }
+          }}
         />
       </div>
 
@@ -181,7 +185,9 @@ export default connect<{ disabled }, Values>(function WasteInfo({
             traitement de type{" "}
             {PROCESSING_OPERATIONS_GROUPEMENT_CODES.join(", ")}.
           </p>
-          <Appendix2MultiSelect />
+          <Appendix2MultiSelectWrapper
+            emitterCompanySiret={values.emitter?.company?.siret}
+          />
         </>
       )}
 
@@ -289,6 +295,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
           inputTitle={"Test"}
           label="Le déchet est soumis à l'ADR"
           checked={values.wasteDetails.isSubjectToADR ?? false}
+          disabled={disabled}
         />
 
         {values.wasteDetails.isSubjectToADR && (

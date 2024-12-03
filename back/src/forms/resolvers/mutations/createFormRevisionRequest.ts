@@ -18,17 +18,19 @@ import {
   BSDD_SAMPLE_NUMBER_WASTE_CODES
 } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { WeightUnits, weight } from "../../../common/validation";
+import { WeightUnits, weight, v20241101 } from "../../../common/validation";
+import { prisma } from "@td/prisma";
 import {
   FormRevisionRequestContentInput,
   MutationCreateFormRevisionRequestArgs
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getFormOrFormNotFound } from "../../database";
+import { getFormOrFormNotFound, getTransportersSync } from "../../database";
 import {
   expandableFormIncludes,
-  flattenBsddRevisionRequestInput
+  flattenBsddRevisionRequestInput,
+  PrismaFormWithForwardedInAndTransporters
 } from "../../converter";
 import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
@@ -36,6 +38,12 @@ import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn, quantityRefused } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../common/operationModes";
+import { isDangerous } from "@td/constants";
+import {
+  canProcessDangerousWaste,
+  canProcessNonDangerousWaste
+} from "../../../companies/companyProfilesRules";
+import { INVALID_DESTINATION_SUBPROFILE } from "../../errors";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [
@@ -102,7 +110,12 @@ export default async function createFormRevisionRequest(
   { input }: MutationCreateFormRevisionRequestArgs,
   context: GraphQLContext
 ) {
-  const { formId, content, comment, authoringCompanySiret } = input;
+  const {
+    formId,
+    content,
+    comment,
+    authoringCompanySiret: authoringCompanyOrgId
+  } = input;
 
   const user = checkIsAuthenticated(context);
   const existingBsdd = await getFormOrFormNotFound(
@@ -120,7 +133,7 @@ export default async function createFormRevisionRequest(
   const authoringCompany = await getAuthoringCompany(
     user,
     existingBsdd,
-    authoringCompanySiret
+    authoringCompanyOrgId
   );
   const approversSirets = await getApproversSirets(
     existingBsdd,
@@ -143,8 +156,8 @@ export default async function createFormRevisionRequest(
 
 async function getAuthoringCompany(
   user: Express.User,
-  bsdd: Form,
-  authoringCompanySiret: string
+  bsdd: PrismaFormWithForwardedInAndTransporters,
+  authoringCompanyOrgId: string
 ) {
   const forwardedIn = await getFormRepository(user).findForwardedInById(
     bsdd.id
@@ -153,28 +166,33 @@ async function getAuthoringCompany(
   const transporterCanBeAuthor =
     bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER && bsdd.takenOverAt;
 
+  const transporterOrgIds = () =>
+    getTransportersSync(bsdd)
+      .flatMap(t => [t.transporterCompanySiret, t.transporterCompanyVatNumber])
+      .filter(Boolean);
+
   const canBeAuthorCompany = [
     bsdd.emitterCompanySiret,
     bsdd.recipientCompanySiret,
     bsdd.ecoOrganismeSiret,
     forwardedIn?.recipientCompanySiret,
-    ...(transporterCanBeAuthor ? bsdd.transportersSirets : [])
+    ...(transporterCanBeAuthor ? transporterOrgIds() : [])
   ].filter(Boolean);
 
-  if (!canBeAuthorCompany.includes(authoringCompanySiret)) {
+  if (!canBeAuthorCompany.includes(authoringCompanyOrgId)) {
     throw new UserInputError(
-      `Le SIRET "${authoringCompanySiret}" ne peut pas être auteur de la révision.`
+      `Le SIRET "${authoringCompanyOrgId}" ne peut pas être auteur de la révision.`
     );
   }
 
   const userCompanies = await getUserCompanies(user.id);
   const authoringCompany = userCompanies.find(
-    company => company.siret === authoringCompanySiret
+    company => company.orgId === authoringCompanyOrgId
   );
 
   if (!authoringCompany) {
     throw new UserInputError(
-      `Vous n'avez pas les droits suffisants pour déclarer le SIRET "${authoringCompanySiret}" comme auteur de la révision.`
+      `Vous n'avez pas les droits suffisants pour déclarer le SIRET "${authoringCompanyOrgId}" comme auteur de la révision.`
     );
   }
 
@@ -223,6 +241,35 @@ async function checkIfUserCanRequestRevisionOnBsdd(
   }
 }
 
+async function validateWAsteAccordingToDestination(bsdd: Form, flatContent) {
+  // do not run on existing bsdds created before release v20241101
+  const bsddCreatedAt = bsdd.createdAt || new Date(); // new bsd do not have a createdAt yet
+  const isCreatedAfterV202411011 =
+    bsddCreatedAt.getTime() > v20241101.getTime();
+
+  if (!isCreatedAfterV202411011) {
+    return true;
+  }
+
+  const recipientCompany = await prisma.company.findUnique({
+    where: { siret: bsdd.recipientCompanySiret! }
+  });
+  const hasDangerousWaste =
+    isDangerous(flatContent.wasteDetailsCode || bsdd.wasteDetailsCode) ||
+    flatContent.wasteDetailsPop ||
+    bsdd.wasteDetailsPop ||
+    flatContent.wasteDetailsIsDangerous ||
+    bsdd.wasteDetailsIsDangerous;
+
+  if (recipientCompany) {
+    const canProcess = hasDangerousWaste
+      ? canProcessDangerousWaste(recipientCompany)
+      : canProcessNonDangerousWaste(recipientCompany);
+    if (!canProcess) {
+      throw new UserInputError(INVALID_DESTINATION_SUBPROFILE);
+    }
+  }
+}
 async function getFlatContent(
   content: FormRevisionRequestContentInput,
   bsdd: Form & { transporters: BsddTransporter[] }
@@ -311,6 +358,9 @@ async function getFlatContent(
     );
   }
 
+  await validateWAsteAccordingToDestination(bsdd, flatContent);
+
+  //
   if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
     await appendix1ProducerRevisionRequestSchema.validate(flatContent, {
       strict: true
@@ -326,7 +376,9 @@ async function getFlatContent(
       );
     }
   } else {
-    await bsddRevisionRequestSchema.validate(flatContent, { strict: true });
+    await bsddRevisionRequestSchema.validate(flatContent, {
+      strict: true
+    });
   }
 
   // Double-check the waste quantities
@@ -430,6 +482,7 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
     wasteDetailsCode: yup
       .string()
       .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
+
     wasteDetailsName: yup.string().nullable(),
     wasteDetailsPop: yup.boolean().nullable(),
     wasteDetailsPackagingInfos: yup

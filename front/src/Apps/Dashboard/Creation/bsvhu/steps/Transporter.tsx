@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import RecepisseExemption from "../../../../Forms/Components/RecepisseExemption/RecepiceExemption";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { clearCompanyError, setFieldError } from "../../utils";

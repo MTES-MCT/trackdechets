@@ -7,6 +7,7 @@ import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
 import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
 import { disableAddPackagingCta } from "../../common/utils/rules";
+import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
 const Appendix1ProducerRequestRevision = ({
   bsdd,
@@ -67,7 +68,7 @@ const Appendix1ProducerRequestRevision = ({
         value={bsdd.wasteDetails?.quantity}
         defaultValue={initialBsddReview.wasteDetails.quantity}
       >
-        <Input
+        <NonScrollableInput
           label="Poids en tonnes"
           className="fr-col-2"
           nativeInputProps={{

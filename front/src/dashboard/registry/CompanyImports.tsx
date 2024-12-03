@@ -135,7 +135,7 @@ export function CompanyImports() {
             />
           )}
           {data && tableData.length === 0 && (
-            <p className="tw-mt-10 tw-text-2xl tw-text-center">
+            <p className="tw-mt-24 tw-text-xl tw-mb-4 tw-text-center">
               Aucun import n'a encore été réalisé pour cette entreprise
             </p>
           )}

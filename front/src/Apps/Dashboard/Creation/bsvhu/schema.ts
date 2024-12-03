@@ -31,27 +31,18 @@ const zodEmitter = z.object({
 });
 
 const zodTransporter = z.object({
-  company: zodCompany,
+  company: zodCompany.extend({ vatNumber: z.string().nullish() }),
   transport: z.object({
-    signature: z.object({
-      author: z.string().nullish(),
-      takenOverAt: z.coerce
-        .date()
-        .nullish()
-        .transform(v => v?.toISOString())
-    }),
-    recepisse: z
-      .object({
-        department: z.string().nullish(),
-        number: z.string().nullish(),
-        validityLimit: z.coerce
-          .date()
-          .nullish()
-          .transform(v => v?.toISOString()),
-        isExempted: z.boolean().nullish()
-      })
+    takenOverAt: z.coerce
+      .date()
       .nullish()
-  })
+      .transform(v => v?.toISOString())
+  }),
+  recepisse: z
+    .object({
+      isExempted: z.boolean().nullish()
+    })
+    .nullish()
 });
 
 const zodDestination = z.object({

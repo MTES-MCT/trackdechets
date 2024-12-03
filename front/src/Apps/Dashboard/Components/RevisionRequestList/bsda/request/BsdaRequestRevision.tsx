@@ -19,7 +19,7 @@ import { removeEmptyKeys } from "../../../../../../common/helper";
 import WorkSiteAddress from "../../../../../../form/common/components/work-site/WorkSiteAddress";
 import RhfCompanyContactInfo from "../../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import { Loader } from "../../../../../common/Components";
-import RhfCompanySelectorWrapper from "../../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
@@ -33,6 +33,7 @@ import {
 import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCancelationInput";
 import TagsInput from "../../../../../Forms/Components/TagsInput/TagsInput";
 import styles from "./BsdaRequestRevision.module.scss";
+import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 type Props = {
   bsda: Bsda;
 };
@@ -276,7 +277,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 value={bsda.destination?.reception?.weight}
                 defaultValue={initialBsdaReview.destination?.reception?.weight}
               >
-                <Input
+                <NonScrollableInput
                   label="Poids en tonnes"
                   className="fr-col-2"
                   state={errors.destination?.reception?.weight && "error"}
@@ -370,7 +371,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 }
                 defaultValue={initialBsdaReview.broker}
               >
-                <RhfCompanySelectorWrapper
+                <CompanySelectorWrapper
                   orgId={siret}
                   favoriteType={FavoriteType.Broker}
                   onCompanySelected={onCompanyBrokerSeleted}

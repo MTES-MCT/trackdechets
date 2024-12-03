@@ -2,10 +2,10 @@ import { Company, RegistryDelegation } from "@prisma/client";
 import { UserInputError } from "../../../../common/errors";
 import { getRegistryDelegationRepository } from "../../../repository";
 import { ParsedCreateRegistryDelegationInput } from "../../../validation";
-import { prisma } from "@td/prisma";
 import { renderMail, registryDelegationCreation } from "@td/mail";
 import { sendMail } from "../../../../mailer/mailing";
 import { toddMMYYYY } from "../../../../utils";
+import { getDelegationNotifiableUsers } from "../../utils";
 
 export const createDelegation = async (
   user: Express.User,
@@ -72,22 +72,11 @@ export const sendRegistryDelegationCreationEmail = async (
   delegator: Company,
   delegate: Company
 ) => {
-  // Find admins from both delegator & delegate companies
-  const companyAssociations = await prisma.companyAssociation.findMany({
-    where: {
-      companyId: { in: [delegator.id, delegate.id] },
-      role: "ADMIN"
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true
-        }
-      }
-    }
-  });
+  // Find notifiable users from both delegator & delegate companies
+  const users = await getDelegationNotifiableUsers(delegation);
+
+  // Noone subscribed to notifications
+  if (!users.length) return;
 
   // Prepare mail template
   const payload = renderMail(registryDelegationCreation, {
@@ -99,9 +88,9 @@ export const sendRegistryDelegationCreationEmail = async (
     },
     messageVersions: [
       {
-        to: companyAssociations.map(companyAssociation => ({
-          email: companyAssociation.user.email,
-          name: companyAssociation.user.name
+        to: users.map(user => ({
+          email: user.email,
+          name: user.name
         }))
       }
     ]

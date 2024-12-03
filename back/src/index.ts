@@ -86,3 +86,7 @@ export { getBsdaFromActivityEvents } from "./activity-events/bsda";
 export { getBsddFromActivityEvents } from "./activity-events/bsdd";
 export { cleanUpIsReturnForTab } from "./common/elasticHelpers";
 export { UserNotification } from "./users/notifications";
+export {
+  getDelegationNotifiableUsers,
+  getRegistryDelegationsExpiringInDays
+} from "./registryDelegation/resolvers/utils";

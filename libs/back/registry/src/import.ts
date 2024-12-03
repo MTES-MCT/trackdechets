@@ -69,7 +69,7 @@ export async function processStream({
     }> = inputStream.pipe(transformStream).on("error", error => {
       stats.errors++;
       if (errorStream.writable) {
-        errorStream.write([["errors", error.message]]);
+        errorStream.write([["errors", formatErrorMessage(error.message)]]);
       }
     });
 
@@ -138,4 +138,13 @@ export async function processStream({
   }
 
   return stats;
+}
+
+function formatErrorMessage(message: string) {
+  // CSV parsing error when the content is unreadable
+  if (message.includes("Parse Error:")) {
+    return "Erreur de format du fichier. Il ne correspond pas au format attendu et n'a pas pu être lu. Vérifiez que le fichier est bien au format CSV ou XLSX";
+  }
+
+  return message;
 }

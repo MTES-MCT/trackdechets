@@ -30,8 +30,6 @@ export async function registryDownloadSignedUrl(
     );
   }
 
-  const key =
-    target === "ERROR_FILE" ? `${importId}.csv` : registryImport.s3FileKey;
   const bucketName =
     target === "ERROR_FILE"
       ? process.env.S3_REGISTRY_ERRORS_BUCKET!
@@ -39,8 +37,8 @@ export async function registryDownloadSignedUrl(
 
   const signedUrl = await getSignedUrlForDownload({
     bucketName,
-    key
+    key: registryImport.s3FileKey
   });
 
-  return { fileKey: key, signedUrl };
+  return { fileKey: registryImport.s3FileKey, signedUrl };
 }

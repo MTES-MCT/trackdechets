@@ -21,4 +21,4 @@ jobs:
       - name: Add remote & push
         run: |
           git remote add brgm ${{ secrets.BRGM_GITLAB_URL }}
-          git push brgm --all
+          git push brgm --all --force

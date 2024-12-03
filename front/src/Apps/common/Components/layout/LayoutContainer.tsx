@@ -67,7 +67,10 @@ const GET_ME = gql`
     }
   }
 `;
-
+const BANNER_MESSAGES = [
+  `La cohérence entre le type de déchet (dangereux, non dangereux) et le sous-profil sélectionné par l’installation de destination est désormais vérifiée sur les BSDD.
+   Nous invitons les installations de destinations à vérifier et mettre à jour leur sous-profil dans l'onglet Mes établissements > Profil.`
+];
 export default function LayoutContainer() {
   const { orgId } = usePermissions();
   const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
@@ -115,12 +118,12 @@ export default function LayoutContainer() {
               isAdmin={isAdmin}
               v2banner={
                 <SurveyBanner
-                  message="Gérez vos notifications e-mail sur Trackdéchets ! Vous pouvez désormais personnaliser les types d'e-mails que vous souhaitez recevoir directement depuis Mon compte > Notifications"
+                  messages={BANNER_MESSAGES}
                   button={{
-                    title: "Plus d'informations",
-                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#gerer-les-notifications-e-mail"
+                    title: "Consulter la FAQ",
+                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/questions-frequentes#quel-s-sous-profil-s-selectionner"
                   }}
-                  persistedSurveyName="td-20241022"
+                  persistedSurveyName="td-20241119"
                 />
               }
               defaultOrgId={defaultOrgId}

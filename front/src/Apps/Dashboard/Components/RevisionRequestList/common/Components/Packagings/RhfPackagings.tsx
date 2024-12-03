@@ -12,6 +12,7 @@ import { useFormContext, useFieldArray } from "react-hook-form";
 import { PACKAGINGS_BSD_NAMES } from "./packagings";
 import { BsdTypename } from "../../../../../../common/types/bsdTypes";
 import { selectPackagingRules } from "../../utils/rules";
+import NonScrollableInput from "../../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
 export const emptyPackaging = {
   quantity: 1,
@@ -47,7 +48,7 @@ const BsdPackaging = ({ bsdType, path, idx, remove, disabled }) => {
       {idx > 0 && <hr />}
       <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-1v">
         <div className="fr-col-12 fr-col-md-2">
-          <Input
+          <NonScrollableInput
             label={
               bsdType === BsdTypename.Bsdd &&
               [BsddPackagingsType.Citerne, BsddPackagingsType.Benne].includes(
@@ -117,7 +118,7 @@ const BsdPackaging = ({ bsdType, path, idx, remove, disabled }) => {
           />
         </div>
         <div className="fr-col-12 fr-col-md-2">
-          <Input
+          <NonScrollableInput
             label="Volume unitaire (l)"
             disabled={disabled || bsdType !== BsdTypename.Bsdasri}
             state={volumeError && "error"}

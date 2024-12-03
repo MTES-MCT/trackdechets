@@ -1714,6 +1714,90 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd?.nextDestinationProcessingOperation).toBe("");
   });
 
+  it("should be possible for a foreign transporter to approve a revision on an annexe1", async () => {
+    const vatNumber = "IT13029381004";
+    const { user, company: foreignTransporter } = await userWithCompanyFactory(
+      "ADMIN",
+      { siret: null, vatNumber, orgId: vatNumber }
+    );
+    const { user: emitter, company: emitterCompany } =
+      await userWithCompanyFactory();
+    const { company: collectorCompany } = await userWithCompanyFactory();
+    const { company: destinationCompany } = await userWithCompanyFactory();
+
+    const bsdd = await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterType: "APPENDIX1_PRODUCER",
+        emitterCompanySiret: emitterCompany.siret,
+        wasteDetailsQuantity: 1,
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanyVatNumber: foreignTransporter.vatNumber,
+            transporterCompanySiret: null
+          }
+        }
+      }
+    });
+
+    const bsddTourneeDedie = await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterType: "APPENDIX1",
+        emitterCompanySiret: collectorCompany.siret,
+        recipientCompanySiret: destinationCompany.siret,
+        wasteDetailsQuantity: 1,
+        grouping: { create: { initialFormId: bsdd.id, quantity: 1 } }
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        status: "PENDING",
+        bsddId: bsdd.id,
+        authoringCompanyId: emitterCompany.id,
+        approvals: { create: { approverSiret: foreignTransporter.orgId! } },
+        wasteDetailsQuantity: 2,
+        comment: "Yolo"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { data, errors } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(data.submitFormRevisionRequestApproval.status).toEqual("ACCEPTED");
+
+    expect(errors).toBeUndefined();
+
+    const updatedRevisionRequest =
+      await prisma.bsddRevisionRequest.findUniqueOrThrow({
+        where: { id: revisionRequest.id }
+      });
+
+    expect(updatedRevisionRequest.status).toEqual("ACCEPTED");
+
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
+      where: { id: bsdd.id }
+    });
+
+    expect(updatedBsdd.wasteDetailsQuantity?.toNumber()).toEqual(2);
+
+    const updatedBsddTourneeDedie = await prisma.form.findUniqueOrThrow({
+      where: { id: bsddTourneeDedie.id }
+    });
+
+    expect(updatedBsddTourneeDedie.wasteDetailsQuantity?.toNumber()).toEqual(2);
+  });
+
   describe("wasteAcceptationStatus & quantityRefused", () => {
     it("should update the BSDD wasteAcceptationStatus", async () => {
       // Given

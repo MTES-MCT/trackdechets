@@ -3,6 +3,7 @@ import { UserInputError } from "../../common/errors";
 import { getRegistryDelegationRepository } from "../repository";
 import { Company, Prisma, RegistryDelegation } from "@prisma/client";
 import { RegistryDelegationStatus } from "../../generated/graphql/types";
+import { endOfDay, inXDays, todayAtMidnight } from "../../utils";
 
 export const findDelegateAndDelegatorOrThrow = async (
   delegateOrgId: string,
@@ -102,4 +103,61 @@ export const getDelegationStatus = (delegation: RegistryDelegation) => {
   if (!endDate || endDate > NOW) return "ONGOING" as RegistryDelegationStatus;
 
   return "EXPIRED" as RegistryDelegationStatus;
+};
+
+/**
+ * Get delegations expiring in X days, that have a bigger duration than X
+ *
+ * Skip cancelled or revoked delegations.
+ */
+export const getRegistryDelegationsExpiringInDays = async (days: number) => {
+  const NOW = todayAtMidnight();
+  const X_DAYS_FROM_NOW = endOfDay(inXDays(NOW, days));
+
+  const delegations = await prisma.registryDelegation.findMany({
+    where: {
+      startDate: { lt: NOW },
+      endDate: X_DAYS_FROM_NOW,
+      cancelledBy: null,
+      revokedBy: null
+    },
+    include: {
+      delegator: true,
+      delegate: true
+    }
+  });
+
+  return delegations;
+};
+
+/**
+ * For a given delegation, return all users that are subscribed
+ * to registry notifications
+ */
+export const getDelegationNotifiableUsers = async (
+  delegation: RegistryDelegation
+): Promise<
+  {
+    id: string;
+    email: string;
+    name: string;
+  }[]
+> => {
+  const companyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      companyId: { in: [delegation.delegatorId, delegation.delegateId] },
+      notificationIsActiveRegistryDelegation: true
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true
+        }
+      }
+    }
+  });
+
+  return companyAssociations.map(companyAssociation => companyAssociation.user);
 };

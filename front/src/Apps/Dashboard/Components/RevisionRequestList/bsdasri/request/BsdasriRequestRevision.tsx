@@ -39,6 +39,7 @@ import {
 } from "../../common/utils/rules";
 import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
+import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
 type Props = {
   readonly bsdasri: Bsdasri;
@@ -232,7 +233,7 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             defaultValue={initialDasriReview?.destination?.operation?.weight}
             disabled={isDisabled("destination.operation.weight", status)}
           >
-            <Input
+            <NonScrollableInput
               label="Poids en kilos"
               className="fr-col-2"
               state={errors?.destination?.operation?.weight && "error"}

@@ -10,6 +10,7 @@ const CompanyFragment = gql`
       bsdRefusal
       bsdaFinalDestinationUpdate
       revisionRequest
+      registryDelegation
     }
     users {
       id
@@ -21,6 +22,7 @@ const CompanyFragment = gql`
         bsdRefusal
         bsdaFinalDestinationUpdate
         revisionRequest
+        registryDelegation
       }
     }
   }

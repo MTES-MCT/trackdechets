@@ -14,5 +14,7 @@ export const hintTexts: { [key in keyof UserNotifications]: string } = {
     "Un courriel sera envoyé lorsque le BSDA est envoyé à un exutoire" +
     " différent de celui prévu lors de la signature producteur",
   revisionRequest:
-    "Un courriel sera envoyé à chaque fois qu'une révision sera restée sans réponse 14 jours après sa demande"
+    "Un courriel sera envoyé à chaque fois qu'une révision sera restée sans réponse 14 jours après sa demande",
+  registryDelegation:
+    "Un courriel sera envoyé dès lors qu'une délégation est créée ou est sur le point d'expirer."
 };

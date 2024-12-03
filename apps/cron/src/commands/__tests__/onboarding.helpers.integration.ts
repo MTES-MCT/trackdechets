@@ -7,8 +7,12 @@ import {
 import { prisma } from "@td/prisma";
 import {
   associateUserToCompany,
+  endOfDay,
+  inXDays,
   Mutation,
-  MutationDeleteCompanyArgs
+  MutationDeleteCompanyArgs,
+  todayAtMidnight,
+  toddMMYYYY
 } from "back";
 import { resetDatabase } from "libs/back/tests-integration";
 import makeClient from "back/src/__tests__/testClient";
@@ -20,6 +24,7 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "back/src/__tests__/factories";
+import { registryDelegationFactory } from "back/src/registryDelegation/__tests__/factories";
 import { bsdaFactory } from "back/src/bsda/__tests__/factories";
 import { bsdasriFactory } from "back/src/bsdasris/__tests__/factories";
 import {
@@ -32,7 +37,8 @@ import {
   getPendingMembershipRequestsAndAssociatedSubscribers,
   getRecentlyRegisteredProducers,
   getRecentlyRegisteredProfesionals,
-  getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest
+  getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
+  getExpiringRegistryDelegationWarningMailPayloads
 } from "../onboarding.helpers";
 import { xDaysAgo } from "../helpers";
 
@@ -41,6 +47,10 @@ const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
 const TWO_DAYS_AGO = xDaysAgo(TODAY, 2);
 const THREE_DAYS_AGO = xDaysAgo(TODAY, 3);
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
+
+const NOW = todayAtMidnight();
+const YESTERDAY = xDaysAgo(NOW, 1);
+const NOW_PLUS_SEVEN_DAYS = endOfDay(inXDays(NOW, 7));
 
 export const DELETE_COMPANY = `
   mutation DeleteCompany($id: ID!) {
@@ -2059,5 +2069,181 @@ describe("addPendingApprovalsCompanyAdmins", () => {
     expect(wrappedRequests.length).toBe(1);
     expect(wrappedRequests[0].id).toBe(request.id);
     expect(wrappedRequests[0].approvals.length).toBe(0);
+  });
+});
+
+describe("getExpiringRegistryDelegationWarningMailPayloads", () => {
+  afterEach(resetDatabase);
+
+  it("should return nothing if no expiring delegation", async () => {
+    // Given
+
+    // When
+    const mails = await getExpiringRegistryDelegationWarningMailPayloads();
+
+    // Then
+    expect(mails.length).toBe(0);
+  });
+
+  it("should return a warning email to expired delegation's involved users", async () => {
+    // Given
+    const {
+      delegation,
+      delegatorUser,
+      delegateUser,
+      delegatorCompany,
+      delegateCompany
+    } = await registryDelegationFactory({
+      startDate: YESTERDAY,
+      endDate: NOW_PLUS_SEVEN_DAYS
+    });
+
+    // When
+    const mails = await getExpiringRegistryDelegationWarningMailPayloads();
+
+    // Then
+    expect(mails.length).toBe(1);
+    const sortFn = (a, b) => a.email.localeCompare(b.email);
+    expect(mails[0].to?.sort(sortFn)).toMatchObject(
+      [
+        { email: delegatorUser.email, name: delegatorUser.name },
+        { email: delegateUser.email, name: delegateUser.name }
+      ].sort(sortFn)
+    );
+    expect(mails[0].subject).toBe(
+      `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany.orgId} et l'établissement ${delegateCompany.orgId}`
+    );
+    expect(mails[0].body).toBe(`<p>
+  La plateforme Trackdéchets vous informe que la délégation accordée par
+  l'établissement ${delegatorCompany.name} (${
+      delegatorCompany.orgId
+    }) à l'établissement
+  ${delegateCompany.name} (${
+      delegateCompany.orgId
+    }), effective depuis le ${toddMMYYYY(delegation.startDate).replace(
+      /\//g,
+      "&#x2F;"
+    )},
+  arrivera à expiration dans 7 jours, soit le ${toddMMYYYY(
+    delegation.endDate!
+  ).replace(/\//g, "&#x2F;")}.
+</p>
+
+<p>
+  Pour en savoir plus sur les délégations et découvrir comment prolonger cette
+  période, nous vous invitons à consulter cet
+  <a
+    href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#visualiser-lensemble-des-collaborateurs-ayant-acces-a-mon-etablissement"
+  >
+    article de notre FAQ </a
+  >.
+</p>
+`);
+  });
+
+  it("should send a warning email to expired delegation's involved users - multiple delegations involved", async () => {
+    // Given
+    const {
+      delegation: delegation1,
+      delegatorUser: delegatorUser1,
+      delegateUser: delegateUser1,
+      delegatorCompany: delegatorCompany1,
+      delegateCompany: delegateCompany1
+    } = await registryDelegationFactory({
+      startDate: YESTERDAY,
+      endDate: NOW_PLUS_SEVEN_DAYS
+    });
+
+    const {
+      delegation: delegation2,
+      delegatorUser: delegatorUser2,
+      delegateUser: delegateUser2,
+      delegatorCompany: delegatorCompany2,
+      delegateCompany: delegateCompany2
+    } = await registryDelegationFactory({
+      startDate: YESTERDAY,
+      endDate: NOW_PLUS_SEVEN_DAYS
+    });
+
+    // When
+    const mails = await getExpiringRegistryDelegationWarningMailPayloads();
+
+    // Then
+    expect(mails.length).toBe(2);
+    const sortFn = (a, b) => a.email.localeCompare(b.email);
+
+    // Mail 1
+    expect(mails[0].to?.sort(sortFn)).toMatchObject(
+      [
+        { email: delegatorUser1.email, name: delegatorUser1.name },
+        { email: delegateUser1.email, name: delegateUser1.name }
+      ].sort(sortFn)
+    );
+    expect(mails[0].subject).toBe(
+      `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany1.orgId} et l'établissement ${delegateCompany1.orgId}`
+    );
+    expect(mails[0].body).toBe(`<p>
+  La plateforme Trackdéchets vous informe que la délégation accordée par
+  l'établissement ${delegatorCompany1.name} (${
+      delegatorCompany1.orgId
+    }) à l'établissement
+  ${delegateCompany1.name} (${
+      delegateCompany1.orgId
+    }), effective depuis le ${toddMMYYYY(delegation1.startDate).replace(
+      /\//g,
+      "&#x2F;"
+    )},
+  arrivera à expiration dans 7 jours, soit le ${toddMMYYYY(
+    delegation1.endDate!
+  ).replace(/\//g, "&#x2F;")}.
+</p>
+
+<p>
+  Pour en savoir plus sur les délégations et découvrir comment prolonger cette
+  période, nous vous invitons à consulter cet
+  <a
+    href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#visualiser-lensemble-des-collaborateurs-ayant-acces-a-mon-etablissement"
+  >
+    article de notre FAQ </a
+  >.
+</p>
+`);
+
+    // Mail 2
+    expect(mails[1].to?.sort(sortFn)).toMatchObject(
+      [
+        { email: delegatorUser2.email, name: delegatorUser2.name },
+        { email: delegateUser2.email, name: delegateUser2.name }
+      ].sort(sortFn)
+    );
+    expect(mails[1].subject).toBe(
+      `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany2.orgId} et l'établissement ${delegateCompany2.orgId}`
+    );
+    expect(mails[1].body).toBe(`<p>
+  La plateforme Trackdéchets vous informe que la délégation accordée par
+  l'établissement ${delegatorCompany2.name} (${
+      delegatorCompany2.orgId
+    }) à l'établissement
+  ${delegateCompany2.name} (${
+      delegateCompany2.orgId
+    }), effective depuis le ${toddMMYYYY(delegation2.startDate).replace(
+      /\//g,
+      "&#x2F;"
+    )},
+  arrivera à expiration dans 7 jours, soit le ${toddMMYYYY(
+    delegation2.endDate!
+  ).replace(/\//g, "&#x2F;")}.
+</p>
+
+<p>
+  Pour en savoir plus sur les délégations et découvrir comment prolonger cette
+  période, nous vous invitons à consulter cet
+  <a
+    href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#visualiser-lensemble-des-collaborateurs-ayant-acces-a-mon-etablissement"
+  >
+    article de notre FAQ </a
+  >.
+</p>
+`);
   });
 });
