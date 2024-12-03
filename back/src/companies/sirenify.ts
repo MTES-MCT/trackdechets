@@ -136,11 +136,7 @@ export function nextBuildSirenify<T>(
   ) => NextCompanyInputAccessor<T>[]
 ): (input: T, sealedFields: string[]) => Promise<T> {
   return async (input, sealedFields) => {
-    console.log(">> nextBuildSirenify");
     const accessors = companyInputAccessors(input, sealedFields);
-    console.log("input", input);
-    console.log("sealedFields", sealedFields);
-    console.log("accessors", accessors);
 
     // check if we found a corresponding companySearchResult based on siret
     const companySearchResults = await Promise.all(
@@ -151,8 +147,6 @@ export function nextBuildSirenify<T>(
         return searchCompanyFailFast(siret);
       })
     );
-
-    console.log("companySearchResults", companySearchResults);
 
     // make a copy to avoid mutating initial data
     const sirenifiedInput = { ...input };

@@ -51,6 +51,10 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
       user,
       enableCompletionTransformers: true,
       enablePreviousBsdasChecks: true,
+      // L'UI utilise 'createDraft', 'create' est juste utilisé côté API
+      // On part du principe que le BSD doit être prêt pour la signature
+      // émetteur, donc on remonte déjà toutes les erreurs de l'étape
+      // de signature émetteur (d'où currentSignatureType: EMISSION)
       currentSignatureType: !isDraft ? "EMISSION" : undefined
     }
   );

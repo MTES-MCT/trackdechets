@@ -10,8 +10,6 @@ const sirenifyBsdaAccessors = (
   bsda: ParsedZodBsda,
   sealedFields: string[] // Tranformations should not be run on sealed fields
 ): NextCompanyInputAccessor<ParsedZodBsda>[] => {
-  console.log("sealedFields", sealedFields);
-
   return [
     {
       siret: bsda?.emitterCompanySiret,

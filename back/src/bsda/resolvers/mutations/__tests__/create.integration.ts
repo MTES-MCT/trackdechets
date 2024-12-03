@@ -1817,6 +1817,12 @@ describe("Mutation.Bsda.create", () => {
           }
         ]
       };
+    });
+
+    describe("SIRENE closed", () => {
+      afterEach(() => {
+        jest.resetAllMocks();
+      });
 
       // Mock les appels à la base SIRENE
       jest.mock("../../../../companies/search", () => ({
@@ -1829,67 +1835,133 @@ describe("Mutation.Bsda.create", () => {
       jest.resetModules();
       makeClientLocal = require("../../../../__tests__/testClient")
         .default as typeof makeClient;
-    });
 
-    const mockCloseCompany = siretToClose => {
-      searchCompanyMock.mockImplementation(siret => {
-        return {
-          siret,
-          etatAdministratif: siret === siretToClose ? "F" : "O",
-          address: "Company address",
-          name: "Company name"
-        };
-      });
-    };
+      const mockCloseCompany = siretToClose => {
+        searchCompanyMock.mockImplementation(siret => {
+          return {
+            siret,
+            etatAdministratif: siret === siretToClose ? "F" : "O",
+            address: "Company address",
+            name: "Company name"
+          };
+        });
+      };
 
-    const testCreatingBsdaWithClosedSiret = async siret => {
-      // Given
-      mockCloseCompany(siret);
+      const testCreatingBsdaWithClosedSiret = async siret => {
+        // Given
+        mockCloseCompany(siret);
 
-      // When
-      const { mutate } = makeClientLocal(user);
-      const { errors } = await mutate<Pick<Mutation, "createBsda">>(
-        CREATE_BSDA,
-        {
-          variables: {
-            input: bsdaInput
+        // When
+        const { mutate } = makeClientLocal(user);
+        const { errors } = await mutate<Pick<Mutation, "createBsda">>(
+          CREATE_BSDA,
+          {
+            variables: {
+              input: bsdaInput
+            }
           }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          `L'établissement ${siret} est fermé selon le répertoire SIRENE`
+        );
+      };
+
+      it.each(["emitter", "transporter", "destination", "worker", "broker"])(
+        "should not allow creating a BSDA with a closed %p siret",
+        async role => {
+          // Given
+          const siret = bsdaInput?.[role]?.company?.siret;
+
+          // When > Then
+          await testCreatingBsdaWithClosedSiret(siret);
         }
       );
 
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        `L'établissement ${siret} est fermé selon le répertoire SIRENE`
-      );
-    };
-
-    //TODO: emitter ?
-    it.each(["transporter", "destination", "worker", "broker"])(
-      "should not allow creating a BSDA with a closed %p siret",
-      async role => {
+      it("should not allow creating a BSDA with a closed intermediary siret", async () => {
         // Given
-        const siret = bsdaInput?.[role]?.company?.siret;
+        const siret = (bsdaInput?.intermediaries ?? [])[0].siret;
 
         // When > Then
         await testCreatingBsdaWithClosedSiret(siret);
-      }
-    );
+      });
 
-    it("should not allow creating a BSDA with a closed intermediary siret", async () => {
-      // Given
-      const siret = (bsdaInput?.intermediaries ?? [])[0].siret;
+      it("should not allow creating a BSDA with a closed ecoOrganisme siret", async () => {
+        // Given
+        const siret = bsdaInput?.ecoOrganisme?.siret;
 
-      // When > Then
-      await testCreatingBsdaWithClosedSiret(siret);
+        // When > Then
+        await testCreatingBsdaWithClosedSiret(siret);
+      });
     });
 
-    it("should not allow creating a BSDA with a closed ecoOrganisme siret", async () => {
-      // Given
-      const siret = bsdaInput?.ecoOrganisme?.siret;
+    describe("dormant company", () => {
+      const testCreatingBsdaWithDormantSiret = async siret => {
+        // Given
 
-      // When > Then
-      await testCreatingBsdaWithClosedSiret(siret);
+        // Reset previous companies
+        await prisma.company.updateMany({
+          data: {
+            isDormantSince: null
+          }
+        });
+
+        // Make target company go dormant
+        await prisma.company.update({
+          where: {
+            siret
+          },
+          data: {
+            isDormantSince: new Date()
+          }
+        });
+
+        // When
+        const { mutate } = makeClientLocal(user);
+        const { errors } = await mutate<Pick<Mutation, "createBsda">>(
+          CREATE_BSDA,
+          {
+            variables: {
+              input: bsdaInput
+            }
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+        );
+      };
+
+      it.each(["emitter", "transporter", "destination", "worker", "broker"])(
+        "should not allow creating a BSDA with a dormant %p siret",
+        async role => {
+          // Given
+          const siret = bsdaInput?.[role]?.company?.siret;
+
+          // When > Then
+          await testCreatingBsdaWithDormantSiret(siret);
+        }
+      );
+
+      it("should not allow creating a BSDA with a dormant intermediary siret", async () => {
+        // Given
+        const siret = (bsdaInput?.intermediaries ?? [])[0].siret;
+
+        // When > Then
+        await testCreatingBsdaWithDormantSiret(siret);
+      });
+
+      it("should not allow creating a BSDA with a dormant ecoOrganisme siret", async () => {
+        // Given
+        const siret = bsdaInput?.ecoOrganisme?.siret;
+
+        // When > Then
+        await testCreatingBsdaWithDormantSiret(siret);
+      });
     });
   });
 });
