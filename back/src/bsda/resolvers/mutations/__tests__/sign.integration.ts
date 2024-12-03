@@ -24,7 +24,45 @@ import {
 import { buildPdfAsBase64 } from "../../../pdf/generator";
 import { getTransportersSync } from "../../../database";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
-import { UPDATE_BSDA } from "./update.integration";
+
+export const UPDATE_BSDA = `
+  mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
+    updateBsda(id: $id, input: $input) {
+      id
+      emitter {
+        company {
+          name
+        }
+      }
+      waste {
+        code
+      }
+      transporter {
+        company {
+          name
+          siret
+        }
+        recepisse {
+          isExempted
+          number
+          department
+          validityLimit
+        }
+        transport {
+          mode
+        }
+      }
+      destination {
+        company {
+          name
+        }
+      }
+      intermediaries {
+        siret
+      }
+    }
+  }
+`;
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
