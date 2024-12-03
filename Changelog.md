@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Permettre aux éco-organismes de réviser un BSDA [PR 3790](https://github.com/MTES-MCT/trackdechets/pull/3790)
+- Permettre l'ajout de courtier, négociant et intermédiaires sur le BSVHU [PR 3795](https://github.com/MTES-MCT/trackdechets/pull/3795)
 
 #### :nail_care: Améliorations
 
