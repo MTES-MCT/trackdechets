@@ -166,10 +166,12 @@ export const extractEmittedAt = (texts: string[]) => {
 };
 
 export const extractSiret = (texts: string[]) => {
-  const siret = extractLine(texts, "Identifiant SIRET du siège")?.replace(
-    / /g,
-    ""
-  );
+  const siret = extractLine(
+    // On exclue la ligne correspondant au SIRET du siège
+    // pour éviter qu'elle match à tort dans `extractLine`
+    texts.filter(t => !t.includes("Identifiant SIRET du siège")),
+    "Identifiant SIRET"
+  )?.replace(/ /g, "");
 
   if (!siret || !siret.length || !isSiret(siret)) {
     throw new Error("Invalid siret");

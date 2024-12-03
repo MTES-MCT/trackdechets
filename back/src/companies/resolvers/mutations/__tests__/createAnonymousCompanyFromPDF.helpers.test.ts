@@ -52,7 +52,7 @@ export const EXTRACTED_STRINGS = (date?: Date) => {
     `À la date du ${nowAsddMMYYYY}`,
     `Description de l'entrepriseEntreprise active depuis le ${nowAsddMMYYYY}`,
     "Identifiant SIREN982 549 826",
-    "Identifiant SIRET du siège982 549 826 00013",
+    "Identifiant SIRET du siège982 549 826 00021",
     "DénominationACME CORP",
     "Catégorie juridique5499 - Société à responsabilité limitée (sans autre ",
     "indication)",
@@ -63,6 +63,8 @@ export const EXTRACTED_STRINGS = (date?: Date) => {
     "Appartenance au champ des ",
     "sociétés à mission",
     `Description de l'établissementEtablissement actif depuis le ${nowAsddMMYYYY}`,
+    // tra-15570 cela doit fonctionner si le SIRET de
+    // l'établissement est différent du SIRET du siège
     "Identifiant SIRET982 549 826 00013",
     "Adresse4 BD PASTEUR",
     "44100 NANTES",
