@@ -1,4 +1,4 @@
-import { Bsda } from "@prisma/client";
+import { Bsda, Prisma } from "@prisma/client";
 import * as QRCode from "qrcode";
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
@@ -7,19 +7,30 @@ import { expandBsdaFromDb } from "../converter";
 import { getBsdaHistory } from "../database";
 import { BsdaPdf } from "./components/BsdaPdf";
 import concatStream from "concat-stream";
-import { BsdaWithTransporters, BsdaWithTransportersInclude } from "../types";
+import {
+  BsdaWithIntermediariesInclude,
+  BsdaWithTransportersInclude
+} from "../types";
 import { emptyValues } from "../../common/pdf/emptypdf";
 
-export type BsdaForPDF = Bsda & BsdaWithTransporters;
+export const BsdaForPDFInclude = {
+  ...BsdaWithTransportersInclude,
+  ...BsdaWithIntermediariesInclude
+};
 
-export const BsdaForPDFInclude = BsdaWithTransportersInclude;
+export type BsdaForPDF = Prisma.BsdaGetPayload<{
+  include: typeof BsdaForPDFInclude;
+}>;
 
 export async function buildPdf(bsda: BsdaForPDF, renderEmptyPdf?: boolean) {
   const qrCode = renderEmptyPdf
     ? ""
     : await QRCode.toString(bsda.id, { type: "svg" });
 
-  let expandedBsda = expandBsdaFromDb(bsda);
+  let expandedBsda = {
+    ...expandBsdaFromDb(bsda),
+    intermediaries: bsda.intermediaries
+  };
 
   const previousDbBsdas = await getBsdaHistory(bsda, {
     include: BsdaForPDFInclude
