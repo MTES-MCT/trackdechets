@@ -90,7 +90,7 @@ const CompanySwitcher = ({
 
   const { data, loading, error, refetch } = useQuery<
     Pick<Query, "myCompanies">
-  >(MY_COMPANIES, { variables: { first: 10 } });
+  >(MY_COMPANIES, { fetchPolicy: "network-only", variables: { first: 10 } });
 
   const debouncedSearch = useMemo(
     () =>
