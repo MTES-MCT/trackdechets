@@ -7,7 +7,8 @@ import {
   checkRequiredFields,
   checkOperationMode,
   checkReceptionWeight,
-  checkEmitterSituation
+  checkEmitterSituation,
+  checkPackaginAndIdentificationType
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
@@ -152,7 +153,7 @@ const rawBsvhuSchema = z.object({
   wasteCode: ZodWasteCodeEnum,
   packaging: z.nativeEnum(BsvhuPackaging).nullish(),
   identificationNumbers: z.array(z.string()).optional(),
-  identificationType: z.nativeEnum(BsvhuIdentificationType).nullish(),
+  identificationType: z.nativeEnum(BsvhuIdentificationType).nullish(), // see refinements
   quantity: z.number().nullish(),
   weightValue: weightSchema(WeightUnits.Kilogramme)
     .nonnegative("Le poids doit être supérieur à 0")
@@ -227,7 +228,8 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkWeights)
   .superRefine(checkReceptionWeight)
   .superRefine(checkOperationMode)
-  .superRefine(checkEmitterSituation);
+  .superRefine(checkEmitterSituation)
+  .superRefine(checkPackaginAndIdentificationType);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`

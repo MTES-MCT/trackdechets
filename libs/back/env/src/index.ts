@@ -156,7 +156,9 @@ export const schema = z.object({
   VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER: z
     .string()
     .datetime()
-    .optional()
+    .optional(),
+
+  OVERRIDE_V20241201: z.string().datetime().optional()
 });
 
 export const envVariables = schema.superRefine((val, ctx) => {
