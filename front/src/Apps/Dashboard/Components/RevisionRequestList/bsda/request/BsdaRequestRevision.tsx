@@ -68,9 +68,23 @@ export function BsdaRequestRevision({ bsda }: Props) {
     navigate(-1);
   };
 
-  const onSubmitForm = async data => {
+  // Hacky fonction implémentée en hotfix dans tra-15573
+  // La bonne solution à mon sens (benoît) serait d'initialiser
+  // le formulaire de révision avec les valeurs du BSDA
+  // puis de n'envoyer que les champs "dirty" dans onSubmit
+  const resetPopIfUnchanged = (data: Pick<ValidationSchema, "waste">) => {
+    const pop = data?.waste?.pop;
+    if (pop !== null && pop !== undefined && pop === bsda?.waste?.pop) {
+      // aucun changement n'a eu lieu sur le champ pop
+      // on le réinitialise à la valeur par défaut du formulaire
+      data.waste.pop = null;
+    }
+    return data;
+  };
+
+  const onSubmitForm = async (data: ValidationSchema) => {
     const { comment, ...content } = data;
-    const cleanedContent = removeEmptyKeys(content);
+    const cleanedContent = removeEmptyKeys(resetPopIfUnchanged(content));
 
     await createBsdaRevisionRequest({
       variables: {
@@ -226,6 +240,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 path="waste.pop"
                 value={Boolean(bsda.waste?.pop) ? "Oui" : "Non"}
                 defaultValue={initialBsdaReview.waste.pop}
+                initialValue={bsda?.waste?.pop}
               >
                 <ToggleSwitch
                   label="Le déchet contient des polluants organiques persistants"
