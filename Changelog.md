@@ -34,6 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - La vérification de l'avis de situation SIRENE ne fonctionne pas pour les établissements anonymes lorsque le SIRET du siège est différent du SIRET de l'établissement [PR 3794](https://github.com/MTES-MCT/trackdechets/pull/3794)
 - Corrige la sélection d'un organisme de certification amiante dans la création d'un établissement [PR 3797](https://github.com/MTES-MCT/trackdechets/pull/3797)
 - Corrige le sélecteur d'entreprise sur le dashboard n'affichant qu'un seul résultat [PR 3799](https://github.com/MTES-MCT/trackdechets/pull/3799)
+- Amélioration d'affichange de la page Mes établissements [PR 3798](https://github.com/MTES-MCT/trackdechets/pull/3798)
 
 # [2024.11.1] 19/11/2024
 
