@@ -1,0 +1,17 @@
+overwrite: true
+schema: back/src/**/*.graphql
+generates:
+  libs/back/codegen/src/generated/types.ts:
+    plugins:
+      - typescript
+      - typescript-resolvers
+    config:
+      contextType: back/src/types#GraphQLContext
+      enumsAsTypes: true
+      allowParentTypeOverride: true
+      scalars:
+        DateTime: Date
+        URL: URL
+      scalarDefaults:
+        DateTime: new Date()
+        URL: "https://example.com"

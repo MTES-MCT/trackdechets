@@ -56,7 +56,9 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     | "grouping"
     | "rowNumber"
     // Done manually
+    // TODO(registry): clone associated registryLookup
     | "finalOperations"
+    | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.BSDA),
     brokerCompanyAddress: bsda.brokerCompanyAddress,
@@ -244,6 +246,7 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
     | "rowNumber"
     // Done manually
     | "finalOperations"
+    | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.DASRI),
     createdAt: bsdasri.createdAt,
@@ -419,7 +422,7 @@ export const cloneBsff = async (user: Express.User, id: string) => {
   const newBsffCreateInput: Omit<
     Required<Prisma.BsffCreateInput>,
     // Ignored for the time being
-    "rowNumber"
+    "rowNumber" | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.FF),
     createdAt: bsff.createdAt,
@@ -541,7 +544,7 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
   const newBsvhuCreateInput: Omit<
     Required<Prisma.BsvhuCreateInput>,
     // Ignored for the time being
-    "rowNumber"
+    "rowNumber" | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.VHU),
     createdAt: bsvhu.createdAt,
@@ -685,7 +688,7 @@ export const cloneBspaoh = async (user: Express.User, id: string) => {
   const newBspaohCreateInput: Omit<
     Required<Prisma.BspaohCreateInput>,
     // Ignored for the time being
-    "rowNumber"
+    "rowNumber" | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.PAOH),
     canAccessDraftSirets: bspaoh.canAccessDraftSirets,
@@ -820,6 +823,7 @@ export const cloneBsdd = async (
     | "bsddRevisionRequests"
     // Done manually
     | "finalOperations"
+    | "registryLookups"
   > = {
     owner: {
       connect: {

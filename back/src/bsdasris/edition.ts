@@ -40,6 +40,7 @@ type EditableBsdasriFields = Required<
     | "finalOperations"
     | "FinalOperationToFinalBsdasri"
     | "bsdasriRevisionRequests"
+    | "registryLookups"
   >
 >;
 // Defines until which signature BSDASRI fields can be modified

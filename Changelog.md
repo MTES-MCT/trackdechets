@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Permettre au transporteur étranger d'avoir les mêmes droits qu'un transporteur FR concernant la révision sur une Annexe 1 [PR 3770](https://github.com/MTES-MCT/trackdechets/pull/3770)
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de l'export v2 des registres SSD [PR 3755](https://github.com/MTES-MCT/trackdechets/pull/3755)
+
 #### :bug: Corrections de bugs
 
 - Ne pas doubler les quantités restantes à regrouper lorsqu'on modifie un bordereau de groupement [PR 3760](https://github.com/MTES-MCT/trackdechets/pull/3760)

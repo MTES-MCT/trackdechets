@@ -15,6 +15,15 @@ interface Args {
   first?: number | null | undefined;
 }
 
+const getActiveDelegationFilter = (): Prisma.RegistryDelegationWhereInput => {
+  return {
+    revokedBy: null,
+    cancelledBy: null,
+    startDate: { lte: new Date() },
+    OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
+  };
+};
+
 export const getPaginatedDelegations = async (
   user: Express.User,
   { delegates, delegator, activeOnly, search, skip, first }: Args
@@ -31,12 +40,7 @@ export const getPaginatedDelegations = async (
     delegateId: delegates.length
       ? { in: delegates.map(delegate => delegate.id) }
       : undefined,
-    ...(activeOnly && {
-      revokedBy: null,
-      cancelledBy: null,
-      startDate: { lte: new Date() },
-      OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
-    }),
+    ...(activeOnly ? getActiveDelegationFilter() : {}),
     ...(search
       ? {
           delegator: {
@@ -76,4 +80,38 @@ export const getPaginatedDelegations = async (
   });
 
   return result;
+};
+
+export const getDelegatesOfCompany = async (
+  user: Express.User,
+  delegatorId: string
+): Promise<Company[]> => {
+  const delegationRepository = getRegistryDelegationRepository(user);
+  const delegations = await delegationRepository.findMany(
+    {
+      delegatorId,
+      ...getActiveDelegationFilter()
+    },
+    {
+      include: { delegate: true }
+    }
+  );
+  return delegations.map(delegation => delegation.delegate);
+};
+
+export const getDelegatorsOfCompanies = async (
+  user: Express.User,
+  delegateIds: string[]
+): Promise<Company[]> => {
+  const delegationRepository = getRegistryDelegationRepository(user);
+  const delegations = await delegationRepository.findMany(
+    {
+      delegateId: { in: delegateIds },
+      ...getActiveDelegationFilter()
+    },
+    {
+      include: { delegator: true }
+    }
+  );
+  return delegations.map(delegation => delegation.delegator);
 };

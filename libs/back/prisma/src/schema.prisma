@@ -552,6 +552,7 @@ model Form {
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
   intermediaries       IntermediaryFormAssociation[]
+  registryLookups      RegistryLookup[]
 
   forwarding    Form?   @relation("BsddForwarding")
   forwardedInId String? @unique
@@ -924,6 +925,7 @@ model User {
   registryImports            RegistryImport[]
   registrySsds               RegistrySsd[]
   registryIncomingWastes     RegistryIncomingWaste[]
+  registryExports            RegistryExport[]
 }
 
 enum GovernmentPermission {
@@ -1102,7 +1104,8 @@ model Bsvhu {
   traderRecepisseDepartment    String?
   traderRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
-  intermediaries IntermediaryBsvhuAssociation[]
+  intermediaries  IntermediaryBsvhuAssociation[]
+  registryLookups RegistryLookup[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1271,6 +1274,7 @@ model Bsdasri {
   synthesizedInId String?
 
   bsdasriRevisionRequests BsdasriRevisionRequest[]
+  registryLookups         RegistryLookup[]
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
   // Emitter sirets list in case of synthesis bsd
@@ -1433,6 +1437,7 @@ model Bsff {
   ficheInterventions BsffFicheIntervention[] @relation("BsffToBsffFicheIntervention")
   packagings         BsffPackaging[]
   transporters       BsffTransporter[]
+  registryLookups    RegistryLookup[]
 
   // Denormalized detenteur sirets to speed up query `bsffs`
   detenteurCompanySirets String[] @default([])
@@ -1699,6 +1704,7 @@ model Bsda {
   grouping             Bsda[]                        @relation("BsdaGrouping")
   bsdaRevisionRequests BsdaRevisionRequest[]
   intermediaries       IntermediaryBsdaAssociation[]
+  registryLookups      RegistryLookup[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
@@ -1952,7 +1958,8 @@ model Bspaoh {
   currentTransporterOrgId                        String?
   nextTransporterOrgId                           String?
 
-  transporters BspaohTransporter[]
+  transporters    BspaohTransporter[]
+  registryLookups RegistryLookup[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   transportersSirets   String[] @default([])
@@ -2305,6 +2312,8 @@ model RegistrySsd {
   destinationPostalCode      String?
   destinationCountryCode     String?
 
+  registryLookups RegistryLookup[]
+
   @@index([importId], map: "_RegistrySsdImportIdIdx")
   @@index([publicId], map: "_RegistrySsdPublicIdIdx")
 }
@@ -2411,4 +2420,119 @@ model RegistryIncomingWaste {
   transporter5PostalCode          String?
   transporter5City                String?
   transporter5CountryCode         String?
+}
+
+enum RegistryExportType {
+  SSD
+  INCOMING
+  OUTGOING
+  MANAGED
+  TRANSPORTED
+}
+
+enum RegistryExportWasteType {
+  DND
+  DD
+  TEXS
+}
+
+enum RegistryExportDeclarationType {
+  BSD
+  REGISTRY
+}
+
+enum RegistryExportStatus {
+  PENDING
+  STARTED
+  SUCCESSFUL
+  FAILED
+  CANCELED
+}
+
+enum RegistryExportFormat {
+  CSV
+  XLSX
+}
+
+// This object is created when a user requests a registry export
+// it is used in the export processing job to get the export parameters
+// and to display the export history with their statuses on the frontend
+model RegistryExport {
+  id          String               @id @default(cuid())
+  createdAt   DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime             @updatedAt @db.Timestamptz(6)
+  createdById String
+  status      RegistryExportStatus @default(PENDING)
+  s3FileKey   String?
+
+  // if this export is made as a delegate
+  delegateSiret   String?
+  sirets          String[]
+  registryType    RegistryExportType?
+  wasteTypes      RegistryExportWasteType[]      @default([])
+  wasteCodes      String[]                       @default([])
+  declarationType RegistryExportDeclarationType?
+  startDate       DateTime
+  endDate         DateTime?
+  format          RegistryExportFormat
+
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  @@index([createdById], map: "_RegistryExportCreatedByIdIdx")
+  @@index([sirets], map: "_RegistryExportSiretsIdx", type: Gin)
+}
+
+// This object is associated with every BSD/registry entry, and is used for efficient lookup
+// during registry exports. There is one registry lookup for every BSD/registrry entry, PER EXPORT REGISTRY
+// for example, if a BSD should appear in IncomingRegistry and TransportRegistry, there will be 2 registryLookup objects
+model RegistryLookup {
+  createdAt          DateTime                      @default(now()) @db.Timestamptz(6)
+  // contains the id of the Registry entry or the id of the BSD
+  id                 String
+  // contains the publicId of the registry or the readableId of the BSD
+  // for support/display
+  readableId         String
+  reportAsSirets     String[]                      @default([])
+  siret              String
+  exportRegistryType RegistryExportType
+  declarationType    RegistryExportDeclarationType
+  wasteType          RegistryExportWasteType
+  wasteCode          String
+  date               DateTime
+  // should be a UUIDv7 using date as time source
+  // to allow cursor based queries that required a unique key that should
+  // also be the sort order
+  dateId             String                        @unique @db.Uuid
+
+  // foreign keys to registry models
+  registrySsdId String?
+  registrySsd   RegistrySsd? @relation(fields: [registrySsdId], references: [id], onDelete: Cascade)
+
+  // foreign keys to BSD models
+  bsddId    String?
+  bsdd      Form?    @relation(fields: [bsddId], references: [id], onDelete: Cascade)
+  bsdaId    String?
+  bsda      Bsda?    @relation(fields: [bsdaId], references: [id], onDelete: Cascade)
+  bsdasriId String?
+  bsdasri   Bsdasri? @relation(fields: [bsdasriId], references: [id], onDelete: Cascade)
+  bsffId    String?
+  bsff      Bsff?    @relation(fields: [bsffId], references: [id], onDelete: Cascade)
+  bspaohId  String?
+  bspaoh    Bspaoh?  @relation(fields: [bspaohId], references: [id], onDelete: Cascade)
+  bsvhuId   String?
+  bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
+
+  // the id itself is not unique, since a same BSD will appear in multiple export registries.
+  // so the unique index is made of id + exportRegistryType
+  @@id([id, exportRegistryType, siret])
+  // pseudo-random with only "=" lookups so hash index is appropriate
+  @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
+  // array of elements so gin index
+  @@index([reportAsSirets], map: "_RegistryLookupReportAsSiretsIdx", type: Gin)
+  // multi-column index because those columns are mandatory for any export
+  @@index([date(sort: Asc), exportRegistryType, siret], map: "_RegistryLookupMainIdx")
+  @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
+  @@index([dateId(sort: Asc)], map: "_RegistryLookupDateIdIdx")
+  @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
+  @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
 }
