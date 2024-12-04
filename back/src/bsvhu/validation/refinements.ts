@@ -10,7 +10,11 @@ import {
 import { getSignatureAncestors } from "./helpers";
 import { isArray } from "../../common/dataTypes";
 import { capitalize } from "../../common/strings";
-import { BsdType, WasteAcceptationStatus } from "@prisma/client";
+import {
+  BsdType,
+  WasteAcceptationStatus,
+  BsvhuIdentificationType
+} from "@prisma/client";
 import {
   destinationOperationModeRefinement,
   isBrokerRefinement,
@@ -148,6 +152,55 @@ export const checkEmitterSituation: Refinement<ParsedZodBsvhu> = (
       path: ["emitter", "irregularSituation"],
       message:
         "emitterIrregularSituation : L'émetteur doit obligatoirement avoir un numéro de SIRET si il n'est pas en situation irrégulière"
+    });
+  }
+};
+
+// Date de la MAJ 2024.12.1 qui modifie les règles de validation de BsvhuInput.packaging et identification.type
+export const v20241201 = new Date(
+  process.env.OVERRIDE_V20241201 || "2024-12-18T00:00:00.000"
+);
+
+const BsvhuIdentificationTypesAfterV20241201 = [
+  BsvhuIdentificationType.NUMERO_ORDRE_REGISTRE_POLICE,
+  BsvhuIdentificationType.NUMERO_IMMATRICULATION
+];
+
+export const checkPackaginAndIdentificationType: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  { addIssue }
+) => {
+  if ((bsvhu.createdAt || new Date()).getTime() < v20241201.getTime()) {
+    return;
+  }
+
+  if (
+    !!bsvhu.identificationType &&
+    !BsvhuIdentificationTypesAfterV20241201.includes(bsvhu.identificationType)
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["identification", "type"],
+      message:
+        "identificationType : La valeur du type d'identification est dépréciée"
+    });
+  }
+
+  if (bsvhu.packaging === "LOT" && !!bsvhu.identificationType) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["identification", "type"],
+      message:
+        "identificationType : Le type d'identification doit être null quand le conditionnement est en lot"
+    });
+  }
+
+  if (bsvhu.packaging === "UNITE" && !bsvhu.identificationType) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["identification", "type"],
+      message:
+        "identificationType : Le type d'identification est obligatoire quand le conditionnement est en unité"
     });
   }
 };

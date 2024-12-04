@@ -11,6 +11,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import gql from "graphql-tag";
+import { BsvhuIdentificationType } from "@prisma/client";
 
 const CREATE_VHU_FORM = gql`
   mutation CreateVhuForm($input: BsvhuInput!) {
@@ -945,4 +946,320 @@ describe("Mutation.Vhu.create", () => {
     );
     expect(data.createBsvhu.emitter!.company!.name).toEqual("The crusher");
   });
+
+  it("should fail when deprecated identificationType is used", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_LOTS_SORTANTS"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "identificationType : La valeur du type d'identification est dépréciée",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should fail when packaging is LOT and identificationType is not null", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "LOT",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "identificationType : Le type d'identification doit être null quand le conditionnement est en lot",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should succeed when packaging is LOT and identificationType is null", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "LOT",
+      identification: {
+        numbers: ["123", "456"],
+        type: null
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createBsvhu.id).toBeTruthy();
+  });
+
+  it("should fail when packaging is UNITE and identificationType is null", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: null
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        plannedOperationCode: "R 12",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        agrementNumber: "9876"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "identificationType : Le type d'identification est obligatoire quand le conditionnement est en unité\n" +
+          "Le type de numéro d'identification est un champ requis.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it.each([
+    BsvhuIdentificationType.NUMERO_ORDRE_REGISTRE_POLICE,
+    BsvhuIdentificationType.NUMERO_IMMATRICULATION
+  ])(
+    "when packaging is UNITE and identificationType is %p",
+    async identificationType => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const destinationCompany = await companyFactory({
+        companyTypes: ["WASTE_VEHICLES"],
+        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+      });
+
+      const input = {
+        emitter: {
+          company: {
+            siret: company.siret,
+            name: "The crusher",
+            address: "Rue de la carcasse",
+            contact: "Un centre VHU",
+            phone: "0101010101",
+            mail: "emitter@mail.com"
+          },
+          agrementNumber: "1234"
+        },
+        wasteCode: "16 01 06",
+        packaging: "UNITE",
+        identification: {
+          numbers: ["123", "456"],
+          type: identificationType
+        },
+        quantity: 2,
+        weight: {
+          isEstimate: false,
+          value: 1.3
+        },
+        destination: {
+          type: "BROYEUR",
+          plannedOperationCode: "R 12",
+          company: {
+            siret: destinationCompany.siret,
+            name: "destination",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          },
+          agrementNumber: "9876"
+        }
+      };
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<Pick<Mutation, "createBsvhu">>(
+        CREATE_VHU_FORM,
+        {
+          variables: {
+            input
+          }
+        }
+      );
+
+      expect(data.createBsvhu.id).toBeTruthy();
+    }
+  );
 });

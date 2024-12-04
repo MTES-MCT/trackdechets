@@ -10,11 +10,27 @@ import { getOperationModeLabel } from "../../../common/operationModes";
 import { dateToXMonthAtHHMM } from "../../../common/helpers";
 import { Recepisse } from "../../../common/pdf/components/Recepisse";
 
-const IDENTIFICATION_TYPES_LABELS = {
+const UNITE_IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
-    "N° d'ordre tels qu'ils figurent dans le registre de police",
-  NUMERO_ORDRE_LOTS_SORTANTS: "N° d'ordre des lots sortants"
+    "identification par n° d'ordre tels qu'ils figurent dans le registre de police",
+  NUMERO_IMMATRICULATION: "identification par numéro d’immatriculation"
 };
+
+const getIdentificationTypeLabel = (bsvhu: Bsvhu) => {
+  if (bsvhu?.identification?.type === "NUMERO_ORDRE_LOTS_SORTANTS") {
+    //deprecated, kept for older bsvhus
+    return "N° d'ordre des lots sortants";
+  }
+  if (bsvhu.packaging === "LOT") {
+    return "En lots (identification par numéro de lot)";
+  }
+  return bsvhu?.identification?.type
+    ? `En unités (${
+        UNITE_IDENTIFICATION_TYPES_LABELS[bsvhu.identification.type]
+      })`
+    : "En unités";
+};
+
 const removeSpaces = (val: string | null | undefined): string => {
   if (!val) {
     return "";
@@ -245,15 +261,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
               <strong>5. Identification du ou des VHU</strong>
             </p>
             <p className="mb-3">
-              {!!bsvhu?.identification?.type && (
-                <>
-                  <strong>
-                    {" "}
-                    {IDENTIFICATION_TYPES_LABELS[bsvhu?.identification?.type]}
-                  </strong>{" "}
-                  :{" "}
-                </>
-              )}
+              <strong> {getIdentificationTypeLabel(bsvhu)}</strong> :{" "}
               {bsvhu?.identification?.numbers?.join(", ")}
             </p>
 
