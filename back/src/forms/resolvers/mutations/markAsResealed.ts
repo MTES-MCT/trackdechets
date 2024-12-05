@@ -25,6 +25,7 @@ import { getFormRepository } from "../../repository";
 import { sirenifyResealedFormInput } from "../../sirenify";
 import { prismaJsonNoNull } from "../../../common/converter";
 import { bsddWasteQuantities } from "../../helpers/bsddWasteQuantities";
+import { FormWithForwardedInWithTransportersInclude } from "../../types";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,
@@ -35,12 +36,14 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   const { id, resealedInfos } = args;
 
-  const form = await getFormOrFormNotFound({ id });
+  const form = await getFormOrFormNotFound(
+    { id },
+    FormWithForwardedInWithTransportersInclude
+  );
 
   const formRepository = getFormRepository(user);
 
-  const { forwardedIn } =
-    (await formRepository.findFullFormById(form.id)) ?? {};
+  const forwardedIn = form.forwardedIn;
 
   // markAsResealed can be called several times to update BSD suite data
   const existingForwardedInTransporter = forwardedIn
@@ -124,14 +127,24 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     transportersForValidation.push(transporterData);
   }
 
-  // validate input
-  await sealedFormSchema.validate({
+  const bsdSuiteForValidation = {
     ...forwardedIn,
     ...updateInput,
     transporters: transportersForValidation
-  });
+  };
 
-  await validateForwardedInCompanies(form);
+  // validate input
+  await sealedFormSchema.validate(bsdSuiteForValidation);
+
+  // La validation doit s'appliquer sur les données de validation
+  // (fusion de l'existant et de ce qui est contenu dans l'input)
+  await validateForwardedInCompanies({
+    destinationCompanySiret: bsdSuiteForValidation.recipientCompanySiret,
+    transporterCompanySiret:
+      transportersForValidation[0]?.transporterCompanySiret,
+    transporterCompanyVatNumber:
+      transportersForValidation[0]?.transporterCompanyVatNumber
+  });
 
   let formUpdateInput: Prisma.FormUpdateInput = {};
 
