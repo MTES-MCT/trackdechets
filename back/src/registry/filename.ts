@@ -3,11 +3,12 @@ import { WasteRegistryType } from "../generated/graphql/types";
 
 export function getRegistryFileName(
   registryType: WasteRegistryType,
-  sirets: string[]
+  sirets: string[],
+  date?: Date
 ) {
   const components = [
     "TD-Registre",
-    format(new Date(), "yyyyMMdd"),
+    format(date ?? new Date(), "yyyyMMdd"),
     formatRegistryType(registryType)
   ];
 
@@ -22,6 +23,7 @@ export function getRegistryFileName(
 
 export function formatRegistryType(typename: WasteRegistryType) {
   const mapping: Record<WasteRegistryType, string> = {
+    SSD: "Sortie de statut de déchet",
     INCOMING: "Entrant",
     OUTGOING: "Sortant",
     TRANSPORTED: "Transport",

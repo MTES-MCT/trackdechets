@@ -7,10 +7,12 @@ import {
 import { OrderType, WasteRegistryType } from "../generated/graphql/types";
 
 function buildSort(
-  registryType: WasteRegistryType,
+  registryType: Exclude<WasteRegistryType, "SSD">,
   order: OrderType
 ): { [key in keyof BsdElastic]?: OrderType }[] {
-  const sortKey: { [key in WasteRegistryType]: keyof BsdElastic } = {
+  const sortKey: {
+    [key in Exclude<WasteRegistryType, "SSD">]: keyof BsdElastic;
+  } = {
     OUTGOING: "transporterTransportTakenOverAt",
     INCOMING: "destinationReceptionDate",
     TRANSPORTED: "transporterTransportTakenOverAt",
@@ -61,7 +63,9 @@ async function buildSearchAfter(
 export async function getElasticPaginationArgs({
   registryType,
   ...args
-}: GraphqlPaginationArgs & { registryType: WasteRegistryType }) {
+}: GraphqlPaginationArgs & {
+  registryType: Exclude<WasteRegistryType, "SSD">;
+}) {
   validateGqlPaginationArgs({
     first: args.first,
     after: args.after,

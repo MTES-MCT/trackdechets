@@ -48,6 +48,7 @@ type EditableBspaohFields = Required<
     | "transportersSirets"
     | "canAccessDraftSirets"
     | "transporterTransportTakenOverAt"
+    | "registryLookups"
   >
 >;
 

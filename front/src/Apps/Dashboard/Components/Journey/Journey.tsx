@@ -35,7 +35,7 @@ interface JourneyStopNameProps {
 }
 
 export function JourneyStopName({ children }: JourneyStopNameProps) {
-  return <strong className={styles.JourneyStopName}>{children}</strong>;
+  return <p className={styles.JourneyStopName}>{children}</p>;
 }
 
 interface JourneyStopDescriptionProps {
@@ -45,5 +45,5 @@ interface JourneyStopDescriptionProps {
 export function JourneyStopDescription({
   children
 }: JourneyStopDescriptionProps) {
-  return <p>{children}</p>;
+  return <p className="fr-text--bold">{children}</p>;
 }

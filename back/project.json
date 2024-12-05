@@ -72,6 +72,15 @@
       "configurations": {
         "integration": {}
       }
+    },
+    "rebuild-registry-lookup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/rebuildRegistryLookup.ts"
+      },
+      "configurations": {
+        "integration": {}
+      }
     }
   },
   "tags": []

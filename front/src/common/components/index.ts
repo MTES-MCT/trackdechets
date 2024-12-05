@@ -19,7 +19,7 @@ export * from "./Label";
 export * from "./Slideshow";
 export * from "./List";
 export * from "./Table";
-export * from "./Journey";
+export * from "../../Apps/Dashboard/Components/Journey/Journey";
 export * from "../../Apps/common/Components/Journey/DsfrJourney";
 export * from "./DataList";
 export * from "../../Apps/common/Components/DataList/DsfrDataList";

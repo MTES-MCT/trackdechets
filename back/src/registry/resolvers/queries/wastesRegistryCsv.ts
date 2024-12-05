@@ -1,7 +1,8 @@
 import {
   FileDownload,
   QueryResolvers,
-  QueryWastesRegistryCsvArgs
+  QueryWastesRegistryCsvArgs,
+  WasteRegistryType
 } from "../../../generated/graphql/types";
 import { getFileDownload } from "../../../common/fileDownload";
 import { DownloadHandler } from "../../../routers/downloadRouter";
@@ -16,8 +17,12 @@ export const wastesRegistryCsvDownloadHandler: DownloadHandler<QueryWastesRegist
   {
     name: "wastesRegistryCsv",
     handler: (_, res, args) => {
+      if (args.registryType === "SSD") {
+        res.sendStatus(404);
+        return;
+      }
       const reader = wastesReader({
-        registryType: args.registryType,
+        registryType: args.registryType as Exclude<WasteRegistryType, "SSD">,
         sirets: args.sirets,
         where: args.where,
         chunk: 100

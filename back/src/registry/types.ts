@@ -8,7 +8,8 @@ import {
   QueryManagedWastesArgs,
   QueryOutgoingWastesArgs,
   QueryTransportedWastesArgs,
-  AllWaste
+  AllWaste,
+  SsdWaste
 } from "../generated/graphql/types";
 import { estypes } from "@elastic/elasticsearch";
 
@@ -20,6 +21,7 @@ export type RegistryFields =
   | "isAllWasteFor";
 
 export type GenericWaste =
+  | SsdWaste
   | IncomingWaste
   | OutgoingWaste
   | TransportedWaste

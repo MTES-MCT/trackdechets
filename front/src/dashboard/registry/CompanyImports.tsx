@@ -63,7 +63,7 @@ export function CompanyImports() {
     data?.registryImports.edges.map(importData => [
       format(new Date(importData.node.createdAt), "dd/MM/yyyy HH'h'mm"),
       <div>
-        {badges[importData.node.status]}
+        {badges[importData.node.status]("import")}
         <div>{importData.node.type}</div>
       </div>,
       <ul>

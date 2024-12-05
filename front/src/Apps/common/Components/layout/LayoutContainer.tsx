@@ -16,6 +16,7 @@ import Exports from "../../../../dashboard/exports/Registry";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
 import { MyImports } from "../../../../dashboard/registry/MyImports";
 import { CompanyImports } from "../../../../dashboard/registry/CompanyImports";
+import { MyExports } from "../../../../dashboard/registry/MyExports";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -310,6 +311,15 @@ export default function LayoutContainer() {
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <CompanyImports />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.registry_new.export}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <MyExports />
               </RequireAuth>
             }
           />

@@ -1,5 +1,5 @@
 import { Company } from "@prisma/client";
-import { CompanyPrivate } from "../generated/graphql/types";
+import { CompanyPrivate, CompanyPublic } from "../generated/graphql/types";
 import { libelleFromCodeNaf } from "./sirene/utils";
 
 export function toGqlCompanyPrivate(company: Company): CompanyPrivate {
@@ -21,5 +21,16 @@ export function toGqlCompanyPrivate(company: Company): CompanyPrivate {
       revisionRequest: false,
       registryDelegation: false
     }
+  };
+}
+
+export function toGqlCompanyPublic(company: Company): CompanyPublic {
+  return {
+    ...company,
+    ecoOrganismeAgreements:
+      company.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
+    naf: company.codeNaf,
+    isDormant: company.isDormantSince !== null,
+    libelleNaf: company.codeNaf ? libelleFromCodeNaf(company.codeNaf) : ""
   };
 }

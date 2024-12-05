@@ -7,9 +7,17 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2024.12.1] 17/12/2024
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Permettre aux éco-organismes de réviser un BSDA [PR 3790](https://github.com/MTES-MCT/trackdechets/pull/3790)
+
 #### :nail_care: Améliorations
 
 - Permettre au transporteur étranger d'avoir les mêmes droits qu'un transporteur FR concernant la révision sur une Annexe 1 [PR 3770](https://github.com/MTES-MCT/trackdechets/pull/3770)
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de l'export v2 des registres SSD [PR 3755](https://github.com/MTES-MCT/trackdechets/pull/3755)
 
 #### :bug: Corrections de bugs
 
@@ -17,6 +25,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Retirer la possibilité de réviser une Annexe 1 avant la signature de l'enlèvement pour tous les acteurs [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
 - Retirer les accès à la révision pour les profils Négociant, Courtier et Autre intermédiaire [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
 - Corrige le sélecteur d'entreprise sur le dashboard n'affichant qu'un seul résultat [PR 3799](https://github.com/MTES-MCT/trackdechets/pull/3799)
+- Impossible de changer de destination finale sur un BSDD avec entreposage provisoire si la destination finale initialement renseignée a été mise en sommeil [PR 3804](https://github.com/MTES-MCT/trackdechets/pull/3804)
 
 # [2024.11.1] 19/11/2024
 

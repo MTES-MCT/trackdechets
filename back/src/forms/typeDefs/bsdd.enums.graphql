@@ -177,20 +177,6 @@ enum FormsRegisterExportType {
   BROKERED
 }
 
-"""
-Format de l'export du registre
-"""
-enum FormsRegisterExportFormat {
-  """
-  Fichier csv
-  """
-  CSV
-  """
-  Fichier Excel
-  """
-  XLSX
-}
-
 "Charte citerne - Raison pour laquelle la citerne n'a pas été rincée"
 enum CiterneNotWashedOutReason {
   "Exemptions de rinçage (citerne dédiée)"

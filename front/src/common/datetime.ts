@@ -30,3 +30,7 @@ export function formatDateTime(date: Props): string {
     locale: fr
   });
 }
+
+// YYYY-MM-DD
+export const datetimeToYYYYMMDD = (dt: Date): string =>
+  format(new Date(dt), "yyyy-MM-dd");
