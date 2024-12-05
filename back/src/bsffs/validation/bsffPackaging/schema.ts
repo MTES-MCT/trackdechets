@@ -45,9 +45,7 @@ const rawBsffPackagingSchema = z.object({
   acceptationSignatureDate: z.coerce.date().nullish(),
   operationDate: z.coerce.date().nullish(),
   operationNoTraceability: z.coerce
-    .boolean()
-    .nullish()
-    .transform(v => Boolean(v)),
+    .boolean(),
   operationCode: ZodOperationEnum,
   operationMode: z.nativeEnum(OperationMode).nullish(),
   operationDescription: z.string().nullish(),

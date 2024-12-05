@@ -108,10 +108,7 @@ export const rawTransporterSchema = z.object({
     CompanyRole.Transporter
   ).nullish(),
   transporterCustomInfo: z.string().nullish(),
-  transporterRecepisseIsExempted: z
-    .boolean()
-    .nullish()
-    .transform(v => Boolean(v)),
+  transporterRecepisseIsExempted: z.coerce.boolean(),
   transporterRecepisseNumber: z.string().nullish(),
   transporterRecepisseDepartment: z.string().nullish(),
   transporterRecepisseValidityLimit: z.coerce.date().nullish(),
