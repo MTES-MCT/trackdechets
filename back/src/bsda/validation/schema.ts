@@ -100,7 +100,7 @@ export const rawBsdaSchema = z.object({
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
   type: z.nativeEnum(BsdaType).default(BsdaType.OTHER_COLLECTIONS),
-  emitterIsPrivateIndividual: z.coerce.boolean(),
+  emitterIsPrivateIndividual: z.coerce.boolean().nullish(),
   emitterCompanyName: z.string().nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),
@@ -129,7 +129,7 @@ export const rawBsdaSchema = z.object({
     .nullish()
     .default([])
     .transform(val => (val == null ? [] : val)),
-  weightIsEstimate: z.coerce.boolean(),
+  weightIsEstimate: z.coerce.boolean().nullish(),
   weightValue: z.number().nullish(),
   brokerCompanyName: z.string().nullish(),
   brokerCompanySiret: siretSchema(CompanyRole.Broker).nullish(),
@@ -179,23 +179,19 @@ export const rawBsdaSchema = z.object({
   destinationOperationNextDestinationCompanyMail: z.string().nullish(),
   destinationOperationNextDestinationCap: z.string().nullish(),
   destinationOperationNextDestinationPlannedOperationCode: z.string().nullish(),
-  workerIsDisabled: z.coerce
-    .boolean()
-    .default(false)
-    .nullish()
-    .transform(v => Boolean(v)),
+  workerIsDisabled: z.coerce.boolean().nullish(),
   workerCompanyName: z.string().nullish(),
   workerCompanySiret: siretSchema(CompanyRole.Worker).nullish(),
   workerCompanyAddress: z.string().nullish(),
   workerCompanyContact: z.string().nullish(),
   workerCompanyPhone: z.string().nullish(),
   workerCompanyMail: z.string().nullish(),
-  workerCertificationHasSubSectionFour: z.coerce.boolean(),
-  workerCertificationHasSubSectionThree: z.coerce.boolean(),
+  workerCertificationHasSubSectionFour: z.coerce.boolean().nullish(),
+  workerCertificationHasSubSectionThree: z.coerce.boolean().nullish(),
   workerCertificationCertificationNumber: z.string().nullish(),
   workerCertificationValidityLimit: z.coerce.date().nullish(),
   workerCertificationOrganisation: ZodWorkerCertificationOrganismEnum,
-  workerWorkHasEmitterPaperSignature: z.coerce.boolean(),
+  workerWorkHasEmitterPaperSignature: z.coerce.boolean().nullish(),
   workerWorkSignatureAuthor: z.string().nullish(),
   workerWorkSignatureDate: z.coerce.date().nullish(),
   transporters: z
