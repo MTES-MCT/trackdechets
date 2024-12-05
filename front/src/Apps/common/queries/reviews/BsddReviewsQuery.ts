@@ -79,6 +79,10 @@ const reviewFragment = gql`
           processingOperation
         }
       }
+      ecoOrganisme {
+        siret
+        name
+      }
     }
     authoringCompany {
       siret
