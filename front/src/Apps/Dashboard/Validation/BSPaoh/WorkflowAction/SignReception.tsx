@@ -29,6 +29,7 @@ import { useForm } from "react-hook-form";
 import { datetimeToYYYYMMDDHHSS } from "../paohUtils";
 import { PackagingAcceptationWidget } from "./components/PackagingAcceptationWidget";
 import { SignatureTimestamp } from "./components/Signature";
+import { numberToString } from "../../../Creation/bspaoh/utils/numbers";
 
 // instanciate schema in component to have an up-to-date max datetime validaton
 
@@ -320,7 +321,7 @@ function SignReceptionModal({
             }}
           />
           <p className="fr-info-text fr-mt-5v">
-            Soit {(receivedWeight || 0) / 1000} t
+            Soit {numberToString((receivedWeight || 0) / 1000)} t
           </p>
         </div>
       </div>
@@ -402,7 +403,7 @@ function SignReceptionModal({
             }}
           />
           <p className="fr-info-text fr-mt-5v">
-            Soit {(refusedWeight || 0) / 1000} t
+            Soit {numberToString((refusedWeight || 0) / 1000)} t
           </p>
         </div>
         <div className="fr-col-12 fr-col-md-4">
@@ -420,7 +421,7 @@ function SignReceptionModal({
             }}
           />
           <p className="fr-info-text fr-mt-5v">
-            Soit {(acceptedWeight || 0) / 1000} t
+            Soit {numberToString((acceptedWeight || 0) / 1000)} t
           </p>
         </div>
       </div>

@@ -8,6 +8,8 @@ import { SealedFieldsContext } from "../../context";
 import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
 import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
+import { numberToString } from "../utils/numbers";
+
 export function Waste() {
   const { register, watch, setValue, formState } = useFormContext<ZodBspaoh>(); // retrieve all hook methods
   const wasteType = watch("waste.type");
@@ -91,7 +93,9 @@ export function Waste() {
           />
 
           <p className="fr-info-text fr-mt-5v">
-            Soit {(emitter.emission.detail.weight.value || 0) / 1000} t
+            Soit{" "}
+            {numberToString((emitter.emission.detail.weight.value || 0) / 1000)}{" "}
+            t
           </p>
         </div>
 
