@@ -37,6 +37,7 @@ jobs:
           docker exec trackdechets-minio-1 mc alias set myminio http://localhost:9000 trackdechets password
           docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_ERRORS_BUCKET"
           docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_IMPORTS_BUCKET"
+          docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_EXPORTS_BUCKET"
       - name: Start queues
         run: |
           npx nx run-many -t serve --projects=tag:backend:queues --parallel=6 --configuration=integration &
@@ -124,5 +125,6 @@ env:
   S3_SECRET_ACCESS_KEY: password
   S3_REGISTRY_ERRORS_BUCKET: registry-errors-integration
   S3_REGISTRY_IMPORTS_BUCKET: registry-imports-integration
+  S3_REGISTRY_EXPORTS_BUCKET: registry-exports-integration
   VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER: 2024-10-30T00:00:00.000Z
    
