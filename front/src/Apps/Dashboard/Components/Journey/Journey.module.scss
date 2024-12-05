@@ -2,6 +2,7 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  padding-left: calc(1rem + 5px); // account for the radius of journey stops
 
   &:not(:last-child) {
     padding-bottom: 1rem;
@@ -52,8 +53,8 @@
     position: absolute;
     top: 50%;
     left: -1rem;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background-color: #dddddd;
     transform: translate(-50%, -50%);
@@ -73,6 +74,7 @@
 
   &::after {
     background-color: #000091;
+    border-color: #000091;
   }
 }
 
