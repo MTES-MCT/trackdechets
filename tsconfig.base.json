@@ -21,6 +21,7 @@
     "inlineSources": true,
     "baseUrl": ".",
     "paths": {
+      "@td/codegen-back": ["libs/back/codegen/src/index.ts"],
       "@td/codegen-ui": ["libs/front/codegen-ui/src/index.ts"],
       "@td/constants": ["libs/shared/constants/src/index.ts"],
       "@td/env": ["libs/back/env/src/index.ts"],
@@ -31,7 +32,6 @@
       "@td/registry": ["libs/back/registry/src/index.ts"],
       "@td/scripts": ["lib/back/scripts/src/index.ts"],
       "@td/tracer": ["libs/back/tracer/src/index.ts"],
-      "@td/codegen-back": ["libs/back/codegen/src/index.ts"],
       "back": ["back/src/index.ts"],
       "libs/back/tests-integration": [
         "libs/back/tests-integration/src/index.ts"
