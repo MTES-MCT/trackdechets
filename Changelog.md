@@ -25,6 +25,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Retirer la possibilité de réviser une Annexe 1 avant la signature de l'enlèvement pour tous les acteurs [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
 - Retirer les accès à la révision pour les profils Négociant, Courtier et Autre intermédiaire [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
 - Impossible de changer de destination finale sur un BSDD avec entreposage provisoire si la destination finale initialement renseignée a été mise en sommeil [PR 3804](https://github.com/MTES-MCT/trackdechets/pull/3804)
+- Les intermédiaires n'apparaissent pas sur le récépissé PDF du BSDA [PR 3796](https://github.com/MTES-MCT/trackdechets/pull/3796)
 
 # [2024.11.1] 19/11/2024
 
