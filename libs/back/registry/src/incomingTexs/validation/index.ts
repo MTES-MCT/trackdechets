@@ -8,7 +8,6 @@ import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
 import {
   producerRefinement,
-  refineWeighingHour,
   senderRefinement,
   transporter1Refinement,
   transporter2Refinement,
@@ -16,13 +15,12 @@ import {
   transporter4Refinement,
   transporter5Refinement
 } from "./refinement";
-import { incomingWasteSchema } from "./schema";
+import { incomingTexsSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
 
 export function safeParseAsyncIncomingWaste(line: unknown) {
-  return incomingWasteSchema
+  return incomingTexsSchema
     .superRefine(refineIsDangerous)
-    .superRefine(refineWeighingHour)
     .superRefine(refineWeightAndVolume)
     .superRefine(refineMunicipalities)
     .superRefine(refineNotificationNumber)

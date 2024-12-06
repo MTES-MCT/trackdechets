@@ -1,5 +1,5 @@
 import { OperationMode } from "@prisma/client";
-import { BSDD_WASTE_CODES_ENUM, isSiret } from "@td/constants";
+import { BSDD_WASTE_CODES_ENUM } from "@td/constants";
 import { sub } from "date-fns";
 import { z } from "zod";
 import {
@@ -10,6 +10,7 @@ import {
   getActorOrgIdSchema,
   getActorPostalCodeSchema,
   getActorTypeSchema,
+  getReportForSiretSchema,
   operationCodeSchema,
   publicIdSchema,
   reasonSchema,
@@ -28,14 +29,7 @@ const inputSsdSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
   reportAsSiret: reportAsSiretSchema,
-  reportForSiret: z.coerce
-    .string({
-      invalid_type_error:
-        "Le SIRET de l'émetteur doit être une chaîne de caractères"
-    })
-    .refine(value => {
-      return isSiret(value);
-    }, "Le SIRET de l'émetteur n'est pas un SIRET valide"),
+  reportForSiret: getReportForSiretSchema("de l'émetteur"),
   useDate: z.union([
     z.date().optional(),
     z
