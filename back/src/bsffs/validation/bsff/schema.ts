@@ -116,7 +116,7 @@ const rawBsffSchema = z.object({
   weightValue: weightSchema(WeightUnits.Kilogramme)
     .nonnegative("Le poids doit être supérieur à 0")
     .nullish(),
-  weightIsEstimate: z.coerce.boolean().nullish(),
+  weightIsEstimate: z.coerce.boolean(),
   wasteDescription: z.string().nullish(),
   transporterTransportSignatureDate: z.coerce.date().nullish(),
   destinationCompanyName: z.string().nullish(),
