@@ -95,6 +95,8 @@ export async function refineAndGetEcoOrganisme(
     });
   }
 
+  await refineSiretAndGetCompany(siret, ctx);
+
   return ecoOrganisme;
 }
 
@@ -276,6 +278,8 @@ export async function isBrokerRefinement(
   siret: string | null | undefined,
   ctx: RefinementCtx
 ) {
+  if (!siret) return;
+
   const company = await refineSiretAndGetCompany(
     siret,
     ctx,

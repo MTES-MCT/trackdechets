@@ -842,8 +842,7 @@ export async function checkBsdaSealedFields(
 
   const updatedFields = getUpdatedFields(persisted, bsda);
 
-  const currentSignatureType =
-    context.currentSignatureType ?? getCurrentSignatureType(persisted);
+  const currentSignatureType = getCurrentSignatureType(persisted);
 
   // Some signatures may be skipped, so always check all the hierarchy
   const signaturesToCheck = getSignatureAncestors(currentSignatureType);
@@ -960,8 +959,7 @@ export async function getSealedFields(
   bsda: ParsedZodBsda,
   context: BsdaValidationContext
 ) {
-  const currentSignatureType =
-    context.currentSignatureType ?? getCurrentSignatureType(bsda);
+  const currentSignatureType = getCurrentSignatureType(bsda);
   // Some signatures may be skipped, so always check all the hierarchy
   const signaturesToCheck = getSignatureAncestors(currentSignatureType);
 

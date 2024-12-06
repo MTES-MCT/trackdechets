@@ -26,6 +26,7 @@ import { ParsedZodBsda } from "./schema";
 import { prisma } from "@td/prisma";
 import { isWorker } from "../../companies/validation";
 import {
+  isBrokerRefinement,
   isDestinationRefinement,
   isEcoOrganismeRefinement,
   isEmitterNotDormantRefinement,
@@ -336,6 +337,14 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
     zodContext
   );
   await checkEmitterIsNotEcoOrganisme(bsda.emitterCompanySiret, zodContext);
+
+  await isBrokerRefinement(bsda.brokerCompanySiret, zodContext);
+
+  if (bsda.intermediaries?.length) {
+    for (const intermediary of bsda.intermediaries) {
+      await refineSiretAndGetCompany(intermediary.siret, zodContext);
+    }
+  }
 };
 
 export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
