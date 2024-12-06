@@ -143,7 +143,7 @@ describe("Query.bsffPackagings", () => {
         transporter,
         destination
       },
-      { data: { isDraft: true } }
+      { data: { isDraft: true }, userId: emitter.user.id }
     );
 
     const { query } = makeClient(emitter.user);

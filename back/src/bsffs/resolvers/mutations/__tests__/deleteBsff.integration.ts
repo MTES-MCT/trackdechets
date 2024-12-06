@@ -240,7 +240,8 @@ describe("Mutation.deleteBsff", () => {
             weight: p.acceptationWeight!,
             previousPackagings: { connect: { id: p.id } }
           }))
-        }
+        },
+        canAccessDraftOrgIds: [ttr.company.siret!]
       },
       include: { packagings: true }
     });
@@ -310,7 +311,8 @@ describe("Mutation.deleteBsff", () => {
               connect: initialBsff.packagings.map(p => ({ id: p.id }))
             }
           }
-        }
+        },
+        canAccessDraftOrgIds: [ttr.company.siret!]
       },
       include: { packagings: true }
     });
@@ -380,7 +382,8 @@ describe("Mutation.deleteBsff", () => {
               connect: { id: initialBsff.packagings[0].id }
             }
           }
-        }
+        },
+        canAccessDraftOrgIds: [ttr.company.siret!]
       },
       include: { packagings: true }
     });

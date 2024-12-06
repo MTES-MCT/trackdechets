@@ -67,7 +67,10 @@ describe("Mutation.updateBsff", () => {
 
   it("should allow user to update a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter }, { data: { isDraft: true } });
+    const bsff = await createBsff(
+      { emitter },
+      { data: { isDraft: true }, userId: emitter.user.id }
+    );
 
     const { mutate } = makeClient(emitter.user);
     const { data, errors } = await mutate<
@@ -94,7 +97,7 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
       { emitter, transporter: emitter },
-      { data: { isDraft: true } }
+      { data: { isDraft: true }, userId: emitter.user.id }
     );
 
     const transporter = await companyFactory({
@@ -138,6 +141,7 @@ describe("Mutation.updateBsff", () => {
       { emitter, transporter: emitter },
       {
         data: { isDraft: true },
+        userId: emitter.user.id,
         transporterData: {
           transporterRecepisseNumber: "abc",
           transporterRecepisseDepartment: "13",
@@ -181,6 +185,7 @@ describe("Mutation.updateBsff", () => {
       { emitter, transporter: emitter },
       {
         data: { isDraft: true },
+        userId: emitter.user.id,
         transporterData: {
           transporterRecepisseNumber: "abc",
           transporterRecepisseDepartment: "13",
@@ -224,6 +229,7 @@ describe("Mutation.updateBsff", () => {
       { emitter, transporter: emitter },
       {
         data: { isDraft: true },
+        userId: emitter.user.id,
         transporterData: {
           transporterRecepisseIsExempted: true
         }
@@ -263,6 +269,7 @@ describe("Mutation.updateBsff", () => {
       { emitter },
       {
         data: { isDraft: true },
+        userId: emitter.user.id,
         packagingData: {
           type: BsffPackagingType.BOUTEILLE,
           weight: 1,
@@ -560,7 +567,8 @@ describe("Mutation.updateBsff", () => {
           type: "COLLECTE_PETITES_QUANTITES",
           ficheInterventions: { connect: { id: ficheIntervention1.id } },
           isDraft: true
-        }
+        },
+        userId: operateur.user.id
       }
     );
 
@@ -769,6 +777,35 @@ describe("Mutation.updateBsff", () => {
     ]);
   });
 
+  it("should disallow user that is not the draft bsff creator", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsff = await createBsff(
+      { emitter, transporter, destination },
+      { data: { isDraft: true }, userId: destination.user.id }
+    );
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {}
+      }
+    });
+    // despite being the emitter, they re not allowed to update the bsff creatd by destination
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
+      })
+    ]);
+  });
+
   it("should throw an error if the bsff being updated doesn't exist", async () => {
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
 
@@ -820,7 +857,10 @@ describe("Mutation.updateBsff", () => {
 
   it("prevent user from removing their own company from the bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsff({ emitter }, { data: { isDraft: true } });
+    const bsff = await createBsff(
+      { emitter },
+      { data: { isDraft: true }, userId: emitter.user.id }
+    );
 
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
@@ -2086,6 +2126,7 @@ describe("Mutation.updateBsff", () => {
           data: {
             status: BsffStatus.INTERMEDIATELY_PROCESSED
           },
+          userId: emitter.user.id,
           packagingData: { operationCode: OPERATION.R12.code }
         }
       )
@@ -2100,7 +2141,8 @@ describe("Mutation.updateBsff", () => {
         data: {
           type: BsffType.GROUPEMENT,
           isDraft: true
-        }
+        },
+        userId: emitter.user.id
       }
     );
 
@@ -2150,7 +2192,8 @@ describe("Mutation.updateBsff", () => {
         data: {
           type: BsffType.REEXPEDITION,
           isDraft: true
-        }
+        },
+        userId: ttr.user.id
       }
     );
 
@@ -2198,6 +2241,7 @@ describe("Mutation.updateBsff", () => {
           type: BsffType.RECONDITIONNEMENT,
           isDraft: true
         },
+        userId: ttr.user.id,
         previousPackagings: repackagingBsff.packagings
       }
     );
@@ -2247,7 +2291,8 @@ describe("Mutation.updateBsff", () => {
           ficheInterventions: {
             connect: ficheInterventions.map(({ id }) => ({ id }))
           }
-        }
+        },
+        userId: emitter.user.id
       }
     );
 
@@ -2292,7 +2337,8 @@ describe("Mutation.updateBsff", () => {
         data: {
           type: BsffType.GROUPEMENT,
           isDraft: true
-        }
+        },
+        userId: emitter.user.id
       }
     );
     const { mutate } = makeClient(emitter.user);

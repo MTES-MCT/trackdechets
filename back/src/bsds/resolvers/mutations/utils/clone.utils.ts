@@ -488,6 +488,7 @@ export const cloneBsff = async (user: Express.User, id: string) => {
     wasteCode: bsff.wasteCode,
     wasteDescription: bsff.wasteDescription,
     weightIsEstimate: bsff.weightIsEstimate,
+    canAccessDraftOrgIds: [], // filled in repository
     weightValue: bsff.weightValue
   };
 
