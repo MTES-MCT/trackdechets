@@ -1731,16 +1731,22 @@ describe("Mutation.Bsda.create", () => {
     let makeClientLocal: typeof makeClient;
 
     beforeAll(async () => {
-      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER");
+      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
+        name: "Emitter"
+      });
       user = emitterCompanyAndUser.user;
       emitter = emitterCompanyAndUser.company;
-      destination = await companyFactory();
-      transporter = await companyFactory();
-      worker = await companyFactory();
-      broker = await companyFactory();
-      intermediary = await companyFactory();
+      destination = await companyFactory({ name: "Destination" });
+      transporter = await companyFactory({ name: "Transporter" });
+      worker = await companyFactory({ name: "Worker" });
+      broker = await companyFactory({
+        name: "Broker",
+        companyTypes: ["BROKER"]
+      });
+      intermediary = await companyFactory({ name: "Intermediary" });
       ecoOrganisme = await ecoOrganismeFactory({
-        handle: { handleBsda: true }
+        handle: { handleBsda: true },
+        createAssociatedCompany: true
       });
 
       bsdaInput = {
@@ -1749,7 +1755,7 @@ describe("Mutation.Bsda.create", () => {
           isPrivateIndividual: false,
           company: {
             siret: emitter.siret,
-            name: "The crusher",
+            name: emitter.name,
             address: "Rue de la carcasse",
             contact: "Centre amiante",
             phone: "0101010101",
@@ -1759,7 +1765,7 @@ describe("Mutation.Bsda.create", () => {
         worker: {
           company: {
             siret: worker.siret,
-            name: "worker",
+            name: worker.name,
             address: "address",
             contact: "contactEmail",
             phone: "contactPhone",
@@ -1767,7 +1773,7 @@ describe("Mutation.Bsda.create", () => {
           }
         },
         transporter: {
-          company: { siret: transporter.siret }
+          company: { siret: transporter.siret, name: transporter.name }
         },
         waste: {
           code: "06 07 01*",
@@ -1781,7 +1787,7 @@ describe("Mutation.Bsda.create", () => {
         broker: {
           company: {
             siret: broker.siret,
-            name: "broker",
+            name: broker.name,
             address: "address",
             contact: "contactEmail",
             phone: "contactPhone",
@@ -1795,7 +1801,7 @@ describe("Mutation.Bsda.create", () => {
           plannedOperationCode: "D 9",
           company: {
             siret: destination.siret,
-            name: "destination",
+            name: destination.name,
             address: "address",
             contact: "contactEmail",
             phone: "contactPhone",
@@ -1804,25 +1810,19 @@ describe("Mutation.Bsda.create", () => {
         },
         ecoOrganisme: {
           siret: ecoOrganisme.siret!,
-          name: "Eco Organisme"
+          name: ecoOrganisme.name
         },
         intermediaries: [
           {
             siret: intermediary.siret,
+            name: intermediary.name,
             address: "intermediary address",
-            name: "Intermediary",
             contact: "intermediary contact",
             phone: "060401020304",
             mail: "intermediary@mail.com"
           }
         ]
       };
-    });
-
-    describe("SIRENE closed", () => {
-      afterEach(() => {
-        jest.resetAllMocks();
-      });
 
       // Mock les appels à la base SIRENE
       jest.mock("../../../../companies/search", () => ({
@@ -1835,7 +1835,14 @@ describe("Mutation.Bsda.create", () => {
       jest.resetModules();
       makeClientLocal = require("../../../../__tests__/testClient")
         .default as typeof makeClient;
+    });
 
+    afterAll(async () => {
+      jest.resetAllMocks();
+      await resetDatabase();
+    });
+
+    describe("closed company", () => {
       const mockCloseCompany = siretToClose => {
         searchCompanyMock.mockImplementation(siret => {
           return {
@@ -1898,8 +1905,20 @@ describe("Mutation.Bsda.create", () => {
     });
 
     describe("dormant company", () => {
+      const mockOpenCompany = () => {
+        searchCompanyMock.mockImplementation(siret => {
+          return {
+            siret,
+            etatAdministratif: "O",
+            address: "Company address",
+            name: "Company name"
+          };
+        });
+      };
+
       const testCreatingBsdaWithDormantSiret = async siret => {
         // Given
+        mockOpenCompany();
 
         // Reset previous companies
         await prisma.company.updateMany({

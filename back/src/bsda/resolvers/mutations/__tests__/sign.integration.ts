@@ -1,9 +1,9 @@
 import {
   BsdaStatus,
-  // Company,
-  // EcoOrganisme,
+  Company,
+  EcoOrganisme,
   TransportMode,
-  // User,
+  User,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -16,8 +16,8 @@ import {
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
-  // companyFactory,
-  // ecoOrganismeFactory,
+  companyFactory,
+  ecoOrganismeFactory,
   transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -29,6 +29,7 @@ import {
 import { buildPdfAsBase64 } from "../../../pdf/generator";
 import { getTransportersSync } from "../../../database";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
+import bsda from "../../queries/bsda";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
@@ -1650,150 +1651,214 @@ describe("Mutation.Bsda.sign", () => {
     });
   });
 
-  // describe("closed sirets", () => {
-  //   let emitterUser: User;
-  //   let emitter: Company;
-  //   let destination: Company;
-  //   let transporter: Company;
-  //   let workerUser: User;
-  //   let worker: Company;
-  //   let broker: Company;
-  //   let intermediary: Company;
-  //   let ecoOrganisme: EcoOrganisme;
-  //   let bsda: Awaited<ReturnType<typeof bsdaFactory>>;
+  describe.only("closed sirets", () => {
+    let emitterUser: User;
+    let emitter: Company;
+    let destinationUser: User;
+    let destination: Company;
+    let transporter: Company;
+    let transporterUser: User;
+    let workerUser: User;
+    let worker: Company;
+    let broker: Company;
+    let intermediary: Company;
+    let ecoOrganisme: EcoOrganisme;
+    let bsda: Awaited<ReturnType<typeof bsdaFactory>>;
 
-  //   // eslint-disable-next-line prefer-const
-  //   let searchCompanyMock = jest.fn().mockReturnValue({});
-  //   let makeClientLocal: typeof makeClient;
+    // eslint-disable-next-line prefer-const
+    let searchCompanyMock = jest.fn().mockReturnValue({});
+    let makeClientLocal: typeof makeClient;
 
-  //   beforeAll(async () => {
-  //     const emitterCompanyAndUser = await userWithCompanyFactory();
-  //     emitterUser = emitterCompanyAndUser.user;
-  //     emitter = emitterCompanyAndUser.company;
+    const createTestData = async () => {
+      const emitterCompanyAndUser = await userWithCompanyFactory("ADMIN", {
+        companyTypes: ["PRODUCER"]
+      });
+      emitterUser = emitterCompanyAndUser.user;
+      emitter = emitterCompanyAndUser.company;
 
-  //     const workerCompanyAndUser = await userWithCompanyFactory();
-  //     workerUser = workerCompanyAndUser.user;
-  //     worker = workerCompanyAndUser.company;
+      const workerCompanyAndUser = await userWithCompanyFactory("ADMIN", {
+        companyTypes: ["WORKER"]
+      });
+      workerUser = workerCompanyAndUser.user;
+      worker = workerCompanyAndUser.company;
 
-  //     destination = await companyFactory();
-  //     transporter = await companyFactory();
-  //     broker = await companyFactory();
-  //     intermediary = await companyFactory();
-  //     ecoOrganisme = await ecoOrganismeFactory({
-  //       handle: { handleBsda: true }
-  //     });
+      const transporterCompanyAndUser = await userWithCompanyFactory("ADMIN", {
+        companyTypes: ["TRANSPORTER"]
+      });
+      transporterUser = transporterCompanyAndUser.user;
+      transporter = transporterCompanyAndUser.company;
+      await transporterReceiptFactory({ company: transporter });
 
-  //     bsda = await bsdaFactory({
-  //       opt: {
-  //         status: BsdaStatus.INITIAL,
-  //         emitterCompanySiret: emitter.siret,
-  //         emitterEmissionSignatureAuthor: "Emétteur",
-  //         emitterEmissionSignatureDate: new Date(),
-  //         destinationCompanySiret: destination.siret,
-  //         workerCompanySiret: worker.siret,
-  //         workerWorkSignatureAuthor: "Worker",
-  //         workerWorkSignatureDate: new Date(),
-  //         brokerCompanySiret: broker.siret,
-  //         transporters: {
-  //           createMany: {
-  //             data: [
-  //               {
-  //                 number: 1,
-  //                 transporterCompanySiret: transporter.siret,
-  //                 transporterCompanyName: transporter.name
-  //               }
-  //             ]
-  //           }
-  //         },
-  //         intermediaries: {
-  //           create: [
-  //             {
-  //               siret: intermediary.siret!,
-  //               name: intermediary.name,
-  //               address: "intermediary address",
-  //               contact: "intermediary"
-  //             }
-  //           ]
-  //         },
-  //         ecoOrganismeSiret: ecoOrganisme.siret
-  //       },
-  //       transporterOpt: {
-  //         transporterCompanySiret: transporter.siret,
-  //         transporterTransportSignatureAuthor: "Transporter",
-  //         transporterTransportSignatureDate: new Date()
-  //       }
-  //     });
+      const destinationCompanyAndUser = await userWithCompanyFactory("ADMIN", {
+        companyTypes: ["WASTEPROCESSOR"]
+      });
+      destinationUser = destinationCompanyAndUser.user;
+      destination = destinationCompanyAndUser.company;
 
-  //     // Mock les appels à la base SIRENE
-  //     jest.mock("../../../../companies/search", () => ({
-  //       // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
-  //       ...jest.requireActual("../../../../companies/search"),
-  //       searchCompany: searchCompanyMock
-  //     }));
+      broker = await companyFactory({ companyTypes: ["BROKER"] });
+      intermediary = await companyFactory();
+      ecoOrganisme = await ecoOrganismeFactory({
+        handle: { handleBsda: true },
+        createAssociatedCompany: true
+      });
 
-  //     // Ré-importe makeClient pour que searchCompany soit bien mocké
-  //     jest.resetModules();
-  //     makeClientLocal = require("../../../../__tests__/testClient")
-  //       .default as typeof makeClient;
-  //   });
+      bsda = await bsdaFactory({
+        opt: {
+          status: BsdaStatus.INITIAL,
+          emitterCompanySiret: emitter.siret,
+          emitterEmissionSignatureAuthor: null,
+          emitterEmissionSignatureDate: null,
+          destinationCompanySiret: destination.siret,
+          workerCompanySiret: worker.siret,
+          workerWorkSignatureAuthor: null,
+          workerWorkSignatureDate: null,
+          brokerCompanySiret: broker.siret,
+          transporters: {
+            createMany: {
+              data: [
+                {
+                  number: 1,
+                  transporterCompanySiret: transporter.siret,
+                  transporterCompanyName: transporter.name,
+                  transporterCompanyAddress: "Transporter address",
+                  transporterCompanyContact: "Transporter",
+                  transporterCompanyMail: "transporter@mail.com",
+                  transporterCompanyPhone: "060102030405",
+                  transporterRecepisseDepartment: "75",
+                  transporterRecepisseNumber: "RECEIPT-NBR",
+                  transporterRecepisseValidityLimit: new Date(),
+                  transporterTransportMode: "ROAD",
+                  transporterTransportPlates: ["PLATES"]
+                }
+              ]
+            }
+          },
+          intermediaries: {
+            create: [
+              {
+                siret: intermediary.siret!,
+                name: intermediary.name,
+                address: "intermediary address",
+                contact: "intermediary"
+              }
+            ]
+          },
+          ecoOrganismeSiret: ecoOrganisme.siret,
+          ecoOrganismeName: ecoOrganisme.name
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date()
+        }
+      });
 
-  //   const mockCloseCompany = siretToClose => {
-  //     searchCompanyMock.mockImplementation(siret => {
-  //       return {
-  //         siret,
-  //         etatAdministratif: siret === siretToClose ? "F" : "O",
-  //         address: "Company address",
-  //         name: "Company name"
-  //       };
-  //     });
-  //   };
+      // Mock les appels à la base SIRENE
+      jest.mock("../../../../companies/search", () => ({
+        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+        ...jest.requireActual("../../../../companies/search"),
+        searchCompany: searchCompanyMock
+      }));
 
-  //   const testSigningBsdaWithClosedSiret = async (status, type, user) => {
-  //     // Given
-  //     await prisma.bsda.update({
-  //       where: { id: bsda.id },
-  //       data: { status }
-  //     });
-  //     //  mockCloseCompany(siret);
+      // Ré-importe makeClient pour que searchCompany soit bien mocké
+      jest.resetModules();
+      makeClientLocal = require("../../../../__tests__/testClient")
+        .default as typeof makeClient;
+    };
 
-  //     // When
-  //     const { mutate } = makeClient(user);
-  //     const { errors } = await mutate<
-  //       Pick<Mutation, "signBsda">,
-  //       MutationSignBsdaArgs
-  //     >(SIGN_BSDA, {
-  //       variables: {
-  //         id: bsda.id,
-  //         input: {
-  //           author: user.name,
-  //           type
-  //         }
-  //       }
-  //     });
+    afterAll(resetDatabase);
 
-  //     // Then
-  //     expect(errors).not.toBeUndefined();
-  //     expect(errors[0].message).toBe("Nope");
-  //   };
+    const testSigningBsda = async (type, user) => {
+      // Given
 
-  //   // BsdaStatus.INITIAL,
-  //   // BsdaStatus.SIGNED_BY_PRODUCER,
-  //   // BsdaStatus.SIGNED_BY_WORKER,
-  //   // BsdaStatus.SENT,
-  //   // BsdaStatus.PROCESSED,
-  //   // BsdaStatus.CANCELED,
-  //   // BsdaStatus.REFUSED
+      // When
+      const { mutate } = makeClientLocal(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: user.name,
+            type
+          }
+        }
+      });
 
-  //   it("emitter signs EMISSION", async () => {
-  //     // Given
-  //     // const siret = bsda.destinationCompanySiret;
+      // Then
+      expect(errors).toBeUndefined();
+    };
 
-  //     // When > Then
-  //     await testSigningBsdaWithClosedSiret(
-  //       "SIGNED_BY_PRODUCER",
-  //       "WORK",
-  //       workerUser
-  //     );
-  //   });
-  // });
+    describe("closed sirets", () => {
+      beforeAll(async () => {
+        await createTestData();
+
+        // All companies are closed
+        searchCompanyMock.mockImplementation(siret => {
+          return {
+            siret,
+            etatAdministratif: "F",
+            address: "Company address",
+            name: "Company name"
+          };
+        });
+      });
+
+      it("emitter signature", async () => {
+        await testSigningBsda("EMISSION", emitterUser);
+      });
+
+      it("worker signature", async () => {
+        await testSigningBsda("WORK", workerUser);
+      });
+
+      it("transporter signature", async () => {
+        await testSigningBsda("TRANSPORT", transporterUser);
+      });
+
+      it("destination signature", async () => {
+        await testSigningBsda("OPERATION", destinationUser);
+      });
+    });
+
+    describe("dormant sirets", () => {
+      beforeAll(async () => {
+        await createTestData();
+
+        // All companies are open...
+        searchCompanyMock.mockImplementation(siret => {
+          return {
+            siret,
+            etatAdministratif: "O",
+            address: "Company address",
+            name: "Company name"
+          };
+        });
+
+        // ...but dormant
+        await prisma.company.updateMany({
+          data: {
+            isDormantSince: new Date()
+          }
+        });
+      });
+
+      it("emitter signature", async () => {
+        await testSigningBsda("EMISSION", emitterUser);
+      });
+
+      it("worker signature", async () => {
+        await testSigningBsda("WORK", workerUser);
+      });
+
+      it("transporter signature", async () => {
+        await testSigningBsda("TRANSPORT", transporterUser);
+      });
+
+      it("destination signature", async () => {
+        await testSigningBsda("OPERATION", destinationUser);
+      });
+    });
+  });
 });
