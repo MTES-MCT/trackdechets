@@ -80,15 +80,15 @@ const rawBsvhuSchema = z.object({
   isDeleted: z.boolean().default(false),
 
   emitterAgrementNumber: z.string().max(100).nullish(),
-  emitterIrregularSituation: z.coerce
+  emitterIrregularSituation: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  emitterNoSiret: z.coerce
+  emitterNoSiret: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  emitterNotOnTD: z.coerce
+  emitterNotOnTD: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
