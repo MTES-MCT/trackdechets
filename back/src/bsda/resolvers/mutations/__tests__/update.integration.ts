@@ -2425,12 +2425,12 @@ describe("Mutation.updateBsda", () => {
   Trackdéchets vous informe qu'une modification a été apportée sur le bordereau
   amiante n° ${bsda.id} que vous avez signé.
 </p>
-
+<br/>
 <p>
   Le champ CAP initialement A est désormais remplacé par
   B.
 </p>
-
+<br/>
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
   l'entreprise de travaux amiante ${bsda.workerCompanyName}
@@ -2554,12 +2554,12 @@ describe("Mutation.updateBsda", () => {
   Trackdéchets vous informe qu'une modification a été apportée sur le bordereau
   amiante n° ${bsda.id} que vous avez signé.
 </p>
-
+<br/>
 <p>
   Le champ CAP initialement A est désormais remplacé par
   B.
 </p>
-
+<br/>
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
   l'entreprise de travaux amiante ${bsda.workerCompanyName}

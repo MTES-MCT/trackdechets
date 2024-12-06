@@ -332,5 +332,9 @@ export const bsdaDestinationCapModificationEmail: MailTemplate<{
   subject: ({ bsdaId, newCap }) =>
     `CAP du bordereau amiante n° ${bsdaId} mis à jour par ${newCap}`,
   body: mustacheRenderer("bsda-destinationCap-modification-email.html"),
-  templateId: templateIds.LAYOUT
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
 };
