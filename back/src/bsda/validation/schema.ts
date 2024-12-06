@@ -100,7 +100,10 @@ export const rawBsdaSchema = z.object({
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
   type: z.nativeEnum(BsdaType).default(BsdaType.OTHER_COLLECTIONS),
-  emitterIsPrivateIndividual: z.coerce.boolean(),
+  emitterIsPrivateIndividual: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   emitterCompanyName: z.string().nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),
@@ -123,13 +126,19 @@ export const rawBsdaSchema = z.object({
   wasteConsistence: z.nativeEnum(BsdaConsistence).nullish(),
   wasteSealNumbers: z.array(z.string()).default([]),
   wasteAdr: z.string().nullish(),
-  wastePop: z.coerce.boolean(),
+  wastePop: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   packagings: z
     .array(bsdaPackagingSchema)
     .nullish()
     .default([])
     .transform(val => (val == null ? [] : val)),
-  weightIsEstimate: z.coerce.boolean(),
+  weightIsEstimate: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   weightValue: z.number().nullish(),
   brokerCompanyName: z.string().nullish(),
   brokerCompanySiret: siretSchema(CompanyRole.Broker).nullish(),
@@ -190,12 +199,21 @@ export const rawBsdaSchema = z.object({
   workerCompanyContact: z.string().nullish(),
   workerCompanyPhone: z.string().nullish(),
   workerCompanyMail: z.string().nullish(),
-  workerCertificationHasSubSectionFour: z.coerce.boolean(),
-  workerCertificationHasSubSectionThree: z.coerce.boolean(),
+  workerCertificationHasSubSectionFour: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
+  workerCertificationHasSubSectionThree: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   workerCertificationCertificationNumber: z.string().nullish(),
   workerCertificationValidityLimit: z.coerce.date().nullish(),
   workerCertificationOrganisation: ZodWorkerCertificationOrganismEnum,
-  workerWorkHasEmitterPaperSignature: z.coerce.boolean(),
+  workerWorkHasEmitterPaperSignature: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   workerWorkSignatureAuthor: z.string().nullish(),
   workerWorkSignatureDate: z.coerce.date().nullish(),
   transporters: z

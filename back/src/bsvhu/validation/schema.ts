@@ -80,9 +80,18 @@ const rawBsvhuSchema = z.object({
   isDeleted: z.boolean().default(false),
 
   emitterAgrementNumber: z.string().max(100).nullish(),
-  emitterIrregularSituation: z.coerce.boolean(),
-  emitterNoSiret: z.coerce.boolean(),
-  emitterNotOnTD: z.coerce.boolean(),
+  emitterIrregularSituation: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
+  emitterNoSiret: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
+  emitterNotOnTD: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   emitterCompanyName: z.string().nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
   emitterCompanyAddress: z.string().nullish(),
@@ -148,7 +157,10 @@ const rawBsvhuSchema = z.object({
   weightValue: weightSchema(WeightUnits.Kilogramme)
     .nonnegative("Le poids doit être supérieur à 0")
     .nullish(),
-  weightIsEstimate: z.coerce.boolean(),
+  weightIsEstimate: z
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   transporterCompanyName: z.string().nullish(),
   transporterCompanySiret: siretSchema(CompanyRole.Transporter).nullish(),
   transporterCompanyAddress: z.string().nullish(),
@@ -169,7 +181,10 @@ const rawBsvhuSchema = z.object({
   transporterTransportTakenOverAt: z.coerce.date().nullish(),
   transporterCustomInfo: z.string().nullish(),
   transporterTransportPlates: z.array(z.string()).optional(),
-  transporterRecepisseIsExempted: z.coerce.boolean(),
+  transporterRecepisseIsExempted: z
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   brokerCompanyName: z.string().nullish(),

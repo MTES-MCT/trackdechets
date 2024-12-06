@@ -71,8 +71,14 @@ const rawCompanySchema = z.object({
   workerCertificationId: z.string().nullish(),
   vhuAgrementDemolisseurId: z.string().nullish(),
   vhuAgrementBroyeurId: z.string().nullish(),
-  allowBsdasriTakeOverWithoutSignature: z.coerce.boolean(),
-  allowAppendix1SignatureAutomation: z.coerce.boolean()
+  allowBsdasriTakeOverWithoutSignature: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
+  allowAppendix1SignatureAutomation: z.coerce
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v))
 });
 
 export type ZodCompany = z.input<typeof rawCompanySchema>;
