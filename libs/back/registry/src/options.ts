@@ -28,7 +28,7 @@ export type ImportOptions = {
     line,
     importId
   }: {
-    line: ParsedLine;
+    line: ParsedLine & { createdById: string };
     importId: string | null;
   }) => Promise<void>;
   getImportSiretsAssociations: (

@@ -1,6 +1,7 @@
 import { isSiret } from "@td/constants";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
+import { transportModeSchema, wasteCodeSchema } from "./schemas";
 
 export function refineActorOrgId<T>({
   typeKey,
@@ -106,3 +107,132 @@ export function refineActorOrgId<T>({
     }
   };
 }
+
+export const refineIsDangerous: Refinement<{
+  wasteIsDangerous?: boolean | undefined;
+  wastePop: boolean;
+  wasteCode: z.infer<typeof wasteCodeSchema>;
+}> = (item, { addIssue }) => {
+  // No check if the value is not set
+  if (item.wasteIsDangerous == null) {
+    return;
+  }
+
+  if (
+    (item.wastePop || item.wasteCode.includes("*")) &&
+    !item.wasteIsDangerous
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le déchet contient des POP ou a un code déchet avec étoile, il ne peut pas être indiqué comme non dangereux`,
+      path: ["wasteIsDangerous"]
+    });
+  }
+};
+
+export const refineWeightAndVolume: Refinement<{
+  transporter1TransportMode: z.infer<typeof transportModeSchema> | undefined;
+  transporter2TransportMode?: z.infer<typeof transportModeSchema> | undefined;
+  transporter3TransportMode?: z.infer<typeof transportModeSchema> | undefined;
+  transporter4TransportMode?: z.infer<typeof transportModeSchema> | undefined;
+  transporter5TransportMode?: z.infer<typeof transportModeSchema> | undefined;
+  weightValue: number;
+  volume?: number | undefined;
+  weightIsEstimate: boolean;
+  operationCode: string;
+}> = (item, { addIssue }) => {
+  const isUsingRoad = [
+    item.transporter1TransportMode,
+    item.transporter2TransportMode,
+    item.transporter3TransportMode,
+    item.transporter4TransportMode,
+    item.transporter5TransportMode
+  ].some(transportMode => transportMode === "ROUTE");
+
+  if (isUsingRoad && item.weightValue > 40) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le poids ne peut pas dépasser 40 tonnes lorsque le déchet est transporté par la route`,
+      path: ["weightValue"]
+    });
+  }
+
+  if (isUsingRoad && item.volume && item.volume > 40) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le volume ne peut pas dépasser 40 M3 lorsque le déchet est transporté par la route`,
+      path: ["volume"]
+    });
+  }
+
+  if (
+    item.weightIsEstimate &&
+    ["R 1", "D 10", "D 5"].includes(item.operationCode)
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Pour les codes opération R 1, D 10 et D 5, le poids ne peut pas être estimé`,
+      path: ["weightIsEstimate"]
+    });
+  }
+};
+
+export const refineMunicipalities: Refinement<{
+  producerType:
+    | "ENTREPRISE_FR"
+    | "ENTREPRISE_UE"
+    | "ENTREPRISE_HORS_UE"
+    | "ASSOCIATION"
+    | "PERSONNE_PHYSIQUE"
+    | "COMMUNE";
+  municipalitiesInseeCodes: string[];
+  municipalitiesNames: string[];
+}> = (item, { addIssue }) => {
+  if (
+    item.producerType === "COMMUNE" &&
+    !item.municipalitiesInseeCodes?.length
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le ou les codes INSEE des communes doivent être saisi`,
+      path: ["municipalitiesInseeCodes"]
+    });
+  }
+
+  if (item.producerType === "COMMUNE" && !item.municipalitiesNames?.length) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le ou les libellés des communes doivent être saisi`,
+      path: ["municipalitiesNames"]
+    });
+  }
+
+  if (
+    item.municipalitiesInseeCodes?.length !== item.municipalitiesNames?.length
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le nombre de codes INSEE et de noms de communes doit être identique`,
+      path: ["municipalitiesNames"]
+    });
+  }
+};
+
+export const refineNotificationNumber: Refinement<{
+  wasteIsDangerous?: boolean | undefined;
+  wastePop: boolean;
+  wasteCode: z.infer<typeof wasteCodeSchema>;
+  notificationNumber?: string | undefined;
+  nextDestinationIsAbroad?: boolean | undefined;
+}> = (item, { addIssue }) => {
+  const isDangerous =
+    item.wasteIsDangerous || item.wastePop || item.wasteCode.includes("*");
+
+  if (!item.notificationNumber && isDangerous && item.nextDestinationIsAbroad) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le uméro de notification est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
+      path: ["notificationNumber"]
+    });
+  }
+};

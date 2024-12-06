@@ -4,86 +4,91 @@ import {
   publicIdSchema,
   reportAsSiretSchema,
   wasteCodeSchema,
-  wasteCodeBaleSchema,
-  wasteDescriptionSchema,
-  volumeSchema,
-  weightIsEstimateSchema,
-  weightValueSchema,
-  getActorTypeSchema,
-  getActorOrgIdSchema,
-  getActorAddressSchema,
-  getActorCitySchema,
-  getActorCountryCodeSchema,
-  getActorNameSchema,
-  getActorPostalCodeSchema,
-  transportModeSchema,
-  transportReceiptNumberSchema,
-  operationCodeSchema,
-  getActorSiretSchema,
   wastePopSchema,
   wasteIsDangerousSchema,
   receptionDateSchema,
+  wasteDescriptionSchema,
+  wasteCodeBaleSchema,
+  weightValueSchema,
+  weightIsEstimateSchema,
+  volumeSchema,
+  getActorTypeSchema,
+  getActorOrgIdSchema,
+  getActorNameSchema,
+  getActorAddressSchema,
+  getActorPostalCodeSchema,
+  getActorCitySchema,
+  getActorCountryCodeSchema,
   inseeCodesSchema,
+  getActorSiretSchema,
+  operationCodeSchema,
+  transportModeSchema,
+  transportReceiptNumberSchema,
   declarationNumberSchema,
   notificationNumberSchema,
   getReportForSiretSchema,
+  parcelCoordinatesSchema,
+  parcelNumbersSchema,
   municipalitiesNamesSchema,
   nextDestinationIsAbroad
 } from "../../shared/schemas";
 
-export type ParsedZodIncomingWasteItem = z.output<typeof incomingWasteSchema>;
+export type ParsedZodIncomingTexsItem = z.output<typeof incomingTexsSchema>;
 
-const inputIncomingWasteSchema = z.object({
+const inputIncomingTexsSchema = z.object({
   reason: reasonSchema,
+  custominfo: z.string().optional(),
   publicId: publicIdSchema,
   reportAsSiret: reportAsSiretSchema,
   reportForSiret: getReportForSiretSchema("du destinataire"),
   wasteCode: wasteCodeSchema,
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
+  receptionDate: receptionDateSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  receptionDate: receptionDateSchema,
-  weighingHour: z
+  dap: z
     .string()
-    .refine(val => {
-      if (!val) {
-        return true;
-      }
-      // 00:00 or 00:00:00 or 00:00:00.000
-      return /^\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?$/.test(val);
-    }, `L'heure de pesée n'est pas valide. Format attendu: 00:00, 00:00:00 ou 00:00:00.000`)
+    .max(50, "Le DAP ne doit pas excéder 50 caractères")
     .optional(),
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  producerType: getActorTypeSchema("de producteur"),
-  producerOrgId: getActorOrgIdSchema("du producteur"),
-  producerName: getActorNameSchema("du producteur"),
-  producerAddress: getActorAddressSchema("du producteur"),
-  producerPostalCode: getActorPostalCodeSchema("du producteur"),
-  producerCity: getActorCitySchema("du producteur"),
-  producerCountryCode: getActorCountryCodeSchema("du producteur"),
+  parcelInseeCodes: inseeCodesSchema,
+  parcelNumbers: parcelNumbersSchema.optional(),
+  parcelCoordinates: parcelCoordinatesSchema.optional(),
+  sisIdentifiers: z
+    .array(
+      z.string().max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
+    )
+    .optional(),
+  producerType: getActorTypeSchema("de producteur initial"),
+  producerOrgId: getActorOrgIdSchema("du producteur initial"),
+  producerName: getActorNameSchema("du producteur initial"),
+  producerAddress: getActorAddressSchema("du producteur initial"),
+  producerPostalCode: getActorPostalCodeSchema("du producteur initial"),
+  producerCity: getActorCitySchema("du producteur initial"),
+  producerCountryCode: getActorCountryCodeSchema("du producteur initial"),
   municipalitiesInseeCodes: inseeCodesSchema,
   municipalitiesNames: municipalitiesNamesSchema,
-  senderType: getActorTypeSchema("d'expéditeur"),
-  senderOrgId: getActorOrgIdSchema("d'expéditeur"),
-  senderName: getActorNameSchema("d'expéditeur'"),
-  senderAddress: getActorAddressSchema("d'expéditeur"),
-  senderPostalCode: getActorPostalCodeSchema("d'expéditeur"),
-  senderCity: getActorCitySchema("d'expéditeur"),
-  senderCountryCode: getActorCountryCodeSchema("d'expéditeur"),
+  senderType: getActorTypeSchema("d'expéditeur ou détenteur"),
+  senderOrgId: getActorOrgIdSchema("d'expéditeur ou détenteur"),
+  senderName: getActorNameSchema("d'expéditeur ou détenteur'"),
+  senderAddress: getActorAddressSchema("d'expéditeur ou détenteur"),
+  senderPostalCode: getActorPostalCodeSchema("d'expéditeur ou détenteur"),
+  senderCity: getActorCitySchema("d'expéditeur ou détenteur"),
+  senderCountryCode: getActorCountryCodeSchema("d'expéditeur ou détenteur"),
   senderTakeOverAddress: getActorAddressSchema(
-    "de prise en charge de l'expéditeur"
+    "de prise en charge de l'expéditeur ou détenteur"
   ).optional(),
   senderTakeOverPostalCode: getActorPostalCodeSchema(
-    "de prise en charge de l'expéditeur"
+    "de prise en charge de l'expéditeur ou détenteur"
   ).optional(),
   senderTakeOverCity: getActorCitySchema(
-    "de prise en charge de l'expéditeur"
+    "de prise en charge de l'expéditeur ou détenteur"
   ).optional(),
   senderTakeOverCountryCode: getActorCountryCodeSchema(
-    "de prise en charge de l'expéditeur"
+    "de prise en charge de l'expéditeur ou détenteur"
   ).optional(),
   brokerSiret: getActorSiretSchema("du courtier").optional(),
   brokerName: getActorNameSchema("du courtier").optional(),
@@ -103,14 +108,16 @@ const inputIncomingWasteSchema = z.object({
       "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
     )
     .optional(),
-  ecoOrganismeSiret: getActorSiretSchema("de l'éco-organisme").optional(),
-  ecoOrganismeName: getActorNameSchema("de l'éco-organisme").optional(),
   operationCode: operationCodeSchema,
   nextDestinationIsAbroad: nextDestinationIsAbroad.optional(),
   declarationNumber: declarationNumberSchema,
   notificationNumber: notificationNumberSchema,
   movementNumber: z.string().optional(),
   nextOperationCode: operationCodeSchema.optional(),
+  isUpcycled: z.boolean().optional(),
+  destinationParcelInseeCodes: inseeCodesSchema,
+  destinationParcelNumbers: parcelNumbersSchema.optional(),
+  destinationParcelCoordinates: parcelCoordinatesSchema.optional(),
   transporter1TransportMode: transportModeSchema,
   transporter1Type: getActorTypeSchema("de transporteur 1"),
   transporter1OrgId: getActorOrgIdSchema("du transporteur 1"),
@@ -167,7 +174,7 @@ const inputIncomingWasteSchema = z.object({
 });
 
 // Props added through transform
-const transformedIncomingWasteSchema = z.object({
+const transformedIncomingTexsSchema = z.object({
   id: z.string().optional(),
   reportForAddress: z.string().default(""),
   reportForCity: z.string().default(""),
@@ -175,6 +182,6 @@ const transformedIncomingWasteSchema = z.object({
   reportForName: z.coerce.string().default("")
 });
 
-export const incomingWasteSchema = inputIncomingWasteSchema.merge(
-  transformedIncomingWasteSchema
+export const incomingTexsSchema = inputIncomingTexsSchema.merge(
+  transformedIncomingTexsSchema
 );

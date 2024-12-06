@@ -48,28 +48,21 @@ input DeclarationTypeFilter {
 input SsdLineInput {
   reason: RegistryLineReason
   publicId: ID!
-  reportForSiret: String!
-  reportForName: String!
-  reportForAddress: String!
-  reportForCity: String!
-  reportForPostalCode: String!
   reportAsSiret: String
+  reportForSiret: String!
+  useDate: DateTime
+  dispatchDate: DateTime
+  wasteCode: String!
+  wasteDescription: String!
+  wasteCodeBale: String
+  secondaryWasteCodes: [String!]
+  secondaryWasteDescriptions: [String!]
+  product: String!
   weightValue: Float!
   weightIsEstimate: Boolean!
   volume: Float
-  wasteCode: String!
-  wasteCodeBale: String
-  wasteDescription: String!
-  secondaryWasteCodes: [String!]
-  secondaryWasteDescriptions: [String!]
-  dispatchDate: DateTime
-  useDate: DateTime
   processingDate: DateTime!
   processingEndDate: DateTime
-  operationCode: String!
-  operationMode: OperationMode!
-  product: String!
-  administrativeActReference: String!
   destinationType: String!
   destinationOrgId: String
   destinationName: String
@@ -77,4 +70,102 @@ input SsdLineInput {
   destinationCity: String
   destinationPostalCode: String
   destinationCountryCode: String
+  operationCode: String!
+  operationMode: OperationMode!
+  administrativeActReference: String!
+}
+
+input IncomingWasteLineInput {
+  reason: RegistryLineReason
+  publicId: ID!
+  reportAsSiret: String
+  reportForSiret: String!
+  wasteCode: String!
+  wastePop
+  wasteIsDangerous
+  receptionDate
+  weighingHour
+  wasteDescription: String!
+  wasteCodeBale
+  weightValue
+  weightIsEstimate
+  volume
+  producerType
+  producerOrgId
+  producerName
+  producerAddress
+  producerPostalCode
+  producerCity
+  producerCountryCode
+  municipalitiesInseeCodes
+  municipalitiesNames
+  senderType
+  senderOrgId
+  senderName
+  senderAddress
+  senderPostalCode
+  senderCity
+  senderCountryCode
+  senderTakeOverAddress
+  senderTakeOverPostalCode
+  senderTakeOverCity
+  senderTakeOverCountryCode
+  brokerSiret
+  brokerName
+  brokerReceiptNumber
+  traderSiret
+  traderName
+  traderReceiptNumber
+  ecoOrganismeSiret
+  ecoOrganismeName
+  operationCode
+  declarationNumber
+  notificationNumber
+  movementNumber
+  nextOperationCode
+  transporter1TransportMode
+  transporter1Type
+  transporter1OrgId
+  transporter1ReceiptNumber
+  transporter1Name
+  transporter1Address
+  transporter1PostalCode
+  transporter1City
+  transporter1CountryCode
+  transporter2TransportMode
+  transporter2Type
+  transporter2OrgId
+  transporter2ReceiptNumber
+  transporter2Name
+  transporter2Address
+  transporter2PostalCode
+  transporter2City
+  transporter2CountryCode
+  transporter3TransportMode
+  transporter3Type
+  transporter3OrgId
+  transporter3ReceiptNumber
+  transporter3Name
+  transporter3Address
+  transporter3PostalCode
+  transporter3City
+  transporter3CountryCode
+  transporter4TransportMode
+  transporter4Type
+  transporter4OrgId
+  transporter4ReceiptNumber
+  transporter4Name
+  transporter4Address
+  transporter4PostalCode
+  transporter4City
+  transporter4CountryCode
+  transporter5TransportMode
+  transporter5Type
+  transporter5OrgId
+  transporter5ReceiptNumber
+  transporter5Name
+  transporter5Address
+  transporter5PostalCode
+  transporter5City
+  transporter5CountryCode
 }

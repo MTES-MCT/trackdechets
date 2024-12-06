@@ -4,6 +4,7 @@ import {
   PROCESSING_OPERATIONS_CODES_ENUM,
   WASTE_CODES_BALE
 } from "@td/constants";
+import { sub } from "date-fns";
 import { z } from "zod";
 
 export const reasonSchema = z
@@ -55,11 +56,51 @@ export const reportAsSiretSchema = z
       .optional()
   );
 
+export const getReportForSiretSchema = (name: string) =>
+  z.coerce
+    .string({
+      invalid_type_error: `Le SIRET ${name} doit être une chaîne de caractères`
+    })
+    .min(14, `Le SIRET ${name} ne doit pas faire moins de 14 chiffres`)
+    .max(14, `Le SIRET ${name} ne doit pas faire plus de 14 chiffres`)
+    .refine(value => {
+      return isSiret(value);
+    }, `Le SIRET ${name} n'est pas un SIRET valide`);
+
 export const wasteCodeSchema = z.nativeEnum(BSDD_WASTE_CODES_ENUM, {
   required_error: "Le code déchet est requis",
   invalid_type_error:
     "Le code déchet n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces."
 });
+
+export const wastePopSchema = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error: "Le champ POP est requis",
+        invalid_type_error:
+          "Le champ POP n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  { invalid_type_error: "Le champ POP saisi n'est pas valide" }
+);
+
+export const wasteIsDangerousSchema = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error: "Le champ Dangereux est requis",
+        invalid_type_error:
+          "Le champ Dangereux n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI")
+      .optional(),
+    z.boolean().optional()
+  ],
+  { invalid_type_error: "Le champ Dangereux saisi n'est pas valide" }
+);
 
 export const wasteDescriptionSchema = z
   .string()
@@ -126,6 +167,101 @@ export const volumeSchema = z
       .max(1_000, "Le volume ne peut pas dépasser 1 000 M3")
       .multipleOf(0.001, "Le volume ne doit pas avoir plus de 3 décimales")
       .optional()
+  );
+
+export const receptionDateSchema = z.coerce
+  .date()
+  .min(
+    sub(new Date(), { years: 1 }),
+    "La date réception ne peut pas être antérieure à J-1an"
+  )
+  .max(new Date(), "La date réception ne peut pas être dans le futur");
+
+export const inseeCodesSchema = z
+  .string()
+  .optional()
+  .transform(val =>
+    val
+      ? String(val)
+          .split(",")
+          .map(val => val.trim())
+      : []
+  )
+  .pipe(z.array(z.string()));
+
+export const municipalitiesNamesSchema = z
+  .string()
+  .optional()
+  .transform(val =>
+    val
+      ? String(val)
+          .split(",")
+          .map(val => val.trim())
+      : []
+  )
+  .pipe(
+    z.array(
+      z
+        .string()
+        .min(
+          1,
+          "Le libellé de la commune de collecte de déchet doit faire plus de 1 caractère"
+        )
+        .max(
+          300,
+          "Le libellé de la commune de collecte de déchet doit faire moins de 300 caractères"
+        )
+    )
+  );
+
+export const nextDestinationIsAbroad = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error: "Le champ POP est requis",
+        invalid_type_error:
+          "Le champ POP n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  { invalid_type_error: "Le champ POP saisi n'est pas valide" }
+);
+
+export const declarationNumberSchema = z
+  .string()
+  .regex(/^A7[EI][0-9]{10}$/)
+  .optional();
+
+export const notificationNumberSchema = z
+  .string()
+  .regex(/^[A-Z]{2}[0-9]{10}$/)
+  .optional();
+
+export const parcelNumbersSchema = z
+  .string()
+  .optional()
+  .transform(val =>
+    val
+      ? String(val)
+          .split(",")
+          .map(val => val.trim())
+      : []
+  )
+  .pipe(z.array(z.string().regex(/^\d{3}-[A-Z]{2}-\d{2}$/)));
+
+export const parcelCoordinatesSchema = z
+  .string()
+  .optional()
+  .transform(val =>
+    val
+      ? String(val)
+          .split(",")
+          .map(val => val.trim())
+      : []
+  )
+  .pipe(
+    z.array(z.string().regex(/^[NEWS] -?\d+(\.\d+)? [NEWS] -?\d+(\.\d+)?$/))
   );
 
 export const getActorTypeSchema = (name: string) =>

@@ -24,7 +24,7 @@ export async function addToSsdRegistry(
 
   if (lines.length > LINES_LIMIT) {
     throw new UserInputError(
-      `Cannot import more than ${LINES_LIMIT} lines at once`
+      `Vous ne pouvez pas importer plus de ${LINES_LIMIT} lignes par appel`
     );
   }
 
@@ -34,10 +34,16 @@ export async function addToSsdRegistry(
     const result = await safeParseAsync(line);
 
     if (result.success) {
-      await saveLine({ line: result.data, importId: null });
+      await saveLine({
+        line: { ...result.data, createdById: user.id },
+        importId: null
+      });
     } else {
       throw new UserInputError(
-        `Invalid line: ${JSON.stringify(line)}: ${result.error.format()}`
+        [
+          `Ligne avec l'identifiant ${line.publicId} invalide :`,
+          ...result.error.issues.map(issue => `${issue.path}: ${issue.message}`)
+        ].join("\n")
       );
     }
   }
