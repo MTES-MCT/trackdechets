@@ -1,4 +1,10 @@
-import { Prisma, BsvhuStatus, User } from "@prisma/client";
+import {
+  Prisma,
+  BsvhuStatus,
+  User,
+  BsvhuIdentificationType,
+  BsvhuPackaging
+} from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsvhuArgs } from "../../../generated/graphql/types";
@@ -9,10 +15,32 @@ import { checkCanDuplicate } from "../../permissions";
 import { prisma } from "@td/prisma";
 import { prismaToZodBsvhu } from "../../validation/helpers";
 import { parseBsvhuAsync } from "../../validation";
+
 import {
   BsvhuForParsingInclude,
   PrismaBsvhuForParsing
 } from "../../validation/types";
+
+// We introduced new rules for these fields after V20241201, we have to replace
+// not compliant values when duplicating
+const setPackagingAndIdentificationType = (packaging, identificationType) => {
+  if (
+    identificationType === BsvhuIdentificationType.NUMERO_ORDRE_LOTS_SORTANTS
+  ) {
+    return {
+      packaging: BsvhuPackaging.UNITE,
+      identificationType: BsvhuIdentificationType.NUMERO_IMMATRICULATION
+    };
+  }
+  if (packaging === BsvhuPackaging.LOT) {
+    return { packaging: BsvhuPackaging.LOT, identificationType: null };
+  }
+
+  return {
+    identificationType:
+      identificationType || BsvhuIdentificationType.NUMERO_IMMATRICULATION
+  };
+};
 
 export default async function duplicate(
   _,
@@ -115,7 +143,12 @@ async function getDuplicateData(
       trader?.traderReceipt?.validityLimit ??
       bsvhu.traderRecepisseValidityLimit,
     traderRecepisseDepartment:
-      trader?.traderReceipt?.department ?? bsvhu.traderRecepisseDepartment
+      trader?.traderReceipt?.department ?? bsvhu.traderRecepisseDepartment,
+    // NUMERO_ORDRE_LOTS_SORTANTS is deprecated for new bsvhus, we set an arbitrary value
+    ...setPackagingAndIdentificationType(
+      bsvhu.packaging,
+      bsvhu.identificationType
+    )
   };
   if (intermediaries) {
     data = {

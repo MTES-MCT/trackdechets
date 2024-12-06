@@ -13,6 +13,8 @@ enum BsvhuPackaging {
 
 enum BsvhuIdentificationType {
   NUMERO_ORDRE_REGISTRE_POLICE
+  NUMERO_IMMATRICULATION
+  "Déprécié, plus accepté sur les bsvhus créés après le 17/12/2024"
   NUMERO_ORDRE_LOTS_SORTANTS
 }
 

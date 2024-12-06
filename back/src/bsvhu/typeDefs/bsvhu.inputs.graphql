@@ -96,9 +96,18 @@ input BsvhuInput {
   customId: String
   "Code déchet. Presque toujours 16 01 06"
   wasteCode: String
-  "Conditionnement du déchet"
+  """
+  Conditionnement du déchet
+
+  Pour les bsvhus créés après le 17/12/2024:
+
+  - LOT : identification.type doit être null
+  - UNITE : identification.type doit être renseigné
+  """
   packaging: BsvhuPackaging
-  "Identification des VHUs"
+  """
+  Identification des VHUs
+  """
   identification: BsvhuIdentificationInput
   "Quantité de VHUs"
   quantity: Int
@@ -201,7 +210,7 @@ input BsvhuCompanyInput {
 input BsvhuIdentificationInput {
   "Numéros d'identification"
   numbers: [String!]
-  "Type de numéros d'indentification"
+  "Type de numéros d'identification"
   type: BsvhuIdentificationType
 }
 

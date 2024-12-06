@@ -28,11 +28,6 @@ type CompanyProps = {
 
 type Props = { form: Bsvhu };
 
-const IDENTIFICATION_TYPES_LABELS = {
-  NUMERO_ORDRE_REGISTRE_POLICE:
-    "N° d'ordre tels qu'ils figurent dans le registre de police",
-  NUMERO_ORDRE_LOTS_SORTANTS: "N° d'ordre des lots sortants"
-};
 const PACKAGING_LABELS = {
   UNITE: "En unités",
   LOT: "En lots"
@@ -259,6 +254,29 @@ function Company({ company, label, isIrregularSituation }: CompanyProps) {
   );
 }
 
+const UNITE_IDENTIFICATION_TYPES_LABELS = {
+  NUMERO_ORDRE_REGISTRE_POLICE:
+    "identification par n° d'ordre tels qu'ils figurent dans le registre de police",
+  NUMERO_IMMATRICULATION: "identification par numéro d’immatriculation",
+  NUMERO_ORDRE_LOTS_SORTANTS:
+    "identification par numéro d'ordre des lots sortants"
+};
+
+const getIdentificationTypeLabel = (bsvhu: Bsvhu) => {
+  if (bsvhu?.identification?.type === "NUMERO_ORDRE_LOTS_SORTANTS") {
+    //deprecated, kept for older bsvhus
+    return "N° d'ordre des lots sortants";
+  }
+  if (bsvhu.packaging === "LOT") {
+    return "En lots (identification par numéro de lot)";
+  }
+  return bsvhu?.identification?.type
+    ? `En unités (${
+        UNITE_IDENTIFICATION_TYPES_LABELS[bsvhu.identification.type]
+      })`
+    : "En unités";
+};
+
 function Emitter({ form }: { form: Bsvhu }) {
   const { emitter, quantity, packaging, identification, weight } = form;
   return (
@@ -272,12 +290,8 @@ function Emitter({ form }: { form: Bsvhu }) {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={
-            identification?.type
-              ? IDENTIFICATION_TYPES_LABELS[identification.type]
-              : null
-          }
-          label="Type d'identifiant"
+          value={getIdentificationTypeLabel(form)}
+          label="Critères d'identification"
         />
         <DetailRow
           value={identification?.numbers?.join(", ")}
@@ -311,14 +325,6 @@ function Transporter({ form }: { form: Bsvhu }) {
       </div>
       <TransporterReceiptDetails transporter={transporter} />
       <div className={styles.detailGrid}>
-        <DetailRow
-          value={
-            identification?.type
-              ? IDENTIFICATION_TYPES_LABELS[identification.type]
-              : null
-          }
-          label="Type d'identifiant"
-        />
         <DetailRow
           value={identification?.numbers?.join(", ")}
           label="Numéros"
@@ -362,7 +368,7 @@ function Destination({ form }: { form: Bsvhu }) {
         <DetailRow
           value={
             identification?.type
-              ? IDENTIFICATION_TYPES_LABELS[identification.type]
+              ? UNITE_IDENTIFICATION_TYPES_LABELS[identification.type]
               : null
           }
           label="Type d'identifiant"
