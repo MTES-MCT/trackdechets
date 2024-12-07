@@ -5,7 +5,7 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 import { associateUserToCompany } from "../../../database";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";

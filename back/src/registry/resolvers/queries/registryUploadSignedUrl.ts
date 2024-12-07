@@ -1,6 +1,6 @@
 import { getSignedUrlForUpload } from "@td/registry";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryRegistryUploadSignedUrlArgs } from "@td/codegen-back";
+import type { QueryRegistryUploadSignedUrlArgs } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";

@@ -1,4 +1,4 @@
-import { QueryResolvers } from "@td/codegen-back";
+import type { QueryResolvers } from "@td/codegen-back";
 import registryDelegation from "./queries/registryDelegation";
 import registryDelegations from "./queries/registryDelegations";
 

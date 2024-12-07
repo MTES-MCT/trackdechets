@@ -13,7 +13,7 @@ import {
   countries as vatCountries
 } from "@td/constants";
 import { checkVAT } from "jsvat";
-import { FormCompany } from "@td/codegen-back";
+import type { FormCompany } from "@td/codegen-back";
 import countries, { Country } from "world-countries";
 
 export const receiptSchema = yup.object().shape({

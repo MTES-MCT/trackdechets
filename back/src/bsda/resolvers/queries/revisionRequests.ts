@@ -1,6 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import {
+import type {
   Bsda,
   BsdaRevisionRequestContent,
   FormCompany,

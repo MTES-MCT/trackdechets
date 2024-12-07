@@ -1,7 +1,7 @@
 import { Prisma, BsvhuStatus, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { MutationDuplicateBsvhuArgs } from "@td/codegen-back";
+import type { MutationDuplicateBsvhuArgs } from "@td/codegen-back";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
 import { getBsvhuRepository } from "../../repository";

@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { safeInput } from "../common/converter";
-import { BsvhuWhere } from "@td/codegen-back";
+import type { BsvhuWhere } from "@td/codegen-back";
 import {
   toPrismaDateFilter,
   toPrismaStringFilter,

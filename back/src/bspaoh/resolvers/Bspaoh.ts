@@ -1,4 +1,4 @@
-import { BspaohResolvers } from "@td/codegen-back";
+import type { BspaohResolvers } from "@td/codegen-back";
 
 export const Bspaoh: BspaohResolvers = {
   metadata: bspaoh => {

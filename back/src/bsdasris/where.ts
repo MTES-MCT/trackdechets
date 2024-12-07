@@ -1,6 +1,6 @@
 import { Prisma, BsdasriType } from "@prisma/client";
 import { safeInput } from "../common/converter";
-import { BsdasriWhere } from "@td/codegen-back";
+import type { BsdasriWhere } from "@td/codegen-back";
 import {
   toPrismaDateFilter,
   toPrismaStringFilter,

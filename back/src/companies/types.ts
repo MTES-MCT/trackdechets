@@ -1,4 +1,4 @@
-import { FavoriteType } from "@td/codegen-back";
+import type { FavoriteType } from "@td/codegen-back";
 
 /**
  * Company interface only with identifiers

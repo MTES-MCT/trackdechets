@@ -1,7 +1,7 @@
 import { CompanySearchResult } from "../../companies/types";
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import { searchCompany } from "../../companies/search";
-import {
+import type {
   CreateFormInput,
   ResealedFormInput,
   StatutDiffusionEtablissement

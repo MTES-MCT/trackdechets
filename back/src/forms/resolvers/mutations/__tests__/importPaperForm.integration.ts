@@ -21,7 +21,11 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
-import { ImportPaperFormInput, Mutation, Packagings } from "@td/codegen-back";
+import type {
+  ImportPaperFormInput,
+  Mutation,
+  Packagings
+} from "@td/codegen-back";
 
 const IMPORT_PAPER_FORM = `
   mutation ImportPaperForm($input: ImportPaperFormInput!){

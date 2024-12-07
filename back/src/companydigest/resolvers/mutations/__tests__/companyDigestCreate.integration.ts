@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 
 import makeClient from "../../../../__tests__/testClient";
 

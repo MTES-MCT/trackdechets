@@ -11,7 +11,7 @@ import {
   toIntermediaryCompany
 } from "../../../__tests__/factories.vhu";
 
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 import { GovernmentPermission } from "@prisma/client";
 import supertest from "supertest";
 import { faker } from "@faker-js/faker";

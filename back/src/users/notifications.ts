@@ -2,7 +2,7 @@ import { CompanyAssociation, Prisma, UserRole } from "@prisma/client";
 import { Recipient } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { safeInput } from "../common/converter";
-import {
+import type {
   UserNotifications as GqlNotifications,
   UserNotificationsInput
 } from "@td/codegen-back";

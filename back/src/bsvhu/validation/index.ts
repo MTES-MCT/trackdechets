@@ -1,4 +1,4 @@
-import { BsvhuInput } from "@td/codegen-back";
+import type { BsvhuInput } from "@td/codegen-back";
 import {
   getCurrentSignatureType,
   graphQlInputToZodBsvhu,

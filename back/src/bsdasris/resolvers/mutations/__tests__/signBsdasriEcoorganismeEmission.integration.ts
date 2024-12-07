@@ -13,7 +13,7 @@ import {
   readyToPublishData
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 
 describe("Mutation.signBsdasri emission", () => {
   afterEach(resetDatabase);

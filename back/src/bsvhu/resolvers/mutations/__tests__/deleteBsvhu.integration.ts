@@ -3,7 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-import { Mutation, MutationDeleteBsvhuArgs } from "@td/codegen-back";
+import type { Mutation, MutationDeleteBsvhuArgs } from "@td/codegen-back";
 import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 import { prisma } from "@td/prisma";
 const DELETE_VHU = `

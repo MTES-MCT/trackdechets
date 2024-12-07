@@ -44,7 +44,7 @@ import {
 import { exportOptions } from "@td/registry";
 
 import { GenericWaste } from "./types";
-import { WasteRegistryType } from "@td/codegen-back";
+import type { WasteRegistryType } from "@td/codegen-back";
 import { formToBsdd } from "../forms/compat";
 import { RegistryBsdMap } from "./elastic";
 import { RegistrySsd } from "@prisma/client";

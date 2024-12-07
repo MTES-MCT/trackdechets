@@ -1,4 +1,4 @@
-import { BsdasriInput } from "@td/codegen-back";
+import type { BsdasriInput } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";

@@ -1,4 +1,4 @@
-import {
+import type {
   StatutDiffusionEtablissement,
   EtatAdministratif
 } from "@td/codegen-back";

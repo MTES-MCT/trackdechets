@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FormCompany } from "@td/codegen-back";
+import type { FormCompany } from "@td/codegen-back";
 
 type Props = {
   readonly company?: FormCompany | null;

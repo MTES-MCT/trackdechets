@@ -1,4 +1,4 @@
-import { BsffWhere, BsffPackagingWhere } from "@td/codegen-back";
+import type { BsffWhere, BsffPackagingWhere } from "@td/codegen-back";
 import { Prisma } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import {

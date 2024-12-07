@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { AuthType, applyAuthStrategies } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
-import { QueryBsdArgs } from "@td/codegen-back";
+import type { QueryBsdArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandBsdasriFromDB } from "../../../bsdasris/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";

@@ -9,7 +9,7 @@ import {
   bsdaTransporterFactory
 } from "../../../../bsda/__tests__/factories";
 import { ErrorCode } from "../../../../common/errors";
-import {
+import type {
   Mutation,
   MutationCreateBsdaArgs,
   MutationCreateBsdaRevisionRequestArgs,

@@ -6,7 +6,7 @@ import {
   CollectorType
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Mutation, MutationMarkAsSealedArgs } from "@td/codegen-back";
+import type { Mutation, MutationMarkAsSealedArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,

@@ -1,4 +1,4 @@
-import { BsvhuResolvers } from "@td/codegen-back";
+import type { BsvhuResolvers } from "@td/codegen-back";
 import { getReadonlyBsvhuRepository } from "../repository";
 
 const bsvhuResolvers: BsvhuResolvers = {

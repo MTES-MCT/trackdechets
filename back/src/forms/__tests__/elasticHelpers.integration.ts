@@ -1,7 +1,7 @@
 import { gql } from "graphql-tag";
 import { formFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import makeClient from "../../__tests__/testClient";
-import {
+import type {
   Mutation,
   MutationCreateFormRevisionRequestArgs
 } from "@td/codegen-back";

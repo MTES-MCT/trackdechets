@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 import { AuthType } from "@prisma/client";
-import { CompanyInput } from "@td/codegen-back";
+import type { CompanyInput } from "@td/codegen-back";
 import buildSirenify, { searchCompanyFailFast } from "../sirenify";
 import { searchCompany } from "../search";
 

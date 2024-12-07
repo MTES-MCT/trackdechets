@@ -1,5 +1,5 @@
 import { ZodIssue } from "zod";
-import {
+import type {
   BspaohError,
   BspaohMetadata,
   BspaohMetadataFields,

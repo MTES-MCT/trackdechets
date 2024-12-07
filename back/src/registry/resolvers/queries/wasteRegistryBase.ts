@@ -1,4 +1,4 @@
-import { QueryWastesRegistryXlsArgs } from "@td/codegen-back";
+import type { QueryWastesRegistryXlsArgs } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { searchBsds } from "../../elastic";
 import { GraphQLContext } from "../../../types";

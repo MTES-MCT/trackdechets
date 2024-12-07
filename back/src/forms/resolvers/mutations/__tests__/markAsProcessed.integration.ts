@@ -12,7 +12,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { OperationMode, Status } from "@prisma/client";
-import { Mutation, MutationMarkAsProcessedArgs } from "@td/codegen-back";
+import type { Mutation, MutationMarkAsProcessedArgs } from "@td/codegen-back";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { ErrorCode } from "../../../../common/errors";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";

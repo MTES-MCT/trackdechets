@@ -15,7 +15,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import {
+import type {
   CreateFormInput,
   Mutation,
   MutationCreateFormArgs,

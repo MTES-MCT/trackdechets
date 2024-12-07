@@ -1,4 +1,4 @@
-import {
+import type {
   Bsdasri as GqlBsdasri,
   BsdasriEmitter,
   BsdasriTransporter,

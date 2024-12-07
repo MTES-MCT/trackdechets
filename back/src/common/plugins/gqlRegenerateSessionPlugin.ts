@@ -1,7 +1,7 @@
 import { ApolloServerPlugin } from "@apollo/server";
 import { GraphQLContext } from "../../types";
 import { logger } from "@td/logger";
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 
 type GqlQueryKey = keyof MutationResolvers;
 

@@ -1,5 +1,5 @@
 import { Bspaoh, BspaohTransporter } from "@prisma/client";
-import { BspaohSignatureType } from "@td/codegen-back";
+import type { BspaohSignatureType } from "@td/codegen-back";
 
 type SignatureField = Pick<
   Bspaoh,

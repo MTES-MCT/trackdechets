@@ -1,4 +1,4 @@
-import {
+import type {
   MutationCreateCompanyDigestArgs,
   ResolversParentTypes
 } from "@td/codegen-back";

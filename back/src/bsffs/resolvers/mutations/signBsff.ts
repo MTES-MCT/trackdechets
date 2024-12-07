@@ -5,7 +5,7 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   BsffSignatureInput,
   BsffSignatureType,
   MutationResolvers

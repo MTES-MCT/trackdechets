@@ -6,7 +6,7 @@ import {
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import {
+import type {
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs
 } from "@td/codegen-back";

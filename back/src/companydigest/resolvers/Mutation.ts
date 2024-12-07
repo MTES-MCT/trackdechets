@@ -1,6 +1,6 @@
 import createCompanyDigest from "./mutations/create";
 
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 
 const Mutation: MutationResolvers = {
   createCompanyDigest

@@ -1,7 +1,7 @@
 import { setInCache, SetOptions } from "./redis";
 import { FileDownloadPayload } from "../routers/downloadRouter";
 import { getAPIBaseURL, getUid } from "../utils";
-import { FileDownload } from "@td/codegen-back";
+import type { FileDownload } from "@td/codegen-back";
 
 /**
  * GraphQL FileDownload resolver

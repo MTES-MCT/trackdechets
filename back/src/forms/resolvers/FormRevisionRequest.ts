@@ -1,4 +1,4 @@
-import {
+import type {
   FormRevisionRequest,
   FormRevisionRequestResolvers
 } from "@td/codegen-back";

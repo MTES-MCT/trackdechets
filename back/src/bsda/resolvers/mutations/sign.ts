@@ -13,7 +13,7 @@ import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { runInTransaction } from "../../../common/repository/helper";
 import { InvalidTransition } from "../../../forms/errors";
-import {
+import type {
   BsdaSignatureInput,
   BsdaSignatureType,
   MutationResolvers,

@@ -10,7 +10,7 @@ import {
   transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-import { TransportMode } from "@td/codegen-back";
+import type { TransportMode } from "@td/codegen-back";
 import { getFirstTransporter } from "../database";
 
 describe("Test Bsdd Transporter Recipify Module for FormInput", () => {

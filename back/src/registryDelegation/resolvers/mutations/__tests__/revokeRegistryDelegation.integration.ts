@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { User } from "@prisma/client";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { registryDelegationFactory } from "../../../__tests__/factories";
 import { userFactory, userInCompany } from "../../../../__tests__/factories";

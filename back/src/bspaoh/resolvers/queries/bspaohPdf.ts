@@ -1,4 +1,4 @@
-import { QueryBspaohPdfArgs } from "@td/codegen-back";
+import type { QueryBspaohPdfArgs } from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { createPDFResponse } from "../../../common/pdf";

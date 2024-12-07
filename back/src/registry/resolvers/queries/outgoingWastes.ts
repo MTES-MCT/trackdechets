@@ -1,4 +1,4 @@
-import { QueryResolvers } from "@td/codegen-back";
+import type { QueryResolvers } from "@td/codegen-back";
 import getWasteConnection from "../../wastes";
 import { checkIsAuthenticated } from "../../../common/permissions";
 

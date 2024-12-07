@@ -16,7 +16,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, prepareRedis } from "../../../__tests__/helpers";
 import { allowedFormats } from "../../../../common/dates";
 import { ErrorCode } from "../../../../common/errors";
-import { Mutation, MutationMarkAsReceivedArgs } from "@td/codegen-back";
+import type { Mutation, MutationMarkAsReceivedArgs } from "@td/codegen-back";
 import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
 import getReadableId from "../../../readableId";
 import { getFirstTransporter } from "../../../database";

@@ -7,7 +7,7 @@ import {
   initialData,
   readyToPublishData
 } from "../../../__tests__/factories";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 const PUBLISH_DASRI = `
 mutation PublishDasri($id: ID!){
   publishBsdasri(id: $id)  {

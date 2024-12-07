@@ -1,5 +1,5 @@
 import React from "react";
-import { BsdaTransporter, BsffTransporter } from "@td/codegen-back";
+import type { BsdaTransporter, BsffTransporter } from "@td/codegen-back";
 import { TRANSPORT_MODE_LABELS, formatDate } from "../../../common/pdf";
 import { Signature } from "../../../common/pdf/components/Signature";
 import { Recepisse } from "./Recepisse";

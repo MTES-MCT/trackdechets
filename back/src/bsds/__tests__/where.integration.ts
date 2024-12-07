@@ -9,7 +9,7 @@ import {
   indexBsds,
   transportPlateFilter
 } from "../../common/elastic";
-import { BsdWhere } from "@td/codegen-back";
+import type { BsdWhere } from "@td/codegen-back";
 import { toElasticQuery } from "../where";
 
 describe("StringFilter to elastic query", () => {

@@ -8,7 +8,7 @@ import {
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "@td/constants";
-import {
+import type {
   BsffInput,
   BsffOperationCode,
   Mutation,

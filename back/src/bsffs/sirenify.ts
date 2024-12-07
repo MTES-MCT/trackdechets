@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import buildSirenify, { nextBuildSirenify } from "../companies/sirenify";
-import {
+import type {
   BsffFicheInterventionInput,
   BsffInput,
   CompanyInput,

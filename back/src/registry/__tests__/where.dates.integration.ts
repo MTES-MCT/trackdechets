@@ -13,7 +13,7 @@ import { getBsvhuForElastic, indexBsvhu } from "../../bsvhu/elastic";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { client, index } from "../../common/elastic";
 import { getFormForElastic, indexForm } from "../../forms/elastic";
-import { WasteRegistryWhere } from "@td/codegen-back";
+import type { WasteRegistryWhere } from "@td/codegen-back";
 import { formFactory, userFactory } from "../../__tests__/factories";
 import { bspaohFactory } from "../../bspaoh/__tests__/factories";
 import { getBspaohForElastic, indexBspaoh } from "../../bspaoh/elastic";

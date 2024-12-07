@@ -3,7 +3,7 @@ import buildSirenify, {
   nextBuildSirenify,
   NextCompanyInputAccessor
 } from "../companies/sirenify";
-import {
+import type {
   CompanyInput,
   CreateFormInput,
   NextSegmentInfoInput,

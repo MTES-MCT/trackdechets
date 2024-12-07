@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import {
+import type {
   CompanyPrivate,
   MutationInviteUserToCompanyArgs
 } from "@td/codegen-back";

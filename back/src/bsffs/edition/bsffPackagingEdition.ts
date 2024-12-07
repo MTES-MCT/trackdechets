@@ -1,7 +1,10 @@
 import { BsffPackaging, Prisma } from "@prisma/client";
 import { SealedFieldError } from "../../common/errors";
 import { objectDiff } from "../../forms/workflow/diff";
-import { BsffSignatureType, UpdateBsffPackagingInput } from "@td/codegen-back";
+import type {
+  BsffSignatureType,
+  UpdateBsffPackagingInput
+} from "@td/codegen-back";
 import { flattenBsffPackagingInput } from "../converter";
 
 type BsffSignatureTypeAfterReception = Extract<

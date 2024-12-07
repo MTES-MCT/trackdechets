@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import { getBrokerReceiptOrNotFound } from "../../database";
 import { checkCanReadUpdateDeleteBrokerReceipt } from "../../permissions";
 import { receiptSchema } from "../../validation";

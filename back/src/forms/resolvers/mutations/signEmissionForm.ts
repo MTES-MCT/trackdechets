@@ -1,5 +1,5 @@
 import { EmitterType, Form, Prisma, Status } from "@prisma/client";
-import {
+import type {
   MutationResolvers,
   MutationSignEmissionFormArgs,
   Form as GraphQLForm

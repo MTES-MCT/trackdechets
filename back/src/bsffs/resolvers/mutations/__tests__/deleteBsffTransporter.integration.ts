@@ -6,7 +6,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation, MutationDeleteBsffArgs } from "@td/codegen-back";
+import type { Mutation, MutationDeleteBsffArgs } from "@td/codegen-back";
 import { getTransporters } from "../../../database";
 import {
   addBsffTransporter,

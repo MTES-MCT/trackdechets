@@ -1,5 +1,5 @@
 import { Bsdasri } from "@prisma/client";
-import {
+import type {
   BsdasriAcceptationInput,
   BsdasriDestinationInput,
   BsdasriEmissionInput,

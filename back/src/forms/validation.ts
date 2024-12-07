@@ -45,7 +45,7 @@ import {
 } from "../common/validation";
 
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
-import {
+import type {
   CiterneNotWashedOutReason,
   CompanyInput,
   InitialFormFractionInput,

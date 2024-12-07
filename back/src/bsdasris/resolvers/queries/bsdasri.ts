@@ -1,7 +1,7 @@
 import { expandBsdasriFromDB } from "../../converter";
 
 import { MissingIdOrReadableId } from "../../../forms/errors";
-import { QueryResolvers } from "@td/codegen-back";
+import type { QueryResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsdasriOrNotFound } from "../../database";
 import { checkCanRead } from "../../permissions";

@@ -14,7 +14,7 @@ import {
   readyToTakeOverData
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 
 import { SIGN_DASRI } from "./signUtils";
 

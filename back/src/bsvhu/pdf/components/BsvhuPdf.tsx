@@ -5,7 +5,7 @@ import {
   FormCompanyFields,
   SignatureStamp
 } from "../../../common/pdf";
-import { Bsvhu, OperationMode } from "@td/codegen-back";
+import type { Bsvhu, OperationMode } from "@td/codegen-back";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { dateToXMonthAtHHMM } from "../../../common/helpers";
 import { Recepisse } from "../../../common/pdf/components/Recepisse";

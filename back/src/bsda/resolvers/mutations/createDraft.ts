@@ -1,4 +1,4 @@
-import { MutationCreateBsdaArgs } from "@td/codegen-back";
+import type { MutationCreateBsdaArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { genericCreate } from "./create";
 

@@ -1,6 +1,6 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
-import {
+import type {
   MutationBulkUpdateCompaniesProfilesArgs,
   CompanyPrivate
 } from "@td/codegen-back";

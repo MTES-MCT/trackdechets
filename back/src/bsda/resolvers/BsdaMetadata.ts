@@ -1,5 +1,5 @@
 import { ZodIssue } from "zod";
-import { BsdaMetadata, BsdaMetadataResolvers } from "@td/codegen-back";
+import type { BsdaMetadata, BsdaMetadataResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { computeLatestRevision } from "../converter";
 import { parseBsda } from "../validation";

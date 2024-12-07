@@ -1,4 +1,4 @@
-import { QueryResolvers } from "@td/codegen-back";
+import type { QueryResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 /**
  * This query is used to check if the invitation hash is valid

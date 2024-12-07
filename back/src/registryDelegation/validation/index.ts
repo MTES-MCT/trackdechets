@@ -1,4 +1,4 @@
-import {
+import type {
   CreateRegistryDelegationInput,
   MutationRevokeRegistryDelegationArgs,
   QueryRegistryDelegationArgs,

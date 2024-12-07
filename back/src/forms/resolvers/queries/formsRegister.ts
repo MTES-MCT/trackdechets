@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   FormsRegisterExportType,
   QueryResolvers,
   QueryWastesRegistryCsvArgs,

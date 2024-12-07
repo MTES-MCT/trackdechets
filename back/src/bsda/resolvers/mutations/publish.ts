@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationPublishBsdaArgs } from "@td/codegen-back";
+import type { MutationPublishBsdaArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";

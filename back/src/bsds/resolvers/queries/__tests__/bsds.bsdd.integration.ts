@@ -5,7 +5,7 @@ import {
   WasteProcessorType,
   CompanyType
 } from "@prisma/client";
-import {
+import type {
   Query,
   QueryBsdsArgs,
   Mutation,

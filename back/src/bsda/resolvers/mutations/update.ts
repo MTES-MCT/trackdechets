@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationUpdateBsdaArgs } from "@td/codegen-back";
+import type { MutationUpdateBsdaArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";

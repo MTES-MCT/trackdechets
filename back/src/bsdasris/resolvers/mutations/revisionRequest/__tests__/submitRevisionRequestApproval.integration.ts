@@ -8,7 +8,7 @@ import { bsdasriFactory } from "../../../../__tests__/factories";
 import { BsdasriStatus as BsdasriStatusEnum } from "@prisma/client";
 
 import { prisma } from "@td/prisma";
-import {
+import type {
   Mutation,
   MutationSubmitBsdasriRevisionRequestApprovalArgs,
   BsdasriStatus

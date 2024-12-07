@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationSignEmissionFormArgs,
   MutationSubmitFormRevisionRequestApprovalArgs

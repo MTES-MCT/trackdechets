@@ -8,7 +8,7 @@ import {
   indexBsds,
   BsdElastic
 } from "../../common/elastic";
-import { BsdType } from "@td/codegen-back";
+import type { BsdType } from "@td/codegen-back";
 import {
   BsdaForElasticInclude,
   toBsdElastic as bsdaToBsdElastic

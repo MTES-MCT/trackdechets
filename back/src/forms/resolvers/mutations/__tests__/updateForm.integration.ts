@@ -20,7 +20,7 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
+import type {
   FormInput,
   Mutation,
   MutationUpdateFormArgs,

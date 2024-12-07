@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { BsvhuInput, Mutation } from "@td/codegen-back";
+import type { BsvhuInput, Mutation } from "@td/codegen-back";
 import {
   companyFactory,
   siretify,

@@ -1,5 +1,5 @@
 import { getTransporterReceipt } from "../../companies/recipify";
-import {
+import type {
   BsvhuError,
   BsvhuMetadataFields,
   BsvhuMetadata,

@@ -6,7 +6,7 @@ import {
   SignatureStamp,
   buildPdfAddress
 } from "../../../common/pdf";
-import {
+import type {
   Bsdasri,
   InitialBsdasri,
   BsdasriSignature,
