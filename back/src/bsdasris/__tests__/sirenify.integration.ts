@@ -1,7 +1,6 @@
-import { CompanySearchResult } from "../../companies/types";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { searchCompany } from "../../companies/search";
-import type { BsdasriInput } from "@td/codegen-back";
+import type { BsdasriInput, CompanySearchResult } from "@td/codegen-back";
 import { sirenify, sirenifyBsdasriCreateInput } from "../sirenify";
 import { AuthType } from "../../auth";
 import { resetDatabase } from "../../../integration-tests/helper";

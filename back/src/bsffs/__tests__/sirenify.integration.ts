@@ -1,9 +1,9 @@
-import { CompanySearchResult } from "../../companies/types";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { searchCompany } from "../../companies/search";
 import type {
   BsffFicheInterventionInput,
   BsffInput,
+  CompanySearchResult,
   UpdateBsffPackagingInput
 } from "@td/codegen-back";
 import {
