@@ -11,7 +11,7 @@ import {
   readyToReceiveData,
   readyToProcessData
 } from "../../../__tests__/factories";
-import { Query } from "../../../../generated/graphql/types";
+import { Query } from "@td/codegen-back";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { BsdasriType } from "@prisma/client";

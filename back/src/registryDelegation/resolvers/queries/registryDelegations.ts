@@ -1,7 +1,7 @@
 import { getUserCompanies } from "../../../users/database";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import { checkBelongsTo } from "../../permissions";
 import { parseQueryRegistryDelegationsArgs } from "../../validation";
 import { fixPaginatedTyping } from "../typing";

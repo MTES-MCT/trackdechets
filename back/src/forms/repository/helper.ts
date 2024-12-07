@@ -1,5 +1,5 @@
 import { UserInputError } from "../../common/errors";
-import { PackagingInfo } from "../../generated/graphql/types";
+import { PackagingInfo } from "@td/codegen-back";
 
 export function sumPackagingInfos(groupOfPackagingInfos: PackagingInfo[][]) {
   const types = new Set(

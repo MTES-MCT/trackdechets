@@ -5,7 +5,7 @@ import {
   Mutation,
   MutationSignBspaohArgs,
   MutationUpdateBspaohArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 import {
   transporterReceiptFactory,

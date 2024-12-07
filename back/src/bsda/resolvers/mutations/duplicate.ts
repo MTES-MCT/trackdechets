@@ -1,7 +1,7 @@
 import { BsdaStatus, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
+import { MutationDuplicateBsdaArgs } from "@td/codegen-back";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";

@@ -11,7 +11,7 @@ import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { createBsff } from "../../../../bsffs/__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { Mutation } from "../../../../generated/graphql/types";
+import { Mutation } from "@td/codegen-back";
 import {
   BsdType,
   Status,

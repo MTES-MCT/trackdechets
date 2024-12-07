@@ -1,4 +1,4 @@
-import { BsdaResolvers } from "../../generated/graphql/types";
+import { BsdaResolvers } from "@td/codegen-back";
 import { expandBsdaFromDb, toInitialBsda } from "../converter";
 import { getReadonlyBsdaRepository } from "../repository";
 import { isSessionUser } from "../../auth";

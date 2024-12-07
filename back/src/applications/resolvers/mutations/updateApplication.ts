@@ -2,7 +2,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { removeEmptyKeys } from "../../../common/converter";
 import { ForbiddenError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { MutationResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { getApplicationOrApplicationNotFound } from "../../database";
 import { applicationSchema } from "../../validation";

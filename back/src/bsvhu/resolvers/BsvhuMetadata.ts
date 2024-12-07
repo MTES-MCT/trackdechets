@@ -4,7 +4,7 @@ import {
   BsvhuMetadataFields,
   BsvhuMetadata,
   BsvhuMetadataResolvers
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { parseBsvhu } from "../validation";
 import {
   getCurrentSignatureType,

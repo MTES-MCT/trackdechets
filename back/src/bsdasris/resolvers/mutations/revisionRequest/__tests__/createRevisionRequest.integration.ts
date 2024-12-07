@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../../../integration-tests/helper";
 import {
   Mutation,
   MutationCreateBsdasriRevisionRequestArgs
-} from "../../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../../__tests__/factories";
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdasriFactory } from "../../../../__tests__/factories";

@@ -5,7 +5,7 @@ import { safeInput } from "../common/converter";
 import {
   UserNotifications as GqlNotifications,
   UserNotificationsInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 
 // Notifications auxquelles un utilisateur peut s'abonner pour
 // un établissement donné

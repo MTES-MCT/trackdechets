@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BsdaPickupSite } from "../../../generated/graphql/types";
+import { BsdaPickupSite } from "@td/codegen-back";
 
 type Props = {
   pickupSite?: BsdaPickupSite | null;

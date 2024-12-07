@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../mailer/mailing";
-import { CompanyPrivate } from "../../../generated/graphql/types";
+import { CompanyPrivate } from "@td/codegen-back";
 import { randomNumber } from "../../../utils";
 import { renderMail, securityCodeRenewal } from "@td/mail";
 import { isSiret, isVat } from "@td/constants";

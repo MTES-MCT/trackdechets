@@ -4,7 +4,7 @@ import makeClient from "../../__tests__/testClient";
 import {
   Mutation,
   MutationCreateFormRevisionRequestArgs
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getFormRevisionOrgIds } from "../elasticHelpers";
 import { getFormForElastic } from "../elastic";
 import { prisma } from "@td/prisma";

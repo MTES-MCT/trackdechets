@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { prisma } from "@td/prisma";

@@ -4,7 +4,7 @@ import {
   MutationRevokeRegistryDelegationArgs,
   ResolversParentTypes,
   RegistryDelegation
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { checkCanRevoke } from "../../permissions";
 import { parseMutationRevokeRegistryDelegationArgs } from "../../validation";

@@ -1,4 +1,4 @@
-import { BspaohResolvers } from "../../generated/graphql/types";
+import { BspaohResolvers } from "@td/codegen-back";
 
 export const Bspaoh: BspaohResolvers = {
   metadata: bspaoh => {

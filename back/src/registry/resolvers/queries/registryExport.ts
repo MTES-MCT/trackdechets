@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryRegistryExportArgs } from "../../../generated/graphql/types";
+import { QueryRegistryExportArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 
 export async function registryExport(

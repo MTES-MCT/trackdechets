@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { MutationResolvers } from "@td/codegen-back";
 import { getBspaohOrNotFound } from "../../database";
 import { expandBspaohFromDb } from "../../converter";
 import { parseBspaohInContext } from "../../validation";

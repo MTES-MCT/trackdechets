@@ -14,7 +14,7 @@ import {
   MutationSignBsvhuArgs,
   MutationDeleteBsvhuArgs,
   MutationDuplicateBsvhuArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   resetDatabase,
   refreshElasticSearch

@@ -1,6 +1,6 @@
 import { Bsda, BsdaType, BsdaStatus } from "@prisma/client";
 import { createMachine } from "xstate";
-import { BsdaSignatureType } from "../generated/graphql/types";
+import { BsdaSignatureType } from "@td/codegen-back";
 import { PARTIAL_OPERATIONS } from "./validation/constants";
 
 export enum EventType {

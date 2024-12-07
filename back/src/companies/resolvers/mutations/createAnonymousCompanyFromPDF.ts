@@ -5,7 +5,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   CreateAnonymousCompanyFromPdfInput,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getCodeCommune } from "../../geo/getCodeCommune";
 import { validateAndExtractSireneDataFromPDFInBase64 } from "./createAnonymousCompanyFromPDF.helpers";
 import { base64, siret } from "../../../common/validation";

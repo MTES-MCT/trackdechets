@@ -6,7 +6,7 @@ import {
   NextSegmentInfoInput,
   TransportSegment,
   TransporterInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import {
   expandTransportSegmentFromDb,

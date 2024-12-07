@@ -3,7 +3,7 @@ import {
   QueryResolvers,
   QueryWastesRegistryXlsArgs,
   WasteRegistryType
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getRegistryFileName } from "../../filename";

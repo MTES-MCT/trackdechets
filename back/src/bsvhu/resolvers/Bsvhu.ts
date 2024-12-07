@@ -1,4 +1,4 @@
-import { BsvhuResolvers } from "../../generated/graphql/types";
+import { BsvhuResolvers } from "@td/codegen-back";
 import { getReadonlyBsvhuRepository } from "../repository";
 
 const bsvhuResolvers: BsvhuResolvers = {

@@ -1,8 +1,5 @@
 import { prisma } from "@td/prisma";
-import {
-  MutationEditProfileArgs,
-  MutationResolvers
-} from "../../../generated/graphql/types";
+import { MutationEditProfileArgs, MutationResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import * as yup from "yup";

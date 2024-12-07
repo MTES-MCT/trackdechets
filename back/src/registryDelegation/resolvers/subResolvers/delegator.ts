@@ -2,7 +2,7 @@ import { prisma } from "@td/prisma";
 import {
   RegistryDelegation,
   RegistryDelegationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { toGqlCompanyPrivate } from "../../../companies/converters";
 
 const getDelegator = async (delegation: RegistryDelegation) => {

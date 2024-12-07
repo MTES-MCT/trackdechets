@@ -1,6 +1,6 @@
 import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
 import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
-import { BsdasriInput } from "../../../generated/graphql/types";
+import { BsdasriInput } from "@td/codegen-back";
 
 import { validateBsdasri } from "../../validation";
 

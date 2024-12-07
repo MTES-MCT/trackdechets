@@ -1,9 +1,6 @@
 import { Prisma, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  CompanySearchResult,
-  Mutation
-} from "../../../../generated/graphql/types";
+import { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,

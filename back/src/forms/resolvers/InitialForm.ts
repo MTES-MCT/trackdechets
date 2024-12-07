@@ -1,4 +1,4 @@
-import { InitialFormResolvers } from "../../generated/graphql/types";
+import { InitialFormResolvers } from "@td/codegen-back";
 import { isFormReader } from "../permissions";
 
 const initialFormResolvers: InitialFormResolvers = {

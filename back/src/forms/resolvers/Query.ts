@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import form from "./queries/form";
 import forms from "./queries/forms";
 import formPdf from "./queries/formPdf";

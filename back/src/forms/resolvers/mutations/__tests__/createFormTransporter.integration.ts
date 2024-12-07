@@ -1,10 +1,7 @@
 import { gql } from "graphql-tag";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  Mutation,
-  MutationCreateFormTransporterArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationCreateFormTransporterArgs } from "@td/codegen-back";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth";

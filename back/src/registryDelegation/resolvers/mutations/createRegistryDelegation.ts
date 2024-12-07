@@ -4,7 +4,7 @@ import {
   MutationCreateRegistryDelegationArgs,
   ResolversParentTypes,
   RegistryDelegation
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { checkCanCreate } from "../../permissions";
 import { parseCreateRegistryDelegationInput } from "../../validation";

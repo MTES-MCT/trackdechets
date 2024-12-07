@@ -1,10 +1,6 @@
 import { Bsda, BsdaStatus, TransportMode, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  BsdaInput,
-  Mutation,
-  MutationUpdateBsdaArgs
-} from "../../../../generated/graphql/types";
+import { BsdaInput, Mutation, MutationUpdateBsdaArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   siretify,

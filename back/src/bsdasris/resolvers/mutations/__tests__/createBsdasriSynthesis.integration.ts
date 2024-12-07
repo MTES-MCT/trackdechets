@@ -9,7 +9,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory } from "../../../__tests__/factories";
 import { BsdasriStatus } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { Mutation } from "../../../../generated/graphql/types";
+import { Mutation } from "@td/codegen-back";
 import { gql } from "graphql-tag";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { ErrorCode } from "../../../../common/errors";

@@ -5,7 +5,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationChangePasswordArgs,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { checkPasswordCriteria } from "../../utils";
 import { updateUserPassword } from "../../database";
 import { storeUserSessionsId } from "../../../common/redis/users";

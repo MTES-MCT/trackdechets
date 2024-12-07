@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryBspaohArgs } from "../../../generated/graphql/types";
+import { QueryBspaohArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandBspaohFromDb } from "../../converter";
 import { checkCanRead } from "../../permissions";

@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { MutationResolvers } from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getTraderReceiptOrNotFound } from "../../database";

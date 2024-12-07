@@ -8,7 +8,7 @@ import {
   FormCompany,
   FormRevisionRequestContent,
   QueryResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { toPrismaStringFilter } from "../../../common/where";
 

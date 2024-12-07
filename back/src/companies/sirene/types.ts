@@ -1,4 +1,4 @@
-import { StatutDiffusionEtablissement } from "../../generated/graphql/types";
+import { StatutDiffusionEtablissement } from "@td/codegen-back";
 
 /**
  * Interface des résultats sur la base Sirene INSEE

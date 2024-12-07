@@ -10,7 +10,7 @@ import {
   ResealedFormInput,
   TransporterInput,
   UpdateFormInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 
 type FormInput = CreateFormInput | UpdateFormInput;
 

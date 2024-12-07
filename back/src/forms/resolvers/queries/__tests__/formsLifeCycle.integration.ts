@@ -10,7 +10,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, storeRedisCompanyInfo } from "../../../__tests__/helpers";
-import { Query } from "../../../../generated/graphql/types";
+import { Query } from "@td/codegen-back";
 import { StatusLog } from "@prisma/client";
 
 // No mails

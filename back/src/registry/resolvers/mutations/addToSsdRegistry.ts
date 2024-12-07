@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationAddToSsdRegistryArgs } from "../../../generated/graphql/types";
+import { MutationAddToSsdRegistryArgs } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";

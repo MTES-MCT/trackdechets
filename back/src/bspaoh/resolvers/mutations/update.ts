@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationUpdateBspaohArgs } from "../../../generated/graphql/types";
+import { MutationUpdateBspaohArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getBspaohOrNotFound } from "../../database";
 import { checkCanUpdate } from "../../permissions";

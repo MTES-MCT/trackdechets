@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationUpdateBsvhuArgs } from "../../../generated/graphql/types";
+import { MutationUpdateBsvhuArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import {
   companyToIntermediaryInput,

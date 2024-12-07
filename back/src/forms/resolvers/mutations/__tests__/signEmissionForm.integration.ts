@@ -1,9 +1,6 @@
 import { EmitterType, Status } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Mutation,
-  MutationSignEmissionFormArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationSignEmissionFormArgs } from "@td/codegen-back";
 import {
   formFactory,
   formWithTempStorageFactory,

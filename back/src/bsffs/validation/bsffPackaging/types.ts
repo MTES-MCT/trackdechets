@@ -1,5 +1,5 @@
 import { RefinementCtx } from "zod";
-import { BsffSignatureType } from "../../../generated/graphql/types";
+import { BsffSignatureType } from "@td/codegen-back";
 import { ParsedZodBsffPackaging } from "./schema";
 
 export type BsffPackagingValidationContext = {

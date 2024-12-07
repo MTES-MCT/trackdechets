@@ -12,7 +12,7 @@ import {
   Mutation,
   MutationSubmitBsdasriRevisionRequestApprovalArgs,
   BsdasriStatus
-} from "../../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { NON_CANCELLABLE_BSDASRI_STATUSES } from "../../revisionRequest/createRevisionRequest";
 
 import { operationHook } from "../../../../operationHook";

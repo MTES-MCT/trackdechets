@@ -1,6 +1,6 @@
 import { ZodBsvhu } from "./schema";
 import { BsvhuUserFunctions, BsvhuValidationContext } from "./types";
-import { BsvhuInput, SignatureTypeInput } from "../../generated/graphql/types";
+import { BsvhuInput, SignatureTypeInput } from "@td/codegen-back";
 import { User, WasteAcceptationStatus } from "@prisma/client";
 import { isForeignVat } from "@td/constants";
 import {

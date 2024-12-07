@@ -7,7 +7,7 @@ import {
   IdFilter,
   StringNullableListFilter,
   TextFilter
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { UserInputError } from "./errors";
 import { isSiret } from "@td/constants";
 

@@ -4,7 +4,7 @@ import {
   OrderType,
   WasteRegistryType,
   WasteRegistryWhere
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { toElasticFilter } from "./where";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@td/prisma";

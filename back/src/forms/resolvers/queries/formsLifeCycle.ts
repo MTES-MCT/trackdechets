@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import { getFormsRightFilter } from "../../database";
 import { getConnection } from "../../../common/pagination";
 import { getUserRoles } from "../../../permissions";

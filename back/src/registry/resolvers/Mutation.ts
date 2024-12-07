@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../generated/graphql/types";
+import { MutationResolvers } from "@td/codegen-back";
 import { addToSsdRegistry } from "./mutations/addToSsdRegistry";
 import { importFile } from "./mutations/importFile";
 import { generateWastesRegistryExport } from "./mutations/generateWastesRegistryExport";

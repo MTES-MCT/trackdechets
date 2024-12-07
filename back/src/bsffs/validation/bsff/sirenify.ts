@@ -2,7 +2,7 @@ import {
   nextBuildSirenify,
   NextCompanyInputAccessor
 } from "../../../companies/sirenify";
-import { CompanyInput } from "../../../generated/graphql/types";
+import { CompanyInput } from "@td/codegen-back";
 import { ParsedZodBsff, ParsedZodBsffTransporter } from "./schema";
 import { ZodBsffTransporterTransformer } from "./types";
 

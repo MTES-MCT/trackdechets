@@ -1,7 +1,7 @@
 import { UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query, QueryBsdArgs } from "../../../../generated/graphql/types";
+import { Query, QueryBsdArgs } from "@td/codegen-back";
 import {
   formFactory,
   userFactory,

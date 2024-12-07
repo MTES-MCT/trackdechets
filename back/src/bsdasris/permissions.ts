@@ -1,5 +1,5 @@
 import { Bsdasri, BsdasriStatus, User } from "@prisma/client";
-import { BsdasriInput } from "../generated/graphql/types";
+import { BsdasriInput } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 import { ForbiddenError, UserInputError } from "../common/errors";
 

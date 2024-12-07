@@ -11,7 +11,7 @@ import {
   ImportPaperFormInput,
   TransporterInput,
   UpdateFormInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   Permission,
   checkUserPermissions,

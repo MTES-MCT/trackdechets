@@ -57,7 +57,7 @@ import {
   WasteDetails,
   WasteDetailsInput,
   WorkSite
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";

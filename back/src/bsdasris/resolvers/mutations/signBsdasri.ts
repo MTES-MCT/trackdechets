@@ -4,7 +4,7 @@ import {
   BsdasriSignatureType,
   BsdasriSignatureInput,
   SignatureAuthor
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import {
   Bsdasri,

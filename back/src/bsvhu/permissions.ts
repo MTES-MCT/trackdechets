@@ -1,5 +1,5 @@
 import { Bsvhu, BsvhuStatus, User } from "@prisma/client";
-import { BsvhuInput } from "../generated/graphql/types";
+import { BsvhuInput } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 
 /**

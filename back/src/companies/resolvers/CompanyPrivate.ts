@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { CompanyPrivateResolvers } from "../../generated/graphql/types";
+import { CompanyPrivateResolvers } from "@td/codegen-back";
 import { getCompanyUsers } from "../database";
 import { getUserRole, grants, toGraphQLPermission } from "../../permissions";
 import { toGqlNotifications } from "../../users/notifications";

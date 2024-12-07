@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { BsvhuInput, SignatureTypeInput } from "../../generated/graphql/types";
+import { BsvhuInput, SignatureTypeInput } from "@td/codegen-back";
 import { BSVHU_SIGNATURES_HIERARCHY } from "./constants";
 import { ZodBsvhu, ZodOperationEnum, ZodWasteCodeEnum } from "./schema";
 import { BsvhuUserFunctions, PrismaBsvhuForParsing } from "./types";
