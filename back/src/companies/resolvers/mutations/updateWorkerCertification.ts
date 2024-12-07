@@ -1,7 +1,7 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { removeEmptyKeys } from "../../../common/converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   MutationUpdateWorkerCertificationArgs,
   UpdateWorkerCertificationInput
 } from "@td/codegen-back";

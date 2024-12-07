@@ -1,7 +1,7 @@
 import { User, UserRole } from "@prisma/client";
 import { cachedGet } from "../common/redis";
 import { prisma } from "@td/prisma";
-import {
+import type {
   BsdaSignatureType,
   BsdasriSignatureType,
   BsffSignatureType,

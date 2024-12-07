@@ -6,7 +6,7 @@ import * as Excel from "exceljs";
 
 import { format as csvFormat } from "@fast-csv/format";
 
-import { DateFilter, WasteRegistryType } from "@td/codegen-back";
+import type { DateFilter, WasteRegistryType } from "@td/codegen-back";
 import { Upload } from "@aws-sdk/lib-storage";
 import { UserInputError } from "../../common/errors";
 import { pipeline, Readable } from "stream";

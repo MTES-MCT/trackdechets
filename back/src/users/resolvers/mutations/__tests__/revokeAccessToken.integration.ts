@@ -3,7 +3,7 @@ import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Mutation, MutationRevokeAccessTokenArgs } from "@td/codegen-back";
+import type { Mutation, MutationRevokeAccessTokenArgs } from "@td/codegen-back";
 
 const REVOKE_ACCESS_TOKEN = gql`
   mutation RevokeAccessToken($id: ID!) {

@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 
 import makeClient from "../../../../__tests__/testClient";
 import { companyDigestFactory } from "../../../__tests__/factories.companydigest";

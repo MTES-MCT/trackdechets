@@ -1,7 +1,7 @@
 import { estypes } from "@elastic/elasticsearch";
 import { Prisma } from "@prisma/client";
 import { removeEmptyKeys, safeInput } from "../common/converter";
-import {
+import type {
   DateFilter,
   StringFilter,
   IdFilter,

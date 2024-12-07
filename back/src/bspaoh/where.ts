@@ -2,7 +2,7 @@ import { Prisma, BspaohStatus } from "@prisma/client";
 
 import { safeInput } from "../common/converter";
 
-import { BspaohWhere } from "@td/codegen-back";
+import type { BspaohWhere } from "@td/codegen-back";
 import {
   toPrismaDateFilter,
   toPrismaStringFilter,

@@ -1,4 +1,4 @@
-import { BsdasriResolvers } from "@td/codegen-back";
+import type { BsdasriResolvers } from "@td/codegen-back";
 
 import grouping from "./bsdasris/grouping";
 import groupedIn from "./bsdasris/groupedIn";

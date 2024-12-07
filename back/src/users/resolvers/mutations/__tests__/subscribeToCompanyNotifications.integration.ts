@@ -5,7 +5,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
+import type {
   Mutation,
   MutationSubscribeToCompanyNotificationsArgs
 } from "@td/codegen-back";

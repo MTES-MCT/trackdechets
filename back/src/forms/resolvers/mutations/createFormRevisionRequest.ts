@@ -20,7 +20,7 @@ import {
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { WeightUnits, weight, v20241101 } from "../../../common/validation";
 import { prisma } from "@td/prisma";
-import {
+import type {
   FormRevisionRequestContentInput,
   MutationCreateFormRevisionRequestArgs
 } from "@td/codegen-back";

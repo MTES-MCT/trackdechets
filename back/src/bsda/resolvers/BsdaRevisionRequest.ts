@@ -1,4 +1,4 @@
-import {
+import type {
   BsdaRevisionRequest,
   BsdaRevisionRequestResolvers
 } from "@td/codegen-back";

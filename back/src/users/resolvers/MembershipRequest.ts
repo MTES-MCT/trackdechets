@@ -1,4 +1,4 @@
-import { MembershipRequestResolvers } from "@td/codegen-back";
+import type { MembershipRequestResolvers } from "@td/codegen-back";
 import { redactOrShowEmail } from "../utils";
 import { checkIsAuthenticated } from "../../common/permissions";
 

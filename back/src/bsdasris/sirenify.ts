@@ -3,7 +3,7 @@ import buildSirenify, {
   nextBuildSirenify,
   NextCompanyInputAccessor
 } from "../companies/sirenify";
-import { BsdasriInput, CompanyInput } from "@td/codegen-back";
+import type { BsdasriInput, CompanyInput } from "@td/codegen-back";
 
 const accessors = (input: BsdasriInput) => [
   {

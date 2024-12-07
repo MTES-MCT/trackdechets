@@ -3,7 +3,7 @@ import {
   QuantityType,
   Status
 } from "@prisma/client";
-import {
+import type {
   AppendixFormInput,
   InitialFormFractionInput,
   ParcelNumber

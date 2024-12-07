@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryRegistryImportArgs } from "@td/codegen-back";
+import type { QueryRegistryImportArgs } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";

@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import { getBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriRepository } from "../../repository";

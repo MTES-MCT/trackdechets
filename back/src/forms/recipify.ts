@@ -1,4 +1,4 @@
-import {
+import type {
   FormInput,
   ResealedFormInput,
   NextSegmentInfoInput,

@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Mutation, MutationToggleDormantCompanyArgs } from "@td/codegen-back";
+import type {
+  Mutation,
+  MutationToggleDormantCompanyArgs
+} from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { UserRole } from "@prisma/client";

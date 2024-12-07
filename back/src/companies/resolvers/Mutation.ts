@@ -1,4 +1,4 @@
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import createCompany from "./mutations/createCompany";
 import renewSecurityCode from "./mutations/renewSecurityCode";
 import updateCompany from "./mutations/updateCompany";

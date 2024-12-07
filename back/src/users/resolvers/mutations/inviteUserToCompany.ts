@@ -3,7 +3,7 @@ import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import {
   checkUserIsAdminOrPermissions,
   Permission

@@ -1,7 +1,7 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { ForbiddenError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { getApplicationOrApplicationNotFound } from "../../database";
 

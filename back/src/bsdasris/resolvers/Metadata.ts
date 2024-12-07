@@ -1,5 +1,8 @@
 import { Bsdasri } from "@prisma/client";
-import { BsdasriMetadata, BsdasriMetadataResolvers } from "@td/codegen-back";
+import type {
+  BsdasriMetadata,
+  BsdasriMetadataResolvers
+} from "@td/codegen-back";
 import { getBsdasriOrNotFound } from "../database";
 import { validateBsdasri, getRequiredFor } from "../validation";
 import { ValidationError } from "yup";

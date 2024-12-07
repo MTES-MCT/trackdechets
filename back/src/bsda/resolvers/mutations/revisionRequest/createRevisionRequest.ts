@@ -8,7 +8,7 @@ import { z } from "zod";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../../common/operationModes";
 import { checkIsAuthenticated } from "../../../../common/permissions";
-import {
+import type {
   BsdaRevisionRequestContentInput,
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-back";

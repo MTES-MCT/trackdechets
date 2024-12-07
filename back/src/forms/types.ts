@@ -8,7 +8,7 @@ import {
   OperationMode,
   EmitterType
 } from "@prisma/client";
-import { CiterneNotWashedOutReason, FormStatus } from "@td/codegen-back";
+import type { CiterneNotWashedOutReason, FormStatus } from "@td/codegen-back";
 
 export const FormWithTransportersInclude =
   Prisma.validator<Prisma.FormInclude>()({

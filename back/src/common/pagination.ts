@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { PageInfo } from "@td/codegen-back";
+import type { PageInfo } from "@td/codegen-back";
 import { UserInputError } from "./errors";
 
 const DEFAULT_PAGINATE_BY = 50;

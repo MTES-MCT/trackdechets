@@ -1,5 +1,5 @@
 import { nextBuildSirenify } from "../../../companies/sirenify";
-import { CompanyInput } from "@td/codegen-back";
+import type { CompanyInput } from "@td/codegen-back";
 import { ParsedZodBsffPackaging } from "./schema";
 import { ZodBsffPackagingTransformer } from "./types";
 

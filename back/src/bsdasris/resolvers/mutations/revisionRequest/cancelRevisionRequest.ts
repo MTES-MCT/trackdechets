@@ -1,6 +1,6 @@
 import { RevisionRequestStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../../common/permissions";
-import { MutationCancelBsdaRevisionRequestArgs } from "@td/codegen-back";
+import type { MutationCancelBsdaRevisionRequestArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../../types";
 import { getBsdasriRepository } from "../../../repository";
 import { Permission, can, getUserRoles } from "../../../../permissions";

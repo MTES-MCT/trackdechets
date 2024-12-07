@@ -3,7 +3,7 @@ import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { getCompanyActiveUsers } from "../../database";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import { deleteCachedUserRoles } from "../../../common/redis/users";
 import { UserInputError } from "../../../common/errors";
 import { toGqlCompanyPrivate } from "../../converters";

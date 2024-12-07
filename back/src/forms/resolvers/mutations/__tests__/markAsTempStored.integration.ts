@@ -11,7 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { CompanyType, Status, UserRole } from "@prisma/client";
-import { Mutation, MutationMarkAsTempStoredArgs } from "@td/codegen-back";
+import type { Mutation, MutationMarkAsTempStoredArgs } from "@td/codegen-back";
 import getReadableId from "../../../readableId";
 import { sendMail } from "../../../../mailer/mailing";
 import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";

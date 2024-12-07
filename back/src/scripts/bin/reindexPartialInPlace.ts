@@ -4,7 +4,7 @@ import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
 import { reindexPartialInPlace } from "../../bsds/indexation/reindexPartialInPlace";
 import { index } from "../../common/elastic";
-import { BsdType } from "@td/codegen-back";
+import type { BsdType } from "@td/codegen-back";
 import { closeQueues } from "../../queue/producers";
 
 const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];

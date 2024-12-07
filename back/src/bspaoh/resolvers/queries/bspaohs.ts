@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
-import { QueryBspaohsArgs } from "@td/codegen-back";
+import type { QueryBspaohsArgs } from "@td/codegen-back";
 import { toPrismaWhereInput } from "../../where";
 import { Permission, can, getUserRoles } from "../../../permissions";
 import { getBspaohRepository } from "../../repository";

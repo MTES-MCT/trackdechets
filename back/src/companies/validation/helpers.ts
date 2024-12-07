@@ -1,4 +1,4 @@
-import { PrivateCompanyInput } from "@td/codegen-back";
+import type { PrivateCompanyInput } from "@td/codegen-back";
 import { ZodCompany } from "./schema";
 
 export function companyInputToZodCompany(

@@ -6,7 +6,7 @@ import {
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import {
+import type {
   Mutation,
   MutationSignBsdaArgs,
   MutationUpdateBsdaArgs

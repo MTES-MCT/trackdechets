@@ -1,4 +1,4 @@
-import { QueryResolvers, QueryControlBsdsArgs } from "@td/codegen-back";
+import type { QueryResolvers, QueryControlBsdsArgs } from "@td/codegen-back";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
 

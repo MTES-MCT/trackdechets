@@ -1,5 +1,5 @@
 import { Bspaoh as PrismaBspaoh, User, BspaohStatus } from "@prisma/client";
-import { BspaohInput } from "@td/codegen-back";
+import type { BspaohInput } from "@td/codegen-back";
 
 import { Permission, checkUserPermissions } from "../permissions";
 

@@ -1,6 +1,6 @@
 import { flattenFormInput } from "../converter";
 import { nullIfNoValues, safeInput, chain } from "../../common/converter";
-import { FormInput, WasteDetailsInput } from "@td/codegen-back";
+import type { FormInput, WasteDetailsInput } from "@td/codegen-back";
 import { siretify } from "../../__tests__/factories";
 import { Prisma } from "@prisma/client";
 

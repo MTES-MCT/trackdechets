@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   MutationMarkSegmentAsReadyToTakeOverArgs,
   MutationTakeOverSegmentArgs,
   NextSegmentInfoInput,

@@ -4,7 +4,7 @@ import {
   GraphqlPaginationArgs,
   validateGqlPaginationArgs
 } from "../common/pagination";
-import { OrderType, WasteRegistryType } from "@td/codegen-back";
+import type { OrderType, WasteRegistryType } from "@td/codegen-back";
 
 function buildSort(
   registryType: Exclude<WasteRegistryType, "SSD">,

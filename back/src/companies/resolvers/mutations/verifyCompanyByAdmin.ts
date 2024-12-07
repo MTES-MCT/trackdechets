@@ -4,7 +4,7 @@ import {
 } from "@prisma/client";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   getCompanyAdminUsers,

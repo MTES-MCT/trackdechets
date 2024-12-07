@@ -6,7 +6,7 @@ import {
   EmptyReturnADR
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 import {
   formFactory,
   toIntermediaryCompany,

@@ -6,7 +6,7 @@ import {
   FormCompanyFields,
   TRANSPORT_MODE_LABELS
 } from "../../../common/pdf";
-import {
+import type {
   Form as GraphQLForm,
   FormCompany,
   InitialFormFraction,

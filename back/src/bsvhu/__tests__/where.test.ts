@@ -1,5 +1,5 @@
 import { BsvhuStatus } from "@prisma/client";
-import { BsvhuWhere } from "@td/codegen-back";
+import type { BsvhuWhere } from "@td/codegen-back";
 import { toPrismaWhereInput } from "../where";
 
 describe("Bsvhu where builder", () => {

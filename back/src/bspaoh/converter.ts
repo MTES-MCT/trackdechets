@@ -5,7 +5,7 @@ import {
   chain,
   undefinedOrDefault
 } from "../common/converter";
-import {
+import type {
   FormCompany,
   Signature,
   Bspaoh as GraphqlBspaoh,

@@ -3,7 +3,7 @@ import {
   parseQueryRegistryDelegationArgs,
   parseQueryRegistryDelegationsArgs
 } from "..";
-import { CreateRegistryDelegationInput } from "@td/codegen-back";
+import type { CreateRegistryDelegationInput } from "@td/codegen-back";
 import { startOfDay } from "../../../utils";
 
 describe("index", () => {

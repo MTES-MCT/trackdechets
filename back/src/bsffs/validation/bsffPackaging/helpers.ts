@@ -4,7 +4,7 @@ import { BsffPackagingSignatureType } from "./types";
 import { BSFF_PACKAGING_SIGNATURES_HIERARCHY } from "./constants";
 import { ZodOperationEnum, ZodWasteCodeEnum } from "../bsff/schema";
 import { BsffPackaging } from "@prisma/client";
-import { UpdateBsffPackagingInput } from "@td/codegen-back";
+import type { UpdateBsffPackagingInput } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 import { safeInput } from "../../../common/converter";
 

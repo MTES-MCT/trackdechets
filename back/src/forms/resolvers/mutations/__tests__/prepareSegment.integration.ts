@@ -10,7 +10,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 import { CompanyType } from "@prisma/client";
 
 jest.mock("axios", () => ({

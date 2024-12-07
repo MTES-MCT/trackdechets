@@ -6,7 +6,10 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation, MutationUpdateFormTransporterArgs } from "@td/codegen-back";
+import type {
+  Mutation,
+  MutationUpdateFormTransporterArgs
+} from "@td/codegen-back";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { getFirstTransporter } from "../../../database";

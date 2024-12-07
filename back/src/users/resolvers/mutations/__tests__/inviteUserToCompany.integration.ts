@@ -8,7 +8,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
 import { templateIds } from "@td/mail";

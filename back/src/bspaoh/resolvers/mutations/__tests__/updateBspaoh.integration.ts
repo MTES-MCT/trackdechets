@@ -1,6 +1,6 @@
 import { TransportMode, UserRole, BspaohStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Mutation, MutationUpdateBspaohArgs } from "@td/codegen-back";
+import type { Mutation, MutationUpdateBspaohArgs } from "@td/codegen-back";
 import {
   siretify,
   userWithCompanyFactory,

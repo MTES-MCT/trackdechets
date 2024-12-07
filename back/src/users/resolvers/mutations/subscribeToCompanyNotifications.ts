@@ -3,7 +3,10 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { NotCompanyMember, UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { MutationResolvers, UserNotificationsInput } from "@td/codegen-back";
+import type {
+  MutationResolvers,
+  UserNotificationsInput
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../../companies/converters";
 import {

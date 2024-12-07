@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import { objectDiff } from "../../forms/workflow/diff";
-import {
+import type {
   BsdaInput,
   BsdaPackaging,
   BsdaTransporterInput

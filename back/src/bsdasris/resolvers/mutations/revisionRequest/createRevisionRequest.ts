@@ -8,7 +8,7 @@ import {
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 
 import { checkIsAuthenticated } from "../../../../common/permissions";
-import {
+import type {
   BsdasriRevisionRequestContentInput,
   MutationCreateBsdasriRevisionRequestArgs
 } from "@td/codegen-back";

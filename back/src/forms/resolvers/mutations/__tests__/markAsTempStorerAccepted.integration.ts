@@ -15,7 +15,7 @@ import {
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
-import {
+import type {
   Mutation,
   MutationMarkAsTempStorerAcceptedArgs
 } from "@td/codegen-back";

@@ -1,6 +1,6 @@
 import { BsffTransporter, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { getBsffTransporterOrNotFound, getTransporters } from "../../database";
 import { checkCanUpdateBsffTransporter } from "../../permissions";

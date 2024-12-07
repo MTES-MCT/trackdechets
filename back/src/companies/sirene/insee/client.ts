@@ -11,7 +11,7 @@ import {
   SiretNotFoundError
 } from "../errors";
 import { format } from "date-fns";
-import {
+import type {
   EtatAdministratif,
   StatutDiffusionEtablissement
 } from "@td/codegen-back";

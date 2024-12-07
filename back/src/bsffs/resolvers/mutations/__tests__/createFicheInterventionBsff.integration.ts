@@ -1,6 +1,6 @@
 import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   BsffFicheInterventionInput,
   Mutation,
   MutationCreateFicheInterventionBsffArgs

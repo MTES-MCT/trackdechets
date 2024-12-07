@@ -6,7 +6,7 @@ import {
   TransporterReceipt
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { VhuAgrement } from "@td/codegen-back";
+import type { VhuAgrement } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 
 export async function checkCanReadUpdateDeleteTraderReceipt(

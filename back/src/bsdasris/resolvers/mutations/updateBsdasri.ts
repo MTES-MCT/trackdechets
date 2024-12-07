@@ -1,6 +1,6 @@
 import { BsdasriType } from "@prisma/client";
 
-import {
+import type {
   ResolversParentTypes,
   MutationUpdateBsdasriArgs
 } from "@td/codegen-back";

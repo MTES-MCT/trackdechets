@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import { nowPlusXHours } from "../../../../utils";
 import { registryDelegationFactory } from "../../../__tests__/factories";
 import { getDelegation } from "../../queries/__tests__/registryDelegation.integration";
-import { RegistryDelegationStatus } from "@td/codegen-back";
+import type { RegistryDelegationStatus } from "@td/codegen-back";
 
 describe("status", () => {
   it.each([

@@ -1,4 +1,4 @@
-import { MutationResolvers, QueryResolvers } from "@td/codegen-back";
+import type { MutationResolvers, QueryResolvers } from "@td/codegen-back";
 
 import bsvhu from "./queries/bsvhu";
 import bsvhuPdf from "./queries/bsvhuPdf";

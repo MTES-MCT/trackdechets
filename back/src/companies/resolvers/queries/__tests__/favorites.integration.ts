@@ -8,7 +8,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 import {
   indexFavorites,
   favoritesConstrutor

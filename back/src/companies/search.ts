@@ -19,7 +19,7 @@ import { removeEmptyKeys } from "../common/converter";
 import { UserInputError } from "../common/errors";
 import { SearchOptions } from "./sirene/trackdechets/types";
 import { Company } from "@prisma/client";
-import {
+import type {
   CompanySearchResult,
   StatutDiffusionEtablissement
 } from "@td/codegen-back";

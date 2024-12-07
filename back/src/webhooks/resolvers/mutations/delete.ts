@@ -1,4 +1,4 @@
-import {
+import type {
   MutationDeleteWebhookSettingArgs,
   ResolversParentTypes
 } from "@td/codegen-back";

@@ -1,7 +1,7 @@
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import { CompanySearchResult, Mutation } from "@td/codegen-back";
+import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { gql } from "graphql-tag";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@td/prisma";

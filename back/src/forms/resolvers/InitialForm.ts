@@ -1,4 +1,4 @@
-import { InitialFormResolvers } from "@td/codegen-back";
+import type { InitialFormResolvers } from "@td/codegen-back";
 import { isFormReader } from "../permissions";
 
 const initialFormResolvers: InitialFormResolvers = {

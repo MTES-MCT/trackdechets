@@ -1,4 +1,4 @@
-import { WasteDetailsResolvers } from "@td/codegen-back";
+import type { WasteDetailsResolvers } from "@td/codegen-back";
 
 const wasteDetailsResolvers: WasteDetailsResolvers = {
   packagingInfos: parent => parent.packagingInfos || []
