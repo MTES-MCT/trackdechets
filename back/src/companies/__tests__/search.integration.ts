@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory, siretify } from "../../__tests__/factories";
 import { makeSearchCompanies, searchCompany } from "../search";
 import { SireneSearchResult } from "../sirene/types";
-import { CompanySearchResult } from "../types";
+import { CompanySearchResult } from "@td/codegen-back";
 
 const mockSearchCompanyBackend = jest.fn();
 jest.mock("../sirene/searchCompany", () => ({
@@ -72,7 +72,8 @@ describe("searchCompanies(clue, department, allowForeignCompanies) }", () => {
       naf: "6201Z",
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O",
-      codePaysEtrangerEtablissement: undefined
+      codePaysEtrangerEtablissement: undefined,
+      isDormant: false
     } as CompanySearchResult);
 
     const companies = await searchCompanies(company.orgId!);
@@ -103,7 +104,8 @@ describe("searchCompanies(clue, department, allowForeignCompanies) }", () => {
       naf: "6201Z",
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O",
-      codePaysEtrangerEtablissement: undefined
+      codePaysEtrangerEtablissement: undefined,
+      isDormant: false
     } as CompanySearchResult);
 
     const companies = await searchCompanies(siret);
