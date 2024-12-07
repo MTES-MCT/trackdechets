@@ -1,6 +1,6 @@
 import * as React from "react";
 import { formatDate } from "../../../common/pdf";
-import { Bsda } from "@td/codegen-back";
+import type { Bsda } from "@td/codegen-back";
 
 type Props = { previousBsdas: Bsda[] };
 export function TraceabilityTable({ previousBsdas }: Props) {

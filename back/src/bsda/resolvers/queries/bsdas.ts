@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryBsdasArgs } from "@td/codegen-back";
+import type { QueryBsdasArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";

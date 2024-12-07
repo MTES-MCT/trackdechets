@@ -5,7 +5,7 @@ import {
   isSiret,
   cleanClue
 } from "@td/constants";
-import { FormCompanyResolvers } from "@td/codegen-back";
+import type { FormCompanyResolvers } from "@td/codegen-back";
 
 const formCompanyResolvers: FormCompanyResolvers = {
   country: parent => {

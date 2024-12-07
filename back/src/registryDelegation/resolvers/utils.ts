@@ -2,7 +2,7 @@ import { prisma } from "@td/prisma";
 import { UserInputError } from "../../common/errors";
 import { getRegistryDelegationRepository } from "../repository";
 import { Company, Prisma, RegistryDelegation } from "@prisma/client";
-import { RegistryDelegationStatus } from "@td/codegen-back";
+import type { RegistryDelegationStatus } from "@td/codegen-back";
 import { endOfDay, inXDays, todayAtMidnight } from "../../utils";
 
 export const findDelegateAndDelegatorOrThrow = async (

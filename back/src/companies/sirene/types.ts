@@ -1,4 +1,4 @@
-import { StatutDiffusionEtablissement } from "@td/codegen-back";
+import type { StatutDiffusionEtablissement } from "@td/codegen-back";
 
 /**
  * Interface des résultats sur la base Sirene INSEE

@@ -1,4 +1,4 @@
-import { FormResolvers } from "@td/codegen-back";
+import type { FormResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 
 const intermediaryCompaniesResolver: FormResolvers["intermediaries"] =

@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { BsdWhere } from "@td/codegen-back";
+import type { BsdWhere } from "@td/codegen-back";
 import { GET_BSDS_ACTOR_MAX_LENGTH } from "@td/constants";
 import { z } from "zod";
 

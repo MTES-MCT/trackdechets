@@ -1,7 +1,7 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import { getConnection } from "../../../common/pagination";
-import { QueryResolvers } from "@td/codegen-back";
+import type { QueryResolvers } from "@td/codegen-back";
 import { getWebhookSettingRepository } from "../../repository";
 import { formatWebhookSettingFromDB } from "../../converter";
 import { getUserWebhookCompanyOrgIds } from "../../database";

@@ -2,7 +2,7 @@ import { Prisma, User } from "@prisma/client";
 import { ParsedZodBsff, ParsedZodBsffTransporter } from "./schema";
 import { RefinementCtx } from "zod";
 import { MultiModalSignatureType } from "../../../common/types";
-import { BsffSignatureType } from "@td/codegen-back";
+import type { BsffSignatureType } from "@td/codegen-back";
 
 export type BsffUserFunctions = {
   isEmitter: boolean;

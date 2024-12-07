@@ -9,7 +9,7 @@ import { redisClient } from "../common/redis";
 import { formPdfDownloadHandler } from "../forms/resolvers/queries/formPdf";
 import { wastesRegistryCsvDownloadHandler } from "../registry/resolvers/queries/wastesRegistryCsv";
 import { wastesRegistryXlsDownloadHandler } from "../registry/resolvers/queries/wastesRegistryXls";
-import {
+import type {
   Query,
   QueryBsdaPdfArgs,
   QueryBsdasriPdfArgs,

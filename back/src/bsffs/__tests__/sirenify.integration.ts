@@ -1,7 +1,7 @@
 import { CompanySearchResult } from "../../companies/types";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { searchCompany } from "../../companies/search";
-import {
+import type {
   BsffFicheInterventionInput,
   BsffInput,
   UpdateBsffPackagingInput

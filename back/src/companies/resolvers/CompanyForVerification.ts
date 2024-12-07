@@ -1,4 +1,4 @@
-import { CompanyForVerificationResolvers } from "@td/codegen-back";
+import type { CompanyForVerificationResolvers } from "@td/codegen-back";
 
 const companyForVerificationResolvers: CompanyForVerificationResolvers = {
   admin: async (parent, _, context) => {

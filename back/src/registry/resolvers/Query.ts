@@ -1,4 +1,4 @@
-import { QueryResolvers } from "@td/codegen-back";
+import type { QueryResolvers } from "@td/codegen-back";
 import incomingWastes from "./queries/incomingWastes";
 import outgoingWastes from "./queries/outgoingWastes";
 import transportedWastes from "./queries/transportedWastes";

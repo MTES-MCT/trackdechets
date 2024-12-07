@@ -1,4 +1,4 @@
-import { QueryResolvers } from "@td/codegen-back";
+import type { QueryResolvers } from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { createAccessToken } from "../../database";

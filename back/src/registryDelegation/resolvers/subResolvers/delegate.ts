@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import {
+import type {
   RegistryDelegation,
   RegistryDelegationResolvers
 } from "@td/codegen-back";

@@ -34,7 +34,7 @@ import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
 import { getBspaohForElastic, indexBspaoh } from "../../../../bspaoh/elastic";
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 import {
   formFactory,
   siretify,

@@ -1,6 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { BsvhuInput, MutationCreateBsvhuArgs } from "@td/codegen-back";
+import type { BsvhuInput, MutationCreateBsvhuArgs } from "@td/codegen-back";
 
 import { GraphQLContext } from "../../../types";
 import {

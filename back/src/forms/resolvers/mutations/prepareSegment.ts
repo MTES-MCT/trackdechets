@@ -1,4 +1,4 @@
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import { prepareSegment } from "./multiModal";
 
 const prepareSegmentResolver: MutationResolvers["prepareSegment"] = (

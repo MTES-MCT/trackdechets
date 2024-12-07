@@ -3,7 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bspaohFactory } from "../../../__tests__/factories";
-import { Mutation, MutationDeleteBspaohArgs } from "@td/codegen-back";
+import type { Mutation, MutationDeleteBspaohArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { BspaohStatus } from "@prisma/client";
 

@@ -4,7 +4,7 @@ import { AuthType } from "../../../../auth";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { hashToken } from "../../../../utils";
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 
 describe("{ query { apiKey } }", () => {
   afterAll(() => resetDatabase());

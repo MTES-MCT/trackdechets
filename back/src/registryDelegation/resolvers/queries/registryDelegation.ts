@@ -1,6 +1,6 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryResolvers, RegistryDelegation } from "@td/codegen-back";
+import type { QueryResolvers, RegistryDelegation } from "@td/codegen-back";
 import { checkCanAccess } from "../../permissions";
 import { parseQueryRegistryDelegationArgs } from "../../validation";
 import { fixTyping } from "../typing";

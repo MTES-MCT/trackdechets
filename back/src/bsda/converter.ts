@@ -7,7 +7,7 @@ import {
   processDecimal
 } from "../common/converter";
 
-import {
+import type {
   FormCompany,
   Signature,
   Bsda as GraphqlBsda,

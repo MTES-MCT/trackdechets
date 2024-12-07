@@ -8,7 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 
 const MEMBERSHIP_REQUEST = `
   query MembershipRequest($id: ID, $siret: String) {

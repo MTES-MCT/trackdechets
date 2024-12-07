@@ -1,5 +1,5 @@
 import { gql } from "graphql-tag";
-import { Query, QueryFormArgs } from "@td/codegen-back";
+import type { Query, QueryFormArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import makeClient from "../../../../__tests__/testClient";
 import { prepareDB } from "../../../__tests__/helpers";

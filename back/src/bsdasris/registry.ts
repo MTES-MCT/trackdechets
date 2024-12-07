@@ -1,7 +1,7 @@
 import { Bsdasri } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import {
+import type {
   AllWaste,
   IncomingWaste,
   ManagedWaste,

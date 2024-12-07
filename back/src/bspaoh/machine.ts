@@ -1,6 +1,6 @@
 import { Bspaoh, BspaohStatus } from "@prisma/client";
 import { createMachine } from "xstate";
-import { BspaohSignatureType } from "@td/codegen-back";
+import type { BspaohSignatureType } from "@td/codegen-back";
 
 export enum EventType {
   ProducerSignature,

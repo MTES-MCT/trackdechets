@@ -1,5 +1,5 @@
 import { BsdasriType, BsdaType, BsffType, EmitterType } from "@prisma/client";
-import { BsdSubType } from "@td/codegen-back";
+import type { BsdSubType } from "@td/codegen-back";
 
 // !!! WARNING !!!
 // If you modify these functions, you'll need to re-index the BSDs in ES,

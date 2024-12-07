@@ -1,5 +1,5 @@
 import React from "react";
-import { BspaohPackaging } from "@td/codegen-back";
+import type { BspaohPackaging } from "@td/codegen-back";
 
 const PACKAGINGS_NAMES = {
   RELIQUAIRE: "Reliquaire",

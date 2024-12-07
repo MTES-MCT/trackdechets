@@ -1,7 +1,7 @@
 import { Bsdasri, BsdasriStatus, BsdasriType, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import {
+import type {
   MutationDuplicateBsdasriArgs,
   MutationResolvers
 } from "@td/codegen-back";

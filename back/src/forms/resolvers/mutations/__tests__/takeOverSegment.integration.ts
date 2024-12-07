@@ -8,7 +8,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { gql } from "graphql-tag";
-import { Mutation, MutationTakeOverSegmentArgs } from "@td/codegen-back";
+import type { Mutation, MutationTakeOverSegmentArgs } from "@td/codegen-back";
 
 jest.mock("axios", () => ({
   default: {

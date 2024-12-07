@@ -1,7 +1,7 @@
 import { Company } from "@prisma/client";
 import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryResolvers } from "@td/codegen-back";
+import type { QueryResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { AuthType } from "../../../auth";
 import {

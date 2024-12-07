@@ -3,7 +3,7 @@ import { prisma } from "@td/prisma";
 import { companyFactory } from "../../../../__tests__/factories";
 import { getUserCompanies } from "../../../database";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 import { UserRole } from "@prisma/client";
 import { getDefaultNotifications } from "../../../notifications";
 

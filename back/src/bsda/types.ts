@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { BsdaSignatureType } from "@td/codegen-back";
+import type { BsdaSignatureType } from "@td/codegen-back";
 import { MultiModalSignatureType } from "../common/types";
 
 export const BsdaWithTransportersInclude =

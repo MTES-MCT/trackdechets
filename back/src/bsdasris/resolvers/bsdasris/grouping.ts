@@ -1,4 +1,4 @@
-import { BsdasriResolvers } from "@td/codegen-back";
+import type { BsdasriResolvers } from "@td/codegen-back";
 
 import { BsdasriType } from "@prisma/client";
 import { expandGroupingDasri } from "../../converter";

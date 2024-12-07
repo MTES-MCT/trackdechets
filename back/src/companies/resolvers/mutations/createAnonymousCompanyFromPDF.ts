@@ -2,7 +2,7 @@ import * as yup from "yup";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   CreateAnonymousCompanyFromPdfInput,
   MutationResolvers
 } from "@td/codegen-back";

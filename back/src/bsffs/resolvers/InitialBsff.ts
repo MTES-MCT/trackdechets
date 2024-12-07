@@ -1,4 +1,4 @@
-import { BsffResolvers } from "@td/codegen-back";
+import type { BsffResolvers } from "@td/codegen-back";
 import { checkCanRead } from "../permissions";
 import { Bsff } from "./Bsff";
 import { getReadonlyBsffRepository } from "../repository";

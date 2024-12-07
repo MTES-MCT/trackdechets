@@ -5,7 +5,7 @@ import { associateUserToCompany } from "../../../database";
 import { app } from "../../../../server";
 import makeClient from "../../../../__tests__/testClient";
 import gql from "graphql-tag";
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 import { parseString } from "@fast-csv/parse";
 import { formatDate, formatRole } from "../../../export/columns";
 

@@ -12,7 +12,11 @@ import {
   userAccountHashToCompanyMember,
   userAssociationToCompanyMember
 } from "../../../companies/database";
-import { CompanyMember, MutationResolvers, UserRole } from "@td/codegen-back";
+import type {
+  CompanyMember,
+  MutationResolvers,
+  UserRole
+} from "@td/codegen-back";
 import {
   checkUserIsAdminOrPermissions,
   Permission

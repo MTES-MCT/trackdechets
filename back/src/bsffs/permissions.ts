@@ -5,7 +5,7 @@ import {
   BsffStatus,
   BsffTransporter
 } from "@prisma/client";
-import {
+import type {
   BsffFicheInterventionInput,
   BsffInput,
   BsffTransporterInput

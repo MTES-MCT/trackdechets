@@ -1,7 +1,7 @@
 import { AuthType } from "../auth";
 import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
-import {
+import type {
   CompanySearchResult,
   CompanyInput,
   StatutDiffusionEtablissement

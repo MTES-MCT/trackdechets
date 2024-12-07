@@ -1,7 +1,7 @@
 import { Bspaoh, BspaohStatus, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import {
+import type {
   MutationDuplicateBspaohArgs,
   MutationResolvers
 } from "@td/codegen-back";

@@ -5,7 +5,10 @@ import {
 } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query, QueryCompaniesForVerificationArgs } from "@td/codegen-back";
+import type {
+  Query,
+  QueryCompaniesForVerificationArgs
+} from "@td/codegen-back";
 import {
   userFactory,
   userWithCompanyFactory

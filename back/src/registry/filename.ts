@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { WasteRegistryType } from "@td/codegen-back";
+import type { WasteRegistryType } from "@td/codegen-back";
 
 export function getRegistryFileName(
   registryType: WasteRegistryType,

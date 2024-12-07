@@ -1,6 +1,6 @@
 import { estypes } from "@elastic/elasticsearch";
 import { BsdElastic, client, groupByBsdType, index } from "../common/elastic";
-import {
+import type {
   OrderType,
   WasteRegistryType,
   WasteRegistryWhere

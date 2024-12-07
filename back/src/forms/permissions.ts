@@ -6,7 +6,7 @@ import {
   Status,
   User
 } from "@prisma/client";
-import {
+import type {
   CreateFormInput,
   ImportPaperFormInput,
   TransporterInput,

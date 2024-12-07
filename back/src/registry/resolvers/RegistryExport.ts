@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { RegistryExportResolvers } from "@td/codegen-back";
+import type { RegistryExportResolvers } from "@td/codegen-back";
 import { GraphQLContext } from "../../types";
 
 export const RegistryExport: RegistryExportResolvers<

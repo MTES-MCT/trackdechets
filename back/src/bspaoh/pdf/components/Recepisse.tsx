@@ -1,6 +1,6 @@
 import * as React from "react";
 import { formatDate } from "../../../common/pdf";
-import { BspaohRecepisse } from "@td/codegen-back";
+import type { BspaohRecepisse } from "@td/codegen-back";
 
 type Props = { readonly recepisse: BspaohRecepisse | null | undefined };
 

@@ -1,6 +1,6 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   MutationCreateRegistryDelegationArgs,
   ResolversParentTypes,
   RegistryDelegation

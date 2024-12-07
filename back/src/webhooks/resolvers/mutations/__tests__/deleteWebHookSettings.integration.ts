@@ -5,7 +5,7 @@ import {
   companyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 import { gql } from "graphql-tag";
 import { webhookSettingFactory } from "../../../__tests__/factories";
 import {

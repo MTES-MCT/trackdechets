@@ -1,6 +1,6 @@
 import { Bsvhu } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
-import {
+import type {
   AllWaste,
   IncomingWaste,
   ManagedWaste,

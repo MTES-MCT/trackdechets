@@ -1,4 +1,4 @@
-import { FormResolvers } from "@td/codegen-back";
+import type { FormResolvers } from "@td/codegen-back";
 import { expandFormFromDb } from "../../converter";
 
 const groupedInResolver: FormResolvers["groupedIn"] = async (

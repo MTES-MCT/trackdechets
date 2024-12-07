@@ -11,7 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { ErrorCode } from "../../../../common/errors";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 const UPDATE_DASRI = `
 mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {

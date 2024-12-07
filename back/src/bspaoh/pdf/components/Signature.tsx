@@ -1,6 +1,6 @@
 import * as React from "react";
 import { formatDateTime, SignatureStamp } from "../../../common/pdf";
-import { Signature as SignatureType } from "@td/codegen-back";
+import type { Signature as SignatureType } from "@td/codegen-back";
 
 type SignatureProps = {
   readonly signature: SignatureType | null | undefined;

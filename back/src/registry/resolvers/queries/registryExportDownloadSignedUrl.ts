@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { getSignedUrlForDownload } from "@td/registry";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryRegistryExportDownloadSignedUrlArgs } from "@td/codegen-back";
+import type { QueryRegistryExportDownloadSignedUrlArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { ForbiddenError } from "../../../common/errors";
 import { getRegistryFileName } from "../../filename";

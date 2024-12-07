@@ -15,7 +15,7 @@ import {
   safeInput,
   undefinedOrDefault
 } from "../common/converter";
-import {
+import type {
   InitialForm,
   Broker,
   BrokerInput,

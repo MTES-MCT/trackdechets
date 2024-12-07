@@ -12,7 +12,7 @@ import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import { randomNumber } from "../../../utils";
 import { renderMail, verificationProcessInfo } from "@td/mail";
 import { deleteCachedUserRoles } from "../../../common/redis/users";

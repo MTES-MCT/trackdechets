@@ -1,6 +1,6 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationAddSignatureAutomationArgs } from "@td/codegen-back";
+import type { MutationAddSignatureAutomationArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import { getCompanyOrCompanyNotFound } from "../../database";

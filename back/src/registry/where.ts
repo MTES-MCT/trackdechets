@@ -1,7 +1,7 @@
 import { estypes } from "@elastic/elasticsearch";
 import { BsdElastic } from "../common/elastic";
 import { toElasticDateQuery, toElasticStringQuery } from "../common/where";
-import {
+import type {
   BsdTypeFilter,
   DateFilter,
   IdFilter,

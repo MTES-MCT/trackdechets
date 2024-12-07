@@ -4,7 +4,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { sendMail } from "../../../../mailer/mailing";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { renderMail, onSignup } from "@td/mail";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 import makeClient from "../../../../__tests__/testClient";
 
 const viablePassword = "trackdechets#";

@@ -1,5 +1,5 @@
 import { UserInputError } from "../../../common/errors";
-import {
+import type {
   MutationCreateBsdasriArgs,
   ResolversParentTypes
 } from "@td/codegen-back";

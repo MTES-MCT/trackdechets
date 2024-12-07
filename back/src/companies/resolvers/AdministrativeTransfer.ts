@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import {
+import type {
   AdministrativeTransfer,
   AdministrativeTransferResolvers
 } from "@td/codegen-back";

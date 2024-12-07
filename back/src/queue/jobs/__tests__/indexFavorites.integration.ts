@@ -14,7 +14,7 @@ import { favoritesConstrutor } from "../indexFavorites";
 import { getFormForElastic, indexForm } from "../../../forms/elastic";
 import { index, client as elasticSearch } from "../../../common/elastic";
 import makeClient from "../../../__tests__/testClient";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 
 const mockUpdateFavorites = jest.fn();
 const mockGetUpdatedCompanyNameAndAddress = jest.fn();

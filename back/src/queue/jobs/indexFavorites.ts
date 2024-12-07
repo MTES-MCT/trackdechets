@@ -9,7 +9,7 @@ import {
   mergeCompanyToCompanySearchResult,
   searchCompany
 } from "../../companies/search";
-import {
+import type {
   CompanySearchResult,
   FavoriteType,
   StatutDiffusionEtablissement

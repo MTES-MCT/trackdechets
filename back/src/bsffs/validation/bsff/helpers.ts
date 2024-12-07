@@ -8,7 +8,7 @@ import {
 import { getUserCompanies } from "../../../users/database";
 import { BSFF_SIGNATURES_HIERARCHY } from "./constants";
 import { flattenBsffInput, flattenBsffTransporterInput } from "../../converter";
-import { BsffInput, BsffTransporterInput } from "@td/codegen-back";
+import type { BsffInput, BsffTransporterInput } from "@td/codegen-back";
 import { safeInput } from "../../../common/converter";
 import {
   BsffUserFunctions,

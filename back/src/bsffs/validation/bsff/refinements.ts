@@ -29,7 +29,7 @@ import {
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { OPERATION } from "../../constants";
-import { BsffOperationCode } from "@td/codegen-back";
+import type { BsffOperationCode } from "@td/codegen-back";
 import {
   isDestinationRefinement,
   isEmitterNotDormantRefinement,

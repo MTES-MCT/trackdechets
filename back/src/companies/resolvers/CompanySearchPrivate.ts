@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { CompanySearchPrivateResolvers } from "@td/codegen-back";
+import type { CompanySearchPrivateResolvers } from "@td/codegen-back";
 import { CompanyBaseIdentifiers } from "../types";
 import { whereSiretOrVatNumber } from "./CompanySearchResult";
 import { getUserRoles } from "../../permissions";

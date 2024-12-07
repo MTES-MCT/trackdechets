@@ -1,4 +1,4 @@
-import { QueryResolvers } from "@td/codegen-back";
+import type { QueryResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";

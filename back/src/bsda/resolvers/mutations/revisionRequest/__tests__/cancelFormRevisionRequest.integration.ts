@@ -1,6 +1,6 @@
 import { RevisionRequestStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationCancelBsdaRevisionRequestArgs
 } from "@td/codegen-back";

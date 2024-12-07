@@ -1,6 +1,6 @@
 import { logger } from "@td/logger";
 import { client, BsdIndexationConfig } from "../../common/elastic";
-import { BsdType } from "@td/codegen-back";
+import type { BsdType } from "@td/codegen-back";
 import { indexAllBsds } from "./bulkIndexBsds";
 
 /**

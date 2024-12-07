@@ -1,4 +1,4 @@
-import { MutationResolvers } from "@td/codegen-back";
+import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { checkCanUpdate } from "../../permissions";

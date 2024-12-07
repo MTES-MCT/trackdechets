@@ -8,7 +8,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth";
 import { TEST_COMPANY_PREFIX } from "@td/constants";
 import { prisma } from "@td/prisma";
-import { Query } from "@td/codegen-back";
+import type { Query } from "@td/codegen-back";
 
 import {
   companyFactory,

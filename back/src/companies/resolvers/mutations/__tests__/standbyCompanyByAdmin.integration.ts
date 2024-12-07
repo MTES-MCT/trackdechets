@@ -5,7 +5,7 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 import makeClient from "../../../../__tests__/testClient";
 
 const STANDBY_COMPANY_BY_ADMIN = gql`

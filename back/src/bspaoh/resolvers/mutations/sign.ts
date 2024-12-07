@@ -19,7 +19,7 @@ import {
 import { checkIsAuthenticated } from "../../../common/permissions";
 
 import { InvalidTransition } from "../../../forms/errors";
-import {
+import type {
   BspaohSignatureInput,
   BspaohSignatureType,
   MutationResolvers,

@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Mutation, MutationCreateAnonymousCompanyArgs } from "@td/codegen-back";
+import type {
+  Mutation,
+  MutationCreateAnonymousCompanyArgs
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { siretify, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";

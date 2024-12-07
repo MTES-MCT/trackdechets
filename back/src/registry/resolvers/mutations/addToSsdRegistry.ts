@@ -1,5 +1,5 @@
+import type { MutationAddToSsdRegistryArgs } from "@td/codegen-back";
 import { importOptions } from "@td/registry";
-import { MutationAddToSsdRegistryArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { genericAddToRegistry } from "./genericAddToRegistry";
 

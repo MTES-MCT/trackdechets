@@ -1,4 +1,4 @@
-import { BspaohInput, BspaohSignatureType } from "@td/codegen-back";
+import type { BspaohInput, BspaohSignatureType } from "@td/codegen-back";
 import { User } from "@prisma/client";
 import {
   getSignatureAncestors,

@@ -15,7 +15,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { renderMail, verificationDone } from "@td/mail";
-import { Mutation } from "@td/codegen-back";
+import type { Mutation } from "@td/codegen-back";
 
 const VERIFY_COMPANY = gql`
   mutation VerifyCompany($input: VerifyCompanyInput!) {

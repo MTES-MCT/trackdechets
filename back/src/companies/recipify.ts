@@ -1,4 +1,4 @@
-import { CompanyInput, BsdasriRecepisseInput } from "@td/codegen-back";
+import type { CompanyInput, BsdasriRecepisseInput } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   Bsdasri,

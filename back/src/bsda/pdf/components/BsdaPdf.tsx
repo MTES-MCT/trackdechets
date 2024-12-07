@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Document, formatDate, FormCompanyFields } from "../../../common/pdf";
-import { Bsda } from "@td/codegen-back";
+import type { Bsda } from "@td/codegen-back";
 import { PickupSite } from "./PickupSite";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { WasteDescription } from "./WasteDescription";

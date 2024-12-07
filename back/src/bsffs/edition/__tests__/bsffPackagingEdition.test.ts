@@ -1,5 +1,5 @@
 import { BsffPackaging } from "@prisma/client";
-import {
+import type {
   BsffPackagingAcceptationInput,
   BsffPackagingNextDestinationInput,
   BsffPackagingOperationInput,

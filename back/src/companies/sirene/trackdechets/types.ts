@@ -1,4 +1,4 @@
-import { StatutDiffusionEtablissement } from "@td/codegen-back";
+import type { StatutDiffusionEtablissement } from "@td/codegen-back";
 
 export interface SearchStockEtablissement {
   siren: string;

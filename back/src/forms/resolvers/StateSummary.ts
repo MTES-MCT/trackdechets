@@ -1,4 +1,4 @@
-import { StateSummaryResolvers } from "@td/codegen-back";
+import type { StateSummaryResolvers } from "@td/codegen-back";
 
 const stateSummaryResolvers: StateSummaryResolvers = {
   packagingInfos: parent => parent.packagingInfos || [],
