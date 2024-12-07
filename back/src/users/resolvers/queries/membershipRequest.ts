@@ -1,7 +1,7 @@
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyAdminUsers } from "../../../companies/database";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { getMembershipRequestOrNotFoundError } from "../../database";
 

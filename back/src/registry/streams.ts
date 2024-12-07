@@ -1,8 +1,5 @@
 import { Readable, ReadableOptions, Transform } from "stream";
-import {
-  WasteRegistryType,
-  WasteRegistryWhere
-} from "../generated/graphql/types";
+import { WasteRegistryType, WasteRegistryWhere } from "@td/codegen-back";
 import { formatRow } from "./columns";
 import { GenericWaste } from "./types";
 import getWasteConnection from "./wastes";

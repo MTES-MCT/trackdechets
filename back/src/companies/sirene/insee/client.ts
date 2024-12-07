@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import {
   EtatAdministratif,
   StatutDiffusionEtablissement
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 const SIRENE_API_BASE_URL = "https://api.insee.fr/api-sirene/prive/3.11";
 

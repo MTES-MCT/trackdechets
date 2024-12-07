@@ -1,7 +1,7 @@
 import {
   FormRevisionRequest,
   FormRevisionRequestResolvers
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   expandBsddRevisionRequestContent,

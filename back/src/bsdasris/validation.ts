@@ -14,10 +14,7 @@ import {
 } from "@td/constants";
 import configureYup from "../common/yup/configureYup";
 import { prisma } from "@td/prisma";
-import {
-  BsdasriPackagingType,
-  BsdasriSignatureType
-} from "../generated/graphql/types";
+import { BsdasriPackagingType, BsdasriSignatureType } from "@td/codegen-back";
 import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT

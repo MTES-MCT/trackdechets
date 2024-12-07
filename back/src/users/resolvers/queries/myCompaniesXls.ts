@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getXlsxHeaders } from "../../export/columns";
 import { getCompaniesExportFileName } from "../../export/filename";

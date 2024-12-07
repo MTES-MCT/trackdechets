@@ -1,4 +1,4 @@
-import { FavoriteType, QueryResolvers } from "../../../generated/graphql/types";
+import { FavoriteType, QueryResolvers } from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { Permission, checkUserPermissions } from "../../../permissions";

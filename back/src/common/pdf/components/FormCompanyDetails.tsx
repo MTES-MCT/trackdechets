@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FormCompany } from "../../../generated/graphql/types";
+import { FormCompany } from "@td/codegen-back";
 import {
   getReadableCompanyCountry,
   isEUCompany,

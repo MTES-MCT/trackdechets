@@ -24,7 +24,7 @@ import {
   BspaohSignatureType,
   MutationResolvers,
   MutationSignBspaohArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 import { getFirstTransporterSync, expandBspaohFromDb } from "../../converter";
 import { sendMail } from "../../../mailer/mailing";

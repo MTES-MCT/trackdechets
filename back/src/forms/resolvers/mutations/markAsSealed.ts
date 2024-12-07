@@ -4,7 +4,7 @@ import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { runInTransaction } from "../../../common/repository/helper";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { MutationResolvers } from "@td/codegen-back";
 import { sendMail } from "../../../mailer/mailing";
 import { getAndExpandFormFromDb } from "../../converter";
 import {

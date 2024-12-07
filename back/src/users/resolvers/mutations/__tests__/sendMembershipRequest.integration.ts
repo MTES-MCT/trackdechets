@@ -14,7 +14,7 @@ import {
   membershipRequest as membershipRequestMail,
   renderMail
 } from "@td/mail";
-import { Mutation } from "../../../../generated/graphql/types";
+import { Mutation } from "@td/codegen-back";
 import { subMinutes } from "date-fns";
 
 // No mails

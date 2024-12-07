@@ -5,7 +5,7 @@ import {
   CreateFormInput,
   ResealedFormInput,
   StatutDiffusionEtablissement
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   sirenifyFormCreateInput,
   sirenifyFormInput,

@@ -4,7 +4,7 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
-import { Query } from "../../../../generated/graphql/types";
+import { Query } from "@td/codegen-back";
 
 const ME = `
   query Me {

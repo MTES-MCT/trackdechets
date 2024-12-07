@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { CompanySearchResultResolvers } from "../../generated/graphql/types";
+import { CompanySearchResultResolvers } from "@td/codegen-back";
 import { CompanyBaseIdentifiers } from "../types";
 
 /**

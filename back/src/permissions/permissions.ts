@@ -8,7 +8,7 @@ import {
   SignatureTypeInput,
   UserPermission,
   BspaohSignatureType
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { checkSecurityCode } from "../common/permissions";
 import { ForbiddenError } from "../common/errors";
 import { MultiModalSignatureType } from "../common/types";

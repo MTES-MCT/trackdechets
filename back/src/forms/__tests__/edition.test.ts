@@ -11,7 +11,7 @@ import {
   UpdateFormInput,
   WasteDetailsInput,
   WorkSiteInput
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { flattenFormInput } from "../converter";
 import { editionRules } from "../edition";
 

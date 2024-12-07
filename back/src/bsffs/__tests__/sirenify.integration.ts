@@ -5,7 +5,7 @@ import {
   BsffFicheInterventionInput,
   BsffInput,
   UpdateBsffPackagingInput
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   sirenifyBsffInput,
   sirenifyBsffPackagingInput,

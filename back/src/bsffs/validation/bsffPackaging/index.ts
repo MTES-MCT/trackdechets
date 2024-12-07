@@ -11,7 +11,7 @@ import {
   prismaToZodBsffPackaging
 } from "./helpers";
 import { checkBsffPackagingSealedFields } from "./rules";
-import { UpdateBsffPackagingInput } from "../../../generated/graphql/types";
+import { UpdateBsffPackagingInput } from "@td/codegen-back";
 
 /**
  * Wrapper autour de `parseBsffPackagingAsync` qui peut être appelé

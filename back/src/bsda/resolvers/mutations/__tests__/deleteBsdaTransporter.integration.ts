@@ -6,10 +6,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  Mutation,
-  MutationDeleteBsdaArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationDeleteBsdaArgs } from "@td/codegen-back";
 import { getTransporters } from "../../../database";
 import {
   bsdaFactory,

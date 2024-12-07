@@ -11,10 +11,7 @@ import {
 import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
-import {
-  Mutation,
-  MutationMarkAsAcceptedArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationMarkAsAcceptedArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   formFactory,

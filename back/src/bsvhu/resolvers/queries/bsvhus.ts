@@ -1,7 +1,7 @@
 import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyMask } from "../../../common/where";
-import { QueryBsvhusArgs } from "../../../generated/graphql/types";
+import { QueryBsvhusArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getReadonlyBsvhuRepository } from "../../repository";

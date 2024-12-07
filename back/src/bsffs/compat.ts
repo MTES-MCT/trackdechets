@@ -7,7 +7,7 @@ import {
 } from "@prisma/client";
 import { prisma as prismaClient } from "@td/prisma";
 import { RepositoryFnDeps } from "../common/repository/types";
-import { BsffPackagingInput } from "../generated/graphql/types";
+import { BsffPackagingInput } from "@td/codegen-back";
 import { isFinalOperation } from "./constants";
 import { getReadonlyBsffPackagingRepository } from "./repository";
 import { Nullable } from "../types";

@@ -4,7 +4,7 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import {
   CompanyPrivate,
   MutationInviteUserToCompanyArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { sanitizeEmail } from "../../../utils";
 import { associateUserToCompany, createUserAccountHash } from "../../database";
 

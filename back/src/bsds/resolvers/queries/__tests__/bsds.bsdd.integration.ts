@@ -18,7 +18,7 @@ import {
   MutationSubmitFormRevisionRequestApprovalArgs,
   MutationMarkAsReceivedArgs,
   MutationSignTransportFormArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   resetDatabase,
   refreshElasticSearch

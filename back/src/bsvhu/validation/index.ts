@@ -1,4 +1,4 @@
-import { BsvhuInput } from "../../generated/graphql/types";
+import { BsvhuInput } from "@td/codegen-back";
 import {
   getCurrentSignatureType,
   graphQlInputToZodBsvhu,

@@ -23,7 +23,7 @@ import { prisma } from "@td/prisma";
 import {
   FormRevisionRequestContentInput,
   MutationCreateFormRevisionRequestArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound, getTransportersSync } from "../../database";

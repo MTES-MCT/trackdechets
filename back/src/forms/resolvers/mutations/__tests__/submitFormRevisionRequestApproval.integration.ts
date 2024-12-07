@@ -3,7 +3,7 @@ import {
   Mutation,
   MutationSignEmissionFormArgs,
   MutationSubmitFormRevisionRequestApprovalArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,

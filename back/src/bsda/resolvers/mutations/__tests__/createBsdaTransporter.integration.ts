@@ -2,10 +2,7 @@ import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
-import {
-  Mutation,
-  MutationCreateBsdaTransporterArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationCreateBsdaTransporterArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 
 const CREATE_BSDA_TRANSPORTER = gql`

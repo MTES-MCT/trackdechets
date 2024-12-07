@@ -5,7 +5,7 @@ import {
   isSiret,
   cleanClue
 } from "@td/constants";
-import { FormCompanyResolvers } from "../../generated/graphql/types";
+import { FormCompanyResolvers } from "@td/codegen-back";
 
 const formCompanyResolvers: FormCompanyResolvers = {
   country: parent => {

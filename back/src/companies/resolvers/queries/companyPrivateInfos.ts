@@ -2,10 +2,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { isSiret, cleanClue as cleanClueFn } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserRoles } from "../../../permissions";
-import {
-  CompanySearchPrivate,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import { CompanySearchPrivate, QueryResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { getCompanyInfos } from "./companyInfos";
 

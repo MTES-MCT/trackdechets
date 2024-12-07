@@ -4,7 +4,7 @@ import { Client, RequestParams } from "@elastic/elasticsearch";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import { logger } from "@td/logger";
-import { BsdSubType, BsdType, FormCompany } from "../generated/graphql/types";
+import { BsdSubType, BsdType, FormCompany } from "@td/codegen-back";
 import {
   BsdaRevisionRequest,
   BsddRevisionRequest,

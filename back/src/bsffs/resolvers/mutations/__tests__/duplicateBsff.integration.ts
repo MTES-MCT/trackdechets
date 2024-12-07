@@ -5,7 +5,7 @@ import {
   CompanySearchResult,
   Mutation,
   MutationDuplicateBsffArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { createBsff } from "../../../__tests__/factories";

@@ -4,7 +4,7 @@ import {
   BsvhuSignatureInput,
   MutationSignBsvhuArgs,
   SignatureTypeInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";

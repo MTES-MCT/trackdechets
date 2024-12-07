@@ -8,7 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Query } from "../../../../generated/graphql/types";
+import { Query } from "@td/codegen-back";
 
 const MEMBERSHIP_REQUEST = `
   query MembershipRequest($id: ID, $siret: String) {

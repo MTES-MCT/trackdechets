@@ -1,8 +1,5 @@
 import { prisma } from "@td/prisma";
-import {
-  FormMetadata,
-  FormMetadataResolvers
-} from "../../../generated/graphql/types";
+import { FormMetadata, FormMetadataResolvers } from "@td/codegen-back";
 
 export const Metadata: FormMetadataResolvers = {
   latestRevision: async (metadata: FormMetadata & { id: string }) => {

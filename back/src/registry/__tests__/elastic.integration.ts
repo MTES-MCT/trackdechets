@@ -37,7 +37,7 @@ import {
   indexForm,
   toBsdElastic
 } from "../../forms/elastic";
-import { WasteRegistryType } from "../../generated/graphql/types";
+import { WasteRegistryType } from "@td/codegen-back";
 import {
   bsddTransporterFactory,
   companyFactory,

@@ -11,7 +11,7 @@ import { checkIsAuthenticated } from "../../../../common/permissions";
 import {
   BsdaRevisionRequestContentInput,
   MutationCreateBsdaRevisionRequestArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../../types";
 import { getUserCompanies } from "../../../../users/database";
 import { flattenBsdaRevisionRequestInput } from "../../../converter";

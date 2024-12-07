@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 
 const meResolver: QueryResolvers["me"] = async (parent, args, context) => {
   const user = checkIsAuthenticated(context);

@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query } from "../../../../generated/graphql/types";
+import { Query } from "@td/codegen-back";
 
 import makeClient from "../../../../__tests__/testClient";
 import { companyDigestFactory } from "../../../__tests__/factories.companydigest";

@@ -1,7 +1,7 @@
 import { formatWebhookSettingFromDB } from "../../converter";
 
 import { MissingId } from "../../errors";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getWebhookSettingOrNotFound } from "../../database";
 import { checkCanEditWebhookSetting } from "../../permissions";

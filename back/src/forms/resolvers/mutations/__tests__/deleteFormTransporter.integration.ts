@@ -8,10 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  Mutation,
-  MutationDeleteFormTransporterArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationDeleteFormTransporterArgs } from "@td/codegen-back";
 import { getTransporters } from "../../../database";
 
 const DELETE_FORM_TRANSPORTER = gql`

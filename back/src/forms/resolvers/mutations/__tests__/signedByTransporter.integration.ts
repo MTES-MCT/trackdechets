@@ -13,7 +13,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { Status, UserRole } from "@prisma/client";
-import { Mutation } from "../../../../generated/graphql/types";
+import { Mutation } from "@td/codegen-back";
 
 jest.mock("axios", () => ({
   default: {

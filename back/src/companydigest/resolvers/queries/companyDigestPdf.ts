@@ -1,7 +1,4 @@
-import {
-  QueryCompanyDigestPdfArgs,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import { QueryCompanyDigestPdfArgs, QueryResolvers } from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyDigestOrNotFound } from "../../database";

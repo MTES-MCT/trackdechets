@@ -3,7 +3,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
   MutationUpdateFicheInterventionBsffArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   siretify,

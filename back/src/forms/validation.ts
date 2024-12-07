@@ -51,7 +51,7 @@ import {
   InitialFormFractionInput,
   PackagingInfo,
   Packagings
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   EXTRANEOUS_NEXT_DESTINATION,

@@ -18,7 +18,7 @@ import {
   readyToPublishData
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import { Mutation } from "../../../../generated/graphql/types";
+import { Mutation } from "@td/codegen-back";
 import { ErrorCode } from "../../../../common/errors";
 
 import { SIGN_DASRI } from "./signUtils";

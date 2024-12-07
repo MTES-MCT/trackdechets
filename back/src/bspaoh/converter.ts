@@ -36,7 +36,7 @@ import {
   BspaohPackagingAcceptationStatus,
   BspaohReceptionWasteDetail,
   BspaohReceptionWasteWeight
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   BspaohTransporter as PrismaBspaohTransporter,
   BspaohStatus,

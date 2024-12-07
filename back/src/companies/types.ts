@@ -1,5 +1,4 @@
-import { FavoriteType } from "../generated/graphql/types";
-export { CompanySearchResult } from "../generated/graphql/types";
+import { FavoriteType } from "@td/codegen-back";
 
 /**
  * Company interface only with identifiers

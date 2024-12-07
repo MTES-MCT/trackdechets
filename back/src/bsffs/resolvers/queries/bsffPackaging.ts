@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB, expandBsffPackagingFromDB } from "../../converter";
 import { getBsffPackagingOrNotFound } from "../../database";

@@ -1,9 +1,6 @@
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Mutation,
-  MutationCreateApplicationArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationCreateApplicationArgs } from "@td/codegen-back";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 

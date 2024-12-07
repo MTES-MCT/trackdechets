@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { MutationResolvers } from "@td/codegen-back";
 import { luhnCheckSum, TEST_COMPANY_PREFIX } from "@td/constants";
 import { randomNbrChain } from "../../../utils";
 

@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 
 const warningMessageResolver: QueryResolvers["warningMessage"] = async (
   parent,

@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 
 import { safeInput } from "../common/converter";
 
-import { BsdaWhere } from "../generated/graphql/types";
+import { BsdaWhere } from "@td/codegen-back";
 import {
   toPrismaDateFilter,
   toPrismaStringFilter,

@@ -7,7 +7,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
-import { Query } from "../../../../generated/graphql/types";
+import { Query } from "@td/codegen-back";
 import { BsdasriType, GovernmentPermission } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import { app } from "../../../../server";

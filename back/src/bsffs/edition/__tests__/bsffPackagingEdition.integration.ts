@@ -6,7 +6,7 @@ import {
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { checkEditionRules } from "../bsffPackagingEdition";
-import { BsffOperationCode } from "../../../generated/graphql/types";
+import { BsffOperationCode } from "@td/codegen-back";
 
 describe("edition rules", () => {
   afterAll(resetDatabase);

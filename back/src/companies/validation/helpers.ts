@@ -1,4 +1,4 @@
-import { PrivateCompanyInput } from "../../generated/graphql/types";
+import { PrivateCompanyInput } from "@td/codegen-back";
 import { ZodCompany } from "./schema";
 
 export function companyInputToZodCompany(

@@ -4,7 +4,7 @@ import {
   BsdaInput,
   BsdaPackaging,
   BsdaTransporterInput
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { flattenBsdaInput, flattenBsdaTransporterInput } from "../converter";
 import { SIGNATURES_HIERARCHY } from "./constants";
 import { AllBsdaSignatureType } from "../types";

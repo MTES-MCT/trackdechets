@@ -1,6 +1,6 @@
 import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query, QueryBsdasArgs } from "../../../../generated/graphql/types";
+import { Query, QueryBsdasArgs } from "@td/codegen-back";
 import {
   userWithCompanyFactory,
   companyAssociatedToExistingUserFactory,

@@ -5,7 +5,7 @@ import { BsvhuForElastic } from "../../../bsvhu/elastic";
 import { BsdaForElastic } from "../../../bsda/elastic";
 import { BsffForElastic } from "../../../bsffs/elastic";
 import { BspaohForElastic } from "../../../bspaoh/elastic";
-import { Bsd, BsdType } from "../../../generated/graphql/types";
+import { Bsd, BsdType } from "@td/codegen-back";
 import { distinct } from "../../../common/arrays";
 import { prisma } from "@td/prisma";
 import { SearchResponse } from "./types";

@@ -4,7 +4,7 @@ import {
   Form as GraphQLForm,
   MutationSignTransportFormArgs,
   PackagingInfo
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   getFirstTransporter,

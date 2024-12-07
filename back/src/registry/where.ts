@@ -8,7 +8,7 @@ import {
   NumericFilter,
   StringFilter,
   WasteRegistryWhere
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { UserInputError } from "../common/errors";
 
 type QueryDslQueryContainer = estypes.QueryContainer;

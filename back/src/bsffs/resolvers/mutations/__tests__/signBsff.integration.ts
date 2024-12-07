@@ -13,7 +13,7 @@ import {
   Mutation,
   MutationSignBsffArgs,
   MutationUpdateBsffArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   UserWithCompany,

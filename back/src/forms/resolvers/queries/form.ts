@@ -1,7 +1,4 @@
-import {
-  QueryResolvers,
-  QueryFormArgs
-} from "../../../generated/graphql/types";
+import { QueryResolvers, QueryFormArgs } from "@td/codegen-back";
 import { expandableFormIncludes, expandFormFromDb } from "../../converter";
 import { MissingIdOrReadableId } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";

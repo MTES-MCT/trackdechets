@@ -11,7 +11,7 @@ import { checkIsAuthenticated } from "../../../../common/permissions";
 import {
   BsdasriRevisionRequestContentInput,
   MutationCreateBsdasriRevisionRequestArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../../types";
 import { getUserCompanies } from "../../../../users/database";
 import { flattenBsdasriRevisionRequestInput } from "../../../converter";

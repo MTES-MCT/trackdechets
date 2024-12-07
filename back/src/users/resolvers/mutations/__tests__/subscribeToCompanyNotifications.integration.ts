@@ -8,7 +8,7 @@ import makeClient from "../../../../__tests__/testClient";
 import {
   Mutation,
   MutationSubscribeToCompanyNotificationsArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { UserRole } from "@prisma/client";
 import { toPrismaNotifications } from "../../../notifications";

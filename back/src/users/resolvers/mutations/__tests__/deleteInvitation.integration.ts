@@ -9,7 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { createUserAccountHash } from "../../../database";
-import { Mutation } from "../../../../generated/graphql/types";
+import { Mutation } from "@td/codegen-back";
 
 const DELETE_INVITATION = `
   mutation DeleteInvitation($email: String!, $siret: String!){

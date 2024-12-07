@@ -2,7 +2,7 @@ import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
-import { Mutation } from "../../../../generated/graphql/types";
+import { Mutation } from "@td/codegen-back";
 import { compare } from "bcrypt";
 import { addHours } from "date-fns";
 import { ErrorCode } from "../../../../common/errors";

@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationDeleteBsdaArgs } from "../../../generated/graphql/types";
+import { MutationDeleteBsdaArgs } from "@td/codegen-back";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { GraphQLContext } from "../../../types";

@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { WasteRegistryType } from "../generated/graphql/types";
+import { WasteRegistryType } from "@td/codegen-back";
 
 export function getRegistryFileName(
   registryType: WasteRegistryType,

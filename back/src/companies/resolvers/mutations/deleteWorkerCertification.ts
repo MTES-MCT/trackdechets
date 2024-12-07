@@ -1,6 +1,6 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationDeleteWorkerCertificationArgs } from "../../../generated/graphql/types";
+import { MutationDeleteWorkerCertificationArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import { getWorkerCertificationOrNotFound } from "../../database";

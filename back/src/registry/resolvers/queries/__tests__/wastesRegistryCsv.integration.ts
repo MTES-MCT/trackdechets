@@ -14,7 +14,7 @@ import {
   userWithAccessTokenFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Query } from "../../../../generated/graphql/types";
+import { Query } from "@td/codegen-back";
 import { WASTES_REGISTRY_CSV } from "./queries";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";

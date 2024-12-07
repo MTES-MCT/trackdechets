@@ -1,4 +1,4 @@
-import { CompanyForVerificationResolvers } from "../../generated/graphql/types";
+import { CompanyForVerificationResolvers } from "@td/codegen-back";
 
 const companyForVerificationResolvers: CompanyForVerificationResolvers = {
   admin: async (parent, _, context) => {

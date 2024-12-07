@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../generated/graphql/types";
+import { MutationResolvers } from "@td/codegen-back";
 import createForm from "./mutations/createForm";
 import updateForm from "./mutations/updateForm";
 import updateTransporterFields from "./mutations/updateTransporterFields";

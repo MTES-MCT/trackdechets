@@ -3,7 +3,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bspaohFactory } from "../../../__tests__/factories";
-import { Query } from "../../../../generated/graphql/types";
+import { Query } from "@td/codegen-back";
 import { BspaohStatus } from "@prisma/client";
 
 import { fullBspaoh } from "../../../fragments";

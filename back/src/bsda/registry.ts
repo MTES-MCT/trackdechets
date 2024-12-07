@@ -7,7 +7,7 @@ import {
   ManagedWaste,
   OutgoingWaste,
   TransportedWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   GenericWaste,
   RegistryFields,

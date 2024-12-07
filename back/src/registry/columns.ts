@@ -7,7 +7,7 @@ import {
   OutgoingWaste,
   SsdWaste,
   TransportedWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { GenericWaste } from "./types";
 import { formatStatusLabel } from "@td/constants";
 import { format } from "date-fns";

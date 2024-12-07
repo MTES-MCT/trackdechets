@@ -5,10 +5,7 @@ import {
   UserRole
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Mutation,
-  MutationDeleteBsffArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationDeleteBsffArgs } from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {

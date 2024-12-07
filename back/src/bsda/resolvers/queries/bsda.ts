@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryBsdaArgs } from "../../../generated/graphql/types";
+import { QueryBsdaArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";

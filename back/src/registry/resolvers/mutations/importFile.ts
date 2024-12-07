@@ -2,7 +2,7 @@ import { prisma } from "@td/prisma";
 import { getFileMetadata } from "@td/registry";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationImportFileArgs } from "../../../generated/graphql/types";
+import { MutationImportFileArgs } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { enqueueRegistryImportToProcessJob } from "../../../queue/producers/registryImport";
 import { GraphQLContext } from "../../../types";

@@ -1,10 +1,7 @@
 import { EmitterType, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous, BSDD_WASTE_CODES } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  MutationUpdateFormArgs,
-  ResolversParentTypes
-} from "../../../generated/graphql/types";
+import { MutationUpdateFormArgs, ResolversParentTypes } from "@td/codegen-back";
 import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
 import { checkCanUpdate } from "../../permissions";
 import { GraphQLContext } from "../../../types";
