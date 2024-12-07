@@ -12,7 +12,7 @@ import {
   isWasteProcessor,
   isWasteVehicles
 } from "../companies/validation";
-import { CompanyInput } from "../generated/graphql/types";
+import { CompanyInput } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   isForeignVat,

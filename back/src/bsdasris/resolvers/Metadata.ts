@@ -1,8 +1,5 @@
 import { Bsdasri } from "@prisma/client";
-import {
-  BsdasriMetadata,
-  BsdasriMetadataResolvers
-} from "../../generated/graphql/types";
+import { BsdasriMetadata, BsdasriMetadataResolvers } from "@td/codegen-back";
 import { getBsdasriOrNotFound } from "../database";
 import { validateBsdasri, getRequiredFor } from "../validation";
 import { ValidationError } from "yup";

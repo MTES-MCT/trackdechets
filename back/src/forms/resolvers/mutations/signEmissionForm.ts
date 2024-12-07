@@ -3,7 +3,7 @@ import {
   MutationResolvers,
   MutationSignEmissionFormArgs,
   Form as GraphQLForm
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   getFirstTransporterSync,

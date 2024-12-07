@@ -1,6 +1,6 @@
 import { RefinementCtx, z } from "zod";
 
-import { BspaohSignatureType } from "../../generated/graphql/types";
+import { BspaohSignatureType } from "@td/codegen-back";
 import { BspaohValidationContext } from "./index";
 import { ZodBspaoh, ZodFullBspaoh } from "./schema";
 import { distinct } from "../../common/arrays";

@@ -6,10 +6,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Mutation,
-  MutationRevokeAccessTokenArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationRevokeAccessTokenArgs } from "@td/codegen-back";
 
 const REVOKE_AUTHORIZED_APPLICATION = gql`
   mutation RevokeAuthorizedApplication($id: ID!) {

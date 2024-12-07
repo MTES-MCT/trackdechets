@@ -5,7 +5,7 @@ import { GraphQLContext } from "../../../types";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import { getBsdasriRepository } from "../../repository";
 import { Permission, can, getUserRoles } from "../../../permissions";
 

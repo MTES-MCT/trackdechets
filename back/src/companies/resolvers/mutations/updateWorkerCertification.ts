@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationUpdateWorkerCertificationArgs,
   UpdateWorkerCertificationInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import { getWorkerCertificationOrNotFound } from "../../database";

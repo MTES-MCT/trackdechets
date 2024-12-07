@@ -1,8 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Query,
-  QueryBsdaRevisionRequestsArgs
-} from "../../../../generated/graphql/types";
+import { Query, QueryBsdaRevisionRequestsArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";

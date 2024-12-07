@@ -22,7 +22,7 @@ import {
   MutationUpdateBsdaArgs,
   Query,
   QueryBsdsArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   userWithCompanyFactory,

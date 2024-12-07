@@ -20,7 +20,7 @@ import {
   Mutation,
   MutationCreateFormArgs,
   ParcelNumber
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   EmitterType,
   Status,

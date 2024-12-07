@@ -5,7 +5,7 @@ import {
   BsffPackagingOperationInput,
   CompanyInput,
   UpdateBsffPackagingInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { flattenBsffPackagingInput } from "../../converter";
 import { editionRules, isAwaitingSignature } from "../bsffPackagingEdition";
 

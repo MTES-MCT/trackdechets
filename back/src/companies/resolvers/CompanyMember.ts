@@ -1,4 +1,4 @@
-import { CompanyMemberResolvers } from "../../generated/graphql/types";
+import { CompanyMemberResolvers } from "@td/codegen-back";
 
 const companyMemberResolvers: CompanyMemberResolvers = {
   isMe: (parent, _, context) => {

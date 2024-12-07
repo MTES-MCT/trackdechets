@@ -6,7 +6,7 @@ import {
 } from "../../../../__tests__/factories";
 import { webhookSettingFactory } from "../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Query } from "../../../../generated/graphql/types";
+import { Query } from "@td/codegen-back";
 import { ErrorCode } from "../../../../common/errors";
 
 import { gql } from "graphql-tag";

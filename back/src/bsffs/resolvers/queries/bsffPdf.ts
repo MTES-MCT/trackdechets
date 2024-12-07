@@ -1,7 +1,4 @@
-import {
-  QueryBsffPdfArgs,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import { QueryBsffPdfArgs, QueryResolvers } from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";

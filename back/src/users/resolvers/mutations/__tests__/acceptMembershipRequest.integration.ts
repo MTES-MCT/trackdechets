@@ -8,7 +8,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { renderMail, membershipRequestAccepted } from "@td/mail";
-import { Mutation } from "../../../../generated/graphql/types";
+import { Mutation } from "@td/codegen-back";
 import { UserRole } from "@prisma/client";
 import { getDefaultNotifications } from "../../../notifications";
 

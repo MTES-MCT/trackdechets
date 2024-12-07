@@ -5,7 +5,7 @@ import {
   User
 } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../../common/permissions";
-import { MutationSubmitBsdaRevisionRequestApprovalArgs } from "../../../../generated/graphql/types";
+import { MutationSubmitBsdaRevisionRequestApprovalArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../../types";
 import { getBsdaRepository } from "../../../repository";
 import { Permission, can, getUserRoles } from "../../../../permissions";

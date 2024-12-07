@@ -1,4 +1,4 @@
-import { Form, FormResolvers } from "../../../generated/graphql/types";
+import { Form, FormResolvers } from "@td/codegen-back";
 import { bsddWasteQuantities } from "../../helpers/bsddWasteQuantities";
 
 const getWasteQuantityAccepted = (form: Form) => {

@@ -1,7 +1,7 @@
 import { QuantityType, Status } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query, QueryFormArgs } from "../../../../generated/graphql/types";
+import { Query, QueryFormArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,

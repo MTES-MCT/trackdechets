@@ -9,10 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsvhuFactory } from "../../../__tests__/factories.vhu";
-import {
-  CompanySearchResult,
-  Mutation
-} from "../../../../generated/graphql/types";
+import { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { ErrorCode } from "../../../../common/errors";
 import { prisma } from "@td/prisma";
 import { searchCompany } from "../../../../companies/search";

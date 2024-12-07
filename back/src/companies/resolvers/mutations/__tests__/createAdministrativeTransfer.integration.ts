@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
   MutationCreateAdministrativeTransferArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   companyFactory,
   userWithCompanyFactory

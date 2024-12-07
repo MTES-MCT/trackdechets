@@ -16,7 +16,7 @@ import { ForbiddenError } from "../../../common/errors";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { operationHook } from "../../operationHook";
 import { isFinalOperationCode } from "../../../common/operationCodes";
-import { BsdasriPackaging } from "../../../generated/graphql/types";
+import { BsdasriPackaging } from "@td/codegen-back";
 import { computeTotalVolume } from "../../converter";
 
 export type AcceptRevisionRequestApprovalFn = (

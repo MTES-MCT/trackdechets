@@ -25,7 +25,7 @@ import {
   Mutation,
   MutationUpdateFormArgs,
   UpdateFormInput
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { sub } from "date-fns";

@@ -4,7 +4,7 @@ import {
   BsdaInput,
   Mutation,
   MutationCreateDraftBsdaArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   companyFactory,
   siretify,

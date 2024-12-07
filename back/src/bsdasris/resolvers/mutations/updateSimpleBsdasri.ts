@@ -1,7 +1,7 @@
 import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
 import { BsdasriType, Bsdasri } from "@prisma/client";
 
-import { BsdasriInput } from "../../../generated/graphql/types";
+import { BsdasriInput } from "@td/codegen-back";
 import { validateBsdasri } from "../../validation";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { getBsdasriRepository } from "../../repository";

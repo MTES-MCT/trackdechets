@@ -4,7 +4,7 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import {
   MutationDuplicateBspaohArgs,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { expandBspaohFromDb } from "../../converter";
 import { getBspaohOrNotFound, getBspaohFirstTransporter } from "../../database";
 

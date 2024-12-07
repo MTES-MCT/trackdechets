@@ -3,7 +3,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
   MutationCancelFormRevisionRequestArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   formFactory,

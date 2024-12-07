@@ -4,7 +4,7 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import {
   MutationDuplicateBsdasriArgs,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
 import { getBsdasriRepository } from "../../repository";

@@ -13,7 +13,7 @@ import {
   PackagingInfo,
   Transporter,
   TransportSegment
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 import { buildAddress } from "../../../companies/sirene/utils";
 import {

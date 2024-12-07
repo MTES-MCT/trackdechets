@@ -12,11 +12,7 @@ import {
   userAccountHashToCompanyMember,
   userAssociationToCompanyMember
 } from "../../../companies/database";
-import {
-  CompanyMember,
-  MutationResolvers,
-  UserRole
-} from "../../../generated/graphql/types";
+import { CompanyMember, MutationResolvers, UserRole } from "@td/codegen-back";
 import {
   checkUserIsAdminOrPermissions,
   Permission

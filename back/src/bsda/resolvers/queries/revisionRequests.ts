@@ -5,7 +5,7 @@ import {
   BsdaRevisionRequestContent,
   FormCompany,
   QueryResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getReadonlyBsdaRepository } from "../../repository";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";

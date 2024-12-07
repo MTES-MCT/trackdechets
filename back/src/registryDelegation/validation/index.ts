@@ -3,7 +3,7 @@ import {
   MutationRevokeRegistryDelegationArgs,
   QueryRegistryDelegationArgs,
   QueryRegistryDelegationsArgs
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   delegationIdSchema,
   createRegistryDelegationInputSchema,

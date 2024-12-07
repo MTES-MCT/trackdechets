@@ -10,7 +10,7 @@ import {
 import { safeParseAsyncIncomingWaste } from "./incomingWaste/validation";
 import { RegistryExportType } from "@prisma/client";
 import { toSsdWaste } from "./ssd/registry";
-import { SsdWaste } from "@td/codegen-back";
+import type { SsdWaste } from "@td/codegen-back";
 import { INCOMING_TEXS_HEADERS } from "./incomingTexs/constants";
 import {
   saveIncomingTexsLine,

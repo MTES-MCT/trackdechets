@@ -10,7 +10,7 @@ import {
   QueryTransportedWastesArgs,
   AllWaste,
   SsdWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { estypes } from "@elastic/elasticsearch";
 
 export type RegistryFields =

@@ -3,7 +3,7 @@ import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryRegistryImportsArgs } from "../../../generated/graphql/types";
+import { QueryRegistryImportsArgs } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";

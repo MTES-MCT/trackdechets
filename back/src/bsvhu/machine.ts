@@ -1,6 +1,6 @@
 import { Bsvhu, BsvhuStatus } from "@prisma/client";
 import { Machine } from "xstate";
-import { SignatureTypeInput } from "../generated/graphql/types";
+import { SignatureTypeInput } from "@td/codegen-back";
 
 type Event = {
   type: SignatureTypeInput;

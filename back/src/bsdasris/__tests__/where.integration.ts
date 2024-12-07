@@ -1,5 +1,5 @@
 import { BsdasriStatus } from "@prisma/client";
-import { BsdasriWhere } from "../../generated/graphql/types";
+import { BsdasriWhere } from "@td/codegen-back";
 import { toPrismaWhereInput } from "../where";
 
 describe("Bsdasri where conversion", () => {

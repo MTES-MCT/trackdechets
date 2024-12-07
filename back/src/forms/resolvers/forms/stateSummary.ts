@@ -1,9 +1,5 @@
 import { QuantityType, Status } from "@prisma/client";
-import {
-  Form,
-  FormResolvers,
-  TemporaryStorageDetail
-} from "../../../generated/graphql/types";
+import { Form, FormResolvers, TemporaryStorageDetail } from "@td/codegen-back";
 import { isDefined } from "../../../common/helpers";
 
 function getLastActionOn(

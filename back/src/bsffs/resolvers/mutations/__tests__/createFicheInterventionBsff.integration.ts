@@ -4,7 +4,7 @@ import {
   BsffFicheInterventionInput,
   Mutation,
   MutationCreateFicheInterventionBsffArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   siretify,
   userWithCompanyFactory

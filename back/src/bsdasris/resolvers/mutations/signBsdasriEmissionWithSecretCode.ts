@@ -2,7 +2,7 @@ import {
   MutationSignBsdasriEmissionWithSecretCodeArgs,
   MutationResolvers,
   BsdasriSignatureType
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsdasriOrNotFound } from "../../database";
 import { getAuthorizedOrgIds, signEmission } from "./signBsdasri";

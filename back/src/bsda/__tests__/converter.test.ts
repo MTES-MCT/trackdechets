@@ -1,8 +1,5 @@
 import { Decimal } from "decimal.js";
-import {
-  BsdaInput,
-  BsdaRevisionRequestContentInput
-} from "../../generated/graphql/types";
+import { BsdaInput, BsdaRevisionRequestContentInput } from "@td/codegen-back";
 import {
   expandBsdaFromDb,
   expandBsdaRevisionRequestContent,

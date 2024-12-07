@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../generated/graphql/types";
+import { MutationResolvers } from "@td/codegen-back";
 import cancelRegistryDelegation from "./mutations/cancelRegistryDelegation";
 import createRegistryDelegation from "./mutations/createRegistryDelegation";
 import revokeRegistryDelegation from "./mutations/revokeRegistryDelegation";

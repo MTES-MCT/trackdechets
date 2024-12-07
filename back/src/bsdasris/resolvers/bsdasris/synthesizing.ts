@@ -1,4 +1,4 @@
-import { BsdasriResolvers } from "../../../generated/graphql/types";
+import { BsdasriResolvers } from "@td/codegen-back";
 
 import { BsdasriType } from "@prisma/client";
 import { expandSynthesizingDasri } from "../../converter";

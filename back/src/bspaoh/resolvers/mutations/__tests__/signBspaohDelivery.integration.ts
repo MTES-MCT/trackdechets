@@ -1,10 +1,7 @@
 import { BspaohStatus, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 
-import {
-  Mutation,
-  MutationSignBspaohArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationSignBspaohArgs } from "@td/codegen-back";
 
 import {
   transporterReceiptFactory,

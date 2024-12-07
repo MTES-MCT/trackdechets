@@ -1,9 +1,6 @@
 import gql from "graphql-tag";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  CreateRegistryDelegationInput,
-  Mutation
-} from "../../../../generated/graphql/types";
+import { CreateRegistryDelegationInput, Mutation } from "@td/codegen-back";
 import {
   companyFactory,
   userInCompany,

@@ -1,7 +1,4 @@
-import {
-  QueryResolvers,
-  QueryControlBsdsArgs
-} from "../../../generated/graphql/types";
+import { QueryResolvers, QueryControlBsdsArgs } from "@td/codegen-back";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
 

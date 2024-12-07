@@ -5,7 +5,7 @@ import {
   BsffInput,
   CompanyInput,
   UpdateBsffPackagingInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 
 const bsffAccessors = (input: BsffInput) => [
   {

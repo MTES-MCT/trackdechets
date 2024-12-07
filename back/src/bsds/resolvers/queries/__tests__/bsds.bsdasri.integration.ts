@@ -16,7 +16,7 @@ import {
   MutationDuplicateBsdasriArgs,
   MutationCreateBsdasriRevisionRequestArgs,
   MutationSubmitBsdasriRevisionRequestApprovalArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   resetDatabase,
   refreshElasticSearch

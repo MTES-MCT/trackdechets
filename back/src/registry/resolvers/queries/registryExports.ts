@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryRegistryExportsArgs } from "../../../generated/graphql/types";
+import { QueryRegistryExportsArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";

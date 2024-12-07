@@ -6,7 +6,7 @@ import {
   User
 } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationSubmitFormRevisionRequestApprovalArgs } from "../../../generated/graphql/types";
+import { MutationSubmitFormRevisionRequestApprovalArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormRepository } from "../../repository";

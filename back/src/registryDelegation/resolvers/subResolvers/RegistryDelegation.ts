@@ -1,4 +1,4 @@
-import { RegistryDelegationResolvers } from "../../../generated/graphql/types";
+import { RegistryDelegationResolvers } from "@td/codegen-back";
 import { delegateResolver } from "./delegate";
 import { delegatorResolver } from "./delegator";
 import { statusResolver } from "./status";

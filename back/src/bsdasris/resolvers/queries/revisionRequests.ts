@@ -5,7 +5,7 @@ import {
   BsdasriRevisionRequestContent,
   FormCompany,
   QueryResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getReadonlyBsdasriRepository } from "../../repository";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";

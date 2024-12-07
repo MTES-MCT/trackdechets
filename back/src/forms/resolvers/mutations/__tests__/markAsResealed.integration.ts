@@ -18,10 +18,7 @@ import {
   CollectorType,
   WasteProcessorType
 } from "@prisma/client";
-import {
-  Mutation,
-  MutationMarkAsResealedArgs
-} from "../../../../generated/graphql/types";
+import { Mutation, MutationMarkAsResealedArgs } from "@td/codegen-back";
 import { gql } from "graphql-tag";
 import { sirenifyResealedFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";

@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../generated/graphql/types";
+import { QueryResolvers } from "@td/codegen-back";
 import companyInfos from "./queries/companyInfos";
 import companyPrivateInfos from "./queries/companyPrivateInfos";
 import searchCompanies from "./queries/searchCompanies";

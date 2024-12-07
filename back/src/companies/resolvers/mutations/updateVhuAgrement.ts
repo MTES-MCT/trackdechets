@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { MutationResolvers } from "@td/codegen-back";
 import { getVhuAgrementOrNotFound } from "../../database";
 import { checkCanReadUpdateDeleteVhuAgrement } from "../../permissions";
 import { removeEmptyKeys } from "../../../common/converter";

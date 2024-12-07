@@ -18,7 +18,7 @@ import {
   BsdaSignatureType,
   MutationResolvers,
   MutationSignBsdaArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { sendMail } from "../../../mailer/mailing";
 import { Mail, finalDestinationModified, renderMail } from "@td/mail";
 import { checkCanSignFor } from "../../../permissions";

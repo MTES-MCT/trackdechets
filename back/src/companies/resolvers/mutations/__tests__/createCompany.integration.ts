@@ -25,10 +25,7 @@ import {
   verificationProcessInfo,
   verifiedForeignTransporterCompany
 } from "@td/mail";
-import {
-  Mutation,
-  StatutDiffusionEtablissement
-} from "../../../../generated/graphql/types";
+import { Mutation, StatutDiffusionEtablissement } from "@td/codegen-back";
 import { searchCompany } from "../../../search";
 import { sendVerificationCodeLetter } from "../../../../common/post";
 import gql from "graphql-tag";

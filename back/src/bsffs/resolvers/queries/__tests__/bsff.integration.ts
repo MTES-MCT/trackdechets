@@ -1,5 +1,5 @@
 import { UserRole } from "@prisma/client";
-import { Query, QueryBsffArgs } from "../../../../generated/graphql/types";
+import { Query, QueryBsffArgs } from "@td/codegen-back";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   siretify,

@@ -2,7 +2,7 @@ import { prisma } from "@td/prisma";
 import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 import { DASRI_GROUPING_OPERATIONS_CODES } from "@td/constants";
 import { getReadonlyBsdasriRepository } from "../../repository";
-import { CompanyInput } from "../../../generated/graphql/types";
+import { CompanyInput } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 
 export const getEligibleDasrisForSynthesis = async (

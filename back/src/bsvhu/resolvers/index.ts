@@ -1,7 +1,4 @@
-import {
-  MutationResolvers,
-  QueryResolvers
-} from "../../generated/graphql/types";
+import { MutationResolvers, QueryResolvers } from "@td/codegen-back";
 
 import bsvhu from "./queries/bsvhu";
 import bsvhuPdf from "./queries/bsvhuPdf";

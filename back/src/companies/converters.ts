@@ -1,5 +1,5 @@
 import { Company } from "@prisma/client";
-import { CompanyPrivate, CompanyPublic } from "../generated/graphql/types";
+import { CompanyPrivate, CompanyPublic } from "@td/codegen-back";
 import { libelleFromCodeNaf } from "./sirene/utils";
 
 export function toGqlCompanyPrivate(company: Company): CompanyPrivate {

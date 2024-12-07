@@ -5,7 +5,7 @@ import {
   BspaohMetadataFields,
   BspaohMetadataResolvers,
   BspaohStatus
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { parseBspaohInContext } from "../validation";
 import {
   prepareBspaohForParsing,

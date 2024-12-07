@@ -1,6 +1,6 @@
 import * as React from "react";
 import { formatDate, SignatureStamp } from "../../../common/pdf";
-import { Signature as SignatureType } from "../../../generated/graphql/types";
+import { Signature as SignatureType } from "@td/codegen-back";
 
 type Props = {
   signature: SignatureType | null | undefined;

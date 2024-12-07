@@ -5,7 +5,7 @@ import {
   QueryWastesRegistryCsvArgs,
   QueryWastesRegistryXlsArgs,
   WasteRegistryType
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { wastesRegistryCsvResolverFn } from "../../../registry/resolvers/queries/wastesRegistryCsv";
 import { wastesRegistryXlsResolverFn } from "../../../registry/resolvers/queries/wastesRegistryXls";
 import { can, getUserRoles, Permission } from "../../../permissions";

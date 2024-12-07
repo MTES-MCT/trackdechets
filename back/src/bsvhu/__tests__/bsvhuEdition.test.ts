@@ -15,7 +15,7 @@ import {
   BsvhuTransportInput,
   BsvhuWeightInput,
   CompanyInput
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { bsvhuEditionRules } from "../validation/rules";
 import { graphQlInputToZodBsvhu } from "../validation/helpers";
 
