@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { applyAuthStrategies, AuthType } from "../../../auth";

@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 import me from "./queries/me";
 import apiKey from "./queries/apiKey";
 import invitation from "./queries/invitation";

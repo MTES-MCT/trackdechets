@@ -1,8 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationCreateAnonymousCompanyArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { siretify, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";

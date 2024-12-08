@@ -2,10 +2,10 @@ import * as yup from "yup";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   CreateAnonymousCompanyFromPdfInput,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getCodeCommune } from "../../geo/getCodeCommune";
 import { validateAndExtractSireneDataFromPDFInBase64 } from "./createAnonymousCompanyFromPDF.helpers";
 import { base64, siret } from "../../../common/validation";

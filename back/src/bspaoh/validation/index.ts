@@ -1,7 +1,4 @@
-import {
-  BspaohInput,
-  BspaohSignatureType
-} from "../../generated/graphql/types";
+import type { BspaohInput, BspaohSignatureType } from "@td/codegen-back";
 import { User } from "@prisma/client";
 import {
   getSignatureAncestors,

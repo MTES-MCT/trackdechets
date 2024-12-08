@@ -6,14 +6,14 @@ import {
   FormCompanyFields,
   TRANSPORT_MODE_LABELS
 } from "../../../common/pdf";
-import {
+import type {
   Form as GraphQLForm,
   FormCompany,
   InitialFormFraction,
   PackagingInfo,
   Transporter,
   TransportSegment
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 import { buildAddress } from "../../../companies/sirene/utils";
 import {

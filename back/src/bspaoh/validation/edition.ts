@@ -1,8 +1,5 @@
 import { Bspaoh, User } from "@prisma/client";
-import {
-  BspaohInput,
-  BspaohSignatureType
-} from "../../generated/graphql/types";
+import type { BspaohInput, BspaohSignatureType } from "@td/codegen-back";
 import { getUserRoles } from "../../permissions";
 import { editionRules } from "./rules";
 import { SealedFieldError } from "../../common/errors";

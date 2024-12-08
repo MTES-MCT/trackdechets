@@ -1,8 +1,5 @@
 import { gql } from "graphql-tag";
-import {
-  Mutation,
-  MutationCreateAccessTokenArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationCreateAccessTokenArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { hashToken } from "../../../../utils";
 import { userFactory } from "../../../../__tests__/factories";

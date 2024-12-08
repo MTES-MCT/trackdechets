@@ -1,4 +1,4 @@
-import { BsffResolvers } from "../../generated/graphql/types";
+import type { BsffResolvers } from "@td/codegen-back";
 import { getFicheInterventions } from "../database";
 import { isSessionUser } from "../../auth";
 import { expandBsffPackagingFromDB } from "../converter";

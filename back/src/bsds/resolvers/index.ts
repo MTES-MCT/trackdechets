@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 import bsds from "./queries/bsds";
 import { bsdResolver } from "./queries/bsd";
 import { Mutation } from "./Mutation";

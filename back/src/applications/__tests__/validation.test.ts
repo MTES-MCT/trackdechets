@@ -1,4 +1,4 @@
-import { CreateApplicationInput } from "../../generated/graphql/types";
+import type { CreateApplicationInput } from "@td/codegen-back";
 import { applicationSchema } from "../validation";
 
 const application: CreateApplicationInput = {

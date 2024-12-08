@@ -1,4 +1,4 @@
-import { FormResolvers } from "../../generated/graphql/types";
+import type { FormResolvers } from "@td/codegen-back";
 import stateSummary from "./forms/stateSummary";
 import appendix2Forms from "./forms/appendix2Forms";
 import groupedIn from "./forms/groupedIn";

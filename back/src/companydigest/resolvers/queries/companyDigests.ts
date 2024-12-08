@@ -1,7 +1,7 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 
-import { QueryResolvers } from "../../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 
 import { UserInputError } from "../../../common/errors";

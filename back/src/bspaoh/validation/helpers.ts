@@ -1,6 +1,6 @@
 import { Bspaoh, User, BspaohStatus, BspaohTransporter } from "@prisma/client";
 import { objectDiff } from "../../forms/workflow/diff";
-import { BspaohSignatureType } from "../../generated/graphql/types";
+import type { BspaohSignatureType } from "@td/codegen-back";
 
 import { SIGNATURES_HIERARCHY } from "./constants";
 import { UnparsedInputs } from "./index";

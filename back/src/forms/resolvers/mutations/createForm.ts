@@ -1,10 +1,10 @@
 import { EmitterType, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   MutationCreateFormArgs,
   ResolversParentTypes
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { MissingTempStorageFlag } from "../../errors";
 import {

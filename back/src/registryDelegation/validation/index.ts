@@ -1,9 +1,9 @@
-import {
+import type {
   CreateRegistryDelegationInput,
   MutationRevokeRegistryDelegationArgs,
   QueryRegistryDelegationArgs,
   QueryRegistryDelegationsArgs
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   delegationIdSchema,
   createRegistryDelegationInputSchema,

@@ -1,5 +1,5 @@
 import { CompanyType, Status, UserRole } from "@prisma/client";
-import { Query } from "../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,

@@ -3,12 +3,12 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { prisma } from "@td/prisma";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";
-import {
+import type {
   Form,
   FormCompany,
   FormRevisionRequestContent,
   QueryResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { toPrismaStringFilter } from "../../../common/where";
 

@@ -1,7 +1,7 @@
 import webhooksettings from "./queries/webhooksettings";
 import webhooksetting from "./queries/webhooksetting";
 
-import { QueryResolvers } from "../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 const Query: QueryResolvers = {
   webhooksettings,
   webhooksetting

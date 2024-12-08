@@ -6,12 +6,12 @@ import {
   Status,
   User
 } from "@prisma/client";
-import {
+import type {
   CreateFormInput,
   ImportPaperFormInput,
   TransporterInput,
   UpdateFormInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   Permission,
   checkUserPermissions,

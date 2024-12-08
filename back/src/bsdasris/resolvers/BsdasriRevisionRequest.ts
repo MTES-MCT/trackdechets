@@ -1,7 +1,7 @@
-import {
+import type {
   BsdasriRevisionRequest,
   BsdasriRevisionRequestResolvers
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { BsdasriRevisionRequest as PrismaBsdasriRevisionRequest } from "@prisma/client";
 import {

@@ -2,10 +2,7 @@ import gql from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { User } from "@prisma/client";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  Query,
-  QueryRegistryDelegationsArgs
-} from "../../../../generated/graphql/types";
+import type { Query, QueryRegistryDelegationsArgs } from "@td/codegen-back";
 import {
   registryDelegationFactory,
   registryDelegationFactoryWithExistingCompanies

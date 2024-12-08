@@ -1,11 +1,11 @@
-import { CompanySearchResult } from "../../companies/types";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { searchCompany } from "../../companies/search";
-import {
+import type {
   BsffFicheInterventionInput,
   BsffInput,
+  CompanySearchResult,
   UpdateBsffPackagingInput
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   sirenifyBsffInput,
   sirenifyBsffPackagingInput,

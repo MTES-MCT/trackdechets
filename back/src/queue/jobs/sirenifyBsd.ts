@@ -17,7 +17,7 @@ import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
 import { searchCompanyFailFast } from "../../companies/sirenify";
 import { Job } from "bull";
-import { CompanySearchResult } from "../../companies/types";
+import type { CompanySearchResult } from "@td/codegen-back";
 
 type SirenifyOpts<Bsd, BsdInput> = {
   getter: (bsd: Bsd) => string | null;

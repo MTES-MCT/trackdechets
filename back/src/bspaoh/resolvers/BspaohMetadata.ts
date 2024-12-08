@@ -1,11 +1,11 @@
 import { ZodIssue } from "zod";
-import {
+import type {
   BspaohError,
   BspaohMetadata,
   BspaohMetadataFields,
   BspaohMetadataResolvers,
   BspaohStatus
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { parseBspaohInContext } from "../validation";
 import {
   prepareBspaohForParsing,

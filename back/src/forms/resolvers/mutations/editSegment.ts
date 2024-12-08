@@ -1,5 +1,5 @@
 import { editSegment } from "./multiModal";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 
 const editSegmentResolver: MutationResolvers["editSegment"] = (
   parent,
