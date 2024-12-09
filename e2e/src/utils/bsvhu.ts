@@ -105,17 +105,23 @@ export const fillWasteTab = async (page: Page) => {
 
   // "Identification par N° d'ordre" options should be visible
   await expect(
-    page.getByText("tels qu'ils figurent dans le registre de police")
+    page.getByText(
+      "Identification par N° d'ordre tels qu'ils figurent dans le registre de police"
+    )
   ).toBeVisible();
-  await expect(page.getByText("des lots sortants")).toBeVisible();
+  await expect(
+    page.getByText("Identification par numéro d'immatriculation")
+  ).toBeVisible();
 
   // Check default selection
   await expect(
-    page.getByLabel("tels qu'ils figurent dans le registre de police")
+    page.getByLabel(
+      "Identification par N° d'ordre tels qu'ils figurent dans le registre de police"
+    )
   ).toBeChecked();
 
   // Select target value
-  await page.getByText("des lots sortants").click();
+  await page.getByText("Identification par numéro d'immatriculation").click();
 
   // Détail des identifications
   const fillIdentificationsInput = async (value: string) => {
