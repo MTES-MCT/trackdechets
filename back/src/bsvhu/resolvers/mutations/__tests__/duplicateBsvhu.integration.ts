@@ -830,4 +830,112 @@ describe("mutaion.duplicateBsvhu", () => {
     expect(duplicatedVhu.destinationOperationCode).toBeNull();
     expect(duplicatedVhu.destinationOperationMode).toBeNull();
   });
+
+  it("should replace deprecated identification type", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        createdAt: new Date("2024-10-01T00:00:00.000Z"),
+        packaging: "LOT",
+        identificationType: "NUMERO_ORDRE_LOTS_SORTANTS"
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
+      {
+        variables: { id: bsvhu.id }
+      }
+    );
+
+    const duplicatedVhu = await prisma.bsvhu.findFirstOrThrow({
+      where: { id: data.duplicateBsvhu.id }
+    });
+
+    expect(duplicatedVhu.packaging).toEqual("UNITE");
+    expect(duplicatedVhu.identificationType).toEqual("NUMERO_IMMATRICULATION");
+  });
+
+  it("should set identification type to null when packaging is LOT", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        createdAt: new Date("2024-10-01T00:00:00.000Z"),
+        packaging: "LOT",
+        identificationType: "NUMERO_ORDRE_REGISTRE_POLICE" // LOT with non null identificationType are now invalid
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
+      {
+        variables: { id: bsvhu.id }
+      }
+    );
+
+    const duplicatedVhu = await prisma.bsvhu.findFirstOrThrow({
+      where: { id: data.duplicateBsvhu.id }
+    });
+
+    expect(duplicatedVhu.packaging).toEqual("LOT");
+    expect(duplicatedVhu.identificationType).toBeNull();
+  });
+
+  it("should set identification type to non null when packaging is UNITE", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        createdAt: new Date("2024-10-01T00:00:00.000Z"),
+        packaging: "UNITE",
+        identificationType: null // UNITE with null identificationType are now invalid
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
+      {
+        variables: { id: bsvhu.id }
+      }
+    );
+
+    const duplicatedVhu = await prisma.bsvhu.findFirstOrThrow({
+      where: { id: data.duplicateBsvhu.id }
+    });
+
+    expect(duplicatedVhu.packaging).toEqual("UNITE");
+    expect(duplicatedVhu.identificationType).toEqual("NUMERO_IMMATRICULATION");
+  });
+
+  it("should preserve identification type and packaging when valid", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        createdAt: new Date("2024-10-01T00:00:00.000Z"),
+        packaging: "UNITE",
+        identificationType: "NUMERO_IMMATRICULATION"
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
+      {
+        variables: { id: bsvhu.id }
+      }
+    );
+
+    const duplicatedVhu = await prisma.bsvhu.findFirstOrThrow({
+      where: { id: data.duplicateBsvhu.id }
+    });
+
+    expect(duplicatedVhu.packaging).toEqual("UNITE");
+    expect(duplicatedVhu.identificationType).toEqual("NUMERO_IMMATRICULATION");
+  });
 });

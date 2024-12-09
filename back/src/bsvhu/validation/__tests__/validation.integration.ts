@@ -8,7 +8,7 @@ import {
 } from "../../../__tests__/factories";
 import { CompanySearchResult } from "../../../companies/types";
 import { searchCompany } from "../../../companies/search";
-
+import { BsvhuIdentificationType } from "@prisma/client";
 import {
   bsvhuFactory,
   toIntermediaryCompany
@@ -518,6 +518,105 @@ describe("BSVHU validation", () => {
         }
       });
     });
+  });
+
+  describe("Packaging and identificationType", () => {
+    test("when deprecated identificationType is used", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        identificationType: "NUMERO_ORDRE_LOTS_SORTANTS"
+      };
+      expect.assertions(1);
+
+      try {
+        parseBsvhu(data, {
+          ...context
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "identificationType : La valeur du type d'identification est dépréciée"
+          })
+        ]);
+      }
+    });
+
+    test("when packaging is LOT and identificationType is not null", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        packaging: "LOT",
+        identificationType: "NUMERO_ORDRE_REGISTRE_POLICE"
+      };
+      expect.assertions(1);
+
+      try {
+        parseBsvhu(data, {
+          ...context
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "identificationType : Le type d'identification doit être null quand le conditionnement est en lot"
+          })
+        ]);
+      }
+    });
+
+    test("when packaging is LOT and identificationType is null", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        packaging: "LOT",
+        identificationType: null
+      };
+
+      const parsed = parseBsvhu(data, {
+        ...context
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when packaging is UNITE and identificationType is null", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        packaging: "UNITE",
+        identificationType: null
+      };
+      expect.assertions(1);
+
+      try {
+        parseBsvhu(data, { ...context });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "identificationType : Le type d'identification est obligatoire quand le conditionnement est en unité"
+          })
+        ]);
+      }
+    });
+
+    test.each([
+      BsvhuIdentificationType.NUMERO_ORDRE_REGISTRE_POLICE,
+      BsvhuIdentificationType.NUMERO_IMMATRICULATION
+    ])(
+      "when packaging is UNITE and identificationType is %p",
+      async identificationType => {
+        const data: ZodBsvhu = {
+          ...bsvhu,
+          packaging: "UNITE",
+          identificationType
+        };
+
+        const parsed = parseBsvhu(data, {
+          ...context,
+          currentSignatureType: "EMISSION"
+        });
+
+        expect(parsed).toBeDefined();
+      }
+    );
   });
 
   describe("Operation modes", () => {

@@ -2110,7 +2110,8 @@ enum BsvhuPackaging {
 
 enum BsvhuIdentificationType {
   NUMERO_ORDRE_REGISTRE_POLICE
-  NUMERO_ORDRE_LOTS_SORTANTS
+  NUMERO_IMMATRICULATION
+  NUMERO_ORDRE_LOTS_SORTANTS // deprecated
 }
 
 enum BsvhuDestinationType {
