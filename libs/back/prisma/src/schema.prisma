@@ -1445,6 +1445,8 @@ model Bsff {
   // Denormalized transporter sirets to speed up query `bsffs`
   transportersOrgIds     String[] @default([])
 
+  canAccessDraftOrgIds String[] @default([])
+
   // partial _BsffIsDeletedIdx, _BsffIsDraftIdx index see migration82_missing_indices.sql
   @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsffDestinationCompanySiretIdx")
@@ -1454,6 +1456,7 @@ model Bsff {
   @@index([emitterEmissionSignatureDate], map: "_BsffEmitterEmissionSignatureDateIdx")
   @@index([transporterTransportSignatureDate], map: "_BsffTransporterTransportSignatureDateIdx")
   @@index([detenteurCompanySirets], map: "_BsffDetenteurSiretsIdx", type: Gin)
+  @@index([canAccessDraftOrgIds], map: "_BsffCanAccessDraftOrgIdsIdx", type: Gin)
 }
 
 model BsffTransporter {

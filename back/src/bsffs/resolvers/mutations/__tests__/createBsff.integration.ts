@@ -125,6 +125,9 @@ describe("Mutation.createBsff", () => {
     expect(createdBsff.wasteCode).toEqual(BSFF_WASTE_CODES[0]);
     expect(createdBsff.wasteAdr).toEqual("Mention ADR");
     expect(createdBsff.wasteDescription).toEqual("R410");
+
+    // check canAccessDraftOrgIds
+    expect(createdBsff.canAccessDraftOrgIds).toEqual([]);
   });
 
   it("should create a bsff with a fiche d'intervention", async () => {
