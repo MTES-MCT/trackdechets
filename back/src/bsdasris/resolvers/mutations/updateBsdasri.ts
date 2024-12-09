@@ -1,9 +1,9 @@
 import { BsdasriType } from "@prisma/client";
 
-import {
+import type {
   ResolversParentTypes,
   MutationUpdateBsdasriArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
 

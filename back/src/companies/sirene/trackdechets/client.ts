@@ -15,10 +15,10 @@ import {
 } from "./types";
 import client from "./esClient";
 import { SEARCH_COMPANIES_MAX_SIZE } from "../insee/client";
-import {
+import type {
   EtatAdministratif,
   StatutDiffusionEtablissement
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 const { ResponseError } = errors;
 /**

@@ -1,12 +1,12 @@
 import { Bsvhu } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
-import {
+import type {
   AllWaste,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
   TransportedWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   GenericWaste,
   RegistryFields,

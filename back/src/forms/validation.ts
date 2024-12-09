@@ -45,13 +45,13 @@ import {
 } from "../common/validation";
 
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
-import {
+import type {
   CiterneNotWashedOutReason,
   CompanyInput,
   InitialFormFractionInput,
   PackagingInfo,
   Packagings
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   EXTRANEOUS_NEXT_DESTINATION,

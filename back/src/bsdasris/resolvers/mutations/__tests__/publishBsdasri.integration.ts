@@ -7,7 +7,7 @@ import {
   initialData,
   readyToPublishData
 } from "../../../__tests__/factories";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 const PUBLISH_DASRI = `
 mutation PublishDasri($id: ID!){
   publishBsdasri(id: $id)  {

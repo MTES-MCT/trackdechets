@@ -1,9 +1,9 @@
-import {
+import type {
   FormInput,
   ResealedFormInput,
   NextSegmentInfoInput,
   TransporterInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 
 import { recipifyGeneric } from "../companies/recipify";
 import { BsddTransporter, Prisma } from "@prisma/client";

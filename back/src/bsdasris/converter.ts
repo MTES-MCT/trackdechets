@@ -1,4 +1,4 @@
-import {
+import type {
   Bsdasri as GqlBsdasri,
   BsdasriEmitter,
   BsdasriTransporter,
@@ -38,7 +38,7 @@ import {
   BsdasriRevisionRequestDestination,
   BsdasriRevisionRequestOperation,
   BsdasriRevisionRequestReception
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   nullIfNoValues,
   safeInput,

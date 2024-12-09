@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import createBsffResolver from "./mutations/createBsff";
 import createDraftBsff from "./mutations/createDraftBsff";
 import publishBsff from "./mutations/publishBsff";

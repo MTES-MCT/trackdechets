@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound, getFirstTransporterSync } from "../../database";
 import { expandBsffFromDB } from "../../converter";

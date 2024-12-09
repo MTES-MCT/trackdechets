@@ -1,20 +1,20 @@
 import * as Excel from "exceljs";
-import {
+import type {
   AllWaste,
   BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
+  RegistryExportSource,
   SsdWaste,
   TransportedWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { GenericWaste } from "./types";
 import { formatStatusLabel } from "@td/constants";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { TransportMode } from "@prisma/client";
 import { isDefined } from "../common/helpers";
-import { RegistryExportSource } from "@td/codegen-back";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)

@@ -1,11 +1,11 @@
 import { AuthType } from "../auth";
 import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
-import { CompanySearchResult } from "../companies/types";
-import {
+import type {
+  CompanySearchResult,
   CompanyInput,
   StatutDiffusionEtablissement
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
 import { SireneSearchResult } from "./sirene/types";

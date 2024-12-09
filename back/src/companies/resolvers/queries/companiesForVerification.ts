@@ -1,7 +1,7 @@
 import { CompanyType, Prisma } from "@prisma/client";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import * as COMPANY_CONSTANTS from "@td/constants";
 import { getPrismaPaginationArgs } from "../../../common/pagination";

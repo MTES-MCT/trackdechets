@@ -1,10 +1,10 @@
 import { estypes } from "@elastic/elasticsearch";
 import { BsdElastic, client, groupByBsdType, index } from "../common/elastic";
-import {
+import type {
   OrderType,
   WasteRegistryType,
   WasteRegistryWhere
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { toElasticFilter } from "./where";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@td/prisma";

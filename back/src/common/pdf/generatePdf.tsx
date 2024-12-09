@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import { format } from "date-fns";
 import { toPDF } from "./pdf";
 import { CSS_PATHS } from "./components";
-import { Maybe } from "../../generated/graphql/types";
+import type { Maybe } from "@td/codegen-back";
 
 export function formatDate(date?: Date | null) {
   return date ? format(date, "dd/MM/yyyy") : "__/__/____";

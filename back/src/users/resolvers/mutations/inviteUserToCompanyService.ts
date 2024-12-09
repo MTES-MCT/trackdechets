@@ -1,10 +1,10 @@
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import {
+import type {
   CompanyPrivate,
   MutationInviteUserToCompanyArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { sanitizeEmail } from "../../../utils";
 import { associateUserToCompany, createUserAccountHash } from "../../database";
 

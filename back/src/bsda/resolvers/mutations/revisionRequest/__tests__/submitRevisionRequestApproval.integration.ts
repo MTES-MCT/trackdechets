@@ -6,10 +6,10 @@ import {
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import {
+import type {
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs
-} from "../../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { NON_CANCELLABLE_BSDA_STATUSES } from "../createRevisionRequest";
 import { BsdaStatus, UserRole } from "@prisma/client";
 import { operationHook } from "../../../../operationHook";
