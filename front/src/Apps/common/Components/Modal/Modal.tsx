@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
 import FocusTrap from "focus-trap-react";
 import "./modal.scss";
+import { useMedia } from "../../../../common/use-media";
+import { MEDIA_QUERIES } from "../../../../common/config";
 
 const ModalSizesClass = {
   M: "fr-col-12 fr-col-md-6 fr-col-lg-6",
@@ -104,6 +106,19 @@ export default function TdModal({
     },
     ...props
   });
+
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
+
+  useEffect(() => {
+    if (isMobile) {
+      const input = document.querySelector("input");
+      input?.addEventListener("focus", () => {
+        setTimeout(() => {
+          input.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 300); // Délai pour attendre l'apparition du clavier
+      });
+    }
+  }, [isMobile]);
 
   return state.isOpen ? (
     <Modal
