@@ -1928,7 +1928,7 @@ type AllWaste {
 
 type AllWasteEdge {
   cursor: String!
-  node: ManagedWaste!
+  node: AllWaste!
 }
 
 type AllWasteConnection {
