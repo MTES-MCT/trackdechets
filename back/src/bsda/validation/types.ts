@@ -17,6 +17,7 @@ export type BsdaValidationContext = {
   enableCompletionTransformers?: boolean;
   enablePreviousBsdasChecks?: boolean;
   userFunctions?: BsdaUserFunctions;
+  isSignatureStep?: boolean;
 };
 
 export const BsdaForParsingInclude = Prisma.validator<Prisma.BsdaInclude>()({

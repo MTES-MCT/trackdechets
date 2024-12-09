@@ -29,7 +29,6 @@ import {
 import { buildPdfAsBase64 } from "../../../pdf/generator";
 import { getTransportersSync } from "../../../database";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
-import bsda from "../../queries/bsda";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
@@ -1651,7 +1650,7 @@ describe("Mutation.Bsda.sign", () => {
     });
   });
 
-  describe.only("closed sirets", () => {
+  describe("closed sirets", () => {
     let emitterUser: User;
     let emitter: Company;
     let destinationUser: User;
@@ -1849,6 +1848,7 @@ describe("Mutation.Bsda.sign", () => {
       });
 
       it("worker signature", async () => {
+        console.log(">> WORKER SIGNATURE");
         await testSigningBsda("WORK", workerUser);
       });
 

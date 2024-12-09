@@ -1984,14 +1984,12 @@ describe("Mutation.updateBsda", () => {
       ]
     };
     const { mutate } = makeClient(emitter.user);
-
     const { errors } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
       variables: { id: bsda.id, input }
     });
-
     expect(errors).toBeUndefined();
 
     const updatedBsda = await prisma.bsda.findUniqueOrThrow({
@@ -2231,7 +2229,7 @@ describe("Mutation.updateBsda", () => {
     );
   });
 
-  describe.only("closed sirets", () => {
+  describe("closed sirets", () => {
     let user: User;
     let emitter: Company;
     let destination: Company;
@@ -2247,16 +2245,22 @@ describe("Mutation.updateBsda", () => {
     let makeClientLocal: typeof makeClient;
 
     beforeAll(async () => {
-      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER");
+      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
+        name: "Emitter"
+      });
       user = emitterCompanyAndUser.user;
       emitter = emitterCompanyAndUser.company;
-      destination = await companyFactory();
-      transporter = await companyFactory();
-      worker = await companyFactory();
-      broker = await companyFactory();
-      intermediary = await companyFactory();
+      destination = await companyFactory({ name: "Destination" });
+      transporter = await companyFactory({ name: "Transporter" });
+      worker = await companyFactory({ name: "Worker" });
+      broker = await companyFactory({
+        name: "Broker",
+        companyTypes: ["BROKER"]
+      });
+      intermediary = await companyFactory({ name: "Intermediary" });
       ecoOrganisme = await ecoOrganismeFactory({
-        handle: { handleBsda: true }
+        handle: { handleBsda: true },
+        createAssociatedCompany: true
       });
 
       bsda = await bsdaFactory({
@@ -2304,24 +2308,18 @@ describe("Mutation.updateBsda", () => {
         .default as typeof makeClient;
     });
 
-    const mockCloseCompany = siretToClose => {
+    afterEach(jest.restoreAllMocks);
+
+    it("should not be able to do an update if a siret is closed", async () => {
+      // Given
       searchCompanyMock.mockImplementation(siret => {
         return {
           siret,
-          etatAdministratif: siret === siretToClose ? "F" : "O",
+          etatAdministratif: siret === bsda.destinationCompanySiret ? "F" : "O",
           address: "Company address",
           name: "Company name"
         };
       });
-    };
-
-    const testUpdatingBsdaWithClosedSiret = async (status, siret) => {
-      // Given
-      await prisma.bsda.update({
-        where: { id: bsda.id },
-        data: { status }
-      });
-      mockCloseCompany(siret);
 
       // When
       const { mutate } = makeClientLocal(user);
@@ -2342,47 +2340,47 @@ describe("Mutation.updateBsda", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        `L'établissement ${siret} est fermé selon le répertoire SIRENE`
+        `L'établissement ${bsda.destinationCompanySiret} est fermé selon le répertoire SIRENE`
       );
-    };
+    });
 
-    describe.each([
-      BsdaStatus.INITIAL,
-      BsdaStatus.SIGNED_BY_PRODUCER,
-      BsdaStatus.SIGNED_BY_WORKER,
-      BsdaStatus.SENT,
-      BsdaStatus.PROCESSED,
-      BsdaStatus.CANCELED,
-      BsdaStatus.REFUSED
-    ])("status %p", status => {
-      it.each([
-        "destinationCompanySiret",
-        "ecoOrganismeSiret",
-        "brokerCompanySiret",
-        "workerCompanySiret"
-      ])("should not allow updating BSDA if %p is closed", async siretField => {
-        // Given
-        const siret = bsda[siretField];
-
-        // When > Then
-        await testUpdatingBsdaWithClosedSiret(status, siret);
+    it("should not be able to do an update if a siret is dormant", async () => {
+      // Given
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: "O",
+          address: "Company address",
+          name: "Company name"
+        };
       });
 
-      // it("should not allow updating BSDA if transporter siret is closed", async () => {
-      //   // Given
-      //   const siret = bsda.transporters[0].transporterCompanySiret;
+      await prisma.company.update({
+        where: { siret: bsda.destinationCompanySiret! },
+        data: { isDormantSince: new Date() }
+      });
 
-      //   // When > Then
-      //   await testUpdatingBsdaWithClosedSiret(status, siret);
-      // });
+      // When
+      const { mutate } = makeClientLocal(user);
+      const { errors } = await mutate<Pick<Mutation, "updateBsda">>(
+        UPDATE_BSDA,
+        {
+          variables: {
+            id: bsda.id,
+            input: {
+              waste: {
+                code: "06 13 04*"
+              }
+            }
+          }
+        }
+      );
 
-      // it("should not allow updating BSDA if intermediary siret is closed", async () => {
-      //   // Given
-      //   const siret = bsda.intermediaries[0].siret;
-
-      //   // When > Then
-      //   await testUpdatingBsdaWithClosedSiret(status, siret);
-      // });
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'établissement avec le SIRET ${bsda.destinationCompanySiret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+      );
     });
   });
 });

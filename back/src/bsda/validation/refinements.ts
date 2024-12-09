@@ -6,7 +6,8 @@ import {
   isBsdaFieldRequired,
   isBsdaTransporterFieldRequired,
   BsdaEditableFields,
-  BsdaTransporterEditableFields
+  BsdaTransporterEditableFields,
+  getSealedFields
 } from "./rules";
 import { getSignatureAncestors } from "./helpers";
 import { capitalize } from "../../common/strings";
@@ -286,10 +287,14 @@ async function checkEmitterIsNotEcoOrganisme(
  * Ce refinement permet de vérifier que les établissements présents sur le
  * BSDA sont bien inscrits sur Trackdéchets avec le bon profil
  */
-export const checkCompanies: Refinement<ParsedZodBsda> = async (
+export const checkCompanies = async (
   bsda,
-  zodContext
+  zodContext,
+  bsdaValidationContext: BsdaValidationContext
 ) => {
+  const sealedFields = await getSealedFields(bsda, bsdaValidationContext);
+  const isSignature = !!bsdaValidationContext.isSignatureStep;
+
   const isBsdaDestinationExemptFromVerification = (
     destination: Company | null
   ) => {
@@ -301,20 +306,26 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
     );
   };
 
-  await isEmitterNotDormantRefinement(bsda.emitterCompanySiret, zodContext);
+  if (!isSignature && !sealedFields.includes("emitterCompanySiret")) {
+    await isEmitterNotDormantRefinement(bsda.emitterCompanySiret, zodContext);
+  }
+
   await isDestinationRefinement(
     bsda.destinationCompanySiret,
     zodContext,
     "DESTINATION",
     CompanyRole.Destination,
-    isBsdaDestinationExemptFromVerification
+    isBsdaDestinationExemptFromVerification,
+    !isSignature && !sealedFields.includes("destinationCompanySiret")
   );
   await isDestinationRefinement(
     bsda.destinationOperationNextDestinationCompanySiret,
     zodContext,
     "DESTINATION",
     CompanyRole.DestinationOperationNextDestination,
-    isBsdaDestinationExemptFromVerification
+    isBsdaDestinationExemptFromVerification,
+    !isSignature &&
+      !sealedFields.includes("destinationOperationNextDestinationCompanySiret")
   );
   for (const transporter of bsda.transporters ?? []) {
     await isTransporterRefinement(
@@ -323,26 +334,41 @@ export const checkCompanies: Refinement<ParsedZodBsda> = async (
         transporterRecepisseIsExempted:
           transporter.transporterRecepisseIsExempted ?? false
       },
-      zodContext
+      zodContext,
+      !isSignature && !sealedFields.includes("transporters")
     );
     await isRegisteredVatNumberRefinement(
       transporter.transporterCompanyVatNumber,
       zodContext
     );
   }
-  await isWorkerRefinement(bsda.workerCompanySiret, zodContext);
+  await isWorkerRefinement(
+    bsda.workerCompanySiret,
+    zodContext,
+    !isSignature && !sealedFields.includes("workerCompanySiret")
+  );
   await isEcoOrganismeRefinement(
     bsda.ecoOrganismeSiret,
     BsdType.BSDA,
-    zodContext
+    zodContext,
+    !isSignature && !sealedFields.includes("ecoOrganismeSiret")
   );
   await checkEmitterIsNotEcoOrganisme(bsda.emitterCompanySiret, zodContext);
 
-  await isBrokerRefinement(bsda.brokerCompanySiret, zodContext);
+  await isBrokerRefinement(
+    bsda.brokerCompanySiret,
+    zodContext,
+    !isSignature && !sealedFields.includes("brokerCompanySiret")
+  );
 
-  if (bsda.intermediaries?.length) {
+  if (bsda.intermediaries) {
     for (const intermediary of bsda.intermediaries) {
-      await refineSiretAndGetCompany(intermediary.siret, zodContext);
+      await refineSiretAndGetCompany(
+        intermediary.siret,
+        zodContext,
+        CompanyRole.Intermediary,
+        !isSignature && !sealedFields.includes("intermediaries")
+      );
     }
   }
 };
@@ -564,9 +590,15 @@ export const checkTransporters: Refinement<ParsedZodBsda> = (
 };
 export async function isWorkerRefinement(
   siret: string | null | undefined,
-  ctx
+  ctx,
+  checkIsNotDormant = true
 ) {
-  const company = await refineSiretAndGetCompany(siret, ctx);
+  const company = await refineSiretAndGetCompany(
+    siret,
+    ctx,
+    CompanyRole.Worker,
+    checkIsNotDormant
+  );
 
   if (company && !isWorker(company)) {
     ctx.addIssue({
