@@ -128,7 +128,32 @@ export const rawBsvhuSchema = z.object({
           message: `Veuillez sélectionner un éco-organisme`
         });
       }
+    }),
+  broker: z
+    .object({
+      company: zodCompany,
+      recepisse: z
+        .object({
+          number: z.string().nullish(),
+          department: z.string().nullish(),
+          validityLimit: z.string().nullish()
+        })
+        .nullish()
     })
+    .nullish(),
+  trader: z
+    .object({
+      company: zodCompany,
+      recepisse: z
+        .object({
+          number: z.string().nullish(),
+          department: z.string().nullish(),
+          validityLimit: z.string().nullish()
+        })
+        .nullish()
+    })
+    .nullish(),
+  intermediaries: z.array(zodCompany).nullish()
 });
 
 export type ZodBsvhu = z.infer<typeof rawBsvhuSchema>;

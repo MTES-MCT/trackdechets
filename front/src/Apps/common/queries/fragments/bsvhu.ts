@@ -188,6 +188,29 @@ export const FullBsvhuFragment = gql`
       siret
       name
     }
+    broker {
+      company {
+        ...CompanyFragment
+      }
+      recepisse {
+        number
+        department
+        validityLimit
+      }
+    }
+    trader {
+      company {
+        ...CompanyFragment
+      }
+      recepisse {
+        number
+        department
+        validityLimit
+      }
+    }
+    intermediaries {
+      ...CompanyFragment
+    }
   }
   ${companyFragment}
 `;
