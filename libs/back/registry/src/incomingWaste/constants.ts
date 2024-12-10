@@ -1,5 +1,6 @@
 export const INCOMING_WASTE_HEADERS = {
   reason: "Motif",
+  custominfo: "Champ libre / Référence chantier",
   publicId: "Numéro unique",
   reportAsSiret: "SIRET du déclarant",
   reportForSiret: "SIRET du destinataire",
@@ -42,7 +43,8 @@ export const INCOMING_WASTE_HEADERS = {
   ecoOrganismeSiret: "SIRET de l'éco-organisme",
   ecoOrganismeName: "Raison sociale de l'éco-organisme",
   operationCode: "Code d'opération réalisé",
-  nexrDestinationIsAbroad: "Destination ultérieure à l'étranger",
+  noTraceability: "Rupture de traçabilité autorisée",
+  nextDestinationIsAbroad: "Destination ultérieure à l'étranger",
   declarationNumber: "Numéro de déclaration",
   notificationNumber: "Numéro de notification",
   movementNumber: "Numéro de mouvement",

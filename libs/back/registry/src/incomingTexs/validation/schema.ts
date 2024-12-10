@@ -30,7 +30,8 @@ import {
   parcelCoordinatesSchema,
   parcelNumbersSchema,
   municipalitiesNamesSchema,
-  nextDestinationIsAbroad
+  nextDestinationIsAbroad,
+  noTraceability
 } from "../../shared/schemas";
 
 export type ParsedZodIncomingTexsItem = z.output<typeof incomingTexsSchema>;
@@ -109,6 +110,7 @@ const inputIncomingTexsSchema = z.object({
     )
     .optional(),
   operationCode: operationCodeSchema,
+  noTraceability: noTraceability.optional(),
   nextDestinationIsAbroad: nextDestinationIsAbroad.optional(),
   declarationNumber: declarationNumberSchema,
   notificationNumber: notificationNumberSchema,

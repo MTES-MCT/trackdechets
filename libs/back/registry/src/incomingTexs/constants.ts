@@ -48,6 +48,8 @@ export const INCOMING_TEXS_HEADERS = {
   traderName: "Raison sociale du négociant",
   traderReceiptNumber: "Numéro de récépissé du négociant",
   operationCode: "Code d'opération réalisé",
+  noTraceability: "Rupture de traçabilité autorisée",
+  nextDestinationIsAbroad: "Destination ultérieure à l'étranger",
   declarationNumber: "Numéro de déclaration",
   notificationNumber: "Numéro de notification",
   movementNumber: "Numéro de mouvement",
