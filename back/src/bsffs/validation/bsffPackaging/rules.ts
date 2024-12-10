@@ -214,7 +214,7 @@ export async function checkBsffPackagingSealedFields(
     if (isSealed) {
       sealedFieldErrors.push(
         [
-          `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
+          `${fieldDescription} a été verrouillé via signature et ne peut pas être modifié.`,
           sealedRule.customErrorMessage
         ]
           .filter(Boolean)
