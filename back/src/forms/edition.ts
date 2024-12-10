@@ -79,6 +79,7 @@ type EditableBsddFields = Required<
     | "finalOperations"
     | "FinalOperationToFinalForm"
     | "emptyReturnADR"
+    | "registryLookups"
   >
 >;
 

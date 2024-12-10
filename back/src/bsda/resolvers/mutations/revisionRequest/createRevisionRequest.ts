@@ -41,7 +41,8 @@ export const NON_CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = Object.values(
 const BSDA_REVISION_REQUESTER_FIELDS = [
   "emitterCompanySiret",
   "destinationCompanySiret",
-  "workerCompanySiret"
+  "workerCompanySiret",
+  "ecoOrganismeSiret"
 ];
 
 export type RevisionRequestContent = Pick<

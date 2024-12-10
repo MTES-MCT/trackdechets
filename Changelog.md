@@ -7,13 +7,36 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2024.12.1] 17/12/2024
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Permettre aux éco-organismes de réviser un BSDA [PR 3790](https://github.com/MTES-MCT/trackdechets/pull/3790)
+- Permettre l'ajout de courtier, négociant et intermédiaires sur le BSVHU [PR 3795](https://github.com/MTES-MCT/trackdechets/pull/3795)
+
 #### :nail_care: Améliorations
 
 - Permettre au transporteur étranger d'avoir les mêmes droits qu'un transporteur FR concernant la révision sur une Annexe 1 [PR 3770](https://github.com/MTES-MCT/trackdechets/pull/3770)
+- Remonter le VHU en situation irrégulière (sans émetteur TD) dans l'onglet À collecter du transporteur [PR 3792](https://github.com/MTES-MCT/trackdechets/pull/3792)
+- Mise à jour des règles de validations pour le conditionnement et l'identifications des bsvhus [PR 3807](https://github.com/MTES-MCT/trackdechets/pull/3807)
+- Rendre les BSFFs en brouillon inaccessibles aux entreprises dont l'auteur ne fait pas partie [PR 3793](https://github.com/MTES-MCT/trackdechets/pull/3793)
+- Passage au DSFR de la modale de signature transporteur du BSVHU [PR 3809](https://github.com/MTES-MCT/trackdechets/pull/3809)
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de l'export v2 des registres SSD [PR 3755](https://github.com/MTES-MCT/trackdechets/pull/3755)
+- Permettre de faire une demande de révision BSDD lorsque le l'émetteur est un particulier ou un navire étranger [PR 3785](https://github.com/MTES-MCT/trackdechets/pull/3785)
 
 #### :bug: Corrections de bugs
 
 - Ne pas doubler les quantités restantes à regrouper lorsqu'on modifie un bordereau de groupement [PR 3760](https://github.com/MTES-MCT/trackdechets/pull/3760)
+- Retirer la possibilité de réviser une Annexe 1 avant la signature de l'enlèvement pour tous les acteurs [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
+- Retirer les accès à la révision pour les profils Négociant, Courtier et Autre intermédiaire [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
+- Impossible de changer de destination finale sur un BSDD avec entreposage provisoire si la destination finale initialement renseignée a été mise en sommeil [PR 3804](https://github.com/MTES-MCT/trackdechets/pull/3804)
+- Les intermédiaires n'apparaissent pas sur le récépissé PDF du BSDA [PR 3796](https://github.com/MTES-MCT/trackdechets/pull/3796)
+- Corrige l'affichage des décimales sur le poids du PAOH [PR 3808](https://github.com/MTES-MCT/trackdechets/pull/3808)
+- La vérification de l'avis de situation SIRENE ne fonctionne pas pour les établissements anonymes lorsque le SIRET du siège est différent du SIRET de l'établissement [PR 3794](https://github.com/MTES-MCT/trackdechets/pull/3794)
+- Corrige la sélection d'un organisme de certification amiante dans la création d'un établissement [PR 3797](https://github.com/MTES-MCT/trackdechets/pull/3797)
+- Corrige le sélecteur d'entreprise sur le dashboard n'affichant qu'un seul résultat [PR 3799](https://github.com/MTES-MCT/trackdechets/pull/3799)
+- Amélioration d'affichange de la page Mes établissements [PR 3798](https://github.com/MTES-MCT/trackdechets/pull/3798)
 
 # [2024.11.1] 19/11/2024
 

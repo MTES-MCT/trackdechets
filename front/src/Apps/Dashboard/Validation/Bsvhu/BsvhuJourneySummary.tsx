@@ -5,7 +5,7 @@ import {
   JourneyStop,
   JourneyStopName,
   JourneyStopDescription
-} from "../../../../../common/components";
+} from "../../../../common/components";
 
 interface Props {
   bsvhu: Bsvhu;
@@ -17,7 +17,7 @@ export function BsvhuJourneySummary({ bsvhu }: Props) {
       <JourneyStop
         variant={bsvhu.emitter?.emission?.signature ? "complete" : "active"}
       >
-        <JourneyStopName>Émetteur</JourneyStopName>
+        <JourneyStopName>Producteur</JourneyStopName>
         <JourneyStopDescription>
           {bsvhu.emitter?.company?.name} ({bsvhu.emitter?.company?.siret})<br />
           {bsvhu.emitter?.company?.address}

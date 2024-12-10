@@ -1,15 +1,51 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "../../../common/components/company/CompanySelector";
-import { Bsda, BsdaType } from "@td/codegen-ui";
+import { Bsda, BsdaStatus, BsdaType } from "@td/codegen-ui";
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import DateInput from "../../../common/components/custom-inputs/DateInput";
 import Select from "react-select";
 import { IntermediariesSelector } from "../../components/intermediaries/IntermediariesSelector";
 import { getInitialCompany } from "../../../../Apps/common/data/initialState";
+import { BsdaContext } from "../../FormContainer";
+
+const DestinationCAPModificationAlert = () => (
+  <div className="fr-alert fr-alert--info fr-my-4v">
+    <p>
+      En cas de modification de la mention CAP de l'exutoire, le producteur en
+      sera informé par courriel.
+    </p>
+  </div>
+);
+
+const showCAPModificationAlert = bsdaContext => {
+  return (
+    bsdaContext?.status &&
+    [BsdaStatus.SignedByProducer, BsdaStatus.SignedByWorker].includes(
+      bsdaContext?.status
+    ) &&
+    Boolean(bsdaContext?.worker?.company?.siret) &&
+    Boolean(bsdaContext?.emitter?.company?.siret)
+  );
+};
+
+const showDestinationCAPModificationAlert = bsdaContext => {
+  return (
+    !bsdaContext?.nextDestination?.siret &&
+    showCAPModificationAlert(bsdaContext)
+  );
+};
+
+const showNextDestinationCAPModificationAlert = bsdaContext => {
+  return (
+    Boolean(bsdaContext?.nextDestination?.siret) &&
+    showCAPModificationAlert(bsdaContext)
+  );
+};
 
 export function Destination({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
+  const bsdaContext = useContext(BsdaContext);
   const hasNextDestination = Boolean(
     values.destination?.operation?.nextDestination?.company
   );
@@ -161,7 +197,7 @@ export function Destination({ disabled }) {
           />
           <div className="form__row">
             <label>
-              N° CAP:
+              N° CAP :
               <Field
                 disabled={hasNextDestination ? false : disabled}
                 type="text"
@@ -173,12 +209,15 @@ export function Destination({ disabled }) {
                 className="td-input td-input--medium"
               />
             </label>
+            {showDestinationCAPModificationAlert(bsdaContext) && (
+              <DestinationCAPModificationAlert />
+            )}
           </div>
         </>
       )}
 
       <div className="form__row">
-        <label>Opération d’élimination / valorisation prévue (code D/R)</label>
+        <label>Opération d'élimination / valorisation prévue (code D/R)</label>
         <Field
           as="select"
           name={
@@ -244,7 +283,7 @@ export function Destination({ disabled }) {
 
               <div className="form__row">
                 <label>
-                  N° CAP: (optionnel)
+                  N° CAP : (optionnel)
                   <Field
                     disabled={disabled}
                     type="text"
@@ -252,11 +291,14 @@ export function Destination({ disabled }) {
                     className="td-input td-input--medium"
                   />
                 </label>
+                {showNextDestinationCAPModificationAlert(bsdaContext) && (
+                  <DestinationCAPModificationAlert />
+                )}
               </div>
 
               <div className="form__row">
                 <label>
-                  Opération d"élimination / valorisation prévue (code D/R)
+                  Opération d'élimination / valorisation prévue (code D/R)
                 </label>
                 <Field
                   as="select"

@@ -30,7 +30,11 @@ const getSchema = () =>
     .object({
       delegateOrgId: z
         .string({ required_error: "Ce champ est requis" })
-        .refine(isSiret, "Siret non valide"),
+        .refine(
+          check =>
+            isSiret(check, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"),
+          "Siret non valide"
+        ),
       startDate: z.coerce
         .date({
           required_error: "La date de début est requise",

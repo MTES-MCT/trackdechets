@@ -1,4 +1,10 @@
-import { BsdaStatus, Prisma, TransportMode, UserRole } from "@prisma/client";
+import {
+  Bsda,
+  BsdaStatus,
+  TransportMode,
+  Prisma,
+  UserRole
+} from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   BsdaInput,
@@ -11,7 +17,8 @@ import {
   userWithCompanyFactory,
   companyFactory,
   transporterReceiptFactory,
-  ecoOrganismeFactory
+  ecoOrganismeFactory,
+  userInCompany
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
@@ -20,6 +27,15 @@ import {
 } from "../../../__tests__/factories";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
 import { getStream } from "../../../../activity-events";
+import {
+  producerShouldBeNotifiedOfDestinationCapModification,
+  sendDestinationCapModificationMail
+} from "../update";
+import { sendMail } from "../../../../mailer/mailing";
+
+// No mails
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 export const UPDATE_BSDA = `
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
@@ -2220,6 +2236,354 @@ describe("Mutation.updateBsda", () => {
     expect(updatedBsda.destinationReceptionWeight!.toNumber()).toEqual(
       2000 // 2 * 1000
     );
+  });
+
+  describe("updating the CAP", () => {
+    const previousBsda = {
+      destinationCap: "A",
+      status: BsdaStatus.SIGNED_BY_PRODUCER,
+      emitterCompanySiret: "emitter company siret",
+      workerCompanySiret: "worker company siret"
+    } as Bsda;
+    const updatedBsda = {
+      destinationCap: "A",
+      status: BsdaStatus.SIGNED_BY_PRODUCER,
+      emitterCompanySiret: "emitter company siret",
+      workerCompanySiret: "worker company siret"
+    } as Bsda;
+
+    const previousBsdaWithNextDestination = {
+      destinationCap: "A",
+      status: BsdaStatus.SIGNED_BY_PRODUCER,
+      emitterCompanySiret: "emitter company siret",
+      workerCompanySiret: "worker company siret",
+      destinationOperationNextDestinationCompanySiret:
+        "next destination company siret",
+      destinationOperationNextDestinationCap: "A"
+    } as Bsda;
+    const updatedBsdaWithNextDestination = {
+      destinationCap: "A",
+      status: BsdaStatus.SIGNED_BY_PRODUCER,
+      emitterCompanySiret: "emitter company siret",
+      workerCompanySiret: "worker company siret",
+      destinationOperationNextDestinationCompanySiret:
+        "next destination company siret",
+      destinationOperationNextDestinationCap: "A"
+    } as Bsda;
+
+    describe("producerShouldBeNotifiedOfDestinationCapModification", () => {
+      it.each([
+        // Status pas bon
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.INITIAL }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.AWAITING_CHILD }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.CANCELED }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.PROCESSED }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.REFUSED }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.SIGNED_BY_WORKER }],
+        [previousBsda, { ...updatedBsda, status: BsdaStatus.SENT }],
+        // Pas d'entreprise de travaux
+        [previousBsda, { ...updatedBsda, workerCompanySiret: undefined }],
+        // Pas d'émetteur
+        [previousBsda, { ...updatedBsda, emitterCompanySiret: undefined }],
+        // destinationCap identique
+        [previousBsda, updatedBsda],
+        // nextDestinationCap identique
+        [previousBsdaWithNextDestination, updatedBsdaWithNextDestination]
+      ])(
+        "should return false - previous: %p, updated: %p",
+        (previousBsda, updatedBsda) => {
+          // Given
+
+          // When
+          const shouldBeNotified =
+            producerShouldBeNotifiedOfDestinationCapModification(
+              previousBsda,
+              updatedBsda as Bsda
+            );
+
+          // Then
+          expect(shouldBeNotified).toBeFalsy();
+        }
+      );
+
+      it.each([
+        // destinationCap différent
+        [previousBsda, { ...updatedBsda, destinationCap: "B" }],
+        // nextDestinationCap différent
+        [
+          previousBsdaWithNextDestination,
+          {
+            ...updatedBsdaWithNextDestination,
+            destinationOperationNextDestinationCap: "B"
+          }
+        ]
+      ])(
+        "should return true - previous: %p, updated: %p",
+        (previousBsda, updatedBsda) => {
+          // Given
+
+          // When
+          const shouldBeNotified =
+            producerShouldBeNotifiedOfDestinationCapModification(
+              previousBsda,
+              updatedBsda
+            );
+
+          // Then
+          expect(shouldBeNotified).toBeTruthy();
+        }
+      );
+    });
+
+    describe("sendDestinationCapModificationMail", () => {
+      beforeEach(async () => {
+        jest.resetAllMocks();
+        await resetDatabase();
+      });
+
+      it("should send email - destination", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const transporter = await companyFactory();
+
+        await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+        await userInCompany(
+          "MEMBER",
+          worker.id,
+          {
+            email: "worker@mail.com",
+            name: "Worker"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+        await userInCompany(
+          "MEMBER",
+          destination.id,
+          {
+            email: "destination@mail.com",
+            name: "Destination"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+        await userInCompany(
+          "MEMBER",
+          transporter.id,
+          {
+            email: "transporter@mail.com",
+            name: "Transporter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+
+        const bsda = await bsdaFactory({
+          opt: {
+            destinationCap: "A",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: destination.siret,
+            destinationCompanyName: destination.name
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
+
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+        // When
+        await sendDestinationCapModificationMail(bsda, {
+          ...bsda,
+          destinationCap: "B"
+        });
+
+        // Then
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+        expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: `<p>
+  Trackdéchets vous informe qu'une modification a été apportée sur le bordereau
+  amiante n° ${bsda.id} que vous avez signé.
+</p>
+<br />
+<p>
+  Le champ CAP initialement A est désormais remplacé par
+  B.
+</p>
+<br />
+<p>
+  En cas de désaccord ou de question, il convient de vous rapprocher de
+  l'entreprise de travaux amiante ${bsda.workerCompanyName}
+  ${bsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
+  l'établissement de destination finale ${bsda.destinationCompanyName}
+  ${bsda.destinationCompanySiret}.
+</p>
+`,
+            cc: [
+              { email: "worker@mail.com", name: "Worker" },
+              { email: "destination@mail.com", name: "Destination" }
+            ],
+            messageVersions: [
+              { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
+            ],
+            subject: `CAP du bordereau amiante n° ${bsda.id} mis à jour par B`
+          })
+        );
+      });
+
+      it("should send email - nextDestination", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const nextDestination = await companyFactory();
+        const transporter = await companyFactory();
+
+        await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+        await userInCompany(
+          "MEMBER",
+          worker.id,
+          {
+            email: "worker@mail.com",
+            name: "Worker"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+        await userInCompany(
+          "MEMBER",
+          destination.id,
+          {
+            email: "destination@mail.com",
+            name: "Destination"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+        await userInCompany(
+          "MEMBER",
+          nextDestination.id,
+          {
+            email: "next.destination@mail.com",
+            name: "Next Destination"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+        await userInCompany(
+          "MEMBER",
+          transporter.id,
+          {
+            email: "transporter@mail.com",
+            name: "Transporter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+
+        const bsda = await bsdaFactory({
+          opt: {
+            destinationCap: "A",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: destination.siret,
+            destinationCompanyName: destination.name,
+            destinationOperationNextDestinationCompanySiret:
+              nextDestination.siret,
+            destinationOperationNextDestinationCompanyName: nextDestination.name
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
+
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+        // When
+        await sendDestinationCapModificationMail(bsda, {
+          ...bsda,
+          destinationCap: "B"
+        });
+
+        // Then
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+        expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: `<p>
+  Trackdéchets vous informe qu'une modification a été apportée sur le bordereau
+  amiante n° ${bsda.id} que vous avez signé.
+</p>
+<br />
+<p>
+  Le champ CAP initialement A est désormais remplacé par
+  B.
+</p>
+<br />
+<p>
+  En cas de désaccord ou de question, il convient de vous rapprocher de
+  l'entreprise de travaux amiante ${bsda.workerCompanyName}
+  ${bsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
+  l'établissement de destination finale ${bsda.destinationOperationNextDestinationCompanyName}
+  ${bsda.destinationOperationNextDestinationCompanySiret}.
+</p>
+`,
+            cc: [
+              { email: "worker@mail.com", name: "Worker" },
+              { email: "next.destination@mail.com", name: "Next Destination" }
+            ],
+            messageVersions: [
+              { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
+            ],
+            subject: `CAP du bordereau amiante n° ${bsda.id} mis à jour par B`
+          })
+        );
+      });
+    });
   });
 
   describe("closed sirets", () => {

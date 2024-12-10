@@ -18,7 +18,7 @@ export class WasteReader extends Readable {
   }
 }
 export interface WasteReaderArgs {
-  registryType: WasteRegistryType;
+  registryType: Exclude<WasteRegistryType, "SSD">;
   sirets: string[];
   where?: WasteRegistryWhere | null;
   chunk?: number;
@@ -68,14 +68,23 @@ export function wastesReader({
  * Format rows as data flow
  */
 export function wasteFormatter<WasteType extends GenericWaste>(
-  opts = { useLabelAsKey: false }
+  opts: {
+    useLabelAsKey: boolean;
+    columnSorter?:
+      | ((line: Record<string, string>) => Record<string, string>)
+      | null;
+  } = { useLabelAsKey: false, columnSorter: null }
 ) {
   return new Transform({
     readableObjectMode: true,
     writableObjectMode: true,
     transform(waste: WasteType, _encoding, callback) {
       const formatted = formatRow(waste, opts.useLabelAsKey);
-      this.push(formatted);
+      if (opts.columnSorter && !opts.useLabelAsKey) {
+        this.push(opts.columnSorter(formatted));
+      } else {
+        this.push(formatted);
+      }
       callback();
     }
   });

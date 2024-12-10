@@ -136,7 +136,7 @@ const rawBspaohTransporterSchema = z.object({
     .nullish()
     .superRefine(isRegisteredVatNumberRefinement),
   transporterCustomInfo: z.string().nullish(),
-  transporterRecepisseIsExempted: z.coerce
+  transporterRecepisseIsExempted: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),

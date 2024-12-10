@@ -34,6 +34,10 @@ const reviewFragment = gql`
           orgId
         }
       }
+      ecoOrganisme {
+        siret
+        name
+      }
       wasteDetails {
         code
         name
@@ -78,6 +82,10 @@ const reviewFragment = gql`
           cap
           processingOperation
         }
+      }
+      ecoOrganisme {
+        siret
+        name
       }
     }
     authoringCompany {

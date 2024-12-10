@@ -846,6 +846,12 @@ export default function BSDDetailContent({
                   <dd>{form.wasteDetails.sampleNumber}</dd>
                 </>
               )}
+              {form?.emitter?.type === "APPENDIX1" && (
+                <>
+                  <dt>CAP</dt>
+                  <dd>{form.recipient?.cap}</dd>
+                </>
+              )}
             </div>
 
             {form.ecoOrganisme && (

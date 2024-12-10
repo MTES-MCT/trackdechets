@@ -64,7 +64,7 @@ export function MyImports() {
         <div>
           {format(new Date(importData.node.createdAt), "dd/MM/yyyy HH'h'mm")}
         </div>
-        {badges[importData.node.status]}
+        {badges[importData.node.status]("import")}
       </div>,
       importData.node.type,
       <ul>

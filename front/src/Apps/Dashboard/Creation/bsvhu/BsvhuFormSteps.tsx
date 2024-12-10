@@ -38,14 +38,7 @@ import {
 import OtherActors from "./steps/OtherActors";
 
 const vhuToInput = (vhu: BsvhuInput): BsvhuInput => {
-  return omitDeep(vhu, [
-    "isDraft",
-    "emitter.emission.signature",
-    "transporter.transport.signature",
-    "destination.reception.signature",
-    "destination.operation.signature",
-    "ecoOrganisme.hasEcoOrganisme"
-  ]);
+  return omitDeep(vhu, ["isDraft", "ecoOrganisme.hasEcoOrganisme"]);
 };
 interface Props {
   bsdId?: string;
@@ -122,9 +115,8 @@ const BsvhuFormSteps = ({
   const saveForm = (input: BsvhuInput, draft: boolean): Promise<any> => {
     const cleanedInput = vhuToInput(input);
     if (formState.id!) {
-      const cleanedPayload = cleanPayload(omitDeep(cleanedInput));
       return updateVhuForm({
-        variables: { id: formState.id, input: cleanedPayload }
+        variables: { id: formState.id, input: cleanedInput }
       });
     } else {
       const cleanedPayload = cleanPayload(cleanedInput);
@@ -153,6 +145,19 @@ const BsvhuFormSteps = ({
     () => getPublishErrorMessages(BsdType.Bsvhu, errorsFromPublishApi),
     [errorsFromPublishApi]
   );
+  const createdAt = formQuery.data?.bsvhu.createdAt
+    ? new Date(formQuery.data?.bsvhu.createdAt)
+    : null;
+
+  // Date de la MAJ 2024.12.1 qui modifie les règles de validation de BsvhuInput.packaging et identification.type
+  const v20241201Date =
+    import.meta.env.VITE_OVERRIDE_V20241201 || "2024-12-18T00:00:00.000";
+
+  const v20241201 = new Date(v20241201Date);
+
+  const createdBeforeV20241201 = Boolean(
+    createdAt && createdAt.getTime() < v20241201.getTime()
+  );
 
   const tabsContent = useMemo(
     () => ({
@@ -161,6 +166,7 @@ const BsvhuFormSteps = ({
           errors={publishErrorMessages.filter(
             error => error.tabId === TabId.waste
           )}
+          createdBeforeV20241201={createdBeforeV20241201}
         />
       ),
       emitter: (
@@ -186,7 +192,7 @@ const BsvhuFormSteps = ({
       ),
       other: <OtherActors />
     }),
-    [publishErrorMessages]
+    [publishErrorMessages, createdBeforeV20241201]
   );
 
   return (

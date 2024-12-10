@@ -215,7 +215,7 @@ export default function NotificationsUpdateModal({
       label: (
         <div>
           <span className="fr-mr-1w">
-            à la modification de la destination finale amiante
+            à la modification de la destination finale amiante ou du CAP
           </span>
           <SubscribersCountBadge
             count={subscribersCount.bsdaFinalDestinationUpdate}

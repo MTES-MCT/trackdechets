@@ -18,16 +18,7 @@ const zodEmitter = z.object({
   company: zodCompany,
   agrementNumber: z.string().nullish(),
   irregularSituation: z.boolean(),
-  noSiret: z.boolean(),
-  emission: z.object({
-    signature: z.object({
-      author: z.string().nullish(),
-      date: z.coerce
-        .date()
-        .nullish()
-        .transform(v => v?.toISOString())
-    })
-  })
+  noSiret: z.boolean()
 });
 
 const zodTransporter = z.object({
@@ -52,20 +43,10 @@ const zodDestination = z.object({
   operation: z
     .object({
       code: z.string().nullish(),
-      number: z.string().nullish(),
       date: z.coerce
         .date()
         .nullish()
         .transform(v => v?.toISOString()),
-      signature: z
-        .object({
-          author: z.string().nullish(),
-          takenOverAt: z.coerce
-            .date()
-            .nullish()
-            .transform(v => v?.toISOString())
-        })
-        .nullish(),
       nextDestination: z
         .object({
           company: zodCompany
@@ -97,6 +78,7 @@ const zodDestination = z.object({
           type: z
             .enum([
               "NUMERO_ORDRE_LOTS_SORTANTS",
+              "NUMERO_IMMATRICULATION",
               "NUMERO_ORDRE_REGISTRE_POLICE"
             ])
             .nullish()
@@ -120,7 +102,11 @@ export const rawBsvhuSchema = z.object({
   identification: z.object({
     numbers: z.array(z.string()).nullish(),
     type: z
-      .enum(["NUMERO_ORDRE_LOTS_SORTANTS", "NUMERO_ORDRE_REGISTRE_POLICE"])
+      .enum([
+        "NUMERO_ORDRE_LOTS_SORTANTS",
+        "NUMERO_ORDRE_REGISTRE_POLICE",
+        "NUMERO_IMMATRICULATION"
+      ])
       .nullish()
   }),
   quantity: z.coerce.number().nonnegative().nullish(),
@@ -142,7 +128,32 @@ export const rawBsvhuSchema = z.object({
           message: `Veuillez sélectionner un éco-organisme`
         });
       }
+    }),
+  broker: z
+    .object({
+      company: zodCompany,
+      recepisse: z
+        .object({
+          number: z.string().nullish(),
+          department: z.string().nullish(),
+          validityLimit: z.string().nullish()
+        })
+        .nullish()
     })
+    .nullish(),
+  trader: z
+    .object({
+      company: zodCompany,
+      recepisse: z
+        .object({
+          number: z.string().nullish(),
+          department: z.string().nullish(),
+          validityLimit: z.string().nullish()
+        })
+        .nullish()
+    })
+    .nullish(),
+  intermediaries: z.array(zodCompany).nullish()
 });
 
 export type ZodBsvhu = z.infer<typeof rawBsvhuSchema>;

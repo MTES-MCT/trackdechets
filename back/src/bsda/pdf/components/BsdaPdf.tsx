@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Document, formatDate } from "../../../common/pdf";
+import { Document, formatDate, FormCompanyFields } from "../../../common/pdf";
 import { Bsda } from "../../../generated/graphql/types";
 import { PickupSite } from "./PickupSite";
 import { TraceabilityTable } from "./TraceabilityTable";
@@ -15,6 +15,7 @@ import {
   CompanyDescription
 } from "../../../common/pdf/components/Company";
 import Transporter from "../../../common/pdf/components/Transporter";
+import { pluralize } from "@td/constants";
 
 const PACKAGINGS_NAMES = {
   BIG_BAG: "Big-bag / GRV",
@@ -38,6 +39,8 @@ export function BsdaPdf({
   previousBsdas,
   renderEmpty = false
 }: Props) {
+  const intermediaryCount = bsda?.intermediaries?.length ?? 0;
+
   return (
     <Document title={bsda.id}>
       <div className="Page">
@@ -306,6 +309,26 @@ export function BsdaPdf({
             </p>
           </div>
         </div>
+
+        {bsda.intermediaries && bsda.intermediaries.length > 0 && (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>
+                  {pluralize("Autre", intermediaryCount)}{" "}
+                  {pluralize("intermédiaire", intermediaryCount)}
+                </strong>
+              </p>
+              {bsda.intermediaries.map(intermediary => (
+                <div className="Row">
+                  <div className="Col">
+                    <FormCompanyFields company={intermediary} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {bsda?.transporter && (
           <Transporter transporter={bsda.transporter} frameNumber={6} />

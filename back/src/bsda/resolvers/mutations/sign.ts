@@ -34,7 +34,11 @@ import {
 import { machine } from "../../machine";
 import { renderBsdaRefusedEmail } from "../../mails/refused";
 import { BsdaRepository, getBsdaRepository } from "../../repository";
-import { AllBsdaSignatureType, BsdaWithTransporters } from "../../types";
+import {
+  AllBsdaSignatureType,
+  BsdaWithIntermediaries,
+  BsdaWithTransporters
+} from "../../types";
 import { parseBsdaAsync } from "../../validation";
 import { prismaToZodBsda } from "../../validation/helpers";
 import { AlreadySignedError } from "../../../bsvhu/errors";
@@ -147,7 +151,7 @@ export function getAuthorizedOrgIds(
   return getAuthorizedSiretsFn(bsda).filter(Boolean);
 }
 
-type BsdaForSignature = Bsda & BsdaWithTransporters;
+type BsdaForSignature = Bsda & BsdaWithTransporters & BsdaWithIntermediaries;
 
 // Defines different signature function based on signature type
 const signatures: Record<

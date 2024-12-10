@@ -20,7 +20,6 @@ import {
   UserPermission,
   Transporter,
   BsdaTransporter,
-  BsdasriStatus,
   BsffTransporter,
   BsvhuStatus
 } from "@td/codegen-ui";
@@ -289,6 +288,13 @@ const isSameSiretDestination = (
   bsd: BsdDisplay
 ): boolean => currentSiret === bsd.destination?.company?.siret;
 
+// destination finale après entreposage provisoire
+const isSameSiretFinalBsddDestination = (
+  currentSiret: string,
+  bsd: BsdDisplay
+): boolean =>
+  currentSiret === bsd.temporaryStorageDetail?.destination?.company?.siret;
+
 const isSameSiretWorker = (currentSiret: string, bsd: BsdDisplay): boolean =>
   currentSiret === bsd.worker?.company?.siret;
 
@@ -297,7 +303,7 @@ export const isSameSiretTransporter = (
   bsd: BsdDisplay | Form
 ): boolean =>
   currentSiret === bsd.transporter?.company?.siret ||
-  currentSiret === bsd.transporter?.company?.orgId;
+  currentSiret === bsd.transporter?.company?.vatNumber;
 
 // Renvoie le premier transporteur de la liste qui n'a pas encore
 // pris en charge le déchet.
@@ -1408,108 +1414,106 @@ const canUpdateBsff = (bsd, siret) =>
   ].includes(bsd.status) &&
   canDuplicateBsff(bsd, siret);
 
-const canReviewBsda = (bsd, siret) => {
-  const isTransporter = isSameSiretTransporter(siret, bsd);
+export const canReviewBsda = (bsd: BsdDisplay, siret: string) => {
+  if (bsd.type !== BsdType.Bsda || bsd.status === BsdStatusCode.Initial) {
+    return false;
+  }
+
   const isDestination = isSameSiretDestination(siret, bsd);
-  const isProducer = isSameSiretEmitter(siret, bsd);
+  const isEmitter = isSameSiretEmitter(siret, bsd);
   const isWorker = isSameSiretWorker(siret, bsd);
+  const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
 
   return (
-    bsd.type === BsdType.Bsda &&
-    !canDeleteBsda(bsd, siret) &&
-    (isTransporter || isDestination || isProducer || isWorker)
+    (isEmitter &&
+      // On ne propose pas le bouton "Réviser" à l'émetteur
+      // lorsqu'il est le seul à avoir signé car il peut encore
+      // modifier le BSDA
+      bsd.status !== BsdStatusCode.SignedByProducer) ||
+    isDestination ||
+    isWorker ||
+    isEcoOrganisme
   );
 };
 
-const canReviewBsdasri = (bsd, siret) => {
-  // You can't review a SYNTHESIS dasri with RECEIVED status
+export const canReviewBsdasri = (bsd: BsdDisplay, siret: string) => {
+  if (bsd.type !== BsdType.Bsdasri || bsd.status === BsdStatusCode.Initial) {
+    return false;
+  }
+
+  // TRA-14348 tous les champs de révision sont grisés dans ce cas
+  // donc on enlève le bouton
   if (
-    [BsdasriType.Synthesis].includes(bsd.bsdWorkflowType?.toString()) &&
-    bsd.status === BsdasriStatus.Received
+    bsd.bsdWorkflowType === BsdasriType.Synthesis &&
+    bsd.status === BsdStatusCode.Received
   ) {
     return false;
   }
 
+  // TRA-15009 tous les champs de révision sont grisés dans ce cas
+  // donc on enlève le bouton
   if (bsd.groupedIn || bsd.synthesizedIn) {
     return false;
   }
 
   const isDestination = isSameSiretDestination(siret, bsd);
-  const isProducer = isSameSiretEmitter(siret, bsd);
+  const isEmitter = isSameSiretEmitter(siret, bsd);
   const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
 
   return (
-    bsd.type === BsdType.Bsdasri &&
-    !canDeleteBsdasri(bsd, siret) &&
-    (isDestination || isProducer || isEcoOrganisme)
+    (isEmitter &&
+      // On ne propose pas le bouton "Réviser" à l'émetteur
+      // lorsqu'il est le seul à avoir signé car il peut encore
+      // modifier le BSDASRI
+      bsd.status !== BsdStatusCode.SignedByProducer) ||
+    isDestination ||
+    isEcoOrganisme
   );
 };
 
-export const canReviewBsdd = (bsd, siret) => {
-  const isSentStatus = BsdStatusCode.Sent === bsd.status;
+export const canReviewBsdd = (bsd: BsdDisplay, siret: string) => {
+  if (
+    bsd.type !== BsdType.Bsdd ||
+    bsd.status === BsdStatusCode.Draft ||
+    bsd.status === BsdStatusCode.Sealed ||
+    bsd.status === BsdStatusCode.Refused
+  ) {
+    return false;
+  }
 
-  const isMultimodalTransporter =
-    !!bsd.transporters &&
-    bsd.transporters.length > 1 &&
-    (bsd.transporters as Transporter[]).some(t => t.company?.orgId === siret);
-
-  return (
-    bsd.type === BsdType.Bsdd &&
-    ![
-      BsdStatusCode.Draft,
-      BsdStatusCode.Sealed,
-      BsdStatusCode.Refused
-    ].includes(bsd.status) &&
-    !(
-      bsd.emitterType === EmitterType.Producer &&
-      !isSentStatus &&
-      isSameSiretEmitter(siret, bsd) &&
-      canUpdateBsd(bsd, siret)
-    ) &&
-    !(
-      bsd.emitterType === EmitterType.Appendix2 &&
-      !isSentStatus &&
-      isSameSiretDestination(siret, bsd) &&
-      canUpdateBsd(bsd, siret)
-    ) &&
-    !(
-      bsd.emitterType === EmitterType.Appendix2 &&
-      isSameSiretEmitter(siret, bsd) &&
-      canUpdateBsd(bsd, siret) &&
-      bsd.status === BsdStatusCode.SignedByProducer
-    ) &&
-    !isMultimodalTransporter
-  );
-};
-
-const canReviewBsddAppendix1 = (bsd, siret) => {
-  const transporterHasSigned = ![
-    BsdStatusCode.Draft,
-    BsdStatusCode.Sealed
-  ].includes(bsd.status);
-
-  return (
-    bsd.type === BsdType.Bsdd &&
-    isAppendix1Producer(bsd) &&
-    transporterHasSigned &&
-    isSameSiretTransporter(siret, bsd)
-  );
-};
-
-export const canReviewBsd = (bsd, siret) => {
-  const isTransporter = isSameSiretTransporter(siret, bsd);
+  const isEmitter = isSameSiretEmitter(siret, bsd);
   const isDestination = isSameSiretDestination(siret, bsd);
-  const isProducer = isSameSiretEmitter(siret, bsd);
-  const isWorker = isSameSiretWorker(siret, bsd);
-  const isTransporterOnly =
-    isTransporter && !isDestination && !isProducer && !isWorker;
+  const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
+  const isDestinationFinale = isSameSiretFinalBsddDestination(siret, bsd);
 
+  if (bsd.emitterType === EmitterType.Appendix1Producer) {
+    const isTransporter = isSameSiretTransporter(siret, bsd);
+    return (
+      // On n'autorise les révisions qu'à partir de la signature transporteur
+      bsd.status !== BsdStatusCode.SignedByProducer &&
+      (isEmitter || isTransporter)
+    );
+  } else {
+    // vérifier que ça s'applique aussi au bordereau de tournée dédié
+    return (
+      isDestination ||
+      isEcoOrganisme ||
+      isDestinationFinale ||
+      (isEmitter &&
+        // On ne propose pas le bouton "Réviser" à l'émetteur
+        // lorsqu'il est le seul à avoir signé car il peut encore
+        // modifier le BSDD
+        bsd.status !== BsdStatusCode.SignedByProducer)
+    );
+  }
+};
+
+// Specs révision https://docs.google.com/spreadsheets/d/1Mp2Q2Esn3jFa3RT1NtW7WAYq0vh9-iv-xoppEoW80Hk/edit?gid=0#gid=0
+export const canReviewBsd = (bsd: BsdDisplay, siret: string) => {
   return (
-    ((canReviewBsdd(bsd, siret) ||
-      canReviewBsda(bsd, siret) ||
-      canReviewBsdasri(bsd, siret)) &&
-      !isTransporterOnly) ||
-    canReviewBsddAppendix1(bsd, siret)
+    (bsd.type === BsdType.Bsdd && canReviewBsdd(bsd, siret)) ||
+    (bsd.type === BsdType.Bsda && canReviewBsda(bsd, siret)) ||
+    (bsd.type === BsdType.Bsdasri && canReviewBsdasri(bsd, siret))
   );
 };
 
@@ -1622,10 +1626,14 @@ export const hasRoadControlButton = (
   isCollectedTab: boolean,
   isReturnTab?: boolean
 ) => {
-  if (isReturnTab) return true;
+  const isAppendix1 = bsd.emitterType === "APPENDIX1_PRODUCER";
+  if (!isAppendix1 && isReturnTab) return true;
 
   // L'action principale sur le paoh collecté est la déclaration de dépôt par le transporteur
   if (bsd.type === BsdType.Bspaoh) {
+    return false;
+  }
+  if (isAppendix1 && isCollectedTab) {
     return false;
   }
   return ["SENT", "RESENT"].includes(bsd.status) && isCollectedTab;

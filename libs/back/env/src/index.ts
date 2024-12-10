@@ -127,6 +127,7 @@ export const schema = z.object({
   // S3 for registry
   S3_REGISTRY_ERRORS_BUCKET: z.string(),
   S3_REGISTRY_IMPORTS_BUCKET: z.string(),
+  S3_REGISTRY_EXPORTS_BUCKET: z.string(),
   // -------
   // S3 for empty bsds templates
   S3_BSD_TEMPLATES_ACCESS_KEY_ID: z.string().optional(),
@@ -155,7 +156,9 @@ export const schema = z.object({
   VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER: z
     .string()
     .datetime()
-    .optional()
+    .optional(),
+
+  OVERRIDE_V20241201: z.string().datetime().optional()
 });
 
 export const envVariables = schema.superRefine((val, ctx) => {
