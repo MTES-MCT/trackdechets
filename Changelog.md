@@ -31,6 +31,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Les intermédiaires n'apparaissent pas sur le récépissé PDF du BSDA [PR 3796](https://github.com/MTES-MCT/trackdechets/pull/3796)
 - Corrige l'affichage des décimales sur le poids du PAOH [PR 3808](https://github.com/MTES-MCT/trackdechets/pull/3808)
 - La vérification de l'avis de situation SIRENE ne fonctionne pas pour les établissements anonymes lorsque le SIRET du siège est différent du SIRET de l'établissement [PR 3794](https://github.com/MTES-MCT/trackdechets/pull/3794)
+- Corrige la sélection d'un organisme de certification amiante dans la création d'un établissement [PR 3797](https://github.com/MTES-MCT/trackdechets/pull/3797)
 
 # [2024.11.1] 19/11/2024
 
