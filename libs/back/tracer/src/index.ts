@@ -22,14 +22,14 @@ import {
 } from "@opentelemetry/semantic-conventions";
 import { PrismaInstrumentation } from "@prisma/instrumentation";
 import { ElasticsearchInstrumentation } from "opentelemetry-instrumentation-elasticsearch";
-import { findPkg } from "./pkg";
+import { getAppRootFolderName } from "./utils";
 
 if (process.env.NODE_ENV !== "test" && !process.env.OTEL_SDK_DISABLED) {
-  const packageJson = findPkg();
+  const serviceName = getAppRootFolderName();
 
   const sdk = new NodeSDK({
     resource: new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: packageJson.name || "trackdechets",
+      [SEMRESATTRS_SERVICE_NAME]: serviceName || "trackdechets",
       [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]:
         process.env.OTEL_ENVIRONMENT || "development",
       [SEMRESATTRS_CLOUD_REGION]: process.env.REGION_NAME,
