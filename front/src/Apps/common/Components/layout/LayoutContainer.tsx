@@ -68,10 +68,11 @@ const GET_ME = gql`
     }
   }
 `;
+
 const BANNER_MESSAGES = [
-  `La cohérence entre le type de déchet (dangereux, non dangereux) et le sous-profil sélectionné par l’installation de destination est désormais vérifiée sur les BSDD.
-   Nous invitons les installations de destinations à vérifier et mettre à jour leur sous-profil dans l'onglet Mes établissements > Profil.`
+  `Merci d'anticiper dès à présent vos congés en vous assurant que vos collaborateurs possèdent un accès aux établissements nécessaires sur Trackdéchets (Mes établissements > Membres).`
 ];
+
 export default function LayoutContainer() {
   const { orgId } = usePermissions();
   const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
@@ -122,9 +123,9 @@ export default function LayoutContainer() {
                   messages={BANNER_MESSAGES}
                   button={{
                     title: "Consulter la FAQ",
-                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/questions-frequentes#quel-s-sous-profil-s-selectionner"
+                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement#les-responsabilites-des-administrateurs-trackdechets"
                   }}
-                  persistedSurveyName="td-20241119"
+                  persistedSurveyName="td-20241217"
                 />
               }
               defaultOrgId={defaultOrgId}
