@@ -28,13 +28,15 @@ import {
   notificationNumberSchema,
   getReportForSiretSchema,
   municipalitiesNamesSchema,
-  nextDestinationIsAbroad
+  nextDestinationIsAbroad,
+  noTraceability
 } from "../../shared/schemas";
 
 export type ParsedZodIncomingWasteItem = z.output<typeof incomingWasteSchema>;
 
 const inputIncomingWasteSchema = z.object({
   reason: reasonSchema,
+  custominfo: z.string().optional(),
   publicId: publicIdSchema,
   reportAsSiret: reportAsSiretSchema,
   reportForSiret: getReportForSiretSchema("du destinataire"),
@@ -106,6 +108,7 @@ const inputIncomingWasteSchema = z.object({
   ecoOrganismeSiret: getActorSiretSchema("de l'éco-organisme").optional(),
   ecoOrganismeName: getActorNameSchema("de l'éco-organisme").optional(),
   operationCode: operationCodeSchema,
+  noTraceability: noTraceability.optional(),
   nextDestinationIsAbroad: nextDestinationIsAbroad.optional(),
   declarationNumber: declarationNumberSchema,
   notificationNumber: notificationNumberSchema,

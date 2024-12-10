@@ -214,18 +214,39 @@ export const municipalitiesNamesSchema = z
     )
   );
 
-export const nextDestinationIsAbroad = z.union(
+export const noTraceability = z.union(
   [
     z
       .enum(["OUI", "NON"], {
-        required_error: "Le champ POP est requis",
+        required_error: "Le champ rupture de traçabilité autorisée est requis",
         invalid_type_error:
-          "Le champ POP n'est pas valide. Valeurs possibles: OUI, NON"
+          "Le champ rupture de traçabilité autorisée n'est pas valide. Valeurs possibles: OUI, NON"
       })
       .transform(val => val === "OUI"),
     z.boolean()
   ],
-  { invalid_type_error: "Le champ POP saisi n'est pas valide" }
+  {
+    invalid_type_error:
+      "Le champ rupture de traçabilité autorisée saisi n'est pas valide"
+  }
+);
+
+export const nextDestinationIsAbroad = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error:
+          "Le champ destination ultérieure à l'étranger est requis",
+        invalid_type_error:
+          "Le champ destination ultérieure à l'étranger n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  {
+    invalid_type_error:
+      "Le champ destination ultérieure à l'étranger saisi n'est pas valide"
+  }
 );
 
 export const declarationNumberSchema = z
