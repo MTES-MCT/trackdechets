@@ -1655,6 +1655,7 @@ describe("Mutation.Bsda.sign", () => {
     let emitter: Company;
     let destinationUser: User;
     let destination: Company;
+    let nextDestination: Company;
     let transporter: Company;
     let transporterUser: User;
     let workerUser: User;
@@ -1694,6 +1695,10 @@ describe("Mutation.Bsda.sign", () => {
       destinationUser = destinationCompanyAndUser.user;
       destination = destinationCompanyAndUser.company;
 
+      nextDestination = await companyFactory({
+        companyTypes: ["WASTEPROCESSOR"]
+      });
+
       broker = await companyFactory({ companyTypes: ["BROKER"] });
       intermediary = await companyFactory();
       ecoOrganisme = await ecoOrganismeFactory({
@@ -1708,6 +1713,18 @@ describe("Mutation.Bsda.sign", () => {
           emitterEmissionSignatureAuthor: null,
           emitterEmissionSignatureDate: null,
           destinationCompanySiret: destination.siret,
+          destinationOperationNextDestinationCompanyName: nextDestination.name,
+          destinationOperationNextDestinationCompanySiret:
+            nextDestination.siret,
+          destinationOperationNextDestinationCompanyAddress:
+            "Next destination address",
+          destinationOperationNextDestinationCompanyContact:
+            "Next destination contact",
+          destinationOperationNextDestinationCompanyPhone: "060102030405",
+          destinationOperationNextDestinationCompanyMail:
+            "next.destination@mail.com",
+          destinationOperationNextDestinationCap: "Next destination CAP",
+          destinationOperationNextDestinationPlannedOperationCode: "R5",
           workerCompanySiret: worker.siret,
           workerWorkSignatureAuthor: null,
           workerWorkSignatureDate: null,
@@ -1848,7 +1865,6 @@ describe("Mutation.Bsda.sign", () => {
       });
 
       it("worker signature", async () => {
-        console.log(">> WORKER SIGNATURE");
         await testSigningBsda("WORK", workerUser);
       });
 
