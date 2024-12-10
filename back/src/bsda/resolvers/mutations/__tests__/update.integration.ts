@@ -2233,6 +2233,7 @@ describe("Mutation.updateBsda", () => {
     let user: User;
     let emitter: Company;
     let destination: Company;
+    let nextDestination: Company;
     let transporter: Company;
     let worker: Company;
     let broker: Company;
@@ -2251,6 +2252,7 @@ describe("Mutation.updateBsda", () => {
       user = emitterCompanyAndUser.user;
       emitter = emitterCompanyAndUser.company;
       destination = await companyFactory({ name: "Destination" });
+      nextDestination = await companyFactory({ name: "Destination" });
       transporter = await companyFactory({ name: "Transporter" });
       worker = await companyFactory({ name: "Worker" });
       broker = await companyFactory({
@@ -2268,6 +2270,8 @@ describe("Mutation.updateBsda", () => {
           status: BsdaStatus.INITIAL,
           emitterCompanySiret: emitter.siret,
           destinationCompanySiret: destination.siret,
+          destinationOperationNextDestinationCompanySiret:
+            nextDestination.siret,
           workerCompanySiret: worker.siret,
           brokerCompanySiret: broker.siret,
           transporters: {
