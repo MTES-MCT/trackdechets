@@ -13,7 +13,7 @@ import { getFormRepository } from "../../repository";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 const formRevisionRequestWithApprovals =
-  Prisma.validator<Prisma.BsddRevisionRequestArgs>()({
+  Prisma.validator<Prisma.BsddRevisionRequestDefaultArgs>()({
     include: { approvals: true }
   });
 type BsddRevisionRequestWithApprovals = Prisma.BsddRevisionRequestGetPayload<
