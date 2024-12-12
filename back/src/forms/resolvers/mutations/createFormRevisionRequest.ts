@@ -411,7 +411,6 @@ async function getApproversSirets(
     ...(authoringCompanyIsEmitterOrEcoOrg
       ? []
       : [bsdd.emitterCompanySiret, bsdd.ecoOrganismeSiret]),
-    bsdd.traderCompanySiret,
     ...(bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER
       ? [bsdd.currentTransporterOrgId]
       : [bsdd.recipientCompanySiret])
