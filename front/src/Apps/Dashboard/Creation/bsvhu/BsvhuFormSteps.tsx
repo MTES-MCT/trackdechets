@@ -38,7 +38,13 @@ import {
 import OtherActors from "./steps/OtherActors";
 
 const vhuToInput = (vhu: BsvhuInput): BsvhuInput => {
-  return omitDeep(vhu, ["isDraft", "ecoOrganisme.hasEcoOrganisme"]);
+  return omitDeep(vhu, [
+    "isDraft",
+    "ecoOrganisme.hasEcoOrganisme",
+    "hasTrader",
+    "hasBroker",
+    "hasIntermediaries"
+  ]);
 };
 interface Props {
   bsdId?: string;

@@ -280,7 +280,7 @@ const EmitterBsvhu = ({ errors }) => {
 
         <CompanyContactInfo
           fieldName={"emitter.company"}
-          name="emitter"
+          errorObject={formState.errors?.emitter?.["company"]}
           disabled={sealedFields.includes(`emitter.company.siret`)}
           key={orgId}
         />

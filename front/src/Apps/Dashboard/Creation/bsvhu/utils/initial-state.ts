@@ -91,7 +91,7 @@ export default {
   trader: {
     company: getInitialCompany()
   },
-  intermediaries: []
+  intermediaries: [getInitialCompany()]
 };
 
 export const ecoOrganismeList = [
