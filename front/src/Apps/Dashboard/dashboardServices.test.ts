@@ -1535,7 +1535,7 @@ describe("dashboardServices", () => {
         type: BsdType.Bsdd,
         emitterType: EmitterType.Appendix1Producer,
         status: BsdStatusCode.Sent,
-        transporter: { company: { vatNumber } }
+        transporter: { company: { vatNumber, orgId: vatNumber } }
       };
       expect(canReviewBsdd(bsdd as BsdDisplay, vatNumber)).toEqual(true);
     });

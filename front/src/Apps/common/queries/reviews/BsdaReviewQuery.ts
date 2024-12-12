@@ -24,6 +24,12 @@ const reviewFragment = gql`
           infos
         }
       }
+      worker {
+        company {
+          name
+          orgId
+        }
+      }
       ecoOrganisme {
         siret
         name
