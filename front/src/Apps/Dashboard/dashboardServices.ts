@@ -303,7 +303,7 @@ export const isSameSiretTransporter = (
   bsd: BsdDisplay | Form
 ): boolean =>
   currentSiret === bsd.transporter?.company?.siret ||
-  currentSiret === bsd.transporter?.company?.vatNumber;
+  currentSiret === bsd.transporter?.company?.orgId;
 
 // Renvoie le premier transporteur de la liste qui n'a pas encore
 // pris en charge le déchet.
