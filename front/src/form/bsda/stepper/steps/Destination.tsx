@@ -21,9 +21,7 @@ const DestinationCAPModificationAlert = () => (
 const showCAPModificationAlert = bsdaContext => {
   return (
     bsdaContext?.status &&
-    [BsdaStatus.SignedByProducer, BsdaStatus.SignedByWorker].includes(
-      bsdaContext?.status
-    ) &&
+    ![BsdaStatus.Initial].includes(bsdaContext?.status) &&
     Boolean(bsdaContext?.worker?.company?.siret) &&
     Boolean(bsdaContext?.emitter?.company?.siret)
   );
