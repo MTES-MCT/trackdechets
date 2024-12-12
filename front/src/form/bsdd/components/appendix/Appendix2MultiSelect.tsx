@@ -17,6 +17,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Decimal from "decimal.js";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
+import NonScrollableInput from "../../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 
 type Appendix2MultiSelectProps = {
   // Résultat de la query `appendixForms` executé
@@ -253,7 +254,7 @@ export default function Appendix2MultiSelect({
         form.processingOperationDone,
         quantityAccepted.toNumber(),
         quantityLeft.toNumber(),
-        <Input
+        <NonScrollableInput
           label=""
           disabled={!checked}
           state={
@@ -268,6 +269,7 @@ export default function Appendix2MultiSelect({
               : "Vous ne pouvez pas regrouper une" +
                 " quantité supérieure à la quantité restante"
           }
+          style={{ minWidth: "120px" }}
           nativeInputProps={{
             type: "number",
             min: 0,
@@ -294,7 +296,7 @@ export default function Appendix2MultiSelect({
     function onSelectAll(e: React.ChangeEvent<HTMLInputElement>) {
       setIsDirty(true);
       if (e.target.checked) {
-        for (const { form, quantity } of forms) {
+        for (const { form, quantity } of filteredForms) {
           if (!currentlyAnnexedFormIds.includes(form.id)) {
             push({
               form,
@@ -314,7 +316,9 @@ export default function Appendix2MultiSelect({
           {
             label: "",
             nativeInputProps: {
-              checked: currentlyAnnexedForms.length === forms.length,
+              checked:
+                filteredForms.length > 0 &&
+                currentlyAnnexedForms.length >= filteredForms.length,
               onChange: onSelectAll
             }
           }
@@ -325,9 +329,9 @@ export default function Appendix2MultiSelect({
       "Émetteur initial",
       "Date de l'acceptation",
       "Opération réalisée",
-      "Qté acceptée",
-      "Qté restante",
-      "Qté à regrouper"
+      "Qté acceptée (en T)",
+      "Qté restante (en T)",
+      "Qté à regrouper (en T)"
     ];
 
     return (
@@ -364,7 +368,7 @@ export default function Appendix2MultiSelect({
           </div>
           <div className="fr-col-12 fr-col-sm-6 fr-col-md-4 fr-col-xl">
             <Input
-              label="N°SIRET émetteur"
+              label="SIRET de l'émetteur initial"
               nativeInputProps={{
                 value: emitterSiretFilter,
                 onChange: v => setEmitterSiretFilter(v.target.value)
