@@ -443,7 +443,7 @@ describe("Mutation.Bsda.duplicate", () => {
     const { bsda, transporter, emitter, worker, broker } = await createBsda();
 
     // On s'assure que toutes les signatures sont nulles pour ne pas que l'auto-complétion
-    // soit sautée pour cause de champ vérouillé
+    // soit sautée pour cause de champ verrouillé
     await prisma.bsda.update({
       where: { id: bsda.id },
       data: {
@@ -711,7 +711,7 @@ describe("Mutation.Bsda.duplicate", () => {
       });
 
     // On s'assure que toutes les signatures sont nulles pour ne pas que l'auto-complétion
-    // soit sautée pour cause de champ vérouillé
+    // soit sautée pour cause de champ verrouillé
     await prisma.bsda.update({
       where: { id: bsda.id },
       data: {

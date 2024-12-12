@@ -349,7 +349,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le nom de l'entreprise émettrice a été vérouillé via signature et ne peut pas être modifié."
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le nom de l'entreprise émettrice a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -430,7 +430,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de destination a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -479,7 +479,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de destination a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -564,7 +564,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de destination a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -655,7 +655,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le SIRET de l'entreprise de travaux a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de travaux a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -828,7 +828,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le nom du transporteur n°1 a été vérouillé via signature et ne peut pas être modifié."
+          "Le nom du transporteur n°1 a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1183,7 +1183,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
       "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-        "Les intermédiaires a été vérouillé via signature et ne peut pas être modifié."
+        "Les intermédiaires a été verrouillé via signature et ne peut pas être modifié."
     );
   });
 
@@ -1886,7 +1886,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " La liste des transporteurs a été vérouillé via signature et ne peut pas être modifié."
+          " La liste des transporteurs a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -2045,7 +2045,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " Le mode de transport n°1 a été vérouillé via signature et ne peut pas être modifié."
+          " Le mode de transport n°1 a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
