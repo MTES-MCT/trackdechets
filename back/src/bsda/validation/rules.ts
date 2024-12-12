@@ -560,7 +560,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   destinationOperationNextDestinationCap: {
     readableFieldName: "le CAP de l'exutoire",
-    sealed: { from: "OPERATION" },
+    sealed: { from: sealedFromEmissionExceptIfWorker },
     required: {
       from: "EMISSION",
       when: bsda =>
