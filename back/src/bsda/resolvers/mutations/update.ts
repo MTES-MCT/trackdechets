@@ -128,7 +128,7 @@ export const producerShouldBeNotifiedOfDestinationCapModification = (
   previousBsda: Bsda,
   updatedBsda: Bsda
 ) => {
-  if (![BsdaStatus.INITIAL].includes(updatedBsda.status)) {
+  if ([BsdaStatus.INITIAL].includes(updatedBsda.status)) {
     return false;
   }
 

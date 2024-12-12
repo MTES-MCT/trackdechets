@@ -2272,12 +2272,6 @@ describe("Mutation.updateBsda", () => {
       it.each([
         // Status pas bon
         [previousBsda, { ...updatedBsda, status: BsdaStatus.INITIAL }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.AWAITING_CHILD }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.CANCELED }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.PROCESSED }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.REFUSED }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.SIGNED_BY_WORKER }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.SENT }],
         // Pas d'entreprise de travaux
         [previousBsda, { ...updatedBsda, workerCompanySiret: undefined }],
         // Pas d'émetteur
@@ -2355,39 +2349,6 @@ describe("Mutation.updateBsda", () => {
             notificationIsActiveBsdaFinalDestinationUpdate: true
           }
         );
-        await userInCompany(
-          "MEMBER",
-          worker.id,
-          {
-            email: "worker@mail.com",
-            name: "Worker"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          destination.id,
-          {
-            email: "destination@mail.com",
-            name: "Destination"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          transporter.id,
-          {
-            email: "transporter@mail.com",
-            name: "Transporter"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
 
         const bsda = await bsdaFactory({
           opt: {
@@ -2439,10 +2400,6 @@ describe("Mutation.updateBsda", () => {
   ${bsda.destinationCompanySiret}.
 </p>
 `,
-            cc: [
-              { email: "worker@mail.com", name: "Worker" },
-              { email: "destination@mail.com", name: "Destination" }
-            ],
             messageVersions: [
               { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
             ],
@@ -2465,50 +2422,6 @@ describe("Mutation.updateBsda", () => {
           {
             email: "emitter@mail.com",
             name: "Emitter"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          worker.id,
-          {
-            email: "worker@mail.com",
-            name: "Worker"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          destination.id,
-          {
-            email: "destination@mail.com",
-            name: "Destination"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          nextDestination.id,
-          {
-            email: "next.destination@mail.com",
-            name: "Next Destination"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          transporter.id,
-          {
-            email: "transporter@mail.com",
-            name: "Transporter"
           },
           {
             notificationIsActiveBsdaFinalDestinationUpdate: true
@@ -2568,10 +2481,6 @@ describe("Mutation.updateBsda", () => {
   ${bsda.destinationOperationNextDestinationCompanySiret}.
 </p>
 `,
-            cc: [
-              { email: "worker@mail.com", name: "Worker" },
-              { email: "next.destination@mail.com", name: "Next Destination" }
-            ],
             messageVersions: [
               { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
             ],
