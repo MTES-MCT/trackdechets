@@ -1,14 +1,23 @@
+# Contexte
+
 <!--
-  Décrivez brièvement l'objectif de votre pull request.
-  La liste ci-dessous comporte des éléments importants à garder en tête pour chaque PR.
-  Pensez à ajouter le lien du ticket Favro correspondant.
+  Résumé succinct et à jour du ticket Favro
 -->
 
-- [ ] Mettre à jour la documentation
-- [ ] Mettre à jour le change log
-- [ ] Documenter les manipulations à faire lors de la mise en production (sur le ticket Favro de release)
-- [ ] S'assurer que la numérotation des nouvelles migrations est bien cohérente
-- [ ] Informer le data engineer de tout changement de schéma DB
----
+# Points de vigilance pour les intégrateurs
 
-- [Ticket Favro]()
+<!--
+  Si la PR introduit des breaking changes ou des modifications 
+  côté API, mettre ici un bref résumé technique type TL;DR à 
+  l'attention des intégrateurs
+-->
+
+# Démo
+
+<!-- 
+  Vidéo de préférence
+-->
+
+# Ticket Favro
+
+[Titre](lien)
