@@ -42,6 +42,7 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
     where: { id: transporter.company.transporterReceiptId! }
   });
   const broker = await userWithCompanyFactory("ADMIN", {
+    companyTypes: ["BROKER"],
     brokerReceipt: {
       create: {
         receiptNumber: "BROKER-RECEIPT-NUMBER",
