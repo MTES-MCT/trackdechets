@@ -59,6 +59,7 @@ const reviewFragment = gql`
       }
     }
     authoringCompany {
+      orgId
       siret
       name
     }
