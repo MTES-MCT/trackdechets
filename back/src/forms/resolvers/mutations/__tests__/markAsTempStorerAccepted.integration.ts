@@ -75,6 +75,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
           signedAt: "2018-12-11T00:00:00.000Z",
           signedBy: "John Doe",
           quantityReceived: 2.4,
+          quantityRefused: 0,
           quantityType: "REAL"
         }
       }
@@ -118,6 +119,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
           signedAt: "2018-12-11T00:00:00.000Z",
           signedBy: "John Doe",
           quantityReceived: 2.4,
+          quantityRefused: 0,
           quantityType: "REAL"
         }
       }
@@ -173,6 +175,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
           signedBy: "John Doe",
           signedAt: "2018-12-11T00:00:00.000Z",
           quantityReceived: 0,
+          quantityRefused: 0,
           quantityType: "REAL"
         }
       }
@@ -236,6 +239,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
           signedAt: format(signedAt, f),
           signedBy: "John Doe",
           quantityReceived: 2.4,
+          quantityRefused: 0,
           quantityType: "REAL"
         }
       }
@@ -322,7 +326,8 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
             signedAt: "2019-01-18" as any,
             signedBy: "John",
             quantityType: "REAL",
-            quantityReceived: 0
+            quantityReceived: 0,
+            quantityRefused: 0
           }
         }
       });
@@ -652,78 +657,6 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
       body: expect.stringContaining(`<li>Quantité réelle présentée nette : 2.4 tonnes</li>
   <li>Quantité refusée nette : 1.1 tonnes</li>
   <li>Quantité acceptée nette : 1.3 tonnes</li>`)
-    });
-  });
-
-  test("[legacy] user can mark BSD as PARTIALLY_REFUSED with quantityRefused = undefined", async () => {
-    // Given
-    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-
-    const emitterCompany = await companyFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: Status.TEMP_STORED,
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: tempStorerCompany.siret,
-        recipientIsTempStorage: true,
-        forwardedIn: {
-          create: { readableId: getReadableId(), ownerId: user.id }
-        },
-        receivedBy: "John Doe",
-        receivedAt: "2018-12-11T00:00:00.000Z"
-      }
-    });
-
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "markAsTempStorerAccepted">>(
-      MARK_AS_TEMP_STORER_ACCEPTED,
-      {
-        variables: {
-          id: form.id,
-          tempStorerAcceptedInfo: {
-            wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
-            wasteRefusalReason: "Thats isn't what I was expecting man !",
-            signedAt: "2019-01-18" as any,
-            signedBy: "John Doe",
-            quantityReceived: 2.4,
-            quantityType: "REAL"
-          }
-        }
-      }
-    );
-
-    // Then
-    expect(errors).toBeUndefined();
-
-    const formAfterMutation = await prisma.form.findUniqueOrThrow({
-      where: { id: form.id }
-    });
-
-    expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
-    expect(formAfterMutation.wasteAcceptationStatus).toEqual(
-      "PARTIALLY_REFUSED"
-    );
-    expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
-    expect(formAfterMutation.quantityRefused).toBeNull();
-
-    const forwardedFormAfterMutation = await prisma.form.findUniqueOrThrow({
-      where: { id: form.forwardedIn?.id }
-    });
-
-    expect(forwardedFormAfterMutation.wasteDetailsQuantity?.toNumber()).toEqual(
-      2.4
-    );
-
-    // Mail
-    expect.objectContaining({
-      subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
-      body: expect.stringContaining(`<li>Quantité réelle présentée nette : 2.4 tonnes</li>
-    <li>Quantité refusée nette : Non renseignée</li>
-    <li>Quantité acceptée nette : Non renseignée</li>`)
     });
   });
 });

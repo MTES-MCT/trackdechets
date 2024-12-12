@@ -268,11 +268,26 @@ export const quantityRefused = weight(WeightUnits.Tonne)
     (value, context) => {
       const { quantityReceived } = context.parent;
 
-      const quantityReceivedIsDefined =
-        quantityReceived !== null && quantityReceived !== undefined;
-      const quantityRefusedIsDefined = value !== null && value !== undefined;
+      const quantityReceivedIsDefined = isDefined(quantityReceived);
+      const quantityRefusedIsDefined = isDefined(value);
 
       if (!quantityReceivedIsDefined && quantityRefusedIsDefined) return false;
+      return true;
+    }
+  )
+  .test(
+    "quantity-is-required",
+    "La quantité refusée (quantityRefused) est requise",
+    (value, context) => {
+      const { wasteAcceptationStatus, quantityReceived } = context.parent;
+
+      // Si le déchet a été accepté ou refusé, il faut préciser la quantité refusée
+      // On ajoute le check sur la quantityReceived pour laisser les erreurs sur ce champ
+      // remonter avant les erreurs sur quantityRefused
+      if (isDefined(wasteAcceptationStatus) && isDefined(quantityReceived)) {
+        return isDefined(value);
+      }
+
       return true;
     }
   )
@@ -327,8 +342,7 @@ export const quantityRefused = weight(WeightUnits.Tonne)
     (value, context) => {
       const { quantityReceived } = context.parent;
 
-      if (quantityReceived === null || quantityReceived === undefined)
-        return true;
+      if (!isDefined(quantityReceived)) return true;
 
       // Legacy
       if (value === null || value === undefined) return true;
