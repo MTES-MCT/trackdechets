@@ -28,7 +28,7 @@
   },
   "prisma": {
     "seed": "tsx --tsconfig back/tsconfig.lib.json back/prisma/seed.ts",
-    "schema": "libs/back/prisma/src/schema.prisma"
+    "schema": "libs/back/prisma/src/schema"
   },
   "nx": {
     "targets": {}
