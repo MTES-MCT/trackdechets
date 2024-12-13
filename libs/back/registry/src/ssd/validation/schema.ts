@@ -92,7 +92,7 @@ const inputSsdSchema = z.object({
               "Le code déchet secondaire n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces"
           })
         )
-        .nullish()
+        .optional()
     ),
   secondaryWasteDescriptions: z
     .string()
@@ -105,20 +105,18 @@ const inputSsdSchema = z.object({
         : []
     )
     .pipe(
-      z
-        .array(
-          z
-            .string()
-            .min(
-              2,
-              "Les dénominations usuelles du déchet doivent faire au moins 2 caractères"
-            )
-            .max(
-              200,
-              "Les dénominations usuelles du déchet ne peuvent pas dépasser 200 caractères"
-            )
-        )
-        .nullish()
+      z.array(
+        z
+          .string()
+          .min(
+            2,
+            "Les dénominations usuelles du déchet doivent faire au moins 2 caractères"
+          )
+          .max(
+            200,
+            "Les dénominations usuelles du déchet ne peuvent pas dépasser 200 caractères"
+          )
+      )
     ),
   product: z
     .string()
@@ -226,7 +224,7 @@ const transformedSsdSchema = z.object({
   reportForCity: z.string().default(""),
   reportForPostalCode: z.string().default(""),
   reportForName: z.coerce.string().default(""),
-  id: z.string().nullish()
+  id: z.string().optional()
 });
 
 export const ssdSchema = inputSsdSchema.merge(transformedSsdSchema);

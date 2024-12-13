@@ -171,7 +171,7 @@ const inputIncomingWasteSchema = z.object({
 
 // Props added through transform
 const transformedIncomingWasteSchema = z.object({
-  id: z.string().nullish(),
+  id: z.string().optional(),
   reportForAddress: z.string().default(""),
   reportForCity: z.string().default(""),
   reportForPostalCode: z.string().default(""),
