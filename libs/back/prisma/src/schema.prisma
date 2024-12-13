@@ -2343,6 +2343,7 @@ model RegistryIncomingWaste {
   reportForCity             String
   reportForPostalCode       String
   reportAsSiret             String?
+  customInfo                String?
   wasteCode                 String
   wastePop                  Boolean
   wasteIsDangerous          Boolean?
@@ -2382,10 +2383,12 @@ model RegistryIncomingWaste {
   ecoOrganismeSiret         String?
   ecoOrganismeName          String?
   operationCode             String
+  noTraceability            Boolean?
   nextDestinationIsAbroad   Boolean?
   declarationNumber         String?
   notificationNumber        String?
   movementNumber            String?
+  nextOperationCode         String?
   transporter1TransportMode TransportMode
   transporter1Type          String
   transporter1OrgId         String?
@@ -2496,6 +2499,7 @@ model RegistryIncomingTexs {
   traderName                   String?
   traderReceiptNumber          String?
   operationCode                String
+  noTraceability               Boolean?
   nextDestinationIsAbroad      Boolean?
   declarationNumber            String?
   notificationNumber           String?

@@ -127,8 +127,8 @@ export function getTransformXlsxStream(options: ImportOptions) {
         const keys = Object.keys(options.headers);
         for (const [index, key] of keys.entries()) {
           const { value } = row.getCell(index + 1);
-          rawLine[key] = value === null ? undefined : value;
-          if (rawLine[key]) {
+          rawLine[key] = value;
+          if (value) {
             isEmptyLine = false;
           }
         }

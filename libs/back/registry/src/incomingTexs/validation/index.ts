@@ -19,7 +19,7 @@ import {
 import { incomingTexsSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
 
-export function safeParseAsyncIncomingWaste(line: unknown) {
+export function safeParseAsyncIncomingTexs(line: unknown) {
   return incomingTexsSchema
     .superRefine(refineIsDangerous)
     .superRefine(refineWeightAndVolume)

@@ -109,7 +109,7 @@ export function refineActorOrgId<T>({
 }
 
 export const refineIsDangerous: Refinement<{
-  wasteIsDangerous?: boolean | undefined;
+  wasteIsDangerous?: boolean | null | undefined;
   wastePop: boolean;
   wasteCode: z.infer<typeof wasteCodeSchema>;
 }> = (item, { addIssue }) => {
@@ -131,13 +131,25 @@ export const refineIsDangerous: Refinement<{
 };
 
 export const refineWeightAndVolume: Refinement<{
-  transporter1TransportMode: z.infer<typeof transportModeSchema> | undefined;
-  transporter2TransportMode?: z.infer<typeof transportModeSchema> | undefined;
-  transporter3TransportMode?: z.infer<typeof transportModeSchema> | undefined;
-  transporter4TransportMode?: z.infer<typeof transportModeSchema> | undefined;
-  transporter5TransportMode?: z.infer<typeof transportModeSchema> | undefined;
+  transporter1TransportMode: z.infer<typeof transportModeSchema>;
+  transporter2TransportMode?:
+    | z.infer<typeof transportModeSchema>
+    | null
+    | undefined;
+  transporter3TransportMode?:
+    | z.infer<typeof transportModeSchema>
+    | null
+    | undefined;
+  transporter4TransportMode?:
+    | z.infer<typeof transportModeSchema>
+    | null
+    | undefined;
+  transporter5TransportMode?:
+    | z.infer<typeof transportModeSchema>
+    | null
+    | undefined;
   weightValue: number;
-  volume?: number | undefined;
+  volume?: number | null | undefined;
   weightIsEstimate: boolean;
   operationCode: string;
 }> = (item, { addIssue }) => {
@@ -219,11 +231,11 @@ export const refineMunicipalities: Refinement<{
 };
 
 export const refineNotificationNumber: Refinement<{
-  wasteIsDangerous?: boolean | undefined;
+  wasteIsDangerous?: boolean | null | undefined;
   wastePop: boolean;
   wasteCode: z.infer<typeof wasteCodeSchema>;
-  notificationNumber?: string | undefined;
-  nextDestinationIsAbroad?: boolean | undefined;
+  notificationNumber?: string | null | undefined;
+  nextDestinationIsAbroad?: boolean | null | undefined;
 }> = (item, { addIssue }) => {
   const isDangerous =
     item.wasteIsDangerous || item.wastePop || item.wasteCode.includes("*");

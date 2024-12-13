@@ -31,10 +31,10 @@ const inputSsdSchema = z.object({
   reportAsSiret: reportAsSiretSchema,
   reportForSiret: getReportForSiretSchema("de l'émetteur"),
   useDate: z.union([
-    z.date().optional(),
+    z.date().nullish(),
     z
       .string()
-      .optional()
+      .nullish()
       .transform(val => (val ? new Date(val) : undefined))
       .pipe(
         z
@@ -47,14 +47,14 @@ const inputSsdSchema = z.object({
             new Date(),
             "La date d'utilisation ne peut pas être dans le futur"
           )
-          .optional()
+          .nullish()
       )
   ]),
   dispatchDate: z.union([
-    z.date().optional(),
+    z.date().nullish(),
     z
       .string()
-      .optional()
+      .nullish()
       .transform(val => (val ? new Date(val) : undefined))
       .pipe(
         z
@@ -67,7 +67,7 @@ const inputSsdSchema = z.object({
             new Date(),
             "La date d'utilisation ne peut pas être dans le futur"
           )
-          .optional()
+          .nullish()
       )
   ]),
   wasteCode: wasteCodeSchema,
@@ -75,7 +75,7 @@ const inputSsdSchema = z.object({
   wasteCodeBale: wasteCodeBaleSchema,
   secondaryWasteCodes: z
     .string()
-    .optional()
+    .nullish()
     .transform(val =>
       val
         ? String(val)
@@ -92,11 +92,11 @@ const inputSsdSchema = z.object({
               "Le code déchet secondaire n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces"
           })
         )
-        .optional()
+        .nullish()
     ),
   secondaryWasteDescriptions: z
     .string()
-    .optional()
+    .nullish()
     .transform(val =>
       val
         ? String(val)
@@ -118,7 +118,7 @@ const inputSsdSchema = z.object({
               "Les dénominations usuelles du déchet ne peuvent pas dépasser 200 caractères"
             )
         )
-        .optional()
+        .nullish()
     ),
   product: z
     .string()
@@ -135,10 +135,10 @@ const inputSsdSchema = z.object({
     )
     .max(new Date(), "La date de traitement ne peut pas être dans le futur"),
   processingEndDate: z.union([
-    z.date().optional(),
+    z.date().nullish(),
     z
       .string()
-      .optional()
+      .nullish()
       .transform(val => (val ? new Date(val) : undefined))
       .pipe(
         z
@@ -151,7 +151,7 @@ const inputSsdSchema = z.object({
             new Date(),
             "La date de fin de traitement ne peut pas être dans le futur"
           )
-          .optional()
+          .nullish()
       )
   ]),
   destinationType: getActorTypeSchema("de destinataire").exclude([
@@ -226,7 +226,7 @@ const transformedSsdSchema = z.object({
   reportForCity: z.string().default(""),
   reportForPostalCode: z.string().default(""),
   reportForName: z.coerce.string().default(""),
-  id: z.string().optional()
+  id: z.string().nullish()
 });
 
 export const ssdSchema = inputSsdSchema.merge(transformedSsdSchema);
