@@ -86,6 +86,8 @@ enum TransportMode {
   SEA
   "Autre (utilisé avec Packaging = PIPELINE par exemple)"
   OTHER
+  "Non renseigné. Cas particulier pour des données importés"
+  UNKNOWN
 }
 
 "Type de déclaration"
