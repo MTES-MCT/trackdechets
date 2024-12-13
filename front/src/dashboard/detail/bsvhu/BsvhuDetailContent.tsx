@@ -2,6 +2,7 @@ import {
   IconBSVhu,
   IconRenewableEnergyEarth,
   IconWarehouseDelivery,
+  IconWarehousePackage,
   IconWaterDam
 } from "../../../Apps/common/Components/Icons/Icons";
 import { Bsvhu, FormCompany, OperationMode } from "@td/codegen-ui";
@@ -171,7 +172,18 @@ export function BsvhuDetailContent({ form }: Props) {
             <IconWaterDam size="25px" />
             <span className={styles.detailTabCaption}>Producteur</span>
           </Tab>
-
+          {!!form?.trader?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Négociant</span>
+            </Tab>
+          )}
+          {!!form?.broker?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Courtier</span>
+            </Tab>
+          )}
           <Tab className={styles.detailTab}>
             <IconWarehouseDelivery size="25px" />
             <span className={styles.detailTabCaption}>
@@ -183,6 +195,16 @@ export function BsvhuDetailContent({ form }: Props) {
             <IconRenewableEnergyEarth size="25px" />
             <span className={styles.detailTabCaption}>Destinataire</span>
           </Tab>
+
+          {!!form?.intermediaries?.length && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>
+                Intermédiaire
+                {form?.intermediaries?.length > 1 ? "s" : ""}
+              </span>
+            </Tab>
+          )}
         </TabList>
         {/* Tabs content */}
         <div className={styles.detailTabPanels}>
