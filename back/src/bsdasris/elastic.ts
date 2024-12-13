@@ -130,12 +130,14 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
     }
 
     case BsdasriStatus.REFUSED:
+    case BsdasriStatus.CANCELED:
     case BsdasriStatus.PROCESSED: {
       for (const fieldName of siretsFilters.keys()) {
         setTab(siretsFilters, fieldName, "isArchivedFor");
       }
       break;
     }
+
     default:
       break;
   }
