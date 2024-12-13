@@ -53,13 +53,25 @@ const inputIncomingTexsSchema = z.object({
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
   parcelInseeCodes: inseeCodesSchema,
-  parcelNumbers: parcelNumbersSchema.nullish(),
-  parcelCoordinates: parcelCoordinatesSchema.nullish(),
+  parcelNumbers: parcelNumbersSchema,
+  parcelCoordinates: parcelCoordinatesSchema,
   sisIdentifiers: z
-    .array(
-      z.string().max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
+    .string()
+    .nullish()
+    .transform(val =>
+      val
+        ? String(val)
+            .split(",")
+            .map(val => val.trim())
+        : []
     )
-    .nullish(),
+    .pipe(
+      z.array(
+        z
+          .string()
+          .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
+      )
+    ),
   producerType: getActorTypeSchema("de producteur initial"),
   producerOrgId: getActorOrgIdSchema("du producteur initial"),
   producerName: getActorNameSchema("du producteur initial"),
@@ -115,8 +127,8 @@ const inputIncomingTexsSchema = z.object({
   nextOperationCode: operationCodeSchema.nullish(),
   isUpcycled: z.boolean().nullish(),
   destinationParcelInseeCodes: inseeCodesSchema,
-  destinationParcelNumbers: parcelNumbersSchema.nullish(),
-  destinationParcelCoordinates: parcelCoordinatesSchema.nullish(),
+  destinationParcelNumbers: parcelNumbersSchema,
+  destinationParcelCoordinates: parcelCoordinatesSchema,
   transporter1TransportMode: transportModeSchema,
   transporter1Type: getActorTypeSchema("de transporteur 1"),
   transporter1OrgId: getActorOrgIdSchema("du transporteur 1"),
@@ -174,7 +186,7 @@ const inputIncomingTexsSchema = z.object({
 
 // Props added through transform
 const transformedIncomingTexsSchema = z.object({
-  id: z.string().nullish(),
+  id: z.string().optional(),
   reportForAddress: z.string().default(""),
   reportForCity: z.string().default(""),
   reportForPostalCode: z.string().default(""),
