@@ -22,7 +22,7 @@ export const reasonSchema = z
 
     return val;
   })
-  .optional();
+  .nullish();
 
 export const publicIdSchema = z
   .string({
@@ -38,10 +38,10 @@ export const publicIdSchema = z
 
 export const reportAsSiretSchema = z
   .union([
-    z.string().optional(),
+    z.string().nullish(),
     z
       .number()
-      .optional()
+      .nullish()
       .transform(val => (val ? String(val) : undefined))
   ])
   .pipe(
@@ -53,7 +53,7 @@ export const reportAsSiretSchema = z
       .refine(value => {
         return isSiret(value);
       }, "Le SIRET du déclarant n'est pas un SIRET valide")
-      .optional()
+      .nullish()
   );
 
 export const getReportForSiretSchema = (name: string) =>
@@ -96,8 +96,8 @@ export const wasteIsDangerousSchema = z.union(
           "Le champ Dangereux n'est pas valide. Valeurs possibles: OUI, NON"
       })
       .transform(val => val === "OUI")
-      .optional(),
-    z.boolean().optional()
+      .nullish(),
+    z.boolean().nullish()
   ],
   { invalid_type_error: "Le champ Dangereux saisi n'est pas valide" }
 );
@@ -110,7 +110,7 @@ export const wasteDescriptionSchema = z
     "La dénomination usuelle du déchet ne peut pas dépasser 200 caractères"
   );
 
-export const wasteCodeBaleSchema = z.enum(WASTE_CODES_BALE).optional();
+export const wasteCodeBaleSchema = z.enum(WASTE_CODES_BALE).nullish();
 
 export const operationCodeSchema = z
   .string()
@@ -151,12 +151,12 @@ export const weightIsEstimateSchema = z.union(
 
 export const volumeSchema = z
   .union([
-    z.number().optional(),
+    z.number().nullish(),
     z
       .string()
-      .optional()
+      .nullish()
       .transform(val => (val ? Number(val) : undefined))
-  ]) // No coercion to keep .optional()
+  ]) // No coercion to keep .nullish()
   .pipe(
     z
       .number({
@@ -166,7 +166,7 @@ export const volumeSchema = z
       .min(0, "Le volume ne peut pas être inférieur à 0")
       .max(1_000, "Le volume ne peut pas dépasser 1 000 M3")
       .multipleOf(0.001, "Le volume ne doit pas avoir plus de 3 décimales")
-      .optional()
+      .nullish()
   );
 
 export const receptionDateSchema = z.coerce
@@ -179,7 +179,7 @@ export const receptionDateSchema = z.coerce
 
 export const inseeCodesSchema = z
   .string()
-  .optional()
+  .nullish()
   .transform(val =>
     val
       ? String(val)
@@ -191,7 +191,7 @@ export const inseeCodesSchema = z
 
 export const municipalitiesNamesSchema = z
   .string()
-  .optional()
+  .nullish()
   .transform(val =>
     val
       ? String(val)
@@ -252,16 +252,16 @@ export const nextDestinationIsAbroad = z.union(
 export const declarationNumberSchema = z
   .string()
   .regex(/^A7[EI][0-9]{10}$/)
-  .optional();
+  .nullish();
 
 export const notificationNumberSchema = z
   .string()
   .regex(/^[A-Z]{2}[0-9]{10}$/)
-  .optional();
+  .nullish();
 
 export const parcelNumbersSchema = z
   .string()
-  .optional()
+  .nullish()
   .transform(val =>
     val
       ? String(val)
@@ -273,7 +273,7 @@ export const parcelNumbersSchema = z
 
 export const parcelCoordinatesSchema = z
   .string()
-  .optional()
+  .nullish()
   .transform(val =>
     val
       ? String(val)
@@ -320,7 +320,7 @@ export const getActorSiretSchema = (name: string) =>
     .refine(value => {
       return isSiret(value);
     }, "Le SIRET du déclarant n'est pas un SIRET valide")
-    .optional();
+    .nullish();
 
 export const getActorNameSchema = (name: string) =>
   z

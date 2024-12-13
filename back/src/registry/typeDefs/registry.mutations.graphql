@@ -5,6 +5,8 @@ type Mutation {
   ): RegistryImport!
 
   addToSsdRegistry(lines: [SsdLineInput!]!): Boolean!
+  addToIncomingWasteRegistry(lines: [IncomingWasteLineInput!]!): Boolean!
+  addToIncomingTexsRegistry(lines: [IncomingTexsLineInput!]!): Boolean!
 
   "Renvoie un lien permettant de télécharger un registre au format CSV"
   generateWastesRegistryExport(
