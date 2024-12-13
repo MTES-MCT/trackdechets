@@ -38,7 +38,7 @@ export type ParsedZodIncomingTexsItem = z.output<typeof incomingTexsSchema>;
 
 const inputIncomingTexsSchema = z.object({
   reason: reasonSchema,
-  custominfo: z.string().optional(),
+  customInfo: z.string().optional(),
   publicId: publicIdSchema,
   reportAsSiret: reportAsSiretSchema,
   reportForSiret: getReportForSiretSchema("du destinataire"),

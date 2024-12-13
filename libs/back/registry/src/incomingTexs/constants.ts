@@ -1,6 +1,6 @@
 export const INCOMING_TEXS_HEADERS = {
   reason: "Motif",
-  custominfo: "Champ libre / Référence chantier",
+  customInfo: "Champ libre / Référence chantier",
   publicId: "Numéro unique",
   reportAsSiret: "SIRET du déclarant",
   reportForSiret: "SIRET du destinataire",

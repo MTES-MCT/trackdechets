@@ -926,8 +926,8 @@ model User {
   registryImports            RegistryImport[]
   registrySsds               RegistrySsd[]
   registryIncomingWastes     RegistryIncomingWaste[]
+  registryIncomingTexs       RegistryIncomingTexs[]
   registryExports            RegistryExport[]
-  RegistryIncomingTexs       RegistryIncomingTexs[]
 }
 
 enum GovernmentPermission {
@@ -2454,7 +2454,7 @@ model RegistryIncomingTexs {
   reportForCity                String
   reportForPostalCode          String
   reportAsSiret                String?
-  custominfo                   String?
+  customInfo                   String?
   wasteCode                    String
   wastePop                     Boolean
   wasteIsDangerous             Boolean?
