@@ -3,7 +3,7 @@ import {
   reasonSchema,
   publicIdSchema,
   reportAsSiretSchema,
-  wasteCodeSchema,
+  getWasteCodeSchema,
   wasteCodeBaleSchema,
   wasteDescriptionSchema,
   volumeSchema,
@@ -18,7 +18,7 @@ import {
   getActorPostalCodeSchema,
   transportModeSchema,
   transportReceiptNumberSchema,
-  operationCodeSchema,
+  getOperationCodeSchema,
   getActorSiretSchema,
   wastePopSchema,
   wasteIsDangerousSchema,
@@ -31,6 +31,7 @@ import {
   nextDestinationIsAbroad,
   noTraceability
 } from "../../shared/schemas";
+import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
 
 export type ParsedZodIncomingWasteItem = z.output<typeof incomingWasteSchema>;
 
@@ -40,7 +41,7 @@ const inputIncomingWasteSchema = z.object({
   publicId: publicIdSchema,
   reportAsSiret: reportAsSiretSchema,
   reportForSiret: getReportForSiretSchema("du destinataire"),
-  wasteCode: wasteCodeSchema,
+  wasteCode: getWasteCodeSchema(),
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
   wasteDescription: wasteDescriptionSchema,
@@ -107,13 +108,17 @@ const inputIncomingWasteSchema = z.object({
     .nullish(),
   ecoOrganismeSiret: getActorSiretSchema("de l'éco-organisme").nullish(),
   ecoOrganismeName: getActorNameSchema("de l'éco-organisme").nullish(),
-  operationCode: operationCodeSchema,
+  operationCode: getOperationCodeSchema(
+    INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
+  ),
   noTraceability: noTraceability.nullish(),
   nextDestinationIsAbroad: nextDestinationIsAbroad.nullish(),
   declarationNumber: declarationNumberSchema,
   notificationNumber: notificationNumberSchema,
   movementNumber: z.string().nullish(),
-  nextOperationCode: operationCodeSchema.nullish(),
+  nextOperationCode: getOperationCodeSchema(
+    INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
+  ).nullish(),
   transporter1TransportMode: transportModeSchema,
   transporter1Type: getActorTypeSchema("de transporteur 1"),
   transporter1OrgId: getActorOrgIdSchema("du transporteur 1"),

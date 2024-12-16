@@ -1,7 +1,7 @@
 import { isSiret } from "@td/constants";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
-import { transportModeSchema, wasteCodeSchema } from "./schemas";
+import { transportModeSchema, getWasteCodeSchema } from "./schemas";
 
 export function refineActorOrgId<T>({
   typeKey,
@@ -111,7 +111,7 @@ export function refineActorOrgId<T>({
 export const refineIsDangerous: Refinement<{
   wasteIsDangerous?: boolean | null | undefined;
   wastePop: boolean;
-  wasteCode: z.infer<typeof wasteCodeSchema>;
+  wasteCode: z.infer<ReturnType<typeof getWasteCodeSchema>>;
 }> = (item, { addIssue }) => {
   // No check if the value is not set
   if (item.wasteIsDangerous == null) {
@@ -233,7 +233,7 @@ export const refineMunicipalities: Refinement<{
 export const refineNotificationNumber: Refinement<{
   wasteIsDangerous?: boolean | null | undefined;
   wastePop: boolean;
-  wasteCode: z.infer<typeof wasteCodeSchema>;
+  wasteCode: z.infer<ReturnType<typeof getWasteCodeSchema>>;
   notificationNumber?: string | null | undefined;
   nextDestinationIsAbroad?: boolean | null | undefined;
 }> = (item, { addIssue }) => {

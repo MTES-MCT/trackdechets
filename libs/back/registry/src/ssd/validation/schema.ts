@@ -11,13 +11,13 @@ import {
   getActorPostalCodeSchema,
   getActorTypeSchema,
   getReportForSiretSchema,
-  operationCodeSchema,
+  getOperationCodeSchema,
   publicIdSchema,
   reasonSchema,
   reportAsSiretSchema,
   volumeSchema,
   wasteCodeBaleSchema,
-  wasteCodeSchema,
+  getWasteCodeSchema,
   wasteDescriptionSchema,
   weightIsEstimateSchema,
   weightValueSchema
@@ -70,7 +70,7 @@ const inputSsdSchema = z.object({
           .nullish()
       )
   ]),
-  wasteCode: wasteCodeSchema,
+  wasteCode: getWasteCodeSchema(),
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
   secondaryWasteCodes: z
@@ -86,7 +86,7 @@ const inputSsdSchema = z.object({
     .pipe(
       z
         .array(
-          z.nativeEnum(BSDD_WASTE_CODES_ENUM, {
+          z.enum(BSDD_WASTE_CODES_ENUM, {
             required_error: "Le code déchet secondaire est requis",
             invalid_type_error:
               "Le code déchet secondaire n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces"
@@ -162,7 +162,7 @@ const inputSsdSchema = z.object({
   destinationCity: getActorCitySchema("du destinataire"),
   destinationPostalCode: getActorPostalCodeSchema("du destinataire"),
   destinationCountryCode: getActorCountryCodeSchema("du destinataire"),
-  operationCode: operationCodeSchema,
+  operationCode: getOperationCodeSchema(),
   operationMode: z
     .enum(
       [

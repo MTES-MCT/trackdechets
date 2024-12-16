@@ -1,10 +1,14 @@
 -- AlterEnum
+ALTER TYPE "RegistryImportType" ADD VALUE 'INCOMING_TEXS';
+
+-- AlterEnum
 ALTER TYPE "TransportMode" ADD VALUE 'UNKNOWN';
 
 -- AlterTable
 ALTER TABLE "RegistryIncomingWaste" ADD COLUMN     "customInfo" TEXT,
 ADD COLUMN     "nextDestinationIsAbroad" BOOLEAN,
-ADD COLUMN     "nextOperationCode" TEXT;
+ADD COLUMN     "nextOperationCode" TEXT,
+ADD COLUMN     "noTraceability" BOOLEAN;
 
 -- CreateTable
 CREATE TABLE "RegistryIncomingTexs" (
@@ -63,6 +67,7 @@ CREATE TABLE "RegistryIncomingTexs" (
     "traderName" TEXT,
     "traderReceiptNumber" TEXT,
     "operationCode" TEXT NOT NULL,
+    "noTraceability" BOOLEAN,
     "nextDestinationIsAbroad" BOOLEAN,
     "declarationNumber" TEXT,
     "notificationNumber" TEXT,

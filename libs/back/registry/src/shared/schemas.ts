@@ -1,8 +1,10 @@
 import {
+  ALL_TD_PROCESSING_OPERATIONS_CODES,
   BSDD_WASTE_CODES_ENUM,
   isSiret,
-  PROCESSING_OPERATIONS_CODES_ENUM,
-  WASTE_CODES_BALE
+  TdOperationCodeEnum,
+  WASTE_CODES_BALE,
+  WasteCodeEnum
 } from "@td/constants";
 import { sub } from "date-fns";
 import { z } from "zod";
@@ -67,11 +69,14 @@ export const getReportForSiretSchema = (name: string) =>
       return isSiret(value);
     }, `Le SIRET ${name} n'est pas un SIRET valide`);
 
-export const wasteCodeSchema = z.nativeEnum(BSDD_WASTE_CODES_ENUM, {
-  required_error: "Le code déchet est requis",
-  invalid_type_error:
-    "Le code déchet n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces."
-});
+export const getWasteCodeSchema = (
+  wasteCodes: WasteCodeEnum = BSDD_WASTE_CODES_ENUM
+) =>
+  z.enum(wasteCodes, {
+    required_error: "Le code déchet est requis",
+    invalid_type_error:
+      "Le code déchet n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces."
+  });
 
 export const wastePopSchema = z.union(
   [
@@ -112,19 +117,19 @@ export const wasteDescriptionSchema = z
 
 export const wasteCodeBaleSchema = z.enum(WASTE_CODES_BALE).nullish();
 
-export const operationCodeSchema = z
-  .string()
-  .transform(val => val.replace(/([A-Z])(\d)/, "$1 $2")) // D5 becomes D 5
-  .pipe(
-    z.nativeEnum(
-      { ...PROCESSING_OPERATIONS_CODES_ENUM, "R 0": "R 0" },
-      {
+export const getOperationCodeSchema = (
+  operationCodes: TdOperationCodeEnum = ALL_TD_PROCESSING_OPERATIONS_CODES
+) =>
+  z
+    .string()
+    .transform(val => val.replace(/([A-Z])(\d)/, "$1 $2")) // D5 becomes D 5
+    .pipe(
+      z.enum(operationCodes, {
         required_error: "Le code de traitement est requis",
         invalid_type_error:
           "Le code de traitement n'est pas une valeur autorisée. Valeurs possibles: R 0 à R 13, D 1 à D 15"
-      }
-    )
-  );
+      })
+    );
 
 export const weightValueSchema = z.coerce
   .number({
