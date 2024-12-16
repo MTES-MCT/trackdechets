@@ -41,7 +41,6 @@ const WasteBsvhu = ({
   }, [setValue, packaging]);
 
   useEffect(() => {
-    console.log(errors);
     if (errors?.length) {
       setFieldError(
         errors,

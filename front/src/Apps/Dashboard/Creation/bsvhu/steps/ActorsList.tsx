@@ -1,43 +1,76 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { ZodBsvhu } from "../schema";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
-import { CompanySearchResult, FavoriteType } from "@td/codegen-ui";
+import { CompanySearchResult, CompanyType, FavoriteType } from "@td/codegen-ui";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { formatDate } from "../../../../../common/datetime";
+import { getInitialCompany } from "../../../../common/data/initialState";
 
 const ActorsList = () => {
   const { siret } = useParams<{ siret: string }>();
 
-  const { watch, setValue } = useFormContext<ZodBsvhu>();
+  const {
+    watch,
+    setValue,
+    formState: { errors },
+    clearErrors
+  } = useFormContext<ZodBsvhu>();
 
   const { fields, append, remove } = useFieldArray({
     name: "intermediaries"
   });
 
+  const hasBroker = watch("hasBroker");
+  const hasTrader = watch("hasTrader");
+  const hasIntermediaries = watch("hasIntermediaries");
+
   const broker = watch("broker");
   const trader = watch("trader");
   const intermediaries = watch("intermediaries") ?? [];
 
-  const [hasBroker, setHasBroker] = useState(!!broker?.company.siret);
-  const [hasTrader, setHasTrader] = useState(!!trader?.company.siret);
-  const [hasIntermediaries, setHasIntermediaries] = useState<boolean>(
-    !!(intermediaries && intermediaries.length > 0)
-  );
-
   const sealedFields = useContext(SealedFieldsContext);
 
-  const selectedCompanyError = (company?: CompanySearchResult) => {
+  useEffect(() => {
+    if (broker?.company.siret && !hasBroker) {
+      setValue("hasBroker", true);
+    }
+    if (trader?.company.siret && !hasTrader) {
+      setValue("hasTrader", true);
+    }
+    if (intermediaries && intermediaries[0].siret && !hasIntermediaries) {
+      setValue("hasIntermediaries", true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const selectedCompanyError = (
+    company?: CompanySearchResult,
+    type?: CompanyType
+  ) => {
     // L'émetteur est en situation irrégulière mais il a un SIRET et n'est pas inscrit sur Trackdéchets
     if (company) {
       if (!company.isRegistered) {
-        return "L'entreprise n'est pas inscrite sur Trackdéchets.";
+        return "Cet établissement n'est pas inscrit sur Trackdéchets.";
       }
     }
+
+    if (company && type) {
+      if (!company.companyTypes?.includes(type)) {
+        return `Cet établissement n'a pas le profil ${
+          type === CompanyType.Broker
+            ? "Courtier"
+            : type === CompanyType.Trader
+            ? "Négociant"
+            : "requis"
+        }.`;
+      }
+    }
+
     return null;
   };
 
@@ -90,10 +123,10 @@ const ActorsList = () => {
 
       <ToggleSwitch
         label="Présence d'un courtier"
-        checked={hasBroker}
+        checked={!!hasBroker}
         showCheckedHint={false}
         onChange={value => {
-          setHasBroker(value);
+          setValue("hasBroker", value);
           setValue("broker", {
             company: {
               siret: null,
@@ -119,7 +152,9 @@ const ActorsList = () => {
             orgId={siret}
             selectedCompanyOrgId={broker?.company.siret ?? null}
             favoriteType={FavoriteType.Broker}
-            selectedCompanyError={selectedCompanyError}
+            selectedCompanyError={company =>
+              selectedCompanyError(company, CompanyType.Broker)
+            }
             disabled={sealedFields.includes(`broker.company.siret`)}
             onCompanySelected={company => {
               if (company) {
@@ -140,10 +175,15 @@ const ActorsList = () => {
               }
             }}
           />
+          {errors.hasBroker && errors.hasBroker.message && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {errors?.hasBroker.message}
+            </p>
+          )}
 
           <CompanyContactInfo
             fieldName={`broker.company`}
-            name="broker"
+            errorObject={errors.broker?.company}
             disabled={sealedFields.includes(`broker.company.siret`)}
             key={`broker-company-${siret}`}
           />
@@ -157,10 +197,10 @@ const ActorsList = () => {
 
       <ToggleSwitch
         label="Présence d'un négociant"
-        checked={hasTrader}
+        checked={!!hasTrader}
         showCheckedHint={false}
         onChange={value => {
-          setHasTrader(value);
+          setValue("hasTrader", value);
           setValue("trader", {
             company: {
               siret: null,
@@ -186,7 +226,9 @@ const ActorsList = () => {
             orgId={siret}
             selectedCompanyOrgId={trader?.company.siret ?? null}
             favoriteType={FavoriteType.Trader}
-            selectedCompanyError={selectedCompanyError}
+            selectedCompanyError={company =>
+              selectedCompanyError(company, CompanyType.Trader)
+            }
             disabled={sealedFields.includes(`trader.company.siret`)}
             onCompanySelected={company => {
               if (company) {
@@ -207,10 +249,15 @@ const ActorsList = () => {
               }
             }}
           />
+          {errors.hasTrader && errors.hasTrader.message && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {errors?.hasTrader?.message}
+            </p>
+          )}
 
           <CompanyContactInfo
             fieldName={`trader.company`}
-            name="trader"
+            errorObject={errors.trader?.company}
             disabled={sealedFields.includes(`trader.company.siret`)}
             key={`trader-company-${siret}`}
           />
@@ -224,11 +271,13 @@ const ActorsList = () => {
 
       <ToggleSwitch
         label="Présence d'intermédiaires"
-        checked={hasIntermediaries}
+        checked={!!hasIntermediaries}
         showCheckedHint={false}
         onChange={value => {
-          setHasIntermediaries(value);
+          setValue("hasIntermediaries", value);
           remove();
+          setValue("intermediaries", [getInitialCompany()]);
+          clearErrors(["hasIntermediaries"]);
         }}
         disabled={sealedFields.includes(`intermediaries`)}
       />
@@ -259,26 +308,40 @@ const ActorsList = () => {
                   }
                 }}
               />
+              {errors.hasIntermediaries && errors.hasIntermediaries.message && (
+                <p className="fr-text--sm fr-error-text fr-mb-4v">
+                  {errors.hasIntermediaries.message}
+                </p>
+              )}
 
               <CompanyContactInfo
                 fieldName={`intermediaries.${index}`}
-                name={`intermediaries.${index}`}
+                errorObject={errors.intermediaries?.[index]}
                 disabled={sealedFields.includes(`intermediaries`)}
                 key={`intermediaries-${index}-company-${siret}`}
               />
 
-              <button
-                className="fr-btn fr-btn--tertiary fr-mb-2w"
-                onClick={() => remove(index)}
-              >
-                Supprimer l'intermédiaire {index + 1}
-              </button>
+              {fields.length > 1 && (
+                <button
+                  type="button"
+                  className="fr-btn fr-btn--tertiary fr-mb-2w"
+                  onClick={() => remove(index)}
+                >
+                  Supprimer l'intermédiaire {index + 1}
+                </button>
+              )}
               <hr />
             </div>
           ))}
           {fields.length < 3 && (
             <div className="fr-grid-row fr-grid-row--right">
-              <button className="fr-btn fr-btn--secondary" onClick={append}>
+              <button
+                type="button"
+                className="fr-btn fr-btn--secondary"
+                onClick={() => {
+                  append(getInitialCompany());
+                }}
+              >
                 Ajouter un intermédiaire
               </button>
             </div>

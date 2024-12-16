@@ -162,7 +162,7 @@ export function Transporter({ errors }) {
       )}
       <CompanyContactInfo
         fieldName={`${actor}.company`}
-        name={actor}
+        errorObject={formState.errors?.transporter?.["company"]}
         disabled={sealedFields.includes(`transporter.company.siret`)}
         key={orgId}
       />
