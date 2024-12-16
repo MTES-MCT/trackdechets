@@ -635,7 +635,7 @@ input IncomingTexsLineInput {
   customInfo: String
   """
   Code déchet
-  Code de la terre ou du sédiment entrant. Si plusieurs codes déchets sont traités, renseigner ici le code déchet principal. 
+  Code de la terre ou du sédiment entrant. Si plusieurs codes déchets sont traités, renseigner ici le code déchet principal.
   """
   wasteCode: String!
   """
@@ -692,7 +692,7 @@ input IncomingTexsLineInput {
   parcelInseeCodes: [String!]
   """
   Numéro(s) des parcelles
-  Préfixe/Section/N° de parcelle 
+  Préfixe/Section/N° de parcelle
   Complétée en condensant les 3 données Préfixe, Section et N° parcelle, pour obtenir "préfixe-section-n° de parcelle" soit par exemple "000-AB-25"
   Plusieurs numéros peuvent être renseignés
   """
@@ -866,7 +866,7 @@ input IncomingTexsLineInput {
   destinationParcelInseeCodes: [String!]
   """
   Numéro(s) des parcelles de destination si valorisation
-  Préfixe/Section/N° de parcelle 
+  Préfixe/Section/N° de parcelle
   Complétée en condensant les 3 données Préfixe, Section et N° parcelle, pour obtenir "préfixe-section-n° de parcelle" soit par exemple "000-AB-25"
   Plusieurs numéros peuvent être renseignés
   """
