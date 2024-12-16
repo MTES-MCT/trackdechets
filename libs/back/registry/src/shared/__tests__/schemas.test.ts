@@ -2,10 +2,10 @@ import { z, ZodError } from "zod";
 import {
   reasonSchema,
   publicIdSchema,
-  wasteCodeSchema,
+  getWasteCodeSchema,
   wasteDescriptionSchema,
   wasteCodeBaleSchema,
-  operationCodeSchema,
+  getOperationCodeSchema,
   weightValueSchema,
   weightIsEstimateSchema,
   volumeSchema,
@@ -54,9 +54,9 @@ describe("Schemas", () => {
     expect(() => publicIdSchema.parse("invalid id")).toThrow();
   });
 
-  test("wasteCodeSchema", () => {
-    expect(() => wasteCodeSchema.parse("17 02 01")).not.toThrow();
-    expect(() => wasteCodeSchema.parse("invalid")).toThrow();
+  test("getWasteCodeSchema", () => {
+    expect(() => getWasteCodeSchema().parse("17 02 01")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("invalid")).toThrow();
   });
 
   test("wasteDescriptionSchema", () => {
@@ -73,9 +73,9 @@ describe("Schemas", () => {
     expect(() => wasteCodeBaleSchema.parse("A0000")).toThrow();
   });
 
-  test("operationCodeSchema", () => {
-    expect(operationCodeSchema.parse("D5")).toBe("D 5");
-    expect(() => operationCodeSchema.parse("invalid")).toThrow();
+  test("getOperationCodeSchema", () => {
+    expect(getOperationCodeSchema().parse("D5")).toBe("D 5");
+    expect(() => getOperationCodeSchema().parse("invalid")).toThrow();
   });
 
   test("weightValueSchema", () => {
