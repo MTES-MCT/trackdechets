@@ -79,11 +79,14 @@ enum BsdSubType {
   SYNTHESIS
 }
 
+"Type d'import au registre"
 enum RegistryImportType {
   "Sortie de statut de déchet"
   SSD
   "Déchet dangereux et non dangereux entrant"
   INCOMING_WASTE
+  "Terres excavées et sédiments entrant"
+  INCOMING_TEXS
 }
 
 "Type de déchets"
@@ -118,6 +121,7 @@ enum RegistryDownloadTarget {
   IMPORT_FILE
 }
 
+"Type de raison pour spécifier si la ligne doit être modifiée ou supprimée"
 enum RegistryLineReason {
   "Spécifie que la ligne doit être modifiée dans le registre"
   EDIT

@@ -3,7 +3,7 @@ import {
   reasonSchema,
   publicIdSchema,
   reportAsSiretSchema,
-  wasteCodeSchema,
+  getWasteCodeSchema,
   wastePopSchema,
   wasteIsDangerousSchema,
   receptionDateSchema,
@@ -21,7 +21,7 @@ import {
   getActorCountryCodeSchema,
   inseeCodesSchema,
   getActorSiretSchema,
-  operationCodeSchema,
+  getOperationCodeSchema,
   transportModeSchema,
   transportReceiptNumberSchema,
   declarationNumberSchema,
@@ -33,6 +33,10 @@ import {
   nextDestinationIsAbroad,
   noTraceability
 } from "../../shared/schemas";
+import {
+  INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
+  INCOMING_TEXS_WASTE_CODES
+} from "@td/constants";
 
 export type ParsedZodIncomingTexsItem = z.output<typeof incomingTexsSchema>;
 
@@ -42,7 +46,7 @@ const inputIncomingTexsSchema = z.object({
   publicId: publicIdSchema,
   reportAsSiret: reportAsSiretSchema,
   reportForSiret: getReportForSiretSchema("du destinataire"),
-  wasteCode: wasteCodeSchema,
+  wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES),
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
   receptionDate: receptionDateSchema,
@@ -118,13 +122,17 @@ const inputIncomingTexsSchema = z.object({
       "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
     )
     .nullish(),
-  operationCode: operationCodeSchema,
+  operationCode: getOperationCodeSchema(
+    INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
+  ),
   noTraceability: noTraceability.nullish(),
   nextDestinationIsAbroad: nextDestinationIsAbroad.nullish(),
   declarationNumber: declarationNumberSchema,
   notificationNumber: notificationNumberSchema,
   movementNumber: z.string().nullish(),
-  nextOperationCode: operationCodeSchema.nullish(),
+  nextOperationCode: getOperationCodeSchema(
+    INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
+  ).nullish(),
   isUpcycled: z.boolean().nullish(),
   destinationParcelInseeCodes: inseeCodesSchema,
   destinationParcelNumbers: parcelNumbersSchema,

@@ -43,6 +43,7 @@ enum RegistryImportStatus {
 enum RegistryImportType {
     SSD
     INCOMING_WASTE
+    INCOMING_TEXS
 }
 
 model RegistrySsd {
