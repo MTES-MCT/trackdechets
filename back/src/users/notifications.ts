@@ -2,10 +2,10 @@ import { CompanyAssociation, Prisma, UserRole } from "@prisma/client";
 import { Recipient } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { safeInput } from "../common/converter";
-import {
+import type {
   UserNotifications as GqlNotifications,
   UserNotificationsInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 
 // Notifications auxquelles un utilisateur peut s'abonner pour
 // un établissement donné

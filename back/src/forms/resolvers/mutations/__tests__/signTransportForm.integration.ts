@@ -5,10 +5,7 @@ import {
   TransportMode
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Mutation,
-  MutationSignTransportFormArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationSignTransportFormArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   bsddTransporterFactory,

@@ -1,12 +1,12 @@
 import * as yup from "yup";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   MutationMarkSegmentAsReadyToTakeOverArgs,
   MutationTakeOverSegmentArgs,
   NextSegmentInfoInput,
   TransportSegment,
   TransporterInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import {
   expandTransportSegmentFromDb,

@@ -1,8 +1,8 @@
 import * as yup from "yup";
-import {
+import type {
   AnonymousCompanyInput,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { prisma } from "@td/prisma";

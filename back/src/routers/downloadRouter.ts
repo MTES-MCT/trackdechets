@@ -9,7 +9,7 @@ import { redisClient } from "../common/redis";
 import { formPdfDownloadHandler } from "../forms/resolvers/queries/formPdf";
 import { wastesRegistryCsvDownloadHandler } from "../registry/resolvers/queries/wastesRegistryCsv";
 import { wastesRegistryXlsDownloadHandler } from "../registry/resolvers/queries/wastesRegistryXls";
-import {
+import type {
   Query,
   QueryBsdaPdfArgs,
   QueryBsdasriPdfArgs,
@@ -20,7 +20,7 @@ import {
   QueryFormsRegisterArgs,
   QueryWastesRegistryCsvArgs,
   QueryWastesRegistryXlsArgs
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   MyCompaniesCsvArgs,
   myCompaniesCsvDownloadHandler

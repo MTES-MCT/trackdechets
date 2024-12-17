@@ -28,7 +28,6 @@ jobs:
         run: docker compose up -d
       - name: Init DB & ES index
         run: |
-          npx nx run back:codegen
           npx nx run @td/codegen-back:build
           npx nx run @td/prisma:generate
           TERM=xterm bash ./scripts/deploy-db.sh

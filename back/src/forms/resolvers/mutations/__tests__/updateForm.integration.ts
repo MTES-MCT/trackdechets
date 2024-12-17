@@ -20,12 +20,12 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
+import type {
   FormInput,
   Mutation,
   MutationUpdateFormArgs,
   UpdateFormInput
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { sub } from "date-fns";

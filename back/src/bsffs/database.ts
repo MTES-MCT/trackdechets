@@ -7,11 +7,11 @@ import {
   BsffTransporter,
   Bsff
 } from "@prisma/client";
-import {
+import type {
   BsffFicheIntervention,
   BsffInput,
   BsffPackagingInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   expandBsffFromDB,
   expandFicheInterventionBsffFromDB

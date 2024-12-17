@@ -6,7 +6,7 @@ import { sendMail } from "../../../../mailer/mailing";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { onSignup, renderMail } from "@td/mail";
 import { setCaptchaToken } from "../../../../common/redis/captcha";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 
 const RESEND_ACTIVATION_EMAIL = gql`
   mutation ResendActivationEmail($input: ResendActivationEmailInput!) {

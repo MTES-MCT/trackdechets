@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../mailer/mailing";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { onSignup, renderMail } from "@td/mail";
 import { object, string } from "yup";
 import { checkCaptcha } from "../../../captcha/captchaGen";

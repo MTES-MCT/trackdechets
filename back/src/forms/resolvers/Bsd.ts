@@ -1,4 +1,4 @@
-import { BsdResolvers } from "../../generated/graphql/types";
+import type { BsdResolvers } from "@td/codegen-back";
 import { ReadableIdPrefix } from "../../forms/readableId";
 
 const bsdResolvers: BsdResolvers = {

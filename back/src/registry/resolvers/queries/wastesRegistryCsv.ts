@@ -1,9 +1,9 @@
-import {
+import type {
   FileDownload,
   QueryResolvers,
   QueryWastesRegistryCsvArgs,
   WasteRegistryType
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getRegistryFileName } from "../../filename";

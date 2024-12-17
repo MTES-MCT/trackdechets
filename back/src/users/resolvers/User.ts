@@ -1,5 +1,5 @@
 import { libelleFromCodeNaf } from "../../companies/sirene/utils";
-import { UserResolvers, CompanyPrivate } from "../../generated/graphql/types";
+import type { UserResolvers, CompanyPrivate } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../companies/converters";
 

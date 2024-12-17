@@ -5,11 +5,11 @@ import {
   BsffStatus,
   BsffTransporter
 } from "@prisma/client";
-import {
+import type {
   BsffFicheInterventionInput,
   BsffInput,
   BsffTransporterInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 import { BsffWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";

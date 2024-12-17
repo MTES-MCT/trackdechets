@@ -1,7 +1,7 @@
 import { EmitterType, Prisma, Status } from "@prisma/client";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { getFormOrFormNotFound } from "../../database";
 import {
   getAndExpandFormFromDb,

@@ -6,7 +6,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
-import { Query } from "../../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 
 const AUTHORIZED_APPLICATIONS = gql`
   query {

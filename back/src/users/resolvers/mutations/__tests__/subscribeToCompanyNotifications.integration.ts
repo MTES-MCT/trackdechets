@@ -5,10 +5,10 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
+import type {
   Mutation,
   MutationSubscribeToCompanyNotificationsArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { UserRole } from "@prisma/client";
 import { toPrismaNotifications } from "../../../notifications";
