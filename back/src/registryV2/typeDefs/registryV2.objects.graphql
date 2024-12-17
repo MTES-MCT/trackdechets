@@ -399,11 +399,6 @@ type SsdWasteV2 {
   administrativeActReference: String!
 }
 
-type SignedUrlResponse {
-  fileKey: String!
-  signedUrl: String!
-}
-
 type RegistryV2ExportConnection {
   totalCount: Int!
   pageInfo: PageInfo!
