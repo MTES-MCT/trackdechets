@@ -1,13 +1,11 @@
 import * as Excel from "exceljs";
 import type {
-  AllWaste,
-  BsdSubType,
-  IncomingWaste,
-  ManagedWaste,
-  OutgoingWaste,
-  TransportedWaste
+  RegistryV2ExportSource,
+  SsdWasteV2,
+  IncomingWasteV2,
+  BsdSubType
 } from "@td/codegen-back";
-import { GenericWaste } from "./types";
+import { GenericWasteV2 } from "./types";
 import { formatStatusLabel } from "@td/constants";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -21,12 +19,7 @@ export type CustomWasteColumns = {
   statusLabel: string;
 };
 
-export type WasteField = keyof (IncomingWaste &
-  OutgoingWaste &
-  TransportedWaste &
-  ManagedWaste &
-  AllWaste &
-  CustomWasteColumns);
+export type WasteField = keyof (SsdWasteV2 & IncomingWasteV2);
 
 type Column = {
   field: WasteField;
@@ -120,6 +113,24 @@ const formatHasCiterneBeenWashedOut = (
   return hasCiterneBeenWashedOut ? "Effectué" : "Non effectué";
 };
 
+const formatSource = (source: RegistryV2ExportSource) => {
+  switch (source) {
+    case "BSD":
+      return "Tracé";
+    case "REGISTRY":
+      return "Déclaré";
+    default:
+      return "";
+  }
+};
+
+const formatEstimateBoolean = (isEstimate: boolean | null) => {
+  if (isEstimate === null || isEstimate === undefined) {
+    return "";
+  }
+  return isEstimate ? "ESTIME" : "REEL";
+};
+
 export const columns: Column[] = [
   // Dénomination, nature et quantité :
   { field: "id", label: "N° de bordereau" },
@@ -153,7 +164,7 @@ export const columns: Column[] = [
   { field: "customId", label: "Identifiant secondaire" },
   { field: "status", label: "Statut du bordereau (code)" },
   {
-    field: "statusLabel",
+    field: "status",
     label: "Statut du bordereau",
     format: formatStatusLabel
   },
@@ -164,7 +175,7 @@ export const columns: Column[] = [
     label: "Déchet dangereux",
     format: formatBoolean
   },
-  { field: "pop", label: "POP", format: formatBoolean },
+  { field: "wastePop", label: "POP", format: formatBoolean },
   {
     field: "weight",
     label: "Quantité de déchet",
@@ -254,23 +265,6 @@ export const columns: Column[] = [
   { field: "brokerCompanyMail", label: "Courtier contact" },
   { field: "brokerRecepisseNumber", label: "Courtier N°récepissé" },
   // Transport du déchet
-
-  // Intermédiaires
-  {
-    field: "intermediary1CompanyName",
-    label: "Intermédiaire n°1 - Raison sociale"
-  },
-  { field: "intermediary1CompanySiret", label: "Intermédiaire n°1 - SIRET" },
-  {
-    field: "intermediary2CompanyName",
-    label: "Intermédiaire n°2 - Raison sociale"
-  },
-  { field: "intermediary2CompanySiret", label: "Intermédiaire n°2 - SIRET" },
-  {
-    field: "intermediary3CompanyName",
-    label: "Intermédiaire n°3 - Raison sociale"
-  },
-  { field: "intermediary3CompanySiret", label: "Intermédiaire n°3 - SIRET" },
   { field: "transporterCompanyName", label: "Transporteur raison sociale" },
   { field: "transporterCompanyGivenName", label: "Transporteur Nom usuel" },
   {
@@ -288,19 +282,9 @@ export const columns: Column[] = [
   },
   { field: "transporterRecepisseNumber", label: "Transporteur récépissé" },
   {
-    field: "transporterNumberPlates",
-    label: "Transporteur immatriculation",
-    format: (v: string[]) => formatArray(v)
-  },
-  {
     field: "transporterTransportMode",
     label: "Transporteur mode de transport",
     format: formatTransportMode
-  },
-  {
-    field: "transporterHandedOverSignatureDate",
-    label: "Transporteur date de dépôt",
-    format: formatDate
   },
   { field: "transporterCompanyMail", label: "Transporteur contact" },
 
@@ -316,30 +300,6 @@ export const columns: Column[] = [
   { field: "destinationCompanyCity", label: "Destination Commune" },
   { field: "destinationCompanyCountry", label: "Destination Pays" },
   { field: "destinationCompanyMail", label: "Destination Contact" },
-  {
-    field: "postTempStorageDestinationName",
-    label: "Destination post entreposage provisoire Raison Sociale"
-  },
-  {
-    field: "postTempStorageDestinationSiret",
-    label: "Destination post entreposage provisoire SIRET"
-  },
-  {
-    field: "postTempStorageDestinationAddress",
-    label: "Destination post entreposage provisoire Adresse"
-  },
-  {
-    field: "postTempStorageDestinationPostalCode",
-    label: "Destination post entreposage provisoire Code Postal"
-  },
-  {
-    field: "postTempStorageDestinationCity",
-    label: "Destination post entreposage provisoire Ville"
-  },
-  {
-    field: "postTempStorageDestinationCountry",
-    label: "Destination post entreposage provisoire Pays"
-  },
   {
     field: "destinationReceptionAcceptationStatus",
     label: "Statut d'acceptation du déchet"
@@ -384,26 +344,6 @@ export const columns: Column[] = [
     format: formatBoolean
   },
   {
-    field: "destinationFinalOperationCompanySirets",
-    label: "SIRET de la destination finale",
-    format: (v: string[]) => formatArray(v)
-  },
-  {
-    field: "destinationFinalOperationCodes",
-    label: "Code opération finale réalisée",
-    format: (codes: string[]) =>
-      formatArray(codes.map(c => formatOperationCode(c)))
-  },
-  {
-    field: "destinationFinalOperationWeights",
-    label: "Quantité finale (tonnes)",
-    format: (quantities: number[]) =>
-      formatArray(
-        quantities.map(q => q.toLocaleString("fr")),
-        " - "
-      )
-  },
-  {
     field: "nextDestinationNotificationNumber",
     label: "N° de notification / déclaration"
   },
@@ -439,19 +379,9 @@ export const columns: Column[] = [
   },
   { field: "transporter2RecepisseNumber", label: "Transporteur n°2 récépissé" },
   {
-    field: "transporter2NumberPlates",
-    label: "Transporteur n°2 immatriculation",
-    format: (v: string[]) => formatArray(v)
-  },
-  {
     field: "transporter2TransportMode",
     label: "Transporteur n°2 mode de transport",
     format: formatTransportMode
-  },
-  {
-    field: "transporter2HandedOverSignatureDate",
-    label: "Transporteur n°2 date de dépôt",
-    format: formatDate
   },
   { field: "transporter2CompanyMail", label: "Transporteur n°2 contact" },
   {
@@ -480,19 +410,9 @@ export const columns: Column[] = [
   },
   { field: "transporter3RecepisseNumber", label: "Transporteur n°3 récépissé" },
   {
-    field: "transporter3NumberPlates",
-    label: "Transporteur n°3 immatriculation",
-    format: (v: string[]) => formatArray(v)
-  },
-  {
     field: "transporter3TransportMode",
     label: "Transporteur n°3 mode de transport",
     format: formatTransportMode
-  },
-  {
-    field: "transporter3HandedOverSignatureDate",
-    label: "Transporteur n°3 date de dépôt",
-    format: formatDate
   },
   { field: "transporter3CompanyMail", label: "Transporteur n°3 contact" },
   {
@@ -521,19 +441,9 @@ export const columns: Column[] = [
   },
   { field: "transporter4RecepisseNumber", label: "Transporteur n°4 récépissé" },
   {
-    field: "transporter4NumberPlates",
-    label: "Transporteur n°4 immatriculation",
-    format: (v: string[]) => formatArray(v)
-  },
-  {
     field: "transporter4TransportMode",
     label: "Transporteur n°4 mode de transport",
     format: formatTransportMode
-  },
-  {
-    field: "transporter4HandedOverSignatureDate",
-    label: "Transporteur n°4 date de dépôt",
-    format: formatDate
   },
   { field: "transporter4CompanyMail", label: "Transporteur n°4 contact" },
   {
@@ -562,25 +472,129 @@ export const columns: Column[] = [
   },
   { field: "transporter5RecepisseNumber", label: "Transporteur n°5 récépissé" },
   {
-    field: "transporter5NumberPlates",
-    label: "Transporteur n°5 immatriculation",
-    format: (v: string[]) => formatArray(v)
-  },
-  {
     field: "transporter5TransportMode",
     label: "Transporteur n°5 mode de transport",
     format: formatTransportMode
   },
+  { field: "transporter5CompanyMail", label: "Transporteur n°5 contact" },
+  // registry V2 fields (some are already handled above)
   {
-    field: "transporter5HandedOverSignatureDate",
-    label: "Transporteur n°5 date de dépôt",
+    field: "source",
+    label: "Source",
+    format: formatSource
+  },
+  {
+    field: "publicId",
+    label: "Numéro unique"
+  },
+  {
+    field: "reportAsSiret",
+    label: "SIRET du déclarant"
+  },
+  {
+    field: "reportForSiret",
+    label: "SIRET de l'émetteur"
+  },
+  {
+    field: "reportForName",
+    label: "Raison sociale de l'émetteur"
+  },
+  {
+    field: "useDate",
+    label: "Date d'utilisation",
     format: formatDate
   },
-  { field: "transporter5CompanyMail", label: "Transporteur n°5 contact" }
+  {
+    field: "dispatchDate",
+    label: "Date d'expédition",
+    format: formatDate
+  },
+  {
+    field: "wasteCodeBale",
+    label: "Code déchet Bâle"
+  },
+  {
+    field: "secondaryWasteCodes",
+    label: "Codes déchets secondaires"
+  },
+  {
+    field: "secondaryWasteDescriptions",
+    label: "Dénominations des déchets secondaires"
+  },
+  {
+    field: "product",
+    label: "Produit"
+  },
+  {
+    field: "weightValue",
+    label: "Poids en tonnes",
+    format: formatNumber
+  },
+  {
+    field: "weightIsEstimate",
+    label: "Type de poids",
+    format: formatEstimateBoolean
+  },
+  {
+    field: "volume",
+    label: "Quantité en M3",
+    format: formatNumber
+  },
+  {
+    field: "processingDate",
+    label: "Date de traitement",
+    format: formatDate
+  },
+  {
+    field: "processingEndDate",
+    label: "Date de fin de traitement",
+    format: formatDate
+  },
+  {
+    field: "destinationType",
+    label: "Type de destinataire"
+  },
+  {
+    field: "destinationOrgId",
+    label: "Numéro d'identification du destinataire"
+  },
+  {
+    field: "destinationName",
+    label: "Raison sociale du destinataire"
+  },
+  {
+    field: "destinationAddress",
+    label: "Adresse du destinataire"
+  },
+  {
+    field: "destinationPostalCode",
+    label: "Code postal du destinataire"
+  },
+  {
+    field: "destinationCity",
+    label: "Commune du destinataire"
+  },
+  {
+    field: "destinationCountryCode",
+    label: "Pays du destinataire"
+  },
+  {
+    field: "operationCode",
+    label: "Code d'opération",
+    format: formatOperationCode
+  },
+  {
+    field: "operationMode",
+    label: "Mode de traitement"
+  },
+  {
+    field: "administrativeActReference",
+    label: "Référence de l'acte administratif"
+  }
 ];
 
 export function formatRow(
-  waste: GenericWaste,
+  waste: GenericWasteV2,
   useLabelAsKey = false
 ): Record<string, string> {
   return columns.reduce((acc, column) => {
@@ -603,7 +617,7 @@ export function formatRow(
 /**
  * GET XLSX headers based of the first row
  */
-export function getXlsxHeaders(waste: GenericWaste): Partial<Excel.Column>[] {
+export function getXlsxHeaders(waste: GenericWasteV2): Partial<Excel.Column>[] {
   return columns.reduce<Partial<Excel.Column>[]>((acc, column) => {
     if (
       column.field in waste ||

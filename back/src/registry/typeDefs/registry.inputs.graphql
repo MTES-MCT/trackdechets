@@ -25,24 +25,9 @@ input WasteRegistryWhere {
   destinationOperationDate: DateFilter
 }
 
-input WasteRegistryV2Where {
-  wasteType: WasteTypeFilter
-  wasteCode: StringFilter
-  declarationType: DeclarationTypeFilter
-}
-
 input BsdTypeFilter {
   _in: [BsdType!]
   _eq: BsdType
-}
-
-input WasteTypeFilter {
-  _in: [RegistryExportWasteType!]
-  _eq: RegistryExportWasteType
-}
-
-input DeclarationTypeFilter {
-  _eq: DeclarationType
 }
 
 "Contenu d'une ligne pour l'import de sortie de statut de déchet"
@@ -803,7 +788,7 @@ input IncomingTexsLineInput {
   """
   brokerCompanyName: String
   """
-  Numéro de récépissé du courtier
+  Numéro de r��cépissé du courtier
   """
   brokerReceiptNumber: String
   """

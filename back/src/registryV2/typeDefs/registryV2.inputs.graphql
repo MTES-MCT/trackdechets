@@ -1,0 +1,14 @@
+input RegistryV2ExportWhere {
+  wasteType: WasteTypeFilter
+  wasteCode: StringFilter
+  declarationType: DeclarationTypeFilter
+}
+
+input WasteTypeFilter {
+  _in: [RegistryV2ExportWasteType!]
+  _eq: RegistryV2ExportWasteType
+}
+
+input DeclarationTypeFilter {
+  _eq: DeclarationType
+}

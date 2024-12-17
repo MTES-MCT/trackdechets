@@ -10,7 +10,7 @@ import {
 import { safeParseAsyncIncomingWaste } from "./incomingWaste/validation";
 import { RegistryExportType } from "@prisma/client";
 import { toSsdWaste } from "./ssd/registry";
-import type { SsdWaste } from "@td/codegen-back";
+import type { SsdWasteV2 } from "@td/codegen-back";
 import { INCOMING_TEXS_HEADERS } from "./incomingTexs/constants";
 import {
   saveIncomingTexsLine,
@@ -73,7 +73,7 @@ export const UNAUTHORIZED_ERROR =
 
 export type ExportOptions = {
   headers: Record<string, string>;
-  toSsdWaste?: (registry: unknown) => SsdWaste;
+  toSsdWaste?: (registry: unknown) => SsdWasteV2;
 };
 
 export const exportOptions: Partial<Record<RegistryExportType, ExportOptions>> =
