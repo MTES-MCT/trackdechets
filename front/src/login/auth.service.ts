@@ -3,7 +3,8 @@ import { SIRET_STORAGE_KEY } from "../Apps/common/Components/CompanySwitcher/Com
 
 export const localAuthService = {
   locallySignOut() {
-    client.resetStore();
+    client.stop();
+    client.clearStore();
     window.localStorage.removeItem(SIRET_STORAGE_KEY);
   }
 };
