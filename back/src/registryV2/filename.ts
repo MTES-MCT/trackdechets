@@ -1,8 +1,8 @@
 import { format } from "date-fns";
-import type { WasteRegistryType } from "@td/codegen-back";
+import type { RegistryV2ExportType } from "@td/codegen-back";
 
 export function getRegistryFileName(
-  registryType: WasteRegistryType,
+  registryType: RegistryV2ExportType,
   sirets: string[],
   date?: Date
 ) {
@@ -21,8 +21,9 @@ export function getRegistryFileName(
   return filename;
 }
 
-export function formatRegistryType(typename: WasteRegistryType) {
-  const mapping: Record<WasteRegistryType, string> = {
+export function formatRegistryType(typename: RegistryV2ExportType) {
+  const mapping: Record<RegistryV2ExportType, string> = {
+    SSD: "Sortie de statut de déchet",
     INCOMING: "Entrant",
     OUTGOING: "Sortant",
     TRANSPORTED: "Transport",

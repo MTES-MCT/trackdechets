@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { Prisma, RegistryExportStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import type { MutationGenerateWastesRegistryExportArgs } from "@td/codegen-back";
+import type { MutationGenerateRegistryV2ExportArgs } from "@td/codegen-back";
 import {
   Permission,
   can,
@@ -14,7 +14,7 @@ import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getDelegatesOfCompany } from "../../../registryDelegation/resolvers/queries/utils/registryDelegations.utils";
 import { enqueueRegistryExportJob } from "../../../queue/producers/registryExport";
 
-export async function generateWastesRegistryExport(
+export async function generateRegistryV2Export(
   _,
   {
     registryType,
@@ -23,7 +23,7 @@ export async function generateWastesRegistryExport(
     delegateSiret,
     dateRange,
     where
-  }: MutationGenerateWastesRegistryExportArgs,
+  }: MutationGenerateRegistryV2ExportArgs,
   context: GraphQLContext
 ): Promise<Prisma.RegistryExportGetPayload<{ include: { createdBy: true } }>> {
   const user = checkIsAuthenticated(context);

@@ -25,24 +25,9 @@ input WasteRegistryWhere {
   destinationOperationDate: DateFilter
 }
 
-input WasteRegistryV2Where {
-  wasteType: WasteTypeFilter
-  wasteCode: StringFilter
-  declarationType: DeclarationTypeFilter
-}
-
 input BsdTypeFilter {
   _in: [BsdType!]
   _eq: BsdType
-}
-
-input WasteTypeFilter {
-  _in: [RegistryExportWasteType!]
-  _eq: RegistryExportWasteType
-}
-
-input DeclarationTypeFilter {
-  _eq: DeclarationType
 }
 
 input SsdLineInput {
