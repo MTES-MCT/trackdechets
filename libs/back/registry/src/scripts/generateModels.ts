@@ -37,7 +37,14 @@ async function generateExcelModel({
   const workbook = new Excel.Workbook();
   const worksheet = workbook.addWorksheet(name);
 
-  worksheet.addRow(Object.values(headers));
+  const row = worksheet.addRow(Object.values(headers));
+  row.eachCell(cell => {
+    cell.font = { bold: true };
+  });
+  headers.forEach((value, index) => {
+    worksheet.getColumn(index + 1).width = value.toString().length + 2; // We dont use a monospace font, so we add padding to the width
+  });
+
   const excelBuffer = await workbook.xlsx.writeBuffer();
   const buffer = Buffer.from(excelBuffer);
 
