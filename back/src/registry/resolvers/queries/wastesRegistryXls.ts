@@ -17,12 +17,8 @@ export const wastesRegistryXlsDownloadHandler: DownloadHandler<QueryWastesRegist
   {
     name: "wastesRegistryXls",
     handler: (_, res, args) => {
-      if (args.registryType === "SSD") {
-        res.sendStatus(404);
-        return;
-      }
       const reader = wastesReader({
-        registryType: args.registryType as Exclude<WasteRegistryType, "SSD">,
+        registryType: args.registryType as WasteRegistryType,
         sirets: args.sirets,
         where: args.where,
         chunk: 100

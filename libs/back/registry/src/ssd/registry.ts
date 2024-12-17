@@ -1,7 +1,7 @@
 import { RegistrySsd } from "@prisma/client";
 
-import type { SsdWaste } from "@td/codegen-back";
-export const toSsdWaste = (ssd: RegistrySsd): SsdWaste => {
+import type { SsdWasteV2 } from "@td/codegen-back";
+export const toSsdWaste = (ssd: RegistrySsd): SsdWasteV2 => {
   return {
     id: ssd.id,
     source: "REGISTRY",

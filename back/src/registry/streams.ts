@@ -15,7 +15,7 @@ export class WasteReader extends Readable {
   }
 }
 export interface WasteReaderArgs {
-  registryType: Exclude<WasteRegistryType, "SSD">;
+  registryType: WasteRegistryType;
   sirets: string[];
   where?: WasteRegistryWhere | null;
   chunk?: number;

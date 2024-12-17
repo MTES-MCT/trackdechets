@@ -10,9 +10,6 @@ import { registryUploadSignedUrl } from "./queries/registryUploadSignedUrl";
 import { registryDownloadSignedUrl } from "./queries/registryDownloadSignedUrl";
 import { registryImports } from "./queries/registryImports";
 import { registryImport } from "./queries/registryImport";
-import { registryExports } from "./queries/registryExports";
-import { registryExport } from "./queries/registryExport";
-import { registryExportDownloadSignedUrl } from "./queries/registryExportDownloadSignedUrl";
 
 export const Query: QueryResolvers = {
   incomingWastes,
@@ -25,8 +22,5 @@ export const Query: QueryResolvers = {
   registryUploadSignedUrl,
   registryDownloadSignedUrl,
   registryImports: registryImports as any,
-  registryImport: registryImport as any,
-  registryExportDownloadSignedUrl,
-  registryExports: registryExports as any,
-  registryExport: registryExport as any
+  registryImport: registryImport as any
 };
