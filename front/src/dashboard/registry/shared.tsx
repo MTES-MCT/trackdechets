@@ -122,7 +122,7 @@ export const GENERATE_REGISTRY_V2_EXPORT = gql`
     $delegateSiret: String
     $dateRange: DateFilter!
     $declarationType: DeclarationType
-    $wasteTypes: [RegistryExportWasteType!]
+    $wasteTypes: [RegistryV2ExportWasteType!]
     $wasteCodes: [String!]
   ) {
     generateRegistryV2Export(
@@ -137,7 +137,7 @@ export const GENERATE_REGISTRY_V2_EXPORT = gql`
         wasteCode: { _in: $wasteCodes }
       }
     ) {
-      ...RegistryExportFragment
+      ...RegistryV2ExportFragment
     }
   }
   ${registryV2ExportFragment}
@@ -148,7 +148,7 @@ export const GET_REGISTRY_V2_EXPORTS = gql`
     registryV2Exports(first: $first) {
       edges {
         node {
-          ...RegistryExportFragment
+          ...RegistryV2ExportFragment
         }
       }
     }
@@ -159,7 +159,7 @@ export const GET_REGISTRY_V2_EXPORTS = gql`
 export const GET_REGISTRY_V2_EXPORT = gql`
   query RegistryV2Export($id: ID!) {
     registryV2Export(id: $id) {
-      ...RegistryExportFragment
+      ...RegistryV2ExportFragment
     }
   }
   ${registryV2ExportFragment}

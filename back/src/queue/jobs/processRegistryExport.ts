@@ -17,7 +17,7 @@ import {
   RegistryExportStatus
 } from "@prisma/client";
 import { toWaste } from "../../registryV2/converters";
-import { wasteFormatter } from "../../registry/streams";
+import { wasteFormatter } from "../../registryV2/streams";
 import { getXlsxHeaders } from "../../registryV2/columns";
 import { exportOptions } from "@td/registry";
 
