@@ -24,6 +24,7 @@ export { operationHooksQueue } from "./queue/producers/operationHook";
 export { administrativeTransferQueue } from "./queue/producers/administrativeTransfer";
 export { updateAppendix2Queue } from "./queue/producers/updateAppendix2";
 export { registryImportQueue } from "./queue/producers/registryImport";
+export { registryExportQueue } from "./queue/producers/registryExport";
 export {
   indexBsdJob,
   operationHookJob,
@@ -31,7 +32,8 @@ export {
   sendMailJob,
   postGericoJob,
   processAdministrativeTransferJob,
-  processRegistryImportJob
+  processRegistryImportJob,
+  processRegistryExportJob
 } from "./queue/jobs";
 
 export {
@@ -86,3 +88,7 @@ export { getBsdaFromActivityEvents } from "./activity-events/bsda";
 export { getBsddFromActivityEvents } from "./activity-events/bsdd";
 export { cleanUpIsReturnForTab } from "./common/elasticHelpers";
 export { UserNotification } from "./users/notifications";
+export {
+  getDelegationNotifiableUsers,
+  getRegistryDelegationsExpiringInDays
+} from "./registryDelegation/resolvers/utils";

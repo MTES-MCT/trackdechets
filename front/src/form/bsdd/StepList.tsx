@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
+  EmitterType,
   Form,
   FormInput,
   Mutation,
@@ -194,10 +195,20 @@ export default function StepsList(props: Props) {
       ...(ecoOrganisme?.siret ? { ecoOrganisme } : { ecoOrganisme: null }),
       ...(grouping?.length
         ? {
-            grouping: grouping.map(({ form, quantity }) => ({
-              form: { id: form.id },
-              quantity
-            }))
+            grouping: grouping
+              .map(({ form, quantity }) => ({
+                form: { id: form.id },
+                // quantity peut être égal à "" dans le
+                // cas où l'input est laissé vide dans le sélecteur
+                // d'annexes 2
+                quantity: Number(quantity)
+              }))
+              .filter(g =>
+                rest?.emitter?.type === EmitterType.Appendix2
+                  ? // Ne permet pas d'ajouter une annexe 2 avec une quantité égale à 0
+                    g.quantity > 0
+                  : true
+              )
           }
         : {}),
       transporters: transporterIds

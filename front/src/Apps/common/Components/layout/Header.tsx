@@ -120,11 +120,43 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
     location.pathname
   );
 
+  const matchRegistryImport = matchPath(
+    {
+      path: routes.registry_new.myImports,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
+  const matchRegistryCompanyImports = matchPath(
+    {
+      path: routes.registry_new.companyImports,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
+  const matchRegistryExport = matchPath(
+    {
+      path: routes.registry_new.export,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
   const matchReviewsTab = !!matchReviewsReviewed || !!matchReviewsToReview;
   const matchTransportTab =
     !!matchTransportCollected || !!matchTransportToCollect;
   const matchDashboardTab =
     !!matchDashboard && !matchReviewsTab && !matchTransportTab;
+
+  const matchRegistryV2Tab =
+    !!matchRegistryImport ||
+    !!matchRegistryCompanyImports ||
+    !!matchRegistryExport;
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
@@ -311,13 +343,45 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
       )}
       {showRegistryTab && canViewNewRegistry && (
         <li className="fr-nav__item">
-          <MenuLink
-            entry={{
-              navlink: true,
-              caption: "Mes registres (v2)",
-              href: routes.registry_new.myImports
-            }}
-          />
+          <button
+            className="fr-nav__btn"
+            aria-expanded={false}
+            aria-current={matchRegistryV2Tab}
+            aria-controls="menu-registry"
+          >
+            {"Mes registres (v2)"}
+          </button>
+          <div className="fr-collapse fr-menu" id="menu-registry">
+            <ul className="fr-menu__list">
+              <li>
+                <MenuLink
+                  entry={{
+                    navlink: true,
+                    caption: "Mes imports",
+                    href: routes.registry_new.myImports
+                  }}
+                />
+              </li>
+              <li>
+                <MenuLink
+                  entry={{
+                    navlink: true,
+                    caption: "Imports par établissement",
+                    href: routes.registry_new.companyImports
+                  }}
+                />
+              </li>
+              <li>
+                <MenuLink
+                  entry={{
+                    navlink: true,
+                    caption: "Exports",
+                    href: routes.registry_new.export
+                  }}
+                />
+              </li>
+            </ul>
+          </div>
         </li>
       )}
     </>

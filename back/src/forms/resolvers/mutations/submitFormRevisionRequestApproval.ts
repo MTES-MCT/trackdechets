@@ -13,7 +13,7 @@ import { getFormRepository } from "../../repository";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 const formRevisionRequestWithApprovals =
-  Prisma.validator<Prisma.BsddRevisionRequestArgs>()({
+  Prisma.validator<Prisma.BsddRevisionRequestDefaultArgs>()({
     include: { approvals: true }
   });
 type BsddRevisionRequestWithApprovals = Prisma.BsddRevisionRequestGetPayload<
@@ -43,17 +43,18 @@ export default async function submitFormRevisionRequestApproval(
     );
   }
 
-  const currentApproverSiret = await getCurrentApproverSiret(
+  const currentApproverOrgId = await getCurrentApproverOrgId(
     user,
     revisionRequest
   );
+
   const approval = revisionRequest.approvals.find(
-    approval => approval.approverSiret === currentApproverSiret
+    approval => approval.approverSiret === currentApproverOrgId
   );
 
   if (!approval) {
     throw new Error(
-      `No approval found for current approver siret ${currentApproverSiret}`
+      `No approval found for current approver siret ${currentApproverOrgId}`
     );
   }
 
@@ -91,7 +92,7 @@ export default async function submitFormRevisionRequestApproval(
   return formRepository.getRevisionRequestById(id);
 }
 
-async function getCurrentApproverSiret(
+async function getCurrentApproverOrgId(
   user: User,
   revisionRequest: BsddRevisionRequestWithApprovals
 ) {
@@ -101,7 +102,7 @@ async function getCurrentApproverSiret(
 
   const userCompanies = await getUserCompanies(user.id);
   const approvingCompaniesCandidates = userCompanies.filter(
-    company => company.siret && remainingApproverSirets.includes(company.siret)
+    company => company.orgId && remainingApproverSirets.includes(company.orgId)
   );
 
   if (approvingCompaniesCandidates.length === 0) {
@@ -110,5 +111,5 @@ async function getCurrentApproverSiret(
     );
   }
 
-  return approvingCompaniesCandidates[0].siret;
+  return approvingCompaniesCandidates[0].orgId;
 }

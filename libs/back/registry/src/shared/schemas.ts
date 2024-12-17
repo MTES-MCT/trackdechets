@@ -75,11 +75,14 @@ export const operationCodeSchema = z
   .string()
   .transform(val => val.replace(/([A-Z])(\d)/, "$1 $2")) // D5 becomes D 5
   .pipe(
-    z.nativeEnum(PROCESSING_OPERATIONS_CODES_ENUM, {
-      required_error: "Le code de traitement est requis",
-      invalid_type_error:
-        "Le code de traitement n'est pas une valeur autorisée. Valeurs possibles: R1 à R13, D1 à D15"
-    })
+    z.nativeEnum(
+      { ...PROCESSING_OPERATIONS_CODES_ENUM, "R 0": "R 0" },
+      {
+        required_error: "Le code de traitement est requis",
+        invalid_type_error:
+          "Le code de traitement n'est pas une valeur autorisée. Valeurs possibles: R 0 à R 13, D 1 à D 15"
+      }
+    )
   );
 
 export const weightValueSchema = z.coerce

@@ -87,3 +87,27 @@ enum TransportMode {
   "Autre (utilisé avec Packaging = PIPELINE par exemple)"
   OTHER
 }
+
+"Type de déclaration"
+enum DeclarationType {
+  "Bordereau"
+  BSD
+  "Registre"
+  REGISTRY
+  "Tous types"
+  ALL
+}
+
+"""
+Format de l'export du registre
+"""
+enum FormsRegisterExportFormat {
+  """
+  Fichier csv
+  """
+  CSV
+  """
+  Fichier Excel
+  """
+  XLSX
+}

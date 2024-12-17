@@ -36,7 +36,7 @@ const ActorStatus = ({ review }: { review: ReviewInterface }) => {
           &nbsp;Demandeur
         </p>
         <p className="actor-name">
-          {`${review.authoringCompany?.name} - ${review.authoringCompany?.siret}`}
+          {`${review.authoringCompany?.name} - ${review.authoringCompany?.orgId}`}
         </p>
       </div>
       {Object.entries(approvalsGroupedByStatus).map(([status, approvals]) => (
@@ -57,12 +57,11 @@ const ActorStatus = ({ review }: { review: ReviewInterface }) => {
               &nbsp; Approuvée
             </p>
           )}
+
           <p className="actor-name">
-            {approvals
-              .map(approval =>
-                getActorName(review?.bsdContent, approval?.approverSiret)
-              )
-              ?.join(" ")}
+            {approvals.map(approval => (
+              <p>{getActorName(review?.bsdContent, approval?.approverSiret)}</p>
+            ))}
           </p>
         </div>
       ))}

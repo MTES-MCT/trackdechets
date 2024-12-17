@@ -291,16 +291,15 @@ const getFinalOperationsData = (
   const destinationFinalOperationCompanySirets: string[] = [];
   // Check if finalOperations is defined and has elements
 
-  if (
+  // Cf tra-14603 => si le code de traitement du bordereau initial est final,
+  // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
+  // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
+  const bsddIsFinal =
     bsdd.destinationOperationSignatureDate &&
-    bsdd.destinationOperationCode &&
-    // Cf tra-14603 => si le code de traitement du bordereau initial est final,
-    // aucun code d'Opération(s) finale(s) réalisée(s) par la traçabilité suite
-    // ni de Quantité(s) liée(s) ne doit remonter dans les deux colonnes.
-    !isFinalOperationCode(bsdd.destinationOperationCode) &&
-    !bsdd.destinationOperationNoTraceability &&
-    bsdd.finalOperations?.length
-  ) {
+    (isFinalOperationCode(bsdd.destinationOperationCode) ||
+      bsdd.destinationOperationNoTraceability);
+
+  if (!bsddIsFinal && bsdd.finalOperations?.length) {
     // Iterate through each operation once and fill both arrays
     bsdd.finalOperations.forEach(ope => {
       destinationFinalOperationCodes.push(ope.operationCode);

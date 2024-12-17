@@ -18,7 +18,7 @@
     "nx": "nx",
     "dev": "npx nx run-many -t serve --parallel=7 --projects=front,api,tag:backend:background",
     "bg:integration": "npx nx run-many -t serve --configuration=integration --projects=tag:backend:queues --parallel=6",
-    "afterpull": "npm i ; npx prisma migrate dev ; npx nx run back:codegen --skip-nx-cache ; npx nx run @td/codegen-ui:build --skip-nx-cache"
+    "afterpull": "npm i ; npx prisma migrate dev ; npx nx run back:codegen --skip-nx-cache ; npx nx run @td/codegen-ui:build --skip-nx-cache ; npx nx run @td/codegen-back:build --skip-nx-cache"
   },
   "engines": {
     "node": "^20"
@@ -41,7 +41,7 @@
     "@aws-sdk/s3-request-presigner": "3.677.0",
     "@bull-board/api": "^4.12.2",
     "@bull-board/express": "^4.12.2",
-    "@codegouvfr/react-dsfr": "^1.13.8",
+    "@codegouvfr/react-dsfr": "^1.14.5",
     "@docusaurus/core": "^3.5.2",
     "@docusaurus/preset-classic": "^3.5.2",
     "@elastic/elasticsearch": "7.13",
@@ -75,8 +75,8 @@
     "@opentelemetry/sdk-trace-node": "^1.25.1",
     "@opentelemetry/semantic-conventions": "^1.25.1",
     "@opentelemetry/winston-transport": "^0.4.0",
-    "@prisma/client": "5.7.1",
-    "@prisma/instrumentation": "5.7.1",
+    "@prisma/client": "6.0.1",
+    "@prisma/instrumentation": "6.0.1",
     "@sentry/browser": "^6.19.7",
     "@sentry/integrations": "^6.19.7",
     "@sentry/node": "^6.19.6",
@@ -143,7 +143,7 @@
     "plausible-tracker": "^0.3.8",
     "postgres-migrations": "^5.1.0",
     "prism-react-renderer": "2.3.1",
-    "prisma": "5.7.1",
+    "prisma": "6.0.1",
     "prompts": "^2.4.2",
     "qrcode": "^1.4.4",
     "query-string": "^6.10.1",
@@ -170,7 +170,7 @@
     "terser": "^5.17.6",
     "text-security": "^3.2.1",
     "tslib": "^2.3.0",
-    "uuid": "^9.0.0",
+    "uuid": "^11.0.3",
     "winston": "^3.13.0",
     "world-countries": "4.0.0",
     "xss": "^1.0.10",

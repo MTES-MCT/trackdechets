@@ -21,6 +21,7 @@ export type BsvhuEditableFields = Required<
     | "isDraft"
     | "isDeleted"
     | "emitterCustomInfo"
+    | "emitterNotOnTD"
     | "destinationCustomInfo"
     | "transporterCustomInfo"
     | "transporterTransportPlates"
@@ -391,7 +392,11 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   identificationType: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsvhu => bsvhu.packaging === "UNITE"
+    },
+
     readableFieldName: "Le type de numéro d'identification",
     path: ["identification", "type"]
   },

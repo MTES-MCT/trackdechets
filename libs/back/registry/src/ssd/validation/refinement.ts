@@ -47,9 +47,22 @@ export const refineDates: Refinement<ParsedZodSsdItem> = (
   }
 
   if (
-    ssdItem.processingEndDate &&
+    ssdItem.processingDate &&
     ssdItem.useDate &&
     ssdItem.useDate < ssdItem.processingDate
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La date de traitement ne peut pas être postérieure à la date d'utilisation.",
+      path: ["processingDate"]
+    });
+  }
+
+  if (
+    ssdItem.processingEndDate &&
+    ssdItem.useDate &&
+    ssdItem.useDate < ssdItem.processingEndDate
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,

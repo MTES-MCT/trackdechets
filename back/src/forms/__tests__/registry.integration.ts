@@ -944,6 +944,54 @@ describe("toAllWaste", () => {
     }
   );
 
+  test(
+    "destinationFinalOperationCodes and destinationfinalOperationWeights" +
+      " should not be empty in case of temporary storage",
+    async () => {
+      const user = await userFactory();
+
+      const bsdSuite = await formFactory({
+        ownerId: user.id,
+        opt: { processingOperationDone: "R 1", quantityReceived: 1 }
+      });
+
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          recipientIsTempStorage: true,
+          forwardedIn: { connect: { id: bsdSuite.id } },
+          // ces deux champs sont nulls en cas d'entreposage provisioire
+          processingOperationDone: null,
+          processedAt: null,
+          finalOperations: {
+            createMany: {
+              data: [
+                {
+                  finalFormId: bsdSuite.id,
+                  operationCode: bsdSuite.processingOperationDone!,
+                  noTraceability: false,
+                  quantity: bsdSuite.quantityReceived!
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      const formForRegistry = await prisma.form.findUniqueOrThrow({
+        where: { id: form.id },
+        include: RegistryFormInclude
+      });
+      const waste = toAllWaste(formToBsdd(formForRegistry));
+      expect(waste.destinationFinalOperationCodes).toStrictEqual([
+        bsdSuite.processingOperationDone
+      ]);
+      expect(waste.destinationFinalOperationWeights).toStrictEqual([
+        bsdSuite.quantityReceived?.toNumber()
+      ]);
+    }
+  );
+
   it("bsd with forwarding BSD should mention post-temp-storage destination", async () => {
     // Given
     const user = await userFactory();

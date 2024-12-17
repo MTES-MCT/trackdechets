@@ -1,3 +1,4 @@
+import { prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
@@ -6,7 +7,13 @@ import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";
 import { checkCanUpdate } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import { mergeInputAndParseBsdaAsync } from "../../validation";
-import { Prisma } from "@prisma/client";
+import { Bsda, BsdaStatus, Prisma } from "@prisma/client";
+import {
+  bsdaDestinationCapModificationEmail,
+  MessageVersion,
+  renderMail
+} from "@td/mail";
+import { sendMail } from "../../../mailer/mailing";
 
 export default async function edit(
   _,
@@ -103,5 +110,108 @@ export default async function edit(
     }
   );
 
+  // Si le CAP de la destination a été modifié, il faut
+  // peut-être notifier l'émetteur
+  if (
+    producerShouldBeNotifiedOfDestinationCapModification(
+      existingBsda,
+      updatedBsda
+    )
+  ) {
+    await sendDestinationCapModificationMail(existingBsda, updatedBsda);
+  }
+
   return expandBsdaFromDb(updatedBsda);
 }
+
+export const producerShouldBeNotifiedOfDestinationCapModification = (
+  previousBsda: Bsda,
+  updatedBsda: Bsda
+) => {
+  if ([BsdaStatus.INITIAL].includes(updatedBsda.status)) {
+    return false;
+  }
+
+  // Pas de mail si pas d'entreprise de travaux
+  if (!updatedBsda.workerCompanySiret) {
+    return false;
+  }
+
+  // On ne prend pas en compte les particuliers ou les entreprises non inscrites
+  if (!updatedBsda.emitterCompanySiret) {
+    return false;
+  }
+
+  // Pas de TTR
+  if (!updatedBsda.destinationOperationNextDestinationCompanySiret) {
+    return previousBsda.destinationCap !== updatedBsda.destinationCap;
+  }
+  // TTR + destination finale
+  else {
+    return (
+      previousBsda.destinationOperationNextDestinationCap !==
+      updatedBsda.destinationOperationNextDestinationCap
+    );
+  }
+};
+
+export const sendDestinationCapModificationMail = async (
+  previousBsda: Bsda,
+  updatedBsda: Bsda
+) => {
+  const emitterSiret = updatedBsda.emitterCompanySiret;
+
+  if (!emitterSiret) return;
+
+  const emitterCompany = await prisma.company.findFirstOrThrow({
+    where: {
+      orgId: emitterSiret
+    },
+    select: {
+      id: true,
+      orgId: true
+    }
+  });
+
+  const companyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      companyId: emitterCompany.id,
+      notificationIsActiveBsdaFinalDestinationUpdate: true
+    },
+    include: {
+      user: true
+    }
+  });
+
+  const messageVersion: MessageVersion = {
+    to: companyAssociations
+      .filter(association => association.companyId === emitterCompany?.id)
+      .map(association => ({
+        name: association.user.name,
+        email: association.user.email
+      }))
+  };
+
+  const payload = renderMail(bsdaDestinationCapModificationEmail, {
+    variables: {
+      bsdaId: updatedBsda.id,
+      previousCap:
+        previousBsda.destinationOperationNextDestinationCap ??
+        previousBsda.destinationCap,
+      newCap:
+        updatedBsda.destinationOperationNextDestinationCap ??
+        updatedBsda.destinationCap,
+      workerCompanyName: updatedBsda.workerCompanyName,
+      workerCompanySiret: updatedBsda.workerCompanySiret,
+      destinationCompanyName:
+        updatedBsda.destinationOperationNextDestinationCompanyName ??
+        updatedBsda.destinationCompanyName,
+      destinationCompanySiret:
+        updatedBsda.destinationOperationNextDestinationCompanySiret ??
+        updatedBsda.destinationCompanySiret
+    },
+    messageVersions: [messageVersion]
+  });
+
+  await sendMail(payload);
+};

@@ -45,14 +45,13 @@ const takeOverInfoSchema = yup.object<any>().shape({
   takenOverBy: yup.string().required("Le nom du responsable est obligatoire")
 });
 
-const formWithOwnerIdAndTransportSegments = Prisma.validator<Prisma.FormArgs>()(
-  {
+const formWithOwnerIdAndTransportSegments =
+  Prisma.validator<Prisma.FormDefaultArgs>()({
     include: {
       owner: { select: { id: true } },
       transporters: { select: { transporterTransportMode: true } }
     }
-  }
-);
+  });
 type MultiModalForm = Prisma.FormGetPayload<
   typeof formWithOwnerIdAndTransportSegments
 >;

@@ -297,5 +297,44 @@ export const registryDelegationCreation: MailTemplate<{
   subject: ({ delegator }) =>
     `Émission d'une demande de délégation de l'établissement ${delegator.name} (${delegator.siret})`,
   body: mustacheRenderer("registry-delegation-creation.html"),
-  templateId: templateIds.LAYOUT
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
+};
+
+export const expiringRegistryDelegationWarning: MailTemplate<{
+  delegator: Company;
+  delegate: Company;
+  startDate: string;
+  endDate: string;
+}> = {
+  subject: ({ delegator, delegate }) =>
+    `Expiration prochaine de la délégation entre l'établissement ${delegator.orgId} et l'établissement ${delegate.orgId}`,
+  body: mustacheRenderer("expiring-registry-delegation-warning.html"),
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
+};
+
+export const bsdaDestinationCapModificationEmail: MailTemplate<{
+  bsdaId: string;
+  previousCap: string;
+  newCap: string;
+  workerCompanyName: string;
+  workerCompanySiret: string;
+  destinationCompanyName: string;
+  destinationCompanySiret: string;
+}> = {
+  subject: ({ bsdaId, newCap }) =>
+    `CAP du bordereau amiante n° ${bsdaId} mis à jour par ${newCap}`,
+  body: mustacheRenderer("bsda-destinationCap-modification-email.html"),
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
 };

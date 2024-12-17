@@ -9,6 +9,7 @@ import {
   updateDetenteurCompanySirets,
   updateTransporterOrgIds
 } from "../../database";
+import { getCanAccessDraftOrgIds } from "../../utils";
 
 export type CreateBsffFn = <Args extends Prisma.BsffCreateArgs>(
   args: Args,
@@ -78,6 +79,21 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    if (bsff.isDraft) {
+      // store orgIds allowed to access drafts bsff
+      const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(
+        fullBsff,
+        user.id
+      );
+
+      await prisma.bsff.update({
+        where: { id: bsff.id },
+        data: {
+          ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {})
+        }
+      });
+    }
 
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsff.id));
 

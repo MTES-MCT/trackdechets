@@ -2,7 +2,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import React, { useEffect, useMemo, useContext } from "react";
 
 import { useFormContext } from "react-hook-form";
-import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 
 import { CompanySearchResult, FavoriteType } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
@@ -280,7 +280,7 @@ const EmitterBsvhu = ({ errors }) => {
 
         <CompanyContactInfo
           fieldName={"emitter.company"}
-          name="emitter"
+          errorObject={formState.errors?.emitter?.["company"]}
           disabled={sealedFields.includes(`emitter.company.siret`)}
           key={orgId}
         />

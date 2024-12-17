@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import RecepisseExemption from "../../../../Forms/Components/RecepisseExemption/RecepiceExemption";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { clearCompanyError, setFieldError } from "../../utils";
@@ -32,14 +32,13 @@ const TransporterBsvhu = ({ errors }) => {
 
   useEffect(() => {
     if (errors?.length) {
-      if (!transporter?.company?.siret) {
-        setFieldError(
-          errors,
-          `${actor}.company.siret`,
-          formState.errors?.[actor]?.["company"]?.siret,
-          setError
-        );
-      }
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+
       if (transporter?.company?.contact) {
         setFieldError(
           errors,
@@ -172,7 +171,7 @@ const TransporterBsvhu = ({ errors }) => {
         )}
         <CompanyContactInfo
           fieldName={`${actor}.company`}
-          name={actor}
+          errorObject={formState.errors?.transporter?.["company"]}
           disabled={sealedFields.includes(`${actor}.company.siret`)}
           key={orgId}
         />

@@ -21,7 +21,7 @@ import { z } from "zod";
 import WasteCodeSelector from "../../../../../common/Components/WasteCodeSelector/WasteCodeSelector";
 import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
 import RhfCompanyContactInfo from "../../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import RhfCompanySelectorWrapper from "../../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
@@ -476,7 +476,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   }
                   defaultValue={initialBsddReview.broker}
                 >
-                  <RhfCompanySelectorWrapper
+                  <CompanySelectorWrapper
                     orgId={siret}
                     favoriteType={FavoriteType.Broker}
                     onCompanySelected={onCompanyBrokerSeleted}
@@ -518,7 +518,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   }
                   defaultValue={initialBsddReview.trader}
                 >
-                  <RhfCompanySelectorWrapper
+                  <CompanySelectorWrapper
                     orgId={siret}
                     favoriteType={FavoriteType.Trader}
                     onCompanySelected={onCompanyTraderSeleted}

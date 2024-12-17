@@ -12,7 +12,7 @@ import { Permission, can, getUserRoles } from "../../../../permissions";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 
 const bsdaRevisionRequestWithApprovals =
-  Prisma.validator<Prisma.BsdaRevisionRequestArgs>()({
+  Prisma.validator<Prisma.BsdaRevisionRequestDefaultArgs>()({
     include: { approvals: true }
   });
 type BsdaRevisionRequestWithApprovals = Prisma.BsdaRevisionRequestGetPayload<

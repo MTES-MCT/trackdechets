@@ -4,6 +4,7 @@ import {
   MutationCreateFormRevisionRequestArgs
 } from "../../../../generated/graphql/types";
 import {
+  companyFactory,
   formFactory,
   siretify,
   userWithCompanyFactory
@@ -38,6 +39,7 @@ const CREATE_FORM_REVISION_REQUEST = `
         wasteDetails { code }
       }
       authoringCompany {
+        orgId
         siret
       }
       approvals {
@@ -258,6 +260,58 @@ describe("Mutation.createFormRevisionRequest", () => {
       company.siret
     );
     // one approval is created
+    expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+      { approverSiret: recipientCompany.siret, status: "PENDING" }
+    ]);
+  });
+
+  it("should not include trader, broker nor intermediary in the approvals list", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const traderCompany = await companyFactory();
+    const brokerCompany = await companyFactory();
+    const intermediaryCompany = await companyFactory();
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        brokerCompanySiret: brokerCompany.siret,
+        traderCompanySiret: traderCompany.siret,
+        intermediaries: {
+          create: {
+            siret: intermediaryCompany.siret!,
+            name: intermediaryCompany.name!,
+            contact: intermediaryCompany.contact!
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "01 03 08" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    console.log(data.createFormRevisionRequest.approvals.length);
+    // only one approval is created
     expect(data.createFormRevisionRequest.approvals).toStrictEqual([
       { approverSiret: recipientCompany.siret, status: "PENDING" }
     ]);
@@ -624,7 +678,7 @@ describe("Mutation.createFormRevisionRequest", () => {
 
   it(
     "should create a revisionRequest and identifying current user" +
-      " as the requester (transporter when emitterType=APPENIDX_PRODUCER) ",
+      " as the requester (transporter when emitterType=APPENDIX_PRODUCER) ",
     async () => {
       const { company: recipientCompany } = await userWithCompanyFactory(
         "ADMIN",
@@ -679,6 +733,75 @@ describe("Mutation.createFormRevisionRequest", () => {
     }
   );
 
+  it(
+    "should create a revisionRequest and identifying current user" +
+      " as the requester (foreign transporter when emitterType=APPENDIX_PRODUCER) ",
+    async () => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
+      const vatNumber = "IT13029381004";
+      const { user, company: foreignTransporter } =
+        await userWithCompanyFactory("ADMIN", {
+          vatNumber,
+          orgId: vatNumber,
+          siret: null
+        });
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          transportersSirets: [foreignTransporter.vatNumber!],
+          wasteDetailsQuantity: 1,
+          status: "SENT",
+          takenOverAt: new Date(),
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: null,
+              transporterCompanyVatNumber: foreignTransporter.vatNumber
+            }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { wasteDetails: { quantity: 10 } },
+            comment: "A comment",
+            authoringCompanySiret: foreignTransporter.vatNumber!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.orgId).toBe(
+        foreignTransporter.vatNumber
+      );
+      // one approval is created
+      expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+        { approverSiret: emitterCompany.siret, status: "PENDING" }
+      ]);
+    }
+  );
+
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory(
       "ADMIN",
@@ -718,6 +841,123 @@ describe("Mutation.createFormRevisionRequest", () => {
     );
     expect(data.createFormRevisionRequest.approvals[0].status).toBe("PENDING");
   });
+
+  it.each(["emitterIsPrivateIndividual", "emitterIsForeignShip"])(
+    "should be possible for the destination to create a revision request " +
+      "when %p and an eco-organisme is present",
+    async field => {
+      const { company: recipientCompany, user } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { company: ecoOrganismeCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: null,
+          [field]: true,
+          recipientCompanySiret: recipientCompany.siret,
+          ecoOrganismeSiret: ecoOrganismeCompany.siret,
+          wasteDetailsQuantity: 1,
+          quantityReceived: 1,
+          sentAt: new Date(),
+          receivedAt: new Date(),
+          processedAt: new Date(),
+          status: "PROCESSED"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { quantityReceived: 2 },
+            comment: "A comment",
+            authoringCompanySiret: recipientCompany.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+        recipientCompany.siret
+      );
+      expect(data.createFormRevisionRequest.status).toEqual("PENDING");
+
+      // one approval is created
+      expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+        { approverSiret: ecoOrganismeCompany.siret, status: "PENDING" }
+      ]);
+    }
+  );
+
+  it.each(["emitterIsPrivateIndividual", "emitterIsForeignShip"])(
+    "revision request should be automatically approved if %p " +
+      "and there is no eco-organisme",
+    async field => {
+      const { company: recipientCompany, user } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: null,
+          [field]: true,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsQuantity: 1,
+          quantityReceived: 1,
+          sentAt: new Date(),
+          receivedAt: new Date(),
+          processedAt: new Date(),
+          status: "PROCESSED"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { quantityReceived: 2 },
+            comment: "A comment",
+            authoringCompanySiret: recipientCompany.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+        recipientCompany.siret
+      );
+      expect(data.createFormRevisionRequest.approvals).toStrictEqual([]);
+      expect(data.createFormRevisionRequest.status).toEqual("ACCEPTED");
+    }
+  );
 
   it("should fail if unknown fields are provided", async () => {
     const { user } = await userWithCompanyFactory("ADMIN");

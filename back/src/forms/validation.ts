@@ -69,7 +69,6 @@ import {
   MISSING_PROCESSING_OPERATION
 } from "./errors";
 import { format, sub } from "date-fns";
-import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
@@ -2018,33 +2017,33 @@ export async function checkCanBeSealed(form: PrismaForm) {
  * is consistent with the role they play on the form
  * (producer, trader, destination, etc)
  */
-export async function validateForwardedInCompanies(
-  form: PrismaForm
-): Promise<void> {
-  const forwardedIn = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .forwardedIn({ include: { transporters: true } });
-
-  const transporter = forwardedIn ? getFirstTransporterSync(forwardedIn) : null;
-
-  if (forwardedIn?.recipientCompanySiret) {
+export async function validateForwardedInCompanies({
+  destinationCompanySiret,
+  transporterCompanySiret,
+  transporterCompanyVatNumber
+}: {
+  destinationCompanySiret: string | null | undefined;
+  transporterCompanySiret: string | null | undefined;
+  transporterCompanyVatNumber: string | null | undefined;
+}): Promise<void> {
+  if (destinationCompanySiret) {
     await siret
       .label("Destination finale")
       .test(siretTests.isRegistered("DESTINATION"))
       .test(siretTests.isNotDormant)
-      .validate(forwardedIn.recipientCompanySiret);
+      .validate(destinationCompanySiret);
   }
-  if (transporter?.transporterCompanySiret) {
+  if (transporterCompanySiret) {
     await siret
       .label("Transporteur après entreposage provisoire")
       .test(siretTests.isRegistered("TRANSPORTER"))
-      .validate(transporter.transporterCompanySiret);
+      .validate(transporterCompanySiret);
   }
-  if (transporter?.transporterCompanyVatNumber) {
+  if (transporterCompanyVatNumber) {
     await foreignVatNumber
       .label("Transporteur après entreposage provisoire")
       .test(vatNumberTests.isRegisteredTransporter)
-      .validate(transporter.transporterCompanyVatNumber);
+      .validate(transporterCompanyVatNumber);
   }
 }
 

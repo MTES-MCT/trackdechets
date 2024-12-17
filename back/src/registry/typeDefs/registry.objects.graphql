@@ -1928,13 +1928,48 @@ type AllWaste {
 
 type AllWasteEdge {
   cursor: String!
-  node: ManagedWaste!
+  node: AllWaste!
 }
 
 type AllWasteConnection {
   totalCount: Int!
   pageInfo: PageInfo!
   edges: [AllWasteEdge!]!
+}
+
+type SsdWaste {
+  id: ID!
+  source: RegistryExportSource!
+  publicId: String!
+  reportForSiret: String!
+  reportForName: String!
+  reportForAddress: String!
+  reportForCity: String!
+  reportForPostalCode: String!
+  reportAsSiret: String
+  weightValue: Float!
+  weightIsEstimate: Boolean!
+  volume: Float
+  useDate: DateTime
+  dispatchDate: DateTime
+  wasteCode: String!
+  wasteDescription: String!
+  wasteCodeBale: String
+  secondaryWasteCodes: [String!]!
+  secondaryWasteDescriptions: [String!]!
+  product: String
+  processingDate: DateTime!
+  processingEndDate: DateTime
+  destinationType: String!
+  destinationOrgId: String
+  destinationName: String
+  destinationAddress: String
+  destinationPostalCode: String
+  destinationCity: String
+  destinationCountryCode: String
+  operationCode: String!
+  operationMode: OperationMode!
+  administrativeActReference: String!
 }
 
 type RegistryImportConnection {
@@ -1971,14 +2006,47 @@ type RegistryImportAssociation {
 }
 
 type RegistryCompany {
-  "Nom de l'établissement"
+  "Raison sociale de l'établissement"
   name: String
-
+  "Nom de l'établissement"
+  givenName: String
   "SIRET de l'établissement"
   siret: String
+  "SIRET ou num de TVA de l'établissement"
+  orgId: String
 }
 
 type SignedUrlResponse {
   fileKey: String!
   signedUrl: String!
+}
+
+type RegistryExportConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [RegistryExportEdge!]!
+}
+
+type RegistryExportEdge {
+  cursor: String!
+  node: RegistryExport!
+}
+
+type RegistryExport {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: User!
+  status: RegistryExportStatus!
+  delegate: RegistryCompany
+  delegateSirets: String
+  sirets: [String!]!
+  companies: [RegistryCompany!]!
+  registryType: WasteRegistryType!
+  wasteTypes: [WasteType!]
+  wasteCodes: [String!]
+  declarationType: DeclarationType!
+  startDate: DateTime!
+  endDate: DateTime
+  format: FormsRegisterExportFormat!
 }

@@ -84,7 +84,14 @@ export default {
   ecoOrganisme: {
     name: "",
     siret: ""
-  }
+  },
+  broker: {
+    company: getInitialCompany()
+  },
+  trader: {
+    company: getInitialCompany()
+  },
+  intermediaries: [getInitialCompany()]
 };
 
 export const ecoOrganismeList = [
