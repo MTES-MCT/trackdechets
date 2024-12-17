@@ -211,20 +211,27 @@ export const rawBsvhuSchema = z
         path: ["hasIntermediaries"],
         message: `Veuillez sélectionner au moins un intermédiaire`
       });
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["intermediaries", 0, "contact"],
-        message: `La personne à contacter chez l'intermédiaire est un champ requis.`
-      });
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["intermediaries", 0, "phone"],
-        message: `Le N° de téléphone de l'intermédiaire est un champ requis.`
-      });
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["intermediaries", 0, "mail"],
-        message: `L'adresse e-mail de l'intermédiaire est un champ requis.`
+    }
+
+    if (val?.hasIntermediaries) {
+      val?.intermediaries?.forEach((intermediary, index) => {
+        if (!intermediary.siret) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["intermediaries", index, "contact"],
+            message: `La personne à contacter chez l'intermédiaire est un champ requis.`
+          });
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["intermediaries", index, "phone"],
+            message: `Le N° de téléphone de l'intermédiaire est un champ requis.`
+          });
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["intermediaries", index, "mail"],
+            message: `L'adresse e-mail de l'intermédiaire est un champ requis.`
+          });
+        }
       });
     }
   });
