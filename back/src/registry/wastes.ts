@@ -80,7 +80,7 @@ export async function addCompaniesGivenNames<WasteType extends GenericWaste>(
  * @returns
  */
 async function getWasteConnection<WasteType extends GenericWaste>(
-  registryType: Exclude<WasteRegistryType, "SSD">,
+  registryType: WasteRegistryType,
   args: QueryWastesArgs
 ): Promise<WasteConnection<WasteType>> {
   const { size, sort, search_after, isForward } =

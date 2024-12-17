@@ -1,5 +1,9 @@
 "Type de registre"
-enum WasteRegistryType {
+enum RegistryV2ExportType {
+  """
+  Registre Sortie de statut de déchet.
+  """
+  SSD
   """
   Registre sortant.
   Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
@@ -40,65 +44,28 @@ enum WasteRegistryType {
   ALL
 }
 
-enum BsdSubType {
-  "Initial"
-  INITIAL
-
-  "Tournée dédiée"
-  TOURNEE
-
-  "Annexe 1"
-  APPENDIX1
-
-  "Annexe 2"
-  APPENDIX2
-
-  "Entreposage provisoire"
-  TEMP_STORED
-
-  "Collecte en déchetterie"
-  COLLECTION_2710
-
-  "Groupement"
-  GATHERING
-
-  "Regroupement"
-  GROUPEMENT
-
-  "Réexpédition"
-  RESHIPMENT
-
-  "Reconditionnement"
-  RECONDITIONNEMENT
-
-  "Synthèse"
-  SYNTHESIS
+"Type de déchets"
+enum RegistryV2ExportWasteType {
+  "Déchets non dangereux"
+  DND
+  "Déchets dangereux"
+  DD
+  "Terres et sédiments"
+  TEXS
 }
 
-enum RegistryImportType {
-  "Sortie de statut de déchet"
-  SSD
-  "Déchet dangereux et non dangereux entrant"
-  INCOMING_WASTE
+"Source de la ligne de registre"
+enum RegistryV2ExportSource {
+  "Bordereau"
+  BSD
+  "Déclaration au registre"
+  REGISTRY
 }
 
-enum RegistryImportStatus {
+enum RegistryV2ExportStatus {
   PENDING
   STARTED
   SUCCESSFUL
-  PARTIALLY_SUCCESSFUL
   FAILED
   CANCELED
-}
-
-enum RegistryDownloadTarget {
-  ERROR_FILE
-  IMPORT_FILE
-}
-
-enum RegistryLineReason {
-  "Spécifie que la ligne doit être modifiée dans le registre"
-  EDIT
-  "Spécifie que la ligne doit être supprimée du registre"
-  CANCEL
 }

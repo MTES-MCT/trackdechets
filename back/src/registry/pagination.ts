@@ -7,11 +7,11 @@ import {
 import type { OrderType, WasteRegistryType } from "@td/codegen-back";
 
 function buildSort(
-  registryType: Exclude<WasteRegistryType, "SSD">,
+  registryType: WasteRegistryType,
   order: OrderType
 ): { [key in keyof BsdElastic]?: OrderType }[] {
   const sortKey: {
-    [key in Exclude<WasteRegistryType, "SSD">]: keyof BsdElastic;
+    [key in WasteRegistryType]: keyof BsdElastic;
   } = {
     OUTGOING: "transporterTransportTakenOverAt",
     INCOMING: "destinationReceptionDate",
@@ -64,7 +64,7 @@ export async function getElasticPaginationArgs({
   registryType,
   ...args
 }: GraphqlPaginationArgs & {
-  registryType: Exclude<WasteRegistryType, "SSD">;
+  registryType: WasteRegistryType;
 }) {
   validateGqlPaginationArgs({
     first: args.first,

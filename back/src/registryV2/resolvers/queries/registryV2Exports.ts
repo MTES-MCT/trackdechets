@@ -1,13 +1,13 @@
 import { prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import type { QueryRegistryExportsArgs } from "@td/codegen-back";
+import type { QueryRegistryV2ExportsArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";
 
-export async function registryExports(
+export async function registryV2Exports(
   _,
-  { ...gqlPaginationArgs }: QueryRegistryExportsArgs,
+  { ...gqlPaginationArgs }: QueryRegistryV2ExportsArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);

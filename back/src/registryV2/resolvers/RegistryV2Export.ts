@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
-import type { RegistryExportResolvers } from "@td/codegen-back";
+import type { RegistryV2ExportResolvers } from "@td/codegen-back";
 import { GraphQLContext } from "../../types";
 
-export const RegistryExport: RegistryExportResolvers<
+export const RegistryV2Export: RegistryV2ExportResolvers<
   GraphQLContext,
   Prisma.RegistryExportGetPayload<{ include: { createdBy: true } }>
 > = {

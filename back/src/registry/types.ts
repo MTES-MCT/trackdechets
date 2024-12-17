@@ -8,8 +8,7 @@ import type {
   QueryManagedWastesArgs,
   QueryOutgoingWastesArgs,
   QueryTransportedWastesArgs,
-  AllWaste,
-  SsdWaste
+  AllWaste
 } from "@td/codegen-back";
 import { estypes } from "@elastic/elasticsearch";
 
@@ -21,7 +20,6 @@ export type RegistryFields =
   | "isAllWasteFor";
 
 export type GenericWaste =
-  | SsdWaste
   | IncomingWaste
   | OutgoingWaste
   | TransportedWaste
