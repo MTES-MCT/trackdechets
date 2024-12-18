@@ -21,8 +21,8 @@ import { safeParseAsyncIncomingTexs } from "./incomingTexs/validation";
 export type ParsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | null;
   publicId: string;
-  reportForSiret: string;
-  reportAsSiret?: string | null;
+  reportForCompanySiret: string;
+  reportAsCompanySiret?: string | null;
 };
 
 export type ImportOptions = {

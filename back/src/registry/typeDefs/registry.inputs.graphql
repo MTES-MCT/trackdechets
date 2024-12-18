@@ -61,12 +61,12 @@ input SsdLineInput {
   SIRET du déclarant
   SIRET de l'établissement qui fait la déclaration
   """
-  reportAsSiret: String
+  reportAsCompanySiret: String
   """
   SIRET de l'émetteur
   SIRET de l'établissement pour lequel la déclaration SSD est effectuée
   """
-  reportForSiret: String!
+  reportForCompanySiret: String!
   """
   Date d'utilisation
   Date correspondant à l'utilisation sur site du produit faisant l'objet d'une sortie de statut de déchet.
@@ -136,36 +136,36 @@ input SsdLineInput {
   Type de destinataire
   Type d'acteur correspondant au destinataire du déchet faisant l'objet de la sortie de statut de déchet
   """
-  destinationType: String!
+  destinationCompanyType: String!
   """
   Numéro d'identification du destinataire
   Numéro d'identification du destinataire du déchet faisant l'objet de la sortie de statut de déchet, à renseigner selon son type de profil
   """
-  destinationOrgId: String
+  destinationCompanyOrgId: String
   """
   Raison sociale du destinataire
   """
-  destinationName: String
+  destinationCompanyName: String
   """
   Adresse du destinataire
   Libellé de l'adresse du destinataire (n° de voie et voie, complément, lieu-dit etc) du déchet faisant l'objet de la sortie de statut de déchet
   """
-  destinationAddress: String
+  destinationCompanyAddress: String
   """
   Commune du destinataire
   Commune du destinataire du déchet faisant l'objet de la sortie de statut de déchet
   """
-  destinationCity: String
+  destinationCompanyCity: String
   """
   Code postal du destinataire
   Code postal du destinataire du déchet faisant l'objet de la sortie de statut de déchet
   """
-  destinationPostalCode: String
+  destinationCompanyPostalCode: String
   """
   Code pays du destinataire
   Code pays du destinataire du déchet faisant l'objet de la sortie de statut de déchet
   """
-  destinationCountryCode: String
+  destinationCompanyCountryCode: String
   """
   Code d'opération
   Code d'opération du traitement appliqué au déchet faisant l'objet de la sortie de statut de déchet
@@ -205,12 +205,12 @@ input IncomingWasteLineInput {
   SIRET du déclarant
   SIRET de l'établissement qui fait la déclaration
   """
-  reportAsSiret: String
+  reportAsCompanySiret: String
   """
   SIRET du destinataire
   SIRET de l'établissement pour lequel la déclaration est effectuée, soit le destinataire du déchet entrant
   """
-  reportForSiret: String!
+  reportForCompanySiret: String!
   """
   Code déchet
   Code du déchet traité
@@ -266,104 +266,104 @@ input IncomingWasteLineInput {
   Type de producteur
   Type d'acteur correspondant au producteur du déchet
   """
-  producerType: String!
+  initialEmitterCompanyType: String!
   """
   Numéro d'identification du producteur
   Numéro d'identification du producteur, à renseigner selon son type de profil
   """
-  producerOrgId: String
+  initialEmitterCompanyOrgId: String
   """
   Raison sociale du producteur
   """
-  producerName: String
+  initialEmitterCompanyName: String
   """
   Adresse du producteur
   Libellé de l'adresse du producteur (n° de voie et voie, complément, lieu-dit etc) du déchet
   """
-  producerAddress: String
+  initialEmitterCompanyAddress: String
   """
   Code postal du producteur
   """
-  producerPostalCode: String
+  initialEmitterCompanyPostalCode: String
   """
   Commune du producteur
   """
-  producerCity: String
+  initialEmitterCompanyCity: String
   """
   Code pays du producteur
   """
-  producerCountryCode: String
+  initialEmitterCompanyCountryCode: String
   """
   Code(s) INSEE de(s) commune(s)
   Le ou les codes INSEE de la commune de collecte de déchet
   """
-  municipalitiesInseeCodes: [String!]
+  initialEmitterMunicipalitiesInseeCodes: [String!]
   """
   Commune(s)
   Libellé de la commune de collecte de déchet
   """
-  municipalitiesNames: [String!]
+  initialEmitterMunicipalitiesNames: [String!]
   """
   Type d'expéditeur
   Type d'acteur correspondant à l'expéditeur du déchet
   """
-  senderType: String!
+  emitterCompanyType: String!
   """
   Numéro d'identification de l'expéditeur
   Numéro d'identification de l'expéditeur du déchet
   """
-  senderOrgId: String
+  emitterCompanyOrgId: String
   """
   Raison sociale de l'expéditeur
   Raison sociale de l'expéditeur du déchet
   """
-  senderName: String
+  emitterCompanyName: String
   """
   Adresse de l'expéditeur
   Libellé de l’adresse (n° de voie et voie, complément, lieu-dit etc) de l’expéditeur du déchet
   """
-  senderAddress: String
+  emitterCompanyAddress: String
   """
   Code postal de l'expéditeur
   """
-  senderPostalCode: String
+  emitterCompanyPostalCode: String
   """
   Commune de l'expéditeur
   Libellé de la commune de l'expéditeur du déchet
   """
-  senderCity: String
+  emitterCompanyCity: String
   """
   Code pays de l'expéditeur
   """
-  senderCountryCode: String
+  emitterCompanyCountryCode: String
   """
   Libellé de l'adresse de prise en charge de l'expéditeur
   Libellé de prise en charge de l'expéditeur si différente de l'adresse de l'établissement de l'expéditeur du déchet
   """
-  senderTakeOverAddress: String
+  emitterPickupSiteAddress: String
   """
   Code postal de prise en charge de l'expéditeur
   Code postal de prise en charge de l'expéditeur si différente de l'adresse de l'établissement de l'expéditeur du déchet
   """
-  senderTakeOverPostalCode: String
+  emitterPickupSitePostalCode: String
   """
   Commune de prise en charge de l'expéditeur
   Commune de prise en charge de l'expéditeur si différente de l'adresse de l'établissement de l'expéditeur du déchet
   """
-  senderTakeOverCity: String
+  emitterPickupSiteCity: String
   """
   Code pays de prise en charge de l'expéditeur
   Code pays de prise en charge de l'expéditeur si différente de l'adresse de l'établissement de l'expéditeur du déchet
   """
-  senderTakeOverCountryCode: String
+  emitterPickupSiteCountryCode: String
   """
   SIRET du courtier
   """
-  brokerSiret: String
+  brokerCompanySiret: String
   """
   Raison sociale du courtier
   """
-  brokerName: String
+  brokerCompanyName: String
   """
   Numéro de récépissé du courtier
   """
@@ -371,11 +371,11 @@ input IncomingWasteLineInput {
   """
   SIRET du négociant
   """
-  traderSiret: String
+  traderCompanySiret: String
   """
   Raison sociale du négociant
   """
-  traderName: String
+  traderCompanyName: String
   """
   Numéro de récépissé du négociant
   """
@@ -430,11 +430,11 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°1
   """
-  transporter1Type: String!
+  transporter1CompanyType: String!
   """
   Numéro d'identification du transporteur n°1
   """
-  transporter1OrgId: String
+  transporter1CompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°1
   """
@@ -442,23 +442,23 @@ input IncomingWasteLineInput {
   """
   Raison sociale du transporteur n°1
   """
-  transporter1Name: String
+  transporter1CompanyName: String
   """
   Adresse du transporteur n°1
   """
-  transporter1Address: String
+  transporter1CompanyAddress: String
   """
   Code postal du transporteur n°1
   """
-  transporter1PostalCode: String
+  transporter1CompanyPostalCode: String
   """
   Commune du transporteur n°1
   """
-  transporter1City: String
+  transporter1CompanyCity: String
   """
   Pays du transporteur n°1
   """
-  transporter1CountryCode: String
+  transporter1CompanyCountryCode: String
   """
   Mode de transport du transporteur n°2
   """
@@ -466,11 +466,11 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°2
   """
-  transporter2Type: String
+  transporter2CompanyType: String
   """
   Numéro d'identification du transporteur n°2
   """
-  transporter2OrgId: String
+  transporter2CompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°2
   """
@@ -478,23 +478,23 @@ input IncomingWasteLineInput {
   """
   Raison sociale du transporteur n°2
   """
-  transporter2Name: String
+  transporter2CompanyName: String
   """
   Adresse du transporteur n°2
   """
-  transporter2Address: String
+  transporter2CompanyAddress: String
   """
   Code postal du transporteur n°2
   """
-  transporter2PostalCode: String
+  transporter2CompanyPostalCode: String
   """
   Commune du transporteur n°2
   """
-  transporter2City: String
+  transporter2CompanyCity: String
   """
   Pays du transporteur n°2
   """
-  transporter2CountryCode: String
+  transporter2CompanyCountryCode: String
   """
   Mode de transport du transporteur n°3
   """
@@ -502,11 +502,11 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°3
   """
-  transporter3Type: String
+  transporter3CompanyType: String
   """
   Numéro d'identification du transporteur n°3
   """
-  transporter3OrgId: String
+  transporter3CompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°3
   """
@@ -514,23 +514,23 @@ input IncomingWasteLineInput {
   """
   Raison sociale du transporteur n°3
   """
-  transporter3Name: String
+  transporter3CompanyName: String
   """
   Adresse du transporteur n°3
   """
-  transporter3Address: String
+  transporter3CompanyAddress: String
   """
   Code postal du transporteur n°3
   """
-  transporter3PostalCode: String
+  transporter3CompanyPostalCode: String
   """
   Commune du transporteur n°3
   """
-  transporter3City: String
+  transporter3CompanyCity: String
   """
   Pays du transporteur n°3
   """
-  transporter3CountryCode: String
+  transporter3CompanyCountryCode: String
   """
   Mode de transport du transporteur n°4
   """
@@ -538,11 +538,11 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°4
   """
-  transporter4Type: String
+  transporter4CompanyType: String
   """
   Numéro d'identification du transporteur n°4
   """
-  transporter4OrgId: String
+  transporter4CompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°4
   """
@@ -550,23 +550,23 @@ input IncomingWasteLineInput {
   """
   Raison sociale du transporteur n°4
   """
-  transporter4Name: String
+  transporter4CompanyName: String
   """
   Adresse du transporteur n°4
   """
-  transporter4Address: String
+  transporter4CompanyAddress: String
   """
   Code postal du transporteur n°4
   """
-  transporter4PostalCode: String
+  transporter4CompanyPostalCode: String
   """
   Commune du transporteur n°4
   """
-  transporter4City: String
+  transporter4CompanyCity: String
   """
   Pays du transporteur n°4
   """
-  transporter4CountryCode: String
+  transporter4CompanyCountryCode: String
   """
   Mode de transport du transporteur n°5
   """
@@ -574,11 +574,11 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°5
   """
-  transporter5Type: String
+  transporter5CompanyType: String
   """
   Numéro d'identification du transporteur n°5
   """
-  transporter5OrgId: String
+  transporter5CompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°5
   """
@@ -586,23 +586,23 @@ input IncomingWasteLineInput {
   """
   Raison sociale du transporteur n°5
   """
-  transporter5Name: String
+  transporter5CompanyName: String
   """
   Adresse du transporteur n°5
   """
-  transporter5Address: String
+  transporter5CompanyAddress: String
   """
   Code postal du transporteur n°5
   """
-  transporter5PostalCode: String
+  transporter5CompanyPostalCode: String
   """
   Commune du transporteur n°5
   """
-  transporter5City: String
+  transporter5CompanyCity: String
   """
   Pays du transporteur n°5
   """
-  transporter5CountryCode: String
+  transporter5CompanyCountryCode: String
 }
 
 "Contenu d'une ligne pour l'import de terres excavées et sédiments, dangereux et non dangereux entrants"
@@ -621,12 +621,12 @@ input IncomingTexsLineInput {
   SIRET du déclarant
   SIRET de l'établissement qui fait la déclaration
   """
-  reportForSiret: String!
+  reportForCompanySiret: String!
   """
   SIRET du destinataire
   SIRET de l'établissement pour lequel la déclaration est effectuée, soit l'installation de destination du déchet (entrant)
   """
-  reportAsSiret: String
+  reportAsCompanySiret: String
   """
   Champ libre / Référence chantier
   Numéro libre permettant de référencer un chantier
@@ -667,7 +667,7 @@ input IncomingTexsLineInput {
   Numéro de bordereau d'analyse chimique ou Demande d'Acceptation Préalable (DAP)
   DAP
   """
-  dap: String
+  wasteDap: String
   """
   Poids en tonnes
   Poids en tonnes de déchet entrant
@@ -713,95 +713,95 @@ input IncomingTexsLineInput {
   Type de producteur initial
   Type d'acteur correspondant au producteur du déchet
   """
-  producerType: String!
+  initialEmitterCompanyType: String!
   """
   Numéro d'identification du producteur initial
   Numéro d'identification du producteur, à renseigner selon son type de profil
   """
-  producerOrgId: String
+  initialEmitterCompanyOrgId: String
   """
   Raison sociale du producteur initial
   """
-  producerName: String
+  initialEmitterCompanyName: String
   """
   Adresse du producteur initial
   Libellé de l'adresse du producteur (n° de voie et voie, complément, lieu-dit etc) du déchet
   """
-  producerAddress: String
+  initialEmitterCompanyAddress: String
   """
   Code postal du producteur initial
   """
-  producerPostalCode: String
+  initialEmitterCompanyPostalCode: String
   """
   Commune du producteur initial
   """
-  producerCity: String
+  initialEmitterCompanyCity: String
   """
   Pays du producteur initial
   """
-  producerCountryCode: String
+  initialEmitterCompanyCountryCode: String
   """
   Code(s) INSEE de(s) commune(s)
   Le ou les codes INSEE de la commune de collecte de déchet
   """
-  municipalitiesInseeCodes: [String!]
+  initialEmitterMunicipalitiesInseeCodes: [String!]
   """
   Commune(s)
   Le ou les ibellés des communes de collecte de déchet
   """
-  municipalitiesNames: [String!]
+  initialEmitterMunicipalitiesNames: [String!]
   """
   Type d'expéditeur ou détenteur
   """
-  senderType: String!
+  emitterCompanyType: String!
   """
   Numéro d'identification de l'expéditeur ou détenteur
   """
-  senderOrgId: String
+  emitterCompanyOrgId: String
   """
   Raison sociale de l'expéditeur ou détenteur
   """
-  senderName: String
+  emitterCompanyName: String
   """
   Libellé de l'adresse de prise en charge de l'expéditeur ou détenteur
   """
-  senderTakeOverAddress: String
+  emitterPickupSiteAddress: String
   """
   Code postal de prise en charge de l'expéditeur ou détenteur
   """
-  senderTakeOverPostalCode: String
+  emitterPickupSitePostalCode: String
   """
   Commune de prise en charge de l'expéditeur ou détenteur
   """
-  senderTakeOverCity: String
+  emitterPickupSiteCity: String
   """
   Pays de prise en charge de l'expéditeur ou détenteur
   """
-  senderTakeOverCountryCode: String
+  emitterPickupSiteCountryCode: String
   """
   Adresse de l'expéditeur ou détenteur
   """
-  senderAddress: String
+  emitterCompanyAddress: String
   """
   Code postal de l'expéditeur ou détenteur
   """
-  senderPostalCode: String
+  emitterCompanyPostalCode: String
   """
   Commune de l'expéditeur ou détenteur
   """
-  senderCity: String
+  emitterCompanyCity: String
   """
   Pays de l'expéditeur ou détenteur
   """
-  senderCountryCode: String
+  emitterCompanyCountryCode: String
   """
   SIRET du courtier
   """
-  brokerSiret: String
+  brokerCompanySiret: String
   """
   Raison sociale du courtier
   """
-  brokerName: String
+  brokerCompanyName: String
   """
   Numéro de récépissé du courtier
   """
@@ -809,11 +809,11 @@ input IncomingTexsLineInput {
   """
   SIRET du négociant
   """
-  traderSiret: String
+  traderCompanySiret: String
   """
   Raison sociale du négociant
   """
-  traderName: String
+  traderCompanyName: String
   """
   Numéro de récépissé du négociant
   """
@@ -885,11 +885,11 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°1
   """
-  transporter1Type: String!
+  transporter1CompanyType: String!
   """
   Numéro d'identification du transporteur n°1
   """
-  transporter1OrgId: String
+  transporter1CompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°1
   """
@@ -897,23 +897,23 @@ input IncomingTexsLineInput {
   """
   Raison sociale du transporteur n°1
   """
-  transporter1Name: String
+  transporter1CompanyName: String
   """
   Adresse du transporteur n°1
   """
-  transporter1Address: String
+  transporter1CompanyAddress: String
   """
   Code postal du transporteur n°1
   """
-  transporter1PostalCode: String
+  transporter1CompanyPostalCode: String
   """
   Commune du transporteur n°1
   """
-  transporter1City: String
+  transporter1CompanyCity: String
   """
   Pays du transporteur n°1
   """
-  transporter1CountryCode: String
+  transporter1CompanyCountryCode: String
   """
   Mode de transport du transporteur n°2
   """
@@ -921,11 +921,11 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°2
   """
-  transporter2Type: String
+  transporter2CompanyType: String
   """
   Numéro d'identification du transporteur n°2
   """
-  transporter2OrgId: String
+  transporter2CompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°2
   """
@@ -933,23 +933,23 @@ input IncomingTexsLineInput {
   """
   Raison sociale du transporteur n°2
   """
-  transporter2Name: String
+  transporter2CompanyCompanyName: String
   """
   Adresse du transporteur n°2
   """
-  transporter2Address: String
+  transporter2CompanyCompanyAddress: String
   """
   Code postal du transporteur n°2
   """
-  transporter2PostalCode: String
+  transporter2CompanyCompanyPostalCode: String
   """
   Commune du transporteur n°2
   """
-  transporter2City: String
+  transporter2CompanyCompanyCity: String
   """
   Pays du transporteur n°2
   """
-  transporter2CountryCode: String
+  transporter2CompanyCompanyCountryCode: String
   """
   Mode de transport du transporteur n°3
   """
@@ -957,11 +957,11 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°3
   """
-  transporter3Type: String
+  transporter3CompanyCompanyType: String
   """
   Numéro d'identification du transporteur n°3
   """
-  transporter3OrgId: String
+  transporter3CompanyCompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°3
   """
@@ -969,23 +969,23 @@ input IncomingTexsLineInput {
   """
   Raison sociale du transporteur n°3
   """
-  transporter3Name: String
+  transporter3CompanyName: String
   """
   Adresse du transporteur n°3
   """
-  transporter3Address: String
+  transporter3CompanyAddress: String
   """
   Code postal du transporteur n°3
   """
-  transporter3PostalCode: String
+  transporter3CompanyPostalCode: String
   """
   Commune du transporteur n°3
   """
-  transporter3City: String
+  transporter3CompanyCity: String
   """
   Pays du transporteur n°3
   """
-  transporter3CountryCode: String
+  transporter3CompanyCountryCode: String
   """
   Mode de transport du transporteur n°4
   """
@@ -993,11 +993,11 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°4
   """
-  transporter4Type: String
+  transporter4CompanyType: String
   """
   Numéro d'identification du transporteur n°4
   """
-  transporter4OrgId: String
+  transporter4CompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°4
   """
@@ -1005,23 +1005,23 @@ input IncomingTexsLineInput {
   """
   Raison sociale du transporteur n°4
   """
-  transporter4Name: String
+  transporter4CompanyName: String
   """
   Adresse du transporteur n°4
   """
-  transporter4Address: String
+  transporter4CompanyAddress: String
   """
   Code postal du transporteur n°4
   """
-  transporter4PostalCode: String
+  transporter4CompanyPostalCode: String
   """
   Commune du transporteur n°4
   """
-  transporter4City: String
+  transporter4CompanyCity: String
   """
   Pays du transporteur n°4
   """
-  transporter4CountryCode: String
+  transporter4CompanyCountryCode: String
   """
   Mode de transport du transporteur n°5
   """
@@ -1029,11 +1029,11 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°5
   """
-  transporter5Type: String
+  transporter5CompanyType: String
   """
   Numéro d'identification du transporteur n°5
   """
-  transporter5OrgId: String
+  transporter5CompanyOrgId: String
   """
   Numéro de récépissé du transporteur n°5
   """
@@ -1041,21 +1041,21 @@ input IncomingTexsLineInput {
   """
   Raison sociale du transporteur n°5
   """
-  transporter5Name: String
+  transporter5CompanyName: String
   """
   Adresse du transporteur n°5
   """
-  transporter5Address: String
+  transporter5CompanyAddress: String
   """
   Code postal du transporteur n°5
   """
-  transporter5PostalCode: String
+  transporter5CompanyPostalCode: String
   """
   Commune du transporteur n°5
   """
-  transporter5City: String
+  transporter5CompanyCity: String
   """
   Pays du transporteur n°5
   """
-  transporter5CountryCode: String
+  transporter5CompanyCountryCode: String
 }

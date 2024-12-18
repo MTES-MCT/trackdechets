@@ -162,7 +162,7 @@ enum TransportMode {
   RIVER
   SEA
   OTHER
-  UNKNOWN // Used for migrations, when we have missing data
+  UNKNOWN // Utilisé lors des migrations, lorsqu'on n'a pas de donnée
 }
 
 enum UserRole {
@@ -222,6 +222,8 @@ enum OperationMode {
   VALORISATION_ENERGETIQUE
   // Incinération sans valorisation énergétique ou stockage en décharge
   ELIMINATION
+  // Utilisé lors des migrations, lorsqu'on n'a pas de donnée
+  UNKNOWN
 }
 
 model AccessToken {

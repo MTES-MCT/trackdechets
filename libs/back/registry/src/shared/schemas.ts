@@ -1,3 +1,4 @@
+import { OperationMode } from "@prisma/client";
 import {
   ALL_TD_PROCESSING_OPERATIONS_CODES,
   BSDD_WASTE_CODES_ENUM,
@@ -38,7 +39,7 @@ export const publicIdSchema = z
       "Le numéro unique ne peut contenir que des lettres, des chiffres, des tirets, des underscores et des points"
   });
 
-export const reportAsSiretSchema = z
+export const reportAsCompanySiretSchema = z
   .union([
     z.string().nullish(),
     z
@@ -130,6 +131,47 @@ export const getOperationCodeSchema = (
           "Le code de traitement n'est pas une valeur autorisée. Valeurs possibles: R 0 à R 13, D 1 à D 15"
       })
     );
+
+export const operationModeSchema = z
+  .enum(
+    [
+      "Réutilisation",
+      "Reutilisation",
+      "REUTILISATION",
+      "RECYCLAGE",
+      "Recyclage",
+      "Valorisation énergétique",
+      "VALORISATION_ENERGETIQUE",
+      "Élimination",
+      "Elimination",
+      "ELIMINATION"
+    ],
+    {
+      required_error: "Le code de qualification est requis",
+      invalid_type_error:
+        "Le code de qualification n'est pas une valeur autorisée. Valeurs possibles: Réutilisation, Recyclage, Valorisation énergétique ou Élimination"
+    }
+  )
+  .transform(val => {
+    switch (val) {
+      case "Réutilisation":
+      case "Reutilisation":
+      case "REUTILISATION":
+        return OperationMode.REUTILISATION;
+      case "Recyclage":
+      case "RECYCLAGE":
+        return OperationMode.RECYCLAGE;
+      case "Valorisation énergétique":
+      case "VALORISATION_ENERGETIQUE":
+        return OperationMode.VALORISATION_ENERGETIQUE;
+      case "Élimination":
+      case "Elimination":
+      case "ELIMINATION":
+        return OperationMode.ELIMINATION;
+      default:
+        throw Error("Unhandled qualification code");
+    }
+  });
 
 export const weightValueSchema = z.coerce
   .number({
@@ -293,7 +335,7 @@ export const parcelCoordinatesSchema = z
 export const getActorTypeSchema = (name: string) =>
   z.enum(
     [
-      "ENTREPRISE_FR",
+      "ETABLISSEMENT_FR",
       "ENTREPRISE_UE",
       "ENTREPRISE_HORS_UE",
       "ASSOCIATION",
@@ -302,7 +344,7 @@ export const getActorTypeSchema = (name: string) =>
     ],
     {
       required_error: `Le type ${name} est requis`,
-      invalid_type_error: `Le type ${name} n'est pas une valeur autorisée. Valeurs possibles: ENTREPRISE_FR, ENTREPRISE_UE, ENTREPRISE_HORS_UE, ASSOCIATION`
+      invalid_type_error: `Le type ${name} n'est pas une valeur autorisée. Valeurs possibles: ETABLISSEMENT_FR, ENTREPRISE_UE, ENTREPRISE_HORS_UE, ASSOCIATION`
     }
   );
 
@@ -394,7 +436,25 @@ export const transportModeSchema = z
     }
   });
 
-export const transportReceiptNumberSchema = z
+export const transportRecepisseIsExemptedSchema = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error:
+          "Le champ exemption de récépissé transporteur est requis",
+        invalid_type_error:
+          "Le champ exemption de récépissé transporteur n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  {
+    invalid_type_error:
+      "Le champ exemption de récépissé transporteur saisi n'est pas valide"
+  }
+);
+
+export const transportRecepisseNumberSchema = z
   .string()
   .min(
     5,

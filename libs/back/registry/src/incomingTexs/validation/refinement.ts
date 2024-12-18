@@ -2,9 +2,9 @@ import { Refinement } from "zod";
 import { refineActorOrgId } from "../../shared/refinement";
 import { ParsedZodIncomingTexsItem } from "./schema";
 
-export const producerRefinement = refineActorOrgId<ParsedZodIncomingTexsItem>({
-  typeKey: "producerType",
-  orgIdKey: "producerOrgId"
+export const initialEmitterRefinement = refineActorOrgId<ParsedZodIncomingTexsItem>({
+  typeKey: "initialEmitterCompanyType",
+  orgIdKey: "initialEmitterCompanyOrgId"
 });
 
 export const parcelRefinement: Refinement<ParsedZodIncomingTexsItem> = (
@@ -34,9 +34,9 @@ export const parcelRefinement: Refinement<ParsedZodIncomingTexsItem> = (
   }
 };
 
-export const senderRefinement = refineActorOrgId<ParsedZodIncomingTexsItem>({
-  typeKey: "senderType",
-  orgIdKey: "senderOrgId"
+export const emitterRefinement = refineActorOrgId<ParsedZodIncomingTexsItem>({
+  typeKey: "emitterCompanyType",
+  orgIdKey: "emitterCompanyOrgId"
 });
 
 export const transporter1Refinement =
