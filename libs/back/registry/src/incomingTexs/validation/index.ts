@@ -8,8 +8,8 @@ import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
 import {
   parcelRefinement,
-  producerRefinement,
-  senderRefinement,
+  initialEmitterRefinement,
+  emitterRefinement,
   transporter1Refinement,
   transporter2Refinement,
   transporter3Refinement,
@@ -25,8 +25,8 @@ export function safeParseAsyncIncomingTexs(line: unknown) {
     .superRefine(refineWeightAndVolume)
     .superRefine(refineMunicipalities)
     .superRefine(refineNotificationNumber)
-    .superRefine(producerRefinement)
-    .superRefine(senderRefinement)
+    .superRefine(initialEmitterRefinement)
+    .superRefine(emitterRefinement)
     .superRefine(parcelRefinement)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)

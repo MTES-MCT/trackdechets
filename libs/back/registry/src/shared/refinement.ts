@@ -14,7 +14,7 @@ export function refineActorOrgId<T>({
 }): Refinement<T> {
   return (item, { addIssue }) => {
     const type:
-      | "ENTREPRISE_FR"
+      | "ETABLISSEMENT_FR"
       | "ENTREPRISE_UE"
       | "ENTREPRISE_HORS_UE"
       | "ASSOCIATION"
@@ -26,7 +26,7 @@ export function refineActorOrgId<T>({
       : undefined;
 
     switch (type) {
-      case "ENTREPRISE_FR": {
+      case "ETABLISSEMENT_FR": {
         if (!isSiret(orgId)) {
           addIssue({
             code: z.ZodIssueCode.custom,
@@ -190,42 +190,46 @@ export const refineWeightAndVolume: Refinement<{
 };
 
 export const refineMunicipalities: Refinement<{
-  producerType:
-    | "ENTREPRISE_FR"
+  initialEmitterCompanyType:
+    | "ETABLISSEMENT_FR"
     | "ENTREPRISE_UE"
     | "ENTREPRISE_HORS_UE"
     | "ASSOCIATION"
     | "PERSONNE_PHYSIQUE"
     | "COMMUNE";
-  municipalitiesInseeCodes: string[];
-  municipalitiesNames: string[];
+  initialEmitterMunicipalitiesInseeCodes: string[];
+  initialEmitterMunicipalitiesNames: string[];
 }> = (item, { addIssue }) => {
   if (
-    item.producerType === "COMMUNE" &&
-    !item.municipalitiesInseeCodes?.length
+    item.initialEmitterCompanyType === "COMMUNE" &&
+    !item.initialEmitterMunicipalitiesInseeCodes?.length
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
       message: `Le ou les codes INSEE des communes doivent être saisi`,
-      path: ["municipalitiesInseeCodes"]
-    });
-  }
-
-  if (item.producerType === "COMMUNE" && !item.municipalitiesNames?.length) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le ou les libellés des communes doivent être saisi`,
-      path: ["municipalitiesNames"]
+      path: ["initialEmitterMunicipalitiesInseeCodes"]
     });
   }
 
   if (
-    item.municipalitiesInseeCodes?.length !== item.municipalitiesNames?.length
+    item.initialEmitterCompanyType === "COMMUNE" &&
+    !item.initialEmitterMunicipalitiesNames?.length
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le ou les libellés des communes doivent être saisi`,
+      path: ["initialEmitterMunicipalitiesNames"]
+    });
+  }
+
+  if (
+    item.initialEmitterMunicipalitiesInseeCodes?.length !==
+    item.initialEmitterMunicipalitiesNames?.length
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
       message: `Le nombre de codes INSEE et de noms de communes doit être identique`,
-      path: ["municipalitiesNames"]
+      path: ["initialEmitterMunicipalitiesNames"]
     });
   }
 };

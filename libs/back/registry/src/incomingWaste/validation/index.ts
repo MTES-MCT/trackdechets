@@ -7,9 +7,9 @@ import {
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
 import {
-  producerRefinement,
+  initialEmitterRefinement,
   refineWeighingHour,
-  senderRefinement,
+  emitterRefinement,
   transporter1Refinement,
   transporter2Refinement,
   transporter3Refinement,
@@ -26,8 +26,8 @@ export function safeParseAsyncIncomingWaste(line: unknown) {
     .superRefine(refineWeightAndVolume)
     .superRefine(refineMunicipalities)
     .superRefine(refineNotificationNumber)
-    .superRefine(producerRefinement)
-    .superRefine(senderRefinement)
+    .superRefine(initialEmitterRefinement)
+    .superRefine(emitterRefinement)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)
     .superRefine(transporter3Refinement)

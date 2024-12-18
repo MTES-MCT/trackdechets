@@ -1,4 +1,3 @@
-import { OperationMode } from "@prisma/client";
 import { BSDD_WASTE_CODES_ENUM } from "@td/constants";
 import { sub } from "date-fns";
 import { z } from "zod";
@@ -14,22 +13,24 @@ import {
   getOperationCodeSchema,
   publicIdSchema,
   reasonSchema,
-  reportAsSiretSchema,
+  reportAsCompanySiretSchema,
   volumeSchema,
   wasteCodeBaleSchema,
   getWasteCodeSchema,
   wasteDescriptionSchema,
   weightIsEstimateSchema,
-  weightValueSchema
+  weightValueSchema,
+  operationModeSchema
 } from "../../shared/schemas";
 
+export type ParsedZodInputSsdItem = z.output<typeof inputSsdSchema>;
 export type ParsedZodSsdItem = z.output<typeof ssdSchema>;
 
 const inputSsdSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
-  reportAsSiret: reportAsSiretSchema,
-  reportForSiret: getReportForSiretSchema("de l'émetteur"),
+  reportAsCompanySiret: reportAsCompanySiretSchema,
+  reportForCompanySiret: getReportForSiretSchema("de l'émetteur"),
   useDate: z.union([
     z.date().nullish(),
     z
@@ -152,57 +153,18 @@ const inputSsdSchema = z.object({
           .nullish()
       )
   ]),
-  destinationType: getActorTypeSchema("de destinataire").exclude([
+  destinationCompanyType: getActorTypeSchema("de destinataire").exclude([
     "PERSONNE_PHYSIQUE",
     "COMMUNE"
   ]),
-  destinationOrgId: getActorOrgIdSchema("du destinataire"),
-  destinationName: getActorNameSchema("du destinataire"),
-  destinationAddress: getActorAddressSchema("du destinataire"),
-  destinationCity: getActorCitySchema("du destinataire"),
-  destinationPostalCode: getActorPostalCodeSchema("du destinataire"),
-  destinationCountryCode: getActorCountryCodeSchema("du destinataire"),
+  destinationCompanyOrgId: getActorOrgIdSchema("du destinataire"),
+  destinationCompanyName: getActorNameSchema("du destinataire"),
+  destinationCompanyAddress: getActorAddressSchema("du destinataire"),
+  destinationCompanyCity: getActorCitySchema("du destinataire"),
+  destinationCompanyPostalCode: getActorPostalCodeSchema("du destinataire"),
+  destinationCompanyCountryCode: getActorCountryCodeSchema("du destinataire"),
   operationCode: getOperationCodeSchema(),
-  operationMode: z
-    .enum(
-      [
-        "Réutilisation",
-        "Reutilisation",
-        "REUTILISATION",
-        "RECYCLAGE",
-        "Recyclage",
-        "Valorisation énergétique",
-        "VALORISATION_ENERGETIQUE",
-        "Élimination",
-        "Elimination",
-        "ELIMINATION"
-      ],
-      {
-        required_error: "Le code de qualification est requis",
-        invalid_type_error:
-          "Le code de qualification n'est pas une valeur autorisée. Valeurs possibles: Réutilisation, Recyclage, Valorisation énergétique ou Élimination"
-      }
-    )
-    .transform(val => {
-      switch (val) {
-        case "Réutilisation":
-        case "Reutilisation":
-        case "REUTILISATION":
-          return OperationMode.REUTILISATION;
-        case "Recyclage":
-        case "RECYCLAGE":
-          return OperationMode.RECYCLAGE;
-        case "Valorisation énergétique":
-        case "VALORISATION_ENERGETIQUE":
-          return OperationMode.VALORISATION_ENERGETIQUE;
-        case "Élimination":
-        case "Elimination":
-        case "ELIMINATION":
-          return OperationMode.ELIMINATION;
-        default:
-          throw Error("Unhandled qualification code");
-      }
-    }),
+  operationMode: operationModeSchema,
   administrativeActReference: z.enum([
     "Implicite",
     "Arrêté du 29 juillet 2014",
@@ -220,10 +182,10 @@ const inputSsdSchema = z.object({
 
 // Props added through transform
 const transformedSsdSchema = z.object({
-  reportForAddress: z.string().default(""),
-  reportForCity: z.string().default(""),
-  reportForPostalCode: z.string().default(""),
-  reportForName: z.coerce.string().default(""),
+  reportForCompanyAddress: z.string().default(""),
+  reportForCompanyCity: z.string().default(""),
+  reportForCompanyPostalCode: z.string().default(""),
+  reportForCompanyName: z.coerce.string().default(""),
   id: z.string().optional()
 });
 

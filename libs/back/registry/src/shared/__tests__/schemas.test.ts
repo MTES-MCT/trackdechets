@@ -17,7 +17,7 @@ import {
   getActorPostalCodeSchema,
   getActorCountryCodeSchema,
   transportModeSchema,
-  transportReceiptNumberSchema
+  transportRecepisseNumberSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
 
@@ -104,7 +104,7 @@ describe("Schemas", () => {
 
   test("getActorTypeSchema", () => {
     const actorTypeSchema = getActorTypeSchema("test");
-    expect(actorTypeSchema.parse("ENTREPRISE_FR")).toBe("ENTREPRISE_FR");
+    expect(actorTypeSchema.parse("ETABLISSEMENT_FR")).toBe("ETABLISSEMENT_FR");
     expect(() => actorTypeSchema.parse("INVALID")).toThrow();
   });
 
@@ -154,9 +154,9 @@ describe("Schemas", () => {
     expect(() => transportModeSchema.parse("INVALID")).toThrow();
   });
 
-  test("transportReceiptNumberSchema", () => {
-    expect(transportReceiptNumberSchema.parse("12345")).toBe("12345");
-    expect(() => transportReceiptNumberSchema.parse("1234")).toThrow();
-    expect(() => transportReceiptNumberSchema.parse("a".repeat(51))).toThrow();
+  test("transportRecepisseNumberSchema", () => {
+    expect(transportRecepisseNumberSchema.parse("12345")).toBe("12345");
+    expect(() => transportRecepisseNumberSchema.parse("1234")).toThrow();
+    expect(() => transportRecepisseNumberSchema.parse("a".repeat(51))).toThrow();
   });
 });

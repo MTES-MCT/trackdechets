@@ -9,7 +9,7 @@ export async function transformAndRefineReason(
   const incomingTexsItemInDb = await prisma.registryIncomingTexs.findFirst({
     where: {
       publicId: incomingTexsItem.publicId,
-      reportForSiret: incomingTexsItem.reportForSiret,
+      reportForCompanySiret: incomingTexsItem.reportForCompanySiret,
       isActive: true
     }
   });

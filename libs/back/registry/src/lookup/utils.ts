@@ -25,28 +25,28 @@ const updateRegistryDelegateSirets = async (
   registryType: RegistryExportType,
   registry: {
     id: string;
-    reportForSiret: string;
-    reportAsSiret?: string | null;
+    reportForCompanySiret: string;
+    reportAsCompanySiret?: string | null;
   },
   registryLookup: Prisma.RegistryLookupGetPayload<{
-    select: { reportAsSirets: true };
+    select: { reportAsCompanySirets: true };
   }>,
   tx: Omit<PrismaClient, ITXClientDenyList>
 ) => {
-  // if the registry entry comes from a delegation, we need to update the reportAsSirets array.
+  // if the registry entry comes from a delegation, we need to update the reportAsCompanySirets array.
   // We only push the delegator's siret if it's not in it yet.
   // this is done separately from the previous upsert because it's not possible
   // to push to an array and check unicity with prisma.
 
   // For cases where the siret can change during the update :
-  // the new registryLookup doesn't contain anything in reportAsSirets
+  // the new registryLookup doesn't contain anything in reportAsCompanySirets
   // this still makes sense because a change of siret would also mean that previous delegates
   // don't necessarily apply to the new siret, so it makes sense to lose them.
 
   if (
-    registry.reportAsSiret &&
-    registry.reportAsSiret !== registry.reportForSiret &&
-    !registryLookup.reportAsSirets.includes(registry.reportAsSiret)
+    registry.reportAsCompanySiret &&
+    registry.reportAsCompanySiret !== registry.reportForCompanySiret &&
+    !registryLookup.reportAsCompanySirets.includes(registry.reportAsCompanySiret)
   ) {
     await tx.registryLookup.updateMany({
       where: {
@@ -54,9 +54,9 @@ const updateRegistryDelegateSirets = async (
         exportRegistryType: registryType
       },
       data: {
-        reportAsSirets: [
-          ...registryLookup.reportAsSirets,
-          registry.reportAsSiret
+        reportAsCompanySirets: [
+          ...registryLookup.reportAsCompanySirets,
+          registry.reportAsCompanySiret
         ]
       }
     });
@@ -86,7 +86,7 @@ export const updateRegistrySsdLookup = async (
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   let registryLookup: Prisma.RegistryLookupGetPayload<{
-    select: { reportAsSirets: true };
+    select: { reportAsCompanySirets: true };
   }>;
   if (oldRegistrySsdId) {
     // note for future implementations:
@@ -103,7 +103,7 @@ export const updateRegistrySsdLookup = async (
         id_exportRegistryType_siret: {
           id: oldRegistrySsdId,
           exportRegistryType: RegistryExportType.SSD,
-          siret: registrySsd.reportForSiret
+          siret: registrySsd.reportForCompanySiret
         }
       },
       data: {
@@ -118,7 +118,7 @@ export const updateRegistrySsdLookup = async (
       },
       select: {
         // lean selection to improve performances
-        reportAsSirets: true
+        reportAsCompanySirets: true
       }
     });
   } else {
@@ -126,7 +126,7 @@ export const updateRegistrySsdLookup = async (
       data: {
         id: registrySsd.id,
         readableId: registrySsd.publicId,
-        siret: registrySsd.reportForSiret,
+        siret: registrySsd.reportForCompanySiret,
         exportRegistryType: RegistryExportType.SSD,
         declarationType: RegistryExportDeclarationType.REGISTRY,
         wasteType: RegistryExportWasteType.DND,
@@ -138,7 +138,7 @@ export const updateRegistrySsdLookup = async (
       },
       select: {
         // lean selection to improve performances
-        reportAsSirets: true
+        reportAsCompanySirets: true
       }
     });
   }
