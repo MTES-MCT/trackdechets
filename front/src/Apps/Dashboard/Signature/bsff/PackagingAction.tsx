@@ -1,30 +1,9 @@
-import { ActionButton, Modal } from "../../../../../common/components";
-import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { Bsff, BsffPackaging, WasteAcceptationStatus } from "@td/codegen-ui";
+import { Modal } from "../../../../common/components";
+import { Bsff, BsffPackaging } from "@td/codegen-ui";
 import React from "react";
 import { SignBsffAcceptationOnePackagingModalContent } from "./SignAcceptation";
 import { SignBsffOperationOnePackagingModalContent } from "./SignOperation";
-
-interface WorkflowPackagingActionProps {
-  bsff: Bsff;
-  packaging: BsffPackaging;
-}
-
-export function PackagingAction({
-  bsff,
-  packaging
-}: WorkflowPackagingActionProps) {
-  if (packaging.operation?.signature?.date) {
-    return null;
-  }
-  if (packaging.acceptation?.signature?.date) {
-    if (packaging.acceptation?.status === WasteAcceptationStatus.Refused) {
-      return null;
-    }
-    return <SignBsffPackagingOperation packaging={packaging} bsff={bsff} />;
-  }
-  return <SignBsffPackagingAcceptation packaging={packaging} bsff={bsff} />;
-}
+import Button from "@codegouvfr/react-dsfr/Button";
 
 interface SignBsffPackagingProps {
   bsff: Bsff;
@@ -39,12 +18,9 @@ export function SignBsffPackagingAcceptation({
 
   return (
     <>
-      <ActionButton
-        icon={<IconCheckCircle1 size="24px" />}
-        onClick={() => setIsOpen(true)}
-      >
-        Signer l'acceptation
-      </ActionButton>
+      <Button size="small" onClick={() => setIsOpen(true)}>
+        Accepter
+      </Button>
 
       {isOpen && (
         <Modal
@@ -74,12 +50,9 @@ export function SignBsffPackagingOperation({
 
   return (
     <>
-      <ActionButton
-        icon={<IconCheckCircle1 size="24px" />}
-        onClick={() => setIsOpen(true)}
-      >
-        Signer l'opération
-      </ActionButton>
+      <Button size="small" onClick={() => setIsOpen(true)}>
+        Valider le traitement
+      </Button>
 
       {isOpen && (
         <Modal

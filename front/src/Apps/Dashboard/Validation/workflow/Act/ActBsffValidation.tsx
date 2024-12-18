@@ -3,9 +3,8 @@ import { Bsff, BsffStatus } from "@td/codegen-ui";
 import { SignEmission } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignEmission";
 import { SignTransport } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignTransport";
 import { SignReception } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignReception";
-import { SignBsffAcceptationOnePackaging } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignAcceptation";
-import { SignPackagings } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignPackagings";
-import { SignBsffOperationOnePackaging } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignOperation";
+import { SignPackagings } from "../../../Signature/bsff/SignPackagings";
+import SignBsffPackagingModal from "../../../Signature/bsff/SignBsffPackagingModal";
 
 interface ActBsffValidationProps {
   bsd: Bsff;
@@ -48,9 +47,9 @@ const ActBsffValidation = ({
   const renderReceivedModal = () => {
     if (bsd.packagings?.length === 1) {
       return (
-        <SignBsffAcceptationOnePackaging
-          bsffId={bsd.id}
-          {...actionButtonAdapterProps}
+        <SignBsffPackagingModal
+          packagingId={bsd.packagings[0].id}
+          onClose={onClose}
         />
       );
     }
@@ -60,9 +59,9 @@ const ActBsffValidation = ({
   const renderAcceptedModal = () => {
     if (bsd.packagings?.length === 1) {
       return (
-        <SignBsffOperationOnePackaging
-          bsffId={bsd.id}
-          {...actionButtonAdapterProps}
+        <SignBsffPackagingModal
+          packagingId={bsd.packagings[0].id}
+          onClose={onClose}
         />
       );
     }
