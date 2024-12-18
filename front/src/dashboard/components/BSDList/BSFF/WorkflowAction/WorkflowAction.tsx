@@ -5,7 +5,6 @@ import { PublishBsff } from "./PublishBsff";
 import { SignEmission } from "./SignEmission";
 import { SignTransport } from "./SignTransport";
 import { SignReception } from "./SignReception";
-import { SignBsffOperationOnePackaging } from "../../../../../Apps/Dashboard/Signature/bsff/SignOperation";
 import { SignPackagings } from "../../../../../Apps/Dashboard/Signature/bsff/SignPackagings";
 import { useParams } from "react-router-dom";
 import { usePermissions } from "../../../../../common/contexts/PermissionsContext";
@@ -72,7 +71,12 @@ export function WorkflowAction(props: WorkflowActionProps) {
       if (!permissions.includes(UserPermission.BsdCanSignOperation))
         return null;
       if (form.packagings?.length === 1) {
-        return <SignBsffOperationOnePackaging bsffId={form.id} />;
+        return (
+          <SignBsffPackagingButton
+            packagingId={form.packagings[0].id}
+            btnLabel="Valider le traitement"
+          />
+        );
       }
       return <SignPackagings bsffId={form.id} />;
 
