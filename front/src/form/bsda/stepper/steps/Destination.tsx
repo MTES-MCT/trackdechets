@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "../../../common/components/company/CompanySelector";
 import { Bsda, BsdaStatus, BsdaType } from "@td/codegen-ui";
@@ -47,6 +47,15 @@ export function Destination({ disabled }) {
     values.destination?.operation?.nextDestination?.company
   );
   const isDechetterie = values?.type === BsdaType.Collection_2710;
+
+  useEffect(() => {
+    if (isDechetterie) {
+      const company = values?.emitter?.company;
+      setFieldValue("destination.company", {
+        ...company
+      });
+    }
+  }, [isDechetterie, setFieldValue, values?.emitter?.company]);
 
   const hasBroker = Boolean(values.broker);
   function onBrokerToggle() {
