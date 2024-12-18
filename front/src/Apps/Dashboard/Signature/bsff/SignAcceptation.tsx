@@ -18,22 +18,20 @@ import {
   Modal,
   RedErrorMessage,
   Switch
-} from "../../../../../common/components";
-import { Loader } from "../../../../../Apps/common/Components";
-import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
-import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
-import {
-  GET_BSFF_FORM,
-  SIGN_BSFF,
-  UPDATE_BSFF_PACKAGING
-} from "../../../../../Apps/common/queries/bsff/queries";
-import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
+} from "../../../../common/components";
+import { Loader } from "../../../common/Components";
+import { NotificationError } from "../../../common/Components/Error/Error";
+import DateInput from "../../../../form/common/components/custom-inputs/DateInput";
+import { GET_BSFF_FORM, SIGN_BSFF } from "../../../common/queries/bsff/queries";
+import NumberInput from "../../../../form/common/components/custom-inputs/NumberInput";
 import { BSFF_WASTES } from "@td/constants";
-import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { BsffSummary } from "./BsffSummary";
-import TdTooltip from "../../../../../common/components/Tooltip";
-import { BsffPackagingSummary } from "./BsffPackagingSummary";
+import { IconCheckCircle1 } from "../../../common/Components/Icons/Icons";
+import { BsffSummary } from "../../../../dashboard/components/BSDList/BSFF/WorkflowAction/BsffSummary";
+import TdTooltip from "../../../../common/components/Tooltip";
+import { BsffPackagingSummary } from "../../../../dashboard/components/BSDList/BSFF/WorkflowAction/BsffPackagingSummary";
 import { subMonths } from "date-fns";
+import Button from "@codegouvfr/react-dsfr/Button";
+import { UPDATE_BSFF_PACKAGING } from "./queries";
 
 const validationSchema = yup.object({
   numero: yup.string(),
@@ -95,12 +93,9 @@ export function SignBsffAcceptationOnePackaging({
     <>
       {displayActionButton && (
         <>
-          <ActionButton
-            icon={<IconCheckCircle1 size="24px" />}
-            onClick={() => setIsOpen(true)}
-          >
-            Signer l'acceptation
-          </ActionButton>
+          <Button size="small" onClick={() => setIsOpen(true)}>
+            Valider l'acceptation
+          </Button>
           {isOpen && (
             <SignBsffAcceptationOnePackagingModal
               bsffId={bsffId}

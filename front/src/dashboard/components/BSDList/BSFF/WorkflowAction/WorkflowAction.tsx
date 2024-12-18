@@ -5,12 +5,11 @@ import { PublishBsff } from "./PublishBsff";
 import { SignEmission } from "./SignEmission";
 import { SignTransport } from "./SignTransport";
 import { SignReception } from "./SignReception";
-import { SignBsffOperationOnePackaging } from "./SignOperation";
-import { SignBsffAcceptationOnePackaging } from "./SignAcceptation";
-import { SignPackagings } from "./SignPackagings";
-import { useParams, useMatch } from "react-router-dom";
-import routes from "../../../../../Apps/routes";
+import { SignBsffOperationOnePackaging } from "../../../../../Apps/Dashboard/Signature/bsff/SignOperation";
+import { SignPackagings } from "../../../../../Apps/Dashboard/Signature/bsff/SignPackagings";
+import { useParams } from "react-router-dom";
 import { usePermissions } from "../../../../../common/contexts/PermissionsContext";
+import SignBsffPackagingButton from "../../../../../Apps/Dashboard/Signature/bsff/SignBsffPackagingButton";
 
 export interface WorkflowActionProps {
   form: BsffFragment;
@@ -21,8 +20,6 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const { form } = props;
   const { permissions } = usePermissions();
 
-  const isActTab = !!useMatch(routes.dashboard.bsds.act);
-  const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
   const emitterSiret = form.bsffEmitter?.company?.siret;
   const transporterSiret = form.bsffTransporter?.company?.orgId;
   const destinationSiret = form.bsffDestination?.company?.siret;
@@ -37,15 +34,12 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
   switch (form.bsffStatus) {
     case BsffStatus.Initial:
-      if (siret !== emitterSiret || !isActTab) return null;
+      if (siret !== emitterSiret) return null;
       if (!permissions.includes(UserPermission.BsdCanSignEmission)) return null;
       return <SignEmission bsffId={form.id} />;
 
     case BsffStatus.SignedByEmitter:
       if (siret !== transporterSiret) {
-        if (!isToCollectTab) {
-          return null;
-        }
         return null;
       }
       if (!permissions.includes(UserPermission.BsdCanSignTransport))
@@ -53,19 +47,25 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return <SignTransport bsffId={form.id} />;
 
     case BsffStatus.Sent:
-      if (siret !== destinationSiret || !isActTab) return null;
+      if (siret !== destinationSiret) return null;
       if (!permissions.includes(UserPermission.BsdCanSignAcceptation))
         return null;
       return <SignReception bsffId={form.id} />;
 
-    case BsffStatus.Received:
-      if (siret !== destinationSiret || !isActTab) return null;
+    case BsffStatus.Received: {
+      if (siret !== destinationSiret) return null;
       if (!permissions.includes(UserPermission.BsdCanSignOperation))
         return null;
       if (form.packagings?.length === 1) {
-        return <SignBsffAcceptationOnePackaging bsffId={form.id} />;
+        return (
+          <SignBsffPackagingButton
+            packagingId={form.packagings[0].id}
+            btnLabel="Valider l'acceptation"
+          />
+        );
       }
       return <SignPackagings bsffId={form.id} />;
+    }
 
     case BsffStatus.Accepted:
       if (siret !== destinationSiret) return null;

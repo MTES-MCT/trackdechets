@@ -64,6 +64,7 @@ export const dashboardBsffFragment = gql`
       description
     }
     packagings {
+      id
       numero
       operation {
         code

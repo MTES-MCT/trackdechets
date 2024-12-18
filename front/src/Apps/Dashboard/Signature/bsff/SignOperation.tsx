@@ -20,23 +20,21 @@ import {
   ActionButton,
   Modal,
   RedErrorMessage
-} from "../../../../../common/components";
-import { Loader } from "../../../../../Apps/common/Components";
-import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
-import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
-import {
-  GET_BSFF_FORM,
-  SIGN_BSFF,
-  UPDATE_BSFF_PACKAGING
-} from "../../../../../Apps/common/queries/bsff/queries";
-import { IconCheckCircle1 } from "../../../../../Apps/common/Components/Icons/Icons";
-import { BsffSummary } from "./BsffSummary";
-import { BsffPackagingSummary } from "./BsffPackagingSummary";
-import { OPERATION } from "../../../../../form/bsff/utils/constants";
-import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
-import { companySchema } from "../../../../../common/validation/schema";
+} from "../../../../common/components";
+import { Loader } from "../../../common/Components";
+import { NotificationError } from "../../../common/Components/Error/Error";
+import DateInput from "../../../../form/common/components/custom-inputs/DateInput";
+import { GET_BSFF_FORM, SIGN_BSFF } from "../../../common/queries/bsff/queries";
+import { IconCheckCircle1 } from "../../../common/Components/Icons/Icons";
+import { BsffSummary } from "../../../../dashboard/components/BSDList/BSFF/WorkflowAction/BsffSummary";
+import { BsffPackagingSummary } from "../../../../dashboard/components/BSDList/BSFF/WorkflowAction/BsffPackagingSummary";
+import { OPERATION } from "../../../../form/bsff/utils/constants";
+import CompanySelector from "../../../../form/common/components/company/CompanySelector";
+import { companySchema } from "../../../../common/validation/schema";
 import { subMonths } from "date-fns";
-import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
+import OperationModeSelect from "../../../../common/components/OperationModeSelect";
+import Button from "@codegouvfr/react-dsfr/Button";
+import { UPDATE_BSFF_PACKAGING } from "./queries";
 
 const operationCode = yup
   .string()
@@ -100,12 +98,9 @@ export function SignBsffOperationOnePackaging({
     <>
       {displayActionButton && (
         <>
-          <ActionButton
-            icon={<IconCheckCircle1 size="24px" />}
-            onClick={() => setIsOpen(true)}
-          >
-            Signer l'opération
-          </ActionButton>
+          <Button size="small" onClick={() => setIsOpen(true)}>
+            Valider le traitement
+          </Button>
           {isOpen && (
             <SignBsffOperationOnePackagingModal
               bsffId={bsffId}
