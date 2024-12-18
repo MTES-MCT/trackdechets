@@ -152,7 +152,7 @@ const WasteBsvhu = ({
             {...register("packaging")}
           />
           <label className="fr-label" htmlFor="fr-fieldset-radio-lot">
-            En lots
+            En lots (identification par numéro de lot)
           </label>
         </div>
       </fieldset>
