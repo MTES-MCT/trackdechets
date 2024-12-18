@@ -60,7 +60,7 @@ export default {
   wasteCode: "16 01 06",
   identification: {
     numbers: [],
-    type: "NUMERO_ORDRE_REGISTRE_POLICE"
+    type: null
   },
   quantity: null,
   weight: {
