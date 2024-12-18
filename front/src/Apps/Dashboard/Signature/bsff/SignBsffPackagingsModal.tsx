@@ -2,7 +2,6 @@ import React from "react";
 import { Loader } from "../../../common/Components";
 import { useQuery } from "@apollo/client";
 import {
-  Bsff,
   BsffPackaging,
   BsffPackagingType,
   Query,
@@ -19,10 +18,6 @@ import {
 } from "../../../../common/components";
 import Table from "@codegouvfr/react-dsfr/Table";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import {
-  SignBsffPackagingAcceptation,
-  SignBsffPackagingOperation
-} from "./PackagingAction";
 import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 import Badge from "../../Components/Badge/Badge";
 import { BsdStatusCode, TBsdStatusCode } from "../../../common/types/bsdTypes";

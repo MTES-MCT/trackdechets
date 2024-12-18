@@ -40,6 +40,7 @@ import RhfOperationModeSelect from "../../../common/Components/OperationModeSele
 import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
+import { subMonths } from "date-fns";
 
 type SignBsffPackagingFormProps = {
   packaging: BsffPackaging & { bsff?: Bsff };
@@ -147,12 +148,14 @@ function SignBsffPackagingForm({
   );
 
   const signatureType = useMemo(() => getSignatureType(packaging), [packaging]);
+
   const actionBtnLabel = useMemo(() => {
     if (!!signatureType) {
-      return "Signer";
+      return loading ? "Signature en cours" : "Signer";
+    } else {
+      return loading ? "Correction en cours" : "Corriger";
     }
-    return "Corriger";
-  }, [signatureType]);
+  }, [signatureType, loading]);
 
   const methods = useForm<FormValues>({
     defaultValues
@@ -182,6 +185,16 @@ function SignBsffPackagingForm({
       trigger("acceptation.refusalReason");
     }
   }, [wasteAcceptationStatus, trigger, isSubmitted]);
+
+  const actionDescription = useMemo(() => {
+    if (signatureType === BsffSignatureType.Acceptation) {
+      return isAccepted ? "accepter" : "refuser";
+    }
+    if (signatureType === BsffSignatureType.Operation) {
+      return "avoir traité";
+    }
+    return "";
+  }, [signatureType, isAccepted]);
 
   const acceptationWeight = watch("acceptation.weight");
 
@@ -253,7 +266,9 @@ function SignBsffPackagingForm({
       ? "Date de l'acceptation"
       : "Date du refus";
 
-  const maxDate = datetimeToYYYYMMDD(new Date());
+  const today = new Date();
+  const maxDate = datetimeToYYYYMMDD(today);
+  const minDate = datetimeToYYYYMMDD(subMonths(today, 2));
 
   return (
     <FormProvider {...methods}>
@@ -361,6 +376,7 @@ function SignBsffPackagingForm({
                   label={acceptationDateLabel}
                   nativeInputProps={{
                     max: maxDate,
+                    min: minDate,
                     type: "date",
                     ...register("acceptation.date", {
                       required: "Champ requis"
@@ -422,6 +438,7 @@ function SignBsffPackagingForm({
                     label="Date du traitement"
                     nativeInputProps={{
                       max: maxDate,
+                      min: minDate,
                       type: "date",
                       ...register("operation.date", {
                         required: "Champ requis"
@@ -569,11 +586,7 @@ function SignBsffPackagingForm({
             <div className="fr-mb-2w">
               En qualité de <b>destinataire du déchet</b>, j'atteste que les
               informations renseignées ci-dessus sont correctes. En signant ce
-              document, je déclare{" "}
-              {signatureType === BsffSignatureType.Acceptation
-                ? "accpter "
-                : "avoir traité "}
-              le contenant.
+              document, je déclare {actionDescription} le contenant.
             </div>
             <div className="fr-grid-row fr-grid-row--gutters">
               <div className="fr-col-12 fr-col-md-6">
