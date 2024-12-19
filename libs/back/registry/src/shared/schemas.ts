@@ -465,20 +465,18 @@ export const transportRecepisseNumberSchema = z
     "Le numéro de récépissé de transport ne peut pas dépasser 50 caractères"
   );
 
-  export const isUpcycledSchema = z.union(
-    [
-      z
-        .enum(["OUI", "NON"], {
-          required_error:
-            "Le champ terre valorisée est requis",
-          invalid_type_error:
-            "Le champ terre valorisée n'est pas valide. Valeurs possibles: OUI, NON"
-        })
-        .transform(val => val === "OUI"),
-      z.boolean()
-    ],
-    {
-      invalid_type_error:
-        "Le champ terre valorisée saisi n'est pas valide"
-    }
-  );
+export const isUpcycledSchema = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error: "Le champ terre valorisée est requis",
+        invalid_type_error:
+          "Le champ terre valorisée n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  {
+    invalid_type_error: "Le champ terre valorisée saisi n'est pas valide"
+  }
+);
