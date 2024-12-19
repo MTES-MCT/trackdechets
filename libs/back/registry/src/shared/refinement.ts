@@ -115,6 +115,7 @@ export function refineActorOrgId<T>({
               "Le numéro d'identification du destinataire doit contenir le nom et prénom pour une personne physique"
           });
         }
+        break;
       }
       case "COMMUNE":
         break;
