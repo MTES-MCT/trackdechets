@@ -5,6 +5,14 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.01.1] 14/01/2025
+
+#### :nail_care: Améliorations
+
+- Permettre d'ajouter un intermédiaire sur le VHU jusqu'au traitement du bordereau [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
+
+- Retirer la possibilité de publier un BSVHU si l'émetteur visé n'est pas inscrit sur Trackdéchets et qu'il n'est pas une situation irrégulière [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
+
 # [2024.12.1] 17/12/2024
 
 #### :rocket: Nouvelles fonctionnalités
