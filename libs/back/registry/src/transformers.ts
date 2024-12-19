@@ -4,21 +4,27 @@ import duplexify from "duplexify";
 import * as Excel from "exceljs";
 import { PassThrough, Readable } from "node:stream";
 
-import { CSV_DELIMITER, ImportOptions } from "./options";
+import { CSV_DELIMITER, ERROR_HEADER, ImportOptions } from "./options";
 
 export function getTransformCsvStream(options: ImportOptions) {
   const parseStream = parse({
     headers: rawHeaders => {
-      const headerLabels = Object.values(options.headers);
-      const headerKeys = Object.keys(options.headers);
-      return rawHeaders.map((header, index) => {
-        if (header !== headerLabels[index]) {
+      const reverseHeadersMap = new Map(
+        Object.entries(options.headers).map(([key, value]) => [value, key])
+      );
+
+      return rawHeaders.map(header => {
+        if (!header || header === ERROR_HEADER) {
+          return undefined; // Return undefined to indicate that the header is ignored
+        }
+        if (!reverseHeadersMap.has(header)) {
           return header; // Return the original header. The "headers" event handler will detect the error.
         }
-        return headerKeys[index];
+        return reverseHeadersMap.get(header);
       });
     },
     renameHeaders: true,
+    ignoreEmpty: true,
     delimiter: CSV_DELIMITER,
     trim: true
   })
@@ -34,18 +40,18 @@ export function getTransformCsvStream(options: ImportOptions) {
       return { rawLine, result };
     })
     .on("headers", headers => {
-      const expectedHeaders = Object.keys(options.headers);
+      const expectedHeadersKeys = new Set(Object.keys(options.headers));
 
       const errors: string[] = [];
+      const headerEntries = headers.filter(v => v !== undefined).entries();
 
-      for (const [idx, header] of headers.entries()) {
-        if (header === expectedHeaders[idx]) {
+      for (const [idx, headerKey] of headerEntries) {
+        if (expectedHeadersKeys.has(headerKey)) {
           continue;
         }
+
         errors.push(
-          `Colonne numéro ${idx + 1} - attendu "${
-            options.headers[expectedHeaders[idx]]
-          }", reçu "${header}"`
+          `Colonne numéro ${idx + 1} - colonne "${headerKey}" inconnue`
         );
       }
 
@@ -116,11 +122,19 @@ export function getTransformXlsxStream(options: ImportOptions) {
           continue;
         }
 
+        let isEmptyLine = true;
         const rawLine = {};
         const keys = Object.keys(options.headers);
         for (const [index, key] of keys.entries()) {
           const { value } = row.getCell(index + 1);
-          rawLine[key] = value === null ? undefined : value;
+          rawLine[key] = value;
+          if (value) {
+            isEmptyLine = false;
+          }
+        }
+
+        if (isEmptyLine) {
+          continue;
         }
 
         const result = await options.safeParseAsync(rawLine);

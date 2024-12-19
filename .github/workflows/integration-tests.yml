@@ -126,6 +126,7 @@ env:
   S3_REGISTRY_ERRORS_BUCKET: registry-errors-integration
   S3_REGISTRY_IMPORTS_BUCKET: registry-imports-integration
   S3_REGISTRY_EXPORTS_BUCKET: registry-exports-integration
+  S3_REGISTRY_MODELS_BUCKET: registry-models-integration
   VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER: 2024-10-30T00:00:00.000Z
   OVERRIDE_V20241201: 2024-10-30T00:00:00.000Z
    
