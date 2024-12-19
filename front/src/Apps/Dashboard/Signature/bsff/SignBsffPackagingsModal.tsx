@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Loader } from "../../../common/Components";
 import { useQuery } from "@apollo/client";
 import {
@@ -8,7 +8,6 @@ import {
   QueryBsffArgs,
   WasteAcceptationStatus
 } from "@td/codegen-ui";
-import { GET_BSFF_FORM } from "../../../common/queries/bsff/queries";
 import {
   DsfrDataList,
   DsfrDataListDescription,
@@ -22,6 +21,9 @@ import { getOperationModesFromOperationCode } from "../../../common/operationMod
 import Badge from "../../Components/Badge/Badge";
 import { BsdStatusCode, TBsdStatusCode } from "../../../common/types/bsdTypes";
 import SignBsffPackagingButton from "./SignBsffPackagingButton";
+import { GET_BSFF } from "./queries";
+import { pluralize } from "@td/constants";
+import { differenceInDays } from "date-fns";
 
 interface SignPackagingsModalProps {
   bsffId: string;
@@ -31,14 +33,15 @@ interface SignPackagingsModalProps {
 function getSignBtnLabel(packaging: BsffPackaging): string | null {
   if (!!packaging.operation?.signature?.date) {
     // Calcule le nombre de jours depuis la signature du traitement
-    const daysOld =
-      (new Date().getTime() -
-        new Date(packaging.operation.signature.date).getTime()) /
-      (1000 * 3600 * 24);
+    const daysOld = differenceInDays(
+      new Date(),
+      new Date(packaging.operation.signature.date)
+    );
 
-    if (daysOld <= 60) {
-      // La correction n'est autorisée pendant un maximum de 60 jours
-      // après la signature de traitement du contenant
+    if (daysOld <= 60 && !packaging.nextBsff) {
+      // La correction est autorisée pendant un maximum de 60 jours
+      // après la signature de traitement du contenant et tant que le
+      // contenant n'a pas été groupé / réexpédié / reconditionné
       return "Corriger";
     }
     return null;
@@ -110,13 +113,73 @@ export function SignBsffPackagingsModal({
   onClose
 }: SignPackagingsModalProps) {
   const { data, loading, error } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(
-    GET_BSFF_FORM,
+    GET_BSFF,
     {
       variables: {
         id: bsffId
       }
     }
   );
+
+  const packagingsWithStatus = useMemo(
+    () =>
+      (data?.bsff?.packagings ?? []).map(p => ({
+        ...p,
+        status: packagingStatus(p) as TBsdStatusCode
+      })),
+    [data]
+  );
+
+  const packagingsRecap = useMemo(() => {
+    if (!packagingStatus.length) {
+      return "";
+    }
+    const received = packagingsWithStatus.length;
+    const accepted = packagingsWithStatus.filter(
+      p => p.status === BsdStatusCode.Accepted
+    ).length;
+    const refused = packagingsWithStatus.filter(
+      p => p.status === BsdStatusCode.Refused
+    ).length;
+    const processed = packagingsWithStatus.filter(
+      p => p.status === BsdStatusCode.Processed
+    ).length;
+    const intermediatelyProcessed = packagingsWithStatus.filter(
+      p => p.status === BsdStatusCode.IntermediatelyProcessed
+    ).length;
+    const grouped = packagingsWithStatus.filter(
+      p => p.status === BsdStatusCode.Grouped
+    ).length;
+
+    const recapItems = [
+      {
+        count: accepted,
+        text: `${accepted} ${pluralize("accepté", accepted)}`
+      },
+      { count: refused, text: `${refused} ${pluralize("refusé", refused)}` },
+      {
+        count: processed,
+        text: `${processed} ${pluralize("traité", processed)}`
+      },
+      {
+        count: intermediatelyProcessed,
+        text: `${intermediatelyProcessed} ${pluralize(
+          "en attente de traitement",
+          intermediatelyProcessed
+        )}`
+      },
+      { count: grouped, text: `${grouped} annexé à un bordereau suite` }
+    ]
+      .filter(({ count }) => count > 0)
+      .map(({ text }) => text);
+
+    return (
+      `${received} ${pluralize("contenant", received)} ${pluralize(
+        "réceptionné",
+        received
+      )} dont ` + recapItems.join(" - ")
+    );
+  }, [packagingsWithStatus]);
 
   if (loading) {
     return <Loader />;
@@ -147,7 +210,7 @@ export function SignBsffPackagingsModal({
       ""
     ];
 
-    const tableData = bsff.packagings.map(p => {
+    const tableData = packagingsWithStatus.map(p => {
       // poids accepté ou à défaut poids renseigné au départ
       const weight = p.acceptation?.weight ?? p.weight;
       const weightWithUnit = weight ? `${weight} kg` : "";
@@ -164,8 +227,8 @@ export function SignBsffPackagingsModal({
         weightWithUnit,
         wasteCode,
         wasteDescription,
-        p.operation?.code ?? "",
-        <Badge status={packagingStatus(p)} />,
+        p.operation?.code ?? "-",
+        <Badge status={p.status} />,
         signBtnLabel && (
           <SignBsffPackagingButton
             packagingId={p.id}
@@ -214,6 +277,7 @@ export function SignBsffPackagingsModal({
           headers={headers}
           data={tableData}
         ></Table>
+        <div>{packagingsRecap}</div>
       </Modal>
     );
   }

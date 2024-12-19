@@ -4,6 +4,7 @@ const bsffPackagingFragment = gql`
   fragment BsffPackagingFragment on BsffPackaging {
     id
     bsffId
+    type
     numero
     weight
     acceptation {
@@ -40,7 +41,31 @@ const bsffPackagingFragment = gql`
         description
       }
     }
+    nextBsff {
+      id
+    }
   }
+`;
+
+export const GET_BSFF = gql`
+  query Bsff($id: ID!) {
+    bsff(id: $id) {
+      id
+      status
+      waste {
+        code
+        description
+      }
+      weight {
+        value
+        isEstimate
+      }
+      packagings {
+        ...BsffPackagingFragment
+      }
+    }
+  }
+  ${bsffPackagingFragment}
 `;
 
 export const GET_BSFF_PACKAGING = gql`
