@@ -157,6 +157,8 @@ describe("Schemas", () => {
   test("transportRecepisseNumberSchema", () => {
     expect(transportRecepisseNumberSchema.parse("12345")).toBe("12345");
     expect(() => transportRecepisseNumberSchema.parse("1234")).toThrow();
-    expect(() => transportRecepisseNumberSchema.parse("a".repeat(51))).toThrow();
+    expect(() =>
+      transportRecepisseNumberSchema.parse("a".repeat(51))
+    ).toThrow();
   });
 });

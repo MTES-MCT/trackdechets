@@ -7,7 +7,9 @@ import { refineActorOrgId } from "../../shared/refinement";
 export const refineWeighingHour: Refinement<
   ParsedZodIncomingWasteItem
 > = async (incomingWasteItem, { addIssue }) => {
-  const company = await getCachedCompany(incomingWasteItem.reportForCompanySiret);
+  const company = await getCachedCompany(
+    incomingWasteItem.reportForCompanySiret
+  );
 
   const isIncineration = company?.wasteProcessorTypes.some(
     type =>
@@ -35,10 +37,11 @@ export const refineWeighingHour: Refinement<
   }
 };
 
-export const initialEmitterRefinement = refineActorOrgId<ParsedZodIncomingWasteItem>({
-  typeKey: "initialEmitterCompanyType",
-  orgIdKey: "initialEmitterCompanyOrgId"
-});
+export const initialEmitterRefinement =
+  refineActorOrgId<ParsedZodIncomingWasteItem>({
+    typeKey: "initialEmitterCompanyType",
+    orgIdKey: "initialEmitterCompanyOrgId"
+  });
 
 export const emitterRefinement = refineActorOrgId<ParsedZodIncomingWasteItem>({
   typeKey: "emitterCompanyType",
