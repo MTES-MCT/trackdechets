@@ -34,7 +34,7 @@ const getCorrectLine = (siret: string) => {
     volume: 1.2,
     processingDate: "2024-01-01",
     processingEndDate: "",
-    destinationCompanyType: "ENTREPRISE_FR",
+    destinationCompanyType: "ETABLISSEMENT_FR",
     destinationCompanyOrgId: "78467169500103",
     destinationCompanyName: "Nom destination",
     destinationCompanyAddress: "Adresse destination",
