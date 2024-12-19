@@ -334,6 +334,7 @@ model Company {
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
   id                String  @id @default(cuid())
+  createdAt         DateTime @default(now())
   orgId             String  @unique(map: "AnonymousCompany.orgId_unique")
   siret             String? @unique(map: "AnonymousCompany.siret_unique")
   vatNumber         String? @unique(map: "AnonymousCompany.vatnumber_unique")
