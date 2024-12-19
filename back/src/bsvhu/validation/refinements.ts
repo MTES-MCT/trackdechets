@@ -21,7 +21,7 @@ import {
   isBrokerRefinement,
   isDestinationRefinement,
   isEcoOrganismeRefinement,
-  isEmitterNotDormantRefinement,
+  isEmitterRefinement,
   isRegisteredVatNumberRefinement,
   isTraderRefinement,
   isTransporterRefinement
@@ -43,7 +43,12 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
   bsvhu,
   zodContext
 ) => {
-  await isEmitterNotDormantRefinement(bsvhu.emitterCompanySiret, zodContext);
+  await isEmitterRefinement(
+    bsvhu.emitterCompanySiret,
+    BsdType.BSVHU,
+    zodContext,
+    !!bsvhu.emitterIrregularSituation
+  );
   await isDestinationRefinement(
     bsvhu.destinationCompanySiret,
     zodContext,

@@ -6,6 +6,58 @@ import styles from "./WorkSiteAddress.module.scss";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { API_MIN_CHARS } from "../../constants";
 
+export type GeoJsonProperties = {
+  label: string;
+  score: number;
+  housenumber: string;
+  id: string;
+  type: string;
+  name: string;
+  postcode: string;
+  citycode: string;
+  x: number;
+  y: number;
+  city: string;
+  context: string;
+  importance: number;
+  street: string;
+};
+
+type Feature = {
+  type: "Feature";
+  properties: GeoJsonProperties;
+};
+
+type State = {
+  selectedAdress: string;
+  searchInput: string;
+  searchResults: Array<Feature>;
+  address: string | null | undefined;
+  postalCode: string | null | undefined;
+  city: string | null | undefined;
+};
+
+type Action =
+  | {
+      type: "search_input";
+      payload: string;
+    }
+  | {
+      type: "search_done";
+      payload: Array<Feature>;
+    }
+  | {
+      type: "set_fields";
+      payload: {
+        address: string | null | undefined;
+        postalCode: string | null | undefined;
+        city: string | null | undefined;
+      };
+    }
+  | {
+      type: "select_address";
+      payload: string;
+    };
 function init({ address, city, postalCode }) {
   const selectedAdress = [address, postalCode, city].filter(Boolean).join(" ");
   return {
@@ -18,7 +70,7 @@ function init({ address, city, postalCode }) {
   };
 }
 
-function reducer(state, action) {
+function reducer(state: State, action: Action) {
   switch (action.type) {
     case "search_input":
       return { ...state, searchInput: action.payload ?? [] };
@@ -46,6 +98,19 @@ export default function DsfrfWorkSiteAddress({
   designation,
   disabled = false,
   placeholder = "Recherchez une adresse puis sélectionnez un des choix qui apparait..."
+}: {
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  designation?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  onAddressSelection: (selectedAddress: {
+    name: string | null | undefined;
+    city: string | null | undefined;
+    postcode: string | null | undefined;
+    label: string;
+  }) => void;
 }) {
   const [state, dispatch] = useReducer(
     reducer,
@@ -85,7 +150,11 @@ export default function DsfrfWorkSiteAddress({
       payload: feature.properties.label
     });
   }
-  function setManualAddress(payload) {
+  function setManualAddress(payload: {
+    address: string | null | undefined;
+    city: string | null | undefined;
+    postalCode: string | null | undefined;
+  }) {
     const { city, address, postalCode } = payload;
 
     dispatch({
@@ -95,6 +164,9 @@ export default function DsfrfWorkSiteAddress({
 
     // beware postCode/postalCode & name/address (former fields returned by address api)
     onAddressSelection({
+      label: [address ?? "", postalCode ?? "", city ?? ""]
+        .filter(Boolean)
+        .join(" "),
       city: city,
       name: address,
       postcode: postalCode
