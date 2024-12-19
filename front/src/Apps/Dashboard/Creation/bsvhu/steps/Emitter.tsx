@@ -285,13 +285,15 @@ const EmitterBsvhu = ({ errors }) => {
           key={orgId}
         />
       </div>
-      <div className="fr-col-md-8">
-        <Input
-          label="Numéro d'agrément démolisseur"
-          disabled={sealedFields.includes(`emitter.agrementNumber`)}
-          nativeInputProps={{ ...register("emitter.agrementNumber") }}
-        />
-      </div>
+      {!emitter.irregularSituation && (
+        <div className="fr-col-md-8">
+          <Input
+            label="Numéro d'agrément démolisseur"
+            disabled={sealedFields.includes(`emitter.agrementNumber`)}
+            nativeInputProps={{ ...register("emitter.agrementNumber") }}
+          />
+        </div>
+      )}
     </>
   );
 };
