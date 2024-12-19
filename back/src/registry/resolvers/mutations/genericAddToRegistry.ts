@@ -10,8 +10,8 @@ const LINES_LIMIT = 1_000;
 type UnparsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | "EDIT" | "CANCEL" | null;
   publicId: string;
-  reportForSiret: string;
-  reportAsSiret?: string | null;
+  reportForCompanySiret: string;
+  reportAsCompanySiret?: string | null;
 };
 
 export async function genericAddToRegistry<T extends UnparsedLine>(

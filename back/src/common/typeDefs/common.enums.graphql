@@ -19,6 +19,8 @@ enum OperationMode {
   VALORISATION_ENERGETIQUE
   "Incinération sans valorisation énergétique ou stockage en décharge"
   ELIMINATION
+  "Aucun mode renseigné. Cas particulier pour des données importées"
+  UNKNOWN
 }
 
 enum BsdType {
