@@ -30,7 +30,8 @@ import {
   municipalitiesNamesSchema,
   nextDestinationIsAbroad,
   noTraceability,
-  operationModeSchema
+  operationModeSchema,
+  transportRecepisseIsExemptedSchema
 } from "../../shared/schemas";
 import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
 
@@ -41,7 +42,6 @@ export type ParsedZodIncomingWasteItem = z.output<typeof incomingWasteSchema>;
 
 const inputIncomingWasteSchema = z.object({
   reason: reasonSchema,
-  custominfo: z.string().nullish(),
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: getReportForSiretSchema("du destinataire"),
@@ -80,6 +80,7 @@ const inputIncomingWasteSchema = z.object({
   emitterCompanyPostalCode: getActorPostalCodeSchema("d'expéditeur"),
   emitterCompanyCity: getActorCitySchema("d'expéditeur"),
   emitterCompanyCountryCode: getActorCountryCodeSchema("d'expéditeur"),
+  emitterPickupSiteName: z.string().nullish(),
   emitterPickupSiteAddress: getActorAddressSchema(
     "de prise en charge de l'expéditeur"
   ).nullish(),
@@ -94,7 +95,7 @@ const inputIncomingWasteSchema = z.object({
   ).nullish(),
   brokerCompanySiret: getActorSiretSchema("du courtier").nullish(),
   brokerCompanyName: getActorNameSchema("du courtier").nullish(),
-  brokerCompanyRecepisseNumber: z
+  brokerRecepisseNumber: z
     .string()
     .max(
       150,
@@ -103,7 +104,7 @@ const inputIncomingWasteSchema = z.object({
     .nullish(),
   traderCompanySiret: getActorSiretSchema("du négociant").nullish(),
   traderCompanyName: getActorNameSchema("du négociant").nullish(),
-  traderCompanyRecepisseNumber: z
+  traderRecepisseNumber: z
     .string()
     .max(
       150,
@@ -127,6 +128,7 @@ const inputIncomingWasteSchema = z.object({
   transporter1TransportMode: transportModeSchema,
   transporter1CompanyType: getActorTypeSchema("de transporteur 1"),
   transporter1CompanyOrgId: getActorOrgIdSchema("du transporteur 1"),
+  transporter1RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter1RecepisseNumber: transportRecepisseNumberSchema,
   transporter1CompanyName: getActorNameSchema("du transporteur 1"),
   transporter1CompanyAddress: getActorAddressSchema("du transporteur 1"),
@@ -137,6 +139,7 @@ const inputIncomingWasteSchema = z.object({
   transporter2TransportMode: transportModeSchema.nullish(),
   transporter2CompanyType: getActorTypeSchema("de transporteur 2").nullish(),
   transporter2CompanyOrgId: getActorOrgIdSchema("du transporteur 2").nullish(),
+  transporter2RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter2RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter2CompanyName: getActorNameSchema("du transporteur 2").nullish(),
   transporter2CompanyAddress:
@@ -149,6 +152,7 @@ const inputIncomingWasteSchema = z.object({
   transporter3TransportMode: transportModeSchema.nullish(),
   transporter3CompanyType: getActorTypeSchema("de transporteur 3").nullish(),
   transporter3CompanyOrgId: getActorOrgIdSchema("du transporteur 3").nullish(),
+  transporter3RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter3RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter3CompanyName: getActorNameSchema("du transporteur 3").nullish(),
   transporter3CompanyAddress:
@@ -161,6 +165,7 @@ const inputIncomingWasteSchema = z.object({
   transporter4TransportMode: transportModeSchema.nullish(),
   transporter4CompanyType: getActorTypeSchema("de transporteur 4").nullish(),
   transporter4CompanyOrgId: getActorOrgIdSchema("du transporteur 4").nullish(),
+  transporter4RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter4RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter4CompanyName: getActorNameSchema("du transporteur 4").nullish(),
   transporter4CompanyAddress:
@@ -173,6 +178,7 @@ const inputIncomingWasteSchema = z.object({
   transporter5TransportMode: transportModeSchema.nullish(),
   transporter5CompanyType: getActorTypeSchema("de transporteur 5").nullish(),
   transporter5CompanyOrgId: getActorOrgIdSchema("du transporteur 5").nullish(),
+  transporter5RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter5RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter5CompanyName: getActorNameSchema("du transporteur 5").nullish(),
   transporter5CompanyAddress:

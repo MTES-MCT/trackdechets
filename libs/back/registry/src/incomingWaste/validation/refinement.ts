@@ -50,30 +50,30 @@ export const emitterRefinement = refineActorOrgId<ParsedZodIncomingWasteItem>({
 
 export const transporter1Refinement =
   refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter1Type",
-    orgIdKey: "transporter1OrgId"
+    typeKey: "transporter1CompanyType",
+    orgIdKey: "transporter1CompanyOrgId"
   });
 
 export const transporter2Refinement =
   refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter2Type",
-    orgIdKey: "transporter2OrgId"
+    typeKey: "transporter2CompanyType",
+    orgIdKey: "transporter2CompanyOrgId"
   });
 
 export const transporter3Refinement =
   refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter3Type",
-    orgIdKey: "transporter3OrgId"
+    typeKey: "transporter3CompanyType",
+    orgIdKey: "transporter3CompanyOrgId"
   });
 
 export const transporter4Refinement =
   refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter4Type",
-    orgIdKey: "transporter4OrgId"
+    typeKey: "transporter4CompanyType",
+    orgIdKey: "transporter4CompanyOrgId"
   });
 
 export const transporter5Refinement =
   refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter5Type",
-    orgIdKey: "transporter5OrgId"
+    typeKey: "transporter5CompanyType",
+    orgIdKey: "transporter5CompanyOrgId"
   });

@@ -14,79 +14,80 @@ DROP INDEX "_RegistryIncomingWastePublicIdReportForSiretIdx";
 DROP INDEX "_RegistrySsdPublicIdReportForSiretIdx";
 
 -- AlterTable
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "brokerName" TO "brokerCompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "brokerReceiptNumber" TO "brokerRecepisseNumber";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "brokerSiret" TO "brokerCompanySiret";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "municipalitiesInseeCodes" TO "initialEmitterMunicipalitiesInseeCodes";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "municipalitiesNames" TO "initialEmitterMunicipalitiesNames";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "producerAddress" TO "initialEmitterCompanyAddress";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "producerCity" TO "initialEmitterCompanyCity";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "producerCountryCode" TO "initialEmitterCompanyCountryCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "producerName" TO "initialEmitterCompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "producerOrgId" TO "initialEmitterCompanyOrgId";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "producerPostalCode" TO "initialEmitterCompanyPostalCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "producerType" TO "initialEmitterCompanyType";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "reportAsSiret" TO "reportAsCompanySiret";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "reportForAddress" TO "reportForCompanyAddress";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "reportForCity" TO "reportForCompanyCity";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "reportForName" TO "reportForCompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "reportForPostalCode" TO "reportForCompanyPostalCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "reportForSiret" TO "reportForCompanySiret";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderAddress" TO "emitterCompanyAddress";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderCity" TO "emitterCompanyCity";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderCountryCode" TO "emitterCompanyCountryCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderName" TO "emitterCompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderOrgId" TO "emitterCompanyOrgId";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderPostalCode" TO "emitterCompanyPostalCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderTakeOverAddress" TO "emitterPickupSiteAddress";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderTakeOverCity" TO "emitterPickupSiteCity";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderTakeOverCountryCode" TO "emitterPickupSiteCountryCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderTakeOverPostalCode" TO "emitterPickupSitePostalCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "senderType" TO "emitterCompanyType";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "traderName" TO "traderCompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "traderReceiptNumber" TO "traderRecepisseNumber";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "traderSiret" TO "traderCompanySiret";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter1Address" TO "transporter1CompanyAddress";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter1City" TO "transporter1CompanyCity";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter1CountryCode" TO "transporter1CompanyCountryCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter1Name" TO "transporter1CompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter1OrgId" TO "transporter1CompanyOrgId";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter1PostalCode" TO "transporter1CompanyPostalCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter1ReceiptNumber" TO "transporter1RecepisseNumber";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter1Type" TO "transporter1CompanyType";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter2Address" TO "transporter2CompanyAddress";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter2City" TO "transporter2CompanyCity";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter2CountryCode" TO "transporter2CompanyCountryCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter2Name" TO "transporter2CompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter2OrgId" TO "transporter2CompanyOrgId";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter2PostalCode" TO "transporter2CompanyPostalCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter2ReceiptNumber" TO "transporter2RecepisseNumber";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter2Type" TO "transporter2CompanyType";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter3Address" TO "transporter3CompanyAddress";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter3City" TO "transporter3CompanyCity";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter3CountryCode" TO "transporter3CompanyCountryCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter3Name" TO "transporter3CompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter3OrgId" TO "transporter3CompanyOrgId";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter3PostalCode" TO "transporter3CompanyPostalCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter3ReceiptNumber" TO "transporter3RecepisseNumber";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter3Type" TO "transporter3CompanyType";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter4Address" TO "transporter4CompanyAddress";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter4City" TO "transporter4CompanyCity";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter4CountryCode" TO "transporter4CompanyCountryCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter4Name" TO "transporter4CompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter4OrgId" TO "transporter4CompanyOrgId";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter4PostalCode" TO "transporter4CompanyPostalCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter4ReceiptNumber" TO "transporter4RecepisseNumber";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter4Type" TO "transporter4CompanyType";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter5Address" TO "transporter5CompanyAddress";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter5City" TO "transporter5CompanyCity";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter5CountryCode" TO "transporter5CompanyCountryCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter5Name" TO "transporter5CompanyName";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter5OrgId" TO "transporter5CompanyOrgId";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter5PostalCode" TO "transporter5CompanyPostalCode";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter5ReceiptNumber" TO "transporter5RecepisseNumber";
+ALTER TABLE "RegistryIncomingWaste" RENAME COLUMN "transporter5Type" TO "transporter5CompanyType";
+
 ALTER TABLE "RegistryIncomingWaste"
-RENAME COLUMN "brokerName" TO "brokerCompanyName",
-RENAME COLUMN "brokerReceiptNumber" TO "brokerRecepisseNumber",
-RENAME COLUMN "brokerSiret" TO "brokerCompanySiret",
-RENAME COLUMN "municipalitiesInseeCodes" TO "initialEmitterMunicipalitiesInseeCodes",
-RENAME COLUMN "municipalitiesNames" TO "initialEmitterMunicipalitiesNames",
-RENAME COLUMN "producerAddress" TO "initialEmitterCompanyAddress",
-RENAME COLUMN "producerCity" TO "initialEmitterCompanyCity",
-RENAME COLUMN "producerCountryCode" TO "initialEmitterCompanyCountryCode",
-RENAME COLUMN "producerName" TO "initialEmitterCompanyName",
-RENAME COLUMN "producerOrgId" TO "initialEmitterCompanyOrgId",
-RENAME COLUMN "producerPostalCode" TO "initialEmitterCompanyPostalCode",
-RENAME COLUMN "producerType" TO "initialEmitterCompanyType",
-RENAME COLUMN "reportAsSiret" TO "reportAsCompanySiret",
-RENAME COLUMN "reportForAddress" TO "reportForCompanyAddress",
-RENAME COLUMN "reportForCity" TO "reportForCompanyCity",
-RENAME COLUMN "reportForName" TO "reportForCompanyName",
-RENAME COLUMN "reportForPostalCode" TO "reportForCompanyPostalCode",
-RENAME COLUMN "reportForSiret" TO "reportForCompanySiret",
-RENAME COLUMN "senderAddress" TO "emitterCompanyAddress",
-RENAME COLUMN "senderCity" TO "emitterCompanyCity",
-RENAME COLUMN "senderCountryCode" TO "emitterCompanyCountryCode",
-RENAME COLUMN "senderName" TO "emitterCompanyName",
-RENAME COLUMN "senderOrgId" TO "emitterCompanyOrgId",
-RENAME COLUMN "senderPostalCode" TO "emitterCompanyPostalCode",
-RENAME COLUMN "senderTakeOverAddress" TO "emitterPickupSiteAddress",
-RENAME COLUMN "senderTakeOverCity" TO "emitterPickupSiteCity",
-RENAME COLUMN "senderTakeOverCountryCode" TO "emitterPickupSiteCountryCode",
-RENAME COLUMN "senderTakeOverPostalCode" TO "emitterPickupSitePostalCode",
-RENAME COLUMN "senderType" TO "emitterCompanyType",
-RENAME COLUMN "traderName" TO "traderCompanyName",
-RENAME COLUMN "traderReceiptNumber" TO "traderRecepisseNumber",
-RENAME COLUMN "traderSiret" TO "traderCompanySiret",
-RENAME COLUMN "transporter1Address" TO "transporter1CompanyAddress",
-RENAME COLUMN "transporter1City" TO "transporter1CompanyCity",
-RENAME COLUMN "transporter1CountryCode" TO "transporter1CompanyCountryCode",
-RENAME COLUMN "transporter1Name" TO "transporter1CompanyName",
-RENAME COLUMN "transporter1OrgId" TO "transporter1CompanyOrgId",
-RENAME COLUMN "transporter1PostalCode" TO "transporter1CompanyPostalCode",
-RENAME COLUMN "transporter1ReceiptNumber" TO "transporter1RecepisseNumber",
-RENAME COLUMN "transporter1Type" TO "transporter1CompanyType",
-RENAME COLUMN "transporter2Address" TO "transporter2CompanyAddress",
-RENAME COLUMN "transporter2City" TO "transporter2CompanyCity",
-RENAME COLUMN "transporter2CountryCode" TO "transporter2CompanyCountryCode",
-RENAME COLUMN "transporter2Name" TO "transporter2CompanyName",
-RENAME COLUMN "transporter2OrgId" TO "transporter2CompanyOrgId",
-RENAME COLUMN "transporter2PostalCode" TO "transporter2CompanyPostalCode",
-RENAME COLUMN "transporter2ReceiptNumber" TO "transporter2RecepisseNumber",
-RENAME COLUMN "transporter2Type" TO "transporter2CompanyType",
-RENAME COLUMN "transporter3Address" TO "transporter3CompanyAddress",
-RENAME COLUMN "transporter3City" TO "transporter3CompanyCity",
-RENAME COLUMN "transporter3CountryCode" TO "transporter3CompanyCountryCode",
-RENAME COLUMN "transporter3Name" TO "transporter3CompanyName",
-RENAME COLUMN "transporter3OrgId" TO "transporter3CompanyOrgId",
-RENAME COLUMN "transporter3PostalCode" TO "transporter3CompanyPostalCode",
-RENAME COLUMN "transporter3ReceiptNumber" TO "transporter3RecepisseNumber",
-RENAME COLUMN "transporter3Type" TO "transporter3CompanyType",
-RENAME COLUMN "transporter4Address" TO "transporter4CompanyAddress",
-RENAME COLUMN "transporter4City" TO "transporter4CompanyCity",
-RENAME COLUMN "transporter4CountryCode" TO "transporter4CompanyCountryCode",
-RENAME COLUMN "transporter4Name" TO "transporter4CompanyName",
-RENAME COLUMN "transporter4OrgId" TO "transporter4CompanyOrgId",
-RENAME COLUMN "transporter4PostalCode" TO "transporter4CompanyPostalCode",
-RENAME COLUMN "transporter4ReceiptNumber" TO "transporter4RecepisseNumber",
-RENAME COLUMN "transporter4Type" TO "transporter4CompanyType",
-RENAME COLUMN "transporter5Address" TO "transporter5CompanyAddress",
-RENAME COLUMN "transporter5City" TO "transporter5CompanyCity",
-RENAME COLUMN "transporter5CountryCode" TO "transporter5CompanyCountryCode",
-RENAME COLUMN "transporter5Name" TO "transporter5CompanyName",
-RENAME COLUMN "transporter5OrgId" TO "transporter5CompanyOrgId",
-RENAME COLUMN "transporter5PostalCode" TO "transporter5CompanyPostalCode",
-RENAME COLUMN "transporter5ReceiptNumber" TO "transporter5RecepisseNumber",
-RENAME COLUMN "transporter5Type" TO "transporter5CompanyType",
 ADD COLUMN     "transporter1RecepisseIsExempted" BOOLEAN,
 ADD COLUMN     "transporter2RecepisseIsExempted" BOOLEAN,
 ADD COLUMN     "transporter3RecepisseIsExempted" BOOLEAN,
@@ -94,20 +95,19 @@ ADD COLUMN     "transporter4RecepisseIsExempted" BOOLEAN,
 ADD COLUMN     "transporter5RecepisseIsExempted" BOOLEAN;
 
 -- AlterTable
-ALTER TABLE "RegistrySsd"
-RENAME COLUMN "destinationAddress" TO "destinationCompanyAddress",
-RENAME COLUMN "destinationCity" TO "destinationCompanyCity",
-RENAME COLUMN "destinationCountryCode" TO "destinationCompanyCountryCode",
-RENAME COLUMN "destinationName" TO "destinationCompanyName",
-RENAME COLUMN "destinationOrgId" TO "destinationCompanyOrgId",
-RENAME COLUMN "destinationPostalCode" TO "destinationCompanyPostalCode",
-RENAME COLUMN "destinationType" TO "destinationCompanyType",
-RENAME COLUMN "reportAsSiret" TO "reportAsCompanySiret",
-RENAME COLUMN "reportForAddress" TO "reportForCompanyAddress",
-RENAME COLUMN "reportForCity" TO "reportForCompanyCity",
-RENAME COLUMN "reportForName" TO "reportForCompanyName",
-RENAME COLUMN "reportForPostalCode" TO "reportForCompanyPostalCode",
-RENAME COLUMN "reportForSiret" TO "reportForCompanySiret";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "destinationAddress" TO "destinationCompanyAddress";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "destinationCity" TO "destinationCompanyCity";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "destinationCountryCode" TO "destinationCompanyCountryCode";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "destinationName" TO "destinationCompanyName";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "destinationOrgId" TO "destinationCompanyOrgId";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "destinationPostalCode" TO "destinationCompanyPostalCode";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "destinationType" TO "destinationCompanyType";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "reportAsSiret" TO "reportAsCompanySiret";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "reportForAddress" TO "reportForCompanyAddress";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "reportForCity" TO "reportForCompanyCity";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "reportForName" TO "reportForCompanyName";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "reportForPostalCode" TO "reportForCompanyPostalCode";
+ALTER TABLE "RegistrySsd" RENAME COLUMN "reportForSiret" TO "reportForCompanySiret";
 
 -- CreateTable
 CREATE TABLE "RegistryIncomingTexs" (
