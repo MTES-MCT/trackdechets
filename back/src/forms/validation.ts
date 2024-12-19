@@ -592,7 +592,10 @@ const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
       .string()
       .label("Opération d’élimination / valorisation")
       .ensure()
-      .requiredIf(!isDraft)
+      .when("recipientIsTempStorage", {
+        is: recipientIsTempStorage => !recipientIsTempStorage,
+        then: s => s.requiredIf(!isDraft)
+      })
       .when("emitterType", (value, schema) => {
         const oneOf =
           value === EmitterType.APPENDIX2
