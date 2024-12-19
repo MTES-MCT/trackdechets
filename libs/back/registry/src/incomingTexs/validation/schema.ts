@@ -20,6 +20,7 @@ import {
   getActorCitySchema,
   getActorCountryCodeSchema,
   inseeCodesSchema,
+  isUpcycledSchema,
   getActorSiretSchema,
   getOperationCodeSchema,
   transportModeSchema,
@@ -32,7 +33,8 @@ import {
   municipalitiesNamesSchema,
   nextDestinationIsAbroad,
   noTraceability,
-  operationModeSchema
+  operationModeSchema,
+  transportRecepisseIsExemptedSchema
 } from "../../shared/schemas";
 import {
   INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
@@ -46,7 +48,6 @@ export type ParsedZodIncomingTexsItem = z.output<typeof incomingTexsSchema>;
 
 const inputIncomingTexsSchema = z.object({
   reason: reasonSchema,
-  customInfo: z.string().nullish(),
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: getReportForSiretSchema("du destinataire"),
@@ -107,6 +108,7 @@ const inputIncomingTexsSchema = z.object({
   emitterCompanyCountryCode: getActorCountryCodeSchema(
     "d'expéditeur ou détenteur"
   ),
+  emitterPickupSiteName: z.string().nullish(),
   emitterPickupSiteAddress: getActorAddressSchema(
     "de prise en charge de l'expéditeur ou détenteur"
   ).nullish(),
@@ -121,7 +123,7 @@ const inputIncomingTexsSchema = z.object({
   ).nullish(),
   brokerCompanySiret: getActorSiretSchema("du courtier").nullish(),
   brokerCompanyName: getActorNameSchema("du courtier").nullish(),
-  brokerCompanyRecepisseNumber: z
+  brokerRecepisseNumber: z
     .string()
     .max(
       150,
@@ -130,7 +132,7 @@ const inputIncomingTexsSchema = z.object({
     .nullish(),
   traderCompanySiret: getActorSiretSchema("du négociant").nullish(),
   traderCompanyName: getActorNameSchema("du négociant").nullish(),
-  traderCompanyRecepisseNumber: z
+  traderRecepisseNumber: z
     .string()
     .max(
       150,
@@ -149,13 +151,14 @@ const inputIncomingTexsSchema = z.object({
   nextOperationCode: getOperationCodeSchema(
     INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
   ).nullish(),
-  isUpcycled: z.boolean().nullish(),
+  isUpcycled: isUpcycledSchema.nullish(),
   destinationParcelInseeCodes: inseeCodesSchema,
   destinationParcelNumbers: parcelNumbersSchema,
   destinationParcelCoordinates: parcelCoordinatesSchema,
   transporter1TransportMode: transportModeSchema,
   transporter1CompanyType: getActorTypeSchema("de transporteur 1"),
   transporter1CompanyOrgId: getActorOrgIdSchema("du transporteur 1"),
+  transporter1RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter1RecepisseNumber: transportRecepisseNumberSchema,
   transporter1CompanyName: getActorNameSchema("du transporteur 1"),
   transporter1CompanyAddress: getActorAddressSchema("du transporteur 1"),
@@ -166,6 +169,7 @@ const inputIncomingTexsSchema = z.object({
   transporter2TransportMode: transportModeSchema.nullish(),
   transporter2CompanyType: getActorTypeSchema("de transporteur 2").nullish(),
   transporter2CompanyOrgId: getActorOrgIdSchema("du transporteur 2").nullish(),
+  transporter2RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter2RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter2CompanyName: getActorNameSchema("du transporteur 2").nullish(),
   transporter2CompanyAddress:
@@ -178,6 +182,7 @@ const inputIncomingTexsSchema = z.object({
   transporter3TransportMode: transportModeSchema.nullish(),
   transporter3CompanyType: getActorTypeSchema("de transporteur 3").nullish(),
   transporter3CompanyOrgId: getActorOrgIdSchema("du transporteur 3").nullish(),
+  transporter3RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter3RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter3CompanyName: getActorNameSchema("du transporteur 3").nullish(),
   transporter3CompanyAddress:
@@ -190,6 +195,7 @@ const inputIncomingTexsSchema = z.object({
   transporter4TransportMode: transportModeSchema.nullish(),
   transporter4CompanyType: getActorTypeSchema("de transporteur 4").nullish(),
   transporter4CompanyOrgId: getActorOrgIdSchema("du transporteur 4").nullish(),
+  transporter4RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter4RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter4CompanyName: getActorNameSchema("du transporteur 4").nullish(),
   transporter4CompanyAddress:
@@ -202,6 +208,7 @@ const inputIncomingTexsSchema = z.object({
   transporter5TransportMode: transportModeSchema.nullish(),
   transporter5CompanyType: getActorTypeSchema("de transporteur 5").nullish(),
   transporter5CompanyOrgId: getActorOrgIdSchema("du transporteur 5").nullish(),
+  transporter5RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
   transporter5RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter5CompanyName: getActorNameSchema("du transporteur 5").nullish(),
   transporter5CompanyAddress:

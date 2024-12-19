@@ -20,6 +20,11 @@ export function refineActorOrgId<T>({
       | "ASSOCIATION"
       | "PERSONNE_PHYSIQUE"
       | "COMMUNE" = item[typeKey];
+
+    if (!type) {
+      return;
+    }
+
     const orgId: string = item[orgIdKey];
     const inputCountry: string | undefined = countryKey
       ? item[countryKey]
@@ -102,8 +107,19 @@ export function refineActorOrgId<T>({
         }
         break;
       }
+      case "PERSONNE_PHYSIQUE": {
+        if (!orgId) {
+          addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              "Le numéro d'identification du destinataire doit contenir le nom et prénom pour une personne physique"
+          });
+        }
+      }
+      case "COMMUNE":
+        break;
       default:
-        throw new Error("Unhandled destination type");
+        throw new Error(`Unhandled destination type ${type}`);
     }
   };
 }
