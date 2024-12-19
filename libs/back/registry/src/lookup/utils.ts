@@ -29,7 +29,7 @@ const updateRegistryDelegateSirets = async (
     reportAsCompanySiret?: string | null;
   },
   registryLookup: Prisma.RegistryLookupGetPayload<{
-    select: { reportAsCompanySirets: true };
+    select: { reportAsSirets: true };
   }>,
   tx: Omit<PrismaClient, ITXClientDenyList>
 ) => {
@@ -46,7 +46,7 @@ const updateRegistryDelegateSirets = async (
   if (
     registry.reportAsCompanySiret &&
     registry.reportAsCompanySiret !== registry.reportForCompanySiret &&
-    !registryLookup.reportAsCompanySirets.includes(registry.reportAsCompanySiret)
+    !registryLookup.reportAsSirets.includes(registry.reportAsCompanySiret)
   ) {
     await tx.registryLookup.updateMany({
       where: {
@@ -54,8 +54,8 @@ const updateRegistryDelegateSirets = async (
         exportRegistryType: registryType
       },
       data: {
-        reportAsCompanySirets: [
-          ...registryLookup.reportAsCompanySirets,
+        reportAsSirets: [
+          ...registryLookup.reportAsSirets,
           registry.reportAsCompanySiret
         ]
       }
@@ -86,7 +86,7 @@ export const updateRegistrySsdLookup = async (
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   let registryLookup: Prisma.RegistryLookupGetPayload<{
-    select: { reportAsCompanySirets: true };
+    select: { reportAsSirets: true };
   }>;
   if (oldRegistrySsdId) {
     // note for future implementations:
@@ -118,7 +118,7 @@ export const updateRegistrySsdLookup = async (
       },
       select: {
         // lean selection to improve performances
-        reportAsCompanySirets: true
+        reportAsSirets: true
       }
     });
   } else {
@@ -138,7 +138,7 @@ export const updateRegistrySsdLookup = async (
       },
       select: {
         // lean selection to improve performances
-        reportAsCompanySirets: true
+        reportAsSirets: true
       }
     });
   }
