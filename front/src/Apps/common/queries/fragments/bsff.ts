@@ -69,6 +69,9 @@ export const dashboardBsffFragment = gql`
       operation {
         code
         noTraceability
+        signature {
+          date
+        }
       }
     }
     bsffWeight: weight {

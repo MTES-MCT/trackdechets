@@ -54,7 +54,7 @@ export const supprimer_action_label = "Supprimer";
 export const clone_action_label = "Cloner";
 export const completer_bsd_suite = "Compléter le BSD suite";
 export const annexe1 = "Annexe 1";
-export const corriger = "Corriger";
+export const corriger_action_label = "Corriger";
 
 // blankstate
 export const blankstate_action_title = "Il n'y a aucun bordereau à signer";
