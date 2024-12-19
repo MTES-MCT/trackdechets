@@ -120,9 +120,12 @@ const EmitterBsvhu = ({ errors }) => {
   const selectedCompanyError = (company?: CompanySearchResult) => {
     // L'émetteur est en situation irrégulière mais il a un SIRET et n'est pas inscrit sur Trackdéchets
     if (company) {
-      if (!company.isRegistered) {
-        return "L'entreprise n'est pas inscrite sur Trackdéchets, la signature Producteur ne pourra pas se faire. Vous pouvez publier le bordereau, mais seul le transporteur pourra le signer.";
+      if (!emitter.irregularSituation && !company.isRegistered) {
+        return "Cet établissement n'est pas inscrit sur Trackdéchets. Il ne peut être visé comme émetteur sur ce bordereau, sauf s'il s'agit d'une installation en situation irrégulière. Dans ce cas, veuillez cocher la case correspondante ci-dessus.";
       }
+      // if (!company.isRegistered) {
+      //   return "L'entreprise n'est pas inscrite sur Trackdéchets, la signature Producteur ne pourra pas se faire. Vous pouvez publier le bordereau, mais seul le transporteur pourra le signer.";
+      // }
     }
     return null;
   };
@@ -245,7 +248,7 @@ const EmitterBsvhu = ({ errors }) => {
                   placeholder="Rechercher"
                   onAddressSelection={details => {
                     // `address` is passed as `name` because of adresse api return fields
-                    setValue(`emitter.company.address`, details.name);
+                    setValue(`emitter.company.address`, details.label);
                     setValue(`emitter.company.city`, details.city);
                     setValue(`emitter.company.street`, details.name);
                     setValue(`emitter.company.postalCode`, details.postcode);
