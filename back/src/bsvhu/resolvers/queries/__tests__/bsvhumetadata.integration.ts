@@ -139,7 +139,7 @@ describe("Query.Bsvhu", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(37);
+    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(36);
   });
 
   it("should return OPERATION signed bsvhu sealed fields", async () => {
