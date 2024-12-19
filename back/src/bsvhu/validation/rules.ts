@@ -681,7 +681,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   intermediaries: {
     readableFieldName: "les intermédiaires",
-    sealed: { from: "TRANSPORT" },
+    sealed: { from: "OPERATION" },
     path: ["intermediaries"]
   }
 };

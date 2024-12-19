@@ -37,6 +37,7 @@ export function intermediariesRefinement(
   if (intermediaries.length > 3) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["intermediaries"],
       message: "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires",
       fatal: true
     });
@@ -46,11 +47,20 @@ export function intermediariesRefinement(
   const intermediaryIdentifiers = intermediaries.map(
     c => c.siret || c.vatNumber
   );
+  if (intermediaryIdentifiers.some(orgId => !orgId)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["intermediaries"],
+      message: "Intermédiaires: Un SIRET ou numéro de TVA est obligatoire",
+      fatal: true
+    });
+  }
   const hasDuplicate =
     new Set(intermediaryIdentifiers).size !== intermediaryIdentifiers.length;
   if (hasDuplicate) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["intermediaries"],
       message:
         "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois",
       fatal: true

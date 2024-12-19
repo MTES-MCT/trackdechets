@@ -808,7 +808,8 @@ describe("BSVHU validation", () => {
         {
           ...bsvhu,
           emitterEmissionSignatureDate: new Date(),
-          transporterTransportSignatureDate: new Date()
+          transporterTransportSignatureDate: new Date(),
+          destinationOperationSignatureDate: new Date()
         },
         {
           ...context
