@@ -18,6 +18,7 @@ export interface BsdAdditionalActionsButtonProps {
     onConsultReview?: Function;
     onEmitterDasriSign?: Function;
     onEmitterBsddSign?: Function;
+    onCorrection?: Function;
   };
   hideReviewCta?: boolean;
   isToCollectTab?: boolean;

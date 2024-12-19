@@ -47,20 +47,6 @@ function SignBsffPackagingModal({
   packagingId,
   onClose
 }: SignBsffPackagingModalProps) {
-  // const [updateBsffPackaging, updateBsffPackagingResult] = useMutation<
-  //   Pick<Mutation, "updateBsffPackaging">,
-  //   MutationUpdateBsffPackagingArgs
-  // >(UPDATE_BSFF_PACKAGING);
-  // const [signBsff, signBsffResult] = useMutation<
-  //   Pick<Mutation, "signBsff">,
-  //   MutationSignBsffArgs
-  // >(SIGN_BSFF);
-
-  // const TODAY = new Date();
-
-  // const loading = updateBsffPackagingResult.loading || signBsffResult.loading;
-  // const error = updateBsffPackagingResult.error ?? signBsffResult.error;
-
   const { data, error, loading } = useQuery<
     Pick<Query, "bsffPackaging">,
     QueryBsffPackagingArgs
