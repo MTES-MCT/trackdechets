@@ -35,7 +35,8 @@ export const INCOMING_WASTE_HEADERS: {
   emitterCompanyCountryCode: "Code pays de l'expéditeur",
   emitterPickupSiteName:
     "Référence du chantier / lieu de collecte de l'expéditeur",
-  emitterPickupSiteAddress: "Libellé de l'adresse de prise en charge de l'expéditeur",
+  emitterPickupSiteAddress:
+    "Libellé de l'adresse de prise en charge de l'expéditeur",
   emitterPickupSitePostalCode: "Code postal de prise en charge de l'expéditeur",
   emitterPickupSiteCity: "Commune de prise en charge de l'expéditeur",
   emitterPickupSiteCountryCode: "Code pays de prise en charge de l'expéditeur",
