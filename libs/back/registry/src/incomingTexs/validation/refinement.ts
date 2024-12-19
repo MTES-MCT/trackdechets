@@ -2,10 +2,11 @@ import { Refinement } from "zod";
 import { refineActorOrgId } from "../../shared/refinement";
 import { ParsedZodIncomingTexsItem } from "./schema";
 
-export const initialEmitterRefinement = refineActorOrgId<ParsedZodIncomingTexsItem>({
-  typeKey: "initialEmitterCompanyType",
-  orgIdKey: "initialEmitterCompanyOrgId"
-});
+export const initialEmitterRefinement =
+  refineActorOrgId<ParsedZodIncomingTexsItem>({
+    typeKey: "initialEmitterCompanyType",
+    orgIdKey: "initialEmitterCompanyOrgId"
+  });
 
 export const parcelRefinement: Refinement<ParsedZodIncomingTexsItem> = (
   item,
