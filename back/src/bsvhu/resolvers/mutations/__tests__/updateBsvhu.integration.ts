@@ -506,7 +506,7 @@ describe("Mutation.Vhu.update", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         destinationCompanySiret: company.siret,
-        transporterTransportSignatureDate: new Date(),
+        destinationOperationSignatureDate: new Date(),
         intermediaries: {
           create: {
             siret: company.siret!,
@@ -520,8 +520,6 @@ describe("Mutation.Vhu.update", () => {
 
     const { mutate } = makeClient(user);
 
-    // We pass an update with the same value as before.
-    // Even if the field is locked, this should be ignored
     const input = {
       intermediaries: [
         {
@@ -750,7 +748,7 @@ describe("Mutation.Vhu.update", () => {
     ]);
   });
 
-  it("should succed when packaging is UNITE and identificationType is null on a bsvhu created before release date", async () => {
+  it("should succeed when packaging is UNITE and identificationType is null on a bsvhu created before release date", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsvhu = await bsvhuFactory({
       userId: user.id,
@@ -784,7 +782,7 @@ describe("Mutation.Vhu.update", () => {
     BsvhuIdentificationType.NUMERO_ORDRE_REGISTRE_POLICE,
     BsvhuIdentificationType.NUMERO_IMMATRICULATION
   ])(
-    "should succed when packaging is UNITE and identificationType is %p",
+    "should succeed when packaging is UNITE and identificationType is %p",
     async identificationType => {
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
       const bsvhu = await bsvhuFactory({
@@ -803,12 +801,13 @@ describe("Mutation.Vhu.update", () => {
           type: identificationType
         }
       };
-      const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      const { data, errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
         UPDATE_VHU_FORM,
         {
           variables: { id: bsvhu.id, input }
         }
       );
+      console.log(errors);
 
       expect(data.updateBsvhu.packaging).toEqual("UNITE");
       expect(data.updateBsvhu.identification?.type).toEqual(identificationType);
