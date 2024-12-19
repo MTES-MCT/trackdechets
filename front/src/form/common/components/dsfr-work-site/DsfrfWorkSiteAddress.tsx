@@ -99,9 +99,9 @@ export default function DsfrfWorkSiteAddress({
   disabled = false,
   placeholder = "Recherchez une adresse puis sélectionnez un des choix qui apparait..."
 }: {
-  address?: string;
-  city?: string;
-  postalCode?: string;
+  address?: string | null;
+  city?: string | null;
+  postalCode?: string | null;
   designation?: string;
   disabled?: boolean;
   placeholder?: string;
@@ -204,7 +204,7 @@ export default function DsfrfWorkSiteAddress({
             <Input
               label="N° et libellé de voie ou lieu-dit"
               nativeInputProps={{
-                defaultValue: address,
+                defaultValue: address ?? undefined,
                 onChange: e =>
                   setManualAddress({
                     city: state.city,
@@ -219,7 +219,7 @@ export default function DsfrfWorkSiteAddress({
               <Input
                 label="Code postal"
                 nativeInputProps={{
-                  defaultValue: postalCode,
+                  defaultValue: postalCode ?? undefined,
                   onChange: e =>
                     setManualAddress({
                       address: state.address,
@@ -233,7 +233,7 @@ export default function DsfrfWorkSiteAddress({
               <Input
                 label="Ville"
                 nativeInputProps={{
-                  defaultValue: city,
+                  defaultValue: city ?? undefined,
                   onChange: e =>
                     setManualAddress({
                       address: state.address,
