@@ -142,6 +142,28 @@ export const producerShouldBeNotifiedOfDestinationCapModification = (
     return false;
   }
 
+  // User is adding a nextDestination. Careful, compare correct fields
+  if (
+    !previousBsda.destinationOperationNextDestinationCompanySiret &&
+    updatedBsda.destinationOperationNextDestinationCompanySiret
+  ) {
+    return (
+      previousBsda.destinationCap !==
+      updatedBsda.destinationOperationNextDestinationCap
+    );
+  }
+
+  // User is removing the nextDestination. Careful, compare correct fields
+  if (
+    previousBsda.destinationOperationNextDestinationCompanySiret &&
+    !updatedBsda.destinationOperationNextDestinationCompanySiret
+  ) {
+    return (
+      previousBsda.destinationOperationNextDestinationCap !==
+      updatedBsda.destinationCap
+    );
+  }
+
   // Pas de TTR
   if (!updatedBsda.destinationOperationNextDestinationCompanySiret) {
     return previousBsda.destinationCap !== updatedBsda.destinationCap;
