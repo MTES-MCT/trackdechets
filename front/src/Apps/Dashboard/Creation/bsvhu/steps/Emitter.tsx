@@ -127,6 +127,13 @@ const EmitterBsvhu = ({ errors }) => {
     return null;
   };
 
+  const onNoSiretClick = () => {
+    if (!!emitter.company) {
+      setValue("emitter.company", {});
+      setValue("emitter.agrementNumber", null);
+    }
+  };
+
   return (
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
@@ -228,7 +235,8 @@ const EmitterBsvhu = ({ errors }) => {
                 {
                   label: "L'installation n'a pas de numéro SIRET",
                   nativeInputProps: {
-                    ...register("emitter.noSiret")
+                    ...register("emitter.noSiret"),
+                    onClick: onNoSiretClick
                   }
                 }
               ]}
@@ -239,9 +247,9 @@ const EmitterBsvhu = ({ errors }) => {
               <>
                 <DsfrfWorkSiteAddress
                   designation="du site d'enlèvement"
-                  address={emitter.company.address}
-                  postalCode={emitter.company.postalCode}
-                  city={emitter.company.city}
+                  address={emitter.company?.address}
+                  postalCode={emitter.company?.postalCode}
+                  city={emitter.company?.city}
                   placeholder="Rechercher"
                   onAddressSelection={details => {
                     // `address` is passed as `name` because of adresse api return fields
