@@ -300,7 +300,7 @@ const getIdentificationTypeLabel = (bsvhu: Bsvhu) => {
 };
 
 function Emitter({ form }: { form: Bsvhu }) {
-  const { emitter, quantity, packaging, identification, weight } = form;
+  const { emitter, quantity, identification, weight } = form;
   return (
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
@@ -319,11 +319,6 @@ function Emitter({ form }: { form: Bsvhu }) {
           value={identification?.numbers?.join(", ")}
           label="Identifications"
         />
-        <DetailRow
-          value={packaging ? PACKAGING_LABELS[packaging] : null}
-          label="Conditionnement"
-        />
-
         <DetailRow value={quantity} label="Quantité" />
         <DetailRow value={weight?.value} label="Poids" units="tonnes" />
       </div>
