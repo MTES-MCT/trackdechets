@@ -234,7 +234,7 @@ export const mapBsdd = (bsdd: Form): BsdDisplay => {
     broker: bsdd.broker,
     trader: bsdd.trader,
     intermediaries: bsdd.intermediaries,
-    updatedAt: bsdd.stateSummary?.lastActionOn,
+    updatedAt: bsdd.updatedAt,
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,
     grouping: bsdd.grouping,
     temporaryStorageDetail: bsdd.temporaryStorageDetail,
