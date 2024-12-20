@@ -1,5 +1,4 @@
-import { OperationMode } from "@prisma/client";
-import { BSDD_WASTE_CODES_ENUM, isSiret } from "@td/constants";
+import { BSDD_WASTE_CODES_ENUM } from "@td/constants";
 import { sub } from "date-fns";
 import { z } from "zod";
 import {
@@ -10,37 +9,33 @@ import {
   getActorOrgIdSchema,
   getActorPostalCodeSchema,
   getActorTypeSchema,
-  operationCodeSchema,
+  getReportForSiretSchema,
+  getOperationCodeSchema,
   publicIdSchema,
   reasonSchema,
-  reportAsSiretSchema,
+  reportAsCompanySiretSchema,
   volumeSchema,
   wasteCodeBaleSchema,
-  wasteCodeSchema,
+  getWasteCodeSchema,
   wasteDescriptionSchema,
   weightIsEstimateSchema,
-  weightValueSchema
+  weightValueSchema,
+  operationModeSchema
 } from "../../shared/schemas";
 
+export type ParsedZodInputSsdItem = z.output<typeof inputSsdSchema>;
 export type ParsedZodSsdItem = z.output<typeof ssdSchema>;
 
 const inputSsdSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
-  reportAsSiret: reportAsSiretSchema,
-  reportForSiret: z.coerce
-    .string({
-      invalid_type_error:
-        "Le SIRET de l'émetteur doit être une chaîne de caractères"
-    })
-    .refine(value => {
-      return isSiret(value);
-    }, "Le SIRET de l'émetteur n'est pas un SIRET valide"),
+  reportAsCompanySiret: reportAsCompanySiretSchema,
+  reportForCompanySiret: getReportForSiretSchema("de l'émetteur"),
   useDate: z.union([
-    z.date().optional(),
+    z.date().nullish(),
     z
       .string()
-      .optional()
+      .nullish()
       .transform(val => (val ? new Date(val) : undefined))
       .pipe(
         z
@@ -53,14 +48,14 @@ const inputSsdSchema = z.object({
             new Date(),
             "La date d'utilisation ne peut pas être dans le futur"
           )
-          .optional()
+          .nullish()
       )
   ]),
   dispatchDate: z.union([
-    z.date().optional(),
+    z.date().nullish(),
     z
       .string()
-      .optional()
+      .nullish()
       .transform(val => (val ? new Date(val) : undefined))
       .pipe(
         z
@@ -73,15 +68,15 @@ const inputSsdSchema = z.object({
             new Date(),
             "La date d'utilisation ne peut pas être dans le futur"
           )
-          .optional()
+          .nullish()
       )
   ]),
-  wasteCode: wasteCodeSchema,
+  wasteCode: getWasteCodeSchema(),
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
   secondaryWasteCodes: z
     .string()
-    .optional()
+    .nullish()
     .transform(val =>
       val
         ? String(val)
@@ -92,7 +87,7 @@ const inputSsdSchema = z.object({
     .pipe(
       z
         .array(
-          z.nativeEnum(BSDD_WASTE_CODES_ENUM, {
+          z.enum(BSDD_WASTE_CODES_ENUM, {
             required_error: "Le code déchet secondaire est requis",
             invalid_type_error:
               "Le code déchet secondaire n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces"
@@ -102,7 +97,7 @@ const inputSsdSchema = z.object({
     ),
   secondaryWasteDescriptions: z
     .string()
-    .optional()
+    .nullish()
     .transform(val =>
       val
         ? String(val)
@@ -111,20 +106,18 @@ const inputSsdSchema = z.object({
         : []
     )
     .pipe(
-      z
-        .array(
-          z
-            .string()
-            .min(
-              2,
-              "Les dénominations usuelles du déchet doivent faire au moins 2 caractères"
-            )
-            .max(
-              200,
-              "Les dénominations usuelles du déchet ne peuvent pas dépasser 200 caractères"
-            )
-        )
-        .optional()
+      z.array(
+        z
+          .string()
+          .min(
+            2,
+            "Les dénominations usuelles du déchet doivent faire au moins 2 caractères"
+          )
+          .max(
+            200,
+            "Les dénominations usuelles du déchet ne peuvent pas dépasser 200 caractères"
+          )
+      )
     ),
   product: z
     .string()
@@ -141,10 +134,10 @@ const inputSsdSchema = z.object({
     )
     .max(new Date(), "La date de traitement ne peut pas être dans le futur"),
   processingEndDate: z.union([
-    z.date().optional(),
+    z.date().nullish(),
     z
       .string()
-      .optional()
+      .nullish()
       .transform(val => (val ? new Date(val) : undefined))
       .pipe(
         z
@@ -157,60 +150,21 @@ const inputSsdSchema = z.object({
             new Date(),
             "La date de fin de traitement ne peut pas être dans le futur"
           )
-          .optional()
+          .nullish()
       )
   ]),
-  destinationType: getActorTypeSchema("de destinataire").exclude([
+  destinationCompanyType: getActorTypeSchema("de destinataire").exclude([
     "PERSONNE_PHYSIQUE",
     "COMMUNE"
   ]),
-  destinationOrgId: getActorOrgIdSchema("du destinataire"),
-  destinationName: getActorNameSchema("du destinataire"),
-  destinationAddress: getActorAddressSchema("du destinataire"),
-  destinationCity: getActorCitySchema("du destinataire"),
-  destinationPostalCode: getActorPostalCodeSchema("du destinataire"),
-  destinationCountryCode: getActorCountryCodeSchema("du destinataire"),
-  operationCode: operationCodeSchema,
-  operationMode: z
-    .enum(
-      [
-        "Réutilisation",
-        "Reutilisation",
-        "REUTILISATION",
-        "RECYCLAGE",
-        "Recyclage",
-        "Valorisation énergétique",
-        "VALORISATION_ENERGETIQUE",
-        "Élimination",
-        "Elimination",
-        "ELIMINATION"
-      ],
-      {
-        required_error: "Le code de qualification est requis",
-        invalid_type_error:
-          "Le code de qualification n'est pas une valeur autorisée. Valeurs possibles: Réutilisation, Recyclage, Valorisation énergétique ou Élimination"
-      }
-    )
-    .transform(val => {
-      switch (val) {
-        case "Réutilisation":
-        case "Reutilisation":
-        case "REUTILISATION":
-          return OperationMode.REUTILISATION;
-        case "Recyclage":
-        case "RECYCLAGE":
-          return OperationMode.RECYCLAGE;
-        case "Valorisation énergétique":
-        case "VALORISATION_ENERGETIQUE":
-          return OperationMode.VALORISATION_ENERGETIQUE;
-        case "Élimination":
-        case "Elimination":
-        case "ELIMINATION":
-          return OperationMode.ELIMINATION;
-        default:
-          throw Error("Unhandled qualification code");
-      }
-    }),
+  destinationCompanyOrgId: getActorOrgIdSchema("du destinataire"),
+  destinationCompanyName: getActorNameSchema("du destinataire"),
+  destinationCompanyAddress: getActorAddressSchema("du destinataire"),
+  destinationCompanyCity: getActorCitySchema("du destinataire"),
+  destinationCompanyPostalCode: getActorPostalCodeSchema("du destinataire"),
+  destinationCompanyCountryCode: getActorCountryCodeSchema("du destinataire"),
+  operationCode: getOperationCodeSchema(),
+  operationMode: operationModeSchema,
   administrativeActReference: z.enum([
     "Implicite",
     "Arrêté du 29 juillet 2014",
@@ -228,10 +182,10 @@ const inputSsdSchema = z.object({
 
 // Props added through transform
 const transformedSsdSchema = z.object({
-  reportForAddress: z.string().default(""),
-  reportForCity: z.string().default(""),
-  reportForPostalCode: z.string().default(""),
-  reportForName: z.coerce.string().default(""),
+  reportForCompanyAddress: z.string().default(""),
+  reportForCompanyCity: z.string().default(""),
+  reportForCompanyPostalCode: z.string().default(""),
+  reportForCompanyName: z.coerce.string().default(""),
   id: z.string().optional()
 });
 

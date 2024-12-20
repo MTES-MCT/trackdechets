@@ -1,28 +1,28 @@
 import { prisma } from "@td/prisma";
-import { ParsedZodIncomingWasteItem } from "./validation/schema";
+import { ParsedZodIncomingTexsItem } from "./validation/schema";
 
-export async function saveIncomingWasteLine({
+export async function saveIncomingTexsLine({
   line,
   importId
 }: {
-  line: ParsedZodIncomingWasteItem & { createdById: string };
+  line: ParsedZodIncomingTexsItem & { createdById: string };
   importId: string | null;
 }) {
   const { reason, id, ...persistedData } = line;
   switch (line.reason) {
     case "MODIFIER":
       await prisma.$transaction(async tx => {
-        await tx.registryIncomingWaste.update({
+        await tx.registryIncomingTexs.update({
           where: { id },
           data: { isActive: false }
         });
-        await tx.registryIncomingWaste.create({
+        await tx.registryIncomingTexs.create({
           data: { ...persistedData, importId }
         });
       });
       return;
     case "ANNULER":
-      await prisma.registryIncomingWaste.update({
+      await prisma.registryIncomingTexs.update({
         where: { id },
         data: { isCancelled: true }
       });
@@ -30,17 +30,17 @@ export async function saveIncomingWasteLine({
     case "IGNORER":
       return;
     default:
-      await prisma.registryIncomingWaste.create({
+      await prisma.registryIncomingTexs.create({
         data: { ...persistedData, importId }
       });
       return;
   }
 }
 
-export async function getIncomingWasteImportSiretsAssociations(
+export async function getIncomingTexsImportSiretsAssociations(
   importId: string
 ) {
-  const importSirets = await prisma.registryIncomingWaste.findMany({
+  const importSirets = await prisma.registryIncomingTexs.findMany({
     distinct: ["reportForCompanySiret"],
     where: { importId },
     select: { reportForCompanySiret: true, reportAsCompanySiret: true }

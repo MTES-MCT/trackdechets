@@ -1,7 +1,7 @@
-import { ParsedZodInputIncomingWasteItem } from "./validation/schema";
+import { ParsedZodInputIncomingTexsItem } from "./validation/schema";
 
-export const INCOMING_WASTE_HEADERS: {
-  [key in keyof ParsedZodInputIncomingWasteItem]: string;
+export const INCOMING_TEXS_HEADERS: {
+  [key in keyof ParsedZodInputIncomingTexsItem]: string;
 } = {
   reason: "Motif",
   publicId: "Numéro unique",
@@ -13,41 +13,46 @@ export const INCOMING_WASTE_HEADERS: {
   wastePop: "POP",
   wasteIsDangerous: "Dangereux",
   receptionDate: "Date de réception",
-  weighingHour: "Heure de pesée",
+  wasteDap: "DAP",
   weightValue: "Poids en tonnes",
   weightIsEstimate: "Type de poids",
   volume: "Volume en M3",
-  initialEmitterCompanyType: "Type de producteur",
-  initialEmitterCompanyOrgId: "Numéro d'identification du producteur",
-  initialEmitterCompanyName: "Raison sociale du producteur",
-  initialEmitterCompanyAddress: "Adresse du producteur",
-  initialEmitterCompanyPostalCode: "Code postal du producteur",
-  initialEmitterCompanyCity: "Commune du producteur",
-  initialEmitterCompanyCountryCode: "Code pays du producteur",
+  parcelInseeCodes: "Codes INSEE des parcelles",
+  parcelNumbers: "Numéro(s) des parcelles",
+  parcelCoordinates: "Coordonnées des parcelles",
+  sisIdentifiers: "Identifiant SIS des terrains",
+  initialEmitterCompanyType: "Type de producteur initial",
+  initialEmitterCompanyOrgId: "Numéro d'identification du producteur initial",
+  initialEmitterCompanyName: "Raison sociale du producteur initial",
+  initialEmitterCompanyAddress: "Adresse du producteur initial",
+  initialEmitterCompanyPostalCode: "Code postal du producteur initial",
+  initialEmitterCompanyCity: "Commune du producteur initial",
+  initialEmitterCompanyCountryCode: "Code pays du producteur initial",
   initialEmitterMunicipalitiesInseeCodes: "Code(s) INSEE de(s) commune(s)",
   initialEmitterMunicipalitiesNames: "Commune(s)",
-  emitterCompanyType: "Type d'expéditeur",
-  emitterCompanyOrgId: "Numéro d'identification de l'expéditeur",
-  emitterCompanyName: "Raison sociale de l'expéditeur",
-  emitterCompanyAddress: "Adresse de l'expéditeur",
-  emitterCompanyPostalCode: "Code postal de l'expéditeur",
-  emitterCompanyCity: "Commune de l'expéditeur",
-  emitterCompanyCountryCode: "Code pays de l'expéditeur",
+  emitterCompanyType: "Type d'expéditeur ou détenteur",
+  emitterCompanyOrgId: "Numéro d'identification de l'expéditeur ou détenteur",
+  emitterCompanyName: "Raison sociale de l'expéditeur ou détenteur",
   emitterPickupSiteName:
     "Référence du chantier / lieu de collecte de l'expéditeur",
   emitterPickupSiteAddress:
-    "Libellé de l'adresse de prise en charge de l'expéditeur",
-  emitterPickupSitePostalCode: "Code postal de prise en charge de l'expéditeur",
-  emitterPickupSiteCity: "Commune de prise en charge de l'expéditeur",
-  emitterPickupSiteCountryCode: "Code pays de prise en charge de l'expéditeur",
+    "Libellé de l'adresse de prise en charge de l'expéditeur ou détenteur",
+  emitterPickupSitePostalCode:
+    "Code postal de prise en charge de l'expéditeur ou détenteur",
+  emitterPickupSiteCity:
+    "Commune de prise en charge de l'expéditeur ou détenteur",
+  emitterPickupSiteCountryCode:
+    "Pays de prise en charge de l'expéditeur ou détenteur",
+  emitterCompanyAddress: "Adresse de l'expéditeur ou détenteur",
+  emitterCompanyPostalCode: "Code postal de l'expéditeur ou détenteur",
+  emitterCompanyCity: "Commune de l'expéditeur ou détenteur",
+  emitterCompanyCountryCode: "Pays de l'expéditeur ou détenteur",
   brokerCompanySiret: "SIRET du courtier",
   brokerCompanyName: "Raison sociale du courtier",
   brokerRecepisseNumber: "Numéro de récépissé du courtier",
   traderCompanySiret: "SIRET du négociant",
   traderCompanyName: "Raison sociale du négociant",
   traderRecepisseNumber: "Numéro de récépissé du négociant",
-  ecoOrganismeSiret: "SIRET de l'éco-organisme",
-  ecoOrganismeName: "Raison sociale de l'éco-organisme",
   operationCode: "Code d'opération réalisé",
   operationMode: "Mode de traitement réalisé",
   noTraceability: "Rupture de traçabilité autorisée",
@@ -56,6 +61,13 @@ export const INCOMING_WASTE_HEADERS: {
   notificationNumber: "Numéro de notification",
   movementNumber: "Numéro de mouvement",
   nextOperationCode: "Code d'opération ultérieure prévue",
+  isUpcycled: "Terre valorisée",
+  destinationParcelInseeCodes:
+    "Codes INSEE des parcelles de destination si valorisation",
+  destinationParcelNumbers:
+    "Numéro(s) des parcelles de destination si valorisation",
+  destinationParcelCoordinates:
+    "Coordonnées des parcelles de destination si valorisation",
   transporter1TransportMode: "Mode de transport du transporteur n°1",
   transporter1CompanyType: "Type de transporteur n°1",
   transporter1CompanyOrgId: "Numéro d'identification du transporteur n°1",

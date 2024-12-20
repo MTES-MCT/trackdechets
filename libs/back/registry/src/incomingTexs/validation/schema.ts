@@ -4,94 +4,122 @@ import {
   publicIdSchema,
   reportAsCompanySiretSchema,
   getWasteCodeSchema,
-  wasteCodeBaleSchema,
-  wasteDescriptionSchema,
-  volumeSchema,
-  weightIsEstimateSchema,
-  weightValueSchema,
-  getActorTypeSchema,
-  getActorOrgIdSchema,
-  getActorAddressSchema,
-  getActorCitySchema,
-  getActorCountryCodeSchema,
-  getActorNameSchema,
-  getActorPostalCodeSchema,
-  transportModeSchema,
-  transportRecepisseNumberSchema,
-  getOperationCodeSchema,
-  getActorSiretSchema,
   wastePopSchema,
   wasteIsDangerousSchema,
   receptionDateSchema,
+  wasteDescriptionSchema,
+  wasteCodeBaleSchema,
+  weightValueSchema,
+  weightIsEstimateSchema,
+  volumeSchema,
+  getActorTypeSchema,
+  getActorOrgIdSchema,
+  getActorNameSchema,
+  getActorAddressSchema,
+  getActorPostalCodeSchema,
+  getActorCitySchema,
+  getActorCountryCodeSchema,
   inseeCodesSchema,
+  isUpcycledSchema,
+  getActorSiretSchema,
+  getOperationCodeSchema,
+  transportModeSchema,
+  transportRecepisseNumberSchema,
   declarationNumberSchema,
   notificationNumberSchema,
   getReportForSiretSchema,
+  parcelCoordinatesSchema,
+  parcelNumbersSchema,
   municipalitiesNamesSchema,
   nextDestinationIsAbroad,
   noTraceability,
   operationModeSchema,
   transportRecepisseIsExemptedSchema
 } from "../../shared/schemas";
-import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
+import {
+  INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
+  INCOMING_TEXS_WASTE_CODES
+} from "@td/constants";
 
-export type ParsedZodInputIncomingWasteItem = z.output<
-  typeof inputIncomingWasteSchema
+export type ParsedZodInputIncomingTexsItem = z.output<
+  typeof inputIncomingTexsSchema
 >;
-export type ParsedZodIncomingWasteItem = z.output<typeof incomingWasteSchema>;
+export type ParsedZodIncomingTexsItem = z.output<typeof incomingTexsSchema>;
 
-const inputIncomingWasteSchema = z.object({
+const inputIncomingTexsSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: getReportForSiretSchema("du destinataire"),
-  wasteCode: getWasteCodeSchema(),
+  wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES),
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
+  receptionDate: receptionDateSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  receptionDate: receptionDateSchema,
-  weighingHour: z
+  wasteDap: z
     .string()
-    .refine(val => {
-      if (!val) {
-        return true;
-      }
-      // 00:00 or 00:00:00 or 00:00:00.000
-      return /^\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?$/.test(val);
-    }, `L'heure de pesée n'est pas valide. Format attendu: 00:00, 00:00:00 ou 00:00:00.000`)
+    .max(50, "Le DAP ne doit pas excéder 50 caractères")
     .nullish(),
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  initialEmitterCompanyType: getActorTypeSchema("de producteur"),
-  initialEmitterCompanyOrgId: getActorOrgIdSchema("du producteur"),
-  initialEmitterCompanyName: getActorNameSchema("du producteur"),
-  initialEmitterCompanyAddress: getActorAddressSchema("du producteur"),
-  initialEmitterCompanyPostalCode: getActorPostalCodeSchema("du producteur"),
-  initialEmitterCompanyCity: getActorCitySchema("du producteur"),
-  initialEmitterCompanyCountryCode: getActorCountryCodeSchema("du producteur"),
+  parcelInseeCodes: inseeCodesSchema,
+  parcelNumbers: parcelNumbersSchema,
+  parcelCoordinates: parcelCoordinatesSchema,
+  sisIdentifiers: z
+    .string()
+    .nullish()
+    .transform(val =>
+      val
+        ? String(val)
+            .split(",")
+            .map(val => val.trim())
+        : []
+    )
+    .pipe(
+      z.array(
+        z
+          .string()
+          .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
+      )
+    ),
+  initialEmitterCompanyType: getActorTypeSchema("de producteur initial"),
+  initialEmitterCompanyOrgId: getActorOrgIdSchema("du producteur initial"),
+  initialEmitterCompanyName: getActorNameSchema("du producteur initial"),
+  initialEmitterCompanyAddress: getActorAddressSchema("du producteur initial"),
+  initialEmitterCompanyPostalCode: getActorPostalCodeSchema(
+    "du producteur initial"
+  ),
+  initialEmitterCompanyCity: getActorCitySchema("du producteur initial"),
+  initialEmitterCompanyCountryCode: getActorCountryCodeSchema(
+    "du producteur initial"
+  ),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
   initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
-  emitterCompanyType: getActorTypeSchema("d'expéditeur"),
-  emitterCompanyOrgId: getActorOrgIdSchema("d'expéditeur"),
-  emitterCompanyName: getActorNameSchema("d'expéditeur'"),
-  emitterCompanyAddress: getActorAddressSchema("d'expéditeur"),
-  emitterCompanyPostalCode: getActorPostalCodeSchema("d'expéditeur"),
-  emitterCompanyCity: getActorCitySchema("d'expéditeur"),
-  emitterCompanyCountryCode: getActorCountryCodeSchema("d'expéditeur"),
+  emitterCompanyType: getActorTypeSchema("d'expéditeur ou détenteur"),
+  emitterCompanyOrgId: getActorOrgIdSchema("d'expéditeur ou détenteur"),
+  emitterCompanyName: getActorNameSchema("d'expéditeur ou détenteur'"),
+  emitterCompanyAddress: getActorAddressSchema("d'expéditeur ou détenteur"),
+  emitterCompanyPostalCode: getActorPostalCodeSchema(
+    "d'expéditeur ou détenteur"
+  ),
+  emitterCompanyCity: getActorCitySchema("d'expéditeur ou détenteur"),
+  emitterCompanyCountryCode: getActorCountryCodeSchema(
+    "d'expéditeur ou détenteur"
+  ),
   emitterPickupSiteName: z.string().nullish(),
   emitterPickupSiteAddress: getActorAddressSchema(
-    "de prise en charge de l'expéditeur"
+    "de prise en charge de l'expéditeur ou détenteur"
   ).nullish(),
   emitterPickupSitePostalCode: getActorPostalCodeSchema(
-    "de prise en charge de l'expéditeur"
+    "de prise en charge de l'expéditeur ou détenteur"
   ).nullish(),
   emitterPickupSiteCity: getActorCitySchema(
-    "de prise en charge de l'expéditeur"
+    "de prise en charge de l'expéditeur ou détenteur"
   ).nullish(),
   emitterPickupSiteCountryCode: getActorCountryCodeSchema(
-    "de prise en charge de l'expéditeur"
+    "de prise en charge de l'expéditeur ou détenteur"
   ).nullish(),
   brokerCompanySiret: getActorSiretSchema("du courtier").nullish(),
   brokerCompanyName: getActorNameSchema("du courtier").nullish(),
@@ -111,10 +139,8 @@ const inputIncomingWasteSchema = z.object({
       "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
     )
     .nullish(),
-  ecoOrganismeSiret: getActorSiretSchema("de l'éco-organisme").nullish(),
-  ecoOrganismeName: getActorNameSchema("de l'éco-organisme").nullish(),
   operationCode: getOperationCodeSchema(
-    INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
+    INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
   ),
   operationMode: operationModeSchema,
   noTraceability: noTraceability.nullish(),
@@ -123,8 +149,12 @@ const inputIncomingWasteSchema = z.object({
   notificationNumber: notificationNumberSchema,
   movementNumber: z.string().nullish(),
   nextOperationCode: getOperationCodeSchema(
-    INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
+    INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
   ).nullish(),
+  isUpcycled: isUpcycledSchema.nullish(),
+  destinationParcelInseeCodes: inseeCodesSchema,
+  destinationParcelNumbers: parcelNumbersSchema,
+  destinationParcelCoordinates: parcelCoordinatesSchema,
   transporter1TransportMode: transportModeSchema,
   transporter1CompanyType: getActorTypeSchema("de transporteur 1"),
   transporter1CompanyOrgId: getActorOrgIdSchema("du transporteur 1"),
@@ -191,7 +221,7 @@ const inputIncomingWasteSchema = z.object({
 });
 
 // Props added through transform
-const transformedIncomingWasteSchema = z.object({
+const transformedIncomingTexsSchema = z.object({
   id: z.string().optional(),
   reportForCompanyAddress: z.string().default(""),
   reportForCompanyCity: z.string().default(""),
@@ -199,6 +229,6 @@ const transformedIncomingWasteSchema = z.object({
   reportForCompanyName: z.coerce.string().default("")
 });
 
-export const incomingWasteSchema = inputIncomingWasteSchema.merge(
-  transformedIncomingWasteSchema
+export const incomingTexsSchema = inputIncomingTexsSchema.merge(
+  transformedIncomingTexsSchema
 );
