@@ -2494,7 +2494,7 @@ describe("Mutation.updateBsda", () => {
       });
     });
 
-    it("[bug prod] if user updates the BSDA by adding a nextDestination - should not send mail", async () => {
+    it("[bug prod] if user updates the BSDA by adding a nextDestination but does not modify the CAP - should not send mail", async () => {
       // Given
       const emitter = await companyFactory();
       const worker = await companyFactory();
@@ -2571,7 +2571,7 @@ describe("Mutation.updateBsda", () => {
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
     });
 
-    it("[bug prod] if user updates the BSDA by adding a nextDestination, and modifies the destination CAP - should not send mail", async () => {
+    it("[bug prod] if user updates the BSDA by adding a nextDestination, and modifies the destination CAP - should send mail", async () => {
       // Given
       const emitter = await companyFactory();
       const worker = await companyFactory();
@@ -2679,7 +2679,7 @@ describe("Mutation.updateBsda", () => {
       );
     });
 
-    it("[bug prod] if user updates the BSDA by removing a nextDestination - should not send mail", async () => {
+    it("[bug prod] if user updates the BSDA by removing a nextDestination, but does not change the CAP - should not send mail", async () => {
       // Given
       const emitter = await companyFactory();
       const worker = await companyFactory();
@@ -2757,7 +2757,7 @@ describe("Mutation.updateBsda", () => {
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
     });
 
-    it("[bug prod] if user updates the BSDA by removing the nextDestination, and modifies the destination CAP - should not send mail", async () => {
+    it("[bug prod] if user updates the BSDA by removing the nextDestination, and modifies the destination CAP - should send mail", async () => {
       // Given
       const emitter = await companyFactory();
       const worker = await companyFactory();
