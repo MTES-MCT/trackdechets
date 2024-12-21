@@ -157,4 +157,50 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
       expect(isReturnFor).toStrictEqual([]);
     });
   });
+
+  describe("isArchivedFor", () => {
+    it("DASRI is cancelled > should belong to tab", async () => {
+      // Given
+      const transporter = await companyFactory();
+      const destination = await companyFactory();
+      const ecoOrganisme = await companyFactory();
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          status: "CANCELED",
+          emitterCompanyName: emitter.name,
+          emitterCompanySiret: emitter.siret,
+          transporterCompanyName: transporter.name,
+          transporterCompanySiret: transporter.siret,
+          destinationCompanySiret: destination.siret,
+          ecoOrganismeSiret: ecoOrganisme.siret
+        }
+      });
+
+      // When
+      const bsdasriForElastic = await getBsdasriForElastic(bsdasri);
+      const {
+        isArchivedFor,
+        isDraftFor,
+        isForActionFor,
+        isFollowFor,
+        isToCollectFor,
+        isCollectedFor
+      } = toBsdElastic(bsdasriForElastic);
+
+      // Then
+      expect(isDraftFor).toStrictEqual([]);
+      expect(isForActionFor).toStrictEqual([]);
+      expect(isFollowFor).toStrictEqual([]);
+      expect(isToCollectFor).toStrictEqual([]);
+      expect(isCollectedFor).toStrictEqual([]);
+      expect(isArchivedFor.sort()).toStrictEqual(
+        [
+          emitter.siret,
+          transporter.siret,
+          destination.siret,
+          ecoOrganisme.siret
+        ].sort()
+      );
+    });
+  });
 });
