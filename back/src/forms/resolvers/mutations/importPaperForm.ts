@@ -1,9 +1,6 @@
 import { Form, Prisma, Status } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  ImportPaperFormInput,
-  MutationResolvers
-} from "../../../generated/graphql/types";
+import type { ImportPaperFormInput, MutationResolvers } from "@td/codegen-back";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import {
   getAndExpandFormFromDb,

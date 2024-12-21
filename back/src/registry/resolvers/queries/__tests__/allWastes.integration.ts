@@ -31,7 +31,7 @@ import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories"
 import { getBsvhuForElastic, indexBsvhu } from "../../../../bsvhu/elastic";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
-import { Query } from "../../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 import {
   formFactory,
   formWithTempStorageFactory,

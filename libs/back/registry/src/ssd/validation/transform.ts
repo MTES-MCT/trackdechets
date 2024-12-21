@@ -10,7 +10,7 @@ export async function transformAndRefineReason(
   const ssdItemInDb = await prisma.registrySsd.findFirst({
     where: {
       publicId: ssdItem.publicId,
-      reportForSiret: ssdItem.reportForSiret,
+      reportForCompanySiret: ssdItem.reportForCompanySiret,
       isActive: true
     }
   });

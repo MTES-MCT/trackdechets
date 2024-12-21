@@ -5591,16 +5591,18 @@ export const BSDD_WASTE_CODES = BSDD_WASTES.map(waste => waste.code);
 
 type WasteCode =
   (typeof ALL_WASTES_TREE)[number]["children"][number]["children"][number]["code"];
+
+export type WasteCodeEnum = Readonly<[WasteCode, ...WasteCode[]]>;
+
 const wasteCodesArray: WasteCode[] = ALL_WASTES_TREE.flatMap(parent =>
   parent.children.flatMap(child =>
     child.children.map(grandchild => grandchild.code)
   )
 );
-// Build an object that zods nativeEnum can ingest
-export const BSDD_WASTE_CODES_ENUM = wasteCodesArray.reduce((obj, cur) => {
-  obj[cur] = cur;
-  return obj;
-}, {} as Record<WasteCode, WasteCode>);
+
+// To be used in Zod enums
+export const BSDD_WASTE_CODES_ENUM =
+  wasteCodesArray as unknown as WasteCodeEnum;
 
 export const BSDA_WASTES = ALL_WASTES.filter(w =>
   BSDA_WASTE_CODES.some(code => code === w.code)
@@ -5633,6 +5635,14 @@ export const BSDD_SAMPLE_NUMBER_WASTE_CODES = [
   "13 02 06*",
   "13 02 07*",
   "13 02 08*"
+];
+
+export const INCOMING_TEXS_WASTE_CODES: WasteCodeEnum = [
+  "17 05 03*",
+  "17 05 04",
+  "17 05 05*",
+  "17 05 06",
+  "20 02 02"
 ];
 
 function flatten(wastes: readonly WasteNode[]): WasteNode[] {

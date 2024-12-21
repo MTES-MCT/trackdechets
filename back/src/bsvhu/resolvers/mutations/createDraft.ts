@@ -1,4 +1,4 @@
-import { MutationCreateBsvhuArgs } from "../../../generated/graphql/types";
+import type { MutationCreateBsvhuArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { genericCreate } from "./create";
 

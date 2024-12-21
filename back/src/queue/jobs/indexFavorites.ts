@@ -9,11 +9,11 @@ import {
   mergeCompanyToCompanySearchResult,
   searchCompany
 } from "../../companies/search";
-import { CompanySearchResult } from "../../companies/types";
-import {
+import type {
+  CompanySearchResult,
   FavoriteType,
   StatutDiffusionEtablissement
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, index } from "../../common/elastic";
 import { AnonymousCompanyError } from "../../companies/sirene/errors";

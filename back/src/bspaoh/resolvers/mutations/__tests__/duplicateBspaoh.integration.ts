@@ -8,10 +8,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { bspaohFactory } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 import { xDaysAgo } from "../../../../utils";
-import {
-  CompanySearchResult,
-  Mutation
-} from "../../../../generated/graphql/types";
+import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { searchCompany } from "../../../../companies/search";
 import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";

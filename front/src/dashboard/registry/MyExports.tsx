@@ -11,21 +11,21 @@ import {
   DeclarationType,
   FormsRegisterExportFormat,
   Mutation,
-  MutationGenerateWastesRegistryExportArgs,
+  MutationGenerateRegistryV2ExportArgs,
   Query,
-  QueryRegistryExportDownloadSignedUrlArgs,
-  RegistryExportStatus,
-  RegistryExportWasteType,
+  QueryRegistryV2ExportDownloadSignedUrlArgs,
+  RegistryV2ExportStatus,
+  RegistryV2ExportWasteType,
   UserRole,
-  WasteRegistryType
+  RegistryV2ExportType
 } from "@td/codegen-ui";
 import {
   badges,
   downloadFromSignedUrl,
-  GENERATE_REGISTRY_EXPORT,
+  GENERATE_REGISTRY_V2_EXPORT,
   GET_MY_COMPANIES_WITH_DELEGATORS,
-  GET_REGISTRY_EXPORTS,
-  REGISTRY_EXPORT_DOWNLOAD_SIGNED_URL
+  GET_REGISTRY_V2_EXPORTS,
+  REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL
 } from "./shared";
 import { FieldError, useForm } from "react-hook-form";
 import { datetimeToYYYYMMDD } from "../../Apps/Dashboard/Validation/BSPaoh/paohUtils";
@@ -59,19 +59,19 @@ const displayError = (error: FieldError | undefined) => {
   return error ? error.message : null;
 };
 
-const getRegistryTypeWording = (registryType: WasteRegistryType): string => {
+const getRegistryTypeWording = (registryType: RegistryV2ExportType): string => {
   switch (registryType) {
-    case WasteRegistryType.Ssd:
+    case RegistryV2ExportType.Ssd:
       return `Sortie de statut de déchet`;
-    case WasteRegistryType.Incoming:
+    case RegistryV2ExportType.Incoming:
       return `Registre entrant`;
-    case WasteRegistryType.Managed:
+    case RegistryV2ExportType.Managed:
       return `Registre géré`;
-    case WasteRegistryType.Outgoing:
+    case RegistryV2ExportType.Outgoing:
       return `Registre sortant`;
-    case WasteRegistryType.Transported:
+    case RegistryV2ExportType.Transported:
       return `Registre transporté`;
-    case WasteRegistryType.All:
+    case RegistryV2ExportType.All:
       return `Registre exhaustif`;
     default:
       return `Registre exhaustif`;
@@ -94,12 +94,12 @@ const getDeclarationTypeWording = (
 };
 
 const getFilterStateForRegistryType = (
-  registryType: WasteRegistryType,
+  registryType: RegistryV2ExportType,
   filterName: string
 ): {
   disabled: boolean;
 } => {
-  if (registryType === WasteRegistryType.Ssd) {
+  if (registryType === RegistryV2ExportType.Ssd) {
     if (filterName.startsWith("wasteTypes")) {
       return {
         disabled: true
@@ -109,7 +109,7 @@ const getFilterStateForRegistryType = (
         disabled: true
       };
     }
-  } else if (registryType === WasteRegistryType.All) {
+  } else if (registryType === RegistryV2ExportType.All) {
     if (filterName === "wasteTypes.dnd") {
       return {
         disabled: false
@@ -134,67 +134,67 @@ const getFilterStateForRegistryType = (
 };
 
 const getDefaultsForRegistryType = (
-  registryType: WasteRegistryType
+  registryType: RegistryV2ExportType
 ): {
-  wasteTypes: [RegistryExportWasteType, ...RegistryExportWasteType[]];
+  wasteTypes: [RegistryV2ExportWasteType, ...RegistryV2ExportWasteType[]];
   declarationType: DeclarationType;
 } => {
-  if (registryType === WasteRegistryType.Ssd) {
+  if (registryType === RegistryV2ExportType.Ssd) {
     return {
       wasteTypes: [
-        RegistryExportWasteType.Dnd,
-        RegistryExportWasteType.Dd,
-        RegistryExportWasteType.Texs
+        RegistryV2ExportWasteType.Dnd,
+        RegistryV2ExportWasteType.Dd,
+        RegistryV2ExportWasteType.Texs
       ],
       declarationType: DeclarationType.Registry
     };
-  } else if (registryType === WasteRegistryType.Incoming) {
+  } else if (registryType === RegistryV2ExportType.Incoming) {
     return {
       wasteTypes: [
-        RegistryExportWasteType.Dnd,
-        RegistryExportWasteType.Dd,
-        RegistryExportWasteType.Texs
+        RegistryV2ExportWasteType.Dnd,
+        RegistryV2ExportWasteType.Dd,
+        RegistryV2ExportWasteType.Texs
       ],
       declarationType: DeclarationType.All
     };
-  } else if (registryType === WasteRegistryType.Managed) {
+  } else if (registryType === RegistryV2ExportType.Managed) {
     return {
       wasteTypes: [
-        RegistryExportWasteType.Dnd,
-        RegistryExportWasteType.Dd,
-        RegistryExportWasteType.Texs
+        RegistryV2ExportWasteType.Dnd,
+        RegistryV2ExportWasteType.Dd,
+        RegistryV2ExportWasteType.Texs
       ],
       declarationType: DeclarationType.All
     };
-  } else if (registryType === WasteRegistryType.Outgoing) {
+  } else if (registryType === RegistryV2ExportType.Outgoing) {
     return {
       wasteTypes: [
-        RegistryExportWasteType.Dnd,
-        RegistryExportWasteType.Dd,
-        RegistryExportWasteType.Texs
+        RegistryV2ExportWasteType.Dnd,
+        RegistryV2ExportWasteType.Dd,
+        RegistryV2ExportWasteType.Texs
       ],
       declarationType: DeclarationType.All
     };
-  } else if (registryType === WasteRegistryType.Transported) {
+  } else if (registryType === RegistryV2ExportType.Transported) {
     return {
       wasteTypes: [
-        RegistryExportWasteType.Dnd,
-        RegistryExportWasteType.Dd,
-        RegistryExportWasteType.Texs
+        RegistryV2ExportWasteType.Dnd,
+        RegistryV2ExportWasteType.Dd,
+        RegistryV2ExportWasteType.Texs
       ],
       declarationType: DeclarationType.All
     };
-  } else if (registryType === WasteRegistryType.All) {
+  } else if (registryType === RegistryV2ExportType.All) {
     return {
-      wasteTypes: [RegistryExportWasteType.Dnd, RegistryExportWasteType.Dd],
+      wasteTypes: [RegistryV2ExportWasteType.Dnd, RegistryV2ExportWasteType.Dd],
       declarationType: DeclarationType.Bsd
     };
   }
   return {
     wasteTypes: [
-      RegistryExportWasteType.Dnd,
-      RegistryExportWasteType.Dd,
-      RegistryExportWasteType.Texs
+      RegistryV2ExportWasteType.Dnd,
+      RegistryV2ExportWasteType.Dd,
+      RegistryV2ExportWasteType.Texs
     ],
     declarationType: DeclarationType.All
   };
@@ -282,10 +282,10 @@ const getSchema = () =>
           })
           .nullish()
       ),
-      registryType: z.nativeEnum(WasteRegistryType),
+      registryType: z.nativeEnum(RegistryV2ExportType),
       format: z.nativeEnum(FormsRegisterExportFormat),
       declarationType: z.nativeEnum(DeclarationType),
-      wasteTypes: z.nativeEnum(RegistryExportWasteType).array().nonempty({
+      wasteTypes: z.nativeEnum(RegistryV2ExportWasteType).array().nonempty({
         message: "Veullez sélectionner au moins un type de déchet"
       })
     })
@@ -319,30 +319,30 @@ export function MyExports() {
     data: exportsData,
     loading: exportsLoading,
     refetch
-  } = useQuery<Pick<Query, "registryExports">>(GET_REGISTRY_EXPORTS);
-  const registryExports = exportsData?.registryExports?.edges;
+  } = useQuery<Pick<Query, "registryV2Exports">>(GET_REGISTRY_V2_EXPORTS);
+  const registryExports = exportsData?.registryV2Exports?.edges;
   const [generateExport, { loading: generateLoading }] = useMutation<
-    Pick<Mutation, "generateWastesRegistryExport">,
-    Omit<MutationGenerateWastesRegistryExportArgs, "where"> & {
+    Pick<Mutation, "generateRegistryV2Export">,
+    Omit<MutationGenerateRegistryV2ExportArgs, "where"> & {
       declarationType: DeclarationType;
-      wasteTypes: RegistryExportWasteType[] | null;
+      wasteTypes: RegistryV2ExportWasteType[] | null;
       wasteCodes: string[] | null;
     }
-  >(GENERATE_REGISTRY_EXPORT, {
-    refetchQueries: [GET_REGISTRY_EXPORTS]
+  >(GENERATE_REGISTRY_V2_EXPORT, {
+    refetchQueries: [GET_REGISTRY_V2_EXPORTS]
   });
 
   const [getDownloadLink] = useLazyQuery<
-    Pick<Query, "registryExportDownloadSignedUrl">,
-    Partial<QueryRegistryExportDownloadSignedUrlArgs>
-  >(REGISTRY_EXPORT_DOWNLOAD_SIGNED_URL, { fetchPolicy: "no-cache" });
+    Pick<Query, "registryV2ExportDownloadSignedUrl">,
+    Partial<QueryRegistryV2ExportDownloadSignedUrlArgs>
+  >(REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL, { fetchPolicy: "no-cache" });
 
   async function downloadRegistryExportFile(exportId: string) {
     const link = await getDownloadLink({
       variables: { exportId }
     });
     await downloadFromSignedUrl(
-      link.data?.registryExportDownloadSignedUrl.signedUrl
+      link.data?.registryV2ExportDownloadSignedUrl.signedUrl
     );
   }
 
@@ -356,13 +356,13 @@ export function MyExports() {
   } = useForm<z.infer<typeof validationSchema>>({
     defaultValues: {
       startDate: format(startOfYear(new Date()), "yyyy-MM-dd"),
-      registryType: WasteRegistryType.Ssd,
+      registryType: RegistryV2ExportType.Ssd,
       format: FormsRegisterExportFormat.Csv,
       declarationType: DeclarationType.All,
       wasteTypes: [
-        RegistryExportWasteType.Dd,
-        RegistryExportWasteType.Dnd,
-        RegistryExportWasteType.Texs
+        RegistryV2ExportWasteType.Dd,
+        RegistryV2ExportWasteType.Dnd,
+        RegistryV2ExportWasteType.Texs
       ]
     },
     resolver: zodResolver(validationSchema)
@@ -436,7 +436,7 @@ export function MyExports() {
         delegateSiret = company.delegate;
       }
     }
-    if (registryType !== WasteRegistryType.Ssd) {
+    if (registryType !== RegistryV2ExportType.Ssd) {
       toast.error("Seul l'export SSD est supporté pour le moment");
       return;
     }
@@ -444,14 +444,14 @@ export function MyExports() {
       variables: {
         siret,
         delegateSiret,
-        registryType, // WasteRegistryType.Ssd
+        registryType, // RegistryV2ExportType.Ssd
         format, //FormsRegisterExportFormat.Csv
         dateRange: {
           _gte: startOfDayStartDate,
           _lt: endOfDayEndDate
         },
         declarationType, // DeclarationType.All
-        wasteTypes, //RegistryExportWasteType[]
+        wasteTypes, //RegistryV2ExportWasteType[]
         wasteCodes: null
       },
       onCompleted: () => toast.success("Génération de l'export lancée !"),
@@ -515,12 +515,12 @@ export function MyExports() {
                   ...register("registryType")
                 }}
               >
-                {Object.keys(WasteRegistryType).map(key => (
+                {Object.keys(RegistryV2ExportType).map(key => (
                   <option
-                    value={WasteRegistryType[key]}
-                    key={WasteRegistryType[key]}
+                    value={RegistryV2ExportType[key]}
+                    key={RegistryV2ExportType[key]}
                   >
-                    {getRegistryTypeWording(WasteRegistryType[key])}
+                    {getRegistryTypeWording(RegistryV2ExportType[key])}
                   </option>
                 ))}
               </Select>
@@ -556,7 +556,7 @@ export function MyExports() {
                   {
                     label: "Déchets non dangereux",
                     nativeInputProps: {
-                      value: RegistryExportWasteType.Dnd,
+                      value: RegistryV2ExportWasteType.Dnd,
                       disabled: getFilterStateForRegistryType(
                         registryType,
                         "wasteTypes.dnd"
@@ -567,7 +567,7 @@ export function MyExports() {
                   {
                     label: "Déchets dangereux",
                     nativeInputProps: {
-                      value: RegistryExportWasteType.Dd,
+                      value: RegistryV2ExportWasteType.Dd,
                       disabled: getFilterStateForRegistryType(
                         registryType,
                         "wasteTypes.dd"
@@ -578,7 +578,7 @@ export function MyExports() {
                   {
                     label: "Terres et sédiments",
                     nativeInputProps: {
-                      value: RegistryExportWasteType.Texs,
+                      value: RegistryV2ExportWasteType.Texs,
                       disabled: getFilterStateForRegistryType(
                         registryType,
                         "wasteTypes.texs"
@@ -740,7 +740,7 @@ export function MyExports() {
                         registryExport.node.endDate
                       ),
                       registryExport.node.status ===
-                      RegistryExportStatus.Successful ? (
+                      RegistryV2ExportStatus.Successful ? (
                         <Button
                           title="Télécharger"
                           priority="secondary"
@@ -751,9 +751,9 @@ export function MyExports() {
                           size="small"
                         />
                       ) : registryExport.node.status ===
-                          RegistryExportStatus.Pending ||
+                          RegistryV2ExportStatus.Pending ||
                         registryExport.node.status ===
-                          RegistryExportStatus.Started ? (
+                          RegistryV2ExportStatus.Started ? (
                         <Button
                           title="Rafraîchir"
                           disabled={exportsLoading}

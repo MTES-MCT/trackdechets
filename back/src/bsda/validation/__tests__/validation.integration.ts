@@ -24,10 +24,9 @@ import {
   PrismaBsdaForParsing
 } from "../types";
 import { ZodError } from "zod";
-import { CompanySearchResult } from "../../../companies/types";
 import { searchCompany } from "../../../companies/search";
 import { mergeInputAndParseBsdaAsync, parseBsda, parseBsdaAsync } from "..";
-import { BsdaInput } from "../../../generated/graphql/types";
+import type { BsdaInput, CompanySearchResult } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 
 jest.mock("../../../companies/search");

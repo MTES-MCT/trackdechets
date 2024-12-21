@@ -15,7 +15,7 @@ import {
   safeInput,
   undefinedOrDefault
 } from "../common/converter";
-import {
+import type {
   InitialForm,
   Broker,
   BrokerInput,
@@ -57,7 +57,7 @@ import {
   WasteDetails,
   WasteDetailsInput,
   WorkSite
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";

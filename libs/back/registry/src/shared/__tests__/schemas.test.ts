@@ -2,10 +2,10 @@ import { z, ZodError } from "zod";
 import {
   reasonSchema,
   publicIdSchema,
-  wasteCodeSchema,
+  getWasteCodeSchema,
   wasteDescriptionSchema,
   wasteCodeBaleSchema,
-  operationCodeSchema,
+  getOperationCodeSchema,
   weightValueSchema,
   weightIsEstimateSchema,
   volumeSchema,
@@ -17,7 +17,7 @@ import {
   getActorPostalCodeSchema,
   getActorCountryCodeSchema,
   transportModeSchema,
-  transportReceiptNumberSchema
+  transportRecepisseNumberSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
 
@@ -54,9 +54,9 @@ describe("Schemas", () => {
     expect(() => publicIdSchema.parse("invalid id")).toThrow();
   });
 
-  test("wasteCodeSchema", () => {
-    expect(() => wasteCodeSchema.parse("17 02 01")).not.toThrow();
-    expect(() => wasteCodeSchema.parse("invalid")).toThrow();
+  test("getWasteCodeSchema", () => {
+    expect(() => getWasteCodeSchema().parse("17 02 01")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("invalid")).toThrow();
   });
 
   test("wasteDescriptionSchema", () => {
@@ -73,9 +73,9 @@ describe("Schemas", () => {
     expect(() => wasteCodeBaleSchema.parse("A0000")).toThrow();
   });
 
-  test("operationCodeSchema", () => {
-    expect(operationCodeSchema.parse("D5")).toBe("D 5");
-    expect(() => operationCodeSchema.parse("invalid")).toThrow();
+  test("getOperationCodeSchema", () => {
+    expect(getOperationCodeSchema().parse("D5")).toBe("D 5");
+    expect(() => getOperationCodeSchema().parse("invalid")).toThrow();
   });
 
   test("weightValueSchema", () => {
@@ -104,7 +104,7 @@ describe("Schemas", () => {
 
   test("getActorTypeSchema", () => {
     const actorTypeSchema = getActorTypeSchema("test");
-    expect(actorTypeSchema.parse("ENTREPRISE_FR")).toBe("ENTREPRISE_FR");
+    expect(actorTypeSchema.parse("ETABLISSEMENT_FR")).toBe("ETABLISSEMENT_FR");
     expect(() => actorTypeSchema.parse("INVALID")).toThrow();
   });
 
@@ -154,9 +154,11 @@ describe("Schemas", () => {
     expect(() => transportModeSchema.parse("INVALID")).toThrow();
   });
 
-  test("transportReceiptNumberSchema", () => {
-    expect(transportReceiptNumberSchema.parse("12345")).toBe("12345");
-    expect(() => transportReceiptNumberSchema.parse("1234")).toThrow();
-    expect(() => transportReceiptNumberSchema.parse("a".repeat(51))).toThrow();
+  test("transportRecepisseNumberSchema", () => {
+    expect(transportRecepisseNumberSchema.parse("12345")).toBe("12345");
+    expect(() => transportRecepisseNumberSchema.parse("1234")).toThrow();
+    expect(() =>
+      transportRecepisseNumberSchema.parse("a".repeat(51))
+    ).toThrow();
   });
 });

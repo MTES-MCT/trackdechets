@@ -4,13 +4,13 @@ import {
 } from "..";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { bsdasriFactory } from "../../../bsdasris/__tests__/factories";
-import {
+import type {
   Mutation,
   MutationCreateBsdasriArgs,
   MutationSignBsdasriArgs,
   MutationSubmitBsdasriRevisionRequestApprovalArgs,
   MutationUpdateBsdasriArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   transporterReceiptFactory,

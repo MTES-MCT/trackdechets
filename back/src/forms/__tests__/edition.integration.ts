@@ -5,7 +5,7 @@ import {
   toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-import { UpdateFormInput } from "../../generated/graphql/types";
+import type { UpdateFormInput } from "@td/codegen-back";
 import { getFirstTransporterSync, getFullForm } from "../database";
 import { checkEditionRules } from "../edition";
 import { prisma } from "@td/prisma";

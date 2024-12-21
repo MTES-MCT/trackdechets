@@ -1,14 +1,13 @@
-import { prisma } from "@td/prisma";
-import { UserInputError } from "../../../common/errors";
+import { getSignedUrlForUpload } from "@td/registry";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryRegistryImportArgs } from "../../../generated/graphql/types";
+import type { QueryRegistryUploadSignedUrlArgs } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 
-export async function registryImport(
+export async function registryUploadSignedUrl(
   _,
-  { id }: QueryRegistryImportArgs,
+  { fileName }: QueryRegistryUploadSignedUrlArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
@@ -20,14 +19,14 @@ export async function registryImport(
     `Vous n'êtes pas autorisé à importer des données dans le registre`
   );
 
-  const registryImport = await prisma.registryImport.findUnique({
-    where: { id, createdById: user.id },
-    include: { createdBy: true, associations: true }
+  const fileKey = [Date.now(), user.id, fileName].join("_");
+
+  const signedUrl = await getSignedUrlForUpload({
+    bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET!,
+    key: fileKey,
+    metadata: { filename: fileName },
+    tags: { temp: "true", userId: user.id }
   });
 
-  if (!registryImport) {
-    throw new UserInputError(`Import de registre "${id}" non trouvé`);
-  }
-
-  return registryImport;
+  return { fileKey, signedUrl };
 }

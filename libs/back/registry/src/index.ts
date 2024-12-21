@@ -1,6 +1,8 @@
 export * from "./import";
 export {
   ImportType,
+  ImportOptions,
+  ParsedLine,
   IMPORT_TYPES,
   importOptions,
   exportOptions

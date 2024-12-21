@@ -2,7 +2,7 @@ import {
   checkIsAuthenticated,
   checkSecurityCode
 } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import {
   getFirstTransporterSync,
   getFormOrFormNotFound,

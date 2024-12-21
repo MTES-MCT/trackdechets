@@ -1,9 +1,9 @@
-import {
+import type {
   FileDownload,
   QueryResolvers,
   QueryWastesRegistryXlsArgs,
   WasteRegistryType
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getRegistryFileName } from "../../filename";
@@ -17,12 +17,8 @@ export const wastesRegistryXlsDownloadHandler: DownloadHandler<QueryWastesRegist
   {
     name: "wastesRegistryXls",
     handler: (_, res, args) => {
-      if (args.registryType === "SSD") {
-        res.sendStatus(404);
-        return;
-      }
       const reader = wastesReader({
-        registryType: args.registryType as Exclude<WasteRegistryType, "SSD">,
+        registryType: args.registryType as WasteRegistryType,
         sirets: args.sirets,
         where: args.where,
         chunk: 100

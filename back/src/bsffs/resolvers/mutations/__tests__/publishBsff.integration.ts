@@ -2,10 +2,7 @@ import { BsffPackagingType, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
-import {
-  Mutation,
-  MutationPublishBsffArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationPublishBsffArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";

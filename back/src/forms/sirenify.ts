@@ -3,14 +3,14 @@ import buildSirenify, {
   nextBuildSirenify,
   NextCompanyInputAccessor
 } from "../companies/sirenify";
-import {
+import type {
   CompanyInput,
   CreateFormInput,
   NextSegmentInfoInput,
   ResealedFormInput,
   TransporterInput,
   UpdateFormInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 
 type FormInput = CreateFormInput | UpdateFormInput;
 

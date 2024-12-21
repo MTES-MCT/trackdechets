@@ -6,10 +6,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
-import {
-  CompanySearchResult,
-  Mutation
-} from "../../../../generated/graphql/types";
+import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { BsdasriType } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { xDaysAgo } from "../../../../utils";

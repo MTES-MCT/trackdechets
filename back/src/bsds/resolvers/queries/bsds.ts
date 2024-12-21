@@ -1,9 +1,9 @@
 import { ApiResponse, estypes } from "@elastic/elasticsearch";
-import {
+import type {
   QueryResolvers,
   QueryBsdsArgs,
   OrderType
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { client, BsdElastic, index } from "../../../common/elastic";

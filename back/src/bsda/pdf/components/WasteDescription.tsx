@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BsdaWaste } from "../../../generated/graphql/types";
+import type { BsdaWaste } from "@td/codegen-back";
 
 type Props = {
   waste?: BsdaWaste | null;

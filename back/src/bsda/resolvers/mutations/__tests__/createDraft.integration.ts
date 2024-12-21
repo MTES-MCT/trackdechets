@@ -1,10 +1,10 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import {
+import type {
   BsdaInput,
   Mutation,
   MutationCreateDraftBsdaArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   companyFactory,
   siretify,

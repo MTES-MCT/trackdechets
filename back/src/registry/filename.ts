@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { WasteRegistryType } from "../generated/graphql/types";
+import type { WasteRegistryType } from "@td/codegen-back";
 
 export function getRegistryFileName(
   registryType: WasteRegistryType,
@@ -23,7 +23,6 @@ export function getRegistryFileName(
 
 export function formatRegistryType(typename: WasteRegistryType) {
   const mapping: Record<WasteRegistryType, string> = {
-    SSD: "Sortie de statut de déchet",
     INCOMING: "Entrant",
     OUTGOING: "Sortant",
     TRANSPORTED: "Transport",

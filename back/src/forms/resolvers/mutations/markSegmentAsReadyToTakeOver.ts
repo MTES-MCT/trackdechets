@@ -1,5 +1,5 @@
 import { markSegmentAsReadyToTakeOver } from "./multiModal";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 
 const markSegmentAsReadyToTakeOverResolver: MutationResolvers["markSegmentAsReadyToTakeOver"] =
   (parent, args, context) => {

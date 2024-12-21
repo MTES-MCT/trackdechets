@@ -1,20 +1,18 @@
 import * as Excel from "exceljs";
-import {
+import type {
   AllWaste,
   BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
-  SsdWaste,
   TransportedWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { GenericWaste } from "./types";
 import { formatStatusLabel } from "@td/constants";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { TransportMode } from "@prisma/client";
 import { isDefined } from "../common/helpers";
-import { RegistryExportSource } from "@td/codegen-back";
 
 // Type for custom fields that might not be in the DB
 // But that we still want to display (ie for user convenience)
@@ -23,8 +21,7 @@ export type CustomWasteColumns = {
   statusLabel: string;
 };
 
-export type WasteField = keyof (SsdWaste &
-  IncomingWaste &
+export type WasteField = keyof (IncomingWaste &
   OutgoingWaste &
   TransportedWaste &
   ManagedWaste &
@@ -121,24 +118,6 @@ const formatHasCiterneBeenWashedOut = (
   if (!isDefined(hasCiterneBeenWashedOut)) return "";
 
   return hasCiterneBeenWashedOut ? "Effectué" : "Non effectué";
-};
-
-const formatSource = (source: RegistryExportSource) => {
-  switch (source) {
-    case "BSD":
-      return "Tracé";
-    case "REGISTRY":
-      return "Déclaré";
-    default:
-      return "";
-  }
-};
-
-const formatEstimateBoolean = (isEstimate: boolean | null) => {
-  if (isEstimate === null || isEstimate === undefined) {
-    return "";
-  }
-  return isEstimate ? "ESTIME" : "REEL";
 };
 
 export const columns: Column[] = [
@@ -597,121 +576,7 @@ export const columns: Column[] = [
     label: "Transporteur n°5 date de dépôt",
     format: formatDate
   },
-  { field: "transporter5CompanyMail", label: "Transporteur n°5 contact" },
-  // registry V2 fields (some are already handled above)
-  {
-    field: "source",
-    label: "Source",
-    format: formatSource
-  },
-  {
-    field: "publicId",
-    label: "Numéro unique"
-  },
-  {
-    field: "reportAsSiret",
-    label: "SIRET du déclarant"
-  },
-  {
-    field: "reportForSiret",
-    label: "SIRET de l'émetteur"
-  },
-  {
-    field: "reportForName",
-    label: "Raison sociale de l'émetteur"
-  },
-  {
-    field: "useDate",
-    label: "Date d'utilisation",
-    format: formatDate
-  },
-  {
-    field: "dispatchDate",
-    label: "Date d'expédition",
-    format: formatDate
-  },
-  {
-    field: "wasteCodeBale",
-    label: "Code déchet Bâle"
-  },
-  {
-    field: "secondaryWasteCodes",
-    label: "Codes déchets secondaires"
-  },
-  {
-    field: "secondaryWasteDescriptions",
-    label: "Dénominations des déchets secondaires"
-  },
-  {
-    field: "product",
-    label: "Produit"
-  },
-  {
-    field: "weightValue",
-    label: "Poids en tonnes",
-    format: formatNumber
-  },
-  {
-    field: "weightIsEstimate",
-    label: "Type de poids",
-    format: formatEstimateBoolean
-  },
-  {
-    field: "volume",
-    label: "Quantité en M3",
-    format: formatNumber
-  },
-  {
-    field: "processingDate",
-    label: "Date de traitement",
-    format: formatDate
-  },
-  {
-    field: "processingEndDate",
-    label: "Date de fin de traitement",
-    format: formatDate
-  },
-  {
-    field: "destinationType",
-    label: "Type de destinataire"
-  },
-  {
-    field: "destinationOrgId",
-    label: "Numéro d'identification du destinataire"
-  },
-  {
-    field: "destinationName",
-    label: "Raison sociale du destinataire"
-  },
-  {
-    field: "destinationAddress",
-    label: "Adresse du destinataire"
-  },
-  {
-    field: "destinationPostalCode",
-    label: "Code postal du destinataire"
-  },
-  {
-    field: "destinationCity",
-    label: "Commune du destinataire"
-  },
-  {
-    field: "destinationCountryCode",
-    label: "Pays du destinataire"
-  },
-  {
-    field: "operationCode",
-    label: "Code d'opération",
-    format: formatOperationCode
-  },
-  {
-    field: "operationMode",
-    label: "Mode de traitement"
-  },
-  {
-    field: "administrativeActReference",
-    label: "Référence de l'acte administratif"
-  }
+  { field: "transporter5CompanyMail", label: "Transporteur n°5 contact" }
 ];
 
 export function formatRow(

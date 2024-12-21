@@ -5,12 +5,11 @@ import {
   UserRole
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
+import { Mutation, MutationDeleteCompanyArgs } from "@td/codegen-back";
 import {
   associateUserToCompany,
   endOfDay,
   inXDays,
-  Mutation,
-  MutationDeleteCompanyArgs,
   todayAtMidnight,
   toddMMYYYY
 } from "back";

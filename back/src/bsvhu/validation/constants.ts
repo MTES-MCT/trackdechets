@@ -1,4 +1,4 @@
-import { SignatureTypeInput } from "../../generated/graphql/types";
+import type { SignatureTypeInput } from "@td/codegen-back";
 import { ZodBsvhu } from "./schema";
 
 export const BSVHU_SIGNATURES_HIERARCHY: {

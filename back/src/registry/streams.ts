@@ -1,8 +1,5 @@
 import { Readable, ReadableOptions, Transform } from "stream";
-import {
-  WasteRegistryType,
-  WasteRegistryWhere
-} from "../generated/graphql/types";
+import type { WasteRegistryType, WasteRegistryWhere } from "@td/codegen-back";
 import { formatRow } from "./columns";
 import { GenericWaste } from "./types";
 import getWasteConnection from "./wastes";
@@ -18,7 +15,7 @@ export class WasteReader extends Readable {
   }
 }
 export interface WasteReaderArgs {
-  registryType: Exclude<WasteRegistryType, "SSD">;
+  registryType: WasteRegistryType;
   sirets: string[];
   where?: WasteRegistryWhere | null;
   chunk?: number;

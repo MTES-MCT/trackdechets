@@ -9,10 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { gql } from "graphql-tag";
-import {
-  Mutation,
-  MutationEditSegmentArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationEditSegmentArgs } from "@td/codegen-back";
 
 jest.mock("axios", () => ({
   default: {

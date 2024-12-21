@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
-import {
-  QueryFormPdfArgs,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import type { QueryFormPdfArgs, QueryResolvers } from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { hasGovernmentReadAllBsdsPermOrThrow } from "../../../permissions";

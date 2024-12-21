@@ -7,6 +7,7 @@ export const envConfig = z
     S3_ACCESS_KEY_ID: z.string(),
     S3_SECRET_ACCESS_KEY: z.string(),
     S3_REGISTRY_ERRORS_BUCKET: z.string(),
-    S3_REGISTRY_IMPORTS_BUCKET: z.string()
+    S3_REGISTRY_IMPORTS_BUCKET: z.string(),
+    S3_REGISTRY_MODELS_BUCKET: z.string()
   })
   .parse(process.env);
