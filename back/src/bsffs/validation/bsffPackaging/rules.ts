@@ -1,6 +1,7 @@
 import { SealedFieldError } from "../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 import { capitalize } from "../../../common/strings";
+import { daysBetween } from "../../../utils";
 import { isFinalOperation } from "../../constants";
 import { getUpdatedFields } from "../bsff/helpers";
 import { getCurrentSignatureType, getSignatureAncestors } from "./helpers";
@@ -9,6 +10,7 @@ import {
   BsffPackagingSignatureType,
   BsffPackagingValidationContext
 } from "./types";
+import { differenceInDays } from "date-fns";
 
 // Specs métier
 // https://docs.google.com/spreadsheets/d/1Uvd04DsmTNiMr4wzpfmS2uLd84i6IzJsgXssxzy_2ns/edit#gid=0
@@ -49,15 +51,27 @@ function requireNextDestination(bsffPackaging: ZodBsffPackaging) {
   return false;
 }
 
+// tra-15501 Le destinataire peut modifier les informations du contenant
+// (acceptation et opération) jusqu'à 60 jours après l'opération
+function isOperationDateMoreThan60DaysAgo(bsffPackaging: ZodBsffPackaging) {
+  if (bsffPackaging.operationSignatureDate) {
+    return (
+      differenceInDays(new Date(), bsffPackaging.operationSignatureDate) > 60
+    );
+  }
+  return false;
+}
+
 export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
   numero: {
     sealed: {
-      from: "ACCEPTATION"
+      from: "OPERATION",
+      when: isOperationDateMoreThan60DaysAgo
     },
     required: { from: "ACCEPTATION" }
   },
   acceptationDate: {
-    sealed: { from: "ACCEPTATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "ACCEPTATION" }
   },
   acceptationStatus: {
@@ -65,7 +79,7 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     required: { from: "ACCEPTATION" }
   },
   acceptationWeight: {
-    sealed: { from: "ACCEPTATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "ACCEPTATION" }
   },
   acceptationRefusalReason: {
@@ -78,24 +92,24 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     }
   },
   acceptationWasteCode: {
-    sealed: { from: "ACCEPTATION" }
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo }
     // ce champ n'est pas requis car il est auto-complété
     // dans la mutation signBsff
   },
   acceptationWasteDescription: {
-    sealed: { from: "ACCEPTATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "ACCEPTATION" }
   },
   operationDate: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "OPERATION" }
   },
   operationCode: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "OPERATION" }
   },
   operationMode: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: {
       from: "OPERATION",
       when: bsffPackaging => {
@@ -110,25 +124,26 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     }
   },
   operationDescription: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "OPERATION" }
   },
   operationNoTraceability: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "OPERATION" }
   },
   operationNextDestinationPlannedOperationCode: {
-    sealed: { from: "OPERATION", when: requireNextDestination }
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
+    required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCap: {
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo }
   },
   operationNextDestinationCompanyName: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCompanySiret: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: {
       from: "OPERATION",
       when: bsffPackaging =>
@@ -137,7 +152,7 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     }
   },
   operationNextDestinationCompanyVatNumber: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: {
       from: "OPERATION",
       when: bsffPackaging =>
@@ -146,19 +161,19 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     }
   },
   operationNextDestinationCompanyAddress: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCompanyContact: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCompanyPhone: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCompanyMail: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "OPERATION", when: isOperationDateMoreThan60DaysAgo },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   acceptationSignatureAuthor: {
@@ -182,17 +197,17 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
  * en train d'essayer de modifier des données qui ont été verrouillée
  * par une signature
  * @param persisted BsffPackaging persisté en base
- * @param bsff BsffPackaging avec les modifications apportées par l'input
+ * @param bsffPackaging BsffPackaging avec les modifications apportées par l'input
  * @param user Utilisateur qui effectue la modification
  */
 export async function checkBsffPackagingSealedFields(
   persisted: ZodBsffPackaging,
-  bsff: ZodBsffPackaging,
+  bsffPackaging: ZodBsffPackaging,
   context: BsffPackagingValidationContext
 ) {
   const sealedFieldErrors: string[] = [];
 
-  const updatedFields = getUpdatedFields(persisted, bsff);
+  const updatedFields = getUpdatedFields(persisted, bsffPackaging);
 
   const currentSignatureType =
     context.currentSignatureType ?? getCurrentSignatureType(persisted);
@@ -209,7 +224,9 @@ export async function checkBsffPackagingSealedFields(
       : `Le champ ${field}`;
 
     const isSealed =
-      sealedRule.from && signaturesToCheck.includes(sealedRule.from);
+      sealedRule.from &&
+      (!sealedRule.when || sealedRule.when(bsffPackaging)) &&
+      signaturesToCheck.includes(sealedRule.from);
 
     if (isSealed) {
       sealedFieldErrors.push(

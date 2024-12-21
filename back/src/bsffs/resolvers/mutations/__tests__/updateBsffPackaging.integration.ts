@@ -138,6 +138,46 @@ describe("Mutation.updateBsffPackaging", () => {
     );
   });
 
+  test("after acceptation > it should be possible to update sealed fields", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsffBeforeOperation({
+      emitter,
+      transporter,
+      destination
+    });
+
+    const packagingId = bsff.packagings[0].id;
+
+    const { mutate } = makeClient(destination.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsffPackaging">,
+      MutationUpdateBsffPackagingArgs
+    >(UPDATE_BSFF_PACKAGING, {
+      variables: {
+        id: packagingId,
+        input: {
+          numero: "nouveau-numero",
+          acceptation: {
+            date: "2022-11-04" as any,
+            weight: 2,
+            status: "ACCEPTED",
+            wasteCode: "14 06 02*",
+            wasteDescription: "HFC"
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
+      where: { id: packagingId }
+    });
+    expect(updatedPackaging.numero).toEqual("nouveau-numero");
+  });
+
   test("before acceptation > it should be possible to update numero", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");
@@ -220,158 +260,149 @@ describe("Mutation.updateBsffPackaging", () => {
     ]);
   });
 
-  test("after acceptation > it should not be possible to update sealed fields", async () => {
-    const emitter = await userWithCompanyFactory("MEMBER");
-    const transporter = await userWithCompanyFactory("MEMBER");
-    const destination = await userWithCompanyFactory("MEMBER");
-    const bsff = await createBsffBeforeOperation({
-      emitter,
-      transporter,
-      destination
-    });
+  test(
+    "less than 60 days after operation >" +
+      " it should be possible to update acceptation and operation fields",
+    async () => {
+      const emitter = await userWithCompanyFactory("MEMBER");
+      const transporter = await userWithCompanyFactory("MEMBER");
+      const destination = await userWithCompanyFactory("MEMBER");
+      const nextDestination = await userWithCompanyFactory("MEMBER");
+      const bsff = await createBsffAfterOperation(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        { packagingData: { operationSignatureDate: new Date() } }
+      );
 
-    const packagingId = bsff.packagings[0].id;
+      const packagingId = bsff.packagings[0].id;
 
-    const { mutate } = makeClient(destination.user);
-    const { errors } = await mutate<
-      Pick<Mutation, "updateBsffPackaging">,
-      MutationUpdateBsffPackagingArgs
-    >(UPDATE_BSFF_PACKAGING, {
-      variables: {
-        id: packagingId,
-        input: {
-          numero: "nouveau-numero",
-          acceptation: {
-            date: "2022-11-04" as any,
-            weight: 2,
-            status: "ACCEPTED",
-            wasteCode: "14 06 02*",
-            wasteDescription: "HFC"
-          }
-        }
-      }
-    });
-
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " Le champ numero a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ acceptationDate a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ acceptationWeight a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ acceptationWasteDescription a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ acceptationWasteCode a été verrouillé via signature et ne peut pas être modifié."
-      })
-    ]);
-  });
-
-  test("before operation > it should be possible to update operation fields", async () => {
-    const emitter = await userWithCompanyFactory("MEMBER");
-    const transporter = await userWithCompanyFactory("MEMBER");
-    const destination = await userWithCompanyFactory("MEMBER");
-    const nextDestination = await userWithCompanyFactory("MEMBER");
-    const bsff = await createBsffBeforeOperation({
-      emitter,
-      transporter,
-      destination
-    });
-
-    const packagingId = bsff.packagings[0].id;
-
-    const { mutate } = makeClient(destination.user);
-    await mutate<
-      Pick<Mutation, "updateBsffPackaging">,
-      MutationUpdateBsffPackagingArgs
-    >(UPDATE_BSFF_PACKAGING, {
-      variables: {
-        id: packagingId,
-        input: {
-          operation: {
-            date: "2022-11-05" as any,
-            code: "D13",
-            mode: null,
-            description: "Regroupement",
-            nextDestination: {
-              plannedOperationCode: "R2",
-              cap: "CAP 2",
-              company: {
-                siret: nextDestination.company.siret,
-                name: "Traiteur & Co",
-                address: "1 avenue des roses 67100 Strasbourg",
-                contact: "Thomas Largeron",
-                phone: "03 00 00 00 00",
-                mail: "thomas.largeron@traiteur.fr"
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsffPackaging">,
+        MutationUpdateBsffPackagingArgs
+      >(UPDATE_BSFF_PACKAGING, {
+        variables: {
+          id: packagingId,
+          input: {
+            numero: "nouveau-numero",
+            acceptation: {
+              date: "2022-11-04" as any,
+              weight: 2,
+              status: "ACCEPTED",
+              wasteCode: "14 06 02*",
+              wasteDescription: "HFC"
+            },
+            operation: {
+              date: "2022-11-05" as any,
+              code: "D13",
+              mode: null,
+              description: "Regroupement",
+              nextDestination: {
+                plannedOperationCode: "R2",
+                cap: "CAP 2",
+                company: {
+                  siret: nextDestination.company.siret,
+                  name: "Traiteur & Co",
+                  address: "1 avenue des roses 67100 Strasbourg",
+                  contact: "Thomas Largeron",
+                  phone: "03 00 00 00 00",
+                  mail: "thomas.largeron@traiteur.fr"
+                }
               }
             }
           }
         }
-      }
-    });
+      });
+      expect(errors).toBeUndefined();
 
-    const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
-      where: { id: packagingId }
-    });
-    expect(updatedPackaging.operationCode).toEqual("D13");
-  });
+      const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
+        where: { id: packagingId }
+      });
+      expect(updatedPackaging.operationCode).toEqual("D13");
+    }
+  );
 
-  test("after operation > it should not be possible to update sealed fields", async () => {
-    const emitter = await userWithCompanyFactory("MEMBER");
-    const transporter = await userWithCompanyFactory("MEMBER");
-    const destination = await userWithCompanyFactory("MEMBER");
-    const nextDestination = await userWithCompanyFactory("MEMBER");
-    const bsff = await createBsffAfterOperation({
-      emitter,
-      transporter,
-      destination
-    });
+  test(
+    "more than 60 days after operation >" +
+      " it should not be possible to update acceptation and operation fields",
+    async () => {
+      const emitter = await userWithCompanyFactory("MEMBER");
+      const transporter = await userWithCompanyFactory("MEMBER");
+      const destination = await userWithCompanyFactory("MEMBER");
+      const nextDestination = await userWithCompanyFactory("MEMBER");
+      const bsff = await createBsffAfterOperation(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        { packagingData: { operationSignatureDate: new Date(0) } }
+      );
 
-    const packagingId = bsff.packagings[0].id;
+      const packagingId = bsff.packagings[0].id;
 
-    const { mutate } = makeClient(destination.user);
-    const { errors } = await mutate<
-      Pick<Mutation, "updateBsffPackaging">,
-      MutationUpdateBsffPackagingArgs
-    >(UPDATE_BSFF_PACKAGING, {
-      variables: {
-        id: packagingId,
-        input: {
-          operation: {
-            date: "2022-11-05" as any,
-            code: "D13",
-            description: "Regroupement",
-            nextDestination: {
-              plannedOperationCode: "R2",
-              cap: "CAP 2",
-              company: {
-                siret: nextDestination.company.siret,
-                name: "Traiteur & Co",
-                address: "1 avenue des roses 67100 Strasbourg",
-                contact: "Thomas Largeron",
-                phone: "03 00 00 00 00",
-                mail: "thomas.largeron@traiteur.fr"
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsffPackaging">,
+        MutationUpdateBsffPackagingArgs
+      >(UPDATE_BSFF_PACKAGING, {
+        variables: {
+          id: packagingId,
+          input: {
+            numero: "nouveau-numero",
+            acceptation: {
+              date: "2022-11-04" as any,
+              weight: 2,
+              status: "ACCEPTED",
+              wasteCode: "14 06 02*",
+              wasteDescription: "HFC"
+            },
+            operation: {
+              date: "2022-11-05" as any,
+              code: "D13",
+              description: "Regroupement",
+              nextDestination: {
+                plannedOperationCode: "R2",
+                cap: "CAP 2",
+                company: {
+                  siret: nextDestination.company.siret,
+                  name: "Traiteur & Co",
+                  address: "1 avenue des roses 67100 Strasbourg",
+                  contact: "Thomas Largeron",
+                  phone: "03 00 00 00 00",
+                  mail: "thomas.largeron@traiteur.fr"
+                }
               }
             }
           }
         }
-      }
-    });
+      });
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " Le champ operationDate a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationDescription a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCap a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyName a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanySiret a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyAddress a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyContact a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyPhone a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyMail a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationCode a été verrouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationPlannedOperationCode a été verrouillé via signature et ne peut pas être modifié."
-      })
-    ]);
-  });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+            " Le champ numero a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ acceptationDate a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ acceptationWeight a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ acceptationWasteDescription a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationDate a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationDescription a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationNextDestinationCap a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationNextDestinationCompanyName a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationNextDestinationCompanySiret a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationNextDestinationCompanyAddress a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationNextDestinationCompanyContact a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationNextDestinationCompanyPhone a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationNextDestinationCompanyMail a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ acceptationWasteCode a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationCode a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationNextDestinationPlannedOperationCode a été verrouillé via signature et ne peut pas être modifié."
+        })
+      ]);
+    }
+  );
 });
