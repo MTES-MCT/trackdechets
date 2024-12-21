@@ -428,3 +428,47 @@ type RegistryV2Export {
   endDate: DateTime
   format: FormsRegisterExportFormat!
 }
+
+type RegistryCompany {
+  "Raison sociale de l'établissement"
+  name: String
+  "Nom de l'établissement"
+  givenName: String
+  "SIRET de l'établissement"
+  siret: String
+  "SIRET ou num de TVA de l'établissement"
+  orgId: String
+}
+
+type RegistryImportConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [RegistryImportEdge!]!
+}
+
+type RegistryImportEdge {
+  cursor: String!
+  node: RegistryImport!
+}
+
+type RegistryImport {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  status: RegistryImportStatus!
+  type: RegistryImportType!
+  s3FileKey: String!
+  originalFileName: String!
+  numberOfErrors: Int!
+  numberOfInsertions: Int!
+  numberOfEdits: Int!
+  numberOfCancellations: Int!
+  numberOfSkipped: Int!
+  createdBy: User!
+  associations: [RegistryImportAssociation!]!
+}
+
+type RegistryImportAssociation {
+  reportedFor: RegistryCompany!
+  reportedAs: RegistryCompany!
+}
