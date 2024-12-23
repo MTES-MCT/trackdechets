@@ -68,7 +68,7 @@ const SelectedBsdasrisDigest = ({ selectedItems }) => {
         <TableHead>
           <TableRow>
             <TableHeaderCell>{""}</TableHeaderCell>
-            <TableHeaderCell>Quantité (kg)</TableHeaderCell>
+            <TableHeaderCell>Nombre</TableHeaderCell>
             <TableHeaderCell>Type</TableHeaderCell>
 
             <TableHeaderCell> Volume unitaire (l)</TableHeaderCell>
