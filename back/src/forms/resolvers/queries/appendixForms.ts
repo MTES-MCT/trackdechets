@@ -28,6 +28,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
       isDeleted: false,
       readableId: { not: { endsWith: "-suite" } }
     },
+    orderBy: { processedAt: "desc" },
     include: expandableFormIncludes
   });
 
