@@ -106,7 +106,9 @@ const TransporterBsvhu = ({ errors }) => {
         !transporter?.recepisse?.isExempted &&
         !company.companyTypes?.includes(CompanyType.Transporter)
       ) {
-        return "Cet établissement n'a pas le profil Transporteur. Si vous transportez vos propres déchets, veuillez cocher la case d'exemption.";
+        return "Cet établissement n'a pas le profil Transporteur. Il ne pourra pas être visé comme tel sur le bordereau, il lui appartient de compléter cette information dans son profil. Si vous transportez vos propres déchets, veuillez cocher la case d'exemption.";
+      } else if (formState.errors?.transporter?.["company"]?.siret?.message) {
+        return formState.errors?.transporter?.["company"]?.siret?.message;
       }
     }
     return null;
@@ -156,19 +158,12 @@ const TransporterBsvhu = ({ errors }) => {
             }
           }}
         />
-        {formState.errors?.transporter?.["company"]?.orgId?.message && (
-          <p
-            id="text-input-error-desc-error"
-            className="fr-mb-4v fr-error-text"
-          >
-            {formState.errors?.transporter?.["company"]?.orgId?.message}
-          </p>
-        )}
-        {formState.errors?.transporter?.["company"]?.siret && (
-          <p className="fr-mb-4v fr-error-text">
-            {formState.errors?.transporter?.["company"]?.siret?.message}
-          </p>
-        )}
+        {!transporter?.company?.siret &&
+          formState.errors?.transporter?.["company"]?.siret && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {formState.errors?.transporter?.["company"]?.siret?.message}
+            </p>
+          )}
         <CompanyContactInfo
           fieldName={`${actor}.company`}
           errorObject={formState.errors?.transporter?.["company"]}

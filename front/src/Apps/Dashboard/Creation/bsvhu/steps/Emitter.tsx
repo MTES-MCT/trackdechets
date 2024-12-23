@@ -122,6 +122,8 @@ const EmitterBsvhu = ({ errors }) => {
     if (company) {
       if (!company.isRegistered) {
         return "L'entreprise n'est pas inscrite sur Trackdéchets, la signature Producteur ne pourra pas se faire. Vous pouvez publier le bordereau, mais seul le transporteur pourra le signer.";
+      } else if (formState.errors?.emitter?.["company"]?.siret?.message) {
+        return formState.errors?.emitter?.["company"]?.siret?.message;
       }
     }
     return null;
@@ -208,19 +210,13 @@ const EmitterBsvhu = ({ errors }) => {
             }
           }}
         />
-        {formState.errors?.emitter?.["company"]?.orgId?.message && (
-          <p
-            id="text-input-error-desc-error"
-            className="fr-mb-4v fr-error-text"
-          >
-            {formState.errors?.emitter?.["company"]?.orgId?.message}
-          </p>
-        )}
-        {formState.errors?.emitter?.["company"]?.siret && (
-          <p className="fr-mb-4v fr-error-text">
-            {formState.errors?.emitter?.["company"]?.siret?.message}
-          </p>
-        )}
+        {!emitter?.company?.siret &&
+          formState.errors?.emitter?.["company"]?.siret && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {formState.errors?.emitter?.["company"]?.siret?.message}
+            </p>
+          )}
+
         {emitter.irregularSituation && (
           <>
             <Checkbox
