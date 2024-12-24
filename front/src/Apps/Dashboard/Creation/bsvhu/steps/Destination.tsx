@@ -216,17 +216,11 @@ const DestinationBsvhu = ({ errors }) => {
               } else {
                 setValue(
                   `${actor}.company.contact`,
-                  destination?.company?.contact || company.contact
+                  destination?.company?.contact
                 );
-                setValue(
-                  `${actor}.company.phone`,
-                  destination?.company?.phone || company.contactPhone
-                );
+                setValue(`${actor}.company.phone`, destination?.company?.phone);
 
-                setValue(
-                  `${actor}.company.mail`,
-                  destination?.company?.mail || company.contactEmail
-                );
+                setValue(`${actor}.company.mail`, destination?.company?.mail);
               }
               setValue(`${actor}.company.orgId`, company.orgId);
               setValue(`${actor}.company.siret`, company.siret);
