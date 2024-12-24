@@ -136,17 +136,11 @@ const TransporterBsvhu = ({ errors }) => {
               } else {
                 setValue(
                   `${actor}.company.contact`,
-                  transporter?.company?.contact || company.contact
+                  transporter?.company?.contact
                 );
-                setValue(
-                  `${actor}.company.phone`,
-                  transporter?.company?.phone || company.contactPhone
-                );
+                setValue(`${actor}.company.phone`, transporter?.company?.phone);
 
-                setValue(
-                  `${actor}.company.mail`,
-                  transporter?.company?.mail || company.contactEmail
-                );
+                setValue(`${actor}.company.mail`, transporter?.company?.mail);
               }
               setValue(`${actor}.company.orgId`, company.orgId);
               setValue(`${actor}.company.siret`, company.siret);
