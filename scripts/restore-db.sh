@@ -48,7 +48,6 @@ default_user="trackdechets"
 echo "${bold}? Postgres User${reset} [$default_user]: "
 read psqlUser
 psqlUser="${psqlUser:-$default_user}"
-# read -rp $'${bold}? Postgres User:${reset} ' -i "trackdechets" -e psqlUser
 
 echo "Copying backup file to postgres"
 docker cp "$backupPath" "$psql_container_id":/tmp/dump.sql
