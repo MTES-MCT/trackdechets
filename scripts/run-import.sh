@@ -31,7 +31,7 @@ echo "${bold}→ Spawning XSLX2CSV CLI...${reset}"
 echo "${bold}→ Please use the 'Export csv' action${reset}"
 echo "${blue}-------------------------------------------------------${reset}"
 cd "$TD_XSLX2CSV_PATH" || exit
-pipenv run python src/xlsx2csv.py "$cleanedPath"
+pipenv run python xlsx2csv.py "$cleanedPath"
 echo "${blue}-------------------------------------------------------${reset}"
 
 cd "$CURRENT_DIR" || exit
