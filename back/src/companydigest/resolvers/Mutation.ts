@@ -1,6 +1,6 @@
 import createCompanyDigest from "./mutations/create";
 
-import { MutationResolvers } from "../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 
 const Mutation: MutationResolvers = {
   createCompanyDigest

@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 import { expandBsffFromDB } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { toPrismaBsffWhereInput } from "../../where";

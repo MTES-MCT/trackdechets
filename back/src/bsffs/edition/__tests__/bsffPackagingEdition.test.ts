@@ -1,11 +1,11 @@
 import { BsffPackaging } from "@prisma/client";
-import {
+import type {
   BsffPackagingAcceptationInput,
   BsffPackagingNextDestinationInput,
   BsffPackagingOperationInput,
   CompanyInput,
   UpdateBsffPackagingInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { flattenBsffPackagingInput } from "../../converter";
 import { editionRules, isAwaitingSignature } from "../bsffPackagingEdition";
 

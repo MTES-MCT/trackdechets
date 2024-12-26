@@ -1,5 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryBsvhuArgs } from "../../../generated/graphql/types";
+import type { QueryBsvhuArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";

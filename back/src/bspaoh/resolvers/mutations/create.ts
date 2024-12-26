@@ -3,10 +3,7 @@ import { GraphQLContext } from "../../../types";
 import { expandBspaohFromDb } from "../../converter";
 import { checkCanCreate } from "../../permissions";
 import { BspaohStatus } from "@prisma/client";
-import {
-  BspaohInput,
-  MutationCreateBspaohArgs
-} from "../../../generated/graphql/types";
+import type { BspaohInput, MutationCreateBspaohArgs } from "@td/codegen-back";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { parseBspaohInContext } from "../../validation";
 import { getBspaohRepository } from "../../repository";

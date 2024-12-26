@@ -8,7 +8,7 @@ import {
   indexBsds,
   BsdElastic
 } from "../../common/elastic";
-import { BsdType } from "../../generated/graphql/types";
+import type { BsdType } from "@td/codegen-back";
 import {
   BsdaForElasticInclude,
   toBsdElastic as bsdaToBsdElastic

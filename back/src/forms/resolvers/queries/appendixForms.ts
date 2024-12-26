@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 import { expandableFormIncludes, expandFormFromDb } from "../../converter";
 import { checkCanList } from "../../permissions";
 import { bsddWasteQuantities } from "../../helpers/bsddWasteQuantities";

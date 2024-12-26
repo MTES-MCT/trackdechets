@@ -5,7 +5,7 @@ import {
   TRANSPORT_MODE_LABELS,
   buildPdfAddress
 } from "../../../common/pdf";
-import { Bspaoh, BspaohRecepisse } from "../../../generated/graphql/types";
+import type { Bspaoh, BspaohRecepisse } from "@td/codegen-back";
 import { FormCompanyFields } from "./FormCompanyFields";
 import { PackagingInfosTable } from "./PackagingInfosTable";
 import { Recepisse } from "./Recepisse";

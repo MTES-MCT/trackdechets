@@ -1,15 +1,15 @@
 import { prisma } from "@td/prisma";
 import { getSignedUrlForDownload } from "@td/registry";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { QueryRegistryExportDownloadSignedUrlArgs } from "../../../generated/graphql/types";
+import type { QueryRegistryV2ExportDownloadSignedUrlArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { ForbiddenError } from "../../../common/errors";
 import { getRegistryFileName } from "../../filename";
 import { RegistryExportFormat } from "@prisma/client";
 
-export async function registryExportDownloadSignedUrl(
+export async function registryV2ExportDownloadSignedUrl(
   _,
-  { exportId }: QueryRegistryExportDownloadSignedUrlArgs,
+  { exportId }: QueryRegistryV2ExportDownloadSignedUrlArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);

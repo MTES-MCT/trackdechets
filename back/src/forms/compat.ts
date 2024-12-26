@@ -3,11 +3,11 @@ import {
   QuantityType,
   Status
 } from "@prisma/client";
-import {
+import type {
   AppendixFormInput,
   InitialFormFractionInput,
   ParcelNumber
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { Bsdd } from "./types";
 import { RegistryForm } from "../registry/elastic";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";

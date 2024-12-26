@@ -4,7 +4,7 @@ import fs, { createWriteStream } from "fs";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { associateUserToCompany } from "../../../database";
 import makeClient from "../../../../__tests__/testClient";
-import { Query } from "../../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 import gql from "graphql-tag";
 import supertest from "supertest";
 import { app } from "../../../../server";

@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { RegistryImportAssociationResolvers } from "../../generated/graphql/types";
+import type { RegistryImportAssociationResolvers } from "@td/codegen-back";
 
 export const RegistryImportAssociation: RegistryImportAssociationResolvers = {
   reportedFor: async parent => {

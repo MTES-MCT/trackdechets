@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { addMinutes } from "date-fns";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { ReadableIdPrefix } from "../../../forms/readableId";
 import { getUid, getAPIBaseURL } from "../../../utils";
 import { checkIsAuthenticated } from "../../../common/permissions";

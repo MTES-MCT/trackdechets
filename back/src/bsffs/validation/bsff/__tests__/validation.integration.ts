@@ -21,7 +21,7 @@ import { ZodBsff } from "../schema";
 import { parseBsff, parseBsffAsync } from "..";
 import { BsffType, TransportMode } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
-import { CompanySearchResult } from "../../../../companies/types";
+import { CompanySearchResult } from "@td/codegen-back";
 import { searchCompany } from "../../../../companies/search";
 
 jest.mock("../../../../companies/search");
