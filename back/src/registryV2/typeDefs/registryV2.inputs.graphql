@@ -305,6 +305,10 @@ input IncomingWasteLineInput {
   """
   emitterCompanyCountryCode: String
   """
+  Nom de l'adresse de prise en charge de l'expéditeur ou détenteur
+  """
+  emitterPickupSiteName: String
+  """
   Libellé de l'adresse de prise en charge de l'expéditeur
   Libellé de prise en charge de l'expéditeur si différente de l'adresse de l'établissement de l'expéditeur du déchet
   """
@@ -335,7 +339,7 @@ input IncomingWasteLineInput {
   """
   Numéro de récépissé du courtier
   """
-  brokerReceiptNumber: String
+  brokerRecepisseNumber: String
   """
   SIRET du négociant
   """
@@ -347,7 +351,7 @@ input IncomingWasteLineInput {
   """
   Numéro de récépissé du négociant
   """
-  traderReceiptNumber: String
+  traderRecepisseNumber: String
   """
   SIRET de l'éco-organisme
   """
@@ -361,6 +365,11 @@ input IncomingWasteLineInput {
   Code du traitement appliqué au déchet
   """
   operationCode: String!
+  """
+  Mode de traitement
+  Qualification du traitement final correspondant au mode de traitement
+  """
+  operationMode: OperationMode!
   """
   Rupture de traçabilité autorisée
   Indique si une rupture de traçabilité est autorisée ou pas pour ce déchet
@@ -404,9 +413,13 @@ input IncomingWasteLineInput {
   """
   transporter1CompanyOrgId: String
   """
+  Exemption de récépissé du transporteur n°1
+  """
+  transporter1RecepisseIsExempted: Boolean
+  """
   Numéro de récépissé du transporteur n°1
   """
-  transporter1ReceiptNumber: String
+  transporter1RecepisseNumber: String
   """
   Raison sociale du transporteur n°1
   """
@@ -440,9 +453,13 @@ input IncomingWasteLineInput {
   """
   transporter2CompanyOrgId: String
   """
+  Exemption de récépissé du transporteur n°2
+  """
+  transporter2RecepisseIsExempted: Boolean
+  """
   Numéro de récépissé du transporteur n°2
   """
-  transporter2ReceiptNumber: String
+  transporter2RecepisseNumber: String
   """
   Raison sociale du transporteur n°2
   """
@@ -476,9 +493,13 @@ input IncomingWasteLineInput {
   """
   transporter3CompanyOrgId: String
   """
+  Exemption de récépissé du transporteur n°3
+  """
+  transporter3RecepisseIsExempted: Boolean
+  """
   Numéro de récépissé du transporteur n°3
   """
-  transporter3ReceiptNumber: String
+  transporter3RecepisseNumber: String
   """
   Raison sociale du transporteur n°3
   """
@@ -512,9 +533,13 @@ input IncomingWasteLineInput {
   """
   transporter4CompanyOrgId: String
   """
+  Exemption de récépissé du transporteur n°4
+  """
+  transporter4RecepisseIsExempted: Boolean
+  """
   Numéro de récépissé du transporteur n°4
   """
-  transporter4ReceiptNumber: String
+  transporter4RecepisseNumber: String
   """
   Raison sociale du transporteur n°4
   """
@@ -548,9 +573,13 @@ input IncomingWasteLineInput {
   """
   transporter5CompanyOrgId: String
   """
+  Exemption de récépissé du transporteur n°5
+  """
+  transporter5RecepisseIsExempted: Boolean
+  """
   Numéro de récépissé du transporteur n°5
   """
-  transporter5ReceiptNumber: String
+  transporter5RecepisseNumber: String
   """
   Raison sociale du transporteur n°5
   """
@@ -731,6 +760,10 @@ input IncomingTexsLineInput {
   """
   emitterCompanyName: String
   """
+  Nom de l'adresse de prise en charge de l'expéditeur ou détenteur
+  """
+  emitterPickupSiteName: String
+  """
   Libellé de l'adresse de prise en charge de l'expéditeur ou détenteur
   """
   emitterPickupSiteAddress: String
@@ -773,7 +806,7 @@ input IncomingTexsLineInput {
   """
   Numéro de r��cépissé du courtier
   """
-  brokerReceiptNumber: String
+  brokerRecepisseNumber: String
   """
   SIRET du négociant
   """
@@ -785,12 +818,17 @@ input IncomingTexsLineInput {
   """
   Numéro de récépissé du négociant
   """
-  traderReceiptNumber: String
+  traderRecepisseNumber: String
   """
   Code d'opération réalisé
   Code du traitement appliqué au déchet
   """
   operationCode: String!
+  """
+  Mode de traitement
+  Qualification du traitement final correspondant au mode de traitement
+  """
+  operationMode: OperationMode!
   """
   Rupture de traçabilité autorisée
   Indique si une rupture de traçabilité est autorisée ou pas pour ce déchet
@@ -859,9 +897,13 @@ input IncomingTexsLineInput {
   """
   transporter1CompanyOrgId: String
   """
+  Exemption de récépissé du transporteur n°1
+  """
+  transporter1RecepisseIsExempted: Boolean
+  """
   Numéro de récépissé du transporteur n°1
   """
-  transporter1ReceiptNumber: String
+  transporter1RecepisseNumber: String
   """
   Raison sociale du transporteur n°1
   """
@@ -895,29 +937,33 @@ input IncomingTexsLineInput {
   """
   transporter2CompanyOrgId: String
   """
+  Exemption de récépissé du transporteur n°2
+  """
+  transporter2RecepisseIsExempted: Boolean
+  """
   Numéro de récépissé du transporteur n°2
   """
-  transporter2ReceiptNumber: String
+  transporter2RecepisseNumber: String
   """
   Raison sociale du transporteur n°2
   """
-  transporter2CompanyCompanyName: String
+  transporter2CompanyName: String
   """
   Adresse du transporteur n°2
   """
-  transporter2CompanyCompanyAddress: String
+  transporter2CompanyAddress: String
   """
   Code postal du transporteur n°2
   """
-  transporter2CompanyCompanyPostalCode: String
+  transporter2CompanyPostalCode: String
   """
   Commune du transporteur n°2
   """
-  transporter2CompanyCompanyCity: String
+  transporter2CompanyCity: String
   """
   Pays du transporteur n°2
   """
-  transporter2CompanyCompanyCountryCode: String
+  transporter2CompanyCountryCode: String
   """
   Mode de transport du transporteur n°3
   """
@@ -925,15 +971,19 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°3
   """
-  transporter3CompanyCompanyType: String
+  transporter3CompanyType: String
   """
   Numéro d'identification du transporteur n°3
   """
-  transporter3CompanyCompanyOrgId: String
+  transporter3CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°3
+  """
+  transporter3RecepisseIsExempted: Boolean
   """
   Numéro de récépissé du transporteur n°3
   """
-  transporter3ReceiptNumber: String
+  transporter3RecepisseNumber: String
   """
   Raison sociale du transporteur n°3
   """
@@ -967,9 +1017,13 @@ input IncomingTexsLineInput {
   """
   transporter4CompanyOrgId: String
   """
+  Exemption de récépissé du transporteur n°4
+  """
+  transporter4RecepisseIsExempted: Boolean
+  """
   Numéro de récépissé du transporteur n°4
   """
-  transporter4ReceiptNumber: String
+  transporter4RecepisseNumber: String
   """
   Raison sociale du transporteur n°4
   """
@@ -1003,9 +1057,13 @@ input IncomingTexsLineInput {
   """
   transporter5CompanyOrgId: String
   """
+  Exemption de récépissé du transporteur n°5
+  """
+  transporter5RecepisseIsExempted: Boolean
+  """
   Numéro de récépissé du transporteur n°5
   """
-  transporter5ReceiptNumber: String
+  transporter5RecepisseNumber: String
   """
   Raison sociale du transporteur n°5
   """
