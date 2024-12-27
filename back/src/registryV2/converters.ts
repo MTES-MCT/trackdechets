@@ -1,25 +1,57 @@
 import { exportOptions } from "@td/registry";
-import { RegistrySsd } from "@prisma/client";
+import {
+  Bsda,
+  Bsdasri,
+  Bsff,
+  Bspaoh,
+  Bsvhu,
+  Form,
+  RegistryIncomingTexs,
+  RegistryIncomingWaste,
+  RegistrySsd
+} from "@prisma/client";
 import type { RegistryV2ExportType } from "@td/codegen-back";
 
 import { GenericWasteV2 } from "./types";
 // add other types when other exports are added
-type RegistryInputMap = {
+type InputMap = {
   SSD: RegistrySsd | null;
+  INCOMING_WASTE: RegistryIncomingWaste | null;
+  INCOMING_TEXS: RegistryIncomingTexs | null;
+  BSDD: Form | null;
+  BSDA: Bsda | null;
+  BSDASRI: Bsdasri | null;
+  BSFF: Bsff | null;
+  BSPAOH: Bspaoh | null;
+  BSVHU: Bsvhu | null;
 };
 
-const registryToSsdWaste = {
+const inputToSsdWaste: Partial<Record<keyof InputMap, any>> = {
   // "?." because it's partial. Once completed, remove the partial and "?."
   SSD: exportOptions.SSD?.toSsdWaste
 };
 
-const registryToWaste: Record<"SSD", any> = {
-  SSD: registryToSsdWaste
+const inputToIncomingWaste: Partial<Record<keyof InputMap, any>> = {
+  INCOMING_WASTE: exportOptions.INCOMING_WASTE?.toIncomingWaste,
+  INCOMING_TEXS: exportOptions.INCOMING_TEXS?.toIncomingWaste,
+  BSDD: exportOptions.BSDD?.toIncomingWaste,
+  BSDA: exportOptions.BSDA?.toIncomingWaste,
+  BSDASRI: exportOptions.BSDASRI?.toIncomingWaste,
+  BSFF: exportOptions.BSFF?.toIncomingWaste,
+  BSPAOH: exportOptions.BSPAOH?.toIncomingWaste,
+  BSVHU: exportOptions.BSVHU?.toIncomingWaste
+};
+
+const registryToWaste: Partial<
+  Record<Exclude<RegistryV2ExportType, "ALL">, any>
+> = {
+  SSD: inputToSsdWaste,
+  INCOMING: inputToIncomingWaste
 };
 
 export function toWaste<WasteType extends GenericWasteV2>(
   registryType: RegistryV2ExportType,
-  input: RegistryInputMap
+  input: InputMap
   // remove undefined once all types are defined
 ): WasteType | undefined {
   const converter = registryToWaste[registryType];
