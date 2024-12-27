@@ -116,7 +116,7 @@ function getCorrectLine(siret: string) {
     transporter5CompanyAddress: undefined,
     transporter5CompanyPostalCode: undefined,
     transporter5CompanyCity: undefined,
-    transporter5CompanyCountryCode: undefined,
+    transporter5CompanyCountryCode: undefined
   };
 }
 
@@ -165,7 +165,7 @@ describe("Registry - addToIncomingWasteRegistry", () => {
       ADD_TO_INCOMING_WASTE_REGISTRY,
       { variables: { lines } }
     );
-    
+
     expect(data.addToIncomingWasteRegistry).toBe(true);
   });
 
