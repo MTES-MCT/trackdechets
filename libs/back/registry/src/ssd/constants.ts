@@ -29,34 +29,3 @@ export const SSD_HEADERS: { [key in keyof ParsedZodInputSsdItem]: string } = {
   destinationCompanyPostalCode: "Code postal du destinataire",
   destinationCompanyCountryCode: "Code pays du destinataire"
 };
-
-export const SSD_EXPORT_HEADERS = {
-  source: "Source",
-  publicId: "Numéro unique",
-  reportAsCompanySiret: "SIRET du déclarant",
-  reportForCompanySiret: "SIRET de l'émetteur",
-  reportForCompanyName: "Raison sociale de l'émetteur",
-  useDate: "Date d'utilisation",
-  dispatchDate: "Date d'expédition",
-  wasteCode: "Code déchet",
-  wasteDescription: "Dénomination du déchet",
-  wasteCodeBale: "Code déchet Bâle",
-  secondaryWasteCodes: "Codes déchets secondaires",
-  secondaryWasteDescriptions: "Dénominations des déchets secondaires",
-  product: "Produit",
-  weightValue: "Poids en tonnes",
-  weightIsEstimate: "Type de poids",
-  volume: "Quantité en M3",
-  processingDate: "Date de traitement",
-  processingEndDate: "Date de fin de traitement",
-  destinationCompanyType: "Type de destinataire",
-  destinationCompanyOrgId: "Numéro d'identification du destinataire",
-  destinationCompanyName: "Raison sociale du destinataire",
-  destinationCompanyAddress: "Libellé de l'adresse du destinataire",
-  destinationCompanyPostalCode: "Code postal du destinataire",
-  destinationCompanyCity: "Commune du destinataire",
-  destinationCompanyCountryCode: "Pays du destinataire",
-  operationCode: "Code de traitement",
-  operationMode: "Mode de traitement",
-  administrativeActReference: "Référence de l'acte administratif"
-};
