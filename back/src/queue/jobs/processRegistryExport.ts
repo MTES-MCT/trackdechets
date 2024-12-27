@@ -19,7 +19,7 @@ import {
 import { toWaste } from "../../registryV2/converters";
 import { wasteFormatter } from "../../registryV2/streams";
 import { getXlsxHeaders } from "../../registryV2/columns";
-import { exportOptions } from "@td/registry";
+import { EXPORT_HEADERS } from "../../registryV2/headers";
 
 // we have all verified infos in the registryExport,
 // but the date range is a bit more fine in the query than in the object
@@ -51,16 +51,42 @@ const streamLookup = (
             dateId: "asc"
           },
           include: {
-            registrySsd: true
+            registrySsd: true,
+            registryIncomingWaste: true,
+            registryIncomingTexs: true,
+            bsdd: true,
+            bsda: true,
+            bsdasri: true,
+            bsff: true,
+            bspaoh: true,
+            bsvhu: true
           }
         });
         for (const item of items) {
           const lookup = item as Prisma.RegistryLookupGetPayload<{
-            include: { registrySsd: true };
+            include: {
+              registrySsd: true;
+              registryIncomingWaste: true;
+              registryIncomingTexs: true;
+              bsdd: true;
+              bsda: true;
+              bsdasri: true;
+              bsff: true;
+              bspaoh: true;
+              bsvhu: true;
+            };
           }>;
           addEncounteredSiret(lookup.siret);
           const mapped = toWaste(registryType, {
-            SSD: lookup.registrySsd
+            SSD: lookup.registrySsd,
+            INCOMING_WASTE: lookup.registryIncomingWaste,
+            INCOMING_TEXS: lookup.registryIncomingTexs,
+            BSDD: lookup.bsdd,
+            BSDA: lookup.bsda,
+            BSDASRI: lookup.bsdasri,
+            BSFF: lookup.bsff,
+            BSPAOH: lookup.bspaoh,
+            BSVHU: lookup.bsvhu
           });
           if (mapped) {
             this.push(mapped);
@@ -126,7 +152,7 @@ export async function processRegistryExportJob(
     if (!registryExport) {
       throw new UserInputError(`L'export ${exportId} est introuvable`);
     }
-    const { headers } = exportOptions[registryExport.registryType ?? "ALL"];
+    const headers = EXPORT_HEADERS[registryExport.registryType ?? "ALL"];
     // create s3 file with stream
     const streamInfos = getUploadWithWritableStream({
       bucketName: process.env.S3_REGISTRY_EXPORTS_BUCKET,
