@@ -2,20 +2,30 @@
 
 bold=$(tput bold)
 reset=$(tput sgr0)
-green=$(tput setaf 2)
-red=$(tput setaf 9)
+red=$(tput setaf 1)
 blue=$(tput setaf 4)
 
-if [ -f .env ]
+# Change the current directory to the script's directory
+cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
+
+env_file="../.env"
+if [[ -f "$env_file" ]]
 then
-  export "$(<.env xargs)"
+  line=$(grep -E "^TD_XSLX2CSV_PATH=" "$env_file" | head -n 1)
+  if [[ -n "$line" ]]; then
+      eval "export $line"
+  fi
 fi
 
 CURRENT_DIR=$(pwd)
 if [ -z "$TD_XSLX2CSV_PATH" ];
 then
-    echo "${red}Please set \$TD_XSLX2CSV_PATH either as ENV or in .env file (ex: home/you/trackdechets-xslx2csv/src)${reset}"
-    exit
+    echo "${red}Please set \$TD_XSLX2CSV_PATH either as ENV or in the root .env file (ex: home/you/trackdechets-xslx2csv/src)${reset}"
+    exit 1
+fi
+if [[ ! -d "$TD_XSLX2CSV_PATH" ]]; then
+    echo "${red}Invalid directory: '$TD_XSLX2CSV_PATH'. The directory must be absolute or relative to the script file${reset}"
+    exit 1
 fi
 
 while read -erp "${bold}? Enter local XLS path :${reset} " xlsPath; do
@@ -30,11 +40,11 @@ done
 echo "${bold}→ Spawning XSLX2CSV CLI...${reset}"
 echo "${bold}→ Please use the 'Export csv' action${reset}"
 echo "${blue}-------------------------------------------------------${reset}"
-cd "$TD_XSLX2CSV_PATH" || exit
+cd "$TD_XSLX2CSV_PATH" || exit 1
 pipenv run python xlsx2csv.py "$cleanedPath"
 echo "${blue}-------------------------------------------------------${reset}"
 
-cd "$CURRENT_DIR" || exit
+cd "$CURRENT_DIR" || exit 1
 OUTPUT_DIR="$TD_XSLX2CSV_PATH/csv"
 
 echo "${bold}→ Listing extracted files${reset}"
