@@ -213,6 +213,8 @@ model RegistryIncomingWaste {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
+    registryLookups RegistryLookup[]
+
     @@index([importId], map: "_RegistryIncomingWasteImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingWastePublicIdReportForCompanySiretIdx")
 }
@@ -343,6 +345,8 @@ model RegistryIncomingTexs {
     transporter5CompanyPostalCode          String?
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
+
+    registryLookups RegistryLookup[]
 
     @@index([importId], map: "_RegistryIncomingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingTexsPublicIdReportForCompanySiretIdx")
@@ -563,6 +567,12 @@ model RegistryLookup {
     // foreign keys to registry models
     registrySsdId String?
     registrySsd   RegistrySsd? @relation(fields: [registrySsdId], references: [id], onDelete: Cascade)
+
+    registryIncomingWasteId String?
+    registryIncomingWaste   RegistryIncomingWaste? @relation(fields: [registryIncomingWasteId], references: [id], onDelete: Cascade)
+
+    registryIncomingTexsId String?
+    registryIncomingTexs   RegistryIncomingTexs? @relation(fields: [registryIncomingTexsId], references: [id], onDelete: Cascade)
 
     // foreign keys to BSD models
     bsddId    String?

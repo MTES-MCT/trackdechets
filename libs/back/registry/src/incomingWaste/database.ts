@@ -1,5 +1,6 @@
 import { prisma } from "@td/prisma";
 import { ParsedZodIncomingWasteItem } from "./validation/schema";
+import LookupUtils from "../lookup/utils";
 
 export async function saveIncomingWasteLine({
   line,
@@ -16,23 +17,41 @@ export async function saveIncomingWasteLine({
           where: { id },
           data: { isLatest: false }
         });
-        await tx.registryIncomingWaste.create({
+        const registryIncomingWaste = await tx.registryIncomingWaste.create({
           data: { ...persistedData, importId }
         });
+        await LookupUtils.RegistryIncomingWaste.update(
+          registryIncomingWaste,
+          id ?? null,
+          tx
+        );
       });
       return;
     case "ANNULER":
-      await prisma.registryIncomingWaste.update({
-        where: { id },
-        data: { isCancelled: true }
+      await prisma.$transaction(async tx => {
+        await tx.registryIncomingWaste.update({
+          where: { id },
+          data: { isCancelled: true }
+        });
+        if (id) {
+          await LookupUtils.RegistryIncomingWaste.delete(id, tx);
+        }
       });
       return;
     case "IGNORER":
       return;
     default:
-      await prisma.registryIncomingWaste.create({
-        data: { ...persistedData, importId }
+      await prisma.$transaction(async tx => {
+        const registryIncomingWaste = await tx.registryIncomingWaste.create({
+          data: { ...persistedData, importId }
+        });
+        await LookupUtils.RegistryIncomingWaste.update(
+          registryIncomingWaste,
+          null,
+          tx
+        );
       });
+
       return;
   }
 }

@@ -25,7 +25,7 @@ export async function saveSsdLine({
       return;
     case "ANNULER":
       await prisma.$transaction(async tx => {
-        await prisma.registrySsd.update({
+        await tx.registrySsd.update({
           where: { id },
           data: { isCancelled: true }
         });
