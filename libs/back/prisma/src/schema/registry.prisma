@@ -139,6 +139,7 @@ model RegistryIncomingWaste {
     emitterCompanyPostalCode               String?
     emitterCompanyCity                     String?
     emitterCompanyCountryCode              String?
+    emitterPickupSiteName                  String?
     emitterPickupSiteAddress               String?
     emitterPickupSitePostalCode            String?
     emitterPickupSiteCity                  String?
@@ -259,6 +260,7 @@ model RegistryIncomingTexs {
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
+    emitterPickupSiteName                  String?
     emitterPickupSiteAddress               String?
     emitterPickupSitePostalCode            String?
     emitterPickupSiteCity                  String?

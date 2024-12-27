@@ -412,11 +412,27 @@ export const getActorCountryCodeSchema = (name: string) =>
   }, `Le code du pays ${name} n'est pas valide. Il doit être composé de 2 lettres majuscules`);
 
 export const transportModeSchema = z
-  .enum(["ROUTE", "AÉRIEN", "FLUVIAL", "MARITIME", "PIPELINE", "FERRÉ"], {
-    required_error: "Le mode de transport est requis",
-    invalid_type_error:
-      "Le mode de transport n'est pas valide. Consultez la documentation pour la liste des valeurs possibles"
-  })
+  .enum(
+    [
+      "ROUTE",
+      "AÉRIEN",
+      "FLUVIAL",
+      "MARITIME",
+      "PIPELINE",
+      "FERRÉ",
+      "ROAD",
+      "AIR",
+      "RIVER",
+      "SEA",
+      "OTHER",
+      "RAIL"
+    ],
+    {
+      required_error: "Le mode de transport est requis",
+      invalid_type_error:
+        "Le mode de transport n'est pas valide. Consultez la documentation pour la liste des valeurs possibles"
+    }
+  )
   .transform(val => {
     switch (val) {
       case "ROUTE":
@@ -432,7 +448,7 @@ export const transportModeSchema = z
       case "FERRÉ":
         return "RAIL";
       default:
-        throw Error("Unhandled transport mode");
+        return val;
     }
   });
 

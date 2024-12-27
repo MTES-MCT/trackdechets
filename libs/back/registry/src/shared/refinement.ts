@@ -176,7 +176,7 @@ export const refineWeightAndVolume: Refinement<{
     item.transporter3TransportMode,
     item.transporter4TransportMode,
     item.transporter5TransportMode
-  ].some(transportMode => transportMode === "ROUTE");
+  ].some(transportMode => transportMode === "ROAD");
 
   if (isUsingRoad && item.weightValue > 40) {
     addIssue({
