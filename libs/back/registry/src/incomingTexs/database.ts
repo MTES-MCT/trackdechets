@@ -1,5 +1,6 @@
 import { prisma } from "@td/prisma";
 import { ParsedZodIncomingTexsItem } from "./validation/schema";
+import LookupUtils from "../lookup/utils";
 
 export async function saveIncomingTexsLine({
   line,
@@ -16,22 +17,40 @@ export async function saveIncomingTexsLine({
           where: { id },
           data: { isLatest: false }
         });
-        await tx.registryIncomingTexs.create({
+        const registryIncomingTexs = await tx.registryIncomingTexs.create({
           data: { ...persistedData, importId }
         });
+        await LookupUtils.RegistryIncomingTexs.update(
+          registryIncomingTexs,
+          id ?? null,
+          tx
+        );
       });
       return;
     case "ANNULER":
-      await prisma.registryIncomingTexs.update({
-        where: { id },
-        data: { isCancelled: true }
+      await prisma.$transaction(async tx => {
+        await tx.registryIncomingTexs.update({
+          where: { id },
+          data: { isCancelled: true }
+        });
+        if (id) {
+          await LookupUtils.RegistryIncomingTexs.delete(id, tx);
+        }
       });
+
       return;
     case "IGNORER":
       return;
     default:
-      await prisma.registryIncomingTexs.create({
-        data: { ...persistedData, importId }
+      await prisma.$transaction(async tx => {
+        const registryIncomingTexs = await prisma.registryIncomingTexs.create({
+          data: { ...persistedData, importId }
+        });
+        await LookupUtils.RegistryIncomingTexs.update(
+          registryIncomingTexs,
+          null,
+          tx
+        );
       });
       return;
   }
