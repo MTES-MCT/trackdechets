@@ -59,7 +59,7 @@ export const toIncomingWaste = (
     emitterCompanyCity: incomingTexs.emitterCompanyCity,
     emitterCompanyCountry: incomingTexs.emitterCompanyCountryCode,
     emitterCompanyMail: null,
-    emitterPickupsiteName: null,
+    emitterPickupsiteName: incomingTexs.emitterPickupSiteName,
     emitterPickupsiteAddress: incomingTexs.emitterPickupSiteAddress,
     emitterPickupsitePostalCode: incomingTexs.emitterPickupSitePostalCode,
     emitterPickupsiteCity: incomingTexs.emitterPickupSiteCity,

@@ -17,9 +17,8 @@ import {
   RegistryExportStatus
 } from "@prisma/client";
 import { toWaste } from "../../registryV2/converters";
-import { wasteFormatter } from "../../registryV2/streams";
-import { getXlsxHeaders } from "../../registryV2/columns";
-import { EXPORT_HEADERS } from "../../registryV2/headers";
+import { wasteFormatterV2 } from "../../registryV2/streams";
+import { EXPORT_COLUMNS } from "../../registryV2/columns";
 
 // we have all verified infos in the registryExport,
 // but the date range is a bit more fine in the query than in the object
@@ -152,7 +151,8 @@ export async function processRegistryExportJob(
     if (!registryExport) {
       throw new UserInputError(`L'export ${exportId} est introuvable`);
     }
-    const headers = EXPORT_HEADERS[registryExport.registryType ?? "ALL"];
+    const exportType = registryExport.registryType ?? "ALL";
+    const columns = EXPORT_COLUMNS[exportType];
     // create s3 file with stream
     const streamInfos = getUploadWithWritableStream({
       bucketName: process.env.S3_REGISTRY_EXPORTS_BUCKET,
@@ -207,24 +207,19 @@ export async function processRegistryExportJob(
       {
         where: query
       },
-      registryExport.registryType ?? "ALL",
+      exportType,
       addEncounteredSiret
     );
 
     // handle CSV exports
     if (registryExport.format === RegistryExportFormat.CSV) {
       const csvStream = csvFormat({
-        headers: Object.keys(headers).map(key => headers[key]),
+        headers: Object.keys(columns).map(key => columns[key].label),
         delimiter: ";",
         alwaysWriteHeaders: true
       });
-      const transformer = wasteFormatter({
-        useLabelAsKey: false,
-        columnSorter: (line: Record<string, string>) => {
-          return Object.fromEntries(
-            Object.keys(headers).map(key => [headers[key], line[key]])
-          );
-        }
+      const transformer = wasteFormatterV2({
+        exportType
       });
       pipeline(
         inputStream,
@@ -247,20 +242,18 @@ export async function processRegistryExportJob(
         stream: outputStream
       });
       const worksheet = workbook.addWorksheet("registre");
-      const transformer = wasteFormatter({
-        useLabelAsKey: false,
-        columnSorter: (line: Record<string, string>) => {
-          return Object.fromEntries(
-            Object.keys(headers).map(key => [key, line[key]])
-          );
-        }
+      const transformer = wasteFormatterV2({
+        exportType
       });
       transformer.on("data", waste => {
         if (worksheet.columns === null) {
           // write headers if not present
-          const columns = getXlsxHeaders(waste);
-          worksheet.columns = Object.keys(headers)
-            .map(key => columns.find(col => col.key === key))
+          worksheet.columns = Object.keys(columns)
+            .map(key => ({
+              key,
+              header: columns[key].label,
+              width: 20
+            }))
             .filter(Boolean);
         }
 
