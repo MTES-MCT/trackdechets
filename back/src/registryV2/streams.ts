@@ -11,12 +11,13 @@ export function wasteFormatterV2<WasteType extends GenericWasteV2>(opts: {
   columnSorter?:
     | ((line: Record<string, string>) => Record<string, string>)
     | null;
+  useLabelAsKey?: boolean;
 }) {
   return new Transform({
     readableObjectMode: true,
     writableObjectMode: true,
     transform(waste: WasteType, _encoding, callback) {
-      const formatted = formatRow(waste, opts.exportType);
+      const formatted = formatRow(waste, opts.exportType, opts.useLabelAsKey);
       if (opts.columnSorter) {
         this.push(opts.columnSorter(formatted));
       } else {
