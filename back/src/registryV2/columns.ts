@@ -8,14 +8,19 @@ import {
 import { isDefined } from "../common/helpers";
 import { format } from "date-fns";
 import { TransportMode } from "@prisma/client";
-import { formatStatusLabel } from "@td/constants";
+import { formatStatusLabel as _formatStatusLabel } from "@td/constants";
 
 import { fr } from "date-fns/locale";
 import { GenericWasteV2 } from "./types";
 
+type formatOptions = {
+  separator?: string;
+  waste?: GenericWasteV2;
+};
+
 type columnInfos = {
   label: string;
-  format?: (v: unknown, options: unknown) => string | number | null;
+  format?: (v: unknown, options?: formatOptions) => string | number | null;
 };
 export const formatDate = (d: Date | null) => {
   if (!d) return "";
@@ -32,8 +37,8 @@ const formatBoolean = (b: boolean | null) => {
 };
 const formatNumber = (n: number) =>
   isDefined(n) ? parseFloat(n.toFixed(3)) : null; // return as a number to allow xls cells formulas
-const formatArray = (arr: any[], sep = ",") =>
-  Array.isArray(arr) ? arr.join(sep) : "";
+const formatArray = (arr: any[], opts = { separator: "," }) =>
+  Array.isArray(arr) ? arr.join(opts.separator) : "";
 const formatArrayWithMissingElements = (arr: any[]) => {
   if (!Array.isArray(arr)) {
     return "";
@@ -120,6 +125,11 @@ const formatEstimateBoolean = (isEstimate: boolean | null) => {
   }
   return isEstimate ? "ESTIME" : "REEL";
 };
+
+const formatStatusLabel = (status: string | null, opts: formatOptions) => {
+  return _formatStatusLabel(status, opts.waste);
+};
+
 export const EXPORT_COLUMNS: {
   SSD: Partial<Record<keyof SsdWasteV2, columnInfos>>;
   INCOMING: Partial<Record<keyof IncomingWasteV2, columnInfos>>;
@@ -135,9 +145,13 @@ export const EXPORT_COLUMNS: {
     wasteCode: { label: "Code déchet" },
     wasteDescription: { label: "Dénomination du déchet" },
     wasteCodeBale: { label: "Code déchet Bâle" },
-    secondaryWasteCodes: { label: "Codes déchets secondaires" },
+    secondaryWasteCodes: {
+      label: "Codes déchets secondaires",
+      format: formatArray
+    },
     secondaryWasteDescriptions: {
-      label: "Dénominations des déchets secondaires"
+      label: "Dénominations des déchets secondaires",
+      format: formatArray
     },
     product: { label: "Produit" },
     weightValue: { label: "Poids en tonnes", format: formatNumber },
@@ -423,7 +437,8 @@ export const EXPORT_COLUMNS: {
 
 export function formatRow(
   waste: GenericWasteV2,
-  exportType: RegistryV2ExportType
+  exportType: RegistryV2ExportType,
+  useLabelAsKey?: boolean
 ): Record<string, string> {
   const columns = EXPORT_COLUMNS[exportType];
   return Object.entries(columns).reduce(
@@ -434,8 +449,11 @@ export function formatRow(
       if (key in waste) {
         return {
           ...acc,
-          [key]: columnInfos.format
-            ? columnInfos.format(waste[key], waste)
+          [useLabelAsKey ? columnInfos.label : key]: columnInfos.format
+            ? columnInfos.format(waste[key], {
+                waste,
+                separator: ","
+              })
             : waste[key] ?? ""
         };
       }

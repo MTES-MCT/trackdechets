@@ -219,7 +219,8 @@ export async function processRegistryExportJob(
         alwaysWriteHeaders: true
       });
       const transformer = wasteFormatterV2({
-        exportType
+        exportType,
+        useLabelAsKey: true
       });
       pipeline(
         inputStream,

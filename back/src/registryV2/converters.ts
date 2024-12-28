@@ -43,7 +43,10 @@ const inputToIncomingWaste: Partial<Record<keyof InputMap, any>> = {
 };
 
 const registryToWaste: Partial<
-  Record<Exclude<RegistryV2ExportType, "ALL">, any>
+  Record<
+    Exclude<RegistryV2ExportType, "ALL">,
+    Partial<Record<keyof InputMap, any>>
+  >
 > = {
   SSD: inputToSsdWaste,
   INCOMING: inputToIncomingWaste
@@ -55,9 +58,35 @@ export function toWaste<WasteType extends GenericWasteV2>(
   // remove undefined once all types are defined
 ): WasteType | undefined {
   const converter = registryToWaste[registryType];
-  const { SSD } = input;
-  if (input.SSD) {
+  const {
+    SSD,
+    INCOMING_WASTE,
+    INCOMING_TEXS,
+    BSDD,
+    BSDA,
+    BSDASRI,
+    BSFF,
+    BSPAOH,
+    BSVHU
+  } = input;
+  if (SSD) {
     return converter.SSD?.(SSD);
+  } else if (INCOMING_WASTE) {
+    return converter.INCOMING_WASTE?.(INCOMING_WASTE);
+  } else if (INCOMING_TEXS) {
+    return converter.INCOMING_TEXS?.(INCOMING_TEXS);
+  } else if (BSDD) {
+    return converter.BSDD?.(BSDD);
+  } else if (BSDA) {
+    return converter.BSDA?.(BSDA);
+  } else if (BSDASRI) {
+    return converter.BSDASRI?.(BSDASRI);
+  } else if (BSFF) {
+    return converter.BSFF?.(BSFF);
+  } else if (BSPAOH) {
+    return converter.BSPAOH?.(BSPAOH);
+  } else if (BSVHU) {
+    return converter.BSVHU?.(BSVHU);
   }
   return;
 }
