@@ -436,8 +436,13 @@ export function MyExports() {
         delegateSiret = company.delegate;
       }
     }
-    if (registryType !== RegistryV2ExportType.Ssd) {
-      toast.error("Seul l'export SSD est supporté pour le moment");
+    if (
+      registryType !== RegistryV2ExportType.Ssd &&
+      registryType !== RegistryV2ExportType.Incoming
+    ) {
+      toast.error(
+        "Seuls les exports SSD et entrants sont supportés pour le moment"
+      );
       return;
     }
     await generateExport({
