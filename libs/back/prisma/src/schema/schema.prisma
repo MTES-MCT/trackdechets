@@ -1083,8 +1083,9 @@ model Bsvhu {
   transporterTransportSignatureDate                   DateTime?                @db.Timestamptz(6)
   transporterTransportTakenOverAt                     DateTime?                @db.Timestamptz(6)
   transporterCustomInfo                               String?
-  transporterTransportPlates                          String[]
-  transporterRecepisseIsExempted                      Boolean?
+  transporterTransportMode                            TransportMode?           @default(ROAD)
+  transporterTransportPlates     String[]
+  transporterRecepisseIsExempted Boolean?
 
   ecoOrganismeName  String?
   ecoOrganismeSiret String?

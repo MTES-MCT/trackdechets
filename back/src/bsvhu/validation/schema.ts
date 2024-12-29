@@ -8,7 +8,9 @@ import {
   checkOperationMode,
   checkReceptionWeight,
   checkEmitterSituation,
-  checkPackaginAndIdentificationType
+  checkPackagingAndIdentificationType,
+  checkTransportModeAndWeight,
+  checkTransportModeAndReceptionWeight
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
@@ -31,6 +33,7 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { fillIntermediariesOrgIds, runTransformers } from "./transformers";
+import { TransportMode } from "@prisma/client";
 
 export const ZodWasteCodeEnum = z
   .enum(BSVHU_WASTE_CODES, {
@@ -67,6 +70,8 @@ export const ZodOperationEnum = z
   .nullish();
 
 export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
+
+const notOnlyWhiteSpace = (str: string) => str.trim(); // check whitespaces, tabs, newlines and invisible chars
 
 const rawBsvhuSchema = z.object({
   id: z.string().default(() => getReadableId(ReadableIdPrefix.VHU)),
@@ -171,21 +176,41 @@ const rawBsvhuSchema = z.object({
     .string()
     .email("E-mail transporteur invalide")
     .nullish(),
-  transporterRecepisseNumber: z.string().nullish(),
-  transporterRecepisseDepartment: z.string().nullish(),
-  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
   transporterCompanyVatNumber: foreignVatNumberSchema(
     CompanyRole.Transporter
   ).nullish(),
-  transporterTransportSignatureAuthor: z.string().nullish(),
-  transporterTransportSignatureDate: z.coerce.date().nullish(),
-  transporterTransportTakenOverAt: z.coerce.date().nullish(),
-  transporterCustomInfo: z.string().nullish(),
-  transporterTransportPlates: z.array(z.string()).optional(),
+  transporterRecepisseNumber: z.string().nullish(),
+  transporterRecepisseDepartment: z.string().nullish(),
+  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
   transporterRecepisseIsExempted: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
+
+  transporterTransportSignatureAuthor: z.string().nullish(),
+  transporterTransportSignatureDate: z.coerce.date().nullish(),
+  transporterTransportTakenOverAt: z.coerce.date().nullish(),
+  transporterCustomInfo: z.string().nullish(),
+  transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
+  transporterTransportPlates: z
+    .array(
+      z
+        .string()
+        .min(4, {
+          message:
+            "Un numéro d'immatriculation doit faire 4 caractères au minimum"
+        })
+        .max(12, {
+          message:
+            "Un numéro d'immatriculation doit faire 12 caractères au maximum"
+        })
+        .refine(notOnlyWhiteSpace, {
+          message: "Le numéro de plaque fourni est incorrect"
+        })
+    )
+    .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+    .default([]),
+
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   brokerCompanyName: z.string().nullish(),
@@ -229,7 +254,9 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkReceptionWeight)
   .superRefine(checkOperationMode)
   .superRefine(checkEmitterSituation)
-  .superRefine(checkPackaginAndIdentificationType);
+  .superRefine(checkPackagingAndIdentificationType)
+  .superRefine(checkTransportModeAndWeight)
+  .superRefine(checkTransportModeAndReceptionWeight);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`

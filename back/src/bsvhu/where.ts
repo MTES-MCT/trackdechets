@@ -6,7 +6,8 @@ import {
   toPrismaStringFilter,
   toPrismaNestedWhereInput,
   toPrismaGenericWhereInput,
-  toPrismaEnumFilter
+  toPrismaEnumFilter,
+  toPrismaStringNullableListFilter
 } from "../common/where";
 
 function toPrismaBsvhuWhereInput(where: BsvhuWhere): Prisma.BsvhuWhereInput {
@@ -23,6 +24,9 @@ function toPrismaBsvhuWhereInput(where: BsvhuWhere): Prisma.BsvhuWhereInput {
     ),
     transporterTransportSignatureDate: toPrismaDateFilter(
       where.transporter?.transport?.signature?.date
+    ),
+    transporterTransportPlates: toPrismaStringNullableListFilter(
+      where.transporter?.transport?.plates
     ),
     destinationCompanySiret: toPrismaStringFilter(
       where.destination?.company?.siret

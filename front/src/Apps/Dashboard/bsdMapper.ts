@@ -87,7 +87,7 @@ export const getCurrentTransporterInfos = (
     case BsdTypename.Bsdasri:
       return getBsdasriCurrentTransporterInfos(bsd);
     case BsdTypename.Bsvhu:
-      return null;
+      return getBsvhuCurrentTransporterInfos(bsd);
     case BsdTypename.Bspaoh:
       return getBspaohCurrentTransporterInfos(bsd);
     default:
@@ -196,6 +196,22 @@ export const getBsdasriCurrentTransporterInfos = (
       plate => plate.trim()
     ),
     transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
+  };
+};
+
+export const getBsvhuCurrentTransporterInfos = (
+  bsvhu: Bsvhu
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bsvhu.transporter;
+  // since there is only one transporter per BSVHU, transporterId is useless,
+  // the update is done through the BSD using its id
+
+  return {
+    transporterNumberPlate: currentTransporter?.transport?.plates?.filter(
+      plate => plate.trim()
+    ),
+    transporterCustomInfo: "",
     transporterMode: currentTransporter?.transport?.mode ?? undefined
   };
 };
@@ -349,6 +365,7 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
     transporter: bsvhu.transporter || bsvhu["bsvhuTransporter"],
+    transporterNumberPlate: "fff",
     updatedAt: bsvhu["bsvhuUpdatedAt"],
     ecoOrganisme: bsvhu.ecoOrganisme
   };

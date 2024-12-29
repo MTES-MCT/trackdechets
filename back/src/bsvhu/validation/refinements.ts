@@ -13,7 +13,8 @@ import { capitalize } from "../../common/strings";
 import {
   BsdType,
   WasteAcceptationStatus,
-  BsvhuIdentificationType
+  BsvhuIdentificationType,
+  TransportMode
 } from "@prisma/client";
 import {
   destinationOperationModeRefinement,
@@ -27,7 +28,10 @@ import {
 } from "../../common/validation/zod/refinement";
 import { EditionRule } from "./rules";
 import { CompanyRole } from "../../common/validation/zod/schema";
-
+import {
+  MAX_WEIGHT_TONNES,
+  MAX_WEIGHT_BY_ROAD_TONNES
+} from "../../common/validation";
 // Date de la MAJ 2024.07.2 introduisant un changement
 // des règles de validations sur les poids et volume qui doivent
 // désormais être strictement > 0
@@ -161,12 +165,17 @@ export const v20241201 = new Date(
   process.env.OVERRIDE_V20241201 || "2024-12-18T00:00:00.000"
 );
 
+// Date de la MAJ 2025.01.1 qui modifie les règles de validation du mode de transport, des palques d'immatriculations et la quantité transportée
+export const v20250101 = new Date(
+  process.env.OVERRIDE_V20250101 || "2025-15-01T00:00:00.000"
+);
+
 const BsvhuIdentificationTypesAfterV20241201 = [
   BsvhuIdentificationType.NUMERO_ORDRE_REGISTRE_POLICE,
   BsvhuIdentificationType.NUMERO_IMMATRICULATION
 ];
 
-export const checkPackaginAndIdentificationType: Refinement<ParsedZodBsvhu> = (
+export const checkPackagingAndIdentificationType: Refinement<ParsedZodBsvhu> = (
   bsvhu,
   { addIssue }
 ) => {
@@ -240,6 +249,60 @@ function checkFieldIsDefined<T extends ZodBsvhu>(
     });
   }
 }
+const MAX_WEIGHT_BY_ROAD_KG = MAX_WEIGHT_BY_ROAD_TONNES * 1000;
+
+export const checkTransportModeAndWeightRefinement = (
+  createdAt: Date | null | undefined,
+  weightValue: number | null | undefined,
+  transportMode: TransportMode | null | undefined,
+  weightFieldPath: string[],
+  ctx: RefinementCtx
+) => {
+  if ((createdAt || new Date()).getTime() < v20250101.getTime()) {
+    return;
+  }
+
+  if (!weightValue) {
+    return;
+  }
+  // max weight (50000t is handled on raw zod schema)
+
+  if (weightValue > MAX_WEIGHT_BY_ROAD_KG && transportMode === "ROAD") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: weightFieldPath,
+      message:
+        "Le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+    });
+  }
+};
+
+export const checkTransportModeAndWeight: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  zodContext
+) => {
+  return checkTransportModeAndWeightRefinement(
+    bsvhu.createdAt,
+    bsvhu.weightValue,
+
+    bsvhu.transporterTransportMode,
+    ["weight", "value"],
+    zodContext
+  );
+};
+
+export const checkTransportModeAndReceptionWeight: Refinement<
+  ParsedZodBsvhu
+> = (bsvhu, zodContext) => {
+  return checkTransportModeAndWeightRefinement(
+    bsvhu.createdAt,
+    bsvhu.destinationReceptionWeight,
+
+    bsvhu.transporterTransportMode,
+    ["destination", "reception", "weight"],
+    zodContext
+  );
+};
 
 export const checkRequiredFields: (
   validationContext: BsvhuValidationContext

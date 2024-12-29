@@ -3,7 +3,8 @@ import {
   Document,
   formatDate,
   FormCompanyFields,
-  SignatureStamp
+  SignatureStamp,
+  TRANSPORT_MODE_LABELS
 } from "../../../common/pdf";
 import type { Bsvhu, OperationMode } from "@td/codegen-back";
 import { getOperationModeLabel } from "../../../common/operationModes";
@@ -425,6 +426,17 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             ) : (
               <Recepisse recepisse={bsvhu?.transporter?.recepisse} />
             )}
+
+            <p className="mb-3">
+              Mode de transport:{" "}
+              {bsvhu?.transporter?.transport?.mode
+                ? TRANSPORT_MODE_LABELS[bsvhu?.transporter?.transport?.mode]
+                : ""}
+            </p>
+            <p className="mb-3">
+              Immatriculation(s) :{" "}
+              {bsvhu?.transporter?.transport?.plates?.join(", ")}
+            </p>
             <p className="mb-3">
               Date de prise en charge :{" "}
               {formatDate(bsvhu?.transporter?.transport?.takenOverAt)}

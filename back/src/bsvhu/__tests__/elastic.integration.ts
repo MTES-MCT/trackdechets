@@ -58,6 +58,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         transporterCompanyName: transporter.name,
         transporterCompanySiret: transporter.siret,
         transporterCompanyVatNumber: transporter.vatNumber,
+        transporterTransportPlates: ["XY-87-IU"],
         destinationCompanyName: destination.name,
         destinationCompanySiret: destination.siret,
         ecoOrganismeName: ecoOrganisme.name,
@@ -121,7 +122,10 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyOrgIds).toContain(broker.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(trader.siret);
   });
-
+  test("plates should be indexed", async () => {
+    // Then
+    expect(elasticBsvhu.transporterTransportPlates).toEqual(["XY87IU"]);
+  });
   describe("isReturnFor", () => {
     it.each([
       WasteAcceptationStatus.REFUSED,
