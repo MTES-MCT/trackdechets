@@ -11,8 +11,8 @@ import {
   RegistrySsd
 } from "@prisma/client";
 import type { RegistryV2ExportType } from "@td/codegen-back";
-
 import { GenericWasteV2 } from "./types";
+import { toIncomingWasteV2 as bsvhuToIncomingWasteV2 } from "../bsvhu/registryV2";
 // add other types when other exports are added
 type InputMap = {
   SSD: RegistrySsd | null;
@@ -39,7 +39,7 @@ const inputToIncomingWaste: Partial<Record<keyof InputMap, any>> = {
   BSDASRI: exportOptions.BSDASRI?.toIncomingWaste,
   BSFF: exportOptions.BSFF?.toIncomingWaste,
   BSPAOH: exportOptions.BSPAOH?.toIncomingWaste,
-  BSVHU: exportOptions.BSVHU?.toIncomingWaste
+  BSVHU: bsvhuToIncomingWasteV2
 };
 
 const registryToWaste: Partial<
