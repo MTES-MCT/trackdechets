@@ -4,8 +4,10 @@ export type GenericWasteV2 = SsdWasteV2 | IncomingWasteV2;
 
 type Nullable<T> = { [K in keyof T]: T[K] | null };
 
-export const emptyIncomingWasteV2: Required<Nullable<IncomingWasteV2>> = {
-  __typename: "IncomingWasteV2",
+export const emptyIncomingWasteV2: Omit<
+  Required<Nullable<IncomingWasteV2>>,
+  "__typename"
+> = {
   id: null,
   source: null,
   publicId: null,
