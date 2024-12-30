@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { ParsedZodIncomingWasteItem } from "./validation/schema";
-import LookupUtils from "../lookup/utils";
+import { lookupUtils } from "./registry";
 
 export async function saveIncomingWasteLine({
   line,
@@ -20,11 +20,7 @@ export async function saveIncomingWasteLine({
         const registryIncomingWaste = await tx.registryIncomingWaste.create({
           data: { ...persistedData, importId }
         });
-        await LookupUtils.RegistryIncomingWaste.update(
-          registryIncomingWaste,
-          id ?? null,
-          tx
-        );
+        await lookupUtils.update(registryIncomingWaste, id ?? null, tx);
       });
       return;
     case "ANNULER":
@@ -34,7 +30,7 @@ export async function saveIncomingWasteLine({
           data: { isCancelled: true }
         });
         if (id) {
-          await LookupUtils.RegistryIncomingWaste.delete(id, tx);
+          await lookupUtils.delete(id, tx);
         }
       });
       return;
@@ -45,11 +41,7 @@ export async function saveIncomingWasteLine({
         const registryIncomingWaste = await tx.registryIncomingWaste.create({
           data: { ...persistedData, importId }
         });
-        await LookupUtils.RegistryIncomingWaste.update(
-          registryIncomingWaste,
-          null,
-          tx
-        );
+        await lookupUtils.update(registryIncomingWaste, null, tx);
       });
 
       return;

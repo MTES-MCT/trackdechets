@@ -1,10 +1,19 @@
-import { Bsvhu } from "@prisma/client";
+import {
+  Bsvhu,
+  PrismaClient,
+  RegistryExportDeclarationType,
+  RegistryExportType,
+  RegistryExportWasteType
+} from "@prisma/client";
+import { prisma } from "@td/prisma";
+import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
 import { getWasteDescription } from "./utils";
 import { getBsvhuSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import Decimal from "decimal.js";
 import { emptyIncomingWasteV2 } from "../registryV2/types";
+import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
 
 export const toIncomingWasteV2 = (
   bsvhu: Bsvhu
@@ -124,4 +133,77 @@ export const toIncomingWasteV2 = (
     destinationOperationMode: bsvhu.destinationOperationMode,
     destinationOperationNoTraceability: false
   };
+};
+
+export const updateRegistryLookup = async (
+  bsvhu: Bsvhu,
+  tx: Omit<PrismaClient, ITXClientDenyList>
+): Promise<void> => {
+  if (
+    bsvhu.destinationOperationSignatureDate &&
+    bsvhu.destinationCompanySiret
+  ) {
+    await tx.registryLookup.upsert({
+      where: {
+        id_exportRegistryType_siret: {
+          id: bsvhu.id,
+          exportRegistryType: RegistryExportType.INCOMING,
+          siret: bsvhu.destinationCompanySiret
+        }
+      },
+      update: {},
+      create: {
+        id: bsvhu.id,
+        readableId: bsvhu.id,
+        siret: bsvhu.destinationCompanySiret,
+        exportRegistryType: RegistryExportType.INCOMING,
+        declarationType: RegistryExportDeclarationType.BSD,
+        wasteType: RegistryExportWasteType.DD,
+        wasteCode: bsvhu.wasteCode!, // is required from emitter signature, so it has to be there
+        ...generateDateInfos(bsvhu.destinationOperationSignatureDate),
+        bsvhuId: bsvhu.id
+      }
+    });
+  }
+};
+
+export const rebuildRegistryLookup = async () => {
+  await prisma.registryLookup.deleteMany({
+    where: {
+      bsvhuId: { not: null }
+    }
+  });
+  // reindex registrySSD
+  let done = false;
+  let cursorId: string | null = null;
+  while (!done) {
+    const items = await prisma.bsvhu.findMany({
+      where: {
+        isDeleted: false,
+        isDraft: false
+      },
+      take: 100,
+      skip: cursorId ? 1 : 0,
+      cursor: cursorId ? { id: cursorId } : undefined,
+      orderBy: {
+        id: "desc"
+      }
+    });
+    for (const bsvhu of items) {
+      await prisma.$transaction(async tx => {
+        await updateRegistryLookup(bsvhu, tx);
+      });
+    }
+    if (items.length < 100) {
+      done = true;
+      return;
+    }
+    cursorId = items[items.length - 1].id;
+  }
+};
+
+export const lookupUtils = {
+  update: updateRegistryLookup,
+  delete: deleteRegistryLookup,
+  rebuildLookup: rebuildRegistryLookup
 };
