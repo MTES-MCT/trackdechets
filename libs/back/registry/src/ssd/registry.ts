@@ -10,6 +10,7 @@ import type { SsdWasteV2 } from "@td/codegen-back";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { prisma } from "@td/prisma";
 import {
+  deleteRegistryLookup,
   generateDateInfos,
   updateRegistryDelegateSirets
 } from "../lookup/utils";
@@ -155,4 +156,10 @@ export const rebuildRegistryLookup = async () => {
     }
     cursorId = items[items.length - 1].id;
   }
+};
+
+export const lookupUtils = {
+  update: updateRegistryLookup,
+  delete: deleteRegistryLookup,
+  rebuildLookup: rebuildRegistryLookup
 };

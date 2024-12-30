@@ -1,19 +1,6 @@
 import { Prisma, PrismaClient, RegistryExportType } from "@prisma/client";
 import { v7 as uuidv7 } from "uuid";
-
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
-import {
-  updateRegistryLookup as updateRegistrySsdLookup,
-  rebuildRegistryLookup as rebuildRegistrySsdLookup
-} from "../ssd/registry";
-import {
-  updateRegistryLookup as updateRegistryIncomingWasteLookup,
-  rebuildRegistryLookup as rebuildRegistryIncomingWasteLookup
-} from "../incomingWaste/registry";
-import {
-  updateRegistryLookup as updateRegistryIncomingTexsLookup,
-  rebuildRegistryLookup as rebuildRegistryIncomingTexsLookup
-} from "../incomingTexs/registry";
 
 export const generateDateInfos = (date: Date) => ({
   date,
@@ -94,22 +81,4 @@ export const deleteRegistryLookup = async (
     }
   });
   return;
-};
-
-export default {
-  RegistrySsd: {
-    update: updateRegistrySsdLookup,
-    delete: deleteRegistryLookup,
-    rebuildLookup: rebuildRegistrySsdLookup
-  },
-  RegistryIncomingWaste: {
-    update: updateRegistryIncomingWasteLookup,
-    delete: deleteRegistryLookup,
-    rebuildLookup: rebuildRegistryIncomingWasteLookup
-  },
-  RegistryIncomingTexs: {
-    update: updateRegistryIncomingTexsLookup,
-    delete: deleteRegistryLookup,
-    rebuildLookup: rebuildRegistryIncomingTexsLookup
-  }
 };
