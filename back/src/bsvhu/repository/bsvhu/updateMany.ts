@@ -5,6 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
+import { lookupUtils } from "../../registryV2";
 
 export type UpdateManyBsvhuFn = (
   where: Prisma.BsvhuWhereInput,
@@ -27,8 +28,8 @@ export function buildUpdateManyBsvhus(
     });
 
     const updatedBsvhus = await prisma.bsvhu.findMany({
-      where,
-      select: { id: true }
+      where
+      // select: { id: true }
     });
 
     const ids = updatedBsvhus.map(({ id }) => id);
@@ -44,8 +45,11 @@ export function buildUpdateManyBsvhus(
     await prisma.event.createMany({
       data: eventsData
     });
-    for (const id of ids) {
-      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
+    for (const updatedBsvhu of updatedBsvhus) {
+      await lookupUtils.update(updatedBsvhu, prisma);
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(updatedBsvhu.id)
+      );
     }
 
     return update;

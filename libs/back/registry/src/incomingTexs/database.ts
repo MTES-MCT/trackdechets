@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { ParsedZodIncomingTexsItem } from "./validation/schema";
-import LookupUtils from "../lookup/utils";
+import { lookupUtils } from "./registry";
 
 export async function saveIncomingTexsLine({
   line,
@@ -20,11 +20,7 @@ export async function saveIncomingTexsLine({
         const registryIncomingTexs = await tx.registryIncomingTexs.create({
           data: { ...persistedData, importId }
         });
-        await LookupUtils.RegistryIncomingTexs.update(
-          registryIncomingTexs,
-          id ?? null,
-          tx
-        );
+        await lookupUtils.update(registryIncomingTexs, id ?? null, tx);
       });
       return;
     case "ANNULER":
@@ -34,7 +30,7 @@ export async function saveIncomingTexsLine({
           data: { isCancelled: true }
         });
         if (id) {
-          await LookupUtils.RegistryIncomingTexs.delete(id, tx);
+          await lookupUtils.delete(id, tx);
         }
       });
 
@@ -46,11 +42,7 @@ export async function saveIncomingTexsLine({
         const registryIncomingTexs = await prisma.registryIncomingTexs.create({
           data: { ...persistedData, importId }
         });
-        await LookupUtils.RegistryIncomingTexs.update(
-          registryIncomingTexs,
-          null,
-          tx
-        );
+        await lookupUtils.update(registryIncomingTexs, null, tx);
       });
       return;
   }

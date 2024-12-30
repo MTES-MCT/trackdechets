@@ -8,6 +8,7 @@ import {
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import {
+  deleteRegistryLookup,
   generateDateInfos,
   updateRegistryDelegateSirets
 } from "../lookup/utils";
@@ -179,7 +180,7 @@ export const toIncomingWaste = (
   };
 };
 
-export const updateRegistryLookup = async (
+const updateRegistryLookup = async (
   registryIncomingWaste: RegistryIncomingWaste,
   oldRegistryIncomingWasteId: string | null,
   tx: Omit<PrismaClient, ITXClientDenyList>
@@ -248,7 +249,7 @@ export const updateRegistryLookup = async (
   );
 };
 
-export const rebuildRegistryLookup = async () => {
+const rebuildRegistryLookup = async () => {
   await prisma.registryLookup.deleteMany({
     where: {
       registryIncomingWasteId: { not: null }
@@ -281,4 +282,10 @@ export const rebuildRegistryLookup = async () => {
     }
     cursorId = items[items.length - 1].id;
   }
+};
+
+export const lookupUtils = {
+  update: updateRegistryLookup,
+  delete: deleteRegistryLookup,
+  rebuildLookup: rebuildRegistryLookup
 };
