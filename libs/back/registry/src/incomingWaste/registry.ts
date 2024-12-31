@@ -180,7 +180,7 @@ export const toIncomingWaste = (
   };
 };
 
-const updateRegistryLookup = async (
+export const updateRegistryLookup = async (
   registryIncomingWaste: RegistryIncomingWaste,
   oldRegistryIncomingWasteId: string | null,
   tx: Omit<PrismaClient, ITXClientDenyList>
@@ -249,7 +249,7 @@ const updateRegistryLookup = async (
   );
 };
 
-const rebuildRegistryLookup = async () => {
+export const rebuildRegistryLookup = async () => {
   await prisma.registryLookup.deleteMany({
     where: {
       registryIncomingWasteId: { not: null }

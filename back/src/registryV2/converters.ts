@@ -12,6 +12,7 @@ import {
 } from "@prisma/client";
 import type { RegistryV2ExportType } from "@td/codegen-back";
 import { GenericWasteV2 } from "./types";
+import { toIncomingWasteV2 as bspaohToIncomingWasteV2 } from "../bspaoh/registryV2";
 import { toIncomingWasteV2 as bsvhuToIncomingWasteV2 } from "../bsvhu/registryV2";
 // add other types when other exports are added
 type InputMap = {
@@ -38,7 +39,7 @@ const inputToIncomingWaste: Partial<Record<keyof InputMap, any>> = {
   BSDA: exportOptions.BSDA?.toIncomingWaste,
   BSDASRI: exportOptions.BSDASRI?.toIncomingWaste,
   BSFF: exportOptions.BSFF?.toIncomingWaste,
-  BSPAOH: exportOptions.BSPAOH?.toIncomingWaste,
+  BSPAOH: bspaohToIncomingWasteV2,
   BSVHU: bsvhuToIncomingWasteV2
 };
 

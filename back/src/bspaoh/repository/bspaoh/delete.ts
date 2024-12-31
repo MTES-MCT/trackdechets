@@ -6,6 +6,7 @@ import {
 import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
 import { bspaohEventTypes } from "./eventTypes";
 import { PrismaBspaohWithTransporters } from "../../types";
+import { lookupUtils } from "../../registryV2";
 
 export type DeleteBspaohFn = (
   where: Prisma.BspaohWhereUniqueInput,
@@ -32,6 +33,7 @@ export function buildDeleteBspaoh(deps: RepositoryFnDeps): DeleteBspaohFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+    await lookupUtils.delete(deletedBspaoh.id, prisma);
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBspaoh.id));
 
     return deletedBspaoh;

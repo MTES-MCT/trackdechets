@@ -57,7 +57,11 @@ const streamLookup = (
             bsda: true,
             bsdasri: true,
             bsff: true,
-            bspaoh: true,
+            bspaoh: {
+              include: {
+                transporters: true
+              }
+            },
             bsvhu: true
           }
         });
@@ -71,7 +75,11 @@ const streamLookup = (
               bsda: true;
               bsdasri: true;
               bsff: true;
-              bspaoh: true;
+              bspaoh: {
+                include: {
+                  transporters: true;
+                };
+              };
               bsvhu: true;
             };
           }>;
