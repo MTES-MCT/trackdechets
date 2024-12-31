@@ -7,6 +7,7 @@ import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bspaohEventTypes } from "./eventTypes";
 import { PrismaBspaohWithTransporters } from "../../types";
 import { getDenormalizedSirets } from "./denormalizeHelpers";
+import { lookupUtils } from "../../registryV2";
 
 export type CreateBspaohFn = (
   data: Prisma.BspaohCreateInput,
@@ -45,6 +46,7 @@ export function buildCreateBspaoh(deps: RepositoryFnDeps): CreateBspaohFn {
       }
     });
 
+    await lookupUtils.update(bspaoh, prisma);
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bspaoh.id));
 
     return bspaoh;
