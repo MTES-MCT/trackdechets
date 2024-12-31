@@ -143,7 +143,6 @@ const DestinationBsvhu = ({ errors }) => {
   const selectedCompanyError = (company?: CompanySearchResult) => {
     // Le destinatiare doit être inscrit et avec un profil crématorium ou sous-type crémation
     if (company) {
-      console.log(company.companyTypes);
       if (!company.isRegistered) {
         return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
       } else if (!company.companyTypes?.includes(CompanyType.WasteVehicles)) {

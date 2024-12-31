@@ -170,7 +170,6 @@ const TransporterBsvhu = ({ errors }) => {
               setValue(`${actor}.company.name`, company.name);
               setValue(`${actor}.company.vatNumber`, company.vatNumber);
               setValue(`${actor}.company.address`, company.address);
-              console.log(company.transporterReceipt);
               setRecepisse({
                 number: company.transporterReceipt?.receiptNumber,
                 department: company.transporterReceipt?.department,

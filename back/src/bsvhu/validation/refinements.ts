@@ -28,10 +28,8 @@ import {
 } from "../../common/validation/zod/refinement";
 import { EditionRule } from "./rules";
 import { CompanyRole } from "../../common/validation/zod/schema";
-import {
-  MAX_WEIGHT_TONNES,
-  MAX_WEIGHT_BY_ROAD_TONNES
-} from "../../common/validation";
+import { MAX_WEIGHT_BY_ROAD_TONNES } from "../../common/validation";
+
 // Date de la MAJ 2024.07.2 introduisant un changement
 // des règles de validations sur les poids et volume qui doivent
 // désormais être strictement > 0
