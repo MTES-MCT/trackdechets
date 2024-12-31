@@ -8,6 +8,7 @@ import { bspaohEventTypes } from "./eventTypes";
 import { PrismaBspaohWithTransporters } from "../../types";
 import { getDenormalizedSirets } from "./denormalizeHelpers";
 import { objectDiff } from "../../../forms/workflow/diff";
+import { lookupUtils } from "../../registryV2";
 
 export type UpdateBspaohFn = (
   where: Prisma.BspaohWhereUniqueInput,
@@ -56,6 +57,7 @@ export function buildUpdateBspaoh(deps: RepositoryFnDeps): UpdateBspaohFn {
       }
     });
 
+    await lookupUtils.update(bspaoh, prisma);
     prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bspaoh.id));
 
     return bspaoh;

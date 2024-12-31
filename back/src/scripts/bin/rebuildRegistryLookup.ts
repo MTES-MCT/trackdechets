@@ -1,6 +1,12 @@
-import { LookupUtils } from "@td/registry";
+import {
+  ssdLookupUtils,
+  incomingWasteLookupUtils,
+  incomingTexsLookupUtils
+} from "@td/registry";
 import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
+import { lookupUtils as bsvhuLookupUtils } from "../../bsvhu/registryV2";
+import { lookupUtils as bspaohLookupUtils } from "../../bspaoh/registryV2";
 
 async function exitScript() {
   logger.info("Done rebuildRegistryLookup script, exiting");
@@ -12,7 +18,11 @@ async function exitScript() {
  */
 (async function () {
   try {
-    await LookupUtils.RegistrySsd.rebuildLookup();
+    await ssdLookupUtils.rebuildLookup();
+    await incomingWasteLookupUtils.rebuildLookup();
+    await incomingTexsLookupUtils.rebuildLookup();
+    await bsvhuLookupUtils.rebuildLookup();
+    await bspaohLookupUtils.rebuildLookup();
   } catch (error) {
     logger.error("Error in rebuildRegistryLookup script, exiting", error);
     throw new Error(`Error in rebuildRegistryLookup script : ${error}`);
