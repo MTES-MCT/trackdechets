@@ -19,6 +19,14 @@ import {
 import { toWaste } from "../../registryV2/converters";
 import { wasteFormatterV2 } from "../../registryV2/streams";
 import { EXPORT_COLUMNS } from "../../registryV2/columns";
+import {
+  RegistryV2BsdaInclude,
+  RegistryV2BsdasriInclude,
+  RegistryV2BsddInclude,
+  RegistryV2BsffInclude,
+  RegistryV2BspaohInclude,
+  RegistryV2BsvhuInclude
+} from "../../registryV2/types";
 
 // we have all verified infos in the registryExport,
 // but the date range is a bit more fine in the query than in the object
@@ -53,16 +61,24 @@ const streamLookup = (
             registrySsd: true,
             registryIncomingWaste: true,
             registryIncomingTexs: true,
-            bsdd: true,
-            bsda: true,
-            bsdasri: true,
-            bsff: true,
-            bspaoh: {
-              include: {
-                transporters: true
-              }
+            bsdd: {
+              include: RegistryV2BsddInclude
             },
-            bsvhu: true
+            bsda: {
+              include: RegistryV2BsdaInclude
+            },
+            bsdasri: {
+              include: RegistryV2BsdasriInclude
+            },
+            bsff: {
+              include: RegistryV2BsffInclude
+            },
+            bspaoh: {
+              include: RegistryV2BspaohInclude
+            },
+            bsvhu: {
+              include: RegistryV2BsvhuInclude
+            }
           }
         });
         for (const item of items) {
