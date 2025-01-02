@@ -5,6 +5,7 @@ import gql from "graphql-tag";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@td/prisma";
+import { subMonths, format, addDays } from "date-fns";
 
 const ADD_TO_SSD_REGISTRY = gql`
   mutation AddToSsdRegistry($lines: [SsdLineInput!]!) {
@@ -13,12 +14,15 @@ const ADD_TO_SSD_REGISTRY = gql`
 `;
 
 function getCorrectLine(siret: string) {
+  const sixMonthsAgo = subMonths(new Date(), 6);
+  const processingDate = format(sixMonthsAgo, "yyyy-MM-dd");
+  const useDate = format(addDays(sixMonthsAgo, 1), "yyyy-MM-dd");
   return {
     reason: undefined,
     publicId: randomUUID(),
     reportAsCompanySiret: undefined,
     reportForCompanySiret: siret,
-    useDate: "2024-02-01",
+    useDate,
     dispatchDate: undefined,
     wasteCode: "06 07 01*",
     wasteDescription: "Description déchet",
@@ -29,7 +33,7 @@ function getCorrectLine(siret: string) {
     weightValue: 1.4,
     weightIsEstimate: false,
     volume: 1.2,
-    processingDate: "2024-01-01",
+    processingDate,
     processingEndDate: undefined,
     destinationCompanyType: "ETABLISSEMENT_FR",
     destinationCompanyOrgId: "78467169500103",
