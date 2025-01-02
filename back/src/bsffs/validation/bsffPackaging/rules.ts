@@ -1,7 +1,6 @@
 import { SealedFieldError } from "../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 import { capitalize } from "../../../common/strings";
-import { daysBetween } from "../../../utils";
 import { isFinalOperation } from "../../constants";
 import { getUpdatedFields } from "../bsff/helpers";
 import { getCurrentSignatureType, getSignatureAncestors } from "./helpers";

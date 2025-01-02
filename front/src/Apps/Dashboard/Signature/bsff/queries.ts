@@ -36,6 +36,7 @@ const bsffPackagingFragment = gql`
     }
     bsff {
       id
+      status
       waste {
         code
         description

@@ -277,6 +277,8 @@ describe("Mutation.updateBsffPackaging", () => {
         { packagingData: { operationSignatureDate: new Date() } }
       );
 
+      expect(bsff.status).toEqual("PROCESSED");
+
       const packagingId = bsff.packagings[0].id;
 
       const { mutate } = makeClient(destination.user);
@@ -319,9 +321,12 @@ describe("Mutation.updateBsffPackaging", () => {
       expect(errors).toBeUndefined();
 
       const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
-        where: { id: packagingId }
+        where: { id: packagingId },
+        include: { bsff: true }
       });
       expect(updatedPackaging.operationCode).toEqual("D13");
+      // status of bsff should be recalculated to INTERMEDIATELY_PROCESSED
+      expect(updatedPackaging.bsff.status).toEqual("INTERMEDIATELY_PROCESSED");
     }
   );
 

@@ -41,6 +41,8 @@ import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWr
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import { subMonths } from "date-fns";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
 type SignBsffPackagingFormProps = {
   packaging: BsffPackaging & { bsff?: Bsff };
@@ -85,6 +87,157 @@ function getDefaultFormValues(
       type: BsffSignatureType.Acceptation
     }
   };
+}
+
+const acceptationSchema = z.object({
+  numero: z.string({ required_error: "Champ requis" }).min(1, "Champ requis"),
+  acceptation: z.object({
+    weight: z
+      .number({
+        required_error: "Champ requis",
+        invalid_type_error: "Champ requis"
+      })
+      .min(0),
+    status: z.nativeEnum(WasteAcceptationStatus, {
+      required_error: "Champ requis"
+    }),
+    date: z.string({ required_error: "Champ requis" }).min(1, "Champ requis"),
+    wasteCode: z
+      .string({ required_error: "Champ requis" })
+      .min(1, "Champ requis"),
+    wasteDescription: z
+      .string({ required_error: "Champ requis" })
+      .min(1, "Champ requis"),
+    refusalReason: z.string().nullable()
+  })
+});
+
+const acceptationRefinement: z.Refinement<z.infer<typeof acceptationSchema>> = (
+  data,
+  { addIssue }
+) => {
+  if (
+    data.acceptation.status === WasteAcceptationStatus.Accepted &&
+    data.acceptation.weight <= 0
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "La quantité doit être supérieure à 0",
+      path: ["acceptation", "weight"]
+    });
+  }
+
+  if (
+    data.acceptation.status === WasteAcceptationStatus.Refused &&
+    data.acceptation.weight !== 0
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "La quantité doit être à 0 en cas de refus",
+      path: ["acceptation", "weight"]
+    });
+  }
+
+  if (
+    data.acceptation.status === WasteAcceptationStatus.Refused &&
+    !data.acceptation.refusalReason
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Champ requis",
+      path: ["acceptation", "refusalReason"]
+    });
+  }
+};
+
+const operationSchema = z.object({
+  operation: z.object({
+    date: z.string({ required_error: "Champ requis" }).min(1, "Champ requis"),
+    code: z.string({ required_error: "Champ requis" }).min(1, "Champ requis"),
+    mode: z.nativeEnum(OperationMode).nullable(),
+    description: z
+      .string({ required_error: "Champ requis" })
+      .min(1, "Champ requis"),
+    noTraceability: z.boolean(),
+    nextDestination: z
+      .object({
+        plannedOperationCode: z
+          .string({
+            required_error: "Champ requis",
+            invalid_type_error: "Champ requis"
+          })
+          .min(1, "Champ requis"),
+        cap: z.string().nullable(),
+        company: z.object({
+          siret: z
+            .string({
+              required_error: "Champ requis",
+              invalid_type_error: "Champ requis"
+            })
+            .length(14, "Champ requis"),
+          name: z
+            .string({
+              required_error: "Champ requis",
+              invalid_type_error: "Champ requis"
+            })
+            .min(1, "Champ requis"),
+          address: z
+            .string({
+              required_error: "Champ requis",
+              invalid_type_error: "Champ requis"
+            })
+            .min(1, "Champ requis"),
+          contact: z
+            .string({
+              required_error: "Champ requis",
+              invalid_type_error: "Champ requis"
+            })
+            .min(1, "Champ requis"),
+          mail: z
+            .string({
+              required_error: "Champ requis",
+              invalid_type_error: "Champ requis"
+            })
+            .email(),
+          phone: z
+            .string({
+              required_error: "Champ requis",
+              invalid_type_error: "Champ requis"
+            })
+            .min(10)
+        })
+      })
+      .nullable()
+  })
+});
+
+const signatureSchema = z.object({
+  signature: z.object({
+    packagingId: z
+      .string({ required_error: "Champ requis" })
+      .min(1, "Champ requis"),
+    author: z.string({ required_error: "Champ requis" }).min(1, "Champ requis"),
+    type: z.nativeEnum(BsffSignatureType, { required_error: "Champ requis" })
+  })
+});
+
+function getSchema(signatureType: BsffSignatureType | null) {
+  if (signatureType === BsffSignatureType.Operation) {
+    return acceptationSchema
+      .merge(operationSchema)
+      .merge(signatureSchema)
+      .superRefine(acceptationRefinement);
+  } else if (signatureType === null) {
+    // cas de la correction
+    return acceptationSchema
+      .merge(operationSchema)
+      .superRefine(acceptationRefinement);
+  }
+
+  // cas de l'acceptation
+  return acceptationSchema
+    .merge(signatureSchema)
+    .superRefine(acceptationRefinement);
 }
 
 function getSignatureType(packaging: BsffPackaging): BsffSignatureType | null {
@@ -157,8 +310,11 @@ function SignBsffPackagingForm({
     }
   }, [signatureType, loading]);
 
+  const schema = useMemo(() => getSchema(signatureType), [signatureType]);
+
   const methods = useForm<FormValues>({
-    defaultValues
+    defaultValues,
+    resolver: zodResolver(schema)
   });
 
   const {
@@ -179,8 +335,8 @@ function SignBsffPackagingForm({
 
   useEffect(() => {
     if (isSubmitted) {
-      // Les messages d'erreur de ces deux champs
-      // dépendent de la valeur du statut d'acceptation
+      // Re-valide le poids et le message de refus
+      // lorsque le statut d'acceptation change
       trigger("acceptation.weight");
       trigger("acceptation.refusalReason");
     }
@@ -215,21 +371,14 @@ function SignBsffPackagingForm({
     if (!isGroupement && noTraceability) {
       // La rupture de traçabilité n'a de sens qu'en cas de groupement
       setValue("operation.noTraceability", false);
-      unregister("operation.noTraceability");
     }
   }, [isGroupement, noTraceability, setValue, unregister]);
 
   useEffect(() => {
-    if (!hasNextDestination && nextDestination) {
+    if (!hasNextDestination) {
       setValue("operation.nextDestination", null);
-      unregister("operation.nextDestination");
     }
-    if (hasNextDestination) {
-      register("operation.nextDestination.company.siret", {
-        required: "Vous devez choisir une destination ultérieure"
-      });
-    }
-  }, [hasNextDestination, nextDestination, setValue, unregister, register]);
+  }, [hasNextDestination, setValue, unregister, register]);
 
   const onSubmit: SubmitHandler<FormValues> = async data => {
     const { signature, acceptation, operation, ...rest } = data;
@@ -278,9 +427,7 @@ function SignBsffPackagingForm({
           <div className="fr-col-12">
             <Select
               label="Code déchet"
-              nativeSelectProps={register("acceptation.wasteCode", {
-                required: "Champ requis"
-              })}
+              nativeSelectProps={register("acceptation.wasteCode")}
               state={errors.acceptation?.wasteCode ? "error" : "default"}
               stateRelatedMessage={errors.acceptation?.wasteCode?.message}
             >
@@ -296,9 +443,7 @@ function SignBsffPackagingForm({
           <div className="fr-col-12">
             <Input
               label="Description du fluide"
-              nativeInputProps={register("acceptation.wasteDescription", {
-                required: "Champ requis"
-              })}
+              nativeInputProps={register("acceptation.wasteDescription")}
               state={errors.acceptation?.wasteDescription ? "error" : "default"}
               stateRelatedMessage={
                 errors.acceptation?.wasteDescription?.message
@@ -310,9 +455,7 @@ function SignBsffPackagingForm({
           <div className="fr-col-12 fr-col-md-4">
             <Input
               label="Numéro du contenant"
-              nativeInputProps={register("numero", {
-                required: "Champ requis"
-              })}
+              nativeInputProps={register("numero")}
               state={errors.numero ? "error" : "default"}
               stateRelatedMessage={errors.numero?.message}
             />
@@ -355,9 +498,7 @@ function SignBsffPackagingForm({
                   <Input
                     label="Motif du refus"
                     nativeTextAreaProps={{
-                      ...register("acceptation.refusalReason", {
-                        required: "Champ requis"
-                      })
+                      ...register("acceptation.refusalReason")
                     }}
                     textArea
                     state={
@@ -378,9 +519,7 @@ function SignBsffPackagingForm({
                     max: maxDate,
                     min: minDate,
                     type: "date",
-                    ...register("acceptation.date", {
-                      required: "Champ requis"
-                    })
+                    ...register("acceptation.date")
                   }}
                   state={errors.acceptation?.date ? "error" : "default"}
                   stateRelatedMessage={errors.acceptation?.date?.message}
@@ -398,16 +537,7 @@ function SignBsffPackagingForm({
               disabled={isRefused}
               nativeInputProps={{
                 ...register("acceptation.weight", {
-                  required: "Champ requis",
-                  valueAsNumber: true,
-                  validate: v => {
-                    if (isAccepted && v <= 0) {
-                      return "La quantité doit être supérieure à 0";
-                    }
-                    if (isRefused && v !== 0) {
-                      return "La quantité doit être à 0 en cas de refus";
-                    }
-                  }
+                  valueAsNumber: true
                 }),
                 type: "number",
                 inputMode: "decimal",
