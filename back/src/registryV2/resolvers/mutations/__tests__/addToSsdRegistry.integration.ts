@@ -91,11 +91,10 @@ describe("Registry - addToSsdRegistry", () => {
 
     const lines = [getCorrectLine(company.siret!)];
 
-    const { data, errors } = await mutate<Pick<Mutation, "addToSsdRegistry">>(
+    const { data } = await mutate<Pick<Mutation, "addToSsdRegistry">>(
       ADD_TO_SSD_REGISTRY,
       { variables: { lines } }
     );
-    console.log(errors);
 
     expect(data.addToSsdRegistry).toBe(true);
   });
