@@ -1,9 +1,98 @@
 import type { IncomingWasteV2, SsdWasteV2 } from "@td/codegen-back";
-
+import { Prisma } from "@prisma/client";
 export type GenericWasteV2 = SsdWasteV2 | IncomingWasteV2;
 
 type Nullable<T> = { [K in keyof T]: T[K] | null };
 
+// BSDD
+export const RegistryV2BsddInclude = Prisma.validator<Prisma.FormInclude>()({
+  forwarding: { include: { transporters: true } },
+  intermediaries: true,
+  forwardedIn: { include: { transporters: true } },
+  finalOperations: {
+    include: { finalForm: { select: { recipientCompanySiret: true } } }
+  },
+  grouping: { include: { initialForm: { include: { transporters: true } } } },
+  transporters: true
+});
+
+export type RegistryV2Bsdd = Prisma.FormGetPayload<{
+  include: typeof RegistryV2BsddInclude;
+}>;
+
+// BSDA
+export const RegistryV2BsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
+  grouping: true,
+  forwarding: true,
+  intermediaries: true,
+  forwardedIn: true,
+  transporters: true,
+  finalOperations: {
+    include: { finalBsda: { select: { destinationCompanySiret: true } } }
+  }
+});
+
+export type RegistryV2Bsda = Prisma.BsdaGetPayload<{
+  include: typeof RegistryV2BsdaInclude;
+}>;
+
+// BSDASRI
+export const RegistryV2BsdasriInclude =
+  Prisma.validator<Prisma.BsdasriInclude>()({
+    grouping: true,
+    finalOperations: {
+      include: { finalBsdasri: { select: { destinationCompanySiret: true } } }
+    }
+  });
+
+export type RegistryV2Bsdasri = Prisma.BsdasriGetPayload<{
+  include: typeof RegistryV2BsdasriInclude;
+}>;
+
+// BSFF
+export const RegistryV2BsffInclude = Prisma.validator<Prisma.BsffInclude>()({
+  transporters: true,
+  packagings: {
+    include: {
+      finalOperations: {
+        include: {
+          finalBsffPackaging: {
+            include: { bsff: { select: { destinationCompanySiret: true } } }
+          }
+        }
+      },
+      previousPackagings: {
+        include: { bsff: true }
+      }
+    }
+  }
+});
+
+export type RegistryV2Bsff = Prisma.BsffGetPayload<{
+  include: typeof RegistryV2BsffInclude;
+}>;
+
+// BSPAOH
+export const RegistryV2BspaohInclude = Prisma.validator<Prisma.BspaohInclude>()(
+  {
+    transporters: true
+  }
+);
+
+export type RegistryV2Bspaoh = Prisma.BspaohGetPayload<{
+  include: typeof RegistryV2BspaohInclude;
+}>;
+
+// BSVHU
+export const RegistryV2BsvhuInclude = Prisma.validator<Prisma.BsvhuInclude>()({
+  intermediaries: true
+});
+
+export type RegistryV2Bsvhu = Prisma.BsvhuGetPayload<{
+  include: typeof RegistryV2BsvhuInclude;
+}>;
+
+// Empty registy V2 exports
 export const emptyIncomingWasteV2: Omit<
   Required<Nullable<IncomingWasteV2>>,
   "__typename"
