@@ -173,12 +173,16 @@ export function SignBsffPackagingsModal({
       .filter(({ count }) => count > 0)
       .map(({ text }) => text);
 
-    return (
-      `${received} ${pluralize("contenant", received)} ${pluralize(
-        "réceptionné",
-        received
-      )} dont ` + recapItems.join(" - ")
-    );
+    let recap = `${received} ${pluralize("contenant", received)} ${pluralize(
+      "réceptionné",
+      received
+    )}`;
+
+    if (recapItems.length > 0) {
+      recap += ` dont ${recapItems.join(" - ")}`;
+    }
+
+    return recap;
   }, [packagingsWithStatus]);
 
   if (loading) {
