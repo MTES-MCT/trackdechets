@@ -5,6 +5,7 @@ import {
   SSD_HEADERS
 } from "@td/registry";
 import { Job } from "bull";
+import { subMonths, format, addDays } from "date-fns";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   userFactory,
@@ -16,12 +17,15 @@ import {
 } from "../processRegistryImport";
 
 const getCorrectLine = (siret: string) => {
+  const sixMonthsAgo = subMonths(new Date(), 6);
+  const processingDate = format(sixMonthsAgo, "yyyy-MM-dd");
+  const useDate = format(addDays(sixMonthsAgo, 1), "yyyy-MM-dd");
   return {
     reason: "",
     publicId: 1,
     reportAsCompanySiret: "",
     reportForCompanySiret: siret,
-    useDate: "2024-02-01",
+    useDate,
     dispatchDate: "",
     wasteCode: "06 07 01*",
     wasteDescription: "Description déchet",
@@ -32,7 +36,7 @@ const getCorrectLine = (siret: string) => {
     weightValue: 1.4,
     weightIsEstimate: "REEL",
     volume: 1.2,
-    processingDate: "2024-01-01",
+    processingDate,
     processingEndDate: "",
     destinationCompanyType: "ETABLISSEMENT_FR",
     destinationCompanyOrgId: "78467169500103",
