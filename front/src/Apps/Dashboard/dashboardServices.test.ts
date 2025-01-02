@@ -1625,6 +1625,31 @@ describe("dashboardServices", () => {
       );
       expect(result).toBe(false);
     });
+
+    it(
+      "should return false if status is IntermediatelyProcessed and all packagings are" +
+        "included in a bsd suite",
+      () => {
+        const result = canMakeCorrection(
+          {
+            ...bsd,
+            status: BsdStatusCode.IntermediatelyProcessed,
+            packagings: [
+              {
+                operation: { signature: { date: new Date().toISOString() } },
+                nextBsff: { id: "FF" }
+              } as BsffPackaging,
+              {
+                operation: { signature: { date: new Date().toISOString() } },
+                nextBsff: { id: "FF" }
+              } as BsffPackaging
+            ]
+          },
+          currentSiret
+        );
+        expect(result).toBe(false);
+      }
+    );
   });
 
   describe("canReviewBsda", () => {

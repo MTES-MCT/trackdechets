@@ -9,6 +9,7 @@ import makeClient from "../../../../__tests__/testClient";
 import {
   createBsffAfterOperation,
   createBsffAfterReception,
+  createBsffBeforeEmission,
   createBsffBeforeOperation
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
@@ -327,6 +328,80 @@ describe("Mutation.updateBsffPackaging", () => {
       expect(updatedPackaging.operationCode).toEqual("D13");
       // status of bsff should be recalculated to INTERMEDIATELY_PROCESSED
       expect(updatedPackaging.bsff.status).toEqual("INTERMEDIATELY_PROCESSED");
+    }
+  );
+
+  test(
+    "less than 60 days after operation > " +
+      "it should not be possible de update acceptation and operation fields " +
+      "if the packaging is already grouped, forwarded or repackaged",
+    async () => {
+      const emitter = await userWithCompanyFactory("MEMBER");
+      const transporter = await userWithCompanyFactory("MEMBER");
+      const destination = await userWithCompanyFactory("MEMBER");
+      const nextDestination = await userWithCompanyFactory("MEMBER");
+      const nextBsff = await createBsffBeforeEmission({
+        emitter: destination,
+        destination: nextDestination
+      });
+      const bsff = await createBsffAfterOperation(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        {
+          data: { status: "INTERMEDIATELY_PROCESSED" },
+          packagingData: {
+            operationCode: "D13",
+            operationSignatureDate: new Date(),
+            nextPackaging: { connect: { id: nextBsff.packagings[0].id } }
+          }
+        }
+      );
+
+      const packagingId = bsff.packagings[0].id;
+
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsffPackaging">,
+        MutationUpdateBsffPackagingArgs
+      >(UPDATE_BSFF_PACKAGING, {
+        variables: {
+          id: packagingId,
+          input: {
+            numero: "nouveau-numero",
+            acceptation: {
+              date: "2022-11-04" as any,
+              weight: 2,
+              status: "ACCEPTED",
+              wasteCode: "14 06 02*",
+              wasteDescription: "HFC"
+            },
+            operation: {
+              date: "2022-11-05" as any,
+              code: "R1",
+              mode: "VALORISATION_ENERGETIQUE",
+              description: "Incinération"
+            }
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+            " Le champ numero a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ acceptationDate a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ acceptationWeight a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ acceptationWasteDescription a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationDate a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationMode a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationDescription a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ acceptationWasteCode a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ operationCode a été verrouillé via signature et ne peut pas être modifié."
+        })
+      ]);
     }
   );
 

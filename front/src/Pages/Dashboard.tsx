@@ -210,8 +210,6 @@ const DashboardPage = () => {
   const hasNextPage = data?.bsds.pageInfo.hasNextPage;
   const isLoadingBsds = loading;
 
-  console.log(bsds);
-
   return (
     <div className="dashboard-page" role="feed" aria-busy={isLoadingBsds}>
       <div className="dashboard-page__actions">

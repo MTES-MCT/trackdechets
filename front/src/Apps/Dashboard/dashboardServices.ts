@@ -1576,11 +1576,17 @@ export const canMakeCorrection = (bsd: BsdDisplay, siret: string) => {
       return lastDate;
     }, new Date(0));
 
+  // On ne permet pas la correction des contenants qui sont
+  // déjà inclut dans un bordereau suite
+  const haveNextBsff = () =>
+    !!bsd.packagings && bsd.packagings.every(p => !!p.nextBsff);
+
   return (
     bsd.type === BsdType.Bsff &&
     isSameSiretDestination(siret, bsd) &&
     (bsd.status === BsdStatusCode.Processed ||
-      bsd.status === BsdStatusCode.IntermediatelyProcessed) &&
+      (bsd.status === BsdStatusCode.IntermediatelyProcessed &&
+        !haveNextBsff())) &&
     // On autorise la correction d'un BSFF pendant 60 jours après
     // la dernière signature de l'opération sur les contenants
     differenceInDays(new Date(), lastOperationSignatureDate()) <= 60

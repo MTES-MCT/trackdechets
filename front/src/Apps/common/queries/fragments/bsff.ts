@@ -73,6 +73,9 @@ export const dashboardBsffFragment = gql`
           date
         }
       }
+      nextBsff {
+        id
+      }
     }
     bsffWeight: weight {
       value
