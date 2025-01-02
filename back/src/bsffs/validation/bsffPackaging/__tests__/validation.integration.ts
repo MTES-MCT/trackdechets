@@ -410,6 +410,10 @@ describe("validation > parseBsffPackaging", () => {
           expect(e.errors).toEqual([
             expect.objectContaining({
               message:
+                "Le champ operationNextDestinationPlannedOperationCode est obligatoire."
+            }),
+            expect.objectContaining({
+              message:
                 "Le champ operationNextDestinationCompanyName est obligatoire."
             }),
             expect.objectContaining({
