@@ -5,7 +5,6 @@ import {
   TransportMode,
   BsvhuRecepisse
 } from "@td/codegen-ui";
-import { Select } from "@codegouvfr/react-dsfr/Select";
 
 import React, { useEffect, useMemo, useContext, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -19,6 +18,7 @@ import { clearCompanyError, setFieldError } from "../../utils";
 import TransporterRecepisse from "../../../../Forms/Components/TransporterRecepisse/TransporterRecepisse";
 import { isForeignVat } from "@td/constants";
 import { RhfTagsInputWrapper } from "../../../../Forms/Components/TagsInput/TagsInputWrapper";
+import { RhfTransportModeSelect } from "../../../../Forms/Components/TransportMode/TransportMode";
 
 const TransporterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
@@ -217,20 +217,10 @@ const TransporterBsvhu = ({ errors }) => {
       </div>
       <div className="fr-grid-row">
         <div className="fr-col-6">
-          <Select
-            label="Mode de transport"
+          <RhfTransportModeSelect
             disabled={sealedFields.includes(`transporter.transport.mode`)}
-            nativeSelectProps={{
-              ...register("transporter.transport.mode")
-            }}
-          >
-            <option value="ROAD">Route</option>
-            <option value="RAIL">Voie Ferroviaire</option>
-            <option value="AIR">Voie Aérienne</option>
-            <option value="RIVER">Voie Fluviale</option>
-            <option value="SEA">Voie Maritime</option>
-            <option value="OTHER">Autre</option>
-          </Select>
+            fieldPath={`transporter.transport.mode`}
+          />
         </div>
       </div>
       <div className="fr-grid-row">
