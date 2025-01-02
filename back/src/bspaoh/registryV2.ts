@@ -1,7 +1,6 @@
 import Decimal from "decimal.js";
 import {
   Bspaoh,
-  BspaohTransporter,
   PrismaClient,
   RegistryExportDeclarationType,
   RegistryExportType,
@@ -15,13 +14,11 @@ import { getBspaohSubType } from "../common/subTypes";
 import { getWasteDescription } from "./utils";
 import { splitAddress } from "../common/addresses";
 import { getFirstTransporterSync } from "./converter";
-import { emptyIncomingWasteV2 } from "../registryV2/types";
+import { emptyIncomingWasteV2, RegistryV2Bspaoh } from "../registryV2/types";
 import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
 
 export const toIncomingWasteV2 = (
-  bspaoh: Bspaoh & {
-    transporters: BspaohTransporter[];
-  }
+  bspaoh: RegistryV2Bspaoh
 ): Omit<Required<IncomingWasteV2>, "__typename"> => {
   const {
     street: destinationCompanyAddress,

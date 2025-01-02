@@ -12,11 +12,11 @@ import { getWasteDescription } from "./utils";
 import { getBsvhuSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import Decimal from "decimal.js";
-import { emptyIncomingWasteV2 } from "../registryV2/types";
+import { emptyIncomingWasteV2, RegistryV2Bsvhu } from "../registryV2/types";
 import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
 
 export const toIncomingWasteV2 = (
-  bsvhu: Bsvhu
+  bsvhu: RegistryV2Bsvhu
 ): Omit<Required<IncomingWasteV2>, "__typename"> => {
   const {
     street: emitterCompanyAddress,
