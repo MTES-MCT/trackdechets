@@ -256,24 +256,6 @@ export function SignBsffPackagingsModal({
             <DsfrDataListTerm>BSFF n°</DsfrDataListTerm>
             <DsfrDataListDescription>{bsff.id}</DsfrDataListDescription>
           </DsfrDataListItem>
-          <DsfrDataListItem>
-            <DsfrDataListTerm>Code déchet</DsfrDataListTerm>
-            <DsfrDataListDescription>
-              {bsff.waste?.code}
-            </DsfrDataListDescription>
-          </DsfrDataListItem>
-          <DsfrDataListItem>
-            <DsfrDataListTerm>Description</DsfrDataListTerm>
-            <DsfrDataListDescription>
-              {bsff.waste?.description}
-            </DsfrDataListDescription>
-          </DsfrDataListItem>
-          <DsfrDataListItem>
-            <DsfrDataListTerm>Quantité</DsfrDataListTerm>
-            <DsfrDataListDescription>
-              {bsff.weight?.value} kg {bsff.weight?.isEstimate ? "estimé" : ""}
-            </DsfrDataListDescription>
-          </DsfrDataListItem>
         </DsfrDataList>
         <Table
           caption="Liste des contenants du BSFF" // accessibilité

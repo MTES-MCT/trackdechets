@@ -66,6 +66,12 @@ export const dashboardBsffFragment = gql`
     packagings {
       id
       numero
+      weight
+      acceptation {
+        wasteCode
+        wasteDescription
+        weight
+      }
       operation {
         code
         noTraceability
