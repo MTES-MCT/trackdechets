@@ -18,6 +18,7 @@ import { operationHook } from "../../operationHook";
 import { isFinalOperationCode } from "../../../common/operationCodes";
 import type { BsdasriPackaging } from "@td/codegen-back";
 import { computeTotalVolume } from "../../converter";
+import { lookupUtils } from "../../registryV2";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -174,6 +175,7 @@ export async function approveAndApplyRevisionRequest(
     where: { id: updatedRevisionRequest.bsdasriId },
     data: { ...updateData }
   });
+  await lookupUtils.update(updatedBsdasri, prisma);
 
   if (updateData?.destinationOperationCode) {
     const beforeRevisionOperationIsFinal = isFinalOperationCode(

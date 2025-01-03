@@ -5,6 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
+import { lookupUtils } from "../../registryV2";
 
 export type DeleteBsdasriFn = (
   where: Prisma.BsdasriWhereUniqueInput,
@@ -32,6 +33,8 @@ export function buildDeleteBsdasri(deps: RepositoryFnDeps): DeleteBsdasriFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    await lookupUtils.delete(deletedBsdasri.id, prisma);
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsdasri.id));
 
     return deletedBsdasri;
