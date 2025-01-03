@@ -6,6 +6,7 @@ import {
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
 import { objectDiff } from "../../../forms/workflow/diff";
+import { lookupUtils } from "../../registryV2";
 
 export type UpdateBsdasriFn = (
   where: Prisma.BsdasriWhereUniqueInput,
@@ -73,6 +74,7 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
       }
     });
 
+    await lookupUtils.update(bsdasri, prisma);
     prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bsdasri.id));
 
     return bsdasri;
