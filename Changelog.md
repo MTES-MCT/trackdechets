@@ -14,6 +14,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Ajout de "2795" à la suite de Installation de traitement > Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780) sur le type de profil Installation de traitement. [PR 3845](https://github.com/MTES-MCT/trackdechets/pull/3845)
+- BSFF - Mettre à jour les informations du contenant modifié (code déchet, description, poids) dans l'aperçu et dans le tableau de bord lorsque le BSFF a un seul contenant [PR 3853](https://github.com/MTES-MCT/trackdechets/pull/3853).
 
 #### :bug: Corrections de bugs
 
