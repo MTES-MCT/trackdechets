@@ -9,6 +9,7 @@ import {
 } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
 import { BsdaWithTransporters } from "../../types";
+import { lookupUtils } from "../../registryV2";
 
 export type DeleteBsdaFn = (
   where: Prisma.BsdaWhereUniqueInput,
@@ -46,7 +47,7 @@ export function buildDeleteBsda(deps: RepositoryFnDeps): DeleteBsdaFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-
+    await lookupUtils.delete(deletedBsda.id, prisma);
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsda.id));
 
     const linkedBsdaIds = [
