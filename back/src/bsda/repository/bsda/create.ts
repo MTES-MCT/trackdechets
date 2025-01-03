@@ -7,6 +7,7 @@ import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
 import { BsdaWithTransporters } from "../../types";
 import { getCanAccessDraftOrgIds } from "../../utils";
+import { lookupUtils } from "../../registryV2";
 
 export type CreateBsdaFn = (
   data: Prisma.BsdaCreateInput,
@@ -77,6 +78,7 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
       }
     });
 
+    await lookupUtils.update(bsda, prisma);
     prisma.addAfterCommitCallback(() =>
       enqueueCreatedBsdToIndex(updatedBsda.id)
     );

@@ -5,6 +5,7 @@ import {
 } from "@td/registry";
 import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
+import { lookupUtils as bsdaLookupUtils } from "../../bsda/registryV2";
 import { lookupUtils as bsdasriLookupUtils } from "../../bsdasris/registryV2";
 import { lookupUtils as bsffLookupUtils } from "../../bsffs/registryV2";
 import { lookupUtils as bspaohLookupUtils } from "../../bspaoh/registryV2";
@@ -23,6 +24,7 @@ async function exitScript() {
     await ssdLookupUtils.rebuildLookup();
     await incomingWasteLookupUtils.rebuildLookup();
     await incomingTexsLookupUtils.rebuildLookup();
+    await bsdaLookupUtils.rebuildLookup();
     await bsdasriLookupUtils.rebuildLookup();
     await bsffLookupUtils.rebuildLookup();
     await bspaohLookupUtils.rebuildLookup();
