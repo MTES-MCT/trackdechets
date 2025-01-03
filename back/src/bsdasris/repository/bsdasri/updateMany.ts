@@ -5,6 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
+import { lookupUtils } from "../../registryV2";
 
 export type UpdateManyBsdasriFn = (
   where: Prisma.BsdasriWhereInput,
@@ -27,8 +28,8 @@ export function buildUpdateManyBsdasris(
     });
 
     const updatedBsdasris = await prisma.bsdasri.findMany({
-      where,
-      select: { id: true }
+      where
+      // select: { id: true }
     });
 
     const ids = updatedBsdasris.map(({ id }) => id);
@@ -44,8 +45,11 @@ export function buildUpdateManyBsdasris(
     await prisma.event.createMany({
       data: eventsData
     });
-    for (const id of ids) {
-      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
+    for (const updatedBsdasri of updatedBsdasris) {
+      await lookupUtils.update(updatedBsdasri, prisma);
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(updatedBsdasri.id)
+      );
     }
 
     return update;

@@ -12,6 +12,7 @@ import {
 } from "@prisma/client";
 import type { RegistryV2ExportType } from "@td/codegen-back";
 import { GenericWasteV2 } from "./types";
+import { toIncomingWasteV2 as bsdasriToIncomingWasteV2 } from "../bsdasris/registryV2";
 import { toIncomingWasteV2 as bsffToIncomingWasteV2 } from "../bsffs/registryV2";
 import { toIncomingWasteV2 as bspaohToIncomingWasteV2 } from "../bspaoh/registryV2";
 import { toIncomingWasteV2 as bsvhuToIncomingWasteV2 } from "../bsvhu/registryV2";
@@ -38,7 +39,7 @@ const inputToIncomingWaste: Partial<Record<keyof InputMap, any>> = {
   INCOMING_TEXS: exportOptions.INCOMING_TEXS?.toIncomingWaste,
   BSDD: exportOptions.BSDD?.toIncomingWaste,
   BSDA: exportOptions.BSDA?.toIncomingWaste,
-  BSDASRI: exportOptions.BSDASRI?.toIncomingWaste,
+  BSDASRI: bsdasriToIncomingWasteV2,
   BSFF: bsffToIncomingWasteV2,
   BSPAOH: bspaohToIncomingWasteV2,
   BSVHU: bsvhuToIncomingWasteV2
