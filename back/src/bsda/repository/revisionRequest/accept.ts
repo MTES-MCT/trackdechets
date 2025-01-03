@@ -19,6 +19,7 @@ import { ForbiddenError } from "../../../common/errors";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { operationHook } from "../../operationHook";
 import { isFinalOperationCode } from "../../../common/operationCodes";
+import { lookupUtils } from "../../registryV2";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -282,6 +283,7 @@ export async function approveAndApplyRevisionRequest(
     where: { id: updatedRevisionRequest.bsdaId },
     data: { ...updateData }
   });
+  await lookupUtils.update(updatedBsda, prisma);
 
   if (updateData && updateData.destinationOperationCode) {
     const beforeRevisionOperationIsFinal = isFinalOperationCode(
