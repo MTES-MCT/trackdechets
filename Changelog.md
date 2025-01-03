@@ -5,7 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2025.01.1] 14/01/2024
+
+# [2025.01.1] 14/01/2025
+
+#### :bug: Corrections de bugs
+
+- Supprimer l'annexe 2 d'un BSDD de regroupement lorsque celle-ci a bien été retirée [PR 3874](https://github.com/MTES-MCT/trackdechets/pull/3874).
 
 #### :boom: Breaking changes
 
