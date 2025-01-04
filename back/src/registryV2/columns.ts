@@ -313,7 +313,7 @@ export const EXPORT_COLUMNS: {
     },
     destinationReceptionWeightIsEstimate: {
       label: "Type de poids de la quantité traitée nette",
-      format: formatBoolean
+      format: formatEstimateBoolean
     },
     destinationReceptionVolume: {
       label: "Volume en M3 de la quantité traitée",

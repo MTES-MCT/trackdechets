@@ -206,7 +206,7 @@ export const toIncomingWasteV2 = (
       : bsffDestination.receptionWeight,
     destinationReceptionRefusedWeight: null,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionWeightIsEstimate: null,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationOperationCode: bsffDestination.operationCode,
@@ -306,7 +306,6 @@ export const rebuildRegistryLookup = async () => {
       bsffId: { not: null }
     }
   });
-  // reindex registrySSD
   let done = false;
   let cursorId: string | null = null;
   while (!done) {
