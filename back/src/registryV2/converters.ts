@@ -12,6 +12,7 @@ import {
 } from "@prisma/client";
 import type { RegistryV2ExportType } from "@td/codegen-back";
 import { GenericWasteV2 } from "./types";
+import { toIncomingWasteV2 as bsddToIncomingWasteV2 } from "../forms/registryV2";
 import { toIncomingWasteV2 as bsdaToIncomingWasteV2 } from "../bsda/registryV2";
 import { toIncomingWasteV2 as bsdasriToIncomingWasteV2 } from "../bsdasris/registryV2";
 import { toIncomingWasteV2 as bsffToIncomingWasteV2 } from "../bsffs/registryV2";
@@ -38,7 +39,7 @@ const inputToSsdWaste: Partial<Record<keyof InputMap, any>> = {
 const inputToIncomingWaste: Partial<Record<keyof InputMap, any>> = {
   INCOMING_WASTE: exportOptions.INCOMING_WASTE?.toIncomingWaste,
   INCOMING_TEXS: exportOptions.INCOMING_TEXS?.toIncomingWaste,
-  BSDD: exportOptions.BSDD?.toIncomingWaste,
+  BSDD: bsddToIncomingWasteV2,
   BSDA: bsdaToIncomingWasteV2,
   BSDASRI: bsdasriToIncomingWasteV2,
   BSFF: bsffToIncomingWasteV2,
