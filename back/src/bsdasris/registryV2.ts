@@ -164,7 +164,7 @@ export const toIncomingWasteV2 = (
               .toDecimalPlaces(6)
               .toNumber()
         : null,
-    destinationReceptionWeightIsEstimate: null,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsdasri.destinationOperationCode,
     destinationOperationCode: bsdasri.destinationOperationCode,
@@ -217,7 +217,6 @@ export const rebuildRegistryLookup = async () => {
       bsdasriId: { not: null }
     }
   });
-  // reindex registrySSD
   let done = false;
   let cursorId: string | null = null;
   while (!done) {

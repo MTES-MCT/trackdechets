@@ -8,6 +8,7 @@ import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { formDiff, objectDiff } from "../../workflow/diff";
 import { getUserCompanies } from "../../../users/database";
 import { FormWithForwardedIn, FormWithTransporters } from "../../types";
+import { lookupUtils } from "../../registryV2";
 
 export type UpdateFormFn = (
   where: Prisma.FormWhereUniqueInput,
@@ -169,7 +170,7 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
         }
       });
     }
-
+    await lookupUtils.update(updatedForm, prisma);
     let needsReindex = true;
     // APPENDIX1_PRODUCER forms are not indexed if they don't belong to a container
     if (updatedForm.emitterType === "APPENDIX1_PRODUCER") {
