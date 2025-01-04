@@ -127,7 +127,7 @@ export const toIncomingWasteV2 = (
       : bsvhu.destinationReceptionWeight,
     destinationReceptionRefusedWeight: null,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionWeightIsEstimate: null,
+    destinationReceptionWeightIsEstimate: false,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
     destinationOperationCode: bsvhu.destinationOperationCode,
     destinationOperationMode: bsvhu.destinationOperationMode,
@@ -173,7 +173,6 @@ export const rebuildRegistryLookup = async () => {
       bsvhuId: { not: null }
     }
   });
-  // reindex registrySSD
   let done = false;
   let cursorId: string | null = null;
   while (!done) {

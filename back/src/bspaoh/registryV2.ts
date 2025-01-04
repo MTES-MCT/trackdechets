@@ -164,7 +164,7 @@ export const toIncomingWasteV2 = (
             .toDecimalPlaces(6)
             .toNumber()
         : bspaoh.destinationReceptionWasteAcceptedWeightValue,
-    destinationReceptionWeightIsEstimate: null,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bspaoh.destinationOperationCode,
     destinationOperationCode: bspaoh.destinationOperationCode,
@@ -212,7 +212,6 @@ export const rebuildRegistryLookup = async () => {
       bspaohId: { not: null }
     }
   });
-  // reindex registrySSD
   let done = false;
   let cursorId: string | null = null;
   while (!done) {
