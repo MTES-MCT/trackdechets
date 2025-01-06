@@ -9,7 +9,7 @@ import {
   bsdaTransporterFactory
 } from "../../../../bsda/__tests__/factories";
 import { ErrorCode } from "../../../../common/errors";
-import {
+import type {
   Mutation,
   MutationCreateBsdaArgs,
   MutationCreateBsdaRevisionRequestArgs,
@@ -22,7 +22,7 @@ import {
   MutationUpdateBsdaArgs,
   Query,
   QueryBsdsArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   userWithCompanyFactory,

@@ -8,7 +8,7 @@ import {
 } from "../../../../__tests__/factories";
 import { UserRole } from "@prisma/client";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { prisma } from "@td/prisma";

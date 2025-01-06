@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 import bsff from "./queries/bsff";
 import bsffPdf from "./queries/bsffPdf";
 import bsffs from "./queries/bsffs";

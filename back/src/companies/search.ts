@@ -2,7 +2,6 @@ import { checkVAT } from "jsvat";
 import { prisma } from "@td/prisma";
 import redundantCachedSearchSirene from "./sirene/searchCompany";
 import decoratedSearchCompanies from "./sirene/searchCompanies";
-import { CompanySearchResult } from "./types";
 import { searchVat } from "./vat";
 import {
   isSiret,
@@ -20,7 +19,10 @@ import { removeEmptyKeys } from "../common/converter";
 import { UserInputError } from "../common/errors";
 import { SearchOptions } from "./sirene/trackdechets/types";
 import { Company } from "@prisma/client";
-import { StatutDiffusionEtablissement } from "../generated/graphql/types";
+import type {
+  CompanySearchResult,
+  StatutDiffusionEtablissement
+} from "@td/codegen-back";
 import { ViesClientError } from "./vat/vies/client";
 
 interface SearchCompaniesDeps {

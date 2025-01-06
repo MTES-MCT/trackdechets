@@ -1,5 +1,5 @@
 import { getRubriques, getDeclarations } from "../database";
-import { InstallationResolvers } from "../../generated/graphql/types";
+import type { InstallationResolvers } from "@td/codegen-back";
 
 const installationResolvers: InstallationResolvers = {
   urlFiche: parent =>

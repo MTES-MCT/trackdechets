@@ -8,7 +8,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { AuthType } from "../../../../auth";
 import { renderMail, membershipRequestRefused } from "@td/mail";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 
 // No mails
 jest.mock("../../../../mailer/mailing");

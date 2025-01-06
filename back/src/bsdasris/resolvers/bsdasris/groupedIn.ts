@@ -1,4 +1,4 @@
-import { BsdasriResolvers } from "../../../generated/graphql/types";
+import type { BsdasriResolvers } from "@td/codegen-back";
 
 import { expandBsdasriFromDB } from "../../converter";
 import { getReadonlyBsdasriRepository } from "../../repository";

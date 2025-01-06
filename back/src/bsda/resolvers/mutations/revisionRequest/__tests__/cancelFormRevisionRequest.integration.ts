@@ -1,9 +1,9 @@
 import { RevisionRequestStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationCancelBsdaRevisionRequestArgs
-} from "../../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../../../../__tests__/factories";
 import makeClient from "../../../../../__tests__/testClient";

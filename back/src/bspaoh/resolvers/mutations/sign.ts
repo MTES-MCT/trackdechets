@@ -19,12 +19,12 @@ import {
 import { checkIsAuthenticated } from "../../../common/permissions";
 
 import { InvalidTransition } from "../../../forms/errors";
-import {
+import type {
   BspaohSignatureInput,
   BspaohSignatureType,
   MutationResolvers,
   MutationSignBspaohArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 import { getFirstTransporterSync, expandBspaohFromDb } from "../../converter";
 import { sendMail } from "../../../mailer/mailing";

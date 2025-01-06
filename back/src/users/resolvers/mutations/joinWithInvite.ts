@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import {
   acceptNewUserCompanyInvitations,
   getUserAccountHashOrNotFound,

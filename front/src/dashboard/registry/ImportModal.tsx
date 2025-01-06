@@ -167,11 +167,14 @@ function Step1({ register }: StepProps) {
         nativeSelectProps={{ ...register("type", { required: true }) }}
       >
         <option disabled hidden value="">
-          Selectionnez une option
+          Selectionnez un type d'import
         </option>
         <option value="SSD">Sortie de statut de déchet</option>
         <option value="INCOMING_WASTE">
-          Déchet dangereux et non dangereux entrant
+          Déchets dangereux et non dangereux entrants
+        </option>
+        <option value="INCOMING_TEXS">
+          Terres excavées et sédiments, dangereux et non dangereux entrants
         </option>
       </Select>
 

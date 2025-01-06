@@ -42,7 +42,11 @@ const ActorsList = () => {
     if (trader?.company.siret && !hasTrader) {
       setValue("hasTrader", true);
     }
-    if (intermediaries && intermediaries[0].siret && !hasIntermediaries) {
+    if (
+      intermediaries?.length &&
+      intermediaries[0].siret &&
+      !hasIntermediaries
+    ) {
       setValue("hasIntermediaries", true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -142,6 +146,7 @@ const ActorsList = () => {
               validityLimit: null
             }
           });
+          clearErrors(["hasBroker", "broker"]);
         }}
         disabled={sealedFields.includes(`broker.company.siret`)}
       />
@@ -216,6 +221,7 @@ const ActorsList = () => {
               validityLimit: null
             }
           });
+          clearErrors(["hasTrader", "trader"]);
         }}
         disabled={sealedFields.includes(`trader.company.siret`)}
       />
@@ -277,7 +283,7 @@ const ActorsList = () => {
           setValue("hasIntermediaries", value);
           remove();
           setValue("intermediaries", [getInitialCompany()]);
-          clearErrors(["hasIntermediaries"]);
+          clearErrors(["hasIntermediaries", "intermediaries"]);
         }}
         disabled={sealedFields.includes(`intermediaries`)}
       />

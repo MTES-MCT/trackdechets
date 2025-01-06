@@ -5,7 +5,7 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import {
+import type {
   Query,
   QueryBsdsArgs,
   Mutation,
@@ -14,7 +14,7 @@ import {
   MutationSignBsvhuArgs,
   MutationDeleteBsvhuArgs,
   MutationDuplicateBsvhuArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   resetDatabase,
   refreshElasticSearch

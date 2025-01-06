@@ -1,7 +1,4 @@
-import {
-  AuthorizedApplication,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import type { AuthorizedApplication, QueryResolvers } from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { prisma } from "@td/prisma";

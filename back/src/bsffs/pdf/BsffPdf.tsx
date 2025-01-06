@@ -12,11 +12,11 @@ import {
   SignatureStamp,
   SignatureStampSmall
 } from "../../common/pdf";
-import {
+import type {
   Bsff,
   BsffPackaging,
   BsffFicheIntervention
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { BSFF_WASTES } from "@td/constants";
 import { Decimal } from "decimal.js";
 import { getOperationModeLabel } from "../../common/operationModes";

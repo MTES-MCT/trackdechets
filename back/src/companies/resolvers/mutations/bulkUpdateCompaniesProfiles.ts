@@ -1,9 +1,9 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
-import {
+import type {
   MutationBulkUpdateCompaniesProfilesArgs,
   CompanyPrivate
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import { UserRole } from "@prisma/client";

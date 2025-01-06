@@ -8,7 +8,7 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 import { UserRole } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import gql from "graphql-tag";

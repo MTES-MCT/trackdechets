@@ -1,5 +1,5 @@
 import { TotalHits } from "@elastic/elasticsearch/api/types";
-import { WasteRegistryType } from "../generated/graphql/types";
+import type { WasteRegistryType } from "@td/codegen-back";
 import { toWastes, WasteMap } from "./converters";
 import { searchBsds, toPrismaBsds } from "./elastic";
 import { getElasticPaginationArgs } from "./pagination";
@@ -80,7 +80,7 @@ export async function addCompaniesGivenNames<WasteType extends GenericWaste>(
  * @returns
  */
 async function getWasteConnection<WasteType extends GenericWaste>(
-  registryType: Exclude<WasteRegistryType, "SSD">,
+  registryType: WasteRegistryType,
   args: QueryWastesArgs
 ): Promise<WasteConnection<WasteType>> {
   const { size, sort, search_after, isForward } =

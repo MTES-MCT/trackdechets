@@ -15,10 +15,10 @@ import {
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
-import {
+import type {
   Mutation,
   MutationMarkAsTempStorerAcceptedArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import getReadableId from "../../../readableId";
 import { sendMail } from "../../../../mailer/mailing";
 import { generateBsddPdfToBase64 } from "../../../pdf/generateBsddPdf";
