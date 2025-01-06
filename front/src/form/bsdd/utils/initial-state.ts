@@ -52,7 +52,8 @@ export function getInitialTemporaryStorageDetail(
     destination: {
       company: getInitialCompany(temporaryStorageDetail?.destination?.company),
       cap: temporaryStorageDetail?.destination?.cap ?? "",
-      processingOperation: ""
+      processingOperation:
+        temporaryStorageDetail?.destination?.processingOperation ?? ""
     }
   };
 }
