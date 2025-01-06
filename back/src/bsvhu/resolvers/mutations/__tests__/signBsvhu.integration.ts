@@ -12,6 +12,7 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import { prisma } from "@td/prisma";
+import { TransportMode } from "@prisma/client";
 
 const SIGN_VHU_FORM = `
 mutation SignVhuForm($id: ID!, $input: BsvhuSignatureInput!) {
@@ -277,7 +278,8 @@ describe("Mutation.Vhu.sign", () => {
       opt: {
         emitterCompanySiret: emitterCompany.siret,
         transporterCompanySiret: transporterCompany.siret,
-        status: "SIGNED_BY_PRODUCER"
+        status: "SIGNED_BY_PRODUCER",
+        transporterTransportPlates: ["XY-23-TR"]
       }
     });
 
@@ -333,7 +335,8 @@ describe("Mutation.Vhu.sign", () => {
       opt: {
         emitterCompanySiret: emitterCompany.siret,
         transporterCompanySiret: company.siret,
-        transporterRecepisseIsExempted: true
+        transporterRecepisseIsExempted: true,
+        transporterTransportPlates: ["XY-23-TR"]
       }
     });
 
@@ -358,6 +361,116 @@ describe("Mutation.Vhu.sign", () => {
     ]);
   });
 
+  it("should require transporter plates when transport mode is ROAD", async () => {
+    const emitterCompany = await companyFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanySiret: company.siret,
+        transporterRecepisseIsExempted: true,
+        status: "SIGNED_BY_PRODUCER"
+      }
+    });
+
+    const date = new Date().toISOString();
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
+      SIGN_VHU_FORM,
+      {
+        variables: {
+          id: bsvhu.id,
+          input: { type: "TRANSPORT", author: user.name, date }
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "L'immatriculation du transporteur est un champ requis.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should not require transporter plates when transport mode is ROAD and bsvhu was created before release date", async () => {
+    const emitterCompany = await companyFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        createdAt: new Date("2024-12-26:00:00.000Z"), // before v20250101
+        emitterCompanySiret: emitterCompany.siret,
+        transporterCompanySiret: company.siret,
+        transporterRecepisseIsExempted: true,
+        status: "SIGNED_BY_PRODUCER"
+      }
+    });
+
+    const date = new Date().toISOString();
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
+      SIGN_VHU_FORM,
+      {
+        variables: {
+          id: bsvhu.id,
+          input: { type: "TRANSPORT", author: user.name, date }
+        }
+      }
+    );
+    expect(errors).toBeUndefined(); // plates are not required
+  });
+
+  it.each([
+    TransportMode.RAIL,
+    TransportMode.AIR,
+    TransportMode.RIVER,
+    TransportMode.SEA,
+    TransportMode.OTHER
+  ])(
+    "should require not transporter plates when transport mode is %p",
+    async mode => {
+      const emitterCompany = await companyFactory();
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["TRANSPORTER"]
+      });
+
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          emitterCompanySiret: emitterCompany.siret,
+          transporterCompanySiret: company.siret,
+          transporterRecepisseIsExempted: true,
+          transporterTransportMode: mode,
+          status: "SIGNED_BY_PRODUCER"
+        }
+      });
+
+      const date = new Date().toISOString();
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<Pick<Mutation, "signBsvhu">>(
+        SIGN_VHU_FORM,
+        {
+          variables: {
+            id: bsvhu.id,
+            input: { type: "TRANSPORT", author: user.name, date }
+          }
+        }
+      );
+      expect(errors).toBeUndefined();
+
+      expect(data.signBsvhu.transporter!.transport!.signature!.author).toBe(
+        user.name
+      );
+      expect(data.signBsvhu.transporter!.transport!.signature!.date).toBe(date);
+    }
+  );
+
   it("should require emitter signature if the emitter is on TD and situation is irregular", async () => {
     const emitterCompany = await companyFactory();
     const { user, company } = await userWithCompanyFactory("MEMBER", {
@@ -369,7 +482,8 @@ describe("Mutation.Vhu.sign", () => {
         emitterIrregularSituation: true,
         emitterCompanySiret: emitterCompany.siret,
         transporterCompanySiret: company.siret,
-        transporterRecepisseIsExempted: true
+        transporterRecepisseIsExempted: true,
+        transporterTransportPlates: ["XY-23-TR"]
       }
     });
 
@@ -404,7 +518,8 @@ describe("Mutation.Vhu.sign", () => {
         emitterIrregularSituation: true,
         emitterCompanySiret: siretify(45345),
         transporterCompanySiret: company.siret,
-        transporterRecepisseIsExempted: true
+        transporterRecepisseIsExempted: true,
+        transporterTransportPlates: ["XY-23-TR"]
       }
     });
 
@@ -433,7 +548,8 @@ describe("Mutation.Vhu.sign", () => {
         emitterNoSiret: true,
         emitterCompanySiret: null,
         transporterCompanySiret: company.siret,
-        transporterRecepisseIsExempted: true
+        transporterRecepisseIsExempted: true,
+        transporterTransportPlates: ["XY-23-TR"]
       }
     });
 

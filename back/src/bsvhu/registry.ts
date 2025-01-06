@@ -56,6 +56,7 @@ export const getTransporterData = (bsvhu: Bsvhu, includePlates = false) => {
 
   const data = {
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
+    transporterTransportMode: bsvhu.transporterTransportMode,
     transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
     transporterCompanyName: bsvhu.transporterCompanyName,
     transporterCompanySiret: bsvhu.transporterCompanySiret,

@@ -51,6 +51,10 @@ const GET_BSVHUS = `
             recepisse {
               number
             }
+            transport {
+              mode
+              plates
+            }
           }
           broker {
             company {
@@ -121,7 +125,11 @@ describe("Query.Bsvhus", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const bsvhu = await bsvhuFactory({
-      opt: { emitterCompanySiret: company.siret, customId: "some custom ID" }
+      opt: {
+        emitterCompanySiret: company.siret,
+        customId: "some custom ID",
+        transporterTransportPlates: ["FD-87-98"]
+      }
     });
 
     const { query } = makeClient(user);
@@ -148,6 +156,10 @@ describe("Query.Bsvhus", () => {
           mail: bsvhu.transporterCompanyMail,
           phone: bsvhu.transporterCompanyPhone,
           vatNumber: null
+        },
+        transport: {
+          mode: "ROAD",
+          plates: ["FD-87-98"]
         },
         recepisse: { number: bsvhu.transporterRecepisseNumber }
       },
@@ -291,5 +303,34 @@ describe("Query.Bsvhus", () => {
 
     const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
     expect(data.bsvhus.edges.length).toBe(0);
+  });
+
+  it("should get a list of bsvhus filtered by plate", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const opt = {
+      emitterCompanySiret: company.siret
+    };
+    // Create 3 forms on emitter Company
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+    const vhu = await bsvhuFactory({
+      opt: { ...opt, transporterTransportPlates: ["XY-23-TT"] }
+    });
+
+    // And 1 on recipient company
+    await bsvhuFactory({ opt: { destinationCompanySiret: company.siret } });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS, {
+      variables: {
+        where: {
+          transporter: { transport: { plates: { _has: "XY-23-TT" } } }
+        }
+      }
+    });
+
+    expect(data.bsvhus.edges.length).toBe(1);
+    expect(data.bsvhus.edges[0].node.id).toBe(vhu.id);
   });
 });

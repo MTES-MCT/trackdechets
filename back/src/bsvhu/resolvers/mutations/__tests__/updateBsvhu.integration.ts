@@ -458,6 +458,7 @@ describe("Mutation.Vhu.update", () => {
       opt: {
         emitterCompanySiret: company.siret,
         transporterTransportSignatureDate: new Date(),
+        transporterTransportPlates: ["XY-23-TR"],
         intermediaries: {
           create: {
             siret: company.siret!,

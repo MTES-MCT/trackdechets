@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.01.1] 14/01/2024
+
+#### :boom: Breaking changes
+
+- Pour le Bsvhu lors d'un transport routier, la plaque d'immatriculation est désormais obligatoire et les poids de déchets sont limités à 40 T (50 kT pour les autres modes) [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
+
 # [2024.12.1] 17/12/2024
 
 #### :rocket: Nouvelles fonctionnalités

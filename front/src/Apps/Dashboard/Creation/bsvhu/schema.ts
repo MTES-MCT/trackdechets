@@ -27,8 +27,17 @@ const zodTransporter = z.object({
     takenOverAt: z.coerce
       .date()
       .nullish()
-      .transform(v => v?.toISOString())
+      .transform(v => v?.toISOString()),
+    mode: z.string().nullish(),
+    plates: z.preprocess(
+      (val: string) => (typeof val === "string" ? val.split(",") : val ?? []),
+      z
+        .string()
+        .array()
+        .max(2, { message: "Un maximum de 2 plaques est accepté" })
+    )
   }),
+
   recepisse: z
     .object({
       isExempted: z.boolean().nullish()
