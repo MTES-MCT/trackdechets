@@ -15,7 +15,7 @@ import {
 import { getBsdaForElastic, indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
-import { Query } from "../../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 import {
   formFactory,
   siretify,

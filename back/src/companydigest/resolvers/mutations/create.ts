@@ -1,7 +1,7 @@
-import {
+import type {
   MutationCreateCompanyDigestArgs,
   ResolversParentTypes
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { UserInputError } from "../../../common/errors";

@@ -3,7 +3,7 @@ import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
-import { MutationCreateWorkerCertificationArgs } from "../../../generated/graphql/types";
+import type { MutationCreateWorkerCertificationArgs } from "@td/codegen-back";
 import configureYup from "../../../common/yup/configureYup";
 
 configureYup();

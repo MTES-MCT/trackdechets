@@ -97,8 +97,8 @@ export async function downloadFromSignedUrl(signedUrl: string | undefined) {
   link.remove();
 }
 
-const registryExportFragment = gql`
-  fragment RegistryExportFragment on RegistryExport {
+const registryV2ExportFragment = gql`
+  fragment RegistryV2ExportFragment on RegistryV2Export {
     id
     registryType
     startDate
@@ -114,18 +114,18 @@ const registryExportFragment = gql`
   }
 `;
 
-export const GENERATE_REGISTRY_EXPORT = gql`
-  mutation GenerateExport(
-    $registryType: WasteRegistryType!
+export const GENERATE_REGISTRY_V2_EXPORT = gql`
+  mutation GenerateRegistryV2Export(
+    $registryType: RegistryV2ExportType!
     $format: FormsRegisterExportFormat!
     $siret: String
     $delegateSiret: String
     $dateRange: DateFilter!
     $declarationType: DeclarationType
-    $wasteTypes: [RegistryExportWasteType!]
+    $wasteTypes: [RegistryV2ExportWasteType!]
     $wasteCodes: [String!]
   ) {
-    generateWastesRegistryExport(
+    generateRegistryV2Export(
       dateRange: $dateRange
       format: $format
       registryType: $registryType
@@ -137,37 +137,37 @@ export const GENERATE_REGISTRY_EXPORT = gql`
         wasteCode: { _in: $wasteCodes }
       }
     ) {
-      ...RegistryExportFragment
+      ...RegistryV2ExportFragment
     }
   }
-  ${registryExportFragment}
+  ${registryV2ExportFragment}
 `;
 
-export const GET_REGISTRY_EXPORTS = gql`
-  query RegistryExports($first: Int = 5) {
-    registryExports(first: $first) {
+export const GET_REGISTRY_V2_EXPORTS = gql`
+  query RegistryV2Exports($first: Int = 5) {
+    registryV2Exports(first: $first) {
       edges {
         node {
-          ...RegistryExportFragment
+          ...RegistryV2ExportFragment
         }
       }
     }
   }
-  ${registryExportFragment}
+  ${registryV2ExportFragment}
 `;
 
-export const GET_REGISTRY_EXPORT = gql`
-  query RegistryExport($id: ID!) {
-    registryExport(id: $id) {
-      ...RegistryExportFragment
+export const GET_REGISTRY_V2_EXPORT = gql`
+  query RegistryV2Export($id: ID!) {
+    registryV2Export(id: $id) {
+      ...RegistryV2ExportFragment
     }
   }
-  ${registryExportFragment}
+  ${registryV2ExportFragment}
 `;
 
-export const REGISTRY_EXPORT_DOWNLOAD_SIGNED_URL = gql`
-  query RegistryExportDownloadSignedUrl($exportId: String!) {
-    registryExportDownloadSignedUrl(exportId: $exportId) {
+export const REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL = gql`
+  query RegistryV2ExportDownloadSignedUrl($exportId: String!) {
+    registryV2ExportDownloadSignedUrl(exportId: $exportId) {
       fileKey
       signedUrl
     }

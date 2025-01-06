@@ -2,7 +2,7 @@ import {
   nextBuildSirenify,
   NextCompanyInputAccessor
 } from "../../companies/sirenify";
-import { CompanyInput } from "../../generated/graphql/types";
+import type { CompanyInput } from "@td/codegen-back";
 
 import { ZodFullBspaoh } from "./schema";
 type SiretInfos = {

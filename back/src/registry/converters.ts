@@ -41,13 +41,10 @@ import {
   toAllWaste as formToAllWaste
 } from "../forms/registry";
 
-import { exportOptions } from "@td/registry";
-
 import { GenericWaste } from "./types";
-import { WasteRegistryType } from "../generated/graphql/types";
+import type { WasteRegistryType } from "@td/codegen-back";
 import { formToBsdd } from "../forms/compat";
 import { RegistryBsdMap } from "./elastic";
-import { RegistrySsd } from "@prisma/client";
 
 const bsdsToIncomingWastes = {
   BSDD: formToIncomingWaste,
@@ -94,7 +91,7 @@ const bsdsToAllWastes = {
   BSPAOH: bspaohToAllWaste
 };
 
-const bsdsToWastes: Record<Exclude<WasteRegistryType, "SSD">, any> = {
+const bsdsToWastes: Record<WasteRegistryType, any> = {
   INCOMING: bsdsToIncomingWastes,
   OUTGOING: bsdsToOutgoingWastes,
   TRANSPORTED: bsdsToTransportedWastes,
@@ -112,7 +109,7 @@ export type WasteMap<WasteType> = {
 };
 
 export function toWastes<WasteType extends GenericWaste>(
-  registryType: Exclude<WasteRegistryType, "SSD">,
+  registryType: WasteRegistryType,
   bsds: RegistryBsdMap
 ): WasteMap<WasteType> {
   const converter = bsdsToWastes[registryType];
@@ -126,30 +123,4 @@ export function toWastes<WasteType extends GenericWaste>(
     BSFF: bsffs.map(converter.BSFF),
     BSPAOH: bspaohs.map(converter.BSPAOH)
   };
-}
-// add other types when other exports are added
-type RegistryInputMap = {
-  SSD: RegistrySsd | null;
-};
-
-const registryToSsdWaste = {
-  // "?." because it's partial. Once completed, remove the partial and "?."
-  SSD: exportOptions.SSD?.toSsdWaste
-};
-
-const registryToWaste: Record<"SSD", any> = {
-  SSD: registryToSsdWaste
-};
-
-export function toWaste<WasteType extends GenericWaste>(
-  registryType: WasteRegistryType,
-  input: RegistryInputMap
-  // remove undefined once all types are defined
-): WasteType | undefined {
-  const converter = registryToWaste[registryType];
-  const { SSD } = input;
-  if (input.SSD) {
-    return converter.SSD?.(SSD);
-  }
-  return;
 }

@@ -5,11 +5,11 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   BsffSignatureInput,
   BsffSignatureType,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { expandBsffFromDB } from "../../converter";
 import {
   getBsffOrNotFound,

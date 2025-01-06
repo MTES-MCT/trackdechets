@@ -1,4 +1,4 @@
-import { BsdSubType, AllWaste } from "../../generated/graphql/types";
+import type { BsdSubType, AllWaste } from "@td/codegen-back";
 import { CUSTOM_WASTE_COLUMNS, formatRow, formatSubType } from "../columns";
 
 describe("formatRow", () => {

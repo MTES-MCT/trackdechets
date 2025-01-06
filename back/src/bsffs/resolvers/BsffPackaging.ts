@@ -1,4 +1,4 @@
-import { BsffPackagingResolvers } from "../../generated/graphql/types";
+import type { BsffPackagingResolvers } from "@td/codegen-back";
 import { expandBsffFromDB } from "../converter";
 import {
   getReadonlyBsffPackagingRepository,

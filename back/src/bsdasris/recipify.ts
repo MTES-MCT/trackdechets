@@ -1,7 +1,4 @@
-import {
-  BsdasriInput,
-  BsdasriRecepisseInput
-} from "../generated/graphql/types";
+import type { BsdasriInput, BsdasriRecepisseInput } from "@td/codegen-back";
 import { recipifyGeneric } from "../companies/recipify";
 
 export const autocompletedRecepisse = (

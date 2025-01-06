@@ -1,8 +1,5 @@
 import { UserInputError } from "../../../common/errors";
-import {
-  CompanyPublic,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import type { CompanyPublic, QueryResolvers } from "@td/codegen-back";
 import { getInstallation } from "../../database";
 import { searchCompany } from "../../search";
 

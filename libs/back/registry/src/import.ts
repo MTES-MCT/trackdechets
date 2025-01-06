@@ -6,6 +6,7 @@ import { SafeParseReturnType } from "zod";
 import { endImport, startImport, updateImportStats } from "./database";
 import {
   CSV_DELIMITER,
+  ERROR_HEADER,
   importOptions,
   ImportType,
   ParsedLine,
@@ -47,7 +48,7 @@ export async function processStream({
 
   const errorStream = format({
     delimiter: CSV_DELIMITER,
-    headers: ["Erreur", ...Object.values(options.headers)],
+    headers: [ERROR_HEADER, ...Object.values(options.headers)],
     writeHeaders: true
   });
   errorStream.pipe(outputErrorStream);
@@ -91,13 +92,16 @@ export async function processStream({
 
       // Check rights
       const contextualSiretsWithDelegation =
-        delegateToDelegatorsMap.get(result.data.reportAsSiret ?? "") ?? [];
+        delegateToDelegatorsMap.get(result.data.reportAsCompanySiret ?? "") ??
+        [];
       const contextualAllowedSirets = [
         ...allowedSirets,
         ...contextualSiretsWithDelegation
       ];
 
-      if (!contextualAllowedSirets.includes(result.data.reportForSiret)) {
+      if (
+        !contextualAllowedSirets.includes(result.data.reportForCompanySiret)
+      ) {
         stats.errors++;
 
         errorStream.write([

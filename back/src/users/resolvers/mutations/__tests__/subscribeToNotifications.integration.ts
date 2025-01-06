@@ -1,8 +1,8 @@
-import {
+import type {
   Mutation,
   MutationSubscribeToNotificationsArgs,
   UserNotifications
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { associateUserToCompany } from "../../../database";
 import { Prisma } from "@prisma/client";
