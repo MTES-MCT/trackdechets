@@ -1,4 +1,14 @@
 import React from "react";
+
+const PACKAGINGS_NAMES = {
+  BOITE_CARTON: "Caisse en carton avec sac en plastique",
+  FUT: "Fûts ou jerrican à usage unique",
+  BOITE_PERFORANTS: "Boîtes et Mini-collecteurs pour déchets perforants",
+  GRAND_EMBALLAGE: "Grand emballage",
+  GRV: "Grand récipient pour vrac",
+  AUTRE: "Autre"
+};
+
 export function PackagingInfosTable({ packagingInfos }) {
   return (
     <table>
@@ -14,7 +24,7 @@ export function PackagingInfosTable({ packagingInfos }) {
         {packagingInfos.map((row, index) => (
           <tr key={index}>
             <td>{row.quantity}</td>
-            <td>{row.type}</td>
+            <td>{PACKAGINGS_NAMES[row.type]}</td>
             <td>{row.volume}</td>
             <td>{row.quantity * row.volume}</td>
           </tr>
