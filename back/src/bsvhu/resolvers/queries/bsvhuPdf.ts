@@ -1,7 +1,4 @@
-import {
-  QueryBsvhuPdfArgs,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import type { QueryBsvhuPdfArgs, QueryResolvers } from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsvhuOrNotFound } from "../../database";

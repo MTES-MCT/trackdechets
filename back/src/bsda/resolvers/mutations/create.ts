@@ -1,8 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  BsdaInput,
-  MutationCreateBsdaArgs
-} from "../../../generated/graphql/types";
+import type { BsdaInput, MutationCreateBsdaArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";

@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { prepareSegment } from "./multiModal";
 
 const prepareSegmentResolver: MutationResolvers["prepareSegment"] = (

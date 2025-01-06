@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import signup from "./mutations/signup";
 import changePassword from "./mutations/changePassword";
 import createPasswordResetRequest from "./mutations/createPasswordResetRequest";

@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { CreateApplicationInput } from "../generated/graphql/types";
+import type { CreateApplicationInput } from "@td/codegen-back";
 
 export const applicationSchema: yup.SchemaOf<CreateApplicationInput> =
   yup.object({

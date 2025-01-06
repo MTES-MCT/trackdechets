@@ -155,7 +155,7 @@ export function Destination({ errors }) {
 
       <CompanyContactInfo
         fieldName={`${actor}.company`}
-        name={actor}
+        errorObject={formState.errors?.destination?.["company"]}
         disabled={sealedFields.includes(`${actor}.company.siret`)}
         key={orgId}
       />

@@ -3,10 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
-import {
-  Mutation,
-  MutationDeleteBsdasriArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationDeleteBsdasriArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 
 const DELETE_DASRI = `

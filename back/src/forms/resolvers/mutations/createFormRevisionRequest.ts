@@ -20,10 +20,10 @@ import {
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { WeightUnits, weight, v20241101 } from "../../../common/validation";
 import { prisma } from "@td/prisma";
-import {
+import type {
   FormRevisionRequestContentInput,
   MutationCreateFormRevisionRequestArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound, getTransportersSync } from "../../database";
@@ -411,7 +411,6 @@ async function getApproversSirets(
     ...(authoringCompanyIsEmitterOrEcoOrg
       ? []
       : [bsdd.emitterCompanySiret, bsdd.ecoOrganismeSiret]),
-    bsdd.traderCompanySiret,
     ...(bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER
       ? [bsdd.currentTransporterOrgId]
       : [bsdd.recipientCompanySiret])

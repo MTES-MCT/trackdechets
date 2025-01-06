@@ -1,9 +1,9 @@
 import { WasteAcceptationStatus } from "@prisma/client";
 import { gql } from "graphql-tag";
-import {
+import type {
   Mutation,
   MutationUpdateBsffPackagingArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
@@ -256,11 +256,11 @@ describe("Mutation.updateBsffPackaging", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " Le champ numero a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ acceptationDate a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ acceptationWeight a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ acceptationWasteDescription a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ acceptationWasteCode a été vérouillé via signature et ne peut pas être modifié."
+          " Le champ numero a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ acceptationDate a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ acceptationWeight a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ acceptationWasteDescription a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ acceptationWasteCode a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -360,17 +360,17 @@ describe("Mutation.updateBsffPackaging", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " Le champ operationDate a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationDescription a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCap a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyName a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanySiret a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyAddress a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyContact a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyPhone a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationCompanyMail a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationCode a été vérouillé via signature et ne peut pas être modifié.," +
-          " Le champ operationNextDestinationPlannedOperationCode a été vérouillé via signature et ne peut pas être modifié."
+          " Le champ operationDate a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationDescription a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCap a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyName a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanySiret a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyAddress a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyContact a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyPhone a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationCompanyMail a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationCode a été verrouillé via signature et ne peut pas être modifié.," +
+          " Le champ operationNextDestinationPlannedOperationCode a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });

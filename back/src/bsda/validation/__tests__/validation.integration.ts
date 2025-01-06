@@ -24,10 +24,9 @@ import {
   PrismaBsdaForParsing
 } from "../types";
 import { ZodError } from "zod";
-import { CompanySearchResult } from "../../../companies/types";
 import { searchCompany } from "../../../companies/search";
 import { mergeInputAndParseBsdaAsync, parseBsda, parseBsdaAsync } from "..";
-import { BsdaInput } from "../../../generated/graphql/types";
+import type { BsdaInput, CompanySearchResult } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 
 jest.mock("../../../companies/search");
@@ -1194,7 +1193,7 @@ describe("mergeInputAndParseBsdaAsync", () => {
         user: destination.user
       })
     ).rejects.toThrow(
-      "Le nom de l'entreprise émettrice a été vérouillé via signature et ne peut pas être modifié."
+      "Le nom de l'entreprise émettrice a été verrouillé via signature et ne peut pas être modifié."
     );
   });
 
@@ -1374,7 +1373,7 @@ describe("mergeInputAndParseBsdaAsync", () => {
     await expect(() =>
       mergeInputAndParseBsdaAsync(persisted, input, context)
     ).rejects.toThrow(
-      "Le champ workerWorkHasEmitterPaperSignature a été vérouillé via signature et ne peut pas être modifié."
+      "Le champ workerWorkHasEmitterPaperSignature a été verrouillé via signature et ne peut pas être modifié."
     );
   });
 
@@ -1422,7 +1421,7 @@ describe("mergeInputAndParseBsdaAsync", () => {
       mergeInputAndParseBsdaAsync(persisted, input, context)
     ).rejects.toThrow(
       "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-        " L'immatriculation du transporteur n°1 a été vérouillé via signature et ne peut pas être modifié."
+        " L'immatriculation du transporteur n°1 a été verrouillé via signature et ne peut pas être modifié."
     );
   });
 
@@ -1529,7 +1528,7 @@ describe("mergeInputAndParseBsdaAsync", () => {
     await expect(() =>
       mergeInputAndParseBsdaAsync(persisted, input, context)
     ).rejects.toThrow(
-      "Le poids du déchet a été vérouillé via signature et ne peut pas être modifié."
+      "Le poids du déchet a été verrouillé via signature et ne peut pas être modifié."
     );
   });
 

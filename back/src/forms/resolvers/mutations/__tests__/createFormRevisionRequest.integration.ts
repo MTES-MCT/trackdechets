@@ -1,9 +1,10 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationCreateFormRevisionRequestArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
+  companyFactory,
   formFactory,
   siretify,
   userWithCompanyFactory
@@ -259,6 +260,58 @@ describe("Mutation.createFormRevisionRequest", () => {
       company.siret
     );
     // one approval is created
+    expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+      { approverSiret: recipientCompany.siret, status: "PENDING" }
+    ]);
+  });
+
+  it("should not include trader, broker nor intermediary in the approvals list", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const traderCompany = await companyFactory();
+    const brokerCompany = await companyFactory();
+    const intermediaryCompany = await companyFactory();
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        brokerCompanySiret: brokerCompany.siret,
+        traderCompanySiret: traderCompany.siret,
+        intermediaries: {
+          create: {
+            siret: intermediaryCompany.siret!,
+            name: intermediaryCompany.name!,
+            contact: intermediaryCompany.contact!
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "01 03 08" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    console.log(data.createFormRevisionRequest.approvals.length);
+    // only one approval is created
     expect(data.createFormRevisionRequest.approvals).toStrictEqual([
       { approverSiret: recipientCompany.siret, status: "PENDING" }
     ]);

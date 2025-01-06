@@ -7,7 +7,7 @@ import {
   processDecimal
 } from "../common/converter";
 
-import {
+import type {
   FormCompany,
   Signature,
   Bsda as GraphqlBsda,
@@ -41,7 +41,7 @@ import {
   CompanyInput,
   Bsda,
   BsdaTransporterInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   Prisma,
   BsdaTransporter as PrismaBsdaTransporter,

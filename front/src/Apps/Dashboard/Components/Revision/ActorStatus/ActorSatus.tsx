@@ -57,12 +57,11 @@ const ActorStatus = ({ review }: { review: ReviewInterface }) => {
               &nbsp; Approuvée
             </p>
           )}
+
           <p className="actor-name">
-            {approvals
-              .map(approval =>
-                getActorName(review?.bsdContent, approval?.approverSiret)
-              )
-              ?.join(" ")}
+            {approvals.map(approval => (
+              <p>{getActorName(review?.bsdContent, approval?.approverSiret)}</p>
+            ))}
           </p>
         </div>
       ))}

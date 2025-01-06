@@ -1,5 +1,5 @@
 import { UserRole } from "@prisma/client";
-import { Query, QueryBsdsArgs } from "../../../../generated/graphql/types";
+import type { Query, QueryBsdsArgs } from "@td/codegen-back";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";

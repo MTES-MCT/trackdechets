@@ -1,13 +1,13 @@
 import { BsdaRevisionRequestApplied, getBsdaFromActivityEvents } from "..";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { bsdaFactory } from "../../../bsda/__tests__/factories";
-import {
+import type {
   Mutation,
   MutationCreateBsdaArgs,
   MutationSignBsdaArgs,
   MutationSubmitBsdaRevisionRequestApprovalArgs,
   MutationUpdateBsdaArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   transporterReceiptFactory,

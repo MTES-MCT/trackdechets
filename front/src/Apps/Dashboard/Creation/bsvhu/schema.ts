@@ -92,45 +92,46 @@ const zodDestination = z.object({
   type: z.enum(["BROYEUR", "DEMOLISSEUR"]).nullish()
 });
 
-export const rawBsvhuSchema = z.object({
-  customId: z.string().nullish(),
-  wasteCode: z.enum(BSVHU_WASTE_CODES).nullish(),
-  emitter: zodEmitter,
-  transporter: zodTransporter,
-  destination: zodDestination,
-  packaging: z.enum(["LOT", "UNITE"]).nullish(),
-  identification: z.object({
-    numbers: z.array(z.string()).nullish(),
-    type: z
-      .enum([
-        "NUMERO_ORDRE_LOTS_SORTANTS",
-        "NUMERO_ORDRE_REGISTRE_POLICE",
-        "NUMERO_IMMATRICULATION"
-      ])
-      .nullish()
-  }),
-  quantity: z.coerce.number().nonnegative().nullish(),
-  weight: z.object({
-    isEstimate: z.boolean().nullish(),
-    value: z.coerce.number().nonnegative().nullish()
-  }),
-  ecoOrganisme: z
-    .object({
-      siret: z.string().nullish(),
-      name: z.string().nullish(),
-      hasEcoOrganisme: z.boolean().nullish()
-    })
-    .superRefine((val, ctx) => {
-      if (val?.hasEcoOrganisme && !val.siret) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["siret"],
-          message: `Veuillez sélectionner un éco-organisme`
-        });
-      }
+export const rawBsvhuSchema = z
+  .object({
+    customId: z.string().nullish(),
+    wasteCode: z.enum(BSVHU_WASTE_CODES).nullish(),
+    emitter: zodEmitter,
+    transporter: zodTransporter,
+    destination: zodDestination,
+    packaging: z.enum(["LOT", "UNITE"]).nullish(),
+    identification: z.object({
+      numbers: z.array(z.string()).nullish(),
+      type: z
+        .enum([
+          "NUMERO_ORDRE_LOTS_SORTANTS",
+          "NUMERO_ORDRE_REGISTRE_POLICE",
+          "NUMERO_IMMATRICULATION"
+        ])
+        .nullish()
     }),
-  broker: z
-    .object({
+    quantity: z.coerce.number().nonnegative().nullish(),
+    weight: z.object({
+      isEstimate: z.boolean().nullish(),
+      value: z.coerce.number().nonnegative().nullish()
+    }),
+    ecoOrganisme: z
+      .object({
+        siret: z.string().nullish(),
+        name: z.string().nullish(),
+        hasEcoOrganisme: z.boolean().nullish()
+      })
+      .superRefine((val, ctx) => {
+        if (val?.hasEcoOrganisme && !val.siret) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["siret"],
+            message: `Veuillez sélectionner un éco-organisme`
+          });
+        }
+      }),
+    hasBroker: z.boolean().nullish(),
+    broker: z.object({
       company: zodCompany,
       recepisse: z
         .object({
@@ -139,10 +140,9 @@ export const rawBsvhuSchema = z.object({
           validityLimit: z.string().nullish()
         })
         .nullish()
-    })
-    .nullish(),
-  trader: z
-    .object({
+    }),
+    hasTrader: z.boolean().nullish(),
+    trader: z.object({
       company: zodCompany,
       recepisse: z
         .object({
@@ -151,9 +151,89 @@ export const rawBsvhuSchema = z.object({
           validityLimit: z.string().nullish()
         })
         .nullish()
-    })
-    .nullish(),
-  intermediaries: z.array(zodCompany).nullish()
-});
+    }),
+    hasIntermediaries: z.boolean().nullish(),
+    intermediaries: z.array(zodCompany).nullish()
+  })
+  .superRefine((val, ctx) => {
+    if (val?.hasBroker && !val.broker.company.siret) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["hasBroker"],
+        message: `Veuillez sélectionner un courtier`
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["broker.company.contact"],
+        message: `La personne à contacter chez le courtier est un champ requis.`
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["broker.company.phone"],
+        message: `Le N° de téléphone du courtier est un champ requis.`
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["broker.company.mail"],
+        message: `L'adresse e-mail du courtier est un champ requis.`
+      });
+    }
+
+    if (val?.hasTrader && !val.trader.company.siret) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["hasTrader"],
+        message: `Veuillez sélectionner un négociant`
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["trader.company.contact"],
+        message: `La personne à contacter chez le négociant est un champ requis.`
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["trader.company.phone"],
+        message: `Le N° de téléphone du négociant est un champ requis.`
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["trader.company.mail"],
+        message: `L'adresse e-mail du négociant est un champ requis.`
+      });
+    }
+
+    if (
+      val?.hasIntermediaries &&
+      (!val.intermediaries || !val.intermediaries[0].siret)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["hasIntermediaries"],
+        message: `Veuillez sélectionner au moins un intermédiaire`
+      });
+    }
+
+    if (val?.hasIntermediaries) {
+      val?.intermediaries?.forEach((intermediary, index) => {
+        if (!intermediary.siret) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["intermediaries", index, "contact"],
+            message: `La personne à contacter chez l'intermédiaire est un champ requis.`
+          });
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["intermediaries", index, "phone"],
+            message: `Le N° de téléphone de l'intermédiaire est un champ requis.`
+          });
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["intermediaries", index, "mail"],
+            message: `L'adresse e-mail de l'intermédiaire est un champ requis.`
+          });
+        }
+      });
+    }
+  });
 
 export type ZodBsvhu = z.infer<typeof rawBsvhuSchema>;

@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
+import type { MutationUpdateBsdaArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";
@@ -128,13 +128,7 @@ export const producerShouldBeNotifiedOfDestinationCapModification = (
   previousBsda: Bsda,
   updatedBsda: Bsda
 ) => {
-  // On ne notifie que si le bordereau est signé par le producteur
-  // et pas encore pris en charge par le transporteur
-  if (
-    ![BsdaStatus.SIGNED_BY_PRODUCER, BsdaStatus.SIGNED_BY_WORKER].includes(
-      updatedBsda.status
-    )
-  ) {
+  if ([BsdaStatus.INITIAL].includes(updatedBsda.status)) {
     return false;
   }
 
@@ -166,16 +160,12 @@ export const sendDestinationCapModificationMail = async (
   updatedBsda: Bsda
 ) => {
   const emitterSiret = updatedBsda.emitterCompanySiret;
-  const workerSiret = updatedBsda.workerCompanySiret;
-  const destinationSiret =
-    updatedBsda.destinationOperationNextDestinationCompanySiret ??
-    updatedBsda.destinationCompanySiret;
 
-  const companies = await prisma.company.findMany({
+  if (!emitterSiret) return;
+
+  const emitterCompany = await prisma.company.findFirstOrThrow({
     where: {
-      orgId: {
-        in: [emitterSiret, workerSiret, destinationSiret].filter(Boolean)
-      }
+      orgId: emitterSiret
     },
     select: {
       id: true,
@@ -183,13 +173,9 @@ export const sendDestinationCapModificationMail = async (
     }
   });
 
-  const emitterCompany = companies.find(
-    company => company.orgId === emitterSiret
-  );
-
   const companyAssociations = await prisma.companyAssociation.findMany({
     where: {
-      companyId: { in: companies.map(company => company.id) },
+      companyId: emitterCompany.id,
       notificationIsActiveBsdaFinalDestinationUpdate: true
     },
     include: {
@@ -224,13 +210,7 @@ export const sendDestinationCapModificationMail = async (
         updatedBsda.destinationOperationNextDestinationCompanySiret ??
         updatedBsda.destinationCompanySiret
     },
-    messageVersions: [messageVersion],
-    cc: companyAssociations
-      .filter(association => association.companyId !== emitterCompany?.id)
-      .map(association => ({
-        name: association.user.name,
-        email: association.user.email
-      }))
+    messageVersions: [messageVersion]
   });
 
   await sendMail(payload);

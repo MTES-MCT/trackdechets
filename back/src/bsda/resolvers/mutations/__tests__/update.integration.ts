@@ -6,11 +6,11 @@ import {
   UserRole
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   BsdaInput,
   Mutation,
   MutationUpdateBsdaArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   siretify,
@@ -354,7 +354,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le nom de l'entreprise émettrice a été vérouillé via signature et ne peut pas être modifié."
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le nom de l'entreprise émettrice a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -435,7 +435,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de destination a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -484,7 +484,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de destination a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -569,7 +569,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le SIRET de l'entreprise de destination a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de destination a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -660,7 +660,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le SIRET de l'entreprise de travaux a été vérouillé via signature et ne peut pas être modifié."
+          "Le SIRET de l'entreprise de travaux a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -833,7 +833,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-          "Le nom du transporteur n°1 a été vérouillé via signature et ne peut pas être modifié."
+          "Le nom du transporteur n°1 a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -1188,7 +1188,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
       "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-        "Les intermédiaires a été vérouillé via signature et ne peut pas être modifié."
+        "Les intermédiaires a été verrouillé via signature et ne peut pas être modifié."
     );
   });
 
@@ -1891,7 +1891,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " La liste des transporteurs a été vérouillé via signature et ne peut pas être modifié."
+          " La liste des transporteurs a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -2048,7 +2048,7 @@ describe("Mutation.updateBsda", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
-          " Le mode de transport n°1 a été vérouillé via signature et ne peut pas être modifié."
+          " Le mode de transport n°1 a été verrouillé via signature et ne peut pas être modifié."
       })
     ]);
   });
@@ -2275,12 +2275,6 @@ describe("Mutation.updateBsda", () => {
       it.each([
         // Status pas bon
         [previousBsda, { ...updatedBsda, status: BsdaStatus.INITIAL }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.AWAITING_CHILD }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.CANCELED }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.PROCESSED }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.REFUSED }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.SIGNED_BY_WORKER }],
-        [previousBsda, { ...updatedBsda, status: BsdaStatus.SENT }],
         // Pas d'entreprise de travaux
         [previousBsda, { ...updatedBsda, workerCompanySiret: undefined }],
         // Pas d'émetteur
@@ -2359,39 +2353,6 @@ describe("Mutation.updateBsda", () => {
             notificationIsActiveBsdaFinalDestinationUpdate: true
           }
         );
-        await userInCompany(
-          "MEMBER",
-          worker.id,
-          {
-            email: "worker@mail.com",
-            name: "Worker"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          destination.id,
-          {
-            email: "destination@mail.com",
-            name: "Destination"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          transporter.id,
-          {
-            email: "transporter@mail.com",
-            name: "Transporter"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
 
         const bsda = await bsdaFactory({
           opt: {
@@ -2443,10 +2404,6 @@ describe("Mutation.updateBsda", () => {
   ${bsda.destinationCompanySiret}.
 </p>
 `,
-            cc: [
-              { email: "worker@mail.com", name: "Worker" },
-              { email: "destination@mail.com", name: "Destination" }
-            ],
             messageVersions: [
               { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
             ],
@@ -2469,50 +2426,6 @@ describe("Mutation.updateBsda", () => {
           {
             email: "emitter@mail.com",
             name: "Emitter"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          worker.id,
-          {
-            email: "worker@mail.com",
-            name: "Worker"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          destination.id,
-          {
-            email: "destination@mail.com",
-            name: "Destination"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          nextDestination.id,
-          {
-            email: "next.destination@mail.com",
-            name: "Next Destination"
-          },
-          {
-            notificationIsActiveBsdaFinalDestinationUpdate: true
-          }
-        );
-        await userInCompany(
-          "MEMBER",
-          transporter.id,
-          {
-            email: "transporter@mail.com",
-            name: "Transporter"
           },
           {
             notificationIsActiveBsdaFinalDestinationUpdate: true
@@ -2572,10 +2485,6 @@ describe("Mutation.updateBsda", () => {
   ${bsda.destinationOperationNextDestinationCompanySiret}.
 </p>
 `,
-            cc: [
-              { email: "worker@mail.com", name: "Worker" },
-              { email: "next.destination@mail.com", name: "Next Destination" }
-            ],
             messageVersions: [
               { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
             ],

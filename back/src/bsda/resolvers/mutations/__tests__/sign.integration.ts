@@ -9,11 +9,11 @@ import {
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import {
+import type {
   Mutation,
   MutationSignBsdaArgs,
   MutationUpdateBsdaArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,

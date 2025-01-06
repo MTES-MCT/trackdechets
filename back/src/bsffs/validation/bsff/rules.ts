@@ -540,7 +540,7 @@ export async function checkBsffSealedFields(
     if (isSealed) {
       sealedFieldErrors.push(
         [
-          `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
+          `${fieldDescription} a été verrouillé via signature et ne peut pas être modifié.`,
           sealedRule.customErrorMessage
         ]
           .filter(Boolean)
@@ -615,7 +615,7 @@ export async function checkBsffSealedFields(
 
           if (isSealed) {
             sealedFieldErrors.push(
-              `${fieldDescription} n°1 a été vérouillé via signature et ne peut pas être modifié.`
+              `${fieldDescription} n°1 a été verrouillé via signature et ne peut pas être modifié.`
             );
           }
         }

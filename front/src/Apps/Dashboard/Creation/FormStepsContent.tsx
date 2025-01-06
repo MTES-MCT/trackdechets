@@ -59,6 +59,7 @@ const FormStepsContent = ({
       element.scroll({ top: 0 });
     }
   };
+
   const onSubmit = (data, e) => {
     const draft = e.nativeEvent.submitter.id === "id_save_draft";
     const { id, ...input } = data;
@@ -72,9 +73,11 @@ const FormStepsContent = ({
         scrollToTop();
       });
   };
+
   const onErrors = () => {
     scrollToTop();
   };
+
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
     scrollToTop();

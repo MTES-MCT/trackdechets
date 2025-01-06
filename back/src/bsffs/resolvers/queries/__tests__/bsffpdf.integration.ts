@@ -6,7 +6,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { createBsff } from "../../../__tests__/factories";
-import { Query } from "../../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 
 import { GovernmentPermission } from "@prisma/client";
 import { faker } from "@faker-js/faker";

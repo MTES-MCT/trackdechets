@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { isBsddTransporterFieldEditable } from "@td/constants";
 import { getFormOrFormNotFound } from "../../database";

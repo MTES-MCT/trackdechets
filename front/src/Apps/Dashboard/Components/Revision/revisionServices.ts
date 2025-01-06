@@ -1,7 +1,10 @@
-import { Bsda, Form } from "@td/codegen-ui";
+import { Bsda, Bsdasri, Form } from "@td/codegen-ui";
 import { formatBsd } from "../../../Dashboard/bsdMapper";
 
-export const getActorName = (bsd: Form | Bsda, orgId: string): string => {
+export const getActorName = (
+  bsd: Form | Bsda | Bsdasri,
+  orgId: string
+): string => {
   const bsdFormatted = formatBsd(bsd);
 
   const actors = [
@@ -15,7 +18,8 @@ export const getActorName = (bsd: Form | Bsda, orgId: string): string => {
         orgId: bsdFormatted?.ecoOrganisme?.siret,
         name: bsdFormatted?.ecoOrganisme?.name
       }
-    }
+    },
+    { company: bsdFormatted?.worker?.company }
   ];
 
   const actor = actors.find(actor => actor?.company?.orgId === orgId);

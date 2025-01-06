@@ -11,7 +11,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Query } from "../../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 
 function createForms(
   userId: string,

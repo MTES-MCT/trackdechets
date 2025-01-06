@@ -111,7 +111,7 @@ const sealedFromEmissionExceptForEmitter: GetBsdaSignatureTypeFn<ZodBsda> = (
 
 /**
  * Règle de verrouillage des champs définie à partir d'une fonction.
- * Un champ appliquant cette règle est vérouillée à partir de la
+ * Un champ appliquant cette règle est verrouillé à partir de la
  * signature émetteur sauf si l'utilisateur est en train d'ajouter ou supprimer
  * un entreposage provisoire, auquel cas le champ est encore modifiable
  * jusqu'à la signature du transporteur.
@@ -140,17 +140,6 @@ const sealedFromEmissionExceptAddOrRemoveNextDestination: GetBsdaSignatureTypeFn
   }
 
   return isEmitter ? "WORK" : "EMISSION";
-};
-
-const sealedFromEmissionExceptIfWorker: GetBsdaSignatureTypeFn<ZodBsda> = (
-  bsda,
-  _
-) => {
-  // Si entreprise de travaux: on peut modifier jusqu'à l'étape de transport
-  // Sinon, scellé dès la signature émetteur
-  const hasWorker = bsda?.workerCompanySiret;
-
-  return hasWorker ? "TRANSPORT" : "EMISSION";
 };
 
 /**
@@ -445,7 +434,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   destinationCap: {
     readableFieldName: "le CAP du destinataire",
-    sealed: { from: sealedFromEmissionExceptIfWorker },
+    sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
       when: bsda =>
@@ -865,7 +854,7 @@ export async function checkBsdaSealedFields(
     if (isSealed) {
       sealedFieldErrors.push(
         [
-          `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
+          `${fieldDescription} a été verrouillé via signature et ne peut pas être modifié.`,
           sealedRule.customErrorMessage
         ]
           .filter(Boolean)
@@ -940,7 +929,7 @@ export async function checkBsdaSealedFields(
 
           if (isSealed) {
             sealedFieldErrors.push(
-              `${fieldDescription} n°1 a été vérouillé via signature et ne peut pas être modifié.`
+              `${fieldDescription} n°1 a été verrouillé via signature et ne peut pas être modifié.`
             );
           }
         }

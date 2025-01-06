@@ -28,8 +28,20 @@ import WasteVhuSummary from "./WasteVhuSummary";
 
 const schema = z.object({
   author: z
-    .string()
-    .min(3, "Le nom et prénom de l'auteur de la signature est requis"),
+    .string({
+      required_error: "Le nom et prénom de l'auteur de la signature est requis"
+    })
+    .refine(val => val.trim() !== "", {
+      message: "Le nom et prénom de l'auteur de la signature est requis"
+    })
+    .pipe(
+      z
+        .string()
+        .min(
+          2,
+          "Le nom et prénom de l'auteur de la signature doit comporter au moins 2 caractères"
+        )
+    ),
   date: z.coerce
     .date({
       required_error: "La date d'émission est requise",
@@ -162,13 +174,12 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
               {error && <DsfrNotificationError apolloError={error} />}
             </div>
 
-            <div className="fr-modal__footer">
-              <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline fr-btns-group--icon-left">
-                <Button type="button" priority="secondary" onClick={onCancel}>
-                  Annuler
-                </Button>
-                <Button disabled={loading}>Signer</Button>
-              </div>
+            <hr className="fr-mt-2w" />
+            <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
+              <Button type="button" priority="secondary" onClick={onCancel}>
+                Annuler
+              </Button>
+              <Button disabled={loading}>Signer</Button>
             </div>
           </form>
         </>

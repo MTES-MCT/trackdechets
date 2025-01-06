@@ -11,6 +11,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Permettre aux éco-organismes de réviser un BSDA [PR 3790](https://github.com/MTES-MCT/trackdechets/pull/3790)
 - Permettre l'ajout de courtier, négociant et intermédiaires sur le BSVHU [PR 3795](https://github.com/MTES-MCT/trackdechets/pull/3795)
+- Ajout de l'export v2 des registres SSD [PR 3755](https://github.com/MTES-MCT/trackdechets/pull/3755)
+- Permettre de faire une demande de révision BSDD lorsque le l'émetteur est un particulier ou un navire étranger [PR 3785](https://github.com/MTES-MCT/trackdechets/pull/3785)
+- ETQ utilisateur je suis alerté si une délégation expire dans 7 jours [PR 3772](https://github.com/MTES-MCT/trackdechets/pull/3772)
+- ETQ utilisateur je peux m'inscrire / me désinscrire aux alertes e-mails en lien avec les délégations registre [PR 3771](https://github.com/MTES-MCT/trackdechets/pull/3771)
+- ETQ que producteur d'un BSDA, je suis alerté par mail si le destinationCap est modifié (et je peux désactiver la notification) [PR 3780](https://github.com/MTES-MCT/trackdechets/pull/3780)
 
 #### :nail_care: Améliorations
 
@@ -19,11 +24,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Mise à jour des règles de validations pour le conditionnement et l'identifications des bsvhus [PR 3807](https://github.com/MTES-MCT/trackdechets/pull/3807)
 - Rendre les BSFFs en brouillon inaccessibles aux entreprises dont l'auteur ne fait pas partie [PR 3793](https://github.com/MTES-MCT/trackdechets/pull/3793)
 - Passage au DSFR de la modale de signature transporteur du BSVHU [PR 3809](https://github.com/MTES-MCT/trackdechets/pull/3809)
-
-#### :rocket: Nouvelles fonctionnalités
-
-- Ajout de l'export v2 des registres SSD [PR 3755](https://github.com/MTES-MCT/trackdechets/pull/3755)
-- Permettre de faire une demande de révision BSDD lorsque le l'émetteur est un particulier ou un navire étranger [PR 3785](https://github.com/MTES-MCT/trackdechets/pull/3785)
+- Le champ destinationCap du BSDA est scellé à partir de l'étape de transport (ou émission si pas d'entreprise de travaux) [PR 3778](https://github.com/MTES-MCT/trackdechets/pull/3778)
+- Les BSDA sont désormais inclus dans les transferts de bordereaux d'un SIRET mis en sommeil vers un autre SIRET [PR 3777](https://github.com/MTES-MCT/trackdechets/pull/3777)
 
 #### :bug: Corrections de bugs
 

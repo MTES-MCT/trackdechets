@@ -1,4 +1,4 @@
-import { WasteDetailsResolvers } from "../../generated/graphql/types";
+import type { WasteDetailsResolvers } from "@td/codegen-back";
 
 const wasteDetailsResolvers: WasteDetailsResolvers = {
   packagingInfos: parent => parent.packagingInfos || []
