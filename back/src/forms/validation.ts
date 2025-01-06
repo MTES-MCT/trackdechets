@@ -564,9 +564,10 @@ export const ecoOrganismeSchema = yup.object().shape({
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
-const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
-  isDraft
-}) =>
+export const recipientSchemaFn: FactorySchemaOf<
+  FormValidationContext,
+  Recipient
+> = ({ isDraft }) =>
   yup.object({
     recipientCap: yup
       .string()
