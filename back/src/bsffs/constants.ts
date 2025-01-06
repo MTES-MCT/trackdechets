@@ -1,5 +1,5 @@
 import * as Prisma from "@prisma/client";
-import * as GraphQL from "../generated/graphql/types";
+import * as GraphQL from "@td/codegen-back";
 
 export const OPERATION: Record<
   GraphQL.BsffOperationCode,

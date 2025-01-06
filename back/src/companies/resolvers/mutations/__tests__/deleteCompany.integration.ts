@@ -1,9 +1,6 @@
 import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Mutation,
-  MutationDeleteCompanyArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationDeleteCompanyArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";

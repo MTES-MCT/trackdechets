@@ -3,10 +3,7 @@ import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  Mutation,
-  MutationUpdateCompanyArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationUpdateCompanyArgs } from "@td/codegen-back";
 import { libelleFromCodeNaf } from "../../../sirene/utils";
 import {
   CollectorType,

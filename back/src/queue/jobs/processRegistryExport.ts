@@ -6,7 +6,7 @@ import * as Excel from "exceljs";
 
 import { format as csvFormat } from "@fast-csv/format";
 
-import { DateFilter, WasteRegistryType } from "@td/codegen-back";
+import type { DateFilter, RegistryV2ExportType } from "@td/codegen-back";
 import { Upload } from "@aws-sdk/lib-storage";
 import { UserInputError } from "../../common/errors";
 import { pipeline, Readable } from "stream";
@@ -16,9 +16,9 @@ import {
   RegistryExportFormat,
   RegistryExportStatus
 } from "@prisma/client";
-import { toWaste } from "../../registry/converters";
-import { wasteFormatter } from "../../registry/streams";
-import { getXlsxHeaders } from "../../registry/columns";
+import { toWaste } from "../../registryV2/converters";
+import { wasteFormatter } from "../../registryV2/streams";
+import { getXlsxHeaders } from "../../registryV2/columns";
 import { exportOptions } from "@td/registry";
 
 // we have all verified infos in the registryExport,
@@ -33,7 +33,7 @@ const LOOKUP_PAGE_SIZE = 100;
 
 const streamLookup = (
   findManyArgs: Prisma.RegistryLookupFindManyArgs,
-  registryType: WasteRegistryType,
+  registryType: RegistryV2ExportType,
   addEncounteredSiret: (siret: string) => void
 ): Readable => {
   let cursorId: string | null = null;

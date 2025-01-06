@@ -1,11 +1,11 @@
-import { CompanySearchResult } from "../../companies/types";
+import { CompanySearchResult } from "@td/codegen-back";
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import { searchCompany } from "../../companies/search";
-import {
+import type {
   CreateFormInput,
   ResealedFormInput,
   StatutDiffusionEtablissement
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   sirenifyFormCreateInput,
   sirenifyFormInput,
@@ -619,10 +619,14 @@ describe("sirenifyFormCreateInput", () => {
     );
 
     // Transporter
-    expect(sirenified.transporters.create.transporterCompanyName).toEqual(
+    let createdTransporter = sirenified?.transporters?.create;
+    if (Array.isArray(createdTransporter)) {
+      createdTransporter = createdTransporter[0];
+    }
+    expect(createdTransporter?.transporterCompanyName).toEqual(
       searchResults[transporter.company.siret!].name
     );
-    expect(sirenified.transporters.create.transporterCompanyAddress).toEqual(
+    expect(createdTransporter?.transporterCompanyAddress).toEqual(
       searchResults[transporter.company.siret!].address
     );
 
@@ -651,16 +655,16 @@ describe("sirenifyFormCreateInput", () => {
     );
 
     // Intermediaries
-    expect(sirenified.intermediaries.createMany.data[0].name).toEqual(
+    expect(sirenified.intermediaries?.createMany?.data[0].name).toEqual(
       searchResults[intermediary1.company.siret!].name
     );
-    expect(sirenified.intermediaries.createMany.data[0].address).toEqual(
+    expect(sirenified.intermediaries?.createMany?.data[0].address).toEqual(
       searchResults[intermediary1.company.siret!].address
     );
-    expect(sirenified.intermediaries.createMany.data[1].name).toEqual(
+    expect(sirenified.intermediaries?.createMany?.data[1].name).toEqual(
       searchResults[intermediary2.company.siret!].name
     );
-    expect(sirenified.intermediaries.createMany.data[1].address).toEqual(
+    expect(sirenified.intermediaries?.createMany?.data[1].address).toEqual(
       searchResults[intermediary2.company.siret!].address
     );
 

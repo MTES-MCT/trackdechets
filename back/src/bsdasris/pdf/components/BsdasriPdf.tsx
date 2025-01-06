@@ -6,12 +6,12 @@ import {
   SignatureStamp,
   buildPdfAddress
 } from "../../../common/pdf";
-import {
+import type {
   Bsdasri,
   InitialBsdasri,
   BsdasriSignature,
   BsdaRecepisse
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { PackagingInfosTable } from "./PackagingInfosTable";
 import { FormCompanyFields } from "./FormCompanyFields";

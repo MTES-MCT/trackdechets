@@ -37,13 +37,16 @@ import {
 } from "../utils";
 import OtherActors from "./steps/OtherActors";
 
-const vhuToInput = (vhu: BsvhuInput): BsvhuInput => {
+const vhuToInput = (vhu: ZodBsvhu): BsvhuInput => {
   return omitDeep(vhu, [
     "isDraft",
     "ecoOrganisme.hasEcoOrganisme",
     "hasTrader",
+    ...(!vhu.hasTrader ? ["trader"] : []),
     "hasBroker",
-    "hasIntermediaries"
+    ...(!vhu.hasBroker ? ["broker"] : []),
+    "hasIntermediaries",
+    ...(!vhu.hasIntermediaries ? ["intermediaries"] : [])
   ]);
 };
 interface Props {
@@ -118,7 +121,7 @@ const BsvhuFormSteps = ({
   const mainCtaLabel = formState.id ? "Enregistrer" : "Publier";
   const draftCtaLabel = formState.id ? "" : "Enregistrer en brouillon";
 
-  const saveForm = (input: BsvhuInput, draft: boolean): Promise<any> => {
+  const saveForm = (input: ZodBsvhu, draft: boolean): Promise<any> => {
     const cleanedInput = vhuToInput(input);
     if (formState.id!) {
       return updateVhuForm({

@@ -1,10 +1,10 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { removeEmptyKeys } from "../../../common/converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   MutationUpdateWorkerCertificationArgs,
   UpdateWorkerCertificationInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import { getWorkerCertificationOrNotFound } from "../../database";

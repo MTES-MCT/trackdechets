@@ -1,7 +1,7 @@
 import { companyFactory } from "../../__tests__/factories";
 import { WasteMap } from "../converters";
 import { addCompaniesGivenNames } from "../wastes";
-import { AllWaste } from "../../generated/graphql/types";
+import type { AllWaste } from "@td/codegen-back";
 import { GenericWaste } from "../types";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { Company } from "@prisma/client";

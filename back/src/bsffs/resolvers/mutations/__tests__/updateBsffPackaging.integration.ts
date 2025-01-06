@@ -1,9 +1,9 @@
 import { WasteAcceptationStatus } from "@prisma/client";
 import { gql } from "graphql-tag";
-import {
+import type {
   Mutation,
   MutationUpdateBsffPackagingArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {

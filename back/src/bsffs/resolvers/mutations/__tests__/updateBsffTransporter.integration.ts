@@ -7,10 +7,10 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import {
+import type {
   Mutation,
   MutationUpdateBsffTransporterArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getFirstTransporter } from "../../../database";
 import {
   createBsffAfterTransport,

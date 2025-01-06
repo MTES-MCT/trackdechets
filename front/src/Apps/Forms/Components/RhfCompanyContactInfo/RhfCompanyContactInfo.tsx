@@ -40,7 +40,9 @@ export default function CompanyContactInfo({
             label="Personne à contacter"
             disabled={disabled}
             state={errorObject?.contact && "error"}
-            stateRelatedMessage={errorObject?.contact?.message && "error"}
+            stateRelatedMessage={
+              (errorObject?.contact?.message as string) ?? ""
+            }
             nativeInputProps={{ ...register(`${fieldName}.contact`) }}
           />
         </div>
