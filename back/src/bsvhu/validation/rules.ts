@@ -13,7 +13,7 @@ import {
 import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { Leaves } from "../../types";
-import { v20250101 } from "./refinements";
+import { v20250101, v20241001 } from "./refinements";
 
 // Liste des champs éditables sur l'objet Bsvhu
 export type BsvhuEditableFields = Required<
@@ -386,8 +386,15 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["packaging"]
   },
   identificationNumbers: {
-    sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    sealed: {
+      from: sealedFromEmissionExceptForEmitter
+    },
+    required: {
+      from: "EMISSION",
+      when: bsvhu => {
+        return (bsvhu.createdAt || new Date()).getTime() >= v20241001.getTime();
+      }
+    },
     readableFieldName: "Les numéros d'identification",
     path: ["identification", "numbers"]
   },

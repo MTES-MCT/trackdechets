@@ -162,6 +162,8 @@ export const checkEmitterSituation: Refinement<ParsedZodBsvhu> = (
     });
   }
 };
+// Date de la MAJ 2024.10.1 qui rend obligatoire la complétion des numéros d'identification
+export const v20241001 = new Date("2024-10-23T00:00:00.000");
 
 // Date de la MAJ 2024.12.1 qui modifie les règles de validation de BsvhuInput.packaging et identification.type
 export const v20241201 = new Date(

@@ -291,6 +291,26 @@ describe("BSVHU validation", () => {
       expect(parsed).toBeDefined();
     });
 
+    test("when identification numbers are not provided on a bsvhu created before v20241001", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        createdAt: new Date("2024-10-21T00:00:00.000"), // before v20241001
+
+        identificationNumbers: [],
+
+        transporterTransportMode: "ROAD",
+
+        transporterTransportPlates: ["XY-23-TR"]
+      };
+
+      const parsed = await parseBsvhuAsync(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
+
+      expect(parsed).toBeDefined();
+    });
+
     test.each([
       TransportMode.RAIL,
       TransportMode.AIR,
@@ -887,6 +907,32 @@ describe("BSVHU validation", () => {
       }
     );
 
+    test("when identification numbers are not provided on a bsvhu created after v20241001", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+
+        identificationNumbers: [],
+
+        transporterTransportMode: "ROAD",
+
+        transporterTransportPlates: ["XY-23-TR"]
+      };
+
+      expect.assertions(1);
+
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: "Les numéros d'identification est un champ requis."
+          })
+        ]);
+      }
+    });
     describe("Emitter transports own waste", () => {
       it("allowed if exemption", async () => {
         const data: ZodBsvhu = {
