@@ -42,4 +42,15 @@ type Query {
   (en attente, accepté, refusé)
   """
   membershipRequest(id: ID, siret: String): MembershipRequest!
+
+  """
+  !Destiné aux admins uniquement!
+  Récupère toutes les demandes de rattachement en cours qui concernent un établissement
+  (ciblé par ID ou SIRET)
+  """
+  membershipRequests(
+    where: MembershipRequestsWhere
+    skip: Int
+    first: Int
+  ): MembershipRequestsConnection!
 }

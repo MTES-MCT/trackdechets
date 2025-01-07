@@ -3,6 +3,7 @@ import me from "./queries/me";
 import apiKey from "./queries/apiKey";
 import invitation from "./queries/invitation";
 import membershipRequest from "./queries/membershipRequest";
+import membershipRequests from "./queries/membershipRequests";
 import myCompanies from "./queries/myCompanies";
 import authorizedApplications from "./queries/authorizedApplications";
 import accessTokens from "./queries/accessTokens";
@@ -16,6 +17,7 @@ const Query: QueryResolvers = {
   apiKey,
   invitation,
   membershipRequest,
+  membershipRequests,
   myCompanies,
   authorizedApplications,
   accessTokens,
