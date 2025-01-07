@@ -69,7 +69,7 @@ const membershipRequestsResolver: QueryResolvers["membershipRequestsResolver"] =
     }
 
     // Fetch membership requests, paginated
-    const delegationRepository = getMembershipRequestRepository();
+    const membershipRequestRepository = getMembershipRequestRepository();
 
     const { skip, first } = parsedArgs;
     const where = {
@@ -77,7 +77,7 @@ const membershipRequestsResolver: QueryResolvers["membershipRequestsResolver"] =
       status: "PENDING"
     };
 
-    const totalCount = await delegationRepository.count(where);
+    const totalCount = await membershipRequestRepository.count(where);
 
     const paginationArgs = getPrismaPaginationArgs({
       skip: skip ?? 0,
@@ -87,7 +87,7 @@ const membershipRequestsResolver: QueryResolvers["membershipRequestsResolver"] =
     const result = await getConnection({
       totalCount,
       findMany: () =>
-        delegationRepository.findMany(where, {
+        membershipRequestRepository.findMany(where, {
           ...paginationArgs,
           orderBy: { updatedAt: "desc" },
           include: { user: true }
