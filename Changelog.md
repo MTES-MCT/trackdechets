@@ -16,7 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout de "2795" à la suite de Installation de traitement > Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780) sur le type de profil Installation de traitement. [PR 3845](https://github.com/MTES-MCT/trackdechets/pull/3845)
 - BSFF - Mettre à jour les informations du contenant modifié (code déchet, description, poids) dans l'aperçu et dans le tableau de bord lorsque le BSFF a un seul contenant [PR 3853](https://github.com/MTES-MCT/trackdechets/pull/3853).
 - Permettre d'ajouter un intermédiaire sur le VHU jusqu'au traitement du bordereau [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
-- Retirer la possibilité de publier un BSVHU si l'émetteur visé n'est pas inscrit sur Trackdéchets et qu'il n'est pas une situation irrégulière [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
+- Retirer la possibilité de publier un BSVHU si l'émetteur visé n'est pas inscrit sur Trackdéchets et qu'il n'est pas en situation irrégulière [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
 
 #### :bug: Corrections de bugs
 

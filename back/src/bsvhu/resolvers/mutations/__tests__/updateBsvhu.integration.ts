@@ -801,13 +801,12 @@ describe("Mutation.Vhu.update", () => {
           type: identificationType
         }
       };
-      const { data, errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
         UPDATE_VHU_FORM,
         {
           variables: { id: bsvhu.id, input }
         }
       );
-      console.log(errors);
 
       expect(data.updateBsvhu.packaging).toEqual("UNITE");
       expect(data.updateBsvhu.identification?.type).toEqual(identificationType);
