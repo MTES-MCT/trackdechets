@@ -1,7 +1,8 @@
 import { ZodBsvhu } from "./schema";
 import { BsvhuUserFunctions, BsvhuValidationContext } from "./types";
-import { BsvhuInput, SignatureTypeInput } from "../../generated/graphql/types";
-import { User, WasteAcceptationStatus } from "@prisma/client";
+import type { BsvhuInput, SignatureTypeInput } from "@td/codegen-back";
+import { User, WasteAcceptationStatus, TransportMode } from "@prisma/client";
+
 import { isForeignVat } from "@td/constants";
 import {
   getBsvhuUserFunctions,
@@ -12,6 +13,7 @@ import {
 import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { Leaves } from "../../types";
+import { v20250101 } from "./refinements";
 
 // Liste des champs éditables sur l'objet Bsvhu
 export type BsvhuEditableFields = Required<
@@ -21,9 +23,9 @@ export type BsvhuEditableFields = Required<
     | "isDraft"
     | "isDeleted"
     | "emitterCustomInfo"
+    | "emitterNotOnTD"
     | "destinationCustomInfo"
     | "transporterCustomInfo"
-    | "transporterTransportPlates"
     | "emitterEmissionSignatureDate"
     | "emitterEmissionSignatureAuthor"
     | "transporterTransportSignatureDate"
@@ -391,7 +393,11 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   identificationType: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    required: {
+      from: "EMISSION",
+      when: bsvhu => bsvhu.packaging === "UNITE"
+    },
+
     readableFieldName: "Le type de numéro d'identification",
     path: ["identification", "type"]
   },
@@ -512,9 +518,28 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "l'exemption de récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     path: ["transporter", "recepisse", "isExempted"]
-    // required: {
-    //   from: "TRANSPORT"
-    // }
+  },
+  transporterTransportMode: {
+    readableFieldName: "le mode de transport",
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT"
+    },
+    path: ["transporter", "transport", "mode"]
+  },
+  transporterTransportPlates: {
+    readableFieldName: "l'immatriculation du transporteur",
+    sealed: { from: "TRANSPORT" },
+    path: ["transporter", "transport", "plates"],
+    required: {
+      from: "TRANSPORT",
+      when: bsvhu => {
+        return (
+          bsvhu.transporterTransportMode === "ROAD" &&
+          (bsvhu.createdAt || new Date()).getTime() >= v20250101.getTime()
+        );
+      }
+    }
   },
   ecoOrganismeName: {
     readableFieldName: "le nom de l'éco-organisme",
@@ -711,6 +736,7 @@ export const getRequiredAndSealedFieldPaths = async (
 function requireTransporterRecepisse(bsvhu: ZodBsvhu) {
   return (
     !bsvhu.transporterRecepisseIsExempted &&
+    bsvhu.transporterTransportMode === TransportMode.ROAD &&
     !isForeignVat(bsvhu.transporterCompanyVatNumber)
   );
 }

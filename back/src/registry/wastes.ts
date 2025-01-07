@@ -1,5 +1,5 @@
 import { TotalHits } from "@elastic/elasticsearch/api/types";
-import { WasteRegistryType } from "../generated/graphql/types";
+import type { WasteRegistryType } from "@td/codegen-back";
 import { toWastes, WasteMap } from "./converters";
 import { searchBsds, toPrismaBsds } from "./elastic";
 import { getElasticPaginationArgs } from "./pagination";

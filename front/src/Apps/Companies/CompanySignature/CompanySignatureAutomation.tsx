@@ -202,60 +202,72 @@ const CompanySignatureAutomation = ({
         </p>
       )}
 
-      {isAdmin && (
-        <CompanySelector
-          disabled={!allowSignatureAutomation}
-          loading={isLoadingSearch}
-          onSelect={onSelectCompany}
-          onSearch={onSearchCompany}
-          companies={searchResults}
-        />
-      )}
+      <div className="fr-container--fluid fr-mt-6v">
+        <div className="fr-col-12 fr-col-xl-10">
+          {isAdmin && (
+            <CompanySelector
+              disabled={!allowSignatureAutomation}
+              loading={isLoadingSearch}
+              onSelect={onSelectCompany}
+              onSearch={onSearchCompany}
+              companies={searchResults}
+            />
+          )}
 
-      {company.signatureAutomations.length > 0 ? (
-        <div className="fr-table">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Établissement</th>
-                <th scope="col">Ajouté le</th>
-                {isAdmin && <th scope="col">Révoquer</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {company.signatureAutomations.map(delegation => (
-                <tr key={delegation.id}>
-                  <td>
-                    {delegation.to.name} (
-                    {delegation.to.siret ?? delegation.to.vatNumber})
-                  </td>
-                  <td>{formatDate(delegation.createdAt)}</td>
-                  {isAdmin && (
-                    <td>
-                      <button
-                        disabled={!allowSignatureAutomation}
-                        className="fr-btn fr-btn--icon-left fr-icon-delete-line"
-                        onClick={() => onClickRevokeAutomation(delegation.id)}
-                      >
-                        Révoquer
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {company.signatureAutomations.length > 0 ? (
+            <div className="fr-table--lg fr-table fr-table fr-mt-2v">
+              <div className="fr-table__wrapper">
+                <div className="fr-table__container">
+                  <div className="fr-table__content">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th scope="col">Établissement</th>
+                          <th scope="col">Ajouté le</th>
+                          {isAdmin && <th scope="col">Révoquer</th>}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {company.signatureAutomations.map(delegation => (
+                          <tr key={delegation.id}>
+                            <td>
+                              {delegation.to.name} (
+                              {delegation.to.siret ?? delegation.to.vatNumber})
+                            </td>
+                            <td>{formatDate(delegation.createdAt)}</td>
+                            {isAdmin && (
+                              <td>
+                                <button
+                                  disabled={!allowSignatureAutomation}
+                                  className="fr-btn fr-btn--icon-left fr-icon-delete-line"
+                                  onClick={() =>
+                                    onClickRevokeAutomation(delegation.id)
+                                  }
+                                >
+                                  Révoquer
+                                </button>
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            isAdmin && (
+              <div className="fr-alert fr-alert--info fr-alert--sm fr-mt-2w">
+                <p>
+                  Recherchez un premier établissement ci-dessus afin de
+                  l’ajouter à la liste des collecteurs autorisés
+                </p>
+              </div>
+            )
+          )}
         </div>
-      ) : (
-        isAdmin && (
-          <div className="fr-alert fr-alert--info fr-alert--sm fr-mt-2w">
-            <p>
-              Recherchez un premier établissement ci-dessus afin de l’ajouter à
-              la liste des collecteurs autorisés
-            </p>
-          </div>
-        )
-      )}
+      </div>
     </div>
   );
 };

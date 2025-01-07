@@ -2,6 +2,7 @@ import * as cron from "cron";
 import cronValidator from "cron-validate";
 import { cleanUpIsReturnForTab, initSentry } from "back";
 import {
+  sendExpiringRegistryDelegationWarning,
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
   sendPendingMembershipRequestEmail,
@@ -65,6 +66,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
         await sendPendingRevisionRequestEmail();
+      },
+      timeZone: TZ
+    }),
+    // delegations about to expire
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendExpiringRegistryDelegationWarning();
       },
       timeZone: TZ
     })

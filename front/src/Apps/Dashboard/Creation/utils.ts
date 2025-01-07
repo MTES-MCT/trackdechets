@@ -25,7 +25,8 @@ export enum TabId {
   emitter = "emitter",
   transporter = "transporter",
   destination = "destination",
-  none = "none"
+  none = "none",
+  other = "other"
 }
 
 export type NormalizedError = {
@@ -55,28 +56,46 @@ export const getTabs = (
   tabId: TabId;
   label: string;
   iconId: IconIdName;
-}[] => [
-  {
-    tabId: TabId.waste,
-    label: "Déchet",
-    iconId: getTabClassName(errorTabIds, "waste")
-  },
-  {
-    tabId: TabId.emitter,
-    label: "Producteur",
-    iconId: getTabClassName(errorTabIds, "emitter")
-  },
-  {
-    tabId: TabId.transporter,
-    label: "Transporteur",
-    iconId: getTabClassName(errorTabIds, "transporter")
-  },
-  {
-    tabId: TabId.destination,
-    label: bsdType === BsdType.Bspaoh ? "Crématorium" : "Destination finale",
-    iconId: getTabClassName(errorTabIds, "destination")
+}[] => {
+  const commonsTabs = [
+    {
+      tabId: TabId.waste,
+      label: "Déchet",
+      iconId: getTabClassName(errorTabIds, "waste")
+    },
+    {
+      tabId: TabId.emitter,
+      label: "Producteur",
+      iconId: getTabClassName(errorTabIds, "emitter")
+    },
+    {
+      tabId: TabId.transporter,
+      label: "Transporteur",
+      iconId: getTabClassName(errorTabIds, "transporter")
+    },
+    {
+      tabId: TabId.destination,
+      label: bsdType === BsdType.Bspaoh ? "Crématorium" : "Destination finale",
+      iconId: getTabClassName(errorTabIds, "destination")
+    }
+  ];
+  if (bsdType === BsdType.Bsvhu) {
+    return getBsvhuTabs(commonsTabs, errorTabIds);
   }
-];
+  return commonsTabs;
+};
+
+const getBsvhuTabs = (commonTabs, errorTabIds) => {
+  const vhuTabs = [
+    ...commonTabs,
+    {
+      tabId: TabId.other,
+      label: "Autres acteurs",
+      iconId: getTabClassName(errorTabIds, "other")
+    }
+  ];
+  return vhuTabs;
+};
 
 const pathPrefixToTab = {
   [BsdType.Bsvhu]: (pathPrefix: string): TabId | null => {
@@ -87,6 +106,9 @@ const pathPrefixToTab = {
       pathPrefix === "identification"
     ) {
       return TabId.waste;
+    }
+    if (pathPrefix === "ecoOrganisme") {
+      return TabId.other;
     }
     if (Object.values(TabId).includes(pathPrefix as TabId)) {
       return TabId[pathPrefix];

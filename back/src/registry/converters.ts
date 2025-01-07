@@ -42,7 +42,7 @@ import {
 } from "../forms/registry";
 
 import { GenericWaste } from "./types";
-import { WasteRegistryType } from "../generated/graphql/types";
+import type { WasteRegistryType } from "@td/codegen-back";
 import { formToBsdd } from "../forms/compat";
 import { RegistryBsdMap } from "./elastic";
 

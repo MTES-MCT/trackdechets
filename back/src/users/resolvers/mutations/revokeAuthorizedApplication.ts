@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
@@ -41,7 +41,6 @@ const revokeAuthorizedApplicationResolver: MutationResolvers["revokeAuthorizedAp
       id: application.id,
       name: application.name,
       admin: owner.email,
-      logoUrl: application.logoUrl,
       lastConnection
     };
   };

@@ -1,13 +1,11 @@
 input CreateApplicationInput {
   name: String!
-  logoUrl: String!
   goal: ApplicationGoal!
   redirectUris: [String!]!
 }
 
 input UpdateApplicationInput {
   name: String
-  logoUrl: String
   goal: ApplicationGoal
   redirectUris: [String!]
 }

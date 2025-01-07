@@ -6,7 +6,8 @@ import {
   hashToken,
   xDaysAgo,
   randomNbrChain,
-  removeSpecialCharsExceptHyphens
+  removeSpecialCharsExceptHyphens,
+  inXDays
 } from "../utils";
 
 test("getUid returns a unique identifier of fixed length", () => {
@@ -56,6 +57,14 @@ describe("xDaysAgo", () => {
     const someDate = new Date("2019-10-03T00:00:00.000Z");
     const threeDaysBefore = xDaysAgo(someDate, 3);
     expect(threeDaysBefore).toEqual(new Date("2019-09-30T00:00:00.000Z"));
+  });
+});
+
+describe("inXDays", () => {
+  it("should return a date in x days", () => {
+    const someDate = new Date("2019-10-03T10:00:00.000Z");
+    const threeDaysLater = inXDays(someDate, 3);
+    expect(threeDaysLater).toEqual(new Date("2019-10-06T00:00:00.000Z"));
   });
 });
 

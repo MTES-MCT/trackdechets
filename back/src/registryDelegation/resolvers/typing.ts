@@ -1,8 +1,5 @@
 import { RegistryDelegation } from "@prisma/client";
-import {
-  CompanyPublic,
-  RegistryDelegationStatus
-} from "../../generated/graphql/types";
+import type { CompanyPublic, RegistryDelegationStatus } from "@td/codegen-back";
 
 // Revolvers don't provide some of the fields, because they are computed
 // by sub-resolvers (ie: status or delegate).

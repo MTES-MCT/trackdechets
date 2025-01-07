@@ -7,3 +7,4 @@ export { postGericoJob } from "./gerico";
 export { processAdministrativeTransferJob } from "./administrativeTransfer";
 export { updateAppendix2Job } from "./updateAppendix2";
 export { processRegistryImportJob } from "./processRegistryImport";
+export { processRegistryExportJob } from "./processRegistryExport";

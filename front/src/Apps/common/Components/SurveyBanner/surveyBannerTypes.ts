@@ -1,5 +1,5 @@
 export interface SurveyBannerProps {
   button: { title: string; href: string };
-  message: string;
+  messages: string[];
   persistedSurveyName?: string;
 }

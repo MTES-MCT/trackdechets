@@ -159,6 +159,11 @@ export const server = new ApolloServer<GraphQLContext>({
         // Prevent user from creating a huge number of companies
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
         maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+      },
+      importFile: {
+        // Prevent user from massively importing files
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
+        maxRequestsPerWindow: 3 // 3 requests per minute
       }
     }),
     gqlRegenerateSessionPlugin(["changePassword"]),

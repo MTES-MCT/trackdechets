@@ -11,20 +11,25 @@ async function getBody(github, context) {
     return "Rien dans le poulailler ce matin 🐔 On retourne pondre du code ! 🧑‍💻";
   }
 
-  const header = `|Titre|N°|Auteur|Approvals|🐔|
+  const header = `|Titre|N°|Auteur|Approvers en attente|🐔|
 |---|---|---|---|---|`;
 
   const lines = [];
   for (const pr of prs) {
     const nbApprovals = await getNbPrApprovals(github, context, pr);
+    const awaitingApprovers = await getRequestedReviewers(github, context, pr);
 
-    lines.push(
-      `|${pr.title}|[#${pr.number}](${pr.html_url})|@${
-        pr.user.login
-      }|${nbApprovals}| ${
-        nbApprovals >= 2 ? "🐥" : nbApprovals === 1 ? "🐣" : "🥚"
-      }|`
-    );
+    const line = [
+      "", // The line must start with | to be a valid markdown table
+      pr.title,
+      `[#${pr.number}](${pr.html_url})`,
+      `@${pr.user.login}`,
+      awaitingApprovers.map(login => `@${login}`).join(", "),
+      `${nbApprovals >= 2 ? "🐥" : nbApprovals === 1 ? "🐣" : "🥚"}`,
+      ""
+    ].map(v => (v ? v.replaceAll("|", "\\|") : v));
+
+    lines.push(line.join("|"));
   }
 
   return [header, ...lines].join("\n");
@@ -50,4 +55,14 @@ async function getNbPrApprovals(github, context, pr) {
   });
 
   return reviews.data.filter(review => review.state === "APPROVED").length;
+}
+
+async function getRequestedReviewers(github, context, pr) {
+  const reviews = await github.rest.pulls.listRequestedReviewers({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    pull_number: pr.number
+  });
+
+  return reviews.data.users.map(user => user.login);
 }

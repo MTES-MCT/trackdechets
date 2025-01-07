@@ -2,12 +2,14 @@ import {
   IconBSVhu,
   IconRenewableEnergyEarth,
   IconWarehouseDelivery,
+  IconWarehousePackage,
   IconWaterDam
 } from "../../../Apps/common/Components/Icons/Icons";
 import { Bsvhu, FormCompany, OperationMode } from "@td/codegen-ui";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { getTransportModeLabel } from "../../constants";
 
 import {
   DateRow,
@@ -28,17 +30,96 @@ type CompanyProps = {
 
 type Props = { form: Bsvhu };
 
-const IDENTIFICATION_TYPES_LABELS = {
-  NUMERO_ORDRE_REGISTRE_POLICE:
-    "N° d'ordre tels qu'ils figurent dans le registre de police",
-  NUMERO_ORDRE_LOTS_SORTANTS: "N° d'ordre des lots sortants"
-};
 const PACKAGING_LABELS = {
   UNITE: "En unités",
   LOT: "En lots"
 };
 
 export function BsvhuDetailContent({ form }: Props) {
+  const Trader = ({ trader }) => (
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Négociant</dt>
+        <dd>{trader.company?.name}</dd>
+
+        <dt>Siret</dt>
+        <dd>{trader.company?.siret}</dd>
+
+        <dt>Adresse</dt>
+        <dd>{trader.company?.address}</dd>
+
+        <dt>Tél</dt>
+        <dd>{trader.company?.phone}</dd>
+
+        <dt>Mél</dt>
+        <dd>{trader.company?.mail}</dd>
+
+        <dt>Contact</dt>
+        <dd>{trader.company?.contact}</dd>
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={trader.receipt} label="Récépissé" />
+        <DetailRow value={trader.department} label="Départment" />
+        <DateRow value={trader.validityLimit} label="Date de validité" />
+      </div>
+    </div>
+  );
+  const Broker = ({ broker }) => (
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Courtier</dt>
+        <dd>{broker.company?.name}</dd>
+
+        <dt>Siret</dt>
+        <dd>{broker.company?.siret}</dd>
+
+        <dt>Adresse</dt>
+        <dd>{broker.company?.address}</dd>
+
+        <dt>Tél</dt>
+        <dd>{broker.company?.phone}</dd>
+
+        <dt>Mél</dt>
+        <dd>{broker.company?.mail}</dd>
+
+        <dt>Contact</dt>
+        <dd>{broker.company?.contact}</dd>
+      </div>
+      <div className={styles.detailGrid}>
+        <DetailRow value={broker.receipt} label="Récépissé" />
+        <DetailRow value={broker.department} label="Départment" />
+        <DateRow value={broker.validityLimit} label="Date de validité" />
+      </div>
+    </div>
+  );
+
+  const Intermediary = ({ intermediary }) => (
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Établissement intermédiaire</dt>
+        <dd>{intermediary?.name}</dd>
+
+        <dt>Siret</dt>
+        <dd>{intermediary?.siret}</dd>
+
+        <dt>Numéro de TVA</dt>
+        <dd>{intermediary?.vatNumber}</dd>
+
+        <dt>Adresse</dt>
+        <dd>{intermediary?.address}</dd>
+
+        <dt>Tél</dt>
+        <dd>{intermediary?.phone}</dd>
+
+        <dt>Mél</dt>
+        <dd>{intermediary?.mail}</dd>
+
+        <dt>Contact</dt>
+        <dd>{intermediary?.contact}</dd>
+      </div>
+    </div>
+  );
+
   return (
     <div>
       <div className={styles.detailSummary}>
@@ -72,6 +153,16 @@ export function BsvhuDetailContent({ form }: Props) {
             <dt>Code déchet</dt>
             <dd>{form.wasteCode}</dd>
           </div>
+
+          {form?.ecoOrganisme && (
+            <div className={styles.detailGrid}>
+              <dt>EcoOrganisme</dt>
+              <dd>{form.ecoOrganisme?.name}</dd>
+
+              <dt>Siret</dt>
+              <dd>{form.ecoOrganisme?.siret}</dd>
+            </div>
+          )}
         </div>
       </div>
 
@@ -82,7 +173,18 @@ export function BsvhuDetailContent({ form }: Props) {
             <IconWaterDam size="25px" />
             <span className={styles.detailTabCaption}>Producteur</span>
           </Tab>
-
+          {!!form?.trader?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Négociant</span>
+            </Tab>
+          )}
+          {!!form?.broker?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Courtier</span>
+            </Tab>
+          )}
           <Tab className={styles.detailTab}>
             <IconWarehouseDelivery size="25px" />
             <span className={styles.detailTabCaption}>
@@ -94,6 +196,16 @@ export function BsvhuDetailContent({ form }: Props) {
             <IconRenewableEnergyEarth size="25px" />
             <span className={styles.detailTabCaption}>Destinataire</span>
           </Tab>
+
+          {!!form?.intermediaries?.length && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>
+                Intermédiaire
+                {form?.intermediaries?.length > 1 ? "s" : ""}
+              </span>
+            </Tab>
+          )}
         </TabList>
         {/* Tabs content */}
         <div className={styles.detailTabPanels}>
@@ -101,6 +213,20 @@ export function BsvhuDetailContent({ form }: Props) {
           <TabPanel className={styles.detailTabPanel}>
             <Emitter form={form} />
           </TabPanel>
+
+          {/* Trader tab panel */}
+          {!!form?.trader?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Trader trader={form.trader} />
+            </TabPanel>
+          )}
+
+          {/* Broker tab panel */}
+          {!!form?.broker?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Broker broker={form.broker} />
+            </TabPanel>
+          )}
 
           {/* Transporter tab panel */}
           <TabPanel className={styles.detailTabPanel}>
@@ -113,6 +239,15 @@ export function BsvhuDetailContent({ form }: Props) {
               <Destination form={form} />
             </div>
           </TabPanel>
+
+          {/* Intermediaries tab panel */}
+          {Boolean(form?.intermediaries?.length) && (
+            <TabPanel className={styles.detailTabPanel}>
+              {form?.intermediaries?.map(intermediary => (
+                <Intermediary intermediary={intermediary} />
+              ))}
+            </TabPanel>
+          )}
         </div>
       </Tabs>
     </div>
@@ -142,6 +277,29 @@ function Company({ company, label, isIrregularSituation }: CompanyProps) {
   );
 }
 
+const UNITE_IDENTIFICATION_TYPES_LABELS = {
+  NUMERO_ORDRE_REGISTRE_POLICE:
+    "identification par n° d'ordre tels qu'ils figurent dans le registre de police",
+  NUMERO_IMMATRICULATION: "identification par numéro d’immatriculation",
+  NUMERO_ORDRE_LOTS_SORTANTS:
+    "identification par numéro d'ordre des lots sortants"
+};
+
+const getIdentificationTypeLabel = (bsvhu: Bsvhu) => {
+  if (bsvhu?.identification?.type === "NUMERO_ORDRE_LOTS_SORTANTS") {
+    //deprecated, kept for older bsvhus
+    return "N° d'ordre des lots sortants";
+  }
+  if (bsvhu.packaging === "LOT") {
+    return "En lots (identification par numéro de lot)";
+  }
+  return bsvhu?.identification?.type
+    ? `En unités (${
+        UNITE_IDENTIFICATION_TYPES_LABELS[bsvhu.identification.type]
+      })`
+    : "En unités";
+};
+
 function Emitter({ form }: { form: Bsvhu }) {
   const { emitter, quantity, packaging, identification, weight } = form;
   return (
@@ -155,12 +313,8 @@ function Emitter({ form }: { form: Bsvhu }) {
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
-          value={
-            identification?.type
-              ? IDENTIFICATION_TYPES_LABELS[identification.type]
-              : null
-          }
-          label="Type d'identifiant"
+          value={getIdentificationTypeLabel(form)}
+          label="Critères d'identification"
         />
         <DetailRow
           value={identification?.numbers?.join(", ")}
@@ -195,13 +349,18 @@ function Transporter({ form }: { form: Bsvhu }) {
       <TransporterReceiptDetails transporter={transporter} />
       <div className={styles.detailGrid}>
         <DetailRow
+          value={getTransportModeLabel(transporter?.transport?.mode)}
+          label="Mode de transport"
+        />
+        <DetailRow
           value={
-            identification?.type
-              ? IDENTIFICATION_TYPES_LABELS[identification.type]
+            transporter?.transport?.plates
+              ? transporter.transport.plates.join(", ")
               : null
           }
-          label="Type d'identifiant"
+          label="Immatriculations"
         />
+
         <DetailRow
           value={identification?.numbers?.join(", ")}
           label="Numéros"
@@ -214,7 +373,7 @@ function Transporter({ form }: { form: Bsvhu }) {
         <DetailRow value={quantity} label="Quantité" />
         <DetailRow value={weight?.value} label="Poids" units="tonnes" />
       </div>
-      <div className={`${styles.detailGrid} `}>
+      <div className={styles.detailGrid}>
         <DateRow
           value={transporter?.transport?.takenOverAt}
           label="Emporté le"
@@ -245,7 +404,7 @@ function Destination({ form }: { form: Bsvhu }) {
         <DetailRow
           value={
             identification?.type
-              ? IDENTIFICATION_TYPES_LABELS[identification.type]
+              ? UNITE_IDENTIFICATION_TYPES_LABELS[identification.type]
               : null
           }
           label="Type d'identifiant"

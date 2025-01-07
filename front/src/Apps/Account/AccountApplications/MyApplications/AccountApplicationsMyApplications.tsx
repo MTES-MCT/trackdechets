@@ -76,14 +76,6 @@ function AccountApplicationMyApplicationsRow({
         <td colSpan={1}></td>
         <td colSpan={11}>
           <p className="fr-text--sm">
-            {!!myApplication.logoUrl && (
-              <img
-                src={myApplication.logoUrl}
-                alt="Logo"
-                width="40"
-                height="40"
-              />
-            )}
             Client ID : {myApplication.id}
             <br />
             Client secret : {myApplication.clientSecret}

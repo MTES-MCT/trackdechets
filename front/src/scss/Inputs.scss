@@ -2,8 +2,7 @@
 @import "./Mixins.scss";
 
 input:focus,
-textarea:focus,
-select:focus {
+textarea:focus {
   border-color: #006be6;
   border-color: $blue-light;
   outline: none;
@@ -123,10 +122,6 @@ input[type="file"] {
     padding-top: 0.438em;
     padding-bottom: 0.438em;
   }
-}
-
-select:focus {
-  outline: none;
 }
 
 select:-moz-focusring {

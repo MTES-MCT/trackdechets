@@ -100,7 +100,9 @@ export const rawBsdaSchema = z.object({
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
   type: z.nativeEnum(BsdaType).default(BsdaType.OTHER_COLLECTIONS),
-  emitterIsPrivateIndividual: z.coerce
+  // We don't use z.coerce.boolean() because the infered input type would then be boolean only, not allowing null or undefined
+  // and setting z.coerce.boolean().nullish() would have an infered output type of boolean | null | undefined instead of boolean
+  emitterIsPrivateIndividual: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -126,7 +128,7 @@ export const rawBsdaSchema = z.object({
   wasteConsistence: z.nativeEnum(BsdaConsistence).nullish(),
   wasteSealNumbers: z.array(z.string()).default([]),
   wasteAdr: z.string().nullish(),
-  wastePop: z.coerce
+  wastePop: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -135,7 +137,7 @@ export const rawBsdaSchema = z.object({
     .nullish()
     .default([])
     .transform(val => (val == null ? [] : val)),
-  weightIsEstimate: z.coerce
+  weightIsEstimate: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -188,7 +190,7 @@ export const rawBsdaSchema = z.object({
   destinationOperationNextDestinationCompanyMail: z.string().nullish(),
   destinationOperationNextDestinationCap: z.string().nullish(),
   destinationOperationNextDestinationPlannedOperationCode: z.string().nullish(),
-  workerIsDisabled: z.coerce
+  workerIsDisabled: z
     .boolean()
     .default(false)
     .nullish()
@@ -199,18 +201,18 @@ export const rawBsdaSchema = z.object({
   workerCompanyContact: z.string().nullish(),
   workerCompanyPhone: z.string().nullish(),
   workerCompanyMail: z.string().nullish(),
-  workerCertificationHasSubSectionFour: z.coerce
+  workerCertificationHasSubSectionFour: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  workerCertificationHasSubSectionThree: z.coerce
+  workerCertificationHasSubSectionThree: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
   workerCertificationCertificationNumber: z.string().nullish(),
   workerCertificationValidityLimit: z.coerce.date().nullish(),
   workerCertificationOrganisation: ZodWorkerCertificationOrganismEnum,
-  workerWorkHasEmitterPaperSignature: z.coerce
+  workerWorkHasEmitterPaperSignature: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),

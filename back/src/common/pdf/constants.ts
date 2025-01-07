@@ -6,5 +6,6 @@ export const TRANSPORT_MODE_LABELS: Record<TransportMode, string> = {
   [TransportMode.RAIL]: "Voie ferrée",
   [TransportMode.RIVER]: "Voie fluviale",
   [TransportMode.SEA]: "Voie maritime",
-  [TransportMode.OTHER]: "Autres"
+  [TransportMode.OTHER]: "Autres",
+  [TransportMode.UNKNOWN]: "Non renseigné"
 };

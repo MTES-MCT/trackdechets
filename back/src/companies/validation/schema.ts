@@ -71,11 +71,11 @@ const rawCompanySchema = z.object({
   workerCertificationId: z.string().nullish(),
   vhuAgrementDemolisseurId: z.string().nullish(),
   vhuAgrementBroyeurId: z.string().nullish(),
-  allowBsdasriTakeOverWithoutSignature: z.coerce
+  allowBsdasriTakeOverWithoutSignature: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  allowAppendix1SignatureAutomation: z.coerce
+  allowAppendix1SignatureAutomation: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v))

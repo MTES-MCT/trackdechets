@@ -111,7 +111,7 @@ const sealedFromEmissionExceptForEmitter: GetBsdaSignatureTypeFn<ZodBsda> = (
 
 /**
  * Règle de verrouillage des champs définie à partir d'une fonction.
- * Un champ appliquant cette règle est vérouillée à partir de la
+ * Un champ appliquant cette règle est verrouillé à partir de la
  * signature émetteur sauf si l'utilisateur est en train d'ajouter ou supprimer
  * un entreposage provisoire, auquel cas le champ est encore modifiable
  * jusqu'à la signature du transporteur.
@@ -434,7 +434,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   destinationCap: {
     readableFieldName: "le CAP du destinataire",
-    sealed: { from: sealedFromEmissionExceptAddOrRemoveNextDestination },
+    sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
       when: bsda =>
@@ -855,7 +855,7 @@ export async function checkBsdaSealedFields(
     if (isSealed) {
       sealedFieldErrors.push(
         [
-          `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
+          `${fieldDescription} a été verrouillé via signature et ne peut pas être modifié.`,
           sealedRule.customErrorMessage
         ]
           .filter(Boolean)
@@ -930,7 +930,7 @@ export async function checkBsdaSealedFields(
 
           if (isSealed) {
             sealedFieldErrors.push(
-              `${fieldDescription} n°1 a été vérouillé via signature et ne peut pas être modifié.`
+              `${fieldDescription} n°1 a été verrouillé via signature et ne peut pas être modifié.`
             );
           }
         }

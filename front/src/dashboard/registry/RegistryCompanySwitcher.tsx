@@ -49,6 +49,7 @@ export function RegistryCompanySwitcher({ onCompanySelect }: Props) {
   const { data: myCompaniesData, refetch: refetchMyCompanies } = useQuery<
     Pick<Query, "myCompanies">
   >(MY_COMPANIES, {
+    fetchPolicy: "network-only",
     variables: { first: 10 },
     onCompleted: data => {
       if (!selectedItem) {

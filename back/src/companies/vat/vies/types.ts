@@ -1,7 +1,7 @@
-import {
+import type {
   StatutDiffusionEtablissement,
   EtatAdministratif
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 export interface ViesResult {
   countryCode: string;

@@ -1,10 +1,7 @@
 import { UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Query,
-  QueryBsffPackagingsArgs
-} from "../../../../generated/graphql/types";
+import type { Query, QueryBsffPackagingsArgs } from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
@@ -143,7 +140,7 @@ describe("Query.bsffPackagings", () => {
         transporter,
         destination
       },
-      { data: { isDraft: true } }
+      { data: { isDraft: true }, userId: emitter.user.id }
     );
 
     const { query } = makeClient(emitter.user);

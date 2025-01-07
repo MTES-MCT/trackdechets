@@ -54,11 +54,12 @@ const FormStepsContent = ({
   const firstTabId = tabIds[0];
 
   const scrollToTop = () => {
-    const element = document.getElementById("formStepsTabsContent");
+    const element = document.getElementsByClassName("fr-modal__body")[0];
     if (element) {
-      element.scroll({ top: 0, behavior: "smooth" });
+      element.scroll({ top: 0 });
     }
   };
+
   const onSubmit = (data, e) => {
     const draft = e.nativeEvent.submitter.id === "id_save_draft";
     const { id, ...input } = data;
@@ -72,9 +73,11 @@ const FormStepsContent = ({
         scrollToTop();
       });
   };
+
   const onErrors = () => {
     scrollToTop();
   };
+
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
     scrollToTop();

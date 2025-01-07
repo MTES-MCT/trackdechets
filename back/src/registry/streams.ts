@@ -1,8 +1,5 @@
 import { Readable, ReadableOptions, Transform } from "stream";
-import {
-  WasteRegistryType,
-  WasteRegistryWhere
-} from "../generated/graphql/types";
+import type { WasteRegistryType, WasteRegistryWhere } from "@td/codegen-back";
 import { formatRow } from "./columns";
 import { GenericWaste } from "./types";
 import getWasteConnection from "./wastes";
@@ -68,14 +65,23 @@ export function wastesReader({
  * Format rows as data flow
  */
 export function wasteFormatter<WasteType extends GenericWaste>(
-  opts = { useLabelAsKey: false }
+  opts: {
+    useLabelAsKey: boolean;
+    columnSorter?:
+      | ((line: Record<string, string>) => Record<string, string>)
+      | null;
+  } = { useLabelAsKey: false, columnSorter: null }
 ) {
   return new Transform({
     readableObjectMode: true,
     writableObjectMode: true,
     transform(waste: WasteType, _encoding, callback) {
       const formatted = formatRow(waste, opts.useLabelAsKey);
-      this.push(formatted);
+      if (opts.columnSorter && !opts.useLabelAsKey) {
+        this.push(opts.columnSorter(formatted));
+      } else {
+        this.push(formatted);
+      }
       callback();
     }
   });

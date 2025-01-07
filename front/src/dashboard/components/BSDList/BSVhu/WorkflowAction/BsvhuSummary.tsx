@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Bsvhu } from "@td/codegen-ui";
 import { BsvhuWasteSummary } from "./BsvhuWasteSummary";
-import { BsvhuJourneySummary } from "./BsvhuJourneySummary";
+import { BsvhuJourneySummary } from "../../../../../Apps/Dashboard/Validation/Bsvhu/BsvhuJourneySummary";
 
 interface Props {
   bsvhu: Bsvhu;

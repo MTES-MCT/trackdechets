@@ -1,8 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationCancelAdministrativeTransferArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   companyFactory,
   userWithCompanyFactory
@@ -60,7 +60,9 @@ describe("cancelAdministrativeTransfer", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `No AdministrativeTransfer found`
+        message: expect.stringContaining(
+          `An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.`
+        )
       })
     ]);
   });

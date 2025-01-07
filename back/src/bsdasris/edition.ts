@@ -2,7 +2,7 @@ import { Bsdasri, User, Prisma } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import { SealedFieldError } from "../common/errors";
 import { objectDiff } from "../forms/workflow/diff";
-import { BsdasriInput, BsdasriSignatureType } from "../generated/graphql/types";
+import type { BsdasriInput, BsdasriSignatureType } from "@td/codegen-back";
 import { flattenBsdasriInput } from "./converter";
 import { getReadonlyBsdasriRepository } from "./repository";
 import { getUserRoles } from "../permissions";
@@ -40,6 +40,7 @@ type EditableBsdasriFields = Required<
     | "finalOperations"
     | "FinalOperationToFinalBsdasri"
     | "bsdasriRevisionRequests"
+    | "registryLookups"
   >
 >;
 // Defines until which signature BSDASRI fields can be modified

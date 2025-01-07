@@ -4,21 +4,27 @@ import duplexify from "duplexify";
 import * as Excel from "exceljs";
 import { PassThrough, Readable } from "node:stream";
 
-import { CSV_DELIMITER, ImportOptions } from "./options";
+import { CSV_DELIMITER, ERROR_HEADER, ImportOptions } from "./options";
 
 export function getTransformCsvStream(options: ImportOptions) {
   const parseStream = parse({
     headers: rawHeaders => {
-      const headerLabels = Object.values(options.headers);
-      const headerKeys = Object.keys(options.headers);
-      return rawHeaders.map((header, index) => {
-        if (header !== headerLabels[index]) {
+      const reverseHeadersMap = new Map(
+        Object.entries(options.headers).map(([key, value]) => [value, key])
+      );
+
+      return rawHeaders.map(header => {
+        if (!header || header === ERROR_HEADER) {
+          return undefined; // Return undefined to indicate that the header is ignored
+        }
+        if (!reverseHeadersMap.has(header)) {
           return header; // Return the original header. The "headers" event handler will detect the error.
         }
-        return headerKeys[index];
+        return reverseHeadersMap.get(header);
       });
     },
     renameHeaders: true,
+    ignoreEmpty: true,
     delimiter: CSV_DELIMITER,
     trim: true
   })
@@ -34,21 +40,31 @@ export function getTransformCsvStream(options: ImportOptions) {
       return { rawLine, result };
     })
     .on("headers", headers => {
-      const expectedHeaders = Object.keys(options.headers);
+      const expectedHeadersKeys = new Set(Object.keys(options.headers));
 
-      for (const [idx, header] of headers.entries()) {
-        if (header === expectedHeaders[idx]) {
+      const errors: string[] = [];
+      const headerEntries = headers.filter(v => v !== undefined).entries();
+
+      for (const [idx, headerKey] of headerEntries) {
+        if (expectedHeadersKeys.has(headerKey)) {
           continue;
         }
+
+        errors.push(
+          `Colonne numéro ${idx + 1} - colonne "${headerKey}" inconnue`
+        );
+      }
+
+      if (errors.length > 0) {
         // Destroy the stream to stop the parsing process without flushing it
         parseStream.destroy(
           new Error(
-            `En-tête non valide pour la colonne numéro ${idx + 1}. Attendu "${
-              options.headers[expectedHeaders[idx]]
-            }", reçu "${header}"`
+            [
+              "Les en-têtes de colonnes ne correspondent pas au modèle. Assurez-vous que vous utilisez le bon modèle. Le détail des colonnes en erreur est précisé ci-dessous:",
+              ...errors
+            ].join("\n")
           )
         );
-        break;
       }
     })
     .on("error", error => {
@@ -78,6 +94,7 @@ export function getTransformXlsxStream(options: ImportOptions) {
         // In Excel, the first row is 1
         if (row.number === 1) {
           const headerLabels = Object.values(options.headers);
+          const errors: string[] = [];
 
           headerLabels.forEach((label, index) => {
             const {
@@ -87,20 +104,37 @@ export function getTransformXlsxStream(options: ImportOptions) {
             } = row.getCell(index + 1);
 
             if (value !== label) {
-              throw new Error(
+              errors.push(
                 `En-tête non valide dans la cellule ${colLabel}:${rowLabel}. Attendu "${label}", reçu "${value}"`
               );
             }
           });
 
+          if (errors.length > 0) {
+            throw new Error(
+              [
+                "Les en-têtes de colonnes ne correspondent pas au modèle. Assurez-vous que vous utilisez le bon modèle. Le détail des colonnes en erreur est précisé ci-dessous:",
+                ...errors
+              ].join("\n")
+            );
+          }
+
           continue;
         }
 
+        let isEmptyLine = true;
         const rawLine = {};
         const keys = Object.keys(options.headers);
         for (const [index, key] of keys.entries()) {
           const { value } = row.getCell(index + 1);
-          rawLine[key] = value === null ? undefined : value;
+          rawLine[key] = value;
+          if (value) {
+            isEmptyLine = false;
+          }
+        }
+
+        if (isEmptyLine) {
+          continue;
         }
 
         const result = await options.safeParseAsync(rawLine);

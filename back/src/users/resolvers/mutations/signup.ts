@@ -3,10 +3,7 @@ import { hash } from "bcrypt";
 import { prisma } from "@td/prisma";
 import * as yup from "yup";
 import { sendMail } from "../../../mailer/mailing";
-import {
-  MutationResolvers,
-  MutationSignupArgs
-} from "../../../generated/graphql/types";
+import type { MutationResolvers, MutationSignupArgs } from "@td/codegen-back";
 import { sanitizeEmail } from "../../../utils";
 import {
   acceptNewUserCompanyInvitations,

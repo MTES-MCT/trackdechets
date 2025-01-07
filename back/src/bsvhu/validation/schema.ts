@@ -7,7 +7,10 @@ import {
   checkRequiredFields,
   checkOperationMode,
   checkReceptionWeight,
-  checkEmitterSituation
+  checkEmitterSituation,
+  checkPackagingAndIdentificationType,
+  checkTransportModeAndWeight,
+  checkTransportModeAndReceptionWeight
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
@@ -30,6 +33,7 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { fillIntermediariesOrgIds, runTransformers } from "./transformers";
+import { TransportMode } from "@prisma/client";
 
 export const ZodWasteCodeEnum = z
   .enum(BSVHU_WASTE_CODES, {
@@ -67,6 +71,8 @@ export const ZodOperationEnum = z
 
 export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
 
+const notOnlyWhiteSpace = (str: string) => str.trim(); // check whitespaces, tabs, newlines and invisible chars
+
 const rawBsvhuSchema = z.object({
   id: z.string().default(() => getReadableId(ReadableIdPrefix.VHU)),
   // on ajoute `createdAt` au schéma de validation pour appliquer certaines
@@ -80,11 +86,15 @@ const rawBsvhuSchema = z.object({
   isDeleted: z.boolean().default(false),
 
   emitterAgrementNumber: z.string().max(100).nullish(),
-  emitterIrregularSituation: z.coerce
+  emitterIrregularSituation: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  emitterNoSiret: z.coerce
+  emitterNoSiret: z
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
+  emitterNotOnTD: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -148,7 +158,7 @@ const rawBsvhuSchema = z.object({
   wasteCode: ZodWasteCodeEnum,
   packaging: z.nativeEnum(BsvhuPackaging).nullish(),
   identificationNumbers: z.array(z.string()).optional(),
-  identificationType: z.nativeEnum(BsvhuIdentificationType).nullish(),
+  identificationType: z.nativeEnum(BsvhuIdentificationType).nullish(), // see refinements
   quantity: z.number().nullish(),
   weightValue: weightSchema(WeightUnits.Kilogramme)
     .nonnegative("Le poids doit être supérieur à 0")
@@ -166,21 +176,41 @@ const rawBsvhuSchema = z.object({
     .string()
     .email("E-mail transporteur invalide")
     .nullish(),
-  transporterRecepisseNumber: z.string().nullish(),
-  transporterRecepisseDepartment: z.string().nullish(),
-  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
   transporterCompanyVatNumber: foreignVatNumberSchema(
     CompanyRole.Transporter
   ).nullish(),
-  transporterTransportSignatureAuthor: z.string().nullish(),
-  transporterTransportSignatureDate: z.coerce.date().nullish(),
-  transporterTransportTakenOverAt: z.coerce.date().nullish(),
-  transporterCustomInfo: z.string().nullish(),
-  transporterTransportPlates: z.array(z.string()).optional(),
+  transporterRecepisseNumber: z.string().nullish(),
+  transporterRecepisseDepartment: z.string().nullish(),
+  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
   transporterRecepisseIsExempted: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
+
+  transporterTransportSignatureAuthor: z.string().nullish(),
+  transporterTransportSignatureDate: z.coerce.date().nullish(),
+  transporterTransportTakenOverAt: z.coerce.date().nullish(),
+  transporterCustomInfo: z.string().nullish(),
+  transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
+  transporterTransportPlates: z
+    .array(
+      z
+        .string()
+        .min(4, {
+          message:
+            "Un numéro d'immatriculation doit faire 4 caractères au minimum"
+        })
+        .max(12, {
+          message:
+            "Un numéro d'immatriculation doit faire 12 caractères au maximum"
+        })
+        .refine(notOnlyWhiteSpace, {
+          message: "Le numéro de plaque fourni est incorrect"
+        })
+    )
+    .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+    .default([]),
+
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   brokerCompanyName: z.string().nullish(),
@@ -223,7 +253,10 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkWeights)
   .superRefine(checkReceptionWeight)
   .superRefine(checkOperationMode)
-  .superRefine(checkEmitterSituation);
+  .superRefine(checkEmitterSituation)
+  .superRefine(checkPackagingAndIdentificationType)
+  .superRefine(checkTransportModeAndWeight)
+  .superRefine(checkTransportModeAndReceptionWeight);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`

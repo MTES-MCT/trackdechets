@@ -24,6 +24,16 @@ const reviewFragment = gql`
           infos
         }
       }
+      worker {
+        company {
+          name
+          orgId
+        }
+      }
+      ecoOrganisme {
+        siret
+        name
+      }
       waste {
         code
         materialName
@@ -74,6 +84,7 @@ const reviewFragment = gql`
     }
     authoringCompany {
       siret
+      orgId
       name
     }
     approvals {

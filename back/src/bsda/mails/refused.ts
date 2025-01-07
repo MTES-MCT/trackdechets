@@ -9,12 +9,14 @@ import {
   formNotAccepted,
   formPartiallyRefused
 } from "@td/mail";
-import { BsdaWithTransporters } from "../types";
+import { BsdaWithIntermediaries, BsdaWithTransporters } from "../types";
 import { getFirstTransporterSync } from "../database";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
-type BsdaForRenderRefusal = Bsda & BsdaWithTransporters;
+type BsdaForRenderRefusal = Bsda &
+  BsdaWithTransporters &
+  BsdaWithIntermediaries;
 
 export async function renderBsdaRefusedEmail(
   bsda: BsdaForRenderRefusal,

@@ -14,7 +14,7 @@ export const registryErrorMap: z.ZodErrorMap = (issue, ctx) => {
   }
 
   if (issue.code === z.ZodIssueCode.invalid_enum_value) {
-    if (issue.options.length <= 10) {
+    if (issue.options.length <= 3) {
       return {
         message: `La valeur "${
           ctx.data
@@ -32,6 +32,12 @@ export const registryErrorMap: z.ZodErrorMap = (issue, ctx) => {
     return {
       message:
         "Le format de date est invalide. Exemples de formats possibles: 2000-01-01T00:00:00.000Z, 2000-01-01T00:00:00.000, 2000-01-01"
+    };
+  }
+
+  if (issue.code === z.ZodIssueCode.invalid_union) {
+    return {
+      message: issue.unionErrors[0].issues[0].message // For unions, output the first error message
     };
   }
 

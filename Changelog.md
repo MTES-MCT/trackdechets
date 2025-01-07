@@ -5,6 +5,55 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.01.1] 14/01/2025
+
+#### :nail_care: Améliorations
+
+- Ajout de "2795" à la suite de Installation de traitement > Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780) sur le type de profil Installation de traitement. [PR 3845](https://github.com/MTES-MCT/trackdechets/pull/3845)
+
+#### :bug: Corrections de bugs
+
+- Supprimer l'annexe 2 d'un BSDD de regroupement lorsque celle-ci a bien été retirée [PR 3874](https://github.com/MTES-MCT/trackdechets/pull/3874).
+
+#### :boom: Breaking changes
+
+- Pour le Bsvhu lors d'un transport routier, la plaque d'immatriculation est désormais obligatoire et les poids de déchets sont limités à 40 T (50 kT pour les autres modes) [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
+
+# [2024.12.1] 17/12/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Permettre aux éco-organismes de réviser un BSDA [PR 3790](https://github.com/MTES-MCT/trackdechets/pull/3790)
+- Permettre l'ajout de courtier, négociant et intermédiaires sur le BSVHU [PR 3795](https://github.com/MTES-MCT/trackdechets/pull/3795)
+- Ajout de l'export v2 des registres SSD [PR 3755](https://github.com/MTES-MCT/trackdechets/pull/3755)
+- Permettre de faire une demande de révision BSDD lorsque le l'émetteur est un particulier ou un navire étranger [PR 3785](https://github.com/MTES-MCT/trackdechets/pull/3785)
+- ETQ utilisateur je suis alerté si une délégation expire dans 7 jours [PR 3772](https://github.com/MTES-MCT/trackdechets/pull/3772)
+- ETQ utilisateur je peux m'inscrire / me désinscrire aux alertes e-mails en lien avec les délégations registre [PR 3771](https://github.com/MTES-MCT/trackdechets/pull/3771)
+- ETQ que producteur d'un BSDA, je suis alerté par mail si le destinationCap est modifié (et je peux désactiver la notification) [PR 3780](https://github.com/MTES-MCT/trackdechets/pull/3780)
+
+#### :nail_care: Améliorations
+
+- Permettre au transporteur étranger d'avoir les mêmes droits qu'un transporteur FR concernant la révision sur une Annexe 1 [PR 3770](https://github.com/MTES-MCT/trackdechets/pull/3770)
+- Remonter le VHU en situation irrégulière (sans émetteur TD) dans l'onglet À collecter du transporteur [PR 3792](https://github.com/MTES-MCT/trackdechets/pull/3792)
+- Mise à jour des règles de validations pour le conditionnement et l'identifications des bsvhus [PR 3807](https://github.com/MTES-MCT/trackdechets/pull/3807)
+- Rendre les BSFFs en brouillon inaccessibles aux entreprises dont l'auteur ne fait pas partie [PR 3793](https://github.com/MTES-MCT/trackdechets/pull/3793)
+- Passage au DSFR de la modale de signature transporteur du BSVHU [PR 3809](https://github.com/MTES-MCT/trackdechets/pull/3809)
+- Le champ destinationCap du BSDA est scellé à partir de l'étape de transport (ou émission si pas d'entreprise de travaux) [PR 3778](https://github.com/MTES-MCT/trackdechets/pull/3778)
+- Les BSDA sont désormais inclus dans les transferts de bordereaux d'un SIRET mis en sommeil vers un autre SIRET [PR 3777](https://github.com/MTES-MCT/trackdechets/pull/3777)
+
+#### :bug: Corrections de bugs
+
+- Ne pas doubler les quantités restantes à regrouper lorsqu'on modifie un bordereau de groupement [PR 3760](https://github.com/MTES-MCT/trackdechets/pull/3760)
+- Retirer la possibilité de réviser une Annexe 1 avant la signature de l'enlèvement pour tous les acteurs [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
+- Retirer les accès à la révision pour les profils Négociant, Courtier et Autre intermédiaire [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
+- Impossible de changer de destination finale sur un BSDD avec entreposage provisoire si la destination finale initialement renseignée a été mise en sommeil [PR 3804](https://github.com/MTES-MCT/trackdechets/pull/3804)
+- Les intermédiaires n'apparaissent pas sur le récépissé PDF du BSDA [PR 3796](https://github.com/MTES-MCT/trackdechets/pull/3796)
+- Corrige l'affichage des décimales sur le poids du PAOH [PR 3808](https://github.com/MTES-MCT/trackdechets/pull/3808)
+- La vérification de l'avis de situation SIRENE ne fonctionne pas pour les établissements anonymes lorsque le SIRET du siège est différent du SIRET de l'établissement [PR 3794](https://github.com/MTES-MCT/trackdechets/pull/3794)
+- Corrige la sélection d'un organisme de certification amiante dans la création d'un établissement [PR 3797](https://github.com/MTES-MCT/trackdechets/pull/3797)
+- Corrige le sélecteur d'entreprise sur le dashboard n'affichant qu'un seul résultat [PR 3799](https://github.com/MTES-MCT/trackdechets/pull/3799)
+- Amélioration d'affichange de la page Mes établissements [PR 3798](https://github.com/MTES-MCT/trackdechets/pull/3798)
+
 # [2024.11.1] 19/11/2024
 
 #### :rocket: Nouvelles fonctionnalités
@@ -12,6 +61,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Permettre l'ajout d'un numéro libre sur le Bsvhu [PR 3718](https://github.com/MTES-MCT/trackdechets/pull/3718)
 - Permettre à l'utilisateur de gérer les alertes de tous ses établissements [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
 - Afficher le nombre d'inscrits par type d'alertes au sein d'un établissement [PR 3688](https://github.com/MTES-MCT/trackdechets/pull/3688)
+- Ajouter un lien "Gérer mes préférences e-mails" dans les e-mails transactionnels auquel l'utilisateur est en capacité de s'inscrire / désinscrire [PR 3738](https://github.com/MTES-MCT/trackdechets/pull/3738)
+
+#### :nail_care: Améliorations
+
+- La mention ADR a été séparée des mentions RID, ADNR, IMDG, et désormais un switch permet de préciser si elle est obligatoire pour un BSDD ou non (+ amélioration du PDF) [PR 3714](https://github.com/MTES-MCT/trackdechets/pull/3714) [PR 3717](https://github.com/MTES-MCT/trackdechets/pull/3717) [PR 3724](https://github.com/MTES-MCT/trackdechets/pull/3724)
 
 #### :boom: Breaking changes
 
@@ -22,6 +76,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Corrige l'indexation des annexes 1 orphelines et draft [PR 3721](https://github.com/MTES-MCT/trackdechets/pull/3721)
+- Dans l'onglet "A collecter", l'icône d'immatriculation est disponible pour tous les BSDs [PR 3715](https://github.com/MTES-MCT/trackdechets/pull/3715)
+- Le profil "Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780)" ne se coche plus automatiquement lorsqu'on sélectionne le profil TTR "Autre cas de déchets non dangereux (Rubrique 2731) et inversement [PR 3726](https://github.com/MTES-MCT/trackdechets/pull/3726)
+- ETQ intermédiaire, je peux créer un BSDA sur lequel j'apparais [PR 3732](https://github.com/MTES-MCT/trackdechets/pull/3732)
+- ETQ utilisateur je peux réviser un DASRI en attente d'un bordereau suite [PR 3734](https://github.com/MTES-MCT/trackdechets/pull/3734)
+- ETQ transporteur je peux réviser une Annexe 1 [PR 3740](https://github.com/MTES-MCT/trackdechets/pull/3740)
+- La mention ADR d'un BSDD n'est plus dupliquée [PR 3703](https://github.com/MTES-MCT/trackdechets/pull/3703)
 
 #### :house: Interne
 
@@ -43,6 +103,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - ETQ membre d'un établissement, je peux gérer mes préférences de notifications (demandes de rattachement, demandes de révisions, renouvellement code signature, etc) en lien avec cet établissement [PR 3634](https://github.com/MTES-MCT/trackdechets/pull/3634)
 - Amélioration du contenu de l'e-mail transactionnel envoyé au contact d'un établissement visé sur un bordereau en tant qu'émetteur [PR 3635](https://github.com/MTES-MCT/trackdechets/pull/3635)
 - Rendre les brouillons BSVHU non accessibles aux entreprises mentionnées sur le bordereau mais qui n'en sont pas les auteurs [PR 3677](https://github.com/MTES-MCT/trackdechets/pull/3677)
+- Modification des valeurs de l'enum EmptyReturnADR [PR 3707](https://github.com/MTES-MCT/trackdechets/pull/3707)
 
 #### :boom: Breaking changes
 

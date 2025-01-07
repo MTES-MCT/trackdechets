@@ -7,7 +7,7 @@
     "build": {
       "executor": "@nx/esbuild:esbuild",
       "dependsOn": [
-        "^codegen",
+        "^build",
         {
           "projects": ["@td/prisma"],
           "target": "generate"

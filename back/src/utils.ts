@@ -112,6 +112,13 @@ export const xDaysAgo = (baseDate: Date, daysAgo: number): Date => {
   return new Date(clonedDate.toDateString());
 };
 
+/**
+ * BaseDate + x days
+ */
+export const inXDays = (baseDate: Date, inDays: number): Date => {
+  return xDaysAgo(baseDate, -inDays);
+};
+
 export function sanitizeEmail(email: string): string {
   return email.toLowerCase().trim();
 }

@@ -1,8 +1,8 @@
 import { resetDatabase } from "../../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
-} from "../../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../../__tests__/factories";
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../../__tests__/factories";
@@ -94,7 +94,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     );
   });
 
-  it("should fail if current user is neither emitter or recipient of the bsda", async () => {
+  it("should fail if current user is neither emitter, recipient, worker or ecoorg of the bsda", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
@@ -154,6 +154,89 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     expect(data.createBsdaRevisionRequest.authoringCompany.siret).toBe(
       company.siret
     );
+  });
+
+  it("should be possible for eco-organisme to create a revision request", async () => {
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
+
+    const { user, company: ecoOrganisme } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { waste: { code: "16 01 11*" } },
+          comment: "A comment",
+          authoringCompanySiret: ecoOrganisme.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+    expect(data.createBsdaRevisionRequest.authoringCompany.siret).toBe(
+      ecoOrganisme.siret
+    );
+  });
+
+  it("should include eco-organisme in approvers", async () => {
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const { company: ecoOrganisme } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { waste: { code: "16 01 11*" } },
+          comment: "A comment",
+          authoringCompanySiret: emitterCompany.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+    const approverSirets = data.createBsdaRevisionRequest.approvals.map(
+      a => a.approverSiret
+    );
+    expect(approverSirets).toContain(ecoOrganisme.siret);
   });
 
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {

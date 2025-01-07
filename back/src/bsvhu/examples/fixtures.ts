@@ -48,6 +48,10 @@ const receiptInput = {
   validityLimit: "2020-06-30"
 };
 
+const platesInput = {
+  plates: "XY-23-TE"
+};
+
 function transporterInput(siret: string) {
   return {
     company: transporterCompanyInput(siret)
@@ -94,5 +98,6 @@ export default {
   broyeurCompanyInput,
   broyeurInput,
   receptionInput,
-  operationInput
+  operationInput,
+  platesInput
 };

@@ -1,9 +1,13 @@
+import { OperationMode } from "@prisma/client";
 import {
+  ALL_TD_PROCESSING_OPERATIONS_CODES,
   BSDD_WASTE_CODES_ENUM,
   isSiret,
-  PROCESSING_OPERATIONS_CODES_ENUM,
-  WASTE_CODES_BALE
+  TdOperationCodeEnum,
+  WASTE_CODES_BALE,
+  WasteCodeEnum
 } from "@td/constants";
+import { sub } from "date-fns";
 import { z } from "zod";
 
 export const reasonSchema = z
@@ -21,7 +25,7 @@ export const reasonSchema = z
 
     return val;
   })
-  .optional();
+  .nullish();
 
 export const publicIdSchema = z
   .string({
@@ -35,12 +39,12 @@ export const publicIdSchema = z
       "Le numéro unique ne peut contenir que des lettres, des chiffres, des tirets, des underscores et des points"
   });
 
-export const reportAsSiretSchema = z
+export const reportAsCompanySiretSchema = z
   .union([
-    z.string().optional(),
+    z.string().nullish(),
     z
       .number()
-      .optional()
+      .nullish()
       .transform(val => (val ? String(val) : undefined))
   ])
   .pipe(
@@ -52,43 +56,130 @@ export const reportAsSiretSchema = z
       .refine(value => {
         return isSiret(value);
       }, "Le SIRET du déclarant n'est pas un SIRET valide")
-      .optional()
+      .nullish()
   );
 
-export const wasteCodeSchema = z.nativeEnum(BSDD_WASTE_CODES_ENUM, {
-  required_error: "Le code déchet est requis",
-  invalid_type_error:
-    "Le code déchet n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces."
-});
+export const getReportForSiretSchema = (name: string) =>
+  z.coerce
+    .string({
+      invalid_type_error: `Le SIRET ${name} doit être une chaîne de caractères`
+    })
+    .min(14, `Le SIRET ${name} ne doit pas faire moins de 14 chiffres`)
+    .max(14, `Le SIRET ${name} ne doit pas faire plus de 14 chiffres`)
+    .refine(value => {
+      return isSiret(value);
+    }, `Le SIRET ${name} n'est pas un SIRET valide`);
+
+export const getWasteCodeSchema = (
+  wasteCodes: WasteCodeEnum = BSDD_WASTE_CODES_ENUM
+) =>
+  z.enum(wasteCodes, {
+    required_error: "Le code déchet est requis",
+    invalid_type_error:
+      "Le code déchet n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces."
+  });
+
+export const wastePopSchema = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error: "Le champ POP est requis",
+        invalid_type_error:
+          "Le champ POP n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  { invalid_type_error: "Le champ POP saisi n'est pas valide" }
+);
+
+export const wasteIsDangerousSchema = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error: "Le champ Dangereux est requis",
+        invalid_type_error:
+          "Le champ Dangereux n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI")
+      .nullish(),
+    z.boolean().nullish()
+  ],
+  { invalid_type_error: "Le champ Dangereux saisi n'est pas valide" }
+);
 
 export const wasteDescriptionSchema = z
   .string()
   .min(2, "La dénomination usuelle du déchet doit faire au moins 2 caractères")
   .max(
-    150,
-    "La dénomination usuelle du déchet ne peut pas dépasser 150 caractères"
+    200,
+    "La dénomination usuelle du déchet ne peut pas dépasser 200 caractères"
   );
 
-export const wasteCodeBaleSchema = z.enum(WASTE_CODES_BALE).optional();
+export const wasteCodeBaleSchema = z.enum(WASTE_CODES_BALE).nullish();
 
-export const operationCodeSchema = z
-  .string()
-  .transform(val => val.replace(/([A-Z])(\d)/, "$1 $2")) // D5 becomes D 5
-  .pipe(
-    z.nativeEnum(PROCESSING_OPERATIONS_CODES_ENUM, {
-      required_error: "Le code de traitement est requis",
+export const getOperationCodeSchema = (
+  operationCodes: TdOperationCodeEnum = ALL_TD_PROCESSING_OPERATIONS_CODES
+) =>
+  z
+    .string()
+    .transform(val => val.replace(/([A-Z])(\d)/, "$1 $2")) // D5 becomes D 5
+    .pipe(
+      z.enum(operationCodes, {
+        required_error: "Le code de traitement est requis",
+        invalid_type_error:
+          "Le code de traitement n'est pas une valeur autorisée. Valeurs possibles: R 0 à R 13, D 1 à D 15"
+      })
+    );
+
+export const operationModeSchema = z
+  .enum(
+    [
+      "Réutilisation",
+      "Reutilisation",
+      "REUTILISATION",
+      "RECYCLAGE",
+      "Recyclage",
+      "Valorisation énergétique",
+      "VALORISATION_ENERGETIQUE",
+      "Élimination",
+      "Elimination",
+      "ELIMINATION"
+    ],
+    {
+      required_error: "Le code de qualification est requis",
       invalid_type_error:
-        "Le code de traitement n'est pas une valeur autorisée. Valeurs possibles: R1 à R13, D1 à D15"
-    })
-  );
+        "Le code de qualification n'est pas une valeur autorisée. Valeurs possibles: Réutilisation, Recyclage, Valorisation énergétique ou Élimination"
+    }
+  )
+  .transform(val => {
+    switch (val) {
+      case "Réutilisation":
+      case "Reutilisation":
+      case "REUTILISATION":
+        return OperationMode.REUTILISATION;
+      case "Recyclage":
+      case "RECYCLAGE":
+        return OperationMode.RECYCLAGE;
+      case "Valorisation énergétique":
+      case "VALORISATION_ENERGETIQUE":
+        return OperationMode.VALORISATION_ENERGETIQUE;
+      case "Élimination":
+      case "Elimination":
+      case "ELIMINATION":
+        return OperationMode.ELIMINATION;
+      default:
+        throw Error("Unhandled qualification code");
+    }
+  });
 
 export const weightValueSchema = z.coerce
   .number({
     required_error: "Le poids est requis",
     invalid_type_error: "Le poids doit être un nombre"
   })
-  .min(0, "Le poids ne peut pas être inférieur à 0")
-  .max(100_000_000, "Le poids ne peut pas dépasser 100 000 000")
+  .min(0, "Le poids ne peut pas être inférieur à 0 tonnes")
+  .max(1_000, "Le poids ne peut pas dépasser 1 000 tonnes")
   .multipleOf(0.001, "Le poids ne doit pas avoir plus de 3 décimales");
 
 export const weightIsEstimateSchema = z.union(
@@ -106,44 +197,164 @@ export const weightIsEstimateSchema = z.union(
 );
 
 export const volumeSchema = z
-  .string()
-  .optional()
-  .transform(val => (val ? Number(val) : undefined))
+  .union([
+    z.number().nullish(),
+    z
+      .string()
+      .nullish()
+      .transform(val => (val ? Number(val) : undefined))
+  ]) // No coercion to keep .nullish()
   .pipe(
     z
       .number({
-        required_error: "La quantité est requise",
-        invalid_type_error: "La quantité doit être un nombre"
+        required_error: "Le volume est requis",
+        invalid_type_error: "Le volume doit être un nombre"
       })
-      .min(0, "La quantité ne peut pas être inférieure à 0")
-      .max(100_000_000, "La quantité ne peut pas dépasser 100 000 000")
-      .multipleOf(0.001, "La quantité ne doit pas avoir plus de 3 décimales")
-      .optional()
+      .min(0, "Le volume ne peut pas être inférieur à 0")
+      .max(1_000, "Le volume ne peut pas dépasser 1 000 M3")
+      .multipleOf(0.001, "Le volume ne doit pas avoir plus de 3 décimales")
+      .nullish()
   );
 
-export const getActorTypeSchema = (name: string) =>
-  z.enum(
-    ["ENTREPRISE_FR", "ENTREPRISE_UE", "ENTREPRISE_HORS_UE", "ASSOCIATION"],
-    {
-      required_error: `Le type ${name} est requis`,
-      invalid_type_error: `Le type ${name} n'est pas une valeur autorisée. Valeurs possibles: ENTREPRISE_FR, ENTREPRISE_UE, ENTREPRISE_HORS_UE, ASSOCIATION`
-    }
-  );
+export const receptionDateSchema = z.coerce
+  .date()
+  .min(
+    sub(new Date(), { years: 1 }),
+    "La date réception ne peut pas être antérieure à J-1an"
+  )
+  .max(new Date(), "La date réception ne peut pas être dans le futur");
 
-export const getActorOrgIdSchema = (name: string) =>
-  z
-    .union([z.string(), z.number().transform(val => String(val))])
-    .pipe(
+export const inseeCodesSchema = z
+  .string()
+  .nullish()
+  .transform(val =>
+    val
+      ? String(val)
+          .split(",")
+          .map(val => val.trim())
+      : []
+  )
+  .pipe(z.array(z.string()));
+
+export const municipalitiesNamesSchema = z
+  .string()
+  .nullish()
+  .transform(val =>
+    val
+      ? String(val)
+          .split(",")
+          .map(val => val.trim())
+      : []
+  )
+  .pipe(
+    z.array(
       z
         .string()
         .min(
           1,
-          `Le numéro d'identification ${name} doit faire plus d'1 caractère`
+          "Le libellé de la commune de collecte de déchet doit faire plus de 1 caractère"
         )
         .max(
-          27,
-          `Le numéro d'identification ${name} ne peut pas dépasser 27 caractères`
+          300,
+          "Le libellé de la commune de collecte de déchet doit faire moins de 300 caractères"
         )
+    )
+  );
+
+export const noTraceability = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error: "Le champ rupture de traçabilité autorisée est requis",
+        invalid_type_error:
+          "Le champ rupture de traçabilité autorisée n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  {
+    invalid_type_error:
+      "Le champ rupture de traçabilité autorisée saisi n'est pas valide"
+  }
+);
+
+export const nextDestinationIsAbroad = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error:
+          "Le champ destination ultérieure à l'étranger est requis",
+        invalid_type_error:
+          "Le champ destination ultérieure à l'étranger n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  {
+    invalid_type_error:
+      "Le champ destination ultérieure à l'étranger saisi n'est pas valide"
+  }
+);
+
+export const declarationNumberSchema = z
+  .string()
+  .regex(/^A7[EI][0-9]{10}$/)
+  .nullish();
+
+export const notificationNumberSchema = z
+  .string()
+  .regex(/^[A-Z]{2}[0-9]{10}$/)
+  .nullish();
+
+export const parcelNumbersSchema = z
+  .string()
+  .nullish()
+  .transform(val =>
+    val
+      ? String(val)
+          .split(",")
+          .map(val => val.trim())
+      : []
+  )
+  .pipe(z.array(z.string().regex(/^\d{3}-[A-Z]{2}-\d{2}$/)));
+
+export const parcelCoordinatesSchema = z
+  .string()
+  .nullish()
+  .transform(val =>
+    val
+      ? String(val)
+          .split(",")
+          .map(val => val.trim())
+      : []
+  )
+  .pipe(
+    z.array(z.string().regex(/^[NEWS] -?\d+(\.\d+)? [NEWS] -?\d+(\.\d+)?$/))
+  );
+
+export const getActorTypeSchema = (name: string) =>
+  z.enum(
+    [
+      "ETABLISSEMENT_FR",
+      "ENTREPRISE_UE",
+      "ENTREPRISE_HORS_UE",
+      "ASSOCIATION",
+      "PERSONNE_PHYSIQUE",
+      "COMMUNE"
+    ],
+    {
+      required_error: `Le type ${name} est requis`,
+      invalid_type_error: `Le type ${name} n'est pas une valeur autorisée. Valeurs possibles: ETABLISSEMENT_FR, ENTREPRISE_UE, ENTREPRISE_HORS_UE, ASSOCIATION`
+    }
+  );
+
+export const getActorOrgIdSchema = (name: string) =>
+  z.coerce
+    .string()
+    .min(1, `Le numéro d'identification ${name} doit faire plus d'1 caractère`)
+    .max(
+      27,
+      `Le numéro d'identification ${name} ne peut pas dépasser 27 caractères`
     );
 
 export const getActorSiretSchema = (name: string) =>
@@ -156,7 +367,7 @@ export const getActorSiretSchema = (name: string) =>
     .refine(value => {
       return isSiret(value);
     }, "Le SIRET du déclarant n'est pas un SIRET valide")
-    .optional();
+    .nullish();
 
 export const getActorNameSchema = (name: string) =>
   z
@@ -201,11 +412,27 @@ export const getActorCountryCodeSchema = (name: string) =>
   }, `Le code du pays ${name} n'est pas valide. Il doit être composé de 2 lettres majuscules`);
 
 export const transportModeSchema = z
-  .enum(["ROUTE", "AÉRIEN", "FLUVIAL", "MARITIME", "PIPELINE", "FERRÉ"], {
-    required_error: "Le mode de transport est requis",
-    invalid_type_error:
-      "Le mode de transport n'est pas valide. Consultez la documentation pour la liste des valeurs possibles"
-  })
+  .enum(
+    [
+      "ROUTE",
+      "AÉRIEN",
+      "FLUVIAL",
+      "MARITIME",
+      "PIPELINE",
+      "FERRÉ",
+      "ROAD",
+      "AIR",
+      "RIVER",
+      "SEA",
+      "OTHER",
+      "RAIL"
+    ],
+    {
+      required_error: "Le mode de transport est requis",
+      invalid_type_error:
+        "Le mode de transport n'est pas valide. Consultez la documentation pour la liste des valeurs possibles"
+    }
+  )
   .transform(val => {
     switch (val) {
       case "ROUTE":
@@ -221,11 +448,29 @@ export const transportModeSchema = z
       case "FERRÉ":
         return "RAIL";
       default:
-        throw Error("Unhandled transport mode");
+        return val;
     }
   });
 
-export const transportReceiptNumberSchema = z
+export const transportRecepisseIsExemptedSchema = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error:
+          "Le champ exemption de récépissé transporteur est requis",
+        invalid_type_error:
+          "Le champ exemption de récépissé transporteur n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  {
+    invalid_type_error:
+      "Le champ exemption de récépissé transporteur saisi n'est pas valide"
+  }
+);
+
+export const transportRecepisseNumberSchema = z
   .string()
   .min(
     5,
@@ -235,3 +480,19 @@ export const transportReceiptNumberSchema = z
     50,
     "Le numéro de récépissé de transport ne peut pas dépasser 50 caractères"
   );
+
+export const isUpcycledSchema = z.union(
+  [
+    z
+      .enum(["OUI", "NON"], {
+        required_error: "Le champ terre valorisée est requis",
+        invalid_type_error:
+          "Le champ terre valorisée n'est pas valide. Valeurs possibles: OUI, NON"
+      })
+      .transform(val => val === "OUI"),
+    z.boolean()
+  ],
+  {
+    invalid_type_error: "Le champ terre valorisée saisi n'est pas valide"
+  }
+);

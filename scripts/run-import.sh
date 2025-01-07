@@ -1,5 +1,11 @@
 #!/bin/bash
 
+bold=$(tput bold)
+reset=$(tput sgr0)
+green=$(tput setaf 2)
+red=$(tput setaf 9)
+blue=$(tput setaf 4)
+
 if [ -f .env ]
 then
   export "$(<.env xargs)"
@@ -8,32 +14,33 @@ fi
 CURRENT_DIR=$(pwd)
 if [ -z "$TD_XSLX2CSV_PATH" ];
 then
-    echo -e "\e[91mPlease set \$TD_XSLX2CSV_PATH either as ENV or in .env file (ex: home/you/trackdechets-xslx2csv/src)\e[m"
+    echo "${red}Please set \$TD_XSLX2CSV_PATH either as ENV or in .env file (ex: home/you/trackdechets-xslx2csv/src)${reset}"
     exit
 fi
 
-while read -erp $'\e[1m? Enter local XLS path :\e[m ' xlsPath; do
-    if [ -f "$xlsPath" ]; then
+while read -erp "${bold}? Enter local XLS path :${reset} " xlsPath; do
+    cleanedPath=$(echo "$xlsPath" | sed -e 's/\\ / /g')
+    if [ -f "$cleanedPath" ]; then
         break
     else
-        echo -e "\e[91m$xlsPath is not a valid path.\e[m"
+        echo "${red}$cleanedPath is not a valid path.${reset}"
     fi 
 done
 
-echo -e "\e[1m→ Spawning XSLX2CSV CLI...\e[m"
-echo -e "\e[1m→ Please use the 'Export csv' action\e[m"
-echo -e "\e[94m-------------------------------------------------------\e[m"
+echo "${bold}→ Spawning XSLX2CSV CLI...${reset}"
+echo "${bold}→ Please use the 'Export csv' action${reset}"
+echo "${blue}-------------------------------------------------------${reset}"
 cd "$TD_XSLX2CSV_PATH" || exit
-pipenv run python xlsx2csv.py "$xlsPath"
-echo -e "\e[94m-------------------------------------------------------\e[m"
+pipenv run python xlsx2csv.py "$cleanedPath"
+echo "${blue}-------------------------------------------------------${reset}"
 
 cd "$CURRENT_DIR" || exit
 OUTPUT_DIR="$TD_XSLX2CSV_PATH/csv"
 
-echo -e "\e[1m→ Listing extracted files\e[m"
+echo "${bold}→ Listing extracted files${reset}"
 ls "$OUTPUT_DIR"
 
-read -erp $'\e[1m? Proceed with import \e[m (Y/n) ' -n 1 PROCEED
+read -erp "${bold}? Proceed with import ${reset} (Y/n) " -n 1 PROCEED
 PROCEED=${PROCEED:-Y}
 
 if [[ ! $PROCEED =~ ^[Yy]$ ]]

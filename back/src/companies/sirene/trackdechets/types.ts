@@ -1,4 +1,4 @@
-import { StatutDiffusionEtablissement } from "../../../generated/graphql/types";
+import type { StatutDiffusionEtablissement } from "@td/codegen-back";
 
 export interface SearchStockEtablissement {
   siren: string;

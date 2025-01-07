@@ -3,6 +3,7 @@ import { prisma } from "@td/prisma";
 import { Job } from "bull";
 import { getFormRepository } from "../../forms/repository";
 import { AuthType } from "../../auth";
+import { getBsdaRepository } from "../../bsda/repository";
 
 export type AdministrativeTransferArgs = { fromOrgId: string; toOrgId: string };
 
@@ -45,6 +46,28 @@ export async function processAdministrativeTransferJob(
       recipientCompanyContact: toCompany.contact,
       recipientCompanyMail: toCompany.contactEmail,
       recipientCompanyPhone: toCompany.contactPhone
+    }
+  );
+
+  // BSDAs
+  const bsdaRepository = getBsdaRepository({
+    auth: AuthType.Bearer,
+    id: "JOB_ADMINISTRATIVE_TRANSFER",
+    name: "JOB_ADMINISTRATIVE_TRANSFER"
+  } as Express.User);
+
+  await bsdaRepository.updateMany(
+    {
+      destinationCompanySiret: fromOrgId,
+      status: "AWAITING_CHILD"
+    },
+    {
+      destinationCompanySiret: toCompany.orgId,
+      destinationCompanyName: toCompany.name,
+      destinationCompanyAddress: toCompany.address,
+      destinationCompanyContact: toCompany.contact,
+      destinationCompanyMail: toCompany.contactEmail,
+      destinationCompanyPhone: toCompany.contactPhone
     }
   );
 

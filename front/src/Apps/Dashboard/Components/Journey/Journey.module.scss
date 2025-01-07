@@ -1,0 +1,120 @@
+.Journey {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-left: calc(1rem + 5px); // account for the radius of journey stops
+
+  &:not(:last-child) {
+    padding-bottom: 1rem;
+  }
+}
+
+.JourneyStop {
+  position: relative;
+
+  &:not(:last-child) {
+    padding-bottom: 1rem;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -1rem;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      #dddddd 0%,
+      #dddddd 50%,
+      #dddddd 50%,
+      #dddddd 100%
+    );
+    transform: translate(-50%, 0);
+  }
+
+  &:first-child,
+  &:last-child {
+    &::before {
+      height: 50%;
+    }
+  }
+
+  &:first-child::before {
+    top: 50%;
+  }
+
+  &:last-child::before {
+    top: 0;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -1rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #dddddd;
+    transform: translate(-50%, -50%);
+    border: 2px solid #fff;
+  }
+}
+.JourneyStopComplete {
+  &::before {
+    background: linear-gradient(
+      180deg,
+      #000091 0%,
+      #000091 50%,
+      #000091 50%,
+      #000091 100%
+    );
+  }
+
+  &::after {
+    background-color: #000091;
+    border-color: #000091;
+  }
+}
+
+.JourneyStopActive {
+  &:not(:first-child):not(:last-child)::before {
+    background: linear-gradient(
+      180deg,
+      #000091 0%,
+      #000091 50%,
+      #dddddd 50%,
+      #dddddd 100%
+    );
+  }
+
+  &:last-child::before {
+    background: linear-gradient(
+      180deg,
+      #000091 0%,
+      #000091 50%,
+      #000091 50%,
+      #000091 100%
+    );
+  }
+
+  &::after {
+    background-color: #dddddd;
+    border-color: #000091;
+  }
+
+  @keyframes example {
+    from {
+      border-color: #dddddd;
+    }
+    to {
+      border-color: #000091;
+    }
+  }
+}
+
+.JourneyStopName {
+  font-size: 0.875rem !important;
+  line-height: 1.5rem !important;
+}

@@ -6,7 +6,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
-import { Query } from "../../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 import { fullBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
 

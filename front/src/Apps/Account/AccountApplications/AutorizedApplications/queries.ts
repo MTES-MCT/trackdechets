@@ -5,7 +5,6 @@ export const AUTHORIZED_APPLICATIONS = gql`
     authorizedApplications {
       id
       name
-      logoUrl
       lastConnection
       admin
     }

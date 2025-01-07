@@ -5,10 +5,7 @@ import {
   UserRole
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Mutation,
-  MutationDeleteBsffArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationDeleteBsffArgs } from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
@@ -240,7 +237,8 @@ describe("Mutation.deleteBsff", () => {
             weight: p.acceptationWeight!,
             previousPackagings: { connect: { id: p.id } }
           }))
-        }
+        },
+        canAccessDraftOrgIds: [ttr.company.siret!]
       },
       include: { packagings: true }
     });
@@ -310,7 +308,8 @@ describe("Mutation.deleteBsff", () => {
               connect: initialBsff.packagings.map(p => ({ id: p.id }))
             }
           }
-        }
+        },
+        canAccessDraftOrgIds: [ttr.company.siret!]
       },
       include: { packagings: true }
     });
@@ -380,7 +379,8 @@ describe("Mutation.deleteBsff", () => {
               connect: { id: initialBsff.packagings[0].id }
             }
           }
-        }
+        },
+        canAccessDraftOrgIds: [ttr.company.siret!]
       },
       include: { packagings: true }
     });

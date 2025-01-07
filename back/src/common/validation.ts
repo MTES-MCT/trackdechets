@@ -12,7 +12,7 @@ import {
   isWasteProcessor,
   isWasteVehicles
 } from "../companies/validation";
-import { CompanyInput } from "../generated/graphql/types";
+import type { CompanyInput } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   isForeignVat,
@@ -27,6 +27,8 @@ import {
   canProcessDangerousWaste,
   canProcessNonDangerousWaste
 } from "../companies/companyProfilesRules";
+import { INVALID_DESTINATION_SUBPROFILE } from "../forms/errors";
+
 // Poids maximum en tonnes tout mode de transport confondu
 export const MAX_WEIGHT_TONNES = 50000;
 
@@ -228,7 +230,7 @@ const { VERIFY_COMPANY, VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER } =
   process.env;
 
 // Date de la MAJ 2024.11.1 qui rend obligatoire certtains sous profils pour traiter les déchets dangereux et non dangereux
-const v20241101 = new Date(
+export const v20241101 = new Date(
   VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER ||
     "2024-11-19T00:00:00.000Z"
 );
@@ -322,24 +324,21 @@ export const siretTests: SiretTests = {
   },
   destinationHasAppropriateSubProfiles: {
     name: "destination-has-appropriate-subprofiles",
-    message: () =>
-      "Les autorisations de l'établissement de destination ne semblent pas correspondre à la caractérisation du déchet " +
-      "renseigné. Merci de bien vouloir procéder à la mise à jour du profil de l'établissement ou modifier le type de " +
-      "déchet sans quoi le bordereau ne pourra être enregistré.",
+    message: () => INVALID_DESTINATION_SUBPROFILE,
     test: async (siret, ctx) => {
       if (!siret) return true;
 
       // do not run on existing bsdds created before release v20241101
       const bsddCreatedAt = ctx.parent.createdAt || new Date(); // new bsd do not have a createdAt yet
       const isCreatedAfterV202411011 =
-        bsddCreatedAt.getTime() - v20241101.getTime() > 0;
+        bsddCreatedAt.getTime() > v20241101.getTime();
 
       if (!isCreatedAfterV202411011) {
         return true;
       }
 
       const hasDangerousWaste =
-        isDangerous(ctx.parent.wasteDetailCode) ||
+        isDangerous(ctx.parent.wasteDetailsCode) ||
         ctx.parent.wasteDetailsPop ||
         ctx.parent.wasteDetailsIsDangerous;
 
@@ -356,6 +355,35 @@ export const siretTests: SiretTests = {
     }
   }
 };
+
+export async function validateRecipientSubprofiles(siret, bsdd) {
+  if (!siret) return true;
+
+  // do not run on existing bsdds created before release v20241101
+  const bsddCreatedAt = bsdd.createdAt || new Date(); // new bsd do not have a createdAt yet
+  const isCreatedAfterV202411011 =
+    bsddCreatedAt.getTime() - v20241101.getTime() > 0;
+
+  if (!isCreatedAfterV202411011) {
+    return true;
+  }
+
+  const hasDangerousWaste =
+    isDangerous(bsdd.wasteDetailsCode) ||
+    bsdd.wasteDetailsPop ||
+    bsdd.wasteDetailsIsDangerous;
+
+  const company = await prisma.company.findUnique({
+    where: { siret }
+  });
+  if (company === null) {
+    return true; // catched by siretTests.isRegistered
+  }
+
+  return hasDangerousWaste
+    ? canProcessDangerousWaste(company)
+    : canProcessNonDangerousWaste(company);
+}
 
 // Different tests that can be applied to a vat number
 type VatNumberTests = {

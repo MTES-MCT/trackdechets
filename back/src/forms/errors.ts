@@ -117,3 +117,7 @@ export const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseign�
 
 export const INVALID_INDIVIDUAL_OR_FOREIGNSHIP =
   "Ne peut pas être à la fois un particulier et un navire étranger";
+
+export const INVALID_DESTINATION_SUBPROFILE =
+  "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+  " Il lui appartient de mettre à jour son profil.";

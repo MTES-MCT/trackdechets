@@ -25,6 +25,7 @@ const fragment = gql`
       bsdRefusal
       bsdaFinalDestinationUpdate
       revisionRequest
+      registryDelegation
     }
     users {
       id
@@ -36,6 +37,7 @@ const fragment = gql`
         bsdRefusal
         bsdaFinalDestinationUpdate
         revisionRequest
+        registryDelegation
       }
     }
   }

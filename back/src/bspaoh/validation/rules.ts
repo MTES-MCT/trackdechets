@@ -1,9 +1,6 @@
 import { Prisma, User, WasteAcceptationStatus } from "@prisma/client";
 import { RefinementCtx, z } from "zod";
-import {
-  BspaohInput,
-  BspaohSignatureType
-} from "../../generated/graphql/types";
+import type { BspaohInput, BspaohSignatureType } from "@td/codegen-back";
 import { capitalize } from "../../common/strings";
 import { ZodFullBspaoh } from "./schema";
 import { isForeignVat } from "@td/constants";
@@ -48,6 +45,7 @@ type EditableBspaohFields = Required<
     | "transportersSirets"
     | "canAccessDraftSirets"
     | "transporterTransportTakenOverAt"
+    | "registryLookups"
   >
 >;
 

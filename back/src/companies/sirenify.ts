@@ -1,11 +1,11 @@
 import { AuthType } from "../auth";
 import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
-import { CompanySearchResult } from "../companies/types";
-import {
+import type {
+  CompanySearchResult,
   CompanyInput,
   StatutDiffusionEtablissement
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
 import { SireneSearchResult } from "./sirene/types";
@@ -117,6 +117,7 @@ export default function buildSirenify<T>(
 export type NextCompanyInputAccessor<T> = {
   siret: string | null | undefined;
   skip: boolean;
+  setterIfNotFound?: (input: T) => void;
   setter: (
     input: T,
     data: {
@@ -152,8 +153,11 @@ export function nextBuildSirenify<T>(
     const sirenifiedInput = { ...input };
 
     for (const [idx, companySearchResult] of companySearchResults.entries()) {
-      const { setter } = accessors[idx];
+      const { setter, setterIfNotFound } = accessors[idx];
       if (!companySearchResult) {
+        if (setterIfNotFound) {
+          setterIfNotFound(sirenifiedInput);
+        }
         continue;
       }
       const company = companySearchResult as CompanySearchResult;

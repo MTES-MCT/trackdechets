@@ -1,24 +1,17 @@
 @import "../../../../scss/Breakpoints.scss";
 
 .formSteps {
-  &__tabs {
-    overflow: hidden;
-    overflow-y: scroll;
-    max-height: 380px;
-  }
-  &__actions {
+  .fr-btns-group > div {
     display: flex;
     justify-content: space-between;
-    margin-top: 2rem;
-    &__cta-group {
-      display: flex;
-      flex-direction: column;
-      @include tablet {
-        flex-direction: row;
-      }
-      gap: 1rem;
-    }
+    flex-wrap: wrap;
   }
+
+  .fr-modal__footer {
+    padding: 2rem 0;
+    margin-top: 0;
+  }
+
   .tabError {
     background-color: var(--light-background-contrast-error, #ffe9e9);
     &[aria-selected="true"]:not(:disabled) {

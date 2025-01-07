@@ -1,5 +1,5 @@
 import { ParsedZodBsda, ParsedZodBsdaTransporter } from "./schema";
-import { CompanyInput } from "../../generated/graphql/types";
+import type { CompanyInput } from "@td/codegen-back";
 import {
   nextBuildSirenify,
   NextCompanyInputAccessor

@@ -371,9 +371,9 @@ describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
             ]
           }
         ],
-        params: {
+        params: expect.objectContaining({
           body: expect.any(String)
-        }
+        })
       },
       expect.anything()
     );
@@ -474,7 +474,7 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
       {
         subject: "Votre action est attendue sur une demande de révision",
         templateId: 9, // hardcoded console FIRST_ONBOARDING_TEMPLATE_ID template ID
-        params: { body: expect.any(String) },
+        params: expect.objectContaining({ body: expect.any(String) }),
         sender: {
           email: "us@td.test",
           name: "Wastetracker corp."

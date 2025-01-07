@@ -1,0 +1,112 @@
+# https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043884563
+
+type Query {
+  "Renvoie un lien permettant de téléverser un registre au format CSV ou Excel"
+  registryUploadSignedUrl(fileName: String!): SignedUrlResponse!
+
+  "Renvoie un lien permettant de témécharger un fichier du registre"
+  registryDownloadSignedUrl(
+    importId: String!
+    target: RegistryDownloadTarget!
+  ): SignedUrlResponse!
+
+  "Liste des imports de registre"
+  registryImports(
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des imports les plus récents aux imports les plus anciens)
+    Curseur après lequel les imports doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les imports les plus récents
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    after: ID
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `cursorAfter` de paginer "en avant"
+    (des imports les plus récents aux imports les plus anciens)
+    Nombre d'imports retournés après le `cursorAfter`
+    Défaut à 50, maximum à 500
+    """
+    first: Int
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `last` de paginer "en arrière"
+    (des imports les plus anciens aux imports les plus récents)
+    Curseur avant lequel les imports doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les imports les plus anciens
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    before: ID
+
+    """
+    (Optionnel) PAGINATION
+    Nombre d'imports retournés avant le `cursorBefore`
+    Défaut à 50, maximum à 500
+    """
+    last: Int
+
+    "SIRET de l'établissement dont je veux visualiser les imports"
+    siret: String
+
+    "Permet de limiter aux imports que j'ai réalisés"
+    ownImportsOnly: Boolean
+  ): RegistryImportConnection!
+
+  """
+  Permet de consulter uniquement les imports que l'on a réalisé
+  """
+  registryImport(id: ID!): RegistryImport!
+  "Renvoie un lien permettant de télécharger un export de registre précédemment généré"
+  registryV2ExportDownloadSignedUrl(exportId: String!): SignedUrlResponse!
+
+  "Liste des exports de registre demandés"
+  registryV2Exports(
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `first` de paginer "en avant"
+    (des exports les plus récents aux exports les plus anciens)
+    Curseur après lequel les exports doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les exports les plus récents
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    after: ID
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `cursorAfter` de paginer "en avant"
+    (des exports les plus récents aux exports les plus anciens)
+    Nombre d'exports retournés après le `cursorAfter`
+    Défaut à 50, maximum à 500
+    """
+    first: Int
+
+    """
+    (Optionnel) PAGINATION
+    Permet en conjonction avec `last` de paginer "en arrière"
+    (des exports les plus anciens aux exports les plus récents)
+    Curseur avant lequel les exports doivent être retournés
+    Attend un identifiant (propriété `id`) de BSD
+    Défaut à vide, pour retourner les exports les plus anciens
+    Le BSD précisé dans le curseur ne fait pas partie du résultat
+    """
+    before: ID
+
+    """
+    (Optionnel) PAGINATION
+    Nombre d'exports retournés avant le `cursorBefore`
+    Défaut à 50, maximum à 500
+    """
+    last: Int
+  ): RegistryV2ExportConnection!
+
+  """
+  Permet de récupérer un export en particulier
+  """
+  registryV2Export(id: ID!): RegistryV2Export!
+}

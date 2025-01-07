@@ -62,30 +62,44 @@ describe("getOrgIdsByTab", () => {
 
   afterEach(resetDatabase);
 
-  test("status INITIAL (isDraft=true)", async () => {
-    const bsff = await createBsff(
-      { emitter, destination },
-      {
-        data: {
-          isDraft: true,
-          ficheInterventions: { connect: { id: ficheIntervention.id } },
-          transporters: {
-            create: [
-              { transporterCompanySiret: transporter.company.siret, number: 1 },
-              { transporterCompanySiret: transporter2.company.siret, number: 2 }
-            ]
-          }
-        }
-      }
-    );
+  test.each(["emitter", "destination", "transporter", "transporter2"])(
+    "status INITIAL (isDraft=true) role: %p",
+    async role => {
+      const roles = {
+        emitter,
+        destination,
+        transporter,
+        transporter2
+        // detenteur should not be able to access a draft bsff if only mentionned on the fiche
+      };
 
-    const { isDraftFor } = getOrgIdsByTab(bsff);
-    expect(isDraftFor).toContain(emitter.company.siret);
-    expect(isDraftFor).toContain(transporter.company.siret);
-    expect(isDraftFor).toContain(transporter2.company.siret);
-    expect(isDraftFor).toContain(destination.company.siret);
-    expect(isDraftFor).toContain(detenteur.company.siret);
-  });
+      const bsff = await createBsff(
+        { emitter, destination },
+        {
+          data: {
+            isDraft: true,
+            ficheInterventions: { connect: { id: ficheIntervention.id } },
+            transporters: {
+              create: [
+                {
+                  transporterCompanySiret: transporter.company.siret,
+                  number: 1
+                },
+                {
+                  transporterCompanySiret: transporter2.company.siret,
+                  number: 2
+                }
+              ]
+            }
+          },
+          userId: roles[role].user.id
+        }
+      );
+
+      const { isDraftFor } = getOrgIdsByTab(bsff);
+      expect(isDraftFor).toEqual([roles[role].company.siret]);
+    }
+  );
 
   test("status INITIAL (isDraft=false)", async () => {
     const bsff = await createBsff(

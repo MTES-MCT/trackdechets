@@ -32,7 +32,6 @@ export const validationApplicationSchema = z.object({
       message: "Vous devez spécifier une URL valide"
     })
   ),
-  logoUrl: z.string(),
   goal: z.nativeEnum(ApplicationGoal)
 });
 
@@ -89,7 +88,6 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
     useForm<ValidationSchema>({
       defaultValues: {
         name: application?.name || "",
-        logoUrl: application?.logoUrl || "https://",
         redirectUris: application?.redirectUris || ["https://"],
         goal: application?.goal || ApplicationGoal.Personnal
       },
@@ -174,18 +172,6 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
               </div>
             </div>
           )}
-          <div className="fr-grid-row fr-grid-row--gutters">
-            <div className="fr-col-10 fr-col-md-9">
-              <Input
-                label="URL du logo"
-                state={formState.errors?.logoUrl && "error"}
-                stateRelatedMessage={formState.errors?.logoUrl?.message}
-                nativeInputProps={{
-                  ...register("logoUrl")
-                }}
-              />
-            </div>
-          </div>
 
           <label className="fr-label fr-mt-2w fr-pb-1w">
             URL(s) de redirection

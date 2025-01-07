@@ -1,8 +1,9 @@
-import { Prisma, UserRole } from "@prisma/client";
+import { EmitterType, Prisma, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   CompanySearchResult,
-  Mutation
+  Mutation,
+  MutationCreateFormArgs
 } from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
@@ -20,8 +21,17 @@ import {
   getFirstTransporterSync
 } from "../../../database";
 import { searchCompany } from "../../../../companies/search";
+import getReadableId from "../../../readableId";
 
 jest.mock("../../../../companies/search");
+
+const CREATE_FORM = `
+  mutation CreateForm($createFormInput: CreateFormInput!) {
+    createForm(createFormInput: $createFormInput) {
+      id
+    }
+  }
+`;
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
@@ -216,6 +226,7 @@ describe("Mutation.duplicateForm", () => {
       brokerValidityLimit,
       ecoOrganismeName,
       ecoOrganismeSiret,
+      wasteDetailsIsSubjectToADR,
       ...rest
     } = form;
 
@@ -296,8 +307,7 @@ describe("Mutation.duplicateForm", () => {
       "hasCiterneBeenWashedOut",
       "emptyReturnADR",
       "wasteDetailsNonRoadRegulationMention",
-      "wasteDetailsOnuCode",
-      "wasteDetailsIsSubjectToADR"
+      "wasteDetailsOnuCode"
     ];
 
     const expectedSkippedTransporter = [
@@ -394,7 +404,8 @@ describe("Mutation.duplicateForm", () => {
       brokerDepartment,
       brokerValidityLimit,
       ecoOrganismeName,
-      ecoOrganismeSiret
+      ecoOrganismeSiret,
+      wasteDetailsIsSubjectToADR
     });
 
     expect(duplicatedTransporter).toMatchObject({
@@ -1257,4 +1268,131 @@ describe("Mutation.duplicateForm", () => {
       );
     }
   );
+
+  it.each([true, false, null])(
+    "should set `wasteDetailsIsSubjectToADR=true` when waste is dangerous " +
+      "and wasteDetailsIsSubjectToADR is %p on the BSDD being duplicated",
+    async wasteDetailsIsSubjectToADR => {
+      const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret,
+          wasteDetailsIsDangerous: true,
+          wasteDetailsIsSubjectToADR
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+        DUPLICATE_FORM,
+        {
+          variables: {
+            id: form.id
+          }
+        }
+      );
+
+      const duplicatedForm = await prisma.form.findUniqueOrThrow({
+        where: {
+          id: data.duplicateForm.id
+        }
+      });
+
+      expect(duplicatedForm).toEqual(
+        expect.objectContaining({
+          wasteDetailsIsSubjectToADR: true
+        })
+      );
+    }
+  );
+
+  it.each([true, false, null])(
+    "should keep existing wasteDetailsIsSubjectToADR when" +
+      " wasteDetailsIsSubjectToADR is %p and waste is not dangerous",
+    async wasteDetailsIsSubjectToADR => {
+      const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret,
+          wasteDetailsIsDangerous: false,
+          wasteDetailsIsSubjectToADR
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+        DUPLICATE_FORM,
+        {
+          variables: {
+            id: form.id
+          }
+        }
+      );
+
+      const duplicatedForm = await prisma.form.findUniqueOrThrow({
+        where: {
+          id: data.duplicateForm.id
+        }
+      });
+
+      expect(duplicatedForm).toEqual(
+        expect.objectContaining({
+          wasteDetailsIsSubjectToADR
+        })
+      );
+    }
+  );
+
+  it("should not be possible to duplicate annexe 1", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const appendix1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.SEALED,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            type: "APPENDIX1",
+            company: { siret: company.siret }
+          },
+          transporter: { company: { siret: company.siret } },
+          grouping: [{ form: { id: appendix1.id } }]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    // When
+    const { errors: errors2 } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: appendix1.id
+        }
+      }
+    );
+
+    // Then
+    expect(errors2).not.toBeUndefined();
+    expect(errors2[0].message).toBe(
+      "Impossible de dupliquer un bordereau d'annexe 1"
+    );
+  });
 });

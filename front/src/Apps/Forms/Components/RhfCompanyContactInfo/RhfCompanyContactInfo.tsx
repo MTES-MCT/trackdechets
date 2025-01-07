@@ -5,7 +5,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 interface CompanyContactInfoProps {
   fieldName: string;
   disabled?: boolean;
-  name?: string;
+  errorObject?: any;
 }
 
 /**
@@ -22,16 +22,15 @@ interface CompanyContactInfoProps {
  *  <CompanyContactInfo fieldName={fieldName}>
  * <>
  *
+ * Attention : errorObject représente l'objet Zod contenant l'erreur et le message
+ * et doit être fourni par le parent
  */
 export default function CompanyContactInfo({
   fieldName,
   disabled = false,
-  name
+  errorObject
 }: Readonly<CompanyContactInfoProps>) {
-  const {
-    register,
-    formState: { errors }
-  } = useFormContext();
+  const { register } = useFormContext();
 
   return (
     <div>
@@ -40,10 +39,9 @@ export default function CompanyContactInfo({
           <Input
             label="Personne à contacter"
             disabled={disabled}
-            state={errors?.[`${name}`]?.["company"]?.contact && "error"}
+            state={errorObject?.contact && "error"}
             stateRelatedMessage={
-              (errors?.[`${name}`]?.["company"]?.contact?.message as string) ??
-              ""
+              (errorObject?.contact?.message as string) ?? ""
             }
             nativeInputProps={{ ...register(`${fieldName}.contact`) }}
           />
@@ -54,10 +52,8 @@ export default function CompanyContactInfo({
           <Input
             label="Téléphone"
             disabled={disabled}
-            state={errors?.[`${name}`]?.["company"]?.phone && "error"}
-            stateRelatedMessage={
-              (errors?.[`${name}`]?.["company"]?.phone?.message as string) ?? ""
-            }
+            state={errorObject?.phone && "error"}
+            stateRelatedMessage={(errorObject?.phone?.message as string) ?? ""}
             nativeInputProps={{ ...register(`${fieldName}.phone`) }}
           />
         </div>
@@ -65,10 +61,8 @@ export default function CompanyContactInfo({
           <Input
             label="Mail"
             disabled={disabled}
-            state={errors?.[`${name}`]?.["company"]?.mail && "error"}
-            stateRelatedMessage={
-              (errors?.[`${name}`]?.["company"]?.mail?.message as string) ?? ""
-            }
+            state={errorObject?.mail && "error"}
+            stateRelatedMessage={(errorObject?.mail?.message as string) ?? ""}
             nativeInputProps={{
               ...register(`${fieldName}.mail`),
               type: "email"

@@ -1,4 +1,4 @@
-import {
+import type {
   BspaohWasteAcceptationInput,
   BspaohWasteDetailInput,
   CompanyInput,
@@ -17,7 +17,7 @@ import {
   BspaohWasteWeightInput,
   BspaohPackagingAcceptationInput,
   BspaohInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { flattenBspaohInput } from "../../converter";
 import { editionRules } from "../rules";
 

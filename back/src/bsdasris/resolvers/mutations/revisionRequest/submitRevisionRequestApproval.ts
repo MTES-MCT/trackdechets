@@ -5,14 +5,14 @@ import {
   User
 } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../../common/permissions";
-import { MutationSubmitBsdaRevisionRequestApprovalArgs } from "../../../../generated/graphql/types";
+import type { MutationSubmitBsdaRevisionRequestApprovalArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../../types";
 import { getBsdasriRepository } from "../../../repository";
 import { Permission, can, getUserRoles } from "../../../../permissions";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 
 const bsdasriRevisionRequestWithApprovals =
-  Prisma.validator<Prisma.BsdasriRevisionRequestArgs>()({
+  Prisma.validator<Prisma.BsdasriRevisionRequestDefaultArgs>()({
     include: { approvals: true }
   });
 type BsdasriRevisionRequestWithApprovals =

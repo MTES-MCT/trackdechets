@@ -15,12 +15,12 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import {
+import type {
   CreateFormInput,
   Mutation,
   MutationCreateFormArgs,
   ParcelNumber
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   EmitterType,
   Status,
@@ -266,10 +266,8 @@ describe("Mutation.createForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Les autorisations de l'établissement de destination ne semblent pas correspondre " +
-            "à la caractérisation du déchet renseigné. Merci de bien vouloir procéder à la mise à " +
-            "jour du profil de l'établissement ou modifier le type de déchet sans quoi le bordereau ne " +
-            "pourra être enregistré.",
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
           extensions: {
             code: "BAD_USER_INPUT"
           }
@@ -302,10 +300,8 @@ describe("Mutation.createForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Les autorisations de l'établissement de destination ne semblent pas correspondre " +
-            "à la caractérisation du déchet renseigné. Merci de bien vouloir procéder à la mise à " +
-            "jour du profil de l'établissement ou modifier le type de déchet sans quoi le bordereau ne " +
-            "pourra être enregistré.",
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
           extensions: {
             code: "BAD_USER_INPUT"
           }
@@ -338,10 +334,8 @@ describe("Mutation.createForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Les autorisations de l'établissement de destination ne semblent pas correspondre " +
-            "à la caractérisation du déchet renseigné. Merci de bien vouloir procéder à la mise à " +
-            "jour du profil de l'établissement ou modifier le type de déchet sans quoi le bordereau ne " +
-            "pourra être enregistré.",
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
           extensions: {
             code: "BAD_USER_INPUT"
           }
@@ -374,10 +368,8 @@ describe("Mutation.createForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Les autorisations de l'établissement de destination ne semblent pas correspondre " +
-            "à la caractérisation du déchet renseigné. Merci de bien vouloir procéder à la mise à " +
-            "jour du profil de l'établissement ou modifier le type de déchet sans quoi le bordereau ne " +
-            "pourra être enregistré.",
+            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+            " Il lui appartient de mettre à jour son profil.",
           extensions: {
             code: "BAD_USER_INPUT"
           }
@@ -2673,6 +2665,60 @@ describe("Mutation.createForm", () => {
           }
         })
       ]);
+    });
+
+    it("should create an appendix 1 child and copy parent's ADR info in it", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { mutate } = makeClient(user);
+
+      const appendix1Child = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SEALED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      // When
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: "APPENDIX1",
+              company: { siret: company.siret }
+            },
+            transporter: { company: { siret: company.siret } },
+            wasteDetails: {
+              isSubjectToADR: true,
+              onuCode: "Mention ADR",
+              nonRoadRegulationMention: "Mention RID"
+            },
+            grouping: [{ form: { id: appendix1Child.id } }]
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedAppendix1Child = await prisma.form.findFirstOrThrow({
+        where: { id: appendix1Child.id }
+      });
+
+      expect(updatedAppendix1Child.wasteDetailsIsSubjectToADR).toBeTruthy();
+      expect(updatedAppendix1Child.wasteDetailsOnuCode).toBe("Mention ADR");
+      expect(updatedAppendix1Child.wasteDetailsNonRoadRegulationMention).toBe(
+        "Mention RID"
+      );
     });
   });
 

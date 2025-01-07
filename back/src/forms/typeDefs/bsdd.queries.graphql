@@ -248,7 +248,10 @@ type Query {
   Renvoie les demandes de révisions BSDD associées à un SIRET (demandes soumises et approbations requises)
   """
   formRevisionRequests(
-    "SIRET d'un établissement dont je suis membre"
+    """
+    SIRET d'un établissement dont je suis membre
+    (ou numéro de TVA intracommunautaire pour les transporteurs étrangers)
+    """
     siret: String!
     "(Optionnel) Filtres"
     where: FormRevisionRequestWhere

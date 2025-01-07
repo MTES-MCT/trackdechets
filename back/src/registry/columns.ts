@@ -1,12 +1,12 @@
 import * as Excel from "exceljs";
-import {
+import type {
   AllWaste,
   BsdSubType,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
   TransportedWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { GenericWaste } from "./types";
 import { formatStatusLabel } from "@td/constants";
 import { format } from "date-fns";
@@ -579,7 +579,10 @@ export const columns: Column[] = [
   { field: "transporter5CompanyMail", label: "Transporteur n°5 contact" }
 ];
 
-export function formatRow(waste: GenericWaste, useLabelAsKey = false) {
+export function formatRow(
+  waste: GenericWaste,
+  useLabelAsKey = false
+): Record<string, string> {
   return columns.reduce((acc, column) => {
     if (
       column.field in waste ||

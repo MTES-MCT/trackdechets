@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useState, useContext } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
@@ -142,7 +142,6 @@ const DestinationBsvhu = ({ errors }) => {
 
   const selectedCompanyError = (company?: CompanySearchResult) => {
     // Le destinatiare doit être inscrit et avec un profil crématorium ou sous-type crémation
-    // Le profil crématorium sera bientôt supprimé
     if (company) {
       if (!company.isRegistered) {
         return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
@@ -247,7 +246,7 @@ const DestinationBsvhu = ({ errors }) => {
           )}
         <CompanyContactInfo
           fieldName={`${actor}.company`}
-          name={actor}
+          errorObject={formState.errors?.destination?.["company"]}
           disabled={sealedFields.includes(`${actor}.company.siret`)}
           key={orgId}
         />

@@ -6,6 +6,7 @@ import { Select } from "@codegouvfr/react-dsfr/Select";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { emptyPackaging } from "../initial-state";
 import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
+import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
 const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
   const { register, getFieldState, watch } = useFormContext();
@@ -44,7 +45,7 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
           </Select>
         </div>
         <div className="fr-col-12 fr-col-md-2">
-          <Input
+          <NonScrollableInput
             label="Volume (optionnel)"
             disabled={disabled}
             nativeInputProps={{
@@ -53,7 +54,7 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
               pattern: "[0-9]*",
               type: "number"
             }}
-          ></Input>
+          />
         </div>
         <div className="fr-col-12 fr-col-md-4">
           <Input

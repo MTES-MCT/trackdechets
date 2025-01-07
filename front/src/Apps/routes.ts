@@ -244,7 +244,8 @@ export const titles = {
     "Ajouter un transporteur étranger, Non-French carrier — Trackdéchets",
   "/companies/join": "",
   "/companies/create": "Ajouter un établissement — Trackdéchets",
-  "/registre": "Mes registres — Trackdéchets"
+  "/registre": "Mes registres — Trackdéchets",
+  "/registre-v2": "Mes registres — Trackdéchets"
 };
 
 export default routes;

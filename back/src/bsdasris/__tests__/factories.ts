@@ -7,7 +7,7 @@ import {
   OperationMode,
   TransportMode
 } from "@prisma/client";
-import { BsdasriPackagingsInput } from "../../generated/graphql/types";
+import type { BsdasriPackagingsInput } from "@td/codegen-back";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { distinct } from "../../common/arrays";
 import { computeTotalVolume } from "../converter";

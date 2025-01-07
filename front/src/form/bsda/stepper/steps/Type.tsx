@@ -16,6 +16,7 @@ import {
   getInitialCompany,
   initialTransporter
 } from "../../../../Apps/common/data/initialState";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type Props = { disabled: boolean };
 
@@ -121,18 +122,24 @@ export function Type({ disabled }: Props) {
       <div className="tw-mt-4">
         {BsdaType.Gathering === type && (
           <>
-            <p className="fr-text--bold fr-p-2w">
-              Sélectionner des BSDA ayant le même code déchet et le même
-              excutoire
-            </p>
+            <Alert
+              description="Sélectionner des BSDA ayant le même code déchet et le même
+              exutoire"
+              severity="info"
+              small
+            />
+            <br />
             <BsdaPicker name="grouping" bsdaId={id} />
           </>
         )}
         {BsdaType.Reshipment === type && (
           <>
-            <p className="fr-text--bold fr-p-2w">
-              Sélectionner 1 seul BSDA à réexpédier
-            </p>
+            <Alert
+              description="Sélectionner 1 seul BSDA à réexpédier"
+              severity="info"
+              small
+            />
+            <br />
             <BsdaPicker name="forwarding" bsdaId={id} />
           </>
         )}

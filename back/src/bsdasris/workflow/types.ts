@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { BsdasriSignatureType } from "../../generated/graphql/types";
+import type { BsdasriSignatureType } from "@td/codegen-back";
 
 // Xstate event
 export type BsdasriEvent = {

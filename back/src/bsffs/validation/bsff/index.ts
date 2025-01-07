@@ -1,4 +1,4 @@
-import { BsffInput } from "../../../generated/graphql/types";
+import type { BsffInput } from "@td/codegen-back";
 import {
   getCurrentSignatureType,
   graphQlInputToZodBsff,

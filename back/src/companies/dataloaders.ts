@@ -1,16 +1,32 @@
 import DataLoader from "dataloader";
 import { prisma } from "@td/prisma";
-import { UserRole } from "@prisma/client";
+import { Company, UserRole } from "@prisma/client";
 
 export function createCompanyDataLoaders() {
   return {
+    companies: new DataLoader((sirets: string[]) => getCompanies(sirets)),
     installations: new DataLoader((sirets: string[]) =>
       getInstallations(sirets)
     ),
     companiesAdmin: new DataLoader((companyIds: string[]) =>
       getCompaniesAdmin(companyIds)
+    ),
+    delegators: new DataLoader((companyIds: string[]) =>
+      getCompaniesDelegators(companyIds)
     )
   };
+}
+
+async function getCompanies(sirets: string[]) {
+  const companies = await prisma.company.findMany({
+    where: {
+      orgId: { in: sirets }
+    }
+  });
+
+  return sirets.map(
+    siret => companies.find(company => company.orgId === siret) ?? null
+  );
 }
 
 async function getInstallations(sirets: string[]) {
@@ -91,3 +107,25 @@ async function getCompaniesAdmin(companyIds: string[]) {
     return association?.admin ?? null;
   });
 }
+
+const getCompaniesDelegators = async (
+  companyIds: string[]
+): Promise<Company[][]> => {
+  const delegations = await prisma.registryDelegation.findMany({
+    where: {
+      delegateId: { in: companyIds },
+      revokedBy: null,
+      cancelledBy: null,
+      startDate: { lte: new Date() },
+      OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
+    },
+    include: {
+      delegator: true
+    }
+  });
+  return companyIds.map(companyId =>
+    delegations
+      .filter(delegation => delegation.delegateId === companyId)
+      .map(delegation => delegation.delegator)
+  );
+};

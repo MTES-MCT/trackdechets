@@ -5,11 +5,11 @@ import {
   BsffStatus,
   BsffTransporter
 } from "@prisma/client";
-import {
+import type {
   BsffFicheInterventionInput,
   BsffInput,
   BsffTransporterInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 import { BsffWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";
@@ -20,15 +20,17 @@ import { prisma } from "@td/prisma";
  * Retrieves organisations allowed to read a BSFF
  */
 export function readers(bsff: BsffWithTransporters) {
-  return [
-    bsff.emitterCompanySiret,
-    ...bsff.transporters.flatMap(t => [
-      t.transporterCompanySiret,
-      t.transporterCompanyVatNumber
-    ]),
-    bsff.destinationCompanySiret,
-    ...bsff.detenteurCompanySirets
-  ].filter(Boolean);
+  return bsff.isDraft
+    ? [...bsff.canAccessDraftOrgIds]
+    : [
+        bsff.emitterCompanySiret,
+        ...bsff.transporters.flatMap(t => [
+          t.transporterCompanySiret,
+          t.transporterCompanyVatNumber
+        ]),
+        bsff.destinationCompanySiret,
+        ...bsff.detenteurCompanySirets
+      ].filter(Boolean);
 }
 
 /**
@@ -60,7 +62,7 @@ async function contributors(bsff: BsffWithTransporters, input?: BsffInput) {
       : bsff.destinationCompanySiret;
 
   if (input?.transporters) {
-    // on prend en compte la nouvelle liste de tranporteurs fournit
+    // on prend en compte la nouvelle liste de tranporteurs fournis
     transporters = await prisma.bsffTransporter.findMany({
       where: { id: { in: input.transporters } }
     });
@@ -99,11 +101,19 @@ async function contributors(bsff: BsffWithTransporters, input?: BsffInput) {
     .flatMap(t => [t.transporterCompanySiret, t.transporterCompanyVatNumber])
     .filter(Boolean);
 
-  return [
+  const bsffContributors = [
     emitterCompanySiret,
     destinationCompanySiret,
     ...transportersOrgIds
   ].filter(Boolean);
+
+  if (bsff.isDraft) {
+    return bsffContributors.filter(cb =>
+      bsff.canAccessDraftOrgIds.includes(cb)
+    );
+  }
+
+  return bsffContributors;
 }
 
 /**

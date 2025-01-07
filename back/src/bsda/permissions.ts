@@ -1,5 +1,5 @@
 import { Bsda, BsdaStatus, BsdaTransporter, User } from "@prisma/client";
-import { BsdaInput, BsdaTransporterInput } from "../generated/graphql/types";
+import type { BsdaInput, BsdaTransporterInput } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 import { getFirstTransporterSync, getPreviousBsdas } from "./database";
 import { BsdaWithTransporters } from "./types";
@@ -336,7 +336,8 @@ export async function checkCanRequestRevision(user: User, bsda: Bsda) {
   const authorizedOrgIds = [
     bsda.emitterCompanySiret,
     bsda.workerCompanySiret,
-    bsda.destinationCompanySiret
+    bsda.destinationCompanySiret,
+    bsda.ecoOrganismeSiret
   ].filter(Boolean);
 
   return checkUserPermissions(

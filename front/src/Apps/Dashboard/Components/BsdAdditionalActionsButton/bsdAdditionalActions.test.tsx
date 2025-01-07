@@ -243,6 +243,7 @@ describe("BsdAdditionalActionsButton", () => {
     const permissions = [UserPermission.BsdCanRevise];
     const bsdReview = {
       ...bsd,
+      emitter: { company: { siret: currentSiret } },
       status: BsdStatusCode.Processed,
       type: BsdType.Bsdd
     } as BsdDisplay;

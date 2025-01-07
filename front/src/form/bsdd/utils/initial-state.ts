@@ -182,7 +182,7 @@ export function getInitialState(f?: Form | null): FormFormikValues {
     wasteDetails: {
       code: f?.wasteDetails?.code ?? "",
       name: f?.wasteDetails?.name ?? "",
-      isSubjectToADR: f?.wasteDetails?.isSubjectToADR ?? true,
+      isSubjectToADR: f?.wasteDetails?.isSubjectToADR ?? false,
       onuCode: f?.wasteDetails?.onuCode ?? "",
       nonRoadRegulationMention:
         f?.wasteDetails?.nonRoadRegulationMention ?? null,

@@ -2,7 +2,10 @@ import {
   getCompaniesAndSubscribersByCompanyOrgIds,
   formatDate,
   sendMail,
-  UserNotification
+  UserNotification,
+  getDelegationNotifiableUsers,
+  getRegistryDelegationsExpiringInDays,
+  toddMMYYYY
 } from "back";
 import { prisma } from "@td/prisma";
 import {
@@ -28,7 +31,9 @@ import {
   pendingMembershipRequestEmail,
   profesionalsSecondOnboardingEmail,
   producersSecondOnboardingEmail,
-  pendingRevisionRequestEmail
+  pendingRevisionRequestEmail,
+  expiringRegistryDelegationWarning,
+  Mail
 } from "@td/mail";
 import { xDaysAgo } from "./helpers";
 
@@ -566,6 +571,56 @@ export const sendPendingRevisionRequestEmail = async (
 
     await sendMail(payload, { sync });
   }
+
+  await prisma.$disconnect();
+};
+
+export const getExpiringRegistryDelegationWarningMailPayloads = async () => {
+  const expiringDelegations = await getRegistryDelegationsExpiringInDays(7);
+
+  if (!expiringDelegations.length) return [];
+
+  const payloads: Mail[] = await Promise.all(
+    expiringDelegations
+      .map(async delegation => {
+        const users = await getDelegationNotifiableUsers(delegation);
+
+        if (!users.length) return undefined;
+
+        const variables = {
+          startDate: toddMMYYYY(delegation.startDate),
+          endDate: toddMMYYYY(delegation.endDate!),
+          delegator: delegation.delegator,
+          delegate: delegation.delegate
+        };
+
+        const payload = renderMail(expiringRegistryDelegationWarning, {
+          variables,
+          to: users.map(user => ({
+            email: user.email,
+            name: user.name
+          }))
+        });
+
+        return payload;
+      })
+      .filter(Boolean) as unknown as Mail[]
+  );
+
+  return payloads;
+};
+
+/**
+ * If a delegation expires in X days, warn involved companies' users.
+ *
+ * If delegation isn't even X days long, skip.
+ */
+export const sendExpiringRegistryDelegationWarning = async () => {
+  const payloads = await getExpiringRegistryDelegationWarningMailPayloads();
+
+  if (!payloads?.length) return;
+
+  await Promise.all(payloads?.map(async p => await sendMail(p)));
 
   await prisma.$disconnect();
 };

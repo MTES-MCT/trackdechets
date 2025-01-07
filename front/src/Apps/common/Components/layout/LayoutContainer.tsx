@@ -16,6 +16,7 @@ import Exports from "../../../../dashboard/exports/Registry";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
 import { MyImports } from "../../../../dashboard/registry/MyImports";
 import { CompanyImports } from "../../../../dashboard/registry/CompanyImports";
+import { MyExports } from "../../../../dashboard/registry/MyExports";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -68,6 +69,10 @@ const GET_ME = gql`
   }
 `;
 
+const BANNER_MESSAGES = [
+  `Merci d'anticiper dès à présent vos congés en vous assurant que vos collaborateurs possèdent un accès aux établissements nécessaires sur Trackdéchets (Mes établissements > Membres).`
+];
+
 export default function LayoutContainer() {
   const { orgId } = usePermissions();
   const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
@@ -115,12 +120,12 @@ export default function LayoutContainer() {
               isAdmin={isAdmin}
               v2banner={
                 <SurveyBanner
-                  message="Gérez vos notifications e-mail sur Trackdéchets ! Vous pouvez désormais personnaliser les types d'e-mails que vous souhaitez recevoir directement depuis Mon compte > Notifications"
+                  messages={BANNER_MESSAGES}
                   button={{
-                    title: "Plus d'informations",
-                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#gerer-les-notifications-e-mail"
+                    title: "Consulter la FAQ",
+                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement#les-responsabilites-des-administrateurs-trackdechets"
                   }}
-                  persistedSurveyName="td-20241022"
+                  persistedSurveyName="td-20241217"
                 />
               }
               defaultOrgId={defaultOrgId}
@@ -307,6 +312,15 @@ export default function LayoutContainer() {
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <CompanyImports />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.registry_new.export}
+            element={
+              <RequireAuth isAuthenticated={isAuthenticated}>
+                <MyExports />
               </RequireAuth>
             }
           />

@@ -87,7 +87,7 @@ export const WASTE_PROCESSOR_TYPE_OPTIONS: CompanySubTypeOption[] = [
   },
   {
     label:
-      "Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780)",
+      "Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780, 2795)",
     value: WasteProcessorType.OtherNonDangerousWastes
   },
   {

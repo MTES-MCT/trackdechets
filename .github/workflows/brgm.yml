@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Set up Git
         run: |
@@ -21,4 +23,4 @@ jobs:
       - name: Add remote & push
         run: |
           git remote add brgm ${{ secrets.BRGM_GITLAB_URL }}
-          git push brgm --all
+          git push brgm --all --force

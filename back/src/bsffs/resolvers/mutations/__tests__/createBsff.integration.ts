@@ -2,11 +2,11 @@ import { BsffPackagingType, BsffType, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "@td/constants";
-import {
+import type {
   Mutation,
   MutationCreateBsffArgs,
   BsffOperationCode
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   siretify,
   userWithCompanyFactory,
@@ -125,6 +125,9 @@ describe("Mutation.createBsff", () => {
     expect(createdBsff.wasteCode).toEqual(BSFF_WASTE_CODES[0]);
     expect(createdBsff.wasteAdr).toEqual("Mention ADR");
     expect(createdBsff.wasteDescription).toEqual("R410");
+
+    // check canAccessDraftOrgIds
+    expect(createdBsff.canAccessDraftOrgIds).toEqual([]);
   });
 
   it("should create a bsff with a fiche d'intervention", async () => {

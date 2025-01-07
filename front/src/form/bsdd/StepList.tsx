@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
+  EmitterType,
   Form,
   FormInput,
   Mutation,
@@ -148,6 +149,22 @@ export default function StepsList(props: Props) {
   }
 
   async function onSubmit(values: FormFormikValues) {
+    const initialForm = formQuery?.data?.form;
+
+    // Hotfix Zammad #43735
+    // COMPAT suite à TRA-14522 https://github.com/MTES-MCT/trackdechets/pull/3717
+    // La valeur de `isSubjectToADR` sur les bordereaux historiques est `null`.
+    // Or dans ce cas, le switch "Le déchet est soumis à l'ADR" est initialisé
+    // à `false`. Lors d'une modififcation d'un BSDD, `false` était envoyé
+    // et une erreur de verrouillage de champ était levée.
+    if (
+      !!initialForm?.emittedAt &&
+      values.wasteDetails?.isSubjectToADR === false &&
+      initialForm?.wasteDetails?.isSubjectToADR === null
+    ) {
+      values.wasteDetails.isSubjectToADR = null;
+    }
+
     const {
       temporaryStorageDetail,
       ecoOrganisme,
@@ -176,12 +193,22 @@ export default function StepsList(props: Props) {
         : { temporaryStorageDetail: null }),
       // discard ecoOrganisme if not selected
       ...(ecoOrganisme?.siret ? { ecoOrganisme } : { ecoOrganisme: null }),
-      ...(grouping?.length
+      ...(grouping
         ? {
-            grouping: grouping.map(({ form, quantity }) => ({
-              form: { id: form.id },
-              quantity
-            }))
+            grouping: grouping
+              .map(({ form, quantity }) => ({
+                form: { id: form.id },
+                // quantity peut être égal à "" dans le
+                // cas où l'input est laissé vide dans le sélecteur
+                // d'annexes 2
+                quantity: Number(quantity)
+              }))
+              .filter(g =>
+                rest?.emitter?.type === EmitterType.Appendix2
+                  ? // Ne permet pas d'ajouter une annexe 2 avec une quantité égale à 0
+                    g.quantity > 0
+                  : true
+              )
           }
         : {}),
       transporters: transporterIds

@@ -29,7 +29,9 @@ import {
   hasRoadControlButton,
   getPrimaryActionsLabelFromBsdStatus,
   isSiretActorForBsd,
-  ActorType
+  ActorType,
+  canReviewBsda,
+  canReviewBsdasri
 } from "./dashboardServices";
 import {
   BsdType,
@@ -1355,52 +1357,396 @@ describe("dashboardServices", () => {
   });
 
   describe("canReviewBsdd", () => {
-    it("should return true when Bsdd status is not Draft, Sealed, or Refused, and emitterType is not Appendix1Producer", () => {
-      const bsd = {
-        type: BsdType.Bsdd,
-        status: BsdStatusCode.Accepted,
-        emitterType: EmitterType.Producer
-      };
-
-      const result = canReviewBsdd(bsd, "1234");
-
-      expect(result).toBe(true);
-    });
-
-    it("should return false when bsd type is not Bsdd", () => {
-      const bsd = {
+    it("should return false if bsd is not BSDD", async () => {
+      const siret = "123";
+      const bsdd = {
         type: BsdType.Bsda,
-        status: BsdStatusCode.Accepted,
-        emitterType: EmitterType.Producer
+        status: BsdStatusCode.Processed,
+        emitter: { company: { siret } }
       };
-
-      const result = canReviewBsdd(bsd, "1234");
-
-      expect(result).toBe(false);
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(false);
     });
 
-    it("should return false when bsd status is Draft, Sealed, or Refused", () => {
-      const bsd = {
+    it.each([BsdStatusCode.Draft, BsdStatusCode.Sealed, BsdStatusCode.Refused])(
+      "should not be possible to revise a BSDD when its status is %p",
+      status => {
+        const siret = "123";
+        const bsdd = {
+          type: BsdType.Bsdd,
+          emitter: { company: { siret } },
+          status
+        };
+        expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(false);
+      }
+    );
+
+    it.each([
+      EmitterType.Producer,
+      EmitterType.Other,
+      EmitterType.Appendix1,
+      EmitterType.Appendix2
+    ])(
+      "should be possible for emitter to revise a BSDD when emitter type is %p",
+      emitterType => {
+        const siret = "123";
+        const bsdd = {
+          type: BsdType.Bsdd,
+          emitterType,
+          status: BsdStatusCode.Processed,
+          emitter: { company: { siret } }
+        };
+        expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(true);
+      }
+    );
+
+    it.each([
+      EmitterType.Producer,
+      EmitterType.Other,
+      EmitterType.Appendix1,
+      EmitterType.Appendix2
+    ])(
+      "should be possible for destination to revise a BSDD when emitter type is %p",
+      emitterType => {
+        const siret = "123";
+        const bsdd = {
+          type: BsdType.Bsdd,
+          emitterType,
+          status: BsdStatusCode.Processed,
+          destination: { company: { siret } }
+        };
+        expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(true);
+      }
+    );
+
+    it.each([
+      EmitterType.Producer,
+      EmitterType.Other,
+      EmitterType.Appendix1,
+      EmitterType.Appendix2
+    ])(
+      "should be possible for eco-organisme to revise a BSDD when emitter type is %p",
+      emitterType => {
+        const siret = "123";
+        const bsdd = {
+          type: BsdType.Bsdd,
+          emitterType,
+          status: BsdStatusCode.Processed,
+          ecoOrganisme: { siret, name: "ÉCO-ORG" }
+        };
+        expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(true);
+      }
+    );
+
+    it.each([EmitterType.Producer, EmitterType.Other, EmitterType.Appendix2])(
+      "should be possible for final destination after temp storage to revise a BSDD when emitter type is %p",
+      emitterType => {
+        const siret = "123";
+        const bsdd = {
+          type: BsdType.Bsdd,
+          emitterType,
+          status: BsdStatusCode.Processed,
+          isTempStorage: true,
+          temporaryStorageDetail: { destination: { company: { siret } } }
+        };
+        expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(true);
+      }
+    );
+
+    it("should not be possible for a trader to revise a BSDD", async () => {
+      const siret = "123";
+      const bsdd = {
         type: BsdType.Bsdd,
-        status: BsdStatusCode.Draft,
-        emitterType: EmitterType.Producer
+        emitterType: EmitterType.Producer,
+        status: BsdStatusCode.Processed,
+        trader: { company: { siret } }
       };
-
-      const result = canReviewBsdd(bsd, "1234");
-
-      expect(result).toBe(false);
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(false);
     });
 
-    it("should return true when emitterType is Appendix1Producer", () => {
-      const bsd = {
+    it("should not be possible for a broker to revise a BSDD", async () => {
+      const siret = "123";
+      const bsdd = {
         type: BsdType.Bsdd,
-        status: BsdStatusCode.Accepted,
-        emitterType: EmitterType.Appendix1Producer
+        emitterType: EmitterType.Producer,
+        status: BsdStatusCode.Processed,
+        broker: { company: { siret } }
       };
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(false);
+    });
 
-      const result = canReviewBsdd(bsd, "1234");
+    it("should not be possible for an intermediary to revise a BSDD", async () => {
+      const siret = "123";
+      const bsdd = {
+        type: BsdType.Bsdd,
+        emitterType: EmitterType.Producer,
+        status: BsdStatusCode.Processed,
+        intermediaries: [{ siret }]
+      };
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(false);
+    });
 
-      expect(result).toBe(true);
+    it("should be possible for destination to revise a BSDD when status is SIGNED_BY_PRODUCER", async () => {
+      const siret = "123";
+      const bsdd = {
+        type: BsdType.Bsdd,
+        emitterType: EmitterType.Producer,
+        status: BsdStatusCode.SignedByProducer,
+        destination: { company: { siret } }
+      };
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should not be possible for emitter to revise a BSDD when status is SIGNED_BY_PRODUCER", async () => {
+      const siret = "123";
+      const bsdd = {
+        type: BsdType.Bsdd,
+        emitterType: EmitterType.Producer,
+        status: BsdStatusCode.SignedByProducer,
+        emitter: { company: { siret } }
+      };
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(false);
+    });
+
+    it("should be possible for emitter to review an APPENDIX_1_PRODUCER bsdd after transporter signature", async () => {
+      const siret = "123";
+      const bsdd = {
+        type: BsdType.Bsdd,
+        emitterType: EmitterType.Appendix1Producer,
+        status: BsdStatusCode.Sent,
+        emitter: { company: { siret } }
+      };
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for transporter to review an APPENDIX_1_PRODUCER bsdd after transporter signature", async () => {
+      const siret = "123";
+      const bsdd = {
+        type: BsdType.Bsdd,
+        emitterType: EmitterType.Appendix1Producer,
+        status: BsdStatusCode.Sent,
+        transporter: { company: { siret } }
+      };
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for foreign transporter to review an APPENDIX_1_PRODUCER bsdd after transporter signature", async () => {
+      const vatNumber = "123";
+      const bsdd = {
+        type: BsdType.Bsdd,
+        emitterType: EmitterType.Appendix1Producer,
+        status: BsdStatusCode.Sent,
+        transporter: { company: { vatNumber, orgId: vatNumber } }
+      };
+      expect(canReviewBsdd(bsdd as BsdDisplay, vatNumber)).toEqual(true);
+    });
+
+    it("should not be possible for emitter to review an APPENDIX_1_PRODUCER bsdd before transporter signature", async () => {
+      const siret = "123";
+      const bsdd = {
+        type: BsdType.Bsdd,
+        emitterType: EmitterType.Appendix1Producer,
+        status: BsdStatusCode.SignedByProducer,
+        emitter: { company: { siret } }
+      };
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(false);
+    });
+
+    it("should not be possible for transporter to review an APPENDIX_1_PRODUCER bsdd before transporter signature", async () => {
+      const siret = "123";
+      const bsdd = {
+        type: BsdType.Bsdd,
+        emitterType: EmitterType.Appendix1Producer,
+        status: BsdStatusCode.SignedByProducer,
+        transporter: { company: { siret } }
+      };
+      expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(false);
+    });
+  });
+
+  describe("canReviewBsda", () => {
+    it("should return false if bsd is not BSDA", async () => {
+      const siret = "123";
+      const bsda = {
+        type: BsdType.Bsdd,
+        status: BsdStatusCode.Processed,
+        emitter: { company: { siret } }
+      };
+      expect(canReviewBsda(bsda as BsdDisplay, siret)).toEqual(false);
+    });
+
+    it("should not be possible to revise a BSDA when its status is Initial", () => {
+      const siret = "123";
+      const bsda = {
+        type: BsdType.Bsda,
+        emitter: { company: { siret } },
+        status: BsdStatusCode.Initial
+      };
+      expect(canReviewBsda(bsda as BsdDisplay, siret)).toEqual(false);
+    });
+
+    it("should be possible for worker to revise a BSDA", () => {
+      const siret = "123";
+      const bsda = {
+        type: BsdType.Bsda,
+        worker: { company: { siret } },
+        status: BsdStatusCode.Processed
+      };
+      expect(canReviewBsda(bsda as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for destination to revise a BSDA", () => {
+      const siret = "123";
+      const bsda = {
+        type: BsdType.Bsda,
+        destination: { company: { siret } },
+        status: BsdStatusCode.Processed
+      };
+      expect(canReviewBsda(bsda as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for emitter to revise a BSDA", () => {
+      const siret = "123";
+      const bsda = {
+        type: BsdType.Bsda,
+        emitter: { company: { siret } },
+        status: BsdStatusCode.Processed
+      };
+      expect(canReviewBsda(bsda as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for worker to revise a BSDA before transporter's signature", () => {
+      const siret = "123";
+      const bsda = {
+        type: BsdType.Bsda,
+        worker: { company: { siret } },
+        status: BsdStatusCode.SignedByProducer
+      };
+      expect(canReviewBsda(bsda as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for destination to revise a BSDA before transporter's signature", () => {
+      const siret = "123";
+      const bsda = {
+        type: BsdType.Bsda,
+        destination: { company: { siret } },
+        status: BsdStatusCode.SignedByProducer
+      };
+      expect(canReviewBsda(bsda as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for emitter to revise a BSDA before transporter's signature", () => {
+      const siret = "123";
+      const bsda = {
+        type: BsdType.Bsda,
+        emitter: { company: { siret } },
+        status: BsdStatusCode.SignedByProducer
+      };
+      expect(canReviewBsda(bsda as BsdDisplay, siret)).toEqual(false);
+    });
+  });
+
+  describe("canReviewBsdasri", () => {
+    it("should return false if bsd is not BSDASRI", async () => {
+      const siret = "123";
+      const bsdasri = {
+        type: BsdType.Bsdd,
+        status: BsdStatusCode.Processed,
+        emitter: { company: { siret } }
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(false);
+    });
+
+    it("should not be possible to revise a BSDASRI when its status is Initial", () => {
+      const siret = "123";
+      const bsdasri = {
+        type: BsdType.Bsdasri,
+        emitter: { company: { siret } },
+        status: BsdStatusCode.Initial
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(false);
+    });
+
+    it("should not be possible to revise a synthesis BSDASRI at status RECEIVED", () => {
+      const siret = "123";
+      const bsdasri = {
+        bsdWorkflowType: BsdasriType.Synthesis,
+        type: BsdType.Bsdasri,
+        emitter: { company: { siret } },
+        status: BsdStatusCode.Received
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(false);
+    });
+
+    it("should not be possible to revise a BSDASRI that is grouped in another one", () => {
+      const siret = "123";
+      const bsdasri = {
+        type: BsdType.Bsdasri,
+        emitter: { company: { siret } },
+        status: BsdStatusCode.AwaitingGroup,
+        groupedIn: { id: "" }
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(false);
+    });
+
+    it("should not be possible to revise a BSDASRI that is synthesized in another one", () => {
+      const siret = "123";
+      const bsdasri = {
+        type: BsdType.Bsdasri,
+        emitter: { company: { siret } },
+        status: BsdStatusCode.Sent,
+        synthesizedIn: { id: "" }
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(false);
+    });
+
+    it("should be possible for emitter to revise a BSDASRI", () => {
+      const siret = "123";
+      const bsdasri = {
+        type: BsdType.Bsdasri,
+        emitter: { company: { siret } },
+        status: BsdStatusCode.Processed
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for destination to revise a BSDASRI", () => {
+      const siret = "123";
+      const bsdasri = {
+        type: BsdType.Bsdasri,
+        destination: { company: { siret } },
+        status: BsdStatusCode.Processed
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for destination to revise a BSDASRI", () => {
+      const siret = "123";
+      const bsdasri = {
+        type: BsdType.Bsdasri,
+        destination: { company: { siret } },
+        status: BsdStatusCode.Processed
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should be possible for eco-organisme to revise a BSDASRI", () => {
+      const siret = "123";
+      const bsdasri = {
+        type: BsdType.Bsdasri,
+        ecoOrganisme: { siret },
+        status: BsdStatusCode.Processed
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(true);
+    });
+
+    it("should not be possible for emitter to revise a BSDASRI before transporter signature", () => {
+      const siret = "123";
+      const bsdasri = {
+        type: BsdType.Bsdasri,
+        status: BsdStatusCode.SignedByProducer,
+        emitter: { company: { siret } }
+      };
+      expect(canReviewBsdasri(bsdasri as BsdDisplay, siret)).toEqual(false);
     });
   });
 

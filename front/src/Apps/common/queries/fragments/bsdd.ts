@@ -259,6 +259,7 @@ const mutableFieldsFragment = gql`
         }
         signedAt
         quantityReceived
+        quantityAccepted
         quantityGrouped
         processingOperationDone
       }
@@ -410,6 +411,7 @@ export const dashboardFormFragment = gql`
     emittedBy
     emittedByEcoOrganisme
     takenOverAt
+    updatedAt
     status
     quantityReceived
     wasteDetails {

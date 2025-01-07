@@ -84,7 +84,7 @@ export function Appendix1ProducerForm({
       >
         {({ isSubmitting, values, handleChange, setFieldValue }) => (
           <Form>
-            <h4 className="form__section-heading">Entreprise émettrice</h4>
+            <h4 className="form__section-heading">Établissement émetteur</h4>
             <div className="form__row">
               <label>
                 <Field

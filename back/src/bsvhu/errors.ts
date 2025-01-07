@@ -15,7 +15,7 @@ export class InvalidSignatureError extends UserInputError {
 export class SealedFieldsError extends ForbiddenError {
   constructor(fields) {
     super(
-      `Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: ${fields.join(
+      `Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: ${fields.join(
         ", "
       )}`
     );

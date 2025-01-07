@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useContext } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import { useFormContext } from "react-hook-form";
-import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 
 import { FavoriteType } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
@@ -146,7 +146,7 @@ export function Emitter({ errors }) {
 
       <CompanyContactInfo
         fieldName={`${actor}.company`}
-        name={actor}
+        errorObject={formState.errors?.emitter?.["company"]}
         disabled={sealedFields.includes(`emitter.company.siret`)}
         key={orgId}
       />

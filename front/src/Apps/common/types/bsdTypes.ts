@@ -48,7 +48,8 @@ import {
   Broker,
   Trader,
   BsdaBroker,
-  FormCompany
+  FormCompany,
+  BsvhuEcoOrganisme
 } from "@td/codegen-ui";
 
 export enum BsdTypename {
@@ -117,7 +118,8 @@ export interface BsdDisplay {
   ecoOrganisme?:
     | Maybe<FormEcoOrganisme>
     | Maybe<BsdaEcoOrganisme>
-    | Maybe<BsdasriEcoOrganisme>;
+    | Maybe<BsdasriEcoOrganisme>
+    | Maybe<BsvhuEcoOrganisme>;
   updatedAt?: Maybe<string> | Maybe<Scalars["DateTime"]>;
   emittedByEcoOrganisme?: Maybe<boolean> | Maybe<BsdaEcoOrganisme>;
   worker?: Maybe<BsdaWorker>;

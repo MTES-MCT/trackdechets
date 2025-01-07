@@ -17,6 +17,10 @@ export const vhuFragment = gql`
       company {
         ...CompanyFragment
       }
+      transport {
+        plates
+        mode
+      }
       recepisse {
         number
       }
@@ -70,6 +74,10 @@ export const dashboardVhuFragment = gql`
       company {
         ...DashboardCompanyFragment
       }
+      transport {
+        plates
+        mode
+      }
       recepisse {
         number
         department
@@ -89,6 +97,10 @@ export const dashboardVhuFragment = gql`
     wasteCode
     weight {
       value
+    }
+    ecoOrganisme {
+      siret
+      name
     }
     bsvhuUpdatedAt: updatedAt
   }
@@ -173,12 +185,41 @@ export const FullBsvhuFragment = gql`
         isExempted
       }
       transport {
+        plates
+        mode
         takenOverAt
         signature {
           author
           date
         }
       }
+    }
+    ecoOrganisme {
+      siret
+      name
+    }
+    broker {
+      company {
+        ...CompanyFragment
+      }
+      recepisse {
+        number
+        department
+        validityLimit
+      }
+    }
+    trader {
+      company {
+        ...CompanyFragment
+      }
+      recepisse {
+        number
+        department
+        validityLimit
+      }
+    }
+    intermediaries {
+      ...CompanyFragment
     }
   }
   ${companyFragment}

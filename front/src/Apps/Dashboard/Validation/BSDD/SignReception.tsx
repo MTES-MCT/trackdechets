@@ -745,15 +745,6 @@ function SignReceptionModal({
                   options={[
                     {
                       label:
-                        EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyNotWashed],
-                      nativeInputProps: {
-                        ...register("emptyReturnADR", {}),
-                        value: EmptyReturnAdr.EmptyNotWashed,
-                        defaultChecked: false
-                      }
-                    },
-                    {
-                      label:
                         EMPTY_RETURN_ADR_REASON[
                           EmptyReturnAdr.EmptyReturnNotWashed
                         ],
@@ -778,6 +769,26 @@ function SignReceptionModal({
                       nativeInputProps: {
                         ...register("emptyReturnADR", {}),
                         value: EmptyReturnAdr.EmptyCiterne,
+                        defaultChecked: false
+                      }
+                    },
+                    {
+                      label:
+                        EMPTY_RETURN_ADR_REASON[EmptyReturnAdr.EmptyContainer],
+                      nativeInputProps: {
+                        ...register("emptyReturnADR", {}),
+                        value: EmptyReturnAdr.EmptyContainer,
+                        defaultChecked: false
+                      }
+                    },
+                    {
+                      label:
+                        EMPTY_RETURN_ADR_REASON[
+                          EmptyReturnAdr.EmptyCiterneContainer
+                        ],
+                      nativeInputProps: {
+                        ...register("emptyReturnADR", {}),
+                        value: EmptyReturnAdr.EmptyCiterneContainer,
                         defaultChecked: false
                       }
                     }

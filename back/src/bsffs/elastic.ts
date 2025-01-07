@@ -49,6 +49,58 @@ export async function getBsffForElastic(
   });
 }
 
+// Renvoie pour chaque transporteur son rôle (transporter1, transporter2, etc)
+function transporterCompanyRole(transporter: BsffTransporter) {
+  return `transporter${transporter.number}`;
+}
+const getOrgIdByRole = bsff => {
+  // build a mapping that looks like
+  // { transporter1CompanyOrgId: "SIRET1", transporter2CompanyOrgId: "SIRET2"}
+  const transporterOrgIdByRole = (bsff.transporters ?? []).reduce(
+    (acc, transporter) => {
+      const orgId = getTransporterCompanyOrgId(transporter);
+      if (orgId) {
+        return {
+          ...acc,
+          [transporterCompanyRole(transporter)]: orgId
+        };
+      }
+      return acc;
+    },
+    {}
+  );
+  const detenteurSiretByRole = bsff.ficheInterventions.reduce(
+    (sirets, ficheIntervention) => {
+      if (ficheIntervention.detenteurCompanySiret) {
+        const nbOfKeys = Object.keys(sirets).length;
+        return {
+          ...sirets,
+          [`detenteur${nbOfKeys + 1}`]: ficheIntervention.detenteurCompanySiret
+        };
+      }
+      return sirets;
+    },
+    {}
+  );
+  const orgIdByRole = {
+    emitter: bsff.emitterCompanySiret,
+    destination: bsff.destinationCompanySiret,
+    ...detenteurSiretByRole,
+    ...transporterOrgIdByRole
+  };
+
+  if (bsff.isDraft) {
+    // Drafts appear in the dashboard only for companies the bsff owner belongs to
+
+    const draftFormSiretsEntries = Object.entries(orgIdByRole).filter(
+      ([, siret]) => siret && bsff.canAccessDraftOrgIds.includes(siret)
+    );
+    return Object.fromEntries(draftFormSiretsEntries);
+  }
+
+  return orgIdByRole;
+};
+
 type TabsKeys =
   | "isDraftFor"
   | "isForActionFor"
@@ -75,51 +127,10 @@ export function getOrgIdsByTab(
 
   const firstTransporter = getFirstTransporterSync(bsff);
 
-  // Renvoie pour chaque transporteur son rôle (transporter1, transporter2, etc)
-  function transporterCompanyRole(transporter: BsffTransporter) {
-    return `transporter${transporter.number}`;
-  }
-
-  // build a mapping that looks like
-  // { transporter1CompanyOrgId: "SIRET1", transporter2CompanyOrgId: "SIRET2"}
-  const transporterOrgIdByRole = (bsff.transporters ?? []).reduce(
-    (acc, transporter) => {
-      const orgId = getTransporterCompanyOrgId(transporter);
-      if (orgId) {
-        return {
-          ...acc,
-          [transporterCompanyRole(transporter)]: orgId
-        };
-      }
-      return acc;
-    },
-    {}
-  );
-
-  const detenteurSiretByRole = bsff.ficheInterventions.reduce(
-    (sirets, ficheIntervention) => {
-      if (ficheIntervention.detenteurCompanySiret) {
-        const nbOfKeys = Object.keys(sirets).length;
-        return {
-          ...sirets,
-          [`detenteur${nbOfKeys + 1}`]: ficheIntervention.detenteurCompanySiret
-        };
-      }
-      return sirets;
-    },
-    {}
-  );
-
   // Crée un mapping qui associe à chaque rôle sur le BSFF
   // (ex : "emitter", "destination","transporter1", etc)
   // l'identifiant de l'établissement correspondant.
-  const orgIdByRole = {
-    emitter: bsff.emitterCompanySiret,
-    destination: bsff.destinationCompanySiret,
-    ...detenteurSiretByRole,
-    ...transporterOrgIdByRole
-  };
-
+  const orgIdByRole = getOrgIdByRole(bsff);
   const roles = Object.keys(orgIdByRole);
 
   // Crée un mapping qui associe pour chaque rôle l'onglet

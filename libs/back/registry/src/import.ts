@@ -6,6 +6,7 @@ import { SafeParseReturnType } from "zod";
 import { endImport, startImport, updateImportStats } from "./database";
 import {
   CSV_DELIMITER,
+  ERROR_HEADER,
   importOptions,
   ImportType,
   ParsedLine,
@@ -47,7 +48,7 @@ export async function processStream({
 
   const errorStream = format({
     delimiter: CSV_DELIMITER,
-    headers: ["Erreur", ...Object.values(options.headers)],
+    headers: [ERROR_HEADER, ...Object.values(options.headers)],
     writeHeaders: true
   });
   errorStream.pipe(outputErrorStream);
@@ -69,7 +70,7 @@ export async function processStream({
     }> = inputStream.pipe(transformStream).on("error", error => {
       stats.errors++;
       if (errorStream.writable) {
-        errorStream.write([["errors", error.message]]);
+        errorStream.write([["errors", formatErrorMessage(error.message)]]);
       }
     });
 
@@ -90,12 +91,16 @@ export async function processStream({
       }
 
       // Check rights
+      const contextualSiretsWithDelegation =
+        delegateToDelegatorsMap.get(result.data.reportAsCompanySiret ?? "") ??
+        [];
+      const contextualAllowedSirets = [
+        ...allowedSirets,
+        ...contextualSiretsWithDelegation
+      ];
+
       if (
-        !allowedSirets.includes(result.data.reportForSiret) &&
-        result.data.reportAsSiret &&
-        !delegateToDelegatorsMap
-          .get(result.data.reportAsSiret)
-          ?.includes(result.data.reportForSiret)
+        !contextualAllowedSirets.includes(result.data.reportForCompanySiret)
       ) {
         stats.errors++;
 
@@ -137,4 +142,13 @@ export async function processStream({
   }
 
   return stats;
+}
+
+function formatErrorMessage(message: string) {
+  // CSV parsing error when the content is unreadable
+  if (message.includes("Parse Error:")) {
+    return "Erreur de format du fichier. Il ne correspond pas au format attendu et n'a pas pu être lu. Vérifiez que le fichier est bien au format CSV ou XLSX";
+  }
+
+  return message;
 }

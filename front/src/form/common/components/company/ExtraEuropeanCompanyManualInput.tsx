@@ -80,6 +80,7 @@ export default function ExtraEuropeanCompanyManualInput({
           <CountrySelector
             value={field.value.country!}
             onChange={value => setFieldValue(`${field.name}.country`, value)}
+            cca2sToExclude={["FR"]}
           />
         </label>
         <RedErrorMessage name={`${field.name}.country`} />

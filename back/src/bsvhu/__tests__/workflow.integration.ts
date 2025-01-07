@@ -123,6 +123,9 @@ describe("Exemples de circuit du bordereau de suivi de véhicule hors d'usage", 
                 recepisse: {
                   isExempted: true
                 }
+                transport: {
+                  plates: "XY-23-TE"
+                }
               }
             }) { id }
             signBsvhu(id: "${id}", input: {

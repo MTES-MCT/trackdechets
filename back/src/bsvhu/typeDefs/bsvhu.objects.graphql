@@ -112,6 +112,10 @@ type BsvhuTransporter {
 }
 
 type BsvhuTransport {
+  "Mode de transport"
+  mode: TransportMode
+  "Plaque(s) d'immatriculation"
+  plates: [String!]
   "Date de prise en charge"
   takenOverAt: DateTime
   signature: Signature

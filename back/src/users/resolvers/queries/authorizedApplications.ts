@@ -1,7 +1,4 @@
-import {
-  AuthorizedApplication,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import type { AuthorizedApplication, QueryResolvers } from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
@@ -44,7 +41,6 @@ const authorizedApplicationsResolver: QueryResolvers["authorizedApplications"] =
               id: application.id,
               name: application.name,
               admin: application.admin?.email,
-              logoUrl: application.logoUrl,
               lastConnection: accessToken.lastUsed
                 ? new Date(accessToken.lastUsed)
                 : undefined

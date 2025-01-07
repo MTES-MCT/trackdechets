@@ -45,4 +45,6 @@ export type MailTemplate<
   // optional body or body template to be used in conjunction with the LAYOUT templateId
   body?: string | ((values: V) => string);
   prepareVariables?: (variables: V) => any;
+  // paramètres transactionnels Brevo
+  params?: { [id: string]: any };
 };

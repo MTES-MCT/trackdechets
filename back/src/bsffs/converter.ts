@@ -7,7 +7,7 @@ import {
   undefinedOrDefault,
   processDecimal
 } from "../common/converter";
-import * as GraphQL from "../generated/graphql/types";
+import * as GraphQL from "@td/codegen-back";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsffForElastic } from "./elastic";

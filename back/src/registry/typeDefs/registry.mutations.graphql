@@ -1,8 +1,0 @@
-type Mutation {
-  importFile(
-    importType: RegistryImportType!
-    s3FileKey: String!
-  ): RegistryImport!
-
-  addToSsdRegistry(lines: [SsdLineInput!]!): Boolean!
-}

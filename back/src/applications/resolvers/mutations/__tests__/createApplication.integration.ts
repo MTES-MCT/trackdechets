@@ -1,9 +1,6 @@
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Mutation,
-  MutationCreateApplicationArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationCreateApplicationArgs } from "@td/codegen-back";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -30,7 +27,6 @@ describe("createApplication", () => {
       variables: {
         input: {
           name: "Acme",
-          logoUrl: "https://acme.com/logo.png",
           redirectUris: [
             "http://localhost:3000/callback",
             "https://acme.com/callback"

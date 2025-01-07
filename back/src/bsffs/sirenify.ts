@@ -1,11 +1,11 @@
 import { Prisma } from "@prisma/client";
 import buildSirenify, { nextBuildSirenify } from "../companies/sirenify";
-import {
+import type {
   BsffFicheInterventionInput,
   BsffInput,
   CompanyInput,
   UpdateBsffPackagingInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 
 const bsffAccessors = (input: BsffInput) => [
   {

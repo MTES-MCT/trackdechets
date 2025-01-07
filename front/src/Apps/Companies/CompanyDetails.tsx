@@ -79,7 +79,7 @@ const buildTabs = (
   if (canViewRndtsFeatures) {
     tabs.push({
       tabId: "tab6",
-      label: "Délégations RNDTS",
+      label: "Délégations",
       iconId
     });
     tabsContent["tab6"] = CompanyRegistryDelegation;

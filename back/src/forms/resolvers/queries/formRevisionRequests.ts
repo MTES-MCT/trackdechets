@@ -3,12 +3,12 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { prisma } from "@td/prisma";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";
-import {
+import type {
   Form,
   FormCompany,
   FormRevisionRequestContent,
   QueryResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { toPrismaStringFilter } from "../../../common/where";
 
@@ -17,18 +17,18 @@ const MAX_SIZE = 50;
 
 const formRevisionRequestResolver: QueryResolvers["formRevisionRequests"] =
   async (_, args, context) => {
-    const { siret, where, first = MAX_SIZE, after } = args;
+    const { siret: orgId, where, first = MAX_SIZE, after } = args;
 
     const user = checkIsAuthenticated(context);
 
     await checkUserPermissions(
       user,
-      siret,
+      orgId,
       Permission.BsdCanList,
-      `Vous n'avez pas la permission de lister les demandes de révision de l'établissement ${siret}`
+      `Vous n'avez pas la permission de lister les demandes de révision de l'établissement ${orgId}`
     );
-    // TODO support orgId instead of siret for foreign companies
-    const company = await getCompanyOrCompanyNotFound({ siret });
+
+    const company = await getCompanyOrCompanyNotFound({ orgId });
 
     const pageSize = Math.max(Math.min(first ?? 0, MAX_SIZE), MIN_SIZE);
 

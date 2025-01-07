@@ -1,4 +1,4 @@
-import {
+import type {
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
@@ -9,7 +9,7 @@ import {
   QueryOutgoingWastesArgs,
   QueryTransportedWastesArgs,
   AllWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { estypes } from "@elastic/elasticsearch";
 
 export type RegistryFields =

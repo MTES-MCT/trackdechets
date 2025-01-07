@@ -1,10 +1,10 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   MutationCreateRegistryDelegationArgs,
   ResolversParentTypes,
   RegistryDelegation
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { checkCanCreate } from "../../permissions";
 import { parseCreateRegistryDelegationInput } from "../../validation";

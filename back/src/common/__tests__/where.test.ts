@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { safeInput } from "../../common/converter";
-import { BsffWhere } from "../../generated/graphql/types";
+import type { BsffWhere } from "@td/codegen-back";
 import {
   NestingWhereError,
   toPrismaDateFilter,

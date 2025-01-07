@@ -1,9 +1,9 @@
 import { prisma } from "@td/prisma";
 
-import {
+import type {
   MutationResetPasswordArgs,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { checkPasswordCriteria } from "../../utils";
 import { updateUserPassword } from "../../database";
 import { clearUserSessions } from "../../clearUserSessions";

@@ -1,4 +1,4 @@
-import { CompanySearchResult } from "../../../companies/types";
+import { CompanySearchResult } from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { searchCompany } from "../../../companies/search";
 import { sirenify } from "../sirenify";

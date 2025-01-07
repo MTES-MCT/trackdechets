@@ -10,6 +10,11 @@ type FileDownload {
   downloadLink: String
 }
 
+type SignedUrlResponse {
+  fileKey: String!
+  signedUrl: String!
+}
+
 type PageInfo {
   startCursor: String
   endCursor: String

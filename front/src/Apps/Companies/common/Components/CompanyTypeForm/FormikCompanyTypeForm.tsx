@@ -153,7 +153,13 @@ const FormikCompanyTypeForm = ({
   ];
 
   function fieldProps(name: string, index?: number) {
-    let value = values[name];
+    let value;
+    if (name.includes(".")) {
+      value = name.split(".").reduce((a, b) => a[b] || "", values);
+    } else {
+      value = values[name];
+    }
+
     let fieldName = name;
 
     if (index !== undefined) {

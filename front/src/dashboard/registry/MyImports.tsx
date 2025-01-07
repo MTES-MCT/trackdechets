@@ -5,7 +5,8 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
-  RegistryDownloadTarget
+  RegistryDownloadTarget,
+  RegistryImportType
 } from "@td/codegen-ui";
 import React, { useState } from "react";
 
@@ -31,6 +32,12 @@ const HEADERS = [
   "Fichier importé",
   "Rapport d'erreur"
 ];
+
+const TYPES: { [key in RegistryImportType]: string } = {
+  INCOMING_TEXS: "TEXS entrants",
+  INCOMING_WASTE: "D(N)D entrants",
+  SSD: "SSD"
+};
 
 export function MyImports() {
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
@@ -64,9 +71,9 @@ export function MyImports() {
         <div>
           {format(new Date(importData.node.createdAt), "dd/MM/yyyy HH'h'mm")}
         </div>
-        {badges[importData.node.status]}
+        {badges[importData.node.status]("import")}
       </div>,
-      importData.node.type,
+      TYPES[importData.node.type],
       <ul>
         {importData.node.numberOfErrors > 0 && (
           <li>
@@ -98,7 +105,7 @@ export function MyImports() {
             : []
         )
         .join("\n"),
-      <div className="tw-flex">
+      <div>
         <Download
           details={(
             importData.node.originalFileName.split(".").pop() ?? ""
@@ -133,7 +140,7 @@ export function MyImports() {
     <div id="companies" className="companies dashboard">
       {!isMobile && <RegistryMenu />}
       <div className="dashboard-content tw-flex-grow">
-        <div className="tw-p-6">
+        <div className="tw-px-6 tw-py-4">
           <div className="tw-flex tw-gap-6">
             <div>
               <Button
@@ -167,10 +174,10 @@ export function MyImports() {
           )}
           {data && tableData.length === 0 && (
             <div className="tw-text-center">
-              <p className="tw-mt-10 tw-text-2xl">
+              <p className="tw-mt-24 tw-text-xl tw-mb-4">
                 Vous n'avez pas encore fait d'import
               </p>
-              <p>
+              <p className="tw-text-sm">
                 Utilisez le bouton "Importer" ci-dessus pour réaliser un import
               </p>
             </div>

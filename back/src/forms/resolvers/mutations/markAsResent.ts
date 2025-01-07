@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
 import { getAndExpandFormFromDb, flattenFormInput } from "../../converter";
@@ -12,6 +12,7 @@ import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import { EmitterType, Prisma, Status } from "@prisma/client";
 import { UserInputError } from "../../../common/errors";
+import { FormWithForwardedInWithTransportersInclude } from "../../types";
 
 const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   parent,
@@ -22,7 +23,10 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
 
   const { id, resentInfos } = args;
 
-  const form = await getFormOrFormNotFound({ id });
+  const form = await getFormOrFormNotFound(
+    { id },
+    FormWithForwardedInWithTransportersInclude
+  );
 
   const formRepository = getFormRepository(user);
 
@@ -40,7 +44,7 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
   const { destination, wasteDetails } = resentInfos;
 
   // copy basic info from initial BSD and overwrite it with resealedInfos
-  const updateInput: Prisma.FormUpdateInput = {
+  const updateInput = {
     emitterType: EmitterType.PRODUCER,
     emitterCompanySiret: form.recipientCompanySiret,
     emitterCompanyName: form.recipientCompanyName,
@@ -59,17 +63,30 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
     ...flattenFormInput({ wasteDetails, recipient: destination })
   };
 
-  // validate input
-  await sealedFormSchema.validate({
+  const bsdSuiteForValidation = {
     ...forwardedIn,
     ...updateInput
+  };
+
+  // validate input
+  await sealedFormSchema.validate(bsdSuiteForValidation);
+
+  // La validation doit s'appliquer sur les données de validation
+  // (fusion de l'existant et de ce qui est contenu dans l'input)
+  await validateForwardedInCompanies({
+    destinationCompanySiret: bsdSuiteForValidation.recipientCompanySiret,
+    transporterCompanySiret: null,
+    transporterCompanyVatNumber: null
   });
 
-  await validateForwardedInCompanies(form);
+  const forwardedInUpdateInput: Prisma.FormUpdateWithoutForwardingInput = {
+    ...updateInput,
+    status: Status.SEALED
+  };
 
   const formUpdateInput: Prisma.FormUpdateInput = {
     forwardedIn: {
-      update: { ...updateInput, status: Status.SENT }
+      update: forwardedInUpdateInput
     }
   };
 

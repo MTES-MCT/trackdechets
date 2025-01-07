@@ -3,6 +3,7 @@ import { createBsvhu } from "../steps/createBsvhu";
 import { signForProducer } from "../steps/signForProducer";
 import { signOperation } from "../steps/signOperation";
 import { signTransport } from "../steps/signTransport";
+import { updateForeignTransporter } from "../steps/updateTransporter";
 import { updateDestination } from "../steps/updateDestination";
 import fixtures from "../fixturesForeignTransporter";
 
@@ -27,6 +28,7 @@ const workflow: Workflow = {
   steps: [
     createBsvhu("producteur", fixtures as any),
     signForProducer("producteur"),
+    updateForeignTransporter("transporteur"),
     signTransport("transporteur"),
     updateDestination("broyeur"),
     signOperation("broyeur")

@@ -325,11 +325,11 @@ function BsdCard({
     bsdDisplay?.transporter?.company?.siret !== null &&
     bsdDisplay?.emitter?.company?.siret ===
       bsdDisplay?.transporter?.company?.siret;
-  const transporterNameEmmiter = emitterIsTransporter
+  const transporterNameEmitter = emitterIsTransporter
     ? bsdDisplay?.emitter?.company?.name
     : bsdDisplay?.transporter?.company?.name;
 
-  const transporterName = transporterNameEmmiter || NON_RENSEIGNE;
+  const transporterName = transporterNameEmitter || NON_RENSEIGNE;
 
   const unitOfMeasure =
     isBsdasri(bsdDisplay?.type!) ||

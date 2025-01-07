@@ -162,14 +162,17 @@ export const userWithCompanyFactory = async (
 export const userInCompany = async (
   role: UserRole = "ADMIN",
   companyId: string,
-  userOpts: Partial<Prisma.UserCreateInput> = {}
+  userOpts: Partial<Prisma.UserCreateInput> = {},
+  associationOpts: Partial<Prisma.CompanyAssociationCreateInput> = {}
 ) => {
   const user = await userFactory({
     ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: companyId } },
-        role: role
+        role,
+        ...getDefaultNotifications(role),
+        ...associationOpts
       }
     }
   });
@@ -335,6 +338,7 @@ const formdata: Partial<Prisma.FormCreateInput> = {
   wasteDetailsIsDangerous: true,
   wasteDetailsName: "Divers",
   wasteDetailsOnuCode: "2003",
+  wasteDetailsIsSubjectToADR: true,
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
   wasteDetailsPop: false,
   wasteDetailsQuantity: 22.5,

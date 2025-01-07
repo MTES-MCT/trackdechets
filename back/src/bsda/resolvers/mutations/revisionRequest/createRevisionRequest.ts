@@ -8,10 +8,10 @@ import { z } from "zod";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../../common/operationModes";
 import { checkIsAuthenticated } from "../../../../common/permissions";
-import {
+import type {
   BsdaRevisionRequestContentInput,
   MutationCreateBsdaRevisionRequestArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../../types";
 import { getUserCompanies } from "../../../../users/database";
 import { flattenBsdaRevisionRequestInput } from "../../../converter";
@@ -41,7 +41,8 @@ export const NON_CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = Object.values(
 const BSDA_REVISION_REQUESTER_FIELDS = [
   "emitterCompanySiret",
   "destinationCompanySiret",
-  "workerCompanySiret"
+  "workerCompanySiret",
+  "ecoOrganismeSiret"
 ];
 
 export type RevisionRequestContent = Pick<

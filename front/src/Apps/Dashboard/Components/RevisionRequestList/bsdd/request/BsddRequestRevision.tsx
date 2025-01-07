@@ -21,7 +21,7 @@ import { z } from "zod";
 import WasteCodeSelector from "../../../../../common/Components/WasteCodeSelector/WasteCodeSelector";
 import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
 import RhfCompanyContactInfo from "../../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import RhfCompanySelectorWrapper from "../../../../../common/Components/CompanySelectorWrapper/RhfCompanySelectorWrapper";
+import CompanySelectorWrapper from "../../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
@@ -35,6 +35,7 @@ import Appendix1ProducerRequestRevision from "./Appendix1ProducerRequestRevision
 import styles from "./BsddRequestRevision.module.scss";
 import Loader from "../../../../../common/Components/Loader/Loaders";
 import { disableAddPackagingCta } from "../../common/utils/rules";
+import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
 type Props = {
   bsdd: Bsdd;
@@ -72,9 +73,25 @@ export function BsddRequestRevision({ bsdd }: Props) {
     navigate(-1);
   };
 
-  const onSubmitForm = async data => {
+  // Hacky fonction implémentée en hotfix dans tra-15573
+  // La bonne solution à mon sens (benoît) serait d'initialiser
+  // le formulaire de révision avec les valeurs du BSDD
+  // puis de n'envoyer que les champs "dirty" dans onSubmit
+  const resetPopIfUnchanged = (
+    data: Pick<ValidationSchema, "wasteDetails">
+  ) => {
+    const pop = data?.wasteDetails?.pop;
+    if (pop !== null && pop !== undefined && pop === bsdd?.wasteDetails?.pop) {
+      // aucun changement n'a eu lieu sur le champ pop
+      // on le réinitialise à la valeur par défaut du formulaire
+      data.wasteDetails.pop = null;
+    }
+    return data;
+  };
+
+  const onSubmitForm = async (data: ValidationSchema) => {
     const { comment, ...content } = data;
-    const cleanedContent = removeEmptyKeys(content);
+    const cleanedContent = removeEmptyKeys(resetPopIfUnchanged(content));
 
     await createFormRevisionRequest({
       variables: {
@@ -222,6 +239,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   path="wasteDetails.pop"
                   value={Boolean(bsdd.wasteDetails?.pop) ? "Oui" : "Non"}
                   defaultValue={initialBsddReview.wasteDetails.pop}
+                  initialValue={bsdd.wasteDetails?.pop}
                 >
                   <ToggleSwitch
                     label="Le déchet contient des polluants organiques persistants"
@@ -267,7 +285,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   value={bsdd.quantityReceived}
                   defaultValue={initialBsddReview?.quantityReceived}
                 >
-                  <Input
+                  <NonScrollableInput
                     label="Poids en tonnes"
                     className="fr-col-2"
                     state={errors.quantityReceived && "error"}
@@ -301,7 +319,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         ?.quantityReceived
                     }
                   >
-                    <Input
+                    <NonScrollableInput
                       label="Poids en tonnes"
                       className="fr-col-2"
                       state={
@@ -458,7 +476,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   }
                   defaultValue={initialBsddReview.broker}
                 >
-                  <RhfCompanySelectorWrapper
+                  <CompanySelectorWrapper
                     orgId={siret}
                     favoriteType={FavoriteType.Broker}
                     onCompanySelected={onCompanyBrokerSeleted}
@@ -500,7 +518,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   }
                   defaultValue={initialBsddReview.trader}
                 >
-                  <RhfCompanySelectorWrapper
+                  <CompanySelectorWrapper
                     orgId={siret}
                     favoriteType={FavoriteType.Trader}
                     onCompanySelected={onCompanyTraderSeleted}
