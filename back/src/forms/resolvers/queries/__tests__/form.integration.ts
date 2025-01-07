@@ -12,11 +12,13 @@ import {
   toIntermediaryCompany,
   bsddTransporterFactory,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  formWithTempStorageFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
 import { ErrorCode } from "../../../../common/errors";
+import gql from "graphql-tag";
 
 const GET_FORM_QUERY = `
   query GetForm($id: ID, $readableId: String) {
@@ -52,6 +54,19 @@ const GET_FORM_INTERMEDIARY_QUERY = `
       intermediaries {
         name
         siret
+      }
+    }
+  }
+`;
+
+const GET_FORM_WITH_GROUPING_QUERY = gql`
+  query GetForm($id: ID, $readableId: String) {
+    form(id: $id, readableId: $readableId) {
+      id
+      grouping {
+        form {
+          quantityAccepted
+        }
       }
     }
   }
@@ -436,4 +451,62 @@ describe("Query.form", () => {
       EmptyReturnADR.EMPTY_CITERNE_CONTAINER
     );
   });
+
+  it(
+    "[bug tra-15074] should return initial forms (annexe 2) with the right accepted quantity when " +
+      "there has been a temporary storage in the initial form",
+    async () => {
+      const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+      const tempStorer = await userWithCompanyFactory(UserRole.ADMIN);
+      const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+
+      // Le bordereau initial est un bordereau avec entreprosage provisoire
+      const initialForm = await formWithTempStorageFactory({
+        ownerId: emitter.user.id,
+        opt: {
+          recipientCompanySiret: tempStorer.company.siret,
+          quantityReceived: 2,
+          quantityRefused: 0
+        },
+        forwardedInOpts: {
+          recipientCompanySiret: ttr.company.siret,
+          // La quantité acceptée sur l'installation de groupement est
+          // différente de la quantité acceptée lors de l'étape
+          // d'entreposage preovisoire
+          quantityReceived: 1,
+          quantityRefused: 0
+        }
+      });
+
+      // Ce bordereau initial est ensuite groupé dans un autre
+      const form = await formFactory({
+        ownerId: ttr.user.id,
+        opt: {
+          emitterCompanySiret: ttr.company.siret,
+          grouping: { create: { initialFormId: initialForm.id, quantity: 1 } }
+        }
+      });
+
+      const { query } = makeClient(ttr.user);
+      const { errors, data } = await query<Pick<Query, "form">>(
+        GET_FORM_WITH_GROUPING_QUERY,
+        {
+          variables: {
+            id: form.id
+          }
+        }
+      );
+
+      expect(errors).toBeUndefined();
+
+      expect(data.form.grouping).toEqual([
+        // Vérifie que la quantité acceptée sur le bordereau annexée
+        // correspond bien à la quantité acceptée au niveau du TTR et
+        // non à la quantité acceptée lors de l'entreposage provisoire
+        expect.objectContaining({
+          form: expect.objectContaining({ quantityAccepted: 1 })
+        })
+      ]);
+    }
+  );
 });

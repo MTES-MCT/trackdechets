@@ -935,9 +935,9 @@ export function expandInitialFormFromDb(
     transporter,
     takenOverAt,
     signedAt,
-    wasteAcceptationStatus,
     quantityReceived,
     quantityRefused,
+    quantityAccepted,
     processingOperationDone,
     quantityGrouped
   } = expandFormFromDb({
@@ -948,12 +948,6 @@ export function expandInitialFormFromDb(
 
   const hasPickupSite =
     emitter?.workSite?.postalCode && emitter.workSite.postalCode.length > 0;
-
-  const wasteQuantities = bsddWasteQuantities({
-    wasteAcceptationStatus,
-    quantityReceived,
-    quantityRefused
-  });
 
   return {
     id,
@@ -970,7 +964,7 @@ export function expandInitialFormFromDb(
     transporter,
     quantityReceived,
     quantityRefused,
-    quantityAccepted: wasteQuantities?.quantityAccepted?.toNumber() ?? null,
+    quantityAccepted,
     quantityGrouped,
     processingOperationDone
   };

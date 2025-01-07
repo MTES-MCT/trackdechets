@@ -14,6 +14,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Supprimer l'annexe 2 d'un BSDD de regroupement lorsque celle-ci a bien été retirée [PR 3874](https://github.com/MTES-MCT/trackdechets/pull/3874).
+- Au chargement des quantités du tableau des Annexes 2, bien récupérer la quantité acceptée par l'installation de destination finale et non par l'entreposage provisoire (si BSDD-suite à regrouper) à la modification [PR 3875](https://github.com/MTES-MCT/trackdechets/pull/3875)
 
 #### :boom: Breaking changes
 
