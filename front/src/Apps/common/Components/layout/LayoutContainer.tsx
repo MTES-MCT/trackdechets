@@ -26,9 +26,6 @@ const CompaniesRoutes = lazy(
   () => import("../../../Companies/CompaniesRoutes")
 );
 const Account = lazy(() => import("../../../Account/Account"));
-const AccountMembershipRequest = lazy(
-  () => import("../../../Account/AccountMembershipRequest")
-);
 const FormContainer = lazy(() => import("../../../../form/bsdd/FormContainer"));
 
 const BsffFormContainer = lazy(
@@ -276,15 +273,6 @@ export default function LayoutContainer() {
             element={
               <RequireAuth isAuthenticated={isAuthenticated}>
                 <CompaniesRoutes />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.membershipRequest}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <AccountMembershipRequest />
               </RequireAuth>
             }
           />
