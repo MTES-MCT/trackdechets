@@ -45,7 +45,10 @@ import {
   useBsvhuDuplicate,
   useBspaohDuplicate
 } from "../Duplicate/useDuplicate";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../common/queries/company/query";
+import {
+  COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS,
+  COMPANY_SELECTOR_PRIVATE_INFOS
+} from "../../../common/queries/company/query";
 import { Loader } from "../../../common/Components";
 import { BsdDisplay, BsdStatusCode } from "../../../common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
@@ -187,6 +190,16 @@ function BsdCard({
     )?.length
   );
 
+  const { data: dataEmitterRegistered } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
+    variables: { clue: bsd.emitter?.company?.siret! }
+  });
+
+  const isEmitterRegistered =
+    dataEmitterRegistered?.companyPrivateInfos?.isRegistered;
+
   const actionsLabel = useMemo(
     () =>
       getPrimaryActionsLabelFromBsdStatus(
@@ -195,7 +208,8 @@ function BsdCard({
         permissions,
         bsdCurrentTab,
         hasAutomaticSignature,
-        emitterIsExutoireOrTtr
+        emitterIsExutoireOrTtr,
+        isEmitterRegistered
       ),
     [
       bsdCurrentTab,
@@ -203,7 +217,8 @@ function BsdCard({
       currentSiret,
       hasAutomaticSignature,
       permissions,
-      emitterIsExutoireOrTtr
+      emitterIsExutoireOrTtr,
+      isEmitterRegistered
     ]
   );
   const ctaPrimaryLabel = bsdDisplay?.type ? actionsLabel : "";
