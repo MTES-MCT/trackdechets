@@ -10,6 +10,7 @@ import {
 } from "../../../common/pagination";
 import { getMembershipRequestRepository } from "../../repository";
 import { isDefined } from "../../../common/helpers";
+import { MembershipRequestStatus, User } from "@prisma/client";
 
 export const argsSchema = z.object({
   where: z.object({
@@ -74,7 +75,7 @@ const membershipRequestsResolver: QueryResolvers["membershipRequestsResolver"] =
     const { skip, first } = parsedArgs;
     const where = {
       companyId: company.id,
-      status: "PENDING"
+      status: MembershipRequestStatus.PENDING
     };
 
     const totalCount = await membershipRequestRepository.count(where);
@@ -92,7 +93,12 @@ const membershipRequestsResolver: QueryResolvers["membershipRequestsResolver"] =
           orderBy: { updatedAt: "desc" },
           include: { user: true }
         }),
-      formatNode: node => {
+      formatNode: (node: {
+        id: string;
+        user: User;
+        status: MembershipRequestStatus;
+        createdAt: Date;
+      }) => {
         return {
           id: node.id,
           email: node.user.email,
