@@ -336,17 +336,17 @@ model Company {
 // Cette table permet également de stocker de "faux établissements" pouvant être visés lors
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
-  id                String  @id @default(cuid())
+  id                String    @id @default(cuid())
   createdAt         DateTime? @default(now())
-  orgId             String  @unique(map: "AnonymousCompany.orgId_unique")
-  siret             String? @unique(map: "AnonymousCompany.siret_unique")
-  vatNumber         String? @unique(map: "AnonymousCompany.vatnumber_unique")
+  orgId             String    @unique(map: "AnonymousCompany.orgId_unique")
+  siret             String?   @unique(map: "AnonymousCompany.siret_unique")
+  vatNumber         String?   @unique(map: "AnonymousCompany.vatnumber_unique")
   name              String
   address           String
   codeNaf           String
   libelleNaf        String
   codeCommune       String
-  etatAdministratif String  @default("A")
+  etatAdministratif String    @default("A")
 
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
@@ -443,6 +443,7 @@ model Form {
   updatedAt                             DateTime                   @updatedAt @db.Timestamptz(6)
   readableId                            String                     @unique(map: "Form.readableId._UNIQUE")
   customId                              String?
+  isDuplicateOf                         String?
   isDeleted                             Boolean?                   @default(false)
   status                                Status                     @default(DRAFT)
   emitterType                           EmitterType?
@@ -1016,7 +1017,8 @@ model Bsvhu {
   isDeleted Boolean  @default(false)
   customId  String?
 
-  status BsvhuStatus @default(INITIAL)
+  status        BsvhuStatus @default(INITIAL)
+  isDuplicateOf String?
 
   emitterIrregularSituation                           Boolean?                 @default(false)
   emitterNoSiret                                      Boolean?                 @default(false)
@@ -1086,8 +1088,8 @@ model Bsvhu {
   transporterTransportTakenOverAt                     DateTime?                @db.Timestamptz(6)
   transporterCustomInfo                               String?
   transporterTransportMode                            TransportMode?           @default(ROAD)
-  transporterTransportPlates     String[]
-  transporterRecepisseIsExempted Boolean?
+  transporterTransportPlates                          String[]
+  transporterRecepisseIsExempted                      Boolean?
 
   ecoOrganismeName  String?
   ecoOrganismeSiret String?
@@ -1181,14 +1183,15 @@ model IntermediaryBsvhuAssociation {
 }
 
 model Bsdasri {
-  id        String        @id
-  type      BsdasriType   @default(SIMPLE)
-  status    BsdasriStatus @default(INITIAL)
-  rowNumber Int           @unique(map: "Bsdasri_rowNumber_ukey") @default(autoincrement())
-  createdAt DateTime      @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime      @updatedAt @db.Timestamptz(6)
-  isDeleted Boolean?      @default(false)
-  isDraft   Boolean?      @default(false)
+  id            String        @id
+  type          BsdasriType   @default(SIMPLE)
+  status        BsdasriStatus @default(INITIAL)
+  rowNumber     Int           @unique(map: "Bsdasri_rowNumber_ukey") @default(autoincrement())
+  createdAt     DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime      @updatedAt @db.Timestamptz(6)
+  isDeleted     Boolean?      @default(false)
+  isDraft       Boolean?      @default(false)
+  isDuplicateOf String?
 
   emitterCompanyName                          String?
   emitterCompanySiret                         String?
@@ -1400,14 +1403,15 @@ model BsdasriRevisionRequestApproval {
 // end dasri revisions
 
 model Bsff {
-  id        String     @id
-  rowNumber Int        @unique(map: "Bsff_rowNumber_ukey") @default(autoincrement())
-  createdAt DateTime   @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime   @updatedAt @db.Timestamptz(6)
-  status    BsffStatus @default(INITIAL)
-  isDraft   Boolean    @default(false)
-  type      BsffType   @default(TRACER_FLUIDE)
-  isDeleted Boolean    @default(false)
+  id            String     @id
+  rowNumber     Int        @unique(map: "Bsff_rowNumber_ukey") @default(autoincrement())
+  createdAt     DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime   @updatedAt @db.Timestamptz(6)
+  status        BsffStatus @default(INITIAL)
+  isDraft       Boolean    @default(false)
+  type          BsffType   @default(TRACER_FLUIDE)
+  isDeleted     Boolean    @default(false)
+  isDuplicateOf String?
 
   emitterCompanyName             String?
   emitterCompanySiret            String?
@@ -1607,14 +1611,15 @@ model BsffPackaging {
 }
 
 model Bsda {
-  id        String     @id
-  rowNumber Int        @unique(map: "Bsda_rowNumber_ukey") @default(autoincrement())
-  createdAt DateTime   @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime   @updatedAt @db.Timestamptz(6)
-  isDraft   Boolean    @default(false)
-  isDeleted Boolean    @default(false)
-  status    BsdaStatus @default(INITIAL)
-  type      BsdaType   @default(OTHER_COLLECTIONS)
+  id            String     @id
+  rowNumber     Int        @unique(map: "Bsda_rowNumber_ukey") @default(autoincrement())
+  createdAt     DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime   @updatedAt @db.Timestamptz(6)
+  isDraft       Boolean    @default(false)
+  isDeleted     Boolean    @default(false)
+  status        BsdaStatus @default(INITIAL)
+  type          BsdaType   @default(OTHER_COLLECTIONS)
+  isDuplicateOf String?
 
   emitterIsPrivateIndividual     Boolean?
   emitterCompanyName             String?
@@ -1909,12 +1914,13 @@ model Event {
 }
 
 model Bspaoh {
-  id        String       @id
-  rowNumber Int          @unique(map: "Bspaoh_rowNumber_ukey") @default(autoincrement())
-  createdAt DateTime     @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime     @updatedAt @db.Timestamptz(6)
-  isDeleted Boolean      @default(false)
-  status    BspaohStatus @default(INITIAL)
+  id            String       @id
+  rowNumber     Int          @unique(map: "Bspaoh_rowNumber_ukey") @default(autoincrement())
+  createdAt     DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime     @updatedAt @db.Timestamptz(6)
+  isDeleted     Boolean      @default(false)
+  status        BspaohStatus @default(INITIAL)
+  isDuplicateOf String?
 
   wasteCode       String?
   wasteAdr        String?
