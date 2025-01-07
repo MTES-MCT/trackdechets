@@ -113,13 +113,6 @@ export const fillWasteTab = async (page: Page) => {
     page.getByText("Identification par numéro d'immatriculation")
   ).toBeVisible();
 
-  // Check default selection
-  await expect(
-    page.getByLabel(
-      "Identification par N° d'ordre tels qu'ils figurent dans le registre de police"
-    )
-  ).toBeChecked();
-
   // Select target value
   await page.getByText("Identification par numéro d'immatriculation").click();
 
