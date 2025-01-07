@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
-export type FindManyMembershipRequestFn = <
+export type FindManyMembershipRequestsFn = <
   Args extends Omit<Prisma.MembershipRequestFindManyArgs, "where">
 >(
   where: Prisma.MembershipRequestWhereInput,
@@ -10,7 +10,7 @@ export type FindManyMembershipRequestFn = <
 
 export function buildFindManyMembershipRequest({
   prisma
-}: ReadRepositoryFnDeps): FindManyMembershipRequestFn {
+}: ReadRepositoryFnDeps): FindManyMembershipRequestsFn {
   return async <
     Args extends Omit<Prisma.MembershipRequestFindManyArgs, "where">
   >(

@@ -21,95 +21,98 @@ export const argsSchema = z.object({
   first: z.number().min(1).max(50).nullish()
 });
 
-const membershipRequestsResolver: QueryResolvers["membershipRequestsResolver"] =
-  async (_, args, context) => {
-    // User must be authenticated
-    const user = checkIsAuthenticated(context);
+const membershipRequestsResolver: QueryResolvers["membershipRequests"] = async (
+  _,
+  args,
+  context
+) => {
+  // User must be authenticated
+  const user = checkIsAuthenticated(context);
 
-    // Sync validation of args
-    const parsedArgs = argsSchema.parse(args);
+  // Sync validation of args
+  const parsedArgs = argsSchema.parse(args);
 
-    // Check on `id` and `siret`. Exactly one of them can be set.
-    const { siret, id } = parsedArgs.where;
+  // Check on `id` and `siret`. Exactly one of them can be set.
+  const { siret, id } = parsedArgs.where;
 
-    if (id && siret) {
-      throw new UserInputError(
-        "Vous devez faire une recherche par `id` ou `siret` mais pas les deux"
-      );
-    }
+  if (id && siret) {
+    throw new UserInputError(
+      "Vous devez faire une recherche par `id` ou `siret` mais pas les deux"
+    );
+  }
 
-    if (!id && !siret) {
-      throw new UserInputError(
-        "Vous devez saisir soit `id` soit `siret` comme paramètre de recherche"
-      );
-    }
+  if (!id && !siret) {
+    throw new UserInputError(
+      "Vous devez saisir soit `id` soit `siret` comme paramètre de recherche"
+    );
+  }
 
-    // Make sure company exists
-    const findUniqueWhere = isDefined(id) ? { id: id! } : { siret: siret! };
-    const company = await prisma.company.findUnique({
-      where: findUniqueWhere
-    });
+  // Make sure company exists
+  const findUniqueWhere = isDefined(id) ? { id: id! } : { siret: siret! };
+  const company = await prisma.company.findUnique({
+    where: findUniqueWhere
+  });
 
-    if (!company) {
-      throw new UserInputError("L'entreprise ciblée n'existe pas");
-    }
+  if (!company) {
+    throw new UserInputError("L'entreprise ciblée n'existe pas");
+  }
 
-    // Make sure user is admin of said company
-    const association = await prisma.companyAssociation.findFirst({
-      where: {
-        userId: user.id,
-        companyId: company.id,
-        role: "ADMIN"
-      }
-    });
-
-    if (!association) {
-      throw new UserInputError(
-        "Vous n'êtes pas administrateur de l'entreprise ciblée"
-      );
-    }
-
-    // Fetch membership requests, paginated
-    const membershipRequestRepository = getMembershipRequestRepository();
-
-    const { skip, first } = parsedArgs;
-    const where = {
+  // Make sure user is admin of said company
+  const association = await prisma.companyAssociation.findFirst({
+    where: {
+      userId: user.id,
       companyId: company.id,
-      status: MembershipRequestStatus.PENDING
-    };
+      role: "ADMIN"
+    }
+  });
 
-    const totalCount = await membershipRequestRepository.count(where);
+  if (!association) {
+    throw new UserInputError(
+      "Vous n'êtes pas administrateur de l'entreprise ciblée"
+    );
+  }
 
-    const paginationArgs = getPrismaPaginationArgs({
-      skip: skip ?? 0,
-      first: first ?? 50
-    });
+  // Fetch membership requests, paginated
+  const membershipRequestRepository = getMembershipRequestRepository();
 
-    const result = await getConnection({
-      totalCount,
-      findMany: () =>
-        membershipRequestRepository.findMany(where, {
-          ...paginationArgs,
-          orderBy: { updatedAt: "desc" },
-          include: { user: true }
-        }),
-      formatNode: (node: {
-        id: string;
-        user: User;
-        status: MembershipRequestStatus;
-        createdAt: Date;
-      }) => {
-        return {
-          id: node.id,
-          email: node.user.email,
-          name: node.user.name,
-          status: node.status,
-          createdAt: node.createdAt
-        };
-      }
-    });
-
-    return result;
+  const { skip, first } = parsedArgs;
+  const where = {
+    companyId: company.id,
+    status: MembershipRequestStatus.PENDING
   };
+
+  const totalCount = await membershipRequestRepository.count(where);
+
+  const paginationArgs = getPrismaPaginationArgs({
+    skip: skip ?? 0,
+    first: first ?? 50
+  });
+
+  const result = await getConnection({
+    totalCount,
+    findMany: () =>
+      membershipRequestRepository.findMany(where, {
+        ...paginationArgs,
+        orderBy: { updatedAt: "desc" },
+        include: { user: true }
+      }),
+    formatNode: (node: {
+      id: string;
+      user: User;
+      status: MembershipRequestStatus;
+      createdAt: Date;
+    }) => {
+      return {
+        id: node.id,
+        email: node.user.email,
+        name: node.user.name,
+        status: node.status,
+        createdAt: node.createdAt
+      };
+    }
+  });
+
+  return result;
+};
 
 export default membershipRequestsResolver;
