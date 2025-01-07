@@ -12,6 +12,10 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { flattenFicheInterventionBsffInput } from "../../../converter";
 
+import {
+  createBsff,
+  createFicheIntervention
+} from "../../../__tests__/factories";
 const UPDATE_FICHE_INTERVENTION = `
   mutation UpdateFicheIntervention($id: ID!, $input: BsffFicheInterventionInput!) {
     updateFicheInterventionBsff(id: $id, input: $input) {
@@ -144,6 +148,75 @@ describe("Mutation.updateFicheInterventionBsff", () => {
       expect.objectContaining({
         message: `La fiche d'intervention n°abcdefgh n'existe pas.`
       })
+    ]);
+  });
+
+  it("should update detenteurCompanySirets when siret detenteur is updated", async () => {
+    const detenteurAndOperateur = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const newDetenteur = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention1 = await createFicheIntervention({
+      operateur: detenteurAndOperateur,
+      detenteur: detenteurAndOperateur
+    });
+
+    const bsff = await createBsff(
+      { emitter: detenteurAndOperateur },
+      {
+        data: {
+          isDraft: true,
+          ficheInterventions: { connect: { id: ficheIntervention1.id } },
+          detenteurCompanySirets: [detenteurAndOperateur.company.siret!]
+        },
+        userId: emitter.user.id
+      }
+    );
+
+    const { mutate } = makeClient(detenteurAndOperateur.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateFicheInterventionBsff">,
+      MutationUpdateFicheInterventionBsffArgs
+    >(UPDATE_FICHE_INTERVENTION, {
+      variables: {
+        id: ficheIntervention1.id,
+
+        input: {
+          numero: "ABCDEFGHIJK",
+          weight: 2,
+          detenteur: {
+            company: {
+              name: "Nouveau détenteur",
+              siret: newDetenteur.company.siret,
+              address: "12 rue de la Tige, 69000",
+              mail: "contact@gmail.com",
+              phone: "06",
+              contact: "Jeanne Michelin"
+            }
+          },
+          operateur: {
+            company: {
+              name: "Clim'op",
+              siret: detenteurAndOperateur.company.siret,
+              address: "12 rue de la Tige, 69000",
+              mail: "contact@climop.com",
+              phone: "06",
+              contact: "Dupont Jean"
+            }
+          },
+          postalCode: "69000"
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateFicheInterventionBsff.id).toBe(ficheIntervention1.id);
+
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
+      where: { id: bsff.id }
+    });
+    expect(updatedBsff.detenteurCompanySirets).toEqual([
+      newDetenteur.company.siret
     ]);
   });
 });

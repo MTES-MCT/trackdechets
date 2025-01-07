@@ -22,14 +22,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Supprimer l'annexe 2 d'un BSDD de regroupement lorsque celle-ci a bien été retirée [PR 3874](https://github.com/MTES-MCT/trackdechets/pull/3874).
 - Au chargement des quantités du tableau des Annexes 2, bien récupérer la quantité acceptée par l'installation de destination finale et non par l'entreposage provisoire (si BSDD-suite à regrouper) à la modification [PR 3875](https://github.com/MTES-MCT/trackdechets/pull/3875)
+- Correction de la mise à jour des numéros d'identification sur le bsvhu [PR 3876](https://github.com/MTES-MCT/trackdechets/pull/3876)
+- Correction des permissions d'accès à un Bsff lors de la modification du détenteur d'une fiche d'inspection associée [PR 3880](https://github.com/MTES-MCT/trackdechets/pull/3880)
 
 #### :boom: Breaking changes
 
 - Pour le Bsvhu lors d'un transport routier, la plaque d'immatriculation est désormais obligatoire et les poids de déchets sont limités à 40 T (50 kT pour les autres modes) [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
-
-#### :bug: Corrections de bugs
-
-- Correction de la mise à jour des numéros d'identification sur le bsvhu [PR 3876](https://github.com/MTES-MCT/trackdechets/pull/3876)
 
 # [2024.12.1] 17/12/2024
 
