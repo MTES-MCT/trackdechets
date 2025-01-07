@@ -27,6 +27,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Pour le Bsvhu lors d'un transport routier, la plaque d'immatriculation est désormais obligatoire et les poids de déchets sont limités à 40 T (50 kT pour les autres modes) [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
 
+#### :bug: Corrections de bugs
+
+- Correction de la mise à jour des numéros d'identification sur le bsvhu [PR 3876](https://github.com/MTES-MCT/trackdechets/pull/3876)
+
 # [2024.12.1] 17/12/2024
 
 #### :rocket: Nouvelles fonctionnalités
