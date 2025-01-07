@@ -153,6 +153,10 @@ const EmitterBsvhu = ({ errors }) => {
                   );
                   if (!e.currentTarget.checked) {
                     setValue("emitter.noSiret", false);
+                  } else {
+                    if (emitter.agrementNumber) {
+                      setValue("emitter.agrementNumber", "");
+                    }
                   }
                 }
               }

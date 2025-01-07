@@ -54,6 +54,12 @@ const WasteBsvhu = ({
         formState.errors?.identification?.numbers?.length,
         setError
       );
+      setFieldError(
+        errors,
+        "identification.type",
+        formState.errors?.identification?.type,
+        setError
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
@@ -140,6 +146,10 @@ const WasteBsvhu = ({
           disabled={sealedFields.includes("identification.type")}
           className="fr-col-sm-10 fr-ml-3w"
           options={identificationTypeOptions}
+          state={formState.errors?.identification?.type && "error"}
+          stateRelatedMessage={
+            formState.errors?.identification?.type?.["message"]
+          }
         />
       )}
       <fieldset className="fr-fieldset">
