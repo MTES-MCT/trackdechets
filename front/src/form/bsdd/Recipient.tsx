@@ -135,7 +135,7 @@ export default function Recipient({ disabled }) {
         </div>
       )}
       {isTempStorage && (
-        <div className="notification tw-mt-2">
+        <div className="notification fr-mt-6v">
           Vous avez sélectionné "Entreposage provisoire ou reconditionnement".
           En cas de doute, et pour éviter une erreur qui serait bloquante pour
           le parcours du déchet, veuillez vérifier avec vos partenaires ce qu'il
@@ -168,15 +168,17 @@ export default function Recipient({ disabled }) {
         disabled={disabled}
       />
       <h4 className="form__section-heading">Informations complémentaires</h4>
-      <div className="form__row">
-        <Field
-          component={ProcessingOperation}
-          name="recipient.processingOperation"
-          enableReuse={isGrouping}
-          disabled={disabled}
-        />
-        <RedErrorMessage name="recipient.processingOperation" />
-      </div>
+      {!isTempStorage && (
+        <div className="form__row">
+          <Field
+            component={ProcessingOperation}
+            name="recipient.processingOperation"
+            enableReuse={isGrouping}
+            disabled={disabled}
+          />
+          <RedErrorMessage name="recipient.processingOperation" />
+        </div>
+      )}
       <div className="form__row">
         <label>
           Numéro de CAP

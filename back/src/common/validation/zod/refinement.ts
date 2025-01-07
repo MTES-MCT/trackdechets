@@ -224,16 +224,30 @@ export async function isDestinationRefinement(
   }
 }
 
-export async function isEmitterNotDormantRefinement(
+export async function isEmitterRefinement(
   siret: string | null | undefined,
-  ctx: RefinementCtx
+  bsdType: BsdType,
+  ctx: RefinementCtx,
+  isExemptedFromVerification = false,
+  checkIsNotDormant = true
 ) {
-  if (!siret) return null;
-  const company = await prisma.company.findUnique({
-    where: { siret }
-  });
+  let company: Company | null = null;
+  // if the emitter of the BSD has to be registered on TD, add the BSD type here
+  if (bsdType === BsdType.BSVHU && !isExemptedFromVerification) {
+    company = await refineSiretAndGetCompany(
+      siret,
+      ctx,
+      CompanyRole.Emitter,
+      checkIsNotDormant
+    );
+  } else {
+    if (!siret) return null;
+    company = await prisma.company.findUnique({
+      where: { siret }
+    });
+  }
 
-  if (company?.isDormantSince) {
+  if (checkIsNotDormant && company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: pathFromCompanyRole(CompanyRole.Emitter),

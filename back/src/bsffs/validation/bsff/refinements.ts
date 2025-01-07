@@ -22,6 +22,7 @@ import { getSignatureAncestors } from "./helpers";
 import { isArray } from "../../../common/dataTypes";
 import { capitalize } from "../../../common/strings";
 import {
+  BsdType,
   BsffPackagingType,
   BsffType,
   Prisma,
@@ -32,7 +33,7 @@ import { OPERATION } from "../../constants";
 import type { BsffOperationCode } from "@td/codegen-back";
 import {
   isDestinationRefinement,
-  isEmitterNotDormantRefinement,
+  isEmitterRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement
 } from "../../../common/validation/zod/refinement";
@@ -55,7 +56,7 @@ export const checkCompanies: Refinement<ParsedZodBsff> = async (
   bsff,
   zodContext
 ) => {
-  await isEmitterNotDormantRefinement(bsff.emitterCompanySiret, zodContext);
+  await isEmitterRefinement(bsff.emitterCompanySiret, BsdType.BSFF, zodContext);
   await isDestinationRefinement(bsff.destinationCompanySiret, zodContext);
 
   for (const transporter of bsff.transporters ?? []) {

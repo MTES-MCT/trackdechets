@@ -55,8 +55,6 @@ const RhfOperationModeSelect = ({ operationCode, path }) => {
           }))}
         />
       </fieldset>
-
-      {/* <RedErrorMessage name={name} /> */}
     </div>
   );
 };

@@ -30,7 +30,7 @@ import {
   isBrokerRefinement,
   isDestinationRefinement,
   isEcoOrganismeRefinement,
-  isEmitterNotDormantRefinement,
+  isEmitterRefinement,
   isRegisteredVatNumberRefinement,
   isTransporterRefinement,
   refineSiretAndGetCompany
@@ -305,10 +305,13 @@ export const checkCompanies = async (
     );
   };
 
-  if (!sealedFields.includes("emitterCompanySiret")) {
-    await isEmitterNotDormantRefinement(bsda.emitterCompanySiret, zodContext);
-  }
-
+  await isEmitterRefinement(
+    bsda.emitterCompanySiret,
+    BsdType.BSDA,
+    zodContext,
+    false,
+    !sealedFields.includes("emitterCompanySiret")
+  );
   await isDestinationRefinement(
     bsda.destinationCompanySiret,
     zodContext,

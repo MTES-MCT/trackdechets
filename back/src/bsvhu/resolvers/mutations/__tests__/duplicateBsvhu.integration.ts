@@ -28,7 +28,7 @@ const DUPLICATE_BVHU = gql`
   }
 `;
 
-describe("mutaion.duplicateBsvhu", () => {
+describe("mutation.duplicateBsvhu", () => {
   afterEach(async () => {
     await resetDatabase();
     jest.resetModules();
@@ -257,8 +257,8 @@ describe("mutaion.duplicateBsvhu", () => {
       transporterCompanyVatNumber,
       transporterTransportTakenOverAt,
       transporterCustomInfo,
-      transporterTransportPlates,
       transporterRecepisseIsExempted,
+      transporterTransportMode,
       ecoOrganismeSiret,
       ecoOrganismeName,
       brokerCompanyName,
@@ -296,6 +296,7 @@ describe("mutaion.duplicateBsvhu", () => {
       "emitterEmissionSignatureDate",
       "transporterTransportSignatureAuthor",
       "transporterTransportSignatureDate",
+      "transporterTransportPlates",
       "destinationReceptionQuantity",
       "destinationReceptionWeight",
       "destinationReceptionAcceptationStatus",
@@ -369,7 +370,6 @@ describe("mutaion.duplicateBsvhu", () => {
       transporterCompanyVatNumber,
       transporterTransportTakenOverAt,
       transporterCustomInfo,
-      transporterTransportPlates,
       transporterRecepisseIsExempted,
       ecoOrganismeSiret,
       ecoOrganismeName,

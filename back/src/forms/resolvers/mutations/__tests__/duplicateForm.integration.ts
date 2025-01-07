@@ -1,6 +1,10 @@
-import { Prisma, UserRole } from "@prisma/client";
+import { EmitterType, Prisma, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import type { CompanySearchResult, Mutation } from "@td/codegen-back";
+import {
+  CompanySearchResult,
+  Mutation,
+  MutationCreateFormArgs
+} from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,
@@ -17,8 +21,17 @@ import {
   getFirstTransporterSync
 } from "../../../database";
 import { searchCompany } from "../../../../companies/search";
+import getReadableId from "../../../readableId";
 
 jest.mock("../../../../companies/search");
+
+const CREATE_FORM = `
+  mutation CreateForm($createFormInput: CreateFormInput!) {
+    createForm(createFormInput: $createFormInput) {
+      id
+    }
+  }
+`;
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
@@ -1331,4 +1344,55 @@ describe("Mutation.duplicateForm", () => {
       );
     }
   );
+
+  it("should not be possible to duplicate annexe 1", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const appendix1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.SEALED,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            type: "APPENDIX1",
+            company: { siret: company.siret }
+          },
+          transporter: { company: { siret: company.siret } },
+          grouping: [{ form: { id: appendix1.id } }]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    // When
+    const { errors: errors2 } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: appendix1.id
+        }
+      }
+    );
+
+    // Then
+    expect(errors2).not.toBeUndefined();
+    expect(errors2[0].message).toBe(
+      "Impossible de dupliquer un bordereau d'annexe 1"
+    );
+  });
 });

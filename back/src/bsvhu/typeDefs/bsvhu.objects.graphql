@@ -86,7 +86,7 @@ type BsvhuEmitter {
   irregularSituation: Boolean!
   "Indique si l'émetteur est un particulier ou une entreprise sans SIRET"
   noSiret: Boolean!
-  "Coordonnées de l'entreprise émétrice"
+  "Coordonnées de l'entreprise émettrice"
   company: FormCompany
   "Déclaration générale de l'émetteur du bordereau"
   emission: BsvhuEmission
@@ -112,6 +112,10 @@ type BsvhuTransporter {
 }
 
 type BsvhuTransport {
+  "Mode de transport"
+  mode: TransportMode
+  "Plaque(s) d'immatriculation"
+  plates: [String!]
   "Date de prise en charge"
   takenOverAt: DateTime
   signature: Signature

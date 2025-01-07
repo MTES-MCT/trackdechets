@@ -564,9 +564,10 @@ export const ecoOrganismeSchema = yup.object().shape({
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
-const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
-  isDraft
-}) =>
+export const recipientSchemaFn: FactorySchemaOf<
+  FormValidationContext,
+  Recipient
+> = ({ isDraft }) =>
   yup.object({
     recipientCap: yup
       .string()
@@ -592,7 +593,10 @@ const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
       .string()
       .label("Opération d’élimination / valorisation")
       .ensure()
-      .requiredIf(!isDraft)
+      .when("recipientIsTempStorage", {
+        is: recipientIsTempStorage => !recipientIsTempStorage,
+        then: s => s.requiredIf(!isDraft)
+      })
       .when("emitterType", (value, schema) => {
         const oneOf =
           value === EmitterType.APPENDIX2

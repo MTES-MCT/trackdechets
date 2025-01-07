@@ -46,14 +46,6 @@ export const UPDATE_BSFF_FORM = gql`
   ${FullBsffFragment}
 `;
 
-export const UPDATE_BSFF_PACKAGING = gql`
-  mutation UpdateBsffPackaging($id: ID!, $input: UpdateBsffPackagingInput!) {
-    updateBsffPackaging(id: $id, input: $input) {
-      id
-    }
-  }
-`;
-
 export const SIGN_BSFF = gql`
   mutation SignBsff($id: ID!, $input: BsffSignatureInput!) {
     signBsff(id: $id, input: $input) {

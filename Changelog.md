@@ -5,6 +5,28 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.01.1] 14/01/2025
+
+#### :rocket: Nouvelles fonctionnalités
+
+- BSFF - Permettre la modification des informations d'un contenant à la signature de son opération et après son traitement pendant 60 jours. [PR 3853](https://github.com/MTES-MCT/trackdechets/pull/3853)
+
+#### :nail_care: Améliorations
+
+- Ajout de "2795" à la suite de Installation de traitement > Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780) sur le type de profil Installation de traitement. [PR 3845](https://github.com/MTES-MCT/trackdechets/pull/3845)
+- BSFF - Mettre à jour les informations du contenant modifié (code déchet, description, poids) dans l'aperçu et dans le tableau de bord lorsque le BSFF a un seul contenant [PR 3853](https://github.com/MTES-MCT/trackdechets/pull/3853).
+- Permettre d'ajouter un intermédiaire sur le VHU jusqu'au traitement du bordereau [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
+- Retirer la possibilité de publier un BSVHU si l'émetteur visé n'est pas inscrit sur Trackdéchets et qu'il n'est pas en situation irrégulière [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
+
+#### :bug: Corrections de bugs
+
+- Supprimer l'annexe 2 d'un BSDD de regroupement lorsque celle-ci a bien été retirée [PR 3874](https://github.com/MTES-MCT/trackdechets/pull/3874).
+- Au chargement des quantités du tableau des Annexes 2, bien récupérer la quantité acceptée par l'installation de destination finale et non par l'entreposage provisoire (si BSDD-suite à regrouper) à la modification [PR 3875](https://github.com/MTES-MCT/trackdechets/pull/3875)
+
+#### :boom: Breaking changes
+
+- Pour le Bsvhu lors d'un transport routier, la plaque d'immatriculation est désormais obligatoire et les poids de déchets sont limités à 40 T (50 kT pour les autres modes) [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
+
 # [2024.12.1] 17/12/2024
 
 #### :rocket: Nouvelles fonctionnalités

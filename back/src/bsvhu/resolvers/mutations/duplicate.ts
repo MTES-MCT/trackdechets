@@ -73,6 +73,7 @@ async function getDuplicateData(
     emitterEmissionSignatureDate,
     transporterTransportSignatureAuthor,
     transporterTransportSignatureDate,
+    transporterTransportPlates,
     destinationReceptionQuantity,
     destinationReceptionWeight,
     destinationReceptionAcceptationStatus,

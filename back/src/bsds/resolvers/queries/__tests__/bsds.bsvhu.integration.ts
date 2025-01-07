@@ -159,7 +159,8 @@ describe("Query.bsds.vhus base workflow", () => {
                 contact: "Un transporteur de voiture cassée",
                 phone: "0101010101",
                 mail: "transporter@mail.com"
-              }
+              },
+              transport: { plates: ["XY-87-IU"] }
             }
           }
         }
@@ -238,6 +239,26 @@ describe("Query.bsds.vhus base workflow", () => {
       ]);
     });
 
+    it("draft vhu should be found with plates", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              transporter: {
+                transport: { plates: { _has: "XY-87-IU" } }
+              }
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: vhuId } })
+      ]);
+    });
+
     it("draft vhu should not be isDraftFor transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
@@ -253,6 +274,7 @@ describe("Query.bsds.vhus base workflow", () => {
 
       expect(data.bsds.edges).toEqual([]);
     });
+
     it("draft vhu should not be isDraftFor destination", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
@@ -551,7 +573,7 @@ describe("Query.bsds.vhus base workflow", () => {
       ]);
     });
 
-    it("processed  vhu should be isArchivedFor destination", async () => {
+    it("processed vhu should be isArchivedFor destination", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -621,7 +643,7 @@ describe("Query.bsds.vhus base workflow", () => {
       ]);
     });
 
-    it("refused  vhu should be isArchivedFor recipient", async () => {
+    it("refused vhu should be isArchivedFor recipient", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,

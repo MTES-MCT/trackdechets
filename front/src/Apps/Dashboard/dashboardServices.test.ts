@@ -31,7 +31,8 @@ import {
   isSiretActorForBsd,
   ActorType,
   canReviewBsda,
-  canReviewBsdasri
+  canReviewBsdasri,
+  canMakeCorrection
 } from "./dashboardServices";
 import {
   BsdType,
@@ -39,7 +40,8 @@ import {
   EmitterType,
   BsdasriType,
   BsdaType,
-  UserPermission
+  UserPermission,
+  BsffPackaging
 } from "@td/codegen-ui";
 
 import { BsdCurrentTab } from "../common/types/commonTypes";
@@ -1561,6 +1563,93 @@ describe("dashboardServices", () => {
       };
       expect(canReviewBsdd(bsdd as BsdDisplay, siret)).toEqual(false);
     });
+  });
+
+  describe("canMakeCorrection", () => {
+    const currentSiret = "123456789";
+    const bsd = {
+      type: BsdType.Bsff,
+      destination: { company: { siret: currentSiret } },
+      status: BsdStatusCode.Processed,
+      packagings: [
+        { operation: { signature: { date: new Date().toISOString() } } },
+        { operation: { signature: { date: new Date().toISOString() } } }
+      ]
+    } as any as BsdDisplay;
+
+    it("should return true if bsd type is BSFF, status is Processed, and within 60 days of last operation", () => {
+      const result = canMakeCorrection(bsd, currentSiret);
+      expect(result).toBe(true);
+    });
+
+    it("should return false if bsd type is not BSFF", () => {
+      const result = canMakeCorrection(
+        { ...bsd, type: BsdType.Bsda },
+        currentSiret
+      );
+      expect(result).toBe(false);
+    });
+
+    it("should return false if status is not Processed or IntermediatelyProcessed", () => {
+      const result = canMakeCorrection(
+        { ...bsd, status: BsdStatusCode.Sent },
+        currentSiret
+      );
+      expect(result).toBe(false);
+    });
+
+    it("should return false if currentSiret does not match destination siret", () => {
+      const result = canMakeCorrection(
+        { ...bsd, destination: { company: { siret: "987654321" } } },
+        currentSiret
+      );
+      expect(result).toBe(false);
+    });
+
+    it("should return false if more than 60 days have passed since the last operation", () => {
+      const oldDate = new Date();
+      oldDate.setDate(oldDate.getDate() - 61);
+      const result = canMakeCorrection(
+        {
+          ...bsd,
+          packagings: [
+            {
+              operation: { signature: { date: oldDate.toISOString() } }
+            } as BsffPackaging,
+            {
+              operation: { signature: { date: oldDate.toISOString() } }
+            } as BsffPackaging
+          ]
+        },
+        currentSiret
+      );
+      expect(result).toBe(false);
+    });
+
+    it(
+      "should return false if status is IntermediatelyProcessed and all packagings are" +
+        "included in a bsd suite",
+      () => {
+        const result = canMakeCorrection(
+          {
+            ...bsd,
+            status: BsdStatusCode.IntermediatelyProcessed,
+            packagings: [
+              {
+                operation: { signature: { date: new Date().toISOString() } },
+                nextBsff: { id: "FF" }
+              } as BsffPackaging,
+              {
+                operation: { signature: { date: new Date().toISOString() } },
+                nextBsff: { id: "FF" }
+              } as BsffPackaging
+            ]
+          },
+          currentSiret
+        );
+        expect(result).toBe(false);
+      }
+    );
   });
 
   describe("canReviewBsda", () => {

@@ -56,6 +56,7 @@ input BsvhuTransporterWhere {
 "Champs possible pour le filtre sur le transport."
 input BsvhuTransportWhere {
   signature: SignatureWhere
+  plates: StringNullableListFilter
 }
 
 "Champs possible pour le filtre sur la destination."
@@ -215,7 +216,11 @@ input BsvhuIdentificationInput {
 }
 
 input BsvhuWeightInput {
-  "Poids en tonnes"
+  """
+  Poids   en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   value: Float
   "Est-ce une estimation?"
   isEstimate: Boolean
@@ -242,7 +247,12 @@ input BsvhuReceptionInput {
   date: DateTime
   "Quantité de VHUs reçue"
   quantity: Int
-  "Poids réel reçu en tonnes"
+
+  """
+  Poids réel reçu en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   weight: Float
   "Lot accepté oui/non"
   acceptationStatus: WasteAcceptationStatus
@@ -291,6 +301,10 @@ input BsvhuTraderInput {
 }
 
 input BsvhuTransportInput {
+  "Mode de transport"
+  mode: TransportMode
+  "Plaque(s) d'immatriculation - maximum 2"
+  plates: [String!]
   "Date de prise en charge"
   takenOverAt: DateTime
 }
