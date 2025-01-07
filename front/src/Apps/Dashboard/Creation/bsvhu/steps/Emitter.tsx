@@ -193,17 +193,13 @@ const EmitterBsvhu = ({ errors }) => {
                   name: (emitter?.company?.name || company.name) as string,
                   address: (emitter?.company?.address ||
                     company.address) as string,
-                  contact: (emitter?.company?.contact ||
-                    company.contact) as string,
-                  phone: (emitter?.company?.phone ||
-                    company.contactPhone) as string,
-                  mail: (emitter?.company?.mail ||
-                    company.contactEmail) as string,
+                  contact: emitter?.company?.contact,
+                  phone: emitter?.company?.phone,
+                  mail: emitter?.company?.mail,
                   country: company.codePaysEtrangerEtablissement
                 };
 
-                agrementNumber = (emitter?.agrementNumber ||
-                  company?.vhuAgrementDemolisseur?.agrementNumber) as string;
+                agrementNumber = emitter?.agrementNumber;
               }
 
               setValue("emitter", {
