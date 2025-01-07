@@ -53,7 +53,7 @@ function requireNextDestination(bsffPackaging: ZodBsffPackaging) {
   return false;
 }
 
-function isBsffPackagingFieldSield(bsffPackaging: ZodBsffPackaging) {
+function isBsffPackagingFieldSealed(bsffPackaging: ZodBsffPackaging) {
   if (
     !!bsffPackaging.operationSignatureDate &&
     // cas particulier : on ne permet pas de modifier un contenant qui est
@@ -72,12 +72,12 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
   numero: {
     sealed: {
       from: "OPERATION",
-      when: isBsffPackagingFieldSield
+      when: isBsffPackagingFieldSealed
     },
     required: { from: "ACCEPTATION" }
   },
   acceptationDate: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "ACCEPTATION" }
   },
   acceptationStatus: {
@@ -85,7 +85,7 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     required: { from: "ACCEPTATION" }
   },
   acceptationWeight: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "ACCEPTATION" }
   },
   acceptationRefusalReason: {
@@ -98,24 +98,24 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     }
   },
   acceptationWasteCode: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield }
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed }
     // ce champ n'est pas requis car il est auto-complété
     // dans la mutation signBsff
   },
   acceptationWasteDescription: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "ACCEPTATION" }
   },
   operationDate: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION" }
   },
   operationCode: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION" }
   },
   operationMode: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: {
       from: "OPERATION",
       when: bsffPackaging => {
@@ -130,26 +130,26 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     }
   },
   operationDescription: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION" }
   },
   operationNoTraceability: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION" }
   },
   operationNextDestinationPlannedOperationCode: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCap: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield }
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed }
   },
   operationNextDestinationCompanyName: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCompanySiret: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: {
       from: "OPERATION",
       when: bsffPackaging =>
@@ -158,7 +158,7 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     }
   },
   operationNextDestinationCompanyVatNumber: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: {
       from: "OPERATION",
       when: bsffPackaging =>
@@ -167,19 +167,19 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     }
   },
   operationNextDestinationCompanyAddress: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCompanyContact: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCompanyPhone: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   operationNextDestinationCompanyMail: {
-    sealed: { from: "OPERATION", when: isBsffPackagingFieldSield },
+    sealed: { from: "OPERATION", when: isBsffPackagingFieldSealed },
     required: { from: "OPERATION", when: requireNextDestination }
   },
   acceptationSignatureAuthor: {

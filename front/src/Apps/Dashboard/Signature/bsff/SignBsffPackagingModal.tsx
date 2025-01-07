@@ -20,7 +20,6 @@ type SignBsffPackagingModalProps = {
 
 function getModalTitle(packaging: BsffPackaging) {
   if (packaging.operation?.signature) {
-    // TODO vérifier les 6 mois
     return `Corriger le contenant ${packaging.numero}`;
   }
   if (packaging?.acceptation?.signature) {
