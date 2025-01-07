@@ -1,10 +1,5 @@
 import { EmitterType, Prisma, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  CompanySearchResult,
-  Mutation,
-  MutationCreateFormArgs
-} from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,
@@ -22,6 +17,11 @@ import {
 } from "../../../database";
 import { searchCompany } from "../../../../companies/search";
 import getReadableId from "../../../readableId";
+import {
+  CompanySearchResult,
+  Mutation,
+  MutationCreateFormArgs
+} from "@td/codegen-back";
 
 jest.mock("../../../../companies/search");
 
@@ -37,6 +37,7 @@ const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
     duplicateForm(id: $id) {
       id
+      isDuplicateOf
       intermediaries {
         siret
         name
@@ -255,6 +256,7 @@ describe("Mutation.duplicateForm", () => {
       "rowNumber",
       "readableId",
       "status",
+      "isDuplicateOf",
       "emittedBy",
       "emittedAt",
       "emittedByEcoOrganisme",
@@ -342,6 +344,8 @@ describe("Mutation.duplicateForm", () => {
       }
     );
 
+    expect(data.duplicateForm.isDuplicateOf).toEqual(form.readableId);
+
     const duplicatedForm = await prisma.form.findUnique({
       where: { id: data.duplicateForm.id },
       include: { transporters: true }
@@ -350,6 +354,7 @@ describe("Mutation.duplicateForm", () => {
     const duplicatedTransporter = await getFirstTransporter(duplicatedForm!);
 
     expect(duplicatedForm).toMatchObject({
+      isDuplicateOf: form.readableId,
       emitterType,
       emitterPickupSite,
       emitterIsPrivateIndividual,
@@ -546,6 +551,7 @@ describe("Mutation.duplicateForm", () => {
       "rowNumber",
       "readableId",
       "status",
+      "isDuplicateOf",
       "recipientIsTempStorage",
       "emitterCompanyOmiNumber",
       "emitterIsForeignShip",

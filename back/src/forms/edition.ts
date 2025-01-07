@@ -21,6 +21,7 @@ type EditableBsddFields = Required<
     | "updatedAt"
     | "rowNumber"
     | "readableId"
+    | "isDuplicateOf"
     | "status"
     | "emittedBy"
     | "emittedAt"

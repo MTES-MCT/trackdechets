@@ -105,6 +105,7 @@ export function expandBspaohFromDb(
       bspaoh.status === BspaohStatus.DRAFT
         ? BspaohStatus.INITIAL
         : bspaoh.status,
+    isDuplicateOf: bspaoh.isDuplicateOf,
     waste: nullIfNoValues<BspaohWaste>({
       code: bspaoh.wasteCode,
       adr: bspaoh.wasteAdr,

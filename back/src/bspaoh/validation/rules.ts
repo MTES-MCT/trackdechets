@@ -30,6 +30,7 @@ type EditableBspaohFields = Required<
     | "updatedAt"
     | "rowNumber"
     | "isDeleted"
+    | "isDuplicateOf"
     | "status"
     | "emitterEmissionSignatureDate"
     | "emitterEmissionSignatureAuthor"

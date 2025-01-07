@@ -19,6 +19,7 @@ export const DUPLICATE_BSDA = gql`
   mutation DuplicateBsda($id: ID!) {
     duplicateBsda(id: $id) {
       id
+      isDuplicateOf
     }
   }
 `;
@@ -152,6 +153,7 @@ describe("Mutation.Bsda.duplicate", () => {
 
     // Then
     expect(errors).toBeUndefined();
+    expect(data.duplicateBsda.isDuplicateOf).toEqual(bsda.id);
     const duplicatedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: data.duplicateBsda.id },
       include: { transporters: true }
@@ -251,6 +253,7 @@ describe("Mutation.Bsda.duplicate", () => {
       "isDraft",
       "isDeleted",
       "status",
+      "isDuplicateOf",
       "emitterEmissionSignatureAuthor",
       "emitterEmissionSignatureDate",
       "emitterCustomInfo",
@@ -299,6 +302,7 @@ describe("Mutation.Bsda.duplicate", () => {
 
     expect(duplicatedBsda).toMatchObject({
       type,
+      isDuplicateOf: bsda.id,
       emitterIsPrivateIndividual,
       emitterCompanyName,
       emitterCompanySiret,

@@ -23,6 +23,7 @@ mutation DuplicateDasri($id: ID!){
     id
     status
     isDraft
+    isDuplicateOf
   }
 }
 `;
@@ -144,6 +145,7 @@ describe("Mutation.duplicateBsdasri", () => {
 
     expect(data.duplicateBsdasri.status).toBe("INITIAL");
     expect(data.duplicateBsdasri.isDraft).toBe(true);
+    expect(data.duplicateBsdasri.isDuplicateOf).toBe(dasri.id);
   });
 
   test("duplicated BSDASRI should have the updated data when company info changes", async () => {

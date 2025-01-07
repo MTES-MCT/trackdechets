@@ -88,6 +88,7 @@ async function getDuplicateFormInput(
 
   return {
     readableId: getReadableId(),
+    isDuplicateOf: form.readableId,
     status: Status.DRAFT,
     owner: { connect: { id: user.id } },
     emitterType: form.emitterType,

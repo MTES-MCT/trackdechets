@@ -57,7 +57,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
     id: bsdasri.id,
     isDraft: Boolean(bsdasri.isDraft),
     type: bsdasri.type,
-
+    isDuplicateOf: bsdasri.isDuplicateOf,
     waste: nullIfNoValues<BsdasriWaste>({
       code: bsdasri.wasteCode,
       adr: bsdasri.wasteAdr

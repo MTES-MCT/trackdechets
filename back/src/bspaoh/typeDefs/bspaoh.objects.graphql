@@ -180,6 +180,12 @@ type BspaohTransporter {
 type Bspaoh {
   "Bordereau n°"
   id: ID!
+
+  """
+  Identifiant du bordereau à partir duquel ce celui-ci a été dupliqué.
+  Est égal à `null` si le bordereau n'est pas issue d'une duplication.
+  """
+  isDuplicateOf: String
   "Date de création"
   createdAt: DateTime!
   "Date de dernière modification"

@@ -102,6 +102,7 @@ async function getDuplicateData(
     id: getReadableId(ReadableIdPrefix.VHU),
     status: BsvhuStatus.INITIAL,
     isDraft: true,
+    isDuplicateOf: bsvhu.id,
     createdAt: new Date(),
     emitterCompanyContact:
       emitter?.contact ?? parsedBsvhu.emitterCompanyContact,
