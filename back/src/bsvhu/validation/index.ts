@@ -35,6 +35,35 @@ export async function mergeInputAndParseBsvhuAsync(
     ...zodInput
   };
 
+  // keep address fields coherent while we have both address and street/city/postalCode
+  // if the address changes, and the street/city/postalCode is not in input, clean it
+  // if street/city/postalCode changes, cleanup address field.
+  if (
+    zodInput.emitterCompanyAddress !== undefined &&
+    zodInput.emitterCompanyAddress !== zodPersisted.emitterCompanyAddress
+  ) {
+    if (!zodInput.emitterCompanyStreet) {
+      bsvhu.emitterCompanyStreet = null;
+    }
+    if (!zodInput.emitterCompanyCity) {
+      bsvhu.emitterCompanyCity = null;
+    }
+    if (!zodInput.emitterCompanyPostalCode) {
+      bsvhu.emitterCompanyPostalCode = null;
+    }
+  } else if (
+    ((zodInput.emitterCompanyStreet !== undefined &&
+      zodInput.emitterCompanyStreet !== zodPersisted.emitterCompanyStreet) ||
+      (zodInput.emitterCompanyCity !== undefined &&
+        zodInput.emitterCompanyCity !== zodPersisted.emitterCompanyCity) ||
+      (zodInput.emitterCompanyPostalCode !== undefined &&
+        zodInput.emitterCompanyPostalCode !==
+          zodPersisted.emitterCompanyPostalCode)) &&
+    !zodInput.emitterCompanyAddress
+  ) {
+    bsvhu.emitterCompanyAddress = null;
+  }
+
   // Calcule la signature courante à partir des données si elle n'est
   // pas fourni via le contexte
   const currentSignatureType =
