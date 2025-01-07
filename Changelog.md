@@ -7,9 +7,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.01.1] 14/01/2025
 
+#### :rocket: Nouvelles fonctionnalités
+
+- BSFF - Permettre la modification des informations d'un contenant à la signature de son opération et après son traitement pendant 60 jours. [PR 3853](https://github.com/MTES-MCT/trackdechets/pull/3853)
+
 #### :nail_care: Améliorations
 
 - Ajout de "2795" à la suite de Installation de traitement > Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780) sur le type de profil Installation de traitement. [PR 3845](https://github.com/MTES-MCT/trackdechets/pull/3845)
+- BSFF - Mettre à jour les informations du contenant modifié (code déchet, description, poids) dans l'aperçu et dans le tableau de bord lorsque le BSFF a un seul contenant [PR 3853](https://github.com/MTES-MCT/trackdechets/pull/3853).
 
 #### :bug: Corrections de bugs
 

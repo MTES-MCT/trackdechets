@@ -66,7 +66,7 @@ import {
   completer_bsd_suite
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "../common/types/commonTypes";
-import { sub } from "date-fns";
+import { sub, differenceInDays } from "date-fns";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -1561,6 +1561,37 @@ export const canUpdateBsd = (bsd, siret) =>
   canUpdateBspaoh(bsd);
 
 export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
+
+export const canMakeCorrection = (bsd: BsdDisplay, siret: string) => {
+  const lastOperationSignatureDate = () =>
+    (bsd.packagings ?? []).reduce((lastDate, packaging) => {
+      const signatureDate = packaging?.operation?.signature?.date;
+      if (signatureDate) {
+        const date = new Date(signatureDate);
+        if (lastDate) {
+          return date > lastDate ? date : lastDate;
+        }
+        return date;
+      }
+      return lastDate;
+    }, new Date(0));
+
+  // On ne permet pas la correction des contenants qui sont
+  // déjà inclut dans un bordereau suite
+  const haveNextBsff = () =>
+    !!bsd.packagings && bsd.packagings.every(p => !!p.nextBsff);
+
+  return (
+    bsd.type === BsdType.Bsff &&
+    isSameSiretDestination(siret, bsd) &&
+    (bsd.status === BsdStatusCode.Processed ||
+      (bsd.status === BsdStatusCode.IntermediatelyProcessed &&
+        !haveNextBsff())) &&
+    // On autorise la correction d'un BSFF pendant 60 jours après
+    // la dernière signature de l'opération sur les contenants
+    differenceInDays(new Date(), lastOperationSignatureDate()) <= 60
+  );
+};
 
 export const hasAppendix1Cta = (
   bsd: BsdDisplay,

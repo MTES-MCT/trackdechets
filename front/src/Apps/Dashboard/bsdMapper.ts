@@ -374,6 +374,19 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
 
 const mapBsff = (bsff: Bsff): BsdDisplay => {
   const statusCode = bsff?.status || bsff["bsffStatus"];
+  let wasteCode = bsff.waste?.code;
+  let wasteDescription = bsff.waste?.description;
+  let weight = bsff["bsffWeight"]?.value;
+
+  if (bsff.packagings && bsff.packagings.length === 1) {
+    // TRA-11553 - Lorsqu'on a un BSFF avec un seul contenant, on veut que les informations
+    // de l'acceptation de ce contenant s'affiche en lieu et place des informations
+    // qui ont été renseignés sur le BSFF.
+    wasteCode = bsff.packagings[0].acceptation?.wasteCode ?? wasteCode;
+    wasteDescription =
+      bsff.packagings[0].acceptation?.wasteDescription ?? wasteDescription;
+    weight = bsff.packagings[0].acceptation?.weight ?? weight;
+  }
   const bsffFormatted: BsdDisplay = {
     id: bsff.id,
     readableid: bsff.id,
@@ -381,9 +394,9 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     isDraft: bsff.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
-      code: bsff.waste?.code,
-      name: bsff.waste?.description,
-      weight: bsff["bsffWeight"]?.value
+      code: wasteCode,
+      name: wasteDescription,
+      weight
     },
     emitter: bsff.emitter || bsff["bsffEmitter"],
     destination: bsff.destination || bsff["bsffDestination"],

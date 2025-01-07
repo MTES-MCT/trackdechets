@@ -64,10 +64,23 @@ export const dashboardBsffFragment = gql`
       description
     }
     packagings {
+      id
       numero
+      weight
+      acceptation {
+        wasteCode
+        wasteDescription
+        weight
+      }
       operation {
         code
         noTraceability
+        signature {
+          date
+        }
+      }
+      nextBsff {
+        id
       }
     }
     bsffWeight: weight {

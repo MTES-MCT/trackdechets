@@ -68,7 +68,8 @@ const rawBsffPackagingSchema = z.object({
   operationNextDestinationCompanyMail: z
     .string()
     .email("E-mail destination ultérieure invalide")
-    .nullish()
+    .nullish(),
+  nextPackagingId: z.string().nullish()
 });
 
 // Type inféré par Zod - avant parsing

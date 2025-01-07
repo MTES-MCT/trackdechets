@@ -5,6 +5,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 interface CompanyContactInfoProps {
   fieldName: string;
   disabled?: boolean;
+  required?: boolean;
   errorObject?: any;
 }
 
@@ -28,6 +29,7 @@ interface CompanyContactInfoProps {
 export default function CompanyContactInfo({
   fieldName,
   disabled = false,
+  required = false,
   errorObject
 }: Readonly<CompanyContactInfoProps>) {
   const { register } = useFormContext();
@@ -43,7 +45,12 @@ export default function CompanyContactInfo({
             stateRelatedMessage={
               (errorObject?.contact?.message as string) ?? ""
             }
-            nativeInputProps={{ ...register(`${fieldName}.contact`) }}
+            nativeInputProps={{
+              ...register(
+                `${fieldName}.contact`,
+                required ? { required: "Champ requis" } : {}
+              )
+            }}
           />
         </div>
       </div>
@@ -54,7 +61,12 @@ export default function CompanyContactInfo({
             disabled={disabled}
             state={errorObject?.phone && "error"}
             stateRelatedMessage={(errorObject?.phone?.message as string) ?? ""}
-            nativeInputProps={{ ...register(`${fieldName}.phone`) }}
+            nativeInputProps={{
+              ...register(
+                `${fieldName}.phone`,
+                required ? { required: "Champ requis" } : {}
+              )
+            }}
           />
         </div>
         <div className="fr-col-12 fr-col-md-6">
@@ -64,7 +76,10 @@ export default function CompanyContactInfo({
             state={errorObject?.mail && "error"}
             stateRelatedMessage={(errorObject?.mail?.message as string) ?? ""}
             nativeInputProps={{
-              ...register(`${fieldName}.mail`),
+              ...register(
+                `${fieldName}.mail`,
+                required ? { required: "Champ requis" } : {}
+              ),
               type: "email"
             }}
           />
