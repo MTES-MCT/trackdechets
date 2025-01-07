@@ -118,7 +118,9 @@ async function getDuplicateFormInput(
     recipientCompanyMail: recipient?.contactEmail ?? form.recipientCompanyMail,
     recipientIsTempStorage: form.recipientIsTempStorage,
     wasteDetailsCode: form.wasteDetailsCode,
-    wasteDetailsPackagingInfos: Prisma.JsonNull,
+    wasteDetailsPackagingInfos: prismaJsonNoNull(
+      form.wasteDetailsPackagingInfos
+    ),
     wasteDetailsQuantity: 0,
     wasteDetailsQuantityType: form.wasteDetailsQuantityType,
     wasteDetailsPop: form.wasteDetailsPop,
@@ -129,9 +131,11 @@ async function getDuplicateFormInput(
     wasteDetailsName: form.wasteDetailsName,
     wasteDetailsConsistence: form.wasteDetailsConsistence,
     wasteDetailsSampleNumber: form.wasteDetailsSampleNumber,
-    wasteDetailsIsSubjectToADR: form.wasteDetailsIsDangerous
-      ? true
-      : form.wasteDetailsIsSubjectToADR,
+    wasteDetailsIsSubjectToADR:
+      form.wasteDetailsIsDangerous || form.wasteDetailsPop
+        ? true
+        : form.wasteDetailsIsSubjectToADR,
+    wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     traderCompanyName: trader?.name ?? form.traderCompanyName,
     traderCompanySiret: form.traderCompanySiret,
     traderCompanyAddress: trader?.address ?? form.traderCompanyAddress,
