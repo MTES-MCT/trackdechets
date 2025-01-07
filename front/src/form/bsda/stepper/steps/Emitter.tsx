@@ -128,7 +128,7 @@ export function Emitter({ disabled }) {
         <CompanySelector
           disabled={disabled}
           name="emitter.company"
-          heading="Entreprise émettrice"
+          heading="Établissement émetteur"
         />
       )}
 
