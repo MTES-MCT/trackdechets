@@ -635,6 +635,7 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
     transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
     transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
     transporterRecepisseValidityLimit: bsvhu.transporterRecepisseValidityLimit,
+    transporterTransportMode: bsvhu.transporterTransportMode,
     transporterTransportPlates: bsvhu.transporterTransportPlates,
     transporterTransportSignatureAuthor:
       bsvhu.transporterTransportSignatureAuthor,

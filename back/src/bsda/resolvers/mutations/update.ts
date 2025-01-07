@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
+import type { MutationUpdateBsdaArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";
@@ -140,6 +140,28 @@ export const producerShouldBeNotifiedOfDestinationCapModification = (
   // On ne prend pas en compte les particuliers ou les entreprises non inscrites
   if (!updatedBsda.emitterCompanySiret) {
     return false;
+  }
+
+  // User is adding a nextDestination. Careful, compare correct fields
+  if (
+    !previousBsda.destinationOperationNextDestinationCompanySiret &&
+    updatedBsda.destinationOperationNextDestinationCompanySiret
+  ) {
+    return (
+      previousBsda.destinationCap !==
+      updatedBsda.destinationOperationNextDestinationCap
+    );
+  }
+
+  // User is removing the nextDestination. Careful, compare correct fields
+  if (
+    previousBsda.destinationOperationNextDestinationCompanySiret &&
+    !updatedBsda.destinationOperationNextDestinationCompanySiret
+  ) {
+    return (
+      previousBsda.destinationOperationNextDestinationCap !==
+      updatedBsda.destinationCap
+    );
   }
 
   // Pas de TTR

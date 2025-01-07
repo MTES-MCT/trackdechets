@@ -87,7 +87,7 @@ export const getCurrentTransporterInfos = (
     case BsdTypename.Bsdasri:
       return getBsdasriCurrentTransporterInfos(bsd);
     case BsdTypename.Bsvhu:
-      return null;
+      return getBsvhuCurrentTransporterInfos(bsd);
     case BsdTypename.Bspaoh:
       return getBspaohCurrentTransporterInfos(bsd);
     default:
@@ -200,6 +200,22 @@ export const getBsdasriCurrentTransporterInfos = (
   };
 };
 
+export const getBsvhuCurrentTransporterInfos = (
+  bsvhu: Bsvhu
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bsvhu.transporter;
+  // since there is only one transporter per BSVHU, transporterId is useless,
+  // the update is done through the BSD using its id
+
+  return {
+    transporterNumberPlate: currentTransporter?.transport?.plates?.filter(
+      plate => plate.trim()
+    ),
+    transporterCustomInfo: "",
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
+  };
+};
+
 export const getBspaohCurrentTransporterInfos = (
   bspaoh: Bspaoh
 ): BsdCurrentTransporterInfos => {
@@ -234,7 +250,7 @@ export const mapBsdd = (bsdd: Form): BsdDisplay => {
     broker: bsdd.broker,
     trader: bsdd.trader,
     intermediaries: bsdd.intermediaries,
-    updatedAt: bsdd.stateSummary?.lastActionOn,
+    updatedAt: bsdd.updatedAt,
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,
     grouping: bsdd.grouping,
     temporaryStorageDetail: bsdd.temporaryStorageDetail,
@@ -349,6 +365,7 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
     transporter: bsvhu.transporter || bsvhu["bsvhuTransporter"],
+    transporterNumberPlate: "fff",
     updatedAt: bsvhu["bsvhuUpdatedAt"],
     ecoOrganisme: bsvhu.ecoOrganisme
   };

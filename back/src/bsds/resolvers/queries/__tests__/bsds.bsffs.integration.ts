@@ -8,7 +8,7 @@ import { createBsffAfterEmission } from "../../../../bsffs/__tests__/factories";
 import { getBsffForElastic, indexBsff } from "../../../../bsffs/elastic";
 import { prisma } from "@td/prisma";
 import makeClient from "../../../../__tests__/testClient";
-import { Query, QueryBsdsArgs } from "../../../../generated/graphql/types";
+import type { Query, QueryBsdsArgs } from "@td/codegen-back";
 
 const GET_BSDS = gql`
   query GetBsds($where: BsdWhere) {

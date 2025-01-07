@@ -7,13 +7,17 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.01.1] 14/01/2025
 
-#### :rocket: Nouvelles fonctionnalités
-
 #### :nail_care: Améliorations
 
 - Ajout de "2795" à la suite de Installation de traitement > Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780) sur le type de profil Installation de traitement. [PR 3845](https://github.com/MTES-MCT/trackdechets/pull/3845)
 
 #### :bug: Corrections de bugs
+
+- Supprimer l'annexe 2 d'un BSDD de regroupement lorsque celle-ci a bien été retirée [PR 3874](https://github.com/MTES-MCT/trackdechets/pull/3874).
+
+#### :boom: Breaking changes
+
+- Pour le Bsvhu lors d'un transport routier, la plaque d'immatriculation est désormais obligatoire et les poids de déchets sont limités à 40 T (50 kT pour les autres modes) [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
 
 # [2024.12.1] 17/12/2024
 

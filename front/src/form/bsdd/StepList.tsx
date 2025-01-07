@@ -193,7 +193,7 @@ export default function StepsList(props: Props) {
         : { temporaryStorageDetail: null }),
       // discard ecoOrganisme if not selected
       ...(ecoOrganisme?.siret ? { ecoOrganisme } : { ecoOrganisme: null }),
-      ...(grouping?.length
+      ...(grouping
         ? {
             grouping: grouping
               .map(({ form, quantity }) => ({

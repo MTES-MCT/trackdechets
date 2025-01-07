@@ -1,4 +1,9 @@
-import { Company, EcoOrganisme, OperationMode } from "@prisma/client";
+import {
+  Company,
+  EcoOrganisme,
+  OperationMode,
+  TransportMode
+} from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,
@@ -6,7 +11,7 @@ import {
   intermediaryReceiptFactory,
   transporterReceiptFactory
 } from "../../../__tests__/factories";
-import { CompanySearchResult } from "../../../companies/types";
+import { CompanySearchResult } from "@td/codegen-back";
 import { searchCompany } from "../../../companies/search";
 import { BsvhuIdentificationType } from "@prisma/client";
 import {
@@ -98,7 +103,8 @@ describe("BSVHU validation", () => {
       const data: ZodBsvhu = {
         ...bsvhu,
         transporterCompanyVatNumber: foreignTransporter.vatNumber,
-        transporterCompanySiret: null
+        transporterCompanySiret: null,
+        transporterTransportPlates: ["XY-23-TR"]
       };
       const parsed = parseBsvhu(data, {
         ...context,
@@ -113,7 +119,8 @@ describe("BSVHU validation", () => {
         transporterCompanyVatNumber: foreignTransporter.vatNumber,
         transporterCompanySiret: null,
         transporterRecepisseDepartment: null,
-        transporterRecepisseNumber: null
+        transporterRecepisseNumber: null,
+        transporterTransportPlates: ["XY-23-TR"]
       };
       const parsed = parseBsvhu(data, {
         ...context,
@@ -121,13 +128,183 @@ describe("BSVHU validation", () => {
       });
       expect(parsed).toBeDefined();
     });
+
     test("when transporter is french and exemption of recepisse is true", async () => {
       const data: ZodBsvhu = {
         ...bsvhu,
         transporterRecepisseIsExempted: true,
         transporterRecepisseDepartment: null,
         transporterRecepisseNumber: null,
-        transporterRecepisseValidityLimit: null
+        transporterRecepisseValidityLimit: null,
+        transporterTransportPlates: ["XY-23-TR"]
+      };
+      const parsed = parseBsvhu(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when up to 2 plates are provided", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportPlates: ["XY-23-TR", "DF-23-TR"]
+      };
+      const parsed = parseBsvhu(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when transport mode is ROAD and weight is up to 40T", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD",
+        weightValue: 40_000, //  40T
+        transporterTransportPlates: ["XY-23-TR"]
+      };
+      const parsed = parseBsvhu(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test.each([
+      TransportMode.RAIL,
+      TransportMode.AIR,
+      TransportMode.RIVER,
+      TransportMode.SEA,
+      TransportMode.OTHER
+    ])("when transport mode is %p and weight is more than 40T", async mode => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: mode,
+        weightValue: 50_000,
+        transporterTransportPlates: ["XY-23-TR"]
+      };
+      const parsed = parseBsvhu(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test.each([
+      TransportMode.RAIL,
+      TransportMode.AIR,
+      TransportMode.RIVER,
+      TransportMode.SEA,
+      TransportMode.OTHER
+    ])(
+      "when transport mode is %p and reception weight is more than 40T",
+      async mode => {
+        const data: ZodBsvhu = {
+          ...bsvhu,
+          transporterRecepisseIsExempted: true,
+          transporterRecepisseDepartment: null,
+          transporterRecepisseNumber: null,
+          transporterRecepisseValidityLimit: null,
+          transporterTransportMode: mode,
+
+          transporterTransportPlates: ["XY-23-TR"],
+          destinationReceptionWeight: 50_000 // more than 40T
+        };
+        const parsed = parseBsvhu(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+        expect(parsed).toBeDefined();
+      }
+    );
+
+    test("when transport mode is ROAD and reception weight is up to 40T", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD",
+
+        transporterTransportPlates: ["XY-23-TR"],
+        destinationReceptionWeight: 40_000 // 40 T
+      };
+      const parsed = parseBsvhu(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when transport mode is ROAD and reception weight is more than 40T on a bsvhu created before v20250101", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        createdAt: new Date("2024-12-26:00:00.000Z"), // before v20250101
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD",
+
+        transporterTransportPlates: ["XY-23-TR"],
+        destinationReceptionWeight: 50_000 // more than 40T
+      };
+      const parsed = parseBsvhu(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when transport mode is ROAD and weight is heavier than 40T on a bsvhu created before v20250101", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        createdAt: new Date("2024-12-26:00:00.000Z"), // before v20250101
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD",
+        weightValue: 41_000, // more than 40T
+        transporterTransportPlates: ["XY-23-TR"]
+      };
+
+      const parsed = await parseBsvhuAsync(data, {
+        ...context,
+        currentSignatureType: "TRANSPORT"
+      });
+
+      expect(parsed).toBeDefined();
+    });
+
+    test.each([
+      TransportMode.RAIL,
+      TransportMode.AIR,
+      TransportMode.RIVER,
+      TransportMode.SEA,
+      TransportMode.OTHER
+    ])("when transport mode is %p and no plate is provided", async mode => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: mode
       };
       const parsed = parseBsvhu(data, {
         ...context,
@@ -141,7 +318,9 @@ describe("BSVHU validation", () => {
     test("when emitter siret is not valid", async () => {
       const data: ZodBsvhu = {
         ...bsvhu,
-        emitterCompanySiret: "1"
+        emitterCompanySiret: "1",
+
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -162,7 +341,8 @@ describe("BSVHU validation", () => {
     test("when transporter siret is not valid", async () => {
       const data: ZodBsvhu = {
         ...bsvhu,
-        transporterCompanySiret: "1"
+        transporterCompanySiret: "1",
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -183,7 +363,8 @@ describe("BSVHU validation", () => {
     test("when transporter is not registered in Trackdéchets", async () => {
       const data: ZodBsvhu = {
         ...bsvhu,
-        transporterCompanySiret: "85001946400021"
+        transporterCompanySiret: "85001946400021",
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -206,7 +387,8 @@ describe("BSVHU validation", () => {
       const data: ZodBsvhu = {
         ...bsvhu,
         transporterCompanySiret: null,
-        transporterCompanyVatNumber: "ESA15022510"
+        transporterCompanyVatNumber: "ESA15022510",
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -229,7 +411,8 @@ describe("BSVHU validation", () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const data: ZodBsvhu = {
         ...bsvhu,
-        transporterCompanySiret: company.siret
+        transporterCompanySiret: company.siret,
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -260,7 +443,8 @@ describe("BSVHU validation", () => {
       const data: ZodBsvhu = {
         ...bsvhu,
         transporterCompanySiret: null,
-        transporterCompanyVatNumber: company.vatNumber
+        transporterCompanyVatNumber: company.vatNumber,
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -285,7 +469,8 @@ describe("BSVHU validation", () => {
     test("when transporter vatNumber is FR", async () => {
       const data: ZodBsvhu = {
         ...bsvhu,
-        transporterCompanyVatNumber: "FR35552049447"
+        transporterCompanyVatNumber: "FR35552049447",
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -311,7 +496,8 @@ describe("BSVHU validation", () => {
     test("when destination siret is not valid", async () => {
       const data: ZodBsvhu = {
         ...bsvhu,
-        destinationCompanySiret: "1"
+        destinationCompanySiret: "1",
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -336,7 +522,8 @@ describe("BSVHU validation", () => {
     test("when destination is not registered in Trackdéchets", async () => {
       const data: ZodBsvhu = {
         ...bsvhu,
-        destinationCompanySiret: "85001946400021"
+        destinationCompanySiret: "85001946400021",
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -359,7 +546,8 @@ describe("BSVHU validation", () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const data: ZodBsvhu = {
         ...bsvhu,
-        destinationCompanySiret: company.siret
+        destinationCompanySiret: company.siret,
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -382,7 +570,8 @@ describe("BSVHU validation", () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const data: ZodBsvhu = {
         ...bsvhu,
-        destinationOperationNextDestinationCompanySiret: company.siret
+        destinationOperationNextDestinationCompanySiret: company.siret,
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -407,7 +596,8 @@ describe("BSVHU validation", () => {
         transporterRecepisseIsExempted: false,
         transporterRecepisseDepartment: null,
         transporterRecepisseNumber: null,
-        transporterRecepisseValidityLimit: null
+        transporterRecepisseValidityLimit: null,
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -439,7 +629,7 @@ describe("BSVHU validation", () => {
         ...bsvhu,
         destinationAgrementNumber: null
       };
-
+      expect.assertions(1);
       try {
         parseBsvhu(data, {
           ...context,
@@ -460,7 +650,8 @@ describe("BSVHU validation", () => {
       });
       const data: ZodBsvhu = {
         ...bsvhu,
-        ecoOrganismeSiret: ecoOrg.siret
+        ecoOrganismeSiret: ecoOrg.siret,
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(1);
 
@@ -478,12 +669,231 @@ describe("BSVHU validation", () => {
       }
     });
 
+    test("when transport mode is ROAD and weight is heavier than 40T", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD",
+        weightValue: 41_000, // more than 40T
+        transporterTransportPlates: ["XY-23-TR"]
+      };
+      expect.assertions(1);
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+          })
+        ]);
+      }
+    });
+
+    test("when transport mode is ROAD and no plate is provided", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD"
+      };
+      expect.assertions(1);
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: "L'immatriculation du transporteur est un champ requis."
+          })
+        ]);
+      }
+    });
+
+    test("when provided plate is too short", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["abc"]
+      };
+      expect.assertions(1);
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        console.log(err);
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Un numéro d'immatriculation doit faire 4 caractères au minimum"
+          })
+        ]);
+      }
+    });
+
+    test("when provided plate is too long", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["ABCDEFGHIJKLMNOPQ"]
+      };
+      expect.assertions(1);
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        console.log(err);
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Un numéro d'immatriculation doit faire 12 caractères au maximum"
+          })
+        ]);
+      }
+    });
+
+    test("when an astute and lazy user provides a plate number made of whitespace", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["     "] // 5 blank spaces
+      };
+      expect.assertions(1);
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        console.log(err);
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: "Le numéro de plaque fourni est incorrect"
+          })
+        ]);
+      }
+    });
+
+    test("when more than 2 plates are provided", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportPlates: ["XY-23-TR", "DF-23-TR", "VG-23-TR"]
+      };
+      expect.assertions(1);
+      try {
+        parseBsvhu(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: "Un maximum de 2 plaques d'immatriculation est accepté"
+          })
+        ]);
+      }
+    });
+
+    test("when transport mode is ROAD and reception weight is heavier than 40T", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["XY-23-TR"],
+        destinationReceptionWeight: 41_000 // more than 40T
+      };
+      expect.assertions(1);
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+          })
+        ]);
+      }
+    });
+
+    test.each([
+      TransportMode.RAIL,
+      TransportMode.AIR,
+      TransportMode.RIVER,
+      TransportMode.SEA,
+      TransportMode.OTHER
+    ])(
+      "when transport mode is %p and reception weight is more than 50 000 T",
+      async mode => {
+        const data: ZodBsvhu = {
+          ...bsvhu,
+          transporterRecepisseIsExempted: true,
+          transporterRecepisseDepartment: null,
+          transporterRecepisseNumber: null,
+          transporterRecepisseValidityLimit: null,
+          transporterTransportMode: mode,
+          weightValue: 1,
+          transporterTransportPlates: ["XY-23-TR"],
+          destinationReceptionWeight: 50_000_001 // more than 50 000
+        };
+        expect.assertions(1);
+        try {
+          await parseBsvhuAsync(data, {
+            ...context,
+            currentSignatureType: "TRANSPORT"
+          });
+        } catch (err) {
+          expect((err as ZodError).issues).toEqual([
+            expect.objectContaining({
+              message: "le poids doit être inférieur à 50000 tonnes"
+            })
+          ]);
+        }
+      }
+    );
+
     describe("Emitter transports own waste", () => {
       it("allowed if exemption", async () => {
         const data: ZodBsvhu = {
           ...bsvhu,
           transporterCompanySiret: bsvhu.emitterCompanySiret,
-          transporterRecepisseIsExempted: true
+          transporterRecepisseIsExempted: true,
+          transporterTransportPlates: ["XY-23-TR"]
         };
 
         expect.assertions(1);
@@ -499,7 +909,8 @@ describe("BSVHU validation", () => {
         const data: ZodBsvhu = {
           ...bsvhu,
           transporterCompanySiret: bsvhu.emitterCompanySiret,
-          transporterRecepisseIsExempted: false
+          transporterRecepisseIsExempted: false,
+          transporterTransportPlates: ["XY-23-TR"]
         };
 
         expect.assertions(1);
@@ -627,7 +1038,8 @@ describe("BSVHU validation", () => {
         destinationOperationMode: "REUTILISATION",
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED",
-        destinationOperationDate: new Date()
+        destinationOperationDate: new Date(),
+        transporterTransportPlates: ["XY-23-TR"]
       };
 
       const parsed = parseBsvhu(data, {
@@ -644,7 +1056,8 @@ describe("BSVHU validation", () => {
         destinationOperationMode: "ELIMINATION",
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED",
-        destinationOperationDate: new Date()
+        destinationOperationDate: new Date(),
+        transporterTransportPlates: ["XY-23-TR"]
       };
 
       const parsed = parseBsvhu(data, {
@@ -661,9 +1074,10 @@ describe("BSVHU validation", () => {
         destinationOperationMode: undefined,
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED",
-        destinationOperationDate: new Date()
+        destinationOperationDate: new Date(),
+        transporterTransportPlates: ["XY-23-TR"]
       };
-
+      expect.assertions(2);
       try {
         parseBsvhu(data, {
           ...context,
@@ -692,7 +1106,8 @@ describe("BSVHU validation", () => {
           destinationOperationMode: mode,
           destinationReceptionWeight: 10,
           destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationOperationDate: new Date()
+          destinationOperationDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"]
         };
         expect.assertions(2);
 
@@ -720,7 +1135,8 @@ describe("BSVHU validation", () => {
         destinationOperationMode: undefined,
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED",
-        destinationOperationDate: new Date()
+        destinationOperationDate: new Date(),
+        transporterTransportPlates: ["XY-23-TR"]
       };
       expect.assertions(2);
 

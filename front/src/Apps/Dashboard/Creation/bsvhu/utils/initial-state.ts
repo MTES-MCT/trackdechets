@@ -1,6 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 
-import { BsvhuCompanyInput } from "@td/codegen-ui";
+import { BsvhuCompanyInput, TransportMode } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
 
 const getInitialEmitterCompany = (company?: BsvhuCompanyInput | null) => {
@@ -75,6 +75,8 @@ export default {
       isExempted: false
     },
     transport: {
+      mode: TransportMode.Road,
+      plates: [],
       signature: {
         author: null,
         takenOverAt: null

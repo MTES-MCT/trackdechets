@@ -1,12 +1,12 @@
 import { Bsvhu } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
-import {
+import type {
   AllWaste,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
   TransportedWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   GenericWaste,
   RegistryFields,
@@ -56,6 +56,7 @@ export const getTransporterData = (bsvhu: Bsvhu, includePlates = false) => {
 
   const data = {
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
+    transporterTransportMode: bsvhu.transporterTransportMode,
     transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
     transporterCompanyName: bsvhu.transporterCompanyName,
     transporterCompanySiret: bsvhu.transporterCompanySiret,

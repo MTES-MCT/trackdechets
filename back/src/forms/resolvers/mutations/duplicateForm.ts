@@ -1,6 +1,6 @@
-import { Form, Prisma, Status, User } from "@prisma/client";
+import { EmitterType, Form, Prisma, Status, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import { getAndExpandFormFromDb } from "../../converter";
 import { checkCanDuplicate } from "../../permissions";
@@ -10,6 +10,7 @@ import { FullForm } from "../../types";
 import { prismaJsonNoNull } from "../../../common/converter";
 import { prisma } from "@td/prisma";
 import { sirenifyFormCreateInput } from "../../sirenify";
+import { UserInputError } from "../../../common/errors";
 
 /**
  * Retrieves companies present on the form that a registered in TD
@@ -260,6 +261,10 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   const user = checkIsAuthenticated(context);
 
   const existingForm = await getFormOrFormNotFound({ id });
+
+  if (existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+    throw new UserInputError("Impossible de dupliquer un bordereau d'annexe 1");
+  }
 
   await checkCanDuplicate(user, existingForm);
 

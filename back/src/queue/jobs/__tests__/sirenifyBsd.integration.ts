@@ -3,7 +3,7 @@ import {
   formFactory,
   userWithCompanyFactory
 } from "../../../__tests__/factories";
-import { CompanySearchResult } from "../../../companies/types";
+import { CompanySearchResult } from "@td/codegen-back";
 import { searchCompany } from "../../../companies/search";
 import { sirenifyBsdd } from "../sirenifyBsd";
 import { prisma } from "@td/prisma";

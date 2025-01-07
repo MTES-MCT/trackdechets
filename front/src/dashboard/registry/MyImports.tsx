@@ -5,7 +5,8 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
-  RegistryDownloadTarget
+  RegistryDownloadTarget,
+  RegistryImportType
 } from "@td/codegen-ui";
 import React, { useState } from "react";
 
@@ -31,6 +32,12 @@ const HEADERS = [
   "Fichier importé",
   "Rapport d'erreur"
 ];
+
+const TYPES: { [key in RegistryImportType]: string } = {
+  INCOMING_TEXS: "TEXS entrants",
+  INCOMING_WASTE: "D(N)D entrants",
+  SSD: "SSD"
+};
 
 export function MyImports() {
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
@@ -66,7 +73,7 @@ export function MyImports() {
         </div>
         {badges[importData.node.status]("import")}
       </div>,
-      importData.node.type,
+      TYPES[importData.node.type],
       <ul>
         {importData.node.numberOfErrors > 0 && (
           <li>
@@ -98,7 +105,7 @@ export function MyImports() {
             : []
         )
         .join("\n"),
-      <div className="tw-flex">
+      <div>
         <Download
           details={(
             importData.node.originalFileName.split(".").pop() ?? ""
@@ -133,7 +140,7 @@ export function MyImports() {
     <div id="companies" className="companies dashboard">
       {!isMobile && <RegistryMenu />}
       <div className="dashboard-content tw-flex-grow">
-        <div className="tw-p-6">
+        <div className="tw-px-6 tw-py-4">
           <div className="tw-flex tw-gap-6">
             <div>
               <Button

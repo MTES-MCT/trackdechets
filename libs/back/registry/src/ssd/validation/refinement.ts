@@ -87,9 +87,9 @@ export const refineDates: Refinement<ParsedZodSsdItem> = (
 };
 
 export const refineDestinationOrgId = refineActorOrgId<ParsedZodSsdItem>({
-  typeKey: "destinationType",
-  orgIdKey: "destinationOrgId",
-  countryKey: "destinationCountryCode"
+  typeKey: "destinationCompanyType",
+  orgIdKey: "destinationCompanyOrgId",
+  countryKey: "destinationCompanyCountryCode"
 });
 
 export const refineSecondaryWasteCodes: Refinement<ParsedZodSsdItem> = (

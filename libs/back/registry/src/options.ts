@@ -10,13 +10,19 @@ import {
 import { safeParseAsyncIncomingWaste } from "./incomingWaste/validation";
 import { RegistryExportType } from "@prisma/client";
 import { toSsdWaste } from "./ssd/registry";
-import { SsdWaste } from "@td/codegen-back";
+import type { SsdWasteV2 } from "@td/codegen-back";
+import { INCOMING_TEXS_HEADERS } from "./incomingTexs/constants";
+import {
+  saveIncomingTexsLine,
+  getIncomingTexsImportSiretsAssociations
+} from "./incomingTexs/database";
+import { safeParseAsyncIncomingTexs } from "./incomingTexs/validation";
 
 export type ParsedLine = {
-  reason?: "MODIFIER" | "ANNULER" | "IGNORER";
+  reason?: "MODIFIER" | "ANNULER" | "IGNORER" | null;
   publicId: string;
-  reportForSiret: string;
-  reportAsSiret?: string;
+  reportForCompanySiret: string;
+  reportAsCompanySiret?: string | null;
 };
 
 export type ImportOptions = {
@@ -28,7 +34,7 @@ export type ImportOptions = {
     line,
     importId
   }: {
-    line: ParsedLine;
+    line: ParsedLine & { createdById: string };
     importId: string | null;
   }) => Promise<void>;
   getImportSiretsAssociations: (
@@ -36,7 +42,8 @@ export type ImportOptions = {
   ) => Promise<{ for: string; as: string }[]>;
 };
 
-export const IMPORT_TYPES = ["SSD", "INCOMING_WASTE"] as const;
+export const ERROR_HEADER = "Erreur";
+export const IMPORT_TYPES = ["SSD", "INCOMING_WASTE", "INCOMING_TEXS"] as const;
 export type ImportType = (typeof IMPORT_TYPES)[number];
 
 export const importOptions: Record<ImportType, ImportOptions> = {
@@ -51,6 +58,12 @@ export const importOptions: Record<ImportType, ImportOptions> = {
     safeParseAsync: safeParseAsyncIncomingWaste,
     saveLine: saveIncomingWasteLine,
     getImportSiretsAssociations: getIncomingWasteImportSiretsAssociations
+  },
+  INCOMING_TEXS: {
+    headers: INCOMING_TEXS_HEADERS,
+    safeParseAsync: safeParseAsyncIncomingTexs,
+    saveLine: saveIncomingTexsLine,
+    getImportSiretsAssociations: getIncomingTexsImportSiretsAssociations
   }
 };
 
@@ -60,7 +73,7 @@ export const UNAUTHORIZED_ERROR =
 
 export type ExportOptions = {
   headers: Record<string, string>;
-  toSsdWaste?: (registry: unknown) => SsdWaste;
+  toSsdWaste?: (registry: unknown) => SsdWasteV2;
 };
 
 export const exportOptions: Partial<Record<RegistryExportType, ExportOptions>> =

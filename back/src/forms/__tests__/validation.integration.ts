@@ -15,7 +15,7 @@ import {
   transporterSchemaFn,
   beforeTransportSchemaFn
 } from "../validation";
-import { ReceivedFormInput } from "../../generated/graphql/types";
+import type { ReceivedFormInput } from "@td/codegen-back";
 import {
   companyFactory,
   ecoOrganismeFactory,

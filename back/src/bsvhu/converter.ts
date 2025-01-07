@@ -5,7 +5,7 @@ import {
   chain,
   undefinedOrDefault
 } from "../common/converter";
-import {
+import type {
   FormCompany,
   Signature,
   BsvhuEmitter,
@@ -26,7 +26,7 @@ import {
   BsvhuEcoOrganisme,
   BsvhuBroker,
   BsvhuTrader
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   Prisma,
   Bsvhu as PrismaVhuForm,
@@ -157,6 +157,8 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         isExempted: form.transporterRecepisseIsExempted
       }),
       transport: nullIfNoValues<BsvhuTransport>({
+        mode: form.transporterTransportMode,
+        plates: form.transporterTransportPlates,
         signature: nullIfNoValues<Signature>({
           author: form.transporterTransportSignatureAuthor,
           date: processDate(form.transporterTransportSignatureDate)
@@ -446,7 +448,14 @@ function flattenTransporterTransportInput(
   }
 
   return {
-    transporterTransportTakenOverAt: chain(input.transport, t => t.takenOverAt)
+    transporterTransportTakenOverAt: chain(input.transport, t => t.takenOverAt),
+    transporterTransportMode: chain(input, t =>
+      chain(t.transport, tr => tr.mode)
+    ),
+    transporterTransportPlates: undefinedOrDefault(
+      chain(input, t => chain(t.transport, tr => tr.plates)),
+      []
+    )
   };
 }
 

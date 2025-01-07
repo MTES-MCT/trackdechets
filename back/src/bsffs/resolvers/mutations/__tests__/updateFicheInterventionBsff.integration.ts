@@ -1,9 +1,9 @@
 import { Company, Prisma, User, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationUpdateFicheInterventionBsffArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   siretify,

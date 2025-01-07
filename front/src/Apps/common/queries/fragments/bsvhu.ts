@@ -17,6 +17,10 @@ export const vhuFragment = gql`
       company {
         ...CompanyFragment
       }
+      transport {
+        plates
+        mode
+      }
       recepisse {
         number
       }
@@ -69,6 +73,10 @@ export const dashboardVhuFragment = gql`
     transporter {
       company {
         ...DashboardCompanyFragment
+      }
+      transport {
+        plates
+        mode
       }
       recepisse {
         number
@@ -177,6 +185,8 @@ export const FullBsvhuFragment = gql`
         isExempted
       }
       transport {
+        plates
+        mode
         takenOverAt
         signature {
           author

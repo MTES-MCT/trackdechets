@@ -1,4 +1,4 @@
-import { FormResolvers } from "../../../generated/graphql/types";
+import type { FormResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 
 const intermediaryCompaniesResolver: FormResolvers["intermediaries"] =

@@ -1,5 +1,5 @@
 import { Bspaoh as PrismaBspaoh, User, BspaohStatus } from "@prisma/client";
-import { BspaohInput } from "../generated/graphql/types";
+import type { BspaohInput } from "@td/codegen-back";
 
 import { Permission, checkUserPermissions } from "../permissions";
 

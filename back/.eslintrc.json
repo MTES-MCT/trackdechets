@@ -2,7 +2,6 @@
   "extends": ["../.eslintrc.json"],
   "ignorePatterns": [
     "!**/*",
-    "src/generated/**",
     "prisma/seed*.ts",
     "src/common/plugins/graphiql/**",
     "graphql-markdown-plugin.js",

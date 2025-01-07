@@ -1,8 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Query,
-  QueryFormRevisionRequestsArgs
-} from "../../../../generated/graphql/types";
+import type { Query, QueryFormRevisionRequestsArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   formFactory,

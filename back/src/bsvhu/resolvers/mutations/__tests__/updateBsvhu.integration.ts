@@ -8,7 +8,7 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 import { UserRole } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import gql from "graphql-tag";
@@ -458,6 +458,7 @@ describe("Mutation.Vhu.update", () => {
       opt: {
         emitterCompanySiret: company.siret,
         transporterTransportSignatureDate: new Date(),
+        transporterTransportPlates: ["XY-23-TR"],
         intermediaries: {
           create: {
             siret: company.siret!,

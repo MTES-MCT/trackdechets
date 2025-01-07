@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query } from "../../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 import {
   companyFactory,
   userWithCompanyFactory
@@ -40,6 +40,10 @@ query GetBsvhu($id: ID!) {
       }
       recepisse {
         number
+      }
+      transport {
+        mode
+        plates
       }
     }
     ecoOrganisme {
@@ -188,7 +192,8 @@ describe("Query.Bsvhu", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         customId: "some custom ID",
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        transporterTransportPlates: ["SD-78-YT"]
       }
     });
 
@@ -217,6 +222,7 @@ describe("Query.Bsvhu", () => {
           phone: bsvhu.transporterCompanyPhone,
           vatNumber: null
         },
+        transport: { plates: ["SD-78-YT"], mode: "ROAD" },
         recepisse: { number: bsvhu.transporterRecepisseNumber }
       },
       ecoOrganisme: {

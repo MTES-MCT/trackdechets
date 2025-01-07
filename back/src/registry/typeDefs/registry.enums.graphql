@@ -1,10 +1,6 @@
 "Type de registre"
 enum WasteRegistryType {
   """
-  Registre Sortie de statut de déchet.
-  """
-  SSD
-  """
   Registre sortant.
   Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
   a été signé et sont triés par date d'enlèvement du déchet.
@@ -77,58 +73,4 @@ enum BsdSubType {
 
   "Synthèse"
   SYNTHESIS
-}
-
-enum RegistryImportType {
-  "Sortie de statut de déchet"
-  SSD
-  "Déchet dangereux et non dangereux entrant"
-  INCOMING_WASTE
-}
-
-"Type de déchets"
-enum RegistryExportWasteType {
-  "Déchets non dangereux"
-  DND
-  "Déchets dangereux"
-  DD
-  "Terres et sédiments"
-  TEXS
-}
-
-"Source de la ligne de registre"
-enum RegistryExportSource {
-  "Bordereau"
-  BSD
-  "Déclaration au registre"
-  REGISTRY
-}
-
-enum RegistryImportStatus {
-  PENDING
-  STARTED
-  SUCCESSFUL
-  PARTIALLY_SUCCESSFUL
-  FAILED
-  CANCELED
-}
-
-enum RegistryDownloadTarget {
-  ERROR_FILE
-  IMPORT_FILE
-}
-
-enum RegistryLineReason {
-  "Spécifie que la ligne doit être modifiée dans le registre"
-  EDIT
-  "Spécifie que la ligne doit être supprimée du registre"
-  CANCEL
-}
-
-enum RegistryExportStatus {
-  PENDING
-  STARTED
-  SUCCESSFUL
-  FAILED
-  CANCELED
 }

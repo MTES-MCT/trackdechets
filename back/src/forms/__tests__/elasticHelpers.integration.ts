@@ -1,10 +1,10 @@
 import { gql } from "graphql-tag";
 import { formFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import makeClient from "../../__tests__/testClient";
-import {
+import type {
   Mutation,
   MutationCreateFormRevisionRequestArgs
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { getFormRevisionOrgIds } from "../elasticHelpers";
 import { getFormForElastic } from "../elastic";
 import { prisma } from "@td/prisma";

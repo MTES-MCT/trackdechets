@@ -6,22 +6,22 @@ export async function transformReportForInfos(
   line: ParsedLine,
   { addIssue }: RefinementCtx
 ) {
-  const company = await getCachedCompany(line.reportForSiret);
+  const company = await getCachedCompany(line.reportForCompanySiret);
 
   if (!company) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le siret "${line.reportForSiret}" n'est pas inscrit sur Trackdéchets`,
-      path: ["reportForSiret"]
+      message: `Le siret "${line.reportForCompanySiret}" n'est pas inscrit sur Trackdéchets`,
+      path: ["reportForCompanySiret"]
     });
     return z.NEVER;
   }
 
   return {
     ...line,
-    reportForName: company.name,
-    reportForAddress: company.address,
-    reportForCity: "",
-    reportForPostalCode: ""
+    reportForCompanyName: company.name,
+    reportForCompanyAddress: company.address,
+    reportForCompanyCity: "",
+    reportForCompanyPostalCode: ""
   };
 }

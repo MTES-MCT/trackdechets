@@ -1,7 +1,7 @@
 import { Prisma, User } from "@prisma/client";
 import { ParsedZodBsvhu } from "./schema";
 import { RefinementCtx } from "zod";
-import { SignatureTypeInput } from "../../generated/graphql/types";
+import type { SignatureTypeInput } from "@td/codegen-back";
 
 export type BsvhuUserFunctions = {
   isEmitter: boolean;

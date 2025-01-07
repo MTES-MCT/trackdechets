@@ -14,7 +14,7 @@ import {
   readyToPublishData,
   readyToTakeOverData
 } from "../../../__tests__/factories";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 
 const UPDATE_DASRI = `
 mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {

@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 
 const ecoOrganismeResolver: QueryResolvers["ecoOrganismes"] = () => {
   return prisma.ecoOrganisme.findMany();

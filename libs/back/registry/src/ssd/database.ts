@@ -51,18 +51,18 @@ export async function saveSsdLine({
 
 export async function getSsdImportSiretsAssociations(importId: string) {
   const importSirets = await prisma.registrySsd.findMany({
-    distinct: ["reportForSiret"],
+    distinct: ["reportForCompanySiret"],
     where: { importId },
-    select: { reportForSiret: true, reportAsSiret: true }
+    select: { reportForCompanySiret: true, reportAsCompanySiret: true }
   });
 
   const siretsMap = importSirets.reduce(
-    (list, { reportForSiret, reportAsSiret }) => {
-      const as = reportAsSiret ?? reportForSiret;
-      const key = `${reportForSiret}-${as}`;
+    (list, { reportForCompanySiret, reportAsCompanySiret }) => {
+      const as = reportAsCompanySiret ?? reportForCompanySiret;
+      const key = `${reportForCompanySiret}-${as}`;
 
       if (!list.has(key)) {
-        list.set(key, { for: reportForSiret, as });
+        list.set(key, { for: reportForCompanySiret, as });
       }
 
       return list;

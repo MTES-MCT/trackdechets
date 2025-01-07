@@ -11,7 +11,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import { OPERATION } from "../../../constants";
-import { CompanySearchResult } from "../../../../companies/types";
+import { CompanySearchResult } from "@td/codegen-back";
 
 jest.mock("../../../../companies/search");
 

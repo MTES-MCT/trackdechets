@@ -7,14 +7,13 @@ import {
   siretify,
   formWithTempStorageFactory
 } from "../../../__tests__/factories";
-import { CompanySearchResult } from "../../../companies/types";
 import getReadableId from "../../../forms/readableId";
 import { searchCompany } from "../../../companies/search";
 import { favoritesConstrutor } from "../indexFavorites";
 import { getFormForElastic, indexForm } from "../../../forms/elastic";
 import { index, client as elasticSearch } from "../../../common/elastic";
 import makeClient from "../../../__tests__/testClient";
-import { Mutation } from "../../../generated/graphql/types";
+import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 
 const mockUpdateFavorites = jest.fn();
 const mockGetUpdatedCompanyNameAndAddress = jest.fn();

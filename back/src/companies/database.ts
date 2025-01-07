@@ -18,7 +18,7 @@ import {
   VhuAgrementNotFound,
   WorkerCertificationNotFound
 } from "./errors";
-import { CompanyMember } from "../generated/graphql/types";
+import type { CompanyMember } from "@td/codegen-back";
 import { AppDataloaders } from "../types";
 import { differenceInDays } from "date-fns";
 import { UserInputError } from "../common/errors";
