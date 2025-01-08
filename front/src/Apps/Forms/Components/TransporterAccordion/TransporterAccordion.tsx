@@ -82,11 +82,11 @@ export function TransporterAccordion({
             priority="tertiary"
             iconPosition="right"
             iconId="ri-delete-bin-line"
-            title="Supprimer"
+            title={disableUp && disableDown ? "Effacer" : "Supprimer"}
             onClick={onTransporterDelete}
             disabled={disableDelete}
           >
-            Supprimer
+            {disableUp && disableDown ? "Effacer" : "Supprimer"}
           </Button>
           <Button
             type="button"
