@@ -9,6 +9,7 @@ import makeClient from "../../../../__tests__/testClient";
 import {
   createBsffAfterOperation,
   createBsffAfterReception,
+  createBsffAfterRefusal,
   createBsffBeforeEmission,
   createBsffBeforeOperation
 } from "../../../__tests__/factories";
@@ -260,6 +261,105 @@ describe("Mutation.updateBsffPackaging", () => {
       })
     ]);
   });
+
+  test(
+    "less than 60 days after refusal > " +
+      " it should be possible to update acceptation status",
+    async () => {
+      const emitter = await userWithCompanyFactory("MEMBER");
+      const transporter = await userWithCompanyFactory("MEMBER");
+      const destination = await userWithCompanyFactory("MEMBER");
+      const bsff = await createBsffAfterRefusal(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        { packagingData: { acceptationSignatureDate: new Date() } }
+      );
+
+      expect(bsff.status).toEqual("REFUSED");
+
+      const packagingId = bsff.packagings[0].id;
+
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsffPackaging">,
+        MutationUpdateBsffPackagingArgs
+      >(UPDATE_BSFF_PACKAGING, {
+        variables: {
+          id: packagingId,
+          input: {
+            numero: "nouveau-numero",
+            acceptation: {
+              date: new Date().toISOString() as any,
+              weight: 2,
+              status: "ACCEPTED",
+              refusalReason: null
+            }
+          }
+        }
+      });
+      expect(errors).toBeUndefined();
+
+      const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
+        where: { id: packagingId },
+        include: { bsff: true }
+      });
+      expect(updatedPackaging.acceptationStatus).toEqual("ACCEPTED");
+      // status of bsff should be recalculated to ACCEPTED
+      expect(updatedPackaging.bsff.status).toEqual("ACCEPTED");
+    }
+  );
+
+  test(
+    "more than 60 days after refusal > " +
+      " it should not be possible to update acceptation status",
+    async () => {
+      const emitter = await userWithCompanyFactory("MEMBER");
+      const transporter = await userWithCompanyFactory("MEMBER");
+      const destination = await userWithCompanyFactory("MEMBER");
+      const bsff = await createBsffAfterRefusal(
+        {
+          emitter,
+          transporter,
+          destination
+        },
+        { packagingData: { acceptationSignatureDate: new Date(0) } }
+      );
+
+      expect(bsff.status).toEqual("REFUSED");
+
+      const packagingId = bsff.packagings[0].id;
+
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsffPackaging">,
+        MutationUpdateBsffPackagingArgs
+      >(UPDATE_BSFF_PACKAGING, {
+        variables: {
+          id: packagingId,
+          input: {
+            numero: "nouveau-numero",
+            acceptation: {
+              date: new Date().toISOString() as any,
+              weight: 2,
+              status: "ACCEPTED",
+              refusalReason: null
+            }
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+            " Le champ acceptationRefusalReason a été verrouillé via signature et ne peut pas être modifié.," +
+            " Le champ acceptationStatus a été verrouillé via signature et ne peut pas être modifié."
+        })
+      ]);
+    }
+  );
 
   test(
     "less than 60 days after operation >" +

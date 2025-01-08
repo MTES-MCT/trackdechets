@@ -1582,6 +1582,22 @@ describe("dashboardServices", () => {
       expect(result).toBe(true);
     });
 
+    it("should return true if bsd type is BSFF, status is Refused, and within 60 days of refusal", () => {
+      const result = canMakeCorrection(
+        {
+          ...bsd,
+          status: BsdStatusCode.Refused,
+          packagings: [
+            {
+              acceptation: { signature: { date: new Date().toISOString() } }
+            } as BsffPackaging
+          ]
+        },
+        currentSiret
+      );
+      expect(result).toBe(true);
+    });
+
     it("should return false if bsd type is not BSFF", () => {
       const result = canMakeCorrection(
         { ...bsd, type: BsdType.Bsda },

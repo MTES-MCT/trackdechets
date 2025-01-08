@@ -72,6 +72,7 @@ const ActBsffValidation = ({
       {[
         BsffStatus.Received,
         BsffStatus.Accepted,
+        BsffStatus.Refused,
         BsffStatus.PartiallyRefused,
         BsffStatus.Processed,
         BsffStatus.IntermediatelyProcessed
@@ -79,7 +80,7 @@ const ActBsffValidation = ({
         // La modale de signature et de correction par contenant est la même
         // à partir de la réception du BSFF. L'affichage des différents
         // champs du formulaire en fonction du statut est géré directement
-        // au sein des modales <SignBsffPackagingModal /> (1 seul contenant)ou
+        // au sein des modales <SignBsffPackagingModal /> (1 seul contenant) ou
         // <SignPackagings /> (plusieurs contenants).
         renderReceivedModal()}
     </>

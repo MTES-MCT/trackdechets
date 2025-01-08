@@ -71,6 +71,9 @@ export const dashboardBsffFragment = gql`
         wasteCode
         wasteDescription
         weight
+        signature {
+          date
+        }
       }
       operation {
         code

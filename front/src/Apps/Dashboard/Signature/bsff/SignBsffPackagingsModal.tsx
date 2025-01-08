@@ -31,19 +31,27 @@ interface SignPackagingsModalProps {
 }
 
 function getSignBtnLabel(packaging: BsffPackaging): string | null {
-  if (!!packaging.operation?.signature?.date) {
-    // Calcule le nombre de jours depuis la signature du traitement
-    const daysOld = differenceInDays(
-      new Date(),
-      new Date(packaging.operation.signature.date)
-    );
+  if (
+    !!packaging.operation?.signature?.date ||
+    (!!packaging.acceptation?.signature?.date &&
+      packaging.acceptation?.status === WasteAcceptationStatus.Refused)
+  ) {
+    const signatureDate =
+      packaging.operation?.signature?.date ??
+      packaging.acceptation?.signature?.date;
 
-    if (daysOld <= 60 && !packaging.nextBsff) {
-      // La correction est autorisée pendant un maximum de 60 jours
-      // après la signature de traitement du contenant et tant que le
-      // contenant n'a pas été groupé / réexpédié / reconditionné
-      return "Corriger";
+    if (signatureDate) {
+      // Calcule le nombre de jours depuis la signature du traitement ou du refus
+      const daysOld = differenceInDays(new Date(), new Date(signatureDate));
+
+      if (daysOld <= 60 && !packaging.nextBsff) {
+        // La correction est autorisée pendant un maximum de 60 jours
+        // après la signature de traitement du contenant et tant que le
+        // contenant n'a pas été groupé / réexpédié / reconditionné
+        return "Corriger";
+      }
     }
+
     return null;
   }
   if (packaging.acceptation?.signature?.date) {

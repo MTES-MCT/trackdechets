@@ -1593,9 +1593,11 @@ export const canUpdateBsd = (bsd, siret) =>
 export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
 
 export const canMakeCorrection = (bsd: BsdDisplay, siret: string) => {
-  const lastOperationSignatureDate = () =>
+  const lastSignatureDate = () =>
     (bsd.packagings ?? []).reduce((lastDate, packaging) => {
-      const signatureDate = packaging?.operation?.signature?.date;
+      const signatureDate =
+        packaging?.operation?.signature?.date ??
+        packaging?.acceptation?.signature?.date;
       if (signatureDate) {
         const date = new Date(signatureDate);
         if (lastDate) {
@@ -1615,11 +1617,12 @@ export const canMakeCorrection = (bsd: BsdDisplay, siret: string) => {
     bsd.type === BsdType.Bsff &&
     isSameSiretDestination(siret, bsd) &&
     (bsd.status === BsdStatusCode.Processed ||
+      bsd.status === BsdStatusCode.Refused ||
       (bsd.status === BsdStatusCode.IntermediatelyProcessed &&
         !haveNextBsff())) &&
     // On autorise la correction d'un BSFF pendant 60 jours après
     // la dernière signature de l'opération sur les contenants
-    differenceInDays(new Date(), lastOperationSignatureDate()) <= 60
+    differenceInDays(new Date(), lastSignatureDate()) <= 60
   );
 };
 
