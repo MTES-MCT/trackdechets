@@ -203,7 +203,7 @@
     "@nx/storybook": "20.0.3",
     "@nx/vite": "20.0.3",
     "@nx/web": "20.0.3",
-    "@playwright/test": "^1.40.1",
+    "@playwright/test": "^1.49.1",
     "@storybook/addon-a11y": "8.3.6",
     "@storybook/addon-actions": "8.3.6",
     "@storybook/addon-essentials": "8.3.6",
