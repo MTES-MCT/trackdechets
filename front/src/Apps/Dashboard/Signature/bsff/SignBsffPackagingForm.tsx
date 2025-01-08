@@ -564,11 +564,10 @@ function SignBsffPackagingForm({
         )}
         {isAccepted && (
           <div className="fr-grid-row fr-grid-row--gutters">
-            <div className="fr-col-12 fr-col-md-4">
+            <div className="fr-col-12 fr-col-md-6">
               <NonScrollableInput
                 label="Quantité de fluide présentée en kg"
                 hintText="pour les installations d'entreposage ou de reconditionnement, la quantité peut être estimée"
-                disabled={isRefused}
                 nativeInputProps={{
                   ...register("acceptation.weight", {
                     valueAsNumber: true
@@ -589,7 +588,6 @@ function SignBsffPackagingForm({
             </div>
           </div>
         )}
-
         {
           // signature du traitement ou correction
           showOperation && (
