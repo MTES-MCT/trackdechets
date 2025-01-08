@@ -86,7 +86,10 @@ function getDefaultFormValues(
       date: packaging?.operation?.date
         ? datetimeToYYYYMMDD(new Date(packaging.operation.date))
         : datetimeToYYYYMMDD(today),
-      code: packaging?.operation?.code ?? BsffOperationCode.R1,
+      code:
+        packaging?.operation?.code ??
+        packaging.bsff.destination?.plannedOperationCode ??
+        BsffOperationCode.R1,
       mode: packaging?.operation?.mode ?? OperationMode.Elimination,
       description: packaging?.operation?.description ?? "",
       noTraceability: packaging?.operation?.noTraceability ?? false,
@@ -325,6 +328,11 @@ function SignBsffPackagingForm({
 
   const signatureType = useMemo(() => getSignatureType(packaging), [packaging]);
 
+  // Permet d'afficher ou non les champs du formulaire relatifs à l'opération
+  const showOperation =
+    packaging.acceptation?.signature?.date &&
+    packaging.acceptation.status === WasteAcceptationStatus.Accepted;
+
   const actionBtnLabel = useMemo(() => {
     if (!!signatureType) {
       return loading ? "Signature en cours" : "Signer";
@@ -410,10 +418,7 @@ function SignBsffPackagingForm({
         id: packaging.id,
         input: {
           acceptation,
-          // On exclut les données de l'opération lors de la signature de l'acceptation
-          ...(signatureType === BsffSignatureType.Acceptation
-            ? {}
-            : { operation }),
+          ...(showOperation ? { operation } : {}),
           ...rest
         }
       }
@@ -586,12 +591,8 @@ function SignBsffPackagingForm({
         )}
 
         {
-          // signature traitement
-          (signatureType === BsffSignatureType.Operation ||
-            // ou correction (sauf refus)
-            (signatureType === null &&
-              packaging.acceptation?.status ===
-                WasteAcceptationStatus.Accepted)) && (
+          // signature du traitement ou correction
+          showOperation && (
             <>
               <h6 className="fr-h6">Traitement</h6>
               <div className="fr-grid-row fr-grid-row--gutters">

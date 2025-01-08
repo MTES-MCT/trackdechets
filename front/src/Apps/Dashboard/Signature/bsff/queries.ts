@@ -45,6 +45,9 @@ const bsffPackagingFragment = gql`
       weight {
         value
       }
+      destination {
+        plannedOperationCode
+      }
       packagings {
         id
       }
