@@ -74,12 +74,12 @@ input SubscribeToNotificationsInput {
 
 input MembershipRequestsWhere {
   """
-  OrgId of target company. You must specify either the orgId or the ID
+  OrgId de l'entreprise. Vous devez spécifier l'orgId OU l'ID
   """
   orgId: String
 
   """
-  ID of target company. You must specify either the orgId or the ID
+  ID de l'entreprise. Vous devez spécifier l'orgId OU l'ID
   """
   id: ID
 }
