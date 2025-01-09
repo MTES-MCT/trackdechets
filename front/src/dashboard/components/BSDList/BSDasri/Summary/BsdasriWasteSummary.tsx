@@ -6,6 +6,7 @@ import {
   DataListTerm,
   DataListDescription
 } from "../../../../../common/components";
+import { verbosePackagings } from "../../../../detail/bsdasri/BsdasriDetailContent";
 
 interface BsdasriWasteSummaryProps {
   bsdasri: Bsdasri;
@@ -50,7 +51,8 @@ export function BsdasriWasteSummary({ bsdasri }: BsdasriWasteSummaryProps) {
             <>
               {packagings.map((packaging, idx) => (
                 <div key={idx}>
-                  {packaging.quantity} {packaging.other} {packaging.type} (
+                  {packaging.quantity} {verbosePackagings[packaging.type]}
+                  {!!packaging.other && `: ${packaging.other}`} (
                   {packaging.volume} litre(s))
                 </div>
               ))}
