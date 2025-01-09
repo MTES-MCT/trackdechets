@@ -270,6 +270,7 @@ export function SignBsffPackagingsModal({
           noCaption
           headers={headers}
           data={tableData}
+          fixed={true}
         ></Table>
         <div>{packagingsRecap}</div>
       </Modal>
