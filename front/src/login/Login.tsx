@@ -76,7 +76,7 @@ export default function Login() {
     return <Navigate to={{ pathname: routes.login }} state={state} />;
   }
 
-  const { returnTo, errorCode, username } = location.state || {};
+  const { returnTo, errorCode, username = "" } = location.state || {};
 
   const showCaptcha = displayCaptcha(errorCode);
 

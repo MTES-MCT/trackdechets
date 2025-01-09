@@ -35,7 +35,7 @@ describe("POST /login", () => {
 
     // should redirect to /
     expect(login.status).toBe(302);
-    expect(login.header.location).toBe(`http://${UI_HOST}/`);
+    expect(login.header.location).toBe(`http://${UI_HOST}/dashboard`);
 
     const cookieValue = sessionCookie.match(cookieRegExp)[1];
 
