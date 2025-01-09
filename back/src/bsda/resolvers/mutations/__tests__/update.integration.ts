@@ -2498,166 +2498,169 @@ describe("Mutation.updateBsda", () => {
       });
     });
 
-    it("[bug prod] if user updates the BSDA by adding a nextDestination but does not modify the CAP - should not send mail", async () => {
-      // Given
-      const emitter = await companyFactory();
-      const worker = await companyFactory();
-      const destination = await companyFactory();
-      const ttr = await companyFactory();
-      const transporter = await companyFactory();
+    describe("[bug prod]", () => {
+      beforeEach(resetDatabase);
 
-      const user = await userInCompany(
-        "MEMBER",
-        emitter.id,
-        {
-          email: "emitter@mail.com",
-          name: "Emitter"
-        },
-        {
-          notificationIsActiveBsdaFinalDestinationUpdate: true
-        }
-      );
+      it("if user updates the BSDA by adding a nextDestination but does not modify the CAP - should not send mail", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const ttr = await companyFactory();
+        const transporter = await companyFactory();
 
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          destinationCap: "DESTINATION-CAP",
-          // Companies
-          emitterCompanySiret: emitter.siret,
-          emitterCompanyName: emitter.name,
-          workerCompanySiret: worker.siret,
-          workerCompanyName: worker.name,
-          destinationCompanySiret: destination.siret,
-          destinationCompanyName: destination.name
-          // No next destination
-        },
-        transporterOpt: {
-          transporterCompanySiret: transporter.siret,
-          transporterCompanyName: transporter.name
-        }
-      });
+        const user = await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
 
-      // No mails
-      const { sendMail } = require("../../../../mailer/mailing");
-      jest.mock("../../../../mailer/mailing");
-      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SIGNED_BY_PRODUCER",
+            destinationCap: "DESTINATION-CAP",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: destination.siret,
+            destinationCompanyName: destination.name
+            // No next destination
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
 
-      // When
-      const { mutate } = makeClient(user);
-      const { errors } = await mutate<
-        Pick<Mutation, "updateBsda">,
-        MutationUpdateBsdaArgs
-      >(UPDATE_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            destination: {
-              cap: "TTR-CAP",
-              company: {
-                siret: ttr.siret
-              },
-              operation: {
-                // User adds a next destination!
-                nextDestination: {
-                  cap: "DESTINATION-CAP",
-                  company: {
-                    siret: destination.siret
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                cap: "TTR-CAP",
+                company: {
+                  siret: ttr.siret
+                },
+                operation: {
+                  // User adds a next destination!
+                  nextDestination: {
+                    cap: "DESTINATION-CAP",
+                    company: {
+                      siret: destination.siret
+                    }
                   }
                 }
               }
             }
           }
-        }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
       });
 
-      // Then
-      expect(errors).toBeUndefined();
-      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
-    });
+      it("if user updates the BSDA by adding a nextDestination, and modifies the destination CAP - should send mail", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const ttr = await companyFactory();
+        const transporter = await companyFactory();
 
-    it("[bug prod] if user updates the BSDA by adding a nextDestination, and modifies the destination CAP - should send mail", async () => {
-      // Given
-      const emitter = await companyFactory();
-      const worker = await companyFactory();
-      const destination = await companyFactory();
-      const ttr = await companyFactory();
-      const transporter = await companyFactory();
+        const user = await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
 
-      const user = await userInCompany(
-        "MEMBER",
-        emitter.id,
-        {
-          email: "emitter@mail.com",
-          name: "Emitter"
-        },
-        {
-          notificationIsActiveBsdaFinalDestinationUpdate: true
-        }
-      );
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SIGNED_BY_PRODUCER",
+            destinationCap: "DESTINATION-CAP",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: destination.siret,
+            destinationCompanyName: destination.name
+            // No next destination
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
 
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          destinationCap: "DESTINATION-CAP",
-          // Companies
-          emitterCompanySiret: emitter.siret,
-          emitterCompanyName: emitter.name,
-          workerCompanySiret: worker.siret,
-          workerCompanyName: worker.name,
-          destinationCompanySiret: destination.siret,
-          destinationCompanyName: destination.name
-          // No next destination
-        },
-        transporterOpt: {
-          transporterCompanySiret: transporter.siret,
-          transporterCompanyName: transporter.name
-        }
-      });
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
-      // No mails
-      const { sendMail } = require("../../../../mailer/mailing");
-      jest.mock("../../../../mailer/mailing");
-      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
-
-      // When
-      const { mutate } = makeClient(user);
-      const { errors } = await mutate<
-        Pick<Mutation, "updateBsda">,
-        MutationUpdateBsdaArgs
-      >(UPDATE_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            destination: {
-              cap: "TTR-CAP",
-              company: {
-                siret: ttr.siret,
-                name: ttr.name
-              },
-              operation: {
-                // User adds a next destination AND modifies the CAP!
-                nextDestination: {
-                  cap: "NEW-DESTINATION-CAP",
-                  company: {
-                    siret: destination.siret,
-                    name: destination.name
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                cap: "TTR-CAP",
+                company: {
+                  siret: ttr.siret,
+                  name: ttr.name
+                },
+                operation: {
+                  // User adds a next destination AND modifies the CAP!
+                  nextDestination: {
+                    cap: "NEW-DESTINATION-CAP",
+                    company: {
+                      siret: destination.siret,
+                      name: destination.name
+                    }
                   }
                 }
               }
             }
           }
-        }
-      });
+        });
 
-      // Then
-      const updatedBsda = await prisma.bsda.findFirstOrThrow({
-        where: { id: bsda.id }
-      });
-      expect(errors).toBeUndefined();
-      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
-      expect(sendMail as jest.Mock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: `<p>
+        // Then
+        const updatedBsda = await prisma.bsda.findFirstOrThrow({
+          where: { id: bsda.id }
+        });
+        expect(errors).toBeUndefined();
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+        expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: `<p>
   Trackdéchets vous informe qu'une modification a été apportée sur le bordereau
   amiante n° ${updatedBsda.id} que vous avez signé.
 </p>
@@ -2675,174 +2678,174 @@ describe("Mutation.updateBsda", () => {
   ${updatedBsda.destinationOperationNextDestinationCompanySiret}.
 </p>
 `,
-          messageVersions: [
-            { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
-          ],
-          subject: `CAP du bordereau amiante n° ${updatedBsda.id} mis à jour par NEW-DESTINATION-CAP`
-        })
-      );
-    });
-
-    it("[bug prod] if user updates the BSDA by removing a nextDestination, but does not change the CAP - should not send mail", async () => {
-      // Given
-      const emitter = await companyFactory();
-      const worker = await companyFactory();
-      const destination = await companyFactory();
-      const ttr = await companyFactory();
-      const transporter = await companyFactory();
-
-      const user = await userInCompany(
-        "MEMBER",
-        emitter.id,
-        {
-          email: "emitter@mail.com",
-          name: "Emitter"
-        },
-        {
-          notificationIsActiveBsdaFinalDestinationUpdate: true
-        }
-      );
-
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          // Companies
-          emitterCompanySiret: emitter.siret,
-          emitterCompanyName: emitter.name,
-          workerCompanySiret: worker.siret,
-          workerCompanyName: worker.name,
-          destinationCompanySiret: ttr.siret,
-          destinationCompanyName: ttr.name,
-          destinationCap: "TTR-CAP",
-          destinationOperationNextDestinationCompanySiret: destination.siret,
-          destinationOperationNextDestinationCompanyName: destination.name,
-          destinationOperationNextDestinationCap: "DESTINATION-CAP"
-        },
-        transporterOpt: {
-          transporterCompanySiret: transporter.siret,
-          transporterCompanyName: transporter.name
-        }
+            messageVersions: [
+              { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
+            ],
+            subject: `CAP du bordereau amiante n° ${updatedBsda.id} mis à jour par NEW-DESTINATION-CAP`
+          })
+        );
       });
 
-      // No mails
-      const { sendMail } = require("../../../../mailer/mailing");
-      jest.mock("../../../../mailer/mailing");
-      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+      it("if user updates the BSDA by removing a nextDestination, but does not change the CAP - should not send mail", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const ttr = await companyFactory();
+        const transporter = await companyFactory();
 
-      // When
-      const { mutate } = makeClient(user);
-      const { errors } = await mutate<
-        Pick<Mutation, "updateBsda">,
-        MutationUpdateBsdaArgs
-      >(UPDATE_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            destination: {
-              cap: "DESTINATION-CAP",
-              company: {
-                siret: destination.siret,
-                name: destination.name
-              },
-              operation: {
-                // User removes the next destination
-                nextDestination: {
-                  cap: null,
-                  company: null
+        const user = await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SIGNED_BY_PRODUCER",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: ttr.siret,
+            destinationCompanyName: ttr.name,
+            destinationCap: "TTR-CAP",
+            destinationOperationNextDestinationCompanySiret: destination.siret,
+            destinationOperationNextDestinationCompanyName: destination.name,
+            destinationOperationNextDestinationCap: "DESTINATION-CAP"
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
+
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                cap: "DESTINATION-CAP",
+                company: {
+                  siret: destination.siret,
+                  name: destination.name
+                },
+                operation: {
+                  // User removes the next destination
+                  nextDestination: {
+                    cap: null,
+                    company: null
+                  }
                 }
               }
             }
           }
-        }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
       });
 
-      // Then
-      expect(errors).toBeUndefined();
-      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
-    });
+      it("if user updates the BSDA by removing the nextDestination, and modifies the destination CAP - should send mail", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const ttr = await companyFactory();
+        const transporter = await companyFactory();
 
-    it("[bug prod] if user updates the BSDA by removing the nextDestination, and modifies the destination CAP - should send mail", async () => {
-      // Given
-      const emitter = await companyFactory();
-      const worker = await companyFactory();
-      const destination = await companyFactory();
-      const ttr = await companyFactory();
-      const transporter = await companyFactory();
+        const user = await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
 
-      const user = await userInCompany(
-        "MEMBER",
-        emitter.id,
-        {
-          email: "emitter@mail.com",
-          name: "Emitter"
-        },
-        {
-          notificationIsActiveBsdaFinalDestinationUpdate: true
-        }
-      );
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SIGNED_BY_PRODUCER",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: ttr.siret,
+            destinationCompanyName: ttr.name,
+            destinationCap: "TTR-CAP",
+            destinationOperationNextDestinationCompanySiret: destination.siret,
+            destinationOperationNextDestinationCompanyName: destination.name,
+            destinationOperationNextDestinationCap: "DESTINATION-CAP"
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
 
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SIGNED_BY_PRODUCER",
-          // Companies
-          emitterCompanySiret: emitter.siret,
-          emitterCompanyName: emitter.name,
-          workerCompanySiret: worker.siret,
-          workerCompanyName: worker.name,
-          destinationCompanySiret: ttr.siret,
-          destinationCompanyName: ttr.name,
-          destinationCap: "TTR-CAP",
-          destinationOperationNextDestinationCompanySiret: destination.siret,
-          destinationOperationNextDestinationCompanyName: destination.name,
-          destinationOperationNextDestinationCap: "DESTINATION-CAP"
-        },
-        transporterOpt: {
-          transporterCompanySiret: transporter.siret,
-          transporterCompanyName: transporter.name
-        }
-      });
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
-      // No mails
-      const { sendMail } = require("../../../../mailer/mailing");
-      jest.mock("../../../../mailer/mailing");
-      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
-
-      // When
-      const { mutate } = makeClient(user);
-      const { errors } = await mutate<
-        Pick<Mutation, "updateBsda">,
-        MutationUpdateBsdaArgs
-      >(UPDATE_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            destination: {
-              cap: "NEW-DESTINATION-CAP",
-              company: {
-                siret: destination.siret,
-                name: destination.name
-              },
-              operation: {
-                // User removes the next destination
-                nextDestination: {
-                  cap: null,
-                  company: null
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                cap: "NEW-DESTINATION-CAP",
+                company: {
+                  siret: destination.siret,
+                  name: destination.name
+                },
+                operation: {
+                  // User removes the next destination
+                  nextDestination: {
+                    cap: null,
+                    company: null
+                  }
                 }
               }
             }
           }
-        }
-      });
+        });
 
-      // Then
-      const updatedBsda = await prisma.bsda.findFirstOrThrow({
-        where: { id: bsda.id }
-      });
-      expect(errors).toBeUndefined();
-      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
-      expect(sendMail as jest.Mock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: `<p>
+        // Then
+        const updatedBsda = await prisma.bsda.findFirstOrThrow({
+          where: { id: bsda.id }
+        });
+        expect(errors).toBeUndefined();
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+        expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: `<p>
   Trackdéchets vous informe qu'une modification a été apportée sur le bordereau
   amiante n° ${updatedBsda.id} que vous avez signé.
 </p>
@@ -2860,12 +2863,13 @@ describe("Mutation.updateBsda", () => {
   ${updatedBsda.destinationCompanySiret}.
 </p>
 `,
-          messageVersions: [
-            { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
-          ],
-          subject: `CAP du bordereau amiante n° ${updatedBsda.id} mis à jour par NEW-DESTINATION-CAP`
-        })
-      );
+            messageVersions: [
+              { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
+            ],
+            subject: `CAP du bordereau amiante n° ${updatedBsda.id} mis à jour par NEW-DESTINATION-CAP`
+          })
+        );
+      });
     });
   });
 
