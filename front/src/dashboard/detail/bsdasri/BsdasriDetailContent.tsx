@@ -510,7 +510,7 @@ const Dasripackaging = ({
   );
 };
 
-const verbosePackagings = {
+export const verbosePackagings = {
   BOITE_CARTON: "Caisse en carton avec sac en plastique",
   FUT: "Fûts ou jerrican à usage unique",
   BOITE_PERFORANTS: "Boîtes et Mini-collecteurs pour déchets perforants",
