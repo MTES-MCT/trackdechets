@@ -701,7 +701,7 @@ export default function Header({
                   <img
                     className="fr-responsive-img"
                     style={{ width: "70px" }}
-                    src="./trackdechets.png"
+                    src="/trackdechets.png"
                     alt="Trackdéchets"
                     data-fr-js-ratio="true"
                   />
