@@ -315,6 +315,7 @@ function BsffQuantity({
   renderEmpty
 }: Pick<Props, "bsff" | "renderEmpty">) {
   const renderCheckboxState = !renderEmpty;
+
   return (
     <div className="BoxCol">
       <p>
@@ -340,7 +341,11 @@ function BsffQuantity({
               />{" "}
               Estimée
               <br />
-              "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
+              {bsff.weight?.isEstimate && (
+                <div>
+                  "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2 de l'ADR"
+                </div>
+              )}
             </span>
           </div>
           <div>Kilogramme(s) : {bsff.weight.value}</div>
