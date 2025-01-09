@@ -82,7 +82,7 @@ export async function buildPdf(bsff: BsffForBuildPdf, renderEmpty?: boolean) {
     bsffForPdf = emptyValues(bsffForPdf);
   }
   const html = ReactDOMServer.renderToStaticMarkup(
-    <BsffPdf bsff={bsffForPdf} qrCode={qrCode} renderEmpty={true} />
+    <BsffPdf bsff={bsffForPdf} qrCode={qrCode} renderEmpty={renderEmpty} />
   );
   return generatePdf(html);
 }

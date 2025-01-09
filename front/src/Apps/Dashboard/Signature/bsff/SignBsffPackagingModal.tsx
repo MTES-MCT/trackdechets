@@ -7,7 +7,12 @@ import {
   Modal
 } from "../../../../common/components";
 import { useQuery } from "@apollo/client";
-import { BsffPackaging, Query, QueryBsffPackagingArgs } from "@td/codegen-ui";
+import {
+  BsffPackaging,
+  Query,
+  QueryBsffPackagingArgs,
+  WasteAcceptationStatus
+} from "@td/codegen-ui";
 import { GET_BSFF_PACKAGING } from "./queries";
 import { Loader } from "../../../common/Components";
 import Alert from "@codegouvfr/react-dsfr/Alert";
@@ -19,10 +24,14 @@ type SignBsffPackagingModalProps = {
 };
 
 function getModalTitle(packaging: BsffPackaging) {
-  if (packaging.operation?.signature) {
+  if (
+    packaging.operation?.signature?.date ||
+    (packaging.acceptation?.signature?.date &&
+      packaging.acceptation?.status === WasteAcceptationStatus.Refused)
+  ) {
     return `Corriger le contenant ${packaging.numero}`;
   }
-  if (packaging?.acceptation?.signature) {
+  if (packaging?.acceptation?.signature?.date) {
     return `Signer le traitement du contenant ${packaging.numero}`;
   }
   return `Signer l'acceptation du contenant ${packaging.numero}`;

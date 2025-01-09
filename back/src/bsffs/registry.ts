@@ -313,9 +313,22 @@ export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     country: emitterCompanyCountry
   } = splitAddress(bsff.emitterCompanyAddress);
 
+  let wasteCode = bsff.wasteCode;
+  let wasteDescription = bsff.wasteDescription;
+
+  if (
+    bsff.packagings.length === 1 &&
+    bsff.packagings[0].acceptationSignatureDate
+  ) {
+    const packaging = bsff.packagings[0];
+    wasteCode = packaging.acceptationWasteCode ?? wasteCode;
+    wasteDescription =
+      packaging.acceptationWasteDescription ?? wasteDescription;
+  }
+
   return {
-    wasteDescription: bsff.wasteDescription,
-    wasteCode: bsff.wasteCode,
+    wasteDescription,
+    wasteCode,
     wasteIsDangerous: true,
     pop: false,
     id: bsff.id,

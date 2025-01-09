@@ -54,14 +54,18 @@ function requireNextDestination(bsffPackaging: ZodBsffPackaging) {
 }
 
 function isBsffPackagingFieldSealed(bsffPackaging: ZodBsffPackaging) {
+  const lastSignatureDate =
+    bsffPackaging.operationSignatureDate ??
+    bsffPackaging.acceptationSignatureDate;
+
   if (
-    !!bsffPackaging.operationSignatureDate &&
+    !!lastSignatureDate &&
     // cas particulier : on ne permet pas de modifier un contenant qui est
     // déjà réexpédié, regroupé ou reconditionné
     !bsffPackaging.nextPackagingId &&
     // tra-15501 Le destinataire peut modifier les informations du contenant
-    // (acceptation et opération) jusqu'à 60 jours après l'opération
-    differenceInDays(new Date(), bsffPackaging.operationSignatureDate) <= 60
+    // (acceptation et opération) jusqu'à 60 jours après l'opération ou le refus
+    differenceInDays(new Date(), lastSignatureDate) <= 60
   ) {
     return false;
   }
@@ -81,7 +85,7 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     required: { from: "ACCEPTATION" }
   },
   acceptationStatus: {
-    sealed: { from: "ACCEPTATION" },
+    sealed: { from: "ACCEPTATION", when: isBsffPackagingFieldSealed },
     required: { from: "ACCEPTATION" }
   },
   acceptationWeight: {
@@ -89,7 +93,7 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     required: { from: "ACCEPTATION" }
   },
   acceptationRefusalReason: {
-    sealed: { from: "ACCEPTATION" },
+    sealed: { from: "ACCEPTATION", when: isBsffPackagingFieldSealed },
     required: {
       from: "ACCEPTATION",
       when: p =>

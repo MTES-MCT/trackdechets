@@ -45,36 +45,51 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 type SignBsffPackagingFormProps = {
-  packaging: BsffPackaging & { bsff?: Bsff };
+  packaging: BsffPackaging & { bsff: Bsff };
   onCancel: () => void;
   onSuccess: () => void;
 };
 
 type FormValues = UpdateBsffPackagingInput & { signature: BsffSignatureInput };
 
+function getDefaultWeight(packaging: BsffPackaging & { bsff?: Bsff }) {
+  if (packaging.bsff.packagings.length === 1 && packaging.bsff.weight?.value) {
+    // Lorsqu'un seul contenant est présent sur le BSFF
+    // on prend la valeur du poids total renseigné sur le BSFF lors de l'émission
+    // comme valeur par défaut pour le contenant
+    return packaging.bsff.weight.value;
+  }
+  return 0;
+}
+
 function getDefaultFormValues(
   packaging: BsffPackaging & { bsff?: Bsff }
 ): FormValues {
+  const today = new Date();
+
   return {
     acceptation: {
-      weight: packaging?.acceptation?.weight ?? 0,
+      weight: packaging?.acceptation?.weight ?? getDefaultWeight(packaging),
       status: packaging?.acceptation?.status ?? WasteAcceptationStatus.Accepted,
       date: packaging?.acceptation?.date
         ? datetimeToYYYYMMDD(new Date(packaging.acceptation.date))
-        : "",
+        : datetimeToYYYYMMDD(today),
       wasteCode:
         packaging?.acceptation?.wasteCode ?? packaging.bsff?.waste?.code ?? "",
       wasteDescription:
         packaging?.acceptation?.wasteDescription ??
         packaging.bsff?.waste?.description ??
         "",
-      refusalReason: null
+      refusalReason: packaging?.acceptation?.refusalReason ?? null
     },
     operation: {
       date: packaging?.operation?.date
         ? datetimeToYYYYMMDD(new Date(packaging.operation.date))
-        : "",
-      code: packaging?.operation?.code ?? BsffOperationCode.R1,
+        : datetimeToYYYYMMDD(today),
+      code:
+        packaging?.operation?.code ??
+        packaging.bsff.destination?.plannedOperationCode ??
+        BsffOperationCode.R1,
       mode: packaging?.operation?.mode ?? OperationMode.Elimination,
       description: packaging?.operation?.description ?? "",
       noTraceability: packaging?.operation?.noTraceability ?? false,
@@ -221,27 +236,38 @@ const signatureSchema = z.object({
   })
 });
 
-function getSchema(signatureType: BsffSignatureType | null) {
-  if (signatureType === BsffSignatureType.Operation) {
-    return acceptationSchema
-      .merge(operationSchema)
-      .merge(signatureSchema)
-      .superRefine(acceptationRefinement);
-  } else if (signatureType === null) {
-    // cas de la correction
+function getSchema(packaging: BsffPackaging) {
+  if (packaging?.operation?.signature?.date) {
+    // Correction post traitement
     return acceptationSchema
       .merge(operationSchema)
       .superRefine(acceptationRefinement);
   }
 
-  // cas de l'acceptation
+  if (packaging?.acceptation?.signature?.date) {
+    if (packaging?.acceptation?.status === WasteAcceptationStatus.Refused) {
+      // Correction d'un refus
+      return acceptationSchema.superRefine(acceptationRefinement);
+    } else {
+      // Signature de l'opération
+      return acceptationSchema
+        .merge(operationSchema)
+        .merge(signatureSchema)
+        .superRefine(acceptationRefinement);
+    }
+  }
+
+  // Signature de l'acceptation
   return acceptationSchema
     .merge(signatureSchema)
     .superRefine(acceptationRefinement);
 }
 
 function getSignatureType(packaging: BsffPackaging): BsffSignatureType | null {
-  if (packaging?.operation?.signature?.date) {
+  if (
+    packaging?.operation?.signature?.date ||
+    packaging?.acceptation?.status === WasteAcceptationStatus.Refused
+  ) {
     return null;
   }
   if (packaging?.acceptation?.signature?.date) {
@@ -302,6 +328,11 @@ function SignBsffPackagingForm({
 
   const signatureType = useMemo(() => getSignatureType(packaging), [packaging]);
 
+  // Permet d'afficher ou non les champs du formulaire relatifs à l'opération
+  const showOperation =
+    packaging.acceptation?.signature?.date &&
+    packaging.acceptation.status === WasteAcceptationStatus.Accepted;
+
   const actionBtnLabel = useMemo(() => {
     if (!!signatureType) {
       return loading ? "Signature en cours" : "Signer";
@@ -310,7 +341,7 @@ function SignBsffPackagingForm({
     }
   }, [signatureType, loading]);
 
-  const schema = useMemo(() => getSchema(signatureType), [signatureType]);
+  const schema = useMemo(() => getSchema(packaging), [packaging]);
 
   const methods = useForm<FormValues>({
     defaultValues,
@@ -387,10 +418,7 @@ function SignBsffPackagingForm({
         id: packaging.id,
         input: {
           acceptation,
-          // On exclut les données de l'opération lors de la signature de l'acceptation
-          ...(signatureType === BsffSignatureType.Acceptation
-            ? {}
-            : { operation }),
+          ...(showOperation ? { operation } : {}),
           ...rest
         }
       }
@@ -462,7 +490,10 @@ function SignBsffPackagingForm({
           </div>
         </div>
 
-        {signatureType === BsffSignatureType.Acceptation && (
+        {(signatureType === BsffSignatureType.Acceptation ||
+          (signatureType === null &&
+            packaging.acceptation?.status ===
+              WasteAcceptationStatus.Refused)) && (
           <>
             <div className="fr-grid-row fr-grid-row--gutters">
               <div className="fr-col-12">
@@ -482,13 +513,31 @@ function SignBsffPackagingForm({
                         field.onChange(status);
                         if (!checked) {
                           setValue("acceptation.refusalReason", null);
-                          unregister("acceptation.refusalReason");
+                          setValue(
+                            "acceptation.weight",
+                            getDefaultWeight(packaging)
+                          );
                         } else {
                           setValue("acceptation.weight", 0);
                         }
                       }}
                     />
                   )}
+                />
+              </div>
+            </div>
+            <div className="fr-grid-row fr-grid-row--gutters">
+              <div className="fr-col-12 fr-col-md-4">
+                <Input
+                  label={acceptationDateLabel}
+                  nativeInputProps={{
+                    max: maxDate,
+                    min: minDate,
+                    type: "date",
+                    ...register("acceptation.date")
+                  }}
+                  state={errors.acceptation?.date ? "error" : "default"}
+                  stateRelatedMessage={errors.acceptation?.date?.message}
                 />
               </div>
             </div>
@@ -511,55 +560,37 @@ function SignBsffPackagingForm({
                 </div>
               </div>
             )}
-            <div className="fr-grid-row fr-grid-row--gutters">
-              <div className="fr-col-12 fr-col-md-4">
-                <Input
-                  label={acceptationDateLabel}
-                  nativeInputProps={{
-                    max: maxDate,
-                    min: minDate,
-                    type: "date",
-                    ...register("acceptation.date")
-                  }}
-                  state={errors.acceptation?.date ? "error" : "default"}
-                  stateRelatedMessage={errors.acceptation?.date?.message}
-                />
-              </div>
-            </div>
           </>
         )}
-
-        <div className="fr-grid-row fr-grid-row--gutters">
-          <div className="fr-col-12 fr-col-md-4">
-            <NonScrollableInput
-              label="Quantité de fluide présentée en kg"
-              hintText="pour les installations d'entreposage ou de reconditionnement, la quantité peut être estimée"
-              disabled={isRefused}
-              nativeInputProps={{
-                ...register("acceptation.weight", {
-                  valueAsNumber: true
-                }),
-                type: "number",
-                inputMode: "decimal",
-                step: "1"
-              }}
-              state={errors.acceptation?.weight ? "error" : "default"}
-              stateRelatedMessage={errors.acceptation?.weight?.message}
-            />
-            {acceptationWeight > 0 && (
-              <p className="fr-info-text fr-mt-5v">
-                Soit {new Decimal(acceptationWeight).dividedBy(1000).toFixed(4)}{" "}
-                t
-              </p>
-            )}
+        {isAccepted && (
+          <div className="fr-grid-row fr-grid-row--gutters">
+            <div className="fr-col-12 fr-col-md-6">
+              <NonScrollableInput
+                label="Quantité de fluide présentée en kg"
+                hintText="pour les installations d'entreposage ou de reconditionnement, la quantité peut être estimée"
+                nativeInputProps={{
+                  ...register("acceptation.weight", {
+                    valueAsNumber: true
+                  }),
+                  type: "number",
+                  inputMode: "decimal",
+                  step: "0.001" // grammes
+                }}
+                state={errors.acceptation?.weight ? "error" : "default"}
+                stateRelatedMessage={errors.acceptation?.weight?.message}
+              />
+              {acceptationWeight > 0 && (
+                <p className="fr-info-text fr-mt-5v">
+                  Soit{" "}
+                  {new Decimal(acceptationWeight).dividedBy(1000).toFixed(4)} t
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-
+        )}
         {
-          // signature traitement
-          (signatureType === BsffSignatureType.Operation ||
-            // ou correction
-            signatureType === null) && (
+          // signature du traitement ou correction
+          showOperation && (
             <>
               <h6 className="fr-h6">Traitement</h6>
               <div className="fr-grid-row fr-grid-row--gutters">

@@ -13,6 +13,7 @@ const bsffPackagingFragment = gql`
       weight
       wasteCode
       wasteDescription
+      refusalReason
       signature {
         date
       }
@@ -40,6 +41,15 @@ const bsffPackagingFragment = gql`
       waste {
         code
         description
+      }
+      weight {
+        value
+      }
+      destination {
+        plannedOperationCode
+      }
+      packagings {
+        id
       }
     }
     nextBsff {
@@ -81,7 +91,6 @@ export const GET_BSFF_PACKAGING = gql`
 export const UPDATE_BSFF_PACKAGING = gql`
   mutation UpdateBsffPackaging($id: ID!, $input: UpdateBsffPackagingInput!) {
     updateBsffPackaging(id: $id, input: $input) {
-      id
       ...BsffPackagingFragment
     }
   }

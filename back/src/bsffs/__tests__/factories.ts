@@ -311,6 +311,21 @@ export function createBsffAfterAcceptation(
   });
 }
 
+export function createBsffAfterRefusal(
+  companies: Required<BsffFactoryCompanies>,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffBeforeRefusal(companies, {
+    ...opts,
+    data: { status: BsffStatus.REFUSED, ...opts.data },
+    packagingData: {
+      acceptationSignatureAuthor: "Juste Leblanc",
+      acceptationSignatureDate: new Date().toISOString(),
+      ...opts.packagingData
+    }
+  });
+}
+
 export function createBsffBeforeOperation(
   companies: Required<BsffFactoryCompanies>,
   opts: BsffFactoryOpts = {}
