@@ -1,13 +1,23 @@
 import React, { useContext, useEffect } from "react";
 import { Field, useFormikContext } from "formik";
 import CompanySelector from "../../../common/components/company/CompanySelector";
-import { Bsda, BsdaStatus, BsdaType } from "@td/codegen-ui";
+import {
+  Bsda,
+  BsdaStatus,
+  BsdaType,
+  CompanyType,
+  Query,
+  QueryCompanyPrivateInfosArgs
+} from "@td/codegen-ui";
 import RedErrorMessage from "../../../../common/components/RedErrorMessage";
 import DateInput from "../../../common/components/custom-inputs/DateInput";
 import Select from "react-select";
 import { IntermediariesSelector } from "../../components/intermediaries/IntermediariesSelector";
 import { getInitialCompany } from "../../../../Apps/common/data/initialState";
 import { BsdaContext } from "../../FormContainer";
+import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../../../Apps/common/queries/company/query";
+import { useLazyQuery } from "@apollo/client";
+import { useParams } from "react-router-dom";
 
 const DestinationCAPModificationAlert = () => (
   <div className="fr-alert fr-alert--info fr-my-4v">
@@ -48,14 +58,45 @@ export function Destination({ disabled }) {
   );
   const isDechetterie = values?.type === BsdaType.Collection_2710;
 
+  const { siret } = useParams<{ siret: string }>();
+
+  const [getCompanyQuery, { data: dataCompany }] = useLazyQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_SELECTOR_PRIVATE_INFOS);
+
   useEffect(() => {
     if (isDechetterie) {
-      const company = values?.emitter?.company;
-      setFieldValue("destination.company", {
-        ...company
+      getCompanyQuery({
+        variables: { clue: siret! }
       });
+
+      if (
+        dataCompany?.companyPrivateInfos?.companyTypes?.includes(
+          CompanyType.WasteCenter
+        )
+      ) {
+        const company = dataCompany?.companyPrivateInfos;
+        setFieldValue("destination.company", {
+          orgId: company?.orgId,
+          siret: company?.siret,
+          name: company?.name,
+          address: company?.address,
+          contact: company?.contact,
+          mail: company?.contactEmail,
+          phone: company?.contactPhone,
+          vatNumber: company?.vatNumber,
+          country: company?.codePaysEtrangerEtablissement
+        });
+      }
     }
-  }, [isDechetterie, setFieldValue, values?.emitter?.company]);
+  }, [
+    isDechetterie,
+    setFieldValue,
+    dataCompany?.companyPrivateInfos,
+    getCompanyQuery,
+    siret
+  ]);
 
   const hasBroker = Boolean(values.broker);
   function onBrokerToggle() {
