@@ -7,8 +7,6 @@ import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
-import { getDefaultOrgId } from "../CompanySwitcher/CompanySwitcher";
-import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import Exports from "../../../../dashboard/exports/Registry";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
 import { MyImports } from "../../../../dashboard/registry/MyImports";
@@ -55,9 +53,6 @@ const BANNER_MESSAGES = [
 ];
 
 export default function LayoutContainer() {
-  // const { orgId } = usePermissions();
-  // const defaultOrgId = orgId ?? getDefaultOrgId([]);
-
   return (
     <Suspense fallback={<Loader />}>
       <Routes>
@@ -78,6 +73,33 @@ export default function LayoutContainer() {
             </RequireAuth>
           }
         />
+
+        <Route element={<Layout unauthenticatedRoutes />}>
+          <Route path={"/"} element={<Login />} />
+
+          <Route path={routes.login} element={<Login />} />
+
+          <Route path={routes.invite} element={<Invite />} />
+
+          <Route path={routes.signup.index} element={<Signup />} />
+
+          <Route path={routes.signup.details} element={<WasteSelector />} />
+
+          <Route
+            path={routes.passwordResetRequest}
+            element={<PasswordResetRequest />}
+          />
+
+          <Route path={routes.passwordReset} element={<PasswordReset />} />
+
+          <Route path={routes.userActivation} element={<UserActivation />} />
+
+          <Route
+            path={routes.resendActivationEmail}
+            element={<ResendActivationEmail />}
+          />
+        </Route>
+
         <Route
           element={
             <Layout
@@ -103,31 +125,23 @@ export default function LayoutContainer() {
             }
           />
 
-          <Route path={routes.login} element={<Login />} />
-
-          <Route path={routes.invite} element={<Invite />} />
-
-          <Route path={routes.signup.index} element={<Signup />} />
-
-          <Route path={routes.signup.details} element={<WasteSelector />} />
-
           <Route
-            path={routes.passwordResetRequest}
-            element={<PasswordResetRequest />}
+            path={routes.company}
+            element={
+              <RequireAuth>
+                <Company />
+              </RequireAuth>
+            }
           />
 
-          <Route path={routes.passwordReset} element={<PasswordReset />} />
-
-          <Route path={routes.userActivation} element={<UserActivation />} />
-
           <Route
-            path={routes.resendActivationEmail}
-            element={<ResendActivationEmail />}
+            path={routes.wasteTree}
+            element={
+              <RequireAuth>
+                <WasteTree />
+              </RequireAuth>
+            }
           />
-
-          <Route path={routes.company} element={<Company />} />
-
-          <Route path={routes.wasteTree} element={<WasteTree />} />
 
           <Route
             path={"/dashboard/:siret/bsds/edit/:id"}

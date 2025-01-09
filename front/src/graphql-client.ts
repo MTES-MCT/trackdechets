@@ -53,14 +53,8 @@ const errorLink = onError(({ response, graphQLErrors }) => {
         // If we catch an UNAUTHENTICATED exception at this point,
         // the user session has probably expired. Redirect to login
         // page with a hint in the URL to display a message
-        if (
-          window.location.pathname !== "/" &&
-          window.location.pathname !== "/login"
-        ) {
-          // Logout
-          localAuthService.locallySignOut();
-          window.location.href = "/login?session=expired";
-        }
+        localAuthService.locallySignOut();
+        window.location.href = "/login?session=expired";
       }
     }
   }
