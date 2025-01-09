@@ -33,12 +33,15 @@ import {
 
 import routes from "../../../routes";
 import styles from "./Header.module.scss";
-import CompanySwitcher from "../CompanySwitcher/CompanySwitcher";
+import CompanySwitcher, {
+  getDefaultOrgId
+} from "../CompanySwitcher/CompanySwitcher";
 
 export const GET_ME = gql`
   {
     me {
       id
+      isAdmin
       companies {
         id
         name
@@ -581,22 +584,12 @@ const getDesktopMenuEntries = (
   return [...(isAuthenticated ? connected : []), ...(isAdmin ? admin : [])];
 };
 
-type HeaderProps = {
-  isAuthenticated: boolean;
-  isAdmin: boolean;
-  defaultOrgId?: string;
-};
-
 /**
  * Main nav
  * Contains External and internal links
  * On mobile appear as a sliding panel and includes other items
  */
-export default function Header({
-  isAuthenticated,
-  isAdmin,
-  defaultOrgId
-}: HeaderProps) {
+export default function Header() {
   const { VITE_API_ENDPOINT } = import.meta.env;
   const location = useLocation();
   const { updatePermissions, role, permissions } = usePermissions();
@@ -611,10 +604,15 @@ export default function Header({
     location.pathname
   );
 
+  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME);
+
+  const isAuthenticated = !loading && data != null;
+  const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
+
+  const defaultOrgId = getDefaultOrgId(data?.me.companies ?? []);
+
   // Catching siret from url when not available from props (just after login)
   const currentSiret = matchDashboard?.params["siret"] || defaultOrgId;
-
-  const { data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   useEffect(() => {
     if (isAuthenticated && data && currentSiret) {
@@ -647,6 +645,8 @@ export default function Header({
     },
     [navigate, role]
   );
+
+  if (loading) return null;
 
   const showRegistry =
     permissions.includes(UserPermission.RegistryCanRead) &&
