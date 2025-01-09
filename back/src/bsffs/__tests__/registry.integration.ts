@@ -208,6 +208,39 @@ describe("toGenericWaste", () => {
     expect(waste.emitterCompanyCity).toBe("Nantes");
     expect(waste.emitterCompanyCountry).toBe("FR");
   });
+
+  it(
+    "it should return accepted wasteCode and wasteDescription when there is" +
+      " only one packaging",
+    async () => {
+      const emitter = await userWithCompanyFactory();
+      const transporter = await userWithCompanyFactory();
+      const destination = await userWithCompanyFactory();
+
+      const bsff = await createBsffAfterAcceptation(
+        { emitter, transporter, destination },
+        {
+          data: {
+            wasteCode: "14 06 01*",
+            wasteDescription: "HFC"
+          },
+          packagingData: {
+            acceptationWasteCode: "14 06 02*",
+            acceptationWasteDescription: "HFC 2"
+          }
+        }
+      );
+
+      const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
+        where: { id: bsff.id },
+        include: RegistryBsffInclude
+      });
+      const waste = toGenericWaste(bsffForRegistry);
+
+      expect(waste.wasteCode).toEqual("14 06 02*");
+      expect(waste.wasteDescription).toEqual("HFC 2");
+    }
+  );
 });
 
 describe("toIncomingWaste", () => {
