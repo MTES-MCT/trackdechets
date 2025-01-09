@@ -93,7 +93,7 @@ describe("membershipRequests", () => {
     expect(data.membershipRequests.edges[0].node.email).toEqual(user.email);
   });
 
-  it("should return a list of membership requests - using the company SIRET", async () => {
+  it("should return a list of membership requests - using the company orgId", async () => {
     // Given
     const { company, user: admin } = await userWithCompanyFactory();
 
@@ -171,7 +171,7 @@ describe("membershipRequests", () => {
     expect(errors[0].message).toBe("L'entreprise ciblée n'existe pas");
   });
 
-  it("should return an error if the company SIRET does not exist", async () => {
+  it("should return an error if the company orgId does not exist", async () => {
     // Given
     const { user: admin } = await userWithCompanyFactory();
 
@@ -185,7 +185,7 @@ describe("membershipRequests", () => {
     expect(errors[0].message).toBe("L'entreprise ciblée n'existe pas");
   });
 
-  it("should return an error no ID nor SIRET has been provided", async () => {
+  it("should return an error no ID nor orgId has been provided", async () => {
     // Given
     const { user: admin } = await userWithCompanyFactory();
 
@@ -197,7 +197,7 @@ describe("membershipRequests", () => {
     expect(errors[0].message).toBe("Required");
   });
 
-  it("should return an error if using both ID and SIRET", async () => {
+  it("should return an error if using both ID and orgId", async () => {
     // Given
     const { company, user: admin } = await userWithCompanyFactory();
 
