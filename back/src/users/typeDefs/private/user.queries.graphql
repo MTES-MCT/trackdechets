@@ -36,4 +36,15 @@ type Query {
   Par exemple lorsqu'un administrateur personnifie un compte utilisateur.
   """
   warningMessage: String
+
+  """
+  !Destiné aux admins uniquement!
+  Récupère toutes les demandes de rattachement en cours qui concernent un établissement
+  (ciblé par ID ou orgId)
+  """
+  membershipRequests(
+    where: MembershipRequestsWhere
+    skip: Int
+    first: Int
+  ): MembershipRequestsConnection!
 }

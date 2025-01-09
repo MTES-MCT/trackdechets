@@ -53,6 +53,20 @@ export const getMembershipRequests = async (
 describe("membershipRequests", () => {
   afterAll(resetDatabase);
 
+  it("user should be authenticaed", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory();
+
+    // When
+    const { errors } = await getMembershipRequests(null, {
+      where: { id: company.id }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe("Vous n'êtes pas connecté.");
+  });
+
   it("should return a list of membership requests - using the company ID", async () => {
     // Given
     const { company, user: admin } = await userWithCompanyFactory();
@@ -88,7 +102,7 @@ describe("membershipRequests", () => {
 
     // When
     const { errors, data } = await getMembershipRequests(admin, {
-      where: { siret: company.siret }
+      where: { orgId: company.orgId }
     });
 
     // Then
@@ -105,7 +119,7 @@ describe("membershipRequests", () => {
     expect(data.membershipRequests.edges[0].node.email).toEqual(user.email);
   });
 
-  it("should return an error if user is not admin of company", async () => {
+  it("should return an error if user doesn't have appropriate permissions", async () => {
     // Given
     const { company, user: companyMember } = await userWithCompanyFactory(
       "MEMBER"
@@ -122,7 +136,24 @@ describe("membershipRequests", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Vous n'êtes pas administrateur de l'entreprise ciblée"
+      `Vous n'avez pas la permission de lister les demandes de rattachement de l'établissement ${company.orgId}`
+    );
+  });
+
+  it("should return an error if user doesn't belong to target company", async () => {
+    // Given
+    const { user: admin1 } = await userWithCompanyFactory("ADMIN");
+    const { company: company2 } = await userWithCompanyFactory("ADMIN");
+
+    // When
+    const { errors } = await getMembershipRequests(admin1, {
+      where: { id: company2.id }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      `Vous n'avez pas la permission de lister les demandes de rattachement de l'établissement ${company2.orgId}`
     );
   });
 
@@ -146,7 +177,7 @@ describe("membershipRequests", () => {
 
     // When
     const { errors } = await getMembershipRequests(admin, {
-      where: { id: siretify(3) }
+      where: { orgId: siretify(3) }
     });
 
     // Then
@@ -172,13 +203,13 @@ describe("membershipRequests", () => {
 
     // When
     const { errors } = await getMembershipRequests(admin, {
-      where: { id: company.id, siret: company.siret }
+      where: { id: company.id, orgId: company.orgId }
     });
 
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Vous devez faire une recherche par `id` ou `siret` mais pas les deux"
+      "Vous devez faire une recherche par `id` ou `orgId` mais pas les deux"
     );
   });
 
@@ -240,7 +271,7 @@ describe("membershipRequests", () => {
 
     // When
     const { errors, data } = await getMembershipRequests(admin, {
-      where: { siret: company.siret }
+      where: { orgId: company.orgId }
     });
 
     // Then

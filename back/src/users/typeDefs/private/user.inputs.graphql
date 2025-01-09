@@ -71,3 +71,15 @@ input SubscribeToNotificationsInput {
   """
   notifications: UserNotificationsInput!
 }
+
+input MembershipRequestsWhere {
+  """
+  OrgId (SIRET or VAT number) of target company. You must specify either the orgId or the ID
+  """
+  orgId: String
+
+  """
+  ID of target company. You must specify either the orgId or the ID
+  """
+  id: ID
+}

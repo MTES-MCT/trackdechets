@@ -1,7 +1,0 @@
-input MembershipRequestsWhere {
-  """
-  SIRET or company ID. Specify exactly one of them
-  """
-  siret: String
-  id: ID
-}
