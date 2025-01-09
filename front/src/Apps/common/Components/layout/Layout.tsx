@@ -11,9 +11,7 @@ import PageTitle from "../PageTitle/PageTitle";
 import A11ySkipLinks from "../A11ySkipLinks/A11ySkipLinks";
 
 interface AuthProps {
-  isAuthenticated: boolean;
-  isAdmin: boolean;
-  defaultOrgId?: string;
+  v2banner?: JSX.Element;
 }
 const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE, VITE_API_ENDPOINT } =
   import.meta.env;
@@ -27,14 +25,7 @@ const GET_WARNING_MESSAGE = gql`
 /**
  * Layout with common elements to all routes
  */
-export default function Layout({
-  isAuthenticated,
-  isAdmin,
-  v2banner,
-  defaultOrgId
-}: AuthProps & {
-  v2banner?: JSX.Element;
-}) {
+export default function Layout({ v2banner }: AuthProps) {
   const { data } = useQuery<Pick<Query, "warningMessage">>(GET_WARNING_MESSAGE);
 
   const isIE11 = !!navigator.userAgent.match(/Trident.*rv:11\./);
@@ -104,11 +95,7 @@ export default function Layout({
         </div>
       )}
       <A11ySkipLinks />
-      <Header
-        isAuthenticated={isAuthenticated}
-        isAdmin={isAdmin}
-        defaultOrgId={defaultOrgId}
-      />
+      <Header />
       <Outlet />
       <PageTitle />
     </>
