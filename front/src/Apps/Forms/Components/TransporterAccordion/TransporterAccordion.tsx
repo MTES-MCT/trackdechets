@@ -87,6 +87,9 @@ export function TransporterAccordion({
             title={deleteLabel}
             onClick={onTransporterDelete}
             disabled={disableDelete}
+            nativeButtonProps={{
+              "data-testid": collapseElementId
+            }}
           >
             {deleteLabel}
           </Button>
