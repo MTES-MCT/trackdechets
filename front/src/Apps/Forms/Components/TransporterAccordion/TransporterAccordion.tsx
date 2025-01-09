@@ -16,6 +16,7 @@ export type TransporterAccordionProps = {
   disableDown?: boolean;
   expanded?: boolean;
   children: NonNullable<React.ReactNode>;
+  deleteLabel: string;
 };
 
 /**
@@ -38,7 +39,8 @@ export function TransporterAccordion({
   disableDelete = false,
   disableUp = false,
   disableDown = false,
-  children
+  children,
+  deleteLabel
 }: TransporterAccordionProps) {
   const collapseElementId = `transporter__${numero}__form`;
 
@@ -82,11 +84,11 @@ export function TransporterAccordion({
             priority="tertiary"
             iconPosition="right"
             iconId="ri-delete-bin-line"
-            title={disableUp && disableDown ? "Effacer" : "Supprimer"}
+            title={deleteLabel}
             onClick={onTransporterDelete}
             disabled={disableDelete}
           >
-            {disableUp && disableDown ? "Effacer" : "Supprimer"}
+            {deleteLabel}
           </Button>
           <Button
             type="button"

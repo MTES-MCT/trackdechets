@@ -99,7 +99,10 @@ export function TransporterList<TransporterInput extends AnyTransporterInput>({
               // Désactive la possibilité de supprimer le transporteur
               // s'il est le seul dans la liste ou s'il a déjà pris en charge le déchet
               const disableDelete =
-                hasTakenOver || (transporters.length === 1 && hasTakenOver);
+                hasTakenOver || (transporters.length === 1 && !t.company?.name);
+
+              const deleteLabel =
+                transporters.length === 1 ? "Effacer" : "Supprimer";
 
               // Désactive le bouton permettant de remonter le transporteur dans
               // la liste s'il est le seul ou le premier, ou s'il a déjà pris en
@@ -160,6 +163,7 @@ export function TransporterList<TransporterInput extends AnyTransporterInput>({
                   disableUp={disableUp}
                   disableDown={disableDown}
                   expanded={idx === expandedIdx}
+                  deleteLabel={deleteLabel}
                 >
                   {t.takenOverAt ? (
                     <TransporterDisplay transporter={t} />
