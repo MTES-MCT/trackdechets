@@ -92,7 +92,7 @@ function AuthDialog({
                     <img
                       className="fr-responsive-img"
                       style={{ width: "70px", height: "70px" }}
-                      src="../../trackdechets.png"
+                      src="/trackdechets.png"
                       alt="Trackdéchets"
                       data-fr-js-ratio="true"
                     />
