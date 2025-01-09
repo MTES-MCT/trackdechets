@@ -65,7 +65,7 @@ const toRelative = route => {
 
 function DashboardRoutes() {
   const { siret } = useParams<{ siret: string }>();
-  const { data } = useQuery<Pick<Query, "me">>(GET_ME);
+  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME);
   const { updatePermissions } = usePermissions();
 
   const navigate = useNavigate();
@@ -108,7 +108,7 @@ function DashboardRoutes() {
     }
   }, [updatePermissions, data, siret]);
 
-  if (data?.me == null) {
+  if (loading || data?.me == null) {
     return <Loader />;
   }
 
