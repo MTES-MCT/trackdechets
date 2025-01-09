@@ -93,6 +93,7 @@ const signBsda: MutationResolvers["signBsda"] = async (
     { ...zodBsda, ...transporterReceipt },
     {
       user,
+      enableCompletionTransformers: true,
       currentSignatureType: signatureType
     }
   );

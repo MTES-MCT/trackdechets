@@ -299,7 +299,9 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
 
   // refinement asynchrones
   const refinedAsyncSchema = schema
-    .superRefine(checkCompanies)
+    .superRefine((bsda, zodContext) =>
+      checkCompanies(bsda, zodContext, context)
+    )
     .superRefine(validateDestination(context))
     .superRefine(
       // run le check sur les champs requis après les transformations

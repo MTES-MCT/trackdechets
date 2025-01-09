@@ -747,7 +747,9 @@ describe("BSDA parsing", () => {
       const transporter = await userWithCompanyFactory("MEMBER");
       const destination = await userWithCompanyFactory("MEMBER");
       const worker = await userWithCompanyFactory("MEMBER");
-      const broker = await userWithCompanyFactory("MEMBER");
+      const broker = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["BROKER"]
+      });
       const intermediary1 = await userWithCompanyFactory("MEMBER");
       const intermediary2 = await userWithCompanyFactory("MEMBER");
 
@@ -864,7 +866,9 @@ describe("BSDA parsing", () => {
       const transporter = await userWithCompanyFactory("MEMBER");
       const destination = await userWithCompanyFactory("MEMBER");
       const worker = await userWithCompanyFactory("MEMBER");
-      const broker = await userWithCompanyFactory("MEMBER");
+      const broker = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["BROKER"]
+      });
       const intermediary1 = await userWithCompanyFactory("MEMBER");
       const intermediary2 = await userWithCompanyFactory("MEMBER");
 
@@ -971,7 +975,9 @@ describe("BSDA parsing", () => {
       const transporter = await userWithCompanyFactory("MEMBER");
       const destination = await userWithCompanyFactory("MEMBER");
       const worker = await userWithCompanyFactory("MEMBER");
-      const broker = await userWithCompanyFactory("MEMBER");
+      const broker = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["BROKER"]
+      });
       const intermediary1 = await userWithCompanyFactory("MEMBER");
       const intermediary2 = await userWithCompanyFactory("MEMBER");
 
