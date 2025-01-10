@@ -20,6 +20,7 @@ import { getInitialCompany } from "../../Apps/common/data/initialState";
 import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../Apps/Forms/Components/CompanyContactInfo/CompanyContactInfo";
+import Recepisse from "../../Apps/Dashboard/Components/Recepisse/Recepisse";
 
 export default function Recipient({ disabled }) {
   const { siret } = useParams<{ siret: string }>();
@@ -195,6 +196,14 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
             }}
           />
           <CompanyContactInfo fieldName="broker.company" />
+          {values.broker?.receipt && (
+            <Recepisse
+              title="Récépisse de courtage"
+              numero={values.broker?.receipt}
+              departement={values.broker?.department}
+              validityLimit={values.broker?.validityLimit}
+            />
+          )}
         </div>
       )}
       <ToggleSwitch
@@ -254,6 +263,14 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
             }}
           />
           <CompanyContactInfo fieldName="trader.company" />
+          {values.trader?.receipt && (
+            <Recepisse
+              title="Récépisse de négoce"
+              numero={values.trader?.receipt}
+              departement={values.trader?.department}
+              validityLimit={values.trader?.validityLimit}
+            />
+          )}
         </div>
       )}
       <ToggleSwitch
