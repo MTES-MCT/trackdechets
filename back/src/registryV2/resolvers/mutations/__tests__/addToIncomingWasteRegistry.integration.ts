@@ -165,7 +165,7 @@ describe("Registry - addToIncomingWasteRegistry", () => {
       ADD_TO_INCOMING_WASTE_REGISTRY,
       { variables: { lines } }
     );
-
+    
     expect(data.addToIncomingWasteRegistry).toBe(true);
   });
 

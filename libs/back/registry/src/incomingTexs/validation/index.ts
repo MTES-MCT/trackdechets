@@ -1,5 +1,5 @@
 import {
-    refineFollowingTraceabilityInfos,
+  refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,
   refineNotificationNumber,

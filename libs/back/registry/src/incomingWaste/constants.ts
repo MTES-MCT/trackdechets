@@ -37,9 +37,12 @@ export const INCOMING_WASTE_HEADERS: {
     "Référence du chantier ou du lieu de collecte de l'expéditeur",
   emitterPickupSiteAddress:
     "Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur",
-  emitterPickupSitePostalCode: "Code postal du chantier ou du lieu de collecte de l'expéditeur",
-  emitterPickupSiteCity: "Commune du chantier ou du lieu de collecte de l'expéditeur",
-  emitterPickupSiteCountryCode: "Code pays du chantier ou du lieu de collecte de l'expéditeur",
+  emitterPickupSitePostalCode:
+    "Code postal du chantier ou du lieu de collecte de l'expéditeur",
+  emitterPickupSiteCity:
+    "Commune du chantier ou du lieu de collecte de l'expéditeur",
+  emitterPickupSiteCountryCode:
+    "Code pays du chantier ou du lieu de collecte de l'expéditeur",
   brokerCompanySiret: "SIRET du courtier",
   brokerCompanyName: "Raison sociale du courtier",
   brokerRecepisseNumber: "Numéro de récépissé du courtier",

@@ -54,9 +54,9 @@ export async function processStream({
       // The columns might not be in the right order when received.
       // We reorder them to match the headers for the error file
       const headerKeys = ["errors", ...Object.keys(options.headers)];
-      return headerKeys.reduce((line, header) => {
-        line[header] = row[header] ?? "";
-        return line;
+      return headerKeys.reduce((reshapedRow, header) => {
+        reshapedRow[header] = row[header] ?? "";
+        return reshapedRow;
       }, {});
     }
   });

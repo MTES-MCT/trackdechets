@@ -48,4 +48,6 @@ export async function transformDestination(ssdItem: ParsedZodSsdItem) {
     ssdItem.destinationCompanyCity = ssdItem.reportForCompanyCity;
     ssdItem.destinationCompanyPostalCode = ssdItem.reportForCompanyPostalCode;
   }
+  
+  return ssdItem;
 }

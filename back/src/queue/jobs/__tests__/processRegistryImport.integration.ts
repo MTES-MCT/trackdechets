@@ -20,7 +20,7 @@ const getCorrectLine = (siret: string) => {
   const sixMonthsAgo = subMonths(new Date(), 6);
   const processingDate = format(sixMonthsAgo, "yyyy-MM-dd");
   const useDate = format(addDays(sixMonthsAgo, 1), "yyyy-MM-dd");
-  return {
+  const value = {
     reason: "",
     publicId: 1,
     reportAsCompanySiret: "",
@@ -49,6 +49,11 @@ const getCorrectLine = (siret: string) => {
     qualificationCode: "Recyclage",
     administrativeActReference: "Arrêté du 24 août 2016"
   };
+
+  return Object.keys(SSD_HEADERS).reduce((row, key) => {
+    row[key] = value[key];
+    return row;
+  }, {});
 };
 
 describe("Process registry import job", () => {
@@ -138,7 +143,9 @@ describe("Process registry import job", () => {
 
     it("should return correct stats when the SSD file only has insertions", async () => {
       const fileKey = "one-insertion.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
@@ -184,7 +191,9 @@ describe("Process registry import job", () => {
 
     it("should return correct stats when the SSD file only has a mix of several actions", async () => {
       const fileKey = "mixed.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
@@ -231,7 +240,9 @@ describe("Process registry import job", () => {
 
     it("should write an error file with detailed errors when the SSD file contains data errors", async () => {
       const fileKey = "check-errors.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
@@ -281,7 +292,9 @@ describe("Process registry import job", () => {
 
     it("should work if the export has correct lines and lines with missing columns", async () => {
       const fileKey = "missing-column.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
@@ -328,7 +341,9 @@ describe("Process registry import job", () => {
 
     it("should fail if the current user doesnt have the rights on the reportFor siret", async () => {
       const fileKey = "missing-colon.csv";
-      const { company } = await userWithCompanyFactory();
+      const { company } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
       const { user } = await userWithCompanyFactory();
 
       const { s3Stream, upload } = getUploadWithWritableStream({
@@ -375,7 +390,9 @@ describe("Process registry import job", () => {
 
     it("should work if the current user has delegation rights on the reportFor siret", async () => {
       const fileKey = "missing-colon.csv";
-      const { company } = await userWithCompanyFactory();
+      const { company } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
       const { user, company: delegationCompany } =
         await userWithCompanyFactory();
 
@@ -431,7 +448,9 @@ describe("Process registry import job", () => {
 
     it("should fail if the uploaded file is not in a valid format", async () => {
       const fileKey = "invalid-file.csv";
-      const { company } = await userWithCompanyFactory();
+      const { company } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
       const { user, company: delegationCompany } =
         await userWithCompanyFactory();
 
@@ -485,7 +504,9 @@ describe("Process registry import job", () => {
 
     it("should ignore the first column if its called Erreur", async () => {
       const fileKey = "one-insertion-with-error.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
@@ -535,7 +556,9 @@ describe("Process registry import job", () => {
 
     it("should ignore empty lines", async () => {
       const fileKey = "one-insertion-with-empty-lines.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,

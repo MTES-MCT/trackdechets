@@ -107,7 +107,7 @@ describe("Schemas", () => {
     expect(() => volumeSchema.parse("-1")).toThrow();
     expect(() => volumeSchema.parse("1001")).toThrow();
   });
-  
+
   test("wastePopSchema", () => {
     expect(wastePopSchema.parse("OUI")).toBe(true);
     expect(wastePopSchema.parse("Oui")).toBe(true);
@@ -121,7 +121,7 @@ describe("Schemas", () => {
     expect(() => wastePopSchema.parse("")).toThrow();
     expect(() => wastePopSchema.parse(undefined)).toThrow();
   });
-  
+
   test("wasteIsDangerousSchema", () => {
     expect(wasteIsDangerousSchema.parse("OUI")).toBe(true);
     expect(wasteIsDangerousSchema.parse("Oui")).toBe(true);
@@ -187,13 +187,15 @@ describe("Schemas", () => {
       transportRecepisseNumberSchema.parse("a".repeat(51))
     ).toThrow();
   });
-  
+
   test("operationModeSchema", () => {
     expect(operationModeSchema.parse("Recyclage")).toBe("RECYCLAGE");
     expect(operationModeSchema.parse("Reutilisation")).toBe("REUTILISATION");
     expect(operationModeSchema.parse("Réutilisation")).toBe("REUTILISATION");
     expect(operationModeSchema.parse("réutilisation")).toBe("REUTILISATION");
-    expect(operationModeSchema.parse("Valorisation énergétique")).toBe("VALORISATION_ENERGETIQUE");
+    expect(operationModeSchema.parse("Valorisation énergétique")).toBe(
+      "VALORISATION_ENERGETIQUE"
+    );
     expect(() => operationModeSchema.parse("Valo énergétique")).toThrow();
     expect(operationModeSchema.parse(null)).toBe(null);
   });

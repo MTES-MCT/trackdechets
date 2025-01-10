@@ -22,7 +22,6 @@ export async function transformReportForInfos<T extends ParsedLine>(
     reportForCompanyName: company.name,
     reportForCompanyAddress: company.address,
     reportForCompanyCity: "",
-    reportForCompanyPostalCode: "",
-    reportForCompanyCountry: "FR"
+    reportForCompanyPostalCode: ""
   };
 }

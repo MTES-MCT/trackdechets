@@ -77,7 +77,7 @@ model RegistrySsd {
     processingDate                DateTime      @db.Timestamptz(6)
     processingEndDate             DateTime?     @db.Timestamptz(6)
     operationCode                 String
-    operationMode                 OperationMode
+    operationMode                 OperationMode?
     product                       String
     administrativeActReference    String
     destinationCompanyType        String
@@ -153,7 +153,7 @@ model RegistryIncomingWaste {
     ecoOrganismeSiret                      String?
     ecoOrganismeName                       String?
     operationCode                          String
-    operationMode                          OperationMode
+    operationMode                          OperationMode?
     noTraceability                         Boolean?
     nextDestinationIsAbroad                Boolean?
     declarationNumber                      String?
