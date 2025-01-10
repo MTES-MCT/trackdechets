@@ -161,8 +161,8 @@ model RegistryIncomingWaste {
     movementNumber                         String?
     nextOperationCode                      String?
     isDirectSupply                         Boolean?
-    transporter1TransportMode              TransportMode
-    transporter1CompanyType                String
+    transporter1TransportMode              TransportMode?
+    transporter1CompanyType                String?
     transporter1CompanyOrgId               String?
     transporter1RecepisseIsExempted        Boolean?
     transporter1RecepisseNumber            String?
@@ -277,7 +277,7 @@ model RegistryIncomingTexs {
     traderCompanyName                      String?
     traderRecepisseNumber                  String?
     operationCode                          String
-    operationMode                          OperationMode
+    operationMode                          OperationMode?
     noTraceability                         Boolean?
     nextDestinationIsAbroad                Boolean?
     declarationNumber                      String?
@@ -289,8 +289,8 @@ model RegistryIncomingTexs {
     destinationParcelNumbers               String[]
     destinationParcelCoordinates           String[]
     isDirectSupply                         Boolean?
-    transporter1TransportMode              TransportMode
-    transporter1CompanyType                String
+    transporter1TransportMode              TransportMode?
+    transporter1CompanyType                String?
     transporter1CompanyOrgId               String?
     transporter1RecepisseIsExempted        Boolean?
     transporter1RecepisseNumber            String?
