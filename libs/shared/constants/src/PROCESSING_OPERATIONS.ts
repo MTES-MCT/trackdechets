@@ -171,7 +171,7 @@ export const PROCESSING_OPERATIONS_CODES = PROCESSING_OPERATIONS.map(
 );
 
 type OperationCode = (typeof PROCESSING_OPERATIONS_CODES)[number];
-type TdOperationCode = OperationCode | "R 0";
+export type TdOperationCode = OperationCode | "R 0";
 export type TdOperationCodeEnum = Readonly<
   [TdOperationCode, ...TdOperationCode[]]
 >;

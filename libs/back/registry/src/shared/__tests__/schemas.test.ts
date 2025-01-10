@@ -9,15 +9,18 @@ import {
   weightValueSchema,
   weightIsEstimateSchema,
   volumeSchema,
-  getActorTypeSchema,
-  getActorOrgIdSchema,
-  getActorNameSchema,
-  getActorAddressSchema,
-  getActorCitySchema,
-  getActorPostalCodeSchema,
-  getActorCountryCodeSchema,
+  actorTypeSchema,
+  actorOrgIdSchema,
+  actorNameSchema,
+  actorAddressSchema,
+  actorCitySchema,
+  actorPostalCodeSchema,
+  actorCountryCodeSchema,
   transportModeSchema,
-  transportRecepisseNumberSchema
+  transportRecepisseNumberSchema,
+  wastePopSchema,
+  wasteIsDangerousSchema,
+  operationModeSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
 
@@ -64,7 +67,7 @@ describe("Schemas", () => {
       "Valid description"
     );
     expect(() => wasteDescriptionSchema.parse("a")).toThrow();
-    expect(() => wasteDescriptionSchema.parse("a".repeat(201))).toThrow();
+    expect(() => wasteDescriptionSchema.parse("a".repeat(301))).toThrow();
   });
 
   test("wasteCodeBaleSchema", () => {
@@ -79,9 +82,12 @@ describe("Schemas", () => {
   });
 
   test("weightValueSchema", () => {
-    expect(weightValueSchema.parse(500)).toBe(500);
-    expect(() => weightValueSchema.parse(-1)).toThrow();
-    expect(() => weightValueSchema.parse(1001)).toThrow();
+    expect(weightValueSchema.parse("500")).toBe(500);
+    expect(weightValueSchema.parse("500,1")).toBe(500.1);
+    expect(weightValueSchema.parse("500.1")).toBe(500.1);
+    expect(() => weightValueSchema.parse("-1")).toThrow();
+    expect(() => weightValueSchema.parse("1001")).toThrow();
+    expect(() => weightValueSchema.parse("1.0001")).toThrow();
   });
 
   test("weightIsEstimateSchema", () => {
@@ -101,49 +107,69 @@ describe("Schemas", () => {
     expect(() => volumeSchema.parse("-1")).toThrow();
     expect(() => volumeSchema.parse("1001")).toThrow();
   });
+  
+  test("wastePopSchema", () => {
+    expect(wastePopSchema.parse("OUI")).toBe(true);
+    expect(wastePopSchema.parse("Oui")).toBe(true);
+    expect(wastePopSchema.parse("oui")).toBe(true);
+    expect(wastePopSchema.parse("NON")).toBe(false);
+    expect(wastePopSchema.parse("Non")).toBe(false);
+    expect(wastePopSchema.parse("non")).toBe(false);
+    expect(wastePopSchema.parse(false)).toBe(false);
+    expect(wastePopSchema.parse(true)).toBe(true);
+    expect(() => wastePopSchema.parse("foo")).toThrow();
+    expect(() => wastePopSchema.parse("")).toThrow();
+    expect(() => wastePopSchema.parse(undefined)).toThrow();
+  });
+  
+  test("wasteIsDangerousSchema", () => {
+    expect(wasteIsDangerousSchema.parse("OUI")).toBe(true);
+    expect(wasteIsDangerousSchema.parse("Oui")).toBe(true);
+    expect(wasteIsDangerousSchema.parse("oui")).toBe(true);
+    expect(wasteIsDangerousSchema.parse("NON")).toBe(false);
+    expect(wasteIsDangerousSchema.parse("Non")).toBe(false);
+    expect(wasteIsDangerousSchema.parse("non")).toBe(false);
+    expect(wasteIsDangerousSchema.parse(false)).toBe(false);
+    expect(wasteIsDangerousSchema.parse(true)).toBe(true);
+    expect(() => wasteIsDangerousSchema.parse("foo")).toThrow();
+    expect(() => wasteIsDangerousSchema.parse("")).toThrow();
+  });
 
-  test("getActorTypeSchema", () => {
-    const actorTypeSchema = getActorTypeSchema("test");
+  test("actorTypeSchema", () => {
     expect(actorTypeSchema.parse("ETABLISSEMENT_FR")).toBe("ETABLISSEMENT_FR");
     expect(() => actorTypeSchema.parse("INVALID")).toThrow();
   });
 
-  test("getActorOrgIdSchema", () => {
-    const actorOrgIdSchema = getActorOrgIdSchema("test");
+  test("actorOrgIdSchema", () => {
     expect(actorOrgIdSchema.parse("123")).toBe("123");
     expect(actorOrgIdSchema.parse(123)).toBe("123");
     expect(() => actorOrgIdSchema.parse("")).toThrow();
   });
 
-  test("getActorNameSchema", () => {
-    const actorNameSchema = getActorNameSchema("test");
+  test("actorNameSchema", () => {
     expect(actorNameSchema.parse("Valid Name")).toBe("Valid Name");
-    expect(() => actorNameSchema.parse("a")).toThrow();
+    expect(() => actorNameSchema.parse("")).toThrow();
     expect(() => actorNameSchema.parse("a".repeat(151))).toThrow();
   });
 
-  test("getActorAddressSchema", () => {
-    const actorAddressSchema = getActorAddressSchema("test");
+  test("actorAddressSchema", () => {
     expect(actorAddressSchema.parse("Valid Address")).toBe("Valid Address");
-    expect(() => actorAddressSchema.parse("a")).toThrow();
+    expect(() => actorAddressSchema.parse("")).toThrow();
     expect(() => actorAddressSchema.parse("a".repeat(151))).toThrow();
   });
 
-  test("getActorCitySchema", () => {
-    const actorCitySchema = getActorCitySchema("test");
+  test("actorCitySchema", () => {
     expect(actorCitySchema.parse("Valid City")).toBe("Valid City");
-    expect(() => actorCitySchema.parse("a")).toThrow();
+    expect(() => actorCitySchema.parse("")).toThrow();
     expect(() => actorCitySchema.parse("a".repeat(46))).toThrow();
   });
 
-  test("getActorPostalCodeSchema", () => {
-    const actorPostalCodeSchema = getActorPostalCodeSchema("test");
+  test("actorPostalCodeSchema", () => {
     expect(actorPostalCodeSchema.parse("12345")).toBe("12345");
     expect(() => actorPostalCodeSchema.parse("invalid")).toThrow();
   });
 
-  test("getActorCountryCodeSchema", () => {
-    const actorCountryCodeSchema = getActorCountryCodeSchema("test");
+  test("actorCountryCodeSchema", () => {
     expect(actorCountryCodeSchema.parse("FR")).toBe("FR");
     expect(() => actorCountryCodeSchema.parse("invalid")).toThrow();
   });
@@ -160,5 +186,15 @@ describe("Schemas", () => {
     expect(() =>
       transportRecepisseNumberSchema.parse("a".repeat(51))
     ).toThrow();
+  });
+  
+  test("operationModeSchema", () => {
+    expect(operationModeSchema.parse("Recyclage")).toBe("RECYCLAGE");
+    expect(operationModeSchema.parse("Reutilisation")).toBe("REUTILISATION");
+    expect(operationModeSchema.parse("Réutilisation")).toBe("REUTILISATION");
+    expect(operationModeSchema.parse("réutilisation")).toBe("REUTILISATION");
+    expect(operationModeSchema.parse("Valorisation énergétique")).toBe("VALORISATION_ENERGETIQUE");
+    expect(() => operationModeSchema.parse("Valo énergétique")).toThrow();
+    expect(operationModeSchema.parse(null)).toBe(null);
   });
 });

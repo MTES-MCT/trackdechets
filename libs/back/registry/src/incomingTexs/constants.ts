@@ -4,7 +4,7 @@ export const INCOMING_TEXS_HEADERS: {
   [key in keyof ParsedZodInputIncomingTexsItem]: string;
 } = {
   reason: "Motif",
-  publicId: "Numéro unique",
+  publicId: "Identifiant unique",
   reportAsCompanySiret: "SIRET du déclarant",
   reportForCompanySiret: "SIRET du destinataire",
   wasteDescription: "Dénomination du déchet",
@@ -68,6 +68,7 @@ export const INCOMING_TEXS_HEADERS: {
     "Numéro(s) des parcelles de destination si valorisation",
   destinationParcelCoordinates:
     "Coordonnées des parcelles de destination si valorisation",
+  isDirectSupply: "Approvisionnement direct",
   transporter1TransportMode: "Mode de transport du transporteur n°1",
   transporter1CompanyType: "Type de transporteur n°1",
   transporter1CompanyOrgId: "Numéro d'identification du transporteur n°1",

@@ -2,13 +2,13 @@ import { ParsedZodInputSsdItem } from "./validation/schema";
 
 export const SSD_HEADERS: { [key in keyof ParsedZodInputSsdItem]: string } = {
   reason: "Motif",
-  publicId: "Numéro unique",
+  publicId: "Identifiant unique",
   reportAsCompanySiret: "SIRET du déclarant",
   reportForCompanySiret: "SIRET de l'émetteur",
   useDate: "Date d'utilisation",
   dispatchDate: "Date d'expédition",
-  wasteCode: "Code déchet",
   wasteDescription: "Dénomination du déchet",
+  wasteCode: "Code déchet",
   wasteCodeBale: "Code déchet Bâle",
   secondaryWasteCodes: "Codes déchets secondaires",
   secondaryWasteDescriptions: "Dénominations des déchets secondaires",
@@ -18,16 +18,16 @@ export const SSD_HEADERS: { [key in keyof ParsedZodInputSsdItem]: string } = {
   volume: "Volume en M3",
   processingDate: "Date de traitement",
   processingEndDate: "Date de fin de traitement",
+  operationCode: "Code de traitement",
+  operationMode: "Mode de traitement",
+  administrativeActReference: "Référence de l'acte administratif",
   destinationCompanyType: "Type de destinataire",
   destinationCompanyOrgId: "Numéro d'identification du destinataire",
   destinationCompanyName: "Raison sociale du destinataire",
-  destinationCompanyAddress: "Adresse du destinataire",
+  destinationCompanyAddress: "Libellé de l'adresse du destinataire",
   destinationCompanyCity: "Commune du destinataire",
   destinationCompanyPostalCode: "Code postal du destinataire",
-  destinationCompanyCountryCode: "Code pays du destinataire",
-  operationCode: "Code d'opération",
-  operationMode: "Mode de traitement",
-  administrativeActReference: "Référence de l'acte administratif"
+  destinationCompanyCountryCode: "Code pays du destinataire"
 };
 
 export const SSD_EXPORT_HEADERS = {
@@ -52,7 +52,7 @@ export const SSD_EXPORT_HEADERS = {
   destinationCompanyType: "Type de destinataire",
   destinationCompanyOrgId: "Numéro d'identification du destinataire",
   destinationCompanyName: "Raison sociale du destinataire",
-  destinationCompanyAddress: "Adresse du destinataire",
+  destinationCompanyAddress: "Libellé de l'adresse du destinataire",
   destinationCompanyPostalCode: "Code postal du destinataire",
   destinationCompanyCity: "Commune du destinataire",
   destinationCompanyCountryCode: "Pays du destinataire",

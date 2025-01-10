@@ -2,8 +2,8 @@ import { ParsedLine } from "../options";
 import { RefinementCtx, z } from "zod";
 import { getCachedCompany } from "./helpers";
 
-export async function transformReportForInfos(
-  line: ParsedLine,
+export async function transformReportForInfos<T extends ParsedLine>(
+  line: T,
   { addIssue }: RefinementCtx
 ) {
   const company = await getCachedCompany(line.reportForCompanySiret);
@@ -22,6 +22,7 @@ export async function transformReportForInfos(
     reportForCompanyName: company.name,
     reportForCompanyAddress: company.address,
     reportForCompanyCity: "",
-    reportForCompanyPostalCode: ""
+    reportForCompanyPostalCode: "",
+    reportForCompanyCountry: "FR"
   };
 }

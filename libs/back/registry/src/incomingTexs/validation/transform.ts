@@ -25,7 +25,7 @@ export async function transformAndRefineReason(
   if (!incomingTexsItemInDb && incomingTexsItem.reason) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `La raison doit rester vide, le numéro unique "${incomingTexsItem.publicId}" n'a jamais été importé.`,
+      message: `La raison doit rester vide, l'identifiant unique "${incomingTexsItem.publicId}" n'a jamais été importé.`,
       path: ["reason"]
     });
     return z.NEVER;

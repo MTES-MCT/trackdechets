@@ -49,7 +49,16 @@ export async function processStream({
   const errorStream = format({
     delimiter: CSV_DELIMITER,
     headers: [ERROR_HEADER, ...Object.values(options.headers)],
-    writeHeaders: true
+    writeHeaders: true,
+    transform: (row: Record<string, any>) => {
+      // The columns might not be in the right order when received.
+      // We reorder them to match the headers for the error file
+      const headerKeys = ["errors", ...Object.keys(options.headers)];
+      return headerKeys.reduce((line, header) => {
+        line[header] = row[header] ?? "";
+        return line;
+      }, {});
+    }
   });
   errorStream.pipe(outputErrorStream);
 
@@ -70,7 +79,7 @@ export async function processStream({
     }> = inputStream.pipe(transformStream).on("error", error => {
       stats.errors++;
       if (errorStream.writable) {
-        errorStream.write([["errors", formatErrorMessage(error.message)]]);
+        errorStream.write({ errors: formatErrorMessage(error.message) });
       }
     });
 
@@ -85,8 +94,7 @@ export async function processStream({
           })
           .join("\n");
 
-        // As we are renaming headers we need to provide an hash array
-        errorStream.write([["errors", errors], ...Object.entries(rawLine)]);
+        errorStream.write({ errors, ...rawLine });
         continue;
       }
 
@@ -104,10 +112,7 @@ export async function processStream({
       ) {
         stats.errors++;
 
-        errorStream.write([
-          ["errors", UNAUTHORIZED_ERROR],
-          ...Object.entries(rawLine)
-        ]);
+        errorStream.write({ errors: UNAUTHORIZED_ERROR, ...rawLine });
         continue;
       }
 

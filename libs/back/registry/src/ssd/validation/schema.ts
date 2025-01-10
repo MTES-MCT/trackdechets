@@ -2,14 +2,14 @@ import { BSDD_WASTE_CODES_ENUM } from "@td/constants";
 import { sub } from "date-fns";
 import { z } from "zod";
 import {
-  getActorAddressSchema,
-  getActorCitySchema,
-  getActorCountryCodeSchema,
-  getActorNameSchema,
-  getActorOrgIdSchema,
-  getActorPostalCodeSchema,
-  getActorTypeSchema,
-  getReportForSiretSchema,
+  actorAddressSchema,
+  actorCitySchema,
+  actorCountryCodeSchema,
+  actorNameSchema,
+  actorOrgIdSchema,
+  actorPostalCodeSchema,
+  actorTypeSchema,
+  siretSchema,
   getOperationCodeSchema,
   publicIdSchema,
   reasonSchema,
@@ -30,7 +30,7 @@ const inputSsdSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
-  reportForCompanySiret: getReportForSiretSchema("de l'émetteur"),
+  reportForCompanySiret: siretSchema,
   useDate: z.union([
     z.date().nullish(),
     z
@@ -42,7 +42,7 @@ const inputSsdSchema = z.object({
           .date()
           .min(
             sub(new Date(), { years: 1 }),
-            "La date d'utilisation ne peut pas être antérieure à J-1an"
+            "La date d'utilisation ne peut pas être antérieure à J-1 an"
           )
           .max(
             new Date(),
@@ -62,7 +62,7 @@ const inputSsdSchema = z.object({
           .date()
           .min(
             sub(new Date(), { years: 1 }),
-            "La date d'utilisation ne peut pas être antérieure à J-1an"
+            "La date d'utilisation ne peut pas être antérieure à J-1 an"
           )
           .max(
             new Date(),
@@ -114,15 +114,15 @@ const inputSsdSchema = z.object({
             "Les dénominations usuelles du déchet doivent faire au moins 2 caractères"
           )
           .max(
-            200,
-            "Les dénominations usuelles du déchet ne peuvent pas dépasser 200 caractères"
+            300,
+            "Les dénominations usuelles du déchet ne peuvent pas dépasser 300 caractères"
           )
       )
     ),
   product: z
     .string()
     .min(2, "Le produit doit faire au moins 2 caractères")
-    .max(75, "Le produit ne peut pas dépasser 75 caractères"),
+    .max(300, "Le produit ne peut pas dépasser 300 caractères"),
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
@@ -144,7 +144,7 @@ const inputSsdSchema = z.object({
           .date()
           .min(
             sub(new Date(), { years: 1 }),
-            "La date de fin de traitement ne peut pas être antérieure à J-1an"
+            "La date de fin de traitement ne peut pas être antérieure à J-1 an"
           )
           .max(
             new Date(),
@@ -153,16 +153,16 @@ const inputSsdSchema = z.object({
           .nullish()
       )
   ]),
-  destinationCompanyType: getActorTypeSchema("de destinataire").exclude([
+  destinationCompanyType: actorTypeSchema.exclude([
     "PERSONNE_PHYSIQUE",
     "COMMUNE"
   ]),
-  destinationCompanyOrgId: getActorOrgIdSchema("du destinataire"),
-  destinationCompanyName: getActorNameSchema("du destinataire"),
-  destinationCompanyAddress: getActorAddressSchema("du destinataire"),
-  destinationCompanyCity: getActorCitySchema("du destinataire"),
-  destinationCompanyPostalCode: getActorPostalCodeSchema("du destinataire"),
-  destinationCompanyCountryCode: getActorCountryCodeSchema("du destinataire"),
+  destinationCompanyOrgId: actorOrgIdSchema.nullish(),
+  destinationCompanyName: actorNameSchema.nullish(),
+  destinationCompanyAddress: actorAddressSchema.nullish(),
+  destinationCompanyCity: actorCitySchema.nullish(),
+  destinationCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  destinationCompanyCountryCode: actorCountryCodeSchema.nullish(),
   operationCode: getOperationCodeSchema(),
   operationMode: operationModeSchema,
   administrativeActReference: z.enum([

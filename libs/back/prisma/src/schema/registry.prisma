@@ -160,6 +160,7 @@ model RegistryIncomingWaste {
     notificationNumber                     String?
     movementNumber                         String?
     nextOperationCode                      String?
+    isDirectSupply                         Boolean?
     transporter1TransportMode              TransportMode
     transporter1CompanyType                String
     transporter1CompanyOrgId               String?
@@ -287,6 +288,7 @@ model RegistryIncomingTexs {
     destinationParcelInseeCodes            String[]
     destinationParcelNumbers               String[]
     destinationParcelCoordinates           String[]
+    isDirectSupply                         Boolean?
     transporter1TransportMode              TransportMode
     transporter1CompanyType                String
     transporter1CompanyOrgId               String?

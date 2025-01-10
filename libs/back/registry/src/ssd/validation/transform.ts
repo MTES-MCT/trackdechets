@@ -26,11 +26,26 @@ export async function transformAndRefineReason(
   if (!ssdItemInDb && ssdItem.reason) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `La raison doit rester vide, le numéro unique "${ssdItem.publicId}" n'a jamais été importé.`,
+      message: `La raison doit rester vide, l'identifiant unique "${ssdItem.publicId}" n'a jamais été importé.`,
       path: ["reason"]
     });
     return z.NEVER;
   }
 
   return ssdItem;
+}
+
+export async function transformDestination(ssdItem: ParsedZodSsdItem) {
+  if (
+    !ssdItem.dispatchDate &&
+    ssdItem.useDate &&
+    !ssdItem.destinationCompanyType
+  ) {
+    ssdItem.destinationCompanyType = "ETABLISSEMENT_FR";
+    ssdItem.destinationCompanyOrgId = ssdItem.reportForCompanySiret;
+    ssdItem.destinationCompanyName = ssdItem.reportForCompanyName;
+    ssdItem.destinationCompanyAddress = ssdItem.reportForCompanyAddress;
+    ssdItem.destinationCompanyCity = ssdItem.reportForCompanyCity;
+    ssdItem.destinationCompanyPostalCode = ssdItem.reportForCompanyPostalCode;
+  }
 }
