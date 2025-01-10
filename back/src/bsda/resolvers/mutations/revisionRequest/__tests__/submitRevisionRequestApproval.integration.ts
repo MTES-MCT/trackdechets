@@ -1076,4 +1076,94 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       expect(updatedInitialBsda.finalOperations).toHaveLength(1);
     }
   );
+
+  it("should be able to update the destination cap", async () => {
+    // Given
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        destinationCap: "DESTINATION-CAP"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        destinationCap: "NEW-DESTINATION-CAP",
+        comment: ""
+      }
+    });
+
+    // When
+    await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    // Then
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.destinationCap).toBe("NEW-DESTINATION-CAP");
+  });
+
+  it("should be able to update the operation next destination cap", async () => {
+    // Given
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        destinationOperationNextDestinationCap: "NEXT-DESTINATION-CAP"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        destinationOperationNextDestinationCap: "NEW-NEXT-DESTINATION-CAP",
+        comment: ""
+      }
+    });
+
+    // When
+    await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    // Then
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.destinationOperationNextDestinationCap).toBe(
+      "NEW-NEXT-DESTINATION-CAP"
+    );
+  });
 });

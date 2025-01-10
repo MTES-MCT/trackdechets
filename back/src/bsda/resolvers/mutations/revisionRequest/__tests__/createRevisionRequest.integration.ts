@@ -21,6 +21,14 @@ const CREATE_BSDA_REVISION_REQUEST = `
       }
       content {
         waste { code }
+        destination { 
+          cap
+          operation { 
+            nextDestination { 
+              cap 
+            } 
+          }
+        }
       }
       authoringCompany {
         siret
@@ -349,6 +357,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     });
 
     expect(data.createBsdaRevisionRequest.content).toEqual({
+      destination: null,
       waste: { code: "16 01 11*" }
     });
   });
@@ -794,5 +803,88 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     expect(errors[0].message).toBe(
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
     );
+  });
+
+  it("should be possible to review the destination CAP", async () => {
+    // Given
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        destinationCap: "DESTINATION-SIRET",
+        status: "SENT"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { destination: { cap: "NEW-DESTINATION-CAP" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createBsdaRevisionRequest?.content?.destination?.cap).toBe(
+      "NEW-DESTINATION-CAP"
+    );
+  });
+
+  it("should be possible to review the operation next destination CAP", async () => {
+    // Given
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        destinationOperationNextDestinationCap: "NEXT-DESTINATION-CAP",
+        status: "SENT"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            destination: {
+              operation: {
+                nextDestination: { cap: "NEW-NEXT-DESTINATION-CAP" }
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(
+      data.createBsdaRevisionRequest?.content?.destination?.operation
+        ?.nextDestination?.cap
+    ).toBe("NEW-NEXT-DESTINATION-CAP");
   });
 });
