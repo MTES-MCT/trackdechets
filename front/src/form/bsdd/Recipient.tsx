@@ -1,16 +1,13 @@
 import React from "react";
-import toast from "react-hot-toast";
 import classNames from "classnames";
-import Select from "react-select";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
 import TdSwitch from "../../common/components/Switch";
 import Tooltip from "../../common/components/Tooltip";
 import ProcessingOperation from "../common/components/processing-operation/ProcessingOperation";
-import { Field, useFormikContext } from "formik";
+import { Field, FieldArray, useFormikContext } from "formik";
 import { isDangerous } from "@td/constants";
-import { Form } from "@td/codegen-ui";
+import { FavoriteType, Form } from "@td/codegen-ui";
 import CompanySelector from "../common/components/company/CompanySelector";
-import DateInput from "../common/components/custom-inputs/DateInput";
 import TemporaryStorage from "./components/temporaryStorage/TemporaryStorage";
 import styles from "./Recipient.module.scss";
 import {
@@ -18,86 +15,26 @@ import {
   getInitialTemporaryStorageDetail,
   getInitialTrader
 } from "./utils/initial-state";
-import { IntermediariesSelector } from "../bsda/components/intermediaries/IntermediariesSelector";
-import { TOAST_DURATION } from "../../common/config";
-
-type IntermediariesSelect = {
-  value: string;
-  label: string;
-};
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { getInitialCompany } from "../../Apps/common/data/initialState";
+import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
+import { useParams } from "react-router-dom";
+import CompanyContactInfo from "../../Apps/Forms/Components/CompanyContactInfo/CompanyContactInfo";
 
 export default function Recipient({ disabled }) {
+  const { siret } = useParams<{ siret: string }>();
+
   const { values, setFieldValue } = useFormikContext<Form>();
-  const hasTrader = !!values.trader;
-  const hasBroker = !!values.broker;
+
   const isTempStorage = !!values.recipient?.isTempStorage;
   const isDangerousWaste = isDangerous(values.wasteDetails?.code ?? "");
-  // limite arbitraire du nombre d'intermédiaires qu'on peut ajouter
-  const isAddIntermediaryButtonEnabled = values.intermediaries.length <= 20;
 
   const isChapeau = values?.emitter?.type === "APPENDIX1";
   const isGrouping = values?.emitter?.type === "APPENDIX2";
 
-  const intermediariesOptions: IntermediariesSelect[] = [
-    ...(!hasTrader && !hasBroker
-      ? [
-          {
-            value: "TRADER",
-            label: "Je suis passé par un négociant"
-          }
-        ]
-      : []),
-    ...(!hasTrader && !hasBroker
-      ? [
-          {
-            value: "BROKER",
-            label: "Je suis passé par un courtier"
-          }
-        ]
-      : []),
-    ...(isAddIntermediaryButtonEnabled
-      ? [
-          {
-            value: "INTERMEDIARY",
-            label: "Ajouter un autre type d'intermédiaire"
-          }
-        ]
-      : [])
-  ];
-
-  function handleTraderToggle() {
-    setFieldValue("trader", getInitialTrader(), false);
-  }
-
-  function handleBrokerToggle() {
-    setFieldValue("broker", getInitialBroker(), false);
-  }
-
-  function handleIntermediaryAdd() {
-    setFieldValue(
-      "intermediaries",
-      values.intermediaries.concat([
-        {
-          siret: "",
-          orgId: "",
-          name: "",
-          address: "",
-          contact: "",
-          mail: "",
-          phone: "",
-          vatNumber: "",
-          country: ""
-        }
-      ])
-    );
-    toast.success(
-      "Nouvel intermédiaire ajouté en bas de page: merci de chercher un SIRET ou un nom d'entreprise pour lancer une recherche.",
-      {
-        duration: TOAST_DURATION,
-        position: "bottom-right"
-      }
-    );
-  }
+  const hasBroker = !!values.broker;
+  const hasTrader = !!values.trader;
+  const hasIntermediaries = !!values.intermediaries?.length;
 
   function handleTempStorageToggle(checked) {
     if (checked) {
@@ -198,199 +135,213 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           />
         </label>
       </div>
-      <div className="form__row">
-        <div className="td-input">
-          <label> Ajout d'intermédiaires:</label>
-          <Select
-            placeholder="Ajouter un intermédiaire"
-            options={intermediariesOptions}
-            onChange={option => {
-              switch ((option as IntermediariesSelect).value) {
-                case "INTERMEDIARY":
-                  return handleIntermediaryAdd();
-                case "TRADER":
-                  return handleTraderToggle();
-                case "BROKER":
-                  return handleBrokerToggle();
-                default:
-                  return;
-              }
-            }}
-            classNamePrefix="react-select"
-            isDisabled={disabled}
-          />
-        </div>
-      </div>
-      {hasTrader && (
-        <div className="form__row">
-          <h4 className="form__section-heading">Négociant</h4>
-          <CompanySelector
-            name="trader.company"
-            onCompanySelected={trader => {
-              if (trader?.traderReceipt) {
-                setFieldValue(
-                  "trader.receipt",
-                  trader.traderReceipt.receiptNumber
-                );
-                setFieldValue(
-                  "trader.validityLimit",
-                  trader.traderReceipt.validityLimit
-                );
-                setFieldValue(
-                  "trader.department",
-                  trader.traderReceipt.department
-                );
-              } else {
-                setFieldValue("trader.receipt", "");
-                setFieldValue("trader.validityLimit", null);
-                setFieldValue("trader.department", "");
-              }
-            }}
-          />
-
-          <div className="form__row">
-            <label>
-              Numéro de récépissé
-              <Field type="text" name="trader.receipt" className="td-input" />
-            </label>
-
-            <RedErrorMessage name="trader.receipt" />
-          </div>
-          <div className="form__row">
-            <label>
-              Département
-              <Field
-                type="text"
-                name="trader.department"
-                placeholder="Ex: 83"
-                className={classNames("td-input", styles.recipientDepartment)}
-              />
-            </label>
-
-            <RedErrorMessage name="trader.department" />
-          </div>
-          <div className="form__row">
-            <label>
-              Limite de validité
-              <Field
-                component={DateInput}
-                name="trader.validityLimit"
-                className={classNames(
-                  "td-input",
-                  styles.recipientValidityLimit
-                )}
-              />
-            </label>
-
-            <RedErrorMessage name="trader.validityLimit" />
-          </div>
-          <div className="tw-mt-2">
-            <button
-              className="btn btn--danger tw-mr-1"
-              type="button"
-              onClick={async () => {
-                setFieldValue("trader", null, false);
-              }}
-            >
-              Supprimer le négociant
-            </button>
-          </div>
-        </div>
-      )}
-      {hasBroker && (
-        <div className="form__row">
-          <h4 className="form__section-heading">Courtier</h4>
-          <CompanySelector
-            name="broker.company"
-            onCompanySelected={broker => {
-              if (broker?.brokerReceipt) {
-                setFieldValue(
-                  "broker.receipt",
-                  broker.brokerReceipt.receiptNumber
-                );
-                setFieldValue(
-                  "broker.validityLimit",
-                  broker.brokerReceipt.validityLimit
-                );
-                setFieldValue(
-                  "broker.department",
-                  broker.brokerReceipt.department
-                );
-              } else {
-                setFieldValue("broker.receipt", "");
-                setFieldValue("broker.validityLimit", null);
-                setFieldValue("broker.department", "");
-              }
-            }}
-          />
-
-          <div className="form__row">
-            <label>
-              Numéro de récépissé
-              <Field type="text" name="broker.receipt" className="td-input" />
-            </label>
-
-            <RedErrorMessage name="broker.receipt" />
-          </div>
-          <div className="form__row">
-            <label>
-              Département
-              <Field
-                type="text"
-                name="broker.department"
-                placeholder="Ex: 83"
-                className={classNames("td-input", styles.recipientDepartment)}
-              />
-            </label>
-
-            <RedErrorMessage name="broker.department" />
-          </div>
-          <div className="form__row">
-            <label>
-              Limite de validité
-              <Field
-                component={DateInput}
-                name="broker.validityLimit"
-                className={classNames(
-                  "td-input",
-                  styles.recipientValidityLimit
-                )}
-              />
-            </label>
-
-            <RedErrorMessage name="broker.validityLimit" />
-          </div>
-          <div className="tw-mt-2">
-            <button
-              className="btn btn--danger tw-mr-1"
-              type="button"
-              onClick={async () => {
-                setFieldValue("broker", null, false);
-              }}
-            >
-              Supprimer le courtier
-            </button>
-          </div>
-        </div>
-      )}
-      <div className="form__row">
-        {Boolean(values.intermediaries?.length) && (
-          <h4 className="form__section-heading">
-            Autre{values.intermediaries?.length > 1 ? "s" : ""} type
-            {values.intermediaries?.length > 1 ? "s" : ""} d'intermédiaire
-            {values.intermediaries?.length > 1 ? "s" : ""}
-          </h4>
-        )}
-        {Boolean(values.intermediaries?.length) && (
-          <Field
-            name="intermediaries"
-            component={IntermediariesSelector}
-            maxNbOfIntermediaries={3}
-          />
-        )}
-      </div>
       {isTempStorage && values.temporaryStorageDetail && (
         <TemporaryStorage name="temporaryStorageDetail" />
+      )}
+      <h4 className="form__section-heading">Autres acteurs</h4>
+      <ToggleSwitch
+        label="Présence d'un courtier"
+        checked={hasBroker}
+        showCheckedHint={false}
+        onChange={hasBroker => {
+          if (!hasBroker) {
+            setFieldValue("broker", null);
+          } else {
+            setFieldValue("broker", getInitialBroker());
+          }
+        }}
+        disabled={disabled}
+      />
+      {hasBroker && (
+        <div className="fr-mt-2w">
+          <CompanySelectorWrapper
+            orgId={siret}
+            selectedCompanyOrgId={values.broker?.company?.siret ?? null}
+            favoriteType={FavoriteType.Broker}
+            // selectedCompanyError={company =>
+            //   selectedCompanyError(company, CompanyType.Broker)
+            // }
+            disabled={disabled}
+            onCompanySelected={company => {
+              const prevBroker = values.broker;
+
+              if (company) {
+                setFieldValue("broker", {
+                  ...prevBroker,
+                  company: {
+                    ...prevBroker?.company,
+                    ...values.broker?.company,
+                    siret: company?.siret,
+                    orgId: company.orgId,
+                    address: company.address,
+                    name: company.name,
+                    ...(prevBroker?.company?.siret !== company.siret
+                      ? {
+                          // auto-completion des infos de contact uniquement
+                          // s'il y a un changement d'établissement pour
+                          // éviter d'écraser les infos de contact spécifiées par l'utilisateur
+                          // lors d'une modification de bordereau
+                          contact: company.contact ?? "",
+                          phone: company.contactPhone ?? "",
+                          mail: company.contactEmail ?? ""
+                        }
+                      : {})
+                  },
+                  receipt: company.brokerReceipt?.receiptNumber ?? null,
+                  department: company.brokerReceipt?.department ?? null,
+                  validityLimit: company.brokerReceipt?.validityLimit ?? null
+                });
+              }
+            }}
+          />
+          <CompanyContactInfo fieldName="broker.company" />
+        </div>
+      )}
+      <ToggleSwitch
+        className="fr-mt-3w"
+        label="Présence d'un négociant"
+        checked={hasTrader}
+        showCheckedHint={false}
+        onChange={hasTrader => {
+          if (!hasTrader) {
+            setFieldValue("trader", null);
+          } else {
+            setFieldValue("trader", getInitialTrader());
+          }
+        }}
+        disabled={disabled}
+      />
+      {hasTrader && (
+        <div className="fr-mt-2w">
+          <CompanySelectorWrapper
+            orgId={siret}
+            selectedCompanyOrgId={values.trader?.company?.siret ?? null}
+            favoriteType={FavoriteType.Trader}
+            // selectedCompanyError={company =>
+            //   selectedCompanyError(company, CompanyType.Trader)
+            // }
+            disabled={disabled}
+            onCompanySelected={company => {
+              const prevTrader = values.trader;
+
+              if (company) {
+                setFieldValue("trader", {
+                  ...prevTrader,
+                  company: {
+                    ...prevTrader?.company,
+                    ...values.trader?.company,
+                    siret: company?.siret,
+                    orgId: company.orgId,
+                    address: company.address,
+                    name: company.name,
+                    ...(prevTrader?.company?.siret !== company.siret
+                      ? {
+                          // auto-completion des infos de contact uniquement
+                          // s'il y a un changement d'établissement pour
+                          // éviter d'écraser les infos de contact spécifiées par l'utilisateur
+                          // lors d'une modification de bordereau
+                          contact: company.contact ?? "",
+                          phone: company.contactPhone ?? "",
+                          mail: company.contactEmail ?? ""
+                        }
+                      : {})
+                  },
+                  receipt: company.traderReceipt?.receiptNumber ?? null,
+                  department: company.traderReceipt?.department ?? null,
+                  validityLimit: company.traderReceipt?.validityLimit ?? null
+                });
+              }
+            }}
+          />
+          <CompanyContactInfo fieldName="trader.company" />
+        </div>
+      )}
+      <ToggleSwitch
+        className="fr-mt-3w"
+        label="Présence d'intermédiaires"
+        checked={hasIntermediaries}
+        showCheckedHint={false}
+        onChange={hasIntermediary => {
+          if (!hasIntermediary) {
+            setFieldValue("intermediaries", []);
+          } else {
+            setFieldValue("intermediaries", [getInitialCompany()]);
+          }
+        }}
+        disabled={disabled}
+      />
+      {hasIntermediaries && (
+        <FieldArray
+          name="intermediaries"
+          render={({ push, remove }) => (
+            <>
+              {values.intermediaries.map((i, idx) => (
+                <div className="fr-mt-2w" key={idx}>
+                  <h6 className="fr-h6">Intermédiaire {idx + 1}</h6>
+                  <CompanySelectorWrapper
+                    orgId={siret}
+                    selectedCompanyOrgId={
+                      values.intermediaries[idx]?.siret ?? null
+                    }
+                    // selectedCompanyError={company =>
+                    //   selectedCompanyError(company, CompanyType.Trader)
+                    // }
+                    disabled={disabled}
+                    onCompanySelected={company => {
+                      const prevIntermediary = values.intermediaries[idx];
+
+                      if (company) {
+                        setFieldValue(`intermediaries.${idx}`, {
+                          ...prevIntermediary,
+                          siret: company?.siret,
+                          orgId: company.orgId,
+                          address: company.address,
+                          name: company.name,
+                          ...(prevIntermediary?.siret !== company.siret
+                            ? {
+                                // auto-completion des infos de contact uniquement
+                                // s'il y a un changement d'établissement pour
+                                // éviter d'écraser les infos de contact spécifiées par l'utilisateur
+                                // lors d'une modification de bordereau
+                                contact: company.contact ?? "",
+                                phone: company.contactPhone ?? "",
+                                mail: company.contactEmail ?? ""
+                              }
+                            : {})
+                        });
+                      }
+                    }}
+                  />
+                  <CompanyContactInfo fieldName={`intermediaries.${idx}`} />
+                  {values.intermediaries.length > 1 && (
+                    <button
+                      type="button"
+                      className="fr-btn fr-btn--tertiary fr-mb-2w"
+                      onClick={() => remove(idx)}
+                    >
+                      Supprimer l'intermédiaire {idx + 1}
+                    </button>
+                  )}
+                  <hr />
+                </div>
+              ))}
+              {values.intermediaries.length < 3 && (
+                // Pas plus de trois intermédiaires
+                <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
+                  <button
+                    type="button"
+                    className="fr-btn fr-btn--secondary"
+                    onClick={() => {
+                      push(getInitialCompany());
+                    }}
+                  >
+                    Ajouter un intermédiaire
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        ></FieldArray>
       )}
     </>
   );
