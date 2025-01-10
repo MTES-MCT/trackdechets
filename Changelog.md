@@ -17,6 +17,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - BSFF - Mettre à jour les informations du contenant modifié (code déchet, description, poids) dans l'aperçu et dans le tableau de bord lorsque le BSFF a un seul contenant [PR 3853](https://github.com/MTES-MCT/trackdechets/pull/3853).
 - Permettre d'ajouter un intermédiaire sur le VHU jusqu'au traitement du bordereau [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
 - Retirer la possibilité de publier un BSVHU si l'émetteur visé n'est pas inscrit sur Trackdéchets et qu'il n'est pas en situation irrégulière [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
+- Correction du CSS pour la section "Signature automatique (annexe 1)" [PR 3835](https://github.com/MTES-MCT/trackdechets/pull/3835)
+- Plus besoin de préciser de code d'opération prévue pour l'entreposage provisoire pour le BSDD [PR 3841](https://github.com/MTES-MCT/trackdechets/pull/3841)
+- ETQ utilisateur je ne peux pas créer un BSDA avec un siret fermé, mais je peux finaliser un BSDA avec un siret fermé [PR 3761](https://github.com/MTES-MCT/trackdechets/pull/3761)
+- Il n'est plus possible de dupliquer une Annexe 1 sur le BSDD [PR 3854](https://github.com/MTES-MCT/trackdechets/pull/3854)
 
 #### :bug: Corrections de bugs
 
@@ -24,6 +28,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Au chargement des quantités du tableau des Annexes 2, bien récupérer la quantité acceptée par l'installation de destination finale et non par l'entreposage provisoire (si BSDD-suite à regrouper) à la modification [PR 3875](https://github.com/MTES-MCT/trackdechets/pull/3875)
 - Correction de la mise à jour des numéros d'identification sur le bsvhu [PR 3876](https://github.com/MTES-MCT/trackdechets/pull/3876)
 - Correction des permissions d'accès à un Bsff lors de la modification du détenteur d'une fiche d'inspection associée [PR 3880](https://github.com/MTES-MCT/trackdechets/pull/3880)
+- Traduction des intitulés des packagings des DASRI dans le PDF [PR 3833](https://github.com/MTES-MCT/trackdechets/pull/3833)
+- Les DASRI annulés vont dans l'onglet "Archives" et non "Suivis" [PR 3832](https://github.com/MTES-MCT/trackdechets/pull/3832)
+- Le champ "Modifié le" des BSDD dans le dashboard affiche la valeur du updatedAt, pas du lastActionOn [PR 3834](https://github.com/MTES-MCT/trackdechets/pull/3834)
+- Seul l'émetteur peut supprimer un BSVHU s'il l'a signé (SIGNED_BY_PRODUCER) [PR 3837](https://github.com/MTES-MCT/trackdechets/pull/3837)
+- Correction pour les cas particuliers pour le mail sur le changement de CAP: ajout ou suppression de la nextDestination [PR 3858](https://github.com/MTES-MCT/trackdechets/pull/3858)
 
 #### :boom: Breaking changes
 
