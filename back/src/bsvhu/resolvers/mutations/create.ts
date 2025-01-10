@@ -33,12 +33,12 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
   await checkCanCreate(user, input);
 
   const zodBsvhu = graphQlInputToZodBsvhu(input);
-
   const { createdAt, ...parsedZodBsvhu } = await parseBsvhuAsync(
     { ...zodBsvhu, isDraft, createdAt: new Date() },
     {
       user,
-      currentSignatureType: !isDraft ? "EMISSION" : undefined
+      currentSignatureType: !isDraft ? "EMISSION" : undefined,
+      unsealed: true
     }
   );
 

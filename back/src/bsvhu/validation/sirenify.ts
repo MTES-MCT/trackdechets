@@ -12,7 +12,7 @@ const sirenifyBsvhuAccessors = (
   {
     siret: bsvhu?.emitterCompanySiret,
     skip: sealedFields.includes("emitterCompanySiret") || bsvhu.emitterNoSiret,
-    setterIfNotFound: input => {
+    setterIfNotRegistered: input => {
       input.emitterNotOnTD = true;
     },
     setter: (input, companyInput) => {
