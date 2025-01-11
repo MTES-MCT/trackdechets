@@ -16,11 +16,14 @@ const sirenifyBsvhuAccessors = (
       input.emitterNotOnTD = true;
     },
     setter: (input, companyInput) => {
-      input.emitterCompanyName = companyInput.name;
-      input.emitterCompanyAddress = companyInput.address;
-      input.emitterCompanyCity = companyInput.city;
-      input.emitterCompanyPostalCode = companyInput.postalCode;
-      input.emitterCompanyStreet = companyInput.street;
+      input.emitterCompanyName = companyInput.name ?? input.emitterCompanyName;
+      input.emitterCompanyAddress =
+        companyInput.address ?? input.emitterCompanyAddress;
+      input.emitterCompanyCity = companyInput.city ?? input.emitterCompanyCity;
+      input.emitterCompanyPostalCode =
+        companyInput.postalCode ?? input.emitterCompanyPostalCode;
+      input.emitterCompanyStreet =
+        companyInput.street ?? input.emitterCompanyStreet;
     }
   },
   {
