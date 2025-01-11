@@ -282,6 +282,8 @@ input BsvhuTransporterInput {
   company: CompanyInput
   "Récépissé transporteur"
   recepisse: BsvhuRecepisseInput
+  "Champ libre"
+  customInfo: String
   "Informations liés au transport"
   transport: BsvhuTransportInput
 }

@@ -25,7 +25,6 @@ export type BsvhuEditableFields = Required<
     | "emitterCustomInfo"
     | "emitterNotOnTD"
     | "destinationCustomInfo"
-    | "transporterCustomInfo"
     | "emitterEmissionSignatureDate"
     | "emitterEmissionSignatureAuthor"
     | "transporterTransportSignatureDate"
@@ -547,6 +546,11 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
         );
       }
     }
+  },
+  transporterCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires du transporteur",
+    sealed: { from: "TRANSPORT" }
   },
   ecoOrganismeName: {
     readableFieldName: "le nom de l'éco-organisme",

@@ -70,6 +70,7 @@ import { sub, differenceInDays } from "date-fns";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
+
   return bsdView;
 };
 

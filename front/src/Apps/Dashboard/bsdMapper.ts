@@ -211,7 +211,7 @@ export const getBsvhuCurrentTransporterInfos = (
     transporterNumberPlate: currentTransporter?.transport?.plates?.filter(
       plate => plate.trim()
     ),
-    transporterCustomInfo: "",
+    transporterCustomInfo: currentTransporter?.customInfo,
     transporterMode: currentTransporter?.transport?.mode ?? undefined
   };
 };
@@ -350,6 +350,7 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   const wasteCode = bsvhu?.wasteCode;
   const wasteName =
     wasteCode === "16 01 04*" ? "VHU non dépollués" : "VHU dépollués"; //16 01 06
+  const transporter = bsvhu.transporter || bsvhu["bsvhuTransporter"];
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
     readableid: bsvhu.id,
@@ -364,11 +365,13 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     },
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
-    transporter: bsvhu.transporter || bsvhu["bsvhuTransporter"],
-    transporterNumberPlate: "fff",
+    transporter: transporter,
+    transporterCustomInfo: transporter?.customInfo,
+    transporterNumberPlate: transporter?.transport?.plates,
     updatedAt: bsvhu["bsvhuUpdatedAt"],
     ecoOrganisme: bsvhu.ecoOrganisme
   };
+
   return bsvhuFormatted;
 };
 

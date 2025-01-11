@@ -210,7 +210,6 @@ const rawBsvhuSchema = z.object({
     )
     .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
     .default([]),
-
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   brokerCompanyName: z.string().nullish(),
