@@ -309,6 +309,46 @@ export const checkTransportModeAndReceptionWeight: Refinement<
   );
 };
 
+const onlyWhiteSpace = (str: string) => !str.trim().length; // check whitespaces, tabs, newlines and invisible chars
+
+export const checkTransportPlates: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  ctx
+) => {
+  const { transporterTransportPlates } = bsvhu;
+  const path = ["transporter", "transport", "plates"];
+  if (transporterTransportPlates.length > 2) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Un maximum de 2 plaques d'immatriculation est accepté"
+    });
+  }
+
+  if (transporterTransportPlates.some(plate => plate.length > 12)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Un numéro d'immatriculation doit faire 12 caractères au maximum"
+    });
+  }
+
+  if (transporterTransportPlates.some(plate => plate.length < 4)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Un numéro d'immatriculation doit faire 4 caractères au minimum"
+    });
+  }
+  if (transporterTransportPlates.some(plate => onlyWhiteSpace(plate))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Le numéro de plaque fourni est incorrect"
+    });
+  }
+};
+
 export const checkRequiredFields: (
   validationContext: BsvhuValidationContext
 ) => Refinement<ParsedZodBsvhu> = validationContext => {

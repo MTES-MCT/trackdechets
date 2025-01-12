@@ -92,6 +92,14 @@ const TransporterBsvhu = ({ errors }) => {
           setError
         );
       }
+      if (transporter?.transport?.plates) {
+        setFieldError(
+          errors,
+          `${actor}.transport.plates`,
+          formState.errors?.[actor]?.["transport"]?.plates,
+          setError
+        );
+      }
     }
   }, [
     errors,
@@ -104,7 +112,8 @@ const TransporterBsvhu = ({ errors }) => {
     transporter?.company?.mail,
     transporter?.company?.phone,
     transporter?.company?.siret,
-    transporter?.company?.vatNumber
+    transporter?.company?.vatNumber,
+    transporter?.transport?.plates
   ]);
 
   const orgId = useMemo(
@@ -220,11 +229,6 @@ const TransporterBsvhu = ({ errors }) => {
             fieldName={`transporter.transport.plates`}
             hintText="2 max : Véhicule, remorque"
           />
-          {formState.errors?.transporter?.["transport"]?.plates && (
-            <p className="fr-text--sm fr-error-text fr-mb-4v">
-              {formState.errors?.transporter?.["transport"]?.plates?.message}
-            </p>
-          )}
         </div>
       </div>
     </>
