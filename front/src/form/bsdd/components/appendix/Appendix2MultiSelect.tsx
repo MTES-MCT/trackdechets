@@ -331,9 +331,10 @@ export default function Appendix2MultiSelect({
                 setIsDirty(true);
                 const idx = currentlyAnnexedFormIds.indexOf(form.id);
                 const value = e.target.value;
+
                 replace(idx, {
                   form,
-                  quantity: value === "" ? "" : Number(value)
+                  quantity: value === "" ? "" : value.replace(",", ".")
                 });
               }
             }}
