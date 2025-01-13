@@ -150,6 +150,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         mail: form.transporterCompanyMail,
         vatNumber: form.transporterCompanyVatNumber
       }),
+      customInfo: form.transporterCustomInfo,
       recepisse: nullIfNoValues<BsvhuRecepisse>({
         number: form.transporterRecepisseNumber,
         department: form.transporterRecepisseDepartment,
@@ -370,6 +371,7 @@ function flattenVhuTransporterInput({
     transporterCompanyVatNumber: chain(transporter, t =>
       chain(t.company, c => c.vatNumber)
     ),
+    transporterCustomInfo: chain(transporter, t => t.customInfo),
     transporterRecepisseNumber: chain(transporter, t =>
       chain(t.recepisse, r => r.number)
     ),

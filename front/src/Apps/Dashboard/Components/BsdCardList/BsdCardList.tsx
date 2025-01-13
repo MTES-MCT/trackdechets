@@ -461,6 +461,7 @@ function BsdCardList({
           const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
             node?.emitter?.company?.siret
           );
+
           return (
             <li className="bsd-card-list__item" key={key}>
               <BsdCard

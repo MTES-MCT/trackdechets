@@ -757,7 +757,6 @@ describe("BSVHU validation", () => {
           currentSignatureType: "TRANSPORT"
         });
       } catch (err) {
-        console.log(err);
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message:
@@ -784,7 +783,6 @@ describe("BSVHU validation", () => {
           currentSignatureType: "TRANSPORT"
         });
       } catch (err) {
-        console.log(err);
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message:
@@ -811,7 +809,6 @@ describe("BSVHU validation", () => {
           currentSignatureType: "TRANSPORT"
         });
       } catch (err) {
-        console.log(err);
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message: "Le numéro de plaque fourni est incorrect"
