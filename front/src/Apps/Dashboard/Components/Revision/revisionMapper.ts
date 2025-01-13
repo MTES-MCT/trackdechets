@@ -43,6 +43,8 @@ export enum DataNameEnum {
   POLLUANTS_ORG = "Présence de polluants organiques persistants",
   CAP_FINAL_DEST = "CAP (destination finale)",
   CAP = "CAP",
+  CAP_EXUTOIRE = "CAP de l'exutoire",
+  TTR_CAP = "CAP du TTR",
   SAMPLE_NUMBER = "Numéro d'échantillon",
   CAP_TEMP_STORAGE = "CAP (entreposage provisoire ou reconditionnement)",
   QTY_ESTIMATED = "Poids estimé (en tonnes)",
@@ -133,6 +135,9 @@ export const mapRevision = (
   review: FormRevisionRequest & BsdaRevisionRequest & BsdasriRevisionRequest,
   bsdName: string
 ): ReviewInterface => {
+  const hasTTR =
+    review?.[bsdName]?.destination?.operation?.nextDestination?.company?.orgId;
+
   return {
     id: review?.id,
     readableId: review?.[bsdName]?.readableId || review?.[bsdName]?.id,
@@ -264,9 +269,16 @@ export const mapRevision = (
         dataNewValue: review?.content?.temporaryStorageDetail?.destination?.cap
       },
       {
-        dataName: DataNameEnum.CAP,
+        dataName: hasTTR ? DataNameEnum.TTR_CAP : DataNameEnum.CAP_EXUTOIRE,
         dataOldValue: review?.[bsdName]?.destination?.cap,
         dataNewValue: review?.content?.destination?.cap
+      },
+      {
+        dataName: hasTTR ? DataNameEnum.CAP_EXUTOIRE : DataNameEnum.TTR_CAP,
+        dataOldValue:
+          review?.[bsdName]?.destination?.operation?.nextDestination?.cap,
+        dataNewValue:
+          review?.content?.destination?.operation?.nextDestination?.cap
       },
       {
         dataName: review?.[bsdName]?.form?.temporaryStorageDetail
