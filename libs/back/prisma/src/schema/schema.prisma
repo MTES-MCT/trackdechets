@@ -1817,6 +1817,7 @@ model BsdaRevisionRequest {
   destinationOperationCode        String?
   destinationOperationDescription String?
   destinationOperationMode        OperationMode?
+  destinationOperationNextDestinationCap String?
   brokerCompanyName               String?
   brokerCompanySiret              String?
   brokerCompanyAddress            String?

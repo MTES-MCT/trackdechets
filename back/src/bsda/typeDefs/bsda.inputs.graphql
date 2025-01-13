@@ -451,6 +451,14 @@ input BsdaRevisionRequestOperationInput {
 
   "Description de l'opération"
   description: String
+
+  "Informations relatives au TTR"
+  nextDestination: BsdaRevisionRequestNextDestinationInput
+}
+
+input BsdaRevisionRequestNextDestinationInput {
+  "N° de CAP (le cas échéant)"
+  cap: String
 }
 
 input BsdaRevisionRequestWasteInput {

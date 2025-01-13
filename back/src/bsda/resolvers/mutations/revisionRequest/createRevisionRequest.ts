@@ -56,6 +56,7 @@ export type RevisionRequestContent = Pick<
   | "destinationReceptionWeight"
   | "destinationOperationCode"
   | "destinationOperationDescription"
+  | "destinationOperationNextDestinationCap"
   | "brokerCompanyName"
   | "brokerCompanySiret"
   | "brokerCompanyAddress"
@@ -240,6 +241,7 @@ const schema = rawBsdaSchema
     destinationOperationMode: true,
     destinationOperationDescription: true,
     destinationReceptionWeight: true,
+    destinationOperationNextDestinationCap: true,
     brokerCompanyName: true,
     brokerCompanySiret: true,
     brokerCompanyAddress: true,

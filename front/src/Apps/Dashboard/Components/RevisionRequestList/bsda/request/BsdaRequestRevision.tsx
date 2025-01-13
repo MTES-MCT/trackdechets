@@ -162,6 +162,8 @@ export function BsdaRequestRevision({ bsda }: Props) {
     setValue("waste.sealNumbers", newPlates);
   };
 
+  const hasTTR = bsda.destination?.operation?.nextDestination?.company?.orgId;
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>
@@ -255,19 +257,42 @@ export function BsdaRequestRevision({ bsda }: Props) {
               </RhfReviewableField>
 
               <RhfReviewableField
-                title="CAP"
+                title={hasTTR ? "CAP du TTR" : "CAP"}
                 value={bsda.destination?.cap}
                 path="destination.cap"
                 defaultValue={initialBsdaReview.destination.cap}
               >
                 <Input
-                  label="Numéro de CAP"
+                  label={
+                    hasTTR
+                      ? "Numéro de CAP du TTR"
+                      : "Numéro de CAP de l'exutoire"
+                  }
                   className="fr-col-6"
                   nativeInputProps={{
                     ...register("destination.cap")
                   }}
                 />
               </RhfReviewableField>
+
+              {hasTTR && (
+                <RhfReviewableField
+                  title="CAP de l'exutoire"
+                  value={bsda.destination?.operation?.nextDestination?.cap}
+                  path="bsda.destination.operation.nextDestination.cap"
+                  defaultValue={
+                    initialBsdaReview.destination.operation.nextDestination.cap
+                  }
+                >
+                  <Input
+                    label="Numéro de CAP de l'exutoire"
+                    className="fr-col-6"
+                    nativeInputProps={{
+                      ...register("destination.operation.nextDestination.cap")
+                    }}
+                  />
+                </RhfReviewableField>
+              )}
 
               <RhfReviewableField
                 title="Conditionnement"

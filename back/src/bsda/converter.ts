@@ -40,7 +40,8 @@ import type {
   BsdaWorkerCertification,
   CompanyInput,
   Bsda,
-  BsdaTransporterInput
+  BsdaTransporterInput,
+  BsdaRevisionRequestOperationNextDestination
 } from "@td/codegen-back";
 import {
   Prisma,
@@ -662,6 +663,11 @@ export function flattenBsdaRevisionRequestInput(
         )
       )
     ),
+    destinationOperationNextDestinationCap: chain(reviewContent, r =>
+      chain(r.destination, d =>
+        chain(d.operation, o => chain(o.nextDestination, n => n.cap))
+      )
+    ),
     isCanceled: undefinedOrDefault(
       chain(reviewContent, c => chain(c, r => r.isCanceled)),
       false
@@ -709,7 +715,11 @@ export function expandBsdaRevisionRequestContent(
       operation: nullIfNoValues<BsdaRevisionRequestOperation>({
         code: bsdaRevisionRequest.destinationOperationCode,
         mode: bsdaRevisionRequest.destinationOperationMode,
-        description: bsdaRevisionRequest.destinationOperationDescription
+        description: bsdaRevisionRequest.destinationOperationDescription,
+        nextDestination:
+          nullIfNoValues<BsdaRevisionRequestOperationNextDestination>({
+            cap: bsdaRevisionRequest.destinationOperationNextDestinationCap
+          })
       }),
       reception: nullIfNoValues<BsdaRevisionRequestReception>({
         weight: bsdaRevisionRequest.destinationReceptionWeight
