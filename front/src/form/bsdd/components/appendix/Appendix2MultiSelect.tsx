@@ -334,7 +334,7 @@ export default function Appendix2MultiSelect({
 
                 replace(idx, {
                   form,
-                  quantity: value === "" ? "" : value.replace(",", ".")
+                  quantity: value
                 });
               }
             }}
