@@ -82,9 +82,9 @@ export function Destination({ disabled }) {
           siret: company?.siret,
           name: company?.name,
           address: company?.address,
-          contact: company?.contact,
-          mail: company?.contactEmail,
-          phone: company?.contactPhone,
+          contact: values?.destination?.company?.contact || company?.contact,
+          mail: values?.destination?.company?.mail || company?.contactEmail,
+          phone: values?.destination?.company?.phone || company?.contactPhone,
           vatNumber: company?.vatNumber,
           country: company?.codePaysEtrangerEtablissement
         });
@@ -95,7 +95,10 @@ export function Destination({ disabled }) {
     setFieldValue,
     dataCompany?.companyPrivateInfos,
     getCompanyQuery,
-    siret
+    siret,
+    values?.destination?.company?.contact,
+    values?.destination?.company?.mail,
+    values?.destination?.company?.phone
   ]);
 
   const hasBroker = Boolean(values.broker);
