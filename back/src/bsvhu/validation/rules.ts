@@ -827,6 +827,9 @@ export async function getSealedFields(
   bsvhu: ZodBsvhu,
   context: BsvhuValidationContext
 ): Promise<(keyof BsvhuEditionRules)[]> {
+  if (context.unsealed) {
+    return [];
+  }
   const currentSignatureType =
     context.currentSignatureType ?? getCurrentSignatureType(bsvhu);
   // Some signatures may be skipped, so always check all the hierarchy

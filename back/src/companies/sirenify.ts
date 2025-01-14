@@ -117,7 +117,8 @@ export default function buildSirenify<T>(
 export type NextCompanyInputAccessor<T> = {
   siret: string | null | undefined;
   skip: boolean;
-  setterIfNotFound?: (input: T) => void;
+  // an optional function that will be run if the company is not found or not registered on trackdechet
+  setterIfNotRegistered?: (input: T) => void;
   setter: (
     input: T,
     data: {
@@ -153,11 +154,17 @@ export function nextBuildSirenify<T>(
     const sirenifiedInput = { ...input };
 
     for (const [idx, companySearchResult] of companySearchResults.entries()) {
-      const { setter, setterIfNotFound } = accessors[idx];
-      if (!companySearchResult) {
-        if (setterIfNotFound) {
-          setterIfNotFound(sirenifiedInput);
+      const { siret, skip, setter, setterIfNotRegistered } = accessors[idx];
+      if (
+        siret &&
+        !skip &&
+        (!companySearchResult || !companySearchResult.isRegistered)
+      ) {
+        if (setterIfNotRegistered) {
+          setterIfNotRegistered(sirenifiedInput);
         }
+      }
+      if (!companySearchResult) {
         continue;
       }
       const company = companySearchResult as CompanySearchResult;

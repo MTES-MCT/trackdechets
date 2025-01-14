@@ -14,7 +14,12 @@ export type BsvhuUserFunctions = {
 
 export type BsvhuValidationContext = {
   user?: User;
+  // the last signature applied on the BSVHU
+  // this is used to define which fields are required/sealed
   currentSignatureType?: SignatureTypeInput;
+  // override sealed fields, so all the validation can still happen
+  // for a certain level of signature, without blocking sirenify, recipify,...
+  unsealed?: boolean;
 };
 
 export type ZodBsvhuTransformer = (
