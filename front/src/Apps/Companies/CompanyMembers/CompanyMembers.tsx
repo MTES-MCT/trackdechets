@@ -9,6 +9,7 @@ import * as COMPANY_CONSTANTS from "@td/constants";
 
 import "./companyMembers.scss";
 import CompanyMembersList from "./CompanyMembersList";
+import CompanyMembersRequestsList from "./CompanyMembersRequestsList";
 
 const { VITE_VERIFY_COMPANY } = import.meta.env;
 
@@ -35,6 +36,7 @@ const CompanyMembers = ({
 
   return (
     <div className="company-members">
+      {isAdmin && <CompanyMembersRequestsList company={company} />}
       {isAdmin &&
         (VITE_VERIFY_COMPANY !== "true" ||
         !isProfessional ||

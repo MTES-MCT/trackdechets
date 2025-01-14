@@ -101,7 +101,7 @@ describe("query membershipRequest", () => {
       status: "PENDING",
       email: requester.email,
       siret: company.siret,
-      name: company.name,
+      name: requester.name,
       sentTo: [admin.email, "so****@test.fr"] // emails not belonging to user email domain are partially redacted
     });
   });
@@ -127,7 +127,7 @@ describe("query membershipRequest", () => {
       status: "PENDING",
       email: requester.email,
       siret: company.siret,
-      name: company.name
+      name: requester.name
     });
   });
 
@@ -157,7 +157,7 @@ describe("query membershipRequest", () => {
       status: "PENDING",
       email: requester.email,
       siret: company.orgId,
-      name: company.name
+      name: requester.name
     });
   });
 });

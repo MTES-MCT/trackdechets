@@ -18,7 +18,6 @@ const routes = {
   },
   login: "/login",
   invite: "/invite",
-  membershipRequest: "/membership-request/:id",
   signup: {
     index: "/signup",
     details: "/signup/details",
@@ -153,7 +152,6 @@ export const titles = {
   "/admin/mass-profile": "Gestion en masse des profils — Trackdéchets",
   "/login": "Se connecter — Trackdéchets",
   "/invite": "",
-  "/membership-request/:id": "",
   "/signup": "Créer un compte — Trackdéchets",
   "/signup/details": "Liste des codes déchets autorisés — Trackdéchets",
   "/signup/activation": "Se connecter — Trackdéchets",

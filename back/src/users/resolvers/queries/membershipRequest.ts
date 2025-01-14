@@ -62,7 +62,7 @@ const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
     status: invitationRequest.status,
     email: membershipRequestUser.email,
     siret: company.orgId,
-    name: company.name ?? ""
+    name: membershipRequestUser.name ?? ""
   };
 };
 

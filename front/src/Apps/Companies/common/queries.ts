@@ -523,3 +523,57 @@ export const CHANGE_USER_ROLE = gql`
   }
   ${AccountCompanyMemberFragment.user}
 `;
+
+export const MEMBERSHIP_REQUESTS = gql`
+  query membershipRequests(
+    $skip: Int
+    $first: Int
+    $where: MembershipRequestsWhere
+  ) {
+    membershipRequests(skip: $skip, first: $first, where: $where) {
+      totalCount
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      edges {
+        node {
+          id
+          email
+          name
+          status
+          createdAt
+        }
+      }
+    }
+  }
+`;
+
+export const MEMBERSHIP_REQUEST = gql`
+  query MembershipRequest($id: ID!) {
+    membershipRequest(id: $id) {
+      id
+      email
+      name
+      status
+    }
+  }
+`;
+
+export const ACCEPT_MEMBERSHIP_REQUEST = gql`
+  mutation AcceptMembershipRequest($id: ID!, $role: UserRole!) {
+    acceptMembershipRequest(id: $id, role: $role) {
+      id
+    }
+  }
+`;
+
+export const REFUSE_MEMBERSHIP_REQUEST = gql`
+  mutation RefuseMembershipRequest($id: ID!) {
+    refuseMembershipRequest(id: $id) {
+      id
+    }
+  }
+`;
