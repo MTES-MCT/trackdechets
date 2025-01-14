@@ -6,7 +6,7 @@ import Tooltip from "../../common/components/Tooltip";
 import ProcessingOperation from "../common/components/processing-operation/ProcessingOperation";
 import { Field, FieldArray, useFormikContext } from "formik";
 import { isDangerous } from "@td/constants";
-import { FavoriteType, Form } from "@td/codegen-ui";
+import { CompanySearchResult, FavoriteType, Form } from "@td/codegen-ui";
 import CompanySelector from "../common/components/company/CompanySelector";
 import TemporaryStorage from "./components/temporaryStorage/TemporaryStorage";
 import styles from "./Recipient.module.scss";
@@ -21,6 +21,31 @@ import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelector
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../Apps/Forms/Components/CompanyContactInfo/CompanyContactInfo";
 import Recepisse from "../../Apps/Dashboard/Components/Recepisse/Recepisse";
+import { CompanyType } from "@prisma/client";
+
+function selectCompanyError(
+  company: CompanySearchResult,
+  expectedCompanyType?: "BROKER" | "TRADER"
+) {
+  if (company.etatAdministratif !== "A") {
+    // Lors de l'écriture de ces lignes, `searchCompanies` renvoie des établissements
+    // fermés lorsque l'on fait une recherche pas raison sociale. Si ce problème est traité
+    // dans le futur, on pourra s'abstenir de gérer cette erreur.
+    return "Cet établissement est fermé";
+  }
+  if (!company.isRegistered) {
+    return "Cet établissement n'est pas inscrit sur Trackdéchets.";
+  }
+  if (
+    expectedCompanyType &&
+    !company.companyTypes?.includes(expectedCompanyType)
+  ) {
+    const translatedType =
+      expectedCompanyType === "BROKER" ? "courtier" : "négociant";
+    return `Cet établissement n'a pas le profil ${translatedType}`;
+  }
+  return null;
+}
 
 export default function Recipient({ disabled }) {
   const { siret } = useParams<{ siret: string }>();
@@ -159,9 +184,12 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
             orgId={siret}
             selectedCompanyOrgId={values.broker?.company?.siret ?? null}
             favoriteType={FavoriteType.Broker}
-            // selectedCompanyError={company =>
-            //   selectedCompanyError(company, CompanyType.Broker)
-            // }
+            selectedCompanyError={company => {
+              if (company) {
+                return selectCompanyError(company, CompanyType.BROKER);
+              }
+              return null;
+            }}
             disabled={disabled}
             onCompanySelected={company => {
               const prevBroker = values.broker;
@@ -198,7 +226,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <CompanyContactInfo fieldName="broker.company" />
           {values.broker?.receipt && (
             <Recepisse
-              title="Récépisse de courtage"
+              title="Récépissé de courtage"
               numero={values.broker?.receipt}
               departement={values.broker?.department}
               validityLimit={values.broker?.validityLimit}
@@ -226,9 +254,12 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
             orgId={siret}
             selectedCompanyOrgId={values.trader?.company?.siret ?? null}
             favoriteType={FavoriteType.Trader}
-            // selectedCompanyError={company =>
-            //   selectedCompanyError(company, CompanyType.Trader)
-            // }
+            selectedCompanyError={company => {
+              if (company) {
+                return selectCompanyError(company, CompanyType.TRADER);
+              }
+              return null;
+            }}
             disabled={disabled}
             onCompanySelected={company => {
               const prevTrader = values.trader;
@@ -265,7 +296,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <CompanyContactInfo fieldName="trader.company" />
           {values.trader?.receipt && (
             <Recepisse
-              title="Récépisse de négoce"
+              title="Récépissé de négoce"
               numero={values.trader?.receipt}
               departement={values.trader?.department}
               validityLimit={values.trader?.validityLimit}
@@ -300,9 +331,6 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
                     selectedCompanyOrgId={
                       values.intermediaries[idx]?.siret ?? null
                     }
-                    // selectedCompanyError={company =>
-                    //   selectedCompanyError(company, CompanyType.Trader)
-                    // }
                     disabled={disabled}
                     onCompanySelected={company => {
                       const prevIntermediary = values.intermediaries[idx];
