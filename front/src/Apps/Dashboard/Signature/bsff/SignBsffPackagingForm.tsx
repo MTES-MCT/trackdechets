@@ -578,9 +578,10 @@ function SignBsffPackagingForm({
                 }}
                 state={errors.acceptation?.weight ? "error" : "default"}
                 stateRelatedMessage={errors.acceptation?.weight?.message}
+                className="fr-mb-2w"
               />
               {acceptationWeight > 0 && (
-                <p className="fr-info-text fr-mt-5v">
+                <p className="fr-info-text">
                   Soit{" "}
                   {new Decimal(acceptationWeight).dividedBy(1000).toFixed(4)} t
                 </p>
@@ -619,6 +620,7 @@ function SignBsffPackagingForm({
                     })}
                     state={errors.operation?.code ? "error" : "default"}
                     stateRelatedMessage={errors.operation?.code?.message}
+                    className="fr-mb-2w"
                   >
                     {Object.values(OPERATION).map(operation => (
                       <option key={operation.code} value={operation.code}>
@@ -626,6 +628,10 @@ function SignBsffPackagingForm({
                       </option>
                     ))}
                   </Select>
+                  <p className="fr-info-text">
+                    Code de traitement prévu :{" "}
+                    {packaging.bsff.destination?.plannedOperationCode}
+                  </p>
                 </div>
               </div>
               <RhfOperationModeSelect
