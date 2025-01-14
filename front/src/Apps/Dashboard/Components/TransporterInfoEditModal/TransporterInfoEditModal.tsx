@@ -7,7 +7,8 @@ import {
   MutationUpdateBsdasriArgs,
   MutationUpdateBsffArgs,
   MutationUpdateBspaohArgs,
-  MutationUpdateFormTransporterArgs
+  MutationUpdateFormTransporterArgs,
+  MutationUpdateBsvhuArgs
 } from "@td/codegen-ui";
 import TdModal from "../../../common/Components/Modal/Modal";
 import { NotificationError } from "../../../common/Components/Error/Error";
@@ -20,6 +21,7 @@ import { UPDATE_BSDD_TRANSPORTER } from "../../../common/queries/bsdd/queries";
 import { UPDATE_BSFF_FORM } from "../../../common/queries/bsff/queries";
 import { UPDATE_BSDASRI } from "../../../common/queries/bsdasri/queries";
 import { UPDATE_BSPAOH } from "../../../common/queries/bspaoh/queries";
+import { UPDATE_VHU_FORM } from "../../../common/queries/bsvhu/queries";
 import TransporterInfoEditForm from "./TransporterInfoEditForm";
 import { Loader } from "../../../common/Components";
 
@@ -71,6 +73,13 @@ const TransporterInfoEditModal = ({
     { error: errorBspaoh, loading: loadingBspaoh }
   ] = useMutation<Pick<Mutation, "updateBspaoh">, MutationUpdateBspaohArgs>(
     UPDATE_BSPAOH
+  );
+
+  const [
+    updateTransporterInfoBsvhu,
+    { error: errorBsvhu, loading: loadingBsvhu }
+  ] = useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
+    UPDATE_VHU_FORM
   );
 
   const onSubmitForm = async data => {
@@ -140,17 +149,35 @@ const TransporterInfoEditModal = ({
           }
         }
       });
+    } else if (bsd.type === BsdType.Bsvhu) {
+      await updateTransporterInfoBsvhu({
+        variables: {
+          id: bsd.id,
+          input: {
+            transporter: {
+              customInfo: data.customInfo,
+              transport: { plates: formattedPlates }
+            }
+          }
+        }
+      });
     }
   };
 
   const error =
-    errorBsdd || errorBsda || errorBsdasri || errorBsff || errorBspaoh;
+    errorBsdd ||
+    errorBsda ||
+    errorBsdasri ||
+    errorBsff ||
+    errorBspaoh ||
+    errorBsvhu;
   const loading =
     loadingBsdd ||
     loadingBsda ||
     loadingBsdasri ||
     loadingBsff ||
-    loadingBspaoh;
+    loadingBspaoh ||
+    loadingBsvhu;
 
   return (
     <TdModal

@@ -185,7 +185,10 @@ describe("mutation.duplicateBsvhu", () => {
     });
 
     const searchResults = {
-      [emitter.company.siret!]: emitter.company
+      [emitter.company.siret!]: {
+        ...emitter.company,
+        isRegistered: true
+      }
     };
 
     (searchCompany as jest.Mock).mockImplementation((clue: string) => {

@@ -10,7 +10,8 @@ import {
   checkEmitterSituation,
   checkPackagingAndIdentificationType,
   checkTransportModeAndWeight,
-  checkTransportModeAndReceptionWeight
+  checkTransportModeAndReceptionWeight,
+  checkTransportPlates
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
@@ -70,8 +71,6 @@ export const ZodOperationEnum = z
   .nullish();
 
 export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
-
-const notOnlyWhiteSpace = (str: string) => str.trim(); // check whitespaces, tabs, newlines and invisible chars
 
 const rawBsvhuSchema = z.object({
   id: z.string().default(() => getReadableId(ReadableIdPrefix.VHU)),
@@ -194,24 +193,8 @@ const rawBsvhuSchema = z.object({
   transporterTransportTakenOverAt: z.coerce.date().nullish(),
   transporterCustomInfo: z.string().nullish(),
   transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
-  transporterTransportPlates: z
-    .array(
-      z
-        .string()
-        .min(4, {
-          message:
-            "Un numéro d'immatriculation doit faire 4 caractères au minimum"
-        })
-        .max(12, {
-          message:
-            "Un numéro d'immatriculation doit faire 12 caractères au maximum"
-        })
-        .refine(notOnlyWhiteSpace, {
-          message: "Le numéro de plaque fourni est incorrect"
-        })
-    )
-    .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
-    .default([]),
+
+  transporterTransportPlates: z.array(z.string()).default([]),
 
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
@@ -258,7 +241,8 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkEmitterSituation)
   .superRefine(checkPackagingAndIdentificationType)
   .superRefine(checkTransportModeAndWeight)
-  .superRefine(checkTransportModeAndReceptionWeight);
+  .superRefine(checkTransportModeAndReceptionWeight)
+  .superRefine(checkTransportPlates);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
@@ -287,7 +271,7 @@ export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
     .transform((bsvhu: ParsedZodBsvhu) => runTransformers(bsvhu, context))
     .superRefine(
       // run le check sur les champs requis après les transformations
-      // au cas où des transformations auto-complète certains champs
+      // au cas où des transformations auto-complètent certains champs
       checkRequiredFields(context)
     );
 };

@@ -162,6 +162,8 @@ export const checkEmitterSituation: Refinement<ParsedZodBsvhu> = (
     });
   }
 };
+// Date de la MAJ 2024.10.1 qui rend obligatoire la complétion des numéros d'identification
+export const v20241001 = new Date("2024-10-23T00:00:00.000");
 
 // Date de la MAJ 2024.12.1 qui modifie les règles de validation de BsvhuInput.packaging et identification.type
 export const v20241201 = new Date(
@@ -305,6 +307,42 @@ export const checkTransportModeAndReceptionWeight: Refinement<
     ["destination", "reception", "weight"],
     zodContext
   );
+};
+
+const onlyWhiteSpace = (str: string) => !str.trim().length; // check whitespaces, tabs, newlines and invisible chars
+
+export const checkTransportPlates: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  ctx
+) => {
+  const { transporterTransportPlates } = bsvhu;
+  const path = ["transporter", "transport", "plates"];
+  if (transporterTransportPlates.length > 2) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Un maximum de 2 plaques d'immatriculation est accepté"
+    });
+  }
+
+  if (
+    transporterTransportPlates.some(plate => plate.length > 12) ||
+    transporterTransportPlates.some(plate => plate.length < 4)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+    });
+  }
+
+  if (transporterTransportPlates.some(plate => onlyWhiteSpace(plate))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Le numéro de plaque fourni est incorrect"
+    });
+  }
 };
 
 export const checkRequiredFields: (

@@ -107,6 +107,8 @@ type BsvhuTransporter {
   company: FormCompany
   "Récépissé transporteur"
   recepisse: BsvhuRecepisse
+  "Champ libre"
+  customInfo: String
   "Informations liés au transport"
   transport: BsvhuTransport
 }

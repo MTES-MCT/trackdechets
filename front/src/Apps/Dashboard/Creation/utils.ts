@@ -110,6 +110,10 @@ const pathPrefixToTab = {
     if (pathPrefix === "ecoOrganisme") {
       return TabId.other;
     }
+    if (pathPrefix.startsWith("transporter")) {
+      // dirty solution to handle TransporterFooBar paths
+      return TabId.transporter;
+    }
     if (Object.values(TabId).includes(pathPrefix as TabId)) {
       return TabId[pathPrefix];
     }
@@ -147,6 +151,7 @@ export const getPublishErrorMessages = (
   apiErrors?: NormalizedError[]
 ): TabError[] => {
   // return an array of messages with tabId, name (path) and the related message
+
   const publishErrorMessages =
     apiErrors
       ?.map(apiError => {

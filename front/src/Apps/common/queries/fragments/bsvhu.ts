@@ -21,6 +21,7 @@ export const vhuFragment = gql`
         plates
         mode
       }
+      customInfo
       recepisse {
         number
       }
@@ -84,6 +85,7 @@ export const dashboardVhuFragment = gql`
         validityLimit
         isExempted
       }
+      customInfo
     }
     destination {
       type
@@ -184,6 +186,7 @@ export const FullBsvhuFragment = gql`
         validityLimit
         isExempted
       }
+      customInfo
       transport {
         plates
         mode

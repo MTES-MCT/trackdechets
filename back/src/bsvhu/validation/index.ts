@@ -21,7 +21,7 @@ import { BsvhuValidationContext, PrismaBsvhuForParsing } from "./types";
  * par signature.
  */
 export async function mergeInputAndParseBsvhuAsync(
-  // BSFF déjà stockée en base de données.
+  // Bsvhu déjà stocké en base de données.
   persisted: PrismaBsvhuForParsing,
   // Données entrantes provenant de la couche GraphQL.
   input: BsvhuInput,
@@ -65,7 +65,7 @@ export async function mergeInputAndParseBsvhuAsync(
   }
 
   // Calcule la signature courante à partir des données si elle n'est
-  // pas fourni via le contexte
+  // pas fournie via le contexte
   const currentSignatureType =
     context.currentSignatureType ?? getCurrentSignatureType(zodPersisted);
 
@@ -75,7 +75,7 @@ export async function mergeInputAndParseBsvhuAsync(
   };
 
   // Vérifie que l'on n'est pas en train de modifier des données
-  // vérrouillées par signature.
+  // verrouillées par signature.
   const updatedFields = await checkBsvhuSealedFields(
     zodPersisted,
     bsvhu,
