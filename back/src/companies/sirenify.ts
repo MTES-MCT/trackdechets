@@ -117,6 +117,7 @@ export default function buildSirenify<T>(
 export type NextCompanyInputAccessor<T> = {
   siret: string | null | undefined;
   skip: boolean;
+  // an optional function that will be run if the company is not found or not registered on trackdechet
   setterIfNotRegistered?: (input: T) => void;
   setter: (
     input: T,
