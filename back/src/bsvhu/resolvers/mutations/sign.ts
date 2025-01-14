@@ -47,8 +47,6 @@ export default async function sign(
 
   const zodBsvhu = prismaToZodBsvhu(bsvhu);
 
-  console.log("zodBsvhu", zodBsvhu)
-
   // Check that all necessary fields are filled
   await parseBsvhuAsync(
     { ...zodBsvhu, ...transporterReceipt },
