@@ -6,7 +6,7 @@ import signBsdasri from "./mutations/signBsdasri";
 import deleteBsdasri from "./mutations/deleteBsdasri";
 import signBsdasriEmissionWithSecretCode from "./mutations/signBsdasriEmissionWithSecretCode";
 import duplicateBsdasri from "./mutations/duplicateBsdasri";
-import { MutationResolvers } from "../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 
 import { createBsdasriRevisionRequest } from "./mutations/revisionRequest/createRevisionRequest";
 import { cancelBsdasriRevisionRequest } from "./mutations/revisionRequest/cancelRevisionRequest";

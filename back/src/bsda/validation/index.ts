@@ -1,4 +1,4 @@
-import { BsdaInput } from "../../generated/graphql/types";
+import type { BsdaInput } from "@td/codegen-back";
 import {
   getCurrentSignatureType,
   graphQlInputToZodBsda,

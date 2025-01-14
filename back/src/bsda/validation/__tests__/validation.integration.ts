@@ -24,10 +24,9 @@ import {
   PrismaBsdaForParsing
 } from "../types";
 import { ZodError } from "zod";
-import { CompanySearchResult } from "../../../companies/types";
 import { searchCompany } from "../../../companies/search";
 import { mergeInputAndParseBsdaAsync, parseBsda, parseBsdaAsync } from "..";
-import { BsdaInput } from "../../../generated/graphql/types";
+import type { BsdaInput, CompanySearchResult } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 
 jest.mock("../../../companies/search");
@@ -748,7 +747,9 @@ describe("BSDA parsing", () => {
       const transporter = await userWithCompanyFactory("MEMBER");
       const destination = await userWithCompanyFactory("MEMBER");
       const worker = await userWithCompanyFactory("MEMBER");
-      const broker = await userWithCompanyFactory("MEMBER");
+      const broker = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["BROKER"]
+      });
       const intermediary1 = await userWithCompanyFactory("MEMBER");
       const intermediary2 = await userWithCompanyFactory("MEMBER");
 
@@ -865,7 +866,9 @@ describe("BSDA parsing", () => {
       const transporter = await userWithCompanyFactory("MEMBER");
       const destination = await userWithCompanyFactory("MEMBER");
       const worker = await userWithCompanyFactory("MEMBER");
-      const broker = await userWithCompanyFactory("MEMBER");
+      const broker = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["BROKER"]
+      });
       const intermediary1 = await userWithCompanyFactory("MEMBER");
       const intermediary2 = await userWithCompanyFactory("MEMBER");
 
@@ -972,7 +975,9 @@ describe("BSDA parsing", () => {
       const transporter = await userWithCompanyFactory("MEMBER");
       const destination = await userWithCompanyFactory("MEMBER");
       const worker = await userWithCompanyFactory("MEMBER");
-      const broker = await userWithCompanyFactory("MEMBER");
+      const broker = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["BROKER"]
+      });
       const intermediary1 = await userWithCompanyFactory("MEMBER");
       const intermediary2 = await userWithCompanyFactory("MEMBER");
 

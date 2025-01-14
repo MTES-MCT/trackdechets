@@ -13,9 +13,10 @@ import {
   receivedInfoSchema,
   processedInfoSchema,
   transporterSchemaFn,
-  beforeTransportSchemaFn
+  beforeTransportSchemaFn,
+  recipientSchemaFn
 } from "../validation";
-import { ReceivedFormInput } from "../../generated/graphql/types";
+import type { ReceivedFormInput } from "@td/codegen-back";
 import {
   companyFactory,
   ecoOrganismeFactory,
@@ -2299,5 +2300,110 @@ describe("processedInfoSchema", () => {
         expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
       }
     );
+  });
+
+  describe("recipientSchemaFn", () => {
+    it.each([false, null, undefined])(
+      "recipientProcessingOperation must be defined if no temp storage and not draft (recipientIsTempStorage: %p)",
+      async recipientIsTempStorage => {
+        // Given
+        const recipientCompany = await companyFactory({
+          companyTypes: ["WASTEPROCESSOR", "COLLECTOR", "WASTEPROCESSOR"],
+          collectorTypes: ["DANGEROUS_WASTES", "NON_DANGEROUS_WASTES"]
+        });
+        const recipient = {
+          recipientCompanySiret: recipientCompany.siret,
+          recipientCompanyName: recipientCompany.name,
+          recipientCompanyAddress: "Test",
+          recipientCompanyContact: "Test",
+          recipientCompanyPhone: "06 00 00 00 00",
+          recipientCompanyMail: recipientCompany.contactEmail,
+          recipientProcessingOperation: undefined, // < Operation not defined
+          recipientIsTempStorage
+        };
+
+        // Then
+        expect.assertions(1);
+        try {
+          await recipientSchemaFn({ isDraft: false }).validate(recipient);
+        } catch (err) {
+          expect(err.message).toBe(
+            "Opération d’élimination / valorisation est un champ requis et doit avoir une valeur"
+          );
+        }
+      }
+    );
+
+    it.each([false, null, undefined])(
+      "recipientProcessingOperation can be undefined if no temp storage and draft (recipientIsTempStorage: %p)",
+      async recipientIsTempStorage => {
+        // Given
+        const recipientCompany = await companyFactory({
+          companyTypes: ["WASTEPROCESSOR", "COLLECTOR", "WASTEPROCESSOR"],
+          collectorTypes: ["DANGEROUS_WASTES", "NON_DANGEROUS_WASTES"]
+        });
+        const recipient = {
+          recipientCompanySiret: recipientCompany.siret,
+          recipientCompanyName: recipientCompany.name,
+          recipientCompanyAddress: "Test",
+          recipientCompanyContact: "Test",
+          recipientCompanyPhone: "06 00 00 00 00",
+          recipientCompanyMail: recipientCompany.contactEmail,
+          recipientProcessingOperation: undefined, // < Operation not defined
+          recipientIsTempStorage
+        };
+
+        // Then
+        expect(
+          await recipientSchemaFn({ isDraft: true }).isValid(recipient)
+        ).toBeTruthy();
+      }
+    );
+
+    it("recipientProcessingOperation can be undefined if temp storage and not draft", async () => {
+      // Given
+      const recipientCompany = await companyFactory({
+        companyTypes: ["WASTEPROCESSOR", "COLLECTOR", "WASTEPROCESSOR"],
+        collectorTypes: ["DANGEROUS_WASTES", "NON_DANGEROUS_WASTES"]
+      });
+      const recipient = {
+        recipientCompanySiret: recipientCompany.siret,
+        recipientCompanyName: recipientCompany.name,
+        recipientCompanyAddress: "Test",
+        recipientCompanyContact: "Test",
+        recipientCompanyPhone: "06 00 00 00 00",
+        recipientCompanyMail: recipientCompany.contactEmail,
+        recipientProcessingOperation: undefined, // < Operation not defined
+        recipientIsTempStorage: true
+      };
+
+      // Then
+      expect(
+        await recipientSchemaFn({ isDraft: false }).isValid(recipient)
+      ).toBeTruthy();
+    });
+
+    it("no error if recipientProcessingOperation is defined and no temp storage and not draft", async () => {
+      // Given
+      const recipientCompany = await companyFactory({
+        companyTypes: ["WASTEPROCESSOR", "COLLECTOR", "WASTEPROCESSOR"],
+        collectorTypes: ["DANGEROUS_WASTES", "NON_DANGEROUS_WASTES"]
+      });
+      const recipient = {
+        recipientCompanySiret: recipientCompany.siret,
+        recipientCompanyName: recipientCompany.name,
+        recipientCompanyAddress: "Test",
+        recipientCompanyContact: "Test",
+        recipientCompanyPhone: "06 00 00 00 00",
+        recipientCompanyMail: recipientCompany.contactEmail,
+        recipientProcessingOperation: "R 1", // < Defined
+        recipientIsTempStorage: false
+      };
+
+      // Then
+      expect(
+        await recipientSchemaFn({ isDraft: false }).isValid(recipient)
+      ).toBeTruthy();
+    });
   });
 });

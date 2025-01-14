@@ -5,10 +5,7 @@ import {
   BsffPackagingType
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  Mutation,
-  MutationCreateDraftBsffArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationCreateDraftBsffArgs } from "@td/codegen-back";
 import {
   companyFactory,
   userFactory,

@@ -9,10 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsvhuFactory } from "../../../__tests__/factories.vhu";
-import {
-  CompanySearchResult,
-  Mutation
-} from "../../../../generated/graphql/types";
+import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { ErrorCode } from "../../../../common/errors";
 import { prisma } from "@td/prisma";
 import { searchCompany } from "../../../../companies/search";
@@ -31,7 +28,7 @@ const DUPLICATE_BVHU = gql`
   }
 `;
 
-describe("mutaion.duplicateBsvhu", () => {
+describe("mutation.duplicateBsvhu", () => {
   afterEach(async () => {
     await resetDatabase();
     jest.resetModules();
@@ -188,7 +185,10 @@ describe("mutaion.duplicateBsvhu", () => {
     });
 
     const searchResults = {
-      [emitter.company.siret!]: emitter.company
+      [emitter.company.siret!]: {
+        ...emitter.company,
+        isRegistered: true
+      }
     };
 
     (searchCompany as jest.Mock).mockImplementation((clue: string) => {
@@ -260,8 +260,8 @@ describe("mutaion.duplicateBsvhu", () => {
       transporterCompanyVatNumber,
       transporterTransportTakenOverAt,
       transporterCustomInfo,
-      transporterTransportPlates,
       transporterRecepisseIsExempted,
+      transporterTransportMode,
       ecoOrganismeSiret,
       ecoOrganismeName,
       brokerCompanyName,
@@ -299,6 +299,7 @@ describe("mutaion.duplicateBsvhu", () => {
       "emitterEmissionSignatureDate",
       "transporterTransportSignatureAuthor",
       "transporterTransportSignatureDate",
+      "transporterTransportPlates",
       "destinationReceptionQuantity",
       "destinationReceptionWeight",
       "destinationReceptionAcceptationStatus",
@@ -372,7 +373,6 @@ describe("mutaion.duplicateBsvhu", () => {
       transporterCompanyVatNumber,
       transporterTransportTakenOverAt,
       transporterCustomInfo,
-      transporterTransportPlates,
       transporterRecepisseIsExempted,
       ecoOrganismeSiret,
       ecoOrganismeName,

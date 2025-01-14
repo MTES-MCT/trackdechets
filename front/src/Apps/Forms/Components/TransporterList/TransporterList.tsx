@@ -67,12 +67,20 @@ export function TransporterList<TransporterInput extends AnyTransporterInput>({
                   // Supprime le transporteur en base et dans le state Formik
                   return deleteFormTransporter({
                     variables: { id: t.id },
-                    onCompleted: () => arrayHelpers.remove(idx)
+                    onCompleted: () => {
+                      arrayHelpers.remove(idx);
+                      if (transporters.length === 1) {
+                        arrayHelpers.insert(0, initialTransporterData);
+                      }
+                    }
                   });
                 } else {
                   // Supprime le transporteur uniquement dans le state Formik
                   // puisqu'il n'existe pas encore en base
                   arrayHelpers.remove(idx);
+                  if (transporters.length === 1) {
+                    arrayHelpers.insert(0, initialTransporterData);
+                  }
                 }
               };
 
@@ -90,7 +98,11 @@ export function TransporterList<TransporterInput extends AnyTransporterInput>({
 
               // Désactive la possibilité de supprimer le transporteur
               // s'il est le seul dans la liste ou s'il a déjà pris en charge le déchet
-              const disableDelete = hasTakenOver || transporters.length === 1;
+              const disableDelete =
+                hasTakenOver || (transporters.length === 1 && !t.company?.name);
+
+              const deleteLabel =
+                transporters.length === 1 ? "Effacer" : "Supprimer";
 
               // Désactive le bouton permettant de remonter le transporteur dans
               // la liste s'il est le seul ou le premier, ou s'il a déjà pris en
@@ -151,6 +163,7 @@ export function TransporterList<TransporterInput extends AnyTransporterInput>({
                   disableUp={disableUp}
                   disableDown={disableDown}
                   expanded={idx === expandedIdx}
+                  deleteLabel={deleteLabel}
                 >
                   {t.takenOverAt ? (
                     <TransporterDisplay transporter={t} />

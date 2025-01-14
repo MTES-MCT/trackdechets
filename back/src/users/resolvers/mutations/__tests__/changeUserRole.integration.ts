@@ -7,7 +7,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
 import { hash } from "bcrypt";
 import { AuthType } from "../../../../auth";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
 import { getDefaultNotifications } from "../../../notifications";

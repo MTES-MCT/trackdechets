@@ -1,5 +1,5 @@
 import { takeOverSegment } from "./multiModal";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 
 const takeOverSegmentResolver: MutationResolvers["takeOverSegment"] = (
   parent,

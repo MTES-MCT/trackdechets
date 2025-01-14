@@ -1,16 +1,23 @@
-import { Bsda, BsdaStatus, TransportMode, UserRole } from "@prisma/client";
-import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
+  Bsda,
+  BsdaStatus,
+  TransportMode,
+  Prisma,
+  UserRole
+} from "@prisma/client";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import type {
   BsdaInput,
   Mutation,
   MutationUpdateBsdaArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   siretify,
   userWithCompanyFactory,
   companyFactory,
   transporterReceiptFactory,
+  ecoOrganismeFactory,
   userInCompany
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -70,9 +77,7 @@ export const UPDATE_BSDA = `
 `;
 
 describe("Mutation.updateBsda", () => {
-  afterEach(async () => {
-    await resetDatabase();
-  });
+  afterAll(resetDatabase);
 
   it("should allow user to update a bsda", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
@@ -1988,14 +1993,12 @@ describe("Mutation.updateBsda", () => {
       ]
     };
     const { mutate } = makeClient(emitter.user);
-
     const { errors } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
       variables: { id: bsda.id, input }
     });
-
     expect(errors).toBeUndefined();
 
     const updatedBsda = await prisma.bsda.findUniqueOrThrow({
@@ -2268,6 +2271,10 @@ describe("Mutation.updateBsda", () => {
       destinationOperationNextDestinationCap: "A"
     } as Bsda;
 
+    beforeEach(() => {
+      jest.resetAllMocks();
+    });
+
     describe("producerShouldBeNotifiedOfDestinationCapModification", () => {
       it.each([
         // Status pas bon
@@ -2327,8 +2334,9 @@ describe("Mutation.updateBsda", () => {
     });
 
     describe("sendDestinationCapModificationMail", () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         jest.resetAllMocks();
+        await resetDatabase();
       });
 
       it("should send email - destination", async () => {
@@ -2488,6 +2496,631 @@ describe("Mutation.updateBsda", () => {
           })
         );
       });
+    });
+
+    describe("[bug prod]", () => {
+      beforeEach(resetDatabase);
+
+      it("if user updates the BSDA by adding a nextDestination but does not modify the CAP - should not send mail", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const ttr = await companyFactory();
+        const transporter = await companyFactory();
+
+        const user = await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SIGNED_BY_PRODUCER",
+            destinationCap: "DESTINATION-CAP",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: destination.siret,
+            destinationCompanyName: destination.name
+            // No next destination
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
+
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                cap: "TTR-CAP",
+                company: {
+                  siret: ttr.siret
+                },
+                operation: {
+                  // User adds a next destination!
+                  nextDestination: {
+                    cap: "DESTINATION-CAP",
+                    company: {
+                      siret: destination.siret
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+      });
+
+      it("if user updates the BSDA by adding a nextDestination, and modifies the destination CAP - should send mail", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const ttr = await companyFactory();
+        const transporter = await companyFactory();
+
+        const user = await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SIGNED_BY_PRODUCER",
+            destinationCap: "DESTINATION-CAP",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: destination.siret,
+            destinationCompanyName: destination.name
+            // No next destination
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
+
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                cap: "TTR-CAP",
+                company: {
+                  siret: ttr.siret,
+                  name: ttr.name
+                },
+                operation: {
+                  // User adds a next destination AND modifies the CAP!
+                  nextDestination: {
+                    cap: "NEW-DESTINATION-CAP",
+                    company: {
+                      siret: destination.siret,
+                      name: destination.name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Then
+        const updatedBsda = await prisma.bsda.findFirstOrThrow({
+          where: { id: bsda.id }
+        });
+        expect(errors).toBeUndefined();
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+        expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: `<p>
+  Trackdéchets vous informe qu'une modification a été apportée sur le bordereau
+  amiante n° ${updatedBsda.id} que vous avez signé.
+</p>
+<br />
+<p>
+  Le champ CAP initialement DESTINATION-CAP est désormais remplacé par
+  NEW-DESTINATION-CAP.
+</p>
+<br />
+<p>
+  En cas de désaccord ou de question, il convient de vous rapprocher de
+  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName}
+  ${updatedBsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
+  l'établissement de destination finale ${updatedBsda.destinationOperationNextDestinationCompanyName}
+  ${updatedBsda.destinationOperationNextDestinationCompanySiret}.
+</p>
+`,
+            messageVersions: [
+              { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
+            ],
+            subject: `CAP du bordereau amiante n° ${updatedBsda.id} mis à jour par NEW-DESTINATION-CAP`
+          })
+        );
+      });
+
+      it("if user updates the BSDA by removing a nextDestination, but does not change the CAP - should not send mail", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const ttr = await companyFactory();
+        const transporter = await companyFactory();
+
+        const user = await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SIGNED_BY_PRODUCER",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: ttr.siret,
+            destinationCompanyName: ttr.name,
+            destinationCap: "TTR-CAP",
+            destinationOperationNextDestinationCompanySiret: destination.siret,
+            destinationOperationNextDestinationCompanyName: destination.name,
+            destinationOperationNextDestinationCap: "DESTINATION-CAP"
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
+
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                cap: "DESTINATION-CAP",
+                company: {
+                  siret: destination.siret,
+                  name: destination.name
+                },
+                operation: {
+                  // User removes the next destination
+                  nextDestination: {
+                    cap: null,
+                    company: null
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+      });
+
+      it("if user updates the BSDA by removing the nextDestination, and modifies the destination CAP - should send mail", async () => {
+        // Given
+        const emitter = await companyFactory();
+        const worker = await companyFactory();
+        const destination = await companyFactory();
+        const ttr = await companyFactory();
+        const transporter = await companyFactory();
+
+        const user = await userInCompany(
+          "MEMBER",
+          emitter.id,
+          {
+            email: "emitter@mail.com",
+            name: "Emitter"
+          },
+          {
+            notificationIsActiveBsdaFinalDestinationUpdate: true
+          }
+        );
+
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SIGNED_BY_PRODUCER",
+            // Companies
+            emitterCompanySiret: emitter.siret,
+            emitterCompanyName: emitter.name,
+            workerCompanySiret: worker.siret,
+            workerCompanyName: worker.name,
+            destinationCompanySiret: ttr.siret,
+            destinationCompanyName: ttr.name,
+            destinationCap: "TTR-CAP",
+            destinationOperationNextDestinationCompanySiret: destination.siret,
+            destinationOperationNextDestinationCompanyName: destination.name,
+            destinationOperationNextDestinationCap: "DESTINATION-CAP"
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name
+          }
+        });
+
+        // No mails
+        const { sendMail } = require("../../../../mailer/mailing");
+        jest.mock("../../../../mailer/mailing");
+        (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                cap: "NEW-DESTINATION-CAP",
+                company: {
+                  siret: destination.siret,
+                  name: destination.name
+                },
+                operation: {
+                  // User removes the next destination
+                  nextDestination: {
+                    cap: null,
+                    company: null
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Then
+        const updatedBsda = await prisma.bsda.findFirstOrThrow({
+          where: { id: bsda.id }
+        });
+        expect(errors).toBeUndefined();
+        expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+        expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: `<p>
+  Trackdéchets vous informe qu'une modification a été apportée sur le bordereau
+  amiante n° ${updatedBsda.id} que vous avez signé.
+</p>
+<br />
+<p>
+  Le champ CAP initialement DESTINATION-CAP est désormais remplacé par
+  NEW-DESTINATION-CAP.
+</p>
+<br />
+<p>
+  En cas de désaccord ou de question, il convient de vous rapprocher de
+  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName}
+  ${updatedBsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
+  l'établissement de destination finale ${updatedBsda.destinationCompanyName}
+  ${updatedBsda.destinationCompanySiret}.
+</p>
+`,
+            messageVersions: [
+              { to: [{ email: "emitter@mail.com", name: "Emitter" }] }
+            ],
+            subject: `CAP du bordereau amiante n° ${updatedBsda.id} mis à jour par NEW-DESTINATION-CAP`
+          })
+        );
+      });
+    });
+  });
+
+  describe("closed sirets", () => {
+    // eslint-disable-next-line prefer-const
+    let searchCompanyMock = jest.fn().mockReturnValue({});
+    let makeClientLocal: typeof makeClient;
+
+    beforeAll(async () => {
+      // Mock les appels à la base SIRENE
+      jest.mock("../../../../companies/search", () => ({
+        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+        ...jest.requireActual("../../../../companies/search"),
+        searchCompany: searchCompanyMock
+      }));
+
+      // Ré-importe makeClient pour que searchCompany soit bien mocké
+      jest.resetModules();
+      makeClientLocal = require("../../../../__tests__/testClient")
+        .default as typeof makeClient;
+    });
+
+    afterEach(async () => {
+      jest.restoreAllMocks();
+      await resetDatabase();
+    });
+
+    const createUserAndBsda = async (
+      input: Partial<Prisma.BsdaCreateInput> = {}
+    ) => {
+      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
+        name: "Emitter"
+      });
+      const user = emitterCompanyAndUser.user;
+      const emitter = emitterCompanyAndUser.company;
+      const destination = await companyFactory({ name: "Destination" });
+      const nextDestination = await companyFactory({ name: "Destination" });
+      const transporter = await companyFactory({ name: "Transporter" });
+      const worker = await companyFactory({ name: "Worker" });
+      const broker = await companyFactory({
+        name: "Broker",
+        companyTypes: ["BROKER"]
+      });
+      const intermediary = await companyFactory({ name: "Intermediary" });
+      const ecoOrganisme = await ecoOrganismeFactory({
+        handle: { handleBsda: true },
+        createAssociatedCompany: true
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: BsdaStatus.INITIAL,
+          emitterCompanySiret: emitter.siret,
+          destinationCompanySiret: destination.siret,
+          destinationOperationNextDestinationCompanySiret:
+            nextDestination.siret,
+          destinationOperationNextDestinationCompanyName: nextDestination.name,
+          destinationOperationNextDestinationCompanyAddress:
+            "Next destination address",
+          destinationOperationNextDestinationCompanyContact:
+            "Next destination contact",
+          destinationOperationNextDestinationCompanyPhone: "060102030405",
+          destinationOperationNextDestinationCompanyMail:
+            "next.destination@mail.com",
+          destinationOperationNextDestinationCap: "Next destination CAP",
+          destinationOperationNextDestinationPlannedOperationCode: "R5",
+          workerCompanySiret: worker.siret,
+          brokerCompanySiret: broker.siret,
+          transporters: {
+            createMany: {
+              data: [
+                {
+                  number: 1,
+                  transporterCompanySiret: transporter.siret,
+                  transporterCompanyName: transporter.name
+                }
+              ]
+            }
+          },
+          intermediaries: {
+            create: [
+              {
+                siret: intermediary.siret!,
+                name: intermediary.name,
+                address: "intermediary address",
+                contact: "intermediary"
+              }
+            ]
+          },
+          ecoOrganismeSiret: ecoOrganisme.siret,
+          ...input
+        }
+      });
+
+      return { user, bsda };
+    };
+
+    it("should not be able to do an update if a siret is closed", async () => {
+      // Given
+      const { user, bsda } = await createUserAndBsda();
+
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: siret === bsda.emitterCompanySiret ? "F" : "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+
+      // When
+      const { mutate } = makeClientLocal(user);
+      const { errors } = await mutate<Pick<Mutation, "updateBsda">>(
+        UPDATE_BSDA,
+        {
+          variables: {
+            id: bsda.id,
+            input: {
+              waste: {
+                code: "06 13 04*"
+              }
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'établissement ${bsda.emitterCompanySiret} est fermé selon le répertoire SIRENE`
+      );
+    });
+
+    it("should be able to do an update if a siret is closed but field is sealed", async () => {
+      // Given
+      const { user, bsda } = await createUserAndBsda({
+        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureAuthor: "Emitter",
+        status: "SIGNED_BY_PRODUCER"
+      });
+
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: siret === bsda.emitterCompanySiret ? "F" : "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+
+      // When
+      const { mutate } = makeClientLocal(user);
+      const { errors } = await mutate<Pick<Mutation, "updateBsda">>(
+        UPDATE_BSDA,
+        {
+          variables: {
+            id: bsda.id,
+            input: {
+              waste: {
+                code: "06 13 04*"
+              }
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+    });
+
+    it("should not be able to do an update if a siret is dormant", async () => {
+      // Given
+      const { user, bsda } = await createUserAndBsda();
+
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+
+      await prisma.company.update({
+        where: { siret: bsda.emitterCompanySiret! },
+        data: { isDormantSince: new Date() }
+      });
+
+      // When
+      const { mutate } = makeClientLocal(user);
+      const { errors } = await mutate<Pick<Mutation, "updateBsda">>(
+        UPDATE_BSDA,
+        {
+          variables: {
+            id: bsda.id,
+            input: {
+              waste: {
+                code: "06 13 04*"
+              }
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'établissement avec le SIRET ${bsda.emitterCompanySiret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+      );
+    });
+
+    it("should be able to do an update if a siret is dormant but field is sealed", async () => {
+      // Given
+      const { user, bsda } = await createUserAndBsda({
+        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureAuthor: "Emitter",
+        status: "SIGNED_BY_PRODUCER"
+      });
+
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+
+      await prisma.company.update({
+        where: { siret: bsda.emitterCompanySiret! },
+        data: { isDormantSince: new Date() }
+      });
+
+      // When
+      const { mutate } = makeClientLocal(user);
+      const { errors } = await mutate<Pick<Mutation, "updateBsda">>(
+        UPDATE_BSDA,
+        {
+          variables: {
+            id: bsda.id,
+            input: {
+              waste: {
+                code: "06 13 04*"
+              }
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
     });
   });
 });

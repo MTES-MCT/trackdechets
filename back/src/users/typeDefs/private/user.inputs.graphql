@@ -71,3 +71,15 @@ input SubscribeToNotificationsInput {
   """
   notifications: UserNotificationsInput!
 }
+
+input MembershipRequestsWhere {
+  """
+  OrgId de l'entreprise. Vous devez spécifier l'orgId OU l'ID
+  """
+  orgId: String
+
+  """
+  ID de l'entreprise. Vous devez spécifier l'orgId OU l'ID
+  """
+  id: ID
+}

@@ -7,7 +7,7 @@ import {
 } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { MutationDuplicateBsvhuArgs } from "../../../generated/graphql/types";
+import type { MutationDuplicateBsvhuArgs } from "@td/codegen-back";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
 import { getBsvhuRepository } from "../../repository";
@@ -73,6 +73,7 @@ async function getDuplicateData(
     emitterEmissionSignatureDate,
     transporterTransportSignatureAuthor,
     transporterTransportSignatureDate,
+    transporterTransportPlates,
     destinationReceptionQuantity,
     destinationReceptionWeight,
     destinationReceptionAcceptationStatus,

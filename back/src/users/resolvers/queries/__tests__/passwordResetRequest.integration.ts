@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { userFactory } from "../../../../__tests__/factories";
-import { Query } from "../../../../generated/graphql/types";
+import type { Query } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { addHours, addMinutes } from "date-fns";
 const PASSWORD_RESET_REQUEST = `

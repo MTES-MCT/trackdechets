@@ -9,6 +9,7 @@ import { Bsvhu, FormCompany, OperationMode } from "@td/codegen-ui";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { getTransportModeLabel } from "../../constants";
 
 import {
   DateRow,
@@ -239,7 +240,7 @@ export function BsvhuDetailContent({ form }: Props) {
             </div>
           </TabPanel>
 
-          {/* Intermdiaries tab panel */}
+          {/* Intermediaries tab panel */}
           {Boolean(form?.intermediaries?.length) && (
             <TabPanel className={styles.detailTabPanel}>
               {form?.intermediaries?.map(intermediary => (
@@ -300,7 +301,7 @@ const getIdentificationTypeLabel = (bsvhu: Bsvhu) => {
 };
 
 function Emitter({ form }: { form: Bsvhu }) {
-  const { emitter, quantity, packaging, identification, weight } = form;
+  const { emitter, quantity, identification, weight } = form;
   return (
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
@@ -319,11 +320,6 @@ function Emitter({ form }: { form: Bsvhu }) {
           value={identification?.numbers?.join(", ")}
           label="Identifications"
         />
-        <DetailRow
-          value={packaging ? PACKAGING_LABELS[packaging] : null}
-          label="Conditionnement"
-        />
-
         <DetailRow value={quantity} label="Quantité" />
         <DetailRow value={weight?.value} label="Poids" units="tonnes" />
       </div>
@@ -348,6 +344,19 @@ function Transporter({ form }: { form: Bsvhu }) {
       <TransporterReceiptDetails transporter={transporter} />
       <div className={styles.detailGrid}>
         <DetailRow
+          value={getTransportModeLabel(transporter?.transport?.mode)}
+          label="Mode de transport"
+        />
+        <DetailRow
+          value={
+            transporter?.transport?.plates
+              ? transporter.transport.plates.join(", ")
+              : null
+          }
+          label="Immatriculations"
+        />
+
+        <DetailRow
           value={identification?.numbers?.join(", ")}
           label="Numéros"
         />
@@ -359,7 +368,7 @@ function Transporter({ form }: { form: Bsvhu }) {
         <DetailRow value={quantity} label="Quantité" />
         <DetailRow value={weight?.value} label="Poids" units="tonnes" />
       </div>
-      <div className={`${styles.detailGrid} `}>
+      <div className={styles.detailGrid}>
         <DateRow
           value={transporter?.transport?.takenOverAt}
           label="Emporté le"

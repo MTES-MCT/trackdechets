@@ -97,7 +97,7 @@ describe("<TransporterList />", () => {
     "delete button is disabled when there is only one transporter and bsdType is %p",
     bsdType => {
       render(component([getInitialTransporter(bsdType)], bsdType));
-      const addButton = screen.getByTitle("Supprimer");
+      const addButton = screen.getByTestId("transporter__1__form");
       expect(addButton).toBeDisabled();
     }
   );
@@ -159,8 +159,9 @@ describe("<TransporterList />", () => {
       );
       expect(await screen.findByText("1 - Transporteur")).toBeInTheDocument();
       expect(await screen.findByText("2 - Transporteur")).toBeInTheDocument();
-      const deleteButtons = screen.getAllByTitle("Supprimer");
-      fireEvent.click(deleteButtons[1]);
+      const deleteButtonTransporteur2 =
+        screen.getByTestId(`transporter__2__form`);
+      fireEvent.click(deleteButtonTransporteur2);
       expect(await screen.findByText("1 - Transporteur")).toBeInTheDocument();
       await expect(() =>
         screen.findByText("2 - Transporteur")
@@ -316,8 +317,9 @@ describe("<TransporterList />", () => {
       ).toBeInTheDocument();
 
       expect(screen.getByText("Date de prise en charge")).toBeInTheDocument();
-      const deleteButtons = screen.getAllByTitle("Supprimer");
-      expect(deleteButtons[0]).toBeDisabled();
+      const deleteButton1 = screen.getByTestId("transporter__1__form");
+
+      expect(deleteButton1).toBeDisabled();
       const upButtons = screen.getAllByTitle("Remonter");
       expect(upButtons[0]).toBeDisabled();
       // on ne peut pas permuter un transporteur qui a déjà signé

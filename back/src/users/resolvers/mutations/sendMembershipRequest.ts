@@ -6,7 +6,7 @@ import {
   getCompanyOrCompanyNotFound,
   isCompanyMember
 } from "../../../companies/database";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import {
   renderMail,
   membershipRequest as membershipRequestMail,

@@ -13,7 +13,8 @@ import {
   pdf_action_label,
   revision_action_label,
   supprimer_action_label,
-  clone_action_label
+  clone_action_label,
+  corriger_action_label
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 import { BsdAdditionalActionsButtonProps } from "./bsdAdditionalActionsButtonTypes";
 import useOnClickOutsideRefTarget from "../../../common/hooks/useOnClickOutsideRefTarget";
@@ -29,7 +30,8 @@ import {
   canDeleteReview,
   hasBsdasriEmitterSign,
   isSignTransportCanSkipEmission,
-  isSignEmission
+  isSignEmission,
+  canMakeCorrection
 } from "../../dashboardServices";
 import { BsdType, UserPermission } from "@td/codegen-ui";
 
@@ -51,7 +53,8 @@ function BsdAdditionalActionsButton({
     onBsdSuite,
     onConsultReview,
     onEmitterDasriSign,
-    onEmitterBsddSign
+    onEmitterBsddSign,
+    onCorrection
   },
   hideReviewCta,
   isToCollectTab = false,
@@ -143,6 +146,13 @@ function BsdAdditionalActionsButton({
   const handleBsddEmitterSign = () => {
     closeMenu();
     onEmitterBsddSign!(bsd);
+  };
+
+  const handleCorrection = () => {
+    closeMenu();
+    if (onCorrection) {
+      onCorrection(bsd);
+    }
   };
 
   const tabIndex = isOpen ? 0 : -1;
@@ -342,6 +352,20 @@ function BsdAdditionalActionsButton({
                   onClick={handleRevision}
                 >
                   {revision_action_label}
+                </button>
+              </li>
+            )}
+          {permissions.includes(UserPermission.BsdCanUpdate) &&
+            canMakeCorrection(bsd, currentSiret) && (
+              <li>
+                <button
+                  type="button"
+                  data-testid="bsd-delete-btn"
+                  className="fr-btn fr-btn--tertiary-no-outline"
+                  tabIndex={tabIndex}
+                  onClick={handleCorrection}
+                >
+                  {corriger_action_label}
                 </button>
               </li>
             )}

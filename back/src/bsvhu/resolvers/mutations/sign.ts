@@ -1,10 +1,10 @@
 import { Bsvhu, BsvhuStatus, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
+import type {
   BsvhuSignatureInput,
   MutationSignBsvhuArgs,
   SignatureTypeInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";

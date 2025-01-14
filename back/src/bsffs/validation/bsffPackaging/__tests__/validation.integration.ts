@@ -11,7 +11,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import { OPERATION } from "../../../constants";
-import { CompanySearchResult } from "../../../../companies/types";
+import { CompanySearchResult } from "@td/codegen-back";
 
 jest.mock("../../../../companies/search");
 
@@ -408,6 +408,10 @@ describe("validation > parseBsffPackaging", () => {
           });
         } catch (e) {
           expect(e.errors).toEqual([
+            expect.objectContaining({
+              message:
+                "Le champ operationNextDestinationPlannedOperationCode est obligatoire."
+            }),
             expect.objectContaining({
               message:
                 "Le champ operationNextDestinationCompanyName est obligatoire."

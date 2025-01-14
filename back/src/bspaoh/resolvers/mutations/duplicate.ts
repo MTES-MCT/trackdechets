@@ -1,10 +1,10 @@
 import { Bspaoh, BspaohStatus, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import {
+import type {
   MutationDuplicateBspaohArgs,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { expandBspaohFromDb } from "../../converter";
 import { getBspaohOrNotFound, getBspaohFirstTransporter } from "../../database";
 

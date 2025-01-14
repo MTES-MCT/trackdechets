@@ -1,8 +1,8 @@
 import { UserInputError } from "../../../common/errors";
-import {
+import type {
   MutationCreateBsdasriArgs,
   ResolversParentTypes
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import createBsdasri from "./createBsdasri";
 

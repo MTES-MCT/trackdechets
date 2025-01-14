@@ -13,20 +13,22 @@ import { capitalize } from "../../common/strings";
 import {
   BsdType,
   WasteAcceptationStatus,
-  BsvhuIdentificationType
+  BsvhuIdentificationType,
+  TransportMode
 } from "@prisma/client";
 import {
   destinationOperationModeRefinement,
   isBrokerRefinement,
   isDestinationRefinement,
   isEcoOrganismeRefinement,
-  isEmitterNotDormantRefinement,
+  isEmitterRefinement,
   isRegisteredVatNumberRefinement,
   isTraderRefinement,
   isTransporterRefinement
 } from "../../common/validation/zod/refinement";
 import { EditionRule } from "./rules";
 import { CompanyRole } from "../../common/validation/zod/schema";
+import { MAX_WEIGHT_BY_ROAD_TONNES } from "../../common/validation";
 
 // Date de la MAJ 2024.07.2 introduisant un changement
 // des règles de validations sur les poids et volume qui doivent
@@ -41,7 +43,12 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
   bsvhu,
   zodContext
 ) => {
-  await isEmitterNotDormantRefinement(bsvhu.emitterCompanySiret, zodContext);
+  await isEmitterRefinement(
+    bsvhu.emitterCompanySiret,
+    BsdType.BSVHU,
+    zodContext,
+    !!bsvhu.emitterIrregularSituation
+  );
   await isDestinationRefinement(
     bsvhu.destinationCompanySiret,
     zodContext,
@@ -155,10 +162,17 @@ export const checkEmitterSituation: Refinement<ParsedZodBsvhu> = (
     });
   }
 };
+// Date de la MAJ 2024.10.1 qui rend obligatoire la complétion des numéros d'identification
+export const v20241001 = new Date("2024-10-23T00:00:00.000");
 
 // Date de la MAJ 2024.12.1 qui modifie les règles de validation de BsvhuInput.packaging et identification.type
 export const v20241201 = new Date(
   process.env.OVERRIDE_V20241201 || "2024-12-18T00:00:00.000"
+);
+
+// Date de la MAJ 2025.01.1 qui modifie les règles de validation du mode de transport, des palques d'immatriculations et la quantité transportée
+export const v20250101 = new Date(
+  process.env.OVERRIDE_V20250101 || "2025-15-01T00:00:00.000"
 );
 
 const BsvhuIdentificationTypesAfterV20241201 = [
@@ -166,7 +180,7 @@ const BsvhuIdentificationTypesAfterV20241201 = [
   BsvhuIdentificationType.NUMERO_IMMATRICULATION
 ];
 
-export const checkPackaginAndIdentificationType: Refinement<ParsedZodBsvhu> = (
+export const checkPackagingAndIdentificationType: Refinement<ParsedZodBsvhu> = (
   bsvhu,
   { addIssue }
 ) => {
@@ -240,6 +254,96 @@ function checkFieldIsDefined<T extends ZodBsvhu>(
     });
   }
 }
+const MAX_WEIGHT_BY_ROAD_KG = MAX_WEIGHT_BY_ROAD_TONNES * 1000;
+
+export const checkTransportModeAndWeightRefinement = (
+  createdAt: Date | null | undefined,
+  weightValue: number | null | undefined,
+  transportMode: TransportMode | null | undefined,
+  weightFieldPath: string[],
+  ctx: RefinementCtx
+) => {
+  if ((createdAt || new Date()).getTime() < v20250101.getTime()) {
+    return;
+  }
+
+  if (!weightValue) {
+    return;
+  }
+  // max weight (50000t is handled on raw zod schema)
+
+  if (weightValue > MAX_WEIGHT_BY_ROAD_KG && transportMode === "ROAD") {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: weightFieldPath,
+      message:
+        "Le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+    });
+  }
+};
+
+export const checkTransportModeAndWeight: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  zodContext
+) => {
+  return checkTransportModeAndWeightRefinement(
+    bsvhu.createdAt,
+    bsvhu.weightValue,
+
+    bsvhu.transporterTransportMode,
+    ["weight", "value"],
+    zodContext
+  );
+};
+
+export const checkTransportModeAndReceptionWeight: Refinement<
+  ParsedZodBsvhu
+> = (bsvhu, zodContext) => {
+  return checkTransportModeAndWeightRefinement(
+    bsvhu.createdAt,
+    bsvhu.destinationReceptionWeight,
+
+    bsvhu.transporterTransportMode,
+    ["destination", "reception", "weight"],
+    zodContext
+  );
+};
+
+const onlyWhiteSpace = (str: string) => !str.trim().length; // check whitespaces, tabs, newlines and invisible chars
+
+export const checkTransportPlates: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  ctx
+) => {
+  const { transporterTransportPlates } = bsvhu;
+  const path = ["transporter", "transport", "plates"];
+  if (transporterTransportPlates.length > 2) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Un maximum de 2 plaques d'immatriculation est accepté"
+    });
+  }
+
+  if (
+    transporterTransportPlates.some(plate => plate.length > 12) ||
+    transporterTransportPlates.some(plate => plate.length < 4)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+    });
+  }
+
+  if (transporterTransportPlates.some(plate => onlyWhiteSpace(plate))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path,
+      message: "Le numéro de plaque fourni est incorrect"
+    });
+  }
+};
 
 export const checkRequiredFields: (
   validationContext: BsvhuValidationContext

@@ -1,9 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import {
-  BsvhuInput,
-  MutationCreateBsvhuArgs
-} from "../../../generated/graphql/types";
+import type { BsvhuInput, MutationCreateBsvhuArgs } from "@td/codegen-back";
 
 import { GraphQLContext } from "../../../types";
 import {
@@ -36,12 +33,12 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
   await checkCanCreate(user, input);
 
   const zodBsvhu = graphQlInputToZodBsvhu(input);
-
   const { createdAt, ...parsedZodBsvhu } = await parseBsvhuAsync(
     { ...zodBsvhu, isDraft, createdAt: new Date() },
     {
       user,
-      currentSignatureType: !isDraft ? "EMISSION" : undefined
+      currentSignatureType: !isDraft ? "EMISSION" : undefined,
+      unsealed: true
     }
   );
 

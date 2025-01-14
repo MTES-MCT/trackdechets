@@ -1,4 +1,4 @@
-import { BsdaPackaging } from "../../src/generated/graphql/types";
+import type { BsdaPackaging } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 

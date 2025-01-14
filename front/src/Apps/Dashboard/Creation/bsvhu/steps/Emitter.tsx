@@ -120,11 +120,20 @@ const EmitterBsvhu = ({ errors }) => {
   const selectedCompanyError = (company?: CompanySearchResult) => {
     // L'émetteur est en situation irrégulière mais il a un SIRET et n'est pas inscrit sur Trackdéchets
     if (company) {
-      if (!company.isRegistered) {
-        return "L'entreprise n'est pas inscrite sur Trackdéchets, la signature Producteur ne pourra pas se faire. Vous pouvez publier le bordereau, mais seul le transporteur pourra le signer.";
+      if (!emitter.irregularSituation && !company.isRegistered) {
+        return "Cet établissement n'est pas inscrit sur Trackdéchets. Il ne peut être visé comme émetteur sur ce bordereau, sauf s'il s'agit d'une installation en situation irrégulière. Dans ce cas, veuillez cocher la case correspondante ci-dessus.";
+      } else if (formState.errors?.emitter?.["company"]?.siret?.message) {
+        return formState.errors?.emitter?.["company"]?.siret?.message;
       }
     }
     return null;
+  };
+
+  const onNoSiretClick = () => {
+    if (!!emitter.company) {
+      setValue("emitter.company", {});
+      setValue("emitter.agrementNumber", null);
+    }
   };
 
   return (
@@ -144,6 +153,10 @@ const EmitterBsvhu = ({ errors }) => {
                   );
                   if (!e.currentTarget.checked) {
                     setValue("emitter.noSiret", false);
+                  } else {
+                    if (emitter.agrementNumber) {
+                      setValue("emitter.agrementNumber", "");
+                    }
                   }
                 }
               }
@@ -184,17 +197,13 @@ const EmitterBsvhu = ({ errors }) => {
                   name: (emitter?.company?.name || company.name) as string,
                   address: (emitter?.company?.address ||
                     company.address) as string,
-                  contact: (emitter?.company?.contact ||
-                    company.contact) as string,
-                  phone: (emitter?.company?.phone ||
-                    company.contactPhone) as string,
-                  mail: (emitter?.company?.mail ||
-                    company.contactEmail) as string,
+                  contact: emitter?.company?.contact,
+                  phone: emitter?.company?.phone,
+                  mail: emitter?.company?.mail,
                   country: company.codePaysEtrangerEtablissement
                 };
 
-                agrementNumber = (emitter?.agrementNumber ||
-                  company?.vhuAgrementDemolisseur?.agrementNumber) as string;
+                agrementNumber = emitter?.agrementNumber;
               }
 
               setValue("emitter", {
@@ -208,19 +217,13 @@ const EmitterBsvhu = ({ errors }) => {
             }
           }}
         />
-        {formState.errors?.emitter?.["company"]?.orgId?.message && (
-          <p
-            id="text-input-error-desc-error"
-            className="fr-mb-4v fr-error-text"
-          >
-            {formState.errors?.emitter?.["company"]?.orgId?.message}
-          </p>
-        )}
-        {formState.errors?.emitter?.["company"]?.siret && (
-          <p className="fr-mb-4v fr-error-text">
-            {formState.errors?.emitter?.["company"]?.siret?.message}
-          </p>
-        )}
+        {!emitter?.company?.siret &&
+          formState.errors?.emitter?.["company"]?.siret && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {formState.errors?.emitter?.["company"]?.siret?.message}
+            </p>
+          )}
+
         {emitter.irregularSituation && (
           <>
             <Checkbox
@@ -228,7 +231,8 @@ const EmitterBsvhu = ({ errors }) => {
                 {
                   label: "L'installation n'a pas de numéro SIRET",
                   nativeInputProps: {
-                    ...register("emitter.noSiret")
+                    ...register("emitter.noSiret"),
+                    onClick: onNoSiretClick
                   }
                 }
               ]}
@@ -239,13 +243,13 @@ const EmitterBsvhu = ({ errors }) => {
               <>
                 <DsfrfWorkSiteAddress
                   designation="du site d'enlèvement"
-                  address={emitter.company.address}
-                  postalCode={emitter.company.postalCode}
-                  city={emitter.company.city}
+                  address={emitter.company?.address}
+                  postalCode={emitter.company?.postalCode}
+                  city={emitter.company?.city}
                   placeholder="Rechercher"
                   onAddressSelection={details => {
                     // `address` is passed as `name` because of adresse api return fields
-                    setValue(`emitter.company.address`, details.name);
+                    setValue(`emitter.company.address`, details.label);
                     setValue(`emitter.company.city`, details.city);
                     setValue(`emitter.company.street`, details.name);
                     setValue(`emitter.company.postalCode`, details.postcode);
@@ -285,13 +289,15 @@ const EmitterBsvhu = ({ errors }) => {
           key={orgId}
         />
       </div>
-      <div className="fr-col-md-8">
-        <Input
-          label="Numéro d'agrément démolisseur"
-          disabled={sealedFields.includes(`emitter.agrementNumber`)}
-          nativeInputProps={{ ...register("emitter.agrementNumber") }}
-        />
-      </div>
+      {!emitter.irregularSituation && (
+        <div className="fr-col-md-8">
+          <Input
+            label="Numéro d'agrément démolisseur"
+            disabled={sealedFields.includes(`emitter.agrementNumber`)}
+            nativeInputProps={{ ...register("emitter.agrementNumber") }}
+          />
+        </div>
+      )}
     </>
   );
 };

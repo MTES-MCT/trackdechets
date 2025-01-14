@@ -38,16 +38,35 @@ import {
 import OtherActors from "./steps/OtherActors";
 
 const vhuToInput = (vhu: ZodBsvhu): BsvhuInput => {
-  return omitDeep(vhu, [
+  const addressCleanup: string[] = [];
+  // the emitter company object (FormCompany) doesn't support street/city/postalCode
+  // so on updates, even if the address hasn't changed, those fields will be null.
+  // in order to avoid erasing the street/city/postalCode fields on updates, we remove them
+  // from the input.
+  if (vhu.emitter.company.address) {
+    if (!vhu.emitter.company.street) {
+      addressCleanup.push("emitter.company.street");
+    }
+    if (!vhu.emitter.company.city) {
+      addressCleanup.push("emitter.company.city");
+    }
+    if (!vhu.emitter.company.postalCode) {
+      addressCleanup.push("emitter.company.postalCode");
+    }
+  }
+  const omitted = omitDeep(vhu, [
     "isDraft",
     "ecoOrganisme.hasEcoOrganisme",
     "hasTrader",
-    ...(!vhu.hasTrader ? ["trader"] : []),
     "hasBroker",
-    ...(!vhu.hasBroker ? ["broker"] : []),
     "hasIntermediaries",
-    ...(!vhu.hasIntermediaries ? ["intermediaries"] : [])
+    ...addressCleanup
   ]);
+  // clear the intermediaries array if it only contains the default value
+  if (vhu.intermediaries?.length === 1 && !vhu.intermediaries[0].siret) {
+    omitted.intermediaries = [];
+  }
+  return omitted;
 };
 interface Props {
   bsdId?: string;

@@ -66,10 +66,11 @@ import {
   completer_bsd_suite
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "../common/types/commonTypes";
-import { sub } from "date-fns";
+import { sub, differenceInDays } from "date-fns";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
+
   return bsdView;
 };
 
@@ -411,44 +412,64 @@ const canIrregularSituationSignWithNoSiret = (
     bsd.status === BsvhuStatus.Initial &&
     isIrregularSituation(bsd) &&
     bsd.emitter?.noSiret &&
-    isSameSiretTransporter(currentSiret, bsd)
+    isSiretActorForBsd(bsd, currentSiret, [
+      { type: ActorType.Transporter, strict: true }
+    ])
   );
 };
 
-// emitter is irregular but has registered siret, he can sign
+// emitter is irregular and has registered siret, he can sign
 const canIrregularSituationSignWithSiretRegistered = (
   bsd: BsdDisplay,
-  currentSiret: string
+  currentSiret: string,
+  isEmitterRegistered?: boolean
 ) => {
   return (
     bsd.status === BsvhuStatus.Initial &&
     isIrregularSituation(bsd) &&
     !bsd.emitter?.noSiret &&
-    isSameSiretEmitter(currentSiret, bsd) &&
-    !isSameSiretTransporter(currentSiret, bsd)
+    isEmitterRegistered &&
+    isSiretActorForBsd(bsd, currentSiret, [
+      { type: ActorType.Emitter, strict: true }
+    ])
   );
 };
 
-// emitter is irregular but has not registered siret, transporter signature is needed
+// emitter is irregular and has no registered siret, transporter signature is needed
 const canIrregularSituationSignWithSiretNotRegistered = (
   bsd: BsdDisplay,
-  currentSiret: string
+  currentSiret: string,
+  isEmitterRegistered?: boolean
 ) => {
   return (
     bsd.status === BsvhuStatus.Initial &&
     isIrregularSituation(bsd) &&
     !bsd.emitter?.noSiret &&
-    !isSameSiretEmitter(currentSiret, bsd) &&
-    isSameSiretTransporter(currentSiret, bsd)
+    !isEmitterRegistered &&
+    isSiretActorForBsd(bsd, currentSiret, [
+      { type: ActorType.Transporter, strict: true }
+    ])
   );
 };
 
-export const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
+export const isBsvhuSign = (
+  bsd: BsdDisplay,
+  currentSiret: string,
+  isEmitterRegistered?: boolean
+) =>
   isBsvhu(bsd.type) &&
   ((isSameSiretEmitter(currentSiret, bsd) && !isIrregularSituation(bsd)) ||
     canIrregularSituationSignWithNoSiret(bsd, currentSiret) ||
-    canIrregularSituationSignWithSiretRegistered(bsd, currentSiret) ||
-    canIrregularSituationSignWithSiretNotRegistered(bsd, currentSiret));
+    canIrregularSituationSignWithSiretRegistered(
+      bsd,
+      currentSiret,
+      isEmitterRegistered
+    ) ||
+    canIrregularSituationSignWithSiretNotRegistered(
+      bsd,
+      currentSiret,
+      isEmitterRegistered
+    ));
 
 export const isBsffSign = (
   bsd: BsdDisplay,
@@ -469,7 +490,8 @@ export const getIsNonDraftLabel = (
   bsd: BsdDisplay,
   currentSiret: string,
   permissions: UserPermission[],
-  bsdCurrentTab: BsdCurrentTab
+  bsdCurrentTab: BsdCurrentTab,
+  isEmitterRegistered?: boolean
 ): string => {
   const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   const isFollowTab = bsdCurrentTab === "followTab";
@@ -487,7 +509,7 @@ export const getIsNonDraftLabel = (
 
   if (
     !isFollowTab &&
-    (isBsvhuSign(bsd, currentSiret) ||
+    (isBsvhuSign(bsd, currentSiret, isEmitterRegistered) ||
       isBsffSign(bsd, currentSiret, bsdCurrentTab) ||
       isBsdaSign(bsd, currentSiret)) &&
     permissions.includes(UserPermission.BsdCanSignEmission)
@@ -558,10 +580,17 @@ export const getDraftOrInitialBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
   permissions: UserPermission[],
-  bsdCurrentTab: BsdCurrentTab
+  bsdCurrentTab: BsdCurrentTab,
+  isEmitterRegistered?: boolean
 ): string => {
   if (!bsd.isDraft) {
-    return getIsNonDraftLabel(bsd, currentSiret, permissions, bsdCurrentTab);
+    return getIsNonDraftLabel(
+      bsd,
+      currentSiret,
+      permissions,
+      bsdCurrentTab,
+      isEmitterRegistered
+    );
   } else {
     return permissions.includes(UserPermission.BsdCanUpdate) ? PUBLIER : "";
   }
@@ -1147,7 +1176,8 @@ export const getPrimaryActionsLabelFromBsdStatus = (
   permissions: UserPermission[],
   bsdCurrentTab?: BsdCurrentTab,
   hasAutomaticSignature?: boolean,
-  emitterIsExutoireOrTtr?: boolean
+  emitterIsExutoireOrTtr?: boolean,
+  isEmitterRegistered?: boolean
 ) => {
   const isReturnTab = bsdCurrentTab === "returnTab";
 
@@ -1160,7 +1190,8 @@ export const getPrimaryActionsLabelFromBsdStatus = (
         currentSiret,
         bsd,
         permissions,
-        bsdCurrentTab!
+        bsdCurrentTab!,
+        isEmitterRegistered
       );
     case BsdStatusCode.Sealed:
       return getSealedBtnLabel(
@@ -1345,10 +1376,11 @@ const canDeleteBsdasri = (bsd, siret) =>
     (isSameSiretEmitter(siret, bsd) &&
       bsd.status === BsdStatusCode.SignedByProducer));
 
-const canDeleteBsvhu = bsd =>
+const canDeleteBsvhu = (bsd, siret) =>
   bsd.type === BsdType.Bsvhu &&
   (bsd.status === BsdStatusCode.Initial ||
-    bsd.status === BsdStatusCode.SignedByProducer);
+    (isSameSiretEmitter(siret, bsd) &&
+      bsd.status === BsdStatusCode.SignedByProducer));
 
 const canDeleteBspaoh = bsd =>
   bsd.type === BsdType.Bspaoh && bsd.status === BsdStatusCode.Initial;
@@ -1403,7 +1435,7 @@ export const canDeleteBsd = (bsd, siret) =>
   canDeleteBsdasri(bsd, siret) ||
   canDeleteBsff(bsd, siret) ||
   canDeleteBspaoh(bsd) ||
-  canDeleteBsvhu(bsd);
+  canDeleteBsvhu(bsd, siret);
 
 const canUpdateBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
@@ -1560,6 +1592,40 @@ export const canUpdateBsd = (bsd, siret) =>
   canUpdateBspaoh(bsd);
 
 export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
+
+export const canMakeCorrection = (bsd: BsdDisplay, siret: string) => {
+  const lastSignatureDate = () =>
+    (bsd.packagings ?? []).reduce((lastDate, packaging) => {
+      const signatureDate =
+        packaging?.operation?.signature?.date ??
+        packaging?.acceptation?.signature?.date;
+      if (signatureDate) {
+        const date = new Date(signatureDate);
+        if (lastDate) {
+          return date > lastDate ? date : lastDate;
+        }
+        return date;
+      }
+      return lastDate;
+    }, new Date(0));
+
+  // On ne permet pas la correction des contenants qui sont
+  // déjà inclut dans un bordereau suite
+  const haveNextBsff = () =>
+    !!bsd.packagings && bsd.packagings.every(p => !!p.nextBsff);
+
+  return (
+    bsd.type === BsdType.Bsff &&
+    isSameSiretDestination(siret, bsd) &&
+    (bsd.status === BsdStatusCode.Processed ||
+      bsd.status === BsdStatusCode.Refused ||
+      (bsd.status === BsdStatusCode.IntermediatelyProcessed &&
+        !haveNextBsff())) &&
+    // On autorise la correction d'un BSFF pendant 60 jours après
+    // la dernière signature de l'opération sur les contenants
+    differenceInDays(new Date(), lastSignatureDate()) <= 60
+  );
+};
 
 export const hasAppendix1Cta = (
   bsd: BsdDisplay,

@@ -25,14 +25,16 @@ export async function isTransporterRefinement(
     siret: string | null | undefined;
     transporterRecepisseIsExempted: boolean;
   },
-  ctx: RefinementCtx
+  ctx: RefinementCtx,
+  checkIsNotDormant = true
 ) {
   if (transporterRecepisseIsExempted) return;
 
   const company = await refineSiretAndGetCompany(
     siret,
     ctx,
-    CompanyRole.Transporter
+    CompanyRole.Transporter,
+    checkIsNotDormant
   );
 
   if (company && !isTransporter(company)) {
@@ -50,7 +52,8 @@ export async function isTransporterRefinement(
 export async function refineSiretAndGetCompany(
   siret: string | null | undefined,
   ctx: RefinementCtx,
-  companyRole?: CompanyRole
+  companyRole?: CompanyRole,
+  checkIsNotDormant = true
 ): Promise<Company | null> {
   if (!siret) return null;
   const company = await prisma.company.findUnique({
@@ -67,7 +70,7 @@ export async function refineSiretAndGetCompany(
     });
   }
 
-  if (company?.isDormantSince) {
+  if (checkIsNotDormant && company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: pathFromCompanyRole(companyRole),
@@ -80,7 +83,8 @@ export async function refineSiretAndGetCompany(
 
 export async function refineAndGetEcoOrganisme(
   siret: string | null | undefined,
-  ctx: RefinementCtx
+  ctx: RefinementCtx,
+  checkIsNotDormant = true
 ) {
   if (!siret) return null;
   const ecoOrganisme = await prisma.ecoOrganisme.findUnique({
@@ -93,6 +97,20 @@ export async function refineAndGetEcoOrganisme(
       path: ["ecoOrganisme", "siret"],
       message: `L'éco-organisme avec le SIRET ${siret} n'est pas référencé sur Trackdéchets`
     });
+  }
+
+  if (checkIsNotDormant) {
+    const company = await prisma.company.findUnique({
+      where: { siret }
+    });
+
+    if (company?.isDormantSince) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
+        message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+      });
+    }
   }
 
   return ecoOrganisme;
@@ -134,9 +152,15 @@ export async function isDestinationRefinement(
     | "BROYEUR"
     | "DEMOLISSEUR" = "DESTINATION",
   bsdCompanyRole: CompanyRole = CompanyRole.Destination,
-  isExemptedFromVerification?: (destination: Company | null) => boolean
+  isExemptedFromVerification?: (destination: Company | null) => boolean,
+  checkIsNotDormant = true
 ) {
-  const company = await refineSiretAndGetCompany(siret, ctx, bsdCompanyRole);
+  const company = await refineSiretAndGetCompany(
+    siret,
+    ctx,
+    bsdCompanyRole,
+    checkIsNotDormant
+  );
   if (company) {
     if (
       role === "WASTE_VEHICLES" ||
@@ -200,16 +224,30 @@ export async function isDestinationRefinement(
   }
 }
 
-export async function isEmitterNotDormantRefinement(
+export async function isEmitterRefinement(
   siret: string | null | undefined,
-  ctx: RefinementCtx
+  bsdType: BsdType,
+  ctx: RefinementCtx,
+  isExemptedFromVerification = false,
+  checkIsNotDormant = true
 ) {
-  if (!siret) return null;
-  const company = await prisma.company.findUnique({
-    where: { siret }
-  });
+  let company: Company | null = null;
+  // if the emitter of the BSD has to be registered on TD, add the BSD type here
+  if (bsdType === BsdType.BSVHU && !isExemptedFromVerification) {
+    company = await refineSiretAndGetCompany(
+      siret,
+      ctx,
+      CompanyRole.Emitter,
+      checkIsNotDormant
+    );
+  } else {
+    if (!siret) return null;
+    company = await prisma.company.findUnique({
+      where: { siret }
+    });
+  }
 
-  if (company?.isDormantSince) {
+  if (checkIsNotDormant && company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: pathFromCompanyRole(CompanyRole.Emitter),
@@ -251,9 +289,14 @@ export function destinationOperationModeRefinement(
 export async function isEcoOrganismeRefinement(
   siret: string | null | undefined,
   bsdType: BsdType,
-  ctx: RefinementCtx
+  ctx: RefinementCtx,
+  checkIsNotDormant = true
 ) {
-  const ecoOrganisme = await refineAndGetEcoOrganisme(siret, ctx);
+  const ecoOrganisme = await refineAndGetEcoOrganisme(
+    siret,
+    ctx,
+    checkIsNotDormant
+  );
 
   if (ecoOrganisme) {
     if (bsdType === BsdType.BSDA && !ecoOrganisme.handleBsda) {
@@ -274,12 +317,15 @@ export async function isEcoOrganismeRefinement(
 
 export async function isBrokerRefinement(
   siret: string | null | undefined,
-  ctx: RefinementCtx
+  ctx: RefinementCtx,
+  checkIsNotDormant = true
 ) {
+  if (!siret) return;
   const company = await refineSiretAndGetCompany(
     siret,
     ctx,
-    CompanyRole.Broker
+    CompanyRole.Broker,
+    checkIsNotDormant
   );
 
   if (company && !isBroker(company)) {
@@ -293,12 +339,14 @@ export async function isBrokerRefinement(
 
 export async function isTraderRefinement(
   siret: string | null | undefined,
-  ctx: RefinementCtx
+  ctx: RefinementCtx,
+  checkIsNotDormant = true
 ) {
   const company = await refineSiretAndGetCompany(
     siret,
     ctx,
-    CompanyRole.Trader
+    CompanyRole.Trader,
+    checkIsNotDormant
   );
 
   if (company && !isTrader(company)) {

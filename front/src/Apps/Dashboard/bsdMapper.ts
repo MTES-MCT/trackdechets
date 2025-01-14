@@ -87,7 +87,7 @@ export const getCurrentTransporterInfos = (
     case BsdTypename.Bsdasri:
       return getBsdasriCurrentTransporterInfos(bsd);
     case BsdTypename.Bsvhu:
-      return null;
+      return getBsvhuCurrentTransporterInfos(bsd);
     case BsdTypename.Bspaoh:
       return getBspaohCurrentTransporterInfos(bsd);
     default:
@@ -200,6 +200,22 @@ export const getBsdasriCurrentTransporterInfos = (
   };
 };
 
+export const getBsvhuCurrentTransporterInfos = (
+  bsvhu: Bsvhu
+): BsdCurrentTransporterInfos => {
+  const currentTransporter = bsvhu.transporter;
+  // since there is only one transporter per BSVHU, transporterId is useless,
+  // the update is done through the BSD using its id
+
+  return {
+    transporterNumberPlate: currentTransporter?.transport?.plates?.filter(
+      plate => plate.trim()
+    ),
+    transporterCustomInfo: currentTransporter?.customInfo,
+    transporterMode: currentTransporter?.transport?.mode ?? undefined
+  };
+};
+
 export const getBspaohCurrentTransporterInfos = (
   bspaoh: Bspaoh
 ): BsdCurrentTransporterInfos => {
@@ -234,7 +250,7 @@ export const mapBsdd = (bsdd: Form): BsdDisplay => {
     broker: bsdd.broker,
     trader: bsdd.trader,
     intermediaries: bsdd.intermediaries,
-    updatedAt: bsdd.stateSummary?.lastActionOn,
+    updatedAt: bsdd.updatedAt,
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,
     grouping: bsdd.grouping,
     temporaryStorageDetail: bsdd.temporaryStorageDetail,
@@ -334,6 +350,7 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   const wasteCode = bsvhu?.wasteCode;
   const wasteName =
     wasteCode === "16 01 04*" ? "VHU non dépollués" : "VHU dépollués"; //16 01 06
+  const transporter = bsvhu.transporter || bsvhu["bsvhuTransporter"];
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
     readableid: bsvhu.id,
@@ -348,15 +365,31 @@ const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     },
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
-    transporter: bsvhu.transporter || bsvhu["bsvhuTransporter"],
+    transporter: transporter,
+    transporterCustomInfo: transporter?.customInfo,
+    transporterNumberPlate: transporter?.transport?.plates,
     updatedAt: bsvhu["bsvhuUpdatedAt"],
     ecoOrganisme: bsvhu.ecoOrganisme
   };
+
   return bsvhuFormatted;
 };
 
 const mapBsff = (bsff: Bsff): BsdDisplay => {
   const statusCode = bsff?.status || bsff["bsffStatus"];
+  let wasteCode = bsff.waste?.code;
+  let wasteDescription = bsff.waste?.description;
+  let weight = bsff["bsffWeight"]?.value;
+
+  if (bsff.packagings && bsff.packagings.length === 1) {
+    // TRA-11553 - Lorsqu'on a un BSFF avec un seul contenant, on veut que les informations
+    // de l'acceptation de ce contenant s'affiche en lieu et place des informations
+    // qui ont été renseignés sur le BSFF.
+    wasteCode = bsff.packagings[0].acceptation?.wasteCode ?? wasteCode;
+    wasteDescription =
+      bsff.packagings[0].acceptation?.wasteDescription ?? wasteDescription;
+    weight = bsff.packagings[0].acceptation?.weight ?? weight;
+  }
   const bsffFormatted: BsdDisplay = {
     id: bsff.id,
     readableid: bsff.id,
@@ -364,9 +397,9 @@ const mapBsff = (bsff: Bsff): BsdDisplay => {
     isDraft: bsff.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
-      code: bsff.waste?.code,
-      name: bsff.waste?.description,
-      weight: bsff["bsffWeight"]?.value
+      code: wasteCode,
+      name: wasteDescription,
+      weight
     },
     emitter: bsff.emitter || bsff["bsffEmitter"],
     destination: bsff.destination || bsff["bsffDestination"],

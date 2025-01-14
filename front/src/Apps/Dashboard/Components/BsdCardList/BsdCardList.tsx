@@ -397,6 +397,14 @@ function BsdCardList({
     [redirectToPath]
   );
 
+  const onCorrection = useCallback((bsd: BsdDisplay) => {
+    if (bsd.type === BsdType.Bsff) {
+      setValidationWorkflowType("ACT_BSFF");
+      setBsdClicked(bsd);
+      setIsModalOpen(true);
+    }
+  }, []);
+
   const onBsdSuite = useCallback((bsd: BsdDisplay) => {
     if (!bsd.temporaryStorageDetail) {
       setValidationWorkflowType("ACT_BSD_SUITE");
@@ -453,6 +461,7 @@ function BsdCardList({
           const hasAutomaticSignature = siretsWithAutomaticSignature?.includes(
             node?.emitter?.company?.siret
           );
+
           return (
             <li className="bsd-card-list__item" key={key}>
               <BsdCard
@@ -466,6 +475,7 @@ function BsdCardList({
                   onUpdate: onBsdUpdate,
                   onOverview: onBsdOverview,
                   onRevision: onBsdRevision,
+                  onCorrection,
                   onBsdSuite,
                   onAppendix1,
                   onConsultReview,

@@ -5,7 +5,7 @@ import {
   WasteProcessorType,
   CompanyType
 } from "@prisma/client";
-import {
+import type {
   Query,
   QueryBsdsArgs,
   Mutation,
@@ -18,7 +18,7 @@ import {
   MutationSubmitFormRevisionRequestApprovalArgs,
   MutationMarkAsReceivedArgs,
   MutationSignTransportFormArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   resetDatabase,
   refreshElasticSearch

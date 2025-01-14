@@ -1,4 +1,4 @@
-import {
+import type {
   CompanyInput,
   BsdaRecepisseInput,
   PickupSiteInput,
@@ -18,7 +18,7 @@ import {
   BsdaTransporterInput,
   EcoOrganismeInput,
   BsdaInput
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { flattenBsdaInput } from "../../converter";
 import { bsdaEditionRules } from "../rules";
 

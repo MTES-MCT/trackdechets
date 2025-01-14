@@ -1,39 +1,56 @@
 #!/bin/bash
 
-if [ -f .env ]
+bold=$(tput bold)
+reset=$(tput sgr0)
+red=$(tput setaf 1)
+blue=$(tput setaf 4)
+
+# Change the current directory to the script's directory
+cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
+
+env_file="../.env"
+if [[ -f "$env_file" ]]
 then
-  export "$(<.env xargs)"
+  line=$(grep -E "^TD_XSLX2CSV_PATH=" "$env_file" | head -n 1)
+  if [[ -n "$line" ]]; then
+      eval "export $line"
+  fi
 fi
 
 CURRENT_DIR=$(pwd)
 if [ -z "$TD_XSLX2CSV_PATH" ];
 then
-    echo -e "\e[91mPlease set \$TD_XSLX2CSV_PATH either as ENV or in .env file (ex: home/you/trackdechets-xslx2csv/src)\e[m"
-    exit
+    echo "${red}Please set \$TD_XSLX2CSV_PATH either as ENV or in the root .env file (ex: home/you/trackdechets-xslx2csv/src)${reset}"
+    exit 1
+fi
+if [[ ! -d "$TD_XSLX2CSV_PATH" ]]; then
+    echo "${red}Invalid directory: '$TD_XSLX2CSV_PATH'. The directory must be absolute or relative to the script file${reset}"
+    exit 1
 fi
 
-while read -erp $'\e[1m? Enter local XLS path :\e[m ' xlsPath; do
-    if [ -f "$xlsPath" ]; then
+while read -erp "${bold}? Enter local XLS path :${reset} " xlsPath; do
+    cleanedPath=$(echo "$xlsPath" | sed -e 's/\\ / /g')
+    if [ -f "$cleanedPath" ]; then
         break
     else
-        echo -e "\e[91m$xlsPath is not a valid path.\e[m"
+        echo "${red}$cleanedPath is not a valid path.${reset}"
     fi 
 done
 
-echo -e "\e[1m→ Spawning XSLX2CSV CLI...\e[m"
-echo -e "\e[1m→ Please use the 'Export csv' action\e[m"
-echo -e "\e[94m-------------------------------------------------------\e[m"
-cd "$TD_XSLX2CSV_PATH" || exit
-pipenv run python xlsx2csv.py "$xlsPath"
-echo -e "\e[94m-------------------------------------------------------\e[m"
+echo "${bold}→ Spawning XSLX2CSV CLI...${reset}"
+echo "${bold}→ Please use the 'Export csv' action${reset}"
+echo "${blue}-------------------------------------------------------${reset}"
+cd "$TD_XSLX2CSV_PATH" || exit 1
+pipenv run python xlsx2csv.py "$cleanedPath"
+echo "${blue}-------------------------------------------------------${reset}"
 
-cd "$CURRENT_DIR" || exit
+cd "$CURRENT_DIR" || exit 1
 OUTPUT_DIR="$TD_XSLX2CSV_PATH/csv"
 
-echo -e "\e[1m→ Listing extracted files\e[m"
+echo "${bold}→ Listing extracted files${reset}"
 ls "$OUTPUT_DIR"
 
-read -erp $'\e[1m? Proceed with import \e[m (Y/n) ' -n 1 PROCEED
+read -erp "${bold}? Proceed with import ${reset} (Y/n) " -n 1 PROCEED
 PROCEED=${PROCEED:-Y}
 
 if [[ ! $PROCEED =~ ^[Yy]$ ]]

@@ -206,6 +206,7 @@ const DashboardPage = () => {
   };
 
   const bsds = data?.bsds.edges;
+
   const bsdsTotalCount = data?.bsds.totalCount;
   const hasNextPage = data?.bsds.pageInfo.hasNextPage;
   const isLoadingBsds = loading;

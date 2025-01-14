@@ -5,7 +5,7 @@ import {
   chain,
   undefinedOrDefault
 } from "../common/converter";
-import {
+import type {
   FormCompany,
   Signature,
   Bspaoh as GraphqlBspaoh,
@@ -36,7 +36,7 @@ import {
   BspaohPackagingAcceptationStatus,
   BspaohReceptionWasteDetail,
   BspaohReceptionWasteWeight
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   BspaohTransporter as PrismaBspaohTransporter,
   BspaohStatus,

@@ -1,8 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationCancelAdministrativeTransferArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   companyFactory,
   userWithCompanyFactory

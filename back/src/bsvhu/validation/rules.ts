@@ -1,7 +1,8 @@
 import { ZodBsvhu } from "./schema";
 import { BsvhuUserFunctions, BsvhuValidationContext } from "./types";
-import { BsvhuInput, SignatureTypeInput } from "../../generated/graphql/types";
-import { User, WasteAcceptationStatus } from "@prisma/client";
+import type { BsvhuInput, SignatureTypeInput } from "@td/codegen-back";
+import { User, WasteAcceptationStatus, TransportMode } from "@prisma/client";
+
 import { isForeignVat } from "@td/constants";
 import {
   getBsvhuUserFunctions,
@@ -12,6 +13,7 @@ import {
 import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { Leaves } from "../../types";
+import { v20250101, v20241001 } from "./refinements";
 
 // Liste des champs éditables sur l'objet Bsvhu
 export type BsvhuEditableFields = Required<
@@ -23,8 +25,6 @@ export type BsvhuEditableFields = Required<
     | "emitterCustomInfo"
     | "emitterNotOnTD"
     | "destinationCustomInfo"
-    | "transporterCustomInfo"
-    | "transporterTransportPlates"
     | "emitterEmissionSignatureDate"
     | "emitterEmissionSignatureAuthor"
     | "transporterTransportSignatureDate"
@@ -385,8 +385,15 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["packaging"]
   },
   identificationNumbers: {
-    sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    sealed: {
+      from: sealedFromEmissionExceptForEmitter
+    },
+    required: {
+      from: "EMISSION",
+      when: bsvhu => {
+        return (bsvhu.createdAt || new Date()).getTime() >= v20241001.getTime();
+      }
+    },
     readableFieldName: "Les numéros d'identification",
     path: ["identification", "numbers"]
   },
@@ -517,9 +524,33 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "l'exemption de récépissé du transporteur",
     sealed: { from: "TRANSPORT" },
     path: ["transporter", "recepisse", "isExempted"]
-    // required: {
-    //   from: "TRANSPORT"
-    // }
+  },
+  transporterTransportMode: {
+    readableFieldName: "le mode de transport",
+    sealed: { from: "TRANSPORT" },
+    required: {
+      from: "TRANSPORT"
+    },
+    path: ["transporter", "transport", "mode"]
+  },
+  transporterTransportPlates: {
+    readableFieldName: "l'immatriculation du transporteur",
+    sealed: { from: "TRANSPORT" },
+    path: ["transporter", "transport", "plates"],
+    required: {
+      from: "TRANSPORT",
+      when: bsvhu => {
+        return (
+          bsvhu.transporterTransportMode === "ROAD" &&
+          (bsvhu.createdAt || new Date()).getTime() >= v20250101.getTime()
+        );
+      }
+    }
+  },
+  transporterCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires du transporteur",
+    sealed: { from: "TRANSPORT" }
   },
   ecoOrganismeName: {
     readableFieldName: "le nom de l'éco-organisme",
@@ -681,7 +712,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   intermediaries: {
     readableFieldName: "les intermédiaires",
-    sealed: { from: "TRANSPORT" },
+    sealed: { from: "OPERATION" },
     path: ["intermediaries"]
   }
 };
@@ -716,6 +747,7 @@ export const getRequiredAndSealedFieldPaths = async (
 function requireTransporterRecepisse(bsvhu: ZodBsvhu) {
   return (
     !bsvhu.transporterRecepisseIsExempted &&
+    bsvhu.transporterTransportMode === TransportMode.ROAD &&
     !isForeignVat(bsvhu.transporterCompanyVatNumber)
   );
 }
@@ -795,6 +827,9 @@ export async function getSealedFields(
   bsvhu: ZodBsvhu,
   context: BsvhuValidationContext
 ): Promise<(keyof BsvhuEditionRules)[]> {
+  if (context.unsealed) {
+    return [];
+  }
   const currentSignatureType =
     context.currentSignatureType ?? getCurrentSignatureType(bsvhu);
   // Some signatures may be skipped, so always check all the hierarchy

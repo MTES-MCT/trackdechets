@@ -1,4 +1,4 @@
-import { FormResolvers } from "../../../generated/graphql/types";
+import type { FormResolvers } from "@td/codegen-back";
 import { expandFormFromDb } from "../../converter";
 
 const groupedInResolver: FormResolvers["groupedIn"] = async (
