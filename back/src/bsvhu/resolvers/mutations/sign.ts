@@ -47,6 +47,8 @@ export default async function sign(
 
   const zodBsvhu = prismaToZodBsvhu(bsvhu);
 
+  console.log("zodBsvhu", zodBsvhu)
+
   // Check that all necessary fields are filled
   await parseBsvhuAsync(
     { ...zodBsvhu, ...transporterReceipt },
@@ -79,12 +81,13 @@ export function getAuthorizedOrgIds(
   const signatureTypeToFn: {
     [Key in SignatureTypeInput]: (bsda: Bsvhu) => (string | null)[];
   } = {
-    EMISSION: (bsda: Bsvhu) => [bsda.emitterCompanySiret],
-    TRANSPORT: (bsda: Bsvhu) => [
-      bsda.transporterCompanySiret,
-      bsda.transporterCompanyVatNumber
+    EMISSION: (bsvhu: Bsvhu) => [bsvhu.emitterCompanySiret],
+    TRANSPORT: (bsvhu: Bsvhu) => [
+      bsvhu.transporterCompanySiret,
+      bsvhu.transporterCompanyVatNumber
     ],
-    OPERATION: (bsda: Bsvhu) => [bsda.destinationCompanySiret]
+    RECEPTION: (bsvhu: Bsvhu) => [bsvhu.destinationCompanySiret],
+    OPERATION: (bsvhu: Bsvhu) => [bsvhu.destinationCompanySiret]
   };
 
   const getAuthorizedSiretsFn = signatureTypeToFn[signatureType];
@@ -103,6 +106,7 @@ const signatures: Record<
 > = {
   EMISSION: signEmission,
   TRANSPORT: signTransport,
+  RECEPTION: signReception,
   OPERATION: signOperation
 };
 
@@ -165,6 +169,26 @@ async function signTransport(
       input.transporterRecepisseDepartment ?? null,
     transporterRecepisseValidityLimit:
       input.transporterRecepisseValidityLimit ?? null
+  };
+
+  return updateBsvhu(user, bsvhu, updateInput);
+}
+
+async function signReception(
+  user: Express.User,
+  bsvhu: Bsvhu,
+  input: BsvhuSignatureInput
+) {
+  if (bsvhu.destinationReceptionSignatureDate !== null) {
+    throw new AlreadySignedError();
+  }
+
+  const nextStatus = await getNextStatus(bsvhu, input.type);
+
+  const updateInput: Prisma.BsvhuUpdateInput = {
+    destinationReceptionSignatureAuthor: input.author,
+    destinationReceptionSignatureDate: new Date(input.date ?? Date.now()),
+    status: nextStatus
   };
 
   return updateBsvhu(user, bsvhu, updateInput);

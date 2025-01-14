@@ -155,6 +155,8 @@ const rawBsvhuSchema = z.object({
   destinationReceptionDate: z.coerce.date().nullish(),
   destinationCustomInfo: z.string().nullish(),
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
+  destinationReceptionSignatureAuthor: z.string().nullish(),
+  destinationReceptionSignatureDate: z.coerce.date().nullish(),
   wasteCode: ZodWasteCodeEnum,
   packaging: z.nativeEnum(BsvhuPackaging).nullish(),
   identificationNumbers: z.array(z.string()).optional(),

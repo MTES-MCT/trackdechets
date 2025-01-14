@@ -32,6 +32,8 @@ export type BsvhuEditableFields = Required<
     | "transporterTransportSignatureAuthor"
     | "destinationOperationSignatureDate"
     | "destinationOperationSignatureAuthor"
+    | "destinationReceptionSignatureDate"
+    | "destinationReceptionSignatureAuthor"
     | "intermediariesOrgIds"
   >
 >;
@@ -238,17 +240,33 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "L'adresse e-mail du destinataire",
     path: ["destination", "company", "mail"]
   },
+  // TODO
   destinationReceptionAcceptationStatus: {
     sealed: { from: "OPERATION" },
-    required: { from: "OPERATION" },
+    required: { from: "RECEPTION" },
     readableFieldName: "Le statut d'acceptation du destinataire",
     path: ["destination", "reception", "acceptationStatus"]
   },
+  // TODO
   destinationReceptionRefusalReason: {
     sealed: { from: "OPERATION" },
     readableFieldName: "La raison du refus par le destinataire",
-    required: { from: "OPERATION", when: isRefusedOrPartiallyRefused },
+    required: { from: "RECEPTION", when: isRefusedOrPartiallyRefused },
     path: ["destination", "reception", "refusalReason"]
+  },
+  // TODO
+  destinationReceptionWeight: {
+    sealed: { from: "OPERATION" },
+    required: { from: "RECEPTION" },
+    readableFieldName: "Le poids réel reçu",
+    path: ["destination", "reception", "weight"]
+  },
+  // TODO
+  destinationReceptionDate: {
+    readableFieldName: "la date de réception",
+    required: { from: "RECEPTION" },
+    sealed: { from: "OPERATION" },
+    path: ["destination", "reception", "date"],
   },
   destinationReceptionIdentificationNumbers: {
     sealed: { from: "OPERATION" },
@@ -356,18 +374,6 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "OPERATION" },
     readableFieldName: "La quantité de VHUs reçue",
     path: ["destination", "reception", "quantity"]
-  },
-  destinationReceptionWeight: {
-    sealed: { from: "OPERATION" },
-    required: { from: "OPERATION" },
-    readableFieldName: "Le poids réel reçu",
-    path: ["destination", "reception", "weight"]
-  },
-  destinationReceptionDate: {
-    readableFieldName: "la date de réception",
-    sealed: { from: "OPERATION" },
-    path: ["destination", "reception", "date"]
-    // required: { from: "OPERATION" }
   },
   wasteCode: {
     sealed: {

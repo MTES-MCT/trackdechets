@@ -2,6 +2,7 @@ enum BsvhuStatus {
   INITIAL
   SIGNED_BY_PRODUCER
   SENT
+  RECEIVED
   PROCESSED
   REFUSED
 }
@@ -26,5 +27,6 @@ enum BsvhuDestinationType {
 enum SignatureTypeInput {
   EMISSION
   TRANSPORT
+  RECEPTION
   OPERATION
 }

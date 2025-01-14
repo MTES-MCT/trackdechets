@@ -80,6 +80,20 @@ type Mutation {
   }
   ```
 
+  **Champs requis pour `RECEPTION` :**
+  (à noter, cette étape est optionnelle)
+
+  ```
+  destination {
+    reception {
+      weight # doit être 0 si acceptationStatus est REFUSED
+      acceptationStatus
+      refusalReason
+      date  
+    }
+  }
+  ```
+
   **Champs requis pour `OPERATION` :**
 
   ```
