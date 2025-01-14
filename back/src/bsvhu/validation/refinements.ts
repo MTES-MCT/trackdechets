@@ -325,21 +325,17 @@ export const checkTransportPlates: Refinement<ParsedZodBsvhu> = (
     });
   }
 
-  if (transporterTransportPlates.some(plate => plate.length > 12)) {
+  if (
+    transporterTransportPlates.some(plate => plate.length > 12) ||
+    transporterTransportPlates.some(plate => plate.length < 4)
+  ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path,
-      message: "Un numéro d'immatriculation doit faire 12 caractères au maximum"
+      message: "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
     });
   }
 
-  if (transporterTransportPlates.some(plate => plate.length < 4)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path,
-      message: "Un numéro d'immatriculation doit faire 4 caractères au minimum"
-    });
-  }
   if (transporterTransportPlates.some(plate => onlyWhiteSpace(plate))) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

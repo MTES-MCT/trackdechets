@@ -760,7 +760,7 @@ describe("BSVHU validation", () => {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message:
-              "Un numéro d'immatriculation doit faire 4 caractères au minimum"
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
           })
         ]);
       }
@@ -786,7 +786,7 @@ describe("BSVHU validation", () => {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message:
-              "Un numéro d'immatriculation doit faire 12 caractères au maximum"
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
           })
         ]);
       }
