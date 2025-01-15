@@ -203,7 +203,7 @@ export const updateRegistryLookup = async (
         exportRegistryType: RegistryExportType.INCOMING,
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
-        wasteCode: bsdasri.wasteCode!, // is required from emitter signature, so it has to be there
+        wasteCode: bsdasri.wasteCode,
         ...generateDateInfos(bsdasri.destinationReceptionSignatureDate),
         bsdasriId: bsdasri.id
       }
