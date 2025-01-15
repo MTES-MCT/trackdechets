@@ -235,7 +235,7 @@ model RegistryIncomingTexs {
     reportForCompanyPostalCode             String
     reportAsCompanySiret                   String?
     customInfo                             String?
-    wasteCode                              String
+    wasteCode                              String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
     receptionDate                          DateTime
