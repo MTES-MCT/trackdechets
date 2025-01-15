@@ -336,17 +336,19 @@ model Company {
 // Cette table permet également de stocker de "faux établissements" pouvant être visés lors
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
-  id                String  @id @default(cuid())
+  id                String    @id @default(cuid())
   createdAt         DateTime? @default(now())
-  orgId             String  @unique(map: "AnonymousCompany.orgId_unique")
-  siret             String? @unique(map: "AnonymousCompany.siret_unique")
-  vatNumber         String? @unique(map: "AnonymousCompany.vatnumber_unique")
+  orgId             String    @unique(map: "AnonymousCompany.orgId_unique")
+  siret             String?   @unique(map: "AnonymousCompany.siret_unique")
+  vatNumber         String?   @unique(map: "AnonymousCompany.vatnumber_unique")
   name              String
   address           String
   codeNaf           String
   libelleNaf        String
   codeCommune       String
-  etatAdministratif String  @default("A")
+  etatAdministratif String    @default("A")
+  // dummy field to trigger prisma client rebuild
+  note              String?
 
   @@index([vatNumber], map: "_AnonymousCompanyVatNumberIdx")
 }
@@ -1085,8 +1087,8 @@ model Bsvhu {
   transporterTransportTakenOverAt                     DateTime?                @db.Timestamptz(6)
   transporterCustomInfo                               String?
   transporterTransportMode                            TransportMode?           @default(ROAD)
-  transporterTransportPlates     String[]
-  transporterRecepisseIsExempted Boolean?
+  transporterTransportPlates                          String[]
+  transporterRecepisseIsExempted                      Boolean?
 
   ecoOrganismeName  String?
   ecoOrganismeSiret String?
