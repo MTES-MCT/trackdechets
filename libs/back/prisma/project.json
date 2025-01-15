@@ -17,7 +17,7 @@
     },
     "generate": {
       "inputs": ["{projectRoot}/src/schema.prisma"],
-      "cache": true,
+      "cache": false,
       "executor": "nx:run-commands",
       "options": {
         "command": "prisma generate"
