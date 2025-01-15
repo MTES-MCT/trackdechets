@@ -136,21 +136,21 @@ export const EXPORT_COLUMNS: {
 } = {
   SSD: {
     source: { label: "Source", format: formatSource },
-    publicId: { label: "Numéro unique" },
+    publicId: { label: "Identifiant unique" },
     reportAsSiret: { label: "SIRET du déclarant" },
     reportForSiret: { label: "SIRET de l'émetteur" },
     reportForName: { label: "Raison sociale de l'émetteur" },
     useDate: { label: "Date d'utilisation", format: formatDate },
     dispatchDate: { label: "Date d'expédition", format: formatDate },
-    wasteCode: { label: "Code déchet" },
     wasteDescription: { label: "Dénomination du déchet" },
+    wasteCode: { label: "Code déchet" },
     wasteCodeBale: { label: "Code déchet Bâle" },
-    secondaryWasteCodes: {
-      label: "Codes déchets secondaires",
-      format: formatArray
-    },
     secondaryWasteDescriptions: {
       label: "Dénominations des déchets secondaires",
+      format: formatArray
+    },
+    secondaryWasteCodes: {
+      label: "Codes déchets secondaires",
       format: formatArray
     },
     product: { label: "Produit" },
@@ -162,16 +162,19 @@ export const EXPORT_COLUMNS: {
       label: "Date de fin de traitement",
       format: formatDate
     },
+    operationCode: {
+      label: "Code de traitement réalisé",
+      format: formatOperationCode
+    },
+    operationMode: { label: "Mode de traitement" },
+    administrativeActReference: { label: "Référence de l'acte administratif" },
     destinationType: { label: "Type de destinataire" },
     destinationOrgId: { label: "Numéro d'identification du destinataire" },
     destinationName: { label: "Raison sociale du destinataire" },
-    destinationAddress: { label: "Adresse du destinataire" },
+    destinationAddress: { label: "Libellé de l'adresse du destinataire" },
     destinationPostalCode: { label: "Code postal du destinataire" },
     destinationCity: { label: "Commune du destinataire" },
-    destinationCountryCode: { label: "Pays du destinataire" },
-    operationCode: { label: "Code d'opération", format: formatOperationCode },
-    operationMode: { label: "Mode de traitement" },
-    administrativeActReference: { label: "Référence de l'acte administratif" }
+    destinationCountryCode: { label: "Code pays du destinataire" }
   },
   INCOMING: {
     source: { label: "Source", format: formatSource },
