@@ -1,11 +1,102 @@
 import type { IncomingWasteV2, SsdWasteV2 } from "@td/codegen-back";
-
+import { Prisma } from "@prisma/client";
 export type GenericWasteV2 = SsdWasteV2 | IncomingWasteV2;
 
 type Nullable<T> = { [K in keyof T]: T[K] | null };
 
-export const emptyIncomingWasteV2: Required<Nullable<IncomingWasteV2>> = {
-  __typename: "IncomingWasteV2",
+// BSDD
+export const RegistryV2BsddInclude = Prisma.validator<Prisma.FormInclude>()({
+  forwarding: { include: { transporters: true } },
+  intermediaries: true,
+  forwardedIn: { include: { transporters: true } },
+  finalOperations: {
+    include: { finalForm: { select: { recipientCompanySiret: true } } }
+  },
+  grouping: { include: { initialForm: { include: { transporters: true } } } },
+  transporters: true
+});
+
+export type RegistryV2Bsdd = Prisma.FormGetPayload<{
+  include: typeof RegistryV2BsddInclude;
+}>;
+
+// BSDA
+export const RegistryV2BsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
+  grouping: true,
+  forwarding: true,
+  intermediaries: true,
+  forwardedIn: true,
+  transporters: true,
+  finalOperations: {
+    include: { finalBsda: { select: { destinationCompanySiret: true } } }
+  }
+});
+
+export type RegistryV2Bsda = Prisma.BsdaGetPayload<{
+  include: typeof RegistryV2BsdaInclude;
+}>;
+
+// BSDASRI
+export const RegistryV2BsdasriInclude =
+  Prisma.validator<Prisma.BsdasriInclude>()({
+    grouping: true,
+    finalOperations: {
+      include: { finalBsdasri: { select: { destinationCompanySiret: true } } }
+    }
+  });
+
+export type RegistryV2Bsdasri = Prisma.BsdasriGetPayload<{
+  include: typeof RegistryV2BsdasriInclude;
+}>;
+
+// BSFF
+export const RegistryV2BsffInclude = Prisma.validator<Prisma.BsffInclude>()({
+  transporters: true,
+  packagings: {
+    include: {
+      finalOperations: {
+        include: {
+          finalBsffPackaging: {
+            include: { bsff: { select: { destinationCompanySiret: true } } }
+          }
+        }
+      },
+      previousPackagings: {
+        include: { bsff: true }
+      }
+    }
+  }
+});
+
+export type RegistryV2Bsff = Prisma.BsffGetPayload<{
+  include: typeof RegistryV2BsffInclude;
+}>;
+
+// BSPAOH
+export const RegistryV2BspaohInclude = Prisma.validator<Prisma.BspaohInclude>()(
+  {
+    transporters: true
+  }
+);
+
+export type RegistryV2Bspaoh = Prisma.BspaohGetPayload<{
+  include: typeof RegistryV2BspaohInclude;
+}>;
+
+// BSVHU
+export const RegistryV2BsvhuInclude = Prisma.validator<Prisma.BsvhuInclude>()({
+  intermediaries: true
+});
+
+export type RegistryV2Bsvhu = Prisma.BsvhuGetPayload<{
+  include: typeof RegistryV2BsvhuInclude;
+}>;
+
+// Empty registy V2 exports
+export const emptyIncomingWasteV2: Omit<
+  Required<Nullable<IncomingWasteV2>>,
+  "__typename"
+> = {
   id: null,
   source: null,
   publicId: null,
@@ -23,9 +114,9 @@ export const emptyIncomingWasteV2: Required<Nullable<IncomingWasteV2>> = {
   status: null,
   wasteDescription: null,
   wasteCode: null,
-  wasteIsDangerous: null,
-  wastePop: null,
   wasteCodeBale: null,
+  wastePop: null,
+  wasteIsDangerous: null,
   weight: null,
   initialEmitterCompanyName: null,
   initialEmitterCompanySiret: null,
@@ -33,8 +124,8 @@ export const emptyIncomingWasteV2: Required<Nullable<IncomingWasteV2>> = {
   initialEmitterCompanyPostalCode: null,
   initialEmitterCompanyCity: null,
   initialEmitterCompanyCountry: null,
-  municipalitiesNames: null,
-  municipalitiesInseeCodes: null,
+  initialEmitterMunicipalitiesNames: null,
+  initialEmitterMunicipalitiesInseeCodes: null,
   emitterCompanyIrregularSituation: null,
   emitterCompanyName: null,
   emitterCompanyGivenName: null,
@@ -43,12 +134,12 @@ export const emptyIncomingWasteV2: Required<Nullable<IncomingWasteV2>> = {
   emitterCompanyPostalCode: null,
   emitterCompanyCity: null,
   emitterCompanyCountry: null,
-  emitterCompanyMail: null,
   emitterPickupsiteName: null,
   emitterPickupsiteAddress: null,
   emitterPickupsitePostalCode: null,
   emitterPickupsiteCity: null,
   emitterPickupsiteCountry: null,
+  emitterCompanyMail: null,
   workerCompanyName: null,
   workerCompanySiret: null,
   workerCompanyAddress: null,
@@ -56,31 +147,62 @@ export const emptyIncomingWasteV2: Required<Nullable<IncomingWasteV2>> = {
   workerCompanyCity: null,
   workerCompanyCountry: null,
   parcelCities: null,
-  parcelPostalCodes: null,
+  parcelInseeCodes: null,
   parcelNumbers: null,
   parcelCoordinates: null,
-  parcelSIS: null,
+  sisIdentifiers: null,
   ecoOrganismeName: null,
-  ecoOrganismeSiren: null,
+  ecoOrganismeSiret: null,
   traderCompanyName: null,
   traderCompanySiret: null,
-  traderRecepisseNumber: null,
   traderCompanyMail: null,
+  traderRecepisseNumber: null,
   brokerCompanyName: null,
   brokerCompanySiret: null,
-  brokerRecepisseNumber: null,
   brokerCompanyMail: null,
-  transporterCompanyName: null,
-  transporterCompanyGivenName: null,
-  transporterCompanySiret: null,
-  transporterCompanyAddress: null,
-  transporterCompanyPostalCode: null,
-  transporterCompanyCity: null,
-  transporterCompanyCountry: null,
-  transporterRecepisseIsExempted: null,
-  transporterRecepisseNumber: null,
-  transporterTransportMode: null,
-  transporterCompanyMail: null,
+  brokerRecepisseNumber: null,
+  isDirectSupply: null,
+  transporter1CompanyName: null,
+  transporter1CompanyGivenName: null,
+  transporter1CompanySiret: null,
+  transporter1CompanyAddress: null,
+  transporter1CompanyPostalCode: null,
+  transporter1CompanyCity: null,
+  transporter1CompanyCountry: null,
+  transporter1RecepisseIsExempted: null,
+  transporter1RecepisseNumber: null,
+  transporter1TransportMode: null,
+  transporter1CompanyMail: null,
+  wasteAdr: null,
+  nonRoadRegulationMention: null,
+  destinationCap: null,
+  wasteDap: null,
+  destinationCompanyName: null,
+  destinationCompanyGivenName: null,
+  destinationCompanySiret: null,
+  destinationCompanyAddress: null,
+  destinationCompanyPostalCode: null,
+  destinationCompanyCity: null,
+  destinationCompanyMail: null,
+  destinationReceptionAcceptationStatus: null,
+  destinationReceptionWeight: null,
+  destinationReceptionRefusedWeight: null,
+  destinationReceptionAcceptedWeight: null,
+  destinationReceptionWeightIsEstimate: null,
+  destinationReceptionVolume: null,
+  destinationPlannedOperationCode: null,
+  destinationOperationCode: null,
+  destinationOperationMode: null,
+  destinationHasCiterneBeenWashedOut: null,
+  destinationOperationNoTraceability: null,
+  declarationNumber: null,
+  notificationNumber: null,
+  movementNumber: null,
+  nextOperationCode: null,
+  isUpcycled: null,
+  destinationParcelInseeCodes: null,
+  destinationParcelNumbers: null,
+  destinationParcelCoordinates: null,
   transporter2CompanyName: null,
   transporter2CompanyGivenName: null,
   transporter2CompanySiret: null,
@@ -124,36 +246,5 @@ export const emptyIncomingWasteV2: Required<Nullable<IncomingWasteV2>> = {
   transporter5RecepisseIsExempted: null,
   transporter5RecepisseNumber: null,
   transporter5TransportMode: null,
-  transporter5CompanyMail: null,
-  wasteAdr: null,
-  nonRoadRegulationMention: null,
-  destinationCap: null,
-  wasteDap: null,
-  destinationCompanyName: null,
-  destinationCompanyGivenName: null,
-  destinationCompanySiret: null,
-  destinationCompanyAddress: null,
-  destinationCompanyPostalCode: null,
-  destinationCompanyCity: null,
-  destinationCompanyCountry: null,
-  destinationCompanyMail: null,
-  destinationReceptionAcceptationStatus: null,
-  destinationReceptionWeight: null,
-  destinationReceptionRefusedWeight: null,
-  destinationReceptionAcceptedWeight: null,
-  destinationReceptionWeightIsEstimate: null,
-  destinationReceptionVolume: null,
-  destinationPlannedOperationCode: null,
-  destinationOperationMode: null,
-  destinationOperationCode: null,
-  destinationHasCiterneBeenWashedOut: null,
-  destinationOperationNoTraceability: null,
-  documentNumber: null,
-  movementNumber: null,
-  nextDestinationNotificationNumber: null,
-  nextDestinationProcessingOperation: null,
-  isUpcycled: null,
-  destinationParcelInseeCodes: null,
-  destinationParcelNumbers: null,
-  destinationParcelCoordinates: null
+  transporter5CompanyMail: null
 };

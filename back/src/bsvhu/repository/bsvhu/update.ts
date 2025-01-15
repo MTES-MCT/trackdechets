@@ -6,6 +6,7 @@ import {
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
 import { objectDiff } from "../../../forms/workflow/diff";
+import { lookupUtils } from "../../registryV2";
 
 export type UpdateBsvhuFn = (
   where: Prisma.BsvhuWhereUniqueInput,
@@ -30,7 +31,7 @@ export function buildUpdateBsvhu(deps: RepositoryFnDeps): UpdateBsvhuFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-
+    await lookupUtils.update(bsvhu, prisma);
     prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bsvhu.id));
 
     return bsvhu;
