@@ -175,7 +175,8 @@ type IncomingWasteV2 {
   brokerRecepisseNumber: String
   "L'adresse email du contact du courtier"
   brokerCompanyMail: String
-
+  "Approvisionnement direct (pipeline, convoyeur)"
+  isDirectSupply: Boolean
   "La raison sociale du transporteur"
   transporter1CompanyName: String
   "Le nom usuel du transporteur"
