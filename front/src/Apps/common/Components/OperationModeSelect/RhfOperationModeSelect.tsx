@@ -8,7 +8,11 @@ import {
 import Tooltip from "../../../../common/components/Tooltip";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 
-const RhfOperationModeSelect = ({ operationCode, path }) => {
+const RhfOperationModeSelect = ({
+  operationCode,
+  path,
+  addedDsfrClass = ""
+}) => {
   const { setValue, watch, getFieldState } = useFormContext();
   const { error: fieldError } = getFieldState(path);
   const modes = useMemo(
@@ -35,7 +39,7 @@ const RhfOperationModeSelect = ({ operationCode, path }) => {
   return (
     <div className="form__row">
       <fieldset>
-        <legend className="fr-mb-2w fr-grid-row">
+        <legend className={`fr-pb-2w fr-grid-row ${addedDsfrClass}`}>
           Mode de traitement{" "}
           <Tooltip msg="Le mode de traitement correspond à un des 4 choix de la hiérarchie des modes de traitement, il s'impose de lui même ou doit être précisé selon l'opération réalisée" />
         </legend>
