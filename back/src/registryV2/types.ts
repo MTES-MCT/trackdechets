@@ -161,6 +161,7 @@ export const emptyIncomingWasteV2: Omit<
   brokerCompanySiret: null,
   brokerCompanyMail: null,
   brokerRecepisseNumber: null,
+  isDirectSupply: null,
   transporter1CompanyName: null,
   transporter1CompanyGivenName: null,
   transporter1CompanySiret: null,

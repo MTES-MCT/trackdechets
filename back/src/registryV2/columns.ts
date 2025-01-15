@@ -178,7 +178,7 @@ export const EXPORT_COLUMNS: {
   },
   INCOMING: {
     source: { label: "Source", format: formatSource },
-    publicId: { label: "Numéro unique" },
+    publicId: { label: "identifiant unique" },
     bsdId: { label: "N° de bordereau" },
     reportAsSiret: { label: "SIRET du déclarant" },
     createdAt: { label: "Date de création du bordereau", format: formatDate },
@@ -197,108 +197,129 @@ export const EXPORT_COLUMNS: {
       format: formatDate
     },
     bsdType: { label: "Type de bordereau" },
-    bsdSubType: { label: "Sous-type", format: formatSubType },
+    bsdSubType: { label: "Sous-type de bordereau", format: formatSubType },
     customId: { label: "Identifiant secondaire" },
     status: { label: "Statut du bordereau", format: formatStatusLabel },
     wasteDescription: { label: "Dénomination usuelle" },
-    wasteCode: { label: "Code du déchet" },
+    wasteCode: { label: "Code déchet" },
     wasteCodeBale: { label: "Code déchet Bâle" },
     wastePop: { label: "POP", format: formatBoolean },
-    wasteIsDangerous: { label: "Déchet dangereux", format: formatBoolean },
-    weight: { label: "Quantité de déchet", format: formatNumber },
-    initialEmitterCompanyName: { label: "Producteur initial raison sociale" },
-    initialEmitterCompanySiret: { label: "Producteur initial SIRET" },
-    initialEmitterCompanyAddress: { label: "Producteur initial adresse" },
+    wasteIsDangerous: { label: "Dangereux", format: formatBoolean },
+    weight: { label: "Émetteur - Quantité de déchet ", format: formatNumber },
+    initialEmitterCompanySiret: {
+      label: "Producteur initial - N° d'identification"
+    },
+    initialEmitterCompanyName: { label: "Producteur initial - Raison sociale" },
+    initialEmitterCompanyAddress: {
+      label: "Producteur initial - Libellé adresse"
+    },
     initialEmitterCompanyPostalCode: {
-      label: "Producteur initial Code postal"
+      label: "Producteur initial - Code postal"
     },
-    initialEmitterCompanyCity: { label: "Producteur initial Commune" },
-    initialEmitterCompanyCountry: { label: "Producteur initial Pays" },
-    initialEmitterMunicipalitiesNames: {
-      label: "Producteur(s) - Commune(s)",
-      format: formatArray
-    },
+    initialEmitterCompanyCity: { label: "Producteur initial - Commune" },
+    initialEmitterCompanyCountry: { label: "Producteur initial - Code pays" },
     initialEmitterMunicipalitiesInseeCodes: {
       label: "Producteur(s) - Code(s) INSEE de(s) commune(s)",
       format: formatArray
     },
+    initialEmitterMunicipalitiesNames: {
+      label: "Producteur(s) - Commune(s)",
+      format: formatArray
+    },
     emitterCompanyIrregularSituation: {
-      label: "Expéditeur situation irrégulière",
+      label: "Expéditeur - Situation irrégulière",
       format: formatBoolean
     },
-    emitterCompanyName: { label: "Expéditeur raison sociale" },
-    emitterCompanyGivenName: { label: "Expéditeur Nom usuel" },
-    emitterCompanySiret: { label: "Expéditeur SIRET" },
-    emitterCompanyAddress: { label: "Expéditeur Adresse" },
-    emitterCompanyPostalCode: { label: "Expéditeur Code postal" },
-    emitterCompanyCity: { label: "Expéditeur Commune" },
-    emitterCompanyCountry: { label: "Expéditeur Pays" },
-    emitterPickupsiteName: { label: "Nom du point de prise en charge" },
-    emitterPickupsiteAddress: { label: "Prise en charge adresse" },
-    emitterPickupsitePostalCode: { label: "Prise en charge Code postal" },
-    emitterPickupsiteCity: { label: "Prise en charge Commune" },
-    emitterPickupsiteCountry: { label: "Prise en charge Pays" },
-    emitterCompanyMail: { label: "Expéditeur contact" },
-    workerCompanyName: { label: "Entreprise de travaux raison sociale" },
-    workerCompanySiret: { label: "Entreprise de travaux SIRET" },
-    workerCompanyAddress: { label: "Entreprise de travaux adresse" },
-    workerCompanyPostalCode: { label: "Entreprise de travaux Code postal" },
-    workerCompanyCity: { label: "Entreprise de travaux Commune" },
-    workerCompanyCountry: { label: "Entreprise de travaux Pays" },
-    parcelCities: { label: "Parcelle commune", format: formatArray },
-    parcelInseeCodes: { label: "Parcelle code Insee", format: formatArray },
+    emitterCompanySiret: { label: "Expéditeur - N° d'identification" },
+    emitterCompanyName: { label: "Expéditeur - Raison sociale" },
+    emitterCompanyGivenName: { label: "Expéditeur - Nom usuel" },
+    emitterCompanyAddress: { label: "Expéditeur - Libellé adresse" },
+    emitterCompanyPostalCode: { label: "Expéditeur - Code postal" },
+    emitterCompanyCity: { label: "Expéditeur - Commune" },
+    emitterCompanyCountry: { label: "Expéditeur - Code pays" },
+    emitterPickupsiteName: {
+      label: "Expéditeur - Référence du chantier / lieu de collecte"
+    },
+    emitterPickupsiteAddress: {
+      label: "Expéditeur - Libellé adresse du chantier / lieu de collecte"
+    },
+    emitterPickupsitePostalCode: {
+      label: "Expéditeur - Code postal du chantier / lieu de collecte"
+    },
+    emitterPickupsiteCity: {
+      label: "Expéditeur - Commune du chantier / lieu de collecte"
+    },
+    emitterPickupsiteCountry: {
+      label: "Expéditeur - Code pays du chantier / lieu de collecte"
+    },
+    emitterCompanyMail: { label: "Expéditeur - Contact" },
+    workerCompanyName: { label: "Entreprise de travaux - Raison sociale" },
+    workerCompanySiret: { label: "Entreprise de travaux - SIRET" },
+    workerCompanyAddress: { label: "Entreprise de travaux - Libellé adresse" },
+    workerCompanyPostalCode: { label: "Entreprise de travaux - Code postal" },
+    workerCompanyCity: { label: "Entreprise de travaux - Commune" },
+    workerCompanyCountry: { label: "Entreprise de travaux - Pays" },
+    parcelCities: { label: "Parcelle(s) - Commune(s)", format: formatArray },
+    parcelInseeCodes: {
+      label: "Parcelle(s) - Code(s) postal(aux) ou INSEE",
+      format: formatArray
+    },
     parcelNumbers: {
-      label: "Parcelle numéro",
+      label: "Parcelle(s) - Numéro(s)",
       format: formatArrayWithMissingElements
     },
     parcelCoordinates: {
-      label: "Parcelle coordonnées",
+      label: "Parcelle(s) - Coordonnées",
       format: formatArrayWithMissingElements
     },
     sisIdentifiers: {
       label: "Identifiant SIS du terrain",
       format: formatArrayWithMissingElements
     },
-    ecoOrganismeName: { label: "Éco-organisme raison sociale" },
-    ecoOrganismeSiret: { label: "Éco-organisme SIRET" },
-    traderCompanyName: { label: "Négociant raison sociale" },
-    traderCompanySiret: { label: "Négociant SIRET" },
-    traderCompanyMail: { label: "Négociant contact" },
-    traderRecepisseNumber: { label: "Négociant récépissé" },
-    brokerCompanyName: { label: "Courtier raison sociale" },
-    brokerCompanySiret: { label: "Courtier SIRET" },
-    brokerCompanyMail: { label: "Courtier contact" },
-    brokerRecepisseNumber: { label: "Courtier N° récepissé" },
-    transporter1CompanyName: { label: "Transporteur raison sociale" },
-    transporter1CompanyGivenName: { label: "Transporteur Nom usuel" },
-    transporter1CompanySiret: {
-      label: "Transporteur SIRET ou n° de TVA intracommunautaire"
-    },
-    transporter1CompanyAddress: { label: "Transporteur adresse" },
-    transporter1CompanyPostalCode: { label: "Transporteur Code postal" },
-    transporter1CompanyCity: { label: "Transporteur Commune" },
-    transporter1CompanyCountry: { label: "Transporteur Pays" },
-    transporter1RecepisseIsExempted: {
-      label: "Transporteur exemption de récépissé",
+    ecoOrganismeSiret: { label: "Éco-organisme - SIRET" },
+    ecoOrganismeName: { label: "Éco-organisme - Raison sociale" },
+    brokerCompanySiret: { label: "Courtier - SIRET" },
+    brokerCompanyName: { label: "Courtier - Raison sociale" },
+    brokerRecepisseNumber: { label: "Courtier - N° de récépissé" },
+    brokerCompanyMail: { label: "Courtier - Contact" },
+    traderCompanySiret: { label: "Négociant - SIRET" },
+    traderCompanyName: { label: "Négociant - Raison sociale" },
+    traderRecepisseNumber: { label: "Négociant - Récépissé" },
+    traderCompanyMail: { label: "Négociant - Contact" },
+    isDirectSupply: {
+      label: "Transport direct (pipeline, convoyeur)",
       format: formatBoolean
     },
-    transporter1RecepisseNumber: { label: "Transporteur récépissé" },
     transporter1TransportMode: {
-      label: "Transporteur mode de transport",
+      label: "Transporteur - Mode de transport",
       format: formatTransportMode
     },
-    transporter1CompanyMail: { label: "Transporteur contact" },
+    transporter1CompanySiret: {
+      label: "Transporteur - SIRET ou n° de TVA intracommunautaire"
+    },
+    transporter1CompanyName: { label: "Transporteur - Raison sociale" },
+    transporter1CompanyGivenName: { label: "Transporteur - Nom usuel" },
+    transporter1CompanyAddress: { label: "Transporteur - Libellé adresse" },
+    transporter1CompanyPostalCode: { label: "Transporteur - Code postal" },
+    transporter1CompanyCity: { label: "Transporteur - Commune" },
+    transporter1CompanyCountry: { label: "Transporteur - Code Pays" },
+    transporter1CompanyMail: { label: "Transporteur - Contact" },
+    transporter1RecepisseIsExempted: {
+      label: "Transporteur - Exemption de récépissé",
+      format: formatBoolean
+    },
+    transporter1RecepisseNumber: { label: "Transporteur - N° de récépissé" },
     wasteAdr: { label: "Mention ADR" },
     nonRoadRegulationMention: { label: "Mention RID, ADNR, IMDG" },
     destinationCap: { label: "CAP" },
     wasteDap: { label: "DAP" },
-    destinationCompanyName: { label: "Destination raison sociale" },
-    destinationCompanyGivenName: { label: "Destination Nom usuel" },
-    destinationCompanySiret: { label: "Destination SIRET" },
-    destinationCompanyAddress: { label: "Destination adresse" },
-    destinationCompanyPostalCode: { label: "Destination Code postal" },
-    destinationCompanyCity: { label: "Destination Commune" },
-    destinationCompanyMail: { label: "Destination Contact" },
+    destinationCompanySiret: { label: "Destination - N° d'identification" },
+    destinationCompanyName: { label: "Destination - Raison sociale" },
+    destinationCompanyGivenName: { label: "Destination - Nom usuel" },
+    destinationCompanyAddress: { label: "Destination - Libellé adresse" },
+    destinationCompanyPostalCode: { label: "Destination - Code postal" },
+    destinationCompanyCity: { label: "Destination - Commune" },
+    destinationCompanyMail: { label: "Destination - Contact" },
     destinationReceptionAcceptationStatus: {
       label: "Statut d'acceptation du déchet"
     },
@@ -327,10 +348,10 @@ export const EXPORT_COLUMNS: {
       format: formatOperationCode
     },
     destinationOperationCode: {
-      label: "Code opération réalisé",
+      label: "Code de traitement réalisé",
       format: formatOperationCode
     },
-    destinationOperationMode: { label: "Mode de traitement réalisé" },
+    destinationOperationMode: { label: "Mode de traitement" },
     destinationHasCiterneBeenWashedOut: {
       label: "Rinçage citerne",
       format: formatHasCiterneBeenWashedOut
@@ -339,14 +360,14 @@ export const EXPORT_COLUMNS: {
       label: "Rupture de traçabilité autorisée",
       format: formatBoolean
     },
-    declarationNumber: { label: "N° de déclaration" },
-    notificationNumber: { label: "N° de notification" },
+    declarationNumber: { label: "Numéro de déclaration GISTRID" },
+    notificationNumber: { label: "Numéro de notification GISTRID" },
     movementNumber: { label: "N° de mouvement" },
     nextOperationCode: {
-      label: "Code d'opération ultérieure prévue",
+      label: "Code de traitement ultérieur prévu",
       format: formatOperationCode
     },
-    isUpcycled: { label: "Parcelle(s) valorisée(s)", format: formatBoolean },
+    isUpcycled: { label: "Terres valorisées", format: formatBoolean },
     destinationParcelInseeCodes: {
       label: "Parcelle(s) valorisée(s) - Code(s) INSEE",
       format: formatArray
@@ -359,82 +380,88 @@ export const EXPORT_COLUMNS: {
       label: "Parcelle(s) valorisée(s) - Coordonnées",
       format: formatArrayWithMissingElements
     },
-    transporter2CompanyName: { label: "Transporteur n°2 raison sociale" },
-    transporter2CompanyGivenName: { label: "Transporteur n°2 Nom usuel" },
-    transporter2CompanySiret: {
-      label: "Transporteur n°2 SIRET ou n° de TVA intracommunautaire"
-    },
-    transporter2CompanyAddress: { label: "Transporteur n°2 adresse" },
-    transporter2CompanyPostalCode: { label: "Transporteur n°2 Code postal" },
-    transporter2CompanyCity: { label: "Transporteur n°2 Commune" },
-    transporter2CompanyCountry: { label: "Transporteur n°2 Pays" },
-    transporter2RecepisseIsExempted: {
-      label: "Transporteur n°2 exemption de récépissé",
-      format: formatBoolean
-    },
-    transporter2RecepisseNumber: { label: "Transporteur n°2 récépissé" },
     transporter2TransportMode: {
-      label: "Transporteur n°2 mode de transport",
+      label: "Transporteur n°2 - Mode de transport",
       format: formatTransportMode
     },
-    transporter2CompanyMail: { label: "Transporteur n°2 contact" },
-    transporter3CompanyName: { label: "Transporteur n°3 raison sociale" },
-    transporter3CompanyGivenName: { label: "Transporteur n°3 Nom usuel" },
-    transporter3CompanySiret: {
-      label: "Transporteur n°3 SIRET ou n° de TVA intracommunautaire"
+    transporter2CompanySiret: {
+      label: "Transporteur n°2 - SIRET ou n° de TVA intracommunautaire"
     },
-    transporter3CompanyAddress: { label: "Transporteur n°3 adresse" },
-    transporter3CompanyPostalCode: { label: "Transporteur n°3 Code postal" },
-    transporter3CompanyCity: { label: "Transporteur n°3 Commune" },
-    transporter3CompanyCountry: { label: "Transporteur n°3 Pays" },
-    transporter3RecepisseIsExempted: {
-      label: "Transporteur n°3 exemption de récépissé",
+    transporter2CompanyName: { label: "Transporteur n°2 - Raison sociale" },
+    transporter2CompanyGivenName: { label: "Transporteur n°2 - Nom usuel" },
+    transporter2CompanyAddress: { label: "Transporteur n°2 - Libellé adresse" },
+    transporter2CompanyPostalCode: { label: "Transporteur n°2 - Code postal" },
+    transporter2CompanyCity: { label: "Transporteur n°2 - Commune" },
+    transporter2CompanyCountry: { label: "Transporteur n°2 - Code pays" },
+    transporter2CompanyMail: { label: "Transporteur n°2 - Contact" },
+    transporter2RecepisseIsExempted: {
+      label: "Transporteur n°2 - Exemption de récépissé",
       format: formatBoolean
     },
-    transporter3RecepisseNumber: { label: "Transporteur n°3 récépissé" },
+    transporter2RecepisseNumber: {
+      label: "Transporteur n°2 - N° de récépissé"
+    },
     transporter3TransportMode: {
-      label: "Transporteur n°3 mode de transport",
+      label: "Transporteur n°3 - Mode de transport",
       format: formatTransportMode
     },
-    transporter3CompanyMail: { label: "Transporteur n°3 contact" },
-    transporter4CompanyName: { label: "Transporteur n°4 raison sociale" },
-    transporter4CompanyGivenName: { label: "Transporteur n°4 Nom usuel" },
-    transporter4CompanySiret: {
-      label: "Transporteur n°4 SIRET ou n° de TVA intracommunautaire"
+    transporter3CompanySiret: {
+      label: "Transporteur n°3 - SIRET ou n° de TVA intracommunautaire"
     },
-    transporter4CompanyAddress: { label: "Transporteur n°4 adresse" },
-    transporter4CompanyPostalCode: { label: "Transporteur n°4 Code postal" },
-    transporter4CompanyCity: { label: "Transporteur n°4 Commune" },
-    transporter4CompanyCountry: { label: "Transporteur n°4 Pays" },
-    transporter4RecepisseIsExempted: {
-      label: "Transporteur n°4 exemption de récépissé",
+    transporter3CompanyName: { label: "Transporteur n°3 - Raison sociale" },
+    transporter3CompanyGivenName: { label: "Transporteur n°3 - Nom usuel" },
+    transporter3CompanyAddress: { label: "Transporteur n°3 - Libellé adresse" },
+    transporter3CompanyPostalCode: { label: "Transporteur n°3 - Code postal" },
+    transporter3CompanyCity: { label: "Transporteur n°3 - Commune" },
+    transporter3CompanyCountry: { label: "Transporteur n°3 - Code pays" },
+    transporter3CompanyMail: { label: "Transporteur n°3 - Contact" },
+    transporter3RecepisseIsExempted: {
+      label: "Transporteur n°3 - Exemption de récépissé",
       format: formatBoolean
     },
-    transporter4RecepisseNumber: { label: "Transporteur n°4 récépissé" },
+    transporter3RecepisseNumber: {
+      label: "Transporteur n°3 - N° de récépissé"
+    },
     transporter4TransportMode: {
-      label: "Transporteur n°4 mode de transport",
+      label: "Transporteur n°4 - Mode de transport",
       format: formatTransportMode
     },
-    transporter4CompanyMail: { label: "Transporteur n°4 contact" },
-    transporter5CompanyName: { label: "Transporteur n°5 raison sociale" },
-    transporter5CompanyGivenName: { label: "Transporteur n°5 Nom usuel" },
-    transporter5CompanySiret: {
-      label: "Transporteur n°5 SIRET ou n° de TVA intracommunautaire"
+    transporter4CompanySiret: {
+      label: "Transporteur n°4 - SIRET ou n° de TVA intracommunautaire"
     },
-    transporter5CompanyAddress: { label: "Transporteur n°5 adresse" },
-    transporter5CompanyPostalCode: { label: "Transporteur n°5 Code postal" },
-    transporter5CompanyCity: { label: "Transporteur n°5 Commune" },
-    transporter5CompanyCountry: { label: "Transporteur n°5 Pays" },
-    transporter5RecepisseIsExempted: {
-      label: "Transporteur n°5 exemption de récépissé",
+    transporter4CompanyName: { label: "Transporteur n°4 - Raison sociale" },
+    transporter4CompanyGivenName: { label: "Transporteur n°4 - Nom usuel" },
+    transporter4CompanyAddress: { label: "Transporteur n°4 - Libellé adresse" },
+    transporter4CompanyPostalCode: { label: "Transporteur n°4 - Code postal" },
+    transporter4CompanyCity: { label: "Transporteur n°4 - Commune" },
+    transporter4CompanyCountry: { label: "Transporteur n°4 - Code pays" },
+    transporter4CompanyMail: { label: "Transporteur n°4 - Contact" },
+    transporter4RecepisseIsExempted: {
+      label: "Transporteur n°4 - Exemption de récépissé",
       format: formatBoolean
     },
-    transporter5RecepisseNumber: { label: "Transporteur n°5 récépissé" },
+    transporter4RecepisseNumber: {
+      label: "Transporteur n°4 - N° de récépissé"
+    },
     transporter5TransportMode: {
-      label: "Transporteur n°5 mode de transport",
+      label: "Transporteur n°5 - Mode de transport",
       format: formatTransportMode
     },
-    transporter5CompanyMail: { label: "Transporteur n°5 contact" }
+    transporter5CompanySiret: {
+      label: "Transporteur n°5 - SIRET ou n° de TVA intracommunautaire"
+    },
+    transporter5CompanyName: { label: "Transporteur n°5 - Raison sociale" },
+    transporter5CompanyGivenName: { label: "Transporteur n°5 - Nom usuel" },
+    transporter5CompanyAddress: { label: "Transporteur n°5 - Libellé adresse" },
+    transporter5CompanyPostalCode: { label: "Transporteur n°5 - Code postal" },
+    transporter5CompanyCity: { label: "Transporteur n°5 - Commune" },
+    transporter5CompanyCountry: { label: "Transporteur n°5 - Pays" },
+    transporter5CompanyMail: { label: "Transporteur n°5 - Contact" },
+    transporter5RecepisseIsExempted: {
+      label: "Transporteur n°5 - Exemption de récépissé",
+      format: formatBoolean
+    },
+    transporter5RecepisseNumber: { label: "Transporteur n°5 - N° de récépissé" }
   }
 };
 
