@@ -557,7 +557,7 @@ model RegistryLookup {
     exportRegistryType RegistryExportType
     declarationType    RegistryExportDeclarationType
     wasteType          RegistryExportWasteType
-    wasteCode          String
+    wasteCode          String?
     date               DateTime
     // should be a UUIDv7 using date as time source
     // to allow cursor based queries that required a unique key that should
