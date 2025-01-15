@@ -86,7 +86,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
         if (!permissions.includes(UserPermission.BsdCanSignAcceptation))
           return null;
 
-        let title = "Signer la réception";
+        let title = "Signer la réception et l'acceptation";
         if (isTempStorage) {
           title = "Signer la réception de l'entreposage provisoire";
         }
