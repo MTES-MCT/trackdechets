@@ -518,8 +518,9 @@ export const parcelRefinement: Refinement<{
   nextDestinationIsAbroad?: boolean | null;
 }> = (item, { addIssue }) => {
   if (
-    !item.parcelCoordinates.length ||
-    (!item.parcelNumbers.length && !item.parcelInseeCodes.length)
+    !item.parcelCoordinates.length &&
+    !item.parcelNumbers.length &&
+    !item.parcelInseeCodes.length
   ) {
     addIssue({
       code: "custom",

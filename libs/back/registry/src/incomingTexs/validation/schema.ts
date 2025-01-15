@@ -69,7 +69,8 @@ const inputIncomingTexsSchema = z.object({
   parcelCoordinates: parcelCoordinatesSchema,
   sisIdentifier: z
     .string()
-    .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères"),
+    .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
+    .nullish(),
   initialEmitterCompanyType: actorTypeSchema,
   initialEmitterCompanyOrgId: actorOrgIdSchema,
   initialEmitterCompanyName: actorNameSchema,

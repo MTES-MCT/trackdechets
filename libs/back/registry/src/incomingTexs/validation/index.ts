@@ -1,5 +1,5 @@
 import {
-    parcelRefinement,
+  parcelRefinement,
   refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,

@@ -705,7 +705,7 @@ input IncomingTexsLineInput {
   Identifiant SIS du terrain
   Identifiant du terrain du site de production s'il est placé en SIS
   """
-  sisIdentifiers: [String!]
+  sisIdentifier: String
   """
   Type de producteur initial
   Type d'acteur correspondant au producteur du déchet

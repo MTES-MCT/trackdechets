@@ -362,47 +362,53 @@ export const notificationNumberSchema = z
   )
   .nullish();
 
-export const parcelNumbersSchema = z
-  .string()
-  .nullish()
-  .transform(val =>
-    val
-      ? String(val)
-          .split(",")
-          .map(val => val.trim())
-      : []
-  )
-  .pipe(
-    z.array(
-      z
-        .string()
-        .regex(
-          /^\d{3}-[A-Z]{2}-\d{2}$/,
-          "Le numéro de parcelle ne respecte pas le format attendu"
-        )
+const parcelNumbersArraySchema = z.array(
+  z
+    .string()
+    .regex(
+      /^\d{3}-[A-Z]{2}-\d{2}$/,
+      "Le numéro de parcelle ne respecte pas le format attendu"
     )
-  );
+);
 
-export const parcelCoordinatesSchema = z
-  .string()
-  .nullish()
-  .transform(val =>
-    val
-      ? String(val)
-          .split(",")
-          .map(val => val.trim())
-      : []
-  )
-  .pipe(
-    z.array(
-      z
-        .string()
-        .regex(
-          /^-?\d+(\.\d+)? -?\d+(\.\d+)?$/,
-          "La coordonnée ne respecte pas le format attendu"
-        )
+export const parcelNumbersSchema = z.union([
+  z
+    .string()
+    .nullish()
+    .transform(val =>
+      val
+        ? String(val)
+            .split(",")
+            .map(val => val.trim())
+        : []
     )
-  );
+    .pipe(parcelNumbersArraySchema),
+  parcelNumbersArraySchema
+]);
+
+const parcelCoordinatesArraySchema = z.array(
+  z
+    .string()
+    .regex(
+      /^-?\d+(\.\d+)? -?\d+(\.\d+)?$/,
+      "La coordonnée ne respecte pas le format attendu"
+    )
+);
+
+export const parcelCoordinatesSchema = z.union([
+  z
+    .string()
+    .nullish()
+    .transform(val =>
+      val
+        ? String(val)
+            .split(",")
+            .map(val => val.trim())
+        : []
+    )
+    .pipe(parcelCoordinatesArraySchema),
+  parcelCoordinatesArraySchema
+]);
 
 export const actorTypeSchema = z.enum(
   [

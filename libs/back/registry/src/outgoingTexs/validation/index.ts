@@ -1,5 +1,5 @@
 import {
-    parcelRefinement,
+  parcelRefinement,
   refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,
@@ -16,7 +16,7 @@ import {
   transporter2Refinement,
   transporter3Refinement,
   transporter4Refinement,
-  transporter5Refinement,
+  transporter5Refinement
 } from "./refinement";
 import { outgoingTexsSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
