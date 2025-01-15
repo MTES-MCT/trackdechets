@@ -430,7 +430,7 @@ export async function approveAndApplyRevisionRequest(
       for (const updatedAppendix1Producer of updatedAppendix1Producers) {
         await lookupUtils.update(updatedAppendix1Producer, prisma);
       }
-      //TODO ici
+
       prisma.addAfterCommitCallback?.(() => {
         for (const readableId in appendix1ProducerIds) {
           enqueueUpdatedBsdToIndex(readableId);
