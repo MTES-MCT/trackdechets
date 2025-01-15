@@ -315,7 +315,7 @@ export const updateRegistryLookup = async (
         wasteType: form.wasteDetailsIsDangerous
           ? RegistryExportWasteType.DD
           : RegistryExportWasteType.DND,
-        wasteCode: form.wasteDetailsCode!, // is required from emitter signature, so it has to be there
+        wasteCode: form.wasteDetailsCode,
         ...generateDateInfos(form.receivedAt),
         bsddId: form.id
       }
