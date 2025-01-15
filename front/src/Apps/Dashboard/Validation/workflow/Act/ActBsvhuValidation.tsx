@@ -2,7 +2,7 @@ import React from "react";
 import { Bsvhu, BsvhuStatus } from "@td/codegen-ui";
 import SignVhuEmission from "../../Bsvhu/SignVhuEmission";
 import SignVhuTransport from "../../Bsvhu/SignVhuTransport";
-import { SignOperation } from "../../../../../dashboard/components/BSDList/BSVhu/WorkflowAction/SignOperation";
+import SignVhuOperation from "../../Bsvhu/SignVhuOperation";
 
 interface ActBsvhuValidationProps {
   bsd: Bsvhu;
@@ -13,15 +13,8 @@ interface ActBsvhuValidationProps {
 const ActBsvhuValidation = ({
   bsd,
   currentSiret,
-  isOpen,
   onClose
 }: ActBsvhuValidationProps) => {
-  const actionButtonAdapterProps = {
-    isModalOpenFromParent: isOpen,
-    onModalCloseFromParent: onClose,
-    displayActionButton: false
-  };
-
   const renderInitialModal = () => {
     return <SignVhuEmission bsvhuId={bsd.id} onClose={onClose} />;
   };
@@ -31,13 +24,7 @@ const ActBsvhuValidation = ({
   };
 
   const renderSentModal = () => {
-    return (
-      <SignOperation
-        bsvhuId={bsd.id}
-        siret={currentSiret}
-        {...actionButtonAdapterProps}
-      />
-    );
+    return <SignVhuOperation bsvhuId={bsd.id} onClose={onClose} />;
   };
 
   const status = bsd["bsvhuStatus"];
