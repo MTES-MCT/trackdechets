@@ -10,8 +10,8 @@ export const SSD_HEADERS: { [key in keyof ParsedZodInputSsdItem]: string } = {
   wasteDescription: "Dénomination du déchet",
   wasteCode: "Code déchet",
   wasteCodeBale: "Code déchet Bâle",
-  secondaryWasteCodes: "Codes déchets secondaires",
   secondaryWasteDescriptions: "Dénominations des déchets secondaires",
+  secondaryWasteCodes: "Codes déchets secondaires",
   product: "Produit",
   weightValue: "Poids en tonne",
   weightIsEstimate: "Type de poids",
@@ -56,7 +56,7 @@ export const SSD_EXPORT_HEADERS = {
   destinationCompanyPostalCode: "Code postal du destinataire",
   destinationCompanyCity: "Commune du destinataire",
   destinationCompanyCountryCode: "Pays du destinataire",
-  operationCode: "Code d'opération",
+  operationCode: "Code de traitement",
   operationMode: "Mode de traitement",
   administrativeActReference: "Référence de l'acte administratif"
 };

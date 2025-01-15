@@ -15,49 +15,6 @@ export const initialEmitterRefinement =
     countryKey: "initialEmitterCompanyCountryCode"
   });
 
-export const parcelRefinement: Refinement<ParsedZodIncomingTexsItem> = (
-  item,
-  { addIssue }
-) => {
-  if (
-    !item.parcelCoordinates ||
-    (!item.parcelNumbers && !item.parcelInseeCodes)
-  ) {
-    addIssue({
-      code: "custom",
-      message:
-        "Vous devez renseigner soit les codes INSEE et numéros des parcelles, soit les coordonnées de parcelles",
-      path: ["parcelCoordinates"]
-    });
-  }
-
-  if (
-    item.parcelNumbers &&
-    item.parcelInseeCodes &&
-    item.parcelNumbers.length !== item.parcelInseeCodes.length
-  ) {
-    addIssue({
-      code: "custom",
-      message:
-        "Vous devez renseigner le même nombre de codes INSEE des parcelles que de numéros des parcelles",
-      path: ["parcelNumbers"]
-    });
-  }
-
-  if (
-    item.isUpcycled &&
-    !item.destinationParcelCoordinates &&
-    !item.destinationParcelNumbers
-  ) {
-    addIssue({
-      code: "custom",
-      message:
-        "Vous devez renseigner soit les numéros de parcelles de destination, soit les coordonnées de parcelles de destination",
-      path: ["destinationParcelCoordinates"]
-    });
-  }
-};
-
 export const emitterRefinement = refineActorInfos<ParsedZodIncomingTexsItem>({
   typeKey: "emitterCompanyType",
   orgIdKey: "emitterCompanyOrgId",

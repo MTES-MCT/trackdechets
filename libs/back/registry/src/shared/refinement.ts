@@ -216,7 +216,7 @@ function refineActorDetails<T>({
 export const refineIsDangerous: Refinement<{
   wasteIsDangerous?: boolean | null | undefined;
   wastePop: boolean;
-  wasteCode: z.infer<ReturnType<typeof getWasteCodeSchema>>;
+  wasteCode?: z.infer<ReturnType<typeof getWasteCodeSchema>> | null;
 }> = (item, { addIssue }) => {
   // No check if the value is not set
   if (item.wasteIsDangerous == null) {
@@ -224,7 +224,7 @@ export const refineIsDangerous: Refinement<{
   }
 
   if (
-    (item.wastePop || item.wasteCode.includes("*")) &&
+    (item.wastePop || item.wasteCode?.includes("*")) &&
     !item.wasteIsDangerous
   ) {
     addIssue({
@@ -291,7 +291,7 @@ export const refineWeightAndVolume: Refinement<{
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Pour les codes opération R 1, D 10 et D 5, le poids ne peut pas être estimé`,
+      message: `Pour les codes de traitement R 1, D 10 et D 5, le poids ne peut pas être estimé`,
       path: ["weightIsEstimate"]
     });
   }
@@ -307,7 +307,7 @@ export const refineWeightIsEstimate: Refinement<{
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Pour les codes opération R 1, D 10 et D 5, le poids ne peut pas être estimé`,
+      message: `Pour les codes de traitement R 1, D 10 et D 5, le poids ne peut pas être estimé`,
       path: ["weightIsEstimate"]
     });
   }
@@ -361,13 +361,13 @@ export const refineMunicipalities: Refinement<{
 export const refineNotificationNumber: Refinement<{
   wasteIsDangerous?: boolean | null | undefined;
   wastePop: boolean;
-  wasteCode: z.infer<ReturnType<typeof getWasteCodeSchema>>;
+  wasteCode?: z.infer<ReturnType<typeof getWasteCodeSchema>> | null;
   declarationNumber?: string | null | undefined;
   notificationNumber?: string | null | undefined;
   nextDestinationIsAbroad?: boolean | null | undefined;
 }> = (item, { addIssue }) => {
   const isDangerous =
-    item.wasteIsDangerous || item.wastePop || item.wasteCode.includes("*");
+    item.wasteIsDangerous || item.wastePop || item.wasteCode?.includes("*");
 
   if (!item.notificationNumber && isDangerous && item.nextDestinationIsAbroad) {
     addIssue({
@@ -405,7 +405,7 @@ export const refineOperationMode: Refinement<{
   if (isFinalOperationCode && !item.operationMode) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le mode d'opération est requis lorsqu'un code de traitement final a été renseigné`,
+      message: `Le mode de traitement est requis lorsqu'un code de traitement final a été renseigné`,
       path: ["operationMode"]
     });
   }
@@ -432,7 +432,7 @@ export const refineFollowingTraceabilityInfos: Refinement<{
   if (!isFinalOperationCode && item.noTraceability == null) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `L'information sur la rupture de traçabilité est requise pour les codes d'opération non finaux`,
+      message: `L'information sur la rupture de traçabilité est requise pour les codes de traitement non finaux`,
       path: ["noTraceability"]
     });
   }
@@ -440,7 +440,7 @@ export const refineFollowingTraceabilityInfos: Refinement<{
   if (!isFinalOperationCode && item.nextOperationCode == null) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le code d'opération ultérieure prévue est requis pour les codes d'opération non finaux`,
+      message: `Le code de traitement ultérieur prévue est requis pour les codes de traitement non finaux`,
       path: ["nextOperationCode"]
     });
   }
@@ -504,6 +504,63 @@ export const refineTransportersConsistency: Refinement<{
       code: z.ZodIssueCode.custom,
       message: `Le transporteur 5 ne doit pas être renseigné si le transporteur 4 ne l'est pas`,
       path: ["transporter5CompanyOrgId"]
+    });
+  }
+};
+
+export const parcelRefinement: Refinement<{
+  parcelCoordinates: string[];
+  parcelNumbers: string[];
+  parcelInseeCodes: string[];
+  isUpcycled?: boolean | null;
+  destinationParcelCoordinates: string[];
+  destinationParcelNumbers: string[];
+  nextDestinationIsAbroad?: boolean | null;
+}> = (item, { addIssue }) => {
+  if (
+    !item.parcelCoordinates.length ||
+    (!item.parcelNumbers.length && !item.parcelInseeCodes.length)
+  ) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner soit les codes INSEE et numéros des parcelles, soit les coordonnées de parcelles",
+      path: ["parcelCoordinates"]
+    });
+  }
+
+  if (
+    item.parcelNumbers.length &&
+    item.parcelInseeCodes.length &&
+    item.parcelNumbers.length !== item.parcelInseeCodes.length
+  ) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner le même nombre de codes INSEE des parcelles que de numéros des parcelles",
+      path: ["parcelNumbers"]
+    });
+  }
+
+  if (item.isUpcycled == null && item.nextDestinationIsAbroad === false) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner si les terres sont valorisées ou non lorsque la destination n'est pas à l'étranger",
+      path: ["isUpcycled"]
+    });
+  }
+
+  if (
+    item.isUpcycled &&
+    !item.destinationParcelCoordinates.length &&
+    !item.destinationParcelNumbers.length
+  ) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner soit les numéros de parcelles de destination, soit les coordonnées de parcelles de destination",
+      path: ["destinationParcelCoordinates"]
     });
   }
 };
