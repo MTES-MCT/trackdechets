@@ -351,7 +351,7 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
             </strong>
           </td>
           <td>
-            <strong>COLIS (totaux)</strong>
+            <strong>Total conditionnement</strong>
           </td>
         </tr>
       </tbody>
