@@ -378,6 +378,120 @@ describe("Mutation.createForm", () => {
     }
   );
 
+  test("broker should be registered to Trackdechets", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+
+    const brokerSiret = "88792840600032";
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          broker: { company: { siret: brokerSiret } }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Courtier : l'établissement avec le SIRET ${brokerSiret} n'est pas inscrit sur Trackdéchets`
+      })
+    ]);
+  });
+
+  test("broker should have BROKER profile", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const broker = await companyFactory({ companyTypes: [] });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          broker: { company: { siret: broker.siret } }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          `Le courtier saisi sur le bordereau (SIRET: ${broker.siret}) n'est pas inscrit sur Trackdéchets` +
+          " en tant qu'établissement de courtage et ne peut donc pas être visé sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+          " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+      })
+    ]);
+  });
+
+  test("trader should be registered to Trackdechets", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+
+    const traderSiret = "88792840600032";
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          trader: { company: { siret: traderSiret } }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Négociant : l'établissement avec le SIRET ${traderSiret} n'est pas inscrit sur Trackdéchets`
+      })
+    ]);
+  });
+
+  test("trader should have TRADER profile", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const trader = await companyFactory({ companyTypes: [] });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          trader: { company: { siret: trader.siret } }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          `Le négociant saisi sur le bordereau (SIRET: ${trader.siret}) n'est pas inscrit sur Trackdéchets` +
+          " en tant qu'établissement de négoce et ne peut donc pas être visé sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+          " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+      })
+    ]);
+  });
+
   it("should allow a transporter listed in the transporters list to create a form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -1216,6 +1330,7 @@ describe("Mutation.createForm", () => {
       const { company: transporterCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
+      const traderCompany = await companyFactory({ companyTypes: ["TRADER"] });
 
       const validityLimit = new Date("2040-01-01");
       const createFormInput = {
@@ -1239,7 +1354,7 @@ describe("Mutation.createForm", () => {
         },
         trader: {
           company: {
-            siret: siretify(1),
+            siret: traderCompany.siret,
             name: "Trader",
             address: "123 Wall Street, NY",
             contact: "Jane Doe",
