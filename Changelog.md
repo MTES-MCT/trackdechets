@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.02.1] 11/02/2025
+
+#### :nail_care: Améliorations
+
+BSDD - Dupliquer le(s) conditionnement(s) et la mention ADR et afficher un message informatif en cas de BSDD provenant d'une duplication [PR 3881](https://github.com/MTES-MCT/trackdechets/pull/3881)
+
 # [2025.01.1] 14/01/2025
 
 #### :rocket: Nouvelles fonctionnalités
