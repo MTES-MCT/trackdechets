@@ -9,7 +9,7 @@ interface IdentificationNumberProps {
   name: string;
   disabled: boolean;
   error?: {};
-  type?: string;
+  infoMessage?: string;
   defaultValue?: (string | undefined)[] | null | undefined;
 }
 const IdentificationNumber = ({
@@ -17,7 +17,7 @@ const IdentificationNumber = ({
   name,
   disabled,
   error,
-  type,
+  infoMessage,
   defaultValue
 }: IdentificationNumberProps) => {
   const { setValue, getValues, clearErrors } = useFormContext();
@@ -161,14 +161,14 @@ const IdentificationNumber = ({
           />
         )}
       </div>
-      {type && (
+      {infoMessage && (
         <p
           className={classNames(
             "fr-mt-5v",
             error ? "fr-error-text" : "fr-info-text"
           )}
         >
-          Vous avez {state.codes.length} {type} pour ce contenant
+          {infoMessage.replace("%", state.codes.length)}
         </p>
       )}
     </>

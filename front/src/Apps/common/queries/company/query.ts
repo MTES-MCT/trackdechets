@@ -27,7 +27,8 @@ trackdechetsId
 contact
 contactPhone
 contactEmail
-companyTypes`;
+companyTypes
+wasteVehiclesTypes`;
 
 const commonCompanyTypesSearchString = `
 collectorTypes
