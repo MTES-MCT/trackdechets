@@ -89,7 +89,7 @@ type Mutation {
       weight # doit être 0 si acceptationStatus est REFUSED
       acceptationStatus
       refusalReason
-      date  
+      date
     }
   }
   ```

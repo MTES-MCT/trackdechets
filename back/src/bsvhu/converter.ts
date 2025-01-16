@@ -120,7 +120,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         signature: nullIfNoValues<Signature>({
           date: processDate(form.destinationReceptionSignatureDate),
           author: form.destinationReceptionSignatureAuthor
-        }),
+        })
       }),
       operation: nullIfNoValues<BsvhuOperation>({
         code: form.destinationOperationCode,

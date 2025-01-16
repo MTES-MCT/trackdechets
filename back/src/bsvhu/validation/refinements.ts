@@ -362,7 +362,8 @@ export const checkRequiredFields: (
         const isRequired = isBsvhuFieldRequired(
           required,
           bsvhu,
-          signaturesToCheck
+          signaturesToCheck,
+          validationContext.currentSignatureType
         );
         if (isRequired) {
           checkFieldIsDefined({

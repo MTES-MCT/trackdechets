@@ -13,10 +13,11 @@ import {
 } from "../../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 import { TransportMode } from "@prisma/client";
+import gql from "graphql-tag";
 
-const SIGN_VHU_FORM = `
-mutation SignVhuForm($id: ID!, $input: BsvhuSignatureInput!) {
-  signBsvhu(id: $id, input: $input) {
+const SIGN_VHU = gql`
+  mutation SignVhu($id: ID!, $input: BsvhuSignatureInput!) {
+    signBsvhu(id: $id, input: $input) {
       id
       status
       emitter {
@@ -43,8 +44,16 @@ mutation SignVhuForm($id: ID!, $input: BsvhuSignatureInput!) {
           }
         }
       }
+    }
   }
-}
+`;
+
+const UPDATE_VHU = gql`
+  mutation UpdateVhu($id: ID!, $input: BsvhuInput!) {
+    updateBsvhu(id: $id, input: $input) {
+      id
+    }
+  }
 `;
 
 describe("Mutation.Vhu.sign", () => {
@@ -52,7 +61,7 @@ describe("Mutation.Vhu.sign", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(SIGN_VHU_FORM, {
+    const { errors } = await mutate(SIGN_VHU, {
       variables: {
         id: 1,
         input: { type: "EMISSION", author: "The Ghost" }
@@ -78,7 +87,7 @@ describe("Mutation.Vhu.sign", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
       variables: {
         id: bsvhu.id,
         input: { type: "EMISSION", author: user.name }
@@ -101,15 +110,12 @@ describe("Mutation.Vhu.sign", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
-      SIGN_VHU_FORM,
-      {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "EMISSION", author: user.name }
-        }
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "EMISSION", author: user.name }
       }
-    );
+    });
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Vous ne pouvez pas signer ce bordereau",
@@ -133,15 +139,12 @@ describe("Mutation.Vhu.sign", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
-      SIGN_VHU_FORM,
-      {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "EMISSION", author: user.name, securityCode: 5555 }
-        }
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "EMISSION", author: user.name, securityCode: 5555 }
       }
-    );
+    });
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Le code de signature est invalide.",
@@ -168,7 +171,7 @@ describe("Mutation.Vhu.sign", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
       variables: {
         id: bsvhu.id,
         input: { type: "EMISSION", author: user.name, securityCode: 9421 }
@@ -200,15 +203,12 @@ describe("Mutation.Vhu.sign", () => {
     });
 
     const { mutate } = makeClient(emitter);
-    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
-      SIGN_VHU_FORM,
-      {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "TRANSPORT", author: emitter.name }
-        }
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "TRANSPORT", author: emitter.name }
       }
-    );
+    });
 
     const signedBsvhu = await prisma.bsvhu.findUnique({
       where: { id: bsvhu.id }
@@ -246,15 +246,12 @@ describe("Mutation.Vhu.sign", () => {
     });
 
     const { mutate } = makeClient(emitter);
-    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
-      SIGN_VHU_FORM,
-      {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "TRANSPORT", author: emitter.name, securityCode: 3333 }
-        }
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "TRANSPORT", author: emitter.name, securityCode: 3333 }
       }
-    );
+    });
 
     const signedBsvhu = await prisma.bsvhu.findUnique({
       where: { id: bsvhu.id }
@@ -293,7 +290,7 @@ describe("Mutation.Vhu.sign", () => {
     });
 
     const { mutate } = makeClient(emitter);
-    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
       variables: {
         id: bsvhu.id,
         input: { type: "TRANSPORT", author: emitter.name, securityCode: 9421 }
@@ -323,7 +320,7 @@ describe("Mutation.Vhu.sign", () => {
 
     const date = new Date().toISOString();
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
       variables: {
         id: bsvhu.id,
         input: { type: "EMISSION", author: user.name, date }
@@ -351,15 +348,12 @@ describe("Mutation.Vhu.sign", () => {
 
     const date = new Date().toISOString();
     const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
-      SIGN_VHU_FORM,
-      {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "TRANSPORT", author: user.name, date }
-        }
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "TRANSPORT", author: user.name, date }
       }
-    );
+    });
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Vous ne pouvez pas apposer cette signature sur le bordereau.",
@@ -387,15 +381,12 @@ describe("Mutation.Vhu.sign", () => {
 
     const date = new Date().toISOString();
     const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
-      SIGN_VHU_FORM,
-      {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "TRANSPORT", author: user.name, date }
-        }
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "TRANSPORT", author: user.name, date }
       }
-    );
+    });
     expect(errors).toEqual([
       expect.objectContaining({
         message: "L'immatriculation du transporteur est un champ requis.",
@@ -424,15 +415,12 @@ describe("Mutation.Vhu.sign", () => {
 
     const date = new Date().toISOString();
     const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
-      SIGN_VHU_FORM,
-      {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "TRANSPORT", author: user.name, date }
-        }
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "TRANSPORT", author: user.name, date }
       }
-    );
+    });
     expect(errors).toBeUndefined(); // plates are not required
   });
 
@@ -463,7 +451,7 @@ describe("Mutation.Vhu.sign", () => {
       const date = new Date().toISOString();
       const { mutate } = makeClient(user);
       const { errors, data } = await mutate<Pick<Mutation, "signBsvhu">>(
-        SIGN_VHU_FORM,
+        SIGN_VHU,
         {
           variables: {
             id: bsvhu.id,
@@ -498,15 +486,12 @@ describe("Mutation.Vhu.sign", () => {
 
     const date = new Date().toISOString();
     const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(
-      SIGN_VHU_FORM,
-      {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "TRANSPORT", author: user.name, date }
-        }
+    const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+      variables: {
+        id: bsvhu.id,
+        input: { type: "TRANSPORT", author: user.name, date }
       }
-    );
+    });
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Vous ne pouvez pas apposer cette signature sur le bordereau.",
@@ -534,7 +519,7 @@ describe("Mutation.Vhu.sign", () => {
 
     const date = new Date().toISOString();
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
       variables: {
         id: bsvhu.id,
         input: { type: "TRANSPORT", author: user.name, date }
@@ -564,7 +549,7 @@ describe("Mutation.Vhu.sign", () => {
 
     const date = new Date().toISOString();
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+    const { data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
       variables: {
         id: bsvhu.id,
         input: { type: "TRANSPORT", author: user.name, date }
@@ -577,18 +562,23 @@ describe("Mutation.Vhu.sign", () => {
     expect(data.signBsvhu.transporter!.transport!.signature!.date).toBe(date);
   });
 
+  // We've added the new step "RECEPTION". As it is a non-breaking change, it is
+  // optional and can be skipped.
   describe.only("RECEPTION", () => {
-
-    it.only("should be able to sign reception after transport (and date + signature should be filled)", async () => {
+    it("should be able to sign reception after transport", async () => {
       // Given
-      const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["PRODUCER"]
-      });
-      const { user: destinationUser, company: destinationCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["WASTE_VEHICLES"],
-        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
-      });
-  
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: ["PRODUCER"]
+        }
+      );
+      const { user: destinationUser, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
+
       const bsvhu = await bsvhuFactory({
         opt: {
           status: "SENT",
@@ -602,11 +592,61 @@ describe("Mutation.Vhu.sign", () => {
           destinationReceptionDate: new Date()
         }
       });
-      
+
       // When
       const date = new Date().toISOString();
       const { mutate } = makeClient(destinationUser);
-      const { errors, data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+      const { errors, data } = await mutate<Pick<Mutation, "signBsvhu">>(
+        SIGN_VHU,
+        {
+          variables: {
+            id: bsvhu.id,
+            input: { type: "RECEPTION", author: destinationUser.name, date }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signBsvhu.destination?.reception?.signature?.author).toBe(
+        destinationUser.name
+      );
+      expect(data.signBsvhu.destination?.reception?.signature?.date).toBe(date);
+      expect(data.signBsvhu.status).toBe("RECEIVED");
+    });
+
+    it("should return error if trying to sign RECEPTION and reception params are not filled", async () => {
+      // Given
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: ["PRODUCER"]
+        }
+      );
+      const { user: destinationUser, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
+
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          // Reception data
+          destinationReceptionAcceptationStatus: null, // Missing param
+          destinationReceptionWeight: null, // Missing param
+          destinationReceptionDate: null // Missing param
+        }
+      });
+
+      // When
+      const date = new Date().toISOString();
+      const { mutate } = makeClient(destinationUser);
+      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
         variables: {
           id: bsvhu.id,
           input: { type: "RECEPTION", author: destinationUser.name, date }
@@ -614,29 +654,141 @@ describe("Mutation.Vhu.sign", () => {
       });
 
       // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le statut d'acceptation du destinataire est un champ requis.\n" +
+          "Le poids réel reçu est un champ requis.\n" +
+          "La date de réception est un champ requis."
+      );
+    });
+
+    it("should be able to sign operation after transport, skipping reception", async () => {
+      // Given
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: ["PRODUCER"]
+        }
+      );
+      const { user: destinationUser, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
+
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          // Reception data
+          destinationReceptionAcceptationStatus: "ACCEPTED",
+          destinationReceptionWeight: 1000,
+          destinationReceptionDate: null, // Not required!
+          // Operation data
+          destinationOperationCode: "R 5",
+          destinationOperationDate: new Date(),
+          destinationOperationMode: "REUTILISATION"
+        }
+      });
+
+      // When
+      const date = new Date().toISOString();
+      const { mutate } = makeClient(destinationUser);
+      const { errors, data } = await mutate<Pick<Mutation, "signBsvhu">>(
+        SIGN_VHU,
+        {
+          variables: {
+            id: bsvhu.id,
+            input: { type: "OPERATION", author: destinationUser.name, date }
+          }
+        }
+      );
+
+      // Then
       expect(errors).toBeUndefined();
-      expect(data.signBsvhu.destination?.reception?.signature?.author).toBe(destinationUser.name);
-      expect(data.signBsvhu.destination?.reception?.signature?.date).toBe(date);
-      expect(data.signBsvhu.status).toBe("RECEIVED");
+      expect(data.signBsvhu.destination?.reception?.signature?.author).toBe(
+        undefined
+      );
+      expect(data.signBsvhu.destination?.reception?.signature?.date).toBe(
+        undefined
+      );
+      expect(data.signBsvhu.status).toBe("PROCESSED");
+    });
+
+    it("should not be able to sign operation after transport, skipping reception, if missing reception params", async () => {
+      // Given
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: ["PRODUCER"]
+        }
+      );
+      const { user: destinationUser, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
+
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          // Missing reception data!
+          destinationReceptionAcceptationStatus: null, // Missing param
+          destinationReceptionWeight: null, // Missing param
+          destinationReceptionDate: null, // Not required!
+          // Operation data
+          destinationOperationCode: "R 5",
+          destinationOperationDate: new Date(),
+          destinationOperationMode: "REUTILISATION"
+        }
+      });
+
+      // When
+      const date = new Date().toISOString();
+      const { mutate } = makeClient(destinationUser);
+      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+        variables: {
+          id: bsvhu.id,
+          input: { type: "OPERATION", author: destinationUser.name, date }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le statut d'acceptation du destinataire est un champ requis.\n" +
+          "Le poids réel reçu est un champ requis."
+      );
     });
 
     // it("should fail if requested parameters are missing", async () => {
     //   // Given
-      
+
     //   // When
 
     //   // Then
     // });
 
-    it.only("should fail if VHU has already been received", async () => {
+    it("should fail if VHU has already been received", async () => {
       // Given
-      const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["PRODUCER"]
-      });
-      const { user: destinationUser, company: destinationCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["WASTE_VEHICLES"],
-        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
-      });
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: ["PRODUCER"]
+        }
+      );
+      const { user: destinationUser, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
 
       const bsvhu = await bsvhuFactory({
         opt: {
@@ -657,7 +809,7 @@ describe("Mutation.Vhu.sign", () => {
       // When
       const date = new Date().toISOString();
       const { mutate } = makeClient(destinationUser);
-      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
         variables: {
           id: bsvhu.id,
           input: { type: "RECEPTION", author: destinationUser.name, date }
@@ -669,15 +821,19 @@ describe("Mutation.Vhu.sign", () => {
       expect(errors[0].message).toBe("Cette signature a déjà été apposée.");
     });
 
-    it.only("should fail if VHU has already been processed", async () => {
+    it("should fail if VHU has already been processed", async () => {
       // Given
-      const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["PRODUCER"]
-      });
-      const { user: destinationUser, company: destinationCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["WASTE_VEHICLES"],
-        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
-      });
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: ["PRODUCER"]
+        }
+      );
+      const { user: destinationUser, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
 
       const bsvhu = await bsvhuFactory({
         opt: {
@@ -690,13 +846,17 @@ describe("Mutation.Vhu.sign", () => {
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 1000,
           destinationReceptionDate: new Date(),
+          // Operation data
+          destinationOperationCode: "R 5",
+          destinationOperationDate: new Date(),
+          destinationOperationMode: "REUTILISATION"
         }
       });
 
       // When
       const date = new Date().toISOString();
       const { mutate } = makeClient(destinationUser);
-      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
         variables: {
           id: bsvhu.id,
           input: { type: "RECEPTION", author: destinationUser.name, date }
@@ -705,18 +865,24 @@ describe("Mutation.Vhu.sign", () => {
 
       // Then
       expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe("Vous ne pouvez pas apposer cette signature sur le bordereau.");
+      expect(errors[0].message).toBe(
+        "Vous ne pouvez pas apposer cette signature sur le bordereau."
+      );
     });
 
-    it.only("should fail if VHU hasn't been sent yet", async () => {
+    it("should fail if VHU hasn't been sent yet", async () => {
       // Given
-      const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["PRODUCER"]
-      });
-      const { user: destinationUser, company: destinationCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["WASTE_VEHICLES"],
-        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
-      });
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: ["PRODUCER"]
+        }
+      );
+      const { user: destinationUser, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
 
       const bsvhu = await bsvhuFactory({
         opt: {
@@ -726,14 +892,14 @@ describe("Mutation.Vhu.sign", () => {
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 1000,
-          destinationReceptionDate: new Date(),
+          destinationReceptionDate: new Date()
         }
       });
 
       // When
       const date = new Date().toISOString();
       const { mutate } = makeClient(destinationUser);
-      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
         variables: {
           id: bsvhu.id,
           input: { type: "RECEPTION", author: destinationUser.name, date }
@@ -742,19 +908,23 @@ describe("Mutation.Vhu.sign", () => {
 
       // Then
       expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe("Vous ne pouvez pas apposer cette signature sur le bordereau.");
+      expect(errors[0].message).toBe(
+        "Vous ne pouvez pas apposer cette signature sur le bordereau."
+      );
     });
 
-    it.only("should be able to sign operation after transport, skipping reception (and reception date + signature should be empty)", async () => {
+    it("should return an error if not signed by destination", async () => {
       // Given
-      const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["PRODUCER"]
-      });
-      const { user: destinationUser, company: destinationCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["WASTE_VEHICLES"],
-        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
-      });
-  
+      const { user: emitterUser, company: emitterCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["PRODUCER"]
+        });
+      const { user: destinationUser, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
+
       const bsvhu = await bsvhuFactory({
         opt: {
           status: "SENT",
@@ -765,59 +935,14 @@ describe("Mutation.Vhu.sign", () => {
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 1000,
-          destinationReceptionDate: null, // Not required!
-          // Operation data
-          destinationOperationCode: "R 5",
-          destinationOperationDate: new Date(),
-          destinationOperationMode: "REUTILISATION",
-        }
-      });
-      
-      // When
-      const date = new Date().toISOString();
-      const { mutate } = makeClient(destinationUser);
-      const { errors, data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "OPERATION", author: destinationUser.name, date }
+          destinationReceptionDate: null
         }
       });
 
-      // Then
-      expect(errors).toBeUndefined();
-      expect(data.signBsvhu.destination?.reception?.signature?.author).toBe(undefined);
-      expect(data.signBsvhu.destination?.reception?.signature?.date).toBe(undefined);
-      expect(data.signBsvhu.status).toBe("PROCESSED");
-    });
-
-    it.only("should return an error if not signed by destination", async () => {
-      // Given
-      const { user: emitterUser, company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["PRODUCER"]
-      });
-      const { user: destinationUser, company: destinationCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["WASTE_VEHICLES"],
-        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
-      });
-  
-      const bsvhu = await bsvhuFactory({
-        opt: {
-          status: "SENT",
-          emitterCompanySiret: emitterCompany.siret,
-          destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          // Reception data
-          destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 1000,
-          destinationReceptionDate: null,
-        }
-      });
-      
       // When
       const date = new Date().toISOString();
       const { mutate } = makeClient(emitterUser); // < Should be signed by destination, not emitter!
-      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
+      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
         variables: {
           id: bsvhu.id,
           input: { type: "RECEPTION", author: destinationUser.name, date }
@@ -829,26 +954,23 @@ describe("Mutation.Vhu.sign", () => {
       expect(errors[0].message).toBe("Vous ne pouvez pas signer ce bordereau");
     });
 
-    // TODO: temp storage?
-
-    // TODO: reception data can be overwritten at processing?
-
-    // TODO: destinationReceptionDate is not required if skipping reception
-
-    // TODO
-    it.only("can override reception data before operation (no breaking change)", async () => {
+    it("can NOT override reception data when signing operation", async () => {
       // Given
-      const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["PRODUCER"]
-      });
-      const { user: destinationUser, company: destinationCompany } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: ["WASTE_VEHICLES"],
-        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
-      });
-  
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          companyTypes: ["PRODUCER"]
+        }
+      );
+      const { user: destinationUser, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER", {
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
+
       const bsvhu = await bsvhuFactory({
         opt: {
-          status: "SENT",
+          status: "RECEIVED", // Reception is signed!
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
           transporterTransportSignatureAuthor: "Transporter",
@@ -857,31 +979,41 @@ describe("Mutation.Vhu.sign", () => {
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 1000,
           destinationReceptionDate: null, // Not required!
-          // Operation data
-          destinationOperationCode: "R 5",
-          destinationOperationDate: new Date(),
-          destinationOperationMode: "REUTILISATION",
+          destinationReceptionSignatureAuthor: destinationUser.name,
+          destinationOperationSignatureDate: new Date()
         }
       });
-      
-      // Sign reception
-      const date = new Date().toISOString();
+
+      // When: try to update reception data
       const { mutate } = makeClient(destinationUser);
-      const { errors, data } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU_FORM, {
-        variables: {
-          id: bsvhu.id,
-          input: { type: "RECEPTION", author: destinationUser.name, date }
+      const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+        UPDATE_VHU,
+        {
+          variables: {
+            id: bsvhu.id,
+            input: {
+              destination: {
+                reception: {
+                  acceptationStatus: "PARTIALLY_REFUSED",
+                  refusalReason: "Not enough weight",
+                  weight: 20,
+                  date: new Date().toISOString()
+                }
+              }
+            }
+          }
         }
-      });
-
-      // Still, update reception data
-
+      );
 
       // Then
-      expect(errors).toBeUndefined();
-      expect(data.signBsvhu.destination?.reception?.signature?.author).toBe(undefined);
-      expect(data.signBsvhu.destination?.reception?.signature?.date).toBe(undefined);
-      expect(data.signBsvhu.status).toBe("PROCESSED");
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Des champs ont été verrouillés via signature et ne peuvent" +
+          " plus être modifiés : Le statut d'acceptation du destinataire, La raison du refus par le " +
+          "destinataire, Le poids réel reçu, La date de réception"
+      );
     });
+
+    // TODO: factorize user & companies creation
   });
 });

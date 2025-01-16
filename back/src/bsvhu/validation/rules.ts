@@ -14,6 +14,7 @@ import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { Leaves } from "../../types";
 import { v20250101, v20241001 } from "./refinements";
+import { isDefined } from "../../common/helpers";
 
 // Liste des champs éditables sur l'objet Bsvhu
 export type BsvhuEditableFields = Required<
@@ -62,7 +63,10 @@ export type EditionRule<T extends ZodBsvhu> = {
   // permettant de calculer cette signature
   from: SignatureTypeInput | GetBsvhuSignatureTypeFn<T>;
   // Condition supplémentaire à vérifier pour que le champ soit requis.
-  when?: (bsvhu: T) => boolean;
+  when?: (
+    bsvhu: T,
+    currentSignatureType: SignatureTypeInput | undefined
+  ) => boolean;
   customErrorMessage?: string;
 };
 
@@ -239,33 +243,33 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "L'adresse e-mail du destinataire",
     path: ["destination", "company", "mail"]
   },
-  // TODO
+  // TODO ============================================
   destinationReceptionAcceptationStatus: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
     required: { from: "RECEPTION" },
     readableFieldName: "Le statut d'acceptation du destinataire",
     path: ["destination", "reception", "acceptationStatus"]
   },
-  // TODO
+  // TODO ============================================
   destinationReceptionRefusalReason: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
     readableFieldName: "La raison du refus par le destinataire",
     required: { from: "RECEPTION", when: isRefusedOrPartiallyRefused },
     path: ["destination", "reception", "refusalReason"]
   },
-  // TODO
+  // TODO ============================================
   destinationReceptionWeight: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
     required: { from: "RECEPTION" },
     readableFieldName: "Le poids réel reçu",
     path: ["destination", "reception", "weight"]
   },
-  // TODO
+  // TODO ============================================
   destinationReceptionDate: {
     readableFieldName: "la date de réception",
-    required: { from: "RECEPTION" },
-    sealed: { from: "OPERATION" },
-    path: ["destination", "reception", "date"],
+    required: { from: "RECEPTION", when: isReceptionSignatureStep },
+    sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
+    path: ["destination", "reception", "date"]
   },
   destinationReceptionIdentificationNumbers: {
     sealed: { from: "OPERATION" },
@@ -768,6 +772,20 @@ function isRefusedOrPartiallyRefused(bsvhu: ZodBsvhu) {
   );
 }
 
+function isReceptionSignatureStep(_, currentSignatureType: SignatureTypeInput) {
+  return currentSignatureType === "RECEPTION";
+}
+
+function isDefinedAndNotReceptionSignatureStep(
+  bsvhu: ZodBsvhu,
+  currentSignatureType: SignatureTypeInput
+) {
+  return (
+    isDefined(bsvhu.destinationReceptionRefusalReason) &&
+    currentSignatureType !== "RECEPTION"
+  );
+}
+
 function isNotRefused(bsvhu: ZodBsvhu) {
   return (
     bsvhu.destinationReceptionAcceptationStatus !==
@@ -838,6 +856,7 @@ export async function getSealedFields(
   }
   const currentSignatureType =
     context.currentSignatureType ?? getCurrentSignatureType(bsvhu);
+
   // Some signatures may be skipped, so always check all the hierarchy
   const signaturesToCheck = getSignatureAncestors(currentSignatureType);
 
@@ -869,7 +888,8 @@ function isRuleApplied<T extends ZodBsvhu>(
   rule: EditionRule<T>,
   resource: T,
   signatures: SignatureTypeInput[],
-  context?: RuleContext<T>
+  context?: RuleContext<T>,
+  currentSignatureType?: SignatureTypeInput | undefined
 ) {
   const from =
     typeof rule.from === "function" ? rule.from(resource, context) : rule.from;
@@ -877,7 +897,7 @@ function isRuleApplied<T extends ZodBsvhu>(
   const isApplied =
     from &&
     signatures.includes(from) &&
-    (rule.when === undefined || rule.when(resource));
+    (rule.when === undefined || rule.when(resource, currentSignatureType));
 
   return isApplied;
 }
@@ -894,7 +914,14 @@ function isBsvhuFieldSealed(
 export function isBsvhuFieldRequired(
   rule: EditionRule<ZodBsvhu>,
   bsvhu: ZodBsvhu,
-  signatures: SignatureTypeInput[]
+  signatures: SignatureTypeInput[],
+  currentSignatureType: SignatureTypeInput | undefined
 ) {
-  return isRuleApplied(rule, bsvhu, signatures);
+  return isRuleApplied(
+    rule,
+    bsvhu,
+    signatures,
+    undefined,
+    currentSignatureType
+  );
 }
