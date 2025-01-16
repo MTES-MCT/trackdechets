@@ -151,7 +151,7 @@ export function expandVhuFormFromDb(bsvhu: PrismaVhuForm): GraphqlVhuForm {
         mail: bsvhu.transporterCompanyMail,
         vatNumber: bsvhu.transporterCompanyVatNumber
       }),
-      customInfo: form.transporterCustomInfo,
+      customInfo: bsvhu.transporterCustomInfo,
       recepisse: nullIfNoValues<BsvhuRecepisse>({
         number: bsvhu.transporterRecepisseNumber,
         department: bsvhu.transporterRecepisseDepartment,
