@@ -35,6 +35,22 @@ export const machine = Machine<never, Event>(
       },
       [BsvhuStatus.SENT]: {
         on: {
+          RECEPTION: {
+            target: BsvhuStatus.RECEIVED
+          },
+          OPERATION: [
+            {
+              target: BsvhuStatus.REFUSED,
+              cond: "isBsvhuRefused"
+            },
+            {
+              target: BsvhuStatus.PROCESSED
+            }
+          ]
+        }
+      },
+      [BsvhuStatus.RECEIVED]: {
+        on: {
           OPERATION: [
             {
               target: BsvhuStatus.REFUSED,
