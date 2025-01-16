@@ -38,6 +38,7 @@ describe("expandFormFromDb", () => {
       metadata: undefined,
       citerneNotWashedOutReason: null,
       hasCiterneBeenWashedOut: null,
+      isDuplicateOf: null,
       emitter: {
         type: form.emitterType,
         workSite: null,

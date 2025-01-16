@@ -161,6 +161,7 @@ export const staticFieldsFragment = gql`
     customId
     createdAt
     status
+    isDuplicateOf
     stateSummary {
       packagingInfos {
         type

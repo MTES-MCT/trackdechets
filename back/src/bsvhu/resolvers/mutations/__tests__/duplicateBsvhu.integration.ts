@@ -24,6 +24,7 @@ const DUPLICATE_BVHU = gql`
     duplicateBsvhu(id: $id) {
       id
       status
+      isDuplicateOf
     }
   }
 `;
@@ -294,7 +295,7 @@ describe("mutation.duplicateBsvhu", () => {
       "isDraft",
       "isDeleted",
       "status",
-
+      "isDuplicateOf",
       "emitterEmissionSignatureAuthor",
       "emitterEmissionSignatureDate",
       "transporterTransportSignatureAuthor",
@@ -320,6 +321,7 @@ describe("mutation.duplicateBsvhu", () => {
 
     expect(duplicatedBsvhu.status).toEqual("INITIAL");
     expect(duplicatedBsvhu.isDraft).toBe(true);
+    expect(duplicatedBsvhu.isDuplicateOf).toBe(bsvhu.id);
 
     expect(duplicatedBsvhu).toMatchObject({
       emitterIrregularSituation,

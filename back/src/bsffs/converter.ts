@@ -157,6 +157,7 @@ export function expandBsffFromDB(
     isDraft: prismaBsff.isDraft,
     type: prismaBsff.type,
     status: prismaBsff.status,
+    isDuplicateOf: prismaBsff.isDuplicateOf,
     emitter: nullIfNoValues<GraphQL.BsffEmitter>({
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaBsff.emitterCompanyName,
