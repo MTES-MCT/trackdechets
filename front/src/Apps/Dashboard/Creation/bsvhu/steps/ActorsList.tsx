@@ -7,9 +7,8 @@ import { ZodBsvhu } from "../schema";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { CompanySearchResult, CompanyType, FavoriteType } from "@td/codegen-ui";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import Alert from "@codegouvfr/react-dsfr/Alert";
-import { formatDate } from "../../../../../common/datetime";
 import { getInitialCompany } from "../../../../common/data/initialState";
+import Recepisse from "../../../Components/Recepisse/Recepisse";
 
 const ActorsList = () => {
   const { siret } = useParams<{ siret: string }>();
@@ -103,24 +102,6 @@ const ActorsList = () => {
     return companyData;
   };
 
-  const recepisseAlert = (title, actor) => (
-    <Alert
-      title={title}
-      severity="info"
-      description={
-        <>
-          Numéro: {actor.recepisse.number}
-          <br />
-          Département : {actor.recepisse.department}
-          <br />
-          Date limite de validité:{" "}
-          {formatDate(actor.recepisse.validityLimit ?? "")}
-        </>
-      }
-      closable={false}
-    />
-  );
-
   return (
     <>
       <h4 className="fr-h4 fr-mt-3w">Courtier</h4>
@@ -193,8 +174,14 @@ const ActorsList = () => {
             key={`broker-company-${siret}`}
           />
 
-          {broker?.recepisse?.number &&
-            recepisseAlert("Récépissé de courtage", broker)}
+          {broker?.recepisse?.number && (
+            <Recepisse
+              title="Récépissé de courtage"
+              numero={broker.recepisse?.number}
+              departement={broker.recepisse?.department}
+              validityLimit={broker.recepisse?.validityLimit}
+            />
+          )}
         </div>
       )}
 
@@ -268,8 +255,14 @@ const ActorsList = () => {
             key={`trader-company-${siret}`}
           />
 
-          {trader?.recepisse?.number &&
-            recepisseAlert("Récépissé de négoce", trader)}
+          {trader?.recepisse?.number && (
+            <Recepisse
+              title="Récépissé de négoce"
+              numero={trader.recepisse?.number}
+              departement={trader.recepisse?.department}
+              validityLimit={trader.recepisse?.validityLimit}
+            />
+          )}
         </div>
       )}
 

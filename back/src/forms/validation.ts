@@ -1193,7 +1193,9 @@ export const traderSchemaFn: FactorySchemaOf<FormValidationContext, Trader> = ({
   isDraft
 }) =>
   yup.object({
-    traderCompanySiret: siret.label("Négociant"),
+    traderCompanySiret: siret
+      .label("Négociant")
+      .test(siretTests.isRegistered("TRADER")),
     traderCompanyName: yup.string().when("traderCompanySiret", {
       is: siret => !!siret,
       then: schema =>
@@ -1265,7 +1267,9 @@ export const brokerSchemaFn: FactorySchemaOf<FormValidationContext, Broker> = ({
   isDraft
 }) =>
   yup.object({
-    brokerCompanySiret: siret.label("Courtier"),
+    brokerCompanySiret: siret
+      .label("Courtier")
+      .test(siretTests.isRegistered("BROKER")),
     brokerCompanyName: yup.string().when("brokerCompanySiret", {
       is: siret => !!siret,
       then: schema =>
