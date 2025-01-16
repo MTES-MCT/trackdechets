@@ -400,6 +400,7 @@ input IncomingWasteLineInput {
   Indique le code opération ultérieure prévue
   """
   nextOperationCode: String
+  isDirectSupply: Boolean
   """
   Mode de transport du transporteur n°1
   """
@@ -884,6 +885,7 @@ input IncomingTexsLineInput {
   Attention à bien séparer par des virgules des coordonnées de parcelles différentes, mais à bien utiliser le point au sein même des parcelles
   """
   destinationParcelCoordinates: [String!]
+  isDirectSupply: Boolean
   """
   Mode de transport du transporteur n°1
   """
