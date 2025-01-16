@@ -3,6 +3,7 @@ import { Bsvhu, BsvhuStatus } from "@td/codegen-ui";
 import SignVhuEmission from "../../Bsvhu/SignVhuEmission";
 import SignVhuTransport from "../../Bsvhu/SignVhuTransport";
 import SignVhuOperation from "../../Bsvhu/SignVhuOperation";
+import SignVhuReception from "../../Bsvhu/SignVhuReception";
 
 interface ActBsvhuValidationProps {
   bsd: Bsvhu;
@@ -25,6 +26,10 @@ const ActBsvhuValidation = ({
 
   const renderSentModal = () => {
     return <SignVhuOperation bsvhuId={bsd.id} onClose={onClose} />;
+  };
+
+  const renderReceivedModal = () => {
+    return <SignVhuReception bsvhuId={bsd.id} onClose={onClose} />;
   };
 
   const status = bsd["bsvhuStatus"];
@@ -62,6 +67,8 @@ const ActBsvhuValidation = ({
           (canIrregularSituationSignWithNoSiret ||
             canIrregularSituationSignWithSiretNotRegistered))) &&
         renderSignedByProducerModal()}
+      {/* FIXME new api status Received ? */}
+      {status === BsvhuStatus.Received && renderReceivedModal()}
       {status === BsvhuStatus.Sent && renderSentModal()}
     </>
   );
