@@ -891,6 +891,274 @@ describe("Mutation.updateForm", () => {
     );
   });
 
+  it("should autocomplete broker receipt with receipt pulled from db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        brokerCompanySiret: siretify(),
+        brokerReceipt: "BBBB",
+        brokerDepartment: "13",
+        brokerValidityLimit: new Date("2027-01-01")
+      }
+    });
+
+    const recepisse = {
+      receiptNumber: "AAAA",
+      department: "07",
+      validityLimit: new Date("2026-01-01")
+    };
+
+    const updatedBrokerCompany = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: {
+        create: recepisse
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      broker: {
+        company: { siret: updatedBrokerCompany.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.updateForm.id }
+    });
+
+    expect(updatedForm.brokerReceipt).toEqual(recepisse.receiptNumber);
+    expect(updatedForm.brokerDepartment).toEqual(recepisse.department);
+    expect(updatedForm.brokerValidityLimit).toEqual(recepisse.validityLimit);
+  });
+
+  it("should null broker receipt is they do not have receipt in db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        brokerCompanySiret: siretify(),
+        brokerReceipt: "BBBB",
+        brokerDepartment: "13",
+        brokerValidityLimit: new Date("2027-01-01")
+      }
+    });
+
+    const updatedBrokerCompany = await companyFactory({
+      companyTypes: ["BROKER"]
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      broker: {
+        company: { siret: updatedBrokerCompany.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.updateForm.id }
+    });
+
+    expect(updatedForm.brokerReceipt).toEqual(null);
+    expect(updatedForm.brokerDepartment).toEqual(null);
+    expect(updatedForm.brokerValidityLimit).toBeNull();
+  });
+
+  it("should leave the broker receipt unchanged if broker is unchanged", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const recepisse = {
+      receiptNumber: "AAAA",
+      department: "07",
+      validityLimit: new Date("2026-01-01")
+    };
+
+    const brokerCompany = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: {
+        create: recepisse
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        brokerCompanySiret: brokerCompany.siret,
+        brokerReceipt: recepisse.receiptNumber,
+        brokerDepartment: recepisse.department,
+        brokerValidityLimit: recepisse.validityLimit
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      broker: {
+        company: { siret: brokerCompany.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.updateForm.id }
+    });
+
+    expect(updatedForm.brokerReceipt).toEqual(recepisse.receiptNumber);
+    expect(updatedForm.brokerDepartment).toEqual(recepisse.department);
+    expect(updatedForm.brokerValidityLimit).toEqual(recepisse.validityLimit);
+  });
+
+  it("should autocomplete trader receipt with receipt pulled from db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        traderCompanySiret: siretify(),
+        traderReceipt: "BBBB",
+        traderDepartment: "13",
+        traderValidityLimit: new Date("2027-01-01")
+      }
+    });
+
+    const recepisse = {
+      receiptNumber: "AAAA",
+      department: "07",
+      validityLimit: new Date("2026-01-01")
+    };
+
+    const updatedTraderCompany = await companyFactory({
+      companyTypes: ["TRADER"],
+      traderReceipt: {
+        create: recepisse
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      trader: {
+        company: { siret: updatedTraderCompany.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.updateForm.id }
+    });
+
+    expect(updatedForm.traderReceipt).toEqual(recepisse.receiptNumber);
+    expect(updatedForm.traderDepartment).toEqual(recepisse.department);
+    expect(updatedForm.traderValidityLimit).toEqual(recepisse.validityLimit);
+  });
+
+  it("should null trader receipt is they do not have receipt in db", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        traderCompanySiret: siretify(),
+        traderReceipt: "BBBB",
+        traderDepartment: "13",
+        traderValidityLimit: new Date("2027-01-01")
+      }
+    });
+
+    const updatedTraderCompany = await companyFactory({
+      companyTypes: ["TRADER"]
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      trader: {
+        company: { siret: updatedTraderCompany.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.updateForm.id }
+    });
+
+    expect(updatedForm.traderReceipt).toEqual(null);
+    expect(updatedForm.traderDepartment).toEqual(null);
+    expect(updatedForm.traderValidityLimit).toBeNull();
+  });
+
+  it("should leave the trader receipt unchanged if trader is unchanged", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const recepisse = {
+      receiptNumber: "AAAA",
+      department: "07",
+      validityLimit: new Date("2026-01-01")
+    };
+
+    const traderCompany = await companyFactory({
+      companyTypes: ["TRADER"],
+      traderReceipt: {
+        create: recepisse
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        traderCompanySiret: traderCompany.siret,
+        traderReceipt: recepisse.receiptNumber,
+        traderDepartment: recepisse.department,
+        traderValidityLimit: recepisse.validityLimit
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      trader: {
+        company: { siret: traderCompany.siret }
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.updateForm.id }
+    });
+
+    expect(updatedForm.traderReceipt).toEqual(recepisse.receiptNumber);
+    expect(updatedForm.traderDepartment).toEqual(recepisse.department);
+    expect(updatedForm.traderValidityLimit).toEqual(recepisse.validityLimit);
+  });
+
   it.each(["emitter", "trader", "broker", "transporter"])(
     "should allow %p to update a sealed form",
     async role => {
