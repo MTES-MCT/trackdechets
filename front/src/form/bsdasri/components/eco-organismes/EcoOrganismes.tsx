@@ -88,12 +88,10 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
                       orgId: eo.orgId
                     })
                   }
-                  results={data.ecoOrganismes
-                    .filter(eo => !!eo.handleBsdasri)
-                    .map(eo => ({
-                      ...eo,
-                      orgId: eo.siret
-                    }))}
+                  results={data.ecoOrganismes.map(eo => ({
+                    ...eo,
+                    orgId: eo.siret
+                  }))}
                   selectedItem={
                     data.ecoOrganismes
                       .map(eo => ({
