@@ -25,7 +25,7 @@ export async function transformAndRefineReason(
   if (!incomingWasteItemInDb && incomingWasteItem.reason) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `La raison doit rester vide, le numéro unique "${incomingWasteItem.publicId}" n'a jamais été importé.`,
+      message: `La raison doit rester vide, l'identifiant unique "${incomingWasteItem.publicId}" n'a jamais été importé.`,
       path: ["reason"]
     });
     return z.NEVER;

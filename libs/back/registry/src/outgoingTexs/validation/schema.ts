@@ -1,80 +1,84 @@
+import {
+  INCOMING_TEXS_WASTE_CODES,
+  INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
+} from "@td/constants";
+import { sub } from "date-fns";
 import { z } from "zod";
 import {
   reasonSchema,
   publicIdSchema,
   reportAsCompanySiretSchema,
-  getWasteCodeSchema,
-  wasteCodeBaleSchema,
-  wasteDescriptionSchema,
-  volumeSchema,
-  weightIsEstimateSchema,
-  weightValueSchema,
-  actorTypeSchema,
-  actorOrgIdSchema,
+  siretSchema,
   actorAddressSchema,
+  actorPostalCodeSchema,
   actorCitySchema,
   actorCountryCodeSchema,
-  actorNameSchema,
-  actorPostalCodeSchema,
-  transportModeSchema,
-  transportRecepisseNumberSchema,
-  getOperationCodeSchema,
-  actorSiretSchema,
+  wasteDescriptionSchema,
+  getWasteCodeSchema,
   wastePopSchema,
   wasteIsDangerousSchema,
-  receptionDateSchema,
+  wasteCodeBaleSchema,
+  weightValueSchema,
+  weightIsEstimateSchema,
+  volumeSchema,
+  actorTypeSchema,
+  actorOrgIdSchema,
+  actorNameSchema,
   inseeCodesSchema,
+  municipalitiesNamesSchema,
+  parcelNumbersSchema,
+  parcelCoordinatesSchema,
+  getOperationCodeSchema,
+  operationModeSchema,
+  isUpcycledSchema,
   declarationNumberSchema,
   notificationNumberSchema,
-  siretSchema,
-  municipalitiesNamesSchema,
-  nextDestinationIsAbroad,
-  noTraceability,
-  operationModeSchema,
-  transportRecepisseIsExemptedSchema
+  actorSiretSchema,
+  transportModeSchema,
+  transportRecepisseIsExemptedSchema,
+  transportRecepisseNumberSchema
 } from "../../shared/schemas";
-import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
 
-export type ParsedZodInputIncomingWasteItem = z.output<
-  typeof inputIncomingWasteSchema
+export type ParsedZodInputOutgoingTexsItem = z.output<
+  typeof inputOutgoingTexsSchema
 >;
-export type ParsedZodIncomingWasteItem = z.output<typeof incomingWasteSchema>;
+export type ParsedZodOutgoingTexsItem = z.output<typeof outgoingTexsSchema>;
 
-const inputIncomingWasteSchema = z.object({
+const inputOutgoingTexsSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
-  wasteCode: getWasteCodeSchema(),
+  emitterPickupSiteName: z.string().nullish(),
+  emitterPickupSiteAddress: actorAddressSchema.nullish(),
+  emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
+  emitterPickupSiteCity: actorCitySchema.nullish(),
+  emitterPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
+  wasteDescription: wasteDescriptionSchema,
+  wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES),
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
-  wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  receptionDate: receptionDateSchema,
-  weighingHour: z
+  dispatchDate: z.union([
+    z.date().nullish(),
+    z
+      .string()
+      .nullish()
+      .transform(val => (val ? new Date(val) : undefined))
+      .pipe(
+        z
+          .date()
+          .min(
+            sub(new Date(), { years: 1 }),
+            "La date ne peut pas être antérieure à J-1 an"
+          )
+          .max(new Date(), "La date ne peut pas être dans le futur")
+          .nullish()
+      )
+  ]),
+  wasteDap: z
     .string()
-    .refine(val => {
-      if (!val) {
-        return true;
-      }
-      // 00:00 or 00:00:00 or 00:00:00.000
-      const timeRegex = /^\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?$/;
-
-      if (!timeRegex.test(val)) {
-        return false; // Invalid format
-      }
-
-      const [hours, minutes, seconds] = val.split(":");
-      const hour = parseInt(hours, 10);
-      const minute = parseInt(minutes, 10);
-      const second = seconds ? parseFloat(seconds) : 0;
-
-      if (hour < 0 || hour >= 24) return false;
-      if (minute < 0 || minute >= 60) return false;
-      if (second < 0 || second >= 60) return false;
-
-      return true;
-    }, `Le format d'heure saisi n'est pas valide. Format attendu: 00:00, 00:00:00 ou 00:00:00.000`)
+    .max(50, "Le DAP ne doit pas excéder 50 caractères")
     .nullish(),
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
@@ -88,31 +92,47 @@ const inputIncomingWasteSchema = z.object({
   initialEmitterCompanyCountryCode: actorCountryCodeSchema,
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
   initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
-  emitterCompanyType: actorTypeSchema,
-  emitterCompanyOrgId: actorOrgIdSchema,
-  emitterCompanyName: actorNameSchema,
-  emitterCompanyAddress: actorAddressSchema,
-  emitterCompanyPostalCode: actorPostalCodeSchema,
-  emitterCompanyCity: actorCitySchema,
-  emitterCompanyCountryCode: actorCountryCodeSchema,
-  emitterPickupSiteName: z
+  parcelInseeCodes: inseeCodesSchema,
+  parcelNumbers: parcelNumbersSchema,
+  parcelCoordinates: parcelCoordinatesSchema,
+  sisIdentifier: z
     .string()
-    .max(
-      300,
-      "La référence du chantier ou du lieu de collecte de l'expéditeur ne peut pas faire plus de 300 caractères"
-    )
+    .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
     .nullish(),
-  emitterPickupSiteAddress: actorAddressSchema.nullish(),
-  emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
-  emitterPickupSiteCity: actorCitySchema.nullish(),
-  emitterPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
+  destinationCompanyType: actorTypeSchema,
+  destinationCompanyOrgId: actorOrgIdSchema,
+  destinationCompanyName: actorNameSchema,
+  destinationCompanyAddress: actorAddressSchema,
+  destinationCompanyPostalCode: actorPostalCodeSchema,
+  destinationCompanyCity: actorCitySchema,
+  destinationCompanyCountryCode: actorCountryCodeSchema,
+  destinationDropSiteAddress: actorAddressSchema.nullish(),
+  destinationDropSitePostalCode: actorPostalCodeSchema.nullish(),
+  destinationDropSiteCity: actorCitySchema.nullish(),
+  destinationDropSiteCountryCode: actorCountryCodeSchema.nullish(),
+  operationCode: getOperationCodeSchema(
+    INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
+  ),
+  operationMode: operationModeSchema,
+  isUpcycled: isUpcycledSchema.nullish(),
+  destinationParcelInseeCodes: inseeCodesSchema,
+  destinationParcelNumbers: parcelNumbersSchema,
+  destinationParcelCoordinates: parcelCoordinatesSchema,
+  declarationNumber: declarationNumberSchema,
+  notificationNumber: notificationNumberSchema,
+  movementNumber: z
+    .string()
+    .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
+    .nullish(),
+  ecoOrganismeSiret: actorSiretSchema.nullish(),
+  ecoOrganismeName: actorNameSchema.nullish(),
   brokerCompanySiret: actorSiretSchema.nullish(),
   brokerCompanyName: actorNameSchema.nullish(),
   brokerRecepisseNumber: z
     .string()
     .max(
-      50,
-      "Le numéro de récépissé du courtier ne doit pas excéder 50 caractères"
+      150,
+      "Le numéro de récépissé du courtier ne doit pas excéder 150 caractères"
     )
     .nullish(),
   traderCompanySiret: actorSiretSchema.nullish(),
@@ -120,27 +140,10 @@ const inputIncomingWasteSchema = z.object({
   traderRecepisseNumber: z
     .string()
     .max(
-      50,
-      "Le numéro de récépissé du négociant ne doit pas excéder 50 caractères"
+      150,
+      "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
     )
     .nullish(),
-  ecoOrganismeSiret: actorSiretSchema.nullish(),
-  ecoOrganismeName: actorNameSchema.nullish(),
-  operationCode: getOperationCodeSchema(
-    INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
-  ),
-  operationMode: operationModeSchema,
-  noTraceability: noTraceability.nullish(),
-  nextDestinationIsAbroad: nextDestinationIsAbroad.nullish(),
-  declarationNumber: declarationNumberSchema,
-  notificationNumber: notificationNumberSchema,
-  movementNumber: z
-    .string()
-    .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
-    .nullish(),
-  nextOperationCode: getOperationCodeSchema(
-    INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
-  ).nullish(),
   isDirectSupply: z.boolean().nullish(),
   transporter1TransportMode: transportModeSchema.nullish(),
   transporter1CompanyType: actorTypeSchema.nullish(),
@@ -195,7 +198,7 @@ const inputIncomingWasteSchema = z.object({
 });
 
 // Props added through transform
-const transformedIncomingWasteSchema = z.object({
+const transformedOutgoingTexsSchema = z.object({
   id: z.string().optional(),
   reportForCompanyAddress: z.string().default(""),
   reportForCompanyCity: z.string().default(""),
@@ -203,6 +206,6 @@ const transformedIncomingWasteSchema = z.object({
   reportForCompanyName: z.coerce.string().default("")
 });
 
-export const incomingWasteSchema = inputIncomingWasteSchema.merge(
-  transformedIncomingWasteSchema
+export const outgoingTexsSchema = inputOutgoingTexsSchema.merge(
+  transformedOutgoingTexsSchema
 );

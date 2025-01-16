@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["metrics", "tracing", "prismaSchemaFolder"]
+  previewFeatures = ["metrics", "prismaSchemaFolder"]
 }
 
 datasource db {
@@ -930,6 +930,7 @@ model User {
   registrySsds               RegistrySsd[]
   registryIncomingWastes     RegistryIncomingWaste[]
   registryIncomingTexs       RegistryIncomingTexs[]
+  registryOutgoingTexs       RegistryOutgoingTexs[]
   registryExports            RegistryExport[]
 }
 
