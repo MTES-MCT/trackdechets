@@ -41,6 +41,14 @@ type Query {
 
   """
   Renvoie la liste des éco-organismes
+  Peut être utilisé sans filtres, auquel cas tous les éco-organismes sont renvoyés
+  Sinon passer true sur l'un ou plusieurs des filtres renvoit les éco-organismes pouvant
+  être associés aux bordereaux correspondants
   """
-  ecoOrganismes: [EcoOrganisme!]!
+  ecoOrganismes(
+    handleBsdd: Boolean
+    handleBsda: Boolean
+    handleBsdasri: Boolean
+    handleBsvhu: Boolean
+  ): [EcoOrganisme!]!
 }

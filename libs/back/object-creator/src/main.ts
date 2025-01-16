@@ -18,7 +18,7 @@ function getDbUrlWithSchema(rawDatabaseUrl: string) {
     dbUrl.searchParams.set("schema", "default$default");
 
     return unescape(dbUrl.href); // unescape needed because of the `$`
-  } catch (err) {
+  } catch (_) {
     return "";
   }
 }
