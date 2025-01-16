@@ -7,8 +7,6 @@ import { ZodBsvhu } from "../schema";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { CompanySearchResult, CompanyType, FavoriteType } from "@td/codegen-ui";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import Alert from "@codegouvfr/react-dsfr/Alert";
-import { formatDate } from "../../../../../common/datetime";
 import { getInitialCompany } from "../../../../common/data/initialState";
 import Recepisse from "../../../Components/Recepisse/Recepisse";
 

@@ -25,7 +25,7 @@ import { CompanyType } from "@prisma/client";
 
 function selectCompanyError(
   company: CompanySearchResult,
-  expectedCompanyType?: "BROKER" | "TRADER"
+  expectedCompanyType?: CompanyType
 ) {
   if (company.etatAdministratif !== "A") {
     // Lors de l'écriture de ces lignes, `searchCompanies` renvoie des établissements
@@ -40,9 +40,17 @@ function selectCompanyError(
     expectedCompanyType &&
     !company.companyTypes?.includes(expectedCompanyType)
   ) {
-    const translatedType =
-      expectedCompanyType === "BROKER" ? "courtier" : "négociant";
-    return `Cet établissement n'a pas le profil ${translatedType}`;
+    const translatedType = () => {
+      if (expectedCompanyType === CompanyType.BROKER) {
+        return "courtier";
+      }
+      if (expectedCompanyType === CompanyType.TRADER) {
+        return "négociant";
+      }
+      return "";
+    };
+
+    return `Cet établissement n'a pas le profil ${translatedType()}`;
   }
   return null;
 }
