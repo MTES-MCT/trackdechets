@@ -150,7 +150,7 @@ export const emptyIncomingWasteV2: Omit<
   parcelInseeCodes: null,
   parcelNumbers: null,
   parcelCoordinates: null,
-  sisIdentifiers: null,
+  sisIdentifier: null,
   ecoOrganismeName: null,
   ecoOrganismeSiret: null,
   traderCompanyName: null,

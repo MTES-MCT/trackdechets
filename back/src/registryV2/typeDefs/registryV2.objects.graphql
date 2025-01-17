@@ -143,7 +143,7 @@ type IncomingWasteV2 {
   """
   parcelCoordinates: [String]
 
-  sisIdentifiers: [String]
+  sisIdentifier: String
 
   """
   la raison sociale de l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
