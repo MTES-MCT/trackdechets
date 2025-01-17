@@ -243,28 +243,24 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "L'adresse e-mail du destinataire",
     path: ["destination", "company", "mail"]
   },
-  // TODO ============================================
   destinationReceptionAcceptationStatus: {
     sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
     required: { from: "RECEPTION" },
     readableFieldName: "Le statut d'acceptation du destinataire",
     path: ["destination", "reception", "acceptationStatus"]
   },
-  // TODO ============================================
   destinationReceptionRefusalReason: {
     sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
     readableFieldName: "La raison du refus par le destinataire",
     required: { from: "RECEPTION", when: isRefusedOrPartiallyRefused },
     path: ["destination", "reception", "refusalReason"]
   },
-  // TODO ============================================
   destinationReceptionWeight: {
     sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
     required: { from: "RECEPTION" },
     readableFieldName: "Le poids réel reçu",
     path: ["destination", "reception", "weight"]
   },
-  // TODO ============================================
   destinationReceptionDate: {
     readableFieldName: "la date de réception",
     required: { from: "RECEPTION", when: isReceptionSignatureStep },
