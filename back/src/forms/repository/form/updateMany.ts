@@ -6,6 +6,7 @@ import {
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { checkIfHasPossibleSiretChange } from "./update";
+import { lookupUtils } from "../../registryV2";
 
 export type UpdateManyFormFn = (
   ids: string[],
@@ -50,12 +51,15 @@ const buildUpdateManyForms: (deps: RepositoryFnDeps) => UpdateManyFormFn =
     });
 
     const forms = await prisma.form.findMany({
-      where: { id: { in: ids } },
-      select: { readableId: true }
+      where: { id: { in: ids } }
+      // select: { readableId: true }
     });
 
-    for (const { readableId } of forms) {
-      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(readableId));
+    for (const form of forms) {
+      await lookupUtils.update(form, prisma);
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(form.readableId)
+      );
     }
 
     return update;
