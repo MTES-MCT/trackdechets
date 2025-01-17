@@ -193,7 +193,7 @@ export const EXPORT_COLUMNS: {
     },
     weighingHour: { label: "Heure de pesée" },
     destinationOperationDate: {
-      label: "Date de réalisation de l'opération",
+      label: "Date de réalisation du traitement",
       format: formatDate
     },
     bsdType: { label: "Type de bordereau" },
@@ -253,12 +253,12 @@ export const EXPORT_COLUMNS: {
       label: "Expéditeur - Code pays du chantier / lieu de collecte"
     },
     emitterCompanyMail: { label: "Expéditeur - Contact" },
-    workerCompanyName: { label: "Entreprise de travaux - Raison sociale" },
     workerCompanySiret: { label: "Entreprise de travaux - SIRET" },
+    workerCompanyName: { label: "Entreprise de travaux - Raison sociale" },
     workerCompanyAddress: { label: "Entreprise de travaux - Libellé adresse" },
     workerCompanyPostalCode: { label: "Entreprise de travaux - Code postal" },
     workerCompanyCity: { label: "Entreprise de travaux - Commune" },
-    workerCompanyCountry: { label: "Entreprise de travaux - Pays" },
+    workerCompanyCountry: { label: "Entreprise de travaux - Code pays" },
     parcelCities: { label: "Parcelle(s) - Commune(s)", format: formatArray },
     parcelInseeCodes: {
       label: "Parcelle(s) - Code(s) postal(aux) ou INSEE",
@@ -272,9 +272,8 @@ export const EXPORT_COLUMNS: {
       label: "Parcelle(s) - Coordonnées",
       format: formatArrayWithMissingElements
     },
-    sisIdentifiers: {
-      label: "Identifiant SIS du terrain",
-      format: formatArrayWithMissingElements
+    sisIdentifier: {
+      label: "Identifiant SIS du terrain"
     },
     ecoOrganismeSiret: { label: "Éco-organisme - SIRET" },
     ecoOrganismeName: { label: "Éco-organisme - Raison sociale" },

@@ -103,7 +103,7 @@ export const toIncomingWasteV2 = (
     parcelInseeCodes: null,
     parcelNumbers: null,
     parcelCoordinates: null,
-    sisIdentifiers: null,
+    sisIdentifier: null,
     ecoOrganismeName: bsdasri.ecoOrganismeName,
     ecoOrganismeSiret: bsdasri.ecoOrganismeSiret,
     traderCompanyName: null,

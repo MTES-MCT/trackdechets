@@ -174,7 +174,7 @@ export const toIncomingWasteV2 = (
     parcelInseeCodes: bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
     parcelCoordinates: bsdd.parcelCoordinates,
-    sisIdentifiers: null,
+    sisIdentifier: null,
     ecoOrganismeName: bsdd.ecoOrganismeName,
     ecoOrganismeSiret: bsdd.ecoOrganismeSiret,
     traderCompanyName: bsdd.traderCompanyName,
