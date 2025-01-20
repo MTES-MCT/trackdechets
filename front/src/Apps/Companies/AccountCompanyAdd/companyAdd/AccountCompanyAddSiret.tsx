@@ -280,6 +280,7 @@ export default function AccountCompanyAddSiret({
                 {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" &&
                   !onlyForeignVAT && (
                     <Button
+                      type="button"
                       priority="tertiary"
                       disabled={loading || isDisabled}
                       title="Génère un n°SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
