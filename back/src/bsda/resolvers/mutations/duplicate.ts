@@ -114,6 +114,7 @@ export default async function duplicate(
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
     isDraft: true,
+    isDuplicateOf: prismaBsda.id,
     // Emitter company info
     emitterCompanyMail: emitter?.contactEmail ?? bsda.emitterCompanyMail,
     emitterCompanyPhone: emitter?.contactPhone ?? bsda.emitterCompanyPhone,

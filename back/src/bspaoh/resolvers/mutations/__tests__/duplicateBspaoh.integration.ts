@@ -112,6 +112,7 @@ describe("Mutation.duplicateBspaoh", () => {
 
     expect(data.duplicateBspaoh.status).toBe("INITIAL");
     expect(data.duplicateBspaoh.isDraft).toBe(true);
+    expect(data.duplicateBspaoh.isDuplicateOf).toBe(bspaoh.id);
 
     const duplicated = await prisma.bspaoh.findUnique({
       where: { id: data.duplicateBspaoh.id },

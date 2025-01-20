@@ -51,158 +51,159 @@ export const getAddress = ({
   return address ?? null;
 };
 
-export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
+export function expandVhuFormFromDb(bsvhu: PrismaVhuForm): GraphqlVhuForm {
   return {
-    id: form.id,
-    customId: form.customId,
-    createdAt: processDate(form.createdAt),
-    updatedAt: processDate(form.updatedAt),
-    isDraft: form.isDraft,
-    status: form.status,
+    id: bsvhu.id,
+    customId: bsvhu.customId,
+    createdAt: processDate(bsvhu.createdAt),
+    updatedAt: processDate(bsvhu.updatedAt),
+    isDraft: bsvhu.isDraft,
+    status: bsvhu.status,
+    isDuplicateOf: bsvhu.isDuplicateOf,
     emitter: nullIfNoValues<BsvhuEmitter>({
-      agrementNumber: form.emitterAgrementNumber,
-      irregularSituation: form.emitterIrregularSituation ?? false,
-      noSiret: form.emitterNoSiret ?? false,
+      agrementNumber: bsvhu.emitterAgrementNumber,
+      irregularSituation: bsvhu.emitterIrregularSituation ?? false,
+      noSiret: bsvhu.emitterNoSiret ?? false,
       company: nullIfNoValues<FormCompany>({
-        name: form.emitterCompanyName,
-        siret: form.emitterCompanySiret,
+        name: bsvhu.emitterCompanyName,
+        siret: bsvhu.emitterCompanySiret,
         address: getAddress({
-          address: form.emitterCompanyAddress,
-          street: form.emitterCompanyStreet,
-          city: form.emitterCompanyCity,
-          postalCode: form.emitterCompanyPostalCode
+          address: bsvhu.emitterCompanyAddress,
+          street: bsvhu.emitterCompanyStreet,
+          city: bsvhu.emitterCompanyCity,
+          postalCode: bsvhu.emitterCompanyPostalCode
         }),
-        contact: form.emitterCompanyContact,
-        phone: form.emitterCompanyPhone,
-        mail: form.emitterCompanyMail
+        contact: bsvhu.emitterCompanyContact,
+        phone: bsvhu.emitterCompanyPhone,
+        mail: bsvhu.emitterCompanyMail
       }),
       emission: nullIfNoValues<BsvhuEmission>({
         signature: nullIfNoValues<Signature>({
-          author: form.emitterEmissionSignatureAuthor,
-          date: processDate(form.emitterEmissionSignatureDate)
+          author: bsvhu.emitterEmissionSignatureAuthor,
+          date: processDate(bsvhu.emitterEmissionSignatureDate)
         })
       })
     }),
-    packaging: form.packaging,
-    wasteCode: form.wasteCode,
+    packaging: bsvhu.packaging,
+    wasteCode: bsvhu.wasteCode,
     identification: nullIfNoValues<BsvhuIdentification>({
-      numbers: form.identificationNumbers,
-      type: form.identificationType
+      numbers: bsvhu.identificationNumbers,
+      type: bsvhu.identificationType
     }),
-    quantity: form.quantity,
+    quantity: bsvhu.quantity,
     weight: nullIfNoValues<BsvhuWeight>({
-      value: form.weightValue ? form.weightValue / 1000 : form.weightValue,
-      isEstimate: form.weightIsEstimate
+      value: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
+      isEstimate: bsvhu.weightIsEstimate
     }),
     destination: nullIfNoValues<BsvhuDestination>({
-      type: form.destinationType,
-      agrementNumber: form.destinationAgrementNumber,
+      type: bsvhu.destinationType,
+      agrementNumber: bsvhu.destinationAgrementNumber,
       company: nullIfNoValues<FormCompany>({
-        name: form.destinationCompanyName,
-        siret: form.destinationCompanySiret,
-        address: form.destinationCompanyAddress,
-        contact: form.destinationCompanyContact,
-        phone: form.destinationCompanyPhone,
-        mail: form.destinationCompanyMail
+        name: bsvhu.destinationCompanyName,
+        siret: bsvhu.destinationCompanySiret,
+        address: bsvhu.destinationCompanyAddress,
+        contact: bsvhu.destinationCompanyContact,
+        phone: bsvhu.destinationCompanyPhone,
+        mail: bsvhu.destinationCompanyMail
       }),
-      plannedOperationCode: form.destinationPlannedOperationCode,
+      plannedOperationCode: bsvhu.destinationPlannedOperationCode,
       reception: nullIfNoValues<BsvhuReception>({
-        acceptationStatus: form.destinationReceptionAcceptationStatus,
-        date: processDate(form.destinationReceptionDate),
+        acceptationStatus: bsvhu.destinationReceptionAcceptationStatus,
+        date: processDate(bsvhu.destinationReceptionDate),
         identification: nullIfNoValues<BsvhuIdentification>({
-          numbers: form.destinationReceptionIdentificationNumbers,
-          type: form.destinationReceptionIdentificationType
+          numbers: bsvhu.destinationReceptionIdentificationNumbers,
+          type: bsvhu.destinationReceptionIdentificationType
         }),
-        weight: form.destinationReceptionWeight
-          ? form.destinationReceptionWeight / 1000
-          : form.destinationReceptionWeight,
-        refusalReason: form.destinationReceptionRefusalReason,
+        weight: bsvhu.destinationReceptionWeight
+          ? bsvhu.destinationReceptionWeight / 1000
+          : bsvhu.destinationReceptionWeight,
+        refusalReason: bsvhu.destinationReceptionRefusalReason,
         signature: nullIfNoValues<Signature>({
-          date: processDate(form.destinationReceptionSignatureDate),
-          author: form.destinationReceptionSignatureAuthor
+          date: processDate(bsvhu.destinationReceptionSignatureDate),
+          author: bsvhu.destinationReceptionSignatureAuthor
         })
       }),
       operation: nullIfNoValues<BsvhuOperation>({
-        code: form.destinationOperationCode,
-        mode: form.destinationOperationMode,
-        date: processDate(form.destinationOperationDate),
+        code: bsvhu.destinationOperationCode,
+        mode: bsvhu.destinationOperationMode,
+        date: processDate(bsvhu.destinationOperationDate),
         nextDestination: nullIfNoValues<BsvhuNextDestination>({
           company: nullIfNoValues<FormCompany>({
-            name: form.destinationOperationNextDestinationCompanyName,
-            siret: form.destinationOperationNextDestinationCompanySiret,
-            address: form.destinationOperationNextDestinationCompanyAddress,
-            contact: form.destinationOperationNextDestinationCompanyContact,
-            phone: form.destinationOperationNextDestinationCompanyPhone,
-            mail: form.destinationOperationNextDestinationCompanyMail
+            name: bsvhu.destinationOperationNextDestinationCompanyName,
+            siret: bsvhu.destinationOperationNextDestinationCompanySiret,
+            address: bsvhu.destinationOperationNextDestinationCompanyAddress,
+            contact: bsvhu.destinationOperationNextDestinationCompanyContact,
+            phone: bsvhu.destinationOperationNextDestinationCompanyPhone,
+            mail: bsvhu.destinationOperationNextDestinationCompanyMail
           })
         }),
 
         signature: nullIfNoValues<Signature>({
-          author: form.destinationOperationSignatureAuthor,
-          date: processDate(form.destinationOperationSignatureDate)
+          author: bsvhu.destinationOperationSignatureAuthor,
+          date: processDate(bsvhu.destinationOperationSignatureDate)
         })
       })
     }),
     transporter: nullIfNoValues<BsvhuTransporter>({
       company: nullIfNoValues<FormCompany>({
-        name: form.transporterCompanyName,
-        orgId: getTransporterCompanyOrgId(form),
-        siret: form.transporterCompanySiret,
-        address: form.transporterCompanyAddress,
-        contact: form.transporterCompanyContact,
-        phone: form.transporterCompanyPhone,
-        mail: form.transporterCompanyMail,
-        vatNumber: form.transporterCompanyVatNumber
+        name: bsvhu.transporterCompanyName,
+        orgId: getTransporterCompanyOrgId(bsvhu),
+        siret: bsvhu.transporterCompanySiret,
+        address: bsvhu.transporterCompanyAddress,
+        contact: bsvhu.transporterCompanyContact,
+        phone: bsvhu.transporterCompanyPhone,
+        mail: bsvhu.transporterCompanyMail,
+        vatNumber: bsvhu.transporterCompanyVatNumber
       }),
-      customInfo: form.transporterCustomInfo,
+      customInfo: bsvhu.transporterCustomInfo,
       recepisse: nullIfNoValues<BsvhuRecepisse>({
-        number: form.transporterRecepisseNumber,
-        department: form.transporterRecepisseDepartment,
-        validityLimit: processDate(form.transporterRecepisseValidityLimit),
-        isExempted: form.transporterRecepisseIsExempted
+        number: bsvhu.transporterRecepisseNumber,
+        department: bsvhu.transporterRecepisseDepartment,
+        validityLimit: processDate(bsvhu.transporterRecepisseValidityLimit),
+        isExempted: bsvhu.transporterRecepisseIsExempted
       }),
       transport: nullIfNoValues<BsvhuTransport>({
-        mode: form.transporterTransportMode,
-        plates: form.transporterTransportPlates,
+        mode: bsvhu.transporterTransportMode,
+        plates: bsvhu.transporterTransportPlates,
         signature: nullIfNoValues<Signature>({
-          author: form.transporterTransportSignatureAuthor,
-          date: processDate(form.transporterTransportSignatureDate)
+          author: bsvhu.transporterTransportSignatureAuthor,
+          date: processDate(bsvhu.transporterTransportSignatureDate)
         }),
-        takenOverAt: processDate(form.transporterTransportTakenOverAt)
+        takenOverAt: processDate(bsvhu.transporterTransportTakenOverAt)
       })
     }),
     ecoOrganisme: nullIfNoValues<BsvhuEcoOrganisme>({
-      name: form.ecoOrganismeName,
-      siret: form.ecoOrganismeSiret
+      name: bsvhu.ecoOrganismeName,
+      siret: bsvhu.ecoOrganismeSiret
     }),
     broker: nullIfNoValues<BsvhuBroker>({
       company: nullIfNoValues<FormCompany>({
-        name: form.brokerCompanyName,
-        siret: form.brokerCompanySiret,
-        address: form.brokerCompanyAddress,
-        contact: form.brokerCompanyContact,
-        phone: form.brokerCompanyPhone,
-        mail: form.brokerCompanyMail
+        name: bsvhu.brokerCompanyName,
+        siret: bsvhu.brokerCompanySiret,
+        address: bsvhu.brokerCompanyAddress,
+        contact: bsvhu.brokerCompanyContact,
+        phone: bsvhu.brokerCompanyPhone,
+        mail: bsvhu.brokerCompanyMail
       }),
       recepisse: nullIfNoValues<BsvhuRecepisse>({
-        department: form.brokerRecepisseDepartment,
-        number: form.brokerRecepisseNumber,
-        validityLimit: processDate(form.brokerRecepisseValidityLimit)
+        department: bsvhu.brokerRecepisseDepartment,
+        number: bsvhu.brokerRecepisseNumber,
+        validityLimit: processDate(bsvhu.brokerRecepisseValidityLimit)
       })
     }),
     trader: nullIfNoValues<BsvhuTrader>({
       company: nullIfNoValues<FormCompany>({
-        name: form.traderCompanyName,
-        siret: form.traderCompanySiret,
-        address: form.traderCompanyAddress,
-        contact: form.traderCompanyContact,
-        phone: form.traderCompanyPhone,
-        mail: form.traderCompanyMail
+        name: bsvhu.traderCompanyName,
+        siret: bsvhu.traderCompanySiret,
+        address: bsvhu.traderCompanyAddress,
+        contact: bsvhu.traderCompanyContact,
+        phone: bsvhu.traderCompanyPhone,
+        mail: bsvhu.traderCompanyMail
       }),
       recepisse: nullIfNoValues<BsvhuRecepisse>({
-        department: form.traderRecepisseDepartment,
-        number: form.traderRecepisseNumber,
-        validityLimit: processDate(form.traderRecepisseValidityLimit)
+        department: bsvhu.traderRecepisseDepartment,
+        number: bsvhu.traderRecepisseNumber,
+        validityLimit: processDate(bsvhu.traderRecepisseValidityLimit)
       })
     }),
     metadata: null as any

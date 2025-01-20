@@ -637,6 +637,7 @@ export function expandFormFromDb(
     readableId: form.readableId,
     customId: form.customId,
     isImportedFromPaper: form.isImportedFromPaper,
+    isDuplicateOf: form.isDuplicateOf,
     emitter: nullIfNoValues<Emitter>({
       type: form.emitterType,
       workSite: nullIfNoValues<WorkSite>({

@@ -1,10 +1,5 @@
 import { EmitterType, Prisma, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
-  CompanySearchResult,
-  Mutation,
-  MutationCreateFormArgs
-} from "../../../../generated/graphql/types";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,
@@ -22,6 +17,11 @@ import {
 } from "../../../database";
 import { searchCompany } from "../../../../companies/search";
 import getReadableId from "../../../readableId";
+import {
+  CompanySearchResult,
+  Mutation,
+  MutationCreateFormArgs
+} from "@td/codegen-back";
 
 jest.mock("../../../../companies/search");
 
@@ -37,6 +37,7 @@ const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
     duplicateForm(id: $id) {
       id
+      isDuplicateOf
       intermediaries {
         siret
         name
@@ -196,6 +197,7 @@ describe("Mutation.duplicateForm", () => {
       recipientIsTempStorage,
       wasteDetailsCode,
       wasteDetailsPackagingInfos,
+      wasteDetailsOnuCode,
       wasteDetailsQuantity,
       wasteDetailsQuantityType,
       wasteDetailsPop,
@@ -255,6 +257,7 @@ describe("Mutation.duplicateForm", () => {
       "rowNumber",
       "readableId",
       "status",
+      "isDuplicateOf",
       "emittedBy",
       "emittedAt",
       "emittedByEcoOrganisme",
@@ -306,8 +309,7 @@ describe("Mutation.duplicateForm", () => {
       "citerneNotWashedOutReason",
       "hasCiterneBeenWashedOut",
       "emptyReturnADR",
-      "wasteDetailsNonRoadRegulationMention",
-      "wasteDetailsOnuCode"
+      "wasteDetailsNonRoadRegulationMention"
     ];
 
     const expectedSkippedTransporter = [
@@ -342,6 +344,8 @@ describe("Mutation.duplicateForm", () => {
       }
     );
 
+    expect(data.duplicateForm.isDuplicateOf).toEqual(form.readableId);
+
     const duplicatedForm = await prisma.form.findUnique({
       where: { id: data.duplicateForm.id },
       include: { transporters: true }
@@ -350,6 +354,7 @@ describe("Mutation.duplicateForm", () => {
     const duplicatedTransporter = await getFirstTransporter(duplicatedForm!);
 
     expect(duplicatedForm).toMatchObject({
+      isDuplicateOf: form.readableId,
       emitterType,
       emitterPickupSite,
       emitterIsPrivateIndividual,
@@ -383,6 +388,10 @@ describe("Mutation.duplicateForm", () => {
       wasteDetailsAnalysisReferences,
       wasteDetailsLandIdentifiers,
       wasteDetailsName,
+      // [tra-15504] les contenants doivent être dupliqués
+      wasteDetailsPackagingInfos,
+      // [tra-15504] la mention ADR doit être dupliquée
+      wasteDetailsOnuCode,
       wasteDetailsConsistence,
       wasteDetailsSampleNumber,
       traderCompanyName,
@@ -546,6 +555,7 @@ describe("Mutation.duplicateForm", () => {
       "rowNumber",
       "readableId",
       "status",
+      "isDuplicateOf",
       "recipientIsTempStorage",
       "emitterCompanyOmiNumber",
       "emitterIsForeignShip",
@@ -1279,6 +1289,45 @@ describe("Mutation.duplicateForm", () => {
         opt: {
           emitterCompanySiret: company.siret,
           wasteDetailsIsDangerous: true,
+          wasteDetailsIsSubjectToADR
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+        DUPLICATE_FORM,
+        {
+          variables: {
+            id: form.id
+          }
+        }
+      );
+
+      const duplicatedForm = await prisma.form.findUniqueOrThrow({
+        where: {
+          id: data.duplicateForm.id
+        }
+      });
+
+      expect(duplicatedForm).toEqual(
+        expect.objectContaining({
+          wasteDetailsIsSubjectToADR: true
+        })
+      );
+    }
+  );
+
+  it.each([true, false, null])(
+    "should set `wasteDetailsIsSubjectToADR=true` when waste contains pop " +
+      "and wasteDetailsIsSubjectToADR is %p on the BSDD being duplicated",
+    async wasteDetailsIsSubjectToADR => {
+      const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: company.siret,
+          wasteDetailsIsDangerous: false,
+          wasteDetailsPop: true,
           wasteDetailsIsSubjectToADR
         }
       });

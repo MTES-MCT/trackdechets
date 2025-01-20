@@ -130,7 +130,7 @@ export type CreateOrUpdateTransporterInput = TransporterInput & {
 
 export type FormFormikValues = Omit<FormInput, "transporters"> & {
   transporters: CreateOrUpdateTransporterInput[];
-} & { id?: string | null };
+} & { id?: string | null; isDuplicateOf?: string | null };
 
 /**
  * Computes initial values of Formik's form by merging
@@ -146,6 +146,7 @@ export function getInitialState(f?: Form | null): FormFormikValues {
   return {
     id: f?.id ?? null,
     customId: f?.customId ?? "",
+    isDuplicateOf: f?.isDuplicateOf,
     emitter: {
       pickupSite: null, // deprecated
       type: f?.emitter?.type ?? EmitterType.Producer,
