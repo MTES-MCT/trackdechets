@@ -443,7 +443,7 @@ function Destination({ form }: { form: Bsvhu }) {
         />
         <DateRow
           value={destination?.reception?.date}
-          label="Réception signée par"
+          label="Réception signée le"
         />
       </div>
       <div className={styles.detailGrid}>

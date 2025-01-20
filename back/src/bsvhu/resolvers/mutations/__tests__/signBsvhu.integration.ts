@@ -823,7 +823,7 @@ describe("Mutation.Vhu.sign", () => {
           transporterTransportSignatureDate: new Date(),
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 1000,
+          destinationReceptionWeight: 20,
           destinationReceptionDate: new Date(),
           destinationReceptionSignatureAuthor: destinationUser.name,
           destinationReceptionSignatureDate: new Date()
@@ -849,7 +849,7 @@ describe("Mutation.Vhu.sign", () => {
           transporterTransportSignatureDate: new Date(),
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 1000,
+          destinationReceptionWeight: 20,
           destinationReceptionDate: new Date(),
           // Operation data
           destinationOperationCode: "R 5",
@@ -877,7 +877,7 @@ describe("Mutation.Vhu.sign", () => {
           destinationCompanySiret: destinationCompany.siret,
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 1000,
+          destinationReceptionWeight: 20,
           destinationReceptionDate: new Date()
         }
       });
@@ -903,7 +903,7 @@ describe("Mutation.Vhu.sign", () => {
           transporterTransportSignatureDate: new Date(),
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 1000,
+          destinationReceptionWeight: 20,
           destinationReceptionDate: null
         }
       });
@@ -927,7 +927,7 @@ describe("Mutation.Vhu.sign", () => {
           transporterTransportSignatureDate: new Date(),
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 1000,
+          destinationReceptionWeight: 20,
           destinationReceptionDate: null, // Not required!
           destinationReceptionSignatureAuthor: destinationUser.name,
           destinationOperationSignatureDate: new Date()
