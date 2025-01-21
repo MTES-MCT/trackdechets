@@ -6,7 +6,12 @@ import Tooltip from "../../common/components/Tooltip";
 import ProcessingOperation from "../common/components/processing-operation/ProcessingOperation";
 import { Field, FieldArray, useFormikContext } from "formik";
 import { isDangerous } from "@td/constants";
-import { CompanySearchResult, FavoriteType, Form } from "@td/codegen-ui";
+import {
+  CompanySearchResult,
+  CompanyType,
+  FavoriteType,
+  Form
+} from "@td/codegen-ui";
 import CompanySelector from "../common/components/company/CompanySelector";
 import TemporaryStorage from "./components/temporaryStorage/TemporaryStorage";
 import styles from "./Recipient.module.scss";
@@ -21,7 +26,6 @@ import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelector
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../Apps/Forms/Components/CompanyContactInfo/CompanyContactInfo";
 import Recepisse from "../../Apps/Dashboard/Components/Recepisse/Recepisse";
-import { CompanyType } from "@prisma/client";
 
 function selectCompanyError(
   company: CompanySearchResult,
@@ -41,10 +45,10 @@ function selectCompanyError(
     !company.companyTypes?.includes(expectedCompanyType)
   ) {
     const translatedType = () => {
-      if (expectedCompanyType === CompanyType.BROKER) {
+      if (expectedCompanyType === CompanyType.Broker) {
         return "courtier";
       }
-      if (expectedCompanyType === CompanyType.TRADER) {
+      if (expectedCompanyType === CompanyType.Trader) {
         return "négociant";
       }
       return "";
@@ -194,7 +198,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
             favoriteType={FavoriteType.Broker}
             selectedCompanyError={company => {
               if (company) {
-                return selectCompanyError(company, CompanyType.BROKER);
+                return selectCompanyError(company, CompanyType.Broker);
               }
               return null;
             }}
@@ -264,7 +268,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
             favoriteType={FavoriteType.Trader}
             selectedCompanyError={company => {
               if (company) {
-                return selectCompanyError(company, CompanyType.TRADER);
+                return selectCompanyError(company, CompanyType.Trader);
               }
               return null;
             }}
