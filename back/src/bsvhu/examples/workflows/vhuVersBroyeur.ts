@@ -1,4 +1,4 @@
-import { signReception } from "../../../bsdasris/examples/steps/signReception";
+import { signReception } from "../steps/signReception";
 import { Workflow } from "../../../common/workflow";
 import { createBsvhu } from "../steps/createBsvhu";
 import { signForProducer } from "../steps/signForProducer";

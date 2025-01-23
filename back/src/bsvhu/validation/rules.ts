@@ -14,7 +14,6 @@ import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { Leaves } from "../../types";
 import { v20250101, v20241001 } from "./refinements";
-import { isDefined } from "../../common/helpers";
 
 // Liste des champs éditables sur l'objet Bsvhu
 export type BsvhuEditableFields = Required<
@@ -773,17 +772,10 @@ function isReceptionSignatureStep(_, currentSignatureType: SignatureTypeInput) {
 }
 
 function isReceptionDataSealed(bsvhu: ZodBsvhu) {
-  // Data has been provided. Can be modified as long as reception
-  // has not been signed
-  if (
-    isDefined(bsvhu.destinationReceptionRefusalReason) &&
-    !Boolean(bsvhu.destinationReceptionSignatureDate)
-  ) {
-    return true;
-  }
-
-  // Data has NOT been provided. Can modify until OPERATION
-  return Boolean(bsvhu.destinationOperationSignatureDate);
+  return (
+    Boolean(bsvhu.destinationReceptionSignatureDate) ||
+    Boolean(bsvhu.destinationOperationSignatureDate)
+  );
 }
 
 function isNotRefused(bsvhu: ZodBsvhu) {

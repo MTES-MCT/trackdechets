@@ -14,7 +14,7 @@ export function updateReception(company: string): WorkflowStep {
         }
       }
     }),
-    expected: { status: "SIGNED_BY_PRODUCER" },
+    expected: { status: "SENT" },
     data: response => response.updateBsvhu,
     company,
     setContext: (ctx, data) => ({ ...ctx, bsd: data })

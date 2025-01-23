@@ -916,7 +916,7 @@ describe("Mutation.Vhu.sign", () => {
       expect(errors[0].message).toBe("Vous ne pouvez pas signer ce bordereau");
     });
 
-    it("can NOT override reception data when signing operation", async () => {
+    it("can NOT override reception data once reception has been signed", async () => {
       // Given
       const bsvhu = await bsvhuFactory({
         opt: {
@@ -930,7 +930,7 @@ describe("Mutation.Vhu.sign", () => {
           destinationReceptionWeight: 20,
           destinationReceptionDate: null, // Not required!
           destinationReceptionSignatureAuthor: destinationUser.name,
-          destinationOperationSignatureDate: new Date()
+          destinationReceptionSignatureDate: new Date()
         }
       });
 

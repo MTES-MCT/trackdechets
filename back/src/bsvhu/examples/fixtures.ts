@@ -80,7 +80,8 @@ function broyeurInput(siret: string) {
 
 const receptionInput = {
   weight: 1.4,
-  acceptationStatus: "ACCEPTED"
+  acceptationStatus: "ACCEPTED",
+  date: "2021-04-27"
 };
 
 const operationInput = {
