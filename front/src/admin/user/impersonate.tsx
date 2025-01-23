@@ -57,8 +57,6 @@ export function Impersonate() {
       </form>
     ]) ?? [];
 
-  console.log("error", error);
-
   return (
     <div>
       <div>
