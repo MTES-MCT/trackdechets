@@ -692,9 +692,11 @@ export default function Header({
                     <br />
                     écologique,
                     <br />
-                    de l'énergie, du climat, <br />
-                    et de la prévention <br />
-                    des risques
+                    de la biodiversité,
+                    <br />
+                    de la forêt, de la mer
+                    <br />
+                    et de la pêche
                   </p>
                 </div>
                 <div className="fr-header__operator">

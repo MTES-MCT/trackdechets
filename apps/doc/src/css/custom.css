@@ -15,4 +15,9 @@
   --ifm-color-primary-lighter: #0000a7;
   --ifm-color-primary-lightest: #0000bd;
   --ifm-code-font-size: 95%;
+  --ifm-navbar-height: 80px;
+}
+.navbar__logo img {
+  height: 200%;
+  margin-top: -15px;
 }
