@@ -11,9 +11,11 @@ import passwordResetRequest from "./queries/passwordResetRequest";
 import warningMessage from "./queries/warningMessage";
 import myCompaniesCsv from "./queries/myCompaniesCsv";
 import myCompaniesXls from "./queries/myCompaniesXls";
+import isAuthenticated from "./queries/isAuthenticated";
 
 const Query: QueryResolvers = {
   me,
+  isAuthenticated,
   apiKey,
   invitation,
   membershipRequest,
