@@ -202,7 +202,7 @@ describe("Registry - addToIncomingWasteRegistry", () => {
     expect(data.addToIncomingWasteRegistry).toBe(true);
 
     const result = await prisma.registryIncomingWaste.findFirstOrThrow({
-      where: { publicId: line.publicId, isActive: true }
+      where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");
   });

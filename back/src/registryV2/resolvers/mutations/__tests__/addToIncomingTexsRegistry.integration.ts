@@ -201,7 +201,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
     expect(data.addToIncomingTexsRegistry).toBe(true);
 
     const result = await prisma.registryIncomingTexs.findFirstOrThrow({
-      where: { publicId: line.publicId, isActive: true }
+      where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");
   });
