@@ -17,6 +17,12 @@ import {
   getIncomingTexsImportSiretsAssociations
 } from "./incomingTexs/database";
 import { safeParseAsyncIncomingTexs } from "./incomingTexs/validation";
+import { OUTGOING_TEXS_HEADERS } from "./outgoingTexs/constants";
+import { safeParseAsyncOutgoingTexs } from "./outgoingTexs/validation";
+import {
+  getOutgoingTexsImportSiretsAssociations,
+  saveOutgoingTexsLine
+} from "./outgoingTexs/database";
 
 export type ParsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | null;
@@ -43,7 +49,12 @@ export type ImportOptions = {
 };
 
 export const ERROR_HEADER = "Erreur";
-export const IMPORT_TYPES = ["SSD", "INCOMING_WASTE", "INCOMING_TEXS"] as const;
+export const IMPORT_TYPES = [
+  "SSD",
+  "INCOMING_WASTE",
+  "INCOMING_TEXS",
+  "OUTGOING_TEXS"
+] as const;
 export type ImportType = (typeof IMPORT_TYPES)[number];
 
 export const importOptions: Record<ImportType, ImportOptions> = {
@@ -64,6 +75,12 @@ export const importOptions: Record<ImportType, ImportOptions> = {
     safeParseAsync: safeParseAsyncIncomingTexs,
     saveLine: saveIncomingTexsLine,
     getImportSiretsAssociations: getIncomingTexsImportSiretsAssociations
+  },
+  OUTGOING_TEXS: {
+    headers: OUTGOING_TEXS_HEADERS,
+    safeParseAsync: safeParseAsyncOutgoingTexs,
+    saveLine: saveOutgoingTexsLine,
+    getImportSiretsAssociations: getOutgoingTexsImportSiretsAssociations
   }
 };
 

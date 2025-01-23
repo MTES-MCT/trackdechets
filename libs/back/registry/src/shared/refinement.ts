@@ -314,13 +314,14 @@ export const refineWeightIsEstimate: Refinement<{
 };
 
 export const refineMunicipalities: Refinement<{
-  initialEmitterCompanyType:
+  initialEmitterCompanyType?:
     | "ETABLISSEMENT_FR"
     | "ENTREPRISE_UE"
     | "ENTREPRISE_HORS_UE"
     | "ASSOCIATION"
     | "PERSONNE_PHYSIQUE"
-    | "COMMUNE";
+    | "COMMUNE"
+    | null;
   initialEmitterMunicipalitiesInseeCodes: string[];
   initialEmitterMunicipalitiesNames: string[];
 }> = (item, { addIssue }) => {

@@ -4,7 +4,20 @@ import { ParsedZodIncomingTexsItem } from "./schema";
 import { $Enums } from "@prisma/client";
 import { getCachedCompany } from "../../shared/helpers";
 
-export const initialEmitterRefinement =
+export const initialEmitterRefinement: Refinement<
+  ParsedZodIncomingTexsItem
+> = async (incomingTexsItem, { addIssue }) => {
+  if (
+    !incomingTexsItem.emitterNoTraceability &&
+    !incomingTexsItem.initialEmitterCompanyOrgId
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `L'organisme initial émetteur doit être renseigné`,
+      path: ["initialEmitterCompanyOrgId"]
+    });
+  }
+
   refineActorInfos<ParsedZodIncomingTexsItem>({
     typeKey: "initialEmitterCompanyType",
     orgIdKey: "initialEmitterCompanyOrgId",
@@ -14,6 +27,7 @@ export const initialEmitterRefinement =
     cityKey: "initialEmitterCompanyCity",
     countryKey: "initialEmitterCompanyCountryCode"
   });
+};
 
 export const emitterRefinement = refineActorInfos<ParsedZodIncomingTexsItem>({
   typeKey: "emitterCompanyType",

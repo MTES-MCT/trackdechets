@@ -7,7 +7,8 @@ export const INCOMING_TEXS_HEADERS: {
   publicId: "Identifiant unique",
   reportAsCompanySiret: "SIRET du déclarant",
   reportForCompanySiret: "SIRET du destinataire",
-  wasteDescription: "Dénomination du déchet",
+  wasteDescription:
+    "Dénomination usuelle des terres et sédiments ou des déchets",
   wasteCode: "Code déchet",
   wasteCodeBale: "Code déchet Bâle",
   wastePop: "POP",
@@ -33,6 +34,8 @@ export const INCOMING_TEXS_HEADERS: {
   emitterCompanyType: "Type d'expéditeur ou détenteur",
   emitterCompanyOrgId: "Numéro d'identification de l'expéditeur ou détenteur",
   emitterCompanyName: "Raison sociale de l'expéditeur ou détenteur",
+  emitterNoTraceability:
+    "Rupture de traçabilité de l'expéditeur ou du détenteur",
   emitterPickupSiteName:
     "Référence du chantier ou du lieu de collecte de l'expéditeur",
   emitterPickupSiteAddress:
@@ -56,7 +59,7 @@ export const INCOMING_TEXS_HEADERS: {
   traderCompanyName: "Raison sociale du négociant",
   traderRecepisseNumber: "Numéro de récépissé du négociant",
   operationCode: "Code de traitement réalisé",
-  operationMode: "Mode de traitement réalisé",
+  operationMode: "Mode de traitement",
   noTraceability: "Rupture de traçabilité autorisée",
   nextDestinationIsAbroad: "Destination ultérieure à l'étranger",
   declarationNumber: "Numéro de déclaration",
@@ -64,10 +67,8 @@ export const INCOMING_TEXS_HEADERS: {
   movementNumber: "Numéro de mouvement",
   nextOperationCode: "Code de traitement ultérieur prévue",
   isUpcycled: "Terre valorisée",
-  destinationParcelInseeCodes:
-    "Codes INSEE des parcelles de destination si valorisation",
-  destinationParcelNumbers:
-    "Numéro(s) des parcelles de destination si valorisation",
+  destinationParcelInseeCodes: "Codes INSEE des parcelles si valorisation",
+  destinationParcelNumbers: "Numéro(s) des parcelles si valorisation",
   destinationParcelCoordinates:
     "Coordonnées des parcelles de destination si valorisation",
   isDirectSupply: "Approvisionnement direct",

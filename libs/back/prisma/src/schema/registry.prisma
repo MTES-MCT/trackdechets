@@ -123,7 +123,7 @@ model RegistryIncomingWaste {
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?
-    initialEmitterCompanyType              String
+    initialEmitterCompanyType              String?
     initialEmitterCompanyOrgId             String?
     initialEmitterCompanyName              String?
     initialEmitterCompanyAddress           String?
@@ -249,7 +249,7 @@ model RegistryIncomingTexs {
     parcelNumbers                          String[]
     parcelCoordinates                      String[]
     sisIdentifier                          String?
-    initialEmitterCompanyType              String
+    initialEmitterCompanyType              String?
     initialEmitterCompanyOrgId             String?
     initialEmitterCompanyName              String?
     initialEmitterCompanyAddress           String?
