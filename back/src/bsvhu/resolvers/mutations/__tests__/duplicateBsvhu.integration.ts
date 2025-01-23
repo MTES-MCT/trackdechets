@@ -305,6 +305,8 @@ describe("mutation.duplicateBsvhu", () => {
       "destinationReceptionWeight",
       "destinationReceptionAcceptationStatus",
       "destinationReceptionRefusalReason",
+      "destinationReceptionSignatureAuthor",
+      "destinationReceptionSignatureDate",
       "destinationReceptionIdentificationNumbers",
       "destinationReceptionIdentificationType",
       "destinationReceptionDate",
