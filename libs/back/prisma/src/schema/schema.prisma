@@ -404,6 +404,7 @@ model EcoOrganisme {
   siret         String  @unique(map: "EcoOrganisme.siret._UNIQUE")
   name          String
   address       String
+  handleBsdd    Boolean @default(false)
   handleBsdasri Boolean @default(false)
   handleBsda    Boolean @default(false)
   handleBsvhu   Boolean @default(false)
