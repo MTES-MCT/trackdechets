@@ -658,7 +658,8 @@ describe("Mutation.Vhu.sign", () => {
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
           transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date()
+          transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"]
         }
       });
 
@@ -708,6 +709,7 @@ describe("Mutation.Vhu.sign", () => {
           destinationCompanySiret: destinationCompany.siret,
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"],
           // Reception data
           destinationReceptionAcceptationStatus: null, // Missing param
           destinationReceptionWeight: null, // Missing param
@@ -735,7 +737,8 @@ describe("Mutation.Vhu.sign", () => {
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
           transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date()
+          transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"]
         }
       });
 
@@ -790,6 +793,7 @@ describe("Mutation.Vhu.sign", () => {
           destinationCompanySiret: destinationCompany.siret,
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"],
           // Missing reception data!
           destinationReceptionAcceptationStatus: null, // Missing param
           destinationReceptionWeight: null, // Missing param
@@ -821,6 +825,7 @@ describe("Mutation.Vhu.sign", () => {
           destinationCompanySiret: destinationCompany.siret,
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"],
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 20,
@@ -847,6 +852,7 @@ describe("Mutation.Vhu.sign", () => {
           destinationCompanySiret: destinationCompany.siret,
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"],
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 20,
@@ -875,6 +881,7 @@ describe("Mutation.Vhu.sign", () => {
           status: "INITIAL",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
+          transporterTransportPlates: ["XY-23-TR"],
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 20,
@@ -925,6 +932,7 @@ describe("Mutation.Vhu.sign", () => {
           destinationCompanySiret: destinationCompany.siret,
           transporterTransportSignatureAuthor: "Transporter",
           transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"],
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 20,
