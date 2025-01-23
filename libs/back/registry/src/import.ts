@@ -50,6 +50,14 @@ export async function processStream({
     delimiter: CSV_DELIMITER,
     headers: ["errors", ...Object.keys(options.headers)],
     writeHeaders: false, // Use headers only to reorder the columns properly
+    transform: (row: Record<string, unknown>) => {
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => [
+          key,
+          value instanceof Date ? value.toISOString() : value
+        ])
+      );
+    }
   });
   errorStream.pipe(outputErrorStream);
   // Write the headers ourself, as the keys dont match the labels
