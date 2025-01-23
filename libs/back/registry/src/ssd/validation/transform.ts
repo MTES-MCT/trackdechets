@@ -11,7 +11,7 @@ export async function transformAndRefineReason(
     where: {
       publicId: ssdItem.publicId,
       reportForCompanySiret: ssdItem.reportForCompanySiret,
-      isActive: true
+      isLatest: true
     }
   });
 

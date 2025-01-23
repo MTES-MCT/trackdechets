@@ -51,7 +51,7 @@ model RegistrySsd {
     createdAt DateTime @default(now()) @db.Timestamptz(6)
     importId  String?
 
-    isActive    Boolean @default(true)
+    isLatest    Boolean @default(true)
     isCancelled Boolean @default(false)
 
     createdById String
@@ -99,7 +99,7 @@ model RegistryIncomingWaste {
     createdAt DateTime @default(now()) @db.Timestamptz(6)
     importId  String?
 
-    isActive    Boolean @default(true)
+    isLatest    Boolean @default(true)
     isCancelled Boolean @default(false)
 
     createdById String
@@ -132,6 +132,7 @@ model RegistryIncomingWaste {
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
     initialEmitterMunicipalitiesNames      String[]
+    emitterNoTraceability                  Boolean
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
@@ -221,7 +222,7 @@ model RegistryIncomingTexs {
     createdAt DateTime @default(now()) @db.Timestamptz(6)
     importId  String?
 
-    isActive    Boolean @default(true)
+    isLatest    Boolean @default(true)
     isCancelled Boolean @default(false)
 
     createdById String
@@ -258,6 +259,7 @@ model RegistryIncomingTexs {
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
     initialEmitterMunicipalitiesNames      String[]
+    emitterNoTraceability                  Boolean
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
@@ -351,7 +353,7 @@ model RegistryOutgoingTexs {
     createdAt DateTime @default(now()) @db.Timestamptz(6)
     importId  String?
 
-    isActive    Boolean @default(true)
+    isLatest    Boolean @default(true)
     isCancelled Boolean @default(false)
 
     createdById String

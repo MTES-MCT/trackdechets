@@ -14,7 +14,7 @@ export async function saveOutgoingTexsLine({
       await prisma.$transaction(async tx => {
         await tx.registryOutgoingTexs.update({
           where: { id },
-          data: { isActive: false }
+          data: { isLatest: false }
         });
         await tx.registryOutgoingTexs.create({
           data: { ...persistedData, importId }

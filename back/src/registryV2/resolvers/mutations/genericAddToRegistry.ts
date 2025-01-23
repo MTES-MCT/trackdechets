@@ -56,7 +56,7 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
     if (errors.size > 0) {
       throw new UserInputError(
-        `${errors.size} lignes comportent des erreurs et n'ont pas pu être importées.`,
+        `${errors.size} ligne(s) en erreur n'ont pas pu être importées.`,
         {
           errors: Array.from(errors.entries()).map(([publicId, errors]) => ({
             message: errors,

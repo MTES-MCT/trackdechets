@@ -14,7 +14,7 @@ export async function saveIncomingWasteLine({
       await prisma.$transaction(async tx => {
         await tx.registryIncomingWaste.update({
           where: { id },
-          data: { isActive: false }
+          data: { isLatest: false }
         });
         await tx.registryIncomingWaste.create({
           data: { ...persistedData, importId }
