@@ -174,7 +174,7 @@ export function BsdAdmin() {
           bsd({ variables: { id: formData.get("id") } });
         }}
       >
-        <div className="fr-grid-row fr-grid-row--bottom">
+        <div className="fr-grid-row fr-grid-row--bottom fr-mb-4v">
           <div className="fr-col-8">
             <Input
               label="Identifiant du bordereau"
