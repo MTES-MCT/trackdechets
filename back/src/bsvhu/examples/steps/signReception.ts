@@ -1,7 +1,7 @@
 import mutations from "../mutations";
 import { WorkflowStep } from "../../../common/workflow";
 
-export function signOperation(company: string): WorkflowStep {
+export function signReception(company: string): WorkflowStep {
   return {
     description: `Le broyeur procède ensuite à la signature de la réception (étape facultative)`,
     mutation: mutations.signBsvhu,

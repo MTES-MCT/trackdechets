@@ -244,19 +244,19 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["destination", "company", "mail"]
   },
   destinationReceptionAcceptationStatus: {
-    sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
     required: { from: "RECEPTION" },
     readableFieldName: "Le statut d'acceptation du destinataire",
     path: ["destination", "reception", "acceptationStatus"]
   },
   destinationReceptionRefusalReason: {
-    sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
     readableFieldName: "La raison du refus par le destinataire",
     required: { from: "RECEPTION", when: isRefusedOrPartiallyRefused },
     path: ["destination", "reception", "refusalReason"]
   },
   destinationReceptionWeight: {
-    sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
     required: { from: "RECEPTION" },
     readableFieldName: "Le poids réel reçu",
     path: ["destination", "reception", "weight"]
@@ -264,7 +264,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationReceptionDate: {
     readableFieldName: "la date de réception",
     required: { from: "RECEPTION", when: isReceptionSignatureStep },
-    sealed: { from: "RECEPTION", when: isDefinedAndNotReceptionSignatureStep },
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
     path: ["destination", "reception", "date"]
   },
   destinationReceptionIdentificationNumbers: {
@@ -772,14 +772,18 @@ function isReceptionSignatureStep(_, currentSignatureType: SignatureTypeInput) {
   return currentSignatureType === "RECEPTION";
 }
 
-function isDefinedAndNotReceptionSignatureStep(
-  bsvhu: ZodBsvhu,
-  currentSignatureType: SignatureTypeInput
-) {
-  return (
+function isReceptionDataSealed(bsvhu: ZodBsvhu) {
+  // Data has been provided. Can be modified as long as reception
+  // has not been signed
+  if (
     isDefined(bsvhu.destinationReceptionRefusalReason) &&
-    currentSignatureType !== "RECEPTION"
-  );
+    !Boolean(bsvhu.destinationReceptionSignatureDate)
+  ) {
+    return true;
+  }
+
+  // Data has NOT been provided. Can modify until OPERATION
+  return Boolean(bsvhu.destinationOperationSignatureDate);
 }
 
 function isNotRefused(bsvhu: ZodBsvhu) {
