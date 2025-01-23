@@ -54,11 +54,9 @@ export const siretSchema = z.coerce
   .string({
     invalid_type_error: `Le SIRET doit être une chaîne de caractères`
   })
-  .min(14, `Le SIRET ne doit pas faire moins de 14 chiffres`)
-  .max(14, `Le SIRET ne doit pas faire plus de 14 chiffres`)
   .refine(value => {
     return isSiret(value);
-  }, `Le SIRET n'est pas un SIRET valide`);
+  }, `Le SIRET n'est pas valide`);
 
 export const reportAsCompanySiretSchema = z
   .union([

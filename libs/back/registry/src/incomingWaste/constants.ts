@@ -26,23 +26,26 @@ export const INCOMING_WASTE_HEADERS: {
   initialEmitterCompanyCountryCode: "Code pays du producteur initial",
   initialEmitterMunicipalitiesInseeCodes: "Code(s) INSEE de(s) commune(s)",
   initialEmitterMunicipalitiesNames: "Commune(s)",
-  emitterCompanyType: "Type d'expéditeur",
-  emitterCompanyOrgId: "Numéro d'identification de l'expéditeur",
-  emitterCompanyName: "Raison sociale de l'expéditeur",
-  emitterCompanyAddress: "Libellé de l'adresse de l'expéditeur",
-  emitterCompanyPostalCode: "Code postal de l'expéditeur",
-  emitterCompanyCity: "Commune de l'expéditeur",
-  emitterCompanyCountryCode: "Code pays de l'expéditeur",
+  emitterCompanyType: "Type d'expéditeur ou de détenteur",
+  emitterCompanyOrgId:
+    "Numéro d'identification de l'expéditeur ou du détenteur",
+  emitterCompanyName: "Raison sociale de l'expéditeur ou du détenteur",
+  emitterCompanyAddress: "Libellé de l'adresse de l'expéditeur ou du détenteur",
+  emitterCompanyPostalCode: "Code postal de l'expéditeur ou du détenteur",
+  emitterCompanyCity: "Commune de l'expéditeur ou du détenteur",
+  emitterCompanyCountryCode: "Code pays de l'expéditeur ou du détenteur",
+  emitterNoTraceability:
+    "Rupture de traçabilité de l'expéditeur ou du détenteur",
   emitterPickupSiteName:
-    "Référence du chantier ou du lieu de collecte de l'expéditeur",
+    "Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   emitterPickupSiteAddress:
-    "Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur",
+    "Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   emitterPickupSitePostalCode:
-    "Code postal du chantier ou du lieu de collecte de l'expéditeur",
+    "Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   emitterPickupSiteCity:
-    "Commune du chantier ou du lieu de collecte de l'expéditeur",
+    "Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   emitterPickupSiteCountryCode:
-    "Code pays du chantier ou du lieu de collecte de l'expéditeur",
+    "Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   ecoOrganismeSiret: "SIRET de l'éco-organisme",
   ecoOrganismeName: "Raison sociale de l'éco-organisme",
   brokerCompanySiret: "SIRET du courtier",

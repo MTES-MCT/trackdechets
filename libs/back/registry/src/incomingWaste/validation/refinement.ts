@@ -37,7 +37,20 @@ export const refineWeighingHour: Refinement<
   }
 };
 
-export const initialEmitterRefinement =
+export const initialEmitterRefinement: Refinement<
+  ParsedZodIncomingWasteItem
+> = async (incomingWasteItem, { addIssue }) => {
+  if (
+    !incomingWasteItem.emitterNoTraceability &&
+    !incomingWasteItem.initialEmitterCompanyOrgId
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `L'organisme initial émetteur doit être renseigné`,
+      path: ["initialEmitterCompanyOrgId"]
+    });
+  }
+
   refineActorInfos<ParsedZodIncomingWasteItem>({
     typeKey: "initialEmitterCompanyType",
     orgIdKey: "initialEmitterCompanyOrgId",
@@ -47,6 +60,7 @@ export const initialEmitterRefinement =
     cityKey: "initialEmitterCompanyCity",
     countryKey: "initialEmitterCompanyCountryCode"
   });
+};
 
 export const emitterRefinement = refineActorInfos<ParsedZodIncomingWasteItem>({
   typeKey: "emitterCompanyType",
@@ -115,8 +129,10 @@ export const transporter5Refinement =
 
 export const refineReportForProfile: Refinement<
   ParsedZodIncomingWasteItem
-> = async (ssdItem, { addIssue }) => {
-  const company = await getCachedCompany(ssdItem.reportForCompanySiret);
+> = async (incomingWasteItem, { addIssue }) => {
+  const company = await getCachedCompany(
+    incomingWasteItem.reportForCompanySiret
+  );
   if (!company) {
     return;
   }

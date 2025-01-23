@@ -38,6 +38,7 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
   for (const line of lines) {
     const result = await safeParseAsync(line);
+    const errors = new Map<string, string>();
 
     if (result.success) {
       await saveLine({
@@ -45,11 +46,23 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
         importId: null
       });
     } else {
+      errors.set(
+        line.publicId,
+        result.error.issues
+          .map(issue => `${issue.path}: ${issue.message}`)
+          .join("\n")
+      );
+    }
+
+    if (errors.size > 0) {
       throw new UserInputError(
-        [
-          `Ligne avec l'identifiant ${line.publicId} invalide :`,
-          ...result.error.issues.map(issue => `${issue.path}: ${issue.message}`)
-        ].join("\n")
+        `${errors.size} ligne(s) en erreur n'ont pas pu être importées.`,
+        {
+          errors: Array.from(errors.entries()).map(([publicId, errors]) => ({
+            message: errors,
+            publicId
+          }))
+        }
       );
     }
   }

@@ -175,7 +175,7 @@ export const rebuildRegistrySsdLookup = async () => {
     const items = await prisma.registrySsd.findMany({
       where: {
         isCancelled: false,
-        isActive: true
+        isLatest: true
       },
       take: 100,
       skip: cursorId ? 1 : 0,

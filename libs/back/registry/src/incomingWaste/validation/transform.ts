@@ -10,7 +10,7 @@ export async function transformAndRefineReason(
     where: {
       publicId: incomingWasteItem.publicId,
       reportForCompanySiret: incomingWasteItem.reportForCompanySiret,
-      isActive: true
+      isLatest: true
     }
   });
 

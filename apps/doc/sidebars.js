@@ -29,6 +29,7 @@ const referenceDefs = [
 
   { id: "user-company", label: "Utilisateurs et Établissements" },
   { id: "registre", label: "Registre" },
+  { id: "registreV2", label: "Registre V2" },
   { id: "webhooks", label: "Webhooks" },
 ];
 

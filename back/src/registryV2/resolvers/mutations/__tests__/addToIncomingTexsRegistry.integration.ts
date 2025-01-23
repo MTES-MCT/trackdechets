@@ -37,6 +37,7 @@ function getCorrectLine(siret: string) {
     initialEmitterCompanyCountryCode: "FR",
     initialEmitterMunicipalitiesInseeCodes: null,
     initialEmitterMunicipalitiesNames: null,
+    emitterNoTraceability: false,
     emitterCompanyType: "ETABLISSEMENT_FR",
     emitterCompanyOrgId: "78467169500103",
     emitterCompanyName: "Raison sociale de l'expéditeur",
@@ -200,7 +201,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
     expect(data.addToIncomingTexsRegistry).toBe(true);
 
     const result = await prisma.registryIncomingTexs.findFirstOrThrow({
-      where: { publicId: line.publicId, isActive: true }
+      where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");
   });

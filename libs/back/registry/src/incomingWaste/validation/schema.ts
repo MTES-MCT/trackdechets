@@ -79,13 +79,13 @@ const inputIncomingWasteSchema = z.object({
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  initialEmitterCompanyType: actorTypeSchema,
-  initialEmitterCompanyOrgId: actorOrgIdSchema,
-  initialEmitterCompanyName: actorNameSchema,
-  initialEmitterCompanyAddress: actorAddressSchema,
-  initialEmitterCompanyPostalCode: actorPostalCodeSchema,
-  initialEmitterCompanyCity: actorCitySchema,
-  initialEmitterCompanyCountryCode: actorCountryCodeSchema,
+  initialEmitterCompanyType: actorTypeSchema.nullish(),
+  initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
+  initialEmitterCompanyName: actorNameSchema.nullish(),
+  initialEmitterCompanyAddress: actorAddressSchema.nullish(),
+  initialEmitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  initialEmitterCompanyCity: actorCitySchema.nullish(),
+  initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
   initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
   emitterCompanyType: actorTypeSchema,
@@ -95,6 +95,7 @@ const inputIncomingWasteSchema = z.object({
   emitterCompanyPostalCode: actorPostalCodeSchema,
   emitterCompanyCity: actorCitySchema,
   emitterCompanyCountryCode: actorCountryCodeSchema,
+  emitterNoTraceability: z.boolean(),
   emitterPickupSiteName: z
     .string()
     .max(

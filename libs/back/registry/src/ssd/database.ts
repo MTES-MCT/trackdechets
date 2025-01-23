@@ -15,7 +15,7 @@ export async function saveSsdLine({
       await prisma.$transaction(async tx => {
         await tx.registrySsd.update({
           where: { id },
-          data: { isActive: false }
+          data: { isLatest: false }
         });
         const registrySsd = await tx.registrySsd.create({
           data: { ...persistedData, importId }

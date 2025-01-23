@@ -48,19 +48,20 @@ export async function processStream({
 
   const errorStream = format({
     delimiter: CSV_DELIMITER,
-    headers: [ERROR_HEADER, ...Object.values(options.headers)],
-    writeHeaders: true,
-    transform: (row: Record<string, any>) => {
-      // The columns might not be in the right order when received.
-      // We reorder them to match the headers for the error file
-      const headerKeys = ["errors", ...Object.keys(options.headers)];
-      return headerKeys.reduce((reshapedRow, header) => {
-        reshapedRow[header] = row[header] ?? "";
-        return reshapedRow;
-      }, {});
+    headers: ["errors", ...Object.keys(options.headers)],
+    writeHeaders: false, // Use headers only to reorder the columns properly
+    transform: (row: Record<string, unknown>) => {
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => [
+          key,
+          value instanceof Date ? value.toISOString() : value
+        ])
+      );
     }
   });
   errorStream.pipe(outputErrorStream);
+  // Write the headers ourself, as the keys dont match the labels
+  errorStream.write({ errors: ERROR_HEADER, ...options.headers });
 
   const transformStream =
     fileType === "CSV"
@@ -73,7 +74,7 @@ export async function processStream({
   try {
     await startImport(importId);
 
-    const dataStream: AsyncIterable<{
+    const parsedLinesStream: AsyncIterable<{
       rawLine: Record<string, string>;
       result: SafeParseReturnType<unknown, ParsedLine>;
     }> = inputStream.pipe(transformStream).on("error", error => {
@@ -83,7 +84,7 @@ export async function processStream({
       }
     });
 
-    for await (const { rawLine, result } of dataStream) {
+    for await (const { rawLine, result } of parsedLinesStream) {
       if (!result.success) {
         stats.errors++;
 
