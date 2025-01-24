@@ -310,7 +310,6 @@ describe("Mutation.createFormRevisionRequest", () => {
       }
     });
 
-    console.log(data.createFormRevisionRequest.approvals.length);
     // only one approval is created
     expect(data.createFormRevisionRequest.approvals).toStrictEqual([
       { approverSiret: recipientCompany.siret, status: "PENDING" }
@@ -1601,6 +1600,90 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     expect(errors).toBeUndefined();
+  });
+
+  it("should fail when trying to add a broker with wrong profile", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const brokerCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { broker: { company: { siret: brokerCompany.siret } } },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          `Le courtier saisi sur le bordereau (SIRET: ${brokerCompany.siret}) n'est pas inscrit sur Trackdéchets` +
+          " en tant qu'établissement de courtage et ne peut donc pas être visé sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+          " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+      })
+    ]);
+  });
+
+  it("should fail when trying to add a trader with wrong profile", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const traderCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { trader: { company: { siret: traderCompany.siret } } },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          `Le négociant saisi sur le bordereau (SIRET: ${traderCompany.siret}) n'est pas inscrit sur Trackdéchets` +
+          " en tant qu'établissement de négoce et ne peut donc pas être visé sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+          " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+      })
+    ]);
   });
 
   describe("wasteAcceptationStatus & quantityRefused", () => {

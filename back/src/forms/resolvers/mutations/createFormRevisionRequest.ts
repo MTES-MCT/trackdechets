@@ -18,7 +18,13 @@ import {
   BSDD_SAMPLE_NUMBER_WASTE_CODES
 } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { WeightUnits, weight, v20241101 } from "../../../common/validation";
+import {
+  WeightUnits,
+  weight,
+  v20241101,
+  siret,
+  siretTests
+} from "../../../common/validation";
 import { prisma } from "@td/prisma";
 import type {
   FormRevisionRequestContentInput,
@@ -522,14 +528,9 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
       ),
     processingOperationDescription: yup.string().nullable(),
     brokerCompanyName: yup.string().nullable(),
-    brokerCompanySiret: yup
-      .string()
-      .nullable()
-      .test(
-        "is-siret",
-        "Courtier: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => !value || isSiret(value)
-      ),
+    brokerCompanySiret: siret
+      .label("Courtier")
+      .test(siretTests.isRegistered("BROKER")),
     brokerCompanyAddress: yup.string().nullable(),
     brokerCompanyContact: yup.string().nullable(),
     brokerCompanyPhone: yup.string().nullable(),
@@ -538,14 +539,9 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
     brokerDepartment: yup.string().nullable(),
     brokerValidityLimit: yup.date().nullable(),
     traderCompanyName: yup.string().nullable(),
-    traderCompanySiret: yup
-      .string()
-      .nullable()
-      .test(
-        "is-siret",
-        "Négociant: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => !value || isSiret(value)
-      ),
+    traderCompanySiret: siret
+      .label("Négociant")
+      .test(siretTests.isRegistered("TRADER")),
     traderCompanyAddress: yup.string().nullable(),
     traderCompanyContact: yup.string().nullable(),
     traderCompanyPhone: yup.string().nullable(),
