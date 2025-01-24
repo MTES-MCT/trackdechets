@@ -144,7 +144,7 @@ const runIntegrityTest = async () => {
     console.log(`There are ${Object.keys(mem).length} misses :(`);
     for (const miss of Object.keys(mem)) {
       console.log(
-        `BSD id: ${miss.split("_")[0]}, siret: ${
+        `Registry: INCOMING, BSD id: ${miss.split("_")[0]}, siret: ${
           miss.split("_")[1]
         }, found in: ${mem[miss]}`
       );

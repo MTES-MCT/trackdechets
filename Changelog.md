@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.02.1] 11/02/2025
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de l'export du registre entrant V2 [PR 3910](https://github.com/MTES-MCT/trackdechets/pull/3910)
+
 #### :nail_care: Améliorations
 
 BSDD - Dupliquer le(s) conditionnement(s) et la mention ADR et afficher un message informatif en cas de BSDD provenant d'une duplication [PR 3881](https://github.com/MTES-MCT/trackdechets/pull/3881)
