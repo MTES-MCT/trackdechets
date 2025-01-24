@@ -8,11 +8,15 @@ import { INCOMING_TEXS_HEADERS } from "../incomingTexs/constants";
 import { INCOMING_WASTE_HEADERS } from "../incomingWaste/constants";
 import { registryS3Client } from "../s3";
 import { SSD_HEADERS } from "../ssd/constants";
+import { OUTGOING_WASTE_HEADERS } from "../outgoingWaste/constants";
+import { OUTGOING_TEXS_HEADERS } from "../outgoingTexs/constants";
 
 const MODEL_SOURCES = [
   { headers: SSD_HEADERS, name: "Modele SSD" },
   { headers: INCOMING_WASTE_HEADERS, name: "Modele DND entrant" },
-  { headers: INCOMING_TEXS_HEADERS, name: "Modele TEXS entrant" }
+  { headers: INCOMING_TEXS_HEADERS, name: "Modele TEXS entrant" },
+  { headers: OUTGOING_WASTE_HEADERS, name: "Modele DND sortant" },
+  { headers: OUTGOING_TEXS_HEADERS, name: "Modele TEXS sortant" }
 ];
 
 /**

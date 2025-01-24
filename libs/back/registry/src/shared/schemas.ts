@@ -252,6 +252,24 @@ export const receptionDateSchema = z.coerce
   )
   .max(new Date(), "La date réception ne peut pas être dans le futur");
 
+export const classicDateSchema = z.union([
+  z.date().nullish(),
+  z
+    .string()
+    .nullish()
+    .transform(val => (val ? new Date(val) : undefined))
+    .pipe(
+      z
+        .date()
+        .min(
+          sub(new Date(), { years: 1 }),
+          "La date ne peut pas être antérieure à J-1 an"
+        )
+        .max(new Date(), "La date ne peut pas être dans le futur")
+        .nullish()
+    )
+]);
+
 export const inseeCodesSchema = z
   .string()
   .nullish()

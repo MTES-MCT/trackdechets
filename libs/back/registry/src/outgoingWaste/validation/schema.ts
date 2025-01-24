@@ -1,7 +1,3 @@
-import {
-  INCOMING_TEXS_WASTE_CODES,
-  INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
-} from "@td/constants";
 import { z } from "zod";
 import {
   reasonSchema,
@@ -25,13 +21,10 @@ import {
   actorNameSchema,
   inseeCodesSchema,
   municipalitiesNamesSchema,
-  parcelNumbersSchema,
-  parcelCoordinatesSchema,
-  getOperationCodeSchema,
-  operationModeSchema,
-  isUpcycledSchema,
   declarationNumberSchema,
   notificationNumberSchema,
+  getOperationCodeSchema,
+  operationModeSchema,
   actorSiretSchema,
   transportModeSchema,
   transportRecepisseIsExemptedSchema,
@@ -39,12 +32,12 @@ import {
   classicDateSchema
 } from "../../shared/schemas";
 
-export type ParsedZodInputOutgoingTexsItem = z.output<
-  typeof inputOutgoingTexsSchema
+export type ParsedZodInputOutgoingWasteItem = z.output<
+  typeof inputOutgoingWasteSchema
 >;
-export type ParsedZodOutgoingTexsItem = z.output<typeof outgoingTexsSchema>;
+export type ParsedZodOutgoingWasteItem = z.output<typeof outgoingWasteSchema>;
 
-const inputOutgoingTexsSchema = z.object({
+const inputOutgoingWasteSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
@@ -55,15 +48,11 @@ const inputOutgoingTexsSchema = z.object({
   reportForPickupSiteCity: actorCitySchema.nullish(),
   reportForPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
   wasteDescription: wasteDescriptionSchema,
-  wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES),
+  wasteCode: getWasteCodeSchema(),
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
   wasteCodeBale: wasteCodeBaleSchema,
   dispatchDate: classicDateSchema,
-  wasteDap: z
-    .string()
-    .max(50, "Le DAP ne doit pas excéder 50 caractères")
-    .nullish(),
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
@@ -76,13 +65,6 @@ const inputOutgoingTexsSchema = z.object({
   initialEmitterCompanyCountryCode: actorCountryCodeSchema,
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
   initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
-  parcelInseeCodes: inseeCodesSchema,
-  parcelNumbers: parcelNumbersSchema,
-  parcelCoordinates: parcelCoordinatesSchema,
-  sisIdentifier: z
-    .string()
-    .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
-    .nullish(),
   destinationCompanyType: actorTypeSchema,
   destinationCompanyOrgId: actorOrgIdSchema,
   destinationCompanyName: actorNameSchema,
@@ -94,20 +76,14 @@ const inputOutgoingTexsSchema = z.object({
   destinationDropSitePostalCode: actorPostalCodeSchema.nullish(),
   destinationDropSiteCity: actorCitySchema.nullish(),
   destinationDropSiteCountryCode: actorCountryCodeSchema.nullish(),
-  operationCode: getOperationCodeSchema(
-    INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
-  ),
-  operationMode: operationModeSchema,
-  isUpcycled: isUpcycledSchema.nullish(),
-  destinationParcelInseeCodes: inseeCodesSchema,
-  destinationParcelNumbers: parcelNumbersSchema,
-  destinationParcelCoordinates: parcelCoordinatesSchema,
   declarationNumber: declarationNumberSchema,
   notificationNumber: notificationNumberSchema,
   movementNumber: z
     .string()
     .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
     .nullish(),
+  operationCode: getOperationCodeSchema(),
+  operationMode: operationModeSchema,
   ecoOrganismeSiret: actorSiretSchema.nullish(),
   ecoOrganismeName: actorNameSchema.nullish(),
   brokerCompanySiret: actorSiretSchema.nullish(),
@@ -132,57 +108,56 @@ const inputOutgoingTexsSchema = z.object({
   transporter1TransportMode: transportModeSchema.nullish(),
   transporter1CompanyType: actorTypeSchema.nullish(),
   transporter1CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter1RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
-  transporter1RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter1CompanyName: actorNameSchema.nullish(),
   transporter1CompanyAddress: actorAddressSchema.nullish(),
   transporter1CompanyPostalCode: actorPostalCodeSchema.nullish(),
   transporter1CompanyCity: actorCitySchema.nullish(),
   transporter1CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  transporter1RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter1RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter2TransportMode: transportModeSchema.nullish(),
   transporter2CompanyType: actorTypeSchema.nullish(),
   transporter2CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter2RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
-  transporter2RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter2CompanyName: actorNameSchema.nullish(),
   transporter2CompanyAddress: actorAddressSchema.nullish(),
   transporter2CompanyPostalCode: actorPostalCodeSchema.nullish(),
   transporter2CompanyCity: actorCitySchema.nullish(),
   transporter2CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  transporter2RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter2RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter3TransportMode: transportModeSchema.nullish(),
   transporter3CompanyType: actorTypeSchema.nullish(),
   transporter3CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter3RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
-  transporter3RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter3CompanyName: actorNameSchema.nullish(),
   transporter3CompanyAddress: actorAddressSchema.nullish(),
   transporter3CompanyPostalCode: actorPostalCodeSchema.nullish(),
   transporter3CompanyCity: actorCitySchema.nullish(),
   transporter3CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  transporter3RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter3RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter4TransportMode: transportModeSchema.nullish(),
   transporter4CompanyType: actorTypeSchema.nullish(),
   transporter4CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter4RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
-  transporter4RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter4CompanyName: actorNameSchema.nullish(),
   transporter4CompanyAddress: actorAddressSchema.nullish(),
   transporter4CompanyPostalCode: actorPostalCodeSchema.nullish(),
   transporter4CompanyCity: actorCitySchema.nullish(),
   transporter4CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  transporter4RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter4RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter5TransportMode: transportModeSchema.nullish(),
   transporter5CompanyType: actorTypeSchema.nullish(),
   transporter5CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter5RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
-  transporter5RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter5CompanyName: actorNameSchema.nullish(),
   transporter5CompanyAddress: actorAddressSchema.nullish(),
   transporter5CompanyPostalCode: actorPostalCodeSchema.nullish(),
   transporter5CompanyCity: actorCitySchema.nullish(),
-  transporter5CompanyCountryCode: actorCountryCodeSchema.nullish()
+  transporter5CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  transporter5RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter5RecepisseNumber: transportRecepisseNumberSchema.nullish()
 });
 
-// Props added through transform
-const transformedOutgoingTexsSchema = z.object({
+const transformedOutgoingWasteSchema = z.object({
   id: z.string().optional(),
   reportForCompanyAddress: z.string().default(""),
   reportForCompanyCity: z.string().default(""),
@@ -190,6 +165,6 @@ const transformedOutgoingTexsSchema = z.object({
   reportForCompanyName: z.coerce.string().default("")
 });
 
-export const outgoingTexsSchema = inputOutgoingTexsSchema.merge(
-  transformedOutgoingTexsSchema
+export const outgoingWasteSchema = inputOutgoingWasteSchema.merge(
+  transformedOutgoingWasteSchema
 );

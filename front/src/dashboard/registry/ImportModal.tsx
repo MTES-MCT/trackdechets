@@ -176,6 +176,12 @@ function Step1({ register }: StepProps) {
         <option value="INCOMING_TEXS">
           Terres excavées et sédiments, dangereux et non dangereux entrants
         </option>
+        <option value="OUTGOING_WASTE">
+          Déchets dangereux et non dangereux sortants
+        </option>
+        <option value="OUTGOING_TEXS">
+          Terres excavées et sédiments, dangereux et non dangereux sortants
+        </option>
       </Select>
 
       <Upload
