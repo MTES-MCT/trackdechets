@@ -930,14 +930,10 @@ describe("Mutation.createForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        siret: eo.siret!,
-        name: eo.name
-      }
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
-
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: {

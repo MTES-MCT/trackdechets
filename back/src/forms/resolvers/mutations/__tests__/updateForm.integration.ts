@@ -17,7 +17,8 @@ import {
   toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type {
@@ -1648,12 +1649,9 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: eo.name,
-        siret: eo.siret!
-      }
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
 
     // recipient needs appropriate profiles and subprofiles
@@ -1764,13 +1762,11 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: originalEO.name,
-        siret: originalEO.siret!
-      }
+    await ecoOrganismeFactory({
+      siret: originalEO.siret!,
+      handle: { handleBsdd: true }
     });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -1786,12 +1782,9 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: newEO.name,
-        siret: newEO.siret!
-      }
+    await ecoOrganismeFactory({
+      siret: newEO.siret!,
+      handle: { handleBsdd: true }
     });
 
     const { mutate } = makeClient(user);
@@ -1820,12 +1813,10 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: eo.name,
-        siret: eo.siret!
-      }
+
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
     // recipient needs appropriate profiles and subprofiles
     const destination = await companyFactory({
@@ -3965,12 +3956,9 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: ecoOrganisme.company.name,
-        siret: ecoOrganisme.company.siret!
-      }
+    await ecoOrganismeFactory({
+      siret: ecoOrganisme.company.siret!,
+      handle: { handleBsdd: true }
     });
 
     const { mutate } = makeClient(user);
