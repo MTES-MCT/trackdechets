@@ -7,7 +7,14 @@ import { index } from "../../common/elastic";
 import type { BsdType } from "@td/codegen-back";
 import { closeQueues } from "../../queue/producers";
 
-const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
+const bsdTypes: BsdType[] = [
+  "BSDD",
+  "BSDA",
+  "BSDASRI",
+  "BSVHU",
+  "BSFF",
+  "BSPAOH"
+];
 
 async function exitScript() {
   logger.info("Finished reindex-partial-in-place script, exiting");
