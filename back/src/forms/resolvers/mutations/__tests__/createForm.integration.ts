@@ -980,6 +980,38 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
+  it("should return an error when trying to create a form with an ecoorganisme not allowed to handle BSDDs", async () => {
+    const ecoOrg = await ecoOrganismeFactory({});
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      ecoOrganisme: {
+        name: ecoOrg.name,
+        siret: ecoOrg.siret
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'éco-organisme avec le siret "${createFormInput.ecoOrganisme.siret}" n'est pas reconnu.`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it("should create a form with a pickup site", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
