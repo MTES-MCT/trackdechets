@@ -7,6 +7,7 @@ import ProcessingOperation from "../common/components/processing-operation/Proce
 import { Field, FieldArray, useFormikContext } from "formik";
 import { isDangerous } from "@td/constants";
 import {
+  BsdType,
   CompanySearchResult,
   CompanyType,
   FavoriteType,
@@ -26,6 +27,8 @@ import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelector
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../Apps/Forms/Components/CompanyContactInfo/CompanyContactInfo";
 import Recepisse from "../../Apps/Dashboard/Components/Recepisse/Recepisse";
+import FormikBroker from "../../Apps/Forms/Components/Broker/FormikBroker";
+import FormikTrader from "../../Apps/Forms/Components/Trader/FormikTrader";
 
 function selectCompanyError(
   company: CompanySearchResult,
@@ -177,145 +180,10 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
         <TemporaryStorage name="temporaryStorageDetail" />
       )}
       <h4 className="form__section-heading">Autres acteurs</h4>
-      <ToggleSwitch
-        label="Présence d'un courtier"
-        checked={hasBroker}
-        showCheckedHint={false}
-        onChange={hasBroker => {
-          if (!hasBroker) {
-            setFieldValue("broker", null);
-          } else {
-            setFieldValue("broker", getInitialBroker());
-          }
-        }}
-        disabled={disabled}
-      />
-      {hasBroker && (
-        <div className="fr-mt-2w">
-          <CompanySelectorWrapper
-            orgId={siret}
-            selectedCompanyOrgId={values.broker?.company?.siret ?? null}
-            favoriteType={FavoriteType.Broker}
-            selectedCompanyError={company => {
-              if (company) {
-                return selectCompanyError(company, CompanyType.Broker);
-              }
-              return null;
-            }}
-            disabled={disabled}
-            onCompanySelected={company => {
-              const prevBroker = values.broker;
-
-              if (company) {
-                setFieldValue("broker", {
-                  ...prevBroker,
-                  company: {
-                    ...prevBroker?.company,
-                    ...values.broker?.company,
-                    siret: company?.siret,
-                    orgId: company.orgId,
-                    address: company.address,
-                    name: company.name,
-                    ...(prevBroker?.company?.siret !== company.siret
-                      ? {
-                          // auto-completion des infos de contact uniquement
-                          // s'il y a un changement d'établissement pour
-                          // éviter d'écraser les infos de contact spécifiées par l'utilisateur
-                          // lors d'une modification de bordereau
-                          contact: company.contact ?? "",
-                          phone: company.contactPhone ?? "",
-                          mail: company.contactEmail ?? ""
-                        }
-                      : {})
-                  },
-                  receipt: company.brokerReceipt?.receiptNumber ?? null,
-                  department: company.brokerReceipt?.department ?? null,
-                  validityLimit: company.brokerReceipt?.validityLimit ?? null
-                });
-              }
-            }}
-          />
-          <CompanyContactInfo fieldName="broker.company" />
-          {values.broker?.receipt && (
-            <Recepisse
-              title="Récépissé de courtage"
-              numero={values.broker?.receipt}
-              departement={values.broker?.department}
-              validityLimit={values.broker?.validityLimit}
-            />
-          )}
-        </div>
-      )}
-      <ToggleSwitch
-        className="fr-mt-3w"
-        label="Présence d'un négociant"
-        checked={hasTrader}
-        showCheckedHint={false}
-        onChange={hasTrader => {
-          if (!hasTrader) {
-            setFieldValue("trader", null);
-          } else {
-            setFieldValue("trader", getInitialTrader());
-          }
-        }}
-        disabled={disabled}
-      />
-      {hasTrader && (
-        <div className="fr-mt-2w">
-          <CompanySelectorWrapper
-            orgId={siret}
-            selectedCompanyOrgId={values.trader?.company?.siret ?? null}
-            favoriteType={FavoriteType.Trader}
-            selectedCompanyError={company => {
-              if (company) {
-                return selectCompanyError(company, CompanyType.Trader);
-              }
-              return null;
-            }}
-            disabled={disabled}
-            onCompanySelected={company => {
-              const prevTrader = values.trader;
-
-              if (company) {
-                setFieldValue("trader", {
-                  ...prevTrader,
-                  company: {
-                    ...prevTrader?.company,
-                    ...values.trader?.company,
-                    siret: company?.siret,
-                    orgId: company.orgId,
-                    address: company.address,
-                    name: company.name,
-                    ...(prevTrader?.company?.siret !== company.siret
-                      ? {
-                          // auto-completion des infos de contact uniquement
-                          // s'il y a un changement d'établissement pour
-                          // éviter d'écraser les infos de contact spécifiées par l'utilisateur
-                          // lors d'une modification de bordereau
-                          contact: company.contact ?? "",
-                          phone: company.contactPhone ?? "",
-                          mail: company.contactEmail ?? ""
-                        }
-                      : {})
-                  },
-                  receipt: company.traderReceipt?.receiptNumber ?? null,
-                  department: company.traderReceipt?.department ?? null,
-                  validityLimit: company.traderReceipt?.validityLimit ?? null
-                });
-              }
-            }}
-          />
-          <CompanyContactInfo fieldName="trader.company" />
-          {values.trader?.receipt && (
-            <Recepisse
-              title="Récépissé de négoce"
-              numero={values.trader?.receipt}
-              departement={values.trader?.department}
-              validityLimit={values.trader?.validityLimit}
-            />
-          )}
-        </div>
-      )}
+      <FormikBroker bsdType={BsdType.Bsdd} siret={siret} disabled={disabled} />
+      <div className="fr-mt-3w">
+        <FormikTrader siret={siret} disabled={disabled} />
+      </div>
       <ToggleSwitch
         className="fr-mt-3w"
         label="Présence d'intermédiaires"

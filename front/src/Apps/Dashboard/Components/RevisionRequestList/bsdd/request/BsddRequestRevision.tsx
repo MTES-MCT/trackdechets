@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import {
   Form as Bsdd,
+  BsdType,
   FavoriteType,
   Mutation,
   MutationCreateFormRevisionRequestArgs
@@ -10,14 +11,12 @@ import React, { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { removeEmptyKeys } from "../../../../../../common/helper";
 import { CREATE_FORM_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsddReviewsQuery";
-
 import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
 import WasteCodeSelector from "../../../../../common/Components/WasteCodeSelector/WasteCodeSelector";
 import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
 import RhfCompanyContactInfo from "../../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
@@ -27,6 +26,7 @@ import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
 import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
 import {
+  BsddRevisionRequestValidationSchema,
   initialBsddReview,
   validationBsddSchema
 } from "../../common/utils/schema";
@@ -36,6 +36,8 @@ import styles from "./BsddRequestRevision.module.scss";
 import Loader from "../../../../../common/Components/Loader/Loaders";
 import { disableAddPackagingCta } from "../../common/utils/rules";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
+import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
+import RhfTrader from "../../../../../Forms/Components/Trader/RhfTrader";
 
 type Props = {
   bsdd: Bsdd;
@@ -52,9 +54,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
   const isTempStorage = !!bsdd.temporaryStorageDetail;
   const isAppendix1Producer = bsdd.emitter?.type === "APPENDIX1_PRODUCER";
 
-  type ValidationSchema = z.infer<typeof validationBsddSchema>;
-
-  const methods = useForm<ValidationSchema>({
+  const methods = useForm<BsddRevisionRequestValidationSchema>({
     mode: "onTouched",
     defaultValues: initialBsddReview,
     resolver: zodResolver(validationBsddSchema)
@@ -78,7 +78,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
   // le formulaire de révision avec les valeurs du BSDD
   // puis de n'envoyer que les champs "dirty" dans onSubmit
   const resetPopIfUnchanged = (
-    data: Pick<ValidationSchema, "wasteDetails">
+    data: Pick<BsddRevisionRequestValidationSchema, "wasteDetails">
   ) => {
     const pop = data?.wasteDetails?.pop;
     if (pop !== null && pop !== undefined && pop === bsdd?.wasteDetails?.pop) {
@@ -89,8 +89,9 @@ export function BsddRequestRevision({ bsdd }: Props) {
     return data;
   };
 
-  const onSubmitForm = async (data: ValidationSchema) => {
+  const onSubmitForm = async (data: BsddRevisionRequestValidationSchema) => {
     const { comment, ...content } = data;
+
     const cleanedContent = removeEmptyKeys(resetPopIfUnchanged(content));
 
     await createFormRevisionRequest({
@@ -105,7 +106,9 @@ export function BsddRequestRevision({ bsdd }: Props) {
     });
   };
 
-  const onSubmit: SubmitHandler<ValidationSchema> = async data => {
+  const onSubmit: SubmitHandler<
+    BsddRevisionRequestValidationSchema
+  > = async data => {
     await onSubmitForm(data);
     resetAndClose();
   };
@@ -153,14 +156,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
       setValue(`${field}.validityLimit`, null);
       setValue(`${field}.department`, "");
     }
-  };
-
-  const onCompanyBrokerSeleted = company => {
-    const field = "broker";
-    if (company) {
-      setSelectedCompany(company, field);
-    }
-    setBrokerOrTraderReceipt(company?.brokerReceipt, field);
   };
 
   const onCompanyTraderSeleted = company => {
@@ -476,35 +471,10 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   }
                   defaultValue={initialBsddReview.broker}
                 >
-                  <CompanySelectorWrapper
-                    orgId={siret}
-                    favoriteType={FavoriteType.Broker}
-                    onCompanySelected={onCompanyBrokerSeleted}
-                  />
-                  <RhfCompanyContactInfo
-                    fieldName={"broker.company"}
-                    key={orgId}
-                  />
-                  <Input
-                    label="Numéro de récépissé"
-                    nativeInputProps={{
-                      ...register("broker.receipt")
-                    }}
-                    className="fr-col-6"
-                  />
-                  <Input
-                    label="Département"
-                    nativeInputProps={{
-                      ...register("broker.department")
-                    }}
-                    className="fr-col-6"
-                  />
-                  <Input
-                    label="Limite de validité"
-                    nativeInputProps={{
-                      type: "date",
-                      ...register("broker.validityLimit")
-                    }}
+                  <RhfBroker
+                    bsdType={BsdType.Bsdd}
+                    siret={siret}
+                    showSwitch={false}
                   />
                 </RhfReviewableField>
 
@@ -518,36 +488,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   }
                   defaultValue={initialBsddReview.trader}
                 >
-                  <CompanySelectorWrapper
-                    orgId={siret}
-                    favoriteType={FavoriteType.Trader}
-                    onCompanySelected={onCompanyTraderSeleted}
-                  />
-                  <RhfCompanyContactInfo
-                    fieldName={"trader.company"}
-                    key={orgId}
-                  />
-                  <Input
-                    label="Numéro de récépissé"
-                    nativeInputProps={{
-                      ...register("trader.receipt")
-                    }}
-                    className="fr-col-6"
-                  />
-                  <Input
-                    label="Département"
-                    nativeInputProps={{
-                      ...register("trader.department")
-                    }}
-                    className="fr-col-6"
-                  />
-                  <Input
-                    label="Limite de validité"
-                    nativeInputProps={{
-                      type: "date",
-                      ...register("trader.validityLimit")
-                    }}
-                  />
+                  <RhfTrader siret={siret} showSwitch={false} />
                 </RhfReviewableField>
               </div>
             </>

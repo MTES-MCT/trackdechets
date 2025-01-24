@@ -5,6 +5,7 @@ import {
 } from "../../../../../../form/bsdd/utils/initial-state";
 import { ALL_WASTES } from "@td/constants";
 import { getInitialCompany } from "../../../../../common/data/initialState";
+import { Form, FormRevisionRequestContentInput } from "@td/codegen-ui";
 
 export const initialDasriReview = {
   emitter: {
@@ -111,14 +112,16 @@ const company_schema = z.object({
   omiNumber: z.string().nullish()
 });
 
-const bsdd_broker_trader_Schema = z.object({
-  receipt: z.string().nullish(),
-  department: z.string().nullish(),
-  validityLimit: z.string().nullish(),
-  company: company_schema
-});
+const bsdd_broker_trader_Schema = z
+  .object({
+    receipt: z.string().nullish(),
+    department: z.string().nullish(),
+    validityLimit: z.string().nullish(),
+    company: company_schema
+  })
+  .nullable();
 
-export const initialBsddReview = {
+export const initialBsddReview: BsddRevisionRequestValidationSchema = {
   wasteDetails: {
     code: "",
     name: "",
@@ -238,6 +241,10 @@ export const validationBsddSchema = z.object({
     })
   })
 });
+
+export type BsddRevisionRequestValidationSchema = z.infer<
+  typeof validationBsddSchema
+>;
 
 export const initialBsdaReview = {
   emitter: {

@@ -562,12 +562,21 @@ input TransporterInput {
 input TraderInput {
   "N° de récipissé"
   receipt: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le négociant sur son profil Trackdéchets"
+    )
 
   "Département"
   department: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le négociant sur son profil Trackdéchets"
+    )
 
   "Limite de validité"
   validityLimit: DateTime
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le négociant sur son profil Trackdéchets"
+    )
 
   "Établissement négociant"
   company: CompanyInput
@@ -577,12 +586,21 @@ input TraderInput {
 input BrokerInput {
   "N° de récipissé"
   receipt: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier sur son profil Trackdéchets"
+    )
 
   "Département"
   department: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier sur son profil Trackdéchets"
+    )
 
   "Limite de validité"
   validityLimit: DateTime
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier sur son profil Trackdéchets"
+    )
 
   "Établissement courtier"
   company: CompanyInput
