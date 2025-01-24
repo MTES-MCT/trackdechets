@@ -62,6 +62,7 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
     isDraft: bsda.isDraft,
     status: bsda.status,
     type: bsda.type,
+    isDuplicateOf: bsda.isDuplicateOf,
     emitter: nullIfNoValues<BsdaEmitter>({
       isPrivateIndividual: bsda.emitterIsPrivateIndividual,
       company: nullIfNoValues<FormCompany>({

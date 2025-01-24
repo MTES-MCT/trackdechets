@@ -2,7 +2,10 @@ import { z } from "zod";
 
 export const registryErrorMap: z.ZodErrorMap = (issue, ctx) => {
   if (issue.code === z.ZodIssueCode.invalid_type) {
-    if (issue.received === z.ZodParsedType.undefined) {
+    if (
+      issue.received === z.ZodParsedType.undefined ||
+      issue.received === z.ZodParsedType.null
+    ) {
       return { message: "Champ requis" };
     } else if (issue.received === z.ZodParsedType.nan) {
       return { message: "Champ requis. La valeur doit être un nombre" };

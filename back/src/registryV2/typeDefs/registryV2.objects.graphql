@@ -395,7 +395,7 @@ type SsdWasteV2 {
   destinationCity: String
   destinationCountryCode: String
   operationCode: String!
-  operationMode: OperationMode!
+  operationMode: OperationMode
   administrativeActReference: String!
 }
 
