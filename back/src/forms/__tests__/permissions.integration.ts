@@ -4,6 +4,7 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { ErrorCode } from "../../common/errors";
 import {
   companyFactory,
+  ecoOrganismeFactory,
   formFactory,
   formWithTempStorageFactory,
   userFactory,
@@ -89,12 +90,9 @@ async function checkEcoOrganismePermission(
 ) {
   const owner = await userFactory();
   const { user, company } = await userWithCompanyFactory("MEMBER");
-  const ecoOrganisme = await prisma.ecoOrganisme.create({
-    data: {
-      siret: company.siret!,
-      name: "EO",
-      address: ""
-    }
+  const ecoOrganisme = await ecoOrganismeFactory({
+    siret: company.siret!,
+    handle: { handleBsdd: true }
   });
   const form = await formFactory({
     ownerId: owner.id,
