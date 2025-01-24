@@ -4,20 +4,17 @@ import RedErrorMessage from "../../common/components/RedErrorMessage";
 import TdSwitch from "../../common/components/Switch";
 import Tooltip from "../../common/components/Tooltip";
 import ProcessingOperation from "../common/components/processing-operation/ProcessingOperation";
-import { Field, FieldArray, useFormikContext } from "formik";
+import { Field, useFormikContext } from "formik";
 import { isDangerous } from "@td/constants";
 import { BsdType, Form } from "@td/codegen-ui";
 import CompanySelector from "../common/components/company/CompanySelector";
 import TemporaryStorage from "./components/temporaryStorage/TemporaryStorage";
 import styles from "./Recipient.module.scss";
 import { getInitialTemporaryStorageDetail } from "./utils/initial-state";
-import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
-import { getInitialCompany } from "../../Apps/common/data/initialState";
-import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { useParams } from "react-router-dom";
-import CompanyContactInfo from "../../Apps/Forms/Components/CompanyContactInfo/CompanyContactInfo";
 import FormikBroker from "../../Apps/Forms/Components/Broker/FormikBroker";
 import FormikTrader from "../../Apps/Forms/Components/Trader/FormikTrader";
+import FormikIntermediaryList from "../../Apps/Forms/Components/IntermediaryList/FormikIntermediaryList";
 
 export default function Recipient({ disabled }) {
   const { siret } = useParams<{ siret: string }>();
@@ -29,8 +26,6 @@ export default function Recipient({ disabled }) {
 
   const isChapeau = values?.emitter?.type === "APPENDIX1";
   const isGrouping = values?.emitter?.type === "APPENDIX2";
-
-  const hasIntermediaries = !!values.intermediaries?.length;
 
   function handleTempStorageToggle(checked) {
     if (checked) {
@@ -135,94 +130,16 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
         <TemporaryStorage name="temporaryStorageDetail" />
       )}
       <h4 className="form__section-heading">Autres acteurs</h4>
-      <FormikBroker bsdType={BsdType.Bsdd} siret={siret} disabled={disabled} />
-      <div className="fr-mt-3w">
-        <FormikTrader siret={siret} disabled={disabled} />
-      </div>
-      <ToggleSwitch
-        className="fr-mt-3w"
-        label="Présence d'intermédiaires"
-        checked={hasIntermediaries}
-        showCheckedHint={false}
-        onChange={hasIntermediary => {
-          if (!hasIntermediary) {
-            setFieldValue("intermediaries", []);
-          } else {
-            setFieldValue("intermediaries", [getInitialCompany()]);
-          }
-        }}
-        disabled={disabled}
-      />
-      {hasIntermediaries && (
-        <FieldArray
-          name="intermediaries"
-          render={({ push, remove }) => (
-            <>
-              {values.intermediaries.map((i, idx) => (
-                <div className="fr-mt-2w" key={idx}>
-                  <h6 className="fr-h6">Intermédiaire {idx + 1}</h6>
-                  <CompanySelectorWrapper
-                    orgId={siret}
-                    selectedCompanyOrgId={
-                      values.intermediaries[idx]?.siret ?? null
-                    }
-                    disabled={disabled}
-                    onCompanySelected={company => {
-                      const prevIntermediary = values.intermediaries[idx];
 
-                      if (company) {
-                        setFieldValue(`intermediaries.${idx}`, {
-                          ...prevIntermediary,
-                          siret: company?.siret,
-                          orgId: company.orgId,
-                          address: company.address,
-                          name: company.name,
-                          ...(prevIntermediary?.siret !== company.siret
-                            ? {
-                                // auto-completion des infos de contact uniquement
-                                // s'il y a un changement d'établissement pour
-                                // éviter d'écraser les infos de contact spécifiées par l'utilisateur
-                                // lors d'une modification de bordereau
-                                contact: company.contact ?? "",
-                                phone: company.contactPhone ?? "",
-                                mail: company.contactEmail ?? ""
-                              }
-                            : {})
-                        });
-                      }
-                    }}
-                  />
-                  <CompanyContactInfo fieldName={`intermediaries.${idx}`} />
-                  {values.intermediaries.length > 1 && (
-                    <button
-                      type="button"
-                      className="fr-btn fr-btn--tertiary fr-mb-2w"
-                      onClick={() => remove(idx)}
-                    >
-                      Supprimer l'intermédiaire {idx + 1}
-                    </button>
-                  )}
-                  <hr />
-                </div>
-              ))}
-              {values.intermediaries.length < 3 && (
-                // Pas plus de trois intermédiaires
-                <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
-                  <button
-                    type="button"
-                    className="fr-btn fr-btn--secondary"
-                    onClick={() => {
-                      push(getInitialCompany());
-                    }}
-                  >
-                    Ajouter un intermédiaire
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        ></FieldArray>
-      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <FormikBroker
+          bsdType={BsdType.Bsdd}
+          siret={siret}
+          disabled={disabled}
+        />
+        <FormikTrader siret={siret} disabled={disabled} />
+        <FormikIntermediaryList siret={siret} disabled={disabled} />
+      </div>
     </>
   );
 }
