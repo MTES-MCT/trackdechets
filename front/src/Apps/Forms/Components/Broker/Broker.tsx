@@ -1,10 +1,5 @@
 import React, { ReactNode } from "react";
-import {
-  BsdaBrokerInput,
-  BsdType,
-  CompanyType,
-  FavoriteType
-} from "@td/codegen-ui";
+import { CompanyType, FavoriteType } from "@td/codegen-ui";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { getInitialCompany } from "../../../common/data/initialState";
 import CompanySelectorWrapper, {

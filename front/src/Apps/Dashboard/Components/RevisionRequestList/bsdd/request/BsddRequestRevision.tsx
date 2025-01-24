@@ -2,12 +2,11 @@ import { useMutation } from "@apollo/client";
 import {
   Form as Bsdd,
   BsdType,
-  FavoriteType,
   Mutation,
   MutationCreateFormRevisionRequestArgs
 } from "@td/codegen-ui";
 import { PROCESSING_AND_REUSE_OPERATIONS } from "@td/constants";
-import React, { useMemo } from "react";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { removeEmptyKeys } from "../../../../../../common/helper";
 import { CREATE_FORM_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsddReviewsQuery";
@@ -19,8 +18,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import WasteCodeSelector from "../../../../../common/Components/WasteCodeSelector/WasteCodeSelector";
 import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
-import RhfCompanyContactInfo from "../../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
-import CompanySelectorWrapper from "../../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
@@ -119,52 +116,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
   const areModificationsDisabled = formValues.isCanceled;
 
   const wasteDetailsCodeInput = register("wasteDetails.code");
-
-  const orgId = useMemo(
-    () => bsdd?.broker?.company?.orgId ?? bsdd?.broker?.company?.siret ?? null,
-    [bsdd?.broker?.company?.orgId, bsdd?.broker?.company?.siret]
-  );
-
-  const setSelectedCompany = (company, field: "trader" | "broker") => {
-    setValue(`${field}.company.orgId`, company.orgId);
-    setValue(`${field}.company.siret`, company.siret);
-    setValue(`${field}.company.name`, company.name);
-    setValue(`${field}.company.vatNumber`, company.vatNumber);
-    setValue(`${field}.company.address`, company.address);
-    setValue(
-      `${field}.company.contact`,
-      company.contact || bsdd.broker?.company?.contact
-    );
-    setValue(
-      `${field}.company.phone`,
-      company.contactPhone || bsdd.broker?.company?.phone
-    );
-
-    setValue(
-      `${field}.company.mail`,
-      company.contactEmail || bsdd.broker?.company?.mail
-    );
-  };
-
-  const setBrokerOrTraderReceipt = (receipt, field: "trader" | "broker") => {
-    if (receipt) {
-      setValue(`${field}.receipt`, receipt.receiptNumber);
-      setValue(`${field}.validityLimit`, receipt.validityLimit);
-      setValue(`${field}.department`, receipt.department);
-    } else {
-      setValue(`${field}.receipt`, "");
-      setValue(`${field}.validityLimit`, null);
-      setValue(`${field}.department`, "");
-    }
-  };
-
-  const onCompanyTraderSeleted = company => {
-    const field = "trader";
-    if (company) {
-      setSelectedCompany(company, field);
-    }
-    setBrokerOrTraderReceipt(company?.traderReceipt, field);
-  };
 
   return (
     <div className={styles.container}>

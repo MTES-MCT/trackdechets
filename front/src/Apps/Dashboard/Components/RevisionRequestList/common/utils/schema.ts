@@ -5,7 +5,6 @@ import {
 } from "../../../../../../form/bsdd/utils/initial-state";
 import { ALL_WASTES } from "@td/constants";
 import { getInitialCompany } from "../../../../../common/data/initialState";
-import { Form, FormRevisionRequestContentInput } from "@td/codegen-ui";
 
 export const initialDasriReview = {
   emitter: {
