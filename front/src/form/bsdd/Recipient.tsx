@@ -6,61 +6,18 @@ import Tooltip from "../../common/components/Tooltip";
 import ProcessingOperation from "../common/components/processing-operation/ProcessingOperation";
 import { Field, FieldArray, useFormikContext } from "formik";
 import { isDangerous } from "@td/constants";
-import {
-  BsdType,
-  CompanySearchResult,
-  CompanyType,
-  FavoriteType,
-  Form
-} from "@td/codegen-ui";
+import { BsdType, Form } from "@td/codegen-ui";
 import CompanySelector from "../common/components/company/CompanySelector";
 import TemporaryStorage from "./components/temporaryStorage/TemporaryStorage";
 import styles from "./Recipient.module.scss";
-import {
-  getInitialBroker,
-  getInitialTemporaryStorageDetail,
-  getInitialTrader
-} from "./utils/initial-state";
+import { getInitialTemporaryStorageDetail } from "./utils/initial-state";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { getInitialCompany } from "../../Apps/common/data/initialState";
 import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { useParams } from "react-router-dom";
 import CompanyContactInfo from "../../Apps/Forms/Components/CompanyContactInfo/CompanyContactInfo";
-import Recepisse from "../../Apps/Dashboard/Components/Recepisse/Recepisse";
 import FormikBroker from "../../Apps/Forms/Components/Broker/FormikBroker";
 import FormikTrader from "../../Apps/Forms/Components/Trader/FormikTrader";
-
-function selectCompanyError(
-  company: CompanySearchResult,
-  expectedCompanyType?: CompanyType
-) {
-  if (company.etatAdministratif !== "A") {
-    // Lors de l'écriture de ces lignes, `searchCompanies` renvoie des établissements
-    // fermés lorsque l'on fait une recherche pas raison sociale. Si ce problème est traité
-    // dans le futur, on pourra s'abstenir de gérer cette erreur.
-    return "Cet établissement est fermé";
-  }
-  if (!company.isRegistered) {
-    return "Cet établissement n'est pas inscrit sur Trackdéchets.";
-  }
-  if (
-    expectedCompanyType &&
-    !company.companyTypes?.includes(expectedCompanyType)
-  ) {
-    const translatedType = () => {
-      if (expectedCompanyType === CompanyType.Broker) {
-        return "courtier";
-      }
-      if (expectedCompanyType === CompanyType.Trader) {
-        return "négociant";
-      }
-      return "";
-    };
-
-    return `Cet établissement n'a pas le profil ${translatedType()}`;
-  }
-  return null;
-}
 
 export default function Recipient({ disabled }) {
   const { siret } = useParams<{ siret: string }>();
@@ -73,8 +30,6 @@ export default function Recipient({ disabled }) {
   const isChapeau = values?.emitter?.type === "APPENDIX1";
   const isGrouping = values?.emitter?.type === "APPENDIX2";
 
-  const hasBroker = !!values.broker;
-  const hasTrader = !!values.trader;
   const hasIntermediaries = !!values.intermediaries?.length;
 
   function handleTempStorageToggle(checked) {
