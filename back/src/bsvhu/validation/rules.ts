@@ -76,6 +76,7 @@ export type EditionRules<T extends ZodBsvhu, E extends BsvhuEditableFields> = {
     // At what signature the field is required, and under which circumstances. If absent, field is never required
     required?: EditionRule<T>;
     readableFieldName?: string; // A custom field name for errors
+    // a path to return in the errors to help the front display the error in context
     path?: EditionRulePath;
   };
 };
