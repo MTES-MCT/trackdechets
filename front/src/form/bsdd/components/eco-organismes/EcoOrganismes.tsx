@@ -10,7 +10,7 @@ import { getInitialEcoOrganisme } from "../../utils/initial-state";
 
 const GET_ECO_ORGANISMES = gql`
   {
-    ecoOrganismes {
+    ecoOrganismes(handleBsdd: true) {
       id
       name
       siret

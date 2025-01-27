@@ -7,11 +7,13 @@ import {
   MutationSignBsvhuArgs,
   Query,
   QueryBsvhuArgs,
-  SignatureTypeInput
+  SignatureTypeInput,
+  MutationUpdateBsvhuArgs,
+  TransportMode
 } from "@td/codegen-ui";
 import { subMonths } from "date-fns";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { generatePath, Link, useLocation, useParams } from "react-router-dom";
 import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
@@ -20,35 +22,66 @@ import { DsfrNotificationError } from "../../../common/Components/Error/Error";
 import TdModal from "../../../common/Components/Modal/Modal";
 import {
   GET_VHU_FORM,
-  SIGN_BSVHU
+  SIGN_BSVHU,
+  UPDATE_VHU_FORM
 } from "../../../common/queries/bsvhu/queries";
 import routes from "../../../routes";
 import { BsvhuJourneySummary } from "./BsvhuJourneySummary";
 import WasteVhuSummary from "./WasteVhuSummary";
+import { RhfTagsInputWrapper } from "../../../Forms/Components/TagsInput/TagsInputWrapper";
+import { RhfTransportModeSelect } from "../../../Forms/Components/TransportMode/TransportMode";
 
-const schema = z.object({
-  author: z
-    .string({
-      required_error: "Le nom et prénom de l'auteur de la signature est requis"
-    })
-    .refine(val => val.trim() !== "", {
-      message: "Le nom et prénom de l'auteur de la signature est requis"
-    })
-    .pipe(
+const transportModes = [
+  TransportMode.Road,
+  TransportMode.Air,
+  TransportMode.Rail,
+  TransportMode.River,
+  TransportMode.Sea
+];
+
+const schema = z
+  .object({
+    author: z
+      .string({
+        required_error:
+          "Le nom et prénom de l'auteur de la signature est requis"
+      })
+      .refine(val => val.trim() !== "", {
+        message: "Le nom et prénom de l'auteur de la signature est requis"
+      })
+      .pipe(
+        z
+          .string()
+          .min(
+            2,
+            "Le nom et prénom de l'auteur de la signature doit comporter au moins 2 caractères"
+          )
+      ),
+    date: z.coerce
+      .date({
+        required_error: "La date d'émission est requise",
+        invalid_type_error: "Format de date invalide."
+      })
+      .transform(v => v?.toISOString()),
+    mode: z.string(),
+    plates: z.preprocess(
+      val => (Array.isArray(val) ? val : [val]).filter(Boolean),
       z
         .string()
-        .min(
-          2,
-          "Le nom et prénom de l'auteur de la signature doit comporter au moins 2 caractères"
-        )
-    ),
-  date: z.coerce
-    .date({
-      required_error: "La date d'émission est requise",
-      invalid_type_error: "Format de date invalide."
-    })
-    .transform(v => v?.toISOString())
-});
+        .array()
+
+        .max(2, "2 plaques d'immatriculation maximum")
+    )
+  })
+  .superRefine((val, ctx) => {
+    if (val.mode === "ROAD" && !val.plates?.length) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["plates"],
+        message: `Ce champ est requis pour le transport routier`
+      });
+    }
+  });
 export type ZodBsvhuTransport = z.infer<typeof schema>;
 
 const SignVhuTransport = ({ bsvhuId, onClose }) => {
@@ -64,7 +97,11 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
     }
   );
 
-  const [signBsvhu, { loading, error }] = useMutation<
+  const [updateBsvhu, { error: updateError }] = useMutation<
+    Pick<Mutation, "updateBsvhu">,
+    MutationUpdateBsvhuArgs
+  >(UPDATE_VHU_FORM);
+  const [signBsvhu, { loading, error: signError }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
   >(SIGN_BSVHU);
@@ -74,17 +111,22 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
 
   const initialState = {
     date: datetimeToYYYYMMDD(TODAY),
-    author: ""
+    author: "",
+    mode:
+      data?.bsvhu?.transporter?.transport?.mode &&
+      transportModes.includes(data?.bsvhu?.transporter?.transport?.mode)
+        ? data?.bsvhu?.transporter?.transport?.mode
+        : TransportMode.Road,
+    plates: data?.bsvhu?.transporter?.transport?.plates ?? []
   };
 
-  const { handleSubmit, reset, formState, register } =
-    useForm<ZodBsvhuTransport>({
-      values: initialState,
-      resolver: async (data, context, options) => {
-        return zodResolver(schema)(data, context, options);
-      }
-    });
-
+  const methods = useForm<ZodBsvhuTransport>({
+    mode: "onTouched",
+    values: initialState,
+    resolver: async (data, context, options) =>
+      zodResolver(schema)(data, context, options)
+  });
+  const { handleSubmit, reset, formState, register } = methods;
   if (data == null) {
     return <Loader />;
   }
@@ -127,61 +169,90 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
           <WasteVhuSummary bsvhu={bsvhu} />
           <BsvhuJourneySummary bsvhu={bsvhu} />
 
-          <p className="fr-text fr-mb-2w">
-            En qualité <strong>de transporteur du déchet</strong>, j'atteste que
-            les informations ci-dessus sont correctes. En signant ce document,
-            je déclare prendre en charge le déchet.
-          </p>
+          <FormProvider {...methods}>
+            <form
+              onSubmit={handleSubmit(async values => {
+                const { author, date, mode, plates } = values;
 
-          <form
-            onSubmit={handleSubmit(async data => {
-              await signBsvhu({
-                variables: {
-                  id: bsvhu.id,
-                  input: {
-                    ...data,
-                    type: SignatureTypeInput.Transport
+                await updateBsvhu({
+                  variables: {
+                    id: bsvhuId,
+                    input: {
+                      transporter: {
+                        transport: { mode: mode as TransportMode, plates }
+                      }
+                    }
                   }
-                }
-              });
-              onClose();
-            })}
-          >
-            <div className="fr-col-4 fr-mb-2w">
-              <Input
-                label="Date de prise en charge"
-                nativeInputProps={{
-                  type: "date",
-                  min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
-                  max: datetimeToYYYYMMDD(TODAY),
-                  ...register("date")
-                }}
-                state={formState.errors.date ? "error" : "default"}
-                stateRelatedMessage={formState.errors.date?.message}
+                });
+                await signBsvhu({
+                  variables: {
+                    id: bsvhu.id,
+                    input: {
+                      author,
+                      date,
+                      type: SignatureTypeInput.Transport
+                    }
+                  }
+                });
+                onClose();
+              })}
+            >
+              <h5 className="fr-h5">Transport du déchet</h5>
+              <div className="fr-col-6 fr-mb-5v">
+                <RhfTransportModeSelect fieldPath={"mode"} />
+              </div>
+              <RhfTagsInputWrapper
+                maxTags={2}
+                label="Immatriculations"
+                fieldName={"plates"}
+                hintText="2 max : Véhicule, remorque"
               />
-            </div>
-            <div className="fr-col-8 fr-mb-2w">
-              <Input
-                label="Nom et prénom"
-                state={formState.errors.author ? "error" : "default"}
-                nativeInputProps={{
-                  ...register("author")
-                }}
-                stateRelatedMessage={formState.errors.author?.message}
-              />
-            </div>
-            <div className="fr-mb-8w">
-              {error && <DsfrNotificationError apolloError={error} />}
-            </div>
 
-            <hr className="fr-mt-2w" />
-            <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
-              <Button type="button" priority="secondary" onClick={onCancel}>
-                Annuler
-              </Button>
-              <Button disabled={loading}>Signer</Button>
-            </div>
-          </form>
+              <p className="fr-text fr-mt-2w fr-mb-2w">
+                En qualité <strong>de transporteur du déchet</strong>, j'atteste
+                que les informations ci-dessus sont correctes. En signant ce
+                document, je déclare prendre en charge le déchet.
+              </p>
+              <div className="fr-col-4 fr-mb-2w">
+                <Input
+                  label="Date de prise en charge"
+                  nativeInputProps={{
+                    type: "date",
+                    min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
+                    max: datetimeToYYYYMMDD(TODAY),
+                    ...register("date")
+                  }}
+                  state={formState.errors.date ? "error" : "default"}
+                  stateRelatedMessage={formState.errors.date?.message}
+                />
+              </div>
+              <div className="fr-col-8 fr-mb-2w">
+                <Input
+                  label="Nom et prénom"
+                  state={formState.errors.author ? "error" : "default"}
+                  nativeInputProps={{
+                    ...register("author")
+                  }}
+                  stateRelatedMessage={formState.errors.author?.message}
+                />
+              </div>
+
+              <div className="fr-mb-8w">
+                {updateError && (
+                  <DsfrNotificationError apolloError={updateError} />
+                )}
+                {signError && <DsfrNotificationError apolloError={signError} />}
+              </div>
+
+              <hr className="fr-mt-2w" />
+              <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
+                <Button type="button" priority="secondary" onClick={onCancel}>
+                  Annuler
+                </Button>
+                <Button disabled={loading}>Signer</Button>
+              </div>
+            </form>
+          </FormProvider>
         </>
       )}
     </TdModal>

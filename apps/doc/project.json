@@ -41,6 +41,7 @@
           "cd apps/doc && docusaurus docs:generate:graphql:bsda",
           "cd apps/doc && docusaurus docs:generate:graphql:bsvhu",
           "cd apps/doc && docusaurus docs:generate:graphql:registry",
+          "cd apps/doc && docusaurus docs:generate:graphql:registryV2",
           "cd apps/doc && docusaurus docs:generate:graphql:webhooks",
           "cd apps/doc && docusaurus docs:generate:graphql:bspaoh"
         ]

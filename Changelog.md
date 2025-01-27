@@ -5,6 +5,14 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.02.1] 11/02/2025
+
+#### :nail_care: Améliorations
+
+BSDD - Dupliquer le(s) conditionnement(s) et la mention ADR et afficher un message informatif en cas de BSDD provenant d'une duplication [PR 3881](https://github.com/MTES-MCT/trackdechets/pull/3881)
+
+- Ajout d'éco-organismes, filtrage des éco-organismes en front [PR 3916](https://github.com/MTES-MCT/trackdechets/pull/3916)
+
 # [2025.01.1] 14/01/2025
 
 #### :rocket: Nouvelles fonctionnalités
@@ -33,6 +41,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Le champ "Modifié le" des BSDD dans le dashboard affiche la valeur du updatedAt, pas du lastActionOn [PR 3834](https://github.com/MTES-MCT/trackdechets/pull/3834)
 - Seul l'émetteur peut supprimer un BSVHU s'il l'a signé (SIGNED_BY_PRODUCER) [PR 3837](https://github.com/MTES-MCT/trackdechets/pull/3837)
 - Correction pour les cas particuliers pour le mail sur le changement de CAP: ajout ou suppression de la nextDestination [PR 3858](https://github.com/MTES-MCT/trackdechets/pull/3858)
+- Les numéros d'identification du bsvhus ne devraient pas être obligatoires pour les vhus créés avant l'ajout de la règle [PR 3877](https://github.com/MTES-MCT/trackdechets/pull/3877)
+- Permettre d'ajouter un 0 après la virgule dans la quantité à regrouper d'une Annexe 2 [PR 3903](https://github.com/MTES-MCT/trackdechets/pull/3903)
 
 #### :boom: Breaking changes
 

@@ -16,6 +16,7 @@ type EditableBsdasriFields = Required<
     | "rowNumber"
     | "isDraft"
     | "isDeleted"
+    | "isDuplicateOf"
     | "status"
     | "type"
     | "groupedIn"

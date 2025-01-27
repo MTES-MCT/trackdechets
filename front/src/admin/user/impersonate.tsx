@@ -5,6 +5,7 @@ import { Table } from "@codegouvfr/react-dsfr/Table";
 import { Query } from "@td/codegen-ui";
 import React from "react";
 import { SIRET_STORAGE_KEY } from "../../Apps/common/Components/CompanySwitcher/CompanySwitcher";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 const COMPANY_PRIVATE_INFOS = gql`
   query CompanyPrivateInfos($clue: String!) {
@@ -85,7 +86,7 @@ export function Impersonate() {
             search({ variables: { clue: formData.get("clue") } });
           }}
         >
-          <div className="fr-grid-row fr-grid-row--bottom">
+          <div className="fr-grid-row fr-grid-row--bottom fr-mb-4v">
             <div className="fr-col-8">
               <Input
                 label="SIRET ou Numéro TVA"
@@ -99,10 +100,20 @@ export function Impersonate() {
               <Button size="medium">Rechercher</Button>
             </div>
           </div>
+
+          <div className="fr-grid-row">
+            {loading && <div>Chargement...</div>}
+            {error && (
+              <Alert
+                className="fr-mb-3w"
+                small
+                description={error.message}
+                severity="error"
+              />
+            )}
+          </div>
         </form>
       </div>
-      {loading && <div>Chargement...</div>}
-      {error && <div>Erreur</div>}
       {data && (
         <div>
           <Table data={tableData} headers={tableHeaders} />

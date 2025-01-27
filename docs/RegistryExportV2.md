@@ -9,6 +9,55 @@ L'import des déclarations de registres peut se faire de 2 manières:
 - via l'API (sous forme d'une array d'inputs)
 - en important un fichier csv/xlsx
 
+Toute la logique métier est contenue dans 2 blocs, que chaque type d'import doit implémenter:
+
+- un bloc de parsing, chargé de la validation & transformation des données: `safeParseAsync`
+- un bloc d'enregistrement des données en DB: `saveLine`
+
+Le parsing est commun entre l'API et l'import de fichier. Il doit donc être suffisamment générique pour être utilisé avec différents types de données. Par exemple pour un tableau, dans un CSV on reçoit une chaine de caractères alors qu'en GraphQL on aura directement un objet tableau.
+L'enregistrement se base sur les données parsées, et particulièrement sur la colonne `reason` qui permet de déterminer l'action à réaliser:
+
+- creation de ligne
+- modification de ligne: on ajoute une nouvelle ligne et on passe les autres à `isActive: false`
+- annulation de ligne: on passe les lignes correspondant à l'identifiant à `isCancelled: true`
+- ignorer la ligne: on ne fait rien. C'est le cas si on rencontre une ligne avec un identifiant déjà présent en base mais sans raison spécifiée par l'utilisateur, ou si la ligne est invalide. Ignorer les lignes sans raison permet notamment de réinjecter un fichier plusieurs fois sans déclencher d'erreur. C'est utile lorsqu'on corrige des erreurs dans un fichier par exemple.
+
+Il est important de noter que l'import traite les données ligne par ligne, et que chaque ligne est indépendante. Il n'y a pas de rollback si une ligne échoue, et les lignes suivantes continueront d'être traitées.
+
+Voici un schéma global du processus d'import:
+
+```mermaid
+flowchart TD
+ subgraph s1["Save line"]
+        n8["Parsed line with reason"]
+        n9["x"]
+        n10["Create line"]
+        n11["Update isActive: false<br>Create line"]
+        n12["Update isCancelled: true"]
+  end
+ subgraph s2["Zod parsing"]
+        n13["Raw line"]
+        n14["ReportFor &amp; Reason only<br>"]
+        n15["Business rules"]
+  end
+    n8 -- IGNORE --> n9
+    n8 -- CREATE --> n10
+    n8 -- EDIT --> n11
+    n8 -- CANCEL --> n12
+    n13 -- Async --> n14
+    n13 -- Sync --> n15
+    s2 --> n3(["Parsed line<br>"])
+    n3 --> s1
+    n16["File import"] -- CSV / XLS transformers --> n17["Raw lines"]
+    n18["API"] -- Graphql --> n17
+    n17 --> s2
+
+    n9@{ shape: summary}
+    n16@{ shape: hex}
+    n17@{ shape: procs}
+    n18@{ shape: hex}
+```
+
 L'import via l'API est relativement simple, puisqu'il s'agit de valider les lignes envoyées via l'API (avec `safeParseAsync`, qui est un parser Zod), et créer les objets associés en DB via `saveLine`.
 
 L'import via un fichier est un peu plus complexe et suit le flow suivant :

@@ -503,7 +503,7 @@ type EcoOrganisme {
 
   "Adresse de l'éco-organisme"
   address: String!
-
+  handleBsdd: Boolean
   handleBsdasri: Boolean
   handleBsda: Boolean
   handleBsvhu: Boolean

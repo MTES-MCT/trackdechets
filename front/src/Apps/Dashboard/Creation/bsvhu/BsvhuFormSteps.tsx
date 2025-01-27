@@ -62,7 +62,8 @@ const vhuToInput = (vhu: ZodBsvhu): BsvhuInput => {
     "hasIntermediaries",
     ...addressCleanup
   ]);
-  if (!vhu.hasIntermediaries) {
+  // clear the intermediaries array if it only contains the default value
+  if (vhu.intermediaries?.length === 1 && !vhu.intermediaries[0].siret) {
     omitted.intermediaries = [];
   }
   return omitted;

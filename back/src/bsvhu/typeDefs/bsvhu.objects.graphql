@@ -43,6 +43,12 @@ type Bsvhu {
   "Status du bordereau"
   status: BsvhuStatus!
 
+  """
+  Identifiant du bordereau à partir duquel ce celui-ci a été dupliqué.
+  Est égal à `null` si le bordereau n'est pas issue d'une duplication.
+  """
+  isDuplicateOf: String
+
   "Émetteur du bordereau"
   emitter: BsvhuEmitter
 
@@ -107,6 +113,8 @@ type BsvhuTransporter {
   company: FormCompany
   "Récépissé transporteur"
   recepisse: BsvhuRecepisse
+  "Champ libre"
+  customInfo: String
   "Informations liés au transport"
   transport: BsvhuTransport
 }

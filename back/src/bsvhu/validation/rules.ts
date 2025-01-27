@@ -13,7 +13,7 @@ import {
 import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { Leaves } from "../../types";
-import { v20250101 } from "./refinements";
+import { v20250101, v20241001 } from "./refinements";
 
 // Liste des champs éditables sur l'objet Bsvhu
 export type BsvhuEditableFields = Required<
@@ -25,7 +25,6 @@ export type BsvhuEditableFields = Required<
     | "emitterCustomInfo"
     | "emitterNotOnTD"
     | "destinationCustomInfo"
-    | "transporterCustomInfo"
     | "emitterEmissionSignatureDate"
     | "emitterEmissionSignatureAuthor"
     | "transporterTransportSignatureDate"
@@ -386,8 +385,15 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["packaging"]
   },
   identificationNumbers: {
-    sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION" },
+    sealed: {
+      from: sealedFromEmissionExceptForEmitter
+    },
+    required: {
+      from: "EMISSION",
+      when: bsvhu => {
+        return (bsvhu.createdAt || new Date()).getTime() >= v20241001.getTime();
+      }
+    },
     readableFieldName: "Les numéros d'identification",
     path: ["identification", "numbers"]
   },
@@ -540,6 +546,11 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
         );
       }
     }
+  },
+  transporterCustomInfo: {
+    readableFieldName:
+      "les champs d'informations complémentaires du transporteur",
+    sealed: { from: "TRANSPORT" }
   },
   ecoOrganismeName: {
     readableFieldName: "le nom de l'éco-organisme",
@@ -816,6 +827,9 @@ export async function getSealedFields(
   bsvhu: ZodBsvhu,
   context: BsvhuValidationContext
 ): Promise<(keyof BsvhuEditionRules)[]> {
+  if (context.unsealed) {
+    return [];
+  }
   const currentSignatureType =
     context.currentSignatureType ?? getCurrentSignatureType(bsvhu);
   // Some signatures may be skipped, so always check all the hierarchy

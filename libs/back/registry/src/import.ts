@@ -48,10 +48,20 @@ export async function processStream({
 
   const errorStream = format({
     delimiter: CSV_DELIMITER,
-    headers: [ERROR_HEADER, ...Object.values(options.headers)],
-    writeHeaders: true
+    headers: ["errors", ...Object.keys(options.headers)],
+    writeHeaders: false, // Use headers only to reorder the columns properly
+    transform: (row: Record<string, unknown>) => {
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => [
+          key,
+          value instanceof Date ? value.toISOString() : value
+        ])
+      );
+    }
   });
   errorStream.pipe(outputErrorStream);
+  // Write the headers ourself, as the keys dont match the labels
+  errorStream.write({ errors: ERROR_HEADER, ...options.headers });
 
   const transformStream =
     fileType === "CSV"
@@ -64,17 +74,17 @@ export async function processStream({
   try {
     await startImport(importId);
 
-    const dataStream: AsyncIterable<{
+    const parsedLinesStream: AsyncIterable<{
       rawLine: Record<string, string>;
       result: SafeParseReturnType<unknown, ParsedLine>;
     }> = inputStream.pipe(transformStream).on("error", error => {
       stats.errors++;
       if (errorStream.writable) {
-        errorStream.write([["errors", formatErrorMessage(error.message)]]);
+        errorStream.write({ errors: formatErrorMessage(error.message) });
       }
     });
 
-    for await (const { rawLine, result } of dataStream) {
+    for await (const { rawLine, result } of parsedLinesStream) {
       if (!result.success) {
         stats.errors++;
 
@@ -85,8 +95,7 @@ export async function processStream({
           })
           .join("\n");
 
-        // As we are renaming headers we need to provide an hash array
-        errorStream.write([["errors", errors], ...Object.entries(rawLine)]);
+        errorStream.write({ errors, ...rawLine });
         continue;
       }
 
@@ -104,10 +113,7 @@ export async function processStream({
       ) {
         stats.errors++;
 
-        errorStream.write([
-          ["errors", UNAUTHORIZED_ERROR],
-          ...Object.entries(rawLine)
-        ]);
+        errorStream.write({ errors: UNAUTHORIZED_ERROR, ...rawLine });
         continue;
       }
 
