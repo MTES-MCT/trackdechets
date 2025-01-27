@@ -51,10 +51,10 @@ const EcoOrganism = () => {
 
   return (
     <>
-      <h4 className="fr-h4">Éco-organisme</h4>
+      <h4 className="fr-h4">Éco-organisme ou système individuel</h4>
 
       <ToggleSwitch
-        label="Présence d'un éco-organisme"
+        label="Présence d'un éco-organisme ou système individuel"
         checked={!!hasEcoOrganisme}
         showCheckedHint={false}
         onChange={onToggleEcoOrganisme}
@@ -64,7 +64,7 @@ const EcoOrganism = () => {
       {hasEcoOrganisme && (
         <>
           <Select
-            label="Nom de l'éco-organisme"
+            label="Nom de l'éco-organisme ou système individuel"
             nativeSelectProps={{
               ...register("ecoOrganisme.siret"),
               onChange: onChangeEcoOrganisme
@@ -74,7 +74,9 @@ const EcoOrganism = () => {
             disabled={sealedFields.includes(`ecoOrganisme.siret`)}
             className="fr-mt-2w"
           >
-            <option value="">Sélectionner un éco-organisme</option>
+            <option value="">
+              Sélectionner un éco-organisme ou système individuel
+            </option>
 
             {ecoOrganismeList?.map(ecoOrg => {
               return (

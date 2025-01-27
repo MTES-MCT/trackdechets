@@ -133,7 +133,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             </p>
             {bsvhu?.ecoOrganisme?.siret && (
               <p>
-                <strong>Eco-organisme désigné :</strong>{" "}
+                <strong>Eco-organisme ou système individuel désigné :</strong>{" "}
                 <p>
                   Raison sociale : {bsvhu.ecoOrganisme?.name}
                   <br />

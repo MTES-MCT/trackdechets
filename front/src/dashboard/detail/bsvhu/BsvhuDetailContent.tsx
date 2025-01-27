@@ -156,7 +156,7 @@ export function BsvhuDetailContent({ form }: Props) {
 
           {form?.ecoOrganisme && (
             <div className={styles.detailGrid}>
-              <dt>EcoOrganisme</dt>
+              <dt>EcoOrganisme ou système individuel</dt>
               <dd>{form.ecoOrganisme?.name}</dd>
 
               <dt>Siret</dt>
