@@ -247,7 +247,10 @@ export const v20241101 = new Date(
 
 // Date de la MAJ 2025.02.1 qui rend obligatoire pour les
 // courtiers et négociants d'être inscrit avec le bon profil
-const v20250201 = new Date(OVERRIDE_V20250201 || "2025-02-12T00:00:00.000Z");
+// et d'avoir renseigné un récépissé
+export const v20250201 = new Date(
+  OVERRIDE_V20250201 || "2025-02-12T00:00:00.000Z"
+);
 
 export const siretTests: SiretTests = {
   isRegistered: role => ({

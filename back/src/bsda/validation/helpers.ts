@@ -130,7 +130,6 @@ export async function graphQlInputToZodBsda(
  */
 export function prismaToZodBsda(bsda: PrismaBsdaForParsing): ZodBsda {
   const {
-    createdAt,
     updatedAt,
     rowNumber,
     transporters,
