@@ -255,8 +255,11 @@ export function BsdaRequestRevision({ bsda }: Props) {
               </RhfReviewableField>
 
               <RhfReviewableField
-                title="CAP"
-                value={bsda.destination?.cap}
+                title="CAP de l'exutoire"
+                value={
+                  bsda.destination?.operation?.nextDestination?.cap ??
+                  bsda.destination?.cap
+                }
                 path="destination.cap"
                 defaultValue={initialBsdaReview.destination.cap}
               >
