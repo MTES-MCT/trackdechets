@@ -354,6 +354,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     });
 
     expect(data.createBsdaRevisionRequest.content).toEqual({
+      destination: null,
       waste: { code: "16 01 11*" }
     });
   });
