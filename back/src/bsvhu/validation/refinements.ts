@@ -177,7 +177,8 @@ export const v20250101 = new Date(
 
 const BsvhuIdentificationTypesAfterV20241201 = [
   BsvhuIdentificationType.NUMERO_ORDRE_REGISTRE_POLICE,
-  BsvhuIdentificationType.NUMERO_IMMATRICULATION
+  BsvhuIdentificationType.NUMERO_IMMATRICULATION,
+  BsvhuIdentificationType.NUMERO_FICHE_DROMCOM
 ];
 
 export const checkPackagingAndIdentificationType: Refinement<ParsedZodBsvhu> = (

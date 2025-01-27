@@ -281,6 +281,7 @@ const UNITE_IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
     "identification par n° d'ordre tels qu'ils figurent dans le registre de police",
   NUMERO_IMMATRICULATION: "identification par numéro d’immatriculation",
+  NUMERO_FICHE_DROMCOM: "Identification par numéro de fiche VHU DROMCOM",
   NUMERO_ORDRE_LOTS_SORTANTS:
     "identification par numéro d'ordre des lots sortants"
 };

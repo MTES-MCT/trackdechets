@@ -2128,6 +2128,7 @@ enum BsvhuPackaging {
 enum BsvhuIdentificationType {
   NUMERO_ORDRE_REGISTRE_POLICE
   NUMERO_IMMATRICULATION
+  NUMERO_FICHE_DROMCOM
   NUMERO_ORDRE_LOTS_SORTANTS // deprecated
 }
 

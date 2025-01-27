@@ -7,13 +7,19 @@ enum BsvhuStatus {
 }
 
 enum BsvhuPackaging {
+  "En unités"
   UNITE
+  "En lots (identification par numéro de lot)"
   LOT
 }
 
 enum BsvhuIdentificationType {
+  "Identification par n° d'ordre tels qu'ils figurent dans le registre de police"
   NUMERO_ORDRE_REGISTRE_POLICE
+  "Identification par numéro d'immatriculation"
   NUMERO_IMMATRICULATION
+  "Identification par numéro de fiche VHU DROMCOM"
+  NUMERO_FICHE_DROMCOM
   "Déprécié, plus accepté sur les bsvhus créés après le 17/12/2024"
   NUMERO_ORDRE_LOTS_SORTANTS
 }
