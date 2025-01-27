@@ -173,11 +173,10 @@ async function getUpdateFromRevisionRequest(
     // et l'exutoire est bougé dans destinationOperationNextDestinationXXX
     // Les révisions n'autorisent que la modification du CAP de l'exutoire, qui est
     // systématiquement dans le champ destinationCAP
-    ...(hasTTR
-      ? {
-          destinationOperationNextDestinationCap: revisionRequest.destinationCap
-        }
-      : { destinationCap: revisionRequest.destinationCap }),
+    destinationCap: hasTTR ? null : revisionRequest.destinationCap,
+    destinationOperationNextDestinationCap: hasTTR
+      ? revisionRequest.destinationCap
+      : null,
     destinationReceptionWeight: revisionRequest.destinationReceptionWeight,
     destinationOperationCode: revisionRequest.destinationOperationCode,
     destinationOperationDescription:
