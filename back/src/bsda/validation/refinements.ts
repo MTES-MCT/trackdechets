@@ -618,9 +618,6 @@ export const validateDestinationReceptionWeight: (
 ) => Refinement<ParsedZodBsda> = validationContext => {
   const currentSignatureType = validationContext.currentSignatureType;
   return async (bsda, { addIssue }) => {
-    // Destination is freely editable until EMISSION signature.
-    // Once transported, destination is not editable for anyone.
-    // This is enforced by the sealing rules
     if (currentSignatureType !== "OPERATION") {
       return;
     }

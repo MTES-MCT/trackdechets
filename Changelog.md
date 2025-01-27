@@ -11,8 +11,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - BSDD - Dupliquer le(s) conditionnement(s) et la mention ADR et afficher un message informatif en cas de BSDD provenant d'une duplication [PR 3881](https://github.com/MTES-MCT/trackdechets/pull/3881)
 - BSVHU - Ajout d'un nouveau type de conditionnement "Identification par numéro de fiche VHU DROMCOM" [PR 3019](https://github.com/MTES-MCT/trackdechets/pull/3919)
-
 - Ajout d'éco-organismes, filtrage des éco-organismes en front [PR 3916](https://github.com/MTES-MCT/trackdechets/pull/3916)
+- Il ne devrait pas être possible de valider la réception d'un BSDA avec un poids à 0 [PR 3934](https://github.com/MTES-MCT/trackdechets/pull/3934)
 
 # [2025.01.1] 14/01/2025
 
