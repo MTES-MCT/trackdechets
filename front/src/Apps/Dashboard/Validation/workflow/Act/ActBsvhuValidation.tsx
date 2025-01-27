@@ -67,7 +67,6 @@ const ActBsvhuValidation = ({
           (canIrregularSituationSignWithNoSiret ||
             canIrregularSituationSignWithSiretNotRegistered))) &&
         renderSignedByProducerModal()}
-      {/* FIXME new api status Received ? */}
       {status === BsvhuStatus.Received && renderReceivedModal()}
       {status === BsvhuStatus.Sent && renderSentModal()}
     </>

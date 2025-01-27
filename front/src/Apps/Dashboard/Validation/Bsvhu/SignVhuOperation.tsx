@@ -184,11 +184,10 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
                 input: update as BsvhuInput
               }
             });
-            // FIXME: change with new api call ?
             await signBsvhu({
               variables: {
                 id: bsvhu.id,
-                input: { author, date, type: SignatureTypeInput.Operation } // FIXME: change with new api value
+                input: { author, date, type: SignatureTypeInput.Operation }
               }
             });
             onClose();
