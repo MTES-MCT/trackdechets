@@ -3,7 +3,10 @@ import type {
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-back";
-import { userWithCompanyFactory } from "../../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../../__tests__/factories";
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../../__tests__/factories";
 import {
@@ -11,6 +14,7 @@ import {
   NON_CANCELLABLE_BSDA_STATUSES
 } from "../createRevisionRequest";
 import { BsdaStatus } from "@prisma/client";
+import { prisma } from "@td/prisma";
 
 const CREATE_BSDA_REVISION_REQUEST = `
   mutation CreateBsdaRevisionRequest($input: CreateBsdaRevisionRequestInput!) {
@@ -793,6 +797,108 @@ describe("Mutation.createBsdaRevisionRequest", () => {
 
     expect(errors[0].message).toBe(
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
+    );
+  });
+
+  it("should fail when adding a broker whith wrong profile", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const broker = await companyFactory({
+      companyTypes: [
+        // missing BROKER profile
+      ]
+    });
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            broker: {
+              company: {
+                siret: broker.siret,
+                name: broker.name,
+                address: broker.address,
+                contact: "Courtier",
+                phone: "00 00 00 00 00",
+                mail: "broker@trackdechets.fr"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Cet établissement n'a pas le profil Courtier."
+      })
+    ]);
+  });
+
+  it("should auto-complete broker recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const recepisse = {
+      receiptNumber: "recepisse-courtier",
+      department: "13",
+      validityLimit: new Date()
+    };
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: { create: recepisse }
+    });
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            broker: {
+              company: {
+                siret: broker.siret,
+                name: broker.name,
+                address: broker.address,
+                contact: "Courtier",
+                phone: "00 00 00 00 00",
+                mail: "broker@trackdechets.fr"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createBsdaRevisionRequest.id }
+    });
+
+    expect(revisionRequest.brokerRecepisseNumber).toEqual(
+      recepisse.receiptNumber
+    );
+    expect(revisionRequest.brokerRecepisseDepartment).toEqual(
+      recepisse.department
+    );
+    expect(revisionRequest.brokerRecepisseValidityLimit).toEqual(
+      recepisse.validityLimit
     );
   });
 });
