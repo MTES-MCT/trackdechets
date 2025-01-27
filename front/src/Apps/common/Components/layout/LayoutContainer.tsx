@@ -1,8 +1,11 @@
 import React, { lazy, Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
 import routes from "../../../routes";
+import { useQuery, gql } from "@apollo/client";
+import { Query } from "@td/codegen-ui";
+
 import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
@@ -49,7 +52,20 @@ const BANNER_MESSAGES = [
   `Abonnez-vous à notre lettre d'information mensuelle pour suivre les nouveautés de la plateforme, la programmation des formations, des conseils pratiques, ainsi que les évolutions réglementaires liées à la traçabilité des déchets.`
 ];
 
+const IS_AUTHENTICATED = gql`
+  query IsAuthenticated {
+    isAuthenticated
+  }
+`;
+
 export default function LayoutContainer() {
+  const { data, loading } =
+    useQuery<Pick<Query, "isAuthenticated">>(IS_AUTHENTICATED);
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <Suspense fallback={<Loader />}>
       <Routes>
@@ -71,8 +87,31 @@ export default function LayoutContainer() {
           }
         />
 
-        <Route element={<Layout unauthenticatedRoutes />}>
-          <Route path={"/"} element={<Login />} />
+        <Route
+          element={
+            <Layout
+              isAuthenticated={data?.isAuthenticated}
+              v2banner={
+                <SurveyBanner
+                  messages={BANNER_MESSAGES}
+                  button={{
+                    title: "Je m'abonne",
+                    href: "https://0806de2d.sibforms.com/serve/MUIEAG29k1cikyqt55ql5CSQp_3hunRICQ8Eu8IvTZMpZl1EuQSEYeErCYUb31W6nx1mUfBKGfamqI9xMrql4caFpN2IUJQ_NR-00sPbnSv5Kw21AYm8tMHap8_7ah9NCHlcPqpNKrp7CPjO2zYsiAaBFX8r3PHDY72zP55LieF3N9gc3sUfOG16ioQgATXDPF0GeDpTuU46gBWT"
+                  }}
+                  persistedSurveyName="td-20240114"
+                />
+              }
+            />
+          }
+        >
+          <Route
+            path={`${routes.admin.index}/*`}
+            element={
+              <RequireAuth needsAdminPrivilege>
+                <Admin />
+              </RequireAuth>
+            }
+          />
 
           <Route path={routes.login} element={<Login />} />
 
@@ -94,32 +133,6 @@ export default function LayoutContainer() {
           <Route
             path={routes.resendActivationEmail}
             element={<ResendActivationEmail />}
-          />
-        </Route>
-
-        <Route
-          element={
-            <Layout
-              v2banner={
-                <SurveyBanner
-                  messages={BANNER_MESSAGES}
-                  button={{
-                    title: "Je m'abonne",
-                    href: "https://0806de2d.sibforms.com/serve/MUIEAG29k1cikyqt55ql5CSQp_3hunRICQ8Eu8IvTZMpZl1EuQSEYeErCYUb31W6nx1mUfBKGfamqI9xMrql4caFpN2IUJQ_NR-00sPbnSv5Kw21AYm8tMHap8_7ah9NCHlcPqpNKrp7CPjO2zYsiAaBFX8r3PHDY72zP55LieF3N9gc3sUfOG16ioQgATXDPF0GeDpTuU46gBWT"
-                  }}
-                  persistedSurveyName="td-20240114"
-                />
-              }
-            />
-          }
-        >
-          <Route
-            path={`${routes.admin.index}/*`}
-            element={
-              <RequireAuth needsAdminPrivilege>
-                <Admin />
-              </RequireAuth>
-            }
           />
 
           <Route
@@ -223,6 +236,15 @@ export default function LayoutContainer() {
           />
 
           <Route
+            path={routes.dashboard.default}
+            element={
+              <RequireAuth>
+                <DashboardRoutes />
+              </RequireAuth>
+            }
+          />
+
+          <Route
             path={`${routes.dashboard.index}/*`}
             element={
               <RequireAuth>
@@ -288,9 +310,14 @@ export default function LayoutContainer() {
           <Route
             path="*"
             element={
-              <RequireAuth replace>
-                <DashboardRoutes />
-              </RequireAuth>
+              <Navigate
+                to={
+                  data?.isAuthenticated
+                    ? routes.dashboard.default
+                    : routes.login
+                }
+                replace
+              />
             }
           />
         </Route>

@@ -12,7 +12,7 @@ import A11ySkipLinks from "../A11ySkipLinks/A11ySkipLinks";
 
 interface AuthProps {
   v2banner?: JSX.Element;
-  unauthenticatedRoutes?: boolean;
+  isAuthenticated?: boolean;
 }
 const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE, VITE_API_ENDPOINT } =
   import.meta.env;
@@ -28,7 +28,7 @@ const GET_WARNING_MESSAGE = gql`
  */
 export default function Layout({
   v2banner,
-  unauthenticatedRoutes = false
+  isAuthenticated = false
 }: AuthProps) {
   const { data } = useQuery<Pick<Query, "warningMessage">>(GET_WARNING_MESSAGE);
 
@@ -99,7 +99,7 @@ export default function Layout({
         </div>
       )}
       <A11ySkipLinks />
-      {unauthenticatedRoutes ? <UnauthenticatedHeader /> : <Header />}
+      {isAuthenticated ? <Header /> : <UnauthenticatedHeader />}
       <Outlet />
       <PageTitle />
     </>

@@ -44,7 +44,7 @@ authRouter.post(
       }
       req.logIn(user, () => {
         storeUserSessionsId(user.id, req.session.id);
-        const returnTo = req.body.returnTo || "/dashboard";
+        const returnTo = req.body.returnTo || "/";
         return res.redirect(`${UI_BASE_URL}${returnTo}`);
       });
     })(req, res, next);

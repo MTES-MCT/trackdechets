@@ -64,7 +64,7 @@ const toRelative = route => {
 };
 
 function DashboardRoutes() {
-  const { siret } = useParams<{ siret: string }>();
+  const { siret } = useParams<{ siret: string | undefined }>();
   const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME);
   const { updatePermissions } = usePermissions();
 
@@ -279,7 +279,7 @@ function DashboardRoutes() {
           />
 
           <Route
-            path={`${routes.dashboard.index}/*`}
+            path={`${routes.dashboard.index}/:siret/*`}
             element={
               <Redirect
                 path={
