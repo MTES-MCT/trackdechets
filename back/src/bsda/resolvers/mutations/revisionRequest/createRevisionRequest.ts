@@ -312,9 +312,21 @@ const schema = rawBsdaSchema
       }
     }
   })
-  .superRefine((bsda, zodContext) =>
-    isBrokerRefinement(bsda.brokerCompanySiret, zodContext)
-  );
+  .superRefine(async (bsda, zodContext) => {
+    await isBrokerRefinement(bsda.brokerCompanySiret, zodContext);
+    if (
+      bsda.brokerCompanySiret &&
+      (!bsda.brokerRecepisseNumber ||
+        !bsda.brokerRecepisseDepartment ||
+        !bsda.brokerRecepisseValidityLimit)
+    ) {
+      zodContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["broker", "recepisse"],
+        message: `Le courtier n'a pas renseigné de récépissé sur son profil Trackdéchets`
+      });
+    }
+  });
 
 function getBsdaHistory(bsda: Bsda) {
   return {

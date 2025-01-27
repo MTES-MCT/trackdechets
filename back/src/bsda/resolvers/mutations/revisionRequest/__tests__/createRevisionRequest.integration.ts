@@ -839,7 +839,9 @@ describe("Mutation.createBsdaRevisionRequest", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Cet établissement n'a pas le profil Courtier."
+        message: expect.stringContaining(
+          "Cet établissement n'a pas le profil Courtier."
+        )
       })
     ]);
   });
@@ -900,5 +902,57 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     expect(revisionRequest.brokerRecepisseValidityLimit).toEqual(
       recepisse.validityLimit
     );
+  });
+
+  it("should throw error if broker has no recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"]
+      // le récépissé n'est pas complété sur le profil
+    });
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            broker: {
+              company: {
+                siret: broker.siret,
+                name: broker.name,
+                address: broker.address,
+                contact: "Courtier",
+                phone: "00 00 00 00 00",
+                mail: "broker@trackdechets.fr"
+              },
+              // même si l'utilisateur API tente de renseigner
+              // les champs, ils ne doivent pas être pris en compte.
+              recepisse: {
+                number: "rec-courtier",
+                department: "07",
+                validityLimit: new Date().toISOString() as any as Date
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le courtier n'a pas renseigné de récépissé sur son profil Trackdéchets"
+      })
+    ]);
   });
 });
