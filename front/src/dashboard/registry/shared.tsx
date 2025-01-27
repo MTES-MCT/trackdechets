@@ -14,6 +14,7 @@ export const GET_REGISTRY_IMPORTS = gql`
       ownImportsOnly: $ownImportsOnly
       first: $first
     ) {
+      totalCount
       edges {
         node {
           id

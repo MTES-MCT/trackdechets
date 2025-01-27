@@ -1,16 +1,17 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Download } from "@codegouvfr/react-dsfr/Download";
+import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
   RegistryDownloadTarget
 } from "@td/codegen-ui";
+import { format } from "date-fns";
 import React, { useState } from "react";
 
-import Alert from "@codegouvfr/react-dsfr/Alert";
-import { format } from "date-fns";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { MEDIA_QUERIES } from "../../common/config";
 import { useMedia } from "../../common/use-media";
@@ -33,13 +34,18 @@ const HEADERS = [
   "Rapport d'erreur"
 ];
 
+const PAGE_SIZE = 25;
+
 export function MyImports() {
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
+  const [pageIndex, setPageIndex] = useState(0);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const { loading, error, data, refetch } = useQuery<
     Pick<Query, "registryImports">
-  >(GET_REGISTRY_IMPORTS, { variables: { ownImportsOnly: true, first: 25 } });
+  >(GET_REGISTRY_IMPORTS, {
+    variables: { ownImportsOnly: true, first: PAGE_SIZE }
+  });
 
   const [getDownloadLink] = useLazyQuery<
     Pick<Query, "registryDownloadSignedUrl">,
@@ -57,6 +63,19 @@ export function MyImports() {
       variables: { importId, target: RegistryDownloadTarget.ImportFile }
     });
     await downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
+  }
+
+  const totalCount = data?.registryImports.totalCount;
+  const pageCount = totalCount ? Math.ceil(totalCount / PAGE_SIZE) : 0;
+
+  function gotoPage(page: number) {
+    setPageIndex(page);
+
+    refetch({
+      ownImportsOnly: true,
+      skip: page * PAGE_SIZE,
+      first: PAGE_SIZE
+    });
   }
 
   const tableData =
@@ -156,6 +175,16 @@ export function MyImports() {
                 Rafraichir
               </Button>
             </div>
+            <div className="tw-flex tw-items-center">
+              <a
+                href="https://faq.trackdechets.fr/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="fr-link"
+              >
+                Retrouvez les modèles de registres dans la documentation
+              </a>
+            </div>
           </div>
           {loading && <InlineLoader />}
           {error && (
@@ -187,6 +216,23 @@ export function MyImports() {
               />
             </div>
           )}
+
+          <div className="tw-flex tw-justify-center">
+            <Pagination
+              showFirstLast
+              count={pageCount}
+              defaultPage={pageIndex + 1}
+              getPageLinkProps={pageNumber => ({
+                onClick: event => {
+                  event.preventDefault();
+                  gotoPage(pageNumber - 1);
+                },
+                href: "#",
+                key: `pagination-link-${pageNumber}`
+              })}
+              className={"fr-mt-1w"}
+            />
+          </div>
         </div>
       </div>
 
